@@ -59,7 +59,7 @@ namespace Kiwi
             return;
         
         // define current model version :
-        Model::version("1.0 dev");
+        Model::version("1.0_dev");
         
         // basic types declaration :
         FlipTag::declare();
