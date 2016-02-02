@@ -26,7 +26,7 @@
 
 #include "KiwiPatcher.h"
 
-namespace Kiwi
+namespace kiwi
 {
     // ================================================================================ //
     //                                      INSTANCE                                    //

@@ -71,7 +71,7 @@ using namespace std;
 #define M_SQRT1_2   0.707106781186547524400844362104849039  /* 1/sqrt(2)      */
 #endif
 
-namespace Kiwi
+namespace kiwi
 {
     class Atom;
     

@@ -24,7 +24,7 @@
 #include "KiwiPoint.h"
 #include "KiwiPath.h"
 
-namespace Kiwi
+namespace kiwi
 {
     // ================================================================================ //
     //                                      POINT                                       //

@@ -26,7 +26,7 @@
 
 #include "KiwiLink.h"
 
-namespace Kiwi
+namespace kiwi
 {
     // ================================================================================ //
     //                                  PATCHER DOCUMENT                                //

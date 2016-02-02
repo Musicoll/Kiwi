@@ -24,7 +24,7 @@
 #include "KiwiSize.h"
 #include "KiwiPath.h"
 
-namespace Kiwi
+namespace kiwi
 {
 
 }

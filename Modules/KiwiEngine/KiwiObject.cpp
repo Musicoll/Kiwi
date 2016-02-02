@@ -25,7 +25,7 @@
 #include "KiwiPatcher.h"
 #include "KiwiInstance.h"
 
-namespace Kiwi
+namespace kiwi
 {
     // ================================================================================ //
     //                                      OBJECT                                      //

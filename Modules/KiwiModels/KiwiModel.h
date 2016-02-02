@@ -50,7 +50,7 @@
 #include "flip/BackEndBinary.h"
 #include "flip/BackEndMl.h"
 
-namespace Kiwi
+namespace kiwi
 {
     //! The Model class
     class Model : public flip::DataModel<Model>

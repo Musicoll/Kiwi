@@ -23,7 +23,7 @@
 
 #include "KiwiColor.h"
 
-namespace Kiwi
+namespace kiwi
 {
     const string Color::m_hex_digits = string("0123456789ABCDEF");
     

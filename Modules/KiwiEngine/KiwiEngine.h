@@ -26,7 +26,7 @@
 
 #include "KiwiFactory.h"
 
-namespace Kiwi
+namespace kiwi
 {
     
 }

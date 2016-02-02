@@ -23,7 +23,7 @@
 
 #include "KiwiInstance.h"
 
-namespace Kiwi
+namespace kiwi
 {
     // ================================================================================ //
     //                                      INSTANCE                                    //

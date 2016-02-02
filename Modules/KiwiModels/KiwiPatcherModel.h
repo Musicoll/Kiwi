@@ -26,7 +26,7 @@
 
 #include "KiwiLinkModel.h"
 
-namespace Kiwi
+namespace kiwi
 {
     // ================================================================================ //
     //                                      PATCHER                                     //

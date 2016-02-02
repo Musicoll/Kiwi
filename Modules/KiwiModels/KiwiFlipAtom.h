@@ -26,7 +26,7 @@
 
 #include "KiwiFlipTypes.h"
 
-namespace Kiwi
+namespace kiwi
 {
     class FlipAtom;
     typedef vector<FlipAtom>        FlipAtomVector;

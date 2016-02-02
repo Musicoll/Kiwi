@@ -23,7 +23,7 @@
 
 #include "KiwiMouseCursor.h"
 
-namespace Kiwi
+namespace kiwi
 {
     ;
 }

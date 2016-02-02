@@ -23,7 +23,7 @@
 
 #include "KiwiLine.h"
 
-namespace Kiwi
+namespace kiwi
 {
     // ================================================================================ //
     //                                      SEGMENT                                     //

@@ -26,7 +26,7 @@
 
 #include "KiwiAffineMatrix.h"
 
-namespace Kiwi
+namespace kiwi
 {
     class Path;
     // ================================================================================ //

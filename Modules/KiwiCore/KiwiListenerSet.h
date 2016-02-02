@@ -26,7 +26,7 @@
 
 #include "KiwiAtom.h"
 
-namespace Kiwi
+namespace kiwi
 {
     // ================================================================================ //
     //                                  LISTENER SET                                    //

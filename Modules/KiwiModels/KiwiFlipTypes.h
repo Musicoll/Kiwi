@@ -26,7 +26,7 @@
 
 #include "KiwiModel.h"
 
-namespace Kiwi
+namespace kiwi
 {
     // ================================================================================ //
     //                                      FLIP TAG                                    //

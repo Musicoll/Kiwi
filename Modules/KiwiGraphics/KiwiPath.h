@@ -29,7 +29,7 @@
 /**
  @Todo : (dashed line support, other shapes ?)
  */
-namespace Kiwi
+namespace kiwi
 {
     // ================================================================================ //
     //                                      PATH                                        //

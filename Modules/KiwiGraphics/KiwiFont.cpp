@@ -23,7 +23,7 @@
 
 #include "KiwiFont.h"
 
-namespace Kiwi
+namespace kiwi
 {
     double Font::Intern::getCharacterWidth(char const& c) const noexcept
     {

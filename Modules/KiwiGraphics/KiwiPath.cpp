@@ -23,7 +23,7 @@
 
 #include "KiwiPath.h"
 
-namespace Kiwi
+namespace kiwi
 {
     void Path::transform(AffineMatrix const& matrix) noexcept
     {

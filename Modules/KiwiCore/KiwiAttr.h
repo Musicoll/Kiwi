@@ -27,7 +27,7 @@
 #include "KiwiAtom.h"
 #include "KiwiListenerSet.h"
 
-namespace Kiwi
+namespace kiwi
 {
     class Attr;
     typedef shared_ptr<Attr>       sAttr;

@@ -23,7 +23,7 @@
 
 #include "KiwiFlipAttr.h"
 
-namespace Kiwi
+namespace kiwi
 {
     // ================================================================================ //
     //                                 ATTRIBUTE MANAGER								//

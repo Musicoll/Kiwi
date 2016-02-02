@@ -26,7 +26,7 @@
 
 #include "../KiwiModels/KiwiModels.h"
 
-namespace Kiwi
+namespace kiwi
 {
     // ================================================================================ //
     //                                      DEFINES                                     //

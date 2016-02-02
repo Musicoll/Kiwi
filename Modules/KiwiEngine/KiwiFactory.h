@@ -26,7 +26,7 @@
 
 #include "KiwiInstance.h"
 
-namespace Kiwi
+namespace kiwi
 {
     // ================================================================================ //
     //                                      FACTORY                                     //

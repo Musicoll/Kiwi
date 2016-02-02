@@ -23,7 +23,7 @@
 
 #include "KiwiRectangle.h"
 
-namespace Kiwi
+namespace kiwi
 {
     Rectangle Rectangle::resized(const ulong flags, Point const& d, const Point smin, const Point smax, const bool preserve, const bool opposite) const noexcept
     {

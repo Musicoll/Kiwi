@@ -26,7 +26,7 @@
 
 #include "../KiwiCore/KiwiCore.h"
 
-namespace Kiwi
+namespace kiwi
 {
     // ================================================================================ //
     //                                  AFFINE MATRIX                                   //

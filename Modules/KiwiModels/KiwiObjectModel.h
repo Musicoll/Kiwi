@@ -26,7 +26,7 @@
 
 #include "KiwiFlipAttr.h"
 
-namespace Kiwi
+namespace kiwi
 {
     // ================================================================================ //
     //                                       INFO                                       //

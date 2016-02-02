@@ -26,7 +26,7 @@
 
 #include "KiwiSize.h"
 
-namespace Kiwi
+namespace kiwi
 {
     // ================================================================================ //
     //                                      RECTANGLE                                   //

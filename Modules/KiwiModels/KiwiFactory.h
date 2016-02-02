@@ -26,7 +26,7 @@
 
 #include "KiwiPatcherModel.h"
 
-namespace Kiwi
+namespace kiwi
 {
     // ================================================================================ //
     //                                      FACTORY                                     //

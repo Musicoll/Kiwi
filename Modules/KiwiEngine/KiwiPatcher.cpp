@@ -25,7 +25,7 @@
 #include "KiwiInstance.h"
 #include "KiwiFactory.h"
 
-namespace Kiwi
+namespace kiwi
 {    
     // ================================================================================ //
     //                                      PAGE                                        //

@@ -26,7 +26,7 @@
 
 #include "KiwiFont.h"
 
-namespace Kiwi
+namespace kiwi
 {
     // ================================================================================ //
     //                                   MOUSECURSOR                                    //

@@ -23,7 +23,7 @@
 
 using namespace std;
 
-namespace Kiwi
+namespace kiwi
 {
     //==============================================================================
     class KiwiApplication  : public JUCEApplication

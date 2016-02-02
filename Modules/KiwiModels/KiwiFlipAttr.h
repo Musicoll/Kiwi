@@ -26,7 +26,7 @@
 
 #include "KiwiFlipAtom.h"
 
-namespace Kiwi
+namespace kiwi
 {
     // ================================================================================ //
     //                                      ATTRIBUTE                                   //

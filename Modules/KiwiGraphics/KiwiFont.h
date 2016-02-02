@@ -26,7 +26,7 @@
 
 #include "KiwiColor.h"
 
-namespace Kiwi
+namespace kiwi
 {
     class GuiDeviceManager;
 
