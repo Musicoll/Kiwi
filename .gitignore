@@ -37,4 +37,4 @@ MacOSX/
 JuceLibraryCode/
 
 # Project specific
-#ThirdParty/Flip
+build/
