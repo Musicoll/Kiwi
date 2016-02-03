@@ -56,30 +56,6 @@ namespace kiwi
     class Model : public flip::DataModel<Model>
     {
     };
-    
-    class ObjectModel;
-    typedef shared_ptr<ObjectModel>          sObjectModel;
-    typedef weak_ptr<ObjectModel>            wObjectModel;
-    typedef shared_ptr<const ObjectModel>    scObjectModel;
-    typedef weak_ptr<const ObjectModel>      wcObjectModel;
-    
-    class LinkModel;
-    typedef shared_ptr<LinkModel>            sLinkModel;
-    typedef shared_ptr<const LinkModel>      scLinkModel;
-    typedef weak_ptr<LinkModel>              wLinkModel;
-    typedef weak_ptr<const LinkModel>        wcLinkModel;
-    
-    class PatcherModel;
-    typedef shared_ptr<PatcherModel>        sPatcherModel;
-    typedef weak_ptr<PatcherModel>          wPatcherModel;
-    typedef shared_ptr<const PatcherModel>  scPatcherModel;
-    typedef weak_ptr<const PatcherModel>    wcPatcherModel;
-    
-    class InstanceModel;
-    typedef shared_ptr<InstanceModel>        sInstanceModel;
-    typedef weak_ptr<InstanceModel>          wInstanceModel;
-    typedef shared_ptr<const InstanceModel>  scInstanceModel;
-    typedef weak_ptr<const InstanceModel>    wcInstanceModel;
 }
 
 #endif

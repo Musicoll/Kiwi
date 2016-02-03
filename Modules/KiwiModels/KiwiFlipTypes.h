@@ -120,7 +120,7 @@ namespace kiwi
             }
         }
         
-        // static flip declare method.
+        //! static flip declare method.
         static void declare()
         {
             Model::declare<FlipRGBA>()
@@ -135,12 +135,6 @@ namespace kiwi
         operator Atom() const
         {
             return Atom {red(), green(), blue(), alpha()};
-        }
-        
-        //! Retrieve the attribute value as a vector of atoms.
-        operator Color() const
-        {
-            return Color(red(), green(), blue(), alpha());
         }
         
         double red() const noexcept                 {return m_red;}
@@ -264,38 +258,6 @@ namespace kiwi
             .name("cicm.kiwi.FlipArray")
             .template member<flip::Array<T>, &FlipArray::m_data>("data");
         }
-        
-        /*
-        
-        //! Create a color with a vector of atoms.
-        FlipPoint(const Atom& atom)
-        {
-            if(atom.isVector())
-            {
-                Vector atoms = atom;
-                if(atoms.size() >= 2 && atoms[0].isNumber() && atoms[1].isNumber())
-                {
-                    m_x = static_cast<double>(atoms[0]);
-                    m_y = static_cast<double>(atoms[1]);
-                }
-            }
-        }
-        
-        // static flip declare method.
-        static void declare()
-        {
-            Model::declare<FlipPoint>()
-            .name("cicm.kiwi.FlipPoint")
-            .member<flip::Float, &FlipPoint::m_x>("x")
-            .member<flip::Float, &FlipPoint::m_y>("y");
-        }
-        
-        //! Retrieve the attribute value as a vector of atoms.
-        operator Atom() const { return Point(m_x, m_y); }
-        
-        //! Retrieve the attribute value as a vector of atoms.
-        operator Point() const { return Point(m_x, m_y); }
-        */
     };
 }
 

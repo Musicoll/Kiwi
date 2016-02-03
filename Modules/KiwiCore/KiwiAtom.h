@@ -40,6 +40,7 @@ namespace kiwi
     {
     public:
         
+        //! @Todo : replace CAPS with Min and type the enum
         enum Type
         {
             UNDEFINED = 0,
@@ -177,7 +178,7 @@ namespace kiwi
         /** The function allocates the atom with a long value created with a boolean value.
          @param value The value.
          */
-        inline Atom(const bool value) noexcept : m_quark(new QuarkBool(value)) {}
+        inline Atom(bool value) noexcept : m_quark(new QuarkBool(value)) {}
         
         //! Constructor with a long value.
         /** The function allocates the atom with a long value.
@@ -213,7 +214,7 @@ namespace kiwi
         /** The function allocates the atom with a tag created with a string.
          @param tag The tag.
          */
-        inline Atom(const char* tag) noexcept : m_quark(new QuarkTag(Tag::create(tag))) {}
+        inline Atom(char const* tag) noexcept : m_quark(new QuarkTag(Tag::create(tag))) {}
         
         //! Constructor with a string.
         /** The function allocates the atom with a tag created with a string.

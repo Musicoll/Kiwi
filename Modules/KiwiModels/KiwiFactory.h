@@ -54,7 +54,6 @@ namespace kiwi
         {
         public:
             inline ObjectModel* create(Infos const& init) override {return new T(init);}
-            //inline sObjectModel create(Infos const& init) override {return make_shared<T>(init);}
         };
         
         //! Retrieves the static map of creators.
@@ -89,7 +88,7 @@ namespace kiwi
             static_assert(!is_abstract<T>::value, "The class must not be abstract.");
             static_assert(is_constructible<T, Infos const&>::value, "The class must be constructible with Infos.");
             
-            sObjectModel object = make_shared<T>(Infos());
+            shared_ptr<ObjectModel> object = make_shared<T>(Infos());
             if(object)
             {
                 lock_guard<mutex> guard(getMutex());
