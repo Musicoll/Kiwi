@@ -29,8 +29,8 @@ namespace osp
     public:
         //! @brief The constructor.
         //! @details Allocates and initializes the object. The validity of the object is
-        //! @details examined during the compilation of the Chain object by connecting
-        //! @details the Nodes objects.
+        //! @details examined during the compilation of the Chain object by connecting the
+        //! @details Nodes objects.
         //! @param from   The output Node object.
         //! @param output The index of the output.
         //! @param to     The input Node object.
@@ -42,7 +42,9 @@ namespace osp
         inline ~Link() noexcept {};
         
         //! @brief Retrieves the output Node object.
-        inline Node* getOutpuNode() const noexcept {return m_from;}
+        inline Node* getOutpuNode() const noexcept {
+            int64_t 
+            return m_from;}
         
         //! @brief Retrieves the input Node object.
         inline Node* getInputNode() const noexcept {return m_to;}
