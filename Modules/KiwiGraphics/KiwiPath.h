@@ -66,20 +66,20 @@ namespace kiwi
             constexpr inline Node() noexcept : data{0., 0.}, m(Linear) {};
             constexpr inline Node(Point const& pt, Mode const _m = Linear) noexcept : data{pt.m_data[0], pt.m_data[1]}, m(_m) {};
             constexpr inline Node(Node const& other) noexcept : data{other.data[0], other.data[1]}, m(other.m) {};
-            inline Node(Point&& pt, Mode const _m = Linear) noexcept : m(_m) {swap(data, pt.m_data);};
-            inline Node(Node&& other) noexcept : m(other.m) {swap(data, other.data);};
+            inline Node(Point&& pt, Mode const _m = Linear) noexcept : m(_m) {std::swap(data, pt.m_data);};
+            inline Node(Node&& other) noexcept : m(other.m) {std::swap(data, other.data);};
             inline ~Node() noexcept {};
             inline Node& operator=(Point const& pt) noexcept {memcpy(data, pt.m_data, sizeof(double)*2); return *this;}
             inline Node& operator=(Node const& other) noexcept {memcpy(data, other.data, sizeof(double)*2); m = other.m; return *this;}
-            inline Node& operator=(Point&& pt) noexcept {swap(data, pt.m_data); return *this;}
-            inline Node& operator=(Node&& other) noexcept {swap(data, other.data); m = other.m; return *this;}
+            inline Node& operator=(Point&& pt) noexcept {std::swap(data, pt.m_data); return *this;}
+            inline Node& operator=(Node&& other) noexcept {std::swap(data, other.data); m = other.m; return *this;}
             inline bool operator!=(Point const& other) const noexcept {return (data[0] != other.x() && data[1] != other.y());}
             inline Point point() const noexcept {return Point(data[0], data[1]);}
             inline Mode mode() const noexcept{return m;}
             inline void transform(AffineMatrix const& matrix) noexcept {matrix.applyTo(data[0], data[1]);}
         };
     
-        vector<Node> m_nodes;
+        std::vector<Node> m_nodes;
         Rectangle    m_bounds;
         
     public:
@@ -119,7 +119,7 @@ namespace kiwi
         /** The function initializes a path with another.
          @param path The other path.
          */
-        inline Path(Path&& path) noexcept {m_nodes.swap(path.m_nodes); swap(m_bounds, path.m_bounds);}
+        inline Path(Path&& path) noexcept {m_nodes.swap(path.m_nodes); std::swap(m_bounds, path.m_bounds);}
         
         //! Constructor.
         /** The function initializes a path with an origin.
@@ -131,7 +131,7 @@ namespace kiwi
         /** The function initializes a path with a first point.
          @param path The other path.
          */
-        inline Path(Point&& pt) noexcept {addNode(Node(forward<Point>(pt), Move));}
+        inline Path(Point&& pt) noexcept {addNode(Node(std::forward<Point>(pt), Move));}
         
         //! Linear constructor.
         /** The function initializes a path with a segment.
@@ -185,8 +185,8 @@ namespace kiwi
          */
         inline static Path line(Point&& start, Point&& end)
         {
-            Path path(forward<Point>(start));
-            path.addNode(Node(forward<Point>(end), Linear));
+            Path path(std::forward<Point>(start));
+            path.addNode(Node(std::forward<Point>(end), Linear));
             return path;
         }
         
@@ -194,7 +194,7 @@ namespace kiwi
         /** The function initializes a path with a set of lines. The number of points must be superior or equal to 2.
          @param il The set of points.
          */
-        inline static Path lines(initializer_list<Point> il)
+        inline static Path lines(std::initializer_list<Point> il)
         {
             assert(il.size() < 2 && "The number of points must be superior or equal to 2 to create lines.");
             auto it = il.begin();
@@ -225,9 +225,9 @@ namespace kiwi
          */
         inline static Path quadratic(Point&& start, Point&& control, Point&& end)
         {
-            Path path(forward<Point>(start));
-            path.addNode(Node(forward<Point>(control), Quadratic));
-            path.addNode(Node(forward<Point>(end), Quadratic));
+            Path path(std::forward<Point>(start));
+            path.addNode(Node(std::forward<Point>(control), Quadratic));
+            path.addNode(Node(std::forward<Point>(end), Quadratic));
             return path;
         }
         
@@ -235,7 +235,7 @@ namespace kiwi
         /** The function initializes a path with a set of quadratic bezier curves. The number of points must be odd and superior or equal to 3.
          @param il The set of points.
          */
-        inline static Path quadratics(initializer_list<Point> il)
+        inline static Path quadratics(std::initializer_list<Point> il)
         {
             assert(il.size() < 3 && "The number of points must be superior or equal to 3 to create quadratic bezier curves.");
             assert((il.size() % 3) != 1 && "The number of points must be odd to create quadratic bezier curves.");
@@ -270,10 +270,10 @@ namespace kiwi
          */
         inline static Path cubic(Point&& start, Point&& control1, Point&& control2, Point&& end)
         {
-            Path path(forward<Point>(start));
-            path.addNode(Node(forward<Point>(control1), Cubic));
-            path.addNode(Node(forward<Point>(control2), Cubic));
-            path.addNode(Node(forward<Point>(end), Cubic));
+            Path path(std::forward<Point>(start));
+            path.addNode(Node(std::forward<Point>(control1), Cubic));
+            path.addNode(Node(std::forward<Point>(control2), Cubic));
+            path.addNode(Node(std::forward<Point>(end), Cubic));
             return path;
         }
         
@@ -281,7 +281,7 @@ namespace kiwi
         /** The function initializes a path with a set of cubic bezier curves. The number of points must be a multiple of 3 + 1 and superior or equal to 4.
          @param il The set of points.
          */
-        inline static Path cubics(initializer_list<Point> il)
+        inline static Path cubics(std::initializer_list<Point> il)
         {
             assert(il.size() < 3 && "The number of points must be superior or equal to 4 to create cubic bezier curves.");
             assert(!((il.size() - 1) % 3) && "The number of points must be a multiple of 3 + 1 to create cubic bezier curves.");
@@ -310,8 +310,8 @@ namespace kiwi
          */
         inline Path& operator=(Path&& other) noexcept
         {
-            swap(m_nodes, other.m_nodes);
-            swap(m_bounds, other.m_bounds);
+            std::swap(m_nodes, other.m_nodes);
+            std::swap(m_bounds, other.m_bounds);
             return *this;
         }
         
@@ -379,11 +379,11 @@ namespace kiwi
         {
             if(!empty() && m_nodes[m_nodes.size() - 1].mode() == Move)
             {
-                addNode(m_nodes.size() - 1, Node(forward<Point>(point), Move));
+                addNode(m_nodes.size() - 1, Node(std::forward<Point>(point), Move));
             }
             else
             {
-                addNode(Node(forward<Point>(point), Move));
+                addNode(Node(std::forward<Point>(point), Move));
             }
         }
         
@@ -402,14 +402,14 @@ namespace kiwi
          */
         inline void lineTo(Point&& point) noexcept
         {
-            addNode(Node(forward<Point>(point), Linear));
+            addNode(Node(std::forward<Point>(point), Linear));
         }
         
         //! Add a set of points to that will be linked linearly.
         /** The function adds a set of points to that will be linked linearly.
          @param il The set of points.
          */
-        inline void lineTo(initializer_list<Point> il) noexcept
+        inline void lineTo(std::initializer_list<Point> il) noexcept
         {
             addNodes(il, Linear);
         }
@@ -432,15 +432,15 @@ namespace kiwi
          */
         inline void quadraticTo(Point&& control, Point&& end) noexcept
         {
-            addNode(Node(forward<Point>(control), Quadratic));
-            addNode(Node(forward<Point>(end), Quadratic));
+            addNode(Node(std::forward<Point>(control), Quadratic));
+            addNode(Node(std::forward<Point>(end), Quadratic));
         }
         
         //! Add a set of quadratic bezier curves to the path.
         /** The function adds a set of quadratic bezier curves to the path. The number of point must be even, the first point of each pair defines the control point and the second point of each pair defines the end point.
          @param il The set of points that represent the quadratic bezier curves.
          */
-        inline void quadraticsTo(initializer_list<Point> il) noexcept
+        inline void quadraticsTo(std::initializer_list<Point> il) noexcept
         {
             assert(!(il.size() % 2) && "Quadractic bezier curve must have an even number of points.");
             addNodes(il, Quadratic);
@@ -467,16 +467,16 @@ namespace kiwi
          */
         inline void cubicTo(Point&& control1, Point&& control2, Point&& end) noexcept
         {
-            addNode(Node(forward<Point>(control1), Cubic));
-            addNode(Node(forward<Point>(control2), Cubic));
-            addNode(Node(forward<Point>(end), Cubic));
+            addNode(Node(std::forward<Point>(control1), Cubic));
+            addNode(Node(std::forward<Point>(control2), Cubic));
+            addNode(Node(std::forward<Point>(end), Cubic));
         }
         
         //! Add a set of quadratic bezier curves to the path.
         /** The function adds a set of quadratic bezier curves to the path. The number of point must be a multiple of 3, the first point of each set defines the first control point, the second point defines the second control point and the third point defines the end point.
          @param il The set of points that represent the quadratic bezier curves.
          */
-        inline void cubicsTo(initializer_list<Point> il) noexcept
+        inline void cubicsTo(std::initializer_list<Point> il) noexcept
         {
             assert(!(il.size() % 3) && "Cubic bezier curve must have a number of points multiple of 3.");
             addNodes(il, Cubic);
@@ -624,7 +624,7 @@ namespace kiwi
         }
         
         //@internal
-        inline void resize(const vector<Node>::size_type size) noexcept
+        inline void resize(const std::vector<Node>::size_type size) noexcept
         {
             m_nodes.resize(size);
         }
@@ -641,9 +641,9 @@ namespace kiwi
         }
         
         //@internal
-        inline void addNodes(initializer_list<Point> il, Mode mode) noexcept
+        inline void addNodes(std::initializer_list<Point> il, Mode mode) noexcept
         {
-            vector<Node>::size_type size = m_nodes.size();
+            std::vector<Node>::size_type size = m_nodes.size();
             resize(size + il.size());
             for(auto it = il.begin(); it != il.end(); ++it){
                 addNode(size++, Node((*it), mode));
@@ -651,9 +651,9 @@ namespace kiwi
         }
         
         //@internal
-        inline void addNodes(const vector<Point>::size_type s, const Point* begin, const Point* end, Mode mode) noexcept
+        inline void addNodes(const std::vector<Point>::size_type s, const Point* begin, const Point* end, Mode mode) noexcept
         {
-            vector<Node>::size_type size = m_nodes.size();
+            std::vector<Node>::size_type size = m_nodes.size();
             resize(size + s);
             for(auto it = begin; it != end; ++it){
                 addNode(size++, Node((*it), mode));
@@ -670,21 +670,21 @@ namespace kiwi
         //@internal
         inline void addNode(Node&& node) noexcept
         {
-            m_nodes.push_back(forward<Node>(node));
+            m_nodes.push_back(std::forward<Node>(node));
             rebound(m_nodes[m_nodes.size() - 1]);
         }
         
         //@internal
-        inline void addNode(const vector<Node>::size_type pos, Node const& node) noexcept
+        inline void addNode(const std::vector<Node>::size_type pos, Node const& node) noexcept
         {
             m_nodes[pos] = node;
             rebound(node);
         }
         
         //@internal
-        inline void addNode(const vector<Node>::size_type pos, Node&& node) noexcept
+        inline void addNode(const std::vector<Node>::size_type pos, Node&& node) noexcept
         {
-            m_nodes[pos] = forward<Node>(node);
+            m_nodes[pos] = std::forward<Node>(node);
             rebound(m_nodes[pos]);
         }
     };

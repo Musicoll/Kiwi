@@ -26,8 +26,8 @@
 
 namespace kiwi
 {    
-    map<string, sTag> Tag::m_tags;
-    mutex Tag::m_mutex;
+    std::map<std::string, sTag> Tag::m_tags;
+    std::mutex Tag::m_mutex;
     
     const sTag Tags::_empty                = Tag::create("");
     const sTag Tags::arguments             = Tag::create("arguments");

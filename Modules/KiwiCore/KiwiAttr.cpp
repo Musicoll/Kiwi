@@ -39,13 +39,13 @@ namespace kiwi
         for(auto it : dico) {setAttrValue(it.first, it.second);}
     }
     
-    void Attr::Manager::addListener(sListener listener, vector<sTag> const& names)
+    void Attr::Manager::addListener(sListener listener, std::vector<sTag> const& names)
     {
         if(listener)
         {
             if(names.empty())
             {
-                lock_guard<mutex> guard(m_attrs_mutex);
+                std::lock_guard<std::mutex> guard(m_attrs_mutex);
                 for(auto it : m_attrs)
                 {
                     it.second->addListener(listener);
@@ -65,13 +65,13 @@ namespace kiwi
         }
     }
     
-    void Attr::Manager::removeListener(sListener listener, vector<sTag> const& names)
+    void Attr::Manager::removeListener(sListener listener, std::vector<sTag> const& names)
     {
         if(listener)
         {
             if(names.empty())
             {
-                lock_guard<mutex> guard(m_attrs_mutex);
+                std::lock_guard<std::mutex> guard(m_attrs_mutex);
                 for(auto it : m_attrs)
                 {
                     it.second->removeListener(listener);

@@ -56,14 +56,14 @@ namespace kiwi
         Instance*                               m_instance = nullptr;
         PatcherModel*                           m_model = nullptr;
         
-        shared_ptr<flip::Document>              m_document;     // unique_ptr
-        shared_ptr<flip::History<flip::HistoryStoreMemory>>
+        std::shared_ptr<flip::Document>              m_document;     // std::unique_ptr
+        std::shared_ptr<flip::History<flip::HistoryStoreMemory>>
                                                 m_history;
         
-        vector<sObject>                         m_objects;
-        vector<sLink>                           m_links;
+        std::vector<sObject>                         m_objects;
+        std::vector<sLink>                           m_links;
         
-        mutable mutex                           m_mutex;
+        mutable std::mutex                           m_mutex;
         
         void createObject(Dico& dico);
         
@@ -77,7 +77,7 @@ namespace kiwi
         //! Destructor.
         ~Patcher();
         
-        static unique_ptr<Patcher> create(Instance* instance);
+        static std::unique_ptr<Patcher> create(Instance* instance);
 
         //! Get the objects.
         /** The function retrieves the objects from the patcher.
@@ -85,7 +85,7 @@ namespace kiwi
          */
         inline ulong getNumberOfObjects() const
         {
-            lock_guard<mutex> guard(m_mutex);
+            std::lock_guard<std::mutex> guard(m_mutex);
             return m_objects.size();
         }
         
@@ -93,9 +93,9 @@ namespace kiwi
         /** The function retrieves the objects from the patcher.
          @return A vector with the objects.
          */
-        inline vector<sObject>& getObjects() noexcept
+        inline std::vector<sObject>& getObjects() noexcept
         {
-            lock_guard<mutex> guard(m_mutex);
+            std::lock_guard<std::mutex> guard(m_mutex);
             return m_objects;
         }
         
@@ -105,7 +105,7 @@ namespace kiwi
          */
         inline sObject getObjectWithId(const ulong ID) const noexcept
         {
-            lock_guard<mutex> guard(m_mutex);
+            std::lock_guard<std::mutex> guard(m_mutex);
             return nullptr;
         }
         
@@ -126,7 +126,7 @@ namespace kiwi
          @param transaction_name The name of the current transaction
          @see endTransaction
          */
-        void beginTransaction(string transaction_name)
+        void beginTransaction(std::string transaction_name)
         {
             m_document->set_label(transaction_name);
         }

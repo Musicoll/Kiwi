@@ -32,9 +32,9 @@ namespace kiwi
     //                                      TAG                                         //
     // ================================================================================ //
     
-    //! The tag is an unique object that matchs to a "unique" string in the scope of all the kiwi applications.
+    //! The tag is an unique object that matchs to a "unique" std::string in the scope of all the kiwi applications.
     /**
-     The tag are uniques and matchs to a string. If you create a tag with a string that already matchs to a tag, the creation function will return this tag, otherwise it will create a new tag.
+     The tag are uniques and matchs to a string. If you create a tag with a std::string that already matchs to a tag, the creation function will return this tag, otherwise it will create a new tag.
      @see TagFactory
      */
     class Tag
@@ -44,23 +44,23 @@ namespace kiwi
         //! The constructor.
         /** You should never use this method except if you really know what you do.
          */
-        inline Tag(string const& name) : m_name(name) {}
+        inline Tag(std::string const& name) : m_name(name) {}
         
         //! The constructor.
         /** You should never use this method except if you really know what you do.
          */
-        inline Tag(string&& name) noexcept : m_name(name) {}
+        inline Tag(std::string&& name) noexcept : m_name(name) {}
         
         //! The destructor.
         /** You should never use this method except if you really know what you do.
          */
         inline ~Tag() noexcept {}
         
-        //! Retrieve the string of the tag.
-        /** The function retrieves the unique string of the tag.
-         @return The string of the tag.
+        //! Retrieve the std::string of the tag.
+        /** The function retrieves the unique std::string of the tag.
+         @return The std::string of the tag.
          */
-        inline string getName() const noexcept { return m_name; }
+        inline std::string getName() const noexcept { return m_name; }
         
         //! Tag creator.
         /** This function checks if a tag with this name has already been created and returns it,
@@ -68,9 +68,9 @@ namespace kiwi
          @param  name   The name of the tag to retrieve.
          @return        The tag that match with the name.
          */
-        static inline sTag create(string const& name)
+        static inline sTag create(std::string const& name)
         {
-            lock_guard<mutex> guard(m_mutex);
+            std::lock_guard<std::mutex> guard(m_mutex);
             auto it = m_tags.find(name);
             if(it != m_tags.end())
             {
@@ -78,7 +78,7 @@ namespace kiwi
             }
             else
             {
-                auto tag = make_shared<Tag>(name);
+                auto tag = std::make_shared<Tag>(name);
                 m_tags[name] = tag;
                 return tag;
             }
@@ -90,9 +90,9 @@ namespace kiwi
          @param  name   The name of the tag to retrieve.
          @return        The tag that match with the name.
          */
-        static inline sTag create(string&& name) noexcept
+        static inline sTag create(std::string&& name) noexcept
         {
-            lock_guard<mutex> guard(m_mutex);
+            std::lock_guard<std::mutex> guard(m_mutex);
             auto it = m_tags.find(name);
             if(it != m_tags.end())
             {
@@ -100,16 +100,16 @@ namespace kiwi
             }
             else
             {
-                auto tag = make_shared<Tag>(name);
+                auto tag = std::make_shared<Tag>(name);
                 m_tags[name] = tag;
                 return tag;
             }
         }
         
     private:
-        const string                m_name;
-        static map<string, sTag>    m_tags;
-        static mutex                m_mutex;
+        const std::string                   m_name;
+        static std::map<std::string, sTag>  m_tags;
+        static std::mutex                   m_mutex;
     };
     
     class Tags

@@ -119,15 +119,15 @@ namespace kiwi
     
     void Path::addEllipse(Point const& center, const double rx, const double ry) noexcept
     {
-        const Point delta(max(0., rx), max(0., ry));
+        const Point delta(std::max(0., rx), std::max(0., ry));
         addEllipse(Rectangle::withCorners(center - delta, center + delta));
     }
     
     void Path::addArc(Point const& center, const Point& radius, const double start, const double end) noexcept
     {
-        const vector<Point> points = BezierCubic::fromArc(center, radius, start, end);
+        const std::vector<Point> points = BezierCubic::fromArc(center, radius, start, end);
         moveTo(points[0]);
-        for(vector<Point>::size_type i = 1; i < points.size(); i++)
+        for(std::vector<Point>::size_type i = 1; i < points.size(); i++)
         {
             addNode(Node(points[i], Cubic));
         }
@@ -135,9 +135,9 @@ namespace kiwi
     
     void Path::addArc(Point const& center, const Point& radius, const double start, const double end, const double rot) noexcept
     {
-        const vector<Point> points = BezierCubic::fromArc(center, radius, start, end);
+        const std::vector<Point> points = BezierCubic::fromArc(center, radius, start, end);
         moveTo(points[0].rotated(center, rot));
-        for(vector<Point>::size_type i = 1; i < points.size(); i++)
+        for(std::vector<Point>::size_type i = 1; i < points.size(); i++)
         {
             addNode(Node(points[i].rotated(center, rot), Cubic));
         }
@@ -145,10 +145,10 @@ namespace kiwi
     
     void Path::addPieChart(Point const& center, const Point& radius, const double start, const double end) noexcept
     {
-        const vector<Point> points = BezierCubic::fromArc(center, radius, start, end);
+        const std::vector<Point> points = BezierCubic::fromArc(center, radius, start, end);
         moveTo(center);
         lineTo(points[0]);
-        for(vector<Point>::size_type i = 1; i < points.size(); i++)
+        for(std::vector<Point>::size_type i = 1; i < points.size(); i++)
         {
             addNode(Node(points[i], Cubic));
         }
@@ -164,9 +164,9 @@ namespace kiwi
         }
         else if(m_nodes.size() > 1)
         {
-            double dist = numeric_limits<double>::max();
+            double dist = std::numeric_limits<double>::max();
             Point previous;
-            for(vector<Node>::size_type i = 0; i < m_nodes.size(); i++)
+            for(std::vector<Node>::size_type i = 0; i < m_nodes.size(); i++)
             {
                 Point current = m_nodes[i].point();
                 switch(m_nodes[i].mode())
@@ -238,7 +238,7 @@ namespace kiwi
         }
         else if(m_nodes.size() > 1)
         {
-            for(vector<Node>::size_type i = 1; i < m_nodes.size(); i++)
+            for(std::vector<Node>::size_type i = 1; i < m_nodes.size(); i++)
             {
                 switch(m_nodes[i].mode())
                 {
@@ -292,7 +292,7 @@ namespace kiwi
         else if(m_nodes.size() > 1)
         {
             Point previous;
-            for(vector<Node>::size_type i = 0; i < m_nodes.size(); i++)
+            for(std::vector<Node>::size_type i = 0; i < m_nodes.size(); i++)
             {
                 Point current = m_nodes[i].point();
                 switch(m_nodes[i].mode())

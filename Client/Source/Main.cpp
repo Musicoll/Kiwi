@@ -21,15 +21,13 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-using namespace std;
-
 namespace kiwi
 {
     //==============================================================================
     class KiwiApplication  : public JUCEApplication
     {
     private:
-        unique_ptr<Instance> m_instance;
+        std::unique_ptr<Instance> m_instance;
         
     public:
         //==============================================================================
@@ -43,15 +41,15 @@ namespace kiwi
         void initialise (const String& commandLine) override
         {
             m_instance = Instance::create(123456789ULL, "Main");
-            cout << "Kiwi instance : " << m_instance->getName()->getName() << endl;
+            std::cout << "Kiwi instance : " << m_instance->getName()->getName() << '\n';
             
             sPatcher patcher = m_instance->createPatcher();
             
             // change grid size and commit
-            cout << "\n\n------ Change things ------\n\n";
+            std::cout << "\n\n------ Change things ------\n\n";
             patcher->setGridSize(40, true);
             
-            cout << "\n\n------ Change unlocked_bgcolor & gridsize ------\n\n";
+            std::cout << "\n\n------ Change unlocked_bgcolor & gridsize ------\n\n";
             patcher->beginTransaction("Change unlocked_bgcolor & gridsize");
             patcher->setAttributeValue(Tags::unlocked_bgcolor, Atom{0.1, 0.2, 0.3, 1.});
             patcher->setAttributeValue(Tags::gridsize, Atom(45));
@@ -59,7 +57,7 @@ namespace kiwi
             patcher->setAttributeValue(Tag::create("attr_tag"), "zozo");
             patcher->endTransaction();
             
-            cout << "\n\n------ Change things ------\n\n";
+            std::cout << "\n\n------ Change things ------\n\n";
             patcher->beginTransaction("Change things");
             patcher->setAttributeValue(Tags::unlocked_bgcolor, Colors::green);
             patcher->setAttributeValue(Tags::gridsize, 10ll);
@@ -67,11 +65,11 @@ namespace kiwi
             patcher->setAttributeValue(Tag::create("attr_tag"), Atom("lolo"));
             patcher->endTransaction();
             
-            cout << "\n\n------ undo (1) ------\n\n";
+            std::cout << "\n\n------ undo (1) ------\n\n";
             patcher->undo(true);
-            cout << "\n\n------ undo (2) ------\n\n";
+            std::cout << "\n\n------ undo (2) ------\n\n";
             patcher->undo(true);
-            cout << "\n\n------ redo ------\n\n";
+            std::cout << "\n\n------ redo ------\n\n";
             patcher->redo(true);
         }
         

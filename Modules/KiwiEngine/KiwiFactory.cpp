@@ -31,8 +31,8 @@ namespace kiwi
     
     Object* Factory::create(const sTag name, Infos const& detail)
     {
-        lock_guard<mutex> guard(getMutex());
-        map<sTag, sCreator>& creators(getCreators());
+        std::lock_guard<std::mutex> guard(getMutex());
+        std::map<sTag, sCreator>& creators(getCreators());
         
         const auto it = creators.find(name);
         if(it != creators.end())
@@ -53,22 +53,22 @@ namespace kiwi
     
     bool Factory::has(const sTag name)
     {
-        lock_guard<mutex> guard(getMutex());
+        std::lock_guard<std::mutex> guard(getMutex());
         const auto& creators = getCreators();
         return creators.find(name) != creators.end();
     }
     
     void Factory::remove(const sTag name)
     {
-        lock_guard<mutex> guard(getMutex());
-        map<sTag, sCreator>& creators(getCreators());
+        std::lock_guard<std::mutex> guard(getMutex());
+        std::map<sTag, sCreator>& creators(getCreators());
         creators.erase(name);
     }
     
-    vector<sTag> Factory::names()
+    std::vector<sTag> Factory::names()
     {
-        lock_guard<mutex> guard(getMutex());
-        vector<sTag> names;
+        std::lock_guard<std::mutex> guard(getMutex());
+        std::vector<sTag> names;
         for(auto it : getCreators())
         {
             names.push_back(it.first);

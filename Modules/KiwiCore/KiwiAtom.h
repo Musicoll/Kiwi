@@ -130,8 +130,8 @@ namespace kiwi
             inline QuarkVector(QuarkVector const& _val) noexcept : val(_val.val) {}
             inline QuarkVector(Vector const& _val) noexcept : val(_val) {}
             inline QuarkVector(Vector::iterator first, Vector::iterator last) noexcept : val(first, last) {}
-            inline QuarkVector(Vector&& _val) noexcept {swap(val, _val);}
-            inline QuarkVector(initializer_list<Atom> il) noexcept : val(il) {}
+            inline QuarkVector(Vector&& _val) noexcept {std::swap(val, _val);}
+            inline QuarkVector(std::initializer_list<Atom> il) noexcept : val(il) {}
             inline ~QuarkVector() noexcept {val.clear();}
             inline Type getType() const noexcept override {return VECTOR;}
             inline Vector getVector() const noexcept override {return val;}
@@ -144,14 +144,14 @@ namespace kiwi
             inline QuarkDico(QuarkDico const& _val) noexcept : val(_val.val) {}
             inline QuarkDico(Dico const& _val) noexcept : val(_val) {}
             inline QuarkDico(Dico::iterator first, Dico::iterator last) noexcept : val(first, last) {}
-            inline QuarkDico(Dico&& _val) noexcept {swap(val, _val);}
-            inline QuarkDico(initializer_list<pair<const sTag, Atom>> il) noexcept : val(il) {}
+            inline QuarkDico(Dico&& _val) noexcept {std::swap(val, _val);}
+            inline QuarkDico(std::initializer_list<std::pair<const sTag, Atom>> il) noexcept : val(il) {}
             inline ~QuarkDico() noexcept {val.clear();}
             inline Type getType() const noexcept override {return DICO;}
             inline Dico getDico() const noexcept override {return val;}
         };
         
-        Quark* m_quark; // use an unique_ptr<> instead ?
+        Quark* m_quark; // use an std::unique_ptr<> instead ?
         
     public:
         
@@ -167,7 +167,7 @@ namespace kiwi
         //! Constructor with another atom.
         /** The function allocates the atom with an atom.
          */
-        inline Atom(Atom&& other) noexcept : m_quark(move(other.m_quark)) {other.m_quark = new Quark();}
+        inline Atom(Atom&& other) noexcept : m_quark(std::move(other.m_quark)) {other.m_quark = new Quark();}
         
         //! Constructor with another atom.
         /** The function allocates the atom with an atom.
@@ -220,13 +220,13 @@ namespace kiwi
         /** The function allocates the atom with a tag created with a string.
          @param tag The tag.
          */
-        inline Atom(string const& tag) noexcept : m_quark(new QuarkTag(Tag::create(tag))) {}
+        inline Atom(std::string const& tag) noexcept : m_quark(new QuarkTag(Tag::create(tag))) {}
         
         //! Constructor with a string.
         /** The function allocates the atom with a tag created with a string.
          @param tag The tag.
          */
-        inline Atom(string&& tag) noexcept : m_quark(new QuarkTag(Tag::create(forward<string>(tag)))) {}
+        inline Atom(std::string&& tag) noexcept : m_quark(new QuarkTag(Tag::create(std::forward<std::string>(tag)))) {}
         
         //! Constructor with a tag.
         /** The function allocates the atom with a tag.
@@ -241,7 +241,7 @@ namespace kiwi
         //! Constructor with a vector of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline Atom(Vector&& atoms) noexcept : m_quark(new QuarkVector(forward<Vector>(atoms))) {}
+        inline Atom(Vector&& atoms) noexcept : m_quark(new QuarkVector(std::forward<Vector>(atoms))) {}
         
         //! Constructor with a vector of atoms.
         /** The function allocates the atom with a vector of atoms.
@@ -251,7 +251,7 @@ namespace kiwi
         //! Constructor with a vector of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline Atom(initializer_list<Atom> il) noexcept : m_quark(new QuarkVector(il)) {}
+        inline Atom(std::initializer_list<Atom> il) noexcept : m_quark(new QuarkVector(il)) {}
         
         //! Constructor with a map of atoms.
         /** The function allocates the atom with a vector of atoms.
@@ -261,7 +261,7 @@ namespace kiwi
         //! Constructor with a map of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline Atom(Dico&& atoms) noexcept  : m_quark(new QuarkDico(forward<Dico>(atoms))) {}
+        inline Atom(Dico&& atoms) noexcept  : m_quark(new QuarkDico(std::forward<Dico>(atoms))) {}
         
         //! Constructor with a map of atoms.
         /** The function allocates the atom with a vector of atoms.
@@ -271,7 +271,7 @@ namespace kiwi
         //! Constructor with a map of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline Atom(initializer_list<pair<const sTag, Atom>> il) noexcept : m_quark(new QuarkDico(il)) {}
+        inline Atom(std::initializer_list<std::pair<const sTag, Atom>> il) noexcept : m_quark(new QuarkDico(il)) {}
         
         //! Destructor.
         /** Doesn't perform anything.
@@ -406,7 +406,7 @@ namespace kiwi
          */
         Atom& operator=(Atom&& other) noexcept
         {
-            swap(m_quark, other.m_quark);
+            std::swap(m_quark, other.m_quark);
             return *this;
         }
         
@@ -499,7 +499,7 @@ namespace kiwi
          @param tag   The string.
          @return An atom.
          */
-        inline Atom& operator=(string const& tag)
+        inline Atom& operator=(std::string const& tag)
         {
             delete m_quark;
             m_quark = new QuarkTag(Tag::create(tag));
@@ -511,10 +511,10 @@ namespace kiwi
          @param tag   The string.
          @return An atom.
          */
-        inline Atom& operator=(string&& tag) noexcept
+        inline Atom& operator=(std::string&& tag) noexcept
         {
             delete m_quark;
-            m_quark = new QuarkTag(Tag::create(forward<string>(tag)));
+            m_quark = new QuarkTag(Tag::create(std::forward<std::string>(tag)));
             return *this;
         }
         
@@ -550,7 +550,7 @@ namespace kiwi
         inline Atom& operator=(Vector&& atoms) noexcept
         {
             delete m_quark;
-            m_quark = new QuarkVector(forward<Vector>(atoms));
+            m_quark = new QuarkVector(std::forward<Vector>(atoms));
             return *this;
         }
         
@@ -559,7 +559,7 @@ namespace kiwi
          @param atoms   The vector of atoms.
          @return An atom.
          */
-        inline Atom& operator=(initializer_list<Atom> il) noexcept
+        inline Atom& operator=(std::initializer_list<Atom> il) noexcept
         {
             delete m_quark;
             m_quark = new QuarkVector(il);
@@ -586,7 +586,7 @@ namespace kiwi
         inline Atom& operator=(Dico&& atoms) noexcept
         {
             delete m_quark;
-            m_quark = new QuarkDico(forward<Dico>(atoms));
+            m_quark = new QuarkDico(std::forward<Dico>(atoms));
             return *this;
         }
         
@@ -595,7 +595,7 @@ namespace kiwi
          @param atoms   The vector of atoms.
          @return An atom.
          */
-        inline Atom& operator=(initializer_list<pair<const sTag, Atom>> il) noexcept
+        inline Atom& operator=(std::initializer_list<std::pair<const sTag, Atom>> il) noexcept
         {
             delete m_quark;
             m_quark = new QuarkDico(il);
@@ -765,16 +765,16 @@ namespace kiwi
         //! Compare the atom with a string.
         /** The function compares the atom with a string.
          @param tag   The string.
-         @return true if the atom hold the same tag create with the string otherwise false.
+         @return true if the atom hold the same tag create with the std::string otherwise false.
          */
         bool operator==(char const* tag) const noexcept;
         
         //! Compare the atom with a string.
         /** The function compares the atom with a string.
          @param tag   The string.
-         @return true if the atom hold the same tag create with the string otherwise false.
+         @return true if the atom hold the same tag create with the std::string otherwise false.
          */
-        bool operator==(string const& tag) const noexcept;
+        bool operator==(std::string const& tag) const noexcept;
         
         //! Compare the atom with a tag.
         /** The function compares the atom with a tag.
@@ -860,7 +860,7 @@ namespace kiwi
         //! Compare the atom with a string.
         /** The function compares the atom with a string.
          @param tag   The string.
-         @return true if the atom differ from the tag create with the string otherwise false.
+         @return true if the atom differ from the tag create with the std::string otherwise false.
          */
         inline bool operator!=(char const* tag) const noexcept
         {
@@ -870,9 +870,9 @@ namespace kiwi
         //! Compare the atom with a string.
         /** The function compares the atom with a string.
          @param tag   The string.
-         @return true if the atom differ from the tag create with the string otherwise false.
+         @return true if the atom differ from the tag create with the std::string otherwise false.
          */
-        inline bool operator!=(string const& tag) const noexcept
+        inline bool operator!=(std::string const& tag) const noexcept
         {
             return !(*this == tag);
         }
@@ -907,20 +907,20 @@ namespace kiwi
             return !(*this == dico);
         }
         
-        static ostream& toJson(ostream &output, const Atom &atom, ulong& indent);
+        static std::ostream& toJson(std::ostream &output, const Atom &atom, ulong& indent);
         
-        //! Parse a string into a vector of atoms.
-        /** Parse a string into a vector of atoms.
-         @param     text	The string to parse.
+        //! Parse a std::string into a vector of atoms.
+        /** Parse a std::string into a vector of atoms.
+         @param     text	The std::string to parse.
          @return    The vector of atoms.
-         @remark    For example, the string : "foo \"bar 42\" 1 2 3.14" will parsed into a vector of 5 atoms.
+         @remark    For example, the std::string : "foo \"bar 42\" 1 2 3.14" will parsed into a vector of 5 atoms.
          The atom types will be determined automatically as 2 #Atom::Type::TAG atoms, 2 #Atom::Type::LONG atoms,
          and 1 #Atom::Type::DOUBLE atom.
          */
-        static Vector parse(string const& text);
+        static Vector parse(std::string const& text);
     };
     
-    ostream& operator<<(ostream &output, const Atom &atom);
+    std::ostream& operator<<(std::ostream &output, const Atom &atom);
 }
 
 

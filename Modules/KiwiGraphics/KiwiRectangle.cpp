@@ -28,58 +28,58 @@ namespace kiwi
     Rectangle Rectangle::resized(const ulong flags, Point const& d, const Point smin, const Point smax, const bool preserve, const bool opposite) const noexcept
     {
         Rectangle newrect = *this;
-        const double minx = max(0., smin.x());
-        const double miny = max(0., smin.y());
-        const double maxx = max(0., smax.x());
-        const double maxy = max(0., smax.y());
+        const double minx = std::max(0., smin.x());
+        const double miny = std::max(0., smin.y());
+        const double maxx = std::max(0., smax.x());
+        const double maxy = std::max(0., smax.y());
         double initialRatio = m_size.ratio();
         
         if(flags & Left)
         {
             if(!opposite)
             {
-                newrect.left(min(newrect.right() - minx, newrect.x() + d.x()));
+                newrect.left(std::min(newrect.right() - minx, newrect.x() + d.x()));
             }
             else
             {
-                newrect.left(min(x() + (width() * 0.5) - (minx * 0.5), newrect.x() + d.x()));
-                newrect.right(max(newrect.left() + minx, newrect.right() - d.x()));
+                newrect.left(std::min(x() + (width() * 0.5) - (minx * 0.5), newrect.x() + d.x()));
+                newrect.right(std::max(newrect.left() + minx, newrect.right() - d.x()));
             }
         }
         if(flags & Right)
         {
             if(!opposite)
             {
-                newrect.width(max(minx, newrect.width() + d.x()));
+                newrect.width(std::max(minx, newrect.width() + d.x()));
             }
             else
             {
-                newrect.left(min(x() + (width() * 0.5) - (minx * 0.5), newrect.x() - d.x()));
-                newrect.right(max(newrect.left() + minx, newrect.right() + d.x()));
+                newrect.left(std::min(x() + (width() * 0.5) - (minx * 0.5), newrect.x() - d.x()));
+                newrect.right(std::max(newrect.left() + minx, newrect.right() + d.x()));
             }
         }
         if(flags & Top)
         {
             if(!opposite)
             {
-                newrect.top(min(newrect.bottom() - miny, newrect.y() + d.y()));
+                newrect.top(std::min(newrect.bottom() - miny, newrect.y() + d.y()));
             }
             else
             {
-                newrect.top(min(y() + (height() * 0.5) - (miny * 0.5), newrect.y() + d.y()));
-                newrect.height(max(miny, newrect.height() - d.y()));
+                newrect.top(std::min(y() + (height() * 0.5) - (miny * 0.5), newrect.y() + d.y()));
+                newrect.height(std::max(miny, newrect.height() - d.y()));
             }
         }
         if(flags & Bottom)
         {
             if(!opposite)
             {
-                newrect.height(max(miny, newrect.height() + d.y()));
+                newrect.height(std::max(miny, newrect.height() + d.y()));
             }
             else
             {
-                newrect.top(min(y() + (height() * 0.5) - (miny * 0.5), newrect.y() - d.y()));
-                newrect.height(max(miny, newrect.height() + d.y()));
+                newrect.top(std::min(y() + (height() * 0.5) - (miny * 0.5), newrect.y() - d.y()));
+                newrect.height(std::max(miny, newrect.height() + d.y()));
             }
         }
         
@@ -106,8 +106,8 @@ namespace kiwi
             }
             else
             {
-                const double oldRatio = (height() > 0) ? abs(width() / (double)height()) : 0.;
-                const double newRatio = abs(newrect.width() / (double)newrect.height());
+                const double oldRatio = (height() > 0) ? std::abs(width() / (double)height()) : 0.;
+                const double newRatio = std::abs(newrect.width() / (double)newrect.height());
                 adjustWidth = (oldRatio > newRatio);
             }
             
@@ -174,7 +174,7 @@ namespace kiwi
         }
         else
         {
-            const vector<Point> points = curve.discretized(100);
+            const std::vector<Point> points = curve.discretized(100);
             
             for(ulong i = 0; i < points.size(); i+=2)
             {
@@ -196,7 +196,7 @@ namespace kiwi
         }
         else
         {
-            const vector<Point> points = curve.discretized(100);
+            const std::vector<Point> points = curve.discretized(100);
             
             for(ulong i = 0; i < points.size(); i+=2)
             {

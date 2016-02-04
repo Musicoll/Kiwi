@@ -29,8 +29,8 @@
 namespace kiwi
 {
     class FlipAtom;
-    typedef vector<FlipAtom>        FlipAtomVector;
-    typedef map<sTag, FlipAtom>     FlipAtomDico;
+    typedef std::vector<FlipAtom>        FlipAtomVector;
+    typedef std::map<sTag, FlipAtom>     FlipAtomDico;
     
     // ================================================================================ //
     //                                      ATOM                                        //
@@ -145,8 +145,8 @@ namespace kiwi
             inline QuarkVector(QuarkVector const& _val) noexcept : val(_val.val) {}
             inline QuarkVector(FlipAtomVector const& _val) noexcept : val(_val) {}
             inline QuarkVector(FlipAtomVector::iterator first, FlipAtomVector::iterator last) noexcept : val(first, last) {}
-            inline QuarkVector(FlipAtomVector&& _val) noexcept {swap(val, _val);}
-            inline QuarkVector(initializer_list<FlipAtom> il) noexcept : val(il) {}
+            inline QuarkVector(FlipAtomVector&& _val) noexcept {std::swap(val, _val);}
+            inline QuarkVector(std::initializer_list<FlipAtom> il) noexcept : val(il) {}
             inline ~QuarkVector() noexcept {val.clear();}
             inline AtomType getType() const noexcept override {return VECTOR;}
             inline FlipAtomVector getVector() const noexcept override {return val;}
@@ -159,8 +159,8 @@ namespace kiwi
             inline QuarkDico(QuarkDico const& _val) noexcept : val(_val.val) {}
             inline QuarkDico(FlipAtomDico const& _val) noexcept : val(_val) {}
             inline QuarkDico(FlipAtomDico::iterator first, FlipAtomDico::iterator last) noexcept : val(first, last) {}
-            inline QuarkDico(FlipAtomDico&& _val) noexcept {swap(val, _val);}
-            inline QuarkDico(initializer_list<pair<const sTag, FlipAtom>> il) noexcept : val(il) {}
+            inline QuarkDico(FlipAtomDico&& _val) noexcept {std::swap(val, _val);}
+            inline QuarkDico(std::initializer_list<std::pair<const sTag, FlipAtom>> il) noexcept : val(il) {}
             inline ~QuarkDico() noexcept {val.clear();}
             inline AtomType getType() const noexcept override {return DICO;}
             inline FlipAtomDico getDico() const noexcept override {return val;}
@@ -299,7 +299,7 @@ namespace kiwi
         /** The function allocates the atom with a tag created with a string.
          @param tag The tag.
          */
-        inline FlipAtom(string const& tag) noexcept
+        inline FlipAtom(std::string const& tag) noexcept
         {
             m_quark.reset<QuarkTag>(Tag::create(tag));
         }
@@ -308,7 +308,7 @@ namespace kiwi
         /** The function allocates the atom with a tag created with a string.
          @param tag The tag.
          */
-        //inline FlipAtom(string&& tag) noexcept : m_quark(new QuarkTag(Tag::create(forward<string>(tag)))) {}
+        //inline FlipAtom(std::string&& tag) noexcept : m_quark(new QuarkTag(Tag::create(std::forward<std::string>(tag)))) {}
         
         //! Constructor with a tag.
         /** The function allocates the atom with a tag.
@@ -329,7 +329,7 @@ namespace kiwi
         //! Constructor with a vector of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        //inline FlipAtom(FlipAtomVector&& atoms) noexcept : m_quark(new QuarkVector(forward<FlipAtomVector>(atoms))) {}
+        //inline FlipAtom(FlipAtomVector&& atoms) noexcept : m_quark(new QuarkVector(std::forward<FlipAtomVector>(atoms))) {}
         
         //! Constructor with a vector of atoms.
         /** The function allocates the atom with a vector of atoms.
@@ -342,7 +342,7 @@ namespace kiwi
         //! Constructor with a vector of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline FlipAtom(initializer_list<FlipAtom> il) noexcept
+        inline FlipAtom(std::initializer_list<FlipAtom> il) noexcept
         {
             m_quark.reset<QuarkVector>(il);
         }
@@ -358,7 +358,7 @@ namespace kiwi
         //! Constructor with a map of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        //inline FlipAtom(FlipAtomDico&& atoms) noexcept  : m_quark(new QuarkDico(forward<FlipAtomDico>(atoms))) {}
+        //inline FlipAtom(FlipAtomDico&& atoms) noexcept  : m_quark(new QuarkDico(std::forward<FlipAtomDico>(atoms))) {}
         
         //! Constructor with a map of atoms.
         /** The function allocates the atom with a vector of atoms.
@@ -371,7 +371,7 @@ namespace kiwi
         //! Constructor with a map of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline FlipAtom(initializer_list<pair<const sTag, FlipAtom>> il) noexcept
+        inline FlipAtom(std::initializer_list<std::pair<const sTag, FlipAtom>> il) noexcept
         {
             m_quark.reset<QuarkDico>(il);
         }
@@ -582,7 +582,7 @@ namespace kiwi
         /*
         FlipAtom& operator=(FlipAtom&& other) noexcept
         {
-            swap(m_quark, other.m_quark);
+            std::swap(m_quark, other.m_quark);
             return *this;
         }
         */
@@ -658,7 +658,7 @@ namespace kiwi
          @param tag   The string.
          @return An atom.
          */
-        inline FlipAtom& operator=(string const& tag)
+        inline FlipAtom& operator=(std::string const& tag)
         {
             m_quark.reset<QuarkTag>(Tag::create(tag));
             return *this;
@@ -669,9 +669,9 @@ namespace kiwi
          @param tag   The string.
          @return An atom.
          */
-        inline FlipAtom& operator=(string&& tag) noexcept
+        inline FlipAtom& operator=(std::string&& tag) noexcept
         {
-            m_quark.reset<QuarkTag>(Tag::create(forward<string>(tag)));
+            m_quark.reset<QuarkTag>(Tag::create(std::forward<std::string>(tag)));
             return *this;
         }
         
@@ -704,7 +704,7 @@ namespace kiwi
          */
         inline FlipAtom& operator=(FlipAtomVector&& atoms) noexcept
         {
-            m_quark.reset<QuarkVector>(forward<FlipAtomVector>(atoms));
+            m_quark.reset<QuarkVector>(std::forward<FlipAtomVector>(atoms));
             return *this;
         }
         
@@ -713,7 +713,7 @@ namespace kiwi
          @param atoms   The vector of atoms.
          @return An atom.
          */
-        inline FlipAtom& operator=(initializer_list<FlipAtom> il) noexcept
+        inline FlipAtom& operator=(std::initializer_list<FlipAtom> il) noexcept
         {
             m_quark.reset<QuarkVector>(il);
             return *this;
@@ -737,7 +737,7 @@ namespace kiwi
          */
         inline FlipAtom& operator=(FlipAtomDico&& atoms) noexcept
         {
-            m_quark.reset<QuarkDico>(forward<FlipAtomDico>(atoms));
+            m_quark.reset<QuarkDico>(std::forward<FlipAtomDico>(atoms));
             return *this;
         }
         
@@ -746,7 +746,7 @@ namespace kiwi
          @param atoms   The vector of atoms.
          @return An atom.
          */
-        inline FlipAtom& operator=(initializer_list<pair<const sTag, FlipAtom>> il) noexcept
+        inline FlipAtom& operator=(std::initializer_list<std::pair<const sTag, FlipAtom>> il) noexcept
         {
             m_quark.reset<QuarkDico>(il);
             return *this;
@@ -883,16 +883,16 @@ namespace kiwi
         //! Compare the atom with a string.
         /** The function compares the atom with a string.
          @param tag   The string.
-         @return true if the atom hold the same tag create with the string otherwise false.
+         @return true if the atom hold the same tag create with the std::string otherwise false.
          */
         bool operator==(char const* tag) const noexcept;
         
         //! Compare the atom with a string.
         /** The function compares the atom with a string.
          @param tag   The string.
-         @return true if the atom hold the same tag create with the string otherwise false.
+         @return true if the atom hold the same tag create with the std::string otherwise false.
          */
-        bool operator==(string const& tag) const noexcept;
+        bool operator==(std::string const& tag) const noexcept;
         
         //! Compare the atom with a tag.
         /** The function compares the atom with a tag.
@@ -978,7 +978,7 @@ namespace kiwi
         //! Compare the atom with a string.
         /** The function compares the atom with a string.
          @param tag   The string.
-         @return true if the atom differ from the tag create with the string otherwise false.
+         @return true if the atom differ from the tag create with the std::string otherwise false.
          */
         inline bool operator!=(char const* tag) const noexcept
         {
@@ -988,9 +988,9 @@ namespace kiwi
         //! Compare the atom with a string.
         /** The function compares the atom with a string.
          @param tag   The string.
-         @return true if the atom differ from the tag create with the string otherwise false.
+         @return true if the atom differ from the tag create with the std::string otherwise false.
          */
-        inline bool operator!=(string const& tag) const noexcept
+        inline bool operator!=(std::string const& tag) const noexcept
         {
             return !(*this == tag);
         }
@@ -1025,20 +1025,20 @@ namespace kiwi
             return !(*this == dico);
         }
         
-        static ostream& toJson(ostream &output, const FlipAtom &atom, ulong& indent);
+        static std::ostream& toJson(std::ostream &output, const FlipAtom &atom, ulong& indent);
         
-        //! Parse a string into a vector of atoms.
-        /** Parse a string into a vector of atoms.
-         @param     text	The string to parse.
+        //! Parse a std::string into a vector of atoms.
+        /** Parse a std::string into a vector of atoms.
+         @param     text	The std::string to parse.
          @return    The vector of atoms.
-         @remark    For example, the string : "foo \"bar 42\" 1 2 3.14" will parsed into a vector of 5 atoms.
+         @remark    For example, the std::string : "foo \"bar 42\" 1 2 3.14" will parsed into a vector of 5 atoms.
          The atom types will be determined automatically as 2 #FlipAtom::Type::TAG atoms, 2 #FlipAtom::Type::LONG atoms,
          and 1 #FlipAtom::Type::DOUBLE atom.
          */
-        static FlipAtomVector parse(string const& text);
+        static FlipAtomVector parse(std::string const& text);
     };
     
-    ostream& operator<<(ostream &output, const FlipAtom &atom);
+    std::ostream& operator<<(std::ostream &output, const FlipAtom &atom);
 }
 
 

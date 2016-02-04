@@ -37,10 +37,10 @@ namespace kiwi
         if(m_instance != nullptr)
         {
             // Set up a document
-            m_document = make_shared<flip::Document>(Model::use(), *this, m_instance->getUserId(), 'cicm', 'kpat');
+            m_document = std::make_shared<flip::Document>(Model::use(), *this, m_instance->getUserId(), 'cicm', 'kpat');
             
             // Set up an history for this document
-            m_history = make_shared<flip::History<flip::HistoryStoreMemory>>(*m_document.get());
+            m_history = std::make_shared<flip::History<flip::HistoryStoreMemory>>(*m_document.get());
             
             // Get our document's root model
             m_model = &m_document->root<PatcherModel>();
@@ -57,44 +57,44 @@ namespace kiwi
         m_links.clear();
     }
     
-    unique_ptr<Patcher> Patcher::create(Instance* instance)
+    std::unique_ptr<Patcher> Patcher::create(Instance* instance)
     {
-        unique_ptr<Patcher> patcher(new Patcher(instance));
+        std::unique_ptr<Patcher> patcher(new Patcher(instance));
         return patcher;
     }
     
     void Patcher::document_changed(PatcherModel& patcher)
     {
-        cout << "Patcher : document_changed fn" << endl;
+        std::cout << "Patcher : document_changed fn" << '\n';
         
         //if (patcher.attributeChanged())
         if (true)
         {
-            cout << "\tpatcher attribute changed" << endl;
+            std::cout << "\tpatcher attribute changed" << '\n';
             
             const Atom sigcolor = patcher.getAttributeValue(Tags::sigcolor);
-            cout << "\t\t- sigcolor : " << sigcolor << endl;
+            std::cout << "\t\t- sigcolor : " << sigcolor << '\n';
             
             const Atom color = patcher.getAttributeValue(Tags::unlocked_bgcolor);
-            cout << "\t\t- unlocked_bgcolor : " << color << endl;
+            std::cout << "\t\t- unlocked_bgcolor : " << color << '\n';
             
             int64_t gridsize = patcher.getGridSize();
-            cout << "\t\t- gridSize : " << gridsize << endl;
+            std::cout << "\t\t- gridSize : " << gridsize << '\n';
             
             auto val = patcher.getAttributeValue(Tag::create("attr_bool"));
-            cout << "\t\t- attr_bool : " << val << endl;
+            std::cout << "\t\t- attr_bool : " << val << '\n';
             
             auto tag = patcher.getAttributeValue(Tag::create("attr_tag"));
-            cout << "\t\t- attr_tag : " << tag << endl;
+            std::cout << "\t\t- attr_tag : " << tag << '\n';
             
             auto tagArray = patcher.getAttributeValue(Tag::create("attr_tagArray"));
-            cout << "\t\t- attr_tag_array : " << tagArray << endl;
+            std::cout << "\t\t- attr_tag_array : " << tagArray << '\n';
             
-            cout << "\t\t- atom : " << patcher.m_atom << endl;
-            cout << "\t\t-- is undefined : " << patcher.m_atom.isUndefined() << endl;
-            cout << "\t\t-- is bool : " << patcher.m_atom.isBool() << endl;
-            cout << "\t\t-- is number : " << patcher.m_atom.isNumber() << endl;
-            cout << "\t\t-- is tag : " << patcher.m_atom.isTag() << endl;
+            std::cout << "\t\t- atom : " << patcher.m_atom << '\n';
+            std::cout << "\t\t-- is undefined : " << patcher.m_atom.isUndefined() << '\n';
+            std::cout << "\t\t-- is bool : " << patcher.m_atom.isBool() << '\n';
+            std::cout << "\t\t-- is number : " << patcher.m_atom.isNumber() << '\n';
+            std::cout << "\t\t-- is tag : " << patcher.m_atom.isTag() << '\n';
         }
     }
     
@@ -132,7 +132,7 @@ namespace kiwi
             objects = it->second;
         }
         
-        lock_guard<mutex> guard(m_mutex);
+        std::lock_guard<std::mutex> guard(m_mutex);
         
         for(Dico objdico : objects)
         {

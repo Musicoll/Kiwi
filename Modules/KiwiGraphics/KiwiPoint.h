@@ -44,7 +44,7 @@ namespace kiwi
         double m_data[2];
         
         static ulong solve(double a, double b, double c, double const d, double &solution1, double &solution2, double &solution3);
-        static ulong solve(array<Point, 6>& W, double *t, const ulong depth);
+        static ulong solve(std::array<Point, 6>& W, double *t, const ulong depth);
     public:
         
         //! Constructor.
@@ -69,7 +69,7 @@ namespace kiwi
         /** The function initializes a point with another point.
          @param pt The other point.
          */
-        inline Point(Point&& pt) noexcept {swap(m_data, pt.m_data);}
+        inline Point(Point&& pt) noexcept {std::swap(m_data, pt.m_data);}
         
         //! Destructor.
         /** The function deletes the point.
@@ -161,7 +161,7 @@ namespace kiwi
          */
         inline Point& operator=(Point&& pt) noexcept
         {
-            swap(m_data, pt.m_data);
+            std::swap(m_data, pt.m_data);
             return *this;
         }
         
@@ -656,7 +656,7 @@ namespace kiwi
         return Point(pt.x() * value, pt.y() * value);
     }
     
-    typedef shared_ptr<Attr::Typed<Point>>  sAttrPoint;
+    typedef std::shared_ptr<Attr::Typed<Point>>  sAttrPoint;
 }
 
 #endif

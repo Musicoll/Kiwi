@@ -38,8 +38,8 @@ namespace kiwi
     private:
         flip::Array<ObjectModel>    m_objects;      // Array for z-order
         flip::Array<LinkModel>      m_links;        // => Collection ??
-        vector<ulong>               m_free_ids;
-        mutable mutex               m_mutex;        // lock-free (grahams) ??
+        std::vector<ulong>               m_free_ids;
+        mutable std::mutex               m_mutex;        // lock-free (grahams) ??
         
         
         Attribute<flip::Int>        m_gridsize;
@@ -72,7 +72,7 @@ namespace kiwi
          */
         inline ulong getNumberOfObjects() const
         {
-            lock_guard<mutex> guard(m_mutex);
+            std::lock_guard<std::mutex> guard(m_mutex);
             return m_objects.count_if([](const ObjectModel& obj) {return true;});
         }
         
@@ -82,7 +82,7 @@ namespace kiwi
          */
         inline flip::Array<ObjectModel>& getObjects() noexcept
         {
-            lock_guard<mutex> guard(m_mutex);
+            std::lock_guard<std::mutex> guard(m_mutex);
             return m_objects;
         }
         
@@ -92,7 +92,7 @@ namespace kiwi
          */
         inline ObjectModel* getObjectWithId(const ulong ID) const noexcept
         {
-            lock_guard<mutex> guard(m_mutex);
+            std::lock_guard<std::mutex> guard(m_mutex);
             
             auto predicate = [&ID](const ObjectModel& object)
             {

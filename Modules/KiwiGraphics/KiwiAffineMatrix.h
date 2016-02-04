@@ -72,7 +72,7 @@ namespace kiwi
         /** The function initializes an affine matrix with another.
          @param other The other matrix.
          */
-        inline AffineMatrix(AffineMatrix&& other) noexcept {swap(m_matrix, other.m_matrix);}
+        inline AffineMatrix(AffineMatrix&& other) noexcept {std::swap(m_matrix, other.m_matrix);}
         
         //! Reset the affine matrix to an identity matrix.
         /** The function reset the affine matrix to an identity matrix.
@@ -111,7 +111,7 @@ namespace kiwi
         //! Apply this affine transformation matrix to a vector of points.
         /** The function applies this affine transformation matrix to a vector of points.
          */
-        template <class PointType> void applyTo(vector<PointType> const& points) const noexcept
+        template <class PointType> void applyTo(std::vector<PointType> const& points) const noexcept
         {
             for(auto pt : points)
             {
@@ -140,7 +140,7 @@ namespace kiwi
          */
         inline AffineMatrix& operator=(AffineMatrix&& other) noexcept
         {
-            swap(m_matrix, other.m_matrix);
+            std::swap(m_matrix, other.m_matrix);
             return *this;
         }
         

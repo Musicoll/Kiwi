@@ -36,13 +36,13 @@ namespace kiwi
     {
     public:
         class Listener;
-        typedef shared_ptr<Listener>        sListener;
+        typedef std::shared_ptr<Listener>        sListener;
         
     private:
         const uint64_t          m_user_id;
         const sTag              m_name;
-        set<sPatcher>           m_patchers;
-        mutable mutex           m_patchers_mutex;
+        std::set<sPatcher>           m_patchers;
+        mutable std::mutex           m_patchers_mutex;
         ListenerSet<Listener>   m_listeners;
         
         static bool m_declared_flag;
@@ -71,7 +71,7 @@ namespace kiwi
          @param name      The instance name.
          @return          The instance.
          */
-        static unique_ptr<Instance> create(uint64_t user_id, string const& name);
+        static std::unique_ptr<Instance> create(uint64_t user_id, std::string const& name);
         
         //! Retrieve the name of the instance.
         /** The function retrieves the name of the instance.
@@ -118,7 +118,7 @@ namespace kiwi
          @return A vector of patchers.
          @see createPatcher, removePatcher
          */
-        vector<sPatcher> getPatchers();
+        std::vector<sPatcher> getPatchers();
         
         //! Add an instance listener in the binding list of the instance.
         /** The function adds an instance listener in the binding list of the instance. 

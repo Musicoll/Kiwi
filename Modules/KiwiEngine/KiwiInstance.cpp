@@ -38,19 +38,19 @@ namespace kiwi
     
     Instance::~Instance()
     {
-        lock_guard<mutex> guard(m_patchers_mutex);
+        std::lock_guard<std::mutex> guard(m_patchers_mutex);
         m_patchers.clear();
         m_listeners.clear();
     }
     
-    unique_ptr<Instance> Instance::create(uint64_t user_id, string const& name)
+    std::unique_ptr<Instance> Instance::create(uint64_t user_id, std::string const& name)
     {
         declare();
         sTag tagname = Tag::create(name);
         
         //@todo assert unique instance's name
         
-        return unique_ptr<Instance>(new Instance(user_id, tagname));
+        return std::unique_ptr<Instance>(new Instance(user_id, tagname));
     }
     
     void Instance::declare()
@@ -94,7 +94,7 @@ namespace kiwi
         
         if(patcher)
         {
-            lock_guard<mutex> guard(m_patchers_mutex);
+            std::lock_guard<std::mutex> guard(m_patchers_mutex);
             success = m_patchers.insert(patcher).second;
         }
         
@@ -113,7 +113,7 @@ namespace kiwi
         bool state(false);
         {
             patcher = Patcher::create(getShared());
-            lock_guard<mutex> guard(m_patchers_mutex);
+            std::lock_guard<std::mutex> guard(m_patchers_mutex);
             if(patcher && m_patchers.insert(patcher).second)
             {
                 state = true;
@@ -131,7 +131,7 @@ namespace kiwi
     {
         bool success = false;
         {
-            lock_guard<mutex> guard(m_patchers_mutex);
+            std::lock_guard<std::mutex> guard(m_patchers_mutex);
             //success = m_patchers.erase(patcher);
         }
         if(success)
@@ -140,10 +140,10 @@ namespace kiwi
         }
     }
     
-    vector<sPatcher> Instance::getPatchers()
+    std::vector<sPatcher> Instance::getPatchers()
     {
-        lock_guard<mutex> guard(m_patchers_mutex);
-        //return vector<sPatcher>(m_patchers.begin(), m_patchers.end());
+        std::lock_guard<std::mutex> guard(m_patchers_mutex);
+        //return std::vector<sPatcher>(m_patchers.begin(), m_patchers.end());
     }
     
     void Instance::addListener(sListener listener)

@@ -38,13 +38,13 @@ namespace kiwi
     {
         const ulong             lid;
         const sTag              name;
-        const string            text;
+        const std::string            text;
         const Dico				dico;
         const Vector			args;
         
         Infos() noexcept : lid(0), name(Tags::_empty), text(""), dico(), args({}) {}
         
-        Infos(const ulong _id, sTag _name, const string _text, Dico const& _dico, Vector const& _args)
+        Infos(const ulong _id, sTag _name, const std::string _text, Dico const& _dico, Vector const& _args)
         : lid(_id), name(_name), text(_text), dico(_dico), args(_args) {}
     };
     
@@ -133,7 +133,7 @@ namespace kiwi
         /** The function retrieves the text of the object.
          @return The text of the object.
          */
-        inline string getText() const noexcept
+        inline std::string getText() const noexcept
         {
             return m_text;
         }

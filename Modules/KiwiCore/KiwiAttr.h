@@ -30,10 +30,10 @@
 namespace kiwi
 {
     class Attr;
-    typedef shared_ptr<Attr>       sAttr;
-    typedef weak_ptr<Attr>         wAttr;
-    typedef shared_ptr<const Attr> scAttr;
-    typedef weak_ptr<const Attr>   wcAttr;
+    typedef std::shared_ptr<Attr>       sAttr;
+    typedef std::weak_ptr<Attr>         wAttr;
+    typedef std::shared_ptr<const Attr> scAttr;
+    typedef std::weak_ptr<const Attr>   wcAttr;
     
     // ================================================================================ //
     //                                      ATTRIBUTE                                   //
@@ -42,20 +42,20 @@ namespace kiwi
     //! The attribute is an abstract class that holds a set of values of differents kinds and differents sizes.
     /** The attribute manages a set of values that should be displayed in an inspector. The setter and getter must be override.
      */
-    class Attr : public enable_shared_from_this<Attr>
+    class Attr : public std::enable_shared_from_this<Attr>
     {
     public:
         class Manager;
-        typedef shared_ptr<Manager>         sManager;
-        typedef weak_ptr<Manager>           wManager;
-        typedef shared_ptr<const Manager>   scManager;
-        typedef weak_ptr<const Manager>     swManager;
+        typedef std::shared_ptr<Manager>         sManager;
+        typedef std::weak_ptr<Manager>           wManager;
+        typedef std::shared_ptr<const Manager>   scManager;
+        typedef std::weak_ptr<const Manager>     swManager;
         
         class Listener;
-        typedef shared_ptr<Listener>        sListener;
-        typedef weak_ptr<Listener>          wListener;
-        typedef shared_ptr<const Listener>  scListener;
-        typedef weak_ptr<const Listener>    wcListener;
+        typedef std::shared_ptr<Listener>        sListener;
+        typedef std::weak_ptr<Listener>          wListener;
+        typedef std::shared_ptr<const Listener>  scListener;
+        typedef std::weak_ptr<const Listener>    wcListener;
         
         template <class T> class Typed;
         
@@ -73,8 +73,8 @@ namespace kiwi
         
     protected:
         const sTag      m_name;				///< The name of the attribute.
-        const string    m_label;			///< The label of the attribute.
-        const string    m_category;			///< The category of the attribute.
+        const std::string    m_label;			///< The label of the attribute.
+        const std::string    m_category;			///< The category of the attribute.
         const ulong		m_order;			///< The order of the attribute.
         ulong           m_behavior;			///< The behavior of the attribute.
         bool            m_frozen;           ///< The frozen state of the attribute.
@@ -149,7 +149,7 @@ namespace kiwi
         /** The functions gets the liteners from the attribute and removes the deprecated listeners.
          @return The listeners.
          */
-        inline vector<sListener> getListeners() noexcept { return m_listeners.getListeners(); }
+        inline std::vector<sListener> getListeners() noexcept { return m_listeners.getListeners(); }
         
     public:
         
@@ -161,7 +161,7 @@ namespace kiwi
          @param order			The attribute order.
          @param behavior		A combination of the flags which define the attribute's behavior.
          */
-        inline Attr(const sTag name, string const& label, string const& category, const ulong behavior, const ulong order) noexcept :
+        inline Attr(const sTag name, std::string const& label, std::string const& category, const ulong behavior, const ulong order) noexcept :
         m_name(name), m_label(label), m_category(category), m_order(order), m_behavior(behavior), m_frozen(false) {}
         
         //! Constructor.
@@ -172,8 +172,8 @@ namespace kiwi
          @param order			The attribute order.
          @param behavior		A combination of the flags which define the attribute's behavior.
          */
-        inline Attr(sTag&& name, string&& label, string&& category, const ulong behavior, const ulong order) noexcept :
-        m_name(forward<sTag>(name)), m_label(forward<string>(label)), m_category(forward<string>(category)), m_order(order), m_behavior(behavior), m_frozen(false) {}
+        inline Attr(sTag&& name, std::string&& label, std::string&& category, const ulong behavior, const ulong order) noexcept :
+        m_name(std::forward<sTag>(name)), m_label(std::forward<std::string>(label)), m_category(std::forward<std::string>(category)), m_order(order), m_behavior(behavior), m_frozen(false) {}
         
         
         //! Destructor.
@@ -185,7 +185,7 @@ namespace kiwi
         /** The function retrieves the type index of the attribute.
          @return The type index of the attribute.
          */
-        virtual type_index getTypeIndex() const noexcept = 0;
+        virtual std::type_index getTypeIndex() const noexcept = 0;
         
         //! Retrieve the attribute value an atom.
         /** The function retrieves the attribute value as  an atom.
@@ -197,7 +197,7 @@ namespace kiwi
         /** The function retrieves if the attribute is from a specific template.
          @return true if the attribute is from a specific template.
          */
-        template<class T> inline bool isType() const noexcept {return (type_index)typeid(T) == getTypeIndex();}
+        template<class T> inline bool isType() const noexcept {return (std::type_index)typeid(T) == getTypeIndex();}
         
         //! Retrieve the name of the attribute.
         /** The function retrieves the name of the attribute.
@@ -209,13 +209,13 @@ namespace kiwi
         /** The function retrieves the attribute label.
          @return The attribute label.
          */
-        inline string getLabel() const noexcept {return m_label;}
+        inline std::string getLabel() const noexcept {return m_label;}
         
         //! Retrieve the attribute category.
         /** The function retrieves the attribute category.
          @return The attribute category.
          */
-        inline string getCategory() const noexcept {return m_category;}
+        inline std::string getCategory() const noexcept {return m_category;}
         
         //! Retrieve the attribute order.
         /** The function retrieves the attribute order.
@@ -278,8 +278,8 @@ namespace kiwi
         /** You should never have to use the function.
          */
         inline Typed(const sTag name,
-                     string const& label,
-                     string const& category,
+                     std::string const& label,
+                     std::string const& category,
                      T const& value,
                      const ulong behavior,
                      const ulong order)  noexcept
@@ -295,17 +295,17 @@ namespace kiwi
         /** You should never have to use the function.
          */
         inline Typed(sTag&& name,
-                     string&& label,
-                     string&& category,
+                     std::string&& label,
+                     std::string&& category,
                      T&& value,
                      const ulong behavior,
                      const ulong order)  noexcept
         
-            : Attr(forward<sTag>(name),
-                   forward<string>(label),
-                   forward<string>(category),
+            : Attr(std::forward<sTag>(name),
+                   std::forward<std::string>(label),
+                   std::forward<std::string>(category),
                    behavior, order),
-              m_default(forward<T>(value))
+              m_default(std::forward<T>(value))
         {
             resetDefault();
         }
@@ -319,7 +319,7 @@ namespace kiwi
         /** The function retrieves the type index of the attribute.
          @return The type index of the attribute.
          */
-        inline type_index getTypeIndex() const noexcept override {return typeid(T);}
+        inline std::type_index getTypeIndex() const noexcept override {return typeid(T);}
     
         //! Retrieves the values.
         /** The current values.
@@ -359,7 +359,7 @@ namespace kiwi
          @param elements The vector of elements.
          @see get
          */
-        inline void set(T&& value){m_value = forward<T>(value);}
+        inline void set(T&& value){m_value = std::forward<T>(value);}
         
         //! Set the attribute value with an atom.
         /** The function sets the attribute value with an atom.
@@ -415,8 +415,8 @@ namespace kiwi
     class Attr::Manager : public inheritable_enable_shared_from_this<Manager>
     {
     private:
-        map<sTag, sAttr>                m_attrs;
-        mutable mutex                   m_attrs_mutex;
+        std::map<sTag, sAttr>                m_attrs;
+        mutable std::mutex                   m_attrs_mutex;
         
         //! Retrieves an attribute.
         /** The function retrieves an attribute.
@@ -425,7 +425,7 @@ namespace kiwi
          */
         inline sAttr getAttr(const sTag name) const noexcept
         {
-            lock_guard<mutex> guard(m_attrs_mutex);
+            std::lock_guard<std::mutex> guard(m_attrs_mutex);
             const auto it = m_attrs.find(name);
             if(it != m_attrs.end())
             {
@@ -439,15 +439,15 @@ namespace kiwi
          @param name the name of the attribute.
          @return The attribute.
          */
-        template <class T> inline shared_ptr<Typed<T>> getAttr(const sTag name) const noexcept
+        template <class T> inline std::shared_ptr<Typed<T>> getAttr(const sTag name) const noexcept
         {
-            lock_guard<mutex> guard(m_attrs_mutex);
+            std::lock_guard<std::mutex> guard(m_attrs_mutex);
             const auto it = m_attrs.find(name);
             if(it != m_attrs.end())
             {
-                return dynamic_pointer_cast<Typed<T>>(it->second);
+                return std::dynamic_pointer_cast<Typed<T>>(it->second);
             }
-            return shared_ptr<Typed<T>>();
+            return std::shared_ptr<Typed<T>>();
         }
         
     public:
@@ -462,7 +462,7 @@ namespace kiwi
          */
         virtual inline ~Manager() noexcept
         {
-            lock_guard<mutex> guard(m_attrs_mutex);
+            std::lock_guard<std::mutex> guard(m_attrs_mutex);
             m_attrs.clear();
         }
         
@@ -488,7 +488,7 @@ namespace kiwi
          */
         template<class T> inline T getAttrValue(const sTag name) const noexcept
         {
-            const shared_ptr<Typed<T>> attr = getAttr<T>(name);
+            const std::shared_ptr<Typed<T>> attr = getAttr<T>(name);
             if(attr)
             {
                 return attr->get();
@@ -511,7 +511,7 @@ namespace kiwi
                     attr->setValue(atom);
                     if(this->notify(attr))
                     {
-                        vector<sListener> listeners(attr->getListeners());
+                        std::vector<sListener> listeners(attr->getListeners());
                         for(auto it : listeners)
                         {
                             it->attrChanged(shared_from_this(), attr);
@@ -528,7 +528,7 @@ namespace kiwi
 		 */
 		template<class T> inline void setAttrValue(const sTag name, T const& value) noexcept
 		{
-            shared_ptr<Typed<T>> attr = getAttr<T>(name);
+            std::shared_ptr<Typed<T>> attr = getAttr<T>(name);
             if(attr)
             {
                 if(attr->get() != value)
@@ -536,7 +536,7 @@ namespace kiwi
                     attr->set(value);
                     if(this->notify(attr))
                     {
-                        vector<sListener> listeners(attr->getListeners());
+                        std::vector<sListener> listeners(attr->getListeners());
                         for(auto it : listeners)
                         {
                             it->attrChanged(shared_from_this(), attr);
@@ -570,14 +570,14 @@ namespace kiwi
          @param listener  The listener.
          @param names     The names of the attibutes.
          */
-        void addListener(sListener listener, vector<sTag> const& names = vector<sTag>());
+        void addListener(sListener listener, std::vector<sTag> const& names = std::vector<sTag>());
         
         //! Remove a listener from the binding list of the attribute.
         /** The function removes a listener from the binding list of the attribute. The attribute listener can specifies the names of the attributes, an empty vector means it will be detached from all the attributes.
          @param listener  The listener.
          @param names     The names of the attibutes.
          */
-        void removeListener(sListener listener, vector<sTag> const& names = vector<sTag>());
+        void removeListener(sListener listener, std::vector<sTag> const& names = std::vector<sTag>());
         
     protected:
         
@@ -596,16 +596,16 @@ namespace kiwi
          @param order			The attribute order.
          @param behavior		A combination of the flags which define the attribute's behavior.
          */
-        template<class T> inline void createAttr(const sTag name, string const& label,
-                                                 string const& category,
+        template<class T> inline void createAttr(const sTag name, std::string const& label,
+                                                 std::string const& category,
                                                  T const& value,
                                                  const ulong behavior = 0ul,
                                                  const ulong order = 0ul)
         {
-            sAttr attr = make_shared<Typed<T>>(name, label, category, value, behavior, order);
+            sAttr attr = std::make_shared<Typed<T>>(name, label, category, value, behavior, order);
             if(attr)
             {
-                lock_guard<mutex> guard(m_attrs_mutex);
+                std::lock_guard<std::mutex> guard(m_attrs_mutex);
                 m_attrs[name] = attr;
             }
         }
@@ -618,16 +618,16 @@ namespace kiwi
          @param order			The attribute order.
          @param behavior		A combination of the flags which define the attribute's behavior.
          */
-        template<class T> inline void createAttr(const sTag name, string&& label,
-                                                 string&& category,
+        template<class T> inline void createAttr(const sTag name, std::string&& label,
+                                                 std::string&& category,
                                                  T&& value,
                                                  const ulong behavior = 0ul,
                                                  const ulong order = 0ul)
         {
-            sAttr attr = make_shared<Typed<T>>(sTag(name), forward<string>(label), forward<string>(category), forward<T>(value), behavior, order);
+            sAttr attr = std::make_shared<Typed<T>>(sTag(name), std::forward<std::string>(label), std::forward<std::string>(category), std::forward<T>(value), behavior, order);
             if(attr)
             {
-                lock_guard<mutex> guard(m_attrs_mutex);
+                std::lock_guard<std::mutex> guard(m_attrs_mutex);
                 m_attrs[name] = attr;
             }
         }

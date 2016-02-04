@@ -32,7 +32,7 @@ namespace kiwi
     //                                      FLIP TAG                                    //
     // ================================================================================ //
     
-    //! The tag is an unique object that matchs to a "unique" string in the scope of all the kiwi applications.
+    //! The tag is an unique object that matchs to a "unique" std::string in the scope of all the kiwi applications.
     class FlipTag : public flip::Object
     {
     public:
@@ -40,7 +40,7 @@ namespace kiwi
         FlipTag() = default;
         
         //! The constructor.
-        inline explicit FlipTag(string const& name) : m_tag(name) {}
+        inline explicit FlipTag(std::string const& name) : m_tag(name) {}
         
         //! The constructor.
         inline explicit FlipTag(sTag tag) : m_tag(tag->getName()) {}
@@ -63,8 +63,8 @@ namespace kiwi
         
         operator sTag () const { return Tag::create(m_tag); }
         
-        //! Retrieve the string of the tag.
-        inline string getName() const noexcept { return m_tag; }
+        //! Retrieve the std::string of the tag.
+        inline std::string getName() const noexcept { return m_tag; }
         
         //! The constructor.
         inline FlipTag& operator =(sTag tag)
@@ -209,7 +209,7 @@ namespace kiwi
     public:
         FlipArray() = default;
         
-        FlipArray(initializer_list<T> elements)
+        FlipArray(std::initializer_list<T> elements)
         {
             m_data.clear();
             for(auto it = elements.begin(); it != elements.end(); it++)

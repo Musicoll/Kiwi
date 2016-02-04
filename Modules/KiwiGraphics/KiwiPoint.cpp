@@ -71,7 +71,7 @@ namespace kiwi
         }
         else
         {
-            return min(distance(start), distance(end));
+            return std::min(distance(start), distance(end));
         }
     }
     
@@ -106,15 +106,15 @@ namespace kiwi
         }
         else
         {
-            return min(distance(start), distance(end));
+            return std::min(distance(start), distance(end));
         }
     }
     
     double Point::distance(Point const& start, Point const& ctrl1, Point const& ctrl2, Point const& end) const noexcept
     {
-        array<Point, 6> W = {Point(0., 0.), Point(0.2, 0.), Point(0.4, 0.), Point(0.6, 0.), Point(0.8, 0.), Point(1., 0.)};
-        array<Point, 4> C = {Point(start - *this), Point(ctrl1 - *this), Point(ctrl2 - *this), Point(end - *this)};
-        array<Point, 3> D = {Point((ctrl1 - start) * 3.), Point((ctrl2 - ctrl1) * 3.), Point((end - ctrl2) * 3.)};
+        std::array<Point, 6> W = {Point(0., 0.), Point(0.2, 0.), Point(0.4, 0.), Point(0.6, 0.), Point(0.8, 0.), Point(1., 0.)};
+        std::array<Point, 4> C = {Point(start - *this), Point(ctrl1 - *this), Point(ctrl2 - *this), Point(end - *this)};
+        std::array<Point, 3> D = {Point((ctrl1 - start) * 3.), Point((ctrl2 - ctrl1) * 3.), Point((end - ctrl2) * 3.)};
         static const double z[3][4] ={{1.0, 0.6, 0.3, 0.1}, {0.4, 0.6, 0.6, 0.4}, {0.1, 0.3, 0.6, 1.0}};
         double 	cd[3][4];
         for(int i = 0; i < 3; i++)
@@ -126,7 +126,7 @@ namespace kiwi
         }
         for(int k = 0; k < 6; k++)
         {
-            for(int i = max(0, k - 2); i <= min(k, 3); i++)
+            for(int i = std::max(0, k - 2); i <= std::min(k, 3); i++)
             {
                 W[k].y(W[k].y() + cd[k - i][i] * z[k - i][i]);
             }
@@ -215,9 +215,9 @@ namespace kiwi
     
     Point Point::nearest(Point const& start, Point const& ctrl1, Point const& ctrl2, Point const& end) const noexcept
     {
-        array<Point, 6> W = {Point(0., 0.), Point(0.2, 0.), Point(0.4, 0.), Point(0.6, 0.), Point(0.8, 0.), Point(1., 0.)};
-        array<Point, 4> C = {Point(start - *this), Point(ctrl1 - *this), Point(ctrl2 - *this), Point(end - *this)};
-        array<Point, 3> D = {Point((ctrl1 - start) * 3.), Point((ctrl2 - ctrl1) * 3.), Point((end - ctrl2) * 3.)};
+        std::array<Point, 6> W = {Point(0., 0.), Point(0.2, 0.), Point(0.4, 0.), Point(0.6, 0.), Point(0.8, 0.), Point(1., 0.)};
+        std::array<Point, 4> C = {Point(start - *this), Point(ctrl1 - *this), Point(ctrl2 - *this), Point(end - *this)};
+        std::array<Point, 3> D = {Point((ctrl1 - start) * 3.), Point((ctrl2 - ctrl1) * 3.), Point((end - ctrl2) * 3.)};
         static const double z[3][4] ={{1.0, 0.6, 0.3, 0.1}, {0.4, 0.6, 0.6, 0.4}, {0.1, 0.3, 0.6, 1.0}};
         double 	cd[3][4];
         for(int i = 0; i < 3; i++)
@@ -229,7 +229,7 @@ namespace kiwi
         }
         for(int k = 0; k < 6; k++)
         {
-            for(int i = max(0, k - 2); i <= min(k, 3); i++)
+            for(int i = std::max(0, k - 2); i <= std::min(k, 3); i++)
             {
                 W[k].y(W[k].y() + cd[k - i][i] * z[k - i][i]);
             }
@@ -275,7 +275,7 @@ namespace kiwi
     
     ulong Point::solve(double a, double b, double c, double const d, double &solution1, double &solution2, double &solution3)
     {
-        if(abs(a) > 0.)
+        if(std::abs(a) > 0.)
         {
             double z = a;
             double a = b / z, b = c / z; c = d / z;
@@ -324,9 +324,9 @@ namespace kiwi
             a = b;
             b = c;
             c = d;
-            if(abs(a) <= 0.)
+            if(std::abs(a) <= 0.)
             {
-                if(abs(b) <= 0.)
+                if(std::abs(b) <= 0.)
                 {
                     return 0;
                 }
@@ -357,7 +357,7 @@ namespace kiwi
         }
     }
     
-    ulong Point::solve(array<Point, 6>& W, double *t, const ulong depth)
+    ulong Point::solve(std::array<Point, 6>& W, double *t, const ulong depth)
     {
         ulong count = 0;
         bool sign, old_sign = old_sign = W[0].y() < 0. ? true : false;
@@ -406,16 +406,16 @@ namespace kiwi
                 {
                     if(distance[i] < 0.0)
                     {
-                        max_distance_below = min(max_distance_below, distance[i]);
+                        max_distance_below = std::min(max_distance_below, distance[i]);
                     }
                     if(distance[i] > 0.0)
                     {
-                        max_distance_above = max(max_distance_above, distance[i]);
+                        max_distance_above = std::max(max_distance_above, distance[i]);
                     }
                 }
                 
                 double intercept_1 = (c + max_distance_above - b) / -a, intercept_2 = (c + max_distance_below - b ) / -a;
-                if(0.5 * (max(intercept_1, intercept_2) - min(intercept_1, intercept_2)) < numeric_limits<double>::epsilon())
+                if(0.5 * (std::max(intercept_1, intercept_2) - std::min(intercept_1, intercept_2)) < std::numeric_limits<double>::epsilon())
                 {
                     const Point A = W[5] - W[0];
                     t[0] = (A.x() * W[0].y() - A.y() * W[0].y()) / -A.y();
@@ -425,7 +425,7 @@ namespace kiwi
                 break;
             }
         }
-        array<Point, 6> Left, Right;
+        std::array<Point, 6> Left, Right;
         double 	left_t[6], right_t[6];
         
         Point Vtemp[6][6];

@@ -80,7 +80,7 @@ namespace kiwi
         class Intern
         {
         private:
-            const string    m_name;
+            const std::string    m_name;
             double          m_height;
             unsigned        m_style;
         public:
@@ -91,7 +91,7 @@ namespace kiwi
              @param height  The height of the font.
              @param style   The style of the font.
              */
-            inline Intern(string const& name, double height, Style style) noexcept : m_name(name), m_height(height), m_style(style) {}
+            inline Intern(std::string const& name, double height, Style style) noexcept : m_name(name), m_height(height), m_style(style) {}
             
             //! Destructor.
             /** The function does nothing.
@@ -108,15 +108,15 @@ namespace kiwi
             /** The function retrieves the name of the font.
              @return The name of the font.
              */
-            virtual inline unique_ptr<Intern> getNewReference() const noexcept {
-                return unique_ptr<Intern>(new Intern(getName(), getHeight(), Style(getStyle())));
+            virtual inline std::unique_ptr<Intern> getNewReference() const noexcept {
+                return std::unique_ptr<Intern>(new Intern(getName(), getHeight(), Style(getStyle())));
             }
             
             //! Retrieves the font name.
             /** The function retrieves the name of the font.
              @return The name of the font.
              */
-            inline string getName() const noexcept {return m_name;}
+            inline std::string getName() const noexcept {return m_name;}
             
             //! Retrieves the font height.
             /** The function retrieves the height of the font.
@@ -161,14 +161,14 @@ namespace kiwi
              @param line The line.
              @return The width of the line.
              */
-            virtual double getLineWidth(string const& line) const noexcept;
+            virtual double getLineWidth(std::string const& line) const noexcept;
             
             //! Retrieves the width of a line.
             /** The function retreives the width of a line for the font.
              @param line The line.
              @return The width of the line.
              */
-            virtual double getLineWidth(wstring const& line) const noexcept;
+            virtual double getLineWidth(std::wstring const& line) const noexcept;
             
             //! Retrieves the size of a text.
             /** The function the size of a text depending for the font.
@@ -176,7 +176,7 @@ namespace kiwi
              @param width The width limit of the text, zero means no limits.
              @return The width of the text.
              */
-            virtual Size getTextSize(string const& text, const double width = 0.) const noexcept;
+            virtual Size getTextSize(std::string const& text, const double width = 0.) const noexcept;
             
             //! Retrieves the size of a text.
             /** The function the width of a text depending for the font.
@@ -184,11 +184,11 @@ namespace kiwi
              @param width The width limit of the text, zero means no limits.
              @return The width of the text.
              */
-            virtual Size getTextSize(wstring const& text, const double width = 0.) const noexcept;
+            virtual Size getTextSize(std::wstring const& text, const double width = 0.) const noexcept;
             
         };
         
-        unique_ptr<Intern> m_intern;
+        std::unique_ptr<Intern> m_intern;
     public:
         
         //! Font constructor.
@@ -202,13 +202,13 @@ namespace kiwi
          @param height  The height of the font.
          @param style   The style of the font.
          */
-        Font(string const& name, double height = 12., Style style = Regular) noexcept;
+        Font(std::string const& name, double height = 12., Style style = Regular) noexcept;
         
         //! Font constructor.
         /** Initializes a font with an internal font.
          @param internal the internal font.
          */
-        inline Font(unique_ptr<Intern> internal) noexcept : m_intern(move(internal)) {}
+        inline Font(std::unique_ptr<Intern> internal) noexcept : m_intern(std::move(internal)) {}
         
         //! Font constructor.
         /** Initializes a with another font.
@@ -220,7 +220,7 @@ namespace kiwi
         /** Initializes a with another font.
          @param font The other font.
          */
-        inline Font(Font&& font) : m_intern(move(font.m_intern)) {}
+        inline Font(Font&& font) : m_intern(std::move(font.m_intern)) {}
         
         //! Font equal oeprator.
         /** Initializes the font with another font.
@@ -238,7 +238,7 @@ namespace kiwi
          */
         inline Font& operator=(Font&& other) noexcept
         {
-            m_intern = move(other.m_intern);
+            m_intern = std::move(other.m_intern);
             return *this;
         }
         
@@ -257,7 +257,7 @@ namespace kiwi
         /** The function retrieves the name of the font.
          @return The name of the font.
          */
-        inline string getName() const noexcept {return m_intern->getName();}
+        inline std::string getName() const noexcept {return m_intern->getName();}
         
         //! Retrieves the font height.
         /** The function retrieves the height of the font.
@@ -275,7 +275,7 @@ namespace kiwi
         /** The function retrieves a font name as a string.
          @return A font name as a string.
          */
-        string getStyleName() const noexcept;
+        std::string getStyleName() const noexcept;
         
         //! Retrieve if the font is boldened.
         /** The function retrieves if a font is boldened.
@@ -299,7 +299,7 @@ namespace kiwi
         /** The function sets the name of the font.
          @param size The size of the name.
          */
-        void setName(const string& name);
+        void setName(const std::string& name);
 		
         //! Sets the font height.
         /** The function sets the height of the font.
@@ -325,7 +325,7 @@ namespace kiwi
         /** The function sets the style of the font.
          @param styleFlags The style of the font as a set flags.
          */
-        void setStyle(string const& style);
+        void setStyle(std::string const& style);
         
         //! Make the font bold or non-bold
         /** The function makes the font bold or non-bold
@@ -405,7 +405,7 @@ namespace kiwi
          @param line The line.
          @return The width of the line.
          */
-        inline double getLineWidth(string const& line) const noexcept
+        inline double getLineWidth(std::string const& line) const noexcept
         {
             return m_intern->getLineWidth(line);
         }
@@ -415,7 +415,7 @@ namespace kiwi
          @param line The line.
          @return The width of the line.
          */
-        inline double getLineWidth(wstring const& line) const noexcept
+        inline double getLineWidth(std::wstring const& line) const noexcept
         {
             return m_intern->getLineWidth(line);
         }
@@ -426,7 +426,7 @@ namespace kiwi
          @param width The width limit of the text, zero means no limits.
          @return The width of the text.
          */
-        inline Size getTextSize(string const& text, const double width = 0.) const noexcept
+        inline Size getTextSize(std::string const& text, const double width = 0.) const noexcept
         {
             return m_intern->getTextSize(text, width);
         }
@@ -437,7 +437,7 @@ namespace kiwi
          @param width The width limit of the text, zero means no limits.
          @return The width of the text.
          */
-        Size getTextSize(wstring const& text, const double width = 0.) const noexcept
+        Size getTextSize(std::wstring const& text, const double width = 0.) const noexcept
         {
             return m_intern->getTextSize(text, width);
         }
@@ -474,9 +474,9 @@ namespace kiwi
     private:
         friend class GuiDeviceManager;
         
-        inline static void setAvailableFonts(vector<Font> const& fonts) noexcept
+        inline static void setAvailableFonts(std::vector<Font> const& fonts) noexcept
         {
-            map<string, Font>& m_fonts = getAvailableFonts();
+            std::map<std::string, Font>& m_fonts = getAvailableFonts();
             for(auto it : fonts)
             {
                 m_fonts[(it).getName()] = (it);
@@ -489,15 +489,15 @@ namespace kiwi
             m_default = fonts;
         }
         
-        inline static map<string, Font>& getAvailableFonts() noexcept
+        inline static std::map<std::string, Font>& getAvailableFonts() noexcept
         {
-            static map<string, Font> m_fonts;
+            static std::map<std::string, Font> m_fonts;
             return m_fonts;
         }
         
         inline static Font& getDefaultFont() noexcept
         {
-            static Font m_default(unique_ptr<Intern>(new Intern("Helvetica", 12., Regular)));
+            static Font m_default(std::unique_ptr<Intern>(new Intern("Helvetica", 12., Regular)));
             return m_default;
         }
         
@@ -507,7 +507,7 @@ namespace kiwi
         /** The function the available fonts in the system.
          @return The available fonts.
          */
-        inline static map<string, Font> getSystemFontsByName() noexcept
+        inline static std::map<std::string, Font> getSystemFontsByName() noexcept
         {
             return getAvailableFonts();
         }
@@ -516,10 +516,10 @@ namespace kiwi
         /** The function the available fonts in the system.
          @return The available fonts.
          */
-        inline static vector<Font> getSystemFonts() noexcept
+        inline static std::vector<Font> getSystemFonts() noexcept
         {
-            map<string, Font>& m_fonts = getAvailableFonts();
-            vector<Font> fonts;
+            std::map<std::string, Font>& m_fonts = getAvailableFonts();
+            std::vector<Font> fonts;
             for(auto it : m_fonts)
             {
                 fonts.push_back(it.second);
@@ -531,10 +531,10 @@ namespace kiwi
         /** The function the available font names in the system.
          @return The available font names .
          */
-        inline static vector<string> getSystemFontNames() noexcept
+        inline static std::vector<std::string> getSystemFontNames() noexcept
         {
-            map<string, Font>& m_fonts = getAvailableFonts();
-            vector<string> fonts;
+            std::map<std::string, Font>& m_fonts = getAvailableFonts();
+            std::vector<std::string> fonts;
             for(auto it : m_fonts)
             {
                 fonts.push_back(it.first);

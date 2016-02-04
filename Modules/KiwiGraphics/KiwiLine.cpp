@@ -111,9 +111,9 @@ namespace kiwi
         return curve.intersects(*this);
     }
     
-    vector<Point> BezierCubic::fromArc(Point const& center, const Point& radius, double startAngle, double endAngle) noexcept
+    std::vector<Point> BezierCubic::fromArc(Point const& center, const Point& radius, double startAngle, double endAngle) noexcept
     {
-        vector<Point> points;
+        std::vector<Point> points;
         
         double range = wrap(endAngle - startAngle, 0., M_PI * 2.);
         

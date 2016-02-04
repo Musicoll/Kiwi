@@ -35,22 +35,22 @@ namespace kiwi
         return 0.;
     }
     
-    double Font::Intern::getLineWidth(string const& line) const noexcept
+    double Font::Intern::getLineWidth(std::string const& line) const noexcept
     {
         return 0.;
     }
     
-    double Font::Intern::getLineWidth(wstring const& line) const noexcept
+    double Font::Intern::getLineWidth(std::wstring const& line) const noexcept
     {
         return 0.;
     }
     
-    Size Font::Intern::getTextSize(string const& text, const double width) const noexcept
+    Size Font::Intern::getTextSize(std::string const& text, const double width) const noexcept
     {
         return Size(0., 0.);
     }
     
-    Size Font::Intern::getTextSize(wstring const& text, const double width) const noexcept
+    Size Font::Intern::getTextSize(std::wstring const& text, const double width) const noexcept
     {
         return Size(0., 0.);
     }
@@ -60,12 +60,12 @@ namespace kiwi
         m_intern = getDefaultFont().m_intern->getNewReference();
     }
     
-    Font::Font(string const& name, double height, Style style) noexcept
+    Font::Font(std::string const& name, double height, Style style) noexcept
     {
         auto it = getAvailableFonts().find(name);
         if(it != getAvailableFonts().end())
         {
-            m_intern = move(it->second.m_intern->getNewReference());
+            m_intern = std::move(it->second.m_intern->getNewReference());
         }
         else
         {
@@ -75,14 +75,14 @@ namespace kiwi
         setStyle(style);
     }
     
-    void Font::setName(const string& name)
+    void Font::setName(const std::string& name)
     {
         const double height = getHeight();
         const Style  style  = Style(getStyle());
         auto it = getAvailableFonts().find(name);
         if(it != getAvailableFonts().end())
         {
-            m_intern = move(it->second.m_intern->getNewReference());
+            m_intern = std::move(it->second.m_intern->getNewReference());
         }
         else
         {
@@ -92,70 +92,61 @@ namespace kiwi
         setStyle(style);
     }
     
-    string Font::getStyleName() const noexcept
+    std::string Font::getStyleName() const noexcept
     {
-        switch(getStyle())
+        const auto style = getStyle();
+        
+        switch(style)
         {
-            case Regular:
-                return string("Regular");
-                break;
-            case Bold:
-                return string("Bold");
-                break;
-            case Italic:
-                return string("Italic");
-                break;
-            case Underlined:
-                return string("Underlined");
-                break;
-            case BoldItalic:
-                return string("Bold Italic");
-                break;
-            case BoldUnderlined:
-                return string("Bold Underlined");
-                break;
-            case ItalicUnderlined:
-                return string("Italic Underlined");
-                break;
-            default:
-                return string("Bold Italic Underlined");
-                break;
+            case Regular:           return "Regular";
+            case Bold:              return "Bold";
+            case Italic:            return "Italic";
+            case Underlined:        return "Underlined";
+            case BoldItalic:        return "Bold Italic";
+            case BoldUnderlined:    return "Bold Underlined";
+            case ItalicUnderlined:  return "Italic Underlined";
+            default:                return "Bold Italic Underlined";
         }
+        
+        return "Regular";
     }
     
-    void Font::setStyle(string const& style)
+    void Font::setStyle(std::string const& style_name)
     {
-        if(style == string("Regular"))
+        if (style_name != getStyleName())
         {
-            setStyle(Regular);
-        }
-        else if(style == string("Bold"))
-        {
-            setStyle(Bold);
-        }
-        else if(style == string("Italic"))
-        {
-            setStyle(Italic);
-        }
-        else if(style == string("Underlined"))
-        {
-            setStyle(Underlined);
-        }
-        else if(style == string("Bold Italic"))
-        {
-            setStyle(BoldItalic);
-        }
-        else if(style == string("Bold Underlined"))
-        {
-            setStyle(BoldUnderlined);
-        }
-        else if(style == string("Italic Underlined"))
-        {
-            setStyle(ItalicUnderlined);
-        }
-        else if(style == string("Bold Italic Underlined"))
-        {
-            setStyle(BoldItalicUnderlined);
+            if(style_name == "Regular")
+            {
+                setStyle(Regular);
+            }
+            else if(style_name == "Bold")
+            {
+                setStyle(Bold);
+            }
+            else if(style_name == "Italic")
+            {
+                setStyle(Italic);
+            }
+            else if(style_name == "Underlined")
+            {
+                setStyle(Underlined);
+            }
+            else if(style_name == "Bold Italic")
+            {
+                setStyle(BoldItalic);
+            }
+            else if(style_name == "Bold Underlined")
+            {
+                setStyle(BoldUnderlined);
+            }
+            else if(style_name == "Italic Underlined")
+            {
+                setStyle(ItalicUnderlined);
+            }
+            else if(style_name == "Bold Italic Underlined")
+            {
+                setStyle(BoldItalicUnderlined);
+            }
         }
     }
 }

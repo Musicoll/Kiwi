@@ -39,16 +39,16 @@ namespace kiwi
     {
     public:
         class Manager;
-        typedef shared_ptr<Manager>         sManager;
-        typedef weak_ptr<Manager>           wManager;
-        typedef shared_ptr<const Manager>   scManager;
-        typedef weak_ptr<const Manager>     swManager;
+        typedef std::shared_ptr<Manager>         sManager;
+        typedef std::weak_ptr<Manager>           wManager;
+        typedef std::shared_ptr<const Manager>   scManager;
+        typedef std::weak_ptr<const Manager>     swManager;
         
         class Listener;
-        typedef shared_ptr<Listener>        sListener;
-        typedef weak_ptr<Listener>          wListener;
-        typedef shared_ptr<const Listener>  scListener;
-        typedef weak_ptr<const Listener>    wcListener;
+        typedef std::shared_ptr<Listener>        sListener;
+        typedef std::weak_ptr<Listener>          wListener;
+        typedef std::shared_ptr<const Listener>  scListener;
+        typedef std::weak_ptr<const Listener>    wcListener;
         
         /** Flags describing the behavior of the attribute.
          @see setInvisible, setDisabled, setSaveable, setNotifyChanges
@@ -172,7 +172,7 @@ namespace kiwi
         /** The functions gets the liteners from the attribute and removes the deprecated listeners.
          @return The listeners.
          */
-        inline vector<sListener> getListeners() noexcept { return m_listeners.getListeners(); }
+        inline std::vector<sListener> getListeners() noexcept { return m_listeners.getListeners(); }
         
     public:
         
@@ -200,7 +200,7 @@ namespace kiwi
          @param order			The attribute order.
          @param behavior		A combination of the flags which define the attribute's behavior.
          */
-        inline AttributeBase(const sTag name, string const& label, string const& category, const ulong behavior, const ulong order) noexcept :
+        inline AttributeBase(const sTag name, std::string const& label, std::string const& category, const ulong behavior, const ulong order) noexcept :
         m_name(name), m_label(label), m_category(category), m_order(order), m_frozen(false)
         {
             setBehavior(behavior);
@@ -214,8 +214,8 @@ namespace kiwi
          @param order			The attribute order.
          @param behavior		A combination of the flags which define the attribute's behavior.
          */
-        inline AttributeBase(sTag&& name, string&& label, string&& category, const ulong behavior, const ulong order) noexcept :
-        m_name(forward<sTag>(name)), m_label(forward<string>(label)), m_category(forward<string>(category)), m_order(order), m_frozen(false)
+        inline AttributeBase(sTag&& name, std::string&& label, std::string&& category, const ulong behavior, const ulong order) noexcept :
+        m_name(std::forward<sTag>(name)), m_label(std::forward<std::string>(label)), m_category(std::forward<std::string>(category)), m_order(order), m_frozen(false)
         {
             setBehavior(behavior);
         }
@@ -229,7 +229,7 @@ namespace kiwi
         /** The function retrieves the type index of the attribute.
          @return The type index of the attribute.
          */
-        virtual type_index getTypeIndex() const noexcept { return typeid(this); };
+        virtual std::type_index getTypeIndex() const noexcept { return typeid(this); };
         
         //! Retrieve the attribute value an atom.
         /** The function retrieves the attribute value as  an atom.
@@ -241,7 +241,7 @@ namespace kiwi
         /** The function retrieves if the attribute is from a specific template.
          @return true if the attribute is from a specific template.
          */
-        template<class T> inline bool isType() const noexcept {return (type_index)typeid(T) == getTypeIndex();}
+        template<class T> inline bool isType() const noexcept {return (std::type_index)typeid(T) == getTypeIndex();}
         
         //! Retrieve the name of the attribute.
         /** The function retrieves the name of the attribute.
@@ -263,13 +263,13 @@ namespace kiwi
         /** The function retrieves the attribute label.
          @return The attribute label.
          */
-        inline string getLabel() const noexcept {return m_label;}
+        inline std::string getLabel() const noexcept {return m_label;}
         
         //! Set the attribute label.
         /** The function sets the attribute label.
          @param label The attribute label.
          */
-        inline AttributeBase& setLabel(const string& label) noexcept
+        inline AttributeBase& setLabel(const std::string& label) noexcept
         {
             m_label = label;
             return *this;
@@ -290,7 +290,7 @@ namespace kiwi
         /** The function retrieves the attribute category.
          @return The attribute category.
          */
-        inline string getCategory() const noexcept {return m_category;}
+        inline std::string getCategory() const noexcept {return m_category;}
         
         //! Retrieve the attribute order.
         /** The function retrieves the attribute order.
@@ -347,8 +347,8 @@ namespace kiwi
         
         //! Constructor.
         inline Attribute(const sTag name,
-                         string const& label,
-                         string const& category,
+                         std::string const& label,
+                         std::string const& category,
                          T const& value,
                          const ulong behavior = 0ul,
                          const ulong order = 0ul)  noexcept
@@ -357,7 +357,7 @@ namespace kiwi
         m_default(value),
         m_value(value)
         {
-            static_assert(is_base_of<flip::Type, T>::value, "The class must inherit from flip::Type");
+            static_assert(std::is_base_of<flip::Type, T>::value, "The class must inherit from flip::Type");
         }
         
         //! Destructor.
@@ -366,9 +366,9 @@ namespace kiwi
         inline ~Attribute() noexcept {}
         
         // static flip declare method.
-        static void declare(const string& classname)
+        static void declare(const std::string& classname)
         {
-            //static string class_name = "cicm.kiwi.Attribute.";
+            //static std::string class_name = "cicm.kiwi.Attribute.";
             //class_name += typeid(T).name();
 
             Model::declare<Attribute<T>>()
@@ -383,7 +383,7 @@ namespace kiwi
         /** The function retrieves the type index of the attribute.
          @return The type index of the attribute.
          */
-        inline type_index getTypeIndex() const noexcept override {return typeid(T);}
+        inline std::type_index getTypeIndex() const noexcept override {return typeid(T);}
     
         //! Retrieves the values.
         /** The current values.
@@ -479,9 +479,9 @@ namespace kiwi
     class AttributeBase::Manager : public flip::Object
     {
     private:
-        vector<AttributeBase*>              m_attrs;
+        std::vector<AttributeBase*>              m_attrs;
         flip::Collection<AttributeBase>     m_attributes;
-        mutable mutex                       m_attrs_mutex;
+        mutable std::mutex                       m_attrs_mutex;
         
         //! Retrieves an attribute.
         /** The function retrieves an attribute.
@@ -490,7 +490,7 @@ namespace kiwi
          */
         inline AttributeBase* getAttributeBase(const sTag name) const noexcept
         {
-            lock_guard<mutex> guard(m_attrs_mutex);
+            std::lock_guard<std::mutex> guard(m_attrs_mutex);
             
             auto predicate = [name](AttributeBase const* attr)
             {
@@ -518,7 +518,7 @@ namespace kiwi
          */
         virtual inline ~Manager() noexcept
         {
-            lock_guard<mutex> guard(m_attrs_mutex);
+            std::lock_guard<std::mutex> guard(m_attrs_mutex);
             m_attributes.clear();
         }
         
@@ -597,14 +597,14 @@ namespace kiwi
          @param listener  The listener.
          @param names     The names of the attibutes.
          */
-        void addListener(sListener listener, vector<sTag> const& names = vector<sTag>());
+        void addListener(sListener listener, std::vector<sTag> const& names = std::vector<sTag>());
         
         //! Remove a listener from the binding list of the attribute.
         /** The function removes a listener from the binding list of the attribute. The attribute listener can specifies the names of the attributes, an empty vector means it will be detached from all the attributes.
          @param listener  The listener.
          @param names     The names of the attibutes.
          */
-        void removeListener(sListener listener, vector<sTag> const& names = vector<sTag>());
+        void removeListener(sListener listener, std::vector<sTag> const& names = std::vector<sTag>());
     
     protected:
         
@@ -623,13 +623,13 @@ namespace kiwi
          @param order			The attribute order.
          @param behavior		A combination of the flags which define the attribute's behavior.
          */
-        template<class T> inline void createAttribute(const sTag name, string const& label,
-                                                 string const& category,
+        template<class T> inline void createAttribute(const sTag name, std::string const& label,
+                                                 std::string const& category,
                                                  T const& value,
                                                  const ulong behavior = 0ul,
                                                  const ulong order = 0ul)
         {
-            lock_guard<mutex> guard(m_attrs_mutex);
+            std::lock_guard<std::mutex> guard(m_attrs_mutex);
             m_attributes.emplace<Attribute<T>>(name, label, category, value, behavior, order);
         }
         
@@ -655,8 +655,8 @@ namespace kiwi
          @param order			The attribute order.
          @param behavior		A combination of the flags which define the attribute's behavior.
          */
-        template<class T> inline void addAttr(AttributeBase* attr, const sTag name, string const& label,
-                            string const& category,
+        template<class T> inline void addAttr(AttributeBase* attr, const sTag name, std::string const& label,
+                            std::string const& category,
                             T const& value,
                             const ulong behavior = 0ul,
                             const ulong order = 0ul)

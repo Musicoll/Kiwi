@@ -100,8 +100,8 @@ namespace kiwi
          */
         inline Rectangle(Point&& position, Size&& size) noexcept
         {
-            swap(m_position, position);
-            swap(m_size, size);
+            std::swap(m_position, position);
+            std::swap(m_size, size);
         }
         
         //! Constructor.
@@ -110,8 +110,8 @@ namespace kiwi
          */
         inline Rectangle(Rectangle&& rect) noexcept
         {
-            swap(m_position, rect.m_position);
-            swap(m_size, rect.m_size);
+            std::swap(m_position, rect.m_position);
+            std::swap(m_size, rect.m_size);
         }
         
         //! Destructor.
@@ -127,7 +127,7 @@ namespace kiwi
          */
         static inline Rectangle withCorners(Point const& corner1, Point const& corner2) noexcept
         {
-            return Rectangle(min(corner1.x(), corner2.x()), min(corner1.y(), corner2.y()), abs(corner1.x() - corner2.x()), abs(corner1.y() - corner2.y()));
+            return Rectangle(std::fmin(corner1.x(), corner2.x()), std::fmin(corner1.y(), corner2.y()), std::fabs(corner1.x() - corner2.x()), std::fabs(corner1.y() - corner2.y()));
         }
         
         //! Return a rectangle with the center positions and the size.
@@ -171,7 +171,7 @@ namespace kiwi
          */
         inline Rectangle withPosition(Point&& newpos) const noexcept
         {
-            return Rectangle(forward<Point>(newpos), size());
+            return Rectangle(std::forward<Point>(newpos), size());
         }
         
         //! Return the same rectangle with a different abscissa position.
@@ -211,7 +211,7 @@ namespace kiwi
          */
         inline Rectangle withSize(Size&& newSize) const noexcept
         {
-            return Rectangle(position(), forward<Size>(newSize));
+            return Rectangle(position(), std::forward<Size>(newSize));
         }
         
         //! Return the same rectangle with a different width.
@@ -524,7 +524,7 @@ namespace kiwi
          */
         void right(const double right) noexcept
         {
-            x(min(x(), right));
+            x(std::fmin(x(), right));
             width(right - x());
         }
         
@@ -534,7 +534,7 @@ namespace kiwi
          */
         void bottom(double bottom) noexcept
         {
-            y(min(y(), bottom));
+            y(std::fmin(y(), bottom));
             height(bottom - y());
         }
         
@@ -557,8 +557,8 @@ namespace kiwi
          */
         inline Rectangle& operator=(Rectangle&& rect) noexcept
         {
-            swap(m_position, rect.m_position);
-            swap(m_size, rect.m_size);
+            std::swap(m_position, rect.m_position);
+            std::swap(m_size, rect.m_size);
             return *this;
         }
         
@@ -703,7 +703,7 @@ namespace kiwi
         */
         inline Rectangle expanded(Point const& pt) const noexcept
         {
-            return Rectangle(m_position.x() - pt.x(), m_position.y() - pt.y(), max(0., width() + pt.x() * 2.), max(0., height() + pt.y() * 2.));
+            return Rectangle(m_position.x() - pt.x(), m_position.y() - pt.y(), std::max(0., width() + pt.x() * 2.), std::max(0., height() + pt.y() * 2.));
         }
         
         //! Return an the expanded rectangle.
@@ -779,10 +779,10 @@ namespace kiwi
          */
         Rectangle withClippedEdges(const double left, const double top, const double right, const double bottom) const noexcept
         {
-            return Rectangle::withEdges(max(left, this->left()),
-                                        max(top, this->top()),
-                                        min(right, this->right()),
-                                        min(bottom, this->bottom()));
+            return Rectangle::withEdges(std::max(left, this->left()),
+                                        std::max(top, this->top()),
+                                        std::min(right, this->right()),
+                                        std::min(bottom, this->bottom()));
         }
         
         //! Get if the rectangle overlaps another rectangle.

@@ -47,7 +47,7 @@ namespace kiwi
             virtual inline ObjectModel* create(Infos const& infos) = 0;
         };
         
-        typedef shared_ptr<Creator> sCreator;
+        typedef std::shared_ptr<Creator> sCreator;
         
         //! The full virtual object's creator.
         template <class T> class CreatorTyped : public Creator
@@ -60,9 +60,9 @@ namespace kiwi
         /** This function retrieves  the static map of creators.
          @return The map of creators.
          */
-        static inline map<sTag, shared_ptr<Creator>>& getCreators() noexcept
+        static inline std::map<sTag, std::shared_ptr<Creator>>& getCreators() noexcept
         {
-            static map<sTag, sCreator> static_creators;
+            static std::map<sTag, sCreator> static_creators;
             return static_creators;
         }
         
@@ -70,9 +70,9 @@ namespace kiwi
         /** This function retrieves the static mutex.
          @return The mutex.
          */
-        static inline mutex& getMutex() noexcept
+        static inline std::mutex& getMutex() noexcept
         {
-            static mutex static_mutex;
+            static std::mutex static_mutex;
             return static_mutex;
         }
         
@@ -84,14 +84,14 @@ namespace kiwi
          */
         template <class T> static void add(sTag name = Tags::_empty)
         {
-            static_assert(is_base_of<ObjectModel, T>::value, "The class must inherit from object.");
-            static_assert(!is_abstract<T>::value, "The class must not be abstract.");
-            static_assert(is_constructible<T, Infos const&>::value, "The class must be constructible with Infos.");
+            static_assert(std::is_base_of<ObjectModel, T>::value, "The class must inherit from object.");
+            static_assert(!std::is_abstract<T>::value, "The class must not be abstract.");
+            static_assert(std::is_constructible<T, Infos const&>::value, "The class must be constructible with Infos.");
             
-            shared_ptr<ObjectModel> object = make_shared<T>(Infos());
+            std::shared_ptr<ObjectModel> object = std::make_shared<T>(Infos());
             if(object)
             {
-                lock_guard<mutex> guard(getMutex());
+                std::lock_guard<std::mutex> guard(getMutex());
                 
                 auto creators = getCreators();
                 
@@ -102,7 +102,7 @@ namespace kiwi
                 }
                 else
                 {
-                    creators[name] = make_shared<CreatorTyped<T>>();
+                    creators[name] = std::make_shared<CreatorTyped<T>>();
                 }
             }
             else
@@ -136,7 +136,7 @@ namespace kiwi
         /** This function retrieves all the names of the object.
          @return A vector of tags with the names.
          */
-        static vector<sTag> names();
+        static std::vector<sTag> names();
     };
 }
 

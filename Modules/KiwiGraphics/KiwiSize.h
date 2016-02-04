@@ -80,7 +80,7 @@ namespace kiwi
         /** The function initializes a point with another point.
          @param size The other point.
          */
-        inline Size(Size&& size) noexcept {swap(m_data, size.m_data);}
+        inline Size(Size&& size) noexcept {std::swap(m_data, size.m_data);}
         
         //! Destructor.
         /** The function deletes the point.
@@ -93,7 +93,7 @@ namespace kiwi
          */
         inline void width(const double w) noexcept
         {
-            m_data[0] = max(w, minimumWidth());
+            m_data[0] = std::fmax(w, minimumWidth());
             if(m_data[4])
             {
                 m_data[1] = m_data[0] * m_data[4];
@@ -108,7 +108,7 @@ namespace kiwi
         {
             if(!m_data[4])
             {
-                m_data[1] = max(h, minimumHeight());
+                m_data[1] = std::fmax(h, minimumHeight());
             }
         }
         
@@ -118,7 +118,7 @@ namespace kiwi
          */
         inline void ratio(const double r) noexcept
         {
-            m_data[4] = max(r, 0.);
+            m_data[4] = std::fmax(r, 0.);
             if(m_data[4])
             {
                 m_data[1] = m_data[0] * m_data[4];
@@ -197,7 +197,7 @@ namespace kiwi
          */
         inline Size& operator=(Size&& size) noexcept
         {
-            swap(m_data, size.m_data);
+            std::swap(m_data, size.m_data);
             return *this;
         }
         
@@ -479,7 +479,7 @@ namespace kiwi
         return size.width() == pt.x() && size.height() == pt.y();
     }
     
-    typedef shared_ptr<Attr::Typed<Size>>   sAttrSize;
+    typedef std::shared_ptr<Attr::Typed<Size>>   sAttrSize;
 }
 
 #endif

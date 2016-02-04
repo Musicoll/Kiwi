@@ -96,7 +96,7 @@ namespace kiwi
         return *this;
     }
     
-    ostream& Atom::toJson(ostream &output, const Atom &atom, ulong& indent)
+    std::ostream& Atom::toJson(std::ostream &output, const Atom &atom, ulong& indent)
     {
         if(atom.isBool())
         {
@@ -131,7 +131,7 @@ namespace kiwi
         else if(atom.isDico())
         {
             Dico const& dico = atom;
-            output << '{' << endl;
+            output << "{\n";
             ++indent;
             for(auto it = dico.begin(); it != dico.end();)
             {
@@ -143,11 +143,11 @@ namespace kiwi
                 toJson(output, it->second, indent);
                 if(++it != dico.end())
                 {
-                    output << ',' << endl;
+                    output << ',' << '\n';
                 }
                 else
                 {
-                    output << endl;
+                    output << '\n';
                 }
             }
             --indent;
@@ -160,9 +160,9 @@ namespace kiwi
         return output;
     }
     
-    ostream& operator<<(ostream &output, const Atom &atom)
+    std::ostream& operator<<(std::ostream &output, const Atom &atom)
     {
-        const bool boolalpha = output.flags() & ios::boolalpha;
+        const bool boolalpha = output.flags() & std::ios::boolalpha;
         if(!boolalpha)
         {
             output << std::boolalpha;
@@ -176,15 +176,15 @@ namespace kiwi
         return output;
     }
     
-    Vector Atom::parse(string const& text)
+    Vector Atom::parse(std::string const& text)
     {
         Vector atoms;
-        const ulong textlen = text.length();
-        string::size_type pos = text.find_first_not_of(' ', 0);
+        const auto textlen = text.length();
+        auto pos = text.find_first_not_of(' ', 0);
         
         while(pos < textlen)
         {
-            string word;
+            std::string word;
             word.reserve(20); // is it more efficient ?
             bool isTag      = false;
             bool isNumber   = false;
@@ -224,7 +224,7 @@ namespace kiwi
                         pos++;
                         
                         // ignore if it can not be closed
-                        if(text.find_first_of('\"', pos) != string::npos)
+                        if(text.find_first_of('\"', pos) != std::string::npos)
                             isQuoted = isTag = true;
                         
                         continue;
@@ -261,11 +261,11 @@ namespace kiwi
                 {
                     if(isFloat)
                     {
-                        atoms.push_back(Atom(stod(word.c_str())));
+                        atoms.push_back(Atom(std::stod(word.c_str())));
                     }
                     else
                     {
-                        atoms.push_back(Atom(stol(word.c_str())));
+                        atoms.push_back(Atom(std::stol(word.c_str())));
                     }
                 }
                 else

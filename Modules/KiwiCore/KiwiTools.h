@@ -51,8 +51,6 @@
 #include <Accelerate/Accelerate.h>
 #endif
 
-using namespace std;
-
 #define _USE_MATH_DEFINES
 
 #ifndef M_PI
@@ -76,20 +74,20 @@ namespace kiwi
     class Atom;
     
     class Tag;
-    typedef shared_ptr<const Tag>       sTag;
-    typedef weak_ptr<const Tag>         wTag;
+    typedef std::shared_ptr<const Tag>       sTag;
+    typedef std::weak_ptr<const Tag>         wTag;
 
     typedef unsigned long               ulong;
-    typedef vector<Atom>                Vector;
-    typedef map<sTag, Atom>             Dico;
+    typedef std::vector<Atom>                Vector;
+    typedef std::map<sTag, Atom>             Dico;
     
     class Error : public std::exception
     {
-        const string m_message;
+        const std::string m_message;
     public:
         inline Error() noexcept : m_message() {};
         
-        Error(string const& message) noexcept :
+        Error(std::string const& message) noexcept :
         m_message(message)
         {
             ;
@@ -106,7 +104,7 @@ namespace kiwi
         }
     };
     
-    class multiinheritable_enable_shared_from_this: public enable_shared_from_this<multiinheritable_enable_shared_from_this>
+    class multiinheritable_enable_shared_from_this: public std::enable_shared_from_this<multiinheritable_enable_shared_from_this>
     {
     public:
         virtual ~multiinheritable_enable_shared_from_this(){}
@@ -115,20 +113,20 @@ namespace kiwi
     template <class T> class inheritable_enable_shared_from_this : virtual public multiinheritable_enable_shared_from_this
     {
     public:
-        shared_ptr<T> shared_from_this() noexcept
+        std::shared_ptr<T> shared_from_this() noexcept
         {
-            return dynamic_pointer_cast<T>(multiinheritable_enable_shared_from_this::shared_from_this());
+            return std::dynamic_pointer_cast<T>(multiinheritable_enable_shared_from_this::shared_from_this());
         }
         
-        shared_ptr<const T> shared_from_this() const noexcept
+        std::shared_ptr<const T> shared_from_this() const noexcept
         {
-            return dynamic_pointer_cast<const T>(multiinheritable_enable_shared_from_this::shared_from_this());
+            return std::dynamic_pointer_cast<const T>(multiinheritable_enable_shared_from_this::shared_from_this());
         }
     };
     
     template <class Type> constexpr Type clip(const Type& n, const Type& lower, const Type& upper)
     {
-        return max(lower, min(n, upper));
+        return std::max(lower, std::min(n, upper));
     }
     
     template <class Type, typename numericType> constexpr Type lerp(const Type& startval, const Type& endval, const numericType& factor)
@@ -151,12 +149,12 @@ namespace kiwi
         return new_value;
     }
     
-    inline string trimDecimal(string& text)
+    inline std::string trimDecimal(std::string& text)
     {
-        string::size_type pos = text.find('.');
-        if(pos != string::npos)
+        const auto pos = text.find('.');
+        if(pos != std::string::npos)
         {
-            string::size_type size = text.size();
+            std::string::size_type size = text.size();
             while(size > pos && text[size - 1] == '0')
             {
                 text.pop_back();
@@ -166,91 +164,91 @@ namespace kiwi
         return text;
     }
     
-    inline string toString(bool __val)
+    inline std::string toString(bool __val)
     {
         return (__val) ? "true" : "false";
     }
     
-    inline string toString(int __val)
+    inline std::string toString(int __val)
     {
-        return to_string(__val);
+        return std::to_string(__val);
     }
     
-    inline string toString(unsigned __val)
+    inline std::string toString(unsigned __val)
     {
-        return to_string(__val);
+        return std::to_string(__val);
     }
     
-    inline string toString(long __val)
+    inline std::string toString(long __val)
     {
-        return to_string(__val);
+        return std::to_string(__val);
     }
     
-    inline string toString(ulong __val)
+    inline std::string toString(ulong __val)
     {
-        return to_string(__val);
+        return std::to_string(__val);
     }
     
-    inline string toString(long long __val)
+    inline std::string toString(long long __val)
     {
-        return to_string(__val);
+        return std::to_string(__val);
     }
     
-    inline string toString(unsigned long long __val)
+    inline std::string toString(unsigned long long __val)
     {
-        return to_string(__val);
+        return std::to_string(__val);
     }
     
-    inline string toString(float __val, bool trim = true)
+    inline std::string toString(float __val, bool trim = true)
     {
         if(trim)
         {
-            string text = to_string(__val);
+            std::string text = std::to_string(__val);
             return trimDecimal(text);
         }
         else
         {
-            return to_string(__val);
+            return std::to_string(__val);
         }
     }
     
-    inline string toString(double __val, bool trim = true)
+    inline std::string toString(double __val, bool trim = true)
     {
         if(trim)
         {
-            string text = to_string(__val);
+            std::string text = std::to_string(__val);
             return trimDecimal(text);
         }
         else
         {
-            return to_string(__val);
+            return std::to_string(__val);
         }
     }
     
-    inline string toString(long double __val, bool trim = true)
+    inline std::string toString(long double __val, bool trim = true)
     {
         if(trim)
         {
-            string text = to_string(__val);
+            std::string text = std::to_string(__val);
             return trimDecimal(text);
         }
         else
         {
-            return to_string(__val);
+            return std::to_string(__val);
         }
     }
     
-    template<class T> inline T fromString(string const& __val)
+    template<class T> inline T fromString(std::string const& __val)
     {
         return T();
     }
     
-    template<> inline bool fromString(string const& __val)
+    template<> inline bool fromString(std::string const& __val)
     {
-        string::size_type pos = __val.find_first_of("-0123456789");
-        if(pos != string::npos)
+        const auto pos = __val.find_first_of("-0123456789");
+        if(pos != std::string::npos)
         {
-            return (bool)stol(__val.c_str()+pos);
+            return static_cast<bool>(std::stol(__val.c_str() + pos));
         }
         else
         {
@@ -258,12 +256,12 @@ namespace kiwi
         }
     }
     
-    template<> inline int fromString(string const& __val)
+    template<> inline int fromString(std::string const& __val)
     {
-        string::size_type pos = __val.find_first_of("-0123456789");
-        if(pos != string::npos)
+        const auto pos = __val.find_first_of("-0123456789");
+        if(pos != std::string::npos)
         {
-            return stoi(__val.c_str()+pos);
+            return std::stoi(__val.c_str()+pos);
         }
         else
         {
@@ -271,12 +269,12 @@ namespace kiwi
         }
     }
     
-    template<> inline long fromString(string const& __val)
+    template<> inline long fromString(std::string const& __val)
     {
-        string::size_type pos = __val.find_first_of("-0123456789");
-        if(pos != string::npos)
+        const auto pos = __val.find_first_of("-0123456789");
+        if(pos != std::string::npos)
         {
-            return stol(__val.c_str()+pos);
+            return std::stol(__val.c_str()+pos);
         }
         else
         {
@@ -284,12 +282,12 @@ namespace kiwi
         }
     }
     
-    template<> inline ulong fromString(string const& __val)
+    template<> inline ulong fromString(std::string const& __val)
     {
-        string::size_type pos = __val.find_first_of("0123456789");
-        if(pos != string::npos)
+        const auto pos = __val.find_first_of("0123456789");
+        if(pos != std::string::npos)
         {
-            return stoul(__val.c_str()+pos);
+            return std::stoul(__val.c_str()+pos);
         }
         else
         {
@@ -297,12 +295,12 @@ namespace kiwi
         }
     }
     
-    template<> inline long long fromString(string const& __val)
+    template<> inline long long fromString(std::string const& __val)
     {
-        string::size_type pos = __val.find_first_of("-0123456789");
-        if(pos != string::npos)
+        const auto pos = __val.find_first_of("-0123456789");
+        if(pos != std::string::npos)
         {
-            return stoll(__val.c_str()+pos);
+            return std::stoll(__val.c_str()+pos);
         }
         else
         {
@@ -310,12 +308,12 @@ namespace kiwi
         }
     }
     
-    template<> inline unsigned long long fromString(string const& __val)
+    template<> inline unsigned long long fromString(std::string const& __val)
     {
-        string::size_type pos = __val.find_first_of("0123456789");
-        if(pos != string::npos)
+        const auto pos = __val.find_first_of("0123456789");
+        if(pos != std::string::npos)
         {
-            return stoull(__val.c_str()+pos);
+            return std::stoull(__val.c_str()+pos);
         }
         else
         {
@@ -323,12 +321,12 @@ namespace kiwi
         }
     }
     
-    template<> inline float fromString(string const& __val)
+    template<> inline float fromString(std::string const& __val)
     {
-        string::size_type pos = __val.find_first_of("-0123456789.");
-        if(pos != string::npos)
+        const auto pos = __val.find_first_of("-0123456789.");
+        if(pos != std::string::npos)
         {
-            return stof(__val.c_str()+pos);
+            return std::stof(__val.c_str()+pos);
         }
         else
         {
@@ -336,12 +334,12 @@ namespace kiwi
         }
     }
     
-    template<> inline double fromString(string const& __val)
+    template<> inline double fromString(std::string const& __val)
     {
-        string::size_type pos = __val.find_first_of("-0123456789.");
-        if(pos != string::npos)
+        const auto pos = __val.find_first_of("-0123456789.");
+        if(pos != std::string::npos)
         {
-            return stod(__val.c_str()+pos);
+            return std::stod(__val.c_str()+pos);
         }
         else
         {
@@ -349,12 +347,12 @@ namespace kiwi
         }
     }
     
-    template<> inline long double fromString(string const& __val)
+    template<> inline long double fromString(std::string const& __val)
     {
-        string::size_type pos = __val.find_first_of("-0123456789.");
-        if(pos != string::npos)
+        const auto pos = __val.find_first_of("-0123456789.");
+        if(pos != std::string::npos)
         {
-            return stold(__val.c_str()+pos);
+            return std::stold(__val.c_str()+pos);
         }
         else
         {
@@ -362,9 +360,9 @@ namespace kiwi
         }
     }
     
-    static inline string jsonEscape(string const& text)
+    static inline std::string jsonEscape(std::string const& text)
     {
-        ostringstream ss;
+        std::ostringstream ss;
         for(auto iter = text.cbegin(); iter != text.cend(); iter++)
         {
             switch (*iter)
@@ -383,10 +381,10 @@ namespace kiwi
         return '\"' + ss.str() + '\"';
     }
     
-    static inline string jsonUnescape(string const& text)
+    static inline std::string jsonUnescape(std::string const& text)
     {
         bool state = false;
-        ostringstream ss;
+        std::ostringstream ss;
         for(auto iter = text.cbegin(); iter != text.cend(); iter++)
         {
             if(state)

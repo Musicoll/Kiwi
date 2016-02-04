@@ -33,28 +33,28 @@ namespace kiwi
     // ================================================================================ //
     
     class Object;
-    typedef shared_ptr<Object>          sObject;
-    typedef weak_ptr<Object>            wObject;
-    typedef shared_ptr<const Object>    scObject;
-    typedef weak_ptr<const Object>      wcObject;
+    typedef std::shared_ptr<Object>          sObject;
+    typedef std::weak_ptr<Object>            wObject;
+    typedef std::shared_ptr<const Object>    scObject;
+    typedef std::weak_ptr<const Object>      wcObject;
     
     class Link;
-    typedef shared_ptr<Link>            sLink;
-    typedef shared_ptr<const Link>      scLink;
-    typedef weak_ptr<Link>              wLink;
-    typedef weak_ptr<const Link>        wcLink;
+    typedef std::shared_ptr<Link>            sLink;
+    typedef std::shared_ptr<const Link>      scLink;
+    typedef std::weak_ptr<Link>              wLink;
+    typedef std::weak_ptr<const Link>        wcLink;
     
     class Patcher;
-    typedef shared_ptr<Patcher>        sPatcher;
-    typedef weak_ptr<Patcher>          wPatcher;
-    typedef shared_ptr<const Patcher>  scPatcher;
-    typedef weak_ptr<const Patcher>    wcPatcher;
+    typedef std::shared_ptr<Patcher>        sPatcher;
+    typedef std::weak_ptr<Patcher>          wPatcher;
+    typedef std::shared_ptr<const Patcher>  scPatcher;
+    typedef std::weak_ptr<const Patcher>    wcPatcher;
     
     class Instance;
-    typedef shared_ptr<Instance>        sInstance;
-    typedef weak_ptr<Instance>          wInstance;
-    typedef shared_ptr<const Instance>  scInstance;
-    typedef weak_ptr<const Instance>    wcInstance;
+    typedef std::shared_ptr<Instance>        sInstance;
+    typedef std::weak_ptr<Instance>          wInstance;
+    typedef std::shared_ptr<const Instance>  scInstance;
+    typedef std::weak_ptr<const Instance>    wcInstance;
     
     // ================================================================================ //
     //                                       INFO                                       //
@@ -65,13 +65,13 @@ namespace kiwi
     {
         const ulong             lid;
         const sTag              name;
-        const string            text;
+        const std::string            text;
         const Dico				dico;
         const Vector			args;
         
         Infos() noexcept : lid(0), name(Tags::_empty), text(""), dico(), args({}) {}
         
-        Infos(const ulong _id, sTag _name, const string _text, Dico const& _dico, Vector const& _args)
+        Infos(const ulong _id, sTag _name, const std::string _text, Dico const& _dico, Vector const& _args)
         : lid(_id), name(_name), text(_text), dico(_dico), args(_args) {}
     };
     */
@@ -150,7 +150,7 @@ namespace kiwi
         /** The function retrieves the text of the object.
          @return The text of the object.
          */
-        inline string getText() const noexcept
+        inline std::string getText() const noexcept
         {
             return m_model.getText();
         }

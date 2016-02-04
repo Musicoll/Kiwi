@@ -48,7 +48,7 @@ namespace kiwi
         double m_data[4];
         bool   m_mode;
         static constexpr inline double cclip(const double val){return (val > 1.) ? 1. : ((val > 0.) ? val : 0.);}
-        static const string m_hex_digits;
+        static const std::string m_hex_digits;
         static double hueToRGB(double const v1, double const v2, double vH);
         
     public:
@@ -80,7 +80,7 @@ namespace kiwi
         /** The function initialize a color with another.
          @param other The other color.
          */
-        inline Color(Color&& other) noexcept : m_mode(other.m_mode) {swap(m_data, other.m_data);}
+        inline Color(Color&& other) noexcept : m_mode(other.m_mode) {std::swap(m_data, other.m_data);}
         
         //! Destructor.
         /** The function deletes the color.
@@ -102,7 +102,7 @@ namespace kiwi
          @param color The color in hexadecimal.
          @return The color.
          */
-        static Color withHexa(string const& color) noexcept;
+        static Color withHexa(std::string const& color) noexcept;
         
         //! Retrieve a color from the interpolation of two colors.
         /** The function retrieves the a color from the interpolation of two colors.
@@ -226,7 +226,7 @@ namespace kiwi
         /** The function retrieves the hexadecimal value.
          @return The hexadecimal value.
          */
-        string hexa() const noexcept;
+        std::string hexa() const noexcept;
         
         //! Retrieve the luminance of the color.
         /** The function retrieves the luminance value.
@@ -317,7 +317,7 @@ namespace kiwi
          */
         inline Color& operator=(Color&& other) noexcept
         {
-            swap(m_data, other.m_data);
+            std::swap(m_data, other.m_data);
             m_mode = other.m_mode;
             return *this;
         }

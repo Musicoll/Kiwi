@@ -96,7 +96,7 @@ namespace kiwi
             objects = it->second;
         }
         
-        lock_guard<mutex> guard(m_mutex);
+        std::lock_guard<std::mutex> guard(m_mutex);
         
         for(Dico objdico : objects)
         {
@@ -119,7 +119,7 @@ namespace kiwi
     {
         if(object)
         {
-            lock_guard<mutex> guard(m_mutex);
+            std::lock_guard<std::mutex> guard(m_mutex);
             
             auto predicate = [object](const ObjectModel& obj) {
                 return &obj == object;

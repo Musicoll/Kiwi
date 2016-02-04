@@ -232,9 +232,9 @@ namespace kiwi
          @param steps The number of steps.
          @return A vector of points (at least two for start and end values);
          */
-        vector<Point> discretized(const ulong steps) const noexcept
+        std::vector<Point> discretized(const ulong steps) const noexcept
         {
-            vector<Point> points;
+            std::vector<Point> points;
             
             points.push_back(m_start);
             
@@ -298,8 +298,8 @@ namespace kiwi
          */
         inline Segment(Point&& start, Point&& end) noexcept
         {
-            swap(m_start, start);
-            swap(m_end, end);
+            std::swap(m_start, start);
+            std::swap(m_end, end);
         }
         
         //! Constructor.
@@ -308,8 +308,8 @@ namespace kiwi
          */
         inline Segment(Segment&& segment) noexcept
         {
-            swap(m_start, segment.m_start);
-            swap(m_end, segment.m_end);
+            std::swap(m_start, segment.m_start);
+            std::swap(m_end, segment.m_end);
         }
         
         //! Destructor.
@@ -377,8 +377,8 @@ namespace kiwi
          */
         inline Segment& operator=(Segment&& segment) noexcept
         {
-            swap(m_start, segment.m_start);
-            swap(m_end, segment.m_end);
+            std::swap(m_start, segment.m_start);
+            std::swap(m_end, segment.m_end);
             return *this;
         }
         
@@ -544,7 +544,7 @@ namespace kiwi
          */
         const void reverse() noexcept override
         {
-            swap(m_start, m_end);
+            std::swap(m_start, m_end);
         }
         
         //! Retrieve the angle of the segment.
@@ -563,7 +563,7 @@ namespace kiwi
          */
         inline double length() const noexcept override
         {
-            return abs(m_start.distance(m_end));
+            return std::abs(m_start.distance(m_end));
         }
         
         //! Retrieve the smallest distance from a point.
@@ -692,8 +692,8 @@ namespace kiwi
          */
         bool intersects(BezierCurve const& curve) const noexcept
         {
-            const vector<Point> points = curve.discretized(100);
-            for(vector<Point>::size_type i = 0; i < points.size() -1; i++)
+            const std::vector<Point> points = curve.discretized(100);
+            for(std::vector<Point>::size_type i = 0; i < points.size() -1; i++)
             {
                 if(intersects(Segment(points[i], points[i+1])))
                 {
@@ -710,8 +710,8 @@ namespace kiwi
         inline double length() const noexcept override
         {
             double len = 0.;
-            const vector<Point> points = discretized(100);
-            for(vector<Point>::size_type i = 0; i < points.size() - 1; i++)
+            const std::vector<Point> points = discretized(100);
+            for(std::vector<Point>::size_type i = 0; i < points.size() - 1; i++)
             {
                 len += Segment(points[i], points[i+1]).length();
             }
@@ -765,9 +765,9 @@ namespace kiwi
          */
         inline BezierQuad(BezierQuad&& curve) noexcept
         {
-            swap(m_start, curve.m_start);
-            swap(m_ctrl, curve.m_ctrl);
-            swap(m_end, curve.m_end);
+            std::swap(m_start, curve.m_start);
+            std::swap(m_ctrl, curve.m_ctrl);
+            std::swap(m_end, curve.m_end);
         }
         
         //! Constructor.
@@ -778,9 +778,9 @@ namespace kiwi
          */
         inline BezierQuad(Point&& start, Point&& ctrl, Point&& end) noexcept
         {
-            swap(m_start, start);
-            swap(m_ctrl, ctrl);
-            swap(m_end, end);
+            std::swap(m_start, start);
+            std::swap(m_ctrl, ctrl);
+            std::swap(m_end, end);
         }
         
         //! Destructor.
@@ -908,9 +908,9 @@ namespace kiwi
          */
         inline BezierQuad& operator=(BezierQuad&& curve) noexcept
         {
-            swap(m_start, curve.m_start);
-            swap(m_ctrl, curve.m_ctrl);
-            swap(m_end, curve.m_end);
+            std::swap(m_start, curve.m_start);
+            std::swap(m_ctrl, curve.m_ctrl);
+            std::swap(m_end, curve.m_end);
             return *this;
         }
         
@@ -1081,7 +1081,7 @@ namespace kiwi
          */
         const void reverse() noexcept override
         {
-            swap(m_start, m_end);
+            std::swap(m_start, m_end);
         }
         
         //! Retrieve the smallest distance from a point.
@@ -1181,10 +1181,10 @@ namespace kiwi
          */
         inline BezierCubic(BezierCubic&& curve) noexcept
         {
-            swap(m_start, curve.m_start);
-            swap(m_ctrl1, curve.m_ctrl1);
-            swap(m_ctrl2, curve.m_ctrl2);
-            swap(m_end, curve.m_end);
+            std::swap(m_start, curve.m_start);
+            std::swap(m_ctrl1, curve.m_ctrl1);
+            std::swap(m_ctrl2, curve.m_ctrl2);
+            std::swap(m_end, curve.m_end);
         }
         
         //! Constructor.
@@ -1196,10 +1196,10 @@ namespace kiwi
          */
         inline BezierCubic(Point&& start, Point&& ctrl1, Point&& ctrl2, Point&& end) noexcept
         {
-            swap(m_start, start);
-            swap(m_ctrl1, ctrl1);
-            swap(m_ctrl2, ctrl2);
-            swap(m_end, end);
+            std::swap(m_start, start);
+            std::swap(m_ctrl1, ctrl1);
+            std::swap(m_ctrl2, ctrl2);
+            std::swap(m_end, end);
         }
         
         //! Create an elliptical arc with a set of cubic bezier points.
@@ -1210,7 +1210,7 @@ namespace kiwi
          @param endAngle    The end angle.
          @return A vector of cubic bezier points (start, ctrl1, ctrl2, end, ctrl1, ctrl2, end, ...)
          */
-        static vector<Point> fromArc(Point const& center, const Point& radius, double startAngle, double endAngle) noexcept;
+        static std::vector<Point> fromArc(Point const& center, const Point& radius, double startAngle, double endAngle) noexcept;
         
         //! Destructor.
         /** The function deletes the cubic curve.
@@ -1395,10 +1395,10 @@ namespace kiwi
          */
         inline BezierCubic& operator=(BezierCubic&& curve) noexcept
         {
-            swap(m_start, curve.m_start);
-            swap(m_ctrl1, curve.m_ctrl1);
-            swap(m_ctrl2, curve.m_ctrl2);
-            swap(m_end,   curve.m_end);
+            std::swap(m_start, curve.m_start);
+            std::swap(m_ctrl1, curve.m_ctrl1);
+            std::swap(m_ctrl2, curve.m_ctrl2);
+            std::swap(m_end,   curve.m_end);
             return *this;
         }
         
@@ -1577,8 +1577,8 @@ namespace kiwi
          */
         const void reverse() noexcept override
         {
-            swap(m_start, m_end);
-            swap(m_ctrl1, m_ctrl2);
+            std::swap(m_start, m_end);
+            std::swap(m_ctrl1, m_ctrl2);
         }
         
         //! Retrieve the smallest distance from a point.

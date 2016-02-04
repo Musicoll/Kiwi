@@ -42,13 +42,13 @@ namespace kiwi
         }
     }
     
-    void AttributeBase::Manager::addListener(sListener listener, vector<sTag> const& names)
+    void AttributeBase::Manager::addListener(sListener listener, std::vector<sTag> const& names)
     {
         if(listener)
         {
             if(names.empty())
             {
-                lock_guard<mutex> guard(m_attrs_mutex);
+                std::lock_guard<std::mutex> guard(m_attrs_mutex);
                 for(auto& it : m_attributes)
                 {
                     it.addListener(listener);
@@ -68,13 +68,13 @@ namespace kiwi
         }
     }
     
-    void AttributeBase::Manager::removeListener(sListener listener, vector<sTag> const& names)
+    void AttributeBase::Manager::removeListener(sListener listener, std::vector<sTag> const& names)
     {
         if(listener)
         {
             if(names.empty())
             {
-                lock_guard<mutex> guard(m_attrs_mutex);
+                std::lock_guard<std::mutex> guard(m_attrs_mutex);
                 for(auto& it : m_attributes)
                 {
                     it.removeListener(listener);

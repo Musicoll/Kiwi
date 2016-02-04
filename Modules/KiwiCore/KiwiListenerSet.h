@@ -38,12 +38,12 @@ namespace kiwi
     template <class ListenerClass> class ListenerSet
     {
     private:
-        typedef shared_ptr<ListenerClass>		sListener;
-        typedef weak_ptr<ListenerClass>			wListener;
+        typedef std::shared_ptr<ListenerClass>		sListener;
+        typedef std::weak_ptr<ListenerClass>			wListener;
         
-        set<wListener,
-        owner_less<wListener>>  m_listeners;
-        mutable mutex           m_listeners_mutex;
+        std::set<wListener,
+        std::owner_less<wListener>>  m_listeners;
+        mutable std::mutex           m_listeners_mutex;
         
     public:
         
@@ -63,7 +63,7 @@ namespace kiwi
         {
             if(listener)
             {
-                lock_guard<mutex> guard(m_listeners_mutex);
+                std::lock_guard<std::mutex> guard(m_listeners_mutex);
                 if(m_listeners.insert(listener).second)
                 {
                     return true;
@@ -82,7 +82,7 @@ namespace kiwi
         {
             if(listener)
             {
-                lock_guard<mutex> guard(m_listeners_mutex);
+                std::lock_guard<std::mutex> guard(m_listeners_mutex);
                 if(m_listeners.erase(listener))
                 {
                     return true;
@@ -96,7 +96,7 @@ namespace kiwi
          */
         void clean() noexcept
         {
-            lock_guard<mutex> guard(m_listeners_mutex);
+            std::lock_guard<std::mutex> guard(m_listeners_mutex);
             for(auto it = m_listeners.begin(); it != m_listeners.end();)
             {
                 if((*it).lock()) ++it;
@@ -110,7 +110,7 @@ namespace kiwi
          */
         ulong size() const noexcept
         {
-            lock_guard<mutex> guard(m_listeners_mutex);
+            std::lock_guard<std::mutex> guard(m_listeners_mutex);
             return m_listeners.size();
         }
         
@@ -120,7 +120,7 @@ namespace kiwi
          */
         bool empty() const noexcept
         {
-            lock_guard<mutex> guard(m_listeners_mutex);
+            std::lock_guard<std::mutex> guard(m_listeners_mutex);
             return m_listeners.empty();
         }
         
@@ -129,7 +129,7 @@ namespace kiwi
          */
         void clear() noexcept
         {
-            lock_guard<mutex> guard(m_listeners_mutex);
+            std::lock_guard<std::mutex> guard(m_listeners_mutex);
             m_listeners.clear();
         }
         
@@ -147,10 +147,10 @@ namespace kiwi
         /** The functions retrieves the listeners, removing all invalid listeners.
          @return The listeners.
          */
-        inline vector<sListener> getListeners() noexcept
+        inline std::vector<sListener> getListeners() noexcept
         {
-            lock_guard<mutex> guard(m_listeners_mutex);
-            vector<sListener> listeners;
+            std::lock_guard<std::mutex> guard(m_listeners_mutex);
+            std::vector<sListener> listeners;
             for(auto it = m_listeners.begin(); it != m_listeners.end();)
             {
                 sListener l = (*it).lock();
@@ -171,10 +171,10 @@ namespace kiwi
         /** The functions retrieves the listeners
          @return The listeners.
          */
-        inline vector<sListener> getListeners() const noexcept
+        inline std::vector<sListener> getListeners() const noexcept
         {
-            lock_guard<mutex> guard(m_listeners_mutex);
-            vector<sListener> listeners;
+            std::lock_guard<std::mutex> guard(m_listeners_mutex);
+            std::vector<sListener> listeners;
             for(auto elem : m_listeners)
             {
                 sListener l = elem.lock();

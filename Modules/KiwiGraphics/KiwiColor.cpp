@@ -25,7 +25,7 @@
 
 namespace kiwi
 {
-    const string Color::m_hex_digits = string("0123456789ABCDEF");
+    const std::string Color::m_hex_digits{"0123456789ABCDEF"};
     
     Color Color::contrasted(const double value) const noexcept
     {
@@ -36,7 +36,7 @@ namespace kiwi
         else
         {
             Color white(1., 1., 1., value);
-            return Color(fmod(red() * value + 1., 1.), fmod(green() * value + 1., 1.), fmod(blue() * value + 1., 1.), alpha());
+            return Color(std::fmod(red() * value + 1., 1.), std::fmod(green() * value + 1., 1.), std::fmod(blue() * value + 1., 1.), alpha());
         }
     }
 
@@ -63,7 +63,7 @@ namespace kiwi
 
     }
     
-    Color Color::withHexa(string const& color) noexcept
+    Color Color::withHexa(std::string const& color) noexcept
     {
         if(color.size() > 1 && color[0] == '#')
         {
@@ -78,14 +78,14 @@ namespace kiwi
     
     double Color::hue() const noexcept
     {
-        const double _max = max(max(red(), green()),  blue());
+        const double _max = std::max(std::max(red(), green()),  blue());
         if(!_max)
         {
             return 0.;
         }
         else
         {
-            const double _min = min(min(red(), green()),  blue());
+            const double _min = std::min(std::min(red(), green()),  blue());
             const double _delta = _max - _min;
             double hue;
             if(red() == _max)
@@ -124,14 +124,14 @@ namespace kiwi
     
     double Color::saturation() const noexcept
     {
-        const double _max = max(max(red(), green()),  blue());
+        const double _max = std::max(std::max(red(), green()),  blue());
         if(!_max)
         {
             return 0.;
         }
         else
         {
-            const double _min = min(min(red(), green()),  blue());
+            const double _min = std::min(std::min(red(), green()),  blue());
             const double _light = (_max + _min) * 0.5;
             if(_light < 0.5)
             {
@@ -146,14 +146,14 @@ namespace kiwi
     
     double Color::lightness() const noexcept
     {
-        const double _max = max(max(red(), green()),  blue());
-        const double _min = min(min(red(), green()),  blue());
+        const double _max = std::max(std::max(red(), green()),  blue());
+        const double _min = std::min(std::min(red(), green()),  blue());
         return (_max + _min) * 0.5;
     }
     
-    string Color::hexa() const noexcept
+    std::string Color::hexa() const noexcept
     {
-        string color("#");
+        std::string color("#");
         int r = red() * 255;
         int g = green() * 255;
         int b = blue() * 255;
