@@ -632,11 +632,6 @@ namespace kiwi
             }
         }
     };
-
-    typedef shared_ptr<Attr::Typed<bool>>		sAttrBool;
-    typedef shared_ptr<Attr::Typed<long>>		sAttrLong;
-    typedef shared_ptr<Attr::Typed<double>>     sAttrDouble;
-    typedef shared_ptr<Attr::Typed<sTag>>       sAttrTag;
 }
 
 #endif

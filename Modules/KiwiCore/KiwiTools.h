@@ -78,21 +78,12 @@ namespace kiwi
     class Tag;
     typedef shared_ptr<const Tag>       sTag;
     typedef weak_ptr<const Tag>         wTag;
-    
-    class Clock;
-    typedef shared_ptr<Clock>           sClock;
-    typedef weak_ptr<Clock>             wClock;
-    
-    class Beacon;
-    typedef shared_ptr<Beacon>          sBeacon;
-    typedef weak_ptr<Beacon>            wBeacon;
 
     typedef unsigned long               ulong;
-    typedef shared_ptr<const Tag>       sTag;
     typedef vector<Atom>                Vector;
     typedef map<sTag, Atom>             Dico;
     
-    class Error : public exception
+    class Error : public std::exception
     {
         const string m_message;
     public:
