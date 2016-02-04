@@ -21,8 +21,8 @@
  ==============================================================================
 */
 
-#ifndef __DEF_KIWI_ATTR__
-#define __DEF_KIWI_ATTR__
+#ifndef KIWI_ATTR_H_INCLUDED
+#define KIWI_ATTR_H_INCLUDED
 
 #include "KiwiAtom.h"
 #include "KiwiListenerSet.h"
@@ -634,6 +634,4 @@ namespace kiwi
     };
 }
 
-#endif
-
-
+#endif // KIWI_ATTR_H_INCLUDED

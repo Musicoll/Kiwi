@@ -21,8 +21,8 @@
  ==============================================================================
  */
 
-#ifndef __DEF_KIWI_GUI_PATH__
-#define __DEF_KIWI_GUI_PATH__
+#ifndef KIWI_PATH_H_INCLUDED
+#define KIWI_PATH_H_INCLUDED
 
 #include "KiwiRectangle.h"
 
@@ -690,4 +690,4 @@ namespace kiwi
     };
 }
 
-#endif
+#endif // KIWI_PATH_H_INCLUDED

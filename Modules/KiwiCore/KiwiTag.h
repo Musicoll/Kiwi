@@ -21,8 +21,8 @@
  ==============================================================================
 */
 
-#ifndef __DEF_KIWI_TAG__
-#define __DEF_KIWI_TAG__
+#ifndef KIWI_TAG_H_INCLUDED
+#define KIWI_TAG_H_INCLUDED
 
 #include "KiwiTools.h"
 
@@ -199,6 +199,6 @@ namespace kiwi
 };
 
 
-#endif
+#endif // KIWI_TAG_H_INCLUDED
 
 

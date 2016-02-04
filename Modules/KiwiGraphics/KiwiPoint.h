@@ -21,8 +21,8 @@
  ==============================================================================
  */
 
-#ifndef __DEF_KIWI_GUI_POINT__
-#define __DEF_KIWI_GUI_POINT__
+#ifndef KIWI_POINT_H_INCLUDED
+#define KIWI_POINT_H_INCLUDED
 
 #include "KiwiAffineMatrix.h"
 
@@ -659,4 +659,4 @@ namespace kiwi
     typedef std::shared_ptr<Attr::Typed<Point>>  sAttrPoint;
 }
 
-#endif
+#endif // KIWI_POINT_H_INCLUDED

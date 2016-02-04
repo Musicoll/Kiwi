@@ -21,8 +21,8 @@
  ==============================================================================
  */
 
-#ifndef __DEF_KIWI_GUI_COLOR__
-#define __DEF_KIWI_GUI_COLOR__
+#ifndef KIWI_COLOR_H_INCLUDED
+#define KIWI_COLOR_H_INCLUDED
 
 #include "KiwiPath.h"
 
@@ -398,4 +398,4 @@ namespace kiwi
     };
 }
 
-#endif
+#endif // KIWI_COLOR_H_INCLUDED

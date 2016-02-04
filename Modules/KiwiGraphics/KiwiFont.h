@@ -21,8 +21,8 @@
  ==============================================================================
  */
 
-#ifndef __DEF_KIWI_GUI_FONT__
-#define __DEF_KIWI_GUI_FONT__
+#ifndef KIWI_FONT_H_INCLUDED
+#define KIWI_FONT_H_INCLUDED
 
 #include "KiwiColor.h"
 
@@ -544,4 +544,4 @@ namespace kiwi
     };
 }
 
-#endif
+#endif // KIWI_FONT_H_INCLUDED

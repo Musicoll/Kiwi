@@ -21,8 +21,8 @@
  ==============================================================================
  */
 
-#ifndef __DEF_KIWI_GUI_RECTANGLE__
-#define __DEF_KIWI_GUI_RECTANGLE__
+#ifndef KIWI_RECTANGLE_H_INCLUDED
+#define KIWI_RECTANGLE_H_INCLUDED
 
 #include "KiwiSize.h"
 
@@ -889,4 +889,4 @@ namespace kiwi
     };
 }
 
-#endif
+#endif // KIWI_RECTANGLE_H_INCLUDED

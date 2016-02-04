@@ -21,8 +21,8 @@
  ==============================================================================
  */
 
-#ifndef __DEF_KIWI_GUI_MOUSECURSOR__
-#define __DEF_KIWI_GUI_MOUSECURSOR__
+#ifndef KIWI_MOUSECURSOR_H_INCLUDED
+#define KIWI_MOUSECURSOR_H_INCLUDED
 
 #include "KiwiFont.h"
 
@@ -117,4 +117,4 @@ namespace kiwi
     };
 }
 
-#endif
+#endif // KIWI_MOUSECURSOR_H_INCLUDED

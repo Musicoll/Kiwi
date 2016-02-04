@@ -21,8 +21,8 @@
  ==============================================================================
  */
 
-#ifndef __DEF_KIWI_GUI_AFFINEMATRIX__
-#define __DEF_KIWI_GUI_AFFINEMATRIX__
+#ifndef KIWI_AFFINEMATRIX_H_INCLUDED
+#define KIWI_AFFINEMATRIX_H_INCLUDED
 
 #include "../KiwiCore/KiwiCore.h"
 
@@ -328,4 +328,4 @@ namespace kiwi
     };
 }
 
-#endif
+#endif // KIWI_AFFINEMATRIX_H_INCLUDED

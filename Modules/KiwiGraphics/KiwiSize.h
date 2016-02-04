@@ -21,8 +21,8 @@
  ==============================================================================
  */
 
-#ifndef __DEF_KIWI_GUI_SIZE__
-#define __DEF_KIWI_GUI_SIZE__
+#ifndef KIWI_SIZE_H_INCLUDED
+#define KIWI_SIZE_H_INCLUDED
 
 #include "KiwiLine.h"
 
@@ -482,4 +482,4 @@ namespace kiwi
     typedef std::shared_ptr<Attr::Typed<Size>>   sAttrSize;
 }
 
-#endif
+#endif // KIWI_SIZE_H_INCLUDED

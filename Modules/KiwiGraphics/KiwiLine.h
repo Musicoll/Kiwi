@@ -21,8 +21,8 @@
  ==============================================================================
  */
 
-#ifndef __DEF_KIWI_GUI_LINE__
-#define __DEF_KIWI_GUI_LINE__
+#ifndef KIWI_LINE_H_INCLUDED
+#define KIWI_LINE_H_INCLUDED
 
 #include "KiwiPoint.h"
 
@@ -1614,4 +1614,4 @@ namespace kiwi
     };
 }
 
-#endif
+#endif // KIWI_LINE_H_INCLUDED

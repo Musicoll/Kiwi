@@ -21,9 +21,9 @@
  ==============================================================================
  */
 
-#ifndef __DEF_KIWI_GUI_GRAPHICS__
-#define __DEF_KIWI_GUI_GRAPHICS__
+#ifndef KIWI_GRAPHICS_H_INCLUDED
+#define KIWI_GRAPHICS_H_INCLUDED
 
 #include "KiwiFont.h"
 
-#endif
+#endif // KIWI_GRAPHICS_H_INCLUDED

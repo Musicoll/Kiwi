@@ -21,8 +21,8 @@
  ==============================================================================
  */
 
-#ifndef __DEF_KIWI_CORE_ATOM__
-#define __DEF_KIWI_CORE_ATOM__
+#ifndef KIWI_ATOM_H_INCLUDED
+#define KIWI_ATOM_H_INCLUDED
 
 #include "KiwiTag.h"
 
@@ -925,6 +925,4 @@ namespace kiwi
 
 
 
-#endif
-
-
+#endif // KIWI_ATOM_H_INCLUDED

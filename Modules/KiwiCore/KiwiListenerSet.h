@@ -21,8 +21,8 @@
  ==============================================================================
  */
 
-#ifndef __DEF_KIWI_LISTENERSET__
-#define __DEF_KIWI_LISTENERSET__
+#ifndef KIWI_LISTENERSET_H_INCLUDED
+#define KIWI_LISTENERSET_H_INCLUDED
 
 #include "KiwiAtom.h"
 
@@ -214,4 +214,4 @@ namespace kiwi
     };
 }
 
-#endif
+#endif // KIWI_LISTENERSET_H_INCLUDED

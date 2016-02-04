@@ -21,14 +21,14 @@
  ==============================================================================
 */
 
-#ifndef __DEF_KIWI_CORE__
-#define __DEF_KIWI_CORE__
+#ifndef KIWI_CORE_H_INCLUDED
+#define KIWI_CORE_H_INCLUDED
 
 #include "KiwiTag.h"
 #include "KiwiAtom.h"
 #include "KiwiAttr.h"
 #include "KiwiListenerSet.h"
 
-#endif
+#endif // KIWI_CORE_H_INCLUDED
 
 
