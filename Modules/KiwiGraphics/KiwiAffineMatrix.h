@@ -38,9 +38,6 @@ namespace kiwi
      */
     class AffineMatrix
     {
-    private:
-        double m_matrix[6];
-        
     public:
         //! Constructor.
         /** The function initializes an identity matrix.
@@ -325,6 +322,9 @@ namespace kiwi
             return AffineMatrix(-1., 0.,  0,
                                 0., 1., 0);
         }
+        
+    private:
+        std::array<double, 6> m_matrix;
     };
 }
 

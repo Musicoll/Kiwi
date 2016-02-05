@@ -32,32 +32,18 @@ namespace kiwi
     //                                      COLOR                                       //
     // ================================================================================ //
     
-    //! The color holds four double values for red, green, blue and alpha colors values.
+    //! The color is used to represent a color in the rgba format (red, green, blue and alpha).
     /**
-     The rectangle is used to represent a color in the rgba format then, you should use the hsla methods with parsimony.
+     The color is used to represent a color in the rgba format then, you should use the hsla methods with parsimony.
      */
     class Color
     {
-    private:
-        enum Mode
-        {
-            RGBA = 0,
-            HSLA = 1
-        };
-        
-        double m_data[4];
-        bool   m_mode;
-        static constexpr inline double cclip(const double val){return (val > 1.) ? 1. : ((val > 0.) ? val : 0.);}
-        static const std::string m_hex_digits;
-        static double hueToRGB(double const v1, double const v2, double vH);
-        
     public:
-        
         //! Constructor.
         /** The function initialize a default black color.
          */
         constexpr inline Color() noexcept :
-        m_data{0., 0., 0., 1}, m_mode(RGBA) {}
+        m_rgba{0., 0., 0., 1}, m_mode(RGBA) {}
         
         //! Constructor.
         /** The function initialize a color with rgba values.
@@ -67,20 +53,20 @@ namespace kiwi
          @param alpha The alpha value.
          */
         constexpr inline Color(const double red, const double green, const double blue, const double alpha = 1.) noexcept :
-        m_data{cclip(red), cclip(green), cclip(blue), cclip(alpha)}, m_mode(RGBA) {}
+        m_rgba{cclip(red), cclip(green), cclip(blue), cclip(alpha)}, m_mode(RGBA) {}
         
         //! Constructor.
         /** The function initialize a color with another.
          @param other The other color.
          */
         constexpr inline Color(Color const& other) noexcept :
-        m_data{other.m_data[0], other.m_data[1], other.m_data[2], other.m_data[3]}, m_mode(other.m_mode) {}
+        m_rgba{other.m_rgba[0], other.m_rgba[1], other.m_rgba[2], other.m_rgba[3]}, m_mode(other.m_mode) {}
         
         //! Constructor.
         /** The function initialize a color with another.
          @param other The other color.
          */
-        inline Color(Color&& other) noexcept : m_mode(other.m_mode) {std::swap(m_data, other.m_data);}
+        inline Color(Color&& other) noexcept : m_mode(other.m_mode) {std::swap(m_rgba, other.m_rgba);}
         
         //! Destructor.
         /** The function deletes the color.
@@ -174,7 +160,7 @@ namespace kiwi
          */
         inline double red() const noexcept
         {
-            return m_data[0];
+            return m_rgba[0];
         }
         
         //! Retrieve the green value.
@@ -183,7 +169,7 @@ namespace kiwi
          */
         inline double green() const noexcept
         {
-            return m_data[1];
+            return m_rgba[1];
         }
         
         //! Retrieve the blue value.
@@ -192,7 +178,7 @@ namespace kiwi
          */
         inline double blue() const noexcept
         {
-            return m_data[2];
+            return m_rgba[2];
         }
         
         //! Retrieve the alpha value.
@@ -201,7 +187,7 @@ namespace kiwi
          */
         inline double alpha() const noexcept
         {
-            return m_data[3];
+            return m_rgba[3];
         }
         
         //! Retrieve the hue value.
@@ -243,7 +229,7 @@ namespace kiwi
          */
         inline void red(const double value) noexcept
         {
-            m_data[0] = clip(value, 0., 1.);
+            m_rgba[0] = clip(value, 0., 1.);
         }
         
         //! Set the green value.
@@ -252,7 +238,7 @@ namespace kiwi
          */
         inline void green(const double value) noexcept
         {
-            m_data[1] = clip(value, 0., 1.);
+            m_rgba[1] = clip(value, 0., 1.);
         }
         
         //! Set the blue value.
@@ -261,7 +247,7 @@ namespace kiwi
          */
         inline void blue(const double value) noexcept
         {
-            m_data[2] = clip(value, 0., 1.);
+            m_rgba[2] = clip(value, 0., 1.);
         }
         
         //! Set the alpha value.
@@ -270,7 +256,7 @@ namespace kiwi
          */
         inline void alpha(const double value) noexcept
         {
-            m_data[3] = clip(value, 0., 1.);
+            m_rgba[3] = clip(value, 0., 1.);
         }
         
         //! Set the hue value.
@@ -306,7 +292,7 @@ namespace kiwi
          */
         inline Color& operator=(Color const& other) noexcept
         {
-            memcpy(m_data, other.m_data, sizeof(double)*4);
+            m_rgba = other.m_rgba;
             m_mode = other.m_mode;
             return *this;
         }
@@ -317,7 +303,7 @@ namespace kiwi
          */
         inline Color& operator=(Color&& other) noexcept
         {
-            std::swap(m_data, other.m_data);
+            std::swap(m_rgba, other.m_rgba);
             m_mode = other.m_mode;
             return *this;
         }
@@ -377,6 +363,25 @@ namespace kiwi
             }
             return *this;
         }
+        
+    private:
+        
+        //! @internal clip value between 0 and 1.
+        static constexpr inline double cclip(const double val){return (val > 1.) ? 1. : ((val > 0.) ? val : 0.);}
+        
+        //! @internal convert hue value to rgb.
+        static double hueToRGB(double const v1, double const v2, double vH);
+        
+        //! @internal Color Mode
+        enum Mode
+        {
+            RGBA = 0,
+            HSLA = 1
+        };
+        
+        std::array<double, 4>       m_rgba;
+        bool                        m_mode;
+        static const std::string    m_hex_digits;
     };
     
     // ================================================================================ //

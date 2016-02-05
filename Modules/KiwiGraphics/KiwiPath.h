@@ -43,45 +43,6 @@ namespace kiwi
      */
     class Path
     {
-    private:
-        friend class Sketch;
-        
-        //! @internal
-        enum Mode
-        {
-            Close       = 0,
-            Move        = 1,
-            Linear      = 2,
-            Quadratic   = 3,
-            Cubic       = 4
-        };
-        
-        //! @internal
-        class Node
-        {
-        private:
-            double data[2];
-            Mode   m;
-        public:
-            constexpr inline Node() noexcept : data{0., 0.}, m(Linear) {};
-            constexpr inline Node(Point const& pt, Mode const _m = Linear) noexcept : data{pt.m_data[0], pt.m_data[1]}, m(_m) {};
-            constexpr inline Node(Node const& other) noexcept : data{other.data[0], other.data[1]}, m(other.m) {};
-            inline Node(Point&& pt, Mode const _m = Linear) noexcept : m(_m) {std::swap(data, pt.m_data);};
-            inline Node(Node&& other) noexcept : m(other.m) {std::swap(data, other.data);};
-            inline ~Node() noexcept {};
-            inline Node& operator=(Point const& pt) noexcept {memcpy(data, pt.m_data, sizeof(double)*2); return *this;}
-            inline Node& operator=(Node const& other) noexcept {memcpy(data, other.data, sizeof(double)*2); m = other.m; return *this;}
-            inline Node& operator=(Point&& pt) noexcept {std::swap(data, pt.m_data); return *this;}
-            inline Node& operator=(Node&& other) noexcept {std::swap(data, other.data); m = other.m; return *this;}
-            inline bool operator!=(Point const& other) const noexcept {return (data[0] != other.x() && data[1] != other.y());}
-            inline Point point() const noexcept {return Point(data[0], data[1]);}
-            inline Mode mode() const noexcept{return m;}
-            inline void transform(AffineMatrix const& matrix) noexcept {matrix.applyTo(data[0], data[1]);}
-        };
-    
-        std::vector<Node> m_nodes;
-        Rectangle    m_bounds;
-        
     public:
         
         /** The graphic behavior of the joint between lines.
@@ -604,8 +565,46 @@ namespace kiwi
         bool overlaps(Rectangle const& rect) const noexcept;
         
     private:
+        friend class Sketch;
         
-        //@internal
+        //! @internal
+        enum Mode
+        {
+            Close       = 0,
+            Move        = 1,
+            Linear      = 2,
+            Quadratic   = 3,
+            Cubic       = 4
+        };
+        
+        //! @internal
+        class Node
+        {
+        public:
+            constexpr inline Node() noexcept : data{0., 0.}, m(Linear) {};
+            constexpr inline Node(Point const& pt, Mode const _m = Linear) noexcept : data{pt.m_data[0], pt.m_data[1]}, m(_m) {};
+            constexpr inline Node(Node const& other) noexcept : data{other.data[0], other.data[1]}, m(other.m) {};
+            inline Node(Point&& pt, Mode const _m = Linear) noexcept : m(_m) {std::swap(data, pt.m_data);};
+            inline Node(Node&& other) noexcept : m(other.m) {std::swap(data, other.data);};
+            inline ~Node() noexcept {};
+            inline Node& operator=(Point const& pt) noexcept {memcpy(data, pt.m_data, sizeof(double)*2); return *this;}
+            inline Node& operator=(Node const& other) noexcept {memcpy(data, other.data, sizeof(double)*2); m = other.m; return *this;}
+            inline Node& operator=(Point&& pt) noexcept {std::swap(data, pt.m_data); return *this;}
+            inline Node& operator=(Node&& other) noexcept {std::swap(data, other.data); m = other.m; return *this;}
+            inline bool operator!=(Point const& other) const noexcept {return (data[0] != other.x() && data[1] != other.y());}
+            inline Point point() const noexcept {return Point(data[0], data[1]);}
+            inline Mode mode() const noexcept{return m;}
+            inline void transform(AffineMatrix const& matrix) noexcept {matrix.applyTo(data[0], data[1]);}
+            
+        private:
+            double data[2];
+            Mode   m;
+        };
+        
+        std::vector<Node> m_nodes;
+        Rectangle    m_bounds;
+        
+        //! @internal
         inline void rebound(Node const& newnode) noexcept
         {
             if(m_nodes.size() > 1)

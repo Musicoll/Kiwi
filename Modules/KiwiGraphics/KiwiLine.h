@@ -42,9 +42,6 @@ namespace kiwi
      */
     class Line
     {
-    protected:
-        Point m_start, m_end;
-        
     public:
         
         //! Constructor.
@@ -260,6 +257,10 @@ namespace kiwi
         {
             return false;
         }
+        
+    protected:
+        Point m_start, m_end;
+        
     };
     
     // ================================================================================ //
@@ -729,9 +730,6 @@ namespace kiwi
      */
     class BezierQuad : public BezierCurve
     {
-    private:
-        Point m_ctrl;
-        
     public:
         //! Constructor.
         /** The function initializes a quadratic curve, using (0, 0) as its start and end points.
@@ -1114,6 +1112,9 @@ namespace kiwi
         {
             return Point::fromLine(m_start, m_ctrl, m_end, delta);
         }
+        
+    private:
+        Point m_ctrl;
     };
     
     // ================================================================================ //
@@ -1126,9 +1127,6 @@ namespace kiwi
      */
     class BezierCubic : public BezierCurve
     {
-    private:
-        Point m_ctrl1, m_ctrl2;
-        
     public:
         //! Constructor.
         /** The function initializes a cubic curve, using (0, 0) as its start, end and control points.
@@ -1611,6 +1609,9 @@ namespace kiwi
         {
             return Point::fromLine(m_start, m_ctrl1, m_ctrl2, m_end, delta);
         }
+        
+    private:
+        Point m_ctrl1, m_ctrl2;
     };
 }
 

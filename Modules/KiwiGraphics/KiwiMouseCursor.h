@@ -65,11 +65,6 @@ namespace kiwi
             ResizingBottomRight         ///< Bottom-Right Corner
         };
         
-    private:
-        Type m_type;
-        
-    public:
-        
         //! Mouse cursor constructor.
         /** Initializes a mouse cursor.
          @param type The type of cursor as defined by the Type \Enum.
@@ -114,6 +109,9 @@ namespace kiwi
         {
             return m_type != other.m_type;
         }
+        
+    private:
+        Type m_type;
     };
 }
 

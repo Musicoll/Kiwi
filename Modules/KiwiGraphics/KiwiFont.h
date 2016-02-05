@@ -80,9 +80,9 @@ namespace kiwi
         class Intern
         {
         private:
-            const std::string    m_name;
-            double          m_height;
-            unsigned        m_style;
+            const std::string   m_name;
+            double              m_height;
+            unsigned        	m_style;
         public:
             
             //! Font constructor.

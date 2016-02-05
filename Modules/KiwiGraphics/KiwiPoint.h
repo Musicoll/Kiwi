@@ -39,12 +39,6 @@ namespace kiwi
      */
     class Point
     {
-    private:
-        friend class Path;
-        double m_data[2];
-        
-        static ulong solve(double a, double b, double c, double const d, double &solution1, double &solution2, double &solution3);
-        static ulong solve(std::array<Point, 6>& W, double *t, const ulong depth);
     public:
         
         //! Constructor.
@@ -632,6 +626,17 @@ namespace kiwi
             }
             return *this;
         }
+        
+    private:
+        
+        friend class Path;
+        
+        //! @internal
+        static ulong solve(double a, double b, double c, double const d, double &solution1, double &solution2, double &solution3);
+        //! @internal
+        static ulong solve(std::array<Point, 6>& W, double *t, const ulong depth);
+        
+        double m_data[2];
     };
     
     //! Multiply a value with a point.

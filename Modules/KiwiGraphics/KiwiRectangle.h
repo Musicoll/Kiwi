@@ -38,10 +38,6 @@ namespace kiwi
      */
     class Rectangle
     {
-    private:
-        Point m_position;
-        Size  m_size;
-        
     public:
         
         //! Rectangle borders
@@ -886,6 +882,10 @@ namespace kiwi
             }
             return *this;
         }
+        
+    private:
+        Point m_position;
+        Size  m_size;
     };
 }
 

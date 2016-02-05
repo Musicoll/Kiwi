@@ -38,11 +38,6 @@ namespace kiwi
      */
     class Size
     {
-    private:
-        double m_data[5];
-        constexpr static inline double sclip(const double v) {return v > 0. ? v : 0.;}
-        constexpr static inline double sclip(const double v, const double m) {return v > m ? v : m;}
-        constexpr static inline double sdiv(const bool v, const double v1, const double v2) {return (v && v1 > 0. && v2 > 0.) ? v1 / v2 : 0.;}
     public:
         
         //! Constructor.
@@ -437,6 +432,17 @@ namespace kiwi
             }
             return *this;
         }
+        
+    private:
+        
+        //! @internal
+        constexpr static inline double sclip(const double v) {return v > 0. ? v : 0.;}
+        //! @internal
+        constexpr static inline double sclip(const double v, const double m) {return v > m ? v : m;}
+        //! @internal
+        constexpr static inline double sdiv(bool v, const double v1, const double v2) {return (v && v1 > 0. && v2 > 0.) ? v1 / v2 : 0.;}
+        
+        double m_data[5];
     };
             
     //! Get the equality between a size and point.
