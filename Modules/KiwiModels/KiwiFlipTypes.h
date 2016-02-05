@@ -86,14 +86,6 @@ namespace kiwi
     
     class FlipRGBA : public flip::Object
     {
-    private:
-        static constexpr inline double cclip(const double val){return (val > 1.) ? 1. : ((val > 0.) ? val : 0.);}
-        
-        flip::Float m_red;
-        flip::Float m_green;
-        flip::Float m_blue;
-        flip::Float m_alpha;
-        
     public:
         
         FlipRGBA() = default;
@@ -110,12 +102,20 @@ namespace kiwi
             if(atom.isVector())
             {
                 Vector atoms = atom;
-                if(atoms.size() >= 4)
+                if(atoms.size() > 2 &&
+                   atoms[0].isNumber() &&
+                   atoms[1].isNumber() &&
+                   atoms[2].isNumber())
                 {
                     red(cclip(atoms[0]));
                     green(cclip(atoms[1]));
                     blue(cclip(atoms[2]));
-                    alpha(cclip(atoms[3]));
+                    
+                    if(atoms.size() >= 4 &&
+                       atoms[3].isNumber())
+                    {
+                        alpha(cclip(atoms[3]));
+                    }
                 }
             }
         }
@@ -125,13 +125,13 @@ namespace kiwi
         {
             Model::declare<FlipRGBA>()
             .name("cicm.kiwi.FlipRGBA")
-            .member<flip::Float, &FlipRGBA::m_red>("red")
-            .member<flip::Float, &FlipRGBA::m_green>("green")
-            .member<flip::Float, &FlipRGBA::m_blue>("blue")
-            .member<flip::Float, &FlipRGBA::m_alpha>("alpha");
+            .member<flip::Float, &FlipRGBA::m_red>      ("red")
+            .member<flip::Float, &FlipRGBA::m_green>    ("green")
+            .member<flip::Float, &FlipRGBA::m_blue>     ("blue")
+            .member<flip::Float, &FlipRGBA::m_alpha>    ("alpha");
         }
         
-        //! Retrieve the attribute value as a vector of atoms.
+        //! Retrieve the FlipRGBA value as a vector of atoms.
         operator Atom() const
         {
             return Atom {red(), green(), blue(), alpha()};
@@ -146,6 +146,16 @@ namespace kiwi
         void green(const double _green) noexcept    {m_green = _green;}
         void blue(const double _blue) noexcept      {m_blue = _blue;}
         void alpha(const double _alpha) noexcept    {m_alpha = _alpha;}
+        
+    private:
+        
+        //! @internal clip value between 0 and 1
+        static constexpr inline double cclip(const double val){return (val > 1.) ? 1. : ((val > 0.) ? val : 0.);}
+        
+        flip::Float m_red;
+        flip::Float m_green;
+        flip::Float m_blue;
+        flip::Float m_alpha;
     };
     
     // ================================================================================ //
@@ -154,10 +164,6 @@ namespace kiwi
     
     class FlipPoint : public flip::Object
     {
-    private:
-        flip::Float m_x;
-        flip::Float m_y;
-        
     public:
         FlipPoint() : m_x(0.), m_y(0.) {}
         
@@ -193,7 +199,10 @@ namespace kiwi
         
         //! Retrieve the attribute value as a vector of atoms.
         operator Point() const { return Point(m_x, m_y); }
-
+        
+    private:
+        flip::Float m_x;
+        flip::Float m_y;
     };
     
     // ================================================================================ //
@@ -203,9 +212,6 @@ namespace kiwi
     template<class T>
     class FlipArray : public flip::Object
     {
-    private:
-        flip::Array<T> m_data;
-        
     public:
         FlipArray() = default;
         
@@ -258,6 +264,9 @@ namespace kiwi
             .name("cicm.kiwi.FlipArray")
             .template member<flip::Array<T>, &FlipArray::m_data>("data");
         }
+        
+    private:
+        flip::Array<T> m_data;
     };
 }
 
