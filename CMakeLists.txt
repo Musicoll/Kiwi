@@ -19,11 +19,16 @@ include(CheckCXXCompilerFlag)
 # )
 
 # Unit tests sources
-set(TEST_SOURCES
+set(TEST_CORE
     test/Modules/Core/test_KiwiCore.cpp
     )
 
+set(TEST_DSP
+    test/Modules/Dsp/test_KiwiDsp.cpp
+)
+
 # Unit tests executable
-add_executable(test_suite ${TEST_SOURCES})
+add_executable(test_core ${TEST_CORE})
+add_executable(test_dsp ${TEST_DSP})
 
 target_link_libraries(test_suite ${TEST_LIBS})
