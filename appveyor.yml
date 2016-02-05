@@ -1,0 +1,28 @@
+
+environment:
+   matrix:
+      - CONFIGURATION: Debug
+        PLATFORM: Win32
+#     - CONFIGURATION: Release
+#       PLATFORM: Win32
+      - CONFIGURATION: Debug
+        PLATFORM: x64
+#     - CONFIGURATION: Release
+#       PLATFORM: x64
+
+build_script:
+   - mkdir build
+   - cd build
+   - cmake ..
+   - make
+   - ./test_dsp
+   - ./test_core
+
+#---------------------------------#
+#         notifications           #
+#---------------------------------#
+notifications:
+
+  # Email
+  - provider: Email
+    on_build_status_changed: false
