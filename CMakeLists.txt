@@ -31,4 +31,4 @@ set(TEST_DSP
 add_executable(test_core ${TEST_CORE})
 add_executable(test_dsp ${TEST_DSP})
 
-target_link_libraries(test_suite ${TEST_LIBS})
+# target_link_libraries(test_suite ${TEST_LIBS})

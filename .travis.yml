@@ -8,11 +8,13 @@ os:
 - linux
 - osx
 
-script: 
+script:
 - mkdir build
 - cd build
 - cmake ..
 - make
+- ./test_dsp
+- ./test_core
 
 notifications:
   email: false
