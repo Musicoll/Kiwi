@@ -3,23 +3,16 @@ language: cpp
 notifications:
   email: false
 
-# compiler:
-# - gcc
-# - clang
-
-# os:
-# - linux
-# - osx
-
 matrix:
   include:
-	- os: osx
-		compiler: gcc
 
-	- os: osx
-		compiler: clang
+    - os: osx
+      compiler: gcc
 
-    - os: linux
+    - os: osx
+      compiler: clang
+
+    - os: -linux
       compiler: gcc
       addons:
         apt:
@@ -27,12 +20,12 @@ matrix:
           packages: g++-5
       env: COMPILER=g++-5
 
-	- os: linux
-		compiler: clang
-		addons:
+    - os: linux
+    compiler: clang
+    addons:
         apt:
-        	sources: ubuntu-toolchain-r-test
-        	packages: clang-3.7
+          sources: ubuntu-toolchain-r-test
+          packages: clang-3.7
         env: COMPILER=clang++-3.7
 
 script:
