@@ -1,12 +1,39 @@
 language: cpp
 
-compiler:
-- gcc
-- clang
+notifications:
+  email: false
 
-os:
-- linux
-- osx
+# compiler:
+# - gcc
+# - clang
+
+# os:
+# - linux
+# - osx
+
+matrix:
+  include:
+	- os: osx
+		compiler: gcc
+
+	- os: osx
+		compiler: clang
+
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources: ubuntu-toolchain-r-test
+          packages: g++-5
+      env: COMPILER=g++-5
+
+	- os: linux
+		compiler: clang
+		addons:
+        apt:
+        	sources: ubuntu-toolchain-r-test
+        	packages: clang-3.7
+        env: COMPILER=clang++-3.7
 
 script:
 - mkdir build
@@ -15,6 +42,3 @@ script:
 - make
 - ./test_dsp
 - ./test_core
-
-notifications:
-  email: false
