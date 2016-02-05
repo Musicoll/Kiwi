@@ -1,0 +1,327 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		8F51CFEF1C64E76A00D549C8 /* test_KiwiDsp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F51CFEE1C64E76A00D549C8 /* test_KiwiDsp.cpp */; };
+		8F9C6A631C64EC2200537478 /* KiwiDspChain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F9C6A5A1C64EC2200537478 /* KiwiDspChain.cpp */; };
+		8F9C6A641C64EC2200537478 /* KiwiDspSignal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F9C6A5E1C64EC2200537478 /* KiwiDspSignal.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8F51CFE21C64E74800D549C8 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		8F51CFE41C64E74800D549C8 /* KiwiTestDsp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = KiwiTestDsp; sourceTree = BUILT_PRODUCTS_DIR; };
+		8F51CFEE1C64E76A00D549C8 /* test_KiwiDsp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_KiwiDsp.cpp; sourceTree = SOURCE_ROOT; };
+		8F9C6A581C64EC2200537478 /* KiwiChain.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = KiwiChain.hpp; path = ../../../Modules/KiwiDsp/KiwiChain.hpp; sourceTree = "<group>"; };
+		8F9C6A591C64EC2200537478 /* KiwiDsp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = KiwiDsp.hpp; path = ../../../Modules/KiwiDsp/KiwiDsp.hpp; sourceTree = "<group>"; };
+		8F9C6A5A1C64EC2200537478 /* KiwiDspChain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = KiwiDspChain.cpp; path = ../../../Modules/KiwiDsp/KiwiDspChain.cpp; sourceTree = "<group>"; };
+		8F9C6A5B1C64EC2200537478 /* KiwiDspChain.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = KiwiDspChain.hpp; path = ../../../Modules/KiwiDsp/KiwiDspChain.hpp; sourceTree = "<group>"; };
+		8F9C6A5C1C64EC2200537478 /* KiwiDspMisc.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = KiwiDspMisc.hpp; path = ../../../Modules/KiwiDsp/KiwiDspMisc.hpp; sourceTree = "<group>"; };
+		8F9C6A5D1C64EC2200537478 /* KiwiDspSamples.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = KiwiDspSamples.hpp; path = ../../../Modules/KiwiDsp/KiwiDspSamples.hpp; sourceTree = "<group>"; };
+		8F9C6A5E1C64EC2200537478 /* KiwiDspSignal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = KiwiDspSignal.cpp; path = ../../../Modules/KiwiDsp/KiwiDspSignal.cpp; sourceTree = "<group>"; };
+		8F9C6A5F1C64EC2200537478 /* KiwiDspSignal.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = KiwiDspSignal.hpp; path = ../../../Modules/KiwiDsp/KiwiDspSignal.hpp; sourceTree = "<group>"; };
+		8F9C6A601C64EC2200537478 /* KiwiFft.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = KiwiFft.hpp; path = ../../../Modules/KiwiDsp/KiwiFft.hpp; sourceTree = "<group>"; };
+		8F9C6A611C64EC2200537478 /* KiwiLink.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = KiwiLink.hpp; path = ../../../Modules/KiwiDsp/KiwiLink.hpp; sourceTree = "<group>"; };
+		8F9C6A621C64EC2200537478 /* KiwiProcessor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = KiwiProcessor.hpp; path = ../../../Modules/KiwiDsp/KiwiProcessor.hpp; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8F51CFE11C64E74800D549C8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		8F51CFDB1C64E74800D549C8 = {
+			isa = PBXGroup;
+			children = (
+				8F51CFE61C64E74800D549C8 /* KiwiTestDsp */,
+				8F51CFE51C64E74800D549C8 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8F51CFE51C64E74800D549C8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8F51CFE41C64E74800D549C8 /* KiwiTestDsp */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8F51CFE61C64E74800D549C8 /* KiwiTestDsp */ = {
+			isa = PBXGroup;
+			children = (
+				8F51CFEE1C64E76A00D549C8 /* test_KiwiDsp.cpp */,
+				8F9C6A3D1C64EAC700537478 /* KiwiDsp */,
+			);
+			path = KiwiTestDsp;
+			sourceTree = "<group>";
+		};
+		8F9C6A3D1C64EAC700537478 /* KiwiDsp */ = {
+			isa = PBXGroup;
+			children = (
+				8F9C6A581C64EC2200537478 /* KiwiChain.hpp */,
+				8F9C6A591C64EC2200537478 /* KiwiDsp.hpp */,
+				8F9C6A5A1C64EC2200537478 /* KiwiDspChain.cpp */,
+				8F9C6A5B1C64EC2200537478 /* KiwiDspChain.hpp */,
+				8F9C6A5C1C64EC2200537478 /* KiwiDspMisc.hpp */,
+				8F9C6A5E1C64EC2200537478 /* KiwiDspSignal.cpp */,
+				8F9C6A5F1C64EC2200537478 /* KiwiDspSignal.hpp */,
+				8F9C6A601C64EC2200537478 /* KiwiFft.hpp */,
+				8F9C6A611C64EC2200537478 /* KiwiLink.hpp */,
+				8F9C6A621C64EC2200537478 /* KiwiProcessor.hpp */,
+				8F9C6A5D1C64EC2200537478 /* KiwiDspSamples.hpp */,
+			);
+			name = KiwiDsp;
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8F51CFE31C64E74800D549C8 /* KiwiTestDsp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8F51CFEB1C64E74800D549C8 /* Build configuration list for PBXNativeTarget "KiwiTestDsp" */;
+			buildPhases = (
+				8F51CFE01C64E74800D549C8 /* Sources */,
+				8F51CFE11C64E74800D549C8 /* Frameworks */,
+				8F51CFE21C64E74800D549C8 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = KiwiTestDsp;
+			productName = KiwiTestDsp;
+			productReference = 8F51CFE41C64E74800D549C8 /* KiwiTestDsp */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8F51CFDC1C64E74800D549C8 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0720;
+				ORGANIZATIONNAME = CICM;
+				TargetAttributes = {
+					8F51CFE31C64E74800D549C8 = {
+						CreatedOnToolsVersion = 7.2;
+					};
+				};
+			};
+			buildConfigurationList = 8F51CFDF1C64E74800D549C8 /* Build configuration list for PBXProject "KiwiTestDsp" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 8F51CFDB1C64E74800D549C8;
+			productRefGroup = 8F51CFE51C64E74800D549C8 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8F51CFE31C64E74800D549C8 /* KiwiTestDsp */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8F51CFE01C64E74800D549C8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8F51CFEF1C64E76A00D549C8 /* test_KiwiDsp.cpp in Sources */,
+				8F9C6A631C64EC2200537478 /* KiwiDspChain.cpp in Sources */,
+				8F9C6A641C64EC2200537478 /* KiwiDspSignal.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		8F51CFE91C64E74800D549C8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_ASSIGN_ENUM = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_CXX0X_EXTENSIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NULLABLE_TO_NONNULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CLANG_WARN__EXIT_TIME_DESTRUCTORS = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
+				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = YES;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		8F51CFEA1C64E74800D549C8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_ASSIGN_ENUM = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_CXX0X_EXTENSIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NULLABLE_TO_NONNULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CLANG_WARN__EXIT_TIME_DESTRUCTORS = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
+				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = YES;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		8F51CFEC1C64E74800D549C8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN__EXIT_TIME_DESTRUCTORS = NO;
+				PRODUCT_NAME = KiwiTestDsp;
+			};
+			name = Debug;
+		};
+		8F51CFED1C64E74800D549C8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN__EXIT_TIME_DESTRUCTORS = NO;
+				PRODUCT_NAME = KiwiTestDsp;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8F51CFDF1C64E74800D549C8 /* Build configuration list for PBXProject "KiwiTestDsp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8F51CFE91C64E74800D549C8 /* Debug */,
+				8F51CFEA1C64E74800D549C8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8F51CFEB1C64E74800D549C8 /* Build configuration list for PBXNativeTarget "KiwiTestDsp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8F51CFEC1C64E74800D549C8 /* Debug */,
+				8F51CFED1C64E74800D549C8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 8F51CFDC1C64E74800D549C8 /* Project object */;
+}

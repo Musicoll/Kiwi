@@ -7,7 +7,7 @@
 #ifndef __DEF_OSP__
 #define __DEF_OSP__
 
-#include "OspMisc.hpp"
+#include "KiwiDspMisc"
 #include "OspSignal.hpp"
 #include "OspProcessor.hpp"
 #include "OspLink.hpp"

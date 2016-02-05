@@ -7,6 +7,7 @@
 #ifndef KIWI_DSP_SAMPLES_H_INCLUDED
 #define KIWI_DSP_SAMPLES_H_INCLUDED
 
+#include <iostream>
 #include <cstdlib>
 #include <cassert>
 #include <cmath>
