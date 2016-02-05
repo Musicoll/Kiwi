@@ -14,8 +14,11 @@ namespace kiwi
 {
 namespace dsp
 {
+#ifdef KIWI_DSP_FLOAT
     typedef float sample;
-    
+#else
+    typedef double sample;
+#endif
     // ==================================================================================== //
     //                                          SIGNAL                                      //
     // ==================================================================================== //

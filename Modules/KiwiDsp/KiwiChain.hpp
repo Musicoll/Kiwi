@@ -4,14 +4,8 @@
  // WARRANTIES, see the file, "LICENSE.txt," in this distribution.
  */
 
-#ifndef __DEF_OSP_CHAIN__
-#define __DEF_OSP_CHAIN__
-
-#if (__cplusplus <= 199711L)
-#define noexcept
-#define nullptr NULL
-#define constexpr
-#endif
+#ifndef KIWI_DSP_CHAIN_H_INCLUDED
+#define KIWI_DSP_CHAIN_H_INCLUDED
 
 #include "OspMisc.hpp"
 #include "OspSignal.hpp"
@@ -21,7 +15,9 @@
 #include <set>
 #include <cassert>
 
-namespace osp
+namespace kiwi
+{
+namespace dsp
 {
     class Chain;
     
@@ -447,5 +443,6 @@ namespace osp
         size_t              m_vector_size;
     };
 }
+}
 
-#endif
+#endif // KIWI_DSP_CHAIN_H_INCLUDED
