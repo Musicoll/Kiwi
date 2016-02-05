@@ -30,7 +30,7 @@
 		8F68F6E31C60ED7D00549A21 /* KiwiDsp.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = KiwiDsp.hpp; path = ../../../../Modules/KiwiDsp/KiwiDsp.hpp; sourceTree = "<group>"; };
 		8F68F6E41C60ED7D00549A21 /* KiwiFft.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = KiwiFft.hpp; path = ../../../../Modules/KiwiDsp/KiwiFft.hpp; sourceTree = "<group>"; };
 		8F68F6E51C60ED7D00549A21 /* KiwiLink.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = KiwiLink.hpp; path = ../../../../Modules/KiwiDsp/KiwiLink.hpp; sourceTree = "<group>"; };
-		8F68F6E61C60ED7D00549A21 /* KiwiMisc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = KiwiMisc.hpp; path = ../../../../Modules/KiwiDsp/KiwiMisc.hpp; sourceTree = "<group>"; };
+		8F68F6E61C60ED7D00549A21 /* KiwiDspMisc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = KiwiDspMisc.hpp; path = ../../../../Modules/KiwiDsp/KiwiDspMisc.hpp; sourceTree = "<group>"; };
 		8F68F6E71C60ED7D00549A21 /* KiwiProcessor.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = KiwiProcessor.hpp; path = ../../../../Modules/KiwiDsp/KiwiProcessor.hpp; sourceTree = "<group>"; };
 		8F68F6E81C60ED7D00549A21 /* KiwiDspSignal.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = KiwiDspSignal.hpp; path = ../../../../Modules/KiwiDsp/KiwiDspSignal.hpp; sourceTree = "<group>"; };
 		8F68F6E91C60ED7D00549A21 /* KiwiDspSamples.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = KiwiDspSamples.hpp; path = ../../../../Modules/KiwiDsp/KiwiDspSamples.hpp; sourceTree = "<group>"; };
@@ -80,11 +80,11 @@
 				8F68F6E31C60ED7D00549A21 /* KiwiDsp.hpp */,
 				8F68F6E41C60ED7D00549A21 /* KiwiFft.hpp */,
 				8F68F6E51C60ED7D00549A21 /* KiwiLink.hpp */,
-				8F68F6E61C60ED7D00549A21 /* KiwiMisc.hpp */,
 				8F68F6E71C60ED7D00549A21 /* KiwiProcessor.hpp */,
 				8F68F6EA1C61F82A00549A21 /* KiwiDspSignal.cpp */,
 				8F68F6E81C60ED7D00549A21 /* KiwiDspSignal.hpp */,
 				8F68F6E91C60ED7D00549A21 /* KiwiDspSamples.hpp */,
+				8F68F6E61C60ED7D00549A21 /* KiwiDspMisc.hpp */,
 			);
 			name = KiwiDsp;
 			sourceTree = "<group>";

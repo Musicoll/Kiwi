@@ -1,8 +1,8 @@
 /*
- // Copyright (c) 2015 Pierre Guillot.
- // For information on usage and redistribution, and for a DISCLAIMER OF ALL
- // WARRANTIES, see the file, "LICENSE.txt," in this distribution.
- */
+// Copyright (c) 2015 Pierre Guillot.
+// For information on usage and redistribution, and for a DISCLAIMER OF ALL
+// WARRANTIES, see the file, "LICENSE.txt," in this distribution.
+*/
 
 #ifndef __DEF_OSP_LINK__
 #define __DEF_OSP_LINK__
@@ -42,9 +42,7 @@ namespace osp
         inline ~Link() noexcept {};
         
         //! @brief Retrieves the output Node object.
-        inline Node* getOutpuNode() const noexcept {
-            int64_t 
-            return m_from;}
+        inline Node* getOutpuNode() const noexcept {return m_from;}
         
         //! @brief Retrieves the input Node object.
         inline Node* getInputNode() const noexcept {return m_to;}

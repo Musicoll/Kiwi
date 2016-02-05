@@ -1,24 +1,19 @@
 /*
- // Copyright (c) 2015 Pierre Guillot.
- // For information on usage and redistribution, and for a DISCLAIMER OF ALL
- // WARRANTIES, see the file, "LICENSE.txt," in this distribution.
- */
+// Copyright (c) 2015 Pierre Guillot.
+// For information on usage and redistribution, and for a DISCLAIMER OF ALL
+// WARRANTIES, see the file, "LICENSE.txt," in this distribution.
+*/
 
-#ifndef __DEF_OSP_MISC__
-#define __DEF_OSP_MISC__
-
-#if (__cplusplus <= 199711L)
-#define noexcept
-#define nullptr NULL
-#define constexpr
-#endif
+#ifndef KIWI_DSP_MISC_H_INCLUDED
+#define KIWI_DSP_MISC_H_INCLUDED
 
 #include <chrono>
 #include <exception>
 
-namespace osp
+namespace kiwi
 {
-    
+namespace dsp
+{
     // ==================================================================================== //
     //                                          ERROR                                       //
     // ==================================================================================== //
@@ -33,7 +28,7 @@ namespace osp
         //! @brief The destructor.
         virtual inline ~Error() noexcept {}
         //! @brief Retrieves a textual information about the error.
-        virtual const char* what() const noexcept override {return "Osp::Error : problem occurs !";}
+        virtual const char* what() const noexcept override {return "Kiwi::Dsp::Error : problem occurs !";}
     };
     
     // ==================================================================================== //
@@ -63,9 +58,9 @@ namespace osp
         //! @brief The destrcutor.
         inline ~Timer() {};
         //! @brief Gets the lastest time computed.
-        template < typename T > double get() const noexcept {
-            static_assert(std::chrono::__is_duration< T >::value || 1, "Osp::Timer : The template must be a duration.");
-            return std::chrono::duration_cast< T >(m_result - m_start).count();}
+        template < typename Dur > inline double get() const noexcept {
+            static_assert(std::chrono::__is_duration< Dur >::value || 1, "Kiwi::Dsp::Timer : The template must be a duration.");
+            return std::chrono::duration_cast< Dur >(m_result - m_start).count();}
         //! @brief Starts the chronometer.
         inline void start() noexcept {m_start = std::chrono::high_resolution_clock::now();}
         //! @brief Stops the chronometer.
@@ -75,11 +70,6 @@ namespace osp
         std::chrono::high_resolution_clock::time_point  m_result;
     };
 }
+}
 
-#if (__cplusplus <= 199711L)
-#undef noexcept
-#undef nullptr NULL
-#undef constexpr
-#endif
-
-#endif
+#endif // KIWI_DSP_MISC_H_INCLUDED

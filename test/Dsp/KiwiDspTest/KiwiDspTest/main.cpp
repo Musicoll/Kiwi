@@ -9,31 +9,22 @@
 #include <iostream>
 #include <vector>
 
-#include "KiwiDspSamples.hpp"
+#include "KiwiDspSignal.hpp"
 
 using namespace kiwi::dsp;
 
 int main(int, const char*[]) {
-    
-    //int* isamples = Sample<int>::allocate(128);
-    float* fsamples = Samples<float>::allocate(128);
-    double* dsamples = Samples<double>::allocate(128);
-    
-    for(int i = 1; i < 128; i++)
+    try
     {
-        if((reinterpret_cast<char *>(fsamples+i)-sizeof(float)) != (reinterpret_cast<char *>(fsamples+i-1)))
-        {
-            std::cout << "Wrong align float";
-        }
-        if((reinterpret_cast<char *>(dsamples+i)-sizeof(double)) != (reinterpret_cast<char *>(dsamples+i-1)))
-        {
-            std::cout << "Wrong align double";
-        }
-           
+        Signal sig1(64);
+        Signal sig2(sig1);
+        Signal sig3(std::move(Signal(128)));
     }
-    std::cout << "Size of vector : " << sizeof(fsamples) << " and should be " << (128 * sizeof(float)) << "\n";
-    std::cout << "Size of vector : " << sizeof(dsamples) << " and should be " << (128 * sizeof(double)) << "\n";
-    Samples<float>::release(fsamples);
-    Samples<double>::release(dsamples);
+    catch (Error& e)
+    {
+        std::cout << e.what();
+    }
+    
+    
     return 0;
 }
