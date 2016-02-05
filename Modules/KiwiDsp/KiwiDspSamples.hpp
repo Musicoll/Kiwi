@@ -13,7 +13,7 @@
 #include <cmath>
 #include <algorithm>
 
-#ifdef _WINDOWS
+#ifndef __APPLE__
 #include "malloc.h"
 #endif
 
