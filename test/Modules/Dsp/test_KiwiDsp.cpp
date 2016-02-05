@@ -36,7 +36,7 @@ TEST_CASE("Samples Class Tests", "[Samples]")
         SECTION("Fill")
         {
             Samples<sample>::fill(size, 1.2f, vec);
-            CHECK(is_equal(size, 1.4f, vec));
+            CHECK(is_equal(size, 1.2f, vec));
         }
         
         SECTION("Clear")
