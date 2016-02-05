@@ -1,6 +1,3 @@
 [submodule "ThirdParty/Juce"]
 	path = ThirdParty/Juce
 	url = https://github.com/julianstorer/JUCE.git
-[submodule "ThirdParty/Flip"]
-	path = ThirdParty/Flip
-	url = https://github.com/ohmtech/flip.git
