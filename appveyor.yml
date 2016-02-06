@@ -10,12 +10,14 @@ environment:
 #     - CONFIGURATION: Release
 #       PLATFORM: x64
 
+install:
+- if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+
 build_script:
    - mkdir build
    - cd build
    - cmake ..
-   - cmake test_dsp
-   - cmake test_core
+   - make
    - ./test_dsp
    - ./test_core
 
