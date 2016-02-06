@@ -30,7 +30,7 @@ namespace dsp
     {
     public:
         //! @brief The default constructor.
-        //! @details Allocates and initializes an empty Signal.
+        //! @details Allocates and initializes an empty Signal object.
         Signal() noexcept;
         
         //! @brief The filled constructor.

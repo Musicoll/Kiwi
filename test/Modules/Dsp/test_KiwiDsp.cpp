@@ -27,30 +27,44 @@ static inline bool is_equal(size_t const size, sample const& value, sample* in) 
 
 TEST_CASE("Samples Class Tests", "[Samples]")
 {
-    size_t size = 512;
-    sample* vec = Samples<sample>::allocate(size);
-    REQUIRE(vec != nullptr);
-    
-    SECTION("Initialization Section")
+    for(size_t size = 1ul; size < 524288ul; size *= 2ul)
     {
-        SECTION("Fill")
+        std::cout << "Size : " << size << "\n";
+        sample* vec = nullptr;
+        
+        std::cout << "Aki1" << "\n";
+        vec = Samples<sample>::allocate(size);
+        REQUIRE(vec != nullptr);
+
+        SECTION("Initialization Section " + std::to_string(size))
         {
-            Samples<sample>::fill(size, 1.2f, vec);
-            CHECK(is_equal(size, 1.2f, vec));
+            std::cout << "Initialization" << "\n";
+            SECTION("Fill " + std::to_string(size))
+            {
+                std::cout << "Fill" << "\n";
+                Samples<sample>::fill(size, 1.2f, vec);
+                CHECK(is_equal(size, 1.2f, vec));
+            }
+            std::cout << "to Clear" << "\n";
+            SECTION("Clear " + std::to_string(size))
+            {
+                std::cout << "Clear" << "\n";
+                Samples<sample>::clear(size, vec);
+                CHECK(is_equal(size, 0.f, vec));
+            }
         }
         
-        SECTION("Clear")
+        SECTION("Algebra Section " + std::to_string(size))
         {
-            Samples<sample>::clear(size, vec);
-            CHECK(is_equal(size, 0.f, vec));
+            ;
         }
+        
+        SECTION("Deallocation Section " + std::to_string(size))
+        {
+           
+        }
+        
+        vec = Samples<sample>::release(vec);
+        REQUIRE(vec == nullptr);
     }
-    
-    SECTION("Algebra Section")
-    {
-        ;
-    }
-    
-    vec = Samples<sample>::release(vec);
-    REQUIRE(vec == nullptr);
 }

@@ -1,19 +1,17 @@
 /*
- // Copyright (c) 2015 Pierre Guillot.
- // For information on usage and redistribution, and for a DISCLAIMER OF ALL
- // WARRANTIES, see the file, "LICENSE.txt," in this distribution.
- */
+// Copyright (c) 2015 Pierre Guillot.
+// For information on usage and redistribution, and for a DISCLAIMER OF ALL
+// WARRANTIES, see the file, "LICENSE.txt," in this distribution.
+*/
 
-#ifndef __DEF_OSP_PROCESSOR__
-#define __DEF_OSP_PROCESSOR__
+#ifndef KIWI_DSP_PROCESSOR_H_INCLUDED
+#define KIWI_DSP_PROCESSOR_H_INCLUDED
 
-#if (__cplusplus <= 199711L)
-#define noexcept
-#define nullptr NULL
-#define constexpr
-#endif
+#include "KiwiDspSignal.hpp"
 
-namespace osp
+namespace kiwi
+{
+namespace dsp
 {
     class Node;
     // ==================================================================================== //
@@ -29,11 +27,10 @@ namespace osp
     public:
         //! @brief The constructor.
         //! @details Allocates and initializes a default Processor object.
-        inline constexpr Processor() noexcept :
-        m_ninputs(0ul), m_noutputs(0ul), m_inplace(false), m_valid(false), m_running(false) {}
+        Processor() noexcept;
         
         //! @brief The destructor.
-        virtual ~Processor() noexcept {};
+        virtual ~Processor() noexcept;
         
         //! @brief Retrieves the current number of inputs.
         //! @return The number of inputs of the Processor object.
@@ -56,20 +53,20 @@ namespace osp
         //! @details You should use this method while the DSP ins't running.
         //! @param nins The number of inputs.
         //! @see setNumberOfOutlets() and getNumberOfInputs()
-        inline void setNumberOfInlets(const size_t nins) noexcept {if(!m_running){m_ninputs = nins;}}
+        void setNumberOfInlets(const size_t nins) noexcept;
         
         //! @brief Sets the number of outputs.
         //! @details You should use this method while the DSP ins't running.
         //! @param nouts The number of outputs.
         //! @see setNumberOfInlets() and getNumberOfOutputs()
-        inline void setNumberOfOutlets(const size_t nouts) noexcept {if(!m_running){m_noutputs = nouts;}}
+        void setNumberOfOutlets(const size_t nouts) noexcept;
         
         //! @brief Sets if the DSP should be inplace.
         //! @details You should use this method before the perform method's call to set
         //! @details if the inputs and outputs Signal objects own the same samples vectors.
         //! @param status The inplace status.
         //! @see isInplace()
-        inline void setInplace(const bool status) noexcept {m_inplace = status;}
+        void setInplace(const bool status) noexcept;
         
         //! @brief Sets if the perform method should be called.
         //! @details You should always use this method during the call of the prepare method'
@@ -79,7 +76,7 @@ namespace osp
         //! @details and outputs don't match with the needs of your perform.
         //! @param status The perform status.
         //! @see prepare()
-        inline void shouldPerform(const bool status) noexcept {m_running  = status;}
+        void shouldPerform(const bool status) noexcept;
         
     private:
         //! @brief Prepares everything for the perform method.
@@ -112,5 +109,6 @@ namespace osp
         friend Node;
     };
 }
+}
 
-#endif
+#endif // KIWI_DSP_PROCESSOR_H_INCLUDED

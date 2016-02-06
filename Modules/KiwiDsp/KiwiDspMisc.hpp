@@ -7,8 +7,17 @@
 #ifndef KIWI_DSP_MISC_H_INCLUDED
 #define KIWI_DSP_MISC_H_INCLUDED
 
+#include <iostream>
+#include <cstdlib>
+#include <cassert>
+#include <cmath>
+#include <algorithm>
 #include <chrono>
 #include <exception>
+
+#ifndef __APPLE__
+#include "malloc.h"
+#endif
 
 namespace kiwi
 {
@@ -35,9 +44,8 @@ namespace dsp
     //                                          TIMER                                       //
     // ==================================================================================== //
     //! @brief The timer.
-    //! @details The class uses high resolution clocks to estimate the time that CPU used for
-    //! @details a set of processes. Given that the class does not use mutex, you should
-    //! @details always ensure that start() is called before end().
+    //! @details The class uses high resolution clocks to estimate the time that the CPU uses
+    //! @details for a set of processes.
     class Timer
     {
     public:
@@ -57,17 +65,22 @@ namespace dsp
         inline Timer() {};
         //! @brief The destrcutor.
         inline ~Timer() {};
-        //! @brief Gets the lastest time computed.
-        template < typename Dur > inline double get() const noexcept {
-            static_assert(std::chrono::__is_duration< Dur >::value || 1, "Kiwi::Dsp::Timer : The template must be a duration.");
-            return std::chrono::duration_cast< Dur >(m_result - m_start).count();}
-        //! @brief Starts the chronometer.
+        //! @brief Gets the ellapsed time.
+        template <typename Dur> inline double get(const bool reset) noexcept
+        {
+            static_assert(std::chrono::__is_duration<Dur>::value, "Kiwi::Dsp::Timer : The template must be a duration.");
+            const std::chrono::high_resolution_clock::time_point next = std::chrono::high_resolution_clock::now();
+            const double time = std::chrono::duration_cast<Dur>(next - m_start).count();
+            if(reset)
+            {
+                m_start = next;
+            }
+            return time;
+        }
+        //! @brief Starts the timer.
         inline void start() noexcept {m_start = std::chrono::high_resolution_clock::now();}
-        //! @brief Stops the chronometer.
-        inline void stop() noexcept {m_result = std::chrono::high_resolution_clock::now();}
     private:
         std::chrono::high_resolution_clock::time_point  m_start;
-        std::chrono::high_resolution_clock::time_point  m_result;
     };
 }
 }

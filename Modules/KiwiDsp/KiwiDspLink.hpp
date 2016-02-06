@@ -4,17 +4,16 @@
 // WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 */
 
-#ifndef __DEF_OSP_LINK__
-#define __DEF_OSP_LINK__
+#ifndef KIWI_DSP_LINK_H_INCLUDED
+#define KIWI_DSP_LINK_H_INCLUDED
 
-#if (__cplusplus <= 199711L)
-#define noexcept
-#define nullptr NULL
-#define constexpr
-#endif
+#include "KiwiDspSignal.hpp"
 
-namespace osp
+namespace kiwi
 {
+namespace dsp
+{
+    class Node;
     // ==================================================================================== //
     //                                          LINK                                        //
     // ==================================================================================== //
@@ -41,16 +40,16 @@ namespace osp
         //! @brief The destructor.
         inline ~Link() noexcept {};
         
-        //! @brief Retrieves the output Node object.
+        //! @brief Gets the output Node object.
         inline Node* getOutpuNode() const noexcept {return m_from;}
         
-        //! @brief Retrieves the input Node object.
+        //! @brief Gets the input Node object.
         inline Node* getInputNode() const noexcept {return m_to;}
         
-        //! @brief Retrieves the index of the output Node object.
+        //! @brief Gets the index of the output Node object.
         inline size_t getOutputIndex() const noexcept {return m_output;}
         
-        //! @brief Retrieves the index of the input Node object.
+        //! @brief Gets the index of the input Node object.
         inline size_t getInputIndex() const noexcept {return m_input;}
         
     private:
@@ -60,5 +59,6 @@ namespace osp
         size_t  m_input;
     };
 }
+}
 
-#endif
+#endif // KIWI_DSP_LINK_H_INCLUDED
