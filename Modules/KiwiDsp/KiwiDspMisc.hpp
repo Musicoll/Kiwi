@@ -14,6 +14,8 @@
 #include <algorithm>
 #include <chrono>
 #include <exception>
+#include <vector>
+#include <set>
 
 #ifndef __APPLE__
 #include "malloc.h"

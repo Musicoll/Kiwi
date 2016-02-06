@@ -23,25 +23,25 @@ namespace kiwi
         
         void Processor::setNumberOfInlets(const size_t nins) noexcept
         {
-            assert("The setNumberOfInlets method shouldn't be called when the DSP is running" && !m_running);
+            assert("Kiwi::Dsp::Processor : The setNumberOfInlets method shouldn't be called when the DSP is running" && !m_running);
             m_ninputs = nins;
         }
         
         void Processor::setNumberOfOutlets(const size_t nouts) noexcept
         {
-            assert("The setNumberOfOutlets method shouldn't be called when the DSP is running" && !m_running);
+            assert("Kiwi::Dsp::Processor : The setNumberOfOutlets method shouldn't be called when the DSP is running" && !m_running);
             m_noutputs = nouts;
         }
         
         void Processor::setInplace(const bool status) noexcept
         {
-            assert("The setInplace method shouldn't be called when the DSP is running" && !m_running);
+            assert("Kiwi::Dsp::Processor : The setInplace method shouldn't be called when the DSP is running" && !m_running);
             m_inplace = status;
         }
         
         void Processor::shouldPerform(const bool status) noexcept
         {
-            assert("The shouldPerform method shouldn't be called when the DSP is running" && !m_running);
+            assert("Kiwi::Dsp::Processor : The shouldPerform method shouldn't be called when the DSP is running" && !m_running);
             m_valid  = status;
         }
     }
