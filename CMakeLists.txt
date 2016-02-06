@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.6)
-project (Kiwi)
+project (Kiwi CXX)
 set (Kiwi_VERSION_MAJOR 0)
 set (Kiwi_VERSION_MINOR 1)
 
