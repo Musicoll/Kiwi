@@ -12,7 +12,6 @@ environment:
 
 os: Visual Studio 2015
 
-# scripts to run before build
 build_script:
     - echo Running cmake...
     - mkdir build
@@ -21,15 +20,6 @@ build_script:
     - dir
     - cmake --build .
     - test_dsp.exe
-
-# build_script:
-#    - mkdir build
-#    - cd build
-#    - cmake ..
-#    - make
-#    - ./test_dsp
-#    - ./test_core
-
 
 #---------------------------------#
 #         notifications           #
