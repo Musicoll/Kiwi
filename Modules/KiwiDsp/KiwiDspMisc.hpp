@@ -68,11 +68,11 @@ namespace dsp
         //! @brief The destrcutor.
         inline ~Timer() {};
         //! @brief Gets the ellapsed time.
-        template <typename Dur> inline double get(const bool reset) noexcept
+        template < typename Dur > inline double get(const bool reset) noexcept
         {
-            static_assert(std::chrono::__is_duration<Dur>::value, "Kiwi::Dsp::Timer : The template must be a duration.");
+            static_assert(std::chrono::__is_duration< Dur >::value, "Kiwi::Dsp::Timer : The template must be a duration.");
             const std::chrono::high_resolution_clock::time_point next = std::chrono::high_resolution_clock::now();
-            const double time = std::chrono::duration_cast<Dur>(next - m_start).count();
+            const double time = std::chrono::duration_cast< Dur >(next - m_start).count();
             if(reset)
             {
                 m_start = next;

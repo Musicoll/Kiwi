@@ -12,5 +12,6 @@
 #include "KiwiDspSignal.hpp"
 #include "KiwiDspProcessor.hpp"
 #include "KiwiDspLink.hpp"
+#include "KiwiDspChain.hpp"
 
 #endif // KIWI_DSP_H_INCLUDED

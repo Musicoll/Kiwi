@@ -13,6 +13,7 @@
 
 using namespace kiwi::dsp;
 
+/*
 static inline bool is_equal(size_t const size, sample const& value, sample* in) noexcept
 {
     for(size_t i = 0; i < size; ++i)
@@ -24,6 +25,7 @@ static inline bool is_equal(size_t const size, sample const& value, sample* in) 
     }
     return true;
 }
+
 
 TEST_CASE("Samples Class Tests", "[Samples]")
 {
@@ -68,3 +70,4 @@ TEST_CASE("Samples Class Tests", "[Samples]")
         REQUIRE(vec == nullptr);
     }
 }
+ */

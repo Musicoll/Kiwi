@@ -7,15 +7,13 @@
 #ifndef KIWI_DSP_CHAIN_H_INCLUDED
 #define KIWI_DSP_CHAIN_H_INCLUDED
 
-#include "KiwiDspSamples.hpp"
-/*
+#include "KiwiDspLink.hpp"
+#include "KiwiDspNode.cpp"
+
 namespace kiwi
 {
 namespace dsp
 {
-    class Node;
-    class Link;
-    
     // ==================================================================================== //
     //                                          CHAIN                                       //
     // ==================================================================================== //
@@ -28,8 +26,7 @@ namespace dsp
     public:
         //! @brief The constructor.
         //! @details Allocates and initializes an empty Chain.
-        Chain() noexcept :
-        m_running(false), m_sample_rate(0ul), m_vector_size(0ul) {}
+        Chain();
         
         //! @brief The destructor.
         //! @details Stops the digital signal processing if needed and frees the
@@ -46,18 +43,13 @@ namespace dsp
         
         //! @brief Retrieves the current sample rate.
         inline size_t getSampleRate() const noexcept {return m_sample_rate;}
+        
         //! @brief Retrieves the current vector size of the chain.
         inline size_t getVectorSize() const noexcept {return m_vector_size;}
+        
         //! @brief Retrieves the current internal state of the DSP.
         inline bool isRunning() const noexcept {return m_running;}
-        //! @brief Retrieves the number of Node objects.
-        inline size_t getNumberOfNodes() const noexcept {return size_t(m_nodes.size());}
-        //! @brief Retrieves the number of Link objects.
-        inline size_t getNumberOfLinks() const noexcept {return size_t(m_links.size());}
-        //! @brief Retrieves the Node objects.
-        inline std::vector<Node*> getNodes() const noexcept {return m_nodes;}
-        //! @brief Retrieves the Link objects.
-        inline std::vector<Link*> getLinks() const noexcept {return m_links;}
+        
         //! @brief Compiles the dsp chain.
         //! @details The function sorts the dsp nodes and call the prepares methods of the
         //! @details Node objects.
@@ -165,7 +157,7 @@ namespace dsp
                 {
                     try
                     {
-                        it->stop();
+                        it.stop();
                     }
                     catch(Error& e)
                     {
@@ -179,14 +171,14 @@ namespace dsp
         inline void tick() noexcept
         {
             std::lock_guard<std::mutex> guard(m_mutex);
-            for(std::vector<Node*>::size_type i = 0; i < m_nodes.size(); i++)
+            for(std::vector<Node>::size_type i = 0; i < m_nodes.size(); i++)
             {
-                m_nodes[i]->tick();
+                m_nodes[i].perform();
             }
         }
         
-        std::vector<Node*>  m_nodes;
-        std::vector<Link*>  m_links;
+        std::vector<Node>   m_nodes;
+        std::vector<Link>   m_links;
         std::mutex          m_mutex;
         std::atomic<bool>   m_running;
         size_t              m_sample_rate;
@@ -195,5 +187,4 @@ namespace dsp
 }
 }
 
-*/
 #endif // KIWI_DSP_CHAIN_H_INCLUDED

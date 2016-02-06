@@ -104,8 +104,8 @@ namespace dsp
         size_t              m_ninputs;
         size_t              m_noutputs;
         bool                m_inplace;
-        std::atomic_bool    m_valid;
-        std::atomic_bool    m_running;
+        std::atomic<bool>   m_valid;
+        std::atomic<bool>   m_running;
         friend Node;
     };
 }
