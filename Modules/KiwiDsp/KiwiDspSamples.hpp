@@ -68,7 +68,7 @@ namespace dsp
 #ifdef __APPLE__
             return static_cast< Type* >(std::malloc(size * sizeof(Type)));
 #elif _WINDOWS
-            return static_cast< Type* >(_aligned_malloc( size * sizeof(Type), std::pow(2ul, sizeof(Type)) );
+            return static_cast< Type* >(_aligned_malloc( size * sizeof(Type), std::pow(2ul, sizeof(Type)) ));
 #else
             return static_cast< Type* >(memalign(std::pow(2ul, sizeof(Type)), size * sizeof(Type)));
 #endif
