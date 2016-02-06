@@ -3,12 +3,8 @@ environment:
    matrix:
       - CONFIGURATION: Debug
         PLATFORM: Win32
-#     - CONFIGURATION: Release
-#       PLATFORM: Win32
       - CONFIGURATION: Debug
         PLATFORM: x64
-#     - CONFIGURATION: Release
-#       PLATFORM: x64
 
 os: Visual Studio 2015
 
@@ -16,7 +12,7 @@ build_script:
     - echo Running cmake...
     - mkdir build
     - cd build
-    - cmake ..
+    - cmake .. -G "Visual Studio 15"
     - dir
     - cmake --build .
     - test_dsp.exe
