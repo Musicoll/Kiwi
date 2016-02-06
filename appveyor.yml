@@ -12,7 +12,7 @@ build_script:
     - echo Running cmake...
     - mkdir build
     - cd build
-    - cmake .. -G "Visual Studio 15"
+    - cmake .. -G "Visual Studio 14 2015"
     - dir
     - cmake --build .
     - test_dsp.exe
