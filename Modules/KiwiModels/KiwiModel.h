@@ -25,7 +25,6 @@
 #define __DEF_KIWI_MODEL__
 
 #include "../KiwiCore/KiwiCore.h"
-#include "../KiwiGraphics/KiwiGraphics.h"
 
 // ---- Flip headers ---- //
 #include "flip/DataModel.h"

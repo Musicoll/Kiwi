@@ -93,9 +93,6 @@ namespace kiwi
         FlipRGBA(const double red, const double green, const double blue, const double alpha = 1.)
         : m_red(cclip(red)), m_green(cclip(green)), m_blue(cclip(blue)), m_alpha(cclip(alpha)) {}
         
-        FlipRGBA(const Color& color)
-        : m_red(cclip(color.red())), m_green(cclip(color.green())), m_blue(cclip(color.blue())), m_alpha(cclip(color.alpha())) {}
-        
         //! Create a color with a vector of atoms.
         FlipRGBA(const Atom& atom)
         {
@@ -169,8 +166,6 @@ namespace kiwi
         
         FlipPoint(const double x, const double y) : m_x(0.), m_y(0.) {}
         
-        FlipPoint(const Point& pt) : m_x(pt.x()), m_y(pt.y()) {}
-        
         //! Create a color with a vector of atoms.
         FlipPoint(const Atom& atom)
         {
@@ -195,10 +190,7 @@ namespace kiwi
         }
         
         //! Retrieve the attribute value as a vector of atoms.
-        operator Atom() const { return Point(m_x, m_y); }
-        
-        //! Retrieve the attribute value as a vector of atoms.
-        operator Point() const { return Point(m_x, m_y); }
+        operator Atom() const { return {static_cast<double>(m_x), static_cast<double>(m_y)}; }
         
     private:
         flip::Float m_x;
