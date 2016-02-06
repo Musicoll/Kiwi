@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.4)
 project (Kiwi CXX)
 set (Kiwi_VERSION_MAJOR 0)
 set (Kiwi_VERSION_MINOR 1)
