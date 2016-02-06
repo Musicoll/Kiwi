@@ -16,8 +16,9 @@ build_script:
     - dir
     - cmake --build .
     - dir
-    - Debug\dir
-    - Debug\test_dsp
+    - cd Debug
+    - dir
+    - test_dsp
 
 #---------------------------------#
 #         notifications           #
