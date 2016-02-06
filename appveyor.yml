@@ -10,8 +10,7 @@ environment:
 #     - CONFIGURATION: Release
 #       PLATFORM: x64
 
-install:
-- if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+os: Visual Studio 2015
 
 build_script:
    - mkdir build
