@@ -84,7 +84,7 @@ namespace dsp
             if(vec)
 #ifdef _WINDOWS
             {
-                //_aligned_free(vec);
+                _aligned_free(vec);
             }
 #else
             {

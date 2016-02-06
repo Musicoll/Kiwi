@@ -15,7 +15,8 @@ build_script:
     - cmake .. -G "Visual Studio 14 2015"
     - dir
     - cmake --build .
-    - test_dsp.exe
+    - dir
+    - test_dsp
 
 #---------------------------------#
 #         notifications           #
