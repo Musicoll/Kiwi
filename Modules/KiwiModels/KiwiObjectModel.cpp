@@ -30,7 +30,7 @@ namespace kiwi
     //                                      OBJECT                                      //
     // ================================================================================ //
     
-    ObjectModel::ObjectModel(Infos const& detail, const sTag name) noexcept :
+    ObjectModel::ObjectModel(Infos const& detail, const std::string name) noexcept :
     m_name(name),
     m_text(detail.text),
     m_id(detail.lid)
@@ -69,7 +69,7 @@ namespace kiwi
         Model::declare<ObjectModel>()
         .name("cicm.kiwi.ObjectModel")
         .inherit<AttributeBase::Manager>()
-        .member<FlipTag, &ObjectModel::m_name>("name")
+        .member<flip::String, &ObjectModel::m_name>("name")
         .member<flip::String, &ObjectModel::m_text>("text")
         .member<flip::Int, &ObjectModel::m_id>("id");
     }

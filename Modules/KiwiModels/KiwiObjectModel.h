@@ -38,7 +38,7 @@ namespace kiwi
     {
         const ulong             lid;
         const sTag              name;
-        const std::string            text;
+        const std::string       text;
         const Dico				dico;
         const Vector			args;
         
@@ -83,9 +83,9 @@ namespace kiwi
         };
         
     private:
-        FlipTag         m_name;
-        Arguments       m_args;
+        flip::String    m_name;
         flip::String    m_text;
+        Arguments       m_args;
         flip::Int       m_id;
         
     public:
@@ -95,7 +95,7 @@ namespace kiwi
         //! Constructor.
         /** You should never call this method except if you really know what you're doing.
          */
-        ObjectModel(Infos const& detail, const sTag name) noexcept;
+        ObjectModel(Infos const& detail, const std::string name) noexcept;
         
         //! Copy constructor.
         ObjectModel(const ObjectModel& rhs) noexcept;
@@ -124,7 +124,7 @@ namespace kiwi
         /** The function retrieves the name of the object as a tag.
          @return The name of the object as a tag.
          */
-        inline sTag getName() const noexcept
+        inline std::string getName() const noexcept
         {
             return m_name;
         }

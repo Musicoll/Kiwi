@@ -95,7 +95,7 @@ namespace kiwi
                 
                 auto creators = getCreators();
                 
-                if(name == Tags::_empty) {name = object->getName();}
+                if(name == Tags::_empty) {name = Tag::create(object->getName());}
                 if(creators.find(name) != creators.end())
                 {
                     //Console::error("The object " + name->getName() + " already exist !");

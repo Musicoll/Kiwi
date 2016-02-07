@@ -143,7 +143,7 @@ namespace kiwi
          */
         inline sTag getName() const noexcept
         {
-            return m_model.getName();
+            return Tag::create(m_model.getName());
         }
         
         //! Retrieve the text of the object.
