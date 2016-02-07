@@ -1,8 +1,8 @@
-/*
+//
 // Copyright (c) 2015 Pierre Guillot.
 // For information on usage and redistribution, and for a DISCLAIMER OF ALL
 // WARRANTIES, see the file, "LICENSE.txt," in this distribution.
-*/
+//
 
 #ifndef KIWI_DSP_SIGNAL_H_INCLUDED
 #define KIWI_DSP_SIGNAL_H_INCLUDED
@@ -14,11 +14,6 @@ namespace kiwi
 {
 namespace dsp
 {
-#ifdef KIWI_DSP_FLOAT
-    typedef float sample;
-#else
-    typedef double sample;
-#endif
     // ==================================================================================== //
     //                                          SIGNAL                                      //
     // ==================================================================================== //

@@ -10,6 +10,7 @@
 		8F51CFEF1C64E76A00D549C8 /* test_KiwiDsp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F51CFEE1C64E76A00D549C8 /* test_KiwiDsp.cpp */; };
 		8F98709A1C6652DF00C3B213 /* KiwiDspProcessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F9870991C6652DF00C3B213 /* KiwiDspProcessor.cpp */; };
 		8F98709C1C6655EB00C3B213 /* KiwiDspLink.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F98709B1C6655EB00C3B213 /* KiwiDspLink.cpp */; };
+		8F98709F1C66571C00C3B213 /* KiwiDspNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F98709D1C66571C00C3B213 /* KiwiDspNode.cpp */; };
 		8F9C6A631C64EC2200537478 /* KiwiDspChain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F9C6A5A1C64EC2200537478 /* KiwiDspChain.cpp */; };
 		8F9C6A641C64EC2200537478 /* KiwiDspSignal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F9C6A5E1C64EC2200537478 /* KiwiDspSignal.cpp */; };
 /* End PBXBuildFile section */
@@ -31,7 +32,8 @@
 		8F51CFEE1C64E76A00D549C8 /* test_KiwiDsp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_KiwiDsp.cpp; sourceTree = SOURCE_ROOT; };
 		8F9870991C6652DF00C3B213 /* KiwiDspProcessor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = KiwiDspProcessor.cpp; path = ../../../Modules/KiwiDsp/KiwiDspProcessor.cpp; sourceTree = "<group>"; };
 		8F98709B1C6655EB00C3B213 /* KiwiDspLink.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = KiwiDspLink.cpp; path = ../../../Modules/KiwiDsp/KiwiDspLink.cpp; sourceTree = "<group>"; };
-		8F9C6A581C64EC2200537478 /* KiwiChain.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = KiwiChain.hpp; path = ../../../Modules/KiwiDsp/KiwiChain.hpp; sourceTree = "<group>"; };
+		8F98709D1C66571C00C3B213 /* KiwiDspNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = KiwiDspNode.cpp; path = ../../../Modules/KiwiDsp/KiwiDspNode.cpp; sourceTree = "<group>"; };
+		8F98709E1C66571C00C3B213 /* KiwiDspNode.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = KiwiDspNode.hpp; path = ../../../Modules/KiwiDsp/KiwiDspNode.hpp; sourceTree = "<group>"; };
 		8F9C6A591C64EC2200537478 /* KiwiDsp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = KiwiDsp.hpp; path = ../../../Modules/KiwiDsp/KiwiDsp.hpp; sourceTree = "<group>"; };
 		8F9C6A5A1C64EC2200537478 /* KiwiDspChain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = KiwiDspChain.cpp; path = ../../../Modules/KiwiDsp/KiwiDspChain.cpp; sourceTree = "<group>"; };
 		8F9C6A5B1C64EC2200537478 /* KiwiDspChain.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = KiwiDspChain.hpp; path = ../../../Modules/KiwiDsp/KiwiDspChain.hpp; sourceTree = "<group>"; };
@@ -83,9 +85,10 @@
 			isa = PBXGroup;
 			children = (
 				8F9C6A591C64EC2200537478 /* KiwiDsp.hpp */,
-				8F9C6A581C64EC2200537478 /* KiwiChain.hpp */,
 				8F9C6A5A1C64EC2200537478 /* KiwiDspChain.cpp */,
 				8F9C6A5B1C64EC2200537478 /* KiwiDspChain.hpp */,
+				8F98709D1C66571C00C3B213 /* KiwiDspNode.cpp */,
+				8F98709E1C66571C00C3B213 /* KiwiDspNode.hpp */,
 				8F98709B1C6655EB00C3B213 /* KiwiDspLink.cpp */,
 				8F9C6A611C64EC2200537478 /* KiwiDspLink.hpp */,
 				8F9870991C6652DF00C3B213 /* KiwiDspProcessor.cpp */,
@@ -159,6 +162,7 @@
 				8F9C6A631C64EC2200537478 /* KiwiDspChain.cpp in Sources */,
 				8F9C6A641C64EC2200537478 /* KiwiDspSignal.cpp in Sources */,
 				8F98709C1C6655EB00C3B213 /* KiwiDspLink.cpp in Sources */,
+				8F98709F1C66571C00C3B213 /* KiwiDspNode.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,8 +1,8 @@
-/*
+//
 // Copyright (c) 2015 Pierre Guillot.
 // For information on usage and redistribution, and for a DISCLAIMER OF ALL
 // WARRANTIES, see the file, "LICENSE.txt," in this distribution.
-*/
+//
 
 #ifndef KIWI_DSP_PROCESSOR_H_INCLUDED
 #define KIWI_DSP_PROCESSOR_H_INCLUDED
@@ -40,10 +40,6 @@ namespace dsp
         //! @return The number of outputs of the Processor object.
         inline size_t getNumberOfOutputs() const noexcept {return m_noutputs;}
         
-        //! @brief Retrieves if the DSP is inplace.
-        //! @return true if the DSP is inplace, otherwise false.
-        inline bool isInplace() const noexcept {return m_inplace;}
-        
         //! @brief Retrieves if the DSP is running.
         //! @return true if the DSP is running, otherwise false.
         inline bool isRunning() const noexcept {return m_running;}
@@ -61,39 +57,21 @@ namespace dsp
         //! @see setNumberOfInlets() and getNumberOfOutputs()
         void setNumberOfOutlets(const size_t nouts) noexcept;
         
-        //! @brief Sets if the DSP should be inplace.
-        //! @details You should use this method before the perform method's call to set
-        //! @details if the inputs and outputs Signal objects own the same samples vectors.
-        //! @param status The inplace status.
-        //! @see isInplace()
-        void setInplace(const bool status) noexcept;
-        
-        //! @brief Sets if the perform method should be called.
-        //! @details You should always use this method during the call of the prepare method'
-        //! @details to notify the Chain object that the perform method can be called. Usually
-        //! @details this method is called with true but sometimes you should want to avoid
-        //! @details the perform if the sample rate, the vector size or the connected inputs
-        //! @details and outputs don't match with the needs of your perform.
-        //! @param status The perform status.
-        //! @see prepare()
-        void shouldPerform(const bool status) noexcept;
-        
     private:
         //! @brief Prepares everything for the perform method.
         //! @details This is a pure virtual method. You should use this method to check the
         //! @details vector size, the sample rate, the connected inputs and outputs and to
-        //! @details allocate memory if need. You should always call the shouldPerform method
-        //! @details to notify that everything is well setted to process or not.
-        //! @see shouldPerform() and release()
-        virtual void prepare(Node const& node) = 0;
+        //! @details allocate memory if need. The method should return true if the perform
+        //! @details method of the Processor object can be called, otherwise it should return
+        //! @details false.
+        //! @return true if the perform method can be called, otherwise false.
+        //! @see release()
+        virtual bool prepare(Node const& node) = 0;
         
         //! @brief Performs the digital signal processing.
         //! @details This is a pure virtual method. You can use the methods in the following
         //! @details section but you should avoid to allocate memory or do it asynchronously.
-        //! @see getInputsSamples(), getOutputsSamples(), getInputSamples(),
-        //! @see  getOutputSamples(), getNumberOfInputs(), getNumberOfOutputs(),
-        //! @see getVectorSize() and getSampleRate()
-        virtual void perform() noexcept = 0;
+        virtual void perform(Node const& node) noexcept = 0;
         
         //! @brief Releases everything after the digital signal processing.
         //! @details You can use this method to free the memory allocated during the call of
@@ -101,11 +79,9 @@ namespace dsp
         //! @see prepare()
         virtual void release() {};
         
-        size_t              m_ninputs;
-        size_t              m_noutputs;
-        bool                m_inplace;
-        std::atomic_bool    m_valid;
-        std::atomic_bool    m_running;
+        size_t  m_ninputs;
+        size_t  m_noutputs;
+        bool    m_running;
         friend Node;
     };
 }
