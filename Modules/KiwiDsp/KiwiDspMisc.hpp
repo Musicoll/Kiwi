@@ -16,6 +16,7 @@
 #include <exception>
 #include <vector>
 #include <set>
+#include <memory>
 
 #ifndef __APPLE__
 #include "malloc.h"

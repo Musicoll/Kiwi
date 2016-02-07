@@ -156,7 +156,7 @@ namespace kiwi
             
             for(auto& set : m_inputs)
             {
-                for(std::set< std::weak_ptr< Node >, std::owner_less< std::weak_ptr< Node > > >::const_iterator it = set.begin(); it != set.end();)
+                for(auto it = set.cbegin(); it != set.cend();)
                 {
                     std::shared_ptr<Node> snode = it->lock();
                     if(!snode)
