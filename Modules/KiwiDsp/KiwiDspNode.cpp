@@ -65,6 +65,7 @@ namespace kiwi
             }
             m_inputs.clear();
             m_outputs.clear();
+            m_buffer_in     = Samples<sample>::release(m_buffer_in);
         }
         
         void Node::addInput(std::shared_ptr< Node > node, const size_t index)
@@ -152,8 +153,42 @@ namespace kiwi
                 };
                 throw ErrorRunning();
             }
-            //Check if inplace or not
-            m_buffer_out = m_buffer_in = Samples<sample>::allocate(m_chain.getVectorSize() * m_processor.getNumberOfInputs());
+            
+            for(auto& set : m_inputs)
+            {
+                for(std::set< std::weak_ptr< Node >, std::owner_less< std::weak_ptr< Node > > >::const_iterator it = set.begin(); it != set.end();)
+                {
+                    std::shared_ptr<Node> snode = it->lock();
+                    if(!snode)
+                    {
+                        it = set.erase(it);
+                    }
+                    else
+                    {
+                        ++it;
+                    }
+                }
+            }
+            m_buffer_copy.resize(m_processor.getNumberOfInputs());
+            for(std::vector< std::vector< sample const* > >::size_type i = 0; i < m_buffer_copy.size(); ++i)
+            {
+                for(auto node : m_inputs[i])
+                {
+                    std::shared_ptr<Node> snode = node.lock();
+                    if(snode)
+                    {
+                        // TODO : get the sample from a specific output
+                        m_buffer_copy[i].push_back(snode->m_buffer_out);
+                    }
+                }
+            }
+            if(m_processor.getNumberOfInputs() || m_processor.getNumberOfOutputs())
+            {
+                const size_t nchannels = m_processor.getNumberOfInputs() >= m_processor.getNumberOfOutputs() ? m_processor.getNumberOfInputs() : m_processor.getNumberOfOutputs();
+                m_buffer_out = m_buffer_in = Samples<sample>::allocate(m_vector_size * nchannels);
+            }
+            
+            
             if(m_buffer_in)
             {
                 try
@@ -181,9 +216,21 @@ namespace kiwi
         {
             if(m_processor.isRunning())
             {
-                for(std::vector< std::set<Node*> >::size_type i = 0; i < m_inputs.size(); i++)
+                for(std::vector< std::vector< sample const* > >::size_type i = 0; i < m_buffer_copy.size(); ++i)
                 {
-                    //m_inputs[i].perform();
+                    sample *const buffer = m_buffer_in+i*m_vector_size;
+                    if(!m_buffer_copy[i].empty())
+                    {
+                        Samples<sample>::copy(m_vector_size, m_buffer_copy[i][0], buffer);
+                        for(std::vector< sample const* >::size_type j = 1; j < m_buffer_copy[i].size(); ++j)
+                        {
+                            Samples<sample>::add(m_vector_size, m_buffer_copy[i][j], buffer);
+                        }
+                    }
+                    else
+                    {
+                        Samples<sample>::clear(m_vector_size, buffer);
+                    }
                 }
                 m_processor.perform(*this);
             }

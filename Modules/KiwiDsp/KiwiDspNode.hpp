@@ -110,14 +110,15 @@ namespace dsp
         //! @see prepare()
         void perform() const noexcept;
         
-        Chain const&                    m_chain;
-        Processor&                      m_processor;
-        size_t                          m_sample_rate;
-        size_t                          m_vector_size;
-        sample*                         m_buffer_in;
-        sample*                         m_buffer_out;
-        size_t                          m_index;
-        bool                            m_valid;
+        Chain const&                        m_chain;
+        Processor&                          m_processor;
+        size_t                              m_sample_rate;
+        size_t                              m_vector_size;
+        sample*                             m_buffer_in;
+        sample*                             m_buffer_out;
+        size_t                              m_index;
+        bool                                m_valid;
+        std::vector< std::vector< sample const* > >  m_buffer_copy;
         std::vector< std::set< std::weak_ptr< Node >, std::owner_less< std::weak_ptr< Node > > > > m_inputs;
         std::vector< std::set< std::weak_ptr< Node >, std::owner_less< std::weak_ptr< Node > > > > m_outputs;
         friend class Chain;

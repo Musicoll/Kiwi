@@ -118,7 +118,7 @@ namespace kiwi
                         class ErrorLink : public Error
                         {
                         public:
-                            const char* what() const noexcept override {return "Kiwi::Dsp::Chain : A link isn't valid.";}
+                            const char* what() const noexcept final {return "Kiwi::Dsp::Chain : A link isn't valid.";}
                         };
                     }
                 }
@@ -154,7 +154,7 @@ namespace kiwi
                                         class ErrorLoop : public Error
                                         {
                                         public:
-                                            const char* what() const noexcept override {return "Kiwi::Dsp::Chain : A loop is detected.";}
+                                            const char* what() const noexcept final {return "Kiwi::Dsp::Chain : A loop is detected.";}
                                         };
                                         
                                         throw ErrorLoop();
@@ -193,19 +193,27 @@ namespace kiwi
             // ============================================================================ //
             //                              PREPARES THE NODES                              //
             // ============================================================================ //
-            for(auto it : m_nodes)
+            for(std::vector< std::shared_ptr< Node > >::const_iterator it = m_nodes.begin();
+                it != m_nodes.end(); )
             {
-                if(static_cast<bool>(it->m_index))
+                if(static_cast<bool>((*it)->m_index))
                 {
                     try
                     {
-                        it->prepare();
+                        (*it)->prepare();
                     }
                     catch(Error& e)
                     {
                         throw e;
                     }
-                    // Remove the node if the processor don't want to perform
+                    if(!(*it)->m_valid)
+                    {
+                        it = m_nodes.erase(it);
+                    }
+                    else
+                    {
+                        ++it;
+                    }
                 }
             }
             
