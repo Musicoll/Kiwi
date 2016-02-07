@@ -69,7 +69,7 @@ namespace kiwi
             inline bool isDico() const noexcept{return getType() == DICO;}
             inline bool isVector() const noexcept {return getType() == VECTOR;}
             virtual inline bool getBool() const noexcept {return false;}
-            virtual inline int64_t getLong() const noexcept {return 0ul;}
+            virtual inline int64_t getLong() const noexcept {return 0;}
             virtual inline double getDouble() const noexcept {return 0.;}
             virtual inline sTag getTag() const noexcept {return Tags::_empty;}
             virtual inline Vector getVector() const noexcept {return Vector();}
@@ -84,8 +84,8 @@ namespace kiwi
             inline QuarkBool(bool const& _val) noexcept : val(_val) {}
             inline Type getType() const noexcept override {return BOOLEAN;}
             inline bool getBool() const noexcept override {return val;}
-            inline int64_t getLong() const noexcept override {return long(val);}
-            inline double getDouble() const noexcept override {return double(val);}
+            inline int64_t getLong() const noexcept override {return val ? 1 : 0;}
+            inline double getDouble() const noexcept override {return val ? 1. : 0.;}
         };
         
         class QuarkLong : public Quark
@@ -96,9 +96,9 @@ namespace kiwi
             inline QuarkLong(const long& _val) noexcept : val(int64_t(_val)) {}
             inline QuarkLong(const int64_t& _val) noexcept : val(_val) {}
             inline Type getType() const noexcept override {return LONG;}
-            inline bool getBool() const noexcept override {return bool(val);}
+            inline bool getBool() const noexcept override {return static_cast<bool>(val);}
             inline int64_t getLong() const noexcept override {return val;}
-            inline double getDouble() const noexcept override {return double(val);}
+            inline double getDouble() const noexcept override {return static_cast<double>(val);}
         };
         
         class QuarkDouble : public Quark
