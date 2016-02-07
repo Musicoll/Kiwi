@@ -18,32 +18,6 @@
         <FILE id="gZxgiT" name="KiwiListenerSet.h" compile="0" resource="0"
               file="../Modules/KiwiCore/KiwiListenerSet.h"/>
       </GROUP>
-      <GROUP id="{4F2C7B08-ED02-1D7A-7083-0CE0AFA8DC65}" name="KiwiGraphics">
-        <FILE id="FzLGxS" name="KiwiGraphics.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiGraphics.h"/>
-        <FILE id="ugm41O" name="KiwiAffineMatrix.cpp" compile="1" resource="0"
-              file="../Modules/KiwiGraphics/KiwiAffineMatrix.cpp"/>
-        <FILE id="gz9Vqv" name="KiwiAffineMatrix.h" compile="0" resource="0"
-              file="../Modules/KiwiGraphics/KiwiAffineMatrix.h"/>
-        <FILE id="oK1hjR" name="KiwiMouseCursor.cpp" compile="1" resource="0"
-              file="../Modules/KiwiGraphics/KiwiMouseCursor.cpp"/>
-        <FILE id="psERgp" name="KiwiMouseCursor.h" compile="0" resource="0"
-              file="../Modules/KiwiGraphics/KiwiMouseCursor.h"/>
-        <FILE id="edJFey" name="KiwiPoint.cpp" compile="1" resource="0" file="../Modules/KiwiGraphics/KiwiPoint.cpp"/>
-        <FILE id="jh6M1o" name="KiwiPoint.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiPoint.h"/>
-        <FILE id="XR3U3O" name="KiwiLine.cpp" compile="1" resource="0" file="../Modules/KiwiGraphics/KiwiLine.cpp"/>
-        <FILE id="bOgQay" name="KiwiLine.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiLine.h"/>
-        <FILE id="N7y60d" name="KiwiSize.cpp" compile="1" resource="0" file="../Modules/KiwiGraphics/KiwiSize.cpp"/>
-        <FILE id="iMDvSz" name="KiwiSize.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiSize.h"/>
-        <FILE id="h9E70Z" name="KiwiRectangle.cpp" compile="1" resource="0"
-              file="../Modules/KiwiGraphics/KiwiRectangle.cpp"/>
-        <FILE id="hrfhd1" name="KiwiRectangle.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiRectangle.h"/>
-        <FILE id="RxHukZ" name="KiwiPath.cpp" compile="1" resource="0" file="../Modules/KiwiGraphics/KiwiPath.cpp"/>
-        <FILE id="KLRBpc" name="KiwiPath.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiPath.h"/>
-        <FILE id="HAJ1J4" name="KiwiColor.cpp" compile="1" resource="0" file="../Modules/KiwiGraphics/KiwiColor.cpp"/>
-        <FILE id="MbTJgb" name="KiwiColor.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiColor.h"/>
-        <FILE id="JckRsc" name="KiwiFont.cpp" compile="1" resource="0" file="../Modules/KiwiGraphics/KiwiFont.cpp"/>
-        <FILE id="mkLMlE" name="KiwiFont.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiFont.h"/>
-      </GROUP>
       <GROUP id="{91AF2FB1-AB9E-B019-60F0-B44BDDB476D4}" name="KiwiModels">
         <GROUP id="{6D3BAD57-4D3D-00E0-AAE1-8D3A45D44B02}" name="conv">
           <FILE id="bhca0X" name="Converter.txt" compile="0" resource="1" file="../Modules/KiwiModels/conv/Converter.txt"/>
@@ -70,6 +44,32 @@
               file="../Modules/KiwiModels/KiwiPatcherModel.h"/>
         <FILE id="SRmi2V" name="KiwiFactory.cpp" compile="1" resource="0" file="../Modules/KiwiModels/KiwiFactory.cpp"/>
         <FILE id="z08bY2" name="KiwiFactory.h" compile="0" resource="0" file="../Modules/KiwiModels/KiwiFactory.h"/>
+      </GROUP>
+      <GROUP id="{4F2C7B08-ED02-1D7A-7083-0CE0AFA8DC65}" name="KiwiGraphics">
+        <FILE id="FzLGxS" name="KiwiGraphics.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiGraphics.h"/>
+        <FILE id="ugm41O" name="KiwiAffineMatrix.cpp" compile="1" resource="0"
+              file="../Modules/KiwiGraphics/KiwiAffineMatrix.cpp"/>
+        <FILE id="gz9Vqv" name="KiwiAffineMatrix.h" compile="0" resource="0"
+              file="../Modules/KiwiGraphics/KiwiAffineMatrix.h"/>
+        <FILE id="oK1hjR" name="KiwiMouseCursor.cpp" compile="1" resource="0"
+              file="../Modules/KiwiGraphics/KiwiMouseCursor.cpp"/>
+        <FILE id="psERgp" name="KiwiMouseCursor.h" compile="0" resource="0"
+              file="../Modules/KiwiGraphics/KiwiMouseCursor.h"/>
+        <FILE id="edJFey" name="KiwiPoint.cpp" compile="1" resource="0" file="../Modules/KiwiGraphics/KiwiPoint.cpp"/>
+        <FILE id="jh6M1o" name="KiwiPoint.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiPoint.h"/>
+        <FILE id="XR3U3O" name="KiwiLine.cpp" compile="1" resource="0" file="../Modules/KiwiGraphics/KiwiLine.cpp"/>
+        <FILE id="bOgQay" name="KiwiLine.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiLine.h"/>
+        <FILE id="N7y60d" name="KiwiSize.cpp" compile="1" resource="0" file="../Modules/KiwiGraphics/KiwiSize.cpp"/>
+        <FILE id="iMDvSz" name="KiwiSize.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiSize.h"/>
+        <FILE id="h9E70Z" name="KiwiRectangle.cpp" compile="1" resource="0"
+              file="../Modules/KiwiGraphics/KiwiRectangle.cpp"/>
+        <FILE id="hrfhd1" name="KiwiRectangle.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiRectangle.h"/>
+        <FILE id="RxHukZ" name="KiwiPath.cpp" compile="1" resource="0" file="../Modules/KiwiGraphics/KiwiPath.cpp"/>
+        <FILE id="KLRBpc" name="KiwiPath.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiPath.h"/>
+        <FILE id="HAJ1J4" name="KiwiColor.cpp" compile="1" resource="0" file="../Modules/KiwiGraphics/KiwiColor.cpp"/>
+        <FILE id="MbTJgb" name="KiwiColor.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiColor.h"/>
+        <FILE id="JckRsc" name="KiwiFont.cpp" compile="1" resource="0" file="../Modules/KiwiGraphics/KiwiFont.cpp"/>
+        <FILE id="mkLMlE" name="KiwiFont.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiFont.h"/>
       </GROUP>
       <GROUP id="{7975B265-C2A6-7405-C4B3-B0CF5D13EC70}" name="KiwiEngine">
         <FILE id="DIO2Zf" name="KiwiEngine.h" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiEngine.h"/>

@@ -39,7 +39,7 @@ namespace kiwi
     
     void PatcherModel::init(Dico& dico)
     {
-        addAttr(&m_bgcolor, Tags::unlocked_bgcolor, "Unlocked Background Color", "Appearance", Colors::red);
+        addAttr(&m_bgcolor, Tags::unlocked_bgcolor, "Unlocked Background Color", "Appearance", FlipRGBA{0., 0., 0., 1.});
         addAttr(&m_gridsize, Tags::gridsize, "Grid Size", "Editing", 20);
         addAttr(&m_attr_bool, Tag::create("attr_bool"), "Test flip bool", "test", false);
         addAttr(&m_attr_tag, Tag::create("attr_tag"), "Test flip tag", "test", Tag::create("test tag"));
