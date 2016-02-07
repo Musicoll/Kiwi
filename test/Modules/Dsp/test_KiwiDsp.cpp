@@ -6,7 +6,7 @@
 //  Copyright © 2016 CICM. All rights reserved.
 //
 
-#define KIWI_DSP_FLOAT
+#define KIWI_DSP_DOUBLE
 #include "../../../Modules/KiwiDsp/KiwiDsp.hpp"
 
 using namespace kiwi::dsp;
@@ -126,7 +126,7 @@ int main(int , const char *[]) {
             return 1;
         }
         
-        for(size_t i = 100; i; --i)
+        for(size_t i = 1; i; --i)
         {
             chain.tick();
         }
