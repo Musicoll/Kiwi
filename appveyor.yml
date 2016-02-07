@@ -15,6 +15,7 @@ build_script:
     - cmake --build .
     - cd Debug
     - dir
+    - test_core
     - test_dsp
 
 #---------------------------------#

@@ -27,22 +27,31 @@ else()
     endif()
 endif()
 
-# Unit tests sources
-file(GLOB DSP_SRC
+# Module Core
+file(GLOB KIWI_MODULE_CORE_SRC
+    Modules/KiwiCore/*.h
+    Modules/KiwiCore/*.hpp
+    Modules/KiwiCore/*.cpp
+)
+
+# Module DSP
+file(GLOB KIWI_MODULE_DSP_SRC
     Modules/KiwiDsp/*.hpp
     Modules/KiwiDsp/*.cpp
 )
 
+# Core Unit Tests sources
 set(TEST_CORE
+    ${KIWI_MODULE_CORE_SRC}
     test/Modules/Core/test_KiwiCore.cpp
-    )
+) 
+add_executable(test_core ${TEST_CORE})
 
+# DSP Unit Tests sources
 set(TEST_DSP
+    ${KIWI_MODULE_DSP_SRC}
     test/Modules/Dsp/test_KiwiDsp.cpp
 )
-
-# Unit tests executable
-add_executable(test_core ${TEST_CORE})
-add_executable(test_dsp ${TEST_DSP} ${DSP_SRC})
+add_executable(test_dsp ${TEST_DSP})
 
 # target_link_libraries(test_suite ${TEST_LIBS})

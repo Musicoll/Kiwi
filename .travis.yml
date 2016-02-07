@@ -27,5 +27,5 @@ script:
 - cd build
 - cmake ..
 - make
-- ./test_dsp
 - ./test_core
+- ./test_dsp
