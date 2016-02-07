@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <cmath>
+#include <cstring>
 #include <algorithm>
 #include <chrono>
 #include <exception>

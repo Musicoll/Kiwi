@@ -79,9 +79,9 @@ namespace dsp
         //! @see prepare()
         virtual void release() {};
         
-        size_t              m_ninputs;
-        size_t              m_noutputs;
-        std::atomic<bool>   m_running;
+        size_t  m_ninputs;
+        size_t  m_noutputs;
+        bool    m_running;
         friend Node;
     };
 }
