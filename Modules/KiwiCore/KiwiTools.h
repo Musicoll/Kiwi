@@ -29,6 +29,7 @@
 #include <cwchar>
 #include <locale>
 #include <iostream>
+#include <sstream>
 #include <iomanip>
 #include <fstream>
 #include <cstring>
