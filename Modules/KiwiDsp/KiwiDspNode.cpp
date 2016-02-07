@@ -156,10 +156,10 @@ namespace kiwi
             
             for(auto& set : m_inputs)
             {
-                for(auto it = set.cbegin(); it != set.cend();)
+                auto it = set.cbegin();
+                while(it != set.cend())
                 {
-                    std::shared_ptr<Node> snode = it->lock();
-                    if(!snode)
+                    if(it->expired())
                     {
                         it = set.erase(it);
                     }
