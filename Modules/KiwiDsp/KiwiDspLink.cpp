@@ -10,7 +10,7 @@ namespace kiwi
 {
     namespace dsp
     {
-        Link::Link(Processor const& from, size_t output, Processor const& to, size_t input) noexcept :
+        Link::Link(Processor const& from, size_t const output, Processor const& to, size_t const input) noexcept :
         m_from(from), m_output(output), m_to(to), m_input(input)
         {
         }

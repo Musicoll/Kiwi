@@ -7,67 +7,100 @@
 //
 
 #define KIWI_DSP_FLOAT
-#define CATCH_CONFIG_MAIN
-#include "../../catch.hpp"
-#include "../../../Modules/KiwiDsp/KiwiDspSignal.hpp"
+#include "../../../Modules/KiwiDsp/KiwiDsp.hpp"
 
 using namespace kiwi::dsp;
 
-/*
-static inline bool is_equal(size_t const size, sample const& value, sample* in) noexcept
+class Plus : public Processor
 {
-    for(size_t i = 0; i < size; ++i)
+public:
+    Plus() noexcept
     {
-        if(*in++ != value)
+        std::cout << "Plus\n";
+        setNumberOfInlets(2);
+        setNumberOfOutlets(1);
+    }
+    
+    Plus(sample value) noexcept : m_value(value)
+    {
+        std::cout << "Plus " << std::to_string(value) << "\n";
+        setNumberOfInlets(2);
+        setNumberOfOutlets(1);
+    }
+    
+    ~Plus()  noexcept
+    {
+        
+    }
+    
+private:
+    
+    bool prepare(Node const& node) final
+    {
+        if(node.isInputConnected(0ul))
         {
-            return false;
+            return true;
+        }
+        return false;
+    }
+    
+    void perform(Node const& node) noexcept final
+    {
+        if(getNumberOfInputs() > 1)
+        {
+            Samples<sample>::add(node.getVectorSize(), node.getInputSamples(0ul),
+                                 node.getInputSamples(1ul), node.getOutputsSamples());
+        }
+        else
+        {
+            Samples<sample>::add(node.getVectorSize(), m_value,
+                                 node.getInputsSamples(), node.getOutputsSamples());
         }
     }
-    return true;
-}
+    
+    sample m_value;
+};
 
-
-TEST_CASE("Samples Class Tests", "[Samples]")
-{
-    for(size_t size = 1ul; size < 524288ul; size *= 2ul)
+int main(int , const char *[]) {
+    
+    std::unique_ptr<Processor> pr1(new Plus());
+    std::unique_ptr<Processor> pr2(new Plus(1.f));
+    std::unique_ptr<Link> li1(new Link(*pr1.get(), 0, *pr2.get(), 0));
+    
     {
-        std::cout << "Size : " << size << "\n";
-        sample* vec = nullptr;
+        Chain chain;
+        std::vector<Processor*> processes;
+        std::vector<Link*> links;
+        processes.push_back(pr1.get());
+        processes.push_back(pr2.get());
+        links.push_back(li1.get());
         
-        std::cout << "Aki1" << "\n";
-        vec = Samples<sample>::allocate(size);
-        REQUIRE(vec != nullptr);
-
-        SECTION("Initialization Section " + std::to_string(size))
+        try
         {
-            std::cout << "Initialization" << "\n";
-            SECTION("Fill " + std::to_string(size))
-            {
-                std::cout << "Fill" << "\n";
-                Samples<sample>::fill(size, 1.2f, vec);
-                CHECK(is_equal(size, 1.2f, vec));
-            }
-            std::cout << "to Clear" << "\n";
-            SECTION("Clear " + std::to_string(size))
-            {
-                std::cout << "Clear" << "\n";
-                Samples<sample>::clear(size, vec);
-                CHECK(is_equal(size, 0.f, vec));
-            }
+            chain.compile(44100, 64, processes, links);
+        }
+        catch(std::exception& e)
+        {
+            std::cout << e.what() << "\n";
+            return 1;
         }
         
-        SECTION("Algebra Section " + std::to_string(size))
+        for(size_t i = 100; i; --i)
         {
-            ;
+            chain.tick();
         }
         
-        SECTION("Deallocation Section " + std::to_string(size))
+        try
         {
-           
+            chain.stop();
         }
-        
-        vec = Samples<sample>::release(vec);
-        REQUIRE(vec == nullptr);
+        catch(std::exception& e)
+        {
+            std::cout << e.what() << "\n";
+            return 1;
+        }
     }
+    
+    
+    return 0;
 }
- */

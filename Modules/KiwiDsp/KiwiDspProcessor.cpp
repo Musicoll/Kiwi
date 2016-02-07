@@ -11,7 +11,7 @@ namespace kiwi
     namespace dsp
     {
         Processor::Processor() noexcept :
-        m_ninputs(0ul), m_noutputs(0ul), m_inplace(false), m_valid(false), m_running(false)
+        m_ninputs(0ul), m_noutputs(0ul), m_running(false)
         {
             
         }
@@ -31,18 +31,6 @@ namespace kiwi
         {
             assert("Kiwi::Dsp::Processor : The method shouldn't be called when the DSP is running" && !m_running);
             m_noutputs = nouts;
-        }
-        
-        void Processor::setInplace(const bool status) noexcept
-        {
-            assert("Kiwi::Dsp::Processor : The method shouldn't be called when the DSP is running" && !m_running);
-            m_inplace = status;
-        }
-        
-        void Processor::shouldPerform(const bool status) noexcept
-        {
-            assert("Kiwi::Dsp::Processor : The method shouldn't be called when the DSP is running" && !m_running);
-            m_valid  = status;
         }
     }
 }

@@ -33,7 +33,7 @@ namespace dsp
         Node(Chain const& chain, Processor& processor);
         
         //! @brief The destructor.
-        ~Node() noexcept;
+        ~Node();
         
         //! @brief Checks if an input is connected to any Node object.
         //! @details This method can be used to ignore an input's sample vector if the input
@@ -57,11 +57,31 @@ namespace dsp
             return !m_outputs[index].empty();
         }
         
-        //! @brief Gets the current sample rate.
-        size_t getSampleRate() const noexcept;
+        //! @brief Gets the current sample rate of the chain.
+        inline size_t getSampleRate() const noexcept {return m_sample_rate;}
         
         //! @brief Gets the current vector size of the chain.
-        size_t getVectorSize() const noexcept;
+        inline size_t getVectorSize() const noexcept {return m_vector_size;}
+        
+        //! @brief Gets the vector of samples of an input.
+        inline sample const* getInputSamples(const size_t index) const noexcept
+        {
+            assert(index < m_inputs.size() && "Kiwi::Dsp::Node : Index must be inferior to the number of inputs.");
+            return m_buffer_in+index * m_vector_size;
+        }
+        
+        //! @brief Gets the vector of samples of the inputs.
+        inline sample const* getInputsSamples() const noexcept {return m_buffer_in;}
+        
+        //! @brief Gets the vector of samples of an output.
+        inline sample* getOutputSamples(const size_t index) const noexcept
+        {
+            assert(index < m_outputs.size() && "Kiwi::Dsp::Node : Index must be inferior to the number of outputs.");
+            return m_buffer_out+index * m_vector_size;
+        }
+        
+        //! @brief Gets the vector of samples of the inputs.
+        inline sample* getOutputsSamples() const noexcept {return m_buffer_out;}
         
     private:
         
@@ -92,7 +112,12 @@ namespace dsp
         
         Chain const&                    m_chain;
         Processor&                      m_processor;
+        size_t                          m_sample_rate;
+        size_t                          m_vector_size;
+        sample*                         m_buffer_in;
+        sample*                         m_buffer_out;
         size_t                          m_index;
+        bool                            m_valid;
         std::vector< std::set< std::weak_ptr< Node >, std::owner_less< std::weak_ptr< Node > > > > m_inputs;
         std::vector< std::set< std::weak_ptr< Node >, std::owner_less< std::weak_ptr< Node > > > > m_outputs;
         friend class Chain;

@@ -29,7 +29,7 @@ namespace dsp
         //! @param output The index of the output.
         //! @param to     The input Processor object.
         //! @param input  The index of the input.
-        Link(Processor const& from, size_t output, Processor const& to, size_t input) noexcept;
+        Link(Processor const& from, size_t const output, Processor const& to, size_t const input) noexcept;
         
         //! @brief The destructor.
         ~Link() noexcept;

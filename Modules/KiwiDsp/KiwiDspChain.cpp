@@ -18,11 +18,7 @@ namespace kiwi
         
         Chain::~Chain()
         {
-            if(m_running)
-            {
-                stop();
-            }
-            m_nodes.clear();
+            stop();
         }
         
         void Chain::stop()
@@ -30,16 +26,13 @@ namespace kiwi
             if(m_running)
             {
                 m_running = false;
-                for(auto& node : m_nodes)
+                try
                 {
-                    try
-                    {
-                        node->prepare();
-                    }
-                    catch(Error& e)
-                    {
-                        throw e;
-                    }
+                    m_nodes.clear();
+                }
+                catch(std::exception& e)
+                {
+                    throw e;
                 }
             }
         }
@@ -59,10 +52,7 @@ namespace kiwi
             // ============================================================================ //
             //                              STOPS THE DSP                                   //
             // ============================================================================ //
-            if(m_running)
-            {
-                stop();
-            }
+            stop();
             m_sample_rate = samplerate;
             m_vector_size = vectorsize;
             

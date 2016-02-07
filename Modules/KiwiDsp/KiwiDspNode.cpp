@@ -12,8 +12,21 @@ namespace kiwi
     namespace dsp
     {
         Node::Node(Chain const& chain, Processor& processor) :
-        m_chain(chain), m_processor(processor), m_index(0ul)
+        m_chain(chain), m_processor(processor),
+        m_buffer_in(nullptr), m_buffer_out(nullptr),
+        m_sample_rate(chain.getSampleRate()), m_vector_size(chain.getVectorSize()),
+        m_index(0ul), m_valid(false)
         {
+            if(m_processor.isRunning())
+            {
+                class ErrorRunning : public Error
+                {
+                public:
+                    const char* what() const noexcept final {return "Kiwi::Dsp::Node : The processor is already in a Chain.";}
+                };
+                throw ErrorRunning();
+            }
+            
             class ErrorResize : public Error
             {
             public:
@@ -39,23 +52,33 @@ namespace kiwi
             }
         }
         
-        Node::~Node() noexcept
+        Node::~Node()
         {
-            
-        }
-        
-        size_t Node::getSampleRate() const noexcept
-        {
-            return m_chain.getSampleRate();
-        }
-        
-        size_t Node::getVectorSize() const noexcept
-        {
-            return m_chain.getVectorSize();
+            try
+            {
+                m_processor.m_running = false;
+                m_processor.release();
+            }
+            catch(std::exception& e)
+            {
+                throw e;
+            }
+            m_inputs.clear();
+            m_outputs.clear();
         }
         
         void Node::addInput(std::shared_ptr< Node > node, const size_t index)
         {
+            if(m_processor.isRunning())
+            {
+                class ErrorRunning : public Error
+                {
+                public:
+                    const char* what() const noexcept final {return "Kiwi::Dsp::Node : The processor is already in a Chain.";}
+                };
+                throw ErrorRunning();
+            }
+            
             if(index < static_cast<size_t>(m_inputs.size()))
             {
                 if(!m_inputs[index].insert(node).second)
@@ -83,6 +106,16 @@ namespace kiwi
         
         void Node::addOutput(std::shared_ptr< Node > node, const size_t index)
         {
+            if(m_processor.isRunning())
+            {
+                class ErrorRunning : public Error
+                {
+                public:
+                    const char* what() const noexcept final {return "Kiwi::Dsp::Node : The processor is already in a Chain.";}
+                };
+                throw ErrorRunning();
+            }
+            
             if(index < static_cast<size_t>(m_outputs.size()))
             {
                 if(!m_outputs[index].insert(node).second)
@@ -115,9 +148,32 @@ namespace kiwi
                 class ErrorRunning : public Error
                 {
                 public:
-                    const char* what() const noexcept final {return "Kiwi::Dsp::Node : The processor is already is a Chain.";}
+                    const char* what() const noexcept final {return "Kiwi::Dsp::Node : The processor is already in a Chain.";}
                 };
                 throw ErrorRunning();
+            }
+            //Check if inplace or not
+            m_buffer_out = m_buffer_in = Samples<sample>::allocate(m_chain.getVectorSize() * m_processor.getNumberOfInputs());
+            if(m_buffer_in)
+            {
+                try
+                {
+                    m_valid = m_processor.m_running = m_processor.prepare(*this);
+                }
+                catch(std::exception& e)
+                {
+                    m_buffer_out = m_buffer_in = Samples<sample>::release(m_buffer_in);
+                    throw e;
+                }
+            }
+            else
+            {
+                class ErrorAlloc : public Error
+                {
+                public:
+                    const char* what() const noexcept final {return "Kiwi::Dsp::Node : Can't allocate the buffer.";}
+                };
+                throw ErrorAlloc();
             }
         }
         
