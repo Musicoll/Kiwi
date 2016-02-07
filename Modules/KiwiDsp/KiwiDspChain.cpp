@@ -193,7 +193,7 @@ namespace kiwi
             // ============================================================================ //
             //                              PREPARES THE NODES                              //
             // ============================================================================ //
-            std::vector< std::shared_ptr< Node > >::const_iterator it = m_nodes.cbegin();
+            auto it = m_nodes.cbegin();
             while(it != m_nodes.cend())
             {
                 if(static_cast<bool>((*it)->m_index))
