@@ -1,62 +1,55 @@
-/*
+//
 // Copyright (c) 2015 Pierre Guillot.
 // For information on usage and redistribution, and for a DISCLAIMER OF ALL
 // WARRANTIES, see the file, "LICENSE.txt," in this distribution.
-*/
+//
 
 #ifndef KIWI_DSP_LINK_H_INCLUDED
 #define KIWI_DSP_LINK_H_INCLUDED
 
-#include "KiwiDspSignal.hpp"
+#include "KiwiDspProcessor.hpp"
 
 namespace kiwi
 {
 namespace dsp
 {
-    class Node;
     // ==================================================================================== //
     //                                          LINK                                        //
     // ==================================================================================== //
-    //! @brief The class owns the attributes of a connection between two Node objects.
+    //! @brief The class owns the attributes of a connection between two Processor objects.
     //! @details The class acts like a simple structure with constant attributes to connect
-    //! @details two Node objects in a Chain object. The member attributes are private to
-    //! @details allow future changes in the class. You should refer to Chain to perform the
-    //! @details connection.
-    //! @see Chain and Node
+    //! @details two Processor objects in a Chain object.
+    //! @see Chain and Processor
     class Link
     {
     public:
         //! @brief The constructor.
-        //! @details Allocates and initializes the object. The validity of the object is
-        //! @details examined during the compilation of the Chain object by connecting the
-        //! @details Nodes objects.
-        //! @param from   The output Node object.
+        //! @details Allocates and initializes the Link object.
+        //! @param from   The output Processor object.
         //! @param output The index of the output.
-        //! @param to     The input Node object.
+        //! @param to     The input Processor object.
         //! @param input  The index of the input.
-        inline Link(Node* from, size_t output, Node* to, size_t input) noexcept :
-        m_from(from), m_output(output), m_to(to), m_input(input) {};
+        Link(Processor const& from, size_t output, Processor const& to, size_t input) noexcept;
         
         //! @brief The destructor.
-        inline ~Link() noexcept {};
+        ~Link() noexcept;
         
-        //! @brief Gets the output Node object.
-        inline Node* getOutpuNode() const noexcept {return m_from;}
+        //! @brief Gets the output Processor object.
+        inline Processor const& getOutputProcessor() const noexcept {return m_from;}
         
-        //! @brief Gets the input Node object.
-        inline Node* getInputNode() const noexcept {return m_to;}
+        //! @brief Gets the input Processor object.
+        inline Processor const& getInputProcessor() const noexcept {return m_to;}
         
-        //! @brief Gets the index of the output Node object.
+        //! @brief Gets the index of the output Processor object.
         inline size_t getOutputIndex() const noexcept {return m_output;}
         
-        //! @brief Gets the index of the input Node object.
+        //! @brief Gets the index of the input Processor object.
         inline size_t getInputIndex() const noexcept {return m_input;}
-        
     private:
-        Node*   m_from;
-        size_t  m_output;
-        Node*   m_to;
-        size_t  m_input;
+        Processor const&    m_from;
+        size_t const        m_output;
+        Processor const&    m_to;
+        size_t const        m_input;
     };
 }
 }

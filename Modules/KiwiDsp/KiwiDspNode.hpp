@@ -1,8 +1,8 @@
-/*
+//
 // Copyright (c) 2015 Pierre Guillot.
 // For information on usage and redistribution, and for a DISCLAIMER OF ALL
 // WARRANTIES, see the file, "LICENSE.txt," in this distribution.
-*/
+//
 
 #ifndef KIWI_DSP_NODE_H_INCLUDED
 #define KIWI_DSP_NODE_H_INCLUDED
@@ -25,11 +25,12 @@ namespace dsp
     //! @see Processor, Chain, Link and Signal.
     class Node
     {
-        friend class Chain;
     public:
         //! @brief The constructor.
         //! @details Allocates and initializes a Node object for a Processor object.
-        Node(Processor& processor);
+        //! @param chain The Chain object that mamanges the Node object.
+        //! @param processor The Processor object managed by the Node object.
+        Node(Chain const& chain, Processor& processor);
         
         //! @brief The destructor.
         ~Node() noexcept;
@@ -64,25 +65,17 @@ namespace dsp
         
     private:
         
-        //! @brief Retrieves the index of the Node object in the Chain object.
-        //! @details If the index is zero, the Node object is out of the Chain or the Chain
-        //! @details isn't compiled. All the Node objects connected to the inputs should have
-        //! @details a lower index and all the Node objects connected to the outputs should
-        //! @details have an upper index.
-        //! @return The index of the Node object in the Chain object.
-        inline size_t getIndex() const noexcept {return m_index;}
-        
         //! @brief Adds a Node object to an input.
         //! @param node The Node object to add.
         //! @param index The index of the input.
         //! @see addOutput()
-        void addInput(Node* node, const size_t index);
+        void addInput(std::shared_ptr< Node > node, const size_t index);
         
         //! @brief Adds a Node object to an output.
         //! @param node The Node object to add.
         //! @param index The index of the output.
         //! @see addInput()
-        void addOutput(Node* node, const size_t index);
+        void addOutput(std::shared_ptr< Node > node, const size_t index);
         
         //! @brief Prepare the Node object to digital signal processing.
         //! @details The methods retrieves the signals from the inputs Node objects and calls
@@ -95,22 +88,14 @@ namespace dsp
         //! @details method calls the inputs perform methods and the perform method of the
         //! @details Processor object.
         //! @see prepare()
-        inline void perform() noexcept
-        {
-            if(m_processor.isRunning())
-            {
-                for(std::vector< std::set<Node*> >::size_type i = 0; i < m_inputs.size(); i++)
-                {
-                    //m_inputs[i].perform();
-                }
-                m_processor.perform();
-            }
-        }
+        void perform() const noexcept;
         
+        Chain const&                    m_chain;
         Processor&                      m_processor;
         size_t                          m_index;
-        std::vector< std::set<Node*> >  m_inputs;
-        std::vector< std::set<Node*> >  m_outputs;
+        std::vector< std::set< std::weak_ptr< Node >, std::owner_less< std::weak_ptr< Node > > > > m_inputs;
+        std::vector< std::set< std::weak_ptr< Node >, std::owner_less< std::weak_ptr< Node > > > > m_outputs;
+        friend class Chain;
     };
 }
 }

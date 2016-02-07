@@ -10,5 +10,13 @@ namespace kiwi
 {
     namespace dsp
     {
+        Link::Link(Processor const& from, size_t output, Processor const& to, size_t input) noexcept :
+        m_from(from), m_output(output), m_to(to), m_input(input)
+        {
+        }
+        
+        Link::~Link() noexcept
+        {
+        }
     }
 }

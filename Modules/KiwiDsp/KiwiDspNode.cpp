@@ -1,22 +1,23 @@
-/*
+//
 // Copyright (c) 2015 Pierre Guillot.
 // For information on usage and redistribution, and for a DISCLAIMER OF ALL
 // WARRANTIES, see the file, "LICENSE.txt," in this distribution.
-*/
+//
 
 #include "KiwiDspNode.hpp"
+#include "KiwiDspChain.hpp"
 
 namespace kiwi
 {
     namespace dsp
     {
-        Node::Node(Processor& processor) :
-        m_processor(processor), m_index(0ul)
+        Node::Node(Chain const& chain, Processor& processor) :
+        m_chain(chain), m_processor(processor), m_index(0ul)
         {
             class ErrorResize : public Error
             {
             public:
-                const char* what() const noexcept override {return "Kiwi::Dsp::Node : The Node can't allocate its ioputs.";}
+                const char* what() const noexcept final {return "Kiwi::Dsp::Node : The Node can't allocate its ioputs.";}
             };
             
             try
@@ -43,7 +44,17 @@ namespace kiwi
             
         }
         
-        void Node::addInput(Node* node, const size_t index)
+        size_t Node::getSampleRate() const noexcept
+        {
+            return m_chain.getSampleRate();
+        }
+        
+        size_t Node::getVectorSize() const noexcept
+        {
+            return m_chain.getVectorSize();
+        }
+        
+        void Node::addInput(std::shared_ptr< Node > node, const size_t index)
         {
             if(index < static_cast<size_t>(m_inputs.size()))
             {
@@ -52,7 +63,7 @@ namespace kiwi
                     class ErrorDuplicate : public Error
                     {
                     public:
-                        const char* what() const noexcept override {
+                        const char* what() const noexcept final {
                             return "Kiwi::Dsp::Node : The input Node is already connected.";}
                     };
                     throw ErrorDuplicate();
@@ -63,14 +74,14 @@ namespace kiwi
                 class ErrorIndex : public Error
                 {
                 public:
-                    const char* what() const noexcept override {
+                    const char* what() const noexcept final {
                         return "Kiwi::Dsp::Node : The input Node is connected to a wrong index.";}
                 };
                 throw ErrorIndex();
             }
         }
         
-        void Node::addOutput(Node* node, const size_t index)
+        void Node::addOutput(std::shared_ptr< Node > node, const size_t index)
         {
             if(index < static_cast<size_t>(m_outputs.size()))
             {
@@ -79,7 +90,7 @@ namespace kiwi
                     class ErrorDuplicate : public Error
                     {
                     public:
-                        const char* what() const noexcept override {
+                        const char* what() const noexcept final {
                             return "Kiwi::Dsp::Node : The output Node is already connected.";}
                     };
                     throw ErrorDuplicate();
@@ -90,7 +101,7 @@ namespace kiwi
                 class ErrorIndex : public Error
                 {
                 public:
-                    const char* what() const noexcept override {
+                    const char* what() const noexcept final {
                         return "Kiwi::Dsp::Node : The output Node is connected to a wrong index.";}
                 };
                 throw ErrorIndex();
@@ -99,7 +110,27 @@ namespace kiwi
         
         void Node::prepare()
         {
-            
+            if(m_processor.isRunning())
+            {
+                class ErrorRunning : public Error
+                {
+                public:
+                    const char* what() const noexcept final {return "Kiwi::Dsp::Node : The processor is already is a Chain.";}
+                };
+                throw ErrorRunning();
+            }
+        }
+        
+        void Node::perform() const noexcept
+        {
+            if(m_processor.isRunning())
+            {
+                for(std::vector< std::set<Node*> >::size_type i = 0; i < m_inputs.size(); i++)
+                {
+                    //m_inputs[i].perform();
+                }
+                m_processor.perform(*this);
+            }
         }
     }
 }

@@ -1,8 +1,8 @@
-/*
+//
 // Copyright (c) 2015 Pierre Guillot.
 // For information on usage and redistribution, and for a DISCLAIMER OF ALL
 // WARRANTIES, see the file, "LICENSE.txt," in this distribution.
-*/
+//
 
 #ifndef KIWI_DSP_PROCESSOR_H_INCLUDED
 #define KIWI_DSP_PROCESSOR_H_INCLUDED
@@ -93,7 +93,7 @@ namespace dsp
         //! @see getInputsSamples(), getOutputsSamples(), getInputSamples(),
         //! @see  getOutputSamples(), getNumberOfInputs(), getNumberOfOutputs(),
         //! @see getVectorSize() and getSampleRate()
-        virtual void perform() noexcept = 0;
+        virtual void perform(Node const& node) noexcept = 0;
         
         //! @brief Releases everything after the digital signal processing.
         //! @details You can use this method to free the memory allocated during the call of
