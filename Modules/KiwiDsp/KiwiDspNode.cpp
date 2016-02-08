@@ -50,6 +50,16 @@ namespace kiwi
             {
                 throw ErrorResize();
             }
+            
+            try
+            {
+                m_buffer_copy.resize(m_processor.getNumberOfInputs());
+            }
+            catch(std::exception& e)
+            {
+                throw ErrorResize();
+            }
+            
         }
         
         Node::~Node()
@@ -65,6 +75,7 @@ namespace kiwi
             }
             m_inputs.clear();
             m_outputs.clear();
+            m_buffer_copy.clear();
             m_buffer_in     = Samples<sample>::release(m_buffer_in);
         }
         
@@ -169,7 +180,7 @@ namespace kiwi
                     }
                 }
             }
-            m_buffer_copy.resize(m_processor.getNumberOfInputs());
+            
             for(std::vector< std::vector< sample const* > >::size_type i = 0; i < m_buffer_copy.size(); ++i)
             {
                 for(auto node : m_inputs[i])
@@ -216,7 +227,8 @@ namespace kiwi
         {
             if(m_processor.isRunning())
             {
-                for(std::vector< std::vector< sample const* > >::size_type i = 0; i < m_buffer_copy.size(); ++i)
+                typedef std::vector< std::vector< sample const* > >::size_type inc_type;
+                for(inc_type i = 0; i < m_buffer_copy.size(); ++i)
                 {
                     sample *const buffer = m_buffer_in+i*m_vector_size;
                     if(!m_buffer_copy[i].empty())
