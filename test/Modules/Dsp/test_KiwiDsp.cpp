@@ -6,7 +6,7 @@
 //  Copyright © 2016 CICM. All rights reserved.
 //
 
-#define KIWI_DSP_DOUBLE
+#define KIWI_DSP_FLOAT
 #include "../../../Modules/KiwiDsp/KiwiDsp.hpp"
 
 using namespace kiwi::dsp;
@@ -108,6 +108,7 @@ int main(int , const char *[]) {
     
     {
         Chain chain;
+        Chain chain2;
         std::vector<Processor*> processes;
         std::vector<Link*> links;
         processes.push_back(pr1.get());
@@ -123,7 +124,15 @@ int main(int , const char *[]) {
         catch(std::exception& e)
         {
             std::cout << e.what() << "\n";
-            return 1;
+        }
+        
+        try
+        {
+            chain2.compile(44100, 64, processes, links);
+        }
+        catch(std::exception& e)
+        {
+            std::cout << e.what() << "\n";
         }
         
         for(size_t i = 1; i; --i)

@@ -23,23 +23,20 @@ namespace kiwi
         
         void Chain::stop()
         {
-            if(m_running)
+            m_running = false;
+            try
             {
-                m_running = false;
-                try
-                {
-                    m_nodes.clear();
-                }
-                catch(std::exception& e)
-                {
-                    throw e;
-                }
+                m_nodes.clear();
+            }
+            catch(std::exception& e)
+            {
+                throw;
             }
         }
         
         void Chain::tick() const noexcept
         {
-            for(std::vector<Node>::size_type i = 0; i < m_nodes.size(); i++)
+            for(std::vector< Node >::size_type i = 0; i < m_nodes.size(); i++)
             {
                 m_nodes[i]->perform();
             }
@@ -66,11 +63,11 @@ namespace kiwi
                 {
                     try
                     {
-                        m_nodes.emplace_back(std::make_shared<Node>(*this, *processor));
+                        m_nodes.push_back(std::make_shared<Node>(*this, *processor));
                     }
-                    catch(Error& e)
+                    catch(std::exception& e)
                     {
-                        throw e;
+                        throw;
                     }
                 }
             }
@@ -82,35 +79,40 @@ namespace kiwi
             {
                 if(link)
                 {
-                    std::shared_ptr< Node > output = *(std::find_if(m_nodes.begin(), m_nodes.end(),
-                                                                  [=] (std::shared_ptr< Node > const& node)
-                                                                  {
-                                                                      return &node->m_processor == &link->getOutputProcessor();
-                                                                  }));
-                    
-                    std::shared_ptr< Node > input = *(std::find_if(m_nodes.begin(), m_nodes.end(),
-                                                                  [=] (std::shared_ptr< Node > const& node)
-                                                                  {
-                                                                      return &node->m_processor == &link->getInputProcessor();
-                                                                  }));
+                    std::shared_ptr< Node > output, input;
+                    for(auto const& node : m_nodes)
+                    {
+                        if(&node->m_processor == &link->getInputProcessor())
+                        {
+                            input = node;
+                        }
+                        else if(&node->m_processor == &link->getOutputProcessor())
+                        {
+                            output = node;
+                        }
+                        if(output && input)
+                        {
+                            break;
+                        }
+                    }
                     if(output && input)
                     {
                         try
                         {
                             output->addOutput(input, link->getInputIndex());
                         }
-                        catch(Error& e)
+                        catch(std::exception& e)
                         {
-                            throw e;
+                            throw;
                         }
                         
                         try
                         {
                             input->addInput(output, link->getOutputIndex());
                         }
-                        catch(Error& e)
+                        catch(std::exception& e)
                         {
-                            throw e;
+                            throw;
                         }
                     }
                     else
@@ -120,10 +122,9 @@ namespace kiwi
                         public:
                             const char* what() const noexcept final {return "Kiwi::Dsp::Chain : A link isn't valid.";}
                         };
+                        throw ErrorLink();
                     }
                 }
-                
-                
             }
             
             // ============================================================================ //
@@ -178,7 +179,7 @@ namespace kiwi
             }
             catch(Error& e)
             {
-                throw e;
+                throw;
             }
             
             // ============================================================================ //
@@ -202,9 +203,9 @@ namespace kiwi
                     {
                         (*it)->prepare();
                     }
-                    catch(Error& e)
+                    catch(std::exception& e)
                     {
-                        throw e;
+                        throw;
                     }
                     if(!(*it)->m_valid)
                     {
