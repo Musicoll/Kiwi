@@ -19,80 +19,86 @@
  To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
  
  ==============================================================================
-*/
+ */
 
 #include "KiwiAtom.h"
 
 namespace kiwi
-{    
+{
     // ================================================================================ //
     //                                      ATOM                                        //
     // ================================================================================ //
     
     Atom::Atom(Atom const& other) noexcept
     {
+        const auto quark = other.m_quark;
+        
         if(other.isBool())
         {
-            m_quark = new QuarkBool((bool)other);
+            m_quark = new QuarkBool(quark->getBool());
         }
         else if(other.isLong())
         {
-            m_quark = new QuarkLong((long)other);
+            m_quark = new QuarkLong(quark->getLong());
         }
         else if(other.isDouble())
         {
-            m_quark = new QuarkDouble((double)other);
+            m_quark = new QuarkDouble(quark->getDouble());
         }
         else if(other.isTag())
         {
-            m_quark = new QuarkTag((sTag)other);
+            m_quark = new QuarkTag(quark->getTag());
         }
         else if(other.isVector())
         {
-            m_quark = new QuarkVector((Vector const&)other);
+            m_quark = new QuarkVector(quark->getVector());
         }
         else if(other.isDico())
         {
-            m_quark = new QuarkDico((Dico const&)other);
+            m_quark = new QuarkDico(quark->getDico());
         }
         else
         {
             m_quark = new Quark();
         }
     }
-   
+    
     
     Atom& Atom::operator=(Atom const& other) noexcept
     {
         delete m_quark;
+        
+        const auto quark = other.m_quark;
+        
         if(other.isBool())
         {
-            m_quark = new QuarkBool((bool)other);
+            m_quark = new QuarkBool(quark->getBool());
         }
         else if(other.isLong())
         {
-            m_quark = new QuarkLong((long)other);
+            m_quark = new QuarkLong(quark->getLong());
         }
         else if(other.isDouble())
         {
-            m_quark = new QuarkDouble((double)other);
+            m_quark = new QuarkDouble(quark->getDouble());
         }
         else if(other.isTag())
         {
-            m_quark = new QuarkTag((sTag)other);
+            m_quark = new QuarkTag(quark->getTag());
         }
         else if(other.isVector())
         {
-            m_quark = new QuarkVector((Vector const&)other);
+            m_quark = new QuarkVector(quark->getVector());
         }
         else if(other.isDico())
         {
-            m_quark = new QuarkDico((Dico const&)other);
+            m_quark = new QuarkDico(quark->getDico());
         }
         else
         {
             m_quark = new Quark();
         }
+        
         return *this;
     }
     
@@ -100,19 +106,19 @@ namespace kiwi
     {
         if(atom.isBool())
         {
-            output << (bool)atom;
+            output << static_cast<bool>(atom);
         }
         else if(atom.isLong())
         {
-            output << (long)atom;
+            output << static_cast<QuarkLong::type>(atom);
         }
         else if(atom.isDouble())
         {
-            output << (double)atom;
+            output << static_cast<QuarkDouble::type>(atom);
         }
         else if(atom.isTag())
         {
-            output << jsonEscape(((sTag)atom)->getName());
+            output << jsonEscape((static_cast<sTag>(atom))->getName());
         }
         else if(atom.isVector())
         {
@@ -186,11 +192,11 @@ namespace kiwi
         {
             std::string word;
             word.reserve(20); // is it more efficient ?
-            bool isTag      = false;
-            bool isNumber   = false;
-            bool isFloat    = false;
-            bool isNegative = false;
-            bool isQuoted   = false;
+            bool is_tag      = false;
+            bool is_number   = false;
+            bool is_double   = false;
+            bool is_negative = false;
+            bool is_quoted   = false;
             
             while(pos < textlen)
             {
@@ -198,7 +204,7 @@ namespace kiwi
                 
                 if(c == ' ')
                 {
-                    if(!isQuoted)
+                    if(!is_quoted)
                     {
                         if(word.empty()) // delete useless white spaces
                         {
@@ -213,7 +219,7 @@ namespace kiwi
                 }
                 else if(c == '\"')
                 {
-                    if(isQuoted) // closing quote
+                    if(is_quoted) // closing quote
                     {
                         pos++;
                         break;
@@ -225,29 +231,29 @@ namespace kiwi
                         
                         // ignore if it can not be closed
                         if(text.find_first_of('\"', pos) != std::string::npos)
-                            isQuoted = isTag = true;
+                            is_quoted = is_tag = true;
                         
                         continue;
                     }
                 }
-                else if(!isTag)
+                else if(!is_tag)
                 {
                     if(word.empty() && c == '-')
                     {
-                        isNegative = true;
+                        is_negative = true;
                     }
-                    else if(!isFloat && (word.empty() || isNumber || isNegative) && c == '.')
+                    else if(!is_double && (word.empty() || is_number || is_negative) && c == '.')
                     {
-                        isFloat = true;
+                        is_double = true;
                     }
-                    else if(isdigit(c) && (isNumber || (word.empty() || isNegative || isFloat)))
+                    else if(isdigit(c) && (is_number || (word.empty() || is_negative || is_double)))
                     {
-                        isNumber = true;
+                        is_number = true;
                     }
                     else
                     {
-                        isTag = true;
-                        isNumber = isNegative = isFloat = false;
+                        is_tag = true;
+                        is_number = is_negative = is_double = false;
                     }
                 }
                 
@@ -257,20 +263,20 @@ namespace kiwi
             
             if(!word.empty())
             {
-                if(isNumber)
+                if(is_number)
                 {
-                    if(isFloat)
+                    if(is_double)
                     {
-                        atoms.push_back(Atom(std::stod(word.c_str())));
+                        atoms.emplace_back(Atom(std::stod(word.c_str())));
                     }
                     else
                     {
-                        atoms.push_back(Atom(std::stol(word.c_str())));
+                        atoms.emplace_back(Atom(std::stoll(word.c_str())));
                     }
                 }
                 else
                 {
-                    atoms.push_back(Atom(Tag::create(jsonUnescape(word))));
+                    atoms.emplace_back(Atom(Tag::create(jsonUnescape(word))));
                 }
             }
         }

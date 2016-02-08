@@ -28,9 +28,87 @@
 
 using namespace kiwi;
 
+
 // ================================================================================ //
 //                                      ATOM                                        //
 // ================================================================================ //
+
+TEST_CASE("Atom Constructors", "[Atom]")
+{
+    SECTION("temp")
+    {
+        /*
+        std::cout << std::endl;
+        std::cout << "is_integral: " << std::endl;
+        std::cout << "bool: " << std::is_integral<bool>::value << std::endl;
+        std::cout << "int: " << std::is_integral<int>::value << std::endl;
+        std::cout << "unsigned int: " << std::is_integral<unsigned int>::value << std::endl;
+        std::cout << "unsigned long: " << std::is_integral<unsigned long>::value << std::endl;
+        std::cout << "double: " << std::is_integral<double>::value << std::endl;
+        std::cout << "float: " << std::is_integral<float>::value << std::endl;
+        
+        std::cout << "is_signed: " << std::endl;
+        std::cout << "long: " << std::numeric_limits<long>::is_signed << std::endl;
+        std::cout << "unsigned long: " << std::numeric_limits<unsigned long>::is_signed << std::endl;
+        std::cout << std::endl;
+        */
+        
+        //std::cout << "bool: " << Atom::test(true) << std::endl;
+        //std::cout << "int: " << Atom::test<int>(1) << std::endl;
+    }
+    
+    SECTION("Undifined type")
+    {
+        CHECK(Atom().getType() == Atom::UNDEFINED);
+    }
+    
+    SECTION("Boolean types")
+    {
+        CHECK(Atom(true).getType() == Atom::BOOLEAN);
+        CHECK(Atom(false).getType() == Atom::BOOLEAN);
+    }
+    
+    SECTION("Signed Integral types")
+    {
+        CHECK(Atom(short(1)).getType() == Atom::LONG);
+        CHECK(Atom(1).getType() == Atom::LONG);
+        CHECK(Atom(1l).getType() == Atom::LONG);
+        CHECK(Atom(1ll).getType() == Atom::LONG);
+        CHECK(Atom(0xFFFFFF).getType() == Atom::LONG);  // hexadecimal
+        CHECK(Atom(0113).getType() == Atom::LONG);      // octal
+    }
+    
+    SECTION("Unsigned Integral types")
+    {
+        CHECK(Atom(1u).getType() == Atom::LONG);        // unsigned (int)
+        CHECK(Atom(1ul).getType() == Atom::LONG);       // unsigned long
+        CHECK(Atom(1lu).getType() == Atom::LONG);       // unsigned long
+        CHECK(Atom(1ull).getType() == Atom::LONG);      // unsigned long long
+        CHECK(Atom(1llu).getType() == Atom::LONG);      // unsigned long long
+        CHECK_FALSE(Atom(1ui).getType() == Atom::LONG); // ??
+    }
+    
+    SECTION("Floating-Point types")
+    {
+        CHECK(Atom(3.14f).getType() == Atom::DOUBLE);    // float
+        CHECK(Atom(3.14).getType() == Atom::DOUBLE);     // double
+        CHECK(Atom(3.14l).getType() == Atom::DOUBLE);    // long double
+        CHECK(Atom(6.02e23).getType() == Atom::DOUBLE);  // 6.02 x 10^23 (Avogadro constant)
+        CHECK(Atom(1.6e-19).getType() == Atom::DOUBLE);  // 1.6 x 10^-19 (electric charge of an electron)
+    }
+    
+    SECTION("Tag types")
+    {
+        CHECK(Atom("c").getType() == Atom::TAG);
+        CHECK(Atom(Tag::create("tag")).getType() == Atom::TAG);
+        sTag tag = Tag::create("tag");
+        CHECK(Atom(tag).getType() == Atom::TAG);
+        
+        //WARN("Atom('c').getType() == Atom::TAG");
+        //CHECK(Atom('c').getType() == Atom::TAG);
+        //CHECK_FALSE(Atom('c').getType() == Atom::LONG);       //
+    }
+}
 
 TEST_CASE("Atom Undefined", "[Atom]")
 {
@@ -47,8 +125,6 @@ TEST_CASE("Atom Undefined", "[Atom]")
     
     REQUIRE_FALSE(atom == false);
     REQUIRE_FALSE(atom == true);
-    REQUIRE(Atom(false) == Atom(false));
-    REQUIRE(Atom(true) == Atom(true));
     
     Atom a1 = true;
     Atom a2 = 1;
@@ -70,6 +146,9 @@ TEST_CASE("Atom Boolean", "[Atom]")
     CHECK(atom.isVector()         == false);
     CHECK(atom.isDico()           == false);
     CHECK(atom == true);
+    
+    REQUIRE(Atom(false) == Atom(false));
+    REQUIRE(Atom(true) == Atom(true));
 }
 
 TEST_CASE("Atom Long", "[Atom]")
@@ -106,7 +185,7 @@ TEST_CASE("Atom Long", "[Atom]")
 
 TEST_CASE("Atom Double", "[Atom]")
 {
-    Atom atom(1.);
+    Atom atom(1.123);
     CHECK(atom.getType()          == Atom::DOUBLE);
     CHECK(atom.isUndefined()      == false);
     CHECK(atom.isBool()           == false);
@@ -116,10 +195,13 @@ TEST_CASE("Atom Double", "[Atom]")
     CHECK(atom.isTag()            == false);
     CHECK(atom.isVector()         == false);
     CHECK(atom.isDico()           == false);
-    CHECK(atom == 1.);
-    CHECK(atom == 1.f);
+    CHECK(atom == 1.123);
+    CHECK(atom == 1.123f);
+    // Should this fail ??
     CHECK(atom == 1);
     CHECK(atom == true);
+    
+    CHECK_FALSE(Atom(1.123) == 3.14);
     
     Atom atom2{1.}; // call initializer_list ctor => VECTOR type
     CHECK(atom2.getType()         == Atom::VECTOR);
@@ -179,14 +261,14 @@ TEST_CASE("Atom Vector", "[Atom]")
     CHECK(atom_vec[0] == 1);
     
     // Four elements atom vector
-    Atom atom_2{true, 1, 3.14, "tag"};
+    Atom atom_2{true, 42, 3.14, "tag"};
     CHECK(atom_2.isVector()         == true);
     Vector atom_2_vec = atom_2;
     REQUIRE(atom_2_vec.size() == 4);
     CHECK(atom_2_vec[0].isBool()     == true);
     CHECK(atom_2_vec[0] == true);
     CHECK(atom_2_vec[1].isLong()     == true);
-    CHECK(atom_2_vec[1] == 1);
+    CHECK(atom_2_vec[1] == 42);
     CHECK(atom_2_vec[2].isDouble()   == true);
     CHECK(atom_2_vec[2] == 3.14);
     CHECK(atom_2_vec[3].isTag()      == true);
@@ -274,7 +356,7 @@ TEST_CASE("Atom Dico", "[Atom]")
     Atom atom_vector{true, 1, 3.14, "tag"};
     
     Dico temp_dico;
-    temp_dico[Tag::create("long")] = 12;
+    temp_dico[Tag::create("long")] = 12ll;
     temp_dico[Tag::create("object")] = atom_vector;
     
     Atom atom_dico(temp_dico);
