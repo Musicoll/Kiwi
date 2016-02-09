@@ -240,7 +240,7 @@ namespace kiwi
         }
     }
     
-    template<class T> inline T fromString(std::string const& __val)
+    template<class T> inline T fromString(std::string const& /*__val*/)
     {
         return T();
     }

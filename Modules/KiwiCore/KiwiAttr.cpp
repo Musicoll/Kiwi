@@ -29,7 +29,7 @@ namespace kiwi
     //                                 ATTRIBUTE MANAGER								//
     // ================================================================================ //
     
-    void Attr::Manager::write(Dico& dico) const
+    void Attr::Manager::write(Dico&) const
     {
         ;
     }
