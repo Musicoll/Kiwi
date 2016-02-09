@@ -67,7 +67,7 @@ namespace dsp
         inline sample const* getInputSamples(const size_t index) const noexcept
         {
             assert(index < m_inputs.size() && "Kiwi::Dsp::Node : Index must be inferior to the number of inputs.");
-            return m_buffer_in+index * m_vector_size;
+            return m_buffer_in + index * m_vector_size;
         }
         
         //! @brief Gets the vector of samples of the inputs.
@@ -77,7 +77,7 @@ namespace dsp
         inline sample* getOutputSamples(const size_t index) const noexcept
         {
             assert(index < m_outputs.size() && "Kiwi::Dsp::Node : Index must be inferior to the number of outputs.");
-            return m_buffer_out+index * m_vector_size;
+            return m_buffer_out + index * m_vector_size;
         }
         
         //! @brief Gets the vector of samples of the inputs.
@@ -110,7 +110,6 @@ namespace dsp
         //! @see prepare()
         void perform() const noexcept;
         
-        Chain const&                        m_chain;
         Processor&                          m_processor;
         size_t                              m_sample_rate;
         size_t                              m_vector_size;

@@ -54,6 +54,7 @@ namespace dsp
         //! @brief Ticks once all the Node objects.
         void tick() const noexcept;
         
+    private:
         std::vector< std::shared_ptr< Node > >  m_nodes;
         bool                                    m_running;
         size_t                                  m_sample_rate;

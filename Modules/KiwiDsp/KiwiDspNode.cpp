@@ -12,7 +12,7 @@ namespace kiwi
     namespace dsp
     {
         Node::Node(Chain const& chain, Processor& processor) :
-        m_chain(chain), m_processor(processor),
+        m_processor(processor),
         m_buffer_in(nullptr), m_buffer_out(nullptr),
         m_sample_rate(chain.getSampleRate()), m_vector_size(chain.getVectorSize()),
         m_index(0ul), m_valid(false)
@@ -76,7 +76,7 @@ namespace kiwi
             m_inputs.clear();
             m_outputs.clear();
             m_buffer_copy.clear();
-            m_buffer_in     = Samples<sample>::release(m_buffer_in);
+            m_buffer_in = Samples<sample>::release(m_buffer_in);
         }
         
         void Node::addInput(std::shared_ptr< Node > node, const size_t index)
@@ -225,27 +225,24 @@ namespace kiwi
         
         void Node::perform() const noexcept
         {
-            if(m_processor.isRunning())
+            typedef std::vector< std::vector< sample const* > >::size_type inc_type;
+            for(inc_type i = 0; i < m_buffer_copy.size(); ++i)
             {
-                typedef std::vector< std::vector< sample const* > >::size_type inc_type;
-                for(inc_type i = 0; i < m_buffer_copy.size(); ++i)
+                sample *const buffer = m_buffer_in+i*m_vector_size;
+                if(!m_buffer_copy[i].empty())
                 {
-                    sample *const buffer = m_buffer_in+i*m_vector_size;
-                    if(!m_buffer_copy[i].empty())
+                    Samples<sample>::copy(m_vector_size, m_buffer_copy[i][0], buffer);
+                    for(std::vector< sample const* >::size_type j = 1; j < m_buffer_copy[i].size(); ++j)
                     {
-                        Samples<sample>::copy(m_vector_size, m_buffer_copy[i][0], buffer);
-                        for(std::vector< sample const* >::size_type j = 1; j < m_buffer_copy[i].size(); ++j)
-                        {
-                            Samples<sample>::add(m_vector_size, m_buffer_copy[i][j], buffer);
-                        }
-                    }
-                    else
-                    {
-                        Samples<sample>::clear(m_vector_size, buffer);
+                        Samples<sample>::add(m_vector_size, m_buffer_copy[i][j], buffer);
                     }
                 }
-                m_processor.perform(*this);
+                else
+                {
+                    Samples<sample>::clear(m_vector_size, buffer);
+                }
             }
+            m_processor.perform(*this);
         }
     }
 }
