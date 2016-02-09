@@ -21,13 +21,12 @@
  ==============================================================================
  */
 
+#include "../../../Modules/KiwiCore/KiwiAtom.h"
+
 #define CATCH_CONFIG_MAIN
 #include "../../catch.hpp"
 
-#include "../../../Modules/KiwiCore/KiwiAtom.h"
-
 using namespace kiwi;
-
 
 // ================================================================================ //
 //                                      ATOM                                        //
