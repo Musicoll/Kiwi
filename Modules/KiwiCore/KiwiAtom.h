@@ -34,7 +34,7 @@ namespace kiwi
     
     //! The atom class
     /**
-     The atom is a base class that you should inherite from if you want to be able to pass your class in an atom vector or in a dico. The default atoms are the long, the float_t, the tag, the dico and the object.
+     The atom is a base class that you should inherite from if you want to be able to pass your class in an atom vector or in a dico. The default atoms are the long, the float_t, the tag, the dico && the object.
      */
     class Atom
     {
@@ -58,7 +58,7 @@ namespace kiwi
         //! @brief The type of a vector of atom in the Atom class
         using dico_t = std::map<tag_t, Atom>;
         
-        //! @Todo : replace CAPS with Min and type the enum
+        //! @Todo : replace CAPS with Min && type the enum
         enum Type
         {
             UNDEFINED   = 0,
@@ -212,8 +212,8 @@ namespace kiwi
          */
         template<typename IntegerType, typename
         std::enable_if<
-        std::is_constructible<integer_t, IntegerType>::value and
-        std::numeric_limits<IntegerType>::is_integer and
+        std::is_constructible<integer_t, IntegerType>::value &&
+        std::numeric_limits<IntegerType>::is_integer &&
         std::numeric_limits<IntegerType>::is_signed, IntegerType>::type
         = 0>
         Atom(const IntegerType value) noexcept
@@ -223,8 +223,8 @@ namespace kiwi
         // Constructor with unsigned integer
         template < typename UnsignedType, typename
         std::enable_if <
-        std::is_constructible<integer_t, UnsignedType>::value and
-        std::numeric_limits<UnsignedType>::is_integer and
+        std::is_constructible<integer_t, UnsignedType>::value &&
+        std::numeric_limits<UnsignedType>::is_integer &&
         !std::numeric_limits<UnsignedType>::is_signed, UnsignedType >::type
         = 0 >
         Atom(const UnsignedType value) noexcept
@@ -243,7 +243,7 @@ namespace kiwi
          */
         template<typename FloatType, typename = typename
         std::enable_if<
-        std::is_constructible<float_t, FloatType>::value and
+        std::is_constructible<float_t, FloatType>::value &&
         std::is_floating_point<FloatType>::value>::type
         >
         Atom(const FloatType value) noexcept
@@ -384,16 +384,16 @@ namespace kiwi
          */
         template<typename IntegerType, typename
         std::enable_if<
-        std::is_constructible<IntegerType, integer_t>::value and
-        std::numeric_limits<IntegerType>::is_integer and
+        std::is_constructible<IntegerType, integer_t>::value &&
+        std::numeric_limits<IntegerType>::is_integer &&
         std::numeric_limits<IntegerType>::is_signed, IntegerType>::type
         = 0>
         operator IntegerType() const noexcept {return static_cast<IntegerType>(m_quark->getInt());}
         
         template < typename UnsignedType, typename
         std::enable_if <
-        std::is_constructible<UnsignedType, integer_t>::value and
-        std::numeric_limits<UnsignedType>::is_integer and
+        std::is_constructible<UnsignedType, integer_t>::value &&
+        std::numeric_limits<UnsignedType>::is_integer &&
         !std::numeric_limits<UnsignedType>::is_signed, UnsignedType >::type
         = 0 >
         operator UnsignedType() const noexcept {return static_cast<UnsignedType>(m_quark->getInt());}
@@ -406,7 +406,7 @@ namespace kiwi
         
         template<typename FloatType, typename = typename
         std::enable_if<
-        std::is_constructible<FloatType, float_t>::value and
+        std::is_constructible<FloatType, float_t>::value &&
         std::is_floating_point<FloatType>::value>::type
         >
         inline operator FloatType() const noexcept {return static_cast<FloatType>(m_quark->getFloat());}
@@ -473,8 +473,8 @@ namespace kiwi
         
         template<typename IntegerType, typename
         std::enable_if<
-        std::is_constructible<integer_t, IntegerType>::value and
-        std::numeric_limits<IntegerType>::is_integer and
+        std::is_constructible<integer_t, IntegerType>::value &&
+        std::numeric_limits<IntegerType>::is_integer &&
         std::numeric_limits<IntegerType>::is_signed, IntegerType>::type
         = 0>
         inline Atom& operator=(const IntegerType value) noexcept
@@ -486,8 +486,8 @@ namespace kiwi
         
         template<typename UnsignedType, typename
         std::enable_if<
-        std::is_constructible<integer_t, UnsignedType>::value and
-        std::numeric_limits<UnsignedType>::is_integer and
+        std::is_constructible<integer_t, UnsignedType>::value &&
+        std::numeric_limits<UnsignedType>::is_integer &&
         !std::numeric_limits<UnsignedType>::is_signed, UnsignedType>::type
         = 0>
         inline Atom& operator=(const UnsignedType value) noexcept
@@ -511,7 +511,7 @@ namespace kiwi
         
         template<typename FloatType, typename = typename
         std::enable_if<
-        std::is_constructible<float_t, FloatType>::value and
+        std::is_constructible<float_t, FloatType>::value &&
         std::is_floating_point<FloatType>::value>::type
         >
         Atom& operator=(const FloatType value) noexcept
@@ -718,8 +718,8 @@ namespace kiwi
         
         template<typename IntegerType, typename
         std::enable_if<
-        std::is_constructible<IntegerType, integer_t>::value and
-        std::numeric_limits<IntegerType>::is_integer and
+        std::is_constructible<IntegerType, integer_t>::value &&
+        std::numeric_limits<IntegerType>::is_integer &&
         std::numeric_limits<IntegerType>::is_signed, IntegerType>::type
         = 0>
         bool operator==(const IntegerType value) const noexcept
@@ -736,8 +736,8 @@ namespace kiwi
         
         template<typename UnsignedType, typename
         std::enable_if<
-        std::is_constructible<UnsignedType, integer_t>::value and
-        std::numeric_limits<UnsignedType>::is_integer and
+        std::is_constructible<UnsignedType, integer_t>::value &&
+        std::numeric_limits<UnsignedType>::is_integer &&
         !std::numeric_limits<UnsignedType>::is_signed, UnsignedType>::type
         = 0>
         bool operator==(const UnsignedType value) const noexcept
@@ -771,7 +771,7 @@ namespace kiwi
         
         template<typename FloatType, typename = typename
         std::enable_if<
-        std::is_constructible<FloatType, float_t>::value and
+        std::is_constructible<FloatType, float_t>::value &&
         std::is_floating_point<FloatType>::value>::type
         >
         bool operator==(const FloatType value) const noexcept
@@ -872,8 +872,8 @@ namespace kiwi
         }
         template<typename IntegerType, typename
         std::enable_if<
-        std::is_constructible<IntegerType, integer_t>::value and
-        std::numeric_limits<IntegerType>::is_integer and
+        std::is_constructible<IntegerType, integer_t>::value &&
+        std::numeric_limits<IntegerType>::is_integer &&
         std::numeric_limits<IntegerType>::is_signed, IntegerType>::type
         = 0>
         inline bool operator!=(const IntegerType value) const noexcept
@@ -883,8 +883,8 @@ namespace kiwi
         
         template<typename UnsignedType, typename
         std::enable_if<
-        std::is_constructible<UnsignedType, integer_t>::value and
-        std::numeric_limits<UnsignedType>::is_integer and
+        std::is_constructible<UnsignedType, integer_t>::value &&
+        std::numeric_limits<UnsignedType>::is_integer &&
         !std::numeric_limits<UnsignedType>::is_signed, UnsignedType>::type
         = 0>
         inline bool operator!=(const UnsignedType value) const noexcept
@@ -903,7 +903,7 @@ namespace kiwi
         }
         template<typename FloatType, typename = typename
         std::enable_if<
-        std::is_constructible<FloatType, float_t>::value and
+        std::is_constructible<FloatType, float_t>::value &&
         std::is_floating_point<FloatType>::value>::type
         >
         inline bool operator!=(const FloatType value) const noexcept
@@ -969,7 +969,7 @@ namespace kiwi
          @return    The vector of atoms.
          @remark    For example, the std::string : "foo \"bar 42\" 1 2 3.14" will parsed into a vector of 5 atoms.
          The atom types will be determined automatically as 2 #Atom::Type::TAG atoms, 2 #Atom::Type::INT atoms,
-         and 1 #Atom::Type::FLOAT atom.
+         && 1 #Atom::Type::FLOAT atom.
          */
         static Vector parse(std::string const& text);
     };
