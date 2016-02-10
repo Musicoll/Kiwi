@@ -660,8 +660,6 @@ namespace kiwi
     {
         return Point(pt.x() * value, pt.y() * value);
     }
-    
-    typedef std::shared_ptr<Attr::Typed<Point>>  sAttrPoint;
 }
 
 #endif // KIWI_POINT_H_INCLUDED

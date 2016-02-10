@@ -484,8 +484,6 @@ namespace kiwi
     {
         return size.width() == pt.x() && size.height() == pt.y();
     }
-    
-    typedef std::shared_ptr<Attr::Typed<Size>>   sAttrSize;
 }
 
 #endif // KIWI_SIZE_H_INCLUDED
