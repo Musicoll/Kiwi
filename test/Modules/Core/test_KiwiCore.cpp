@@ -94,8 +94,9 @@ TEST_CASE("Atom Constructors", "[Atom]")
         CHECK(Atom(6.02e23).getType() == Atom::FLOAT);  // 6.02 x 10^23 (Avogadro constant)
         CHECK(Atom(1.6e-19).getType() == Atom::FLOAT);  // 1.6 x 10^-19 (electric charge of an electron)
         
-        // check for infinity
-        CHECK(Atom(0./0.).getType() == Atom::FLOAT);    // float
+        // check for infinity and NaN
+        CHECK(Atom(INFINITY).getType() == Atom::FLOAT);    // float
+        CHECK(Atom(NAN).getType() == Atom::FLOAT);    // float
     }
     
     SECTION("Tag types")
