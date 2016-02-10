@@ -13,7 +13,7 @@ addons:
     packages:
     - gcc-4.9
     - g++-4.9
-    - clang
+    - clang++-3.6
 
 os:
   - osx
