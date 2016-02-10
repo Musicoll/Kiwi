@@ -13,6 +13,9 @@ matrix:
         apt:
           sources: ['ubuntu-toolchain-r-test']
           packages: ['g++-4.9', 'python-pip', 'python-yaml']
+      before_install:
+        - sudo apt-get update -qq
+        - sudo apt-get install cmake
       before_script:
         - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
       after_success:
@@ -26,14 +29,23 @@ matrix:
         apt:
           sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.6']
           packages: ['clang-3.6']
+      before_install:
+        - sudo apt-get update -qq
+        - sudo apt-get install cmake
       env: COMPILER=clang++-3.6
 
     - os: osx
       compiler: gcc
+      before_install:
+        - brew update
+        - brew install cmake
       env: COMPILER=g++-4.9
 
     - os: osx
       compiler: clang++
+      before_install:
+        - brew update
+        - brew install cmake
       env: COMPILER=clang++
 
 script:
