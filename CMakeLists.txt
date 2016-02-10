@@ -34,6 +34,12 @@ else()
     endif()
 endif()
 
+# Add Platform-specific CXX flags
+if(${APPLE})
+    # the following flag is (only) needed to compile Accelerate on old Mac/gcc version
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flax-vector-conversions")
+endif()
+
 # Call make to build the whole project
 # Each target (Libraries/Binaries) can be built separatly calling [make [targetname]]
 # Target dependencies are built as well if necessary
