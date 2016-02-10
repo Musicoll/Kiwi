@@ -8,7 +8,7 @@
 #define KIWI_DSP_CHAIN_H_INCLUDED
 
 #include "KiwiDspLink.hpp"
-#include "KiwiDspNode.hpp"
+#include "KiwiDspProcessor.hpp"
 
 namespace kiwi
 {
@@ -51,10 +51,12 @@ namespace dsp
         //! @details Stops the digital signal processing of all the Node objects.
         void stop();
         
-        //! @brief Ticks once all the Node objects.
+        //! @brief Ticks once the DSP chain.
         void tick() const noexcept;
         
     private:
+        class Node;
+        class Tie;
         std::vector< std::shared_ptr< Node > >  m_nodes;
         bool                                    m_running;
         size_t                                  m_sample_rate;

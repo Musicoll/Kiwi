@@ -22,8 +22,8 @@ namespace dsp
     //! @details algebrica, ect.
     template < typename Type > class Samples
     {
-        static_assert(std::is_floating_point< Type >::value, "The type of sample must be floating point.");
-        static_assert(!std::is_const< Type >::value, "The type of sample can't be constant.");
+        static_assert(std::is_floating_point< Type >::value, "The type of sample_tmust be floating point.");
+        static_assert(!std::is_const< Type >::value, "The type of sample_tcan't be constant.");
     public:
         
         // ================================================================================ //

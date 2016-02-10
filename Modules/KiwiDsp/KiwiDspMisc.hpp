@@ -28,9 +28,9 @@ namespace kiwi
 namespace dsp
 {
 #ifdef KIWI_DSP_FLOAT
-    typedef float sample;
-#else
-    typedef double sample;
+    typedef float sample_t;
+#elif KIWI_DSP_DOUBLE
+    typedef double sample_t;
 #endif
     // ==================================================================================== //
     //                                          ERROR                                       //
