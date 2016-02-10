@@ -24,6 +24,7 @@
 #ifndef KIWI_TOOLS_H_INCLUDED
 #define KIWI_TOOLS_H_INCLUDED
 
+#include <cstddef>
 #include <stdio.h>
 #include <stdarg.h>
 #include <cwchar>
@@ -46,8 +47,6 @@
 #include <mutex>
 #include <typeinfo>
 #include <typeindex>
-//#include <codecvt>
-//#include <cxxabi.h>
 
 #ifdef __APPLE__
 #include <Accelerate/Accelerate.h>
@@ -240,7 +239,7 @@ namespace kiwi
         }
     }
     
-    template<class T> inline T fromString(std::string const& __val)
+    template<class T> inline T fromString(std::string const& /*__val*/)
     {
         return T();
     }

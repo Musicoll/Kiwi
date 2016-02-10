@@ -6,8 +6,8 @@
 //  Copyright © 2016 CICM. All rights reserved.
 //
 
-#define KIWI_DSP_FlOAT
-#include <KiwiDsp/KiwiDspChain.hpp>
+#define KIWI_DSP_FLOAT
+#include "KiwiDsp/KiwiDsp.hpp"
 
 using namespace kiwi::dsp;
 
