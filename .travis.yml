@@ -13,8 +13,6 @@ matrix:
         apt:
           sources: ['ubuntu-toolchain-r-test']
           packages: ['g++-4.9', 'python-pip', 'python-yaml']
-      install:
-        - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
       before_script:
         - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
       after_success:
@@ -37,6 +35,9 @@ matrix:
     - os: osx
       compiler: clang
       env: COMPILER=clang++-3.6
+
+install:
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
 
 before_install:
   - mkdir build
