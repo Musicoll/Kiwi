@@ -58,19 +58,22 @@ namespace kiwi
         //! @brief The type of a vector of atom in the Atom class
         using dico_t = std::map<tag_t, Atom>;
         
-        //! @Todo : replace CAPS with Min && type the enum
-        enum Type
+        //! @brief Enum of Atom value types
+        enum class Type : uint8_t
         {
-            UNDEFINED   = 0,
-            BOOLEAN     = 1,
-            INT         = 2,
-            FLOAT       = 3,
-            TAG         = 4,
-            VECTOR      = 5,
-            DICO        = 6
+            Null        = 0,
+            Boolean     = 1,
+            Int         = 2,
+            Float       = 3,
+            Tag         = 4,
+            Vector      = 5,
+            Dico        = 6
         };
         
     private:
+        
+        //! @brief The type of value an Atom can be.
+        using value_t = Atom::Type;
         
         //! @internal
         class Quark
@@ -79,22 +82,22 @@ namespace kiwi
             constexpr inline Quark() noexcept {}
             virtual inline ~Quark() noexcept {}
             // Type checks
-            virtual inline Type getType() const noexcept {return UNDEFINED;}
-            inline bool isUndefined() const noexcept {return getType() == UNDEFINED;}
-            inline bool isBool() const noexcept {return getType() == BOOLEAN;}
-            inline bool isInt() const noexcept {return getType() == INT;}
-            inline bool isFloat() const noexcept {return getType() == FLOAT;}
-            inline bool isNumber() const noexcept {return isInt() || isFloat() || isBool();}
-            inline bool isTag() const noexcept {return getType() == TAG;}
-            inline bool isDico() const noexcept{return getType() == DICO;}
-            inline bool isVector() const noexcept {return getType() == VECTOR;}
+            virtual inline value_t getType() const noexcept {return value_t::Null;}
+            inline bool isNull() const noexcept             {return getType() == value_t::Null;}
+            inline bool isBool() const noexcept             {return getType() == value_t::Boolean;}
+            inline bool isInt() const noexcept              {return getType() == value_t::Int;}
+            inline bool isFloat() const noexcept            {return getType() == value_t::Float;}
+            inline bool isNumber() const noexcept           {return isInt() || isFloat() || isBool();}
+            inline bool isTag() const noexcept              {return getType() == value_t::Tag;}
+            inline bool isDico() const noexcept             {return getType() == value_t::Dico;}
+            inline bool isVector() const noexcept           {return getType() == value_t::Vector;}
             // Getters
-            virtual inline boolean_t getBool() const noexcept {return false;}
-            virtual inline integer_t getInt() const noexcept {return 0ll;}
-            virtual inline float_t getFloat() const noexcept {return 0.;}
-            virtual inline tag_t getTag() const noexcept {return Tags::_empty;}
-            virtual inline vector_t getVector() const noexcept {return Vector();}
-            virtual inline dico_t getDico() const noexcept {return Dico();}
+            virtual inline boolean_t getBool() const noexcept   {return false;}
+            virtual inline integer_t getInt() const noexcept    {return 0ll;}
+            virtual inline float_t   getFloat() const noexcept  {return 0.;}
+            virtual inline tag_t     getTag() const noexcept    {return Tags::_empty;}
+            virtual inline vector_t  getVector() const noexcept {return Vector();}
+            virtual inline dico_t    getDico() const noexcept   {return Dico();}
         };
         
         class QuarkBool : public Quark
@@ -103,7 +106,7 @@ namespace kiwi
             const boolean_t val;
             inline QuarkBool(QuarkBool const& _val) noexcept : val(_val.val) {}
             inline QuarkBool(boolean_t const& _val) noexcept : val(_val) {}
-            inline Type getType() const noexcept override {return BOOLEAN;}
+            inline value_t getType() const noexcept override {return value_t::Boolean;}
             inline boolean_t getBool() const noexcept override {return val;}
             inline integer_t getInt() const noexcept override {return val ? 1ll : 0ll;}
             inline float_t getFloat() const noexcept override {return val ? 1. : 0.;}
@@ -115,7 +118,7 @@ namespace kiwi
             const integer_t val;
             inline QuarkInt(QuarkInt const& _val) noexcept : val(_val.val) {}
             inline QuarkInt(const integer_t& _val) noexcept : val(_val) {}
-            inline Type getType() const noexcept override {return INT;}
+            inline value_t getType() const noexcept override {return value_t::Int;}
             inline boolean_t getBool() const noexcept override {return (val != 0ll);}
             inline integer_t getInt() const noexcept override {return val;}
             inline float_t getFloat() const noexcept override {return static_cast<float_t>(val);}
@@ -127,7 +130,7 @@ namespace kiwi
             const float_t val;
             inline QuarkFloat(QuarkFloat const& _val) noexcept : val(_val.val) {}
             inline QuarkFloat(float_t const& _val) noexcept : val(_val) {}
-            inline Type getType() const noexcept override {return FLOAT;}
+            inline value_t getType() const noexcept override {return value_t::Float;}
             inline boolean_t getBool() const noexcept override {return (val != 0.);}
             inline integer_t getInt() const noexcept override {return static_cast<integer_t>(val);}
             inline float_t getFloat() const noexcept override {return val;}
@@ -139,7 +142,7 @@ namespace kiwi
             const tag_t val;
             inline QuarkTag(QuarkTag const& _val) noexcept : val(_val.val) {}
             inline QuarkTag(const tag_t _val) noexcept : val(_val) {}
-            inline Type getType() const noexcept override {return TAG;}
+            inline value_t getType() const noexcept override {return value_t::Tag;}
             inline tag_t getTag() const noexcept override {return val;}
         };
         
@@ -153,7 +156,7 @@ namespace kiwi
             inline QuarkVector(vector_t&& _val) noexcept {std::swap(val, _val);}
             inline QuarkVector(std::initializer_list<Atom> il) noexcept : val(il) {}
             inline ~QuarkVector() noexcept {val.clear();}
-            inline Type getType() const noexcept override {return VECTOR;}
+            inline value_t getType() const noexcept override {return value_t::Vector;}
             inline vector_t getVector() const noexcept override {return val;}
         };
         
@@ -167,7 +170,7 @@ namespace kiwi
             inline QuarkDico(dico_t&& _val) noexcept {std::swap(val, _val);}
             inline QuarkDico(std::initializer_list<std::pair<const sTag, Atom>> il) noexcept : val(il) {}
             inline ~QuarkDico() noexcept {val.clear();}
-            inline Type getType() const noexcept override {return DICO;}
+            inline value_t getType() const noexcept override {return value_t::Dico;}
             inline dico_t getDico() const noexcept override {return val;}
         };
         
@@ -237,7 +240,7 @@ namespace kiwi
          */
         explicit Atom(const float_t value) noexcept : m_quark(new QuarkFloat(value))
         {
-            // infinity and NAN produce an Undefined Atom type
+            // infinity and NAN produce an Null Atom type
             if (! std::isfinite(value))
             {
                 delete m_quark;
@@ -279,22 +282,22 @@ namespace kiwi
         //! Constructor with a tag.
         /** The function allocates the atom with a tag.
          */
-        inline Atom(const sTag tag) noexcept : m_quark(new QuarkTag(tag)) {}
+        inline Atom(const tag_t tag) noexcept : m_quark(new QuarkTag(tag)) {}
         
         //! Constructor with a vector of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline Atom(Vector const& atoms) noexcept : m_quark(new QuarkVector(atoms)) {}
+        inline Atom(vector_t const& atoms) noexcept : m_quark(new QuarkVector(atoms)) {}
         
         //! Constructor with a vector of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline Atom(Vector&& atoms) noexcept : m_quark(new QuarkVector(std::forward<Vector>(atoms))) {}
+        inline Atom(vector_t&& atoms) noexcept : m_quark(new QuarkVector(std::forward<vector_t>(atoms))) {}
         
         //! Constructor with a vector of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline Atom(Vector::iterator first, Vector::iterator last) noexcept : m_quark(new QuarkVector(first, last)) {}
+        inline Atom(vector_t::iterator first, vector_t::iterator last) noexcept : m_quark(new QuarkVector(first, last)) {}
         
         //! Constructor with a vector of atoms.
         /** The function allocates the atom with a vector of atoms.
@@ -304,22 +307,22 @@ namespace kiwi
         //! Constructor with a map of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline Atom(Dico const& atoms) noexcept : m_quark(new QuarkDico(atoms)) {}
+        inline Atom(dico_t const& atoms) noexcept : m_quark(new QuarkDico(atoms)) {}
         
         //! Constructor with a map of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline Atom(Dico&& atoms) noexcept  : m_quark(new QuarkDico(std::forward<Dico>(atoms))) {}
+        inline Atom(dico_t&& atoms) noexcept  : m_quark(new QuarkDico(std::forward<dico_t>(atoms))) {}
         
         //! Constructor with a map of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline Atom(Dico::iterator first, Dico::iterator last) noexcept : m_quark(new QuarkDico(first, last)) {}
+        inline Atom(dico_t::iterator first, dico_t::iterator last) noexcept : m_quark(new QuarkDico(first, last)) {}
         
         //! Constructor with a map of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline Atom(std::initializer_list<std::pair<const sTag, Atom>> il) noexcept : m_quark(new QuarkDico(il)) {}
+        inline Atom(std::initializer_list<std::pair<const tag_t, Atom>> il) noexcept : m_quark(new QuarkDico(il)) {}
         
         //! Destructor.
         inline ~Atom() noexcept {delete m_quark;}
@@ -334,7 +337,7 @@ namespace kiwi
         /** The function checks if the atom is undefined.
          @return    true if the atom is undefined.
          */
-        inline bool isUndefined() const noexcept {return m_quark->isUndefined();}
+        inline bool isNull() const noexcept {return m_quark->isNull();}
         
         //! Check if the atom is of type bool.
         /** The function checks if the atom is of type bool.
@@ -656,7 +659,7 @@ namespace kiwi
          */
         inline bool operator==(Atom const& other) const noexcept
         {
-            if(other.isUndefined() && isUndefined())
+            if(other.isNull() && isNull())
             {
                 return true;
             }
@@ -976,8 +979,8 @@ namespace kiwi
          @param     text	The std::string to parse.
          @return    The vector of atoms.
          @remark    For example, the std::string : "foo \"bar 42\" 1 2 3.14" will parsed into a vector of 5 atoms.
-         The atom types will be determined automatically as 2 #Atom::Type::TAG atoms, 2 #Atom::Type::INT atoms,
-         && 1 #Atom::Type::FLOAT atom.
+         The atom types will be determined automatically as 2 #Atom::Type::Tag atoms, 2 #Atom::Type::Int atoms,
+         && 1 #Atom::Type::Float atom.
          */
         static Vector parse(std::string const& text);
     };

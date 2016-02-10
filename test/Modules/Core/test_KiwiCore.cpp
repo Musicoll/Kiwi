@@ -56,69 +56,72 @@ TEST_CASE("Atom Constructors", "[Atom]")
         //std::cout << "int: " << Atom::test<int>(1) << std::endl;
     }
     
-    SECTION("Undifined type")
+    SECTION("Null type")
     {
-        CHECK(Atom().getType() == Atom::UNDEFINED);
-        CHECK(Atom(INFINITY).getType() == Atom::UNDEFINED);    // infinite produces Undefined
-        CHECK(Atom(NAN).getType() == Atom::UNDEFINED);         // NaN produces Undefined
+        Atom a;
+        CHECK(a.getType() == Atom::Type::Null);
+        CHECK(a.isNull());
+        CHECK(Atom().getType() == Atom::Type::Null);
+        CHECK(Atom(INFINITY).getType() == Atom::Type::Null);    // infinite produces Null
+        CHECK(Atom(NAN).getType() == Atom::Type::Null);         // NaN produces Null
     }
     
     SECTION("Boolean types")
     {
-        CHECK(Atom(true).getType() == Atom::BOOLEAN);
-        CHECK(Atom(false).getType() == Atom::BOOLEAN);
+        CHECK(Atom(true).getType() == Atom::Type::Boolean);
+        CHECK(Atom(false).getType() == Atom::Type::Boolean);
     }
     
     SECTION("Signed Integral types")
     {
-        CHECK(Atom(short(1)).getType() == Atom::INT);
-        CHECK(Atom(1).getType() == Atom::INT);
-        CHECK(Atom(1l).getType() == Atom::INT);
-        CHECK(Atom(1ll).getType() == Atom::INT);
-        CHECK(Atom(0xFFFFFF).getType() == Atom::INT);  // hexadecimal
-        CHECK(Atom(0113).getType() == Atom::INT);      // octal
+        CHECK(Atom(short(1)).getType() == Atom::Type::Int);
+        CHECK(Atom(1).getType() == Atom::Type::Int);
+        CHECK(Atom(1l).getType() == Atom::Type::Int);
+        CHECK(Atom(1ll).getType() == Atom::Type::Int);
+        CHECK(Atom(0xFFFFFF).getType() == Atom::Type::Int);  // hexadecimal
+        CHECK(Atom(0113).getType() == Atom::Type::Int);      // octal
     }
     
     SECTION("Unsigned Integral types")
     {
-        CHECK(Atom(1u).getType() == Atom::INT);        // unsigned (int)
-        CHECK(Atom(1ul).getType() == Atom::INT);       // unsigned long
-        CHECK(Atom(1lu).getType() == Atom::INT);       // unsigned long
-        CHECK(Atom(1ull).getType() == Atom::INT);      // unsigned long long
-        CHECK(Atom(1llu).getType() == Atom::INT);      // unsigned long long
+        CHECK(Atom(1u).getType() == Atom::Type::Int);        // unsigned (int)
+        CHECK(Atom(1ul).getType() == Atom::Type::Int);       // unsigned long
+        CHECK(Atom(1lu).getType() == Atom::Type::Int);       // unsigned long
+        CHECK(Atom(1ull).getType() == Atom::Type::Int);      // unsigned long long
+        CHECK(Atom(1llu).getType() == Atom::Type::Int);      // unsigned long long
     }
     
     SECTION("Floating-Point types")
     {
-        CHECK(Atom(3.14f).getType() == Atom::FLOAT);    // float
-        CHECK(Atom(3.14).getType() == Atom::FLOAT);     // double
-        CHECK(Atom(3.14l).getType() == Atom::FLOAT);    // long double
-        CHECK(Atom(6.02e23).getType() == Atom::FLOAT);  // 6.02 x 10^23 (Avogadro constant)
-        CHECK(Atom(1.6e-19).getType() == Atom::FLOAT);  // 1.6 x 10^-19 (electric charge of an electron)
+        CHECK(Atom(3.14f).getType() == Atom::Type::Float);    // float
+        CHECK(Atom(3.14).getType() == Atom::Type::Float);     // double
+        CHECK(Atom(3.14l).getType() == Atom::Type::Float);    // long double
+        CHECK(Atom(6.02e23).getType() == Atom::Type::Float);  // 6.02 x 10^23 (Avogadro constant)
+        CHECK(Atom(1.6e-19).getType() == Atom::Type::Float);  // 1.6 x 10^-19 (electric charge of an electron)
         
         // check for infinity and NaN
-        CHECK_FALSE(Atom(INFINITY).getType() == Atom::FLOAT);    // infinite produces Undefined
-        CHECK_FALSE(Atom(NAN).getType() == Atom::FLOAT);         // NaN produces Undefined
+        CHECK_FALSE(Atom(INFINITY).getType() == Atom::Type::Float);    // infinite produces Null
+        CHECK_FALSE(Atom(NAN).getType() == Atom::Type::Float);         // NaN produces Null
     }
     
     SECTION("Tag types")
     {
-        CHECK(Atom("c").getType() == Atom::TAG);
-        CHECK(Atom(Tag::create("tag")).getType() == Atom::TAG);
+        CHECK(Atom("c").getType() == Atom::Type::Tag);
+        CHECK(Atom(Tag::create("tag")).getType() == Atom::Type::Tag);
         sTag tag = Tag::create("tag");
-        CHECK(Atom(tag).getType() == Atom::TAG);
+        CHECK(Atom(tag).getType() == Atom::Type::Tag);
         
-        //WARN("Atom('c').getType() == Atom::TAG");
-        //CHECK(Atom('c').getType() == Atom::TAG);
-        //CHECK_FALSE(Atom('c').getType() == Atom::INT);       //
+        //WARN("Atom('c').getType() == Atom::Type::Tag");
+        //CHECK(Atom('c').getType() == Atom::Type::Tag);
+        //CHECK_FALSE(Atom('c').getType() == Atom::Type::Int);       //
     }
 }
 
-TEST_CASE("Atom Undefined", "[Atom]")
+TEST_CASE("Atom Null", "[Atom]")
 {
     Atom atom;
-    REQUIRE(atom.getType()          == Atom::UNDEFINED);
-    REQUIRE(atom.isUndefined()      == true);
+    REQUIRE(atom.getType()          == Atom::Type::Null);
+    REQUIRE(atom.isNull()      == true);
     REQUIRE(atom.isBool()           == false);
     REQUIRE(atom.isNumber()         == false);
     REQUIRE(atom.isInt()           == false);
@@ -138,17 +141,17 @@ TEST_CASE("Atom Undefined", "[Atom]")
 TEST_CASE("Atom Boolean", "[Atom]")
 {
     Atom atom(true);
-    CHECK(atom.getType()          == Atom::BOOLEAN);
-    CHECK(atom.isUndefined()      == false);
-    CHECK(atom.isBool()           == true);
+    CHECK(atom.getType()        == Atom::Type::Boolean);
+    CHECK(atom.isNull()         == false);
+    CHECK(atom.isBool()         == true);
     
     // for now a bool type Atom is a number
-    CHECK(atom.isNumber()         == true);
-    CHECK(atom.isInt()           == false);
-    CHECK(atom.isFloat()         == false);
-    CHECK(atom.isTag()            == false);
-    CHECK(atom.isVector()         == false);
-    CHECK(atom.isDico()           == false);
+    CHECK(atom.isNumber()       == true);
+    CHECK(atom.isInt()          == false);
+    CHECK(atom.isFloat()        == false);
+    CHECK(atom.isTag()          == false);
+    CHECK(atom.isVector()       == false);
+    CHECK(atom.isDico()         == false);
     CHECK(atom == true);
     
     REQUIRE(Atom(false) == Atom(false));
@@ -158,8 +161,8 @@ TEST_CASE("Atom Boolean", "[Atom]")
 TEST_CASE("Atom Int", "[Atom]")
 {
     Atom atom(1);
-    CHECK(atom.getType()          == Atom::INT);
-    CHECK(atom.isUndefined()      == false);
+    CHECK(atom.getType()          == Atom::Type::Int);
+    CHECK(atom.isNull()      == false);
     
     // Atom(1) is not a bool (?)
     CHECK(atom.isBool()           == false);
@@ -173,15 +176,18 @@ TEST_CASE("Atom Int", "[Atom]")
     CHECK(atom == 1);
     CHECK(atom == 1.);
     
+    CHECK(Atom(std::numeric_limits<int64_t>::max()) == std::numeric_limits<int64_t>::max());
+    CHECK(Atom(std::numeric_limits<uint64_t>::max()) == std::numeric_limits<uint64_t>::max());
+    
     // do we need to support all equality operators ?
     //CHECK(atom == 1ul);
     
     Atom atom2{1}; // call initializer_list ctor => VECTOR type
-    CHECK(atom2.getType()         == Atom::VECTOR);
+    CHECK(atom2.getType()         == Atom::Type::Vector);
     
     Atom to_move(42);
     Atom moved(std::move(to_move));
-    CHECK(to_move.isUndefined()    == true);
+    CHECK(to_move.isNull()    == true);
     CHECK(moved.isNumber()         == true);
     CHECK(moved.isInt()           == true);
     CHECK(moved == 42);
@@ -190,12 +196,12 @@ TEST_CASE("Atom Int", "[Atom]")
 TEST_CASE("Atom Float", "[Atom]")
 {
     Atom atom(1.123);
-    CHECK(atom.getType()          == Atom::FLOAT);
-    CHECK(atom.isUndefined()      == false);
+    CHECK(atom.getType()          == Atom::Type::Float);
+    CHECK(atom.isNull()      == false);
     CHECK(atom.isBool()           == false);
     CHECK(atom.isNumber()         == true);
-    CHECK(atom.isInt()           == false);
-    CHECK(atom.isFloat()         == true);
+    CHECK(atom.isInt()            == false);
+    CHECK(atom.isFloat()          == true);
     CHECK(atom.isTag()            == false);
     CHECK(atom.isVector()         == false);
     CHECK(atom.isDico()           == false);
@@ -208,11 +214,11 @@ TEST_CASE("Atom Float", "[Atom]")
     CHECK_FALSE(Atom(1.123) == 3.14);
     
     Atom atom2{1.}; // call initializer_list ctor => VECTOR type
-    CHECK(atom2.getType()         == Atom::VECTOR);
+    CHECK(atom2.getType()         == Atom::Type::Vector);
     
     Atom to_move(42.42);
     Atom moved(std::move(to_move));
-    CHECK(to_move.isUndefined()    == true);
+    CHECK(to_move.isNull()    == true);
     CHECK(moved.isNumber()         == true);
     CHECK(moved.isFloat()         == true);
     CHECK(moved == 42.42);
@@ -221,8 +227,8 @@ TEST_CASE("Atom Float", "[Atom]")
 TEST_CASE("Atom Tag", "[Atom]")
 {
     Atom atom("foo");
-    CHECK(atom.getType()          == Atom::TAG);
-    CHECK(atom.isUndefined()      == false);
+    CHECK(atom.getType()          == Atom::Type::Tag);
+    CHECK(atom.isNull()      == false);
     CHECK(atom.isBool()           == false);
     CHECK(atom.isNumber()         == false);
     CHECK(atom.isInt()           == false);
@@ -235,11 +241,11 @@ TEST_CASE("Atom Tag", "[Atom]")
     CHECK(atom != Atom("jojo"));
     
     Atom atom2{"foo"}; // call initializer_list ctor => VECTOR type
-    CHECK(atom2.getType()         == Atom::VECTOR);
+    CHECK(atom2.getType()         == Atom::Type::Vector);
     
     Atom to_move("foo");
     Atom moved(std::move(to_move));
-    CHECK(to_move.isUndefined()   == true);
+    CHECK(to_move.isNull()   == true);
     CHECK(moved.isTag()           == true);
 }
 
@@ -248,12 +254,12 @@ TEST_CASE("Atom Vector", "[Atom]")
     // Empty atom vector
     Vector empty_vec;
     Atom atom(empty_vec);
-    CHECK(atom.isUndefined()      == false);
+    CHECK(atom.isNull()      == false);
     CHECK(atom.isVector()         == true);
     
     // It would be nice to simply have to do :
     //Atom atom({}); // implicit empty vector
-    //CHECK(atom.isUndefined()      == false); // true
+    //CHECK(atom.isNull()      == false); // true
     //CHECK(atom.isVector()         == true);  // false
     
     // One element atom vector
@@ -269,7 +275,7 @@ TEST_CASE("Atom Vector", "[Atom]")
     CHECK(atom_2.isVector()         == true);
     Vector atom_2_vec = atom_2;
     REQUIRE(atom_2_vec.size() == 4);
-    CHECK(atom_2_vec[0].getType()   == Atom::BOOLEAN);
+    CHECK(atom_2_vec[0].getType()   == Atom::Type::Boolean);
     CHECK(atom_2_vec[0].isBool()    == true);
     CHECK(atom_2_vec[0] == true);
     CHECK(atom_2_vec[1].isInt()     == true);
