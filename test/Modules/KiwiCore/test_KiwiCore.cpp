@@ -21,13 +21,12 @@
  ==============================================================================
  */
 
+#include "../../../Modules/KiwiCore/KiwiAtom.h"
+
 #define CATCH_CONFIG_MAIN
 #include "../../catch.hpp"
 
-#include "../../../Modules/KiwiCore/KiwiAtom.h"
-
 using namespace kiwi;
-
 
 // ================================================================================ //
 //                                      ATOM                                        //
@@ -70,31 +69,34 @@ TEST_CASE("Atom Constructors", "[Atom]")
     
     SECTION("Signed Integral types")
     {
-        CHECK(Atom(short(1)).getType() == Atom::LONG);
-        CHECK(Atom(1).getType() == Atom::LONG);
-        CHECK(Atom(1l).getType() == Atom::LONG);
-        CHECK(Atom(1ll).getType() == Atom::LONG);
-        CHECK(Atom(0xFFFFFF).getType() == Atom::LONG);  // hexadecimal
-        CHECK(Atom(0113).getType() == Atom::LONG);      // octal
+        CHECK(Atom(short(1)).getType() == Atom::INT);
+        CHECK(Atom(1).getType() == Atom::INT);
+        CHECK(Atom(1l).getType() == Atom::INT);
+        CHECK(Atom(1ll).getType() == Atom::INT);
+        CHECK(Atom(0xFFFFFF).getType() == Atom::INT);  // hexadecimal
+        CHECK(Atom(0113).getType() == Atom::INT);      // octal
     }
     
     SECTION("Unsigned Integral types")
     {
-        CHECK(Atom(1u).getType() == Atom::LONG);        // unsigned (int)
-        CHECK(Atom(1ul).getType() == Atom::LONG);       // unsigned long
-        CHECK(Atom(1lu).getType() == Atom::LONG);       // unsigned long
-        CHECK(Atom(1ull).getType() == Atom::LONG);      // unsigned long long
-        CHECK(Atom(1llu).getType() == Atom::LONG);      // unsigned long long
-        CHECK_FALSE(Atom(1ui).getType() == Atom::LONG); // ??
+        CHECK(Atom(1u).getType() == Atom::INT);        // unsigned (int)
+        CHECK(Atom(1ul).getType() == Atom::INT);       // unsigned long
+        CHECK(Atom(1lu).getType() == Atom::INT);       // unsigned long
+        CHECK(Atom(1ull).getType() == Atom::INT);      // unsigned long long
+        CHECK(Atom(1llu).getType() == Atom::INT);      // unsigned long long
     }
     
     SECTION("Floating-Point types")
     {
-        CHECK(Atom(3.14f).getType() == Atom::DOUBLE);    // float
-        CHECK(Atom(3.14).getType() == Atom::DOUBLE);     // double
-        CHECK(Atom(3.14l).getType() == Atom::DOUBLE);    // long double
-        CHECK(Atom(6.02e23).getType() == Atom::DOUBLE);  // 6.02 x 10^23 (Avogadro constant)
-        CHECK(Atom(1.6e-19).getType() == Atom::DOUBLE);  // 1.6 x 10^-19 (electric charge of an electron)
+        CHECK(Atom(3.14f).getType() == Atom::FLOAT);    // float
+        CHECK(Atom(3.14).getType() == Atom::FLOAT);     // double
+        CHECK(Atom(3.14l).getType() == Atom::FLOAT);    // long double
+        CHECK(Atom(6.02e23).getType() == Atom::FLOAT);  // 6.02 x 10^23 (Avogadro constant)
+        CHECK(Atom(1.6e-19).getType() == Atom::FLOAT);  // 1.6 x 10^-19 (electric charge of an electron)
+        
+        // check for infinity and NaN
+        CHECK(Atom(INFINITY).getType() == Atom::FLOAT);    // float
+        CHECK(Atom(NAN).getType() == Atom::FLOAT);    // float
     }
     
     SECTION("Tag types")
@@ -106,7 +108,7 @@ TEST_CASE("Atom Constructors", "[Atom]")
         
         //WARN("Atom('c').getType() == Atom::TAG");
         //CHECK(Atom('c').getType() == Atom::TAG);
-        //CHECK_FALSE(Atom('c').getType() == Atom::LONG);       //
+        //CHECK_FALSE(Atom('c').getType() == Atom::INT);       //
     }
 }
 
@@ -117,8 +119,8 @@ TEST_CASE("Atom Undefined", "[Atom]")
     REQUIRE(atom.isUndefined()      == true);
     REQUIRE(atom.isBool()           == false);
     REQUIRE(atom.isNumber()         == false);
-    REQUIRE(atom.isLong()           == false);
-    REQUIRE(atom.isDouble()         == false);
+    REQUIRE(atom.isInt()           == false);
+    REQUIRE(atom.isFloat()         == false);
     REQUIRE(atom.isTag()            == false);
     REQUIRE(atom.isVector()         == false);
     REQUIRE(atom.isDico()           == false);
@@ -140,8 +142,8 @@ TEST_CASE("Atom Boolean", "[Atom]")
     
     // for now a bool type Atom is a number
     CHECK(atom.isNumber()         == true);
-    CHECK(atom.isLong()           == false);
-    CHECK(atom.isDouble()         == false);
+    CHECK(atom.isInt()           == false);
+    CHECK(atom.isFloat()         == false);
     CHECK(atom.isTag()            == false);
     CHECK(atom.isVector()         == false);
     CHECK(atom.isDico()           == false);
@@ -151,17 +153,17 @@ TEST_CASE("Atom Boolean", "[Atom]")
     REQUIRE(Atom(true) == Atom(true));
 }
 
-TEST_CASE("Atom Long", "[Atom]")
+TEST_CASE("Atom Int", "[Atom]")
 {
     Atom atom(1);
-    CHECK(atom.getType()          == Atom::LONG);
+    CHECK(atom.getType()          == Atom::INT);
     CHECK(atom.isUndefined()      == false);
     
     // Atom(1) is not a bool (?)
     CHECK(atom.isBool()           == false);
     CHECK(atom.isNumber()         == true);
-    CHECK(atom.isLong()           == true);
-    CHECK(atom.isDouble()         == false);
+    CHECK(atom.isInt()           == true);
+    CHECK(atom.isFloat()         == false);
     CHECK(atom.isTag()            == false);
     CHECK(atom.isVector()         == false);
     CHECK(atom.isDico()           == false);
@@ -179,19 +181,19 @@ TEST_CASE("Atom Long", "[Atom]")
     Atom moved(std::move(to_move));
     CHECK(to_move.isUndefined()    == true);
     CHECK(moved.isNumber()         == true);
-    CHECK(moved.isLong()           == true);
+    CHECK(moved.isInt()           == true);
     CHECK(moved == 42);
 }
 
-TEST_CASE("Atom Double", "[Atom]")
+TEST_CASE("Atom Float", "[Atom]")
 {
     Atom atom(1.123);
-    CHECK(atom.getType()          == Atom::DOUBLE);
+    CHECK(atom.getType()          == Atom::FLOAT);
     CHECK(atom.isUndefined()      == false);
     CHECK(atom.isBool()           == false);
     CHECK(atom.isNumber()         == true);
-    CHECK(atom.isLong()           == false);
-    CHECK(atom.isDouble()         == true);
+    CHECK(atom.isInt()           == false);
+    CHECK(atom.isFloat()         == true);
     CHECK(atom.isTag()            == false);
     CHECK(atom.isVector()         == false);
     CHECK(atom.isDico()           == false);
@@ -210,7 +212,7 @@ TEST_CASE("Atom Double", "[Atom]")
     Atom moved(std::move(to_move));
     CHECK(to_move.isUndefined()    == true);
     CHECK(moved.isNumber()         == true);
-    CHECK(moved.isDouble()         == true);
+    CHECK(moved.isFloat()         == true);
     CHECK(moved == 42.42);
 }
 
@@ -221,8 +223,8 @@ TEST_CASE("Atom Tag", "[Atom]")
     CHECK(atom.isUndefined()      == false);
     CHECK(atom.isBool()           == false);
     CHECK(atom.isNumber()         == false);
-    CHECK(atom.isLong()           == false);
-    CHECK(atom.isDouble()         == false);
+    CHECK(atom.isInt()           == false);
+    CHECK(atom.isFloat()         == false);
     CHECK(atom.isTag()            == true);
     CHECK(atom.isVector()         == false);
     CHECK(atom.isDico()           == false);
@@ -257,7 +259,7 @@ TEST_CASE("Atom Vector", "[Atom]")
     CHECK(atom_1.isVector()         == true);
     Vector atom_vec = atom_1;
     REQUIRE(atom_vec.size() == 1);
-    CHECK(atom_vec[0].isLong()      == true);
+    CHECK(atom_vec[0].isInt()      == true);
     CHECK(atom_vec[0] == 1);
     
     // Four elements atom vector
@@ -265,14 +267,20 @@ TEST_CASE("Atom Vector", "[Atom]")
     CHECK(atom_2.isVector()         == true);
     Vector atom_2_vec = atom_2;
     REQUIRE(atom_2_vec.size() == 4);
-    CHECK(atom_2_vec[0].isBool()     == true);
+    CHECK(atom_2_vec[0].getType()   == Atom::BOOLEAN);
+    CHECK(atom_2_vec[0].isBool()    == true);
     CHECK(atom_2_vec[0] == true);
-    CHECK(atom_2_vec[1].isLong()     == true);
+    CHECK(atom_2_vec[1].isInt()     == true);
     CHECK(atom_2_vec[1] == 42);
-    CHECK(atom_2_vec[2].isDouble()   == true);
+    CHECK(atom_2_vec[2].isFloat()   == true);
     CHECK(atom_2_vec[2] == 3.14);
-    CHECK(atom_2_vec[3].isTag()      == true);
+    CHECK(atom_2_vec[3].isTag()     == true);
     CHECK(atom_2_vec[3] == Atom("tag"));
+    
+    Atom a = {true};
+    Vector a_vec = a;
+    REQUIRE(a_vec.size() == 1);
+    CHECK(atom_2_vec[0].isBool()     == true);
     
     // Do we want to support direct vector access (?)
     //CHECK(atom_2.isVector() == true);
@@ -306,7 +314,7 @@ TEST_CASE("Atom Vector", "[Atom]")
     
     Vector atom_4_vec_2 = atom_4_vec[2];
     REQUIRE(atom_4_vec_2.size() == 2);
-    CHECK(atom_4_vec_2[0].isLong() == true);
+    CHECK(atom_4_vec_2[0].isInt() == true);
     CHECK(atom_4_vec_2[1].isBool() == true);
     
     Vector atom_4_vec_3 = atom_4_vec[3];
@@ -326,7 +334,7 @@ TEST_CASE("Atom Vector", "[Atom]")
     Vector atom_4_vec_5 = atom_4_vec[5];
     REQUIRE(atom_4_vec_5.size() == 2);
     REQUIRE(atom_4_vec_5[0].isVector() == true);
-    REQUIRE(atom_4_vec_5[1].isDouble() == true);
+    REQUIRE(atom_4_vec_5[1].isFloat() == true);
     Vector atom_4_vec_5_vec = atom_4_vec_5[0];
     REQUIRE(atom_4_vec_5_vec.size() == atom_2_vec.size());
     
@@ -363,7 +371,7 @@ TEST_CASE("Atom Dico", "[Atom]")
     REQUIRE(atom_dico.isDico()         == true);
     Dico dico = atom_dico;
     REQUIRE(dico.size()                == 2);
-    REQUIRE(dico[Tag::create("long")].isLong() == true);
+    REQUIRE(dico[Tag::create("long")].isInt() == true);
     REQUIRE(dico[Tag::create("object")].isVector() == true);
     
     //std::cout << atom_dico << '\n';
@@ -380,9 +388,9 @@ TEST_CASE("Atom string parser", "[Atom]")
     REQUIRE(atom_vec.size() == 5);
     CHECK(atom_vec[0].isTag());
     CHECK(atom_vec[1].isTag());
-    CHECK(atom_vec[2].isLong());
-    CHECK(atom_vec[3].isLong());
-    CHECK(atom_vec[4].isDouble());
+    CHECK(atom_vec[2].isInt());
+    CHECK(atom_vec[3].isInt());
+    CHECK(atom_vec[4].isFloat());
 }
 
 
