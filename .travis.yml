@@ -1,5 +1,5 @@
 language: cpp
-sudo: require
+sudo: false
 
 # No Email notification
 notifications:
@@ -35,9 +35,6 @@ matrix:
     - os: osx
       compiler: clang
       env: COMPILER=clang++-3.6
-
-install:
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
 
 before_install:
   - mkdir build
