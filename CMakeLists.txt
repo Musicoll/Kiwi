@@ -3,6 +3,7 @@ project (Kiwi CXX)
 set (Kiwi_VERSION_MAJOR 0)
 set (Kiwi_VERSION_MINOR 1)
 
+# the following flag is (only) needed to compile Accelerate on old Mac/gcc version
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flax-vector-conversions")
 
 if(NOT ${CMAKE_VERSION} LESS 3.2)
@@ -29,30 +30,34 @@ else()
     endif()
 endif()
 
+set(KIWI_MODULES_DIR ${PROJECT_SOURCE_DIR}/Modules)
+set(KIWI_TEST_DIR ${PROJECT_SOURCE_DIR}/test)
+
+include_directories(
+    ${KIWI_MODULES_DIR}
+)
+
 # Module Core
 file(GLOB KIWI_MODULE_CORE_SRC
-    Modules/KiwiCore/*.h
-    Modules/KiwiCore/*.hpp
-    Modules/KiwiCore/*.cpp
+    ${KIWI_MODULES_DIR}/KiwiCore/*.cpp
 )
 
 # Module DSP
 file(GLOB KIWI_MODULE_DSP_SRC
-    Modules/KiwiDsp/*.hpp
-    Modules/KiwiDsp/*.cpp
+    ${KIWI_MODULES_DIR}/KiwiDsp/*.cpp
 )
 
 # Core Unit Tests sources
 set(TEST_CORE
     ${KIWI_MODULE_CORE_SRC}
-    test/Modules/Core/test_KiwiCore.cpp
+    ${KIWI_TEST_DIR}/Modules/Core/test_KiwiCore.cpp
 ) 
 add_executable(test_core ${TEST_CORE})
 
 # DSP Unit Tests sources
 set(TEST_DSP
     ${KIWI_MODULE_DSP_SRC}
-    test/Modules/Dsp/test_KiwiDsp.cpp
+    ${KIWI_TEST_DIR}/Modules/Dsp/test_KiwiDsp.cpp
 )
 add_executable(test_dsp ${TEST_DSP})
 
