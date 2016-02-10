@@ -105,7 +105,8 @@ namespace kiwi
             sTag objectName = dico[Tags::name];
             if(Factory::has(objectName))
             {
-                const auto infos = Infos(ulong(dico[Tags::id]),
+                //@todo no need to cast here
+                const auto infos = Infos(static_cast<int64_t>(dico[Tags::id]),
                                          sTag(dico[Tags::name]),
                                          sTag(dico[Tags::text])->getName(),
                                          dico, dico[Tags::arguments]);

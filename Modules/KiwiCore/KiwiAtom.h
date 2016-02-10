@@ -69,7 +69,7 @@ namespace kiwi
             inline bool isDico() const noexcept{return getType() == DICO;}
             inline bool isVector() const noexcept {return getType() == VECTOR;}
             virtual inline bool getBool() const noexcept {return false;}
-            virtual inline int64_t getLong() const noexcept {return 0;}
+            virtual inline int64_t getLong() const noexcept {return 0ll;}
             virtual inline double getDouble() const noexcept {return 0.;}
             virtual inline sTag getTag() const noexcept {return Tags::_empty;}
             virtual inline Vector getVector() const noexcept {return Vector();}
@@ -84,17 +84,17 @@ namespace kiwi
             inline QuarkBool(bool const& _val) noexcept : val(_val) {}
             inline Type getType() const noexcept override {return BOOLEAN;}
             inline bool getBool() const noexcept override {return val;}
-            inline int64_t getLong() const noexcept override {return val ? 1 : 0;}
+            inline int64_t getLong() const noexcept override {return val ? 1ll : 0ll;}
             inline double getDouble() const noexcept override {return val ? 1. : 0.;}
         };
         
         class QuarkLong : public Quark
         {
         public:
-            const int64_t val;
+            using type = int64_t;
+            const type val;
             inline QuarkLong(QuarkLong const& _val) noexcept : val(_val.val) {}
-            inline QuarkLong(const long& _val) noexcept : val(int64_t(_val)) {}
-            inline QuarkLong(const int64_t& _val) noexcept : val(_val) {}
+            inline QuarkLong(const type& _val) noexcept : val(_val) {}
             inline Type getType() const noexcept override {return LONG;}
             inline bool getBool() const noexcept override {return static_cast<bool>(val);}
             inline int64_t getLong() const noexcept override {return val;}
@@ -104,12 +104,13 @@ namespace kiwi
         class QuarkDouble : public Quark
         {
         public:
-            const double val;
+            using type = double;
+            const type val;
             inline QuarkDouble(QuarkDouble const& _val) noexcept : val(_val.val) {}
             inline QuarkDouble(double const& _val) noexcept : val(_val) {}
             inline Type getType() const noexcept override {return DOUBLE;}
-            inline bool getBool() const noexcept override {return bool(val);}
-            inline int64_t getLong() const noexcept override {return long(val);}
+            inline bool getBool() const noexcept override {return static_cast<bool>(val);}
+            inline int64_t getLong() const noexcept override {return static_cast<int64_t>(val);}
             inline double getDouble() const noexcept override {return val;}
         };
         
@@ -180,35 +181,60 @@ namespace kiwi
          */
         inline Atom(bool value) noexcept : m_quark(new QuarkBool(value)) {}
         
-        //! Constructor with a long value.
-        /** The function allocates the atom with a long value.
-         @param value The value.
-         */
-        inline Atom(const int value) noexcept : m_quark(new QuarkLong(long(value))) {}
-        
-        //! Constructor with a long value.
-        /** The function allocates the atom with a long value.
-         @param value The value.
-         */
-        inline Atom(const long value) noexcept : m_quark(new QuarkLong(int64_t(value))) {}
-        
         //! Constructor with a long long value.
         /** The function allocates the atom with a long long value.
          @param value The value.
          */
-        inline Atom(const int64_t value) noexcept : m_quark(new QuarkLong(value)) {}
+        template<typename IntegerType, typename
+        std::enable_if<
+        std::is_constructible<QuarkLong::type, IntegerType>::value and
+        std::numeric_limits<IntegerType>::is_integer and
+        std::numeric_limits<IntegerType>::is_signed, IntegerType>::type
+        = 0>
+        Atom(const IntegerType value) noexcept
+        : m_quark(new QuarkLong(static_cast<QuarkLong::type>(value)))
+        {}
+        
+        // Constructor with unsigned integer
+        template < typename UnsignedType, typename
+        std::enable_if <
+        std::is_constructible<QuarkLong::type, UnsignedType>::value and
+        std::numeric_limits<UnsignedType>::is_integer and
+        !std::numeric_limits<UnsignedType>::is_signed, UnsignedType >::type
+        = 0 >
+        Atom(const UnsignedType value) noexcept
+        : m_quark(new QuarkLong(static_cast<QuarkLong::type>(value)))
+        {}
+        
+        /*
+        template < typename IntegerType, typename =
+        std::enable_if< std::is_same<int, IntegerType>::value > >
+        static std::string test(IntegerType value)
+        {
+            return "OK";
+        }
+        
+        template < typename IntegerType, typename =
+        std::enable_if <
+        std::is_constructible<QuarkLong::type, IntegerType>::value and
+        std::is_integral<IntegerType>::value > >
+        Atom(const IntegerType value) noexcept
+        : m_quark(new QuarkLong(static_cast<QuarkLong::type>(value)))
+        {}
+        */
         
         //! Constructor with a double value.
         /** The function allocates the atom with a double value.
          @param value The value.
          */
-        inline Atom(const float value) noexcept : m_quark(new QuarkDouble(double(value))) {}
-        
-        //! Constructor with a double value.
-        /** The function allocates the atom with a double value.
-         @param value The value.
-         */
-        inline Atom(const double value) noexcept : m_quark(new QuarkDouble(value)) {}
+        template<typename FloatType, typename = typename
+        std::enable_if<
+        std::is_constructible<QuarkDouble::type, FloatType>::value and
+        std::is_floating_point<FloatType>::value>::type
+        >
+        Atom(const FloatType value) noexcept
+        : m_quark(new QuarkDouble(value))
+        {}
         
         //! Constructor with a string.
         /** The function allocates the atom with a tag created with a string.
@@ -274,8 +300,6 @@ namespace kiwi
         inline Atom(std::initializer_list<std::pair<const sTag, Atom>> il) noexcept : m_quark(new QuarkDico(il)) {}
         
         //! Destructor.
-        /** Doesn't perform anything.
-         */
         inline ~Atom() noexcept {delete m_quark;}
         
         //! Retrieve the type of the atom.
@@ -338,35 +362,25 @@ namespace kiwi
          */
         inline operator bool() const noexcept {return m_quark->getBool();}
         
-        //! Cast the atom to an int.
-        /** The function casts the atom to an int.
-         @return An int value if the atom is a digit otherwise 0.
-         */
-        inline operator int() const noexcept {return int(m_quark->getLong());}
-        
-        //! Cast the atom to a long.
-        /** The function casts the atom to a long.
-         @return A long value if the atom is a digit otherwise 0.
-         */
-        inline operator long() const noexcept {return m_quark->getLong();}
-        
         //! Cast the atom to a long long.
         /** The function casts the atom to a long long.
          @return A long value if the atom is a digit otherwise 0.
          */
-        inline operator int64_t() const noexcept {return m_quark->getLong();}
+        template<typename IntegerType, typename
+        std::enable_if<
+        std::is_constructible<IntegerType, QuarkLong::type>::value and
+        std::numeric_limits<IntegerType>::is_integer and
+        std::numeric_limits<IntegerType>::is_signed, IntegerType>::type
+        = 0>
+        operator IntegerType() const noexcept {return static_cast<IntegerType>(m_quark->getLong());}
         
-        //! Cast the atom to a long.
-        /** The function casts the atom to a long.
-         @return A long value if the atom is a digit otherwise 0.
-         */
-        inline operator ulong() const noexcept {return ulong(m_quark->getLong());}
-        
-        //! Cast the atom to a float.
-        /** The function casts the atom to a float.
-         @return A float value if the atom is a digit otherwise 0.
-         */
-        inline operator float() const noexcept {return float(m_quark->getDouble());}
+        template < typename UnsignedType, typename
+        std::enable_if <
+        std::is_constructible<UnsignedType, QuarkLong::type>::value and
+        std::numeric_limits<UnsignedType>::is_integer and
+        !std::numeric_limits<UnsignedType>::is_signed, UnsignedType >::type
+        = 0 >
+        operator UnsignedType() const noexcept {return static_cast<UnsignedType>(m_quark->getLong());}
         
         //! Cast the atom to a double.
         /** The function casts the atom to a double.
@@ -427,46 +441,10 @@ namespace kiwi
          @param value   The long value.
          @return An atom.
          */
-        inline Atom& operator=(const int value) noexcept
-        {
-            delete m_quark;
-            m_quark = new QuarkLong((long)value);
-            return *this;
-        }
-        
-        //! Set up the atom with a long value.
-        /** The function sets up the atom with a long value.
-         @param value   The long value.
-         @return An atom.
-         */
-        inline Atom& operator=(const long value) noexcept
-        {
-            delete m_quark;
-            m_quark = new QuarkLong(int64_t(value));
-            return *this;
-        }
-        
-        //! Set up the atom with a long value.
-        /** The function sets up the atom with a long value.
-         @param value   The long value.
-         @return An atom.
-         */
         inline Atom& operator=(const int64_t value) noexcept
         {
             delete m_quark;
             m_quark = new QuarkLong(value);
-            return *this;
-        }
-        
-        //! Set up the atom with a double value.
-        /** The function sets up the atom with a double value.
-         @param value   The double value.
-         @return An atom.
-         */
-        inline Atom& operator=(const float value) noexcept
-        {
-            delete m_quark;
-            m_quark = new QuarkDouble((float)value);
             return *this;
         }
         
@@ -660,84 +638,35 @@ namespace kiwi
             }
         }
         
-        //! Compare the atom with a integer value.
-        /** The function compares the atom with a integer value.
-         @param value   The integer value.
-         @return true if the atom hold the same integer value otherwise false.
-         */
-        inline bool operator==(const int value) const noexcept
-        {
-            if(isNumber())
-            {
-                return m_quark->getLong() == (long)value;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        
         //! Compare the atom with a long value.
         /** The function compares the atom with a long.
          @param value   The long value.
          @return true if the atom hold the same long value otherwise false.
          */
-        inline bool operator==(const long value) const noexcept
+        /*
+        inline bool operator==(const int64_t value) const noexcept
         {
             if(isNumber())
             {
-                return m_quark->getLong() == value;
+                return value == static_cast<int64_t>(m_quark->getLong());
             }
             else
             {
                 return false;
             }
         }
+        */
         
-        //! Compare the atom with a long value.
-        /** The function compares the atom with a long.
-         @param value   The long value.
-         @return true if the atom hold the same long value otherwise false.
-         */
-        inline bool operator==(const long long value) const noexcept
+        template<typename IntegerType, typename
+        std::enable_if<
+        std::numeric_limits<IntegerType>::is_integer and
+        std::numeric_limits<IntegerType>::is_signed, IntegerType>::type
+        = 0>
+        bool operator==(const IntegerType value) const noexcept
         {
             if(isNumber())
             {
-                return m_quark->getLong() == long(value);
-            }
-            else
-            {
-                return false;
-            }
-        }
-        
-        //! Compare the atom with a long value.
-        /** The function compares the atom with a long.
-         @param value   The long value.
-         @return true if the atom hold the same long value otherwise false.
-         */
-        inline bool operator!=(const long long value) const noexcept
-        {
-            if(isNumber())
-            {
-                return m_quark->getLong() != long(value);
-            }
-            else
-            {
-                return false;
-            }
-        }
-        
-        //! Compare the atom with a float value.
-        /** The function compares the atom with a float value.
-         @param value   The float value.
-         @return true if the atom hold the same float value otherwise false.
-         */
-        inline bool operator==(const float value) const noexcept
-        {
-            if(isNumber())
-            {
-                return m_quark->getDouble() == (double)value;
+                return value == static_cast<IntegerType>(m_quark->getLong());
             }
             else
             {
@@ -750,11 +679,16 @@ namespace kiwi
          @param value   The double value.
          @return true if the atom hold the same double value otherwise false.
          */
-        inline bool operator==(const double value) const noexcept
+        template<typename FloatType, typename = typename
+        std::enable_if<
+        std::is_constructible<double, FloatType>::value and
+        std::is_floating_point<FloatType>::value>::type
+        >
+        bool operator==(const FloatType value) const noexcept
         {
             if(isNumber())
             {
-                return m_quark->getDouble() == value;
+                return value == static_cast<FloatType>(m_quark->getDouble());
             }
             else
             {
@@ -842,7 +776,7 @@ namespace kiwi
          @param value   The long value.
          @return true if the atom differ from the long value otherwise false.
          */
-        inline bool operator!=(const long value) const noexcept
+        inline bool operator!=(const int64_t value) const noexcept
         {
             return !(*this == value);
         }

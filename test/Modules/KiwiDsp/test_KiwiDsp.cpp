@@ -6,13 +6,14 @@
 //  Copyright © 2016 CICM. All rights reserved.
 //
 
-#define KIWI_DSP_DOUBLE
+#define KIWI_DSP_FlOAT
 #include <KiwiDsp/KiwiDspChain.hpp>
 
 using namespace kiwi::dsp;
 
 static inline void signal_print(const size_t size, sample* in)
 {
+    std::cout << "\n";
     for(size_t i = size>>3; i; --i, in += 8)
     {
         std::cout << in[0] << " " << in[1] << " " << in[2] << " " << in[3] << " "
@@ -22,6 +23,7 @@ static inline void signal_print(const size_t size, sample* in)
     {
         std::cout << in[0] << " ";
     }
+    std::cout << "\n";
 }
 
 class Sig : public Processor
@@ -47,6 +49,7 @@ private:
     void perform(Node const& node) noexcept final
     {
         Samples<sample>::fill(node.getVectorSize(), m_value, node.getOutputsSamples());
+        signal_print(node.getVectorSize(), node.getOutputsSamples());
     }
     
     sample m_value;
@@ -100,14 +103,16 @@ private:
 
 int main(int , const char *[]) {
     
-    std::unique_ptr<Processor> pr1(new Plus());
+    std::unique_ptr<Processor> pr1(new Plus(2.5));
     std::unique_ptr<Processor> pr2(new Plus(1.f));
     std::unique_ptr<Processor> pr3(new Sig(1.3f));
     std::unique_ptr<Link> li1(new Link(*pr1.get(), 0, *pr2.get(), 0));
     std::unique_ptr<Link> li2(new Link(*pr3.get(), 0, *pr1.get(), 0));
+    std::unique_ptr<Link> li3(new Link(*pr2.get(), 0, *pr1.get(), 0)); // Loop
     
     {
         Chain chain;
+        Chain chain2;
         std::vector<Processor*> processes;
         std::vector<Link*> links;
         processes.push_back(pr1.get());
@@ -115,6 +120,7 @@ int main(int , const char *[]) {
         processes.push_back(pr3.get());
         links.push_back(li1.get());
         links.push_back(li2.get());
+        //links.push_back(li3.get());
         
         try
         {
@@ -123,7 +129,16 @@ int main(int , const char *[]) {
         catch(std::exception& e)
         {
             std::cout << e.what() << "\n";
-            return 1;
+            return -1;
+        }
+        
+        try
+        {
+            chain2.compile(44100, 64, processes, links);
+        }
+        catch(std::exception& e)
+        {
+            std::cout << e.what() << "\n";
         }
         
         for(size_t i = 1; i; --i)

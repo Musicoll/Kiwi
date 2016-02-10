@@ -51,7 +51,7 @@ namespace kiwi
             sPatcher patcher = m_instance->createPatcher();
             
             // change grid size and commit
-            std::cout << "\n\n------ Change things ------\n\n";
+            std::cout << "\n\n------ Change things ------\n  \n";
             patcher->setGridSize(40, true);
             
             std::cout << "\n\n------ Change unlocked_bgcolor & gridsize ------\n\n";

@@ -72,7 +72,7 @@ namespace kiwi
             sTag objectName = dico[Tags::name];
             if(FactoryModel::has(objectName))
             {
-                const auto infos = Infos(ulong(dico[Tags::id]),
+                const auto infos = Infos(static_cast<int64_t>(dico[Tags::id]),
                                          sTag(dico[Tags::name]),
                                          sTag(dico[Tags::text])->getName(),
                                          dico, dico[Tags::arguments]);
@@ -108,7 +108,8 @@ namespace kiwi
                 {
                     m_free_ids.erase(m_free_ids.begin());
                 }
-                objdico[Tags::id] = (long)n_id;
+                //@todo : no need to cast here
+                objdico[Tags::id] = static_cast<int64_t>(n_id);
                 
                 createObject(objdico);
             }
