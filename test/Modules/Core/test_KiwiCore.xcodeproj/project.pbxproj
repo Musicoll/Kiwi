@@ -69,10 +69,10 @@
 			children = (
 				2CC9DA201C66811B00B1F821 /* KiwiCore.h */,
 				2CC9DA241C66811B00B1F821 /* KiwiTools.h */,
-				2CC9DA1C1C66811B00B1F821 /* KiwiAtom.cpp */,
-				2CC9DA1D1C66811B00B1F821 /* KiwiAtom.h */,
 				2CC9DA221C66811B00B1F821 /* KiwiTag.cpp */,
 				2CC9DA231C66811B00B1F821 /* KiwiTag.h */,
+				2CC9DA1C1C66811B00B1F821 /* KiwiAtom.cpp */,
+				2CC9DA1D1C66811B00B1F821 /* KiwiAtom.h */,
 				2CC9DA211C66811B00B1F821 /* KiwiListenerSet.h */,
 			);
 			name = KiwiCore;
