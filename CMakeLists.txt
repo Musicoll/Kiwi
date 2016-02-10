@@ -57,9 +57,8 @@ file(GLOB KIWI_CORE_SRC
      ${PROJECT_SOURCE_DIR}/Modules/KiwiCore/*.cpp
 )
 add_library(KiwiCore STATIC ${KIWI_CORE_SRC})
-target_include_directories(KiwiCore                       
-                           PUBLIC 
-                           ${PROJECT_SOURCE_DIR}/Modules)
+set_property(TARGET KiwiCore
+             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
 
 # -> Module DSP
 
@@ -69,9 +68,8 @@ file(GLOB KIWI_DSP_SRC
      ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp/*.cpp
 )
 add_library(KiwiDsp STATIC ${KIWI_DSP_SRC})
-target_include_directories(KiwiDsp 
-                           PUBLIC 
-                           ${PROJECT_SOURCE_DIR}/Modules/)
+set_property(TARGET KiwiDsp
+             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
 
 #----------------------------------
 # Tests
@@ -83,11 +81,13 @@ file(GLOB TEST_CORE_SRC
      ${PROJECT_SOURCE_DIR}/test/Modules/KiwiCore/*.cpp)
 add_executable(test_core ${TEST_CORE_SRC})
 target_link_libraries(test_core KiwiCore)
-target_include_directories(test_core PUBLIC ${PROJECT_SOURCE_DIR}/Modules)
+set_property(TARGET test_core
+             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
 
 # -> Dsp Unit Tests
 
 file(GLOB TEST_DSP_SRC ${PROJECT_SOURCE_DIR}/test/Modules/KiwiDsp/*.cpp)
 add_executable(test_dsp ${TEST_DSP_SRC})
 target_link_libraries(test_dsp KiwiDsp)
-target_include_directories(test_dsp PUBLIC ${PROJECT_SOURCE_DIR}/Modules)
+set_property(TARGET test_dsp
+             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
