@@ -78,7 +78,7 @@ set_property(TARGET KiwiDsp
 # -> Core Unit Tests
 
 file(GLOB TEST_CORE_SRC 
-     ${PROJECT_SOURCE_DIR}/test/Modules/KiwiCore/*.cpp)
+     ${PROJECT_SOURCE_DIR}/test/Modules/Core/*.cpp)
 add_executable(test_core ${TEST_CORE_SRC})
 target_link_libraries(test_core KiwiCore)
 set_property(TARGET test_core
@@ -86,7 +86,7 @@ set_property(TARGET test_core
 
 # -> Dsp Unit Tests
 
-file(GLOB TEST_DSP_SRC ${PROJECT_SOURCE_DIR}/test/Modules/KiwiDsp/*.cpp)
+file(GLOB TEST_DSP_SRC ${PROJECT_SOURCE_DIR}/test/Modules/Dsp/*.cpp)
 add_executable(test_dsp ${TEST_DSP_SRC})
 target_link_libraries(test_dsp KiwiDsp)
 set_property(TARGET test_dsp
