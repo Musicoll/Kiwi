@@ -41,7 +41,7 @@ script:
   - cd build
   - export CXX=$COMPILER
   - cmake ..
-  - make CXX=$COMPILER CXXFLAGS="-lstdc++"
+  - make
 
 after_success:
   - ./test_core
