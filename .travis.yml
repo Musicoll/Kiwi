@@ -34,11 +34,7 @@ matrix:
 
     - os: osx
       compiler: clang
-      addons:
-        apt:
-          sources: ['llvm-toolchain-precise-3.6']
-          packages: ['clang-3.6']
-      env: COMPILER=clang++-3.6
+      env: COMPILER=clang
 
 script:
   - mkdir build
