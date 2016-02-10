@@ -17,7 +17,11 @@ else()
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
         # Add compiler specific flags
         if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+            # The Travis CI build machines don't have libc++ installed
+            if ( NOT DEFINED ENV{TRAVIS} )
+                set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++" )
+            endif()
+            #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
         elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
             # no GNU specific flags yet
         endif() # End compiler specific flags
