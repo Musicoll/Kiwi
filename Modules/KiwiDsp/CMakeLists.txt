@@ -1,5 +1,6 @@
-cmake_minimum_required (VERSION 2.8.7)
-project (Kiwi CXX)
+cmake_minimum_required (VERSION 2.6)
+project (KiwiDsp CXX)
+
 set (Kiwi_VERSION_MAJOR 0)
 set (Kiwi_VERSION_MINOR 1)
 
@@ -12,7 +13,7 @@ else()
     message(STATUS "Checking compiler flags for C++11 support.")
     # Set C++11 support flags for various compilers
     include(CheckCXXCompilerFlag)
-    check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
+    check_cxx_compiler_flag("-std/Users/Jean/Documents/MUSICOLL/KiwiBranches/test_separate_compilation/Test/CMakeLists.txt=c++11" COMPILER_SUPPORTS_CXX11)
     check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
     if(COMPILER_SUPPORTS_CXX11)
         message(STATUS "C++11 is supported.")
@@ -29,37 +30,9 @@ else()
     endif()
 endif()
 
-# Module Core
-file(GLOB KIWI_MODULE_CORE_SRC
-    Modules/KiwiCore/*.h
-    Modules/KiwiCore/*.hpp
-    Modules/KiwiCore/*.cpp
-)
+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/Build)
 
-# Module DSP
-add_subdirectory(${PROJECT_SOURCE_DIR}/Modules/KiwiDsp)
-
-#file(GLOB KIWI_MODULE_DSP_SRC
-#   Modules/KiwiDsp/*.hpp
-#    Modules/KiwiDsp/*.cpp
-#)
-
-# Core Unit Tests sources
-set(TEST_CORE
-    ${KIWI_MODULE_CORE_SRC}
-    test/Modules/Core/test_KiwiCore.cpp
-) 
-add_executable(test_core ${TEST_CORE})
-
-# DSP Unit Tests sources
-set(TEST_DSP
-    ${KIWI_MODULE_DSP_SRC}
-    test/Modules/Dsp/test_KiwiDsp.cpp
-)
-
-add_executable(test_dsp ${TEST_DSP})
-target_link_libraries(test_dsp KiwiDsp)
-#include_directories(${PROJECT_SOURCE_DIR}/Modules/KiwiDsp/src)
-target_include_directories(test_dsp PUBLIC ${PROJECT_SOURCE_DIR}/Modules)
-#set_property(TARGET test_dsp
-#             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
+file(GLOB PROJECT_SOURCE_FILE Source/*.cpp)
+include_directories(Source)
+    
+add_library(KiwiDsp STATIC ${PROJECT_SOURCE_FILE})

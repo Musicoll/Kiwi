@@ -1,5 +1,6 @@
-cmake_minimum_required (VERSION 2.8.7)
-project (Kiwi CXX)
+cmake_minimum_required (VERSION 2.6)
+project (KiwiDsp CXX)
+
 set (Kiwi_VERSION_MAJOR 0)
 set (Kiwi_VERSION_MINOR 1)
 
@@ -29,37 +30,19 @@ else()
     endif()
 endif()
 
-# Module Core
-file(GLOB KIWI_MODULE_CORE_SRC
-    Modules/KiwiCore/*.h
-    Modules/KiwiCore/*.hpp
-    Modules/KiwiCore/*.cpp
-)
+# Global
+set(KIWI_PROJECT_DIR ${PROJECT_SOURCE_DIR}/..)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/Build)
+include_directories(${KIWI_PROJECT_DIR}/Modules)
 
-# Module DSP
-add_subdirectory(${PROJECT_SOURCE_DIR}/Modules/KiwiDsp)
+# KiwiDsp
+file(GLOB TEST_DSP_SOURCE Modules/KiwiDsp/*.cpp)
 
-#file(GLOB KIWI_MODULE_DSP_SRC
-#   Modules/KiwiDsp/*.hpp
-#    Modules/KiwiDsp/*.cpp
-#)
+find_library(KIWI_DSP_LIB KiwiDsp ${KIWI_PROJECT_DIR}/Modules/KiwiDsp/Build)
+add_executable(test_dsp ${TEST_DSP_SOURCE})
+target_link_libraries(test_dsp ${KIWI_DSP_LIB})
 
-# Core Unit Tests sources
-set(TEST_CORE
-    ${KIWI_MODULE_CORE_SRC}
-    test/Modules/Core/test_KiwiCore.cpp
-) 
-add_executable(test_core ${TEST_CORE})
-
-# DSP Unit Tests sources
-set(TEST_DSP
-    ${KIWI_MODULE_DSP_SRC}
-    test/Modules/Dsp/test_KiwiDsp.cpp
-)
-
-add_executable(test_dsp ${TEST_DSP})
-target_link_libraries(test_dsp KiwiDsp)
-#include_directories(${PROJECT_SOURCE_DIR}/Modules/KiwiDsp/src)
-target_include_directories(test_dsp PUBLIC ${PROJECT_SOURCE_DIR}/Modules)
-#set_property(TARGET test_dsp
-#             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
+# KiwiCore
+#file(GLOB TEST_CORE_SOURCE Modules/KiwiCore/*.cpp)
+#add_executable(test_core ${TEST_CORE_SOURCE})
+#target_link_libraries(test_dsp PUBLIC ${KIWI_PROJECT_DIR}/Modules/KiwiDsp/Build)
