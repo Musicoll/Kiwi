@@ -7,7 +7,7 @@
 //
 
 #define KIWI_DSP_DOUBLE
-#include <KiwiDsp/Source/KiwiDspChain.hpp>
+#include <KiwiDsp/KiwiDspChain.hpp>
 
 using namespace kiwi::dsp;
 
