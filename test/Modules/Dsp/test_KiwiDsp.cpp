@@ -7,7 +7,7 @@
 //
 
 #define KIWI_DSP_FLOAT
-#include "KiwiDsp.hpp"
+#include "KiwiDsp/KiwiDsp.hpp"
 
 using namespace kiwi::dsp;
 
