@@ -235,7 +235,15 @@ namespace kiwi
         /** The function allocates the atom with a float_t value.
          @param value The value.
          */
-        explicit Atom(const float_t value) noexcept : m_quark(new QuarkFloat(value)) {}
+        explicit Atom(const float_t value) noexcept : m_quark(new QuarkFloat(value))
+        {
+            // infinity and NAN produce an Undefined Atom type
+            if (! std::isfinite(value))
+            {
+                delete m_quark;
+                m_quark = new Quark();
+            }
+        }
         
         //! Constructor with a float_t value.
         /** The function allocates the atom with a float_t value.
@@ -247,7 +255,7 @@ namespace kiwi
         std::is_floating_point<FloatType>::value>::type
         >
         Atom(const FloatType value) noexcept
-        : m_quark(new QuarkFloat(static_cast<float_t>(value)))
+        : Atom(static_cast<float_t>(value))
         {}
 
         //! Constructor with a string.

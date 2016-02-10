@@ -59,6 +59,8 @@ TEST_CASE("Atom Constructors", "[Atom]")
     SECTION("Undifined type")
     {
         CHECK(Atom().getType() == Atom::UNDEFINED);
+        CHECK(Atom(INFINITY).getType() == Atom::UNDEFINED);    // infinite produces Undefined
+        CHECK(Atom(NAN).getType() == Atom::UNDEFINED);         // NaN produces Undefined
     }
     
     SECTION("Boolean types")
@@ -95,8 +97,8 @@ TEST_CASE("Atom Constructors", "[Atom]")
         CHECK(Atom(1.6e-19).getType() == Atom::FLOAT);  // 1.6 x 10^-19 (electric charge of an electron)
         
         // check for infinity and NaN
-        CHECK(Atom(INFINITY).getType() == Atom::FLOAT);    // float
-        CHECK(Atom(NAN).getType() == Atom::FLOAT);    // float
+        CHECK_FALSE(Atom(INFINITY).getType() == Atom::FLOAT);    // infinite produces Undefined
+        CHECK_FALSE(Atom(NAN).getType() == Atom::FLOAT);         // NaN produces Undefined
     }
     
     SECTION("Tag types")
