@@ -1,9 +1,13 @@
 cmake_minimum_required (VERSION 2.8.7)
 project (Kiwi CXX)
+
 set (Kiwi_VERSION_MAJOR 0)
 set (Kiwi_VERSION_MINOR 1)
 
-# Compiler checks
+#---------------------------------------
+# Compiler Check
+#--------------------------------------
+
 if(NOT ${CMAKE_VERSION} LESS 3.2)
     set(CMAKE_CXX_STANDARD 11)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -36,35 +40,54 @@ if(${APPLE})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flax-vector-conversions")
 endif()
 
-set(KIWI_MODULES_DIR ${PROJECT_SOURCE_DIR}/Modules)
-set(KIWI_TEST_DIR ${PROJECT_SOURCE_DIR}/test)
+# Call make to build the whole project
+# Each target (Libraries/Binaries) can be built separatly calling [make [targetname]]
+# Target dependencies are built as well if necessary
 
-include_directories(
-    ${KIWI_MODULES_DIR}
+#----------------------------------
+# Modules
+#----------------------------------
+
+
+# -> Module Core
+
+file(GLOB KIWI_CORE_SRC                                   
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiCore/*.h         
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiCore/*.hpp
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiCore/*.cpp
 )
+add_library(KiwiCore STATIC ${KIWI_CORE_SRC})
+set_property(TARGET KiwiCore
+             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
 
-# Module Core
-file(GLOB KIWI_MODULE_CORE_SRC
-    ${KIWI_MODULES_DIR}/KiwiCore/*.cpp
+# -> Module DSP
+
+file(GLOB KIWI_DSP_SRC
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp/*.h
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp/*.hpp
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp/*.cpp
 )
+add_library(KiwiDsp STATIC ${KIWI_DSP_SRC})
+set_property(TARGET KiwiDsp
+             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
 
-# Module DSP
-file(GLOB KIWI_MODULE_DSP_SRC
-    ${KIWI_MODULES_DIR}/KiwiDsp/*.cpp
-)
+#----------------------------------
+# Tests
+#----------------------------------
 
-# Core Unit Tests sources
-set(TEST_CORE
-    ${KIWI_MODULE_CORE_SRC}
-    ${KIWI_TEST_DIR}/Modules/Core/test_KiwiCore.cpp
-) 
-add_executable(test_core ${TEST_CORE})
+# -> Core Unit Tests
 
-# DSP Unit Tests sources
-set(TEST_DSP
-    ${KIWI_MODULE_DSP_SRC}
-    ${KIWI_TEST_DIR}/Modules/Dsp/test_KiwiDsp.cpp
-)
-add_executable(test_dsp ${TEST_DSP})
+file(GLOB TEST_CORE_SRC 
+     ${PROJECT_SOURCE_DIR}/test/Modules/Core/*.cpp)
+add_executable(test_core ${TEST_CORE_SRC})
+target_link_libraries(test_core KiwiCore)
+set_property(TARGET test_core
+             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
 
-# target_link_libraries(test_suite ${TEST_LIBS})
+# -> Dsp Unit Tests
+
+file(GLOB TEST_DSP_SRC ${PROJECT_SOURCE_DIR}/test/Modules/Dsp/*.cpp)
+add_executable(test_dsp ${TEST_DSP_SRC})
+target_link_libraries(test_dsp KiwiDsp)
+set_property(TARGET test_dsp
+             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
