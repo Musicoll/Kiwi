@@ -36,12 +36,10 @@ matrix:
       compiler: clang
       env: COMPILER=clang++-3.6
 
-before_install:
+script:
   - mkdir build
   - cd build
   - cmake ..
-
-script:
   - make CXX=$COMPILER
 
 after_success:
