@@ -32,10 +32,9 @@ namespace kiwi
     //                                      ATOM                                        //
     // ================================================================================ //
     
-    //! The atom class
-    /**
-     The atom is a base class that you should inherite from if you want to be able to pass your class in an atom vector or in a dico. The default atoms are the long, the float_t, the tag, the dico && the object.
-     */
+    //! @brief The Atom can dynamically hold different types of value
+    //! The Atom can hold a boolean value, an integer, a float, a tag,
+    //! a vector of Atom or a dictionary of key/Atom pair.
     class Atom
     {
     public:
@@ -70,149 +69,83 @@ namespace kiwi
             Dico        = 6
         };
         
-    private:
-        
-        //! @brief The type of value an Atom can be.
-        using value_t = Atom::Type;
-        
-        //! @internal
-        class Quark
-        {
-        public:
-            constexpr inline Quark() noexcept {}
-            virtual inline ~Quark() noexcept {}
-            // Type checks
-            virtual inline value_t getType() const noexcept {return value_t::Null;}
-            inline bool isNull() const noexcept             {return getType() == value_t::Null;}
-            inline bool isBool() const noexcept             {return getType() == value_t::Boolean;}
-            inline bool isInt() const noexcept              {return getType() == value_t::Int;}
-            inline bool isFloat() const noexcept            {return getType() == value_t::Float;}
-            inline bool isNumber() const noexcept           {return isInt() || isFloat() || isBool();}
-            inline bool isTag() const noexcept              {return getType() == value_t::Tag;}
-            inline bool isDico() const noexcept             {return getType() == value_t::Dico;}
-            inline bool isVector() const noexcept           {return getType() == value_t::Vector;}
-            // Getters
-            virtual inline boolean_t getBool() const noexcept   {return false;}
-            virtual inline integer_t getInt() const noexcept    {return 0ll;}
-            virtual inline float_t   getFloat() const noexcept  {return 0.;}
-            virtual inline tag_t     getTag() const noexcept    {return Tags::_empty;}
-            virtual inline vector_t  getVector() const noexcept {return Vector();}
-            virtual inline dico_t    getDico() const noexcept   {return Dico();}
-        };
-        
-        class QuarkBool : public Quark
-        {
-        public:
-            const boolean_t val;
-            inline QuarkBool(QuarkBool const& _val) noexcept : val(_val.val) {}
-            inline QuarkBool(boolean_t const& _val) noexcept : val(_val) {}
-            inline value_t getType() const noexcept override {return value_t::Boolean;}
-            inline boolean_t getBool() const noexcept override {return val;}
-            inline integer_t getInt() const noexcept override {return val ? 1ll : 0ll;}
-            inline float_t getFloat() const noexcept override {return val ? 1. : 0.;}
-        };
-        
-        class QuarkInt : public Quark
-        {
-        public:
-            const integer_t val;
-            inline QuarkInt(QuarkInt const& _val) noexcept : val(_val.val) {}
-            inline QuarkInt(const integer_t& _val) noexcept : val(_val) {}
-            inline value_t getType() const noexcept override {return value_t::Int;}
-            inline boolean_t getBool() const noexcept override {return (val != 0ll);}
-            inline integer_t getInt() const noexcept override {return val;}
-            inline float_t getFloat() const noexcept override {return static_cast<float_t>(val);}
-        };
-        
-        class QuarkFloat : public Quark
-        {
-        public:
-            const float_t val;
-            inline QuarkFloat(QuarkFloat const& _val) noexcept : val(_val.val) {}
-            inline QuarkFloat(float_t const& _val) noexcept : val(_val) {}
-            inline value_t getType() const noexcept override {return value_t::Float;}
-            inline boolean_t getBool() const noexcept override {return (val != 0.);}
-            inline integer_t getInt() const noexcept override {return static_cast<integer_t>(val);}
-            inline float_t getFloat() const noexcept override {return val;}
-        };
-        
-        class QuarkTag : public Quark
-        {
-        public:
-            const tag_t val;
-            inline QuarkTag(QuarkTag const& _val) noexcept : val(_val.val) {}
-            inline QuarkTag(const tag_t _val) noexcept : val(_val) {}
-            inline value_t getType() const noexcept override {return value_t::Tag;}
-            inline tag_t getTag() const noexcept override {return val;}
-        };
-        
-        class QuarkVector : public Quark
-        {
-        public:
-            vector_t val;
-            inline QuarkVector(QuarkVector const& _val) noexcept : val(_val.val) {}
-            inline QuarkVector(vector_t const& _val) noexcept : val(_val) {}
-            inline QuarkVector(vector_t::iterator first, vector_t::iterator last) noexcept : val(first, last) {}
-            inline QuarkVector(vector_t&& _val) noexcept {std::swap(val, _val);}
-            inline QuarkVector(std::initializer_list<Atom> il) noexcept : val(il) {}
-            inline ~QuarkVector() noexcept {val.clear();}
-            inline value_t getType() const noexcept override {return value_t::Vector;}
-            inline vector_t getVector() const noexcept override {return val;}
-        };
-        
-        class QuarkDico : public Quark
-        {
-        public:
-            dico_t val;
-            inline QuarkDico(QuarkDico const& _val) noexcept : val(_val.val) {}
-            inline QuarkDico(dico_t const& _val) noexcept : val(_val) {}
-            inline QuarkDico(dico_t::iterator first, Dico::iterator last) noexcept : val(first, last) {}
-            inline QuarkDico(dico_t&& _val) noexcept {std::swap(val, _val);}
-            inline QuarkDico(std::initializer_list<std::pair<const sTag, Atom>> il) noexcept : val(il) {}
-            inline ~QuarkDico() noexcept {val.clear();}
-            inline value_t getType() const noexcept override {return value_t::Dico;}
-            inline dico_t getDico() const noexcept override {return val;}
-        };
-        
-        Quark* m_quark; // use an std::unique_ptr<> instead ?
-        
-    public:
-        
         // ================================================================================ //
-        //                                      ATOM                                        //
+        //                                  CONSTRUCTORS                                    //
         // ================================================================================ //
         
-        //! Constructor.
-        /** The function allocates an undefined atom.
-         */
+        //! @brief Construct an Atom of type Null
         inline Atom() noexcept : m_quark(new Quark()) {}
         
-        //! Constructor with another atom.
-        /** The function allocates the atom with an atom.
-         */
-        inline Atom(Atom&& other) noexcept : m_quark(std::move(other.m_quark)) {other.m_quark = new Quark();}
+        //! @brief Move constructor.
+        //! Constructs an Atom value with the contents of another Atom using move semantics.
+        //! It "steals" the resources from the other and leaves it as a Null Atom.
+        //! @param other The other Atom.
+        inline Atom(Atom&& other) noexcept : m_quark(std::move(other.m_quark))
+        {
+            other.m_quark = new Quark();
+        }
         
-        //! Constructor with another atom.
-        /** The function allocates the atom with an atom.
-         */
+        //! @brief Copy constructor.
+        //! Constructs an Atom by copying the contents of an other Atom.
+        //! @param other The other Atom.
         Atom(Atom const& other) noexcept;
         
-        //! Constructor with a boolean value.
-        /** The function allocates the atom with a long value created with a boolean value.
-         @param value The value.
-         */
-        inline /*explicit*/ Atom(bool value) noexcept : m_quark(new QuarkBool(value)) {}
+        //! @brief Constructs an Atom value with a boolean value.
+        //! @param value The value.
+        inline Atom(boolean_t value) noexcept : m_quark(new QuarkBool(value)) {}
         
-        //! Constructor with a boolean value.
-        /** The function allocates the atom with a long value created with a boolean value.
-         @param value The value.
-         */
+        //! @brief Constructs an Atom value with an integer_t value.
+        //! @param value The value.
         inline explicit Atom(const integer_t value) noexcept : m_quark(new QuarkInt(value)) {}
+        
+        //! @brief Constructs an Atom value with an integer value.
+        //! @param value The value.
+        template <class IntegerType, class InternalValueType = IntegerType>
+        using EnableIf = typename std::enable_if<
+        std::is_constructible<integer_t, IntegerType>::value &&
+        std::numeric_limits<IntegerType>::is_integer &&
+        //std::numeric_limits<IntegerType>::is_signed &&
+        (sizeof(IntegerType) <= sizeof(integer_t)), IntegerType>;
+        
+        template<class IntegerType, typename EnableIf<IntegerType>::type = 0>
+        Atom(const IntegerType value) noexcept
+        : Atom(static_cast<integer_t>(value))
+        {
+        }
+        
+        template <class IntegerType, class InternalValueType = IntegerType>
+        using EnableIfCompatibleIntType = typename std::enable_if<
+        (!std::is_same<integer_t, IntegerType>::value) &&
+        (std::is_same<int16_t, IntegerType>::value ||
+        std::is_same<int32_t, IntegerType>::value), IntegerType>;
+        
+        /*
+        template<class IntegerType, typename EnableIfCompatibleIntType<IntegerType>::type = 0>
+        Atom(const IntegerType value) noexcept
+        : Atom(static_cast<integer_t>(value))
+        {
+        }
+        */
+        
+        /*
+        template<typename IntegerType, typename std::enable_if<
+        std::is_constructible<integer_t, IntegerType>::value &&
+        std::numeric_limits<IntegerType>::is_integer &&
+        std::numeric_limits<IntegerType>::is_signed &&
+        (sizeof(IntegerType) <= sizeof(integer_t)),
+        IntegerType>::type = 0>
+        Atom(const IntegerType value) noexcept
+        : Atom(static_cast<integer_t>(value >= std::numeric_limits<integer_t>::max() ? std::numeric_limits<integer_t>::max() : value))
+        {
+            //static_assert(std::numeric_limits<integer_t>::max() >= std::numeric_limits<IntegerType>::max(), "warning : possible loss of data");
+        }
+        */
         
         //! Constructor with a long long value.
         /** The function allocates the atom with a long long value.
          @param value The value.
          */
+        /*
         template<typename IntegerType, typename
         std::enable_if<
         std::is_constructible<integer_t, IntegerType>::value &&
@@ -222,22 +155,25 @@ namespace kiwi
         Atom(const IntegerType value) noexcept
         : m_quark(new QuarkInt(static_cast<integer_t>(value)))
         {}
+        */
         
+        /*
         // Constructor with unsigned integer
-        template < typename UnsignedType, typename
+        template <class UnsignedType, typename
         std::enable_if <
         std::is_constructible<integer_t, UnsignedType>::value &&
         std::numeric_limits<UnsignedType>::is_integer &&
         !std::numeric_limits<UnsignedType>::is_signed, UnsignedType >::type
         = 0 >
         Atom(const UnsignedType value) noexcept
-        : m_quark(new QuarkInt(static_cast<integer_t>(value)))
-        {}
+        : Atom(static_cast<integer_t>(value >= std::numeric_limits<integer_t>::max() ? std::numeric_limits<integer_t>::max() : value))
+        {
+            //static_assert(std::numeric_limits<integer_t>::max() >= std::numeric_limits<UnsignedType>::max(), "warning : possible loss of data");
+        }
+        */
         
-        //! Constructor with a float_t value (explicit).
-        /** The function allocates the atom with a float_t value.
-         @param value The value.
-         */
+        //! @brief Constructs an Atom with a float_t value (explicit).
+        //! @param value The value.
         explicit Atom(const float_t value) noexcept : m_quark(new QuarkFloat(value))
         {
             // infinity and NAN produce an Null Atom type
@@ -252,7 +188,7 @@ namespace kiwi
         /** The function allocates the atom with a float_t value.
          @param value The value.
          */
-        template<typename FloatType, typename = typename
+        template<class FloatType, typename = typename
         std::enable_if<
         std::is_constructible<float_t, FloatType>::value &&
         std::is_floating_point<FloatType>::value>::type
@@ -271,13 +207,15 @@ namespace kiwi
         /** The function allocates the atom with a tag created with a string.
          @param tag The tag.
          */
-        inline Atom(std::string const& tag) noexcept : m_quark(new QuarkTag(Tag::create(tag))) {}
+        inline Atom(std::string const& tag) noexcept
+        : m_quark(new QuarkTag(Tag::create(tag))) {}
         
         //! Constructor with a string.
         /** The function allocates the atom with a tag created with a string.
          @param tag The tag.
          */
-        inline Atom(std::string&& tag) noexcept : m_quark(new QuarkTag(Tag::create(std::forward<std::string>(tag)))) {}
+        inline Atom(std::string&& tag) noexcept
+        : m_quark(new QuarkTag(Tag::create(std::forward<std::string>(tag)))) {}
         
         //! Constructor with a tag.
         /** The function allocates the atom with a tag.
@@ -287,42 +225,50 @@ namespace kiwi
         //! Constructor with a vector of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline Atom(vector_t const& atoms) noexcept : m_quark(new QuarkVector(atoms)) {}
+        inline Atom(vector_t const& atoms) noexcept
+        : m_quark(new QuarkVector(atoms)) {}
         
         //! Constructor with a vector of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline Atom(vector_t&& atoms) noexcept : m_quark(new QuarkVector(std::forward<vector_t>(atoms))) {}
+        inline Atom(vector_t&& atoms) noexcept
+        : m_quark(new QuarkVector(std::forward<vector_t>(atoms))) {}
         
         //! Constructor with a vector of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline Atom(vector_t::iterator first, vector_t::iterator last) noexcept : m_quark(new QuarkVector(first, last)) {}
+        inline Atom(vector_t::iterator first, vector_t::iterator last) noexcept
+        : m_quark(new QuarkVector(first, last)) {}
         
         //! Constructor with a vector of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline Atom(std::initializer_list<Atom> il) noexcept : m_quark(new QuarkVector(il)) {}
+        inline Atom(std::initializer_list<Atom> il) noexcept
+        : m_quark(new QuarkVector(il)) {}
         
         //! Constructor with a map of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline Atom(dico_t const& atoms) noexcept : m_quark(new QuarkDico(atoms)) {}
+        inline Atom(dico_t const& atoms) noexcept
+        : m_quark(new QuarkDico(atoms)) {}
         
         //! Constructor with a map of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline Atom(dico_t&& atoms) noexcept  : m_quark(new QuarkDico(std::forward<dico_t>(atoms))) {}
+        inline Atom(dico_t&& atoms) noexcept
+        : m_quark(new QuarkDico(std::forward<dico_t>(atoms))) {}
         
         //! Constructor with a map of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline Atom(dico_t::iterator first, dico_t::iterator last) noexcept : m_quark(new QuarkDico(first, last)) {}
+        inline Atom(dico_t::iterator first, dico_t::iterator last) noexcept
+        : m_quark(new QuarkDico(first, last)) {}
         
         //! Constructor with a map of atoms.
         /** The function allocates the atom with a vector of atoms.
          */
-        inline Atom(std::initializer_list<std::pair<const tag_t, Atom>> il) noexcept : m_quark(new QuarkDico(il)) {}
+        inline Atom(std::initializer_list<std::pair<const tag_t, Atom>> il) noexcept
+        : m_quark(new QuarkDico(il)) {}
         
         //! Destructor.
         inline ~Atom() noexcept {delete m_quark;}
@@ -439,6 +385,77 @@ namespace kiwi
          @return A map of atoms.
          */
         inline operator dico_t() const noexcept {return m_quark->getDico();}
+        
+        //! @brief Access specified element of an Atom vector.
+        //! @param index The index of the element.
+        //! @throw std::domain_error if Atom is not a vector.
+        //! @return A reference to the element.
+        Atom& operator[](size_t index)
+        {
+            // implicitly convert null value to an empty vector
+            if (isNull())
+            {
+                delete m_quark;
+                m_quark = new QuarkVector();
+            }
+            
+            // operator[] only works for vectors
+            if (isVector())
+            {
+                vector_t& vec = static_cast<QuarkVector*>(m_quark)->getVectorRef();
+                
+                // fill up array with null values until given idx is reached
+                for(size_t i = vec.size(); i <= index; ++i)
+                {
+                    vec.emplace_back(Atom());
+                }
+                
+                return vec.operator[](index);
+            }
+            else
+            {
+                throw std::domain_error("cannot use operator[] with this Atom type");
+            }
+        }
+        
+        //! @brief Access specified element of an Atom vector (const).
+        //! @param index The index of the element.
+        //! @throw std::domain_error if Atom is not a vector.
+        //! @return A const reference to the element.
+        const Atom& operator[](size_t index) const
+        {
+            // operator[] only works for vectors
+            if (isVector())
+            {
+                const vector_t& vec = static_cast<QuarkVector*>(m_quark)->getVectorRef();
+                return vec.operator[](index);
+            }
+            else
+            {
+                throw std::domain_error("cannot use operator[] with this Atom type");
+            }
+        }
+        
+        Atom& operator[](const typename dico_t::key_type& key)
+        {
+            // implicitly convert Atom Null to an Atom dico
+            if (isNull())
+            {
+                delete m_quark;
+                m_quark = new QuarkDico();
+            }
+            
+            // operator[] only works for Atom dico
+            if (isDico())
+            {
+                dico_t& dico = static_cast<QuarkDico*>(m_quark)->getDicoRef();
+                return dico.operator[](key);
+            }
+            else
+            {
+                throw std::domain_error("cannot use operator[] with this Atom type");
+            }
+        }
         
         //! Set up the atom with another atom.
         /** The function sets up the atom with another atom.
@@ -816,7 +833,15 @@ namespace kiwi
          @param tag   The tag.
          @return true if the atom hold the same tag otherwise false.
          */
-        bool operator==(tag_t tag) const noexcept;
+        bool operator==(tag_t tag) const noexcept
+        {
+            if(isTag())
+            {
+                return m_quark->getTag() == tag;
+            }
+            
+            return false;
+        }
         
         //! Compare the atom with a vector.
         /** The function compares the atom with a vector.
@@ -829,10 +854,8 @@ namespace kiwi
             {
                 return m_quark->getVector() == vector;
             }
-            else
-            {
-                return false;
-            }
+            
+            return false;
         }
         
         //! Compare the atom with a dico.
@@ -912,6 +935,7 @@ namespace kiwi
         {
             return !(*this == value);
         }
+        
         template<typename FloatType, typename = typename
         std::enable_if<
         std::is_constructible<FloatType, float_t>::value &&
@@ -983,6 +1007,127 @@ namespace kiwi
          && 1 #Atom::Type::Float atom.
          */
         static Vector parse(std::string const& text);
+        
+    private:
+        
+        //! @brief The type of value an Atom can be.
+        using value_t = Atom::Type;
+        
+        //! @internal Base class of all internal Quark types
+        class Quark
+        {
+        public:
+            constexpr inline Quark() noexcept {}
+            virtual inline ~Quark() noexcept {}
+            // Type checks
+            virtual inline value_t getType() const noexcept {return value_t::Null;}
+            inline bool isNull() const noexcept             {return getType() == value_t::Null;}
+            inline bool isBool() const noexcept             {return getType() == value_t::Boolean;}
+            inline bool isInt() const noexcept              {return getType() == value_t::Int;}
+            inline bool isFloat() const noexcept            {return getType() == value_t::Float;}
+            inline bool isNumber() const noexcept           {return isInt() || isFloat() || isBool();}
+            inline bool isTag() const noexcept              {return getType() == value_t::Tag;}
+            inline bool isDico() const noexcept             {return getType() == value_t::Dico;}
+            inline bool isVector() const noexcept           {return getType() == value_t::Vector;}
+            // Getters
+            virtual inline boolean_t getBool() const noexcept   {return false;}
+            virtual inline integer_t getInt() const noexcept    {return 0ll;}
+            virtual inline float_t   getFloat() const noexcept  {return 0.;}
+            virtual inline tag_t     getTag() const noexcept    {return Tags::_empty;}
+            virtual inline vector_t  getVector() const noexcept {return Vector();}
+            virtual inline dico_t    getDico() const noexcept   {return Dico();}
+        };
+        
+        //! @internal A Quark that hold a boolean
+        class QuarkBool : public Quark
+        {
+        public:
+            const boolean_t val;
+            inline QuarkBool() noexcept : val(false) {}
+            inline QuarkBool(QuarkBool const& _val) noexcept : val(_val.val) {}
+            inline QuarkBool(boolean_t const& _val) noexcept : val(_val) {}
+            inline value_t getType() const noexcept override    {return value_t::Boolean;}
+            inline boolean_t getBool() const noexcept override  {return val;}
+            inline integer_t getInt() const noexcept override   {return val ? 1ll : 0ll;}
+            inline float_t getFloat() const noexcept override   {return val ? 1. : 0.;}
+        };
+        
+        //! @internal A Quark that hold an integer number
+        class QuarkInt : public Quark
+        {
+        public:
+            const integer_t val;
+            inline QuarkInt() noexcept : val(0) {}
+            inline QuarkInt(QuarkInt const& _val) noexcept : val(_val.val) {}
+            inline QuarkInt(const integer_t& _val) noexcept : val(_val) {}
+            inline value_t getType() const noexcept override    {return value_t::Int;}
+            inline boolean_t getBool() const noexcept override  {return (val != 0ll);}
+            inline integer_t getInt() const noexcept override   {return val;}
+            inline float_t getFloat() const noexcept override   {return static_cast<float_t>(val);}
+        };
+        
+        //! @internal A Quark that hold a floating-point number
+        class QuarkFloat : public Quark
+        {
+        public:
+            const float_t val;
+            inline QuarkFloat(QuarkFloat const& _val) noexcept : val(_val.val) {}
+            inline QuarkFloat(float_t const& _val) noexcept : val(_val) {}
+            inline value_t getType() const noexcept override    {return value_t::Float;}
+            inline boolean_t getBool() const noexcept override  {return (val != 0.);}
+            inline integer_t getInt() const noexcept override   {return static_cast<integer_t>(val);}
+            inline float_t getFloat() const noexcept override   {return val;}
+        };
+        
+        //! @internal A Quark that hold a tag
+        class QuarkTag : public Quark
+        {
+        public:
+            const tag_t val;
+            inline QuarkTag(QuarkTag const& _val) noexcept : val(_val.val) {}
+            inline QuarkTag(const tag_t _val) noexcept : val(_val) {}
+            inline value_t getType() const noexcept override    {return value_t::Tag;}
+            inline tag_t getTag() const noexcept override       {return val;}
+        };
+        
+        //! @internal A Quark that hold a vector of Atoms
+        class QuarkVector : public Quark
+        {
+        public:
+            vector_t val;
+            QuarkVector() = default;
+            inline QuarkVector(QuarkVector const& _val) noexcept : val(_val.val) {}
+            inline QuarkVector(vector_t const& _val) noexcept : val(_val) {}
+            inline QuarkVector(vector_t::iterator first, vector_t::iterator last) noexcept
+            : val(first, last) {}
+            inline QuarkVector(vector_t&& _val) noexcept {std::swap(val, _val);}
+            inline QuarkVector(std::initializer_list<Atom> il) noexcept : val(il) {}
+            inline ~QuarkVector() noexcept {val.clear();}
+            inline value_t getType() const noexcept override    {return value_t::Vector;}
+            inline vector_t getVector() const noexcept override {return val;}
+            inline vector_t& getVectorRef() noexcept            {return val;}
+            inline const vector_t& getVectorRef() const noexcept{return val;}
+        };
+        
+        //! @internal A Quark that hold key/Atom pairs
+        class QuarkDico : public Quark
+        {
+        public:
+            dico_t val;
+            QuarkDico() = default;
+            inline QuarkDico(QuarkDico const& _val) noexcept : val(_val.val) {}
+            inline QuarkDico(dico_t const& _val) noexcept : val(_val) {}
+            inline QuarkDico(dico_t::iterator first, Dico::iterator last) noexcept : val(first, last) {}
+            inline QuarkDico(dico_t&& _val) noexcept {std::swap(val, _val);}
+            inline QuarkDico(std::initializer_list<std::pair<const sTag, Atom>> il) noexcept : val(il) {}
+            inline ~QuarkDico() noexcept {val.clear();}
+            inline value_t getType() const noexcept override {return value_t::Dico;}
+            inline dico_t getDico() const noexcept override {return val;}
+            inline dico_t& getDicoRef() noexcept {return val;}
+            inline const dico_t& getDicoRef() const noexcept {return val;}
+        };
+        
+        Quark* m_quark;
     };
     
     std::ostream& operator<<(std::ostream &output, const Atom &atom);

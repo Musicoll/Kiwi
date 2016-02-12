@@ -27,7 +27,7 @@
 /* Begin PBXFileReference section */
 		2CC9D99F1C66808E00B1F821 /* test_KiwiCore */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_KiwiCore; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CC9D9B31C6680F200B1F821 /* test_KiwiCore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = test_KiwiCore.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
-		2CC9DA1C1C66811B00B1F821 /* KiwiAtom.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = KiwiAtom.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		2CC9DA1C1C66811B00B1F821 /* KiwiAtom.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = KiwiAtom.cpp; sourceTree = "<group>"; };
 		2CC9DA1D1C66811B00B1F821 /* KiwiAtom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 2; path = KiwiAtom.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		2CC9DA201C66811B00B1F821 /* KiwiCore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiCore.h; sourceTree = "<group>"; };
 		2CC9DA211C66811B00B1F821 /* KiwiListenerSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiListenerSet.h; sourceTree = "<group>"; };
