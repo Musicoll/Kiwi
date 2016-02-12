@@ -271,7 +271,7 @@ namespace kiwi
                     }
                     else
                     {
-                        atoms.emplace_back(Atom(std::stoll(word.c_str())));
+                        atoms.emplace_back(Atom(static_cast<integer_t>(std::stol(word.c_str()))));
                     }
                 }
                 else

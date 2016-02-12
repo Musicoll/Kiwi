@@ -107,25 +107,42 @@ namespace kiwi
         //std::numeric_limits<IntegerType>::is_signed &&
         (sizeof(IntegerType) <= sizeof(integer_t)), IntegerType>;
         
+        /*
         template<class IntegerType, typename EnableIf<IntegerType>::type = 0>
         Atom(const IntegerType value) noexcept
         : Atom(static_cast<integer_t>(value))
         {
         }
+        */
         
+        /*
         template <class IntegerType, class InternalValueType = IntegerType>
         using EnableIfCompatibleIntType = typename std::enable_if<
         (!std::is_same<integer_t, IntegerType>::value) &&
         (std::is_same<int16_t, IntegerType>::value ||
-        std::is_same<int32_t, IntegerType>::value), IntegerType>;
+         std::is_same<int32_t, IntegerType>::value ||
+         std::is_same<int64_t, IntegerType>::value), IntegerType>;
+        */
         
+        template <class IntegerType>
+        using EnableIfCompatibleIntType = typename std::enable_if<
+        (!std::is_same<integer_t, IntegerType>::value) &&
+        (sizeof(IntegerType) <= sizeof(integer_t)) &&
+        (std::is_same<short, IntegerType>::value ||
+         std::is_same<int, IntegerType>::value ||
+         std::is_same<long, IntegerType>::value ||
+         std::is_same<long long, IntegerType>::value), IntegerType>;
         /*
+        template<class IntegerType, typename EnableIfCompatibleIntType<IntegerType>::type = 0>
+        static void test(const IntegerType value) noexcept
+        {
+        }
+        */
         template<class IntegerType, typename EnableIfCompatibleIntType<IntegerType>::type = 0>
         Atom(const IntegerType value) noexcept
         : Atom(static_cast<integer_t>(value))
         {
         }
-        */
         
         /*
         template<typename IntegerType, typename std::enable_if<
