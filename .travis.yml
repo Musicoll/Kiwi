@@ -12,7 +12,7 @@ matrix:
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-4.9', 'python-pip', 'python-yaml']
+          packages: ['g++-4.9', 'python-3.2', 'python-pip', 'python-yaml']
       before_install:
         - echo "yes" | sudo add-apt-repository ppa:kalakris/cmake
         - sudo apt-get update -qq
@@ -21,7 +21,7 @@ matrix:
         - sudo apt-get install python
         - python --version
       before_script:
-        - sudo pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
+        - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
       after_success:
         - make clean
         - make CXXFLAGS="-fprofile-arcs -ftest-coverage -std=c++11 -lstdc++" CXX=$COMPILER
