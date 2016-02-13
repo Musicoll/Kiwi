@@ -1,6 +1,7 @@
 language: cpp
-dist: trusty
-sudo: required
+#dist: trusty
+#sudo: required
+sudo: true
 
 # No Email notification
 notifications:
