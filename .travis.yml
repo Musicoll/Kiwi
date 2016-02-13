@@ -29,7 +29,7 @@ matrix:
         - lcov --version
         - g++ --version
       before_script:
-        - cd ${TRAVIS_BUILD_DIR}
+        - cd build
         # init coverage to 0 (optional)
         - lcov --directory . --zerocounters
       script:
@@ -37,10 +37,10 @@ matrix:
         - export CXX=$COMPILER
         - cmake ..
         - make
+      after_success:
         - ./test_core
         - ./test_dsp
-      after_success:
-        - cd build
+        #- cd build
         # capture coverage info
         - lcov --directory . --capture --output-file coverage.info
         # filter out system and test code
