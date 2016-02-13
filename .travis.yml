@@ -17,7 +17,7 @@ matrix:
         - echo "yes" | sudo add-apt-repository ppa:kalakris/cmake
         - sudo apt-get update -qq
         - sudo apt-get install cmake
-        - pip install --upgrade pip
+        - sudo apt-get install python 2.7.9
       before_script:
         - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
       after_success:
