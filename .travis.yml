@@ -21,6 +21,8 @@ matrix:
         - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
       after_success:
         - make CXXFLAGS="-fprofile-arcs -ftest-coverage -std=c++11 -lstdc++" CXX=$COMPILER
+        - ./test_core
+        - ./test_dsp
         - coveralls --exclude test/catch.hpp --include 'Modules/*' --gcov-options '\-lp' --gcov 'gcov-4.9'
       env: COMPILER=g++-4.9
 
