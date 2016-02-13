@@ -1,9 +1,6 @@
 language: cpp
 sudo: true
 
-python:
-  - "3.2"
-
 # No Email notification
 notifications:
   email: false
@@ -20,10 +17,13 @@ matrix:
         - echo "yes" | sudo add-apt-repository ppa:kalakris/cmake
         - sudo apt-get update -qq
         - sudo apt-get install cmake
-        #- sudo apt-get install python 3.4.2
+        - python --version
+        - sudo apt-get install python
+        - python --version
       before_script:
-        - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
+        - sudo pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
       after_success:
+        - make clean
         - make CXXFLAGS="-fprofile-arcs -ftest-coverage -std=c++11 -lstdc++" CXX=$COMPILER
         - ./test_core
         - ./test_dsp
