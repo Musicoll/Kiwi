@@ -1,5 +1,6 @@
 language: cpp
-sudo: true
+dist: trusty
+sudo: required
 
 # No Email notification
 notifications:
@@ -17,11 +18,10 @@ matrix:
         - echo "yes" | sudo add-apt-repository ppa:kalakris/cmake
         - sudo apt-get update -qq
         - sudo apt-get install cmake
-        - python --version
-        - sudo apt-get install python
-        - python --version
+        #- python --version
+        #- sudo apt-get install python
+        #- python --version
       before_script:
-        - pip install requests[security]
         - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
       after_success:
         - make clean
