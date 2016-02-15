@@ -24,95 +24,98 @@
 #ifndef KIWI_MOUSECURSOR_H_INCLUDED
 #define KIWI_MOUSECURSOR_H_INCLUDED
 
-#include "KiwiFont.h"
+#include <KiwiGraphics/KiwiFont.h>
 
 namespace kiwi
 {
-    // ================================================================================ //
-    //                                   MOUSECURSOR                                    //
-    // ================================================================================ //
-    
-    //! The mouse cursor represent a cursor type.
-    /**
-     The mouse cursor represent a cursor type.
-     */
-    class MouseCursor
+    namespace graphics
     {
-    public:
+        // ================================================================================ //
+        //                                   MOUSECURSOR                                    //
+        // ================================================================================ //
         
-        //! Enum describing the type of predefined mouse cursor
-        enum class Type : ulong
+        //! The mouse cursor represent a cursor type.
+        /**
+         The mouse cursor represent a cursor type.
+         */
+        class MouseCursor
         {
-            Default = 0,                ///< Default (parent view cursor)
-            None,                       ///< None
-            Arrow,                      ///< Arrow
-            Wait,                       ///< Wait
-            Ibeam,                      ///< I-Beam
-            Crosshair,                  ///< Crosshair
-            Copying,                    ///< Copying
-            HandPointing,               ///< Pointing Hand
-            HandDragging,               ///< Dragging Hand
-            ResizingLeftRight,          ///< Left-Right
-            ResizingUpDown,             ///< Up-Down
-            ResizingFourWay,            ///< Four Way
-            ResizingTop,                ///< Top Edge
-            ResizingBottom,             ///< Bottom Edge
-            ResizingLeft,               ///< Left Edge
-            ResizingRight,              ///< Right Edge
-            ResizingTopLeft,            ///< Top-Left Corner
-            ResizingTopRight,           ///< Top-Right Corner
-            ResizingBottomLeft,         ///< Bottom-Left Corner
-            ResizingBottomRight         ///< Bottom-Right Corner
+        public:
+            
+            //! Enum describing the type of predefined mouse cursor
+            enum class Type : ulong
+            {
+                Default = 0,                ///< Default (parent view cursor)
+                None,                       ///< None
+                Arrow,                      ///< Arrow
+                Wait,                       ///< Wait
+                Ibeam,                      ///< I-Beam
+                Crosshair,                  ///< Crosshair
+                Copying,                    ///< Copying
+                HandPointing,               ///< Pointing Hand
+                HandDragging,               ///< Dragging Hand
+                ResizingLeftRight,          ///< Left-Right
+                ResizingUpDown,             ///< Up-Down
+                ResizingFourWay,            ///< Four Way
+                ResizingTop,                ///< Top Edge
+                ResizingBottom,             ///< Bottom Edge
+                ResizingLeft,               ///< Left Edge
+                ResizingRight,              ///< Right Edge
+                ResizingTopLeft,            ///< Top-Left Corner
+                ResizingTopRight,           ///< Top-Right Corner
+                ResizingBottomLeft,         ///< Bottom-Left Corner
+                ResizingBottomRight         ///< Bottom-Right Corner
+            };
+            
+            //! Mouse cursor constructor.
+            /** Initializes a mouse cursor.
+             @param type The type of cursor as defined by the Type \Enum.
+             */
+            constexpr MouseCursor(const Type type = Type::Default) noexcept : m_type(type) {}
+            
+            //! Destructor.
+            inline ~MouseCursor() noexcept {}
+            
+            //! Retrieve the mouse cursor type.
+            /** The function retrieves the mouse cursor type.
+             @return The mouse cursor type.
+             */
+            inline Type type() const noexcept {return m_type;}
+            
+            //! Mouse cursor equal oeprator.
+            /** Initializes the mouse cursor with another.
+             @param other The other mouse cursor.
+             */
+            inline MouseCursor& operator=(MouseCursor const& other) noexcept
+            {
+                m_type = other.m_type;
+                return *this;
+            }
+            
+            //! Return true if this cursor is the same than an other.
+            /** The function returns true if this cursor is the same than an other.
+             @param other The other mouse cursor.
+             @return true if they are equal, otherwise false.
+             */
+            inline bool operator==(MouseCursor const& other) const noexcept
+            {
+                return m_type == other.m_type;
+            }
+            
+            //! Return true if this cursor is not the same than an other.
+            /** The function returns true if this cursor is not the same than an other.
+             @param other The other mouse cursor.
+             @return true if they are not equal, otherwise false.
+             */
+            inline bool operator!=(MouseCursor const& other) const noexcept
+            {
+                return m_type != other.m_type;
+            }
+            
+        private:
+            Type m_type;
         };
-        
-        //! Mouse cursor constructor.
-        /** Initializes a mouse cursor.
-         @param type The type of cursor as defined by the Type \Enum.
-         */
-        constexpr MouseCursor(const Type type = Type::Default) noexcept : m_type(type) {}
-        
-        //! Destructor.
-        inline ~MouseCursor() noexcept {}
-        
-        //! Retrieve the mouse cursor type.
-        /** The function retrieves the mouse cursor type.
-         @return The mouse cursor type.
-         */
-        inline Type type() const noexcept {return m_type;}
-        
-        //! Mouse cursor equal oeprator.
-        /** Initializes the mouse cursor with another.
-         @param other The other mouse cursor.
-         */
-        inline MouseCursor& operator=(MouseCursor const& other) noexcept
-        {
-            m_type = other.m_type;
-            return *this;
-        }
-
-        //! Return true if this cursor is the same than an other.
-        /** The function returns true if this cursor is the same than an other.
-         @param other The other mouse cursor.
-         @return true if they are equal, otherwise false.
-         */
-        inline bool operator==(MouseCursor const& other) const noexcept
-        {
-            return m_type == other.m_type;
-        }
-        
-        //! Return true if this cursor is not the same than an other.
-        /** The function returns true if this cursor is not the same than an other.
-         @param other The other mouse cursor.
-         @return true if they are not equal, otherwise false.
-         */
-        inline bool operator!=(MouseCursor const& other) const noexcept
-        {
-            return m_type != other.m_type;
-        }
-        
-    private:
-        Type m_type;
-    };
+    }
 }
 
 #endif // KIWI_MOUSECURSOR_H_INCLUDED

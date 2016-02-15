@@ -28,13 +28,16 @@
 
 namespace kiwi
 {
-    TEST_CASE("Point", "[Point]")
+    namespace graphics
     {
-        SECTION("Operators")
+        TEST_CASE("Point", "[Point]")
         {
-            Point p1(1, 1);
-            Point p2(1, 2);
-            REQUIRE(p1 + p2 == Point(2, 3));
+            SECTION("Operators")
+            {
+                Point p1(1, 1);
+                Point p2(1, 2);
+                REQUIRE(p1 + p2 == Point(2, 3));
+            }
         }
     }
 }

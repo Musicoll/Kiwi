@@ -8,15 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		0F0E1D5A1C71DBD300CF0989 /* test_KiwiGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D591C71DBD300CF0989 /* test_KiwiGraphics.cpp */; };
-		0F0E1D6F1C71E4E900CF0989 /* KiwiAffineMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D5C1C71E4E900CF0989 /* KiwiAffineMatrix.cpp */; };
 		0F0E1D701C71E4E900CF0989 /* KiwiColor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D5E1C71E4E900CF0989 /* KiwiColor.cpp */; };
 		0F0E1D711C71E4E900CF0989 /* KiwiFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D601C71E4E900CF0989 /* KiwiFont.cpp */; };
 		0F0E1D721C71E4E900CF0989 /* KiwiLine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D631C71E4E900CF0989 /* KiwiLine.cpp */; };
-		0F0E1D731C71E4E900CF0989 /* KiwiMouseCursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D651C71E4E900CF0989 /* KiwiMouseCursor.cpp */; };
 		0F0E1D741C71E4E900CF0989 /* KiwiPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D671C71E4E900CF0989 /* KiwiPath.cpp */; };
 		0F0E1D751C71E4E900CF0989 /* KiwiPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D691C71E4E900CF0989 /* KiwiPoint.cpp */; };
 		0F0E1D761C71E4E900CF0989 /* KiwiRectangle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D6B1C71E4E900CF0989 /* KiwiRectangle.cpp */; };
-		0F0E1D771C71E4E900CF0989 /* KiwiSize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D6D1C71E4E900CF0989 /* KiwiSize.cpp */; };
 		0F0E1D8A1C71F28000CF0989 /* KiwiAtom.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D831C71F28000CF0989 /* KiwiAtom.cpp */; };
 		0F0E1D8B1C71F28000CF0989 /* KiwiTag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D871C71F28000CF0989 /* KiwiTag.cpp */; };
 /* End PBXBuildFile section */
@@ -36,16 +33,13 @@
 /* Begin PBXFileReference section */
 		0F0E1D4F1C71DB6900CF0989 /* test_KiwiGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_KiwiGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
 		0F0E1D591C71DBD300CF0989 /* test_KiwiGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_KiwiGraphics.cpp; sourceTree = "<group>"; };
-		0F0E1D5C1C71E4E900CF0989 /* KiwiAffineMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiAffineMatrix.cpp; sourceTree = "<group>"; };
 		0F0E1D5D1C71E4E900CF0989 /* KiwiAffineMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiAffineMatrix.h; sourceTree = "<group>"; };
 		0F0E1D5E1C71E4E900CF0989 /* KiwiColor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiColor.cpp; sourceTree = "<group>"; };
 		0F0E1D5F1C71E4E900CF0989 /* KiwiColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiColor.h; sourceTree = "<group>"; };
 		0F0E1D601C71E4E900CF0989 /* KiwiFont.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiFont.cpp; sourceTree = "<group>"; };
 		0F0E1D611C71E4E900CF0989 /* KiwiFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiFont.h; sourceTree = "<group>"; };
-		0F0E1D621C71E4E900CF0989 /* KiwiGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiGraphics.h; sourceTree = "<group>"; };
 		0F0E1D631C71E4E900CF0989 /* KiwiLine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiLine.cpp; sourceTree = "<group>"; };
 		0F0E1D641C71E4E900CF0989 /* KiwiLine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiLine.h; sourceTree = "<group>"; };
-		0F0E1D651C71E4E900CF0989 /* KiwiMouseCursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiMouseCursor.cpp; sourceTree = "<group>"; };
 		0F0E1D661C71E4E900CF0989 /* KiwiMouseCursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiMouseCursor.h; sourceTree = "<group>"; };
 		0F0E1D671C71E4E900CF0989 /* KiwiPath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiPath.cpp; sourceTree = "<group>"; };
 		0F0E1D681C71E4E900CF0989 /* KiwiPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiPath.h; sourceTree = "<group>"; };
@@ -53,7 +47,6 @@
 		0F0E1D6A1C71E4E900CF0989 /* KiwiPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiPoint.h; sourceTree = "<group>"; };
 		0F0E1D6B1C71E4E900CF0989 /* KiwiRectangle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiRectangle.cpp; sourceTree = "<group>"; };
 		0F0E1D6C1C71E4E900CF0989 /* KiwiRectangle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiRectangle.h; sourceTree = "<group>"; };
-		0F0E1D6D1C71E4E900CF0989 /* KiwiSize.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiSize.cpp; sourceTree = "<group>"; };
 		0F0E1D6E1C71E4E900CF0989 /* KiwiSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiSize.h; sourceTree = "<group>"; };
 		0F0E1D831C71F28000CF0989 /* KiwiAtom.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiAtom.cpp; sourceTree = "<group>"; };
 		0F0E1D841C71F28000CF0989 /* KiwiAtom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiAtom.h; sourceTree = "<group>"; };
@@ -96,16 +89,13 @@
 		0F0E1D5B1C71E4E900CF0989 /* KiwiGraphics */ = {
 			isa = PBXGroup;
 			children = (
-				0F0E1D5C1C71E4E900CF0989 /* KiwiAffineMatrix.cpp */,
 				0F0E1D5D1C71E4E900CF0989 /* KiwiAffineMatrix.h */,
 				0F0E1D5E1C71E4E900CF0989 /* KiwiColor.cpp */,
 				0F0E1D5F1C71E4E900CF0989 /* KiwiColor.h */,
 				0F0E1D601C71E4E900CF0989 /* KiwiFont.cpp */,
 				0F0E1D611C71E4E900CF0989 /* KiwiFont.h */,
-				0F0E1D621C71E4E900CF0989 /* KiwiGraphics.h */,
 				0F0E1D631C71E4E900CF0989 /* KiwiLine.cpp */,
 				0F0E1D641C71E4E900CF0989 /* KiwiLine.h */,
-				0F0E1D651C71E4E900CF0989 /* KiwiMouseCursor.cpp */,
 				0F0E1D661C71E4E900CF0989 /* KiwiMouseCursor.h */,
 				0F0E1D671C71E4E900CF0989 /* KiwiPath.cpp */,
 				0F0E1D681C71E4E900CF0989 /* KiwiPath.h */,
@@ -113,7 +103,6 @@
 				0F0E1D6A1C71E4E900CF0989 /* KiwiPoint.h */,
 				0F0E1D6B1C71E4E900CF0989 /* KiwiRectangle.cpp */,
 				0F0E1D6C1C71E4E900CF0989 /* KiwiRectangle.h */,
-				0F0E1D6D1C71E4E900CF0989 /* KiwiSize.cpp */,
 				0F0E1D6E1C71E4E900CF0989 /* KiwiSize.h */,
 			);
 			name = KiwiGraphics;
@@ -191,16 +180,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0F0E1D771C71E4E900CF0989 /* KiwiSize.cpp in Sources */,
 				0F0E1D711C71E4E900CF0989 /* KiwiFont.cpp in Sources */,
 				0F0E1D741C71E4E900CF0989 /* KiwiPath.cpp in Sources */,
-				0F0E1D731C71E4E900CF0989 /* KiwiMouseCursor.cpp in Sources */,
 				0F0E1D5A1C71DBD300CF0989 /* test_KiwiGraphics.cpp in Sources */,
 				0F0E1D751C71E4E900CF0989 /* KiwiPoint.cpp in Sources */,
 				0F0E1D721C71E4E900CF0989 /* KiwiLine.cpp in Sources */,
 				0F0E1D701C71E4E900CF0989 /* KiwiColor.cpp in Sources */,
 				0F0E1D8B1C71F28000CF0989 /* KiwiTag.cpp in Sources */,
-				0F0E1D6F1C71E4E900CF0989 /* KiwiAffineMatrix.cpp in Sources */,
 				0F0E1D761C71E4E900CF0989 /* KiwiRectangle.cpp in Sources */,
 				0F0E1D8A1C71F28000CF0989 /* KiwiAtom.cpp in Sources */,
 			);

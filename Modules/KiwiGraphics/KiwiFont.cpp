@@ -21,131 +21,134 @@
  ==============================================================================
  */
 
-#include "KiwiFont.h"
+#include <KiwiGraphics/KiwiFont.h>
 
 namespace kiwi
 {
-    double Font::Intern::getCharacterWidth(char const& c) const noexcept
+    namespace graphics
     {
-        return 0.;
-    }
-    
-    double Font::Intern::getCharacterWidth(wchar_t const& c) const noexcept
-    {
-        return 0.;
-    }
-    
-    double Font::Intern::getLineWidth(std::string const& line) const noexcept
-    {
-        return 0.;
-    }
-    
-    double Font::Intern::getLineWidth(std::wstring const& line) const noexcept
-    {
-        return 0.;
-    }
-    
-    Size Font::Intern::getTextSize(std::string const& text, const double width) const noexcept
-    {
-        return Size(0., 0.);
-    }
-    
-    Size Font::Intern::getTextSize(std::wstring const& text, const double width) const noexcept
-    {
-        return Size(0., 0.);
-    }
-    
-    Font::Font() noexcept
-    {
-        m_intern = getDefaultFont().m_intern->getNewReference();
-    }
-    
-    Font::Font(std::string const& name, double height, Style style) noexcept
-    {
-        auto it = getAvailableFonts().find(name);
-        if(it != getAvailableFonts().end())
+        double Font::Intern::getCharacterWidth(char const& c) const noexcept
         {
-            m_intern = std::move(it->second.m_intern->getNewReference());
+            return 0.;
         }
-        else
+        
+        double Font::Intern::getCharacterWidth(wchar_t const& c) const noexcept
+        {
+            return 0.;
+        }
+        
+        double Font::Intern::getLineWidth(std::string const& line) const noexcept
+        {
+            return 0.;
+        }
+        
+        double Font::Intern::getLineWidth(std::wstring const& line) const noexcept
+        {
+            return 0.;
+        }
+        
+        Size Font::Intern::getTextSize(std::string const& text, const double width) const noexcept
+        {
+            return Size(0., 0.);
+        }
+        
+        Size Font::Intern::getTextSize(std::wstring const& text, const double width) const noexcept
+        {
+            return Size(0., 0.);
+        }
+        
+        Font::Font() noexcept
         {
             m_intern = getDefaultFont().m_intern->getNewReference();
         }
-        setHeight(height);
-        setStyle(style);
-    }
-    
-    void Font::setName(const std::string& name)
-    {
-        const double height = getHeight();
-        const Style  style  = Style(getStyle());
-        auto it = getAvailableFonts().find(name);
-        if(it != getAvailableFonts().end())
-        {
-            m_intern = std::move(it->second.m_intern->getNewReference());
-        }
-        else
-        {
-            m_intern = getDefaultFont().m_intern->getNewReference();
-        }
-        setHeight(height);
-        setStyle(style);
-    }
-    
-    std::string Font::getStyleName() const noexcept
-    {
-        const auto style = getStyle();
         
-        switch(style)
+        Font::Font(std::string const& name, double height, Style style) noexcept
         {
-            case Regular:           return "Regular";
-            case Bold:              return "Bold";
-            case Italic:            return "Italic";
-            case Underlined:        return "Underlined";
-            case BoldItalic:        return "Bold Italic";
-            case BoldUnderlined:    return "Bold Underlined";
-            case ItalicUnderlined:  return "Italic Underlined";
-            default:                return "Bold Italic Underlined";
+            auto it = getAvailableFonts().find(name);
+            if(it != getAvailableFonts().end())
+            {
+                m_intern = std::move(it->second.m_intern->getNewReference());
+            }
+            else
+            {
+                m_intern = getDefaultFont().m_intern->getNewReference();
+            }
+            setHeight(height);
+            setStyle(style);
         }
         
-        return "Regular";
-    }
-    
-    void Font::setStyle(std::string const& style_name)
-    {
-        if (style_name != getStyleName())
+        void Font::setName(const std::string& name)
         {
-            if(style_name == "Regular")
+            const double height = getHeight();
+            const Style  style  = Style(getStyle());
+            auto it = getAvailableFonts().find(name);
+            if(it != getAvailableFonts().end())
             {
-                setStyle(Regular);
+                m_intern = std::move(it->second.m_intern->getNewReference());
             }
-            else if(style_name == "Bold")
+            else
             {
-                setStyle(Bold);
+                m_intern = getDefaultFont().m_intern->getNewReference();
             }
-            else if(style_name == "Italic")
+            setHeight(height);
+            setStyle(style);
+        }
+        
+        std::string Font::getStyleName() const noexcept
+        {
+            const auto style = getStyle();
+            
+            switch(style)
             {
-                setStyle(Italic);
+                case Regular:           return "Regular";
+                case Bold:              return "Bold";
+                case Italic:            return "Italic";
+                case Underlined:        return "Underlined";
+                case BoldItalic:        return "Bold Italic";
+                case BoldUnderlined:    return "Bold Underlined";
+                case ItalicUnderlined:  return "Italic Underlined";
+                default:                return "Bold Italic Underlined";
             }
-            else if(style_name == "Underlined")
+            
+            return "Regular";
+        }
+        
+        void Font::setStyle(std::string const& style_name)
+        {
+            if (style_name != getStyleName())
             {
-                setStyle(Underlined);
-            }
-            else if(style_name == "Bold Italic")
-            {
-                setStyle(BoldItalic);
-            }
-            else if(style_name == "Bold Underlined")
-            {
-                setStyle(BoldUnderlined);
-            }
-            else if(style_name == "Italic Underlined")
-            {
-                setStyle(ItalicUnderlined);
-            }
-            else if(style_name == "Bold Italic Underlined")
-            {
-                setStyle(BoldItalicUnderlined);
+                if(style_name == "Regular")
+                {
+                    setStyle(Regular);
+                }
+                else if(style_name == "Bold")
+                {
+                    setStyle(Bold);
+                }
+                else if(style_name == "Italic")
+                {
+                    setStyle(Italic);
+                }
+                else if(style_name == "Underlined")
+                {
+                    setStyle(Underlined);
+                }
+                else if(style_name == "Bold Italic")
+                {
+                    setStyle(BoldItalic);
+                }
+                else if(style_name == "Bold Underlined")
+                {
+                    setStyle(BoldUnderlined);
+                }
+                else if(style_name == "Italic Underlined")
+                {
+                    setStyle(ItalicUnderlined);
+                }
+                else if(style_name == "Bold Italic Underlined")
+                {
+                    setStyle(BoldItalicUnderlined);
+                }
             }
         }
     }
