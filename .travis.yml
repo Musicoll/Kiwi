@@ -23,7 +23,8 @@ matrix:
         - ./test_core
         #- ./test_dsp
         #- coveralls --exclude test/catch.hpp --include 'Modules/*' --gcov-options '\-lp' --gcov 'gcov-4.9'
-        - coveralls --verbose --gcov-options '\-lp' --gcov 'gcov-4.9'
+        #- coveralls --verbose --gcov-options '\-lp' --gcov 'gcov-4.9'
+        - coveralls --verbose --gcov-options '\-lp'
       env: COMPILER=g++-4.9
 
     - os: linux
