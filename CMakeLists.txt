@@ -40,6 +40,8 @@ if(${APPLE})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flax-vector-conversions")
 endif()
 
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage" )
+
 # Call make to build the whole project
 # Each target (Libraries/Binaries) can be built separatly calling [make [targetname]]
 # Target dependencies are built as well if necessary
