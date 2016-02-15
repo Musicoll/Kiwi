@@ -18,13 +18,12 @@ matrix:
         - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
       after_success:
         - make clean
-        - cmake -DCOVERALL=ON .
+        - cmake -DCOVERALL=ON ..
         - make CXX=$COMPILER
         - ./test_core
         #- ./test_dsp
-        #- coveralls --exclude test/catch.hpp --include 'Modules/*' --gcov-options '\-lp' --gcov 'gcov-4.9'
+        - coveralls --exclude CMakeFiles --include '../Modules' --gcov-options '\-lp' --gcov 'gcov-4.9'
         #- coveralls --verbose --gcov-options '\-lp' --gcov 'gcov-4.9'
-        - coveralls --verbose --gcov-options '\-lp' --gcov 'gcov-4.9'
       env: COMPILER=g++-4.9
 
     - os: linux
@@ -44,10 +43,10 @@ matrix:
       env: COMPILER=clang++
 
 script:
-  #- mkdir build
-  #- cd build
+  - mkdir build
+  - cd build
   - export CXX=$COMPILER
-  - cmake .
+  - cmake ..
   - make
 
 after_success:
