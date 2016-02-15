@@ -24,7 +24,7 @@ matrix:
         #- ./test_dsp
         #- coveralls --exclude test/catch.hpp --include 'Modules/*' --gcov-options '\-lp' --gcov 'gcov-4.9'
         #- coveralls --verbose --gcov-options '\-lp' --gcov 'gcov-4.9'
-        - coveralls --verbose --gcov-options '\-lp' --gcov $GCOV --root $SRC_DIR --build-root $BIN_DIR
+        - coveralls --verbose --gcov-options '\-lp' --gcov 'gcov-4.9'
       env: COMPILER=g++-4.9
 
     - os: linux
@@ -44,8 +44,8 @@ matrix:
       env: COMPILER=clang++
 
 script:
-  - mkdir build
-  - cd build
+  #- mkdir build
+  #- cd build
   - export CXX=$COMPILER
   - cmake ..
   - make
