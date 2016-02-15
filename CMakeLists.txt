@@ -4,7 +4,12 @@ project (Kiwi CXX)
 set (Kiwi_VERSION_MAJOR 0)
 set (Kiwi_VERSION_MINOR 1)
 
-#---------------------------------------
+#--------------------------------------
+# OPTIONS
+#--------------------------------------
+option(COVERALL "Build with coverall" OFF)
+
+#--------------------------------------
 # Compiler Check
 #--------------------------------------
 
@@ -40,7 +45,12 @@ if(${APPLE})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flax-vector-conversions")
 endif()
 
-set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage" )
+if(COVERALL)
+    message(STATUS "Build with coverall")
+    set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage" )
+else()
+    message(STATUS "Build without coverall")
+endif()
 
 # Call make to build the whole project
 # Each target (Libraries/Binaries) can be built separatly calling [make [targetname]]
