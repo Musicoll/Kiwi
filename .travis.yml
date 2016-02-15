@@ -22,7 +22,7 @@ matrix:
         - make CXX=$COMPILER
         - ./test_core
         #- ./test_dsp
-        - coveralls --exclude CMakeFiles --include '../Modules' --gcov-options '\-lp' --gcov 'gcov-4.9'
+        - coveralls --include "../Modules" --gcov-options '\-lp' --gcov 'gcov-4.9'
         #- coveralls --verbose --gcov-options '\-lp' --gcov 'gcov-4.9'
       env: COMPILER=g++-4.9
 
