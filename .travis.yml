@@ -18,7 +18,7 @@ matrix:
         - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
       after_success:
         - make clean
-        - cmake -DCOVERALL=ON ..
+        - cmake -DCOVERALL=ON .
         - make CXX=$COMPILER
         - ./test_core
         #- ./test_dsp
