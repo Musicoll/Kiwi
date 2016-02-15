@@ -71,6 +71,19 @@ add_library(KiwiDsp STATIC ${KIWI_DSP_SRC})
 set_property(TARGET KiwiDsp
              PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
 
+# -> Module Graphics
+
+file(GLOB KIWI_GRAPHICS_SRC                                   
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiGraphics/*.h         
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiGraphics/*.hpp
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiGraphics/*.cpp
+)
+add_library(KiwiGraphics STATIC ${KIWI_GRAPHICS_SRC})
+target_link_libraries(KiwiGraphics KiwiCore)
+set_property(TARGET KiwiGraphics
+             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
+
+
 #----------------------------------
 # Tests
 #----------------------------------
@@ -90,4 +103,12 @@ file(GLOB TEST_DSP_SRC ${PROJECT_SOURCE_DIR}/test/Modules/Dsp/*.cpp)
 add_executable(test_dsp ${TEST_DSP_SRC})
 target_link_libraries(test_dsp KiwiDsp)
 set_property(TARGET test_dsp
+             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
+
+# -> Graphics Unit Tests
+
+file(GLOB TEST_GRAPHICS_SRC ${PROJECT_SOURCE_DIR}/test/Modules/Graphics/*.cpp)
+add_executable(test_graphics ${TEST_GRAPHICS_SRC})
+target_link_libraries(test_graphics KiwiGraphics)
+set_property(TARGET test_graphics
              PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
