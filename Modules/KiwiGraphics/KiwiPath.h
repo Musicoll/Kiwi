@@ -25,6 +25,7 @@
 #define KIWI_PATH_H_INCLUDED
 
 #include "KiwiRectangle.h"
+#include <assert.h>
 
 /**
  @Todo : (dashed line support, other shapes ?)

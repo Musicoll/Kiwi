@@ -54,3 +54,4 @@ script:
 after_success:
   - ./test_core
   - ./test_dsp
+  - ./test_graphics
