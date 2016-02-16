@@ -22,8 +22,9 @@ matrix:
         - cmake -DCOVERALL=ON .
         - make CXX=$COMPILER
         - ./test_core
-        - ./test_dsp
-        - coveralls --verbose -e ThirdParty -e Client -e test --gcov-options '\-lp' --gcov 'gcov-4.9'
+        #- ./test_dsp
+        #- coveralls --verbose -e ThirdParty -e Client -e test --gcov-options '\-lp' --gcov 'gcov-4.9'
+        - coveralls -E '/build/CMakeFiles/*.cpp' -E '/build/CMakeFiles/*.cxx' -e ThirdParty -e Client -e test --gcov-options '\-lp' --gcov 'gcov-4.9'
       env: COMPILER=g++-4.9
 
     - os: linux
