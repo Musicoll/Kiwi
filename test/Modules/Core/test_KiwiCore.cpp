@@ -91,7 +91,7 @@ TEST_CASE("Atom Constructors", "[Atom]")
         //Atom::test(1l);
     }
     
-    SECTION("Unsigned Integral types")
+    SECTION("Unsigned Integral types are unsupported")
     {
         /*
         CHECK(Atom(1u).getType() == Atom::Type::Int);        // unsigned (int)
@@ -119,7 +119,7 @@ TEST_CASE("Atom Constructors", "[Atom]")
     {
         CHECK(Atom(3.14f).getType() == Atom::Type::Float);    // float
         CHECK(Atom(3.14).getType() == Atom::Type::Float);     // double
-        CHECK(Atom(3.14l).getType() == Atom::Type::Float);    // long double
+        //CHECK(Atom(3.14l).getType() == Atom::Type::Float);  // long double not supported
         CHECK(Atom(6.02e23).getType() == Atom::Type::Float);  // 6.02 x 10^23 (Avogadro constant)
         CHECK(Atom(1.6e-19).getType() == Atom::Type::Float);  // 1.6 x 10^-19 (electric charge of an electron)
         
@@ -221,7 +221,7 @@ TEST_CASE("Atom Float", "[Atom]")
 {
     Atom atom(1.123);
     CHECK(atom.getType()          == Atom::Type::Float);
-    CHECK(atom.isNull()      == false);
+    CHECK(atom.isNull()           == false);
     CHECK(atom.isBool()           == false);
     CHECK(atom.isNumber()         == true);
     CHECK(atom.isInt()            == false);
@@ -230,7 +230,7 @@ TEST_CASE("Atom Float", "[Atom]")
     CHECK(atom.isVector()         == false);
     CHECK(atom.isDico()           == false);
     CHECK(atom == 1.123);
-    CHECK(atom == 1.123f);
+    CHECK(atom == Approx(1.123f));
     // Should this fail ??
     CHECK(atom == 1);
     CHECK(atom == true);
