@@ -32,6 +32,106 @@ namespace kiwi
         //                                      POINT                                       //
         // ================================================================================ //
         
+        // =================================
+        // Operators
+        // =================================
+        
+        Point operator*(const double value, Point const& pt) noexcept
+        {
+            return Point(value * pt.x(),
+                         value * pt.y());
+        }
+        
+        Point operator*(Point const& pt, double const value) noexcept
+        {
+            return value * pt;
+        }
+        
+        Point& operator*=(Point &pt, double const value) noexcept
+        {
+            pt = value * pt;
+            return pt;
+        }
+        
+        Point operator+(Point const& lPt, Point const & rPt) noexcept
+        {
+            return Point(lPt.x() + rPt.x(),
+                         lPt.y() + rPt.y());
+        }
+        
+        Point& operator+=(Point &lPt, Point const& rPt)
+        {
+            lPt = lPt + rPt;
+            return lPt;
+        }
+        
+        Point operator-(Point const& lPt, Point const& rPt) noexcept
+        {
+            return Point(lPt.x() - rPt.x(),
+                         lPt.y() - rPt.y());
+        }
+        
+        Point& operator-=(Point &lPt, Point const& rPt) noexcept
+        {
+            lPt = lPt - rPt;
+            return lPt;
+        }
+        
+        Point operator-(Point const& pt) noexcept
+        {
+            return Point(-pt.x(), -pt.y());
+        }
+        
+        Point operator/(Point const& pt, const double value)
+        {
+            return Point(pt.x() / value,
+                         pt.y() / value);
+        }
+        
+        Point& operator/=(Point & pt, double const value)
+        {
+            pt = pt / value;
+            return pt;
+        }
+        
+        // =================================
+        // Scalar product, Norm
+        // =================================
+        
+        double Point::dot(Point const& pt) const noexcept
+        {
+            return this->x() * pt.x() + this->y() * pt.y();
+        }
+        
+        double norm(Point const& pt) noexcept
+        {
+            return sqrt(pt.dot(pt));
+        }
+        
+        double distance(Point const& lPt, Point const& rPt) noexcept
+        {
+            return norm(rPt - lPt);
+        }
+        
+        bool operator==(Point const& lPt, Point const& rPt) noexcept
+        {
+            return distance(lPt, rPt) == 0;
+        }
+        
+        // =================================
+        // Angle and rotation
+        // =================================
+        
+        Point Point::rotated(Point const& pt, double const angle) const noexcept
+        {
+            const Point newpt = *this - pt;
+            return Point(newpt.x() * cos (angle) - newpt.y() * sin (angle) + pt.x(), newpt.x() * sin (angle) + newpt.y() * cos (angle) + pt.y());
+        }
+        
+        // =================================
+        // Algorithm
+        // =================================
+        
         Point Point::fromLine(Point const& start, Point const& end, double delta) noexcept
         {
             return (end - start) * delta + start;
@@ -60,20 +160,20 @@ namespace kiwi
                 const double ratio = (*this - start).dot(delta) / length;
                 if(ratio < 0.)
                 {
-                    return distance(start);
+                    return norm(start);
                 }
                 else if(ratio > 1.)
                 {
-                    return distance(end);
+                    return norm(end);
                 }
                 else
                 {
-                    return distance((ratio * delta) + start);
+                    return norm((ratio * delta) + start);
                 }
             }
             else
             {
-                return std::min(distance(start), distance(end));
+                return std::min(norm(start), norm(end));
             }
         }
         
@@ -87,10 +187,10 @@ namespace kiwi
             const ulong nresult = solve(B.length(), 3 * A.dot(B), 2 * A.length() + C.dot(B), A.dot(C), sol1, sol2, sol3);
             if(nresult)
             {
-                double dist = distance(fromLine(start, ctrl, end, sol1));
+                double dist = norm(fromLine(start, ctrl, end, sol1));
                 if(nresult > 1)
                 {
-                    const double dist2 = distance(fromLine(start, ctrl, end, sol2));
+                    const double dist2 = norm(fromLine(start, ctrl, end, sol2));
                     if(dist2 < dist)
                     {
                         dist = dist2;
@@ -98,7 +198,7 @@ namespace kiwi
                 }
                 if(nresult > 2)
                 {
-                    const double dist2 = distance(fromLine(start, ctrl, end, sol3));
+                    const double dist2 = norm(fromLine(start, ctrl, end, sol3));
                     if(dist2 < dist)
                     {
                         dist  = dist2;
@@ -108,7 +208,7 @@ namespace kiwi
             }
             else
             {
-                return std::min(distance(start), distance(end));
+                return std::min(norm(start), norm(end));
             }
         }
         
@@ -137,10 +237,10 @@ namespace kiwi
             double 	t_candidate[5];
             ulong n_solutions = solve(W, t_candidate, 0ul);
             
-            double dist = distance(end);
+            double dist = norm(end);
             for(int i = 0; i < n_solutions; i++)
             {
-                const double new_dist = distance(Point::fromLine(start, ctrl1, ctrl2, end, t_candidate[i]));
+                const double new_dist = norm(Point::fromLine(start, ctrl1, ctrl2, end, t_candidate[i]));
                 if(new_dist < dist)
                 {
                     dist = new_dist;
@@ -171,7 +271,7 @@ namespace kiwi
             }
             else
             {
-                return (distance(start) < distance(end)) ? start : end;
+                return (norm(start) < norm(end)) ? start : end;
             }
         }
         
@@ -186,11 +286,11 @@ namespace kiwi
             if(nresult)
             {
                 Point pt = fromLine(start, ctrl, end, sol1);
-                double dist = distance(pt);
+                double dist = norm(pt);
                 if(nresult > 1)
                 {
                     const Point pt2 = fromLine(start, ctrl, end, sol2);
-                    const double dist2 = distance(pt2);
+                    const double dist2 = norm(pt2);
                     if(dist2 < dist)
                     {
                         dist = dist2;
@@ -200,7 +300,7 @@ namespace kiwi
                 if(nresult > 2)
                 {
                     const Point pt2 = fromLine(start, ctrl, end, sol3);
-                    const double dist2 = distance(pt2);
+                    const double dist2 = norm(pt2);
                     if(dist2 < dist)
                     {
                         dist  = dist2;
@@ -211,7 +311,7 @@ namespace kiwi
             }
             else
             {
-                return (distance(start) < distance(end)) ? start : end;
+                return (norm(start) < norm(end)) ? start : end;
             }
         }
         
@@ -241,11 +341,11 @@ namespace kiwi
             ulong n_solutions = solve(W, t_candidate, 0ul);
             
             Point pt = end;
-            double dist = distance(end);
+            double dist = norm(end);
             for(int i = 0; i < n_solutions; i++)
             {
                 const Point pt2 = fromLine(start, ctrl1, ctrl2, end, t_candidate[i]);
-                const double new_dist = distance(pt2);
+                const double new_dist = norm(pt2);
                 if(new_dist < dist)
                 {
                     dist = new_dist;
@@ -257,7 +357,7 @@ namespace kiwi
         
         bool Point::near(Point const& pt, double const dist) const noexcept
         {
-            return distance(pt) <= dist;
+            return norm(pt) <= dist;
         }
         
         bool Point::near(Point const& start, Point const& end, double const dist) const noexcept

@@ -578,7 +578,7 @@ namespace kiwi
              */
             inline Rectangle& operator+=(double const value) noexcept
             {
-                m_position += value;
+                m_position += Point(value, value);
                 return *this;
             }
             
@@ -600,7 +600,7 @@ namespace kiwi
              */
             inline Rectangle& operator-=(double const value) noexcept
             {
-                m_position -= value;
+                m_position -= Point(value, value);
                 return *this;
             }
             
@@ -621,7 +621,7 @@ namespace kiwi
              */
             inline Rectangle operator+(double const value) noexcept
             {
-                return Rectangle(m_position + value, m_size);
+                return Rectangle(m_position + Point(value, value), m_size);
             }
             
             //! Retrieve the rectangle shifted with a point.
@@ -641,7 +641,7 @@ namespace kiwi
              */
             inline Rectangle operator-(double const value) noexcept
             {
-                return Rectangle(m_position - value, m_size);
+                return Rectangle(m_position - Point(value, value), m_size);
             }
             
             //! Get the equality two rectangle.

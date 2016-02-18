@@ -162,7 +162,7 @@ namespace kiwi
         {
             if(m_nodes.size() == 1)
             {
-                return pt.distance(m_nodes[0].point());
+                return kiwi::graphics::distance(pt, m_nodes[0].point());
             }
             else if(m_nodes.size() > 1)
             {
@@ -175,7 +175,7 @@ namespace kiwi
                     {
                         case Move:
                         {
-                            const double newdist = pt.distance(current);
+                            const double newdist = kiwi::graphics::distance(pt, current);
                             if(newdist < dist)
                             {
                                 dist = newdist;

@@ -31,14 +31,11 @@ namespace kiwi
     namespace graphics
     {
         class Path;
+        
         // ================================================================================ //
         //                                      POINT                                       //
         // ================================================================================ //
         
-        //! The point holds two double values.
-        /**
-         The point is used to represent a point in a space and allows several modification.
-         */
         class Point
         {
         public:
@@ -143,10 +140,13 @@ namespace kiwi
              @param pt Another point.
              @return The point.
              */
-            inline Point& operator=(Point const& pt) noexcept
+            inline Point& operator=(Point const& pt)
             {
-                m_data[0] = pt.m_data[0];
-                m_data[1] = pt.m_data[1];
+                if (&pt != this)
+                {
+                    m_data[0] = pt.m_data[0];
+                    m_data[1] = pt.m_data[1];
+                }
                 return *this;
             }
             
@@ -155,207 +155,10 @@ namespace kiwi
              @param pt Another point.
              @return The point.
              */
-            inline Point& operator=(Point&& pt) noexcept
+            inline Point& operator=(Point&& pt)
             {
                 std::swap(m_data, pt.m_data);
                 return *this;
-            }
-            
-            //! Sets the abscissa and the ordinate with a value.
-            /** The function sets the abscissa and the ordinate with a value.
-             @param value The value.
-             @return The point.
-             */
-            inline Point& operator=(double const& value) noexcept
-            {
-                m_data[0] = value;
-                m_data[1] = value;
-                return *this;
-            }
-            
-            //! Increments the abscissa and the ordinate with another point.
-            /** The function increments the abscissa and the ordinate with another point.
-             @param pt Another point.
-             @return The point.
-             */
-            inline Point& operator+=(Point const& pt) noexcept
-            {
-                m_data[0] += pt.m_data[0];
-                m_data[1] += pt.m_data[1];
-                return *this;
-            }
-            
-            //! Increments the abscissa and the ordinate with a value.
-            /** The function increments the abscissa and the ordinate with a value.
-             @param value The value.
-             @return The point.
-             */
-            inline Point& operator+=(double const value) noexcept
-            {
-                m_data[0] += value;
-                m_data[1] += value;
-                return *this;
-            }
-            
-            //! Decrements the abscissa and the ordinate with another point.
-            /** The function decrements the abscissa and the ordinate with another point.
-             @param value The value.
-             @return The point.
-             */
-            inline Point& operator-=(Point const& pt) noexcept
-            {
-                m_data[0] -= pt.m_data[0];
-                m_data[1] -= pt.m_data[1];
-                return *this;
-            }
-            
-            //! Decrements the abscissa and the ordinate with a value.
-            /** The function decrements the abscissa and the ordinate with a value.
-             @param pt Another point.
-             @return The point.
-             */
-            inline Point& operator-=(double const value) noexcept
-            {
-                m_data[0] -= value;
-                m_data[1] -= value;
-                return *this;
-            }
-            
-            //! Multiplies the abscissa and the ordinate with another point.
-            /** The function multiplies the abscissa and the ordinate with another point.
-             @param value The value.
-             @return The point.
-             */
-            inline Point& operator*=(Point const& pt) noexcept
-            {
-                m_data[0] *= pt.m_data[0];
-                m_data[1] *= pt.m_data[1];
-                return *this;
-            }
-            
-            //! Multiplies the abscissa and the ordinate with a value.
-            /** The function multiplies the abscissa and the ordinate with a value.
-             @param pt Another point.
-             @return The point.
-             */
-            inline Point& operator*=(double const value) noexcept
-            {
-                m_data[0] *= value;
-                m_data[1] *= value;
-                return *this;
-            }
-            
-            //! Divides the abscissa and the ordinate with another point.
-            /** The function divides the abscissa and the ordinate with another point.
-             @param value The value.
-             @return The point.
-             */
-            inline Point& operator/=(Point const& pt) noexcept
-            {
-                m_data[0] /= pt.m_data[0];
-                m_data[1] /= pt.m_data[1];
-                return *this;
-            }
-            
-            //! Divides the abscissa and the ordinate with a value.
-            /** The function divides the abscissa and the ordinate with a value.
-             @param pt Another point.
-             @return The point.
-             */
-            inline Point& operator/=(double const value) noexcept
-            {
-                m_data[0] /= value;
-                m_data[1] /= value;
-                return *this;
-            }
-            
-            //! Retrives a new point from the addition of two points.
-            /** The function adds a value to the point.
-             @param pt The point to add.
-             @return The new point.
-             */
-            inline Point operator+(Point const pt) const noexcept
-            {
-                return Point(m_data[0] + pt.x(), m_data[1] + pt.y());
-            }
-            
-            //! Add a value to the point.
-            /** The function adds a value to the point.
-             @param value The value to add.
-             @return The new point.
-             */
-            inline Point operator+(double const value) const noexcept
-            {
-                return Point(m_data[0] + value, m_data[1] + value);
-            }
-            
-            //! Subtract a a value to the point.
-            /** The function subtracts a value to the point.
-             @param value The value to subtract.
-             @return The new point.
-             */
-            inline Point operator-(double const value) const noexcept
-            {
-                return Point(m_data[0] - value, m_data[1] - value);
-            }
-            
-            //! Subtract a a point to the point.
-            /** The function subtract to the point.
-             @param pt The point to subtract.
-             @return The new point.
-             */
-            inline Point operator-(Point const pt) const noexcept
-            {
-                return Point(m_data[0] - pt.x(), m_data[1] - pt.y());
-            }
-            
-            //! Multiply a point with the point.
-            /** The function multiplies a point with the point.
-             @param pt The point to multiply with.
-             @return The new point.
-             */
-            inline Point operator*(Point const pt) const noexcept
-            {
-                return Point(m_data[0] * pt.x(), m_data[1] * pt.y());
-            }
-            
-            //! Divide a value with the point.
-            /** The function divides a value with the point.
-             @param value The value to divide with.
-             @return The new point.
-             */
-            inline Point operator/(const double value) const noexcept
-            {
-                return Point(m_data[0] / value, m_data[1] / value);
-            }
-            
-            //! Divide a point with the point.
-            /** The function divides a point with the point.
-             @param pt The point to divide with.
-             @return The new point.
-             */
-            inline Point operator/(Point const pt) const noexcept
-            {
-                return Point(m_data[0] / pt.x(), m_data[1] / pt.y());
-            }
-            
-            //! Returns the inverse of the point.
-            /** The function return the inverse of the point.
-             @return The new point.
-             */
-            inline Point operator-() const noexcept
-            {
-                return Point(-m_data[0], -m_data[1]);
-            }
-            
-            //! Get the equality of the point with another.
-            /** The function retrieves the equality of the point with another.
-             @param pt The other point.
-             @return true if the two points are equal, otherwise false.
-             */
-            inline bool operator==(Point const& pt) const noexcept
-            {
-                return m_data[0] == pt.x() && m_data[1] == pt.y();
             }
             
             //! Get the equality of the point with another.
@@ -424,11 +227,7 @@ namespace kiwi
              @param angle The angle
              @return The copy with the rotation.
              */
-            inline Point rotated(Point const& pt, double const angle) const noexcept
-            {
-                const Point newpt = *this - pt;
-                return Point(newpt.x() * cos (angle) - newpt.y() * sin (angle) + pt.x(), newpt.x() * sin (angle) + newpt.y() * cos (angle) + pt.y());
-            }
+            Point rotated(Point const& pt, double const angle) const noexcept;
             
             //! Apply a rotation from the origin.
             /** The function retrieves Applies a rotation from the origin.
@@ -458,25 +257,6 @@ namespace kiwi
                 return m_data[0] * m_data[0] + m_data[1] * m_data[1];
             }
             
-            //! Retrieve the distance from the origin.
-            /** The function retrieves the distance from the origin.
-             @return The distance.
-             */
-            inline double distance() const noexcept
-            {
-                return sqrt(m_data[0] * m_data[0] + m_data[1] * m_data[1]);
-            }
-            
-            //! Retrieve the distance from another point.
-            /** The function retrieves the distance from another point.
-             @param pt The other point.
-             @return The distance.
-             */
-            inline double distance(Point const& pt) const noexcept
-            {
-                return sqrt((m_data[0] - pt.x()) * (m_data[0] - pt.x()) + (m_data[1] - pt.y()) * (m_data[1] - pt.y()));
-            }
-            
             //! Retrieve the angle from the origin.
             /** The function retrieves the angle from origin.
              @return The angle.
@@ -501,10 +281,7 @@ namespace kiwi
              @param pt The other point.
              @return The dot product.
              */
-            inline double dot(Point const& pt) const noexcept
-            {
-                return m_data[0] * pt.x() + m_data[1] * pt.y();
-            }
+            double dot(Point const& pt) const noexcept;
             
             //! Retrieve the distance from a line.
             /** The function retrieves the distance a line.
@@ -641,16 +418,25 @@ namespace kiwi
             double m_data[2];
         };
         
-        //! Multiply a value with a point.
-        /** The function multiplies a value a the point.
-         @param pt The point to multiply.
-         @param value The value to multiply with.
-         @return The new point.
+        //! Get the equality of the point with another.
+        /** The function retrieves the equality of the point with another.
+         @param pt The other point.
+         @return true if the two points are equal, otherwise false.
          */
-        static inline Point operator*(Point const& pt, double const value) noexcept
-        {
-            return Point(pt.x() * value, pt.y() * value);
-        }
+        bool operator==(Point const& lPt, Point const& rPt) noexcept;
+        
+        //! Retrieve the distance from the origin.
+        /** The function retrieves the distance from the origin.
+         @return The distance.
+         */
+        double norm(Point const& pt) noexcept;
+        
+        //! Retrieve the distance from another point.
+        /** The function retrieves the distance from another point.
+         @param pt The other point.
+         @return The distance.
+         */
+        double distance(Point const &lPt, Point const& rPt) noexcept;
         
         //! Multiply a value with a point.
         /** The function multiplies a value a the point.
@@ -658,10 +444,70 @@ namespace kiwi
          @param value The value to multiply with.
          @return The new point.
          */
-        static inline Point operator*(const double value, Point const& pt) noexcept
-        {
-            return Point(pt.x() * value, pt.y() * value);
-        }
+        Point operator*(Point const& pt, double const value) noexcept;
+        
+        //! Multiply a value with a point.
+        /** The function multiplies a value a the point.
+         @param pt The point to multiply.
+         @param value The value to multiply with.
+         @return The new point.
+         */
+        Point operator*(const double value, Point const& pt) noexcept;
+        
+        //! Multiplies the abscissa and the ordinate with a value.
+        /** The function multiplies the abscissa and the ordinate with a value.
+         @param pt Another point.
+         @return The point.
+         */
+        Point& operator*=(Point &pt, double const value) noexcept;
+        
+        //! Divide a value with the point.
+        /** The function divides a value with the point.
+         @param value The value to divide with.
+         @return The new point.
+         */
+        Point operator/(Point const& pt, const double value);
+        
+        //! Divides the abscissa and the ordinate with a value.
+        /** The function divides the abscissa and the ordinate with a value.
+         @param pt Another point.
+         @return The point.
+         */
+        Point& operator/=(Point const& pt, double const value);
+        
+        //! Retrives a new point from the addition of two points.
+        /** The function adds a value to the point.
+         @param pt The point to add.
+         @return The new point.
+         */
+        Point operator+(Point const& lPt, Point const & rPt) noexcept;
+        
+        //! Increments the abscissa and the ordinate with another point.
+        /** The function increments the abscissa and the ordinate with another point.
+         @param pt Another point.
+         @return The point.
+         */
+        Point& operator+=(Point &lPt, Point const& rPt);
+        
+        //! Subtract a a point to the point.
+        /** The function subtract to the point.
+         @param pt The point to subtract.
+         @return The new point.
+         */
+        Point operator-(Point const& lPt, Point const& rPt) noexcept;
+        
+        //! Decrements the abscissa and the ordinate with another point.
+        /** The function decrements the abscissa and the ordinate with another point.
+         @param value The value.
+         @return The point.
+         */
+        Point& operator-=(Point &lPt, Point const& rPt) noexcept;
+        
+        //! Returns the inverse of the point.
+        /** The function return the inverse of the point.
+         @return The new point.
+         */
+        Point operator-(Point const& pt) noexcept;
     }
 }
 

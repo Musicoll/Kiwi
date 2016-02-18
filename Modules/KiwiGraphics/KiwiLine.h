@@ -404,8 +404,8 @@ namespace kiwi
              */
             inline Segment& operator+=(double const value) noexcept
             {
-                m_start += value;
-                m_end   += value;
+                m_start += Point(value, value);
+                m_end   += Point(value, value);
                 return *this;
             }
             
@@ -428,8 +428,8 @@ namespace kiwi
              */
             inline Segment& operator-=(double const value) noexcept
             {
-                m_start -= value;
-                m_end   -= value;
+                m_start -= Point(value, value);
+                m_end   -= Point(value, value);
                 return *this;
             }
             
@@ -450,7 +450,7 @@ namespace kiwi
              */
             inline Segment operator+(double const value) const noexcept
             {
-                return Segment(m_start + value, m_end + value);
+                return Segment(m_start + Point(value, value), m_end + Point(value, value));
             }
             
             //! Retrieves a new segment shifted by a point.
@@ -470,7 +470,7 @@ namespace kiwi
              */
             inline Segment operator-(double const value) const noexcept
             {
-                return Segment(m_start - value, m_end - value);
+                return Segment(m_start - Point(value, value), m_end - Point(value, value));
             }
             
             //! Get the equality of the segment with another.
@@ -566,7 +566,7 @@ namespace kiwi
              */
             inline double length() const noexcept override
             {
-                return std::abs(m_start.distance(m_end));
+                return kiwi::graphics::distance(m_start, m_end);
             }
             
             //! Retrieve the smallest distance from a point.
@@ -934,9 +934,9 @@ namespace kiwi
              */
             inline BezierQuad& operator+=(double const value) noexcept
             {
-                m_start += value;
-                m_ctrl  += value;
-                m_end   += value;
+                m_start += Point(value, value);
+                m_ctrl  += Point(value, value);
+                m_end   += Point(value, value);
                 return *this;
             }
             
@@ -960,9 +960,9 @@ namespace kiwi
              */
             inline BezierQuad& operator-=(double const value) noexcept
             {
-                m_start -= value;
-                m_ctrl  -= value;
-                m_end   -= value;
+                m_start -= Point(value, value);
+                m_ctrl  -= Point(value, value);
+                m_end   -= Point(value, value);
                 return *this;
             }
             
@@ -983,7 +983,7 @@ namespace kiwi
              */
             inline BezierQuad operator+(double const value) const noexcept
             {
-                return BezierQuad(m_start + value, m_ctrl + value, m_end + value);
+                return BezierQuad(m_start + Point(value, value), m_ctrl + Point(value, value), m_end + Point(value, value));
             }
             
             //! Retrieves a new quadratic curve shifted by a point.
@@ -1003,7 +1003,7 @@ namespace kiwi
              */
             inline BezierQuad operator-(double const value) const noexcept
             {
-                return BezierQuad(m_start - value, m_ctrl - value, m_end - value);
+                return BezierQuad(m_start - Point(value, value) , m_ctrl - Point(value, value), m_end - Point(value, value));
             }
             
             //! Get the equality of the quadratic curve with another.
@@ -1423,10 +1423,10 @@ namespace kiwi
              */
             inline BezierCubic& operator+=(double const value) noexcept
             {
-                m_start += value;
-                m_ctrl1 += value;
-                m_ctrl2 += value;
-                m_end   += value;
+                m_start += Point(value, value);
+                m_ctrl1 += Point(value, value);
+                m_ctrl2 += Point(value, value);
+                m_end   += Point(value, value);
                 return *this;
             }
             
@@ -1451,10 +1451,10 @@ namespace kiwi
              */
             inline BezierCubic& operator-=(double const value) noexcept
             {
-                m_start -= value;
-                m_ctrl1 -= value;
-                m_ctrl2 -= value;
-                m_end   -= value;
+                m_start -= Point(value, value);
+                m_ctrl1 -= Point(value, value);
+                m_ctrl2 -= Point(value, value);
+                m_end   -= Point(value, value);
                 return *this;
             }
             
@@ -1475,7 +1475,10 @@ namespace kiwi
              */
             inline BezierCubic operator+(double const value) const noexcept
             {
-                return BezierCubic(m_start + value, m_ctrl1 + value, m_ctrl2 + value, m_end + value);
+                return BezierCubic(m_start + Point(value, value),
+                                   m_ctrl1 + Point(value, value),
+                                   m_ctrl2 + Point(value, value),
+                                   m_end   + Point(value, value));
             }
             
             //! Retrieves a new cubic curve shifted by a point.
@@ -1495,7 +1498,10 @@ namespace kiwi
              */
             inline BezierCubic operator-(double const value) const noexcept
             {
-                return BezierCubic(m_start - value, m_ctrl1 - value, m_ctrl2 - value, m_end - value);
+                return BezierCubic(m_start - Point(value, value),
+                                   m_ctrl1 - Point(value, value),
+                                   m_ctrl2 - Point(value, value),
+                                   m_end   - Point(value, value));
             }
             
             //! Get the equality of the cubic curve with another.
