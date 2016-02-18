@@ -79,14 +79,14 @@ namespace kiwi
         {
             //std::cout << "Move construct \n";
             std::lock_guard<std::mutex> guard(m_mutex);
-            auto sym = m_symbols.emplace(std::move(name)).first;
+            const auto sym = m_symbols.emplace(std::move(name)).first;
             return *sym;
         }
         
         const std::string& m_name;
         
         //! @internal
-        static std::set<const std::string>  m_symbols;
+        static std::set<std::string>  m_symbols;
         static std::mutex                   m_mutex;
     };
             

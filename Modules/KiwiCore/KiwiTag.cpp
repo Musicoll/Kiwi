@@ -26,7 +26,7 @@
 
 namespace kiwi
 {
-    std::set<const std::string>  Symbol::m_symbols;
+    std::set<std::string>  Symbol::m_symbols;
     std::mutex                   Symbol::m_mutex;
     
     // ================================================================================ //
