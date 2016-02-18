@@ -28,6 +28,129 @@
 
 using namespace kiwi;
 
+#include <chrono>
+#include <iostream>
+
+class Benchmark
+{
+public:
+    void startChrono() noexcept
+    {
+        m_chrono_start = std::chrono::system_clock::now();
+    }
+    
+    double endChrono(const char* msg = "") noexcept
+    {
+        m_chrono_end = std::chrono::system_clock::now();
+        std::chrono::duration<double> time = m_chrono_end - m_chrono_start;
+        double result_ms = time.count() * 1000.;
+        std::cout << "bench " << result_ms << " ms \t=> " << msg << '\n';
+        return result_ms;
+    }
+    
+private:
+    std::chrono::time_point<std::chrono::system_clock> m_chrono_start, m_chrono_end;
+};
+
+// ================================================================================ //
+//                                      SYMBOL                                      //
+// ================================================================================ //
+
+TEST_CASE("Symbol", "[Symbol]")
+{
+    auto original_symtable_size = Symbol::size();
+    Symbol sym_1("foo");
+    CHECK(Symbol::size() == original_symtable_size + 1);
+    Symbol sym_2("foo");
+    CHECK(Symbol::size() == original_symtable_size + 1);
+    Symbol sym_3("jojo");
+    Symbol sym_4("jojo");
+    CHECK(Symbol::size() == original_symtable_size + 2);
+    
+    CHECK(sym_1 == sym_2);
+    CHECK(sym_1 == sym_1);
+    CHECK_FALSE(sym_1 != sym_2);
+    CHECK(sym_1 != sym_3);
+    
+    // copy construct
+    std::string str = "bar";
+    Symbol sym_5(str);
+    CHECK(sym_5 == "bar");
+    CHECK(sym_5.toString() == "bar");
+    
+    
+    std::vector<Symbol> sims {"jojo", "jaja", "juju"};
+    CHECK(Symbol::size() == original_symtable_size + 5);
+    
+    /*
+    // copy construct
+    std::string str2 = "bar";
+    std::cout << str2 << '\n';
+    Symbol sym_6(str2);
+    std::cout << str2 << '\n';
+    
+    Symbol ss = "ss";
+    */
+    
+    Benchmark bench;
+    
+    bench.startChrono();
+    for(int i = 0; i < 10000; ++i) Symbol("test_same");
+    bench.endChrono("create same Symbols 10000 times");
+    
+    bench.startChrono();
+    for(int i = 0; i < 10000; ++i) Tag::create("test_same");
+    bench.endChrono("create same Tag 10000 times");
+    
+    bench.startChrono();
+    for(int i = 0; i < 10000; ++i) std::string("test_same");
+    bench.endChrono("create same string 10000 times");
+    
+    bench.startChrono();
+    for(int i = 0; i < 10000; ++i) Symbol(std::to_string(i));
+    bench.endChrono("create differents Symbols 10000 times");
+    
+    bench.startChrono();
+    for(int i = 0; i < 10000; ++i) Tag::create(std::to_string(i));
+    bench.endChrono("create differents Tags 10000 times");
+    
+    bench.startChrono();
+    for(int i = 0; i < 10000; ++i) std::string(std::to_string(i));
+    bench.endChrono("create differents strings 10000 times");
+    
+    Symbol      bench_sym_1 = ("bench_equality_compare_1");
+    sTag        bench_tag_1 = Tag::create("bench_equality_compare_1");
+    std::string bench_str_1 = ("bench_equality_compare_1");
+    
+    Symbol      bench_sym_2 = ("bench_equality_compare_2");
+    sTag        bench_tag_2 = Tag::create("bench_equality_compare_2");
+    std::string bench_str_2 = ("bench_equality_compare_2");
+    
+    bench.startChrono();
+    for(int i = 0; i < 100000; ++i) auto r = (bench_sym_1 == bench_sym_2);
+    bench.endChrono("compare Symbol objects 100000 times (==)");
+    
+    bench.startChrono();
+    for(int i = 0; i < 10000; ++i) auto r = (bench_tag_1 == bench_tag_2);
+    bench.endChrono("compare Tag objects 100000 times (==)");
+    
+    bench.startChrono();
+    for(int i = 0; i < 100000; ++i) auto r = (bench_str_1 == bench_str_2);
+    bench.endChrono("compare std::string objects 100000 times (==)");
+    
+    bench.startChrono();
+    for(int i = 0; i < 100000; ++i) auto r = (bench_sym_1 != bench_sym_2);
+    bench.endChrono("compare Symbol objects 100000 times (!=)");
+    
+    bench.startChrono();
+    for(int i = 0; i < 10000; ++i) auto r = (bench_tag_1 != bench_tag_2);
+    bench.endChrono("compare Tag objects 100000 times (!=)");
+    
+    bench.startChrono();
+    for(int i = 0; i < 100000; ++i) auto r = (bench_str_1 != bench_str_2);
+    bench.endChrono("compare std::string objects 100000 times (!=)");
+}
+
 // ================================================================================ //
 //                                      ATOM                                        //
 // ================================================================================ //
