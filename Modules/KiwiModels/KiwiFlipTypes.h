@@ -239,14 +239,14 @@ namespace kiwi
         //! Retrieve the attribute value as a vector of atoms.
         operator Atom() const
         {
-            Vector atoms;
+            Atom::vector_t atoms;
             
             for(auto it = m_data.begin(); it != m_data.end(); it++)
             {
                 //atoms.push_back(Atom(*it));
             }
             
-            return atoms;
+            //return atoms;
         }
         
         // static flip declare method.

@@ -90,106 +90,65 @@ namespace kiwi
         //! @param other The other Atom.
         Atom(Atom const& other) noexcept;
         
-        //! @brief Constructs an Atom value with a boolean value.
+        //! @brief Constructs a boolean_t Atom (explicit).
         //! @param value The value.
         inline Atom(boolean_t value) noexcept : m_quark(new QuarkBool(value)) {}
         
-        //! @brief Constructs an Atom value with an integer_t value.
+        //! @brief Constructs an integer_t Atom (explicit)
         //! @param value The value.
         inline explicit Atom(const integer_t value) noexcept : m_quark(new QuarkInt(value)) {}
         
-        //! @brief Constructs an Atom value with an integer value.
-        //! @param value The value.
-        template <class IntegerType, class InternalValueType = IntegerType>
-        using EnableIf = typename std::enable_if<
-        std::is_constructible<integer_t, IntegerType>::value &&
-        std::numeric_limits<IntegerType>::is_integer &&
-        //std::numeric_limits<IntegerType>::is_signed &&
-        (sizeof(IntegerType) <= sizeof(integer_t)), IntegerType>;
-        
-        /*
-        template<class IntegerType, typename EnableIf<IntegerType>::type = 0>
-        Atom(const IntegerType value) noexcept
-        : Atom(static_cast<integer_t>(value))
-        {
-        }
-        */
-        
-        /*
-        template <class IntegerType, class InternalValueType = IntegerType>
-        using EnableIfCompatibleIntType = typename std::enable_if<
-        (!std::is_same<integer_t, IntegerType>::value) &&
-        (std::is_same<int16_t, IntegerType>::value ||
-         std::is_same<int32_t, IntegerType>::value ||
-         std::is_same<int64_t, IntegerType>::value), IntegerType>;
-        */
-        
+    private:
+        //! @internal Utility to target a compatible integer value.
         template <class IntegerType>
-        using EnableIfCompatibleIntType = typename std::enable_if<
-        (!std::is_same<integer_t, IntegerType>::value) &&
-        (sizeof(IntegerType) <= sizeof(integer_t)) &&
-        (std::is_same<short, IntegerType>::value ||
-         std::is_same<int, IntegerType>::value ||
-         std::is_same<long, IntegerType>::value ||
-         std::is_same<long long, IntegerType>::value), IntegerType>;
-        /*
-        template<class IntegerType, typename EnableIfCompatibleIntType<IntegerType>::type = 0>
-        static void test(const IntegerType value) noexcept
-        {
-        }
-        */
-        template<class IntegerType, typename EnableIfCompatibleIntType<IntegerType>::type = 0>
+        using EnableIfCompatibleIntTypeFrom = typename std::enable_if<
+        std::is_constructible<integer_t, IntegerType>::value
+        && std::numeric_limits<IntegerType>::is_signed
+        && (! std::is_same<integer_t, IntegerType>::value)
+        && (sizeof(IntegerType) <= sizeof(integer_t))
+        && (   std::is_same<short,      IntegerType>::value
+            || std::is_same<int,        IntegerType>::value
+            || std::is_same<long,       IntegerType>::value
+            || std::is_same<long long,  IntegerType>::value), IntegerType>;
+        
+        //! @internal Utility to target a compatible integer value.
+        template <class IntegerType>
+        using EnableIfCompatibleIntTypeTo = typename std::enable_if<
+        std::is_constructible<IntegerType, integer_t>::value
+        && std::numeric_limits<IntegerType>::is_signed
+        && (! std::is_same<integer_t, IntegerType>::value)
+        && (sizeof(integer_t) <= sizeof(IntegerType))
+        && (   std::is_same<short,      IntegerType>::value
+            || std::is_same<int,        IntegerType>::value
+            || std::is_same<long,       IntegerType>::value
+            || std::is_same<long long,  IntegerType>::value), IntegerType>;
+        
+        //! @internal Utility to target a compatible floating-point value.
+        template <class FloatType>
+        using EnableIfCompatibleFloatTypeFrom = typename std::enable_if<
+        std::is_constructible<float_t, FloatType>::value
+        && std::is_floating_point<FloatType>::value
+        && (sizeof(FloatType) <= sizeof(float_t))>;
+        
+        //! @internal Utility to target a compatible floating-point value.
+        template <class FloatType>
+        using EnableIfCompatibleFloatTypeTo = typename std::enable_if<
+        std::is_constructible<FloatType, float_t>::value
+        && std::is_floating_point<FloatType>::value
+        && (sizeof(float_t) <= sizeof(FloatType))>;
+    
+    public:
+        
+        //! @brief Constructs a integer_t Atom with a compatible integer value.
+        //! @detail compatible integer type are short, int, long, long long.
+        //! @param value The value.
+        template<class IntegerType,
+        typename EnableIfCompatibleIntTypeFrom<IntegerType>::type = 0>
         Atom(const IntegerType value) noexcept
-        : Atom(static_cast<integer_t>(value))
-        {
-        }
+        : Atom(static_cast<integer_t>(value)) {}
         
-        /*
-        template<typename IntegerType, typename std::enable_if<
-        std::is_constructible<integer_t, IntegerType>::value &&
-        std::numeric_limits<IntegerType>::is_integer &&
-        std::numeric_limits<IntegerType>::is_signed &&
-        (sizeof(IntegerType) <= sizeof(integer_t)),
-        IntegerType>::type = 0>
-        Atom(const IntegerType value) noexcept
-        : Atom(static_cast<integer_t>(value >= std::numeric_limits<integer_t>::max() ? std::numeric_limits<integer_t>::max() : value))
-        {
-            //static_assert(std::numeric_limits<integer_t>::max() >= std::numeric_limits<IntegerType>::max(), "warning : possible loss of data");
-        }
-        */
-        
-        //! Constructor with a long long value.
-        /** The function allocates the atom with a long long value.
-         @param value The value.
-         */
-        /*
-        template<typename IntegerType, typename
-        std::enable_if<
-        std::is_constructible<integer_t, IntegerType>::value &&
-        std::numeric_limits<IntegerType>::is_integer &&
-        std::numeric_limits<IntegerType>::is_signed, IntegerType>::type
-        = 0>
-        Atom(const IntegerType value) noexcept
-        : m_quark(new QuarkInt(static_cast<integer_t>(value)))
-        {}
-        */
-        
-        /*
-        // Constructor with unsigned integer
-        template <class UnsignedType, typename
-        std::enable_if <
-        std::is_constructible<integer_t, UnsignedType>::value &&
-        std::numeric_limits<UnsignedType>::is_integer &&
-        !std::numeric_limits<UnsignedType>::is_signed, UnsignedType >::type
-        = 0 >
-        Atom(const UnsignedType value) noexcept
-        : Atom(static_cast<integer_t>(value >= std::numeric_limits<integer_t>::max() ? std::numeric_limits<integer_t>::max() : value))
-        {
-            //static_assert(std::numeric_limits<integer_t>::max() >= std::numeric_limits<UnsignedType>::max(), "warning : possible loss of data");
-        }
-        */
-        
-        //! @brief Constructs an Atom with a float_t value (explicit).
+        //! @brief Constructs a float_t Atom (explicit).
+        //! @details infinty and NaN value both produce a Null Atom type.
         //! @param value The value.
         explicit Atom(const float_t value) noexcept : m_quark(new QuarkFloat(value))
         {
@@ -201,176 +160,142 @@ namespace kiwi
             }
         }
         
-        //! Constructor with a float_t value.
-        /** The function allocates the atom with a float_t value.
-         @param value The value.
-         */
-        template<class FloatType, typename = typename
-        std::enable_if<
-        std::is_constructible<float_t, FloatType>::value &&
-        std::is_floating_point<FloatType>::value>::type
-        >
+        //! @brief Constructs a float_t Atom value with a compatible floating-point value.
+        //! @param value The value.
+        template<class FloatType,
+        typename = typename EnableIfCompatibleFloatTypeFrom<FloatType>::type>
         Atom(const FloatType value) noexcept
-        : Atom(static_cast<float_t>(value))
-        {}
+        : Atom(static_cast<float_t>(value)) {}
+        
+        //! @brief Constructs a tag_t Atom (explicit).
+        //! @param tag The tag.
+        inline Atom(const tag_t tag) noexcept
+        : m_quark(new QuarkTag(tag)) {}
 
-        //! Constructor with a string.
-        /** The function allocates the atom with a tag created with a string.
-         @param tag The tag.
-         */
-        inline Atom(char const* tag) noexcept : m_quark(new QuarkTag(Tag::create(tag))) {}
+        //! @brief Constructs a tag_t Atom.
+        //! @param tag The tag
+        inline Atom(char const* tag) noexcept
+        : Atom(Tag::create(tag)) {}
         
-        //! Constructor with a string.
-        /** The function allocates the atom with a tag created with a string.
-         @param tag The tag.
-         */
+        //! @brief Constructs a tag_t Atom with a string.
+        //! @param tag The tag
         inline Atom(std::string const& tag) noexcept
-        : m_quark(new QuarkTag(Tag::create(tag))) {}
+        : Atom(Tag::create(tag)) {}
         
-        //! Constructor with a string.
-        /** The function allocates the atom with a tag created with a string.
-         @param tag The tag.
-         */
+        //! @brief Constructs a tag_t Atom by moving a string.
+        //! @param tag The tag
         inline Atom(std::string&& tag) noexcept
-        : m_quark(new QuarkTag(Tag::create(std::forward<std::string>(tag)))) {}
+        : Atom(Tag::create(std::forward<std::string>(tag))) {}
         
-        //! Constructor with a tag.
-        /** The function allocates the atom with a tag.
-         */
-        inline Atom(const tag_t tag) noexcept : m_quark(new QuarkTag(tag)) {}
-        
-        //! Constructor with a vector of atoms.
-        /** The function allocates the atom with a vector of atoms.
-         */
-        inline Atom(vector_t const& atoms) noexcept
+        //! @brief Constructs a vector_t Atom (explicit).
+        //! @param atoms A vector of atoms
+        inline explicit Atom(vector_t const& atoms) noexcept
         : m_quark(new QuarkVector(atoms)) {}
         
-        //! Constructor with a vector of atoms.
-        /** The function allocates the atom with a vector of atoms.
-         */
+        //! @brief Constructs a vector_t Atom using move semantics.
+        //! @param atoms A vector of atoms
         inline Atom(vector_t&& atoms) noexcept
         : m_quark(new QuarkVector(std::forward<vector_t>(atoms))) {}
         
-        //! Constructor with a vector of atoms.
-        /** The function allocates the atom with a vector of atoms.
-         */
+        //! @brief Constructs a vector_t Atom with iterators.
+        //! @param first First iterator
+        //! @param last Last iterator
         inline Atom(vector_t::iterator first, vector_t::iterator last) noexcept
         : m_quark(new QuarkVector(first, last)) {}
         
-        //! Constructor with a vector of atoms.
-        /** The function allocates the atom with a vector of atoms.
-         */
+        //! @brief Constructs a vector_t Atom using an initializer_list.
+        //! @param il The initializer_list of atoms
         inline Atom(std::initializer_list<Atom> il) noexcept
         : m_quark(new QuarkVector(il)) {}
         
-        //! Constructor with a map of atoms.
-        /** The function allocates the atom with a vector of atoms.
-         */
-        inline Atom(dico_t const& atoms) noexcept
-        : m_quark(new QuarkDico(atoms)) {}
+        //! @brief Constructs a dico_t Atom (explicit).
+        //! @param dico A dico_t
+        inline explicit Atom(dico_t const& dico) noexcept
+        : m_quark(new QuarkDico(dico)) {}
         
-        //! Constructor with a map of atoms.
-        /** The function allocates the atom with a vector of atoms.
-         */
+        //! @brief Constructs a dico_t Atom using move semantics.
+        //! @param dico A dico_t
         inline Atom(dico_t&& atoms) noexcept
         : m_quark(new QuarkDico(std::forward<dico_t>(atoms))) {}
         
-        //! Constructor with a map of atoms.
-        /** The function allocates the atom with a vector of atoms.
-         */
+        //! @brief Constructs a dico_t Atom using iterators.
+        //! @param first The first iterator
+        //! @param first The last iterator
         inline Atom(dico_t::iterator first, dico_t::iterator last) noexcept
         : m_quark(new QuarkDico(first, last)) {}
         
-        //! Constructor with a map of atoms.
-        /** The function allocates the atom with a vector of atoms.
-         */
+        //! @brief Constructs a dico_t Atom using an initializer_list of tag_t/Atom pair.
+        //! @param il The initializer_list of pair
         inline Atom(std::initializer_list<std::pair<const tag_t, Atom>> il) noexcept
         : m_quark(new QuarkDico(il)) {}
         
         //! Destructor.
         inline ~Atom() noexcept {delete m_quark;}
         
-        //! Retrieve the type of the atom.
-        /** The function retrieves the type of the atom.
-         @return The type of the atom as a type.
-         */
+        //! @brief Get the type of the Atom.
+        //! @return The Type of the atom as a Type.
+        //! @see  isNull(), isBool(), isInt(), isFloat(), isNumber(), isTag(), isVector(), isDico()
         inline Type getType() const noexcept {return m_quark->getType();}
         
-        //! Check if the atom is undefined.
-        /** The function checks if the atom is undefined.
-         @return    true if the atom is undefined.
-         */
+        //! @brief Returns true if the Atom is Null.
+        //! @return true if the Atom is Null.
+        //! @see getType(), isBool(), isInt(), isFloat(), isNumber(), isTag(), isVector(), isDico()
         inline bool isNull() const noexcept {return m_quark->isNull();}
         
-        //! Check if the atom is of type bool.
-        /** The function checks if the atom is of type bool.
-         @return    true if the atom is a bool.
-         */
+        //! @brief Returns true if the Atom is a boolean_t.
+        //! @return true if the Atom is a boolean_t.
+        //! @see getType(), isNull(), isInt(), isFloat(), isNumber(), isTag(), isVector(), isDico()
         inline bool isBool() const noexcept {return m_quark->isBool();}
         
-        //! Check if the atom is of type long.
-        /** The function checks if the atom is of type long.
-         @return    true if the atom is a long.
-         */
+        //! @brief Returns true if the Atom is an integer_t.
+        //! @return true if the Atom is an integer_t.
+        //! @see getType(), isNull(), isBool(), isFloat(), isNumber(), isTag(), isVector(), isDico()
         inline bool isInt() const noexcept {return m_quark->isInt();}
         
-        //! Check if the atom is of type float_t.
-        /** The function checks if the atom is of type float_t.
-         @return    true if the atom is a float_t.
-         */
+        //! @brief Returns true if the Atom is a float_t.
+        //! @return true if the Atom is an float_t.
+        //! @see getType(), isNull(), isBool(), isInt(), isNumber(), isTag(), isVector(), isDico()
         inline bool isFloat() const noexcept {return m_quark->isFloat();}
         
-        //! Checks if the atom is of type long or float_t.
-        /** The function checks if the atom is of type long or float_t.
-         @return    true if the atom is a long or a float_t.
-         */
+        //! @brief Returns true if the Atom is a boolean_t, an integer_t, or a float_t.
+        //! @return true if the Atom is a boolean_t, an integer_t, or a float_t.
+        //! @see getType(), isNull(), isBool(), isInt(), isFloat(), isTag(), isVector(), isDico()
         inline bool isNumber() const noexcept {return m_quark->isNumber();}
         
-        //! Check if the atom is of type tag.
-        /** The function checks if the atom is of type tag.
-         @return    true if the atom is a tag.
-         */
+        //! @brief Returns true if the Atom is a tag_t.
+        //! @return true if the Atom is a tag_t.
+        //! @see getType(), isNull(), isBool(), isInt(), isFloat(), isNumber(), isVector(), isDico()
         inline bool isTag() const noexcept {return m_quark->isTag();}
         
-        //! Check if the atom is of type vector.
-        /** The function checks if the atom is of type vector.
-         @return    true if the atom is a vector.
-         */
+        //! @brief Returns true if the Atom is a vector_t.
+        //! @return true if the Atom is a vector_t.
+        //! @see getType(), isNull(), isBool(), isInt(), isFloat(), isNumber(), isTag(), isDico()
         inline bool isVector() const noexcept {return m_quark->isVector();}
         
-        //! Check if the atom is of type map.
-        /** The function checks if the atom is of type map.
-         @return    true if the atom is a map.
-         */
+        //! @brief Returns true if the Atom is a dico_t.
+        //! @return true if the Atom is a dico_t.
+        //! @see getType(), isNull(), isBool(), isInt(), isFloat(), isNumber(), isTag(), isVector()
         inline bool isDico() const noexcept {return m_quark->isDico();}
         
-        //! Cast the atom to a boolean.
-        /** The function casts the atom to a boolean.
-         @return An boolean value if the atom is a digit otherwise 0.
-         */
+        //! @brief Retrieves The Atom value as a boolean_t.
+        //! @return A boolean value if the atom is a boolean or a digit otherwise false.
+        //! @see isBool()
         inline operator boolean_t() const noexcept {return m_quark->getBool();}
         
+        //! @brief Retrieves The Atom value as an integer_t value.
+        //! @return An integer value if the atom is a number otherwise 0.
+        //! @see isNumber()
         inline operator integer_t() const noexcept {return m_quark->getInt();}
         
-        //! Cast the atom to a long long.
-        /** The function casts the atom to a long long.
-         @return A long value if the atom is a digit otherwise 0.
-         */
-        template<typename IntegerType, typename
-        std::enable_if<
-        std::is_constructible<IntegerType, integer_t>::value &&
-        std::numeric_limits<IntegerType>::is_integer &&
-        std::numeric_limits<IntegerType>::is_signed, IntegerType>::type
-        = 0>
-        operator IntegerType() const noexcept {return static_cast<IntegerType>(m_quark->getInt());}
-        
-        template < typename UnsignedType, typename
-        std::enable_if <
-        std::is_constructible<UnsignedType, integer_t>::value &&
-        std::numeric_limits<UnsignedType>::is_integer &&
-        !std::numeric_limits<UnsignedType>::is_signed, UnsignedType >::type
-        = 0 >
-        operator UnsignedType() const noexcept {return static_cast<UnsignedType>(m_quark->getInt());}
+        //! @brief Retrieves The Atom value as an integer value.
+        //! @return An integer value if the atom is a number otherwise 0.
+        //! @see isNumber()
+        template<class IntegerType,
+        typename EnableIfCompatibleIntTypeTo<IntegerType>::type = 0>
+        operator IntegerType() const noexcept
+        {
+            return static_cast<IntegerType>(m_quark->getInt());
+        }
         
         //! Cast the atom to a float_t.
         /** The function casts the atom to a float_t.
@@ -378,12 +303,10 @@ namespace kiwi
          */
         inline operator float_t() const noexcept {return m_quark->getFloat();}
         
-        template<typename FloatType, typename = typename
-        std::enable_if<
-        std::is_constructible<FloatType, float_t>::value &&
-        std::is_floating_point<FloatType>::value>::type
-        >
-        inline operator FloatType() const noexcept {return static_cast<FloatType>(m_quark->getFloat());}
+        template<class FloatType,
+        typename = typename EnableIfCompatibleFloatTypeTo<FloatType>::type>
+        inline operator FloatType() const noexcept
+        {return static_cast<FloatType>(m_quark->getFloat());}
         
         //! Cast the atom to a tag.
         /** The function casts the atom to a tag.
@@ -516,32 +439,15 @@ namespace kiwi
             return *this;
         }
         
-        template<typename IntegerType, typename
-        std::enable_if<
-        std::is_constructible<integer_t, IntegerType>::value &&
-        std::numeric_limits<IntegerType>::is_integer &&
-        std::numeric_limits<IntegerType>::is_signed, IntegerType>::type
-        = 0>
+        template<class IntegerType,
+        typename EnableIfCompatibleIntTypeFrom<IntegerType>::type = 0>
         inline Atom& operator=(const IntegerType value) noexcept
         {
             delete m_quark;
             m_quark = new QuarkInt(static_cast<integer_t>(value));
             return *this;
         }
-        
-        template<typename UnsignedType, typename
-        std::enable_if<
-        std::is_constructible<integer_t, UnsignedType>::value &&
-        std::numeric_limits<UnsignedType>::is_integer &&
-        !std::numeric_limits<UnsignedType>::is_signed, UnsignedType>::type
-        = 0>
-        inline Atom& operator=(const UnsignedType value) noexcept
-        {
-            delete m_quark;
-            m_quark = new QuarkInt(static_cast<integer_t>(value));
-            return *this;
-        }
-        
+
         //! Set up the atom with a float_t value.
         /** The function sets up the atom with a float_t value.
          @param value   The float_t value.
@@ -554,11 +460,8 @@ namespace kiwi
             return *this;
         }
         
-        template<typename FloatType, typename = typename
-        std::enable_if<
-        std::is_constructible<float_t, FloatType>::value &&
-        std::is_floating_point<FloatType>::value>::type
-        >
+        template<class FloatType,
+        typename = typename EnableIfCompatibleFloatTypeFrom<FloatType>::type>
         Atom& operator=(const FloatType value) noexcept
         {
             delete m_quark;
@@ -814,16 +717,14 @@ namespace kiwi
             }
         }
         
-        template<typename FloatType, typename = typename
-        std::enable_if<
-        std::is_constructible<FloatType, float_t>::value &&
-        std::is_floating_point<FloatType>::value>::type
-        >
+        template<class FloatType,
+        typename = typename EnableIfCompatibleFloatTypeFrom<FloatType>::type>
         bool operator==(const FloatType value) const noexcept
         {
             if(isNumber())
             {
-                return value == static_cast<FloatType>(m_quark->getFloat());
+                std::cout << static_cast<float_t>(m_quark->getFloat()) << " == " << static_cast<float_t>(value) <<std::endl;
+                return m_quark->getFloat() == static_cast<float_t>(value);
             }
             else
             {
@@ -953,11 +854,8 @@ namespace kiwi
             return !(*this == value);
         }
         
-        template<typename FloatType, typename = typename
-        std::enable_if<
-        std::is_constructible<FloatType, float_t>::value &&
-        std::is_floating_point<FloatType>::value>::type
-        >
+        template<class FloatType,
+        typename = typename EnableIfCompatibleFloatTypeTo<FloatType>::type>
         inline bool operator!=(const FloatType value) const noexcept
         {
             return !(*this == value);

@@ -29,6 +29,79 @@
 namespace kiwi
 {
     // ================================================================================ //
+    //                                      SYMBOL                                      //
+    // ================================================================================ //
+    
+    //! @brief The Symbol is an unique object that matchs to a "unique" std::string.
+    //! in the scope of all the Kiwi applications.
+    //! Comparing two Symbol objects is very fast (O(1))
+    //! @detail The symbols are uniques and match to a string. If you construct a symbol with a std::string that already matchs to a symbol, the creation function will return this symbol, otherwise it will create a new one.
+    class Symbol
+    {
+    public:
+        
+        //! @brief Constructs a Symbol with an std::string.
+        Symbol(const std::string& name) : m_name(get(name)) {};
+        
+        //! @brief Constructs a Symbol with an std::string with move semantics.
+        Symbol(std::string&& name) : m_name(get(std::forward<std::string>(name))) {};
+        
+        //! @brief Constructs a Symbol with a string Literal.
+        Symbol(const char* name) : Symbol(std::string(name)) {};
+        
+        //! @brief Destructor.
+        ~Symbol() = default;
+        
+        //! @brief Get the total number of symbols already cached
+        //! @todo remove this function
+        static size_t size() noexcept                               { return m_symbols.size(); }
+        
+        //! @brief Get the symbol as an std::string.
+        inline std::string toString() const noexcept                { return m_name; }
+        
+        //! @brief Returns true if the too symbols are equals
+        inline bool operator == (const Symbol& rhs) const noexcept  { return (&m_name == &rhs.m_name); }
+        
+        //! @brief Returns true if the too symbols are NOT equals
+        inline bool operator != (const Symbol& rhs) const noexcept  { return ! (*this == rhs); }
+        
+    private:
+        
+        static const std::string& get(const std::string& name) noexcept
+        {
+            //std::cout << "Copy construct \n";
+            std::lock_guard<std::mutex> guard(m_mutex);
+            const auto sym = m_symbols.emplace(name).first;
+            return *sym;
+        }
+        
+        static const std::string& get(std::string&& name) noexcept
+        {
+            //std::cout << "Move construct \n";
+            std::lock_guard<std::mutex> guard(m_mutex);
+            const auto sym = m_symbols.emplace(std::move(name)).first;
+            return *sym;
+        }
+        
+        const std::string& m_name;
+        
+        //! @internal
+        static std::set<std::string>  m_symbols;
+        static std::mutex                   m_mutex;
+    };
+            
+    // ================================================================================ //
+    //                                    SYMBOLS                                       //
+    // ================================================================================ //
+    
+    struct Symbols
+    {
+        static const Symbol _empty;
+        static const Symbol arguments;
+        static const Symbol Arial;
+    };
+    
+    // ================================================================================ //
     //                                      TAG                                         //
     // ================================================================================ //
     
@@ -45,7 +118,7 @@ namespace kiwi
         /** You should never use this method except if you really know what you do.
          */
         inline Tag(std::string const& name) : m_name(name) {}
-        
+
         //! The constructor.
         /** You should never use this method except if you really know what you do.
          */

@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2CBC8AF51C74B9AA00155993 /* KiwiTag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CC9DA221C66811B00B1F821 /* KiwiTag.cpp */; };
 		2CC9D9B41C6680F200B1F821 /* test_KiwiCore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CC9D9B31C6680F200B1F821 /* test_KiwiCore.cpp */; };
 		2CC9DA251C66811B00B1F821 /* KiwiAtom.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CC9DA1C1C66811B00B1F821 /* KiwiAtom.cpp */; };
-		2CC9DA271C66811B00B1F821 /* KiwiTag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CC9DA221C66811B00B1F821 /* KiwiTag.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -135,9 +135,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2CC9DA271C66811B00B1F821 /* KiwiTag.cpp in Sources */,
-				2CC9DA251C66811B00B1F821 /* KiwiAtom.cpp in Sources */,
 				2CC9D9B41C6680F200B1F821 /* test_KiwiCore.cpp in Sources */,
+				2CC9DA251C66811B00B1F821 /* KiwiAtom.cpp in Sources */,
+				2CBC8AF51C74B9AA00155993 /* KiwiTag.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
