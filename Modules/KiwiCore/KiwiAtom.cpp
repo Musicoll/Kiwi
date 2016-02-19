@@ -37,13 +37,13 @@ namespace kiwi
         {
             m_quark = new QuarkBool(quark->getBool());
         }
-        else if(other.isLong())
+        else if(other.isInt())
         {
-            m_quark = new QuarkLong(quark->getLong());
+            m_quark = new QuarkInt(quark->getInt());
         }
-        else if(other.isDouble())
+        else if(other.isFloat())
         {
-            m_quark = new QuarkDouble(quark->getDouble());
+            m_quark = new QuarkFloat(quark->getFloat());
         }
         else if(other.isTag())
         {
@@ -74,13 +74,13 @@ namespace kiwi
         {
             m_quark = new QuarkBool(quark->getBool());
         }
-        else if(other.isLong())
+        else if(other.isInt())
         {
-            m_quark = new QuarkLong(quark->getLong());
+            m_quark = new QuarkInt(quark->getInt());
         }
-        else if(other.isDouble())
+        else if(other.isFloat())
         {
-            m_quark = new QuarkDouble(quark->getDouble());
+            m_quark = new QuarkFloat(quark->getFloat());
         }
         else if(other.isTag())
         {
@@ -106,19 +106,19 @@ namespace kiwi
     {
         if(atom.isBool())
         {
-            output << static_cast<bool>(atom);
+            output << atom.operator bool();
         }
-        else if(atom.isLong())
+        else if(atom.isInt())
         {
-            output << static_cast<QuarkLong::type>(atom);
+            output << atom.operator integer_t();
         }
-        else if(atom.isDouble())
+        else if(atom.isFloat())
         {
-            output << static_cast<QuarkDouble::type>(atom);
+            output << atom.operator float_t();
         }
         else if(atom.isTag())
         {
-            output << jsonEscape((static_cast<sTag>(atom))->getName());
+            output << jsonEscape((atom.operator tag_t())->getName());
         }
         else if(atom.isVector())
         {
@@ -194,7 +194,7 @@ namespace kiwi
             word.reserve(20); // is it more efficient ?
             bool is_tag      = false;
             bool is_number   = false;
-            bool is_double   = false;
+            bool is_float    = false;
             bool is_negative = false;
             bool is_quoted   = false;
             
@@ -242,18 +242,18 @@ namespace kiwi
                     {
                         is_negative = true;
                     }
-                    else if(!is_double && (word.empty() || is_number || is_negative) && c == '.')
+                    else if(!is_float && (word.empty() || is_number || is_negative) && c == '.')
                     {
-                        is_double = true;
+                        is_float = true;
                     }
-                    else if(isdigit(c) && (is_number || (word.empty() || is_negative || is_double)))
+                    else if(isdigit(c) && (is_number || (word.empty() || is_negative || is_float)))
                     {
                         is_number = true;
                     }
                     else
                     {
                         is_tag = true;
-                        is_number = is_negative = is_double = false;
+                        is_number = is_negative = is_float = false;
                     }
                 }
                 
@@ -265,13 +265,13 @@ namespace kiwi
             {
                 if(is_number)
                 {
-                    if(is_double)
+                    if(is_float)
                     {
                         atoms.emplace_back(Atom(std::stod(word.c_str())));
                     }
                     else
                     {
-                        atoms.emplace_back(Atom(std::stoll(word.c_str())));
+                        atoms.emplace_back(Atom(static_cast<integer_t>(std::stol(word.c_str()))));
                     }
                 }
                 else

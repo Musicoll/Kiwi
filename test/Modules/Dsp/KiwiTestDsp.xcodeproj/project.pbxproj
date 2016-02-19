@@ -300,6 +300,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN__EXIT_TIME_DESTRUCTORS = NO;
+				HEADER_SEARCH_PATHS = ../../../Modules/;
 				PRODUCT_NAME = KiwiTestDsp;
 			};
 			name = Debug;
@@ -308,6 +309,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN__EXIT_TIME_DESTRUCTORS = NO;
+				HEADER_SEARCH_PATHS = ../../../Modules/;
 				PRODUCT_NAME = KiwiTestDsp;
 			};
 			name = Release;

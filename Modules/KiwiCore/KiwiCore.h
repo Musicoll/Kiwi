@@ -26,7 +26,6 @@
 
 #include "KiwiTag.h"
 #include "KiwiAtom.h"
-#include "KiwiAttr.h"
 #include "KiwiListenerSet.h"
 
 #endif // KIWI_CORE_H_INCLUDED

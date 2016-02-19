@@ -29,9 +29,9 @@ namespace kiwi
         class Chain::Node
         {
         public:
-            Node(size_t const samplerate, size_t const vectorsize, Processor& processor) :
-            m_processor(processor), m_buffer_in(nullptr), m_buffer_out(nullptr),
-            m_sample_rate(samplerate), m_vector_size(vectorsize), m_index(0ul), m_valid(false)
+            Node(Processor& processor, size_t const samplerate, size_t const vectorsize) :
+            m_processor(processor), m_sample_rate(samplerate), m_vector_size(vectorsize),
+            m_index(0ul), m_valid(false)
             {
                 if(m_processor.m_running)
                 {
@@ -42,6 +42,7 @@ namespace kiwi
                     };
                     throw ErrorRunning();
                 }
+                m_processor.m_running = true;
                 
                 class ErrorResize : public Error
                 {
@@ -75,7 +76,6 @@ namespace kiwi
                 {
                     throw ErrorResize();
                 }
-                
             }
             
             ~Node()
@@ -92,21 +92,10 @@ namespace kiwi
                 m_inputs.clear();
                 m_outputs.clear();
                 m_buffer_copy.clear();
-                m_buffer_in = Samples< sample_t >::release(m_buffer_in);
             }
             
             void addInput(const size_t index, Tie&& tie)
             {
-                if(m_processor.m_running)
-                {
-                    class ErrorRunning : public Error
-                    {
-                    public:
-                        const char* what() const noexcept final {return "Kiwi::Dsp::Node : The processor is already in a Chain.";}
-                    };
-                    throw ErrorRunning();
-                }
-                
                 if(index < static_cast<size_t>(m_inputs.size()))
                 {
                     auto it = m_inputs[index].insert(std::move(tie));
@@ -116,7 +105,7 @@ namespace kiwi
                         {
                         public:
                             const char* what() const noexcept final {
-                                return "Kiwi::Dsp::Node : The input Node is already connected.";}
+                                return "Kiwi::Dsp::Processor : The input Processor is already connected.";}
                         };
                         throw ErrorDuplicate();
                     }
@@ -127,7 +116,7 @@ namespace kiwi
                     {
                     public:
                         const char* what() const noexcept final {
-                            return "Kiwi::Dsp::Node : The input Node is connected to a wrong index.";}
+                            return "Kiwi::Dsp::Processor : The input Processor is connected to a wrong index.";}
                     };
                     throw ErrorIndex();
                 }
@@ -135,16 +124,6 @@ namespace kiwi
             
             void addOutput(const size_t index, Tie&& tie)
             {
-                if(m_processor.m_running)
-                {
-                    class ErrorRunning : public Error
-                    {
-                    public:
-                        const char* what() const noexcept final {return "Kiwi::Dsp::Node : The processor is already in a Chain.";}
-                    };
-                    throw ErrorRunning();
-                }
-                
                 if(index < static_cast<size_t>(m_outputs.size()))
                 {
                     auto it = m_outputs[index].insert(std::move(tie));
@@ -154,7 +133,7 @@ namespace kiwi
                         {
                         public:
                             const char* what() const noexcept final {
-                                return "Kiwi::Dsp::Node : The input Node is already connected.";}
+                                return "Kiwi::Dsp::Processor : The output Processor is already connected.";}
                         };
                         throw ErrorDuplicate();
                     }
@@ -165,7 +144,7 @@ namespace kiwi
                     {
                     public:
                         const char* what() const noexcept final {
-                            return "Kiwi::Dsp::Node : The input Node is connected to a wrong index.";}
+                            return "Kiwi::Dsp::Processor : The output Processor is connected to a wrong index.";}
                     };
                     throw ErrorIndex();
                 }
@@ -173,16 +152,6 @@ namespace kiwi
             
             void prepare()
             {
-                if(m_processor.m_running)
-                {
-                    class ErrorRunning : public Error
-                    {
-                    public:
-                        const char* what() const noexcept final {return "Kiwi::Dsp::Node : The processor is already in a Chain.";}
-                    };
-                    throw ErrorRunning();
-                }
-                
                 for(auto& set : m_inputs)
                 {
                     auto it = set.cbegin();
@@ -199,23 +168,6 @@ namespace kiwi
                     }
                 }
                 
-                for(std::vector< std::vector< sample_t const* > >::size_type i = 0; i < m_buffer_copy.size(); ++i)
-                {
-                    for(auto& tie : m_inputs[i])
-                    {
-                        std::shared_ptr<Node> snode = tie.node.lock();
-                        if(snode)
-                        {
-                            //m_buffer_copy[i].push_back(snode->getOutputSamples(tie.index));
-                        }
-                    }
-                }
-                if(m_processor.getNumberOfInputs() || m_processor.getNumberOfOutputs())
-                {
-                    const size_t nchannels = m_processor.getNumberOfInputs() >= m_processor.getNumberOfOutputs() ? m_processor.getNumberOfInputs() : m_processor.getNumberOfOutputs();
-                    m_buffer_out = m_buffer_in = Samples< sample_t >::allocate(m_vector_size * nchannels);
-                }
-                
                 std::vector<bool> inputs_states(m_inputs.size()), outputs_states(m_outputs.size());
                 for(std::vector< std::set< Tie > >::size_type i = 0; i < m_inputs.size(); i++)
                 {
@@ -226,18 +178,19 @@ namespace kiwi
                     outputs_states[i] = !m_outputs[i].empty();
                 }
                 
-                if(m_buffer_in)
+                try
                 {
-                    try
-                    {
-                        Infos infos(m_sample_rate, m_vector_size, inputs_states, outputs_states);
-                        m_valid = m_processor.m_running = m_processor.prepare(infos);
-                    }
-                    catch(std::exception& e)
-                    {
-                        m_buffer_out = m_buffer_in = Samples< sample_t >::release(m_buffer_in);
-                        throw;
-                    }
+                    Infos infos(m_sample_rate, m_vector_size, inputs_states, outputs_states);
+                    m_valid = m_processor.m_running = m_processor.prepare(infos);
+                }
+                catch(std::exception& e)
+                {
+                    throw;
+                }
+                
+                if(0)
+                {
+                    
                 }
                 else
                 {
@@ -253,6 +206,7 @@ namespace kiwi
             
             void perform() const noexcept
             {
+                /*
                 typedef std::vector< std::vector< sample_t const* > >::size_type inc_type;
                 for(inc_type i = 0; i < m_buffer_copy.size(); ++i)
                 {
@@ -270,6 +224,7 @@ namespace kiwi
                         Samples< sample_t >::clear(m_vector_size, buffer);
                     }
                 }
+                 */
                 m_processor.perform(m_buffer);
             }
             
@@ -277,8 +232,6 @@ namespace kiwi
             Buffer                              m_buffer;
             size_t                              m_sample_rate;
             size_t                              m_vector_size;
-            sample_t*                           m_buffer_in;
-            sample_t*                           m_buffer_out;
             size_t                              m_index;
             bool                                m_valid;
             std::vector< std::vector< sample_t const* > > m_buffer_copy;
@@ -332,12 +285,6 @@ namespace kiwi
             // ============================================================================ //
             //                              CREATES THE NODES                               //
             // ============================================================================ //
-            class ErrorNode : public Error
-            {
-            public:
-                const char* what() const noexcept final {return "Kiwi::Dsp::Chain : A node isn't valid.";}
-            };
-            
             m_nodes.reserve(processors.size());
             for(auto processor : processors)
             {
@@ -345,7 +292,7 @@ namespace kiwi
                 {
                     try
                     {
-                        m_nodes.push_back(std::make_shared<Node>(m_sample_rate, m_vector_size, *processor));
+                        m_nodes.push_back(std::make_shared<Node>(*processor, m_sample_rate, m_vector_size));
                     }
                     catch(std::exception& e)
                     {
@@ -354,6 +301,12 @@ namespace kiwi
                 }
                 else
                 {
+                    class ErrorNode : public Error
+                    {
+                    public:
+                        const char* what() const noexcept final {
+                            return "Kiwi::Dsp::Chain : A Processor isn't valid.";}
+                    };
                     throw ErrorNode();
                 }
             }
@@ -400,7 +353,7 @@ namespace kiwi
                         
                         try
                         {
-                            from->addOutput(link->getInputIndex(), {to, link->getInputIndex()});
+                            from->addOutput(link->getOutputIndex(), {to, link->getInputIndex()});
                         }
                         catch(std::exception& e)
                         {

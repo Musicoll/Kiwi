@@ -13,8 +13,6 @@
         <FILE id="UXqGh0" name="KiwiTag.h" compile="0" resource="0" file="../Modules/KiwiCore/KiwiTag.h"/>
         <FILE id="EByetQ" name="KiwiAtom.cpp" compile="1" resource="0" file="../Modules/KiwiCore/KiwiAtom.cpp"/>
         <FILE id="VgYlNp" name="KiwiAtom.h" compile="0" resource="0" file="../Modules/KiwiCore/KiwiAtom.h"/>
-        <FILE id="NG1PdW" name="KiwiAttr.cpp" compile="1" resource="0" file="../Modules/KiwiCore/KiwiAttr.cpp"/>
-        <FILE id="OmQ1uz" name="KiwiAttr.h" compile="0" resource="0" file="../Modules/KiwiCore/KiwiAttr.h"/>
         <FILE id="gZxgiT" name="KiwiListenerSet.h" compile="0" resource="0"
               file="../Modules/KiwiCore/KiwiListenerSet.h"/>
       </GROUP>

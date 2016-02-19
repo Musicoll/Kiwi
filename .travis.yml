@@ -1,31 +1,55 @@
 language: cpp
-sudo: false
+dist: trusty
+sudo: required
 
-compiler:
-  - gcc
-  - clang
-install:
-- if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - gcc-4.9
-    - g++-4.9
-    - clang
-
-os:
-  - osx
-  - linux
-
+# No Email notification
 notifications:
   email: false
 
+matrix:
+  include:
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-4.9', 'python-pip', 'python-yaml']
+      before_script:
+        - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
+      after_success:
+        - make clean
+        - cd ../
+        - cmake -DCOVERALL=ON .
+        - make CXX=$COMPILER
+        - ./test_core
+        - ./test_dsp
+        #- coveralls --verbose -e ThirdParty -e Client -e test --gcov-options '\-lp' --gcov 'gcov-4.9'
+        - coveralls -E '/build/CMakeFiles/*.cpp' -E '/build/CMakeFiles/*.cxx' -e ThirdParty -e Client -e test --gcov-options '\-lp' --gcov 'gcov-4.9'
+      env: COMPILER=g++-4.9
+
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.6']
+          packages: ['clang-3.6']
+      env: COMPILER=clang++-3.6
+
+    - os: osx
+      compiler: gcc
+      env: COMPILER=g++-4.9
+
+    - os: osx
+      compiler: clang++
+      env: COMPILER=clang++
+
 script:
-- mkdir build
-- cd build
-- cmake ..
-- make
-- ./test_core
-- ./test_dsp
+  - mkdir build
+  - cd build
+  - export CXX=$COMPILER
+  - cmake ..
+  - make
+
+after_success:
+  - ./test_core
+  - ./test_dsp

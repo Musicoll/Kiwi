@@ -1,9 +1,17 @@
 cmake_minimum_required (VERSION 2.8.7)
 project (Kiwi CXX)
+
 set (Kiwi_VERSION_MAJOR 0)
 set (Kiwi_VERSION_MINOR 1)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flax-vector-conversions")
+#--------------------------------------
+# OPTIONS
+#--------------------------------------
+option(COVERALL "Build with coverall" OFF)
+
+#--------------------------------------
+# Compiler Check
+#--------------------------------------
 
 if(NOT ${CMAKE_VERSION} LESS 3.2)
     set(CMAKE_CXX_STANDARD 11)
@@ -13,47 +21,85 @@ else()
     # Set C++11 support flags for various compilers
     include(CheckCXXCompilerFlag)
     check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
-    check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
     if(COMPILER_SUPPORTS_CXX11)
         message(STATUS "C++11 is supported.")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    elseif(COMPILER_SUPPORTS_CXX0X)
-        message(STATUS "C++0x is supported.")
-        if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -stdlib=libc++")
-        else()
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-        endif()
+        # Add compiler specific flags
+        if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+            # The Travis CI build machines don't have libc++ installed
+            if ( NOT DEFINED ENV{TRAVIS} )
+                set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++" )
+            endif()
+            #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+        elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+            # no GNU specific flags yet
+        endif() # End compiler specific flags
     else()
         message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
     endif()
 endif()
 
-# Module Core
-file(GLOB KIWI_MODULE_CORE_SRC
-    Modules/KiwiCore/*.h
-    Modules/KiwiCore/*.hpp
-    Modules/KiwiCore/*.cpp
+# Add Platform-specific CXX flags
+if(${APPLE})
+    # the following flag is (only) needed to compile Accelerate on old Mac/gcc version
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flax-vector-conversions")
+endif()
+
+if(COVERALL)
+    message(STATUS "Build with coverall")
+    set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage" )
+else()
+    message(STATUS "Build without coverall")
+endif()
+
+# Call make to build the whole project
+# Each target (Libraries/Binaries) can be built separatly calling [make [targetname]]
+# Target dependencies are built as well if necessary
+
+#----------------------------------
+# Modules
+#----------------------------------
+
+
+# -> Module Core
+
+file(GLOB KIWI_CORE_SRC                                   
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiCore/*.h         
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiCore/*.hpp
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiCore/*.cpp
 )
+add_library(KiwiCore STATIC ${KIWI_CORE_SRC})
+set_property(TARGET KiwiCore
+             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
 
-# Module DSP
-file(GLOB KIWI_MODULE_DSP_SRC
-    Modules/KiwiDsp/*.hpp
-    Modules/KiwiDsp/*.cpp
+# -> Module DSP
+
+file(GLOB KIWI_DSP_SRC
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp/*.h
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp/*.hpp
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp/*.cpp
 )
+add_library(KiwiDsp STATIC ${KIWI_DSP_SRC})
+set_property(TARGET KiwiDsp
+             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
 
-# Core Unit Tests sources
-set(TEST_CORE
-    ${KIWI_MODULE_CORE_SRC}
-    test/Modules/Core/test_KiwiCore.cpp
-) 
-add_executable(test_core ${TEST_CORE})
+#----------------------------------
+# Tests
+#----------------------------------
 
-# DSP Unit Tests sources
-set(TEST_DSP
-    ${KIWI_MODULE_DSP_SRC}
-    test/Modules/Dsp/test_KiwiDsp.cpp
-)
-add_executable(test_dsp ${TEST_DSP})
+# -> Core Unit Tests
 
-# target_link_libraries(test_suite ${TEST_LIBS})
+file(GLOB TEST_CORE_SRC 
+     ${PROJECT_SOURCE_DIR}/test/Modules/Core/*.cpp)
+add_executable(test_core ${TEST_CORE_SRC})
+target_link_libraries(test_core KiwiCore)
+set_property(TARGET test_core
+             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
+
+# -> Dsp Unit Tests
+
+file(GLOB TEST_DSP_SRC ${PROJECT_SOURCE_DIR}/test/Modules/Dsp/*.cpp)
+add_executable(test_dsp ${TEST_DSP_SRC})
+target_link_libraries(test_dsp KiwiDsp)
+set_property(TARGET test_dsp
+             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
