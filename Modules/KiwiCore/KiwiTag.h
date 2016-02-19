@@ -53,7 +53,7 @@ namespace kiwi
         ~Symbol() = default;
         
         //! @brief Get the total number of symbols already cached
-        //! @todo remove this function
+        //! @todo remove this function (?)
         static size_t size() noexcept                               { return m_symbols.size(); }
         
         //! @brief Get the symbol as an std::string.
@@ -87,7 +87,7 @@ namespace kiwi
         
         //! @internal
         static std::set<std::string>  m_symbols;
-        static std::mutex                   m_mutex;
+        static std::mutex             m_mutex;
     };
             
     // ================================================================================ //
