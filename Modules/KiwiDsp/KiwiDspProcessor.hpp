@@ -69,8 +69,9 @@ namespace dsp
         //! @details This is a pure virtual method. You should use this method to perform the
         //! @details digital signal processing but you should avoid to allocate memory or do
         //! @details it asynchronously.
-        //! @param buffer The buffer of samples.
-        virtual void perform(Buffer const& buffer) noexcept = 0;
+        //! @param input    The input Buffer object.
+        //! @param output   The output Buffer object.
+        virtual void perform(Buffer const& input, Buffer& output) noexcept = 0;
         
         //! @brief Releases everything after the digital signal processing.
         //! @details You can use this method to free the memory allocated during the call of

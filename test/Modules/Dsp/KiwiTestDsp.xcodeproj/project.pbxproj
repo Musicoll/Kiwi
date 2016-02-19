@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8F067F801C77522E00F6FF3B /* test_class.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F067F7E1C77522E00F6FF3B /* test_class.cpp */; };
 		8F51CFEF1C64E76A00D549C8 /* test_KiwiDsp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F51CFEE1C64E76A00D549C8 /* test_KiwiDsp.cpp */; };
 		8F59D5171C6A84AE00F68336 /* KiwiDspInfos.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F59D5151C6A84AE00F68336 /* KiwiDspInfos.cpp */; };
 		8F98709A1C6652DF00C3B213 /* KiwiDspProcessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F9870991C6652DF00C3B213 /* KiwiDspProcessor.cpp */; };
@@ -28,6 +29,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8F067F7E1C77522E00F6FF3B /* test_class.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_class.cpp; sourceTree = SOURCE_ROOT; };
+		8F067F7F1C77522E00F6FF3B /* test_class.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = test_class.hpp; sourceTree = SOURCE_ROOT; };
 		8F51CFE41C64E74800D549C8 /* KiwiTestDsp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = KiwiTestDsp; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F51CFEE1C64E76A00D549C8 /* test_KiwiDsp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_KiwiDsp.cpp; sourceTree = SOURCE_ROOT; };
 		8F59D5151C6A84AE00F68336 /* KiwiDspInfos.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = KiwiDspInfos.cpp; path = ../../../Modules/KiwiDsp/KiwiDspInfos.cpp; sourceTree = "<group>"; };
@@ -76,6 +79,8 @@
 			isa = PBXGroup;
 			children = (
 				8F51CFEE1C64E76A00D549C8 /* test_KiwiDsp.cpp */,
+				8F067F7E1C77522E00F6FF3B /* test_class.cpp */,
+				8F067F7F1C77522E00F6FF3B /* test_class.hpp */,
 				8F9C6A3D1C64EAC700537478 /* KiwiDsp */,
 			);
 			path = KiwiTestDsp;
@@ -158,6 +163,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8F51CFEF1C64E76A00D549C8 /* test_KiwiDsp.cpp in Sources */,
+				8F067F801C77522E00F6FF3B /* test_class.cpp in Sources */,
 				8F98709A1C6652DF00C3B213 /* KiwiDspProcessor.cpp in Sources */,
 				8F9C6A631C64EC2200537478 /* KiwiDspChain.cpp in Sources */,
 				8F9C6A641C64EC2200537478 /* KiwiDspSignal.cpp in Sources */,

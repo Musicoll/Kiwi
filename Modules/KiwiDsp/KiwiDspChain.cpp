@@ -98,8 +98,7 @@ namespace kiwi
             {
                 if(index < static_cast<size_t>(m_inputs.size()))
                 {
-                    auto it = m_inputs[index].insert(std::move(tie));
-                    if(!it.second)
+                    if(m_inputs[index].emplace(std::forward<Tie>(tie)).second)
                     {
                         class ErrorDuplicate : public Error
                         {
@@ -126,8 +125,7 @@ namespace kiwi
             {
                 if(index < static_cast<size_t>(m_outputs.size()))
                 {
-                    auto it = m_outputs[index].insert(std::move(tie));
-                    if(!it.second)
+                    if(m_outputs[index].emplace(std::forward<Tie>(tie)).second)
                     {
                         class ErrorDuplicate : public Error
                         {
@@ -204,7 +202,7 @@ namespace kiwi
                 }
             }
             
-            void perform() const noexcept
+            void perform() noexcept
             {
                 /*
                 typedef std::vector< std::vector< sample_t const* > >::size_type inc_type;
@@ -225,7 +223,8 @@ namespace kiwi
                     }
                 }
                  */
-                m_processor.perform(m_buffer);
+                Buffer zaza;
+                m_processor.perform(zaza, m_buffer);
             }
             
             Processor&                          m_processor;
@@ -238,7 +237,14 @@ namespace kiwi
             std::vector< std::set< Tie > > m_inputs;
             std::vector< std::set< Tie > > m_outputs;
         };
-                    
+        
+        
+        
+        
+        
+        
+        
+        
         Chain::Chain() :
         m_running(false), m_sample_rate(0ul), m_vector_size(0ul)
         {

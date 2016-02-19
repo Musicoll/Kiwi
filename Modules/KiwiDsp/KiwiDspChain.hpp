@@ -47,10 +47,9 @@ namespace dsp
                      std::vector< Link * > const& links);
         
         //! @brief Stops the digital signal processing.
-        //! @details Stops the digital signal processing of all the Node objects.
         void stop();
         
-        //! @brief Ticks once the DSP chain.
+        //! @brief Ticks once all the Processor objects.
         void tick() const noexcept;
         
     private:

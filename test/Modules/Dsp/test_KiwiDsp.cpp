@@ -6,50 +6,12 @@
 //  Copyright © 2016 CICM. All rights reserved.
 //
 
-#include "KiwiDsp.hpp"
+#include "test_class.hpp"
+#define CATCH_CONFIG_MAIN
+#include "../../catch.hpp"
 
-using namespace kiwi::dsp;
 
-class Sig : public Processor
-{
-public:
-    Sig(sample_t value) noexcept : m_value(value) {setNumberOfInlets(0); setNumberOfOutlets(1);}
-    ~Sig()  noexcept {}
-private:
-    bool prepare(Infos const& infos) final {return infos.isOutputConnected(0ul);}
-    void perform(Buffer const& buffer) noexcept final
-    {
-        Samples< sample_t >::fill(buffer.getVectorSize(), m_value, buffer.getOutputSamples(0ul));
-    }
-    sample_t m_value;
-};
-
-class Plus : public Processor
-{
-public:
-    Plus() noexcept {setNumberOfInlets(2); setNumberOfOutlets(1);}
-    Plus(sample_t value) noexcept : m_value(value){setNumberOfInlets(1);setNumberOfOutlets(1);}
-    ~Plus()  noexcept{}
-private:
-    bool prepare(Infos const& infos) final
-    {
-        return infos.isInputConnected(0ul) || (getNumberOfInputs() > 1 && infos.isInputConnected(1ul));
-    }
-    void perform(Buffer const& buffer) noexcept final
-    {
-        if(getNumberOfInputs() > 1)
-        {
-            Samples< sample_t >::add(buffer.getVectorSize(), buffer.getInputSamples(0ul),
-                                 buffer.getInputSamples(1ul), buffer.getOutputSamples(0ul));
-        }
-        else
-        {
-            Samples< sample_t >::add(buffer.getVectorSize(), m_value,
-                                 buffer.getInputSamples(0ul), buffer.getOutputSamples(0ul));;
-        }
-    }
-    sample_t m_value;
-};
+/*
 
 int main(int , const char *[]) {
     
@@ -84,7 +46,7 @@ int main(int , const char *[]) {
         {
             throw;
         }
-        /*
+
         try
         {
             chain2.compile(44100, 64, processes, links);
@@ -93,7 +55,6 @@ int main(int , const char *[]) {
         {
             std::cout << e.what() << "\n";
         }
-         */
         
         for(size_t i = 1; i; --i)
         {
@@ -118,3 +79,4 @@ int main(int , const char *[]) {
     
     return 0;
 }
+ */
