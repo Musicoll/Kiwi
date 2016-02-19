@@ -10,21 +10,34 @@ namespace kiwi
 {
     namespace dsp
     {
-        Signal::Signal() noexcept :
-        m_samples(nullptr), m_size(0ul), m_owner(true)
+        Buffer::Buffer() noexcept :
+        m_sample_rate(0ul), m_vector_size(0ul), m_ninputs(0ul), m_noutputs(0ul),
+        m_inputs(nullptr), m_outputs(nullptr)
         {
             
         }
         
-        Signal::Signal(const size_t size, const sample val) :
-        m_samples(nullptr), m_size(0ul), m_owner(true)
+        Buffer::~Buffer()
         {
-            m_samples = Samples<sample>::allocate(size);
+            ;
+        }
+        
+        
+        Signal::Signal() noexcept :
+        m_samples(nullptr), m_size(0ul), m_owner(true), m_borrowed(false)
+        {
+            
+        }
+        
+        Signal::Signal(const size_t size, const sample_t val) :
+        m_samples(nullptr), m_size(0ul), m_owner(true), m_borrowed(false)
+        {
+            m_samples = Samples< sample_t >::allocate(size);
             if(m_samples)
             {
                 m_size  = size;
                 m_owner = true;
-                Samples<sample>::fill(size, val, m_samples);
+                Samples< sample_t >::fill(size, val, m_samples);
             }
             else
             {
@@ -37,16 +50,16 @@ namespace kiwi
         }
         
         Signal::Signal(Signal const& other) :
-        m_samples(nullptr), m_size(0ul), m_owner(true)
+        m_samples(nullptr), m_size(0ul), m_owner(true), m_borrowed(false)
         {
             if(other.m_samples && other.m_size)
             {
-                m_samples = Samples<sample>::allocate(other.m_size);
+                m_samples = Samples< sample_t >::allocate(other.m_size);
                 if(m_samples)
                 {
                     m_size  = other.m_size;
                     m_owner = true;
-                    Samples<sample>::copy(other.m_size, other.m_samples, m_samples);
+                    Samples< sample_t >::copy(other.m_size, other.m_samples, m_samples);
                 }
                 else
                 {
@@ -60,7 +73,7 @@ namespace kiwi
         }
         
         Signal::Signal(Signal&& other) noexcept :
-        m_samples(nullptr), m_size(0ul), m_owner(other.m_owner)
+        m_samples(nullptr), m_size(0ul), m_owner(other.m_owner), m_borrowed(false)
         {
             other.m_owner = true;
             std::swap(m_samples, other.m_samples);
@@ -71,7 +84,7 @@ namespace kiwi
         {
             if(m_owner)
             {
-                Samples<sample>::release(m_samples);
+                Samples< sample_t >::release(m_samples);
             }
             m_samples = nullptr;
             m_size    = 0ul;

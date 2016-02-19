@@ -8,7 +8,7 @@
 #define KIWI_DSP_CHAIN_H_INCLUDED
 
 #include "KiwiDspLink.hpp"
-#include "KiwiDspNode.hpp"
+#include "KiwiDspProcessor.hpp"
 
 namespace kiwi
 {
@@ -31,18 +31,17 @@ namespace dsp
         //! @brief The destructor.
         ~Chain();
         
-        //! @brief Retrieves the current sample rate.
+        //! @brief Gets the current sample rate.
         inline size_t getSampleRate() const noexcept {return m_sample_rate;}
         
-        //! @brief Retrieves the current vector size of the chain.
+        //! @brief Gets the current vector size of the chain.
         inline size_t getVectorSize() const noexcept {return m_vector_size;}
         
-        //! @brief Retrieves the current internal state of the DSP.
+        //! @brief Gets the current internal state of the DSP.
         inline bool isRunning() const noexcept {return m_running;}
         
         //! @brief Compiles the dsp chain.
-        //! @details The function sorts the dsp nodes and call the prepares methods of the
-        //! @details Node objects.
+        //! @details The function sorts Processor objects and call their prepares methods.
         void compile(size_t const samplerate, size_t const vectorsize,
                      std::vector< Processor * > const& processors,
                      std::vector< Link * > const& links);
@@ -51,10 +50,12 @@ namespace dsp
         //! @details Stops the digital signal processing of all the Node objects.
         void stop();
         
-        //! @brief Ticks once all the Node objects.
+        //! @brief Ticks once the DSP chain.
         void tick() const noexcept;
         
     private:
+        class Node;
+        class Tie;
         std::vector< std::shared_ptr< Node > >  m_nodes;
         bool                                    m_running;
         size_t                                  m_sample_rate;

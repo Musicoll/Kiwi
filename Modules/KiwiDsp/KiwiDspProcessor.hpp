@@ -7,13 +7,13 @@
 #ifndef KIWI_DSP_PROCESSOR_H_INCLUDED
 #define KIWI_DSP_PROCESSOR_H_INCLUDED
 
-#include "KiwiDspSignal.hpp"
+#include "KiwiDspInfos.hpp"
 
 namespace kiwi
 {
 namespace dsp
 {
-    class Node;
+    class Chain;
     // ==================================================================================== //
     //                                      PROCESSOR                                       //
     // ==================================================================================== //
@@ -40,10 +40,6 @@ namespace dsp
         //! @return The number of outputs of the Processor object.
         inline size_t getNumberOfOutputs() const noexcept {return m_noutputs;}
         
-        //! @brief Retrieves if the DSP is running.
-        //! @return true if the DSP is running, otherwise false.
-        inline bool isRunning() const noexcept {return m_running;}
-        
     protected:
         //! @brief Sets the number of inputs.
         //! @details You should use this method while the DSP ins't running.
@@ -61,17 +57,20 @@ namespace dsp
         //! @brief Prepares everything for the perform method.
         //! @details This is a pure virtual method. You should use this method to check the
         //! @details vector size, the sample rate, the connected inputs and outputs and to
-        //! @details allocate memory if need. The method should return true if the perform
+        //! @details allocate memory if needed. The method should return true if the perform
         //! @details method of the Processor object can be called, otherwise it should return
         //! @details false.
+        //! @param infos The DSP informations.
         //! @return true if the perform method can be called, otherwise false.
         //! @see release()
-        virtual bool prepare(Node const& node) = 0;
+        virtual bool prepare(Infos const& infos) = 0;
         
         //! @brief Performs the digital signal processing.
-        //! @details This is a pure virtual method. You can use the methods in the following
-        //! @details section but you should avoid to allocate memory or do it asynchronously.
-        virtual void perform(Node const& node) noexcept = 0;
+        //! @details This is a pure virtual method. You should use this method to perform the
+        //! @details digital signal processing but you should avoid to allocate memory or do
+        //! @details it asynchronously.
+        //! @param buffer The buffer of samples.
+        virtual void perform(Buffer const& buffer) noexcept = 0;
         
         //! @brief Releases everything after the digital signal processing.
         //! @details You can use this method to free the memory allocated during the call of
@@ -82,7 +81,7 @@ namespace dsp
         size_t  m_ninputs;
         size_t  m_noutputs;
         bool    m_running;
-        friend Node;
+        friend class Chain;
     };
 }
 }
