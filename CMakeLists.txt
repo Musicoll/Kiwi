@@ -63,8 +63,8 @@ endif()
 
 # -> Module Core
 
-file(GLOB KIWI_CORE_SRC                                   
-     ${PROJECT_SOURCE_DIR}/Modules/KiwiCore/*.h         
+file(GLOB KIWI_CORE_SRC
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiCore/*.h
      ${PROJECT_SOURCE_DIR}/Modules/KiwiCore/*.hpp
      ${PROJECT_SOURCE_DIR}/Modules/KiwiCore/*.cpp
 )
@@ -89,7 +89,7 @@ set_property(TARGET KiwiDsp
 
 # -> Core Unit Tests
 
-file(GLOB TEST_CORE_SRC 
+file(GLOB TEST_CORE_SRC
      ${PROJECT_SOURCE_DIR}/test/Modules/Core/*.cpp)
 add_executable(test_core ${TEST_CORE_SRC})
 target_link_libraries(test_core KiwiCore)
@@ -101,5 +101,6 @@ set_property(TARGET test_core
 file(GLOB TEST_DSP_SRC ${PROJECT_SOURCE_DIR}/test/Modules/Dsp/*.cpp)
 add_executable(test_dsp ${TEST_DSP_SRC})
 target_link_libraries(test_dsp KiwiDsp)
+target_compile_definitions(test_dsp KIWI_DSP_FLOAT=1)
 set_property(TARGET test_dsp
              PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
