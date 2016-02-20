@@ -36,24 +36,8 @@ namespace kiwi
                     throw Error("The Processor object is already in a Chain object.");
                 }
                 m_processor.m_running = true;
-                
-                try
-                {
-                    m_inputs.resize(processor.getNumberOfInputs());
-                }
-                catch(std::exception&)
-                {
-                    throw Error("The Processor object can't allocate its inputs.");
-                }
-                
-                try
-                {
-                    m_outputs.resize(processor.getNumberOfOutputs());
-                }
-                catch(std::exception&)
-                {
-                    throw Error("The Processor object can't allocate its outputs");
-                }
+                m_inputs.resize(processor.getNumberOfInputs());
+                m_outputs.resize(processor.getNumberOfOutputs());
             }
             
             ~Node()
@@ -228,20 +212,14 @@ namespace kiwi
             m_nodes.reserve(processors.size());
             for(auto processor : processors)
             {
-                if(processor)
+                assert(processor != nullptr && "A Processor pointer is nullptr.");
+                try
                 {
-                    try
-                    {
-                        m_nodes.push_back(std::make_shared<Node>(*processor, m_sample_rate, m_vector_size));
-                    }
-                    catch(std::exception& e)
-                    {
-                        throw;
-                    }
+                    m_nodes.push_back(std::make_shared<Node>(*processor, m_sample_rate, m_vector_size));
                 }
-                else
+                catch(std::exception& e)
                 {
-                    throw Error("A Processor object is not valid.");
+                    throw;
                 }
             }
             
@@ -250,48 +228,47 @@ namespace kiwi
             // ============================================================================ //
             for(auto link : links)
             {
-                if(link)
+                assert(link != nullptr && "A Link pointer is nullptr.");
+                std::shared_ptr< Node > from, to;
+                for(auto const& node : m_nodes)
                 {
-                    std::shared_ptr< Node > from, to;
-                    for(auto const& node : m_nodes)
+                    if(&node->m_processor == &link->getInputProcessor())
                     {
-                        if(&node->m_processor == &link->getInputProcessor())
-                        {
-                            to = node;
-                        }
-                        else if(&node->m_processor == &link->getOutputProcessor())
-                        {
-                            from = node;
-                        }
-                        if(from && to)
-                        {
-                            break;
-                        }
+                        to = node;
+                    }
+                    else if(&node->m_processor == &link->getOutputProcessor())
+                    {
+                        from = node;
                     }
                     if(from && to)
                     {
-                        try
-                        {
-                            to->addInput(link->getInputIndex(), {from, link->getOutputIndex()});
-                        }
-                        catch(std::exception& e)
-                        {
-                            throw;
-                        }
-                        
-                        try
-                        {
-                            from->addOutput(link->getOutputIndex(), {to, link->getInputIndex()});
-                        }
-                        catch(std::exception& e)
-                        {
-                            throw;
-                        }
+                        break;
                     }
-                    else
+                }
+                if(from && to)
+                {
+                    try
                     {
-                        throw Error("A Link object is not valid.");
+                        to->addInput(link->getInputIndex(), {from, link->getOutputIndex()});
                     }
+                    catch(std::exception& e)
+                    {
+                        throw;
+                    }
+                    
+                    try
+                    {
+                        from->addOutput(link->getOutputIndex(), {to, link->getInputIndex()});
+                    }
+                    catch(std::exception& e)
+                    {
+                        throw;
+                    }
+                }
+                else
+                {
+                    // No pas ça
+                    throw Error("A Link object is not valid.");
                 }
             }
             

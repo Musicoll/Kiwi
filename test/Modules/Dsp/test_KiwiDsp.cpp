@@ -63,7 +63,7 @@ private:
 // ==================================================================================== //
 //                                          TESTS                                       //
 // ==================================================================================== //
-
+//@todo Link is duplicated and Processor is duplicated
 TEST_CASE("Chain", "[Chain]")
 {
     std::vector<Processor*> processes;
@@ -81,7 +81,21 @@ TEST_CASE("Chain", "[Chain]")
     std::unique_ptr<Link> link_loop(new Link(*plus_signal.get(), 0, *plus_scalar.get(), 1));
     std::unique_ptr<Link> link_false(new Link(*sig2.get(), 0, *plus_scalar.get(), 1));
     
-    SECTION("Wrong Link")
+    SECTION("Link Is Wrong")
+    {
+        Chain chain;
+        processes.push_back(sig1.get());
+        processes.push_back(sig2.get());
+        processes.push_back(plus_scalar.get());
+        processes.push_back(plus_signal.get());
+        links.push_back(link1.get());
+        links.push_back(link2.get());
+        links.push_back(link3.get());
+        links.push_back(link_false.get());
+        REQUIRE_THROWS_AS(chain.compile(44100ul, 64ul, processes, links), Error);
+    }
+    
+    SECTION("Link Is Duplicated")
     {
         Chain chain;
         processes.push_back(sig1.get());

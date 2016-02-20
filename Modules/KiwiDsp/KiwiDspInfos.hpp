@@ -40,14 +40,14 @@ namespace dsp
         //! @details Processor object and to adapt the behavior of the Processor.
         //! @return true if the outlet is connected, otherwise it returns false.
         //! @see isOutputConnected()
-        bool isInputConnected(const size_t index) const noexcept;
+        bool isInputConnected(const size_t index) const;
         
         //! @brief Checks if an outlet is connected to any other Processor object.
         //! @details This method can be used to check if an outlet is connected to any other
         //! @details Processor object and to adapt the behavior of the Processor.
         //! @return true if the outlet is connected, otherwise it returns false.
         //! @see isInputConnected()
-        bool isOutputConnected(const size_t index) const noexcept;
+        bool isOutputConnected(const size_t index) const;
         
     private:
         

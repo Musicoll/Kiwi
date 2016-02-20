@@ -34,15 +34,13 @@ namespace kiwi
             return m_vector_size;
         }
         
-        bool Infos::isInputConnected(const size_t index) const noexcept
+        bool Infos::isInputConnected(const size_t index) const
         {
-            assert(index < m_inputs.size() && "Kiwi::Dsp::Infos : Index out of range.");
             return m_inputs[index];
         }
         
-        bool Infos::isOutputConnected(const size_t index) const noexcept
+        bool Infos::isOutputConnected(const size_t index) const
         {
-            assert(index < m_outputs.size() && "Kiwi::Dsp::Infos : Index out of range.");
             return m_outputs[index];
         }
     }
