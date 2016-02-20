@@ -19,9 +19,9 @@ namespace dsp
     // ==================================================================================== //
     //! @brief The pure virtual class that processes digital signal in a Chain object.
     //! @details The class is pure virtual and allows to implement digital signal processing.
-    //! @details You should implement the pure virtual methods prepare(), perform() and
-    //! @details release().
-    //! @see Chain, Node, Link and Signal
+    //! @details You should implement the pure virtual methods prepare, perform and
+    //! @details release.
+    //! @see Buffer and Infos
     class Processor
     {
     public:

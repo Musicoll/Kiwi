@@ -28,6 +28,7 @@ namespace dsp
     //! @details never be detroyed during the compilation or the processing of the Chain
     //! @details object.
     //! @code zaza
+    //! @endcode
     //! @todo make it a little bit more thread safe
     class Chain
     {
@@ -93,7 +94,45 @@ namespace dsp
         
     private:
         class Node;
-        class Tie;
+        
+        // ==================================================================================== //
+        //                                      CHAIN::TIE                                      //
+        // ==================================================================================== //
+        //! @brief The class that manages a Link object inside a Chain object.
+        class Tie : public std::enable_shared_from_this< Tie >
+        {
+        public:
+            //! @brief The constructor that checks the validity of the connection.
+            Tie(Link& link, std::vector< std::shared_ptr< Node> > const& nodes);
+            
+            //! @brief Gets the Link object.
+            Link const& getLink() const noexcept;
+            
+            //! @brief Gets the Link object.
+            Link& getLink() noexcept;
+            
+            //! @brief Connects the Node objects together.
+            void connect() const;
+            
+            //! @brief Gets the output Node object.
+            std::shared_ptr< const Node > getOutputNode() const noexcept;
+            
+            //! @brief Gets the input Node object.
+            std::shared_ptr< const Node >  getInputNode() const noexcept;
+            
+            //! @brief Gets the index of the output Node object.
+            size_t getOutputIndex() const noexcept;
+            
+            //! @brief Gets the index of the input Node object.
+            size_t getInputIndex() const noexcept;
+            
+        private:
+            Link&                   m_link;
+            std::weak_ptr< Node >   m_from;
+            std::weak_ptr< Node >   m_to;
+            size_t                  m_from_index;
+            size_t                  m_to_index;
+        };
         
         std::vector< std::shared_ptr< Node > >  m_nodes;
         std::vector< std::shared_ptr< Tie > >   m_ties;
@@ -101,45 +140,6 @@ namespace dsp
         std::mutex                              m_mutex;
         size_t                                  m_sample_rate;
         size_t                                  m_vector_size;
-    };
-    
-    // ==================================================================================== //
-    //                                      CHAIN::TIE                                      //
-    // ==================================================================================== //
-    //! @brief The class that manages a Link object inside a Chain object.
-    class Chain::Tie : public std::enable_shared_from_this< Tie >
-    {
-    public:
-        //! @brief The constructor that checks the validity of the connection.
-        Tie(Link& link, std::vector< std::shared_ptr< Node> > const& nodes);
-        
-        //! @brief Gets the Link object.
-        Link const& getLink() const noexcept;
-        
-        //! @brief Gets the Link object.
-        Link& getLink() noexcept;
-        
-        //! @brief Connects the Node objects together.
-        void connect() const;
-        
-        //! @brief Gets the output Node object.
-        std::shared_ptr< const Node > getOutputNode() const noexcept;
-        
-        //! @brief Gets the input Node object.
-        std::shared_ptr< const Node >  getInputNode() const noexcept;
-        
-        //! @brief Gets the index of the output Node object.
-        size_t getOutputIndex() const noexcept;
-        
-        //! @brief Gets the index of the input Node object.
-        size_t getInputIndex() const noexcept;
-        
-    private:
-        Link&                   m_link;
-        std::weak_ptr< Node >   m_from;
-        std::weak_ptr< Node >   m_to;
-        size_t                  m_from_index;
-        size_t                  m_to_index;
     };
     
     // ==================================================================================== //

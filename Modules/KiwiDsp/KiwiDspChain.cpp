@@ -124,6 +124,11 @@ namespace kiwi
             }
         }
         
+        Processor const& Chain::Node::getProcessor() const noexcept
+        {
+            return m_processor;
+        }
+        
         void Chain::Node::addInput(std::shared_ptr< const Chain::Tie > tie)
         {
             if(!m_inputs[tie->getInputIndex()].insert(tie).second)
@@ -147,26 +152,43 @@ namespace kiwi
         
         void Chain::Node::prepare()
         {
-            std::vector<bool> inputs_states(m_inputs.size()), outputs_states(m_outputs.size());
+            std::vector<bool> inputs_states(m_inputs.size());
             {
                 auto in = inputs_states.begin();
                 for(auto& set : m_inputs)
                 {
-                    std::remove_if(set.cbegin(), set.cend(), [](tie_set::const_iterator& it)
-                                   {
-                                       return !it->lock()->getInputNode();
-                                   });
+                    auto it = set.cbegin();
+                    while(it != set.cend())
+                    {
+                        if(!(it->lock()->getInputNode()))
+                        {
+                            it = set.erase(it);
+                        }
+                        else
+                        {
+                            ++it;
+                        }
+                    }
                     *in = !set.empty();
                 }
             }
+            std::vector<bool> outputs_states(m_outputs.size());
             {
                 auto out = outputs_states.begin();
                 for(auto& set : m_outputs)
                 {
-                    std::remove_if(set.cbegin(), set.cend(), [](tie_set::const_iterator& it)
-                                   {
-                                       return !it->lock()->getOutputNode();
-                                   });
+                    auto it = set.cbegin();
+                    while(it != set.cend())
+                    {
+                        if(!(it->lock()->getInputNode()))
+                        {
+                            it = set.erase(it);
+                        }
+                        else
+                        {
+                            ++it;
+                        }
+                    }
                     *out = !set.empty();
                 }
             }
@@ -336,6 +358,8 @@ namespace kiwi
                 {
                     if(!static_cast<bool>(node->m_index))
                     {
+                        // TODO
+                        /*
                         m_nodes.insert(node);
                         for(auto& input : node->m_inputs)
                         {
@@ -355,6 +379,7 @@ namespace kiwi
                                 }
                             }
                         }
+                         */
                         m_nodes.erase(node);
                         node->m_index = m_index++;
                     }

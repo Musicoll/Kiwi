@@ -13,7 +13,6 @@ namespace kiwi
 {
 namespace dsp
 {
-    class Node;
     class Infos
     {
     public:
