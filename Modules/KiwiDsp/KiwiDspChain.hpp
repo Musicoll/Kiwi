@@ -68,8 +68,8 @@ namespace dsp
         //! @see tick, release
         //! @exception Error
         void compile(size_t const samplerate, size_t const vectorsize,
-                     std::vector< Processor * > const& processors,
-                     std::vector< Link * > const& links);
+                     std::set< Processor * > const& processors,
+                     std::set< Link * > const& links);
         
         //! @brief Stops the digital signal processing.
         //! @see compile, tick

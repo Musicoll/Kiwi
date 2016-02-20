@@ -214,8 +214,8 @@ namespace kiwi
         }
         
         void Chain::compile(size_t const samplerate, size_t const vectorsize,
-                            std::vector<Processor *> const& processors,
-                            std::vector<Link *> const& links)
+                            std::set<Processor *> const& processors,
+                            std::set<Link *> const& links)
         {
             // ============================================================================ //
             //                              STOPS THE DSP                                   //

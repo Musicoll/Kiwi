@@ -66,8 +66,8 @@ private:
 //@todo Link is duplicated and Processor is duplicated
 TEST_CASE("Chain", "[Chain]")
 {
-    std::vector<Processor*> processes;
-    std::vector<Link*> links;
+    std::set<Processor*> processes;
+    std::set<Link*> links;
     
     std::unique_ptr<Processor> sig1(new Sig(1.3f));
     std::unique_ptr<Processor> sig2(new Sig(2.7f));
@@ -84,41 +84,41 @@ TEST_CASE("Chain", "[Chain]")
     SECTION("Link Is Wrong")
     {
         Chain chain;
-        processes.push_back(sig1.get());
-        processes.push_back(sig2.get());
-        processes.push_back(plus_scalar.get());
-        processes.push_back(plus_signal.get());
-        links.push_back(link1.get());
-        links.push_back(link2.get());
-        links.push_back(link3.get());
-        links.push_back(link_false.get());
+        processes.insert(sig1.get());
+        processes.insert(sig2.get());
+        processes.insert(plus_scalar.get());
+        processes.insert(plus_signal.get());
+        links.insert(link1.get());
+        links.insert(link2.get());
+        links.insert(link3.get());
+        links.insert(link_false.get());
         REQUIRE_THROWS_AS(chain.compile(44100ul, 64ul, processes, links), Error);
     }
     
     SECTION("Link Is Duplicated")
     {
         Chain chain;
-        processes.push_back(sig1.get());
-        processes.push_back(sig2.get());
-        processes.push_back(plus_scalar.get());
-        processes.push_back(plus_signal.get());
-        links.push_back(link1.get());
-        links.push_back(link2.get());
-        links.push_back(link3.get());
-        links.push_back(link_false.get());
+        processes.insert(sig1.get());
+        processes.insert(sig2.get());
+        processes.insert(plus_scalar.get());
+        processes.insert(plus_signal.get());
+        links.insert(link1.get());
+        links.insert(link2.get());
+        links.insert(link3.get());
+        links.insert(link_false.get());
         REQUIRE_THROWS_AS(chain.compile(44100ul, 64ul, processes, links), Error);
     }
     
     SECTION("Processor Already Used")
     {
         Chain chain1, chain2;
-        processes.push_back(sig1.get());
-        processes.push_back(sig2.get());
-        processes.push_back(plus_scalar.get());
-        processes.push_back(plus_signal.get());
-        links.push_back(link1.get());
-        links.push_back(link2.get());
-        links.push_back(link3.get());
+        processes.insert(sig1.get());
+        processes.insert(sig2.get());
+        processes.insert(plus_scalar.get());
+        processes.insert(plus_signal.get());
+        links.insert(link1.get());
+        links.insert(link2.get());
+        links.insert(link3.get());
         REQUIRE_NOTHROW(chain1.compile(44100ul, 64ul, processes, links));
         REQUIRE_THROWS_AS(chain2.compile(44100ul, 64ul, processes, links), Error);
     }
@@ -126,27 +126,27 @@ TEST_CASE("Chain", "[Chain]")
     SECTION("Loop Detected")
     {
         Chain chain;
-        processes.push_back(sig1.get());
-        processes.push_back(sig2.get());
-        processes.push_back(plus_scalar.get());
-        processes.push_back(plus_signal.get());
-        links.push_back(link1.get());
-        links.push_back(link2.get());
-        links.push_back(link3.get());
-        links.push_back(link_loop.get());
+        processes.insert(sig1.get());
+        processes.insert(sig2.get());
+        processes.insert(plus_scalar.get());
+        processes.insert(plus_signal.get());
+        links.insert(link1.get());
+        links.insert(link2.get());
+        links.insert(link3.get());
+        links.insert(link_loop.get());
         REQUIRE_THROWS_AS(chain.compile(44100ul, 64ul, processes, links), Error);
     }
     
     SECTION("Chain Compiled")
     {
         Chain chain;
-        processes.push_back(sig1.get());
-        processes.push_back(sig2.get());
-        processes.push_back(plus_scalar.get());
-        processes.push_back(plus_signal.get());
-        links.push_back(link1.get());
-        links.push_back(link2.get());
-        links.push_back(link3.get());
+        processes.insert(sig1.get());
+        processes.insert(sig2.get());
+        processes.insert(plus_scalar.get());
+        processes.insert(plus_signal.get());
+        links.insert(link1.get());
+        links.insert(link2.get());
+        links.insert(link3.get());
         
         REQUIRE_NOTHROW(chain.compile(44100ul, 64ul, processes, links));
     }
