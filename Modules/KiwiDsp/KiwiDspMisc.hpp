@@ -18,6 +18,8 @@
 #include <vector>
 #include <set>
 #include <memory>
+#include <atomic>
+#include <mutex>
 
 #ifndef __APPLE__
 #include "malloc.h"

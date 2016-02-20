@@ -32,6 +32,17 @@ namespace dsp
     class Chain
     {
     public:
+        
+        //! @brief The possible states of a Chain object.
+        //! @see getState
+        enum class State : uint8_t
+        {
+            NotCompiled = 0, ///< If the object chain is not compiled.
+            Compiling   = 1, ///< If the object chain is compiling.
+            Processing  = 2, ///< If the object chain is processing.
+            Waiting     = 3  ///< If the object chain is waiting the next processing.
+        };
+        
         //! @brief The default constructor.
         //! @details Allocates and initializes an empty Chain object. All the initializations
         //! @details will be performed with the compile method of the Chain object.
@@ -55,9 +66,9 @@ namespace dsp
         //! @see getSampleRate, isProcessing
         size_t getVectorSize() const noexcept;
         
-        //! @brief Gets the state.
-        //! @see getSampleRate, getVectorSize
-        bool isProcessing() const noexcept;
+        //! @brief Gets the current state.
+        //! @see getSampleRate, getVectorSize, State
+        State getState() const noexcept;
         
         //! @brief Compiles the dsp chain.
         //! @details The function sorts Processor objects and call their prepares methods.
@@ -86,9 +97,79 @@ namespace dsp
         
         std::vector< std::shared_ptr< Node > >  m_nodes;
         std::vector< std::shared_ptr< Tie > >   m_ties;
-        bool                                    m_processing;
+        std::atomic< State >                    m_state;
+        std::mutex                              m_mutex;
         size_t                                  m_sample_rate;
         size_t                                  m_vector_size;
+    };
+    
+    // ==================================================================================== //
+    //                                      CHAIN::TIE                                      //
+    // ==================================================================================== //
+    //! @brief The class that manages a Link object inside a Chain object.
+    class Chain::Tie : public std::enable_shared_from_this< Tie >
+    {
+    public:
+        //! @brief The constructor that checks the validity of the connection.
+        Tie(Link& link, std::vector< std::shared_ptr< Node> > const& nodes);
+        
+        //! @brief Gets the Link object.
+        Link const& getLink() const noexcept;
+        
+        //! @brief Gets the Link object.
+        Link& getLink() noexcept;
+        
+        //! @brief Connects the Node objects together.
+        void connect() const;
+        
+        //! @brief Gets the output Node object.
+        std::shared_ptr< const Node > getOutputNode() const noexcept;
+        
+        //! @brief Gets the input Node object.
+        std::shared_ptr< const Node >  getInputNode() const noexcept;
+        
+        //! @brief Gets the index of the output Node object.
+        size_t getOutputIndex() const noexcept;
+        
+        //! @brief Gets the index of the input Node object.
+        size_t getInputIndex() const noexcept;
+        
+    private:
+        Link&                   m_link;
+        std::weak_ptr< Node >   m_from;
+        std::weak_ptr< Node >   m_to;
+        size_t                  m_from_index;
+        size_t                  m_to_index;
+    };
+    
+    // ==================================================================================== //
+    //                                      CHAIN::NODE                                     //
+    // ==================================================================================== //
+    //! @brief The class that manages a Processor object inside a Chain object.
+    class Chain::Node
+    {
+    public:
+        
+        
+        Node(Processor& processor, size_t const samplerate, size_t const vectorsize);
+        ~Node();
+        Processor const& getProcessor() const noexcept;
+        void addInput(std::shared_ptr< const  Tie > tie);
+        void addOutput(std::shared_ptr< const Tie > tie);
+        void prepare();
+        void perform() noexcept;
+  
+        Processor&              m_processor;
+        Buffer                  m_buffer;
+        size_t                  m_sample_rate;
+        size_t                  m_vector_size;
+        size_t                  m_index;
+        bool                    m_valid;
+        
+    private:
+        typedef std::set< std::weak_ptr< const Tie > , std::owner_less< std::weak_ptr< const Tie > > > tie_set;
+        std::vector< tie_set >  m_inputs;
+        std::vector< tie_set >  m_outputs;
     };
 }
 }
