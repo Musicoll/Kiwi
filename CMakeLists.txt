@@ -75,13 +75,14 @@ set_property(TARGET KiwiCore
 # -> Module DSP
 
 file(GLOB KIWI_DSP_SRC
-     ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp/*.h
      ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp/*.hpp
      ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp/*.cpp
 )
 add_library(KiwiDsp STATIC ${KIWI_DSP_SRC})
 set_property(TARGET KiwiDsp
              PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
+set_property(TARGET KiwiDsp
+             APPEND PROPERTY COMPILE_DEFINITIONS KIWI_DSP_FLOAT)
 
 #----------------------------------
 # Tests
@@ -101,6 +102,7 @@ set_property(TARGET test_core
 file(GLOB TEST_DSP_SRC ${PROJECT_SOURCE_DIR}/test/Modules/Dsp/*.cpp)
 add_executable(test_dsp ${TEST_DSP_SRC})
 target_link_libraries(test_dsp KiwiDsp)
-target_compile_definitions(test_dsp PUBLIC -DKIWI_DSP_FLOAT)
 set_property(TARGET test_dsp
              PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
+set_property(TARGET test_dsp
+             APPEND PROPERTY COMPILE_DEFINITIONS KIWI_DSP_FLOAT)

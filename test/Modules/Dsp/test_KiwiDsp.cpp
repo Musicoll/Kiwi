@@ -6,7 +6,7 @@
 //  Copyright © 2016 CICM. All rights reserved.
 //
 
-#include "KiwiDsp.hpp"
+#include "../../../Modules/KiwiDsp/KiwiDsp.hpp"
 
 using namespace kiwi::dsp;
 
