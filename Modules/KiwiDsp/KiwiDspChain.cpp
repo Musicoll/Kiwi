@@ -163,19 +163,31 @@ namespace kiwi
         
         Chain::~Chain()
         {
-            stop();
+            release();
         }
         
-        void Chain::stop()
+        void Chain::release()
         {
-            m_running = false;
-            try
+            if(m_running)
             {
-                m_nodes.clear();
-            }
-            catch(std::exception&)
-            {
-                throw;
+                try
+                {
+                    m_nodes.clear();
+                }
+                catch(std::exception&)
+                {
+                    throw;
+                }
+                m_running = false;
+                try
+                {
+                    m_ties.clear();
+                }
+                catch(std::exception&)
+                {
+                    throw;
+                }
+                m_running = false;
             }
         }
         
@@ -196,7 +208,7 @@ namespace kiwi
             // ============================================================================ //
             try
             {
-                stop();
+                release();
             }
             catch(std::exception&)
             {
