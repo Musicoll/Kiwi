@@ -252,6 +252,7 @@ namespace kiwi
             // ============================================================================ //
             //                              CONNECTS THE NODES                              //
             // ============================================================================ //
+            m_ties.reserve(links.size());
             for(auto link : links)
             {
                 assert(link != nullptr && "A Link pointer is nullptr.");

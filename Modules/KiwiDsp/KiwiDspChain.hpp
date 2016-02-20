@@ -55,7 +55,7 @@ namespace dsp
         //! @see getSampleRate, isProcessing
         size_t getVectorSize() const noexcept;
         
-        //! @brief Gets the DSP state.
+        //! @brief Gets the state.
         //! @see getSampleRate, getVectorSize
         bool isProcessing() const noexcept;
         
