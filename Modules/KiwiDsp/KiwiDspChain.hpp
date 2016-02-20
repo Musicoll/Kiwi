@@ -19,17 +19,43 @@ namespace dsp
     // ==================================================================================== //
     //! @brief The class manages a set of Processor objects connected by a set Link objects.
     //! @details The class acts like a container for Processor and Link objects. After
-    //! @details retrieving the Processor and Link objects, the class compiles the chain by
-    //! @details connecting and sorting the Processor objects depending on the Link objects.
-    //! @details If the compilation has been processed without throwing any exception, the
-    //! @details Chain object can tick the digital signal processing. The methods should be
-    //! @details called in a thread safe context. Indeed, the release or compile methods
-    //! @details should never be called during the tick call or a Processor object should
-    //! @details never be detroyed during the compilation or the processing of the Chain
-    //! @details object.
-    //! @code zaza
+    //! retrieving the Processor and Link objects, the class compiles the chain by connecting
+    //! and sorting the Processor objects depending on the Link objects. If the compilation
+    //! has been processed without throwing any exception, the Chain object can tick the
+    //! digital signal processing. The methods should be called in a thread safe context.
+    //! Indeed, the release or compile methods should never be called during the tick call or
+    //! a Processor object should never be detroyed during the compilation or the processing
+    //! of the Chain object.
+    //! @code
+    //! Chain chain;
+    //! std::set<Processor*> processes;
+    //! std::set<Link*> links;
+    //! ...
+    //! try
+    //! {
+    //!     chain.compile(44100ul, 64ul, processes, links)
+    //! }
+    //! catch(std::exception& e)
+    //! {
+    //!     std::cout e.what();
+    //!     return -1;
+    //! }
+    //! while(...)
+    //! {
+    //!     chain.tick()
+    //! }
+    //! try
+    //! {
+    //!     chain.release()
+    //! }
+    //! catch(std::exception& e)
+    //! {
+    //!     std::cout e.what();
+    //!     return -1;
+    //! }
     //! @endcode
-    //! @todo make it a little bit more thread safe
+    //! @todo Make it a little bit more thread safe !
+    //! @todo Checks exceptions and assertions !
     class Chain
     {
     public:
@@ -79,6 +105,7 @@ namespace dsp
         //! @param links        The set of Links objects used to connect the Processor objects.
         //! @see tick, release
         //! @exception Error
+        //! @todo The documentation.
         void compile(size_t const samplerate, size_t const vectorsize,
                      std::set< Processor * > const& processors,
                      std::set< Link * > const& links);
@@ -86,18 +113,20 @@ namespace dsp
         //! @brief Stops the digital signal processing.
         //! @see compile, tick
         //! @exception Error
+        //! @todo The documentation.
         void release();
         
         //! @brief Ticks once all the Processor objects.
         //! @see compile, release
+        //! @todo The documentation.
         void tick() const noexcept;
         
     private:
         class Node;
         
-        // ==================================================================================== //
-        //                                      CHAIN::TIE                                      //
-        // ==================================================================================== //
+        // ================================================================================ //
+        //                                         TIE                                      //
+        // ================================================================================ //
         //! @brief The class that manages a Link object inside a Chain object.
         class Tie : public std::enable_shared_from_this< Tie >
         {
@@ -126,12 +155,46 @@ namespace dsp
             //! @brief Gets the index of the input Node object.
             size_t getInputIndex() const noexcept;
             
+            //! @brief Gets if two Ties are similars.
+            bool operator==(Tie const& rhs) const noexcept;
+            
         private:
             Link&                   m_link;
             std::weak_ptr< Node >   m_from;
             std::weak_ptr< Node >   m_to;
             size_t                  m_from_index;
             size_t                  m_to_index;
+        };
+        
+        // ================================================================================ //
+        //                                          NODE                                    //
+        // ================================================================================ //
+        //! @brief The class that manages a Processor object inside a Chain object.
+        class Node
+        {
+        public:
+            
+            
+            Node(Processor& processor, size_t const samplerate, size_t const vectorsize);
+            ~Node();
+            Processor const& getProcessor() const noexcept;
+            void addInput(std::shared_ptr< const  Tie > tie);
+            void removeInput(std::shared_ptr< const Tie > tie);
+            void addOutput(std::shared_ptr< const Tie > tie);
+            void prepare();
+            void perform() noexcept;
+            
+            Processor&              m_processor;
+            Buffer                  m_buffer;
+            size_t                  m_sample_rate;
+            size_t                  m_vector_size;
+            size_t                  m_index;
+            bool                    m_valid;
+            
+        private:
+            typedef std::set< std::weak_ptr< const Tie > , std::owner_less< std::weak_ptr< const Tie > > > tie_set;
+            std::vector< tie_set >  m_inputs;
+            std::vector< tie_set >  m_outputs;
         };
         
         std::vector< std::shared_ptr< Node > >  m_nodes;
@@ -142,36 +205,6 @@ namespace dsp
         size_t                                  m_vector_size;
     };
     
-    // ==================================================================================== //
-    //                                      CHAIN::NODE                                     //
-    // ==================================================================================== //
-    //! @brief The class that manages a Processor object inside a Chain object.
-    class Chain::Node
-    {
-    public:
-        
-        
-        Node(Processor& processor, size_t const samplerate, size_t const vectorsize);
-        ~Node();
-        Processor const& getProcessor() const noexcept;
-        void addInput(std::shared_ptr< const  Tie > tie);
-        void removeInput(std::shared_ptr< const Tie > tie);
-        void addOutput(std::shared_ptr< const Tie > tie);
-        void prepare();
-        void perform() noexcept;
-  
-        Processor&              m_processor;
-        Buffer                  m_buffer;
-        size_t                  m_sample_rate;
-        size_t                  m_vector_size;
-        size_t                  m_index;
-        bool                    m_valid;
-        
-    private:
-        typedef std::set< std::weak_ptr< const Tie > , std::owner_less< std::weak_ptr< const Tie > > > tie_set;
-        std::vector< tie_set >  m_inputs;
-        std::vector< tie_set >  m_outputs;
-    };
 }
 }
 

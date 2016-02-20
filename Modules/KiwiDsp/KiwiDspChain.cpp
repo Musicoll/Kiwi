@@ -33,7 +33,7 @@ namespace kiwi
                     break;
                 }
             }
-            assert((!from || !to) && "A Link isn't valid.");
+            assert(static_cast< bool >(from) && static_cast< bool >(to) && "A Link isn't valid.");
             m_from  = from;
             m_to    = to;
         }
@@ -92,6 +92,12 @@ namespace kiwi
             return m_to_index;
         }
         
+        bool Chain::Tie::operator==(Tie const& rhs) const noexcept
+        {
+            return m_to.lock() == rhs.m_to.lock() && m_from.lock() == rhs.m_from.lock() &&
+            m_to_index == rhs.m_to_index && m_from_index == rhs.m_from_index;
+        }
+        
         // ==================================================================================== //
         //                                          NODE                                        //
         // ==================================================================================== //
@@ -131,23 +137,34 @@ namespace kiwi
         
         void Chain::Node::addInput(std::shared_ptr< const Chain::Tie > tie)
         {
-            if(!m_inputs[tie->getInputIndex()].insert(tie).second)
+            assert(tie->getInputIndex() < static_cast< size_t >(m_inputs.size()) && "Index out of range.");
+            for(auto const& input : m_inputs[tie->getInputIndex()])
             {
-                throw Error("The Link object already exists.");
+                if(*(input.lock()) == *tie)
+                {
+                    throw Error("The Link object already exists.");
+                }
             }
+            m_inputs[static_cast< tie_set::size_type >(tie->getInputIndex())].insert(tie);
         }
         
         void Chain::Node::removeInput(std::shared_ptr< const Chain::Tie > tie)
         {
+            assert(tie->getInputIndex() < static_cast< size_t >(m_inputs.size()) && "Index out of range.");
             m_inputs[tie->getInputIndex()].erase(tie);
         }
         
         void Chain::Node::addOutput(std::shared_ptr< const Chain::Tie > tie)
         {
-            if(!m_outputs[tie->getOutputIndex()].insert(tie).second)
+            assert(tie->getOutputIndex() < static_cast< size_t >(m_outputs.size()) && "Index out of range.");
+            for(auto const& input : m_outputs[tie->getInputIndex()])
             {
-                throw Error("The Link object already exists.");
+                if(*(input.lock()) == *tie)
+                {
+                    throw Error("The Link object already exists.");
+                }
             }
+            m_outputs[static_cast< tie_set::size_type >(tie->getInputIndex())].insert(tie);
         }
         
         void Chain::Node::prepare()

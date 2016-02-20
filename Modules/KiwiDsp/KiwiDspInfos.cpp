@@ -36,11 +36,13 @@ namespace kiwi
         
         bool Infos::isInputConnected(const size_t index) const
         {
+            assert(index < static_cast< size_t >(m_inputs.size()) && "Index out of range");
             return m_inputs[index];
         }
         
         bool Infos::isOutputConnected(const size_t index) const
         {
+            assert(index < static_cast< size_t >(m_outputs.size()) && "Index out of range");
             return m_outputs[index];
         }
     }

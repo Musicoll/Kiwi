@@ -66,9 +66,6 @@ private:
 //@todo Link is duplicated and Processor is duplicated
 TEST_CASE("Chain", "[Chain]")
 {
-    std::set<Processor*> processes;
-    std::set<Link*> links;
-    
     std::unique_ptr<Processor> sig1(new Sig(1.3f));
     std::unique_ptr<Processor> sig2(new Sig(2.7f));
     std::unique_ptr<Processor> plus_scalar(new PlusScalar(1.f));
@@ -79,25 +76,12 @@ TEST_CASE("Chain", "[Chain]")
     std::unique_ptr<Link> link2(new Link(*plus_scalar.get(), 0, *plus_signal.get(), 0));
     std::unique_ptr<Link> link3(new Link(*sig2.get(), 0, *plus_signal.get(), 1));
     std::unique_ptr<Link> link_loop(new Link(*plus_signal.get(), 0, *plus_scalar.get(), 1));
-    std::unique_ptr<Link> link_false(new Link(*sig2.get(), 0, *plus_scalar.get(), 1));
-    
-    SECTION("Link Is Wrong")
-    {
-        Chain chain;
-        processes.insert(sig1.get());
-        processes.insert(sig2.get());
-        processes.insert(plus_scalar.get());
-        processes.insert(plus_signal.get());
-        links.insert(link1.get());
-        links.insert(link2.get());
-        links.insert(link3.get());
-        links.insert(link_false.get());
-        REQUIRE_THROWS_AS(chain.compile(44100ul, 64ul, processes, links), Error);
-    }
     
     SECTION("Link Is Duplicated")
     {
         Chain chain;
+        std::set<Processor*> processes;
+        std::set<Link*> links;
         processes.insert(sig1.get());
         processes.insert(sig2.get());
         processes.insert(plus_scalar.get());
@@ -105,13 +89,15 @@ TEST_CASE("Chain", "[Chain]")
         links.insert(link1.get());
         links.insert(link2.get());
         links.insert(link3.get());
-        links.insert(link_false.get());
+        links.insert(link2.get());
         REQUIRE_THROWS_AS(chain.compile(44100ul, 64ul, processes, links), Error);
     }
     
     SECTION("Processor Already Used")
     {
         Chain chain1, chain2;
+        std::set<Processor*> processes;
+        std::set<Link*> links;
         processes.insert(sig1.get());
         processes.insert(sig2.get());
         processes.insert(plus_scalar.get());
@@ -122,10 +108,12 @@ TEST_CASE("Chain", "[Chain]")
         REQUIRE_NOTHROW(chain1.compile(44100ul, 64ul, processes, links));
         REQUIRE_THROWS_AS(chain2.compile(44100ul, 64ul, processes, links), Error);
     }
-    
+    /*
     SECTION("Loop Detected")
     {
         Chain chain;
+        std::set<Processor*> processes;
+        std::set<Link*> links;
         processes.insert(sig1.get());
         processes.insert(sig2.get());
         processes.insert(plus_scalar.get());
@@ -140,6 +128,8 @@ TEST_CASE("Chain", "[Chain]")
     SECTION("Chain Compiled")
     {
         Chain chain;
+        std::set<Processor*> processes;
+        std::set<Link*> links;
         processes.insert(sig1.get());
         processes.insert(sig2.get());
         processes.insert(plus_scalar.get());
@@ -150,5 +140,6 @@ TEST_CASE("Chain", "[Chain]")
         
         REQUIRE_NOTHROW(chain.compile(44100ul, 64ul, processes, links));
     }
+     */
 }
 
