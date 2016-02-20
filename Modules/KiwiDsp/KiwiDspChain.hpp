@@ -27,6 +27,7 @@ namespace dsp
     //! @details should never be called during the tick call or a Processor object should
     //! @details never be detroyed during the compilation or the processing of the Chain
     //! @details object.
+    //! @code zaza
     //! @todo make it a little bit more thread safe
     class Chain
     {
@@ -42,30 +43,41 @@ namespace dsp
         //! @details needed. Nevertheless the release method should always be called before
         //! @details the destruction in the case where exception are thrown by the Processor
         //! @details objects while they release methods are called.
+        //! @see release
+        //! @exception Error
         ~Chain();
         
         //! @brief Gets the current sample rate.
         //! @see getVectorSize, isProcessing
-        inline size_t getSampleRate() const noexcept {return m_sample_rate;}
+        size_t getSampleRate() const noexcept;
         
         //! @brief Gets the current vector size.
         //! @see getSampleRate, isProcessing
-        inline size_t getVectorSize() const noexcept {return m_vector_size;}
+        size_t getVectorSize() const noexcept;
         
         //! @brief Gets the DSP state.
         //! @see getSampleRate, getVectorSize
-        inline bool isProcessing() const noexcept {return m_processing;}
+        bool isProcessing() const noexcept;
         
         //! @brief Compiles the dsp chain.
         //! @details The function sorts Processor objects and call their prepares methods.
+        //! @param samplerate   The sample rate of the digital signal processing.
+        //! @param vectorsize   The vector size of the digital signal processing.
+        //! @param processors   The set of Processor objects to add to the Chain object.
+        //! @param links        The set of Links objects used to connect the Processor objects.
+        //! @see tick, release
+        //! @exception Error
         void compile(size_t const samplerate, size_t const vectorsize,
                      std::vector< Processor * > const& processors,
                      std::vector< Link * > const& links);
         
         //! @brief Stops the digital signal processing.
+        //! @see compile, tick
+        //! @exception Error
         void release();
         
         //! @brief Ticks once all the Processor objects.
+        //! @see compile, release
         void tick() const noexcept;
         
     private:
@@ -78,8 +90,6 @@ namespace dsp
         size_t                                  m_sample_rate;
         size_t                                  m_vector_size;
     };
-    
-    
 }
 }
 

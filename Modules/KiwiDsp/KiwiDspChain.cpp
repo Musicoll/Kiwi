@@ -166,6 +166,21 @@ namespace kiwi
             release();
         }
         
+        size_t Chain::getSampleRate() const noexcept
+        {
+            return m_sample_rate;
+        }
+        
+        size_t Chain::getVectorSize() const noexcept
+        {
+            return m_vector_size;
+        }
+        
+        bool Chain::isProcessing() const noexcept
+        {
+            return m_processing;
+        }
+        
         void Chain::release()
         {
             if(m_processing)
