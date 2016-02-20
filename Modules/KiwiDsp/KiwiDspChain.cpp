@@ -56,7 +56,7 @@ namespace kiwi
             {
                 to->addInput(shared_from_this());
             }
-            catch(std::exception& e)
+            catch(std::exception&)
             {
                 throw;
             }
@@ -65,8 +65,9 @@ namespace kiwi
             {
                 from->addOutput(shared_from_this());
             }
-            catch(std::exception& e)
+            catch(std::exception&)
             {
+                to->removeInput(shared_from_this());
                 throw;
             }
         }
@@ -125,61 +126,49 @@ namespace kiwi
         
         void Chain::Node::addInput(std::shared_ptr< const Chain::Tie > tie)
         {
-            if(tie->getInputIndex() < static_cast<size_t>(m_inputs.size()))
+            if(!m_inputs[tie->getInputIndex()].insert(tie).second)
             {
-                if(!m_inputs[tie->getInputIndex()].insert(tie).second)
-                {
-                    throw Error("The Link object already exists.");
-                }
+                throw Error("The Link object already exists.");
             }
-            else
-            {
-                throw Error("The Link object has a wrong output index.");
-            }
+        }
+        
+        void Chain::Node::removeInput(std::shared_ptr< const Chain::Tie > tie)
+        {
+            m_inputs[tie->getInputIndex()].erase(tie);
         }
         
         void Chain::Node::addOutput(std::shared_ptr< const Chain::Tie > tie)
         {
-            if(tie->getOutputIndex() < static_cast<size_t>(m_outputs.size()))
+            if(!m_outputs[tie->getOutputIndex()].insert(tie).second)
             {
-                if(!m_outputs[tie->getOutputIndex()].insert(tie).second)
-                {
-                    throw Error("The Link object already exists.");
-                }
-            }
-            else
-            {
-                throw Error("The Link object has a wrong input index.");
+                throw Error("The Link object already exists.");
             }
         }
         
         void Chain::Node::prepare()
         {
-            // Clears the invalid previous Node objects
-            for(auto& set : m_inputs)
+            std::vector<bool> inputs_states(m_inputs.size()), outputs_states(m_outputs.size());
             {
-                auto it = set.cbegin();
-                while(it != set.cend())
+                auto in = inputs_states.begin();
+                for(auto& set : m_inputs)
                 {
-                    if(!it->lock()->getInputNode())
-                    {
-                        it = set.erase(it);
-                    }
-                    else
-                    {
-                        ++it;
-                    }
+                    std::remove_if(set.cbegin(), set.cend(), [](tie_set::const_iterator& it)
+                                   {
+                                       return !it->lock()->getInputNode();
+                                   });
+                    *in = !set.empty();
                 }
             }
-            
-            std::vector<bool> inputs_states(m_inputs.size()), outputs_states(m_outputs.size());
-            for(std::vector< std::set< Tie > >::size_type i = 0; i < m_inputs.size(); i++)
             {
-                inputs_states[i] = !m_inputs[i].empty();
-            }
-            for(std::vector< std::set< Tie > >::size_type i = 0; i < m_outputs.size(); i++)
-            {
-                outputs_states[i] = !m_outputs[i].empty();
+                auto out = outputs_states.begin();
+                for(auto& set : m_outputs)
+                {
+                    std::remove_if(set.cbegin(), set.cend(), [](tie_set::const_iterator& it)
+                                   {
+                                       return !it->lock()->getOutputNode();
+                                   });
+                    *out = !set.empty();
+                }
             }
             
             try
@@ -206,7 +195,7 @@ namespace kiwi
         
         void Chain::Node::perform() noexcept
         {
-            ;
+            // Todo
         }
         
         // ==================================================================================== //

@@ -155,6 +155,7 @@ namespace dsp
         ~Node();
         Processor const& getProcessor() const noexcept;
         void addInput(std::shared_ptr< const  Tie > tie);
+        void removeInput(std::shared_ptr< const Tie > tie);
         void addOutput(std::shared_ptr< const Tie > tie);
         void prepare();
         void perform() noexcept;
