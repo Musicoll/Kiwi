@@ -50,11 +50,7 @@ namespace kiwi
             }
             else
             {
-                class ErrorAlloc : public Error
-                {
-                    const char* what() const noexcept final {return "Kiwi::Dsp::Signal : can't allocate samples !";}
-                };
-                throw Error();
+                throw Error("The Signal object can't allocate samples.");
             }
         }
         
@@ -72,11 +68,7 @@ namespace kiwi
                 }
                 else
                 {
-                    class ErrorAlloc : public Error
-                    {
-                        const char* what() const noexcept final {return "Kiwi::Dsp::Signal : can't allocate samples !";}
-                    };
-                    throw Error();
+                    throw Error("The Signal object can't allocate samples.");
                 }
             }
         }

@@ -23,9 +23,7 @@ namespace kiwi
         // ==================================================================================== //
         //                                          NODE                                        //
         // ==================================================================================== //
-        //! @brief The class wraps and manages a Processor objects.
-        //! @details The class mamanges a Processor object to include it in a Chain object.
-        //! @see Processor, Chain, Link and Signal.
+        //! @brief The class manages a Processor objects.
         class Chain::Node
         {
         public:
@@ -35,89 +33,56 @@ namespace kiwi
             {
                 if(m_processor.m_running)
                 {
-                    class ErrorRunning : public Error
-                    {
-                    public:
-                        const char* what() const noexcept final {return "Kiwi::Dsp::Chain : The processor is already in a Chain.";}
-                    };
-                    throw ErrorRunning();
+                    throw Error("The Processor object is already in a Chain object.");
                 }
                 m_processor.m_running = true;
-                
-                class ErrorResize : public Error
-                {
-                public:
-                    const char* what() const noexcept final {return "Kiwi::Dsp::Chain : The Processor can't allocate its ioputs.";}
-                };
                 
                 try
                 {
                     m_inputs.resize(processor.getNumberOfInputs());
                 }
-                catch(std::exception& e)
+                catch(std::exception&)
                 {
-                    throw ErrorResize();
+                    throw Error("The Processor object can't allocate its inputs.");
                 }
                 
                 try
                 {
                     m_outputs.resize(processor.getNumberOfOutputs());
                 }
-                catch(std::exception& e)
+                catch(std::exception&)
                 {
-                    throw ErrorResize();
-                }
-                
-                try
-                {
-                    m_buffer_copy.resize(m_processor.getNumberOfInputs());
-                }
-                catch(std::exception& e)
-                {
-                    throw ErrorResize();
+                    throw Error("The Processor object can't allocate its outputs");
                 }
             }
             
             ~Node()
             {
+                m_inputs.clear();
+                m_outputs.clear();
                 try
                 {
                     m_processor.m_running = false;
                     m_processor.release();
                 }
-                catch(std::exception& e)
+                catch(std::exception&)
                 {
-                    throw e;
+                    throw;
                 }
-                m_inputs.clear();
-                m_outputs.clear();
-                m_buffer_copy.clear();
             }
             
             void addInput(const size_t index, Tie&& tie)
             {
                 if(index < static_cast<size_t>(m_inputs.size()))
                 {
-                    if(m_inputs[index].emplace(std::forward<Tie>(tie)).second)
+                    if(!m_inputs[index].emplace(std::forward<Tie>(tie)).second)
                     {
-                        class ErrorDuplicate : public Error
-                        {
-                        public:
-                            const char* what() const noexcept final {
-                                return "Kiwi::Dsp::Processor : The input Processor is already connected.";}
-                        };
-                        throw ErrorDuplicate();
+                        throw Error("The Link object already exists.");
                     }
                 }
                 else
                 {
-                    class ErrorIndex : public Error
-                    {
-                    public:
-                        const char* what() const noexcept final {
-                            return "Kiwi::Dsp::Processor : The input Processor is connected to a wrong index.";}
-                    };
-                    throw ErrorIndex();
+                    throw Error("The Link object has a wrong output index.");
                 }
             }
             
@@ -125,31 +90,20 @@ namespace kiwi
             {
                 if(index < static_cast<size_t>(m_outputs.size()))
                 {
-                    if(m_outputs[index].emplace(std::forward<Tie>(tie)).second)
+                    if(!m_outputs[index].emplace(std::forward<Tie>(tie)).second)
                     {
-                        class ErrorDuplicate : public Error
-                        {
-                        public:
-                            const char* what() const noexcept final {
-                                return "Kiwi::Dsp::Processor : The output Processor is already connected.";}
-                        };
-                        throw ErrorDuplicate();
+                        throw Error("The Link object already exists.");
                     }
                 }
                 else
                 {
-                    class ErrorIndex : public Error
-                    {
-                    public:
-                        const char* what() const noexcept final {
-                            return "Kiwi::Dsp::Processor : The output Processor is connected to a wrong index.";}
-                    };
-                    throw ErrorIndex();
+                    throw Error("The Link object has a wrong input index.");
                 }
             }
             
             void prepare()
             {
+                // Clears the invalid previous Node objects
                 for(auto& set : m_inputs)
                 {
                     auto it = set.cbegin();
@@ -186,45 +140,21 @@ namespace kiwi
                     throw;
                 }
                 
+                /*
                 if(0)
                 {
                     
                 }
                 else
                 {
-                    class ErrorAlloc : public Error
-                    {
-                    public:
-                        const char* what() const noexcept final
-                        {return "Kiwi::Dsp::Node : Can't allocate the buffer.";}
-                    };
-                    throw ErrorAlloc();
+                    throw Error("The Processor can't allocate its buffers.");
                 }
+                 */
             }
             
             void perform() noexcept
             {
-                /*
-                typedef std::vector< std::vector< sample_t const* > >::size_type inc_type;
-                for(inc_type i = 0; i < m_buffer_copy.size(); ++i)
-                {
-                    sample_t* buffer = m_buffer_in + i * m_vector_size;
-                    if(!m_buffer_copy[i].empty())
-                    {
-                        Samples< sample_t >::copy(m_vector_size, m_buffer_copy[i][0], buffer);
-                        for(std::vector< sample_t const* >::size_type j = 1; j < m_buffer_copy[i].size(); ++j)
-                        {
-                            Samples< sample_t >::add(m_vector_size, m_buffer_copy[i][j], buffer);
-                        }
-                    }
-                    else
-                    {
-                        Samples< sample_t >::clear(m_vector_size, buffer);
-                    }
-                }
-                 */
-                Buffer zaza;
-                m_processor.perform(zaza, m_buffer);
+                ;
             }
             
             Processor&                          m_processor;
@@ -233,13 +163,9 @@ namespace kiwi
             size_t                              m_vector_size;
             size_t                              m_index;
             bool                                m_valid;
-            std::vector< std::vector< sample_t const* > > m_buffer_copy;
-            std::vector< std::set< Tie > > m_inputs;
-            std::vector< std::set< Tie > > m_outputs;
+            std::vector< std::set< Tie > >      m_inputs;
+            std::vector< std::set< Tie > >      m_outputs;
         };
-        
-        
-        
         
         
         
@@ -263,7 +189,7 @@ namespace kiwi
             {
                 m_nodes.clear();
             }
-            catch(std::exception& e)
+            catch(std::exception&)
             {
                 throw;
             }
@@ -284,7 +210,15 @@ namespace kiwi
             // ============================================================================ //
             //                              STOPS THE DSP                                   //
             // ============================================================================ //
-            stop();
+            try
+            {
+                stop();
+            }
+            catch(std::exception&)
+            {
+                throw;
+            }
+            
             m_sample_rate = samplerate;
             m_vector_size = vectorsize;
             
@@ -307,25 +241,13 @@ namespace kiwi
                 }
                 else
                 {
-                    class ErrorNode : public Error
-                    {
-                    public:
-                        const char* what() const noexcept final {
-                            return "Kiwi::Dsp::Chain : A Processor isn't valid.";}
-                    };
-                    throw ErrorNode();
+                    throw Error("A Processor object is not valid.");
                 }
             }
             
             // ============================================================================ //
             //                              CONNECTS THE NODES                              //
             // ============================================================================ //
-            class ErrorLink : public Error
-            {
-            public:
-                const char* what() const noexcept final {return "Kiwi::Dsp::Chain : A link isn't valid.";}
-            };
-            
             for(auto link : links)
             {
                 if(link)
@@ -368,7 +290,7 @@ namespace kiwi
                     }
                     else
                     {
-                        throw ErrorLink();
+                        throw Error("A Link object is not valid.");
                     }
                 }
             }
@@ -397,13 +319,7 @@ namespace kiwi
                                 {
                                     if(m_nodes.find(snode) != m_nodes.end())
                                     {
-                                        class ErrorLoop : public Error
-                                        {
-                                        public:
-                                            const char* what() const noexcept final {return "Kiwi::Dsp::Chain : A loop is detected.";}
-                                        };
-                                        
-                                        throw ErrorLoop();
+                                        throw Error("A loop is detected.");
                                     }
                                     else
                                     {

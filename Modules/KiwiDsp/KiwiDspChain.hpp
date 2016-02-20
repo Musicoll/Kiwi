@@ -55,11 +55,14 @@ namespace dsp
     private:
         class Node;
         class Tie;
+        
         std::vector< std::shared_ptr< Node > >  m_nodes;
         bool                                    m_running;
         size_t                                  m_sample_rate;
         size_t                                  m_vector_size;
     };
+    
+    
 }
 }
 

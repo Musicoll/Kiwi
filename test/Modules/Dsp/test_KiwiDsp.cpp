@@ -10,73 +10,80 @@
 #define CATCH_CONFIG_MAIN
 #include "../../catch.hpp"
 
+#define SAMPLE_RATE 44100ul
+#define VECTOR_SIZE 64ul
 
-/*
-
-int main(int , const char *[]) {
+TEST_CASE("Chain", "[Chain]")
+{
+    std::vector<Processor*> processes;
+    std::vector<Link*> links;
     
-    std::unique_ptr<Processor> pr1(new Plus());
-    std::unique_ptr<Processor> pr2(new Plus(1.f));
-    std::unique_ptr<Processor> pr3(new Sig(1.3f));
-    std::unique_ptr<Processor> pr4(new Sig(2.7f));
-    std::unique_ptr<Link> li1(new Link(*pr1.get(), 0, *pr2.get(), 0));
-    std::unique_ptr<Link> li2(new Link(*pr3.get(), 0, *pr1.get(), 0));
-    std::unique_ptr<Link> li3(new Link(*pr2.get(), 0, *pr1.get(), 0)); // Loop
-    std::unique_ptr<Link> li4(new Link(*pr4.get(), 0, *pr1.get(), 1));
-    try
+    std::unique_ptr<Processor> sig1(new Sig(1.3f));
+    std::unique_ptr<Processor> sig2(new Sig(2.7f));
+    std::unique_ptr<Processor> plus_scalar(new PlusScalar(1.f));
+    std::unique_ptr<Processor> plus_signal(new PlusSignal());
+    
+    
+    std::unique_ptr<Link> link1(new Link(*sig1.get(), 0, *plus_scalar.get(), 0));
+    std::unique_ptr<Link> link2(new Link(*plus_scalar.get(), 0, *plus_signal.get(), 0));
+    std::unique_ptr<Link> link3(new Link(*sig2.get(), 0, *plus_signal.get(), 1));
+    std::unique_ptr<Link> link_loop(new Link(*plus_signal.get(), 0, *plus_scalar.get(), 1));
+    std::unique_ptr<Link> link_false(new Link(*sig2.get(), 0, *plus_scalar.get(), 1));
+    
+    SECTION("Wrong Link")
     {
         Chain chain;
-        Chain chain2;
-        std::vector<Processor*> processes;
-        std::vector<Link*> links;
-        processes.push_back(pr1.get());
-        processes.push_back(pr2.get());
-        processes.push_back(pr3.get());
-        processes.push_back(pr4.get());
-        links.push_back(li1.get());
-        links.push_back(li2.get());
-        links.push_back(li4.get());
-        //links.push_back(li3.get());
-        
-        try
-        {
-            chain.compile(44100, 64, processes, links);
-        }
-        catch(std::exception& e)
-        {
-            throw;
-        }
-
-        try
-        {
-            chain2.compile(44100, 64, processes, links);
-        }
-        catch(std::exception& e)
-        {
-            std::cout << e.what() << "\n";
-        }
-        
-        for(size_t i = 1; i; --i)
-        {
-            chain.tick();
-        }
-        
-        try
-        {
-            chain.stop();
-        }
-        catch(std::exception& e)
-        {
-            throw;
-        }
+        processes.push_back(sig1.get());
+        processes.push_back(sig2.get());
+        processes.push_back(plus_scalar.get());
+        processes.push_back(plus_signal.get());
+        links.push_back(link1.get());
+        links.push_back(link2.get());
+        links.push_back(link3.get());
+        links.push_back(link_false.get());
+        REQUIRE_THROWS_AS(chain.compile(44100ul, 64ul, processes, links), Error);
     }
-    catch(std::exception& e)
+    
+    SECTION("Processor Already Used")
     {
-        std::cout << e.what() << "\n";
-        return -1;
+        Chain chain1, chain2;
+        processes.push_back(sig1.get());
+        processes.push_back(sig2.get());
+        processes.push_back(plus_scalar.get());
+        processes.push_back(plus_signal.get());
+        links.push_back(link1.get());
+        links.push_back(link2.get());
+        links.push_back(link3.get());
+        REQUIRE_NOTHROW(chain1.compile(44100ul, 64ul, processes, links));
+        REQUIRE_THROWS_AS(chain2.compile(44100ul, 64ul, processes, links), Error);
     }
     
+    SECTION("Loop Detected")
+    {
+        Chain chain;
+        processes.push_back(sig1.get());
+        processes.push_back(sig2.get());
+        processes.push_back(plus_scalar.get());
+        processes.push_back(plus_signal.get());
+        links.push_back(link1.get());
+        links.push_back(link2.get());
+        links.push_back(link3.get());
+        links.push_back(link_loop.get());
+        REQUIRE_THROWS_AS(chain.compile(44100ul, 64ul, processes, links), Error);
+    }
     
-    return 0;
+    SECTION("Chain Compiled")
+    {
+        Chain chain;
+        processes.push_back(sig1.get());
+        processes.push_back(sig2.get());
+        processes.push_back(plus_scalar.get());
+        processes.push_back(plus_signal.get());
+        links.push_back(link1.get());
+        links.push_back(link2.get());
+        links.push_back(link3.get());
+        
+        REQUIRE_NOTHROW(chain.compile(44100ul, 64ul, processes, links));
+    }
 }
- */
+

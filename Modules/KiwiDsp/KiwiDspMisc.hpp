@@ -36,17 +36,21 @@ namespace dsp
     //                                          ERROR                                       //
     // ==================================================================================== //
     //! @brief The exception.
-    //! @details The class defines the exceptions that can occur during of the creation or
-    //! @details the compilation of the dsp chain.
-    class Error : public std::exception
+    //! @details The class defines the std::exception objects that can be trown during of by
+    //! @details DSP objects during the compilation of a Chain object.
+    class Error : public std::runtime_error
     {
     public:
-        //! @brief The constructor.
-        inline Error() noexcept {}        
+        //! @brief The std::string constructor.
+        //! @param message The message of the error
+        explicit Error(const std::string& message) :
+        std::runtime_error(std::string("kiwi::dsp : ") + message) {}
+        //! @brief The const char* constructor.
+        //! @param message The message of the error
+        explicit Error(const char* message) :
+        std::runtime_error(std::string("kiwi::dsp : ") + std::string(message)) {}
         //! @brief The destructor.
         virtual inline ~Error() noexcept {}
-        //! @brief Retrieves a textual information about the error.
-        virtual const char* what() const noexcept override {return "Kiwi::Dsp::Error : problem occurs !";}
     };
     
     // ==================================================================================== //
