@@ -156,7 +156,7 @@ namespace kiwi
         
         
         Chain::Chain() :
-        m_running(false), m_sample_rate(0ul), m_vector_size(0ul)
+        m_processing(false), m_sample_rate(0ul), m_vector_size(0ul)
         {
             
         }
@@ -168,7 +168,7 @@ namespace kiwi
         
         void Chain::release()
         {
-            if(m_running)
+            if(m_processing)
             {
                 try
                 {
@@ -178,7 +178,6 @@ namespace kiwi
                 {
                     throw;
                 }
-                m_running = false;
                 try
                 {
                     m_ties.clear();
@@ -187,7 +186,7 @@ namespace kiwi
                 {
                     throw;
                 }
-                m_running = false;
+                m_processing = false;
             }
         }
         
@@ -368,7 +367,7 @@ namespace kiwi
                 }
             }
             
-            m_running = true;
+            m_processing = true;
         }
     }
 }

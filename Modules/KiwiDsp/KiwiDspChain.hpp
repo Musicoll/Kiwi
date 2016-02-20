@@ -27,12 +27,14 @@ namespace dsp
     //! @details should never be called during the tick call or a Processor object should
     //! @details never be detroyed during the compilation or the processing of the Chain
     //! @details object.
+    //! @todo make it a little bit more thread safe
     class Chain
     {
     public:
         //! @brief The default constructor.
         //! @details Allocates and initializes an empty Chain object. All the initializations
         //! @details will be performed with the compile method of the Chain object.
+        //! @see compile
         Chain();
         
         //! @brief The destructor.
@@ -43,13 +45,16 @@ namespace dsp
         ~Chain();
         
         //! @brief Gets the current sample rate.
+        //! @see getVectorSize, isProcessing
         inline size_t getSampleRate() const noexcept {return m_sample_rate;}
         
         //! @brief Gets the current vector size.
+        //! @see getSampleRate, isProcessing
         inline size_t getVectorSize() const noexcept {return m_vector_size;}
         
         //! @brief Gets the DSP state.
-        inline bool isRunning() const noexcept {return m_running;}
+        //! @see getSampleRate, getVectorSize
+        inline bool isProcessing() const noexcept {return m_processing;}
         
         //! @brief Compiles the dsp chain.
         //! @details The function sorts Processor objects and call their prepares methods.
@@ -69,7 +74,7 @@ namespace dsp
         
         std::vector< std::shared_ptr< Node > >  m_nodes;
         std::vector< std::shared_ptr< Tie > >   m_ties;
-        bool                                    m_running;
+        bool                                    m_processing;
         size_t                                  m_sample_rate;
         size_t                                  m_vector_size;
     };
