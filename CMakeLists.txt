@@ -101,6 +101,6 @@ set_property(TARGET test_core
 file(GLOB TEST_DSP_SRC ${PROJECT_SOURCE_DIR}/test/Modules/Dsp/*.cpp)
 add_executable(test_dsp ${TEST_DSP_SRC})
 target_link_libraries(test_dsp KiwiDsp)
-target_compile_definitions(test_dsp -DKIWI_DSP_FLOAT)
+target_compile_definitions(test_dsp PUBLIC -DKIWI_DSP_FLOAT)
 set_property(TARGET test_dsp
              PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
