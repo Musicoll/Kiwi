@@ -3,6 +3,8 @@
 COVERALL_SUPPORT="OFF"
 if [ $TRAVIS_OS_NAME == 'linux' ] && [ $COMPILER == 'g++-4.9' ]; then
   COVERALL_SUPPORT="ON"
+  COVERALL_EXCEPTCPP="\'/CMakeFiles/*.cpp\'"
+  COVERALL_EXCEPTCXX="\'/CMakeFiles/*.cxx\'"
 fi
 
 TARGET="test_core test_dsp"
@@ -15,6 +17,7 @@ elif [ $TRAVIS_BRANCH == 'dev-core' ]; then
   PERFORM_TESTS="./test_core"
 fi
 
+echo ""
 echo "---------------------"
 echo "       SCRIPT        "
 echo "---------------------"
@@ -25,13 +28,10 @@ echo "COVERALL_SUPPORT=" $COVERALL_SUPPORT
 echo "TARGET="$TARGET
 echo "TEST="$PERFORM_TESTS
 echo "-------------------"
+echo ""
 
 export CXX=$COMPILER
 make clean
 cmake -DCOVERALL=$COVERALL_SUPPORT ./
 cmake --build ./ --target $TARGET
 $PERFORM_TESTS
-
-if [ $COVERALL_SUPPORT == "ON" ]; then
-  coveralls -E '/build/CMakeFiles/*.cpp' -E '/build/CMakeFiles/*.cxx' -e ThirdParty -e Client -e test --gcov-options '\-lp' --gcov 'gcov-4.9'
-fi
