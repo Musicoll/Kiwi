@@ -45,6 +45,7 @@ matrix:
 
 before_script:
   - chmod +x .travis/travis_script.sh
+  - chmod +x .travis/travis_after_sucess.sh
 
 script: .travis/travis_script.sh
 
