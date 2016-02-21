@@ -23,15 +23,6 @@ matrix:
         - chmod +x .travis/script.sh
         - chmod +x .travis/after_sucess.sh
         - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
-      after_success:
-        - make clean
-        - cd ../
-        - cmake -DCOVERALL=ON .
-        - make CXX=$COMPILER
-        - ./test_core
-        - ./test_dsp
-        #- coveralls --verbose -e ThirdParty -e Client -e test --gcov-options '\-lp' --gcov 'gcov-4.9'
-        - coveralls -E '/build/CMakeFiles/*.cpp' -E '/build/CMakeFiles/*.cxx' -e ThirdParty -e Client -e test --gcov-options '\-lp' --gcov 'gcov-4.9'
       env: COMPILER=g++-4.9
 
     - os: linux
@@ -40,24 +31,19 @@ matrix:
         apt:
           sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.6']
           packages: ['clang-3.6']
-      before_script:
-        - chmod +x .travis/script.sh
-        - chmod +x .travis/after_sucess.sh
       env: COMPILER=clang++-3.6
 
     - os: osx
       compiler: gcc
-      before_script:
-        - chmod +x .travis/script.sh
-        - chmod +x .travis/after_sucess.sh
       env: COMPILER=g++-4.9
 
     - os: osx
       compiler: clang++
-      before_script:
-        - chmod +x .travis/script.sh
-        - chmod +x .travis/after_sucess.sh
       env: COMPILER=clang++
+
+before_script:
+  - chmod +x .travis/script.sh
+  - chmod +x .travis/after_sucess.sh
 
 script: .travis/script.sh
 
