@@ -20,10 +20,10 @@ matrix:
           sources: ['ubuntu-toolchain-r-test']
           packages: ['g++-4.9', 'python-pip', 'python-yaml']
       before_script:
-        - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
-      after_success:
         - chmod +x .travis/script.sh
         - chmod +x .travis/after_sucess.sh
+        - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
+      after_success:
         - make clean
         - cd ../
         - cmake -DCOVERALL=ON .
