@@ -44,7 +44,7 @@ matrix:
       env: COMPILER=clang++
 
 before_script:
-  - chmod +x .travis
+  - chmod +x .travis/travis_script.sh
 
 script: .travis/travis_script.sh
 
