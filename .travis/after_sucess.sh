@@ -1,13 +1,8 @@
 #!/bin/bash
 
-GCOV_VERSION="\'gcov-4.9\'"
-GCOV_OPTION="\'\-lp\'"
-
 COVERALL_SUPPORT="OFF"
 if [ $TRAVIS_OS_NAME == 'linux' ] && [ $COMPILER == 'g++-4.9' ]; then
   COVERALL_SUPPORT="ON"
-  COVERALL_EXCEPTCPP="\'/CMakeFiles/*.cpp\'"
-  COVERALL_EXCEPTCXX="\'/CMakeFiles/*.cxx\'"
 fi
 
 COVERALL_DIRECTORY="/Modules/"
@@ -17,6 +12,13 @@ elif [ $TRAVIS_BRANCH == 'dev-core' ]; then
   COVERALL_DIRECTORY="/Modules/KiwiCore/"
 fi
 
+echo ""
+echo "---------------------"
+echo "COVERALL_SUPPORT=" $COVERALL_SUPPORT
+echo "COVERALL_DIRECTORY="$COVERALL_DIRECTORY
+echo "---------------------"
+echo ""
+
 if [ $COVERALL_SUPPORT == "ON" ]; then
-  coveralls -i $COVERALL_DIRECTORY --gcov-options $GCOV_OPTION --gcov $GCOV_VERSION
+  coveralls -i $COVERALL_DIRECTORY --gcov-options 'gcov-4.9' --gcov '\-lp'
 fi

@@ -21,7 +21,7 @@ matrix:
           packages: ['g++-4.9', 'python-pip', 'python-yaml']
       before_script:
         - chmod +x .travis/script.sh
-        - chmod +x .travis/after_sucess.sh
+        - chmod +x .travis/after_success.sh
         - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
       env: COMPILER=g++-4.9
 
@@ -43,8 +43,8 @@ matrix:
 
 before_script:
   - chmod +x .travis/script.sh
-  - chmod +x .travis/after_sucess.sh
+  - chmod +x .travis/after_success.sh
 
 script: .travis/script.sh
 
-after_sucess: .travis/after_sucess.sh
+after_success: .travis/after_success.sh

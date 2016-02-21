@@ -19,15 +19,9 @@ fi
 
 echo ""
 echo "---------------------"
-echo "       SCRIPT        "
-echo "---------------------"
-echo "OS=" $TRAVIS_OS_NAME
-echo "BRANCH=" $TRAVIS_BRANCH
-echo "COMPILER=" $COMPILER
-echo "COVERALL_SUPPORT=" $COVERALL_SUPPORT
 echo "TARGET="$TARGET
 echo "TEST="$PERFORM_TESTS
-echo "-------------------"
+echo "---------------------"
 echo ""
 
 export CXX=$COMPILER
