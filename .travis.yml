@@ -43,6 +43,9 @@ matrix:
       compiler: clang++
       env: COMPILER=clang++
 
+before_script:
+  - chmod +x grailsw
+
 script: .travis/travis_script.sh
 
 after_success: .travis/travis_after_sucess.sh
