@@ -6,13 +6,11 @@ sudo: required
 notifications:
   email: false
 
-before install:
-  - if [[ "$TRAVIS_BRANCH == "dev-dsp" == "osx" ]];
-    git:
-      submodules: false; fi
-  - if [[ "$TRAVIS_BRANCH" == "dev-core" ]];
-    git:
-      submodules: false; fi
+install:
+  git:
+    submodules: false
+  on:
+    branch: dev-dsp
 
 matrix:
   include:
