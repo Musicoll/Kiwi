@@ -22,6 +22,8 @@ matrix:
       before_script:
         - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
       after_success:
+        - chmod +x .travis/script.sh
+        - chmod +x .travis/after_sucess.sh
         - make clean
         - cd ../
         - cmake -DCOVERALL=ON .
