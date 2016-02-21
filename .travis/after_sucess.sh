@@ -1,10 +1,10 @@
 #!/bin/bash
 
-TEST_PERFORM = ./test_core ./test_dsp
+TEST_PERFORM = './test_core ./test_dsp'
 if [ $TRAVIS_BRANCH == 'dev-dsp' ]; then
-  $TEST_PERFORM = ./test_dsp
+  $TEST_PERFORM = './test_dsp'
 elif [ $TRAVIS_BRANCH == 'dev-core' ]; then
-  $TEST_PERFORM = ./test_core
+  $TEST_PERFORM = './test_core'
 fi
 
 if [ $TRAVIS_OS_NAME == 'linux' ] && [ $COMPILER == 'gcc' ]; then

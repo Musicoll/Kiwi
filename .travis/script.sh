@@ -1,18 +1,18 @@
 #!/bin/bash
 
-COVERALL_SUPPORT = -DCOVERALL=OFF
+COVERALL_SUPPORT = 'OFF'
 if [ $TRAVIS_OS_NAME == 'linux' ] && [ $COMPILER == 'gcc' ]; then
-  $COVERALL_SUPPORT = -DCOVERALL=ON
+  $COVERALL_SUPPORT = '-DCOVERALL=ON'
 fi
 
-TEST_SUPPORT = --target test_core test_dsp
+TEST_SUPPORT = 'test_core test_dsp'
 if [ $TRAVIS_BRANCH == 'dev-dsp' ]; then
-  $TEST_SUPPORT = --target  --target test_dsp
+  $TEST_SUPPORT = 'test_dsp'
 elif [ $TRAVIS_BRANCH == 'dev-core' ]; then
-  $TEST_SUPPORT = --target  --target test_core
+  $TEST_SUPPORT = 'test_core'
 fi
 
 export CXX=$COMPILER
 make clean
-cmake $COVERALL_SUPPORT ./
-cmake --build ./ $TEST_SUPPORT
+cmake -DCOVERALL=$COVERALL_SUPPORT ./
+cmake --build ./ --target $TEST_SUPPORT
