@@ -31,3 +31,7 @@ make clean
 cmake -DCOVERALL=$COVERALL_SUPPORT ./
 cmake --build ./ --target $TARGET
 $PERFORM_TESTS
+
+if [ $COVERALL_SUPPORT == "ON" ]; then
+  coveralls -E '/build/CMakeFiles/*.cpp' -E '/build/CMakeFiles/*.cxx' -e ThirdParty -e Client -e test --gcov-options '\-lp' --gcov 'gcov-4.9'
+fi
