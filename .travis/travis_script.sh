@@ -4,11 +4,11 @@ if [[ $TRAVIS_BRANCH == 'dev-dsp' ]]
   export CXX=$COMPILER
   cmake ./
   cmake --build ./  --target test_dsp
-else if [[ $TRAVIS_BRANCH == 'dev-core' ]]
+elif [[ $TRAVIS_BRANCH == 'dev-core' ]]
   export CXX=$COMPILER
   cmake ./
   cmake --build ./  --target test_core
-else 
+else
   export CXX=$COMPILER
   cmake ./
   cmake --build ./
