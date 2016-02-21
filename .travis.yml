@@ -43,13 +43,6 @@ matrix:
       compiler: clang++
       env: COMPILER=clang++
 
-script:
-  - mkdir build
-  - cd build
-  - export CXX=$COMPILER
-  - cmake ..
-  - make
+script: .travis/travis_script.sh
 
-after_success:
-  - ./test_core
-  - ./test_dsp
+after_success: .travis/travis_after_sucess.sh
