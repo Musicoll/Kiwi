@@ -7,15 +7,15 @@ fi
 
 
 
-TEST_RUN = "test_core test_dsp"
+TEST_RUN="test_core test_dsp"
 if [ $TRAVIS_BRANCH == 'dev-dsp' ]; then
   $TEST_RUN="test_dsp"
 elif [ $TRAVIS_BRANCH == 'dev-core' ]; then
   $TEST_RUN="test_core"
 fi
 
-echo "COVERALL_SUPPORT = " $COVERALL_SUPPORT
-echo "TEST_RUN = "$TEST_RUN
+echo "COVERALL_SUPPORT=" $COVERALL_SUPPORT
+echo "TEST_RUN="$TEST_RUN
 
 export CXX=$COMPILER
 make clean
