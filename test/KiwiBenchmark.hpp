@@ -34,10 +34,19 @@ public:
     using duration_t = std::chrono::duration<double>;
     using timestamp_t = std::chrono::time_point<clock_t>;
     
+    //! brief Sorting methods
+    enum class Sort : uint8_t
+    {
+        None        = 0,
+        ByPerfAsc   = 1,
+        ByPerfDesc  = 2
+    };
+    
     //! brief Starts a test case.
-    void startTestCase(const std::string& message)
+    void startTestCase(const std::string& message, const Sort& sort_method = Sort::None)
     {
         m_test_case_message = message;
+        m_sort_method = sort_method;
     }
     
     //! brief Ends a test case.
@@ -129,9 +138,31 @@ private:
             }
         }
     };
+    
+    void sortResult() noexcept
+    {
+        if(m_sort_method != Sort::None)
+        {
+            std::sort(m_units.begin(), m_units.end(), [&](const Unit& lhs, const Unit& rhs)
+            {
+                if(m_sort_method == Sort::ByPerfAsc)
+                {
+                    return (lhs.getResult() > rhs.getResult());
+                }
+                else if(m_sort_method == Sort::ByPerfDesc)
+                {
+                    return (lhs.getResult() < rhs.getResult());
+                }
+                
+                return true;
+            });
+        }
+    }
         
     void printResult()
     {
+        sortResult();
+        
         Print::DashedLine();
         Print::newLine();
         std::cout << "Test : " << m_test_case_message;
@@ -158,9 +189,9 @@ private:
         Print::newLine();
     }
     
-    std::vector<Unit> m_units;
-    std::string m_test_case_message;
+    std::vector<Unit>   m_units;
+    Sort                m_sort_method;
+    std::string         m_test_case_message;
 };
-
 
 #endif /* KIWI_TEST_UTILITY_HPP_INCLUDED */

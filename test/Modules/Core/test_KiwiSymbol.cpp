@@ -70,7 +70,7 @@ TEST_CASE("Symbol", "[Symbol]")
     
     Benchmark bench;
     
-    bench.startTestCase("Creation (same) (10000x)");
+    bench.startTestCase("Creation (same) (10000x)", Benchmark::Sort::ByPerfAsc);
     
     {
         bench.startUnit("Symbols");
@@ -88,7 +88,7 @@ TEST_CASE("Symbol", "[Symbol]")
     
     bench.endTestCase();
     
-    bench.startTestCase("Creation (Different) (10000x)");
+    bench.startTestCase("Creation (Different) (10000x)", Benchmark::Sort::ByPerfAsc);
     
     {
         bench.startUnit("Symbols");
@@ -106,9 +106,33 @@ TEST_CASE("Symbol", "[Symbol]")
     
     bench.endTestCase();
     
-    bench.startTestCase("Equality compare (100000x)");
+    /*
+    [&]()
+    {
+        bench.startTestCase("Creation (Different) (10000x)", Benchmark::Sort::ByPerfAsc);
+        
+        {
+            bench.startUnit("Symbols");
+            for(int i = 0; i < 10000; ++i) Symbol(std::to_string(i));
+            bench.endUnit();
+            
+            bench.startUnit("Tag");
+            for(int i = 0; i < 10000; ++i) Tag::create(std::to_string(i));
+            bench.endUnit();
+            
+            bench.startUnit("std::string");
+            for(int i = 0; i < 10000; ++i) std::string(std::to_string(i));
+            bench.endUnit();
+        }
+        
+        bench.endTestCase();
+    }();
+    */
+    
+    bench.startTestCase("Equality compare (100000x)", Benchmark::Sort::ByPerfAsc);
     
     {
+        const int iter = 100000;
         Symbol      bench_sym_1("bench_equality_compare_1");
         sTag        bench_tag_1 = Tag::create("bench_equality_compare_1");
         std::string bench_str_1("bench_equality_compare_1");
@@ -117,29 +141,45 @@ TEST_CASE("Symbol", "[Symbol]")
         sTag        bench_tag_2 = Tag::create("bench_equality_compare_2");
         std::string bench_str_2("bench_equality_compare_2");
         
+        std::vector<Symbol> v_symbols;
+        std::vector<sTag> v_tags;
+        std::vector<std::string> v_strings;
+        
+        for(int i = 0; i < iter; ++i)
+        {
+            const auto rdstr = std::to_string(std::rand());
+            v_symbols.push_back(rdstr);
+            v_tags.push_back(Tag::create(rdstr));
+            v_strings.push_back(rdstr);
+        }
+        
+        bool result = false;
+        
         bench.startUnit("Symbols (==)");
-        for(int i = 0; i < 100000; ++i) auto r = (bench_sym_1 == bench_sym_2);
+        for(uint64_t i = 0; i < iter - 1; ++i) { (v_symbols[i] == v_symbols[i+1]) ; }
         bench.endUnit();
         
         bench.startUnit("Tag (==)");
-        for(int i = 0; i < 10000; ++i) auto r = (bench_tag_1 == bench_tag_2);
+        for(uint64_t i = 0; i < iter - 1; ++i) { (v_tags[i] == v_tags[i+1]); }
         bench.endUnit();
         
         bench.startUnit("std::string (==)");
-        for(int i = 0; i < 100000; ++i) auto r = (bench_str_1 == bench_str_2);
+        for(uint64_t i = 0; i < iter - 1; ++i) { if(v_strings[i] == v_strings[i+1]) result = true; }
         bench.endUnit();
         
         bench.startUnit("Symbols (!=)");
-        for(int i = 0; i < 100000; ++i) auto r = (bench_sym_1 != bench_sym_2);
+        for(int i = 0; i < iter; ++i) auto r = (bench_sym_1 != bench_sym_2);
         bench.endUnit();
         
         bench.startUnit("Tag (!=)");
-        for(int i = 0; i < 10000; ++i) auto r = (bench_tag_1 != bench_tag_2);
+        for(int i = 0; i < iter; ++i) auto r = (bench_tag_1 != bench_tag_2);
         bench.endUnit();
         
         bench.startUnit("std::string (!=)");
-        for(int i = 0; i < 100000; ++i) auto r = (bench_str_1 != bench_str_2);
+        for(int i = 0; i < iter; ++i) auto r = (bench_str_1 != bench_str_2);
         bench.endUnit();
+        
+        result = ! result;
     }
     
     bench.endTestCase();
