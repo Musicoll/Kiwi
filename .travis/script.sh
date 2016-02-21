@@ -1,7 +1,7 @@
 #!/bin/bash
 
 COVERALL_SUPPORT="OFF"
-if [ $TRAVIS_OS_NAME == 'linux' ] && [ $COMPILER == 'gcc' ]; then
+if [ $TRAVIS_OS_NAME == 'linux' ] && [ $COMPILER == 'g++-4.9' ]; then
   COVERALL_SUPPORT="ON"
 fi
 
@@ -12,6 +12,8 @@ elif [ $TRAVIS_BRANCH == 'dev-core' ]; then
   TARGET="test_core"
 fi
 
+echo "---------------------"
+echo "       SCRIPT        "
 echo "---------------------"
 echo "OS=" $TRAVIS_OS_NAME
 echo "BRANCH=" $TRAVIS_BRANCH
