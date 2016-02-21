@@ -6,11 +6,8 @@ sudo: required
 notifications:
   email: false
 
-before_install:
-  git:
-    submodules: false
-    on:
-      branch: dev-dsp
+git:
+  submodules: false
 
 matrix:
   include:
