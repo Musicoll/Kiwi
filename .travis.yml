@@ -8,6 +8,8 @@ notifications:
 
 git:
   submodules: false
+  on:
+    branch: 'dev-dsp'
 
 matrix:
   include:
