@@ -19,6 +19,8 @@ matrix:
         apt:
           sources: ['ubuntu-toolchain-r-test']
           packages: ['g++-4.9', 'python-pip', 'python-yaml']
+      before_script:
+        - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
       after_success:
         - make clean
         - cd ../
@@ -49,10 +51,6 @@ matrix:
 before_script:
   - chmod +x .travis/script.sh
   - chmod +x .travis/after_sucess.sh
-  - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
-  on:
-    os: linux
-    compiler: gcc
 
 script: .travis/script.sh
 
