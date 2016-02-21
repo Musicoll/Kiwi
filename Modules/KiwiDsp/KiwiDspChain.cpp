@@ -14,8 +14,7 @@ namespace kiwi
         //                                          TIE                                         //
         // ==================================================================================== //
         
-        Chain::Tie::Tie(Link& link, std::vector< std::shared_ptr< Node> > const& nodes) :
-        m_link(link)
+        Chain::Tie::Tie(Link& link, std::vector< std::shared_ptr< Node> > const& nodes) : m_link(link)
         {
             std::shared_ptr< Node> from, to;
             for(auto const& node : nodes)
@@ -50,52 +49,33 @@ namespace kiwi
         
         void Chain::Tie::connect() const
         {
-            std::shared_ptr< Node> from = m_from.lock();
-            std::shared_ptr< Node> to   = m_to.lock();
-            try
-            {
-                to->addInput(shared_from_this());
-            }
-            catch(std::exception&)
-            {
-                throw;
-            }
-            
-            try
+            std::shared_ptr< Node> from = m_from.lock(), to = m_to.lock();
+            assert(static_cast< bool >(from) && static_cast< bool >(to) && "A Link isn't valid.");
+            if(from && to)
             {
                 from->addOutput(shared_from_this());
-            }
-            catch(std::exception&)
-            {
-                to->removeInput(shared_from_this());
-                throw;
+                to->addInput(shared_from_this());
             }
         }
         
-        std::shared_ptr< const Chain::Node > Chain::Tie::getOutputNode() const noexcept
+        std::shared_ptr< Chain::Node > Chain::Tie::getOutputNode() const noexcept
         {
             return m_from.lock();
         }
         
-        std::shared_ptr< const Chain::Node >  Chain::Tie::getInputNode() const noexcept
+        std::shared_ptr< Chain::Node >  Chain::Tie::getInputNode() const noexcept
         {
             return m_to.lock();
         }
         
         size_t Chain::Tie::getOutputIndex() const noexcept
         {
-            return m_from_index;
+            return m_link.getOutputIndex();
         }
         
         size_t Chain::Tie::getInputIndex() const noexcept
         {
-            return m_to_index;
-        }
-        
-        bool Chain::Tie::operator==(Tie const& rhs) const noexcept
-        {
-            return m_to.lock() == rhs.m_to.lock() && m_from.lock() == rhs.m_from.lock() &&
-            m_to_index == rhs.m_to_index && m_from_index == rhs.m_from_index;
+            return m_link.getInputIndex();
         }
         
         // ==================================================================================== //
@@ -103,8 +83,7 @@ namespace kiwi
         // ==================================================================================== //
         
         Chain::Node::Node(Processor& processor, size_t const samplerate, size_t const vectorsize) :
-        m_processor(processor), m_sample_rate(samplerate), m_vector_size(vectorsize),
-        m_index(0ul), m_valid(false)
+        m_processor(processor), m_sample_rate(samplerate), m_vector_size(vectorsize), m_index(0ul)
         {
             if(m_processor.m_running)
             {
@@ -135,39 +114,39 @@ namespace kiwi
             return m_processor;
         }
         
+        std::vector< Chain::tie_set > const& Chain::Node::getInputs() const noexcept
+        {
+            return m_inputs;
+        }
+        
+        size_t Chain::Node::getIndex() const noexcept
+        {
+            return m_index;
+        }
+        
+        bool Chain::Node::isSorted() const noexcept
+        {
+            return static_cast< bool >(m_index);
+        }
+        
+        void Chain::Node::setIndex(size_t const index) noexcept
+        {
+            m_index = index;
+        }
+        
         void Chain::Node::addInput(std::shared_ptr< const Chain::Tie > tie)
         {
             assert(tie->getInputIndex() < static_cast< size_t >(m_inputs.size()) && "Index out of range.");
-            for(auto const& input : m_inputs[tie->getInputIndex()])
-            {
-                if(*(input.lock()) == *tie)
-                {
-                    throw Error("The Link object already exists.");
-                }
-            }
             m_inputs[static_cast< tie_set::size_type >(tie->getInputIndex())].insert(tie);
-        }
-        
-        void Chain::Node::removeInput(std::shared_ptr< const Chain::Tie > tie)
-        {
-            assert(tie->getInputIndex() < static_cast< size_t >(m_inputs.size()) && "Index out of range.");
-            m_inputs[tie->getInputIndex()].erase(tie);
         }
         
         void Chain::Node::addOutput(std::shared_ptr< const Chain::Tie > tie)
         {
             assert(tie->getOutputIndex() < static_cast< size_t >(m_outputs.size()) && "Index out of range.");
-            for(auto const& input : m_outputs[tie->getInputIndex()])
-            {
-                if(*(input.lock()) == *tie)
-                {
-                    throw Error("The Link object already exists.");
-                }
-            }
-            m_outputs[static_cast< tie_set::size_type >(tie->getInputIndex())].insert(tie);
+            m_outputs[static_cast< tie_set::size_type >(tie->getOutputIndex())].insert(tie);
         }
         
-        void Chain::Node::prepare()
+        bool Chain::Node::prepare()
         {
             std::vector<bool> inputs_states(m_inputs.size());
             {
@@ -209,17 +188,17 @@ namespace kiwi
                     *out = !set.empty();
                 }
             }
-            
+            bool state = false;
             try
             {
                 Infos infos(m_sample_rate, m_vector_size, inputs_states, outputs_states);
-                m_valid = m_processor.m_running = m_processor.prepare(infos);
+                state = m_processor.m_running = m_processor.prepare(infos);
             }
             catch(std::exception& e)
             {
                 throw;
             }
-            
+            return state;
             /*
              if(0)
              {
@@ -302,6 +281,7 @@ namespace kiwi
                             std::set<Processor *> const& processors,
                             std::set<Link *> const& links)
         {
+            assert(vectorsize && ((vectorsize & (vectorsize - 1)) == 0) && "The vector size must be a power of two.");
             // ============================================================================ //
             //                              STOPS THE DSP                                   //
             // ============================================================================ //
@@ -364,43 +344,41 @@ namespace kiwi
             // ============================================================================ //
             //                              NUMBERS THE NODES                               //
             // ============================================================================ //
-            struct Sorter
+            class Sorter
             {
-                size_t          m_index;
-                std::set< std::weak_ptr< Node >, std::owner_less< std::weak_ptr< Node >  > > m_nodes;
+            public:
+                Sorter() : m_index(1ul) {}
                 
-                inline Sorter() noexcept : m_index(1ul) {}
-                inline ~Sorter() noexcept {m_nodes.clear();}
                 void operator()(std::shared_ptr< Node >& node)
                 {
-                    if(!static_cast<bool>(node->m_index))
+                    if(!static_cast<bool>(node->isSorted()))
                     {
-                        // TODO
-                        /*
                         m_nodes.insert(node);
-                        for(auto& input : node->m_inputs)
+                        for(auto const& tieset : node->getInputs())
                         {
-                            for(auto& wnode : input)
+                            for(auto const& tie : tieset)
                             {
-                                std::shared_ptr< Node > snode = wnode.node.lock();
-                                if(snode && !static_cast<bool>(snode->m_index))
+                                std::shared_ptr< Node > pnode = (tie.lock())->getOutputNode();
+                                if(!pnode->isSorted())
                                 {
-                                    if(m_nodes.find(snode) != m_nodes.end())
+                                    if(m_nodes.find(pnode) != m_nodes.end())
                                     {
                                         throw Error("A loop is detected.");
                                     }
                                     else
                                     {
-                                        this->operator()(snode);
+                                        this->operator()(pnode);
                                     }
                                 }
                             }
                         }
-                         */
                         m_nodes.erase(node);
-                        node->m_index = m_index++;
+                        node->setIndex(m_index++);
                     }
                 }
+            private:
+                size_t      m_index;
+                node_set    m_nodes;
             };
             
             try
@@ -417,7 +395,7 @@ namespace kiwi
             // ============================================================================ //
             sort(m_nodes.begin(), m_nodes.end(), [] (std::shared_ptr<Node> const& n1, std::shared_ptr<Node> const& n2)
                  {
-                     return n1->m_index < n2->m_index;
+                     return n1->getIndex() < n2->getIndex();
                  });
             
             
@@ -427,24 +405,23 @@ namespace kiwi
             auto it = m_nodes.cbegin();
             while(it != m_nodes.cend())
             {
-                if(static_cast<bool>((*it)->m_index))
+                bool ready = false;
+                assert((*it)->isSorted() && "A Node object isn't sorted.");
+                try
                 {
-                    try
-                    {
-                        (*it)->prepare();
-                    }
-                    catch(std::exception& e)
-                    {
-                        throw;
-                    }
-                    if(!(*it)->m_valid)
-                    {
-                        it = m_nodes.erase(it);
-                    }
-                    else
-                    {
-                        ++it;
-                    }
+                    ready = (*it)->prepare();
+                }
+                catch(std::exception& e)
+                {
+                    throw;
+                }
+                if(!ready)
+                {
+                    it = m_nodes.erase(it);
+                }
+                else
+                {
+                    ++it;
                 }
             }
             

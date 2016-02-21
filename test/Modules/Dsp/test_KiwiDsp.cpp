@@ -75,7 +75,7 @@ TEST_CASE("Chain", "[Chain]")
     std::unique_ptr<Link> link1(new Link(*sig1.get(), 0, *plus_scalar.get(), 0));
     std::unique_ptr<Link> link2(new Link(*plus_scalar.get(), 0, *plus_signal.get(), 0));
     std::unique_ptr<Link> link3(new Link(*sig2.get(), 0, *plus_signal.get(), 1));
-    std::unique_ptr<Link> link_loop(new Link(*plus_signal.get(), 0, *plus_scalar.get(), 1));
+    std::unique_ptr<Link> link_loop(new Link(*plus_signal.get(), 0, *plus_scalar.get(), 0));
     
     SECTION("Link Is Duplicated")
     {
@@ -108,7 +108,7 @@ TEST_CASE("Chain", "[Chain]")
         REQUIRE_NOTHROW(chain1.compile(44100ul, 64ul, processes, links));
         REQUIRE_THROWS_AS(chain2.compile(44100ul, 64ul, processes, links), Error);
     }
-    /*
+    
     SECTION("Loop Detected")
     {
         Chain chain;
@@ -140,6 +140,5 @@ TEST_CASE("Chain", "[Chain]")
         
         REQUIRE_NOTHROW(chain.compile(44100ul, 64ul, processes, links));
     }
-     */
 }
 

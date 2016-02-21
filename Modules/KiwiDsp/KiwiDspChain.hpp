@@ -123,6 +123,11 @@ namespace dsp
         
     private:
         class Node;
+        class Tie;
+        typedef std::set< std::weak_ptr< const Tie > ,
+        std::owner_less< std::weak_ptr< const Tie > > > tie_set;
+        typedef std::set< std::weak_ptr< const Node > ,
+        std::owner_less< std::weak_ptr< const Node > > > node_set;
         
         // ================================================================================ //
         //                                         TIE                                      //
@@ -131,7 +136,7 @@ namespace dsp
         class Tie : public std::enable_shared_from_this< Tie >
         {
         public:
-            //! @brief The constructor that checks the validity of the connection.
+            //! @brief The constructor that checks the validity of the Link object.
             Tie(Link& link, std::vector< std::shared_ptr< Node> > const& nodes);
             
             //! @brief Gets the Link object.
@@ -144,10 +149,10 @@ namespace dsp
             void connect() const;
             
             //! @brief Gets the output Node object.
-            std::shared_ptr< const Node > getOutputNode() const noexcept;
+            std::shared_ptr< Node > getOutputNode() const noexcept;
             
             //! @brief Gets the input Node object.
-            std::shared_ptr< const Node >  getInputNode() const noexcept;
+            std::shared_ptr< Node >  getInputNode() const noexcept;
             
             //! @brief Gets the index of the output Node object.
             size_t getOutputIndex() const noexcept;
@@ -155,15 +160,10 @@ namespace dsp
             //! @brief Gets the index of the input Node object.
             size_t getInputIndex() const noexcept;
             
-            //! @brief Gets if two Ties are similars.
-            bool operator==(Tie const& rhs) const noexcept;
-            
         private:
             Link&                   m_link;
             std::weak_ptr< Node >   m_from;
             std::weak_ptr< Node >   m_to;
-            size_t                  m_from_index;
-            size_t                  m_to_index;
         };
         
         // ================================================================================ //
@@ -173,26 +173,39 @@ namespace dsp
         class Node
         {
         public:
-            
-            
+            //! @brief The constructor that checks the validity of the Processor object.
             Node(Processor& processor, size_t const samplerate, size_t const vectorsize);
-            ~Node();
-            Processor const& getProcessor() const noexcept;
-            void addInput(std::shared_ptr< const  Tie > tie);
-            void removeInput(std::shared_ptr< const Tie > tie);
-            void addOutput(std::shared_ptr< const Tie > tie);
-            void prepare();
-            void perform() noexcept;
             
+            // @brief The destrcutor.
+            ~Node();
+            
+            //! @brief Gets the Processor object of the Node object.
+            Processor const& getProcessor() const noexcept;
+            
+            //! @brief Gets the index of the Node object.
+            size_t getIndex() const noexcept;
+            
+            //! @brief Gets the input vector of the Node object.
+            std::vector< tie_set > const& getInputs() const noexcept;
+            
+            //! @brief Gets if the Node object is Sorted.
+            bool isSorted() const noexcept;
+            
+            //! @brief Sets the index of the Node object.
+            void setIndex(size_t const index) noexcept;
+            
+            void addInput(std::shared_ptr< const  Tie > tie);
+            void addOutput(std::shared_ptr< const Tie > tie);
+            bool prepare();
+            void perform() noexcept;
+
+        private:
             Processor&              m_processor;
             Buffer                  m_buffer;
             size_t                  m_sample_rate;
             size_t                  m_vector_size;
             size_t                  m_index;
-            bool                    m_valid;
-            
-        private:
-            typedef std::set< std::weak_ptr< const Tie > , std::owner_less< std::weak_ptr< const Tie > > > tie_set;
+        
             std::vector< tie_set >  m_inputs;
             std::vector< tie_set >  m_outputs;
         };
