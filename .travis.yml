@@ -6,9 +6,13 @@ sudo: required
 notifications:
   email: false
 
-before_install:
-  - chmod +x .travis/before_install.sh
-before_install:  .travis/before_install.sh
+before install:
+  - if [[ "$TRAVIS_BRANCH == "dev-dsp" == "osx" ]];
+    git:
+      submodules: false; fi
+  - if [[ "$TRAVIS_BRANCH" == "dev-core" ]];
+    git:
+      submodules: false; fi
 
 matrix:
   include:
