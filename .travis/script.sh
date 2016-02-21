@@ -15,6 +15,9 @@ if [ $TRAVIS_BRANCH == 'dev-dsp' ]; then
 elif [ $TRAVIS_BRANCH == 'dev-core' ]; then
   TARGET="test_core"
   PERFORM_TESTS="./test_core"
+elif [ $TRAVIS_BRANCH == 'dev-graphics' ]; then
+  TARGET="test_graphics"
+  PERFORM_TESTS="./test_graphics"
 fi
 
 echo ""
