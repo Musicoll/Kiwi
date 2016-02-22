@@ -31,11 +31,6 @@ namespace kiwi
         //                                      SEGMENT                                     //
         // ================================================================================ //
         
-        Point Segment::getNearestPoint(Point const& pt) const noexcept
-        {
-            return pt.nearest(m_start, m_end);
-        }
-        
         bool Segment::intersects(Segment const& s) const noexcept
         {
             Point ignored;

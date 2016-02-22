@@ -550,21 +550,6 @@ namespace kiwi
                 }
             }
             
-            //! Retrieve the smallest distance point with a point.
-            /** The function retrieves the smallest distance point with a point.
-             @param pt The point to compute.
-             @return The distance with the point.
-             */
-            double distance(Point const& pt) const noexcept;
-            
-            //! Retrieve if a point is near the path.
-            /** The function retrieves if a point is near the path.
-             @param pt The point to compute.
-             @param distance The distance of neighborhood (0 means over the line).
-             @return true if the point is near, otherwise false.
-             */
-            bool near(Point const& pt, double const distance) const noexcept;
-            
             bool overlaps(Rectangle const& rect) const noexcept;
             
         private:

@@ -24,6 +24,8 @@
 #ifndef KIWI_LINE_H_INCLUDED
 #define KIWI_LINE_H_INCLUDED
 
+#include <vector>
+
 #include <KiwiGraphics/KiwiPoint.h>
 
 namespace kiwi
@@ -203,20 +205,6 @@ namespace kiwi
             {
                 return getPointAt(0.5);
             }
-            
-            //! Retrieve the smallest distance from a point.
-            /** The function retrieves the smallest distance from a point.
-             @param pt The point.
-             @return The distance from the point.
-             */
-            virtual double distance(Point const& pt) const noexcept = 0;
-            
-            //! Retrieve the point along this line that is nearest to another point.
-            /** This function Retrieve the point along this line that is nearest to another point.
-             @param pt The point.
-             @return The nearest point.
-             */
-            virtual Point getNearestPoint(Point const& pt) const noexcept = 0;
             
             /** Retrieves the point which is at a given distance along this line proportional to the line's length.
              This function retrieves the the point which is at a given distance along this line proportional to the line's length.
@@ -569,23 +557,6 @@ namespace kiwi
                 return kiwi::graphics::distance(m_start, m_end);
             }
             
-            //! Retrieve the smallest distance from a point.
-            /** The function retrieves the smallest distance from a point.
-             @param pt The point.
-             @return The distance from the point.
-             */
-            double distance(Point const& pt) const noexcept override
-            {
-                return pt.distance(m_start, m_end);
-            }
-            
-            //! Retrieve the point along this segment that is nearest to another point.
-            /** This function Retrieve the point along this segment that is nearest to another point.
-             @param pt The point.
-             @return The nearest point.
-             */
-            Point getNearestPoint(Point const& pt) const noexcept override;
-            
             /** Retrieves the point which is at a given distance along this segment proportional to the segment's length.
              This function retrieves the the point which is at a given distance along this segment proportional to the segment's length.
              @param proportionOfLength the distance to move along the segment from its start point, in multiples of the line's length.
@@ -594,7 +565,7 @@ namespace kiwi
              */
             Point getPointAt(const double proportionOfLength) const noexcept override
             {
-                return lerp(m_start, m_end, proportionOfLength);
+                return m_start + proportionOfLength * (m_end - m_start);
             }
             
             //! Returns true if this segment intersects another.
@@ -1084,26 +1055,6 @@ namespace kiwi
                 std::swap(m_start, m_end);
             }
             
-            //! Retrieve the smallest distance from a point.
-            /** The function retrieves the smallest distance from a point.
-             @param pt The point.
-             @return The distance from the point.
-             */
-            double distance(Point const& pt) const noexcept override
-            {
-                return pt.distance(m_start, m_ctrl, m_end);
-            }
-            
-            //! Retrieve the point along this quadratic curve that is nearest to another point.
-            /** This function Retrieve the point along this quadratic curve that is nearest to another point.
-             @param pt The point.
-             @return The nearest point.
-             */
-            Point getNearestPoint(Point const& pt) const noexcept override
-            {
-                return pt.nearest(m_start, m_ctrl, m_end);
-            }
-            
             /** Retrieves the point which is at a given distance along this quadratic curve proportional to the quadratic curve's length.
              This function retrieves the the point which is at a given distance along this quadratic curve proportional to the quadratic curve's length.
              @param delta the distance to move along the quadratic curve from its start point, in multiples of the line's length.
@@ -1112,7 +1063,8 @@ namespace kiwi
              */
             Point getPointAt(const double delta) const noexcept override
             {
-                return Point::fromLine(m_start, m_ctrl, m_end, delta);
+                const double mdelta = (1. - delta);
+                return m_start * (mdelta * mdelta) + m_ctrl * (2. * delta * mdelta) + m_end * (delta * delta);
             }
             
         private:
@@ -1587,26 +1539,6 @@ namespace kiwi
                 std::swap(m_ctrl1, m_ctrl2);
             }
             
-            //! Retrieve the smallest distance from a point.
-            /** The function retrieves the smallest distance from a point.
-             @param pt The point.
-             @return The distance from the point.
-             */
-            double distance(Point const& pt) const noexcept override
-            {
-                return pt.distance(m_start, m_ctrl1, m_ctrl2, m_end);
-            }
-            
-            //! Retrieve the point along this cubic curve that is nearest to another point.
-            /** This function Retrieve the point along this cubic curve that is nearest to another point.
-             @param pt The point.
-             @return The nearest point.
-             */
-            Point getNearestPoint(Point const& pt) const noexcept override
-            {
-                return pt.nearest(m_start, m_ctrl1, m_ctrl2, m_end);
-            }
-            
             /** Retrieves the point which is at a given distance along this cubic curve proportional to the cubic curve's length.
              This function retrieves the the point which is at a given distance along this cubic curve proportional to the cubic curve's length.
              @param delta the distance to move along the cubic curve from its start point, in multiples of the line's length.
@@ -1615,7 +1547,10 @@ namespace kiwi
              */
             Point getPointAt(const double delta) const noexcept override
             {
-                return Point::fromLine(m_start, m_ctrl1, m_ctrl2, m_end, delta);
+                const double d2 = delta * delta;
+                const double md = (1. - delta);
+                const double md2 = md * md;
+                return m_start * md2 * md + 3 * m_ctrl1 * md2 * delta + 3 * m_ctrl2 * md * d2 + m_end * d2 * delta;
             }
             
         private:

@@ -69,36 +69,6 @@ namespace kiwi
              */
             inline ~Point() noexcept {}
             
-            //! Generates a point from a line and a position.
-            /** The function retrieves the point over a line with its relative distance from the origin.
-             @param start The first point of the line.
-             @param end   The end point of the line.
-             @param delta The relative distance from the origin (first point is 0 and end point is 1).
-             @return The point.
-             */
-            static Point fromLine(Point const& start, Point const& end, const double delta) noexcept;
-            
-            //! Generates a point from a quadratic bezier line and a position.
-            /** The function retrieves the point over a quadratic bezier line with its relative distance from the origin.
-             @param start The first point of the line.
-             @param ctrl  The control point of the line.
-             @param end   The end point of the line.
-             @param delta The relative distance from the origin (first point is 0 and end point is 1).
-             @return The point.
-             */
-            static Point fromLine(Point const& start, Point const& ctrl, Point const& end, const double delta) noexcept;
-            
-            //! Generates a point from a cubic bezier line and a position.
-            /** The function retrieves the point over a cubic bezier line with its relative distance from the origin.
-             @param start The first point of the line.
-             @param ctrl1 The first control point of the line.
-             @param ctrl2 The second control point of the line.
-             @param end   The end point of the line.
-             @param delta The relative distance from the origin (first point is 0 and and end point is 1).
-             @return The point.
-             */
-            static Point fromLine(Point const& start, Point const& ctrl1, Point const& ctrl2, Point const& end, const double delta) noexcept;
-            
             //! Retrieves the abscissa.
             /** The function retrieves the abscissa.
              @return The abscissa.
@@ -161,65 +131,12 @@ namespace kiwi
                 return *this;
             }
             
-            //! Get the equality of the point with another.
-            /** The function retrieves the equality of the point with another.
-             @param pt The other point.
-             @return true if the two points are not equal, otherwise false.
-             */
-            inline bool operator!=(Point const& pt) const noexcept
-            {
-                return m_data[0] != pt.x() || m_data[1] != pt.y();
-            }
-            
-            //! Test if this point is greather than another.
-            /** The function return true if x > other.x and y > other.y.
-             @param pt The other point.
-             @return true if this point is greather than another, otherwise false.
-             */
-            inline bool operator>(Point const& pt) const noexcept
-            {
-                return m_data[0] > pt.x() && m_data[1] > pt.y();
-            }
-            
-            //! Test if this point is greather than or equal to another.
-            /** The function return true if x >= other.x and y >= other.y.
-             @param pt The other point.
-             @return true if this point is greather than or equal to another, otherwise false.
-             */
-            inline bool operator>=(Point const& pt) const noexcept
-            {
-                return m_data[0] >= pt.x() && m_data[1] >= pt.y();
-            }
-            
-            //! Test if this point is smaller than another.
-            /** The function return true if x < other.x and y < other.y.
-             @param pt The other point.
-             @return true if this point is smaller than another, otherwise false.
-             */
-            inline bool operator<(Point const& pt) const noexcept
-            {
-                return m_data[0] < pt.x() && m_data[1] < pt.y();
-            }
-            
-            //! Test if this point is smaller than or equal to another.
-            /** The function return true if x <= other.x and y <= other.y.
-             @param pt The other point.
-             @return true if this point is smaller than or equal to another, otherwise false.
-             */
-            inline bool operator<=(Point const& pt) const noexcept
-            {
-                return m_data[0] <= pt.x() && m_data[1] <= pt.y();
-            }
-            
             //! Retrieve a copy and apply a rotation from the origin.
             /** The function retrieves a copy and applies a rotation from the origin.
              @param angle The angle
              @return The copy with the rotation.
              */
-            Point rotated(double const angle) const noexcept
-            {
-                return Point(m_data[0] * cos(angle) - m_data[1] * sin(angle), m_data[0] * sin(angle) + m_data[1] * cos(angle));
-            }
+            Point rotated(double const angle) const noexcept;
             
             //! Retrieve a copy and apply a rotation from another point.
             /** The function retrieves a copy and applies a rotation from another point.
@@ -233,48 +150,27 @@ namespace kiwi
             /** The function retrieves Applies a rotation from the origin.
              @param angle The angle
              */
-            void rotate(double const angle) noexcept
-            {
-                *this = rotated(angle);
-            }
+            void rotate(double const angle) noexcept;
             
             //! Retrieve a copy and apply a rotation from another point.
             /** The function retrieves a copy and applies a rotation from another point.
              @param pt The other point.
              @param angle The angle
              */
-            void rotate(Point const& pt, double const angle) noexcept
-            {
-                *this = rotated(pt, angle);
-            }
-            
-            //! Retrieve the length from the origin.
-            /** The function retrieves the length from the origin.
-             @return The length.
-             */
-            inline double length() const noexcept
-            {
-                return m_data[0] * m_data[0] + m_data[1] * m_data[1];
-            }
+            void rotate(Point const& pt, double const angle) noexcept;
             
             //! Retrieve the angle from the origin.
             /** The function retrieves the angle from origin.
              @return The angle.
              */
-            inline double angle() const noexcept
-            {
-                return atan2(m_data[1], m_data[0]);
-            }
+            inline double angle() const noexcept;
             
             //! Retrieve the angle from another point.
             /** The function retrieves the angle from another point.
              @param pt The other point.
              @return The angle.
              */
-            inline double angle(Point const& pt) const noexcept
-            {
-                return atan2(m_data[1] - pt.y(), m_data[0] - pt.x());
-            }
+            double angle(Point const& pt) const noexcept;
             
             //! Retrieve the dot product with another point.
             /** The function retrieves the dot product with another point.
@@ -283,138 +179,8 @@ namespace kiwi
              */
             double dot(Point const& pt) const noexcept;
             
-            //! Retrieve the distance from a line.
-            /** The function retrieves the distance a line.
-             @param start The first point of the line.
-             @param end   The end point of the line.
-             @return The distance.
-             */
-            double distance(Point const& start, Point const& end) const noexcept;
-            
-            //! Retrieve the distance from a quadratic bezier line.
-            /** The function retrieves the distance a quadratic bezier line.
-             @param start The first point of the line.
-             @param ctrl  The control point of the line.
-             @param end   The end point of the line.
-             @return The distance.
-             */
-            double distance(Point const& start, Point const& ctrl, Point const& end) const noexcept;
-            
-            //! Retrieve the distance from a cubic bezier line.
-            /** The function retrieves the distance from a cubic bezier line.
-             @param start The first point of the line.
-             @param ctrl1 The first control point of the line.
-             @param ctrl2 The second control point of the line.
-             @param end   The end point of the line.
-             @return The distance.
-             */
-            double distance(Point const& start, Point const& ctrl1, Point const& ctrl2, Point const& end) const noexcept;
-            
-            //! Retrieve the nearest point from a line.
-            /** The function retrieves the nearest point a line.
-             @param start The first point of the line.
-             @param end   The end point of the line.
-             @return The distance.
-             */
-            Point nearest(Point const& start, Point const& end) const noexcept;
-            
-            //! Retrieve the nearest point from a quadratic bezier line.
-            /** The function retrieves the nearest point from a quadratic bezier line.
-             @param start The first point of the line.
-             @param ctrl  The control point of the line.
-             @param end   The end point of the line.
-             @return The distance.
-             */
-            Point nearest(Point const& start, Point const& ctrl, Point const& end) const noexcept;
-            
-            //! Retrieve the nearest point from a cubic bezier line.
-            /** The function retrieves the nearest point from a cubic bezier line.
-             @param start The first point of the line.
-             @param ctrl1 The first control point of the line.
-             @param ctrl2 The second control point of the line.
-             @param end   The end point of the line.
-             @return The distance.
-             */
-            Point nearest(Point const& start, Point const& ctrl1, Point const& ctrl2, Point const& end) const noexcept;
-            
-            //! Get if the point is near to another point.
-            /** The function gets if the point is near to another point.
-             @param pt The other point.
-             @param distance The distance of neighborhood.
-             @return true if the two points are near, otherwise false.
-             */
-            bool near(Point const& pt, double const distance) const noexcept;
-            
-            //! Get if the point is near or over a line.
-            /** The function gets if the point is near or over a line.
-             @param start The first point of the line.
-             @param end   The end point of the line.
-             @param distance The distance of neighborhood (0 means over the line).
-             @return true if the point is near to the line, otherwise false.
-             */
-            bool near(Point const& start, Point const& end, double const distance) const noexcept;
-            
-            //! Get if the point is near or over a quadratic bezier line.
-            /** The function gets if the point is near or over a quadratic bezier line.
-             @param start The first point of the line.
-             @param ctrl  The control point of the line.
-             @param end   The end point of the line.
-             @param distance The distance of neighborhood (0 means over the line).
-             @return true if the point is near to the line, otherwise false.
-             */
-            bool near(Point const& start, Point const& ctrl, Point const& end, double const distance) const noexcept;
-            
-            //! Get if the point is near or over a cubic bezier line.
-            /** The function gets if the point is near or over a cubic bezier line.
-             @param start The first point of the line.
-             @param ctrl1 The first control point of the line.
-             @param ctrl2 The second control point of the line.
-             @param end   The end point of the line.
-             @param distance The distance of neighborhood (0 means over the line).
-             @return true if the point is near to the line, otherwise false.
-             */
-            bool near(Point const& start, Point const& ctrl1, Point const& ctrl2, Point const& end, double const distance) const noexcept;
-            
-            // ================================================================================ //
-            //                                      ATTR                                        //
-            // ================================================================================ //
-            
-            //! Retrieve the point as an atom.
-            /** The function retrieves the point as an atom.
-             @return The atom.
-             */
-            inline operator Atom() const noexcept
-            {
-                return Atom({m_data[0], m_data[1]});
-            }
-            
-            //! Set the point with an atom.
-            /** The function sets the point with an atom.
-             @param atom The atom.
-             */
-            inline Point operator=(Atom const& atom) noexcept
-            {
-                if(atom.isVector())
-                {
-                    Vector vector = atom;
-                    if(vector.size() > 1 && vector[0].isNumber() && vector[1].isNumber())
-                    {
-                        m_data[0] = double(vector[0]);
-                        m_data[1] = double(vector[1]);
-                    }
-                }
-                return *this;
-            }
-            
         private:
-            
             friend class Path;
-            
-            //! @internal
-            static ulong solve(double a, double b, double c, double const d, double &solution1, double &solution2, double &solution3);
-            //! @internal
-            static ulong solve(std::array<Point, 6>& W, double *t, const ulong depth);
-            
             double m_data[2];
         };
         
@@ -424,6 +190,13 @@ namespace kiwi
          @return true if the two points are equal, otherwise false.
          */
         bool operator==(Point const& lPt, Point const& rPt) noexcept;
+        
+        //! Get the equality of the point with another.
+        /** The function retrieves the equality of the point with another.
+         @param pt The other point.
+         @return true if the two points are not equal, otherwise false.
+         */
+        bool operator!=(Point const& lPt, Point const& rPt) noexcept;
         
         //! Retrieve the distance from the origin.
         /** The function retrieves the distance from the origin.
