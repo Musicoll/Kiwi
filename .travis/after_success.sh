@@ -1,19 +1,19 @@
 #!/bin/bash
 
-COVERALL_SUPPORT="OFF"
+COVERALLS_SUPPORT="OFF"
 if [ $TRAVIS_OS_NAME == 'linux' ] && [ $COMPILER == 'g++-4.9' ]; then
-  COVERALL_SUPPORT="ON"
+  COVERALLS_SUPPORT="ON"
 fi
 
-if [ $COVERALL_SUPPORT == "ON" ]; then
+if [ $COVERALLS_SUPPORT == "ON" ]; then
 
-  COVERALL_EXCLUDE_MODULES=""
+  COVERALLS_EXCLUDE_MODULES="-e build/CMakeFiles/feature_tests.cxx -e /build/CMakeFiles/3.2.2/CompilerIdCXX/CMakeCXXCompilerId.cpp -e ThirdParty -e Client -e test "
   if [ $TRAVIS_BRANCH == 'dev-dsp' ]; then
-    COVERALL_EXCLUDE_MODULES="-e Modules/KiwiCore -e Modules/KiwiGraphics"
+    COVERALLS_EXCLUDE_MODULES+="-e Modules/KiwiCore -e Modules/KiwiGraphics"
   elif [ $TRAVIS_BRANCH == 'dev-core' ]; then
-    COVERALL_EXCLUDE_MODULES="-e Modules/KiwiDsp -e Modules/KiwiGraphics"
+    COVERALL_EXCLUDE_MODULES+="-e Modules/KiwiDsp -e Modules/KiwiGraphics"
   elif [ $TRAVIS_BRANCH == 'dev-graphics' ]; then
-  COVERALL_EXCLUDE_MODULES="-e Modules/KiwiCore -e Modules/KiwiDsp"
+  COVERALL_EXCLUDE_MODULES+="-e Modules/KiwiCore -e Modules/KiwiDsp"
   fi
-  coveralls -E 'build/CMakeFiles/*.cxx' -E 'build/CMakeFiles/*.cpp' -e ThirdParty -e Client -e test $COVERALL_EXCLUDE_MODULES  --gcov-options '\-lp' --gcov 'gcov-4.9'
+  coveralls $COVERALL_EXCLUDE_MODULES  --gcov-options '\-lp' --gcov 'gcov-4.9'
 fi
