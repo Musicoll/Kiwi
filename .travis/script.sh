@@ -30,5 +30,5 @@ mkdir build
 cd build
 export CXX=$COMPILER
 cmake -DCOVERALL=$COVERALL_SUPPORTS ..
-cmake --build ./ --TARGETS $TARGETS
+cmake --build ./ --target $TARGETS
 $PERFORM_TESTS

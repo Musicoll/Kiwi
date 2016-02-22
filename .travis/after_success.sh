@@ -11,9 +11,9 @@ if [ $COVERALLS_SUPPORT == "ON" ]; then
   if [ $TRAVIS_BRANCH == 'dev-dsp' ]; then
     COVERALLS_EXCLUDE_MODULES+="-e Modules/KiwiCore -e Modules/KiwiGraphics"
   elif [ $TRAVIS_BRANCH == 'dev-core' ]; then
-    COVERALL_EXCLUDE_MODULES+="-e Modules/KiwiDsp -e Modules/KiwiGraphics"
+    COVERALLS_EXCLUDE_MODULES+="-e Modules/KiwiDsp -e Modules/KiwiGraphics"
   elif [ $TRAVIS_BRANCH == 'dev-graphics' ]; then
-  COVERALL_EXCLUDE_MODULES+="-e Modules/KiwiCore -e Modules/KiwiDsp"
+    COVERALLS_EXCLUDE_MODULES+="-e Modules/KiwiCore -e Modules/KiwiDsp"
   fi
-  coveralls $COVERALL_EXCLUDE_MODULES  --gcov-options '\-lp' --gcov 'gcov-4.9'
+  coveralls $COVERALLS_EXCLUDE_MODULES  --gcov-options '\-lp' --gcov 'gcov-4.9'
 fi
