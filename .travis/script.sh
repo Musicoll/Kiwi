@@ -32,5 +32,4 @@ cd build
 export CXX=$COMPILER
 cmake -DCOVERALL=$COVERALL_SUPPORT ..
 cmake --build ./ --target $TARGET
-make clean
 $PERFORM_TESTS
