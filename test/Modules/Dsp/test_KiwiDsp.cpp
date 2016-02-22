@@ -54,6 +54,25 @@ private:
         Samples< sample_t >::add(input.getVectorSize(), input[0ul], input[1ul], output[0ul]);}
 };
 
+class CopyThrow : public Processor
+{
+public:
+    CopyThrow() noexcept {setNumberOfInlets(1); setNumberOfOutlets(1);}
+    ~CopyThrow()  noexcept{}
+private:
+    bool prepare(Infos const& infos) final
+    {
+        if(infos.getSampleRate() != 44100ul || infos.getVectorSize() != 64ul)
+        {
+            throw Error(std::string("CopyThrow wants a sample rate of 44100 and a vector size of 64."));
+        }
+        return infos.isInputConnected(0ul) && infos.isOutputConnected(0ul);
+    }
+    
+    void perform(Buffer const& input, Buffer& output) noexcept final{
+        Samples< sample_t >::add(input.getVectorSize(), input[0ul], input[1ul], output[0ul]);}
+};
+
 #define CATCH_CONFIG_MAIN
 #include "../../catch.hpp"
 
@@ -70,12 +89,14 @@ TEST_CASE("Chain", "[Chain]")
     std::unique_ptr<Processor> sig2(new Sig(2.7f));
     std::unique_ptr<Processor> plus_scalar(new PlusScalar(1.f));
     std::unique_ptr<Processor> plus_signal(new PlusSignal());
+    std::unique_ptr<Processor> copy_throw(new CopyThrow());
     
     
     std::unique_ptr<Link> link1(new Link(*sig1.get(), 0, *plus_scalar.get(), 0));
     std::unique_ptr<Link> link2(new Link(*plus_scalar.get(), 0, *plus_signal.get(), 0));
     std::unique_ptr<Link> link3(new Link(*sig2.get(), 0, *plus_signal.get(), 1));
     std::unique_ptr<Link> link_loop(new Link(*plus_signal.get(), 0, *plus_scalar.get(), 0));
+    std::unique_ptr<Link> link_throw(new Link(*plus_signal.get(), 0, *copy_throw.get(), 0));
     
     /*
     SECTION("Link Is Duplicated")
@@ -125,6 +146,23 @@ TEST_CASE("Chain", "[Chain]")
         links.insert(link3.get());
         links.insert(link_loop.get());
         REQUIRE_THROWS_AS(chain.compile(44100ul, 64ul, processes, links), Error);
+    }
+    
+    SECTION("Processor Throw Based on Infos")
+    {
+        Chain chain;
+        std::set<Processor*> processes;
+        std::set<Link*> links;
+        processes.insert(sig1.get());
+        processes.insert(sig2.get());
+        processes.insert(plus_scalar.get());
+        processes.insert(plus_signal.get());
+        processes.insert(copy_throw.get());
+        links.insert(link1.get());
+        links.insert(link2.get());
+        links.insert(link3.get());
+        links.insert(link_throw.get());
+        REQUIRE_THROWS_AS(chain.compile(44100ul, 128ul, processes, links), Error);
     }
     
     SECTION("Chain Compiled")

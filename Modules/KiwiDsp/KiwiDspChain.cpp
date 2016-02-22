@@ -408,6 +408,7 @@ namespace kiwi
             while(it != m_nodes.cend())
             {
                 bool ready = false;
+                // Throw ici en fait
                 assert((*it)->isSorted() && "A Node object isn't sorted.");
                 try
                 {
