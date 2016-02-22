@@ -27,8 +27,10 @@ echo "TEST="$PERFORM_TESTS
 echo "---------------------"
 echo ""
 
+mkdir build
+cd build
 export CXX=$COMPILER
-make clean
-cmake -DCOVERALL=$COVERALL_SUPPORT ./
+cmake -DCOVERALL=$COVERALL_SUPPORT ..
 cmake --build ./ --target $TARGET
+make clean
 $PERFORM_TESTS

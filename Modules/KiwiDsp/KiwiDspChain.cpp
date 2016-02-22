@@ -198,6 +198,7 @@ namespace kiwi
             {
                 throw;
             }
+            
             return state;
             /*
              if(0)
@@ -322,6 +323,7 @@ namespace kiwi
             for(auto link : links)
             {
                 assert(link != nullptr && "A Link pointer is nullptr.");
+                // Avoid redondant link
                 try
                 {
                     m_ties.push_back(std::make_shared< Tie >(*link, m_nodes));
