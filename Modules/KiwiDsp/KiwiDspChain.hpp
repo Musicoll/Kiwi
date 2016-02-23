@@ -66,8 +66,7 @@ namespace dsp
         {
             NotCompiled = 0, ///< If the object chain is not compiled.
             Compiling   = 1, ///< If the object chain is compiling.
-            Processing  = 2, ///< If the object chain is processing.
-            Waiting     = 3  ///< If the object chain is waiting the next processing.
+            Ready       = 2  ///< If the object chain is ready to process.
         };
         
         //! @brief The default constructor.
@@ -203,7 +202,6 @@ namespace dsp
             Processor&              m_processor;
             Buffer                  m_buffer;
             size_t                  m_index;
-        
             std::vector< tie_set >  m_inputs;
             std::vector< tie_set >  m_outputs;
         };
@@ -211,7 +209,7 @@ namespace dsp
         std::vector< std::shared_ptr< Node > >  m_nodes;
         std::vector< std::shared_ptr< Tie > >   m_ties;
         std::atomic< State >                    m_state;
-        std::mutex                              m_mutex;
+        mutable std::mutex                      m_mutex;
         size_t                                  m_sample_rate;
         size_t                                  m_vector_size;
     };

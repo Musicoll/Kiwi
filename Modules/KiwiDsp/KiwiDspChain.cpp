@@ -62,21 +62,14 @@ namespace kiwi
         //                                          NODE                                        //
         // ==================================================================================== //
         
-        Chain::Node::Node(Processor& processor) : m_processor(processor), m_index(0ul)
+        Chain::Node::Node(Processor& processor) : m_processor(processor), m_index(0ul),
+        m_inputs(processor.getNumberOfInputs()), m_outputs(processor.getNumberOfOutputs())
         {
-            if(m_processor.m_used)
-            {
-                throw Error("The Processor object is already in a Chain object.");
-            }
-            m_processor.m_used = true;
-            m_inputs.resize(processor.getNumberOfInputs());
-            m_outputs.resize(processor.getNumberOfOutputs());
+            ;
         }
         
         Chain::Node::~Node()
         {
-            m_inputs.clear();
-            m_outputs.clear();
             if(m_processor.m_used)
             {
                 // Pas ça ici
@@ -215,7 +208,7 @@ namespace kiwi
         
         Chain::~Chain()
         {
-            release();
+            assert(m_state != State::NotCompiled && "The chain must be not compiled to be destroyed !");
         }
         
         size_t Chain::getSampleRate() const noexcept
@@ -235,7 +228,8 @@ namespace kiwi
         
         void Chain::release()
         {
-            if(m_state == State::Processing)
+            std::lock_guard< std::mutex > guard(m_mutex);
+            if(m_state != State::NotCompiled)
             {
                 try
                 {
@@ -253,12 +247,15 @@ namespace kiwi
                 {
                     throw;
                 }
-                m_state = State::NotCompiled;
+                m_sample_rate = 0ul;
+                m_vector_size = 0ul;
+                m_state.store(State::NotCompiled);
             }
         }
         
         void Chain::tick() const noexcept
         {
+            std::lock_guard< std::mutex > guard(m_mutex);
             for(std::vector< Node >::size_type i = 0; i < m_nodes.size(); i++)
             {
                 m_nodes[i]->perform();
@@ -266,10 +263,11 @@ namespace kiwi
         }
         
         void Chain::compile(size_t const samplerate, size_t const vectorsize,
-                            std::set<Processor *> const& processors,
-                            std::set<Link *> const& links)
+                            std::set< Processor *> const& processors,
+                            std::set< Link *> const& links)
         {
             assert(vectorsize && ((vectorsize & (vectorsize - 1)) == 0) && "The vector size must be a power of two.");
+            
             // ============================================================================ //
             //                              STOPS THE DSP                                   //
             // ============================================================================ //
@@ -279,10 +277,10 @@ namespace kiwi
             }
             catch(std::exception&)
             {
-                // Attention on doit pouvoir vider les vecteurs sans appeler release des processors
                 throw;
             }
-            
+            std::lock_guard< std::mutex > guard(m_mutex);
+            m_state.store(State::Compiling);
             m_sample_rate = samplerate;
             m_vector_size = vectorsize;
             
@@ -292,6 +290,11 @@ namespace kiwi
             m_nodes.reserve(processors.size());
             for(auto processor : processors)
             {
+                if(processor->m_used)
+                {
+                    throw Error("The Processor object is already in a Chain object.");
+                }
+                processor->m_used = true;
                 assert(processor != nullptr && "A Processor pointer is nullptr.");
                 try
                 {
@@ -420,8 +423,6 @@ namespace kiwi
             while(it != m_nodes.cend())
             {
                 bool ready = false;
-                // Throw ici en fait
-                assert((*it)->isSorted() && "A Node object isn't sorted.");
                 try
                 {
                     ready = (*it)->prepare(m_sample_rate, m_vector_size);
@@ -440,7 +441,7 @@ namespace kiwi
                 }
             }
             
-            m_state = State::Processing;
+            m_state = State::Ready;
         }
     }
 }
