@@ -66,8 +66,8 @@ namespace dsp
         //! @see prepare()
         virtual void release() {};
         
-        const size_t        m_ninputs;
-        const size_t        m_noutputs;
+        size_t const        m_ninputs;
+        size_t const        m_noutputs;
         std::atomic< bool > m_used;
         friend class Chain;
     };
