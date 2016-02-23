@@ -10,8 +10,8 @@ namespace kiwi
 {
     namespace dsp
     {
-        Processor::Processor() noexcept :
-        m_ninputs(0ul), m_noutputs(0ul), m_running(false)
+        Processor::Processor(const size_t ninputs, const size_t noutputs) noexcept :
+        m_ninputs(ninputs), m_noutputs(noutputs), m_used(false)
         {
             
         }
@@ -19,18 +19,6 @@ namespace kiwi
         Processor::~Processor() noexcept
         {
             
-        }
-        
-        void Processor::setNumberOfInlets(const size_t nins) noexcept
-        {
-            assert("Kiwi::Dsp::Processor : The method shouldn't be called when the DSP is running" && !m_running);
-            m_ninputs = nins;
-        }
-        
-        void Processor::setNumberOfOutlets(const size_t nouts) noexcept
-        {
-            assert("Kiwi::Dsp::Processor : The method shouldn't be called when the DSP is running" && !m_running);
-            m_noutputs = nouts;
         }
     }
 }

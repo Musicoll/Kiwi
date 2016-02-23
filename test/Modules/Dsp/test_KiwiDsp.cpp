@@ -17,7 +17,7 @@ using namespace kiwi::dsp;
 class Sig : public Processor
 {
 public:
-    Sig(sample_t value) noexcept : m_value(value) {setNumberOfInlets(0); setNumberOfOutlets(1);}
+    Sig(sample_t value) noexcept : Processor(0ul, 1ul), m_value(value) {}
     ~Sig()  noexcept {}
 private:
     bool prepare(Infos const& infos) final {return infos.isOutputConnected(0ul);}
@@ -30,7 +30,7 @@ private:
 class PlusScalar : public Processor
 {
 public:
-    PlusScalar(sample_t value) noexcept : m_value(value){setNumberOfInlets(1);setNumberOfOutlets(1);}
+    PlusScalar(sample_t value) noexcept : Processor(1ul, 1ul), m_value(value) {}
     ~PlusScalar() noexcept{}
 private:
     bool prepare(Infos const& infos) final {
@@ -44,7 +44,7 @@ private:
 class PlusSignal : public Processor
 {
 public:
-    PlusSignal() noexcept {setNumberOfInlets(2); setNumberOfOutlets(1);}
+    PlusSignal() noexcept : Processor(2ul, 1ul) {}
     ~PlusSignal()  noexcept{}
 private:
     bool prepare(Infos const& infos) final {
@@ -57,7 +57,7 @@ private:
 class CopyThrow : public Processor
 {
 public:
-    CopyThrow() noexcept {setNumberOfInlets(1); setNumberOfOutlets(1);}
+    CopyThrow() noexcept : Processor(1ul, 0ul) {}
     ~CopyThrow()  noexcept{}
 private:
     bool prepare(Infos const& infos) final
@@ -66,7 +66,7 @@ private:
         {
             throw Error(std::string("CopyThrow wants a sample rate of 44100 and a vector size of 64."));
         }
-        return infos.isInputConnected(0ul) && infos.isOutputConnected(0ul);
+        return infos.isInputConnected(0ul);
     }
     
     void perform(Buffer const& input, Buffer& output) noexcept final{
