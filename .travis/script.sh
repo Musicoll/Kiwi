@@ -7,8 +7,8 @@ if [ $TRAVIS_OS_NAME == 'linux' ] && [ $COMPILER == 'g++-4.9' ]; then
   COVERALL_EXCEPTCXX="\'/CMakeFiles/*.cxx\'"
 fi
 
-TARGETS="test_core test_dsp"
-PERFORM_TESTS="./test_core ./test_dsp"
+TARGETS="test_dsp"
+PERFORM_TESTS="./test_dsp"
 if [ $TRAVIS_BRANCH == 'dev-dsp' ]; then
   TARGETS="test_dsp"
   PERFORM_TESTS="./test_dsp"
