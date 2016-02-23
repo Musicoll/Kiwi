@@ -28,17 +28,20 @@ namespace dsp
         //! @details Allocates and initializes a default Processor object.
         //! @param ninputs The number of inputs.
         //! @param noutputs The number of outputs.
-        Processor(const size_t ninputs, const size_t noutputs) noexcept;
+        Processor(const size_t ninputs, const size_t noutputs) noexcept :
+        m_ninputs(ninputs), m_noutputs(noutputs), m_used(false) {}
         
         //! @brief The destructor.
-        virtual ~Processor() noexcept;
+        virtual ~Processor() noexcept {}
         
         //! @brief Gets the current number of inputs.
         //! @return The number of inputs of the Processor object.
+        //! @see getNumberOfOutputs()
         inline size_t getNumberOfInputs() const noexcept {return m_ninputs;}
         
         //! @brief Gets the current number of outputs.
         //! @return The number of outputs of the Processor object.
+        //! @see getNumberOfInputs()
         inline size_t getNumberOfOutputs() const noexcept {return m_noutputs;}
         
     private:
@@ -49,7 +52,7 @@ namespace dsp
         //! Processor object can be called, otherwise it should return false.
         //! @param infos The DSP informations.
         //! @return true if the perform method can be called, otherwise false.
-        //! @see release()
+        //! @see perform() and release()
         virtual bool prepare(Infos const& infos) = 0;
         
         //! @brief Performs the digital signal processing.
@@ -58,12 +61,13 @@ namespace dsp
         //! asynchronously.
         //! @param input    The input Buffer object.
         //! @param output   The output Buffer object.
+        //! @see prepare() and release()
         virtual void perform(Buffer const& input, Buffer& output) noexcept = 0;
         
         //! @brief Releases everything after the digital signal processing.
         //! @details You can use this method to free the memory allocated during the call of
         //! the prepare method for example.
-        //! @see prepare()
+        //! @see prepare() and perform()
         virtual void release() {};
         
         size_t const        m_ninputs;

@@ -137,7 +137,7 @@ namespace dsp
         {
         public:
             //! @brief The constructor that checks the validity of the Link object.
-            Tie(Link& link, std::vector< std::shared_ptr< Node> > const& nodes);
+            Tie(Link& link, std::shared_ptr< Node > const& from, std::shared_ptr< Node > const& to);
             
             //! @brief Gets the Link object.
             Link const& getLink() const noexcept;
@@ -161,9 +161,9 @@ namespace dsp
             size_t getInputIndex() const noexcept;
             
         private:
-            Link&                   m_link;
-            std::weak_ptr< Node >   m_from;
-            std::weak_ptr< Node >   m_to;
+            Link&                       m_link;
+            std::weak_ptr< Node > const m_from;
+            std::weak_ptr< Node > const m_to;
         };
         
         // ================================================================================ //

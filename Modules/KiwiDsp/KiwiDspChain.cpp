@@ -14,27 +14,10 @@ namespace kiwi
         //                                          TIE                                         //
         // ==================================================================================== //
         
-        Chain::Tie::Tie(Link& link, std::vector< std::shared_ptr< Node> > const& nodes) : m_link(link)
+        Chain::Tie::Tie(Link& link, std::shared_ptr< Node > const& from, std::shared_ptr< Node > const& to) :
+        m_link(link), m_from(from), m_to(to)
         {
-            std::shared_ptr< Node> from, to;
-            for(auto const& node : nodes)
-            {
-                if(&node->getProcessor() == &link.getInputProcessor())
-                {
-                    to = node;
-                }
-                else if(&node->getProcessor() == &link.getOutputProcessor())
-                {
-                    from = node;
-                }
-                if(from && to)
-                {
-                    break;
-                }
-            }
-            assert(static_cast< bool >(from) && static_cast< bool >(to) && "A Link isn't valid.");
-            m_from  = from;
-            m_to    = to;
+            ;
         }
         
         Link const& Chain::Tie::getLink() const noexcept
@@ -81,11 +64,11 @@ namespace kiwi
         
         Chain::Node::Node(Processor& processor) : m_processor(processor), m_index(0ul)
         {
-            if(m_processor.m_running)
+            if(m_processor.m_used)
             {
                 throw Error("The Processor object is already in a Chain object.");
             }
-            m_processor.m_running = true;
+            m_processor.m_used = true;
             m_inputs.resize(processor.getNumberOfInputs());
             m_outputs.resize(processor.getNumberOfOutputs());
         }
@@ -94,12 +77,12 @@ namespace kiwi
         {
             m_inputs.clear();
             m_outputs.clear();
-            if(m_processor.m_running)
+            if(m_processor.m_used)
             {
                 // Pas ça ici
                 try
                 {
-                    m_processor.m_running = false;
+                    m_processor.m_used = false;
                     m_processor.release();
                 }
                 catch(std::exception&)
@@ -196,7 +179,7 @@ namespace kiwi
             try
             {
                 Infos infos(samplerate, vectorsize, inputs_states, outputs_states);
-                state = m_processor.m_running = m_processor.prepare(infos);
+                state = m_processor.prepare(infos);
             }
             catch(std::exception& e)
             {
@@ -314,7 +297,7 @@ namespace kiwi
                 {
                     m_nodes.push_back(std::make_shared< Node >(*processor));
                 }
-                catch(std::exception& e)
+                catch(std::exception&)
                 {
                     throw;
                 }
@@ -324,13 +307,38 @@ namespace kiwi
             //                              CONNECTS THE NODES                              //
             // ============================================================================ //
             m_ties.reserve(links.size());
-            for(auto link : links)
+            for(auto it = links.cbegin(); it != links.cend(); ++it)
             {
-                assert(link != nullptr && "A Link pointer is nullptr.");
-                // Avoid redondant link
+                assert((*it) != nullptr && "A Link pointer is nullptr.");
+                auto cmp = it;
+                while(++cmp != links.cend())
+                {
+                    // Comparer ici
+                    ;
+                }
+            }
+            for(auto const link : links)
+            {
+                std::shared_ptr< Node> from, to;
+                for(auto const& node : m_nodes)
+                {
+                    if(&node->getProcessor() == &link->getInputProcessor())
+                    {
+                        to = node;
+                    }
+                    else if(&node->getProcessor() == &link->getOutputProcessor())
+                    {
+                        from = node;
+                    }
+                    if(from && to)
+                    {
+                        break;
+                    }
+                }
+                assert(static_cast< bool >(from) && static_cast< bool >(to) && "A Link isn't valid.");
                 try
                 {
-                    m_ties.push_back(std::make_shared< Tie >(*link, m_nodes));
+                    m_ties.push_back(std::make_shared< Tie >(*link, from, to));
                 }
                 catch(std::exception& e)
                 {
