@@ -8,22 +8,18 @@ if [ $TRAVIS_OS_NAME == 'linux' ] && [ $COMPILER == 'g++-4.9' ]; then
 fi
 
 if [ $TRAVIS_BRANCH == 'dev-dsp' ]; then
-  TARGETS="test_dsp"
-  PERFORM_TESTS="./test_dsp"
+  TARGETS=test_dsp
 elif [ $TRAVIS_BRANCH == 'dev-core' ]; then
-  TARGETS="test_core"
-  PERFORM_TESTS="./test_core"
+  TARGETS=test_core
 elif [ $TRAVIS_BRANCH == 'dev-graphics' ]; then
-  TARGETS="test_graphics"
-  PERFORM_TESTS="./test_graphics"
+  TARGETS=test_graphics
 else
-  TARGETS="test_core test_dsp"
-  PERFORM_TESTS=("./test_core" "./test_dsp")
+  TARGETS=(test_core test_dsp)
 fi
 
 echo ""
 echo "---------------------"
-echo "TARGETS="$TARGETS
+echo "TARGETS="${TARGETS[*]}
 echo "---------------------"
 echo ""
 
@@ -31,7 +27,7 @@ mkdir build
 cd build
 export CXX=$COMPILER
 cmake -DCOVERALL=$COVERALL_SUPPORTS ..
-make $TARGETS
-for TEST in $PERFORM_TESTS; do
-$TEST
+make ${TARGETS[*]}
+for TEST in ${TARGETS[*]}; do
+./$TEST
 done
