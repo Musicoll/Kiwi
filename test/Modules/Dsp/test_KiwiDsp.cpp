@@ -6,115 +6,179 @@
 //  Copyright © 2016 CICM. All rights reserved.
 //
 
-#include "KiwiDsp.hpp"
+#include "../../../Modules/KiwiDsp/KiwiDsp.hpp"
 
 using namespace kiwi::dsp;
+
+// ==================================================================================== //
+//                                  CLASSES FOR TESTS                                   //
+// ==================================================================================== //
 
 class Sig : public Processor
 {
 public:
-    Sig(sample_t value) noexcept : m_value(value) {setNumberOfInlets(0); setNumberOfOutlets(1);}
+    Sig(sample_t value) noexcept : Processor(0ul, 1ul), m_value(value) {}
     ~Sig()  noexcept {}
 private:
     bool prepare(Infos const& infos) final {return infos.isOutputConnected(0ul);}
-    void perform(Buffer const& buffer) noexcept final
-    {
-        Samples< sample_t >::fill(buffer.getVectorSize(), m_value, buffer.getOutputSamples(0ul));
-    }
+    
+    void perform(Buffer const& /*input*/, Buffer& output) noexcept final{
+        Samples< sample_t >::fill(output.getVectorSize(), m_value, output[0ul]);}
     sample_t m_value;
 };
 
-class Plus : public Processor
+class PlusScalar : public Processor
 {
 public:
-    Plus() noexcept {setNumberOfInlets(2); setNumberOfOutlets(1);}
-    Plus(sample_t value) noexcept : m_value(value){setNumberOfInlets(1);setNumberOfOutlets(1);}
-    ~Plus()  noexcept{}
+    PlusScalar(sample_t value) noexcept : Processor(1ul, 1ul), m_value(value) {}
+    ~PlusScalar() noexcept{}
+private:
+    bool prepare(Infos const& infos) final {
+        return infos.isInputConnected(0ul) && infos.isOutputConnected(0ul);}
+    
+    void perform(Buffer const& input, Buffer& output) noexcept final {
+        Samples< sample_t >::add(input.getVectorSize(), m_value, input[0ul], output[0ul]);}
+    sample_t m_value;
+};
+
+class PlusSignal : public Processor
+{
+public:
+    PlusSignal() noexcept : Processor(2ul, 1ul) {}
+    ~PlusSignal()  noexcept{}
+private:
+    bool prepare(Infos const& infos) final {
+        return infos.isInputConnected(0ul) && infos.isInputConnected(1ul) && infos.isOutputConnected(0ul);}
+    
+    void perform(Buffer const& input, Buffer& output) noexcept final{
+        Samples< sample_t >::add(input.getVectorSize(), input[0ul], input[1ul], output[0ul]);}
+};
+
+class CopyThrow : public Processor
+{
+public:
+    CopyThrow() noexcept : Processor(1ul, 0ul) {}
+    ~CopyThrow()  noexcept{}
 private:
     bool prepare(Infos const& infos) final
     {
-        return infos.isInputConnected(0ul) || (getNumberOfInputs() > 1 && infos.isInputConnected(1ul));
-    }
-    void perform(Buffer const& buffer) noexcept final
-    {
-        if(getNumberOfInputs() > 1)
+        if(infos.getSampleRate() != 44100ul || infos.getVectorSize() != 64ul)
         {
-            Samples< sample_t >::add(buffer.getVectorSize(), buffer.getInputSamples(0ul),
-                                 buffer.getInputSamples(1ul), buffer.getOutputSamples(0ul));
+            throw Error(std::string("CopyThrow wants a sample rate of 44100 and a vector size of 64."));
         }
-        else
-        {
-            Samples< sample_t >::add(buffer.getVectorSize(), m_value,
-                                 buffer.getInputSamples(0ul), buffer.getOutputSamples(0ul));;
-        }
+        return infos.isInputConnected(0ul);
     }
-    sample_t m_value;
+    
+    void perform(Buffer const& input, Buffer& output) noexcept final{
+        Samples< sample_t >::add(input.getVectorSize(), input[0ul], input[1ul], output[0ul]);}
 };
 
-int main(int , const char *[]) {
+#define CATCH_CONFIG_MAIN
+#include "../../catch.hpp"
+
+#define SAMPLE_RATE 44100ul
+#define VECTOR_SIZE 64ul
+
+// ==================================================================================== //
+//                                          TESTS                                       //
+// ==================================================================================== //
+//@todo Link is duplicated and Processor is duplicated
+TEST_CASE("Chain", "[Chain]")
+{
+    std::unique_ptr<Processor> sig1(new Sig(1.3f));
+    std::unique_ptr<Processor> sig2(new Sig(2.7f));
+    std::unique_ptr<Processor> plus_scalar(new PlusScalar(1.f));
+    std::unique_ptr<Processor> plus_signal(new PlusSignal());
+    std::unique_ptr<Processor> copy_throw(new CopyThrow());
     
-    std::unique_ptr<Processor> pr1(new Plus());
-    std::unique_ptr<Processor> pr2(new Plus(1.f));
-    std::unique_ptr<Processor> pr3(new Sig(1.3f));
-    std::unique_ptr<Processor> pr4(new Sig(2.7f));
-    std::unique_ptr<Link> li1(new Link(*pr1.get(), 0, *pr2.get(), 0));
-    std::unique_ptr<Link> li2(new Link(*pr3.get(), 0, *pr1.get(), 0));
-    std::unique_ptr<Link> li3(new Link(*pr2.get(), 0, *pr1.get(), 0)); // Loop
-    std::unique_ptr<Link> li4(new Link(*pr4.get(), 0, *pr1.get(), 1));
-    try
+    
+    std::unique_ptr<Link> link1(new Link(*sig1.get(), 0, *plus_scalar.get(), 0));
+    std::unique_ptr<Link> link2(new Link(*plus_scalar.get(), 0, *plus_signal.get(), 0));
+    std::unique_ptr<Link> link3(new Link(*sig2.get(), 0, *plus_signal.get(), 1));
+    std::unique_ptr<Link> link_loop(new Link(*plus_signal.get(), 0, *plus_scalar.get(), 0));
+    std::unique_ptr<Link> link_throw(new Link(*plus_signal.get(), 0, *copy_throw.get(), 0));
+    
+    /*
+    SECTION("Link Is Duplicated")
     {
         Chain chain;
-        Chain chain2;
-        std::vector<Processor*> processes;
-        std::vector<Link*> links;
-        processes.push_back(pr1.get());
-        processes.push_back(pr2.get());
-        processes.push_back(pr3.get());
-        processes.push_back(pr4.get());
-        links.push_back(li1.get());
-        links.push_back(li2.get());
-        links.push_back(li4.get());
-        //links.push_back(li3.get());
-        
-        try
-        {
-            chain.compile(44100, 64, processes, links);
-        }
-        catch(std::exception& e)
-        {
-            throw;
-        }
-        /*
-        try
-        {
-            chain2.compile(44100, 64, processes, links);
-        }
-        catch(std::exception& e)
-        {
-            std::cout << e.what() << "\n";
-        }
-         */
-        
-        for(size_t i = 1; i; --i)
-        {
-            chain.tick();
-        }
-        
-        try
-        {
-            chain.stop();
-        }
-        catch(std::exception& e)
-        {
-            throw;
-        }
+        std::set<Processor*> processes;
+        std::set<Link*> links;
+        processes.insert(sig1.get());
+        processes.insert(sig2.get());
+        processes.insert(plus_scalar.get());
+        processes.insert(plus_signal.get());
+        links.insert(link1.get());
+        links.insert(link2.get());
+        links.insert(link3.get());
+        links.insert(link2.get());
+        REQUIRE_THROWS_AS(chain.compile(44100ul, 64ul, processes, links), Error);
     }
-    catch(std::exception& e)
+     */
+    
+    SECTION("Processor Already Used")
     {
-        std::cout << e.what() << "\n";
-        return -1;
+        Chain chain1, chain2;
+        std::set<Processor*> processes;
+        std::set<Link*> links;
+        processes.insert(sig1.get());
+        processes.insert(sig2.get());
+        processes.insert(plus_scalar.get());
+        processes.insert(plus_signal.get());
+        links.insert(link1.get());
+        links.insert(link2.get());
+        links.insert(link3.get());
+        REQUIRE_NOTHROW(chain1.compile(44100ul, 64ul, processes, links));
+        REQUIRE_THROWS_AS(chain2.compile(44100ul, 64ul, processes, links), Error);
     }
     
+    SECTION("Loop Detected")
+    {
+        Chain chain;
+        std::set<Processor*> processes;
+        std::set<Link*> links;
+        processes.insert(sig1.get());
+        processes.insert(sig2.get());
+        processes.insert(plus_scalar.get());
+        processes.insert(plus_signal.get());
+        links.insert(link1.get());
+        links.insert(link2.get());
+        links.insert(link3.get());
+        links.insert(link_loop.get());
+        REQUIRE_THROWS_AS(chain.compile(44100ul, 64ul, processes, links), Error);
+    }
     
-    return 0;
+    SECTION("Processor Throw Based on Infos")
+    {
+        Chain chain;
+        std::set<Processor*> processes;
+        std::set<Link*> links;
+        processes.insert(sig1.get());
+        processes.insert(sig2.get());
+        processes.insert(plus_scalar.get());
+        processes.insert(plus_signal.get());
+        processes.insert(copy_throw.get());
+        links.insert(link1.get());
+        links.insert(link2.get());
+        links.insert(link3.get());
+        links.insert(link_throw.get());
+        REQUIRE_THROWS_AS(chain.compile(44100ul, 128ul, processes, links), Error);
+    }
+    
+    SECTION("Chain Compiled")
+    {
+        Chain chain;
+        std::set<Processor*> processes;
+        std::set<Link*> links;
+        processes.insert(sig1.get());
+        processes.insert(sig2.get());
+        processes.insert(plus_scalar.get());
+        processes.insert(plus_signal.get());
+        links.insert(link1.get());
+        links.insert(link2.get());
+        links.insert(link3.get());
+        
+        REQUIRE_NOTHROW(chain.compile(44100ul, 64ul, processes, links));
+    }
 }
+

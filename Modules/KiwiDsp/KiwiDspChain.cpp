@@ -10,154 +10,138 @@ namespace kiwi
 {
     namespace dsp
     {
-        class Chain::Tie
+        // ==================================================================================== //
+        //                                          TIE                                         //
+        // ==================================================================================== //
+        
+        Chain::Tie::Tie(Link& link, std::shared_ptr< Node > const& from, std::shared_ptr< Node > const& to) :
+        m_link(link), m_from(from), m_to(to)
         {
-        public:
-            std::weak_ptr< Node > node;
-            size_t                index;
-            Tie(std::shared_ptr< Node > n, size_t i) : node(n), index(i) {}
-            Tie(Tie const& other) : node(other.node), index(other.index) {}
-            bool operator<(Tie const& ) const noexcept {return false;}
-        };
+            ;
+        }
+        
+        Link const& Chain::Tie::getLink() const noexcept
+        {
+            return m_link;
+        }
+        
+        Link& Chain::Tie::getLink() noexcept
+        {
+            return m_link;
+        }
+        
+        void Chain::Tie::connect() const
+        {
+            std::shared_ptr< Node> from = m_from.lock(), to = m_to.lock();
+            assert(static_cast< bool >(from) && static_cast< bool >(to) && "A Link isn't valid.");
+            from->addOutput(shared_from_this());
+            to->addInput(shared_from_this());
+        }
+        
+        std::shared_ptr< Chain::Node > Chain::Tie::getOutputNode() const noexcept
+        {
+            return m_from.lock();
+        }
+        
+        std::shared_ptr< Chain::Node >  Chain::Tie::getInputNode() const noexcept
+        {
+            return m_to.lock();
+        }
+        
+        size_t Chain::Tie::getOutputIndex() const noexcept
+        {
+            return m_link.getOutputIndex();
+        }
+        
+        size_t Chain::Tie::getInputIndex() const noexcept
+        {
+            return m_link.getInputIndex();
+        }
         
         // ==================================================================================== //
         //                                          NODE                                        //
         // ==================================================================================== //
-        //! @brief The class wraps and manages a Processor objects.
-        //! @details The class mamanges a Processor object to include it in a Chain object.
-        //! @see Processor, Chain, Link and Signal.
-        class Chain::Node
+        
+        Chain::Node::Node(Processor& processor) : m_processor(processor), m_index(0ul)
         {
-        public:
-            Node(Processor& processor, size_t const samplerate, size_t const vectorsize) :
-            m_processor(processor), m_sample_rate(samplerate), m_vector_size(vectorsize),
-            m_index(0ul), m_valid(false)
+            if(m_processor.m_used)
             {
-                if(m_processor.m_running)
-                {
-                    class ErrorRunning : public Error
-                    {
-                    public:
-                        const char* what() const noexcept final {return "Kiwi::Dsp::Chain : The processor is already in a Chain.";}
-                    };
-                    throw ErrorRunning();
-                }
-                m_processor.m_running = true;
-                
-                class ErrorResize : public Error
-                {
-                public:
-                    const char* what() const noexcept final {return "Kiwi::Dsp::Chain : The Processor can't allocate its ioputs.";}
-                };
-                
-                try
-                {
-                    m_inputs.resize(processor.getNumberOfInputs());
-                }
-                catch(std::exception& e)
-                {
-                    throw ErrorResize();
-                }
-                
-                try
-                {
-                    m_outputs.resize(processor.getNumberOfOutputs());
-                }
-                catch(std::exception& e)
-                {
-                    throw ErrorResize();
-                }
-                
-                try
-                {
-                    m_buffer_copy.resize(m_processor.getNumberOfInputs());
-                }
-                catch(std::exception& e)
-                {
-                    throw ErrorResize();
-                }
+                throw Error("The Processor object is already in a Chain object.");
             }
-            
-            ~Node()
+            m_processor.m_used = true;
+            m_inputs.resize(processor.getNumberOfInputs());
+            m_outputs.resize(processor.getNumberOfOutputs());
+        }
+        
+        Chain::Node::~Node()
+        {
+            m_inputs.clear();
+            m_outputs.clear();
+            if(m_processor.m_used)
             {
+                // Pas ça ici
                 try
                 {
-                    m_processor.m_running = false;
+                    m_processor.m_used = false;
                     m_processor.release();
                 }
-                catch(std::exception& e)
+                catch(std::exception&)
                 {
-                    throw e;
-                }
-                m_inputs.clear();
-                m_outputs.clear();
-                m_buffer_copy.clear();
-            }
-            
-            void addInput(const size_t index, Tie&& tie)
-            {
-                if(index < static_cast<size_t>(m_inputs.size()))
-                {
-                    auto it = m_inputs[index].insert(std::move(tie));
-                    if(!it.second)
-                    {
-                        class ErrorDuplicate : public Error
-                        {
-                        public:
-                            const char* what() const noexcept final {
-                                return "Kiwi::Dsp::Processor : The input Processor is already connected.";}
-                        };
-                        throw ErrorDuplicate();
-                    }
-                }
-                else
-                {
-                    class ErrorIndex : public Error
-                    {
-                    public:
-                        const char* what() const noexcept final {
-                            return "Kiwi::Dsp::Processor : The input Processor is connected to a wrong index.";}
-                    };
-                    throw ErrorIndex();
+                    throw;
                 }
             }
-            
-            void addOutput(const size_t index, Tie&& tie)
+        }
+        
+        Processor const& Chain::Node::getProcessor() const noexcept
+        {
+            return m_processor;
+        }
+        
+        std::vector< Chain::tie_set > const& Chain::Node::getInputs() const noexcept
+        {
+            return m_inputs;
+        }
+        
+        size_t Chain::Node::getIndex() const noexcept
+        {
+            return m_index;
+        }
+        
+        bool Chain::Node::isSorted() const noexcept
+        {
+            return static_cast< bool >(m_index);
+        }
+        
+        void Chain::Node::setIndex(size_t const index) noexcept
+        {
+            m_index = index;
+        }
+        
+        void Chain::Node::addInput(std::shared_ptr< const Chain::Tie > tie)
+        {
+            assert(tie->getInputIndex() < static_cast< size_t >(m_inputs.size()) && "Index out of range.");
+            m_inputs[static_cast< tie_set::size_type >(tie->getInputIndex())].insert(tie);
+        }
+        
+        void Chain::Node::addOutput(std::shared_ptr< const Chain::Tie > tie)
+        {
+            assert(tie->getOutputIndex() < static_cast< size_t >(m_outputs.size()) && "Index out of range.");
+            m_outputs[static_cast< tie_set::size_type >(tie->getOutputIndex())].insert(tie);
+        }
+        
+        bool Chain::Node::prepare(size_t const samplerate, size_t const vectorsize)
+        {
+            // Remove unecessary inputs and outputs nodes
+            // Fills two vectors of states
+            std::vector< bool > inputs_states(m_inputs.size());
             {
-                if(index < static_cast<size_t>(m_outputs.size()))
-                {
-                    auto it = m_outputs[index].insert(std::move(tie));
-                    if(!it.second)
-                    {
-                        class ErrorDuplicate : public Error
-                        {
-                        public:
-                            const char* what() const noexcept final {
-                                return "Kiwi::Dsp::Processor : The output Processor is already connected.";}
-                        };
-                        throw ErrorDuplicate();
-                    }
-                }
-                else
-                {
-                    class ErrorIndex : public Error
-                    {
-                    public:
-                        const char* what() const noexcept final {
-                            return "Kiwi::Dsp::Processor : The output Processor is connected to a wrong index.";}
-                    };
-                    throw ErrorIndex();
-                }
-            }
-            
-            void prepare()
-            {
+                auto in = inputs_states.begin();
                 for(auto& set : m_inputs)
                 {
                     auto it = set.cbegin();
                     while(it != set.cend())
                     {
-                        if(it->node.expired())
+                        if(!(it->lock()->getInputNode()))
                         {
                             it = set.erase(it);
                         }
@@ -166,100 +150,110 @@ namespace kiwi
                             ++it;
                         }
                     }
-                }
-                
-                std::vector<bool> inputs_states(m_inputs.size()), outputs_states(m_outputs.size());
-                for(std::vector< std::set< Tie > >::size_type i = 0; i < m_inputs.size(); i++)
-                {
-                    inputs_states[i] = !m_inputs[i].empty();
-                }
-                for(std::vector< std::set< Tie > >::size_type i = 0; i < m_outputs.size(); i++)
-                {
-                    outputs_states[i] = !m_outputs[i].empty();
-                }
-                
-                try
-                {
-                    Infos infos(m_sample_rate, m_vector_size, inputs_states, outputs_states);
-                    m_valid = m_processor.m_running = m_processor.prepare(infos);
-                }
-                catch(std::exception& e)
-                {
-                    throw;
-                }
-                
-                if(0)
-                {
-                    
-                }
-                else
-                {
-                    class ErrorAlloc : public Error
-                    {
-                    public:
-                        const char* what() const noexcept final
-                        {return "Kiwi::Dsp::Node : Can't allocate the buffer.";}
-                    };
-                    throw ErrorAlloc();
+                    *in = !set.empty();
                 }
             }
-            
-            void perform() const noexcept
+            std::vector< bool > outputs_states(m_outputs.size());
             {
-                /*
-                typedef std::vector< std::vector< sample_t const* > >::size_type inc_type;
-                for(inc_type i = 0; i < m_buffer_copy.size(); ++i)
+                auto out = outputs_states.begin();
+                for(auto& set : m_outputs)
                 {
-                    sample_t* buffer = m_buffer_in + i * m_vector_size;
-                    if(!m_buffer_copy[i].empty())
+                    auto it = set.cbegin();
+                    while(it != set.cend())
                     {
-                        Samples< sample_t >::copy(m_vector_size, m_buffer_copy[i][0], buffer);
-                        for(std::vector< sample_t const* >::size_type j = 1; j < m_buffer_copy[i].size(); ++j)
+                        if(!(it->lock()->getInputNode()))
                         {
-                            Samples< sample_t >::add(m_vector_size, m_buffer_copy[i][j], buffer);
+                            it = set.erase(it);
+                        }
+                        else
+                        {
+                            ++it;
                         }
                     }
-                    else
-                    {
-                        Samples< sample_t >::clear(m_vector_size, buffer);
-                    }
+                    *out = !set.empty();
                 }
-                 */
-                m_processor.perform(m_buffer);
+            }
+            // Prepares the processor
+            // Fills two vectors of states
+            bool state = false;
+            try
+            {
+                Infos infos(samplerate, vectorsize, inputs_states, outputs_states);
+                state = m_processor.prepare(infos);
+            }
+            catch(std::exception& e)
+            {
+                throw;
             }
             
-            Processor&                          m_processor;
-            Buffer                              m_buffer;
-            size_t                              m_sample_rate;
-            size_t                              m_vector_size;
-            size_t                              m_index;
-            bool                                m_valid;
-            std::vector< std::vector< sample_t const* > > m_buffer_copy;
-            std::vector< std::set< Tie > > m_inputs;
-            std::vector< std::set< Tie > > m_outputs;
-        };
-                    
+            return state;
+            /*
+             if(0)
+             {
+             
+             }
+             else
+             {
+             throw Error("The Processor can't allocate its buffers.");
+             }
+             */
+        }
+        
+        void Chain::Node::perform() noexcept
+        {
+            // Todo
+        }
+        
+        // ==================================================================================== //
+        //                                          CHAIN                                       //
+        // ==================================================================================== //
         Chain::Chain() :
-        m_running(false), m_sample_rate(0ul), m_vector_size(0ul)
+        m_state(State::NotCompiled), m_sample_rate(0ul), m_vector_size(0ul)
         {
             
         }
         
         Chain::~Chain()
         {
-            stop();
+            release();
         }
         
-        void Chain::stop()
+        size_t Chain::getSampleRate() const noexcept
         {
-            m_running = false;
-            try
+            return m_sample_rate;
+        }
+        
+        size_t Chain::getVectorSize() const noexcept
+        {
+            return m_vector_size;
+        }
+        
+        Chain::State Chain::getState() const noexcept
+        {
+            return m_state;
+        }
+        
+        void Chain::release()
+        {
+            if(m_state == State::Processing)
             {
-                m_nodes.clear();
-            }
-            catch(std::exception& e)
-            {
-                throw;
+                try
+                {
+                    m_nodes.clear();
+                }
+                catch(std::exception&)
+                {
+                    throw;
+                }
+                try
+                {
+                    m_ties.clear();
+                }
+                catch(std::exception&)
+                {
+                    throw;
+                }
+                m_state = State::NotCompiled;
             }
         }
         
@@ -272,13 +266,23 @@ namespace kiwi
         }
         
         void Chain::compile(size_t const samplerate, size_t const vectorsize,
-                            std::vector<Processor *> const& processors,
-                            std::vector<Link *> const& links)
+                            std::set<Processor *> const& processors,
+                            std::set<Link *> const& links)
         {
+            assert(vectorsize && ((vectorsize & (vectorsize - 1)) == 0) && "The vector size must be a power of two.");
             // ============================================================================ //
             //                              STOPS THE DSP                                   //
             // ============================================================================ //
-            stop();
+            try
+            {
+                release();
+            }
+            catch(std::exception&)
+            {
+                // Attention on doit pouvoir vider les vecteurs sans appeler release des processors
+                throw;
+            }
+            
             m_sample_rate = samplerate;
             m_vector_size = vectorsize;
             
@@ -288,128 +292,107 @@ namespace kiwi
             m_nodes.reserve(processors.size());
             for(auto processor : processors)
             {
-                if(processor)
+                assert(processor != nullptr && "A Processor pointer is nullptr.");
+                try
                 {
-                    try
-                    {
-                        m_nodes.push_back(std::make_shared<Node>(*processor, m_sample_rate, m_vector_size));
-                    }
-                    catch(std::exception& e)
-                    {
-                        throw;
-                    }
+                    m_nodes.push_back(std::make_shared< Node >(*processor));
                 }
-                else
+                catch(std::exception&)
                 {
-                    class ErrorNode : public Error
-                    {
-                    public:
-                        const char* what() const noexcept final {
-                            return "Kiwi::Dsp::Chain : A Processor isn't valid.";}
-                    };
-                    throw ErrorNode();
+                    throw;
                 }
             }
             
             // ============================================================================ //
             //                              CONNECTS THE NODES                              //
             // ============================================================================ //
-            class ErrorLink : public Error
+            m_ties.reserve(links.size());
+            for(auto it = links.cbegin(); it != links.cend(); ++it)
             {
-            public:
-                const char* what() const noexcept final {return "Kiwi::Dsp::Chain : A link isn't valid.";}
-            };
-            
-            for(auto link : links)
-            {
-                if(link)
+                assert((*it) != nullptr && "A Link pointer is nullptr.");
+                auto cmp = it;
+                while(++cmp != links.cend())
                 {
-                    std::shared_ptr< Node > from, to;
-                    for(auto const& node : m_nodes)
+                    // Comparer ici
+                    ;
+                }
+            }
+            for(auto const link : links)
+            {
+                std::shared_ptr< Node> from, to;
+                for(auto const& node : m_nodes)
+                {
+                    if(&node->getProcessor() == &link->getInputProcessor())
                     {
-                        if(&node->m_processor == &link->getInputProcessor())
-                        {
-                            to = node;
-                        }
-                        else if(&node->m_processor == &link->getOutputProcessor())
-                        {
-                            from = node;
-                        }
-                        if(from && to)
-                        {
-                            break;
-                        }
+                        to = node;
+                    }
+                    else if(&node->getProcessor() == &link->getOutputProcessor())
+                    {
+                        from = node;
                     }
                     if(from && to)
                     {
-                        try
-                        {
-                            to->addInput(link->getInputIndex(), {from, link->getOutputIndex()});
-                        }
-                        catch(std::exception& e)
-                        {
-                            throw;
-                        }
-                        
-                        try
-                        {
-                            from->addOutput(link->getOutputIndex(), {to, link->getInputIndex()});
-                        }
-                        catch(std::exception& e)
-                        {
-                            throw;
-                        }
+                        break;
                     }
-                    else
-                    {
-                        throw ErrorLink();
-                    }
+                }
+                assert(static_cast< bool >(from) && static_cast< bool >(to) && "A Link isn't valid.");
+                try
+                {
+                    m_ties.push_back(std::make_shared< Tie >(*link, from, to));
+                }
+                catch(std::exception& e)
+                {
+                    throw;
+                }
+                
+                try
+                {
+                    m_ties.back()->connect();
+                }
+                catch(std::exception& e)
+                {
+                    throw;
                 }
             }
             
             // ============================================================================ //
             //                              NUMBERS THE NODES                               //
             // ============================================================================ //
-            struct Sorter
+            class Sorter
             {
-                size_t          m_index;
-                std::set< std::weak_ptr< Node >, std::owner_less< std::weak_ptr< Node >  > > m_nodes;
+            public:
+                Sorter() : m_index(1ul) {}
                 
-                inline Sorter() noexcept : m_index(1ul) {}
-                inline ~Sorter() noexcept {m_nodes.clear();}
                 void operator()(std::shared_ptr< Node >& node)
                 {
-                    if(!static_cast<bool>(node->m_index))
+                    if(!static_cast<bool>(node->isSorted()))
                     {
                         m_nodes.insert(node);
-                        for(auto& input : node->m_inputs)
+                        for(auto const& tieset : node->getInputs())
                         {
-                            for(auto& wnode : input)
+                            for(auto const& tie : tieset)
                             {
-                                std::shared_ptr< Node > snode = wnode.node.lock();
-                                if(snode && !static_cast<bool>(snode->m_index))
+                                std::shared_ptr< Node > pnode = (tie.lock())->getOutputNode();
+                                if(!pnode->isSorted())
                                 {
-                                    if(m_nodes.find(snode) != m_nodes.end())
+                                    if(m_nodes.find(pnode) != m_nodes.end())
                                     {
-                                        class ErrorLoop : public Error
-                                        {
-                                        public:
-                                            const char* what() const noexcept final {return "Kiwi::Dsp::Chain : A loop is detected.";}
-                                        };
-                                        
-                                        throw ErrorLoop();
+                                        throw Error("A loop is detected.");
                                     }
                                     else
                                     {
-                                        this->operator()(snode);
+                                        this->operator()(pnode);
                                     }
                                 }
                             }
                         }
                         m_nodes.erase(node);
-                        node->m_index = m_index++;
+                        node->setIndex(m_index++);
                     }
                 }
+            private:
+                size_t      m_index;
+                node_set    m_nodes;
             };
             
             try
@@ -426,7 +409,7 @@ namespace kiwi
             // ============================================================================ //
             sort(m_nodes.begin(), m_nodes.end(), [] (std::shared_ptr<Node> const& n1, std::shared_ptr<Node> const& n2)
                  {
-                     return n1->m_index < n2->m_index;
+                     return n1->getIndex() < n2->getIndex();
                  });
             
             
@@ -436,28 +419,28 @@ namespace kiwi
             auto it = m_nodes.cbegin();
             while(it != m_nodes.cend())
             {
-                if(static_cast<bool>((*it)->m_index))
+                bool ready = false;
+                // Throw ici en fait
+                assert((*it)->isSorted() && "A Node object isn't sorted.");
+                try
                 {
-                    try
-                    {
-                        (*it)->prepare();
-                    }
-                    catch(std::exception& e)
-                    {
-                        throw;
-                    }
-                    if(!(*it)->m_valid)
-                    {
-                        it = m_nodes.erase(it);
-                    }
-                    else
-                    {
-                        ++it;
-                    }
+                    ready = (*it)->prepare(m_sample_rate, m_vector_size);
+                }
+                catch(std::exception& e)
+                {
+                    throw;
+                }
+                if(!ready)
+                {
+                    it = m_nodes.erase(it);
+                }
+                else
+                {
+                    ++it;
                 }
             }
             
-            m_running = true;
+            m_state = State::Processing;
         }
     }
 }

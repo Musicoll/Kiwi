@@ -14,25 +14,29 @@ namespace kiwi
 {
 namespace dsp
 {
+    class Signal;
+    
     // ==================================================================================== //
     //                                          BUFFER                                      //
     // ==================================================================================== //
-    //! @brief A class that wraps a matrix of samples.
-    //! @details The class is a wrapper for a matrix of samples that offers optimized
+    //! @brief A class that wraps a matrix of sample_t values.
+    //! @details The class is a wrapper for a matrix of sample_t values that offers optimized
     //! @details operations.
     class Buffer
     {
     public:
         //! @brief The default constructor.
-        //! @details Allocates and initializes an empty Signal object.
+        //! @details Allocates and initializes an empty Buffer object.
         Buffer() noexcept;
         
         //! @brief The filled constructor.
-        //! @details Allocates a Signal object of a specific size and initializes it with a
-        //! @details default value.
-        //! @param size The number of samples.
-        //! @param val  The default value of the signal.
-        Buffer(const size_t size, const sample_t val = sample_t(0.));
+        //! @details Allocates a Buffer object with a specific number of channels and number
+        //! @details of samples per channels. The matrix of sample_t can also be initialized
+        //! @details with a default value.
+        //! @param nchannels    The number of channels of the buffer.
+        //! @param nsamples     The number of samples per channels.
+        //! @param val          The default value of the signal.
+        Buffer(const size_t nchannels, const size_t nsamples, const sample_t val = sample_t(0.));
         
         //! @brief The copy constructor.
         //! @details Allocates a Signal object that is a copy of another.
@@ -48,39 +52,26 @@ namespace dsp
         //! @details Frees the content of the Signal object if needed.
         ~Buffer();
         
-        //! @brief Gets the current sample rate of the chain.
+        //! @brief Gets the sample rate of the Buffer object.
         inline size_t getSampleRate() const noexcept {return m_sample_rate;}
         
-        //! @brief Gets the current vector size of the chain.
+        //! @brief Gets the vector size of the Buffer object.
         inline size_t getVectorSize() const noexcept {return m_vector_size;}
         
-        //! @brief Gets the vector of samples of an input.
-        inline sample_t const* getInputSamples(const size_t index) const noexcept
-        {
-            assert(index < m_ninputs && "Kiwi::Dsp::Buffer : Index out of range.");
-            return m_inputs[index];
-        }
+        //! @brief Gets the number of channels of the Buffer object.
+        inline size_t getNumberOfChannels() const noexcept {return m_nchannels;}
         
-        //! @brief Gets the vector of samples of the inputs.
-        inline sample_t const* const* getInputsSamples() const noexcept {return m_inputs;}
+        //! @brief Gets the sample_t pointer of a channel.
+        inline sample_t const* operator[](const size_t /*index*/) const noexcept {return nullptr;}
         
-        //! @brief Gets the vector of samples of an output.
-        inline sample_t* getOutputSamples(const size_t index) const noexcept
-        {
-            assert(index < m_noutputs && "Kiwi::Dsp::Buffer : Index out of range.");
-            return m_outputs[index];
-        }
-        
-        //! @brief Gets the vector of samples of the inputs.
-        inline sample_t* const* getOutputsSamples() const noexcept {return m_outputs;}
+        //! @brief Gets the sample_t pointer of a channel.
+        inline sample_t* operator[](const size_t /*index*/) noexcept {return nullptr;}
         
     private:
-        const size_t            m_sample_rate;
-        const size_t            m_vector_size;
-        const size_t            m_ninputs;
-        const size_t            m_noutputs;
-        sample_t const* const*  m_inputs;
-        sample_t* const*        m_outputs;
+        size_t              m_sample_rate;
+        size_t              m_vector_size;
+        size_t              m_nchannels;
+        std::vector<Signal> m_signals;
     };
     
     // ==================================================================================== //
