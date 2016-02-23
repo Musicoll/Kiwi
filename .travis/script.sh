@@ -7,8 +7,8 @@ if [ $TRAVIS_OS_NAME == 'linux' ] && [ $COMPILER == 'g++-4.9' ]; then
   COVERALL_EXCEPTCXX="\'/CMakeFiles/*.cxx\'"
 fi
 
-TARGETS="test_dsp"
-PERFORM_TESTS="./test_dsp"
+TARGETS="test_core test_dsp"
+PERFORM_TESTS="./test_core ./test_dsp"
 if [ $TRAVIS_BRANCH == 'dev-dsp' ]; then
   TARGETS="test_dsp"
   PERFORM_TESTS="./test_dsp"
@@ -30,5 +30,7 @@ mkdir build
 cd build
 export CXX=$COMPILER
 cmake -DCOVERALL=$COVERALL_SUPPORTS ..
-cmake --build ./ --target $TARGETS
-$PERFORM_TESTS
+make $TARGETS
+for TEST in $PERFORM_TESTS; do
+$TEST
+done
