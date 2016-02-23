@@ -51,11 +51,8 @@ namespace kiwi
         {
             std::shared_ptr< Node> from = m_from.lock(), to = m_to.lock();
             assert(static_cast< bool >(from) && static_cast< bool >(to) && "A Link isn't valid.");
-            if(from && to)
-            {
-                from->addOutput(shared_from_this());
-                to->addInput(shared_from_this());
-            }
+            from->addOutput(shared_from_this());
+            to->addInput(shared_from_this());
         }
         
         std::shared_ptr< Chain::Node > Chain::Tie::getOutputNode() const noexcept
@@ -82,8 +79,7 @@ namespace kiwi
         //                                          NODE                                        //
         // ==================================================================================== //
         
-        Chain::Node::Node(Processor& processor, size_t const samplerate, size_t const vectorsize) :
-        m_processor(processor), m_sample_rate(samplerate), m_vector_size(vectorsize), m_index(0ul)
+        Chain::Node::Node(Processor& processor) : m_processor(processor), m_index(0ul)
         {
             if(m_processor.m_running)
             {
@@ -98,14 +94,18 @@ namespace kiwi
         {
             m_inputs.clear();
             m_outputs.clear();
-            try
+            if(m_processor.m_running)
             {
-                m_processor.m_running = false;
-                m_processor.release();
-            }
-            catch(std::exception&)
-            {
-                throw;
+                // Pas ça ici
+                try
+                {
+                    m_processor.m_running = false;
+                    m_processor.release();
+                }
+                catch(std::exception&)
+                {
+                    throw;
+                }
             }
         }
         
@@ -146,9 +146,11 @@ namespace kiwi
             m_outputs[static_cast< tie_set::size_type >(tie->getOutputIndex())].insert(tie);
         }
         
-        bool Chain::Node::prepare()
+        bool Chain::Node::prepare(size_t const samplerate, size_t const vectorsize)
         {
-            std::vector<bool> inputs_states(m_inputs.size());
+            // Remove unecessary inputs and outputs nodes
+            // Fills two vectors of states
+            std::vector< bool > inputs_states(m_inputs.size());
             {
                 auto in = inputs_states.begin();
                 for(auto& set : m_inputs)
@@ -168,7 +170,7 @@ namespace kiwi
                     *in = !set.empty();
                 }
             }
-            std::vector<bool> outputs_states(m_outputs.size());
+            std::vector< bool > outputs_states(m_outputs.size());
             {
                 auto out = outputs_states.begin();
                 for(auto& set : m_outputs)
@@ -188,10 +190,12 @@ namespace kiwi
                     *out = !set.empty();
                 }
             }
+            // Prepares the processor
+            // Fills two vectors of states
             bool state = false;
             try
             {
-                Infos infos(m_sample_rate, m_vector_size, inputs_states, outputs_states);
+                Infos infos(samplerate, vectorsize, inputs_states, outputs_states);
                 state = m_processor.m_running = m_processor.prepare(infos);
             }
             catch(std::exception& e)
@@ -308,7 +312,7 @@ namespace kiwi
                 assert(processor != nullptr && "A Processor pointer is nullptr.");
                 try
                 {
-                    m_nodes.push_back(std::make_shared< Node >(*processor, m_sample_rate, m_vector_size));
+                    m_nodes.push_back(std::make_shared< Node >(*processor));
                 }
                 catch(std::exception& e)
                 {
@@ -412,7 +416,7 @@ namespace kiwi
                 assert((*it)->isSorted() && "A Node object isn't sorted.");
                 try
                 {
-                    ready = (*it)->prepare();
+                    ready = (*it)->prepare(m_sample_rate, m_vector_size);
                 }
                 catch(std::exception& e)
                 {

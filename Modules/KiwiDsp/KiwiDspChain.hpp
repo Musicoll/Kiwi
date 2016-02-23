@@ -173,8 +173,8 @@ namespace dsp
         class Node
         {
         public:
-            //! @brief The constructor that checks the validity of the Processor object.
-            Node(Processor& processor, size_t const samplerate, size_t const vectorsize);
+            //! @brief The constructor.
+            Node(Processor& processor);
             
             // @brief The destrcutor.
             ~Node();
@@ -196,14 +196,12 @@ namespace dsp
             
             void addInput(std::shared_ptr< const  Tie > tie);
             void addOutput(std::shared_ptr< const Tie > tie);
-            bool prepare();
+            bool prepare(size_t const samplerate, size_t const vectorsize);
             void perform() noexcept;
 
         private:
             Processor&              m_processor;
             Buffer                  m_buffer;
-            size_t                  m_sample_rate;
-            size_t                  m_vector_size;
             size_t                  m_index;
         
             std::vector< tie_set >  m_inputs;
