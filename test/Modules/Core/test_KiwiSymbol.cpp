@@ -34,14 +34,10 @@ using namespace kiwi;
 
 TEST_CASE("Symbol", "[Symbol]")
 {
-    auto original_symtable_size = Symbol::size();
     Symbol sym_1("foo");
-    CHECK(Symbol::size() == original_symtable_size + 1);
     Symbol sym_2("foo");
-    CHECK(Symbol::size() == original_symtable_size + 1);
     Symbol sym_3("jojo");
     Symbol sym_4("jojo");
-    CHECK(Symbol::size() == original_symtable_size + 2);
     
     CHECK(sym_1 == sym_2);
     CHECK(sym_1 == sym_1);
@@ -56,7 +52,6 @@ TEST_CASE("Symbol", "[Symbol]")
     
     
     std::vector<Symbol> sims {Symbol("jojo"), Symbol("jaja"), Symbol("juju")};
-    CHECK(Symbol::size() == original_symtable_size + 5);
     
     Symbol sym_42("jojo");
     Symbol sym_jojo = sym_42;

@@ -51,10 +51,6 @@ namespace kiwi
         //! @brief Destructor.
         ~Symbol() = default;
         
-        //! @brief Get the total number of symbols already cached
-        //! @todo remove this function (?)
-        static size_t size() noexcept                               { return m_symbols.size(); }
-        
         //! @brief Get the symbol as an std::string.
         inline std::string toString() const noexcept                { return m_name; }
         
