@@ -18,6 +18,8 @@
 #include <vector>
 #include <set>
 #include <memory>
+#include <atomic>
+#include <mutex>
 
 #ifndef __APPLE__
 #include "malloc.h"
@@ -27,26 +29,30 @@ namespace kiwi
 {
 namespace dsp
 {
-#ifdef KIWI_DSP_FLOAT
+#ifdef KIWI_DSP_DOUBLE
     typedef float sample_t;
-#elif KIWI_DSP_DOUBLE
+#elif KIWI_DSP_FLOAT
     typedef double sample_t;
 #endif
     // ==================================================================================== //
     //                                          ERROR                                       //
     // ==================================================================================== //
     //! @brief The exception.
-    //! @details The class defines the exceptions that can occur during of the creation or
-    //! @details the compilation of the dsp chain.
-    class Error : public std::exception
+    //! @details The class defines the std::exception objects that can be trown during of by
+    //! @details DSP objects during the compilation of a Chain object.
+    class Error : public std::runtime_error
     {
     public:
-        //! @brief The constructor.
-        inline Error() noexcept {}        
+        //! @brief The std::string constructor.
+        //! @param message The message of the error
+        explicit Error(const std::string& message) :
+        std::runtime_error(std::string("kiwi::dsp : ") + message) {}
+        //! @brief The const char* constructor.
+        //! @param message The message of the error
+        explicit Error(const char* message) :
+        std::runtime_error(std::string("kiwi::dsp : ") + std::string(message)) {}
         //! @brief The destructor.
         virtual inline ~Error() noexcept {}
-        //! @brief Retrieves a textual information about the error.
-        virtual const char* what() const noexcept override {return "Kiwi::Dsp::Error : problem occurs !";}
     };
     
     // ==================================================================================== //

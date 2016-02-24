@@ -18,7 +18,7 @@ namespace dsp
     // ==================================================================================== //
     //! @brief The class owns the attributes of a connection between two Processor objects.
     //! @details The class acts like a simple structure with constant attributes to connect
-    //! @details two Processor objects in a Chain object.
+    //! two Processor objects in a Chain object.
     //! @see Chain and Processor
     class Link
     {

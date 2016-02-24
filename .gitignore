@@ -36,5 +36,11 @@ MacOSX/
 # Juce
 JuceLibraryCode/
 
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
 # Project specific
 build/
