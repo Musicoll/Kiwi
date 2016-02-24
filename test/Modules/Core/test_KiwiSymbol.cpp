@@ -63,6 +63,7 @@ TEST_CASE("Symbol", "[Symbol]")
     
     CHECK(sym_jojo.toString() == "jojo");
     
+    /*
     Benchmark bench;
     
     bench.startTestCase("Creation (same) (10000x)", Benchmark::Sort::ByPerfAsc);
@@ -83,7 +84,6 @@ TEST_CASE("Symbol", "[Symbol]")
         bench.endUnit();
     }
     bench.endTestCase();
-    
     
     bench.startTestCase("Creation (Different) (10000x)", Benchmark::Sort::ByPerfAsc);
     {
@@ -184,4 +184,5 @@ TEST_CASE("Symbol", "[Symbol]")
     }
     
     bench.endTestCase();
+    */
 }
