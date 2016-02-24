@@ -51,28 +51,25 @@ TEST_CASE("Symbol", "[Symbol]")
     // copy construct
     std::string str = "bar";
     Symbol sym_5(str);
-    CHECK(sym_5 == "bar");
+    //CHECK(sym_5 == "bar");
     CHECK(sym_5.toString() == "bar");
     
     
-    std::vector<Symbol> sims {"jojo", "jaja", "juju"};
+    std::vector<Symbol> sims {Symbol("jojo"), Symbol("jaja"), Symbol("juju")};
     CHECK(Symbol::size() == original_symtable_size + 5);
     
-    /*
-    // copy construct
-    std::string str2 = "bar";
-    std::cout << str2 << '\n';
-    Symbol sym_6(str2);
-    std::cout << str2 << '\n';
+    Symbol sym_42("jojo");
+    Symbol sym_jojo = sym_42;
     
-    Symbol ss = "ss";
-    */
+    CHECK(sym_jojo.toString() == "jojo");
     
     Benchmark bench;
     
     bench.startTestCase("Creation (same) (10000x)", Benchmark::Sort::ByPerfAsc);
-    
     {
+        Symbol("test_same");
+        Tag::create("test_same");
+        
         bench.startUnit("Symbols");
         for(int i = 0; i < 10000; ++i) Symbol("test_same");
         bench.endUnit();
@@ -85,11 +82,10 @@ TEST_CASE("Symbol", "[Symbol]")
         for(int i = 0; i < 10000; ++i) std::string("test_same");
         bench.endUnit();
     }
-    
     bench.endTestCase();
     
-    bench.startTestCase("Creation (Different) (10000x)", Benchmark::Sort::ByPerfAsc);
     
+    bench.startTestCase("Creation (Different) (10000x)", Benchmark::Sort::ByPerfAsc);
     {
         bench.startUnit("Symbols");
         for(int i = 0; i < 10000; ++i) Symbol(std::to_string(i));
@@ -103,36 +99,12 @@ TEST_CASE("Symbol", "[Symbol]")
         for(int i = 0; i < 10000; ++i) std::string(std::to_string(i));
         bench.endUnit();
     }
-    
     bench.endTestCase();
     
-    /*
-    [&]()
-    {
-        bench.startTestCase("Creation (Different) (10000x)", Benchmark::Sort::ByPerfAsc);
-        
-        {
-            bench.startUnit("Symbols");
-            for(int i = 0; i < 10000; ++i) Symbol(std::to_string(i));
-            bench.endUnit();
-            
-            bench.startUnit("Tag");
-            for(int i = 0; i < 10000; ++i) Tag::create(std::to_string(i));
-            bench.endUnit();
-            
-            bench.startUnit("std::string");
-            for(int i = 0; i < 10000; ++i) std::string(std::to_string(i));
-            bench.endUnit();
-        }
-        
-        bench.endTestCase();
-    }();
-    */
     
     bench.startTestCase("Equality compare (100000x)", Benchmark::Sort::ByPerfAsc);
-    
     {
-        const int iter = 100000;
+        const uint64_t iter = 100000;
         Symbol      bench_sym_1("bench_equality_compare_1");
         sTag        bench_tag_1 = Tag::create("bench_equality_compare_1");
         std::string bench_str_1("bench_equality_compare_1");
@@ -145,7 +117,26 @@ TEST_CASE("Symbol", "[Symbol]")
         std::vector<sTag> v_tags;
         std::vector<std::string> v_strings;
         
-        for(int i = 0; i < iter; ++i)
+        std::string str1;
+        std::string str2;
+        
+        std::shared_ptr<std::string> s_str1;
+        std::shared_ptr<std::string> s_str2;
+        
+        bench.startUnit("--string (==)");
+        for(uint64_t i = 0; i < iter - 1; ++i) { (str1 == str2) ; }
+        bench.endUnit();
+        
+        bench.startUnit("--stringRef (==)");
+        for(uint64_t i = 0; i < iter - 1; ++i) { (&str1 == &str2) ; }
+        bench.endUnit();
+        
+        bench.startUnit("--sString (==)");
+        for(uint64_t i = 0; i < iter - 1; ++i) { (s_str1 == s_str1) ; }
+        bench.endUnit();
+        
+        
+        for(uint64_t i = 0; i < iter; ++i)
         {
             const auto rdstr = std::to_string(std::rand());
             v_symbols.push_back(rdstr);
@@ -156,11 +147,21 @@ TEST_CASE("Symbol", "[Symbol]")
         bool result = false;
         
         bench.startUnit("Symbols (==)");
-        for(uint64_t i = 0; i < iter - 1; ++i) { (v_symbols[i] == v_symbols[i+1]) ; }
+        for(uint64_t i = 0; i < iter - 1; ++i) {
+            if((v_symbols[i] == v_symbols[i+1]))
+            {
+                
+            }
+        }
         bench.endUnit();
         
         bench.startUnit("Tag (==)");
-        for(uint64_t i = 0; i < iter - 1; ++i) { (v_tags[i] == v_tags[i+1]); }
+        for(uint64_t i = 0; i < iter - 1; ++i) {
+            if((v_tags[i] == v_tags[i+1]))
+            {
+                std::cout << "Et Johnny il ya un problème !";
+            }
+        }
         bench.endUnit();
         
         bench.startUnit("std::string (==)");

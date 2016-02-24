@@ -34,7 +34,7 @@ public:
     using duration_t = std::chrono::duration<double>;
     using timestamp_t = std::chrono::time_point<clock_t>;
     
-    //! brief Sorting methods
+    //! @brief Sorting methods
     enum class Sort : uint8_t
     {
         None        = 0,
@@ -42,21 +42,22 @@ public:
         ByPerfDesc  = 2
     };
     
-    //! brief Starts a test case.
+    //! @brief Starts a test case.
     void startTestCase(const std::string& message, const Sort& sort_method = Sort::None)
     {
         m_test_case_message = message;
         m_sort_method = sort_method;
     }
     
-    //! brief Ends a test case.
+    //! @brief Ends a test case.
     void endTestCase()
     {
         printResult();
         m_units.clear();
     }
     
-    //! brief Starts a unit.
+    //! @brief Starts a unit.
+    //! @see endUnit()
     void startUnit(const std::string& name)
     {
         Unit unit(name);
@@ -64,7 +65,8 @@ public:
         m_units.push_back(unit);
     }
     
-    //! brief Ends a unit.
+    //! @brief Ends a unit.
+    //! @see startUnit()
     void endUnit()
     {
         if(!m_units.empty())
@@ -147,11 +149,11 @@ private:
             {
                 if(m_sort_method == Sort::ByPerfAsc)
                 {
-                    return (lhs.getResult() > rhs.getResult());
+                    return (lhs.getResult() < rhs.getResult());
                 }
                 else if(m_sort_method == Sort::ByPerfDesc)
                 {
-                    return (lhs.getResult() < rhs.getResult());
+                    return (lhs.getResult() > rhs.getResult());
                 }
                 
                 return true;

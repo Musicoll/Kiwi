@@ -41,13 +41,13 @@ namespace kiwi
     public:
         
         //! @brief Constructs a Symbol with an std::string.
-        Symbol(const std::string& name) : m_name(get(name)) {};
+        Symbol(std::string const& name) : m_name(get(name)) {};
         
         //! @brief Constructs a Symbol with an std::string with move semantics.
         Symbol(std::string&& name) : m_name(get(std::forward<std::string>(name))) {};
         
-        //! @brief Constructs a Symbol with a string Literal.
-        Symbol(const char* name) : Symbol(std::string(name)) {};
+        //! @brief Copy constructor
+        Symbol(Symbol const& symbol) : m_name(symbol.m_name) {};
         
         //! @brief Destructor.
         ~Symbol() = default;
@@ -60,16 +60,15 @@ namespace kiwi
         inline std::string toString() const noexcept                { return m_name; }
         
         //! @brief Returns true if the too symbols are equals
-        inline bool operator == (const Symbol& rhs) const noexcept  { return (&m_name == &rhs.m_name); }
+        inline bool operator == (Symbol const& rhs) const noexcept  { return (&m_name == &rhs.m_name); }
         
         //! @brief Returns true if the too symbols are NOT equals
-        inline bool operator != (const Symbol& rhs) const noexcept  { return ! (*this == rhs); }
+        inline bool operator != (Symbol const& rhs) const noexcept  { return ! (*this == rhs); }
         
     private:
         
         static const std::string& get(const std::string& name) noexcept
         {
-            //std::cout << "Copy construct \n";
             std::lock_guard<std::mutex> guard(m_mutex);
             const auto sym = m_symbols.emplace(name).first;
             return *sym;
@@ -77,7 +76,6 @@ namespace kiwi
         
         static const std::string& get(std::string&& name) noexcept
         {
-            //std::cout << "Move construct \n";
             std::lock_guard<std::mutex> guard(m_mutex);
             const auto sym = m_symbols.emplace(std::move(name)).first;
             return *sym;
