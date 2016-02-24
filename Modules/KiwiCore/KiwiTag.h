@@ -32,10 +32,9 @@ namespace kiwi
     //                                      SYMBOL                                      //
     // ================================================================================ //
     
-    //! @brief The Symbol is an unique object that matchs to a "unique" std::string.
-    //! in the scope of all the Kiwi applications.
-    //! Comparing two Symbol objects is very fast (O(1))
-    //! @detail The symbols are uniques and match to a string. If you construct a symbol with a std::string that already matchs to a symbol, the creation function will return this symbol, otherwise it will create a new one.
+    //! @brief The Symbol is an unique object that matchs to a "unique" std::string in the scope of all the Kiwi application.
+    //! @details Comparing two Symbol objects is very fast (O(1))
+    //! The symbols are uniques and match to a string. If you construct a symbol with a std::string that already matchs to a symbol, the creation function will return this symbol, otherwise it will create a new one.
     class Symbol
     {
     public:
