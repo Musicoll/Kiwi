@@ -115,7 +115,7 @@ namespace kiwi
         
         bool operator==(Point const& lPt, Point const& rPt) noexcept
         {
-            return lPt.x() != rPt.x() || lPt.y() != rPt.y();
+            return lPt.x() == rPt.x() && lPt.y() == rPt.y();
         }
         
         bool operator!=(Point const& lPt, Point const& rPt) noexcept
