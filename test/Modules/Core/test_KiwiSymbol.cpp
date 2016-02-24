@@ -21,7 +21,7 @@
  ==============================================================================
  */
 
-#include "../../../Modules/KiwiCore/KiwiAtom.h"
+#include "../../../Modules/KiwiCore/KiwiSymbol.hpp"
 
 #include "../../catch.hpp"
 #include "../../KiwiBenchmark.hpp"
@@ -57,8 +57,11 @@ TEST_CASE("Symbol", "[Symbol]")
     Symbol sym_jojo = sym_42;
     
     CHECK(sym_jojo.toString() == "jojo");
-    
-    /*
+}
+
+/*
+TEST_CASE("Symbol Benchmark", "[Symbol, Benchmark]")
+{
     Benchmark bench;
     
     bench.startTestCase("Creation (same) (10000x)", Benchmark::Sort::ByPerfAsc);
@@ -179,5 +182,5 @@ TEST_CASE("Symbol", "[Symbol]")
     }
     
     bench.endTestCase();
-    */
 }
+*/

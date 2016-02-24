@@ -21,7 +21,7 @@
  ==============================================================================
  */
 
-#include "KiwiAtom.h"
+#include "KiwiAtom.hpp"
 
 namespace kiwi
 {

@@ -21,10 +21,10 @@
  ==============================================================================
 */
 
-#ifndef KIWI_TAG_H_INCLUDED
-#define KIWI_TAG_H_INCLUDED
+#ifndef KIWI_CORE_SYMBOL_HPP_INCLUDED
+#define KIWI_CORE_SYMBOL_HPP_INCLUDED
 
-#include "KiwiTools.h"
+#include "KiwiTools.hpp"
 
 namespace kiwi
 {
@@ -265,6 +265,4 @@ namespace kiwi
 };
 
 
-#endif // KIWI_TAG_H_INCLUDED
-
-
+#endif // KIWI_CORE_SYMBOL_HPP_INCLUDED

@@ -22,7 +22,7 @@
  */
 
 
-#include "../../../Modules/KiwiCore/KiwiAtom.h"
+#include "../../../Modules/KiwiCore/KiwiAtom.hpp"
 #include "../../catch.hpp"
 
 using namespace kiwi;

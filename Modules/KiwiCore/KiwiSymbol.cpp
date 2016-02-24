@@ -22,7 +22,7 @@
 */
 
 
-#include "KiwiTag.h"
+#include "KiwiSymbol.hpp"
 
 namespace kiwi
 {

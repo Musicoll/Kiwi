@@ -21,8 +21,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_TOOLS_H_INCLUDED
-#define KIWI_TOOLS_H_INCLUDED
+#ifndef KIWI_CORE_TOOLS_HPP_INCLUDED
+#define KIWI_CORE_TOOLS_HPP_INCLUDED
 
 #include <cstddef>
 #include <stdio.h>
@@ -419,4 +419,4 @@ namespace kiwi
     
 };
 
-#endif // KIWI_TOOLS_H_INCLUDED
+#endif // KIWI_CORE_TOOLS_HPP_INCLUDED

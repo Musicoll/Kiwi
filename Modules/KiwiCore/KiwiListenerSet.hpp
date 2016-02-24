@@ -21,10 +21,10 @@
  ==============================================================================
  */
 
-#ifndef KIWI_LISTENERSET_H_INCLUDED
-#define KIWI_LISTENERSET_H_INCLUDED
+#ifndef KIWI_CORE_LISTENERSET_HPP_INCLUDED
+#define KIWI_CORE_LISTENERSET_HPP_INCLUDED
 
-#include "KiwiAtom.h"
+#include "KiwiTools.hpp"
 
 namespace kiwi
 {
@@ -214,4 +214,4 @@ namespace kiwi
     };
 }
 
-#endif // KIWI_LISTENERSET_H_INCLUDED
+#endif // KIWI_CORE_LISTENERSET_HPP_INCLUDED
