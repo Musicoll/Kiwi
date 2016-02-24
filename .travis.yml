@@ -45,6 +45,7 @@ before_script:
   - chmod +x .travis/script.sh
   - chmod +x .travis/after_success.sh
 
-script: .travis/script.sh
-
-after_success: .travis/after_success.sh
+after_success:
+  - ./test_core
+  - ./test_dsp
+  - ./test_graphics

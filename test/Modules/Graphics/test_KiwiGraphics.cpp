@@ -2,7 +2,7 @@
  ==============================================================================
  
  This file is part of the KIWI library.
- Copyright (c) 2014 Pierre Guillot & Eliott Paris.
+ Copyright (c) 2014 Pierre Guillot & Eliott Paris
  
  Permission is granted to use this software under the terms of either:
  a) the GPL v2 (or any later version)
@@ -21,9 +21,23 @@
  ==============================================================================
  */
 
-#include "KiwiAffineMatrix.h"
+#include <KiwiGraphics/KiwiPoint.h>
+
+#define CATCH_CONFIG_MAIN
+#include "../../catch.hpp"
 
 namespace kiwi
 {
-    
+    namespace graphics
+    {
+        TEST_CASE("Point", "[Point]")
+        {
+            SECTION("Operators")
+            {
+                Point p1(1, 1);
+                Point p2(1, 2);
+                REQUIRE(p1 + p2 == Point(2, 3));
+            }
+        }
+    }
 }

@@ -1,0 +1,319 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0F0E1D5A1C71DBD300CF0989 /* test_KiwiGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D591C71DBD300CF0989 /* test_KiwiGraphics.cpp */; };
+		0F0E1D701C71E4E900CF0989 /* KiwiColor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D5E1C71E4E900CF0989 /* KiwiColor.cpp */; };
+		0F0E1D711C71E4E900CF0989 /* KiwiFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D601C71E4E900CF0989 /* KiwiFont.cpp */; };
+		0F0E1D721C71E4E900CF0989 /* KiwiLine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D631C71E4E900CF0989 /* KiwiLine.cpp */; };
+		0F0E1D741C71E4E900CF0989 /* KiwiPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D671C71E4E900CF0989 /* KiwiPath.cpp */; };
+		0F0E1D751C71E4E900CF0989 /* KiwiPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D691C71E4E900CF0989 /* KiwiPoint.cpp */; };
+		0F0E1D761C71E4E900CF0989 /* KiwiRectangle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D6B1C71E4E900CF0989 /* KiwiRectangle.cpp */; };
+		0F0E1D8A1C71F28000CF0989 /* KiwiAtom.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D831C71F28000CF0989 /* KiwiAtom.cpp */; };
+		0F0E1D8B1C71F28000CF0989 /* KiwiTag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D871C71F28000CF0989 /* KiwiTag.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		0F0E1D4D1C71DB6900CF0989 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0F0E1D4F1C71DB6900CF0989 /* test_KiwiGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_KiwiGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
+		0F0E1D591C71DBD300CF0989 /* test_KiwiGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_KiwiGraphics.cpp; sourceTree = "<group>"; };
+		0F0E1D5D1C71E4E900CF0989 /* KiwiAffineMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiAffineMatrix.h; sourceTree = "<group>"; };
+		0F0E1D5E1C71E4E900CF0989 /* KiwiColor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiColor.cpp; sourceTree = "<group>"; };
+		0F0E1D5F1C71E4E900CF0989 /* KiwiColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiColor.h; sourceTree = "<group>"; };
+		0F0E1D601C71E4E900CF0989 /* KiwiFont.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiFont.cpp; sourceTree = "<group>"; };
+		0F0E1D611C71E4E900CF0989 /* KiwiFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiFont.h; sourceTree = "<group>"; };
+		0F0E1D631C71E4E900CF0989 /* KiwiLine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiLine.cpp; sourceTree = "<group>"; };
+		0F0E1D641C71E4E900CF0989 /* KiwiLine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiLine.h; sourceTree = "<group>"; };
+		0F0E1D661C71E4E900CF0989 /* KiwiMouseCursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiMouseCursor.h; sourceTree = "<group>"; };
+		0F0E1D671C71E4E900CF0989 /* KiwiPath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiPath.cpp; sourceTree = "<group>"; };
+		0F0E1D681C71E4E900CF0989 /* KiwiPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiPath.h; sourceTree = "<group>"; };
+		0F0E1D691C71E4E900CF0989 /* KiwiPoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiPoint.cpp; sourceTree = "<group>"; };
+		0F0E1D6A1C71E4E900CF0989 /* KiwiPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiPoint.h; sourceTree = "<group>"; };
+		0F0E1D6B1C71E4E900CF0989 /* KiwiRectangle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiRectangle.cpp; sourceTree = "<group>"; };
+		0F0E1D6C1C71E4E900CF0989 /* KiwiRectangle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiRectangle.h; sourceTree = "<group>"; };
+		0F0E1D6E1C71E4E900CF0989 /* KiwiSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiSize.h; sourceTree = "<group>"; };
+		0F0E1D831C71F28000CF0989 /* KiwiAtom.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiAtom.cpp; sourceTree = "<group>"; };
+		0F0E1D841C71F28000CF0989 /* KiwiAtom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiAtom.h; sourceTree = "<group>"; };
+		0F0E1D851C71F28000CF0989 /* KiwiCore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiCore.h; sourceTree = "<group>"; };
+		0F0E1D861C71F28000CF0989 /* KiwiListenerSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiListenerSet.h; sourceTree = "<group>"; };
+		0F0E1D871C71F28000CF0989 /* KiwiTag.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiTag.cpp; sourceTree = "<group>"; };
+		0F0E1D881C71F28000CF0989 /* KiwiTag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiTag.h; sourceTree = "<group>"; };
+		0F0E1D891C71F28000CF0989 /* KiwiTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiTools.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0F0E1D4C1C71DB6900CF0989 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0F0E1D461C71DB6900CF0989 = {
+			isa = PBXGroup;
+			children = (
+				0F0E1D591C71DBD300CF0989 /* test_KiwiGraphics.cpp */,
+				0F0E1D501C71DB6900CF0989 /* Products */,
+				0F0E1D821C71F28000CF0989 /* KiwiCore */,
+				0F0E1D5B1C71E4E900CF0989 /* KiwiGraphics */,
+			);
+			sourceTree = "<group>";
+		};
+		0F0E1D501C71DB6900CF0989 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0F0E1D4F1C71DB6900CF0989 /* test_KiwiGraphics */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0F0E1D5B1C71E4E900CF0989 /* KiwiGraphics */ = {
+			isa = PBXGroup;
+			children = (
+				0F0E1D5D1C71E4E900CF0989 /* KiwiAffineMatrix.h */,
+				0F0E1D5E1C71E4E900CF0989 /* KiwiColor.cpp */,
+				0F0E1D5F1C71E4E900CF0989 /* KiwiColor.h */,
+				0F0E1D601C71E4E900CF0989 /* KiwiFont.cpp */,
+				0F0E1D611C71E4E900CF0989 /* KiwiFont.h */,
+				0F0E1D631C71E4E900CF0989 /* KiwiLine.cpp */,
+				0F0E1D641C71E4E900CF0989 /* KiwiLine.h */,
+				0F0E1D661C71E4E900CF0989 /* KiwiMouseCursor.h */,
+				0F0E1D671C71E4E900CF0989 /* KiwiPath.cpp */,
+				0F0E1D681C71E4E900CF0989 /* KiwiPath.h */,
+				0F0E1D691C71E4E900CF0989 /* KiwiPoint.cpp */,
+				0F0E1D6A1C71E4E900CF0989 /* KiwiPoint.h */,
+				0F0E1D6B1C71E4E900CF0989 /* KiwiRectangle.cpp */,
+				0F0E1D6C1C71E4E900CF0989 /* KiwiRectangle.h */,
+				0F0E1D6E1C71E4E900CF0989 /* KiwiSize.h */,
+			);
+			name = KiwiGraphics;
+			path = ../../../Modules/KiwiGraphics;
+			sourceTree = "<group>";
+		};
+		0F0E1D821C71F28000CF0989 /* KiwiCore */ = {
+			isa = PBXGroup;
+			children = (
+				0F0E1D831C71F28000CF0989 /* KiwiAtom.cpp */,
+				0F0E1D841C71F28000CF0989 /* KiwiAtom.h */,
+				0F0E1D851C71F28000CF0989 /* KiwiCore.h */,
+				0F0E1D861C71F28000CF0989 /* KiwiListenerSet.h */,
+				0F0E1D871C71F28000CF0989 /* KiwiTag.cpp */,
+				0F0E1D881C71F28000CF0989 /* KiwiTag.h */,
+				0F0E1D891C71F28000CF0989 /* KiwiTools.h */,
+			);
+			name = KiwiCore;
+			path = ../../../Modules/KiwiCore;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0F0E1D4E1C71DB6900CF0989 /* test_KiwiGraphics */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0F0E1D561C71DB6900CF0989 /* Build configuration list for PBXNativeTarget "test_KiwiGraphics" */;
+			buildPhases = (
+				0F0E1D4B1C71DB6900CF0989 /* Sources */,
+				0F0E1D4C1C71DB6900CF0989 /* Frameworks */,
+				0F0E1D4D1C71DB6900CF0989 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = test_KiwiGraphics;
+			productName = test_KiwiGraphics;
+			productReference = 0F0E1D4F1C71DB6900CF0989 /* test_KiwiGraphics */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0F0E1D471C71DB6900CF0989 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0720;
+				ORGANIZATIONNAME = MUSICOLL;
+				TargetAttributes = {
+					0F0E1D4E1C71DB6900CF0989 = {
+						CreatedOnToolsVersion = 7.2.1;
+					};
+				};
+			};
+			buildConfigurationList = 0F0E1D4A1C71DB6900CF0989 /* Build configuration list for PBXProject "test_KiwiGraphics" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 0F0E1D461C71DB6900CF0989;
+			productRefGroup = 0F0E1D501C71DB6900CF0989 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0F0E1D4E1C71DB6900CF0989 /* test_KiwiGraphics */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0F0E1D4B1C71DB6900CF0989 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0F0E1D711C71E4E900CF0989 /* KiwiFont.cpp in Sources */,
+				0F0E1D741C71E4E900CF0989 /* KiwiPath.cpp in Sources */,
+				0F0E1D5A1C71DBD300CF0989 /* test_KiwiGraphics.cpp in Sources */,
+				0F0E1D751C71E4E900CF0989 /* KiwiPoint.cpp in Sources */,
+				0F0E1D721C71E4E900CF0989 /* KiwiLine.cpp in Sources */,
+				0F0E1D701C71E4E900CF0989 /* KiwiColor.cpp in Sources */,
+				0F0E1D8B1C71F28000CF0989 /* KiwiTag.cpp in Sources */,
+				0F0E1D761C71E4E900CF0989 /* KiwiRectangle.cpp in Sources */,
+				0F0E1D8A1C71F28000CF0989 /* KiwiAtom.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		0F0E1D541C71DB6900CF0989 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		0F0E1D551C71DB6900CF0989 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		0F0E1D571C71DB6900CF0989 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = "${KIWI_DIR}/Modules";
+				KIWI_DIR = ../../..;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		0F0E1D581C71DB6900CF0989 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = "${KIWI_DIR}/Modules";
+				KIWI_DIR = ../../..;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0F0E1D4A1C71DB6900CF0989 /* Build configuration list for PBXProject "test_KiwiGraphics" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0F0E1D541C71DB6900CF0989 /* Debug */,
+				0F0E1D551C71DB6900CF0989 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0F0E1D561C71DB6900CF0989 /* Build configuration list for PBXNativeTarget "test_KiwiGraphics" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0F0E1D571C71DB6900CF0989 /* Debug */,
+				0F0E1D581C71DB6900CF0989 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0F0E1D471C71DB6900CF0989 /* Project object */;
+}
