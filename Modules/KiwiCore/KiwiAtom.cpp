@@ -33,11 +33,7 @@ namespace kiwi
     {
         const auto quark = other.m_quark;
         
-        if(other.isBool())
-        {
-            m_quark = new QuarkBool(quark->getBool());
-        }
-        else if(other.isInt())
+        if(other.isInt())
         {
             m_quark = new QuarkInt(quark->getInt());
         }
@@ -45,17 +41,9 @@ namespace kiwi
         {
             m_quark = new QuarkFloat(quark->getFloat());
         }
-        else if(other.isTag())
+        else if(other.isSymbol())
         {
-            m_quark = new QuarkTag(quark->getTag());
-        }
-        else if(other.isVector())
-        {
-            m_quark = new QuarkVector(quark->getVector());
-        }
-        else if(other.isDico())
-        {
-            m_quark = new QuarkDico(quark->getDico());
+            m_quark = new QuarkSymbol(quark->getSymbol());
         }
         else
         {
@@ -70,11 +58,7 @@ namespace kiwi
         
         const auto quark = other.m_quark;
         
-        if(other.isBool())
-        {
-            m_quark = new QuarkBool(quark->getBool());
-        }
-        else if(other.isInt())
+        if(other.isInt())
         {
             m_quark = new QuarkInt(quark->getInt());
         }
@@ -82,17 +66,9 @@ namespace kiwi
         {
             m_quark = new QuarkFloat(quark->getFloat());
         }
-        else if(other.isTag())
+        else if(other.isSymbol())
         {
-            m_quark = new QuarkTag(quark->getTag());
-        }
-        else if(other.isVector())
-        {
-            m_quark = new QuarkVector(quark->getVector());
-        }
-        else if(other.isDico())
-        {
-            m_quark = new QuarkDico(quark->getDico());
+            m_quark = new QuarkSymbol(quark->getSymbol());
         }
         else
         {
@@ -102,79 +78,27 @@ namespace kiwi
         return *this;
     }
     
-    std::ostream& Atom::toJson(std::ostream &output, const Atom &atom, ulong& indent)
-    {
-        if(atom.isBool())
-        {
-            output << atom.operator bool();
-        }
-        else if(atom.isInt())
-        {
-            output << atom.operator integer_t();
-        }
-        else if(atom.isFloat())
-        {
-            output << atom.operator float_t();
-        }
-        else if(atom.isTag())
-        {
-            output << jsonEscape((atom.operator tag_t())->getName());
-        }
-        else if(atom.isVector())
-        {
-            Vector const& vec = atom;
-            output << '[';
-            for(Vector::size_type i = 0; i < vec.size();)
-            {
-                toJson(output, vec[i], indent);
-                if(++i != vec.size())
-                {
-                    output << ", ";
-                }
-            }
-            output << ']';
-        }
-        else if(atom.isDico())
-        {
-            Dico const& dico = atom;
-            output << "{\n";
-            ++indent;
-            for(auto it = dico.begin(); it != dico.end();)
-            {
-                for(ulong i = 0; i < indent; i++)
-                {
-                    output << '\t';
-                }
-                output << jsonEscape(it->first->getName()) << " : ";
-                toJson(output, it->second, indent);
-                if(++it != dico.end())
-                {
-                    output << ',' << '\n';
-                }
-                else
-                {
-                    output << '\n';
-                }
-            }
-            --indent;
-            for(ulong i = 0; i < indent; i++)
-            {
-                output << '\t';
-            }
-            output << '}';
-        }
-        return output;
-    }
-    
-    std::ostream& operator<<(std::ostream &output, const Atom &atom)
+    std::ostream& operator<<(std::ostream& output, Atom const& atom)
     {
         const bool boolalpha = output.flags() & std::ios::boolalpha;
         if(!boolalpha)
         {
             output << std::boolalpha;
         }
-        ulong indent = 0;
-        Atom::toJson(output, atom, indent);
+        
+        if(atom.isInt())
+        {
+            output << atom.operator Atom::integer_t();
+        }
+        else if(atom.isFloat())
+        {
+            output << atom.operator Atom::float_t();
+        }
+        else if(atom.isSymbol())
+        {
+            output << jsonEscape((atom.operator Atom::symbol_t()).toString());
+        }
+        
         if(!boolalpha)
         {
             output << std::noboolalpha;
@@ -182,9 +106,9 @@ namespace kiwi
         return output;
     }
     
-    Vector Atom::parse(std::string const& text)
+    std::vector<Atom> Atom::parse(std::string const& text)
     {
-        Vector atoms;
+        std::vector<Atom> atoms;
         const auto textlen = text.length();
         auto pos = text.find_first_not_of(' ', 0);
         
@@ -276,7 +200,7 @@ namespace kiwi
                 }
                 else
                 {
-                    atoms.emplace_back(Atom(Tag::create(jsonUnescape(word))));
+                    atoms.emplace_back(Atom(Symbol(jsonUnescape(word))));
                 }
             }
         }

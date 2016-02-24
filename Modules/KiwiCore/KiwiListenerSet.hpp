@@ -39,7 +39,7 @@ namespace kiwi
     {
     private:
         typedef std::shared_ptr<ListenerClass>		sListener;
-        typedef std::weak_ptr<ListenerClass>			wListener;
+        typedef std::weak_ptr<ListenerClass>        wListener;
         
         std::set<wListener,
         std::owner_less<wListener>>  m_listeners;
@@ -108,7 +108,7 @@ namespace kiwi
         /** The function return the number of listeners (including invalid ones).
          @return The number of listeners.
          */
-        ulong size() const noexcept
+        unsigned long size() const noexcept
         {
             std::lock_guard<std::mutex> guard(m_listeners_mutex);
             return m_listeners.size();

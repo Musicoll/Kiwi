@@ -72,16 +72,6 @@
 
 namespace kiwi
 {
-    class Atom;
-    
-    class Tag;
-    typedef std::shared_ptr<const Tag>       sTag;
-    typedef std::weak_ptr<const Tag>         wTag;
-
-    typedef unsigned long               ulong;
-    typedef std::vector<Atom>                Vector;
-    typedef std::map<sTag, Atom>             Dico;
-    
     class Error : public std::exception
     {
         const std::string m_message;
@@ -185,7 +175,7 @@ namespace kiwi
         return std::to_string(__val);
     }
     
-    inline std::string toString(ulong __val)
+    inline std::string toString(unsigned long __val)
     {
         return std::to_string(__val);
     }
@@ -283,7 +273,8 @@ namespace kiwi
         }
     }
     
-    template<> inline ulong fromString(std::string const& __val)
+    template<>
+    inline unsigned long fromString(std::string const& __val)
     {
         const auto pos = __val.find_first_of("0123456789");
         if(pos != std::string::npos)
