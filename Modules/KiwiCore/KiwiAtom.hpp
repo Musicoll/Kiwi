@@ -78,7 +78,7 @@ namespace kiwi
         //! @param other The other Atom.
         Atom(Atom const& other) noexcept;
         
-        //! @brief Constructs a boolean_t Atom (explicit).
+        //! @brief Constructs a bool Atom (explicit).
         //! @param value The value.
         inline explicit Atom(bool value) noexcept : m_quark(new QuarkInt(value)) {}
         
@@ -198,8 +198,8 @@ namespace kiwi
         //! @see getType(), isNull(), isInt(), isNumber(), isSymbol()
         inline bool isFloat() const noexcept {return m_quark->isFloat();}
         
-        //! @brief Returns true if the Atom is a boolean_t, an integer_t, or a float_t.
-        //! @return true if the Atom is a boolean_t, an integer_t, or a float_t.
+        //! @brief Returns true if the Atom is a bool, an integer_t, or a float_t.
+        //! @return true if the Atom is a bool, an integer_t, or a float_t.
         //! @see getType(), isNull(), isInt(), isFloat(), isSymbol()
         inline bool isNumber() const noexcept {return m_quark->isNumber();}
         
@@ -516,7 +516,7 @@ namespace kiwi
          @param value   The boolean value.
          @return true if the atom differ from the boolean value otherwise false.
          */
-        inline bool operator!=(const boolean_t value) const noexcept
+        inline bool operator!=(const bool value) const noexcept
         {
             return !(*this == value);
         }
@@ -628,7 +628,7 @@ namespace kiwi
             inline bool isNumber() const noexcept           {return isInt() || isFloat();}
             inline bool isSymbol() const noexcept           {return getType() == value_t::Symbol;}
             // Getters
-            virtual inline boolean_t getBool() const noexcept   {return false;}
+            virtual inline bool getBool() const noexcept   {return false;}
             virtual inline integer_t getInt() const noexcept    {return 0ll;}
             virtual inline float_t   getFloat() const noexcept  {return 0.;}
             virtual inline symbol_t  getSymbol() const noexcept {return Symbol("");}
@@ -643,7 +643,7 @@ namespace kiwi
             inline QuarkInt(QuarkInt const& _val) noexcept : val(_val.val) {}
             inline QuarkInt(const integer_t& _val) noexcept : val(_val) {}
             inline value_t getType() const noexcept override    {return value_t::Int;}
-            inline boolean_t getBool() const noexcept override  {return (val != 0ll);}
+            inline bool getBool() const noexcept override  {return (val != 0ll);}
             inline integer_t getInt() const noexcept override   {return val;}
             inline float_t getFloat() const noexcept override   {return static_cast<float_t>(val);}
         };
@@ -656,7 +656,7 @@ namespace kiwi
             inline QuarkFloat(QuarkFloat const& _val) noexcept : val(_val.val) {}
             inline QuarkFloat(float_t const& _val) noexcept : val(_val) {}
             inline value_t getType() const noexcept override    {return value_t::Float;}
-            inline boolean_t getBool() const noexcept override  {return (val != 0.);}
+            inline bool getBool() const noexcept override  {return (val != 0.);}
             inline integer_t getInt() const noexcept override   {return static_cast<integer_t>(val);}
             inline float_t getFloat() const noexcept override   {return val;}
         };
