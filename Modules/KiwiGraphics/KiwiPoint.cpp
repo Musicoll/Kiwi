@@ -115,7 +115,8 @@ namespace kiwi
         
         bool operator==(Point const& lPt, Point const& rPt) noexcept
         {
-            return lPt.x() == rPt.x() && lPt.y() == rPt.y();
+            const double epsilon = 1e-12;
+            return distance(lPt, rPt) < epsilon;
         }
         
         bool operator!=(Point const& lPt, Point const& rPt) noexcept
@@ -129,12 +130,12 @@ namespace kiwi
         
         double Point::angle() const noexcept
         {
-            return angle(Point(0, 0));
+            return atan2(m_data[1], m_data[0]);
         }
         
-        double Point::angle(Point const& pt) const noexcept
+        double Point::angleToPoint(Point const& pt) const noexcept
         {
-            return atan2(m_data[1] - pt.y(), m_data[0] - pt.x());
+            return (pt - *this).angle();
         }
         
         Point Point::rotated(double const angle) const noexcept

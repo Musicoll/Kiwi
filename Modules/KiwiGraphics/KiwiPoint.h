@@ -58,12 +58,6 @@ namespace kiwi
              */
             constexpr inline Point(Point const& pt) noexcept : m_data{pt.m_data[0], pt.m_data[1]}{}
             
-            //! Constructor.
-            /** The function initializes a point with another point.
-             @param pt The other point.
-             */
-            inline Point(Point&& pt) noexcept {std::swap(m_data, pt.m_data);}
-            
             //! Destructor.
             /** The function deletes the point.
              */
@@ -120,20 +114,9 @@ namespace kiwi
                 return *this;
             }
             
-            //! Sets the abscissa and the ordinate with another point.
-            /** The function sets the abscissa and the ordinate with another point.
-             @param pt Another point.
-             @return The point.
-             */
-            inline Point& operator=(Point&& pt)
-            {
-                std::swap(m_data, pt.m_data);
-                return *this;
-            }
-            
             //! Retrieve a copy and apply a rotation from the origin.
             /** The function retrieves a copy and applies a rotation from the origin.
-             @param angle The angle
+             @param angle The angle in radian
              @return The copy with the rotation.
              */
             Point rotated(double const angle) const noexcept;
@@ -141,36 +124,36 @@ namespace kiwi
             //! Retrieve a copy and apply a rotation from another point.
             /** The function retrieves a copy and applies a rotation from another point.
              @pram pt The other point.
-             @param angle The angle
+             @param angle The angle in radian
              @return The copy with the rotation.
              */
             Point rotated(Point const& pt, double const angle) const noexcept;
             
             //! Apply a rotation from the origin.
             /** The function retrieves Applies a rotation from the origin.
-             @param angle The angle
+             @param angle The angle in radian
              */
             void rotate(double const angle) noexcept;
             
             //! Retrieve a copy and apply a rotation from another point.
             /** The function retrieves a copy and applies a rotation from another point.
              @param pt The other point.
-             @param angle The angle
+             @param angle The angle in radian
              */
             void rotate(Point const& pt, double const angle) noexcept;
             
             //! Retrieve the angle from the origin.
             /** The function retrieves the angle from origin.
-             @return The angle.
+             @return The angle in radian
              */
-            inline double angle() const noexcept;
+            double angle() const noexcept;
             
             //! Retrieve the angle from another point.
             /** The function retrieves the angle from another point.
              @param pt The other point.
-             @return The angle.
+             @return The angle in radian
              */
-            double angle(Point const& pt) const noexcept;
+            double angleToPoint(Point const& pt) const noexcept;
             
             //! Retrieve the dot product with another point.
             /** The function retrieves the dot product with another point.
@@ -246,7 +229,7 @@ namespace kiwi
          @param pt Another point.
          @return The point.
          */
-        Point& operator/=(Point const& pt, double const value);
+        Point& operator/=(Point & pt, double const value);
         
         //! Retrives a new point from the addition of two points.
         /** The function adds a value to the point.

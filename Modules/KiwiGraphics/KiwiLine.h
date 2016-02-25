@@ -545,7 +545,7 @@ namespace kiwi
              */
             inline double angle() const noexcept
             {
-                return m_start.angle(m_end);
+                return m_start.angleToPoint(m_end);
             }
             
             //! Retrieve the length of the segment.
