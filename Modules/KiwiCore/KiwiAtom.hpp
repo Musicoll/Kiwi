@@ -33,22 +33,26 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The Atom can dynamically hold different types of value
-    //! The Atom can hold a boolean value, an integer, a float, a tag,
-    //! a vector of Atom or a dictionary of key/Atom pair.
+    //! @details The Atom can hold an integer, a float or a symbol.
     class Atom
     {
     public:
         
-        //! @brief The type of an integer number in the Atom class
+        // ================================================================================ //
+        //                                      Types                                       //
+        // ================================================================================ //
+        
+        //! @brief The type of a signed integer number in the Atom class.
         using integer_t = int64_t;
         
-        //! @brief The type of a floating-point number in the Atom class
+        //! @brief The type of a floating-point number in the Atom class.
         using float_t = double;
         
-        //! @brief The type of a Symbol in the Atom class
+        //! @brief The type of a Symbol in the Atom class.
         using symbol_t = Symbol;
         
         //! @brief Enum of Atom value types
+        //! @see getType(), isNull(), isInt(), isFloat(), isNumber(), isSymbol()
         enum class Type : uint8_t
         {
             Null        = 0,
@@ -57,627 +61,345 @@ namespace kiwi
             Symbol      = 3
         };
         
+    public:
+        
         // ================================================================================ //
         //                                  CONSTRUCTORS                                    //
         // ================================================================================ //
         
-        //! @brief Construct an Atom of type Null
-        inline Atom() noexcept : m_quark(new Quark()) {}
-        
-        //! @brief Move constructor.
-        //! Constructs an Atom value with the contents of another Atom using move semantics.
-        //! It "steals" the resources from the other and leaves it as a Null Atom.
-        //! @param other The other Atom.
-        inline Atom(Atom&& other) noexcept : m_quark(std::move(other.m_quark))
+        //! @brief Default constructor.
+        //! @details Constructs an Atom of type Null.
+        inline Atom() noexcept :
+            m_type(Type::Null),
+            m_value(Type::Null)
         {
-            other.m_quark = new Quark();
+            ;
         }
         
         //! @brief Copy constructor.
-        //! Constructs an Atom by copying the contents of an other Atom.
+        //! @details Constructs an Atom by copying the contents of an other Atom.
         //! @param other The other Atom.
         Atom(Atom const& other) noexcept;
         
-        //! @brief Constructs a bool Atom (explicit).
+        //! @brief Move constructor.
+        //! @details Constructs an Atom value by stealing the contents of an other Atom using move semantics,
+        //! leaving the other as a Null value Atom.
+        //! @param other The other Atom value.
+        Atom(Atom&& other) noexcept :
+            m_type(std::move(other.m_type)),
+            m_value(std::move(other.m_value))
+        {
+            // leave the other as a Null value Atom
+            other.m_type = Type::Null;
+            other.m_value = {};
+        }
+        
+        //! @brief Copy assigment operator.
+        //! @details Copies an Atom value by the "copy and swap" method.
+        //! @param other The Atom object to copy.
+        Atom& operator=(Atom other)
+        noexcept (std::is_nothrow_move_constructible<Type>::value
+                  && std::is_nothrow_move_assignable<Type>::value
+                  && std::is_nothrow_move_constructible<atom_value>::value
+                  && std::is_nothrow_move_assignable<atom_value>::value)
+        {
+            //std::cout << "Copy and swap called" << '\n';
+            std::swap(m_type, other.m_type);
+            std::swap(m_value, other.m_value);
+            return *this;
+        }
+        
+        //! @brief Constructs an integer_t Atom.
+        //! @details The integer value will be 1 or 0 depending on the bool value.
         //! @param value The value.
-        inline explicit Atom(bool value) noexcept : m_quark(new QuarkInt(value)) {}
+        inline explicit Atom(bool value) noexcept :
+            m_type(Type::Int),
+            m_value(value ? integer_t(1) : integer_t(0))
+        {
+            ;
+        }
         
-        //! @brief Constructs an integer_t Atom (explicit)
+        //! @brief Constructs an integer_t Atom.
         //! @param value The value.
-        inline explicit Atom(const integer_t value) noexcept : m_quark(new QuarkInt(value)) {}
+        inline explicit Atom(const int value) noexcept :
+            m_type(Type::Int),
+            m_value(static_cast<integer_t>(value))
+        {
+            ;
+        }
         
-    private:
-        //! @internal Utility to target a compatible integer value.
-        template <class IntegerType>
-        using EnableIfCompatibleIntTypeFrom = typename std::enable_if<
-        std::is_constructible<integer_t, IntegerType>::value
-        && std::numeric_limits<IntegerType>::is_signed
-        && (! std::is_same<integer_t, IntegerType>::value)
-        && (sizeof(IntegerType) <= sizeof(integer_t))
-        && (   std::is_same<short,      IntegerType>::value
-            || std::is_same<int,        IntegerType>::value
-            || std::is_same<long,       IntegerType>::value
-            || std::is_same<long long,  IntegerType>::value), IntegerType>;
-        
-        //! @internal Utility to target a compatible integer value.
-        template <class IntegerType>
-        using EnableIfCompatibleIntTypeTo = typename std::enable_if<
-        std::is_constructible<IntegerType, integer_t>::value
-        && std::numeric_limits<IntegerType>::is_signed
-        && (! std::is_same<integer_t, IntegerType>::value)
-        && (sizeof(integer_t) <= sizeof(IntegerType))
-        && (   std::is_same<short,      IntegerType>::value
-            || std::is_same<int,        IntegerType>::value
-            || std::is_same<long,       IntegerType>::value
-            || std::is_same<long long,  IntegerType>::value), IntegerType>;
-        
-        //! @internal Utility to target a compatible floating-point value.
-        template <class FloatType>
-        using EnableIfCompatibleFloatTypeFrom = typename std::enable_if<
-        std::is_constructible<float_t, FloatType>::value
-        && std::is_floating_point<FloatType>::value
-        && (sizeof(FloatType) <= sizeof(float_t))>;
-        
-        //! @internal Utility to target a compatible floating-point value.
-        template <class FloatType>
-        using EnableIfCompatibleFloatTypeTo = typename std::enable_if<
-        std::is_constructible<FloatType, float_t>::value
-        && std::is_floating_point<FloatType>::value
-        && (sizeof(float_t) <= sizeof(FloatType))>;
-    
-    public:
-        
-        //! @brief Constructs a integer_t Atom with a compatible integer value.
-        //! @detail compatible integer type are short, int, long, long long.
+        //! @brief Constructs an integer_t Atom.
         //! @param value The value.
-        template<class IntegerType,
-        typename EnableIfCompatibleIntTypeFrom<IntegerType>::type = 0>
-        Atom(const IntegerType value) noexcept
-        : Atom(static_cast<integer_t>(value)) {}
+        inline explicit Atom(const long value) noexcept :
+            m_type(Type::Int),
+            m_value(static_cast<integer_t>(value))
+        {
+            ;
+        }
         
-        //! @brief Constructs a float_t Atom (explicit).
+        //! @brief Constructs an integer_t Atom.
+        //! @param value The value.
+        inline explicit Atom(const long long value) noexcept :
+            m_type(Type::Int),
+            m_value(static_cast<integer_t>(value))
+        {
+            ;
+        }
+        
+        //! @brief Constructs a float_t Atom.
         //! @details infinty and NaN value both produce a Null Atom type.
         //! @param value The value.
-        explicit Atom(const float_t value) noexcept : m_quark(new QuarkFloat(value))
+        inline explicit Atom(const float value) noexcept :
+            m_type(Type::Float),
+            m_value(static_cast<float_t>(value))
         {
             // infinity and NAN produce an Null Atom type
             if (! std::isfinite(value))
             {
-                delete m_quark;
-                m_quark = new Quark();
+                m_type = Type::Null;
+                m_value.float_v = 0.0;
             }
         }
         
-        //! @brief Constructs a float_t Atom value with a compatible floating-point value.
+        //! @brief Constructs a float_t Atom.
+        //! @details infinty and NaN value both produce a Null Atom type.
         //! @param value The value.
-        template<class FloatType,
-        typename = typename EnableIfCompatibleFloatTypeFrom<FloatType>::type>
-        Atom(const FloatType value) noexcept
-        : Atom(static_cast<float_t>(value)) {}
+        inline explicit Atom(const double value) noexcept :
+            m_type(Type::Float),
+            m_value(static_cast<float_t>(value))
+        {
+            // infinity and NAN produce an Null Atom type
+            if (! std::isfinite(value))
+            {
+                m_type = Type::Null;
+                m_value.float_v = 0.0;
+            }
+        }
         
-        //! @brief Constructs a symbol_t Atom (explicit).
-        //! @param tag The tag.
-        inline Atom(const symbol_t tag) noexcept
-        : m_quark(new QuarkSymbol(tag)) {}
+        //! @brief Constructs a symbol_t Atom.
+        //! @param sym The Symbol value.
+        inline Atom(symbol_t const& sym) :
+            m_type(Type::Symbol),
+            m_value(sym)
+        {
+            ;
+        }
 
         //! @brief Constructs a symbol_t Atom.
-        //! @param tag The tag
-        inline Atom(char const* tag) noexcept
-        : Atom(Symbol(tag)) {}
+        //! @param sym The Symbol value.
+        inline Atom(char const* sym) : Atom(Symbol(sym)) {}
         
         //! @brief Constructs a symbol_t Atom with a string.
-        //! @param tag The tag
-        inline Atom(std::string const& tag) noexcept
-        : Atom(Symbol(tag)) {}
+        //! @param sym The Symbol value.
+        inline Atom(std::string const& sym) : Atom(Symbol(sym)) {}
         
         //! @brief Constructs a symbol_t Atom by moving a string.
-        //! @param tag The tag
-        inline Atom(std::string&& tag) noexcept
-        : Atom(Symbol(std::forward<std::string>(tag))) {}
+        //! @param sym The Symbol value.
+        inline Atom(std::string&& sym) : Atom(Symbol(std::forward<std::string>(sym))) {}
         
         //! Destructor.
-        inline ~Atom() noexcept {delete m_quark;}
+        inline ~Atom() noexcept
+        {
+            if(isSymbol())
+            {
+                std::allocator<symbol_t> alloc;
+                alloc.destroy(m_value.sym_v);
+                alloc.deallocate(m_value.sym_v, 1);
+            }
+        }
+        
+        // ================================================================================ //
+        //                                   Type Getters                                   //
+        // ================================================================================ //
         
         //! @brief Get the type of the Atom.
         //! @return The Type of the atom as a Type.
-        //! @see  isNull(), isBool(), isInt(), isFloat(), isNumber(), isSymbol(), isVector(), isDico()
-        inline Type getType() const noexcept {return m_quark->getType();}
+        //! @see isNull(), isInt(), isFloat(), isNumber(), isSymbol()
+        inline Type getType() const noexcept {return m_type;}
         
         //! @brief Returns true if the Atom is Null.
         //! @return true if the Atom is Null.
         //! @see getType(), isInt(), isFloat(), isNumber(), isSymbol()
-        inline bool isNull() const noexcept {return m_quark->isNull();}
+        inline bool isNull() const noexcept {return m_type == Type::Null;}
         
         //! @brief Returns true if the Atom is an integer_t.
         //! @return true if the Atom is an integer_t.
         //! @see getType(), isNull(), isFloat(), isNumber(), isSymbol()
-        inline bool isInt() const noexcept {return m_quark->isInt();}
+        inline bool isInt() const noexcept {return m_type == Type::Int;}
         
         //! @brief Returns true if the Atom is a float_t.
         //! @return true if the Atom is an float_t.
         //! @see getType(), isNull(), isInt(), isNumber(), isSymbol()
-        inline bool isFloat() const noexcept {return m_quark->isFloat();}
+        inline bool isFloat() const noexcept {return m_type == Type::Float;}
         
         //! @brief Returns true if the Atom is a bool, an integer_t, or a float_t.
         //! @return true if the Atom is a bool, an integer_t, or a float_t.
         //! @see getType(), isNull(), isInt(), isFloat(), isSymbol()
-        inline bool isNumber() const noexcept {return m_quark->isNumber();}
+        inline bool isNumber() const noexcept {return (isInt() || isFloat());}
         
         //! @brief Returns true if the Atom is a symbol_t.
         //! @return true if the Atom is a symbol_t.
         //! @see getType(), isNull(), isInt(), isFloat(), isNumber()
-        inline bool isSymbol() const noexcept {return m_quark->isSymbol();}
+        inline bool isSymbol() const noexcept {return m_type == Type::Symbol;}
         
-        //! @brief Retrieves The Atom value as an integer_t value.
-        //! @return An integer value if the atom is a number otherwise 0.
-        //! @see isNumber()
-        inline operator integer_t() const noexcept {return m_quark->getInt();}
+        // ================================================================================ //
+        //                                   Value Getters                                  //
+        // ================================================================================ //
         
-        //! @brief Retrieves The Atom value as an integer value.
-        //! @return An integer value if the atom is a number otherwise 0.
-        //! @see isNumber()
-        template<class IntegerType,
-        typename EnableIfCompatibleIntTypeTo<IntegerType>::type = 0>
-        operator IntegerType() const noexcept
+        //! @brief Retrieves the Atom value as an integer_t value.
+        //! @return The current integer atom value if it is a number otherwise 0.0.
+        //! @see getType(), isNumber(), isInt(), getFloat()
+        integer_t getInt() const noexcept
         {
-            return static_cast<IntegerType>(m_quark->getInt());
+            if(isInt())
+            {
+                return m_value.int_v;
+            }
+            else if(isFloat())
+            {
+                return static_cast<integer_t>(m_value.float_v);
+            }
+            
+            return integer_t();
         }
         
-        //! Cast the atom to a float_t.
-        /** The function casts the atom to a float_t.
-         @return A float_t value if the atom is a digit otherwise 0.
-         */
-        inline operator float_t() const noexcept {return m_quark->getFloat();}
-        
-        template<class FloatType,
-        typename = typename EnableIfCompatibleFloatTypeTo<FloatType>::type>
-        inline operator FloatType() const noexcept
-        {return static_cast<FloatType>(m_quark->getFloat());}
-        
-        //! Cast the atom to a tag.
-        /** The function casts the atom to a tag.
-         @return A tag if the atom is a tag otherwise a nullptr.
-         */
-        inline operator symbol_t() const noexcept {return m_quark->getSymbol();}
-        
-        //! Set up the atom with another atom.
-        /** The function sets up the atom with another atom.
-         @param other   The other atom.
-         @return An atom.
-         */
-        Atom& operator=(Atom const& other) noexcept;
-        
-        //! Set up the atom with another atom.
-        /** The function sets up the atom with another atom.
-         @param other   The other atom.
-         @return An atom.
-         */
-        Atom& operator=(Atom&& other) noexcept
+        //! @brief Retrieves the Atom value as a float_t value.
+        //! @return The current floating-point atom value if it is a number otherwise 0.0.
+        //! @see getType(), isNumber(), isFloat(), getInt()
+        float_t getFloat() const noexcept
         {
-            std::swap(m_quark, other.m_quark);
-            return *this;
+            if(isFloat())
+            {
+                return m_value.float_v;
+            }
+            else if(isInt())
+            {
+                return static_cast<float_t>(m_value.int_v);
+            }
+            
+            return float_t();
         }
         
-        //! Set up the atom with a boolean value.
-        /** The function sets up the atom with a long value created with aboolean value.
-         @param value   The boolean value.
-         @return An atom.
-         */
-        inline Atom& operator=(const bool value) noexcept
+        //! @brief Retrieves the Atom value as a Symbol value.
+        //! @return The current Symbol atom value if it is a Symbol otherwise an empty Symbol.
+        //! @see getType(), isSymbol(), getInt(), getFloat()
+        symbol_t const* const getSymbol() const noexcept
         {
-            delete m_quark;
-            m_quark = new QuarkInt(value);
-            return *this;
+            if(isSymbol())
+            {
+                return m_value.sym_v;
+            }
+            
+            return nullptr;
         }
         
-        //! Set up the atom with a long value.
-        /** The function sets up the atom with a long value.
-         @param value   The long value.
-         @return An atom.
-         */
-        inline Atom& operator=(const integer_t value) noexcept
-        {
-            delete m_quark;
-            m_quark = new QuarkInt(value);
-            return *this;
-        }
+        // ================================================================================ //
+        //                                Equality Operators                                //
+        // ================================================================================ //
         
-        template<class IntegerType,
-        typename EnableIfCompatibleIntTypeFrom<IntegerType>::type = 0>
-        inline Atom& operator=(const IntegerType value) noexcept
-        {
-            delete m_quark;
-            m_quark = new QuarkInt(static_cast<integer_t>(value));
-            return *this;
-        }
-
-        //! Set up the atom with a float_t value.
-        /** The function sets up the atom with a float_t value.
-         @param value   The float_t value.
-         @return An atom.
-         */
-        inline Atom& operator=(const float_t value) noexcept
-        {
-            delete m_quark;
-            m_quark = new QuarkFloat(value);
-            return *this;
-        }
-        
-        template<class FloatType,
-        typename = typename EnableIfCompatibleFloatTypeFrom<FloatType>::type>
-        Atom& operator=(const FloatType value) noexcept
-        {
-            delete m_quark;
-            m_quark = new QuarkFloat(static_cast<float_t>(value));
-            return *this;
-        }
-        
-        //! Set up the atom with a string.
-        /** The function sets up the atom with string.
-         @param tag   The string.
-         @return An atom.
-         */
-        inline Atom& operator=(char const* tag)
-        {
-            delete m_quark;
-            m_quark = new QuarkSymbol(Symbol(tag));
-            return *this;
-        }
-        
-        //! Set up the atom with a string.
-        /** The function sets up the atom with string.
-         @param tag   The string.
-         @return An atom.
-         */
-        inline Atom& operator=(std::string const& tag)
-        {
-            delete m_quark;
-            m_quark = new QuarkSymbol(Symbol(tag));
-            return *this;
-        }
-        
-        //! Set up the atom with a string.
-        /** The function sets up the atom with string.
-         @param tag   The string.
-         @return An atom.
-         */
-        inline Atom& operator=(std::string&& tag) noexcept
-        {
-            delete m_quark;
-            m_quark = new QuarkSymbol(Symbol(std::forward<std::string>(tag)));
-            return *this;
-        }
-        
-        //! Set up the atom with a tag.
-        /** The function sets up the atom with a tag.
-         @param tag   The tag.
-         @return An atom.
-         */
-        inline Atom& operator=(symbol_t tag) noexcept
-        {
-            delete m_quark;
-            m_quark = new QuarkSymbol(tag);
-            return *this;
-        }
-        
-        //! Compare the atom with another.
-        /** The function compares the atom with another.
-         @param other The other atom.
-         @return true if the atoms hold the same value otherwise false.
-         */
+        //! @brief Compare the atom with another.
+        //! @details
+        //! @param other The other atom.
+        //! @return True if the two Atom objects hold the same value otherwise false.
         inline bool operator==(Atom const& other) const noexcept
         {
             if(other.isNull() && isNull())
             {
                 return true;
             }
-            else if(other.isInt() && isNumber())
+            else if(other.isInt() && isInt())
             {
-                return m_quark->getInt() == other.m_quark->getInt();
+                return (m_value.int_v == other.m_value.int_v);
             }
-            else if(other.isFloat() && isNumber())
+            else if(other.isFloat() && isFloat())
             {
-                return m_quark->getFloat() == other.m_quark->getFloat();
+                return (m_value.float_v == other.m_value.float_v);
             }
             else if(other.isSymbol() && isSymbol())
             {
-                return m_quark->getSymbol() == other.m_quark->getSymbol();
+                return (*m_value.sym_v == *other.m_value.sym_v);
             }
             
             return false;
         }
         
-        //! Compare the atom with a long value.
-        /** The function compares the atom with a long.
-         @param value   The long value.
-         @return true if the atom hold the same long value otherwise false.
-         */
-        inline bool operator==(const integer_t value) const noexcept
-        {
-            if(isNumber())
-            {
-                return value == m_quark->getInt();
-            }
-            else
-            {
-                return false;
-            }
-        }
-        
-        template<typename IntegerType, typename
-        std::enable_if<
-        std::is_constructible<IntegerType, integer_t>::value &&
-        std::numeric_limits<IntegerType>::is_integer &&
-        std::numeric_limits<IntegerType>::is_signed, IntegerType>::type
-        = 0>
-        bool operator==(const IntegerType value) const noexcept
-        {
-            if(isNumber())
-            {
-                return value == static_cast<IntegerType>(m_quark->getInt());
-            }
-            else
-            {
-                return false;
-            }
-        }
-        
-        template<typename UnsignedType, typename
-        std::enable_if<
-        std::is_constructible<UnsignedType, integer_t>::value &&
-        std::numeric_limits<UnsignedType>::is_integer &&
-        !std::numeric_limits<UnsignedType>::is_signed, UnsignedType>::type
-        = 0>
-        bool operator==(const UnsignedType value) const noexcept
-        {
-            if(isNumber())
-            {
-                return value == static_cast<UnsignedType>(m_quark->getInt());
-            }
-            else
-            {
-                return false;
-            }
-        }
-        
-        //! Compare the atom with a float_t value.
-        /** The function compares the atom with a float_t value.
-         @param value   The float_t value.
-         @return true if the atom hold the same float_t value otherwise false.
-         */
-        inline bool operator==(const float_t value) const noexcept
-        {
-            if(isNumber())
-            {
-                return value == m_quark->getFloat();
-            }
-            else
-            {
-                return false;
-            }
-        }
-        
-        template<class FloatType,
-        typename = typename EnableIfCompatibleFloatTypeFrom<FloatType>::type>
-        bool operator==(const FloatType value) const noexcept
-        {
-            if(isNumber())
-            {
-                std::cout << static_cast<float_t>(m_quark->getFloat()) << " == " << static_cast<float_t>(value) <<std::endl;
-                return m_quark->getFloat() == static_cast<float_t>(value);
-            }
-            else
-            {
-                return false;
-            }
-        }
-        
-        //! Compare the atom with a string.
-        /** The function compares the atom with a string.
-         @param tag   The string.
-         @return true if the atom hold the same tag create with the std::string otherwise false.
-         */
-        bool operator==(char const* tag) const noexcept;
-        
-        //! Compare the atom with a string.
-        /** The function compares the atom with a string.
-         @param tag   The string.
-         @return true if the atom hold the same tag create with the std::string otherwise false.
-         */
-        bool operator==(std::string const& tag) const noexcept;
-        
-        //! Compare the atom with a tag.
-        /** The function compares the atom with a tag.
-         @param tag   The tag.
-         @return true if the atom hold the same tag otherwise false.
-         */
-        bool operator==(symbol_t tag) const noexcept
-        {
-            if(isSymbol())
-            {
-                return m_quark->getSymbol() == tag;
-            }
-            
-            return false;
-        }
-        
-        //! Compare the atom with another.
-        /** The function compares the atom with another.
-         @param other The other atom.
-         @return true if the atoms differ otherwise false.
-         */
+        //! @brief Compare the atom with another.
+        //! @param other The other atom.
+        //! @return True if the two Atom objects differ otherwise false.
         inline bool operator!=(const Atom& other) const noexcept
         {
             return !(*this == other);
         }
         
-        //! Compare the atom with a boolean value.
-        /** The function compares the atom with a boolean value.
-         @param value   The boolean value.
-         @return true if the atom differ from the boolean value otherwise false.
-         */
-        inline bool operator!=(const bool value) const noexcept
-        {
-            return !(*this == value);
-        }
-        
-        //! Compare the atom with a long value.
-        /** The function compares the atom with a long.
-         @param value   The long value.
-         @return true if the atom differ from the long value otherwise false.
-         */
-        inline bool operator!=(const integer_t value) const noexcept
-        {
-            return !(*this == value);
-        }
-        template<typename IntegerType, typename
-        std::enable_if<
-        std::is_constructible<IntegerType, integer_t>::value &&
-        std::numeric_limits<IntegerType>::is_integer &&
-        std::numeric_limits<IntegerType>::is_signed, IntegerType>::type
-        = 0>
-        inline bool operator!=(const IntegerType value) const noexcept
-        {
-            return !(*this == value);
-        }
-        
-        template<typename UnsignedType, typename
-        std::enable_if<
-        std::is_constructible<UnsignedType, integer_t>::value &&
-        std::numeric_limits<UnsignedType>::is_integer &&
-        !std::numeric_limits<UnsignedType>::is_signed, UnsignedType>::type
-        = 0>
-        inline bool operator!=(const UnsignedType value) const noexcept
-        {
-            return !(*this == value);
-        }
-        
-        //! Compare the atom with a float_t value.
-        /** The function compares the atom with a float_t value.
-         @param value   The float_t value.
-         @return true if the atom differ from the float_t value otherwise false.
-         */
-        inline bool operator!=(const float_t value) const noexcept
-        {
-            return !(*this == value);
-        }
-        
-        template<class FloatType,
-        typename = typename EnableIfCompatibleFloatTypeTo<FloatType>::type>
-        inline bool operator!=(const FloatType value) const noexcept
-        {
-            return !(*this == value);
-        }
-        
-        //! Compare the atom with a string.
-        /** The function compares the atom with a string.
-         @param tag   The string.
-         @return true if the atom differ from the tag create with the std::string otherwise false.
-         */
-        inline bool operator!=(char const* tag) const noexcept
-        {
-            return !(*this == tag);
-        }
-        
-        //! Compare the atom with a string.
-        /** The function compares the atom with a string.
-         @param tag   The string.
-         @return true if the atom differ from the tag create with the std::string otherwise false.
-         */
-        inline bool operator!=(std::string const& tag) const noexcept
-        {
-            return !(*this == tag);
-        }
-        
-        //! Compare the atom with a tag.
-        /** The function compares the atom with a tag.
-         @param value   The tag.
-         @return true if the atom differ from the tag otherwise false.
-         */
-        inline bool operator!=(const Symbol tag) const noexcept
-        {
-            return !(*this == tag);
-        }
+        // ================================================================================ //
+        //                                    Utilities                                     //
+        // ================================================================================ //
                 
-        //! Parse a std::string into a vector of atoms.
-        /** Parse a std::string into a vector of atoms.
-         @param     text	The std::string to parse.
-         @return    The vector of atoms.
-         @remark    For example, the std::string : "foo \"bar 42\" 1 2 3.14" will parsed into a vector of 5 atoms.
-         The atom types will be determined automatically as 2 #Atom::Type::Symbol atoms, 2 #Atom::Type::Int atoms,
-         && 1 #Atom::Type::Float atom.
-         */
+        //! @brief Parse an std::string into an std::vector of Atom objects.
+        //! @param text	The std::string to parse.
+        //! @return A vector of Atom objects.
+        //! @remark For example, the std::string : "foo \"bar 42\" 1 2 3.14" will parsed into a vector of 5 atoms.
+        //! The atom types will be determined automatically as 2 #Atom::Type::Symbol atoms, 2 #Atom::Type::Int atoms, && 1 #Atom::Type::Float atom.
         static std::vector<Atom> parse(std::string const& text);
         
     private:
         
-        //! @brief The type of value an Atom can be.
-        using value_t = Atom::Type;
-        
-        //! @internal Base class of all internal Quark types
-        class Quark
+        //! @internal Exception-safe object creation helper
+        template<typename T, typename... Args>
+        static T* create(Args&& ... args)
         {
-        public:
-            constexpr inline Quark() noexcept {}
-            virtual inline ~Quark() noexcept {}
-            // Type checks
-            virtual inline value_t getType() const noexcept {return value_t::Null;}
-            inline bool isNull() const noexcept             {return getType() == value_t::Null;}
-            inline bool isInt() const noexcept              {return getType() == value_t::Int;}
-            inline bool isFloat() const noexcept            {return getType() == value_t::Float;}
-            inline bool isNumber() const noexcept           {return isInt() || isFloat();}
-            inline bool isSymbol() const noexcept           {return getType() == value_t::Symbol;}
-            // Getters
-            virtual inline bool getBool() const noexcept   {return false;}
-            virtual inline integer_t getInt() const noexcept    {return 0ll;}
-            virtual inline float_t   getFloat() const noexcept  {return 0.;}
-            virtual inline symbol_t  getSymbol() const noexcept {return Symbol("");}
+            std::allocator<T> alloc;
+            auto deleter = [&](T * object) { alloc.deallocate(object, 1); };
+            std::unique_ptr<T, decltype(deleter)> object(alloc.allocate(1), deleter);
+            alloc.construct(object.get(), std::forward<Args>(args)...);
+            return object.release();
+        }
+        
+        //! @internal The actual storage union for an Atom value.
+        union atom_value
+        {
+            //! @brief number (integer).
+            integer_t   int_v;
+            
+            //! @brief number (floating-point).
+            float_t     float_v;
+            
+            //! @brief symbol.
+            symbol_t*   sym_v;
+            
+            //! @brief default constructor (for null values).
+            atom_value() = default;
+            
+            //! @brief constructor for numbers (integer).
+            atom_value(integer_t v) noexcept : int_v(v) {}
+            
+            //! @brief constructor for numbers (floating-point).
+            atom_value(float_t v) noexcept : float_v(v) {}
+            
+            //! @brief constructor for symbols
+            atom_value(symbol_t const& value) : sym_v(create<symbol_t>(value)) {}
+            
+            //! @brief constructor for empty values of a given type.
+            atom_value(Type t)
+            {
+                switch (t)
+                {
+                    case Type::Symbol:  { sym_v = create<symbol_t>(); break; }
+                    case Type::Int:     { int_v = integer_t(0); break; }
+                    case Type::Float:   { float_v = float_t(0.0); break; }
+                    default: break;
+                }
+            }
         };
         
-        //! @internal A Quark that hold an integer number
-        class QuarkInt : public Quark
-        {
-        public:
-            const integer_t val;
-            inline QuarkInt() noexcept : val(0) {}
-            inline QuarkInt(QuarkInt const& _val) noexcept : val(_val.val) {}
-            inline QuarkInt(const integer_t& _val) noexcept : val(_val) {}
-            inline value_t getType() const noexcept override    {return value_t::Int;}
-            inline bool getBool() const noexcept override  {return (val != 0ll);}
-            inline integer_t getInt() const noexcept override   {return val;}
-            inline float_t getFloat() const noexcept override   {return static_cast<float_t>(val);}
-        };
+        //! @internal Atom Type (Null by default)
+        Type        m_type = Type::Null;
         
-        //! @internal A Quark that hold a floating-point number
-        class QuarkFloat : public Quark
-        {
-        public:
-            const float_t val;
-            inline QuarkFloat(QuarkFloat const& _val) noexcept : val(_val.val) {}
-            inline QuarkFloat(float_t const& _val) noexcept : val(_val) {}
-            inline value_t getType() const noexcept override    {return value_t::Float;}
-            inline bool getBool() const noexcept override  {return (val != 0.);}
-            inline integer_t getInt() const noexcept override   {return static_cast<integer_t>(val);}
-            inline float_t getFloat() const noexcept override   {return val;}
-        };
-        
-        //! @internal A Quark that hold a tag
-        class QuarkSymbol : public Quark
-        {
-        public:
-            const symbol_t val;
-            inline QuarkSymbol(QuarkSymbol const& _val) noexcept : val(_val.val) {}
-            inline QuarkSymbol(const symbol_t _val) noexcept : val(_val) {}
-            inline value_t getType() const noexcept override    {return value_t::Symbol;}
-            inline symbol_t getSymbol() const noexcept override       {return val;}
-        };
-        
-        Quark* m_quark;
+        //! @internal Atom value
+        atom_value  m_value = {};
     };
     
     std::ostream& operator<<(std::ostream& output, Atom const& atom);
 }
-
-
 
 #endif // KIWI_CORE_ATOM_HPP_INCLUDED

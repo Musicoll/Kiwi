@@ -28,6 +28,8 @@ namespace kiwi
 {
     std::set<std::string>  Symbol::m_symbols;
     std::mutex             Symbol::m_mutex;
+    
+    const Symbol Symbols::empty("");
 }
 
 

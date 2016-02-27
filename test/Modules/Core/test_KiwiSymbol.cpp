@@ -44,7 +44,7 @@ TEST_CASE("Symbol", "[Symbol]")
     CHECK_FALSE(sym_1 != sym_2);
     CHECK(sym_1 != sym_3);
     
-    // copy construct
+    // std::string copy construct
     std::string str = "bar";
     Symbol sym_5(str);
     //CHECK(sym_5 == "bar");
@@ -53,10 +53,10 @@ TEST_CASE("Symbol", "[Symbol]")
     
     std::vector<Symbol> sims {Symbol("jojo"), Symbol("jaja"), Symbol("juju")};
     
-    Symbol sym_42("jojo");
-    Symbol sym_jojo = sym_42;
+    Symbol sym_jojo("jojo");
+    Symbol sym_jojo_copy = sym_jojo;
     
-    CHECK(sym_jojo.toString() == "jojo");
+    CHECK(sym_jojo_copy.toString() == "jojo");
 }
 
 /*

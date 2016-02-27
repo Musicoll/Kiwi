@@ -28,6 +28,14 @@
 
 namespace kiwi
 {
+    class Symbol;
+    
+    class Symbols
+    {
+    public:
+        static const Symbol empty;
+    };
+    
     // ================================================================================ //
     //                                      SYMBOL                                      //
     // ================================================================================ //
@@ -39,6 +47,9 @@ namespace kiwi
     {
     public:
         
+        //! @brief Constructs a Symbol that references an empty string.
+        Symbol() : m_name(Symbols::empty) {};
+        
         //! @brief Constructs a Symbol with an std::string.
         Symbol(std::string const& name) : m_name(get(name)) {};
         
@@ -48,39 +59,89 @@ namespace kiwi
         //! @brief Copy constructor
         Symbol(Symbol const& symbol) : m_name(symbol.m_name) {};
         
+        //! @brief Constructs a Symbol with an other with move semantics.
+        Symbol(Symbol const&& other) : m_name(std::move(other.m_name)) {};
+        
         //! @brief Destructor.
         ~Symbol() = default;
         
+        //! @brief
+        inline operator std::string const&() const noexcept {return m_name.get();}
+        
+        //! @brief exchanges the values of two Symbol objects
+        void swap(Symbol& other)
+        noexcept (std::is_nothrow_move_constructible<stringRef>::value
+                  && std::is_nothrow_move_assignable<stringRef>::value)
+        {
+            std::swap(m_name, other.m_name);
+        }
+        
+        //! @brief Copy assignment operator
+        inline Symbol& operator = (Symbol rhs) noexcept
+        {
+            m_name = rhs.m_name;
+            return *this;
+        }
+        
         //! @brief Get the symbol as an std::string.
-        inline std::string toString() const noexcept                { return m_name; }
+        inline std::string toString() const
+        {
+            return m_name.get();
+        }
         
-        //! @brief Returns true if the too symbols are equals
-        inline bool operator == (Symbol const& rhs) const noexcept  { return (&m_name == &rhs.m_name); }
+        //! @brief Get the symbol as an std::string.
+        inline std::string const& toStringRef() const
+        {
+            return m_name.get();
+        }
         
-        //! @brief Returns true if the too symbols are NOT equals
-        inline bool operator != (Symbol const& rhs) const noexcept  { return ! (*this == rhs); }
+        //! @brief Returns true if the two symbols are equals
+        inline bool operator == (Symbol const& rhs) const noexcept
+        {
+            return (&m_name.get() == &rhs.m_name.get());
+        }
+        
+        //! @brief Returns true if the two symbols are NOT equals
+        inline bool operator != (Symbol const& rhs) const noexcept
+        {
+            return ! (*this == rhs);
+        }
         
     private:
         
-        static const std::string& get(const std::string& name) noexcept
+        using stringRef = std::reference_wrapper<const std::string>;
+        
+        static stringRef get(const std::string& name)
         {
             std::lock_guard<std::mutex> guard(m_mutex);
-            const auto sym = m_symbols.emplace(name).first;
-            return *sym;
+            return *m_symbols.emplace(name).first;
         }
         
-        static const std::string& get(std::string&& name) noexcept
+        static stringRef get(std::string&& name)
         {
             std::lock_guard<std::mutex> guard(m_mutex);
-            const auto sym = m_symbols.emplace(std::move(name)).first;
-            return *sym;
+            return *m_symbols.emplace(std::move(name)).first;
         }
         
-        const std::string& m_name;
+        stringRef m_name;
         
         //! @internal
         static std::set<std::string>  m_symbols;
         static std::mutex             m_mutex;
     };
 }
+
+// specialization of std::swap for Symbol objects
+namespace std
+{
+    //! @brief exchanges the values of two Symbol objects
+    template <>
+    inline void swap(kiwi::Symbol& s1, kiwi::Symbol& s2)
+    noexcept(is_nothrow_move_constructible<kiwi::Symbol>::value
+             && is_nothrow_move_assignable<kiwi::Symbol>::value)
+    {
+        s1.swap(s2);
+    }
+}
+
 #endif // KIWI_CORE_SYMBOL_HPP_INCLUDED

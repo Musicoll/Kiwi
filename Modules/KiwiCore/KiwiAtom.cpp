@@ -29,79 +29,40 @@ namespace kiwi
     //                                      ATOM                                        //
     // ================================================================================ //
     
-    Atom::Atom(Atom const& other) noexcept
+    Atom::Atom(Atom const& other) noexcept : m_type(other.getType())
     {
-        const auto quark = other.m_quark;
-        
         if(other.isInt())
         {
-            m_quark = new QuarkInt(quark->getInt());
+            m_value = other.m_value.int_v;
         }
         else if(other.isFloat())
         {
-            m_quark = new QuarkFloat(quark->getFloat());
+            m_value = other.m_value.float_v;
         }
         else if(other.isSymbol())
         {
-            m_quark = new QuarkSymbol(quark->getSymbol());
+            assert(other.m_value.sym_v != nullptr);
+            m_value = *other.m_value.sym_v;
         }
         else
         {
-            m_quark = new Quark();
+            m_type = Type::Null;
         }
-    }
-    
-    
-    Atom& Atom::operator=(Atom const& other) noexcept
-    {
-        delete m_quark;
-        
-        const auto quark = other.m_quark;
-        
-        if(other.isInt())
-        {
-            m_quark = new QuarkInt(quark->getInt());
-        }
-        else if(other.isFloat())
-        {
-            m_quark = new QuarkFloat(quark->getFloat());
-        }
-        else if(other.isSymbol())
-        {
-            m_quark = new QuarkSymbol(quark->getSymbol());
-        }
-        else
-        {
-            m_quark = new Quark();
-        }
-        
-        return *this;
     }
     
     std::ostream& operator<<(std::ostream& output, Atom const& atom)
     {
-        const bool boolalpha = output.flags() & std::ios::boolalpha;
-        if(!boolalpha)
-        {
-            output << std::boolalpha;
-        }
-        
         if(atom.isInt())
         {
-            output << atom.operator Atom::integer_t();
+            output << atom.getInt();
         }
         else if(atom.isFloat())
         {
-            output << atom.operator Atom::float_t();
+            output << atom.getFloat();
         }
         else if(atom.isSymbol())
         {
-            output << jsonEscape((atom.operator Atom::symbol_t()).toString());
-        }
-        
-        if(!boolalpha)
-        {
-            output << std::noboolalpha;
+            output << jsonEscape(atom.getSymbol()->toString());
         }
         return output;
     }

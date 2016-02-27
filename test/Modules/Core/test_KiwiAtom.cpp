@@ -45,26 +45,26 @@ TEST_CASE("Atom Constructors", "[Atom]")
     
     SECTION("Signed Integral types")
     {
-        CHECK(Atom(true).getType() == Atom::Type::Int);
-        CHECK(Atom(false).getType() == Atom::Type::Int);
-        CHECK(Atom(short(1)).getType() == Atom::Type::Int);
-        CHECK(Atom(1).getType() == Atom::Type::Int);
-        CHECK(Atom(1l).getType() == Atom::Type::Int);
-        CHECK(Atom(1ll).getType() == Atom::Type::Int);
-        CHECK(Atom(0xFFFFFF).getType() == Atom::Type::Int);     // hexadecimal
-        CHECK(Atom(0113).getType() == Atom::Type::Int);         // octal
+        CHECK(Atom(true).isInt());          // bool
+        CHECK(Atom(false).isInt());         // bool
+        CHECK(Atom(short(1)).isInt());      // short
+        CHECK(Atom(1).isInt());             // int
+        CHECK(Atom(1l).isInt());            // long
+        CHECK(Atom(1ll).isInt());           // long long
+        CHECK(Atom(0xFFFFFF).isInt());      // hexadecimal
+        CHECK(Atom(0113).isInt());          // octal
     }
     
+    /*
     SECTION("Unsigned Integral types are unsupported")
     {
-        /*
         CHECK(Atom(1u).getType() == Atom::Type::Int);        // unsigned (int)
         CHECK(Atom(1ul).getType() == Atom::Type::Int);       // unsigned long
         CHECK(Atom(1lu).getType() == Atom::Type::Int);       // unsigned long
         CHECK(Atom(1ull).getType() == Atom::Type::Int);      // unsigned long long
         CHECK(Atom(1llu).getType() == Atom::Type::Int);      // unsigned long long
-        */
     }
+    */
     
     SECTION("Floating-Point types")
     {
@@ -102,8 +102,8 @@ TEST_CASE("Atom Null", "[Atom]")
     REQUIRE(atom.isFloat()         == false);
     REQUIRE(atom.isSymbol()            == false);
     
-    REQUIRE_FALSE(atom == false);
-    REQUIRE_FALSE(atom == true);
+    //REQUIRE_FALSE(atom == false);
+    //REQUIRE_FALSE(atom == true);
 }
 
 TEST_CASE("Atom Int", "[Atom]")
@@ -116,11 +116,11 @@ TEST_CASE("Atom Int", "[Atom]")
     CHECK(atom.isInt()           == true);
     CHECK(atom.isFloat()         == false);
     CHECK(atom.isSymbol()            == false);
-    CHECK(atom == true);
-    CHECK(atom == 1);
-    CHECK(atom == 1.);
+    //CHECK(atom == true);
+    //CHECK(atom == 1);
+    //CHECK(atom == 1.);
     
-    CHECK(Atom(std::numeric_limits<int64_t>::max()) == std::numeric_limits<int64_t>::max());
+    //CHECK(Atom(std::numeric_limits<int64_t>::max()) == std::numeric_limits<int64_t>::max());
     //CHECK(Atom(std::numeric_limits<uint64_t>::max()) == std::numeric_limits<uint64_t>::max());
     
     // do we need to support all equality operators ?
@@ -131,7 +131,7 @@ TEST_CASE("Atom Int", "[Atom]")
     CHECK(to_move.isNull()          == true);
     CHECK(moved.isNumber()         == true);
     CHECK(moved.isInt()           == true);
-    CHECK(moved == 42);
+    //CHECK(moved == 42);
 }
 
 TEST_CASE("Atom Float", "[Atom]")
@@ -143,20 +143,20 @@ TEST_CASE("Atom Float", "[Atom]")
     CHECK(atom.isInt()            == false);
     CHECK(atom.isFloat()          == true);
     CHECK(atom.isSymbol()         == false);
-    CHECK(atom == 1.123);
-    CHECK(atom == Approx(1.123f));
+    //CHECK(atom == 1.123);
+    //CHECK(atom == Approx(1.123f));
     // Should this fail ??
-    CHECK(atom == 1);
-    CHECK(atom == true);
+    //CHECK(atom == 1);
+    //CHECK(atom == true);
     
-    CHECK_FALSE(Atom(1.123) == 3.14);
+    //CHECK_FALSE(Atom(1.123) == 3.14);
     
     Atom to_move(42.42);
     Atom moved(std::move(to_move));
     CHECK(to_move.isNull()    == true);
     CHECK(moved.isNumber()         == true);
     CHECK(moved.isFloat()         == true);
-    CHECK(moved == 42.42);
+    //CHECK(moved == 42.42);
 }
 
 TEST_CASE("Atom Symbol", "[Atom]")
@@ -176,6 +176,9 @@ TEST_CASE("Atom Symbol", "[Atom]")
     Atom moved(std::move(to_move));
     CHECK(to_move.isNull()   == true);
     CHECK(moved.isSymbol()           == true);
+    
+    //Atom mmmm;
+    //mmmm = Symbol("zaza");
 }
 
 TEST_CASE("Atom string parser", "[Atom]")
