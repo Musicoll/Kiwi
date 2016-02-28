@@ -27,7 +27,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		2C92CECA1C7DCF3200EDF976 /* KiwiAtom.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = KiwiAtom.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		2C92CECA1C7DCF3200EDF976 /* KiwiAtom.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = KiwiAtom.cpp; sourceTree = "<group>"; };
 		2C92CECB1C7DCF3200EDF976 /* KiwiAtom.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; lineEnding = 2; path = KiwiAtom.hpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		2C92CECC1C7DCF3200EDF976 /* KiwiCore.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiCore.hpp; sourceTree = "<group>"; };
 		2C92CECD1C7DCF3200EDF976 /* KiwiListenerSet.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiListenerSet.hpp; sourceTree = "<group>"; };

@@ -175,7 +175,7 @@ TEST_CASE("Atom Symbol", "[Atom]")
     Atom to_move("foo");
     Atom moved(std::move(to_move));
     CHECK(to_move.isNull()   == true);
-    CHECK(moved.isSymbol()           == true);
+    CHECK(moved.isSymbol()   == true);
     
     //Atom mmmm;
     //mmmm = Symbol("zaza");

@@ -45,6 +45,9 @@ namespace kiwi
     //! The symbols are uniques and match to a string. If you construct a symbol with a std::string that already matchs to a symbol, the creation function will return this symbol, otherwise it will create a new one.
     class Symbol
     {
+    private:
+        using stringRef = std::reference_wrapper<const std::string>;
+        
     public:
         
         //! @brief Constructs a Symbol that references an empty string.
@@ -108,8 +111,6 @@ namespace kiwi
         }
         
     private:
-        
-        using stringRef = std::reference_wrapper<const std::string>;
         
         static stringRef get(const std::string& name)
         {

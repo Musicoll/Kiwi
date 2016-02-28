@@ -61,6 +61,62 @@ namespace kiwi
             Symbol      = 3
         };
         
+    private:
+        
+        //! @internal Exception-safe object creation helper
+        template<typename T, typename... Args>
+        static T* create(Args&& ... args)
+        {
+            std::allocator<T> alloc;
+            auto deleter = [&](T * object) { alloc.deallocate(object, 1); };
+            std::unique_ptr<T, decltype(deleter)> object(alloc.allocate(1), deleter);
+            alloc.construct(object.get(), std::forward<Args>(args)...);
+            return object.release();
+        }
+        
+        //! @internal The actual storage union for an Atom value.
+        union atom_value
+        {
+            //! @brief number (integer).
+            integer_t   int_v;
+            
+            //! @brief number (floating-point).
+            float_t     float_v;
+            
+            //! @brief symbol.
+            symbol_t*   sym_v;
+            
+            //! @brief default constructor (for null values).
+            atom_value() = default;
+            
+            //! @brief constructor for numbers (integer).
+            atom_value(integer_t v) noexcept : int_v(v) {}
+            
+            //! @brief constructor for numbers (floating-point).
+            atom_value(float_t v) noexcept : float_v(v) {}
+            
+            //! @brief constructor for symbols
+            atom_value(symbol_t const& value) : sym_v(create<symbol_t>(value)) {}
+            
+            //! @brief constructor for empty values of a given type.
+            atom_value(Type t)
+            {
+                switch (t)
+                {
+                    case Type::Symbol:  { sym_v = create<symbol_t>(); break; }
+                    case Type::Int:     { int_v = integer_t(0); break; }
+                    case Type::Float:   { float_v = float_t(0.0); break; }
+                    default: break;
+                }
+            }
+        };
+        
+        //! @internal Atom Type (Null by default)
+        Type        m_type = Type::Null;
+        
+        //! @internal Atom value
+        atom_value  m_value = {};
+        
     public:
         
         // ================================================================================ //
@@ -95,7 +151,7 @@ namespace kiwi
         }
         
         //! @brief Copy assigment operator.
-        //! @details Copies an Atom value by the "copy and swap" method.
+        //! @details Copies an Atom value with the "copy and swap" method.
         //! @param other The Atom object to copy.
         Atom& operator=(Atom other)
         noexcept (std::is_nothrow_move_constructible<Type>::value
@@ -198,7 +254,7 @@ namespace kiwi
         inline Atom(std::string&& sym) : Atom(Symbol(std::forward<std::string>(sym))) {}
         
         //! Destructor.
-        inline ~Atom() noexcept
+        inline ~Atom()
         {
             if(isSymbol())
             {
@@ -341,62 +397,6 @@ namespace kiwi
         //! @remark For example, the std::string : "foo \"bar 42\" 1 2 3.14" will parsed into a vector of 5 atoms.
         //! The atom types will be determined automatically as 2 #Atom::Type::Symbol atoms, 2 #Atom::Type::Int atoms, && 1 #Atom::Type::Float atom.
         static std::vector<Atom> parse(std::string const& text);
-        
-    private:
-        
-        //! @internal Exception-safe object creation helper
-        template<typename T, typename... Args>
-        static T* create(Args&& ... args)
-        {
-            std::allocator<T> alloc;
-            auto deleter = [&](T * object) { alloc.deallocate(object, 1); };
-            std::unique_ptr<T, decltype(deleter)> object(alloc.allocate(1), deleter);
-            alloc.construct(object.get(), std::forward<Args>(args)...);
-            return object.release();
-        }
-        
-        //! @internal The actual storage union for an Atom value.
-        union atom_value
-        {
-            //! @brief number (integer).
-            integer_t   int_v;
-            
-            //! @brief number (floating-point).
-            float_t     float_v;
-            
-            //! @brief symbol.
-            symbol_t*   sym_v;
-            
-            //! @brief default constructor (for null values).
-            atom_value() = default;
-            
-            //! @brief constructor for numbers (integer).
-            atom_value(integer_t v) noexcept : int_v(v) {}
-            
-            //! @brief constructor for numbers (floating-point).
-            atom_value(float_t v) noexcept : float_v(v) {}
-            
-            //! @brief constructor for symbols
-            atom_value(symbol_t const& value) : sym_v(create<symbol_t>(value)) {}
-            
-            //! @brief constructor for empty values of a given type.
-            atom_value(Type t)
-            {
-                switch (t)
-                {
-                    case Type::Symbol:  { sym_v = create<symbol_t>(); break; }
-                    case Type::Int:     { int_v = integer_t(0); break; }
-                    case Type::Float:   { float_v = float_t(0.0); break; }
-                    default: break;
-                }
-            }
-        };
-        
-        //! @internal Atom Type (Null by default)
-        Type        m_type = Type::Null;
-        
-        //! @internal Atom value
-        atom_value  m_value = {};
     };
     
     std::ostream& operator<<(std::ostream& output, Atom const& atom);
