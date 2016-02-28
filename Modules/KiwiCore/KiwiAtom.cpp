@@ -35,7 +35,7 @@ namespace kiwi
         {
             case Atom::Type::Int:       { output << atom.getInt(); break; }
             case Atom::Type::Float:     { output << atom.getFloat(); break; }
-            case Atom::Type::Symbol:    { output << jsonEscape(atom.getSymbol()->toString()); break; }
+            case Atom::Type::Symbol:    { output << jsonEscape(atom.getSymbol().toString()); break; }
                 
             default: break;
         }

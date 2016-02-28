@@ -33,7 +33,7 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The Atom can dynamically hold different types of value
-    //! @details The Atom can hold an integer, a float or a symbol.
+    //! @details The Atom can hold an integer, a float or a Symbol.
     class Atom
     {
     public:
@@ -62,6 +62,10 @@ namespace kiwi
         };
         
     private:
+        
+        // ================================================================================ //
+        //                                      VALUE                                       //
+        // ================================================================================ //
         
         //! @internal Exception-safe object creation helper
         template<typename T, typename... Args>
@@ -131,6 +135,94 @@ namespace kiwi
         {
             ;
         }
+
+        //! @brief Constructs an integer_t Atom.
+        //! @details The integer value will be 1 or 0 depending on the bool value.
+        //! @param value The value.
+        explicit Atom(bool value) noexcept :
+            m_type(Type::Int),
+            m_value(value ? integer_t(1) : integer_t(0))
+        {
+            ;
+        }
+        
+        //! @brief Constructs an integer_t Atom.
+        //! @param value The value.
+        explicit Atom(int value) noexcept :
+            m_type(Type::Int),
+            m_value(static_cast<integer_t>(value))
+        {
+            ;
+        }
+        
+        //! @brief Constructs an integer_t Atom.
+        //! @param value The value.
+        explicit Atom(long value) noexcept :
+            m_type(Type::Int),
+            m_value(static_cast<integer_t>(value))
+        {
+            ;
+        }
+        
+        //! @brief Constructs an integer_t Atom.
+        //! @param value The value.
+        explicit Atom(long long value) noexcept :
+            m_type(Type::Int),
+            m_value(static_cast<integer_t>(value))
+        {
+            ;
+        }
+        
+        //! @brief Constructs a float_t Atom.
+        //! @details infinty and NaN value both produce a Null Atom type.
+        //! @param value The value.
+        explicit Atom(const float value) noexcept :
+            m_type(Type::Float),
+            m_value(static_cast<float_t>(value))
+        {
+            // infinity and NAN produce an Null Atom type
+            if (! std::isfinite(value))
+            {
+                m_type = Type::Null;
+                m_value.float_v = 0.0;
+            }
+        }
+        
+        //! @brief Constructs a float_t Atom.
+        //! @details infinty and NaN value both produce a Null Atom type.
+        //! @param value The value.
+        explicit Atom(const double value) noexcept :
+            m_type(Type::Float),
+            m_value(static_cast<float_t>(value))
+        {
+            // infinity and NAN produce an Null Atom type
+            if (! std::isfinite(value))
+            {
+                m_type = Type::Null;
+                m_value.float_v = 0.0;
+            }
+        }
+        
+        //! @brief Constructs a symbol_t Atom.
+        //! @param sym The Symbol value.
+        Atom(symbol_t const& sym) :
+            m_type(Type::Symbol),
+            m_value(sym)
+        {
+            ;
+        }
+
+        //! @brief Constructs a symbol_t Atom with a string literal.
+        //! @param sym The Symbol value.
+        Atom(char const* sym) : Atom(Symbol(sym)) {}
+        
+        //! @brief Constructs a symbol_t Atom with a string.
+        //! @param sym The Symbol value.
+        Atom(std::string const& sym) : Atom(Symbol(sym)) {}
+        
+        //! @brief Constructs a symbol_t Atom by moving a string.
+        //! @param sym The Symbol value.
+        Atom(std::string&& sym) : Atom(Symbol(std::forward<std::string>(sym))) {}
         
         //! @brief Copy constructor.
         //! @details Constructs an Atom by copying the contents of an other Atom.
@@ -179,94 +271,6 @@ namespace kiwi
             return *this;
         }
         
-        //! @brief Constructs an integer_t Atom.
-        //! @details The integer value will be 1 or 0 depending on the bool value.
-        //! @param value The value.
-        inline explicit Atom(bool value) noexcept :
-            m_type(Type::Int),
-            m_value(value ? integer_t(1) : integer_t(0))
-        {
-            ;
-        }
-        
-        //! @brief Constructs an integer_t Atom.
-        //! @param value The value.
-        inline explicit Atom(const int value) noexcept :
-            m_type(Type::Int),
-            m_value(static_cast<integer_t>(value))
-        {
-            ;
-        }
-        
-        //! @brief Constructs an integer_t Atom.
-        //! @param value The value.
-        inline explicit Atom(const long value) noexcept :
-            m_type(Type::Int),
-            m_value(static_cast<integer_t>(value))
-        {
-            ;
-        }
-        
-        //! @brief Constructs an integer_t Atom.
-        //! @param value The value.
-        inline explicit Atom(const long long value) noexcept :
-            m_type(Type::Int),
-            m_value(static_cast<integer_t>(value))
-        {
-            ;
-        }
-        
-        //! @brief Constructs a float_t Atom.
-        //! @details infinty and NaN value both produce a Null Atom type.
-        //! @param value The value.
-        inline explicit Atom(const float value) noexcept :
-            m_type(Type::Float),
-            m_value(static_cast<float_t>(value))
-        {
-            // infinity and NAN produce an Null Atom type
-            if (! std::isfinite(value))
-            {
-                m_type = Type::Null;
-                m_value.float_v = 0.0;
-            }
-        }
-        
-        //! @brief Constructs a float_t Atom.
-        //! @details infinty and NaN value both produce a Null Atom type.
-        //! @param value The value.
-        inline explicit Atom(const double value) noexcept :
-            m_type(Type::Float),
-            m_value(static_cast<float_t>(value))
-        {
-            // infinity and NAN produce an Null Atom type
-            if (! std::isfinite(value))
-            {
-                m_type = Type::Null;
-                m_value.float_v = 0.0;
-            }
-        }
-        
-        //! @brief Constructs a symbol_t Atom.
-        //! @param sym The Symbol value.
-        inline Atom(symbol_t const& sym) :
-            m_type(Type::Symbol),
-            m_value(sym)
-        {
-            ;
-        }
-
-        //! @brief Constructs a symbol_t Atom.
-        //! @param sym The Symbol value.
-        inline Atom(char const* sym) : Atom(Symbol(sym)) {}
-        
-        //! @brief Constructs a symbol_t Atom with a string.
-        //! @param sym The Symbol value.
-        inline Atom(std::string const& sym) : Atom(Symbol(sym)) {}
-        
-        //! @brief Constructs a symbol_t Atom by moving a string.
-        //! @param sym The Symbol value.
-        inline Atom(std::string&& sym) : Atom(Symbol(std::forward<std::string>(sym))) {}
-        
         //! @brief Destructor.
         inline ~Atom()
         {
@@ -285,32 +289,32 @@ namespace kiwi
         //! @brief Get the type of the Atom.
         //! @return The Type of the atom as a Type.
         //! @see isNull(), isInt(), isFloat(), isNumber(), isSymbol()
-        inline Type getType() const noexcept {return m_type;}
+        inline Type getType() const noexcept    { return m_type; }
         
         //! @brief Returns true if the Atom is Null.
         //! @return true if the Atom is Null.
         //! @see getType(), isInt(), isFloat(), isNumber(), isSymbol()
-        inline bool isNull() const noexcept {return m_type == Type::Null;}
+        inline bool isNull() const noexcept     { return (m_type == Type::Null); }
         
         //! @brief Returns true if the Atom is an integer_t.
         //! @return true if the Atom is an integer_t.
         //! @see getType(), isNull(), isFloat(), isNumber(), isSymbol()
-        inline bool isInt() const noexcept {return m_type == Type::Int;}
+        inline bool isInt() const noexcept      { return m_type == Type::Int; }
         
         //! @brief Returns true if the Atom is a float_t.
         //! @return true if the Atom is an float_t.
         //! @see getType(), isNull(), isInt(), isNumber(), isSymbol()
-        inline bool isFloat() const noexcept {return m_type == Type::Float;}
+        inline bool isFloat() const noexcept    { return m_type == Type::Float; }
         
         //! @brief Returns true if the Atom is a bool, an integer_t, or a float_t.
         //! @return true if the Atom is a bool, an integer_t, or a float_t.
         //! @see getType(), isNull(), isInt(), isFloat(), isSymbol()
-        inline bool isNumber() const noexcept {return (isInt() || isFloat());}
+        inline bool isNumber() const noexcept   { return (isInt() || isFloat()); }
         
         //! @brief Returns true if the Atom is a symbol_t.
         //! @return true if the Atom is a symbol_t.
         //! @see getType(), isNull(), isInt(), isFloat(), isNumber()
-        inline bool isSymbol() const noexcept {return m_type == Type::Symbol;}
+        inline bool isSymbol() const noexcept   { return m_type == Type::Symbol; }
         
         // ================================================================================ //
         //                                   Value Getters                                  //
@@ -353,14 +357,14 @@ namespace kiwi
         //! @brief Retrieves the Atom value as a Symbol value.
         //! @return The current Symbol atom value if it is a Symbol otherwise an empty Symbol.
         //! @see getType(), isSymbol(), getInt(), getFloat()
-        symbol_t const* const getSymbol() const noexcept
+        symbol_t getSymbol() const noexcept
         {
             if(isSymbol())
             {
-                return m_value.sym_v;
+                return *m_value.sym_v;
             }
             
-            return nullptr;
+            return symbol_t();
         }
         
         // ================================================================================ //
@@ -371,7 +375,7 @@ namespace kiwi
         //! @details
         //! @param other The other atom.
         //! @return True if the two Atom objects hold the same value otherwise false.
-        inline bool operator==(Atom const& other) const noexcept
+        bool operator==(Atom const& other) const noexcept
         {
             if(other.isNull() && isNull())
             {
