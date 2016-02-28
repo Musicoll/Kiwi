@@ -66,6 +66,13 @@ namespace kiwi
         //! @brief Copy constructor
         Symbol(Symbol const& symbol) : m_name(symbol.m_name) {};
         
+        //! @brief Copy assignment operator
+        inline Symbol& operator = (Symbol rhs) noexcept
+        {
+            m_name = rhs.m_name;
+            return *this;
+        }
+        
         //! @brief Destructor.
         ~Symbol() = default;
         
@@ -77,27 +84,11 @@ namespace kiwi
             std::swap(m_name, other.m_name);
         }
         
-        //! @brief Copy assignment operator
-        inline Symbol& operator = (Symbol rhs) noexcept
-        {
-            m_name = rhs.m_name;
-            return *this;
-        }
-        
         //! @brief Returns the std::string const reference that contains the Symbol.
-        inline operator std::string const&() const noexcept {return m_name.get();}
+        inline operator std::string const&() const noexcept { return m_name.get(); }
         
         //! @brief Get the symbol as an std::string.
-        inline std::string toString() const
-        {
-            return m_name.get();
-        }
-        
-        //! @brief Get the symbol as an std::string.
-        inline std::string const& toStringRef() const
-        {
-            return m_name.get();
-        }
+        inline std::string toString() const                 { return m_name.get(); }
         
         //! @brief Returns true if the two symbols are equals
         inline bool operator == (Symbol const& rhs) const noexcept
@@ -125,6 +116,7 @@ namespace kiwi
             return *m_symbols.emplace(std::move(name)).first;
         }
         
+        //! @internal constant string reference.
         stringRef m_name;
         
         //! @internal

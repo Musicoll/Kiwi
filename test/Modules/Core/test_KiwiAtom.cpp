@@ -39,12 +39,17 @@ TEST_CASE("Atom Constructors", "[Atom]")
         CHECK(a.getType() == Atom::Type::Null);
         CHECK(a.isNull());
         CHECK(Atom().getType() == Atom::Type::Null);
-        CHECK(Atom(INFINITY).getType() == Atom::Type::Null);    // infinite produces Null
-        CHECK(Atom(NAN).getType() == Atom::Type::Null);         // NaN produces Null
+        
+        // infinite produces Null
+        CHECK(Atom(INFINITY).getType() == Atom::Type::Null);
+        
+        // NaN produces Null
+        CHECK(Atom(NAN).getType() == Atom::Type::Null);
     }
     
     SECTION("Signed Integral types")
     {
+        CHECK(Atom('c').isInt());           // char
         CHECK(Atom(true).isInt());          // bool
         CHECK(Atom(false).isInt());         // bool
         CHECK(Atom(short(1)).isInt());      // short
@@ -70,7 +75,7 @@ TEST_CASE("Atom Constructors", "[Atom]")
     {
         CHECK(Atom(3.14f).getType() == Atom::Type::Float);    // float
         CHECK(Atom(3.14).getType() == Atom::Type::Float);     // double
-        //CHECK(Atom(3.14l).getType() == Atom::Type::Float);  // long double not supported
+        //CHECK(Atom(3.14l).getType() == Atom::Type::Float);  // long double are not supported
         CHECK(Atom(6.02e23).getType() == Atom::Type::Float);  // 6.02 x 10^23 (Avogadro constant)
         CHECK(Atom(1.6e-19).getType() == Atom::Type::Float);  // 1.6 x 10^-19 (electric charge of an electron)
         
@@ -83,24 +88,23 @@ TEST_CASE("Atom Constructors", "[Atom]")
     {
         CHECK(Atom("c").getType() == Atom::Type::Symbol);
         CHECK(Atom(Symbol("tag")).getType() == Atom::Type::Symbol);
-        Symbol tag = Symbol("tag");
-        CHECK(Atom(tag).getType() == Atom::Type::Symbol);
+        Symbol sym = Symbol("sym");
+        CHECK(Atom(sym).getType() == Atom::Type::Symbol);
         
-        //WARN("Atom('c').getType() == Atom::Type::Symbol");
-        //CHECK(Atom('c').getType() == Atom::Type::Symbol);
-        //CHECK_FALSE(Atom('c').getType() == Atom::Type::Int);       //
+        
+        CHECK_FALSE(Atom('c').isSymbol());       // char is considered as integer
     }
 }
 
 TEST_CASE("Atom Null", "[Atom]")
 {
     Atom atom;
-    REQUIRE(atom.getType()          == Atom::Type::Null);
-    REQUIRE(atom.isNull()      == true);
-    REQUIRE(atom.isNumber()         == false);
-    REQUIRE(atom.isInt()           == false);
-    REQUIRE(atom.isFloat()         == false);
-    REQUIRE(atom.isSymbol()            == false);
+    CHECK(atom.getType()        == Atom::Type::Null);
+    CHECK(atom.isNull()         == true);
+    CHECK(atom.isNumber()       == false);
+    CHECK(atom.isInt()          == false);
+    CHECK(atom.isFloat()        == false);
+    CHECK(atom.isSymbol()       == false);
     
     //REQUIRE_FALSE(atom == false);
     //REQUIRE_FALSE(atom == true);
@@ -121,10 +125,6 @@ TEST_CASE("Atom Int", "[Atom]")
     //CHECK(atom == 1.);
     
     //CHECK(Atom(std::numeric_limits<int64_t>::max()) == std::numeric_limits<int64_t>::max());
-    //CHECK(Atom(std::numeric_limits<uint64_t>::max()) == std::numeric_limits<uint64_t>::max());
-    
-    // do we need to support all equality operators ?
-    //CHECK(atom == 1ul);
     
     Atom to_move(42);
     Atom moved(std::move(to_move));
@@ -143,20 +143,20 @@ TEST_CASE("Atom Float", "[Atom]")
     CHECK(atom.isInt()            == false);
     CHECK(atom.isFloat()          == true);
     CHECK(atom.isSymbol()         == false);
-    //CHECK(atom == 1.123);
-    //CHECK(atom == Approx(1.123f));
-    // Should this fail ??
-    //CHECK(atom == 1);
-    //CHECK(atom == true);
     
-    //CHECK_FALSE(Atom(1.123) == 3.14);
+    CHECK(atom.getFloat() == 1.123);
+    CHECK(atom.getFloat() == Approx(1.123f));
+    
+    // Should this fail ??
+    CHECK(atom.getInt() == 1);
+    //CHECK(atom == true);
     
     Atom to_move(42.42);
     Atom moved(std::move(to_move));
     CHECK(to_move.isNull()    == true);
     CHECK(moved.isNumber()         == true);
     CHECK(moved.isFloat()         == true);
-    //CHECK(moved == 42.42);
+    CHECK(moved.getFloat() == 42.42);
 }
 
 TEST_CASE("Atom Symbol", "[Atom]")
