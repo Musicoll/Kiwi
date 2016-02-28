@@ -40,9 +40,13 @@ namespace kiwi
     //                                      SYMBOL                                      //
     // ================================================================================ //
     
-    //! @brief The Symbol is an unique object that matchs to a "unique" std::string in the scope of all the Kiwi application.
-    //! @details Comparing two Symbol objects is very fast (O(1))
-    //! The symbols are uniques and match to a string. If you construct a symbol with a std::string that already matchs to a symbol, the creation function will return this symbol, otherwise it will create a new one.
+    //! @brief The Symbol holds a reference to a "unique" std::string in the global application scope.
+    //! @details Comparing two Symbol objects is an O(1) operation, so it's much faster
+    //! than comparing two std::string together. However Symbol creation is much slower than
+    //! std::string creation as it need to insert and lookup each created std::string in a set.
+    //! So the best strategy to use the Symbol class optimally is to keep some static Symbol
+    //! objects for the names you will often use or compare.
+    //! @see Symbols
     class Symbol
     {
     private:
@@ -62,14 +66,8 @@ namespace kiwi
         //! @brief Copy constructor
         Symbol(Symbol const& symbol) : m_name(symbol.m_name) {};
         
-        //! @brief Constructs a Symbol with an other with move semantics.
-        Symbol(Symbol const&& other) : m_name(std::move(other.m_name)) {};
-        
         //! @brief Destructor.
         ~Symbol() = default;
-        
-        //! @brief
-        inline operator std::string const&() const noexcept {return m_name.get();}
         
         //! @brief exchanges the values of two Symbol objects
         void swap(Symbol& other)
@@ -85,6 +83,9 @@ namespace kiwi
             m_name = rhs.m_name;
             return *this;
         }
+        
+        //! @brief Returns the std::string const reference that contains the Symbol.
+        inline operator std::string const&() const noexcept {return m_name.get();}
         
         //! @brief Get the symbol as an std::string.
         inline std::string toString() const
