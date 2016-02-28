@@ -183,7 +183,7 @@ TEST_CASE("Atom Symbol", "[Atom]")
 
 TEST_CASE("Atom string parser", "[Atom]")
 {
-    const std::string message = "foo \"bar 42\" 1 2 3.14";
+    const std::string message = "foo \"bar 42\" 1 -4 3.14";
     
     std::vector<Atom> atom_vec(Atom::parse(message));
     REQUIRE(atom_vec.size() == 5);

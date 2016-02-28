@@ -125,7 +125,7 @@ namespace kiwi
         
         //! @brief Default constructor.
         //! @details Constructs an Atom of type Null.
-        inline Atom() noexcept :
+        Atom() noexcept :
             m_type(Type::Null),
             m_value(Type::Null)
         {
@@ -135,13 +135,27 @@ namespace kiwi
         //! @brief Copy constructor.
         //! @details Constructs an Atom by copying the contents of an other Atom.
         //! @param other The other Atom.
-        Atom(Atom const& other) noexcept;
+        Atom(Atom const& other) : m_type(other.m_type)
+        {
+            switch(m_type)
+            {
+                case Type::Int:     { m_value = other.m_value.int_v; break; }
+                case Type::Float:   { m_value = other.m_value.float_v; break; }
+                case Type::Symbol:
+                {
+                    assert(other.m_value.sym_v != nullptr);
+                    m_value = *other.m_value.sym_v;
+                }
+                    
+                default: break;
+            }
+        }
         
         //! @brief Move constructor.
         //! @details Constructs an Atom value by stealing the contents of an other Atom using move semantics,
         //! leaving the other as a Null value Atom.
         //! @param other The other Atom value.
-        Atom(Atom&& other) noexcept :
+        Atom(Atom&& other) :
             m_type(std::move(other.m_type)),
             m_value(std::move(other.m_value))
         {
@@ -253,7 +267,7 @@ namespace kiwi
         //! @param sym The Symbol value.
         inline Atom(std::string&& sym) : Atom(Symbol(std::forward<std::string>(sym))) {}
         
-        //! Destructor.
+        //! @brief Destructor.
         inline ~Atom()
         {
             if(isSymbol())
@@ -303,7 +317,7 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief Retrieves the Atom value as an integer_t value.
-        //! @return The current integer atom value if it is a number otherwise 0.0.
+        //! @return The current integer atom value if it is a number otherwise 0.
         //! @see getType(), isNumber(), isInt(), getFloat()
         integer_t getInt() const noexcept
         {
@@ -316,7 +330,7 @@ namespace kiwi
                 return static_cast<integer_t>(m_value.float_v);
             }
             
-            return integer_t();
+            return integer_t(0);
         }
         
         //! @brief Retrieves the Atom value as a float_t value.
@@ -333,7 +347,7 @@ namespace kiwi
                 return static_cast<float_t>(m_value.int_v);
             }
             
-            return float_t();
+            return float_t(0.0);
         }
         
         //! @brief Retrieves the Atom value as a Symbol value.

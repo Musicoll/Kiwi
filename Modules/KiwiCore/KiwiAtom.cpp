@@ -29,41 +29,17 @@ namespace kiwi
     //                                      ATOM                                        //
     // ================================================================================ //
     
-    Atom::Atom(Atom const& other) noexcept : m_type(other.getType())
-    {
-        if(other.isInt())
-        {
-            m_value = other.m_value.int_v;
-        }
-        else if(other.isFloat())
-        {
-            m_value = other.m_value.float_v;
-        }
-        else if(other.isSymbol())
-        {
-            assert(other.m_value.sym_v != nullptr);
-            m_value = *other.m_value.sym_v;
-        }
-        else
-        {
-            m_type = Type::Null;
-        }
-    }
-    
     std::ostream& operator<<(std::ostream& output, Atom const& atom)
     {
-        if(atom.isInt())
+        switch(atom.getType())
         {
-            output << atom.getInt();
+            case Atom::Type::Int:       { output << atom.getInt(); break; }
+            case Atom::Type::Float:     { output << atom.getFloat(); break; }
+            case Atom::Type::Symbol:    { output << jsonEscape(atom.getSymbol()->toString()); break; }
+                
+            default: break;
         }
-        else if(atom.isFloat())
-        {
-            output << atom.getFloat();
-        }
-        else if(atom.isSymbol())
-        {
-            output << jsonEscape(atom.getSymbol()->toString());
-        }
+        
         return output;
     }
     
@@ -152,16 +128,16 @@ namespace kiwi
                 {
                     if(is_float)
                     {
-                        atoms.emplace_back(Atom(std::stod(word.c_str())));
+                        atoms.emplace_back(std::stod(word.c_str()));
                     }
                     else
                     {
-                        atoms.emplace_back(Atom(static_cast<integer_t>(std::stol(word.c_str()))));
+                        atoms.emplace_back(std::stol(word.c_str()));
                     }
                 }
                 else
                 {
-                    atoms.emplace_back(Atom(Symbol(jsonUnescape(word))));
+                    atoms.emplace_back(jsonUnescape(word));
                 }
             }
         }
