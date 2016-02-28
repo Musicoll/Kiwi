@@ -27,6 +27,7 @@
 #include <cstddef>
 #include <stdio.h>
 #include <stdarg.h>
+#include <assert.h>
 #include <cwchar>
 #include <locale>
 #include <iostream>
