@@ -69,7 +69,7 @@ namespace kiwi
         //! @brief Destructor.
         ~Symbol() = default;
         
-        //! @brief exchanges the values of two Symbol objects
+        //! @brief exchanges the internal std::string reference of two Symbol objects
         void swap(Symbol& other)
         noexcept (std::is_nothrow_move_constructible<stringRef>::value
                   && std::is_nothrow_move_assignable<stringRef>::value)
@@ -131,19 +131,6 @@ namespace kiwi
         static std::set<std::string>  m_symbols;
         static std::mutex             m_mutex;
     };
-}
-
-// specialization of std::swap for Symbol objects
-namespace std
-{
-    //! @brief exchanges the values of two Symbol objects
-    template <>
-    inline void swap(kiwi::Symbol& s1, kiwi::Symbol& s2)
-    noexcept(is_nothrow_move_constructible<kiwi::Symbol>::value
-             && is_nothrow_move_assignable<kiwi::Symbol>::value)
-    {
-        s1.swap(s2);
-    }
 }
 
 #endif // KIWI_CORE_SYMBOL_HPP_INCLUDED
