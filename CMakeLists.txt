@@ -68,9 +68,9 @@ file(GLOB KIWI_CORE_SRC
      ${PROJECT_SOURCE_DIR}/Modules/KiwiCore/*.hpp
      ${PROJECT_SOURCE_DIR}/Modules/KiwiCore/*.cpp
 )
-add_library(KiwiCore STATIC ${KIWI_CORE_SRC})
-set_property(TARGET KiwiCore
-             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
+#add_library(KiwiCore STATIC ${KIWI_CORE_SRC})
+#set_property(TARGET KiwiCore
+#             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
 
 # -> Module DSP
 
@@ -93,7 +93,7 @@ set_property(TARGET KiwiDsp
 file(GLOB TEST_CORE_SRC
      ${PROJECT_SOURCE_DIR}/test/Modules/Core/*.cpp)
 add_executable(test_core ${TEST_CORE_SRC})
-target_link_libraries(test_core KiwiCore)
+#target_link_libraries(test_core KiwiCore)
 set_property(TARGET test_core
              PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
 
