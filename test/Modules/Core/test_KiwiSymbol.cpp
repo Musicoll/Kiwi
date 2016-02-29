@@ -94,7 +94,7 @@ TEST_CASE("Symbol", "[Symbol]")
         CHECK(sym_1.toString() == "foo");
         CHECK(sym_2.toString() == "jojo");
         
-        sym_1.swap(sym_2);
+        std::swap(sym_1, sym_2);
         CHECK(sym_1.toString() == "jojo");
         CHECK(sym_2.toString() == "foo");
         

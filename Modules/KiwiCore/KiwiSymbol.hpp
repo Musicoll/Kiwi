@@ -76,14 +76,6 @@ namespace kiwi
         //! @brief Destructor.
         ~Symbol() = default;
         
-        //! @brief exchanges the internal std::string reference of two Symbol objects
-        void swap(Symbol& other)
-        noexcept (std::is_nothrow_move_constructible<stringRef>::value
-                  && std::is_nothrow_move_assignable<stringRef>::value)
-        {
-            std::swap(m_name, other.m_name);
-        }
-        
         //! @brief Get the symbol as an std::string.
         inline std::string toString() const                 { return m_name.get(); }
         
