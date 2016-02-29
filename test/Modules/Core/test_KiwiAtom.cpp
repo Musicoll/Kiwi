@@ -149,17 +149,6 @@ TEST_CASE("Atom Constructors", "[Atom]")
         CHECK(Atom(1.6e-19).getType() == Atom::Type::Float);    // 1.6 x 10^-19 (electric charge of an electron)
     }
     
-    SECTION("Check for infinity and NaN")
-    {
-        // NaN produces Null
-        CHECK(Atom(double(NAN)).isNull());
-        CHECK_FALSE(Atom(float(NAN)).isFloat());
-        
-        // infinite produces Null
-        CHECK(Atom(double(INFINITY)).isNull());
-        CHECK_FALSE(Atom(float(INFINITY)).isFloat());
-    }
-    
     SECTION("float (Atom::Type::Float)")
     {
         Atom atom_1(3.14f);
