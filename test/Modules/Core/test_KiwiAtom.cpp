@@ -27,6 +27,10 @@
 
 using namespace kiwi;
 
+//! @brief kiwi::Atom unit test
+//! @todo :
+//! - Add more tests to kiwi::Atom::parse method
+
 // ================================================================================ //
 //                                 ATOM CONSTRUCTORS                                //
 // ================================================================================ //
@@ -382,6 +386,7 @@ TEST_CASE("Value getters", "[Atom]")
         CHECK(a_null.getInt() == 0);
         CHECK(a_null.getFloat() == 0.0);
         CHECK(a_null.getSymbol() == Symbols::empty);
+        CHECK(a_null.toString() == "");
     }
     
     SECTION("When Atom is of Type::Int")
@@ -390,6 +395,7 @@ TEST_CASE("Value getters", "[Atom]")
         CHECK(a_int.getInt() == 42);
         CHECK(a_int.getFloat() == 42.);
         CHECK(a_int.getSymbol() == Symbols::empty);
+        CHECK(a_int.toString() == "42");
     }
     
     SECTION("When Atom is of Type::Float")
@@ -398,11 +404,13 @@ TEST_CASE("Value getters", "[Atom]")
         CHECK(a_float.getInt() == 3);
         CHECK(a_float.getFloat() == 3.14f);
         CHECK(a_float.getSymbol() == Symbols::empty);
+        CHECK(a_float.toString() == std::to_string(3.14f));
         
         Atom a_double(3.99);
         CHECK(a_double.getInt() == 3);
         CHECK(a_double.getFloat() == 3.99);
         CHECK(a_double.getSymbol() == Symbols::empty);
+        CHECK(a_double.toString() == std::to_string(3.99));
     }
     
     SECTION("When Atom is of Type::Symbol")
@@ -411,6 +419,7 @@ TEST_CASE("Value getters", "[Atom]")
         CHECK(a_sym.getInt() == 0);
         CHECK(a_sym.getFloat() == 0.0);
         CHECK(a_sym.getSymbol() == Symbol("foo"));
+        CHECK(a_sym.toString() == "foo");
     }
 }
 

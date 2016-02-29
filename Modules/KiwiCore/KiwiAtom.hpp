@@ -354,6 +354,22 @@ namespace kiwi
             return symbol_t();
         }
         
+        //! @brief Retrieves the Atom value as an std::string.
+        //! @return The current Atom value as an std::string.
+        //! @see getSymbol(), getInt(), getFloat()
+        std::string toString() const
+        {
+            switch(m_type)
+            {
+                case Type::Symbol: return getSymbol().toString();
+                case Type::Int:    return std::to_string(getInt());
+                case Type::Float:  return std::to_string(getFloat());
+                default: break;
+            }
+            
+            return std::string();
+        }
+        
         // ================================================================================ //
         //                                Equality Operators                                //
         // ================================================================================ //
