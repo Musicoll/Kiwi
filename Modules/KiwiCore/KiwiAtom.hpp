@@ -182,8 +182,8 @@ namespace kiwi
         }
         
         //! @brief Move constructor.
-        //! @details Constructs an Atom value by stealing the contents of an other Atom using move semantics,
-        //! leaving the other as a Null value Atom.
+        //! @details Constructs an Atom value by stealing the contents of an other Atom
+        //! using move semantics, leaving the other as a Null value Atom.
         //! @param other The other Atom value.
         Atom(Atom&& other) :
             m_type(std::move(other.m_type)),
@@ -206,7 +206,7 @@ namespace kiwi
         }
         
         //! @brief Copy assigment operator.
-        //! @details Copies an Atom value with the "copy and swap" method.
+        //! @details Copies an Atom value.
         //! @param other The Atom object to copy.
         Atom& operator=(Atom const& other)
         {
@@ -218,8 +218,8 @@ namespace kiwi
                     alloc.destroy(m_value.string_v);
                     alloc.deallocate(m_value.string_v, 1);
                 }
-                m_type = other.m_type;
-                m_value= other.m_value;
+                
+                m_value = other.m_value;
             }
             else
             {
@@ -230,9 +230,10 @@ namespace kiwi
                 else
                 {
                     m_value.string_v = create_string_pointer(*other.m_value.string_v);
-                    m_type = other.m_type;
                 }
             }
+            
+            m_type = other.m_type;
             
             return *this;
         }
@@ -327,10 +328,12 @@ namespace kiwi
             {
                 return *m_value.string_v;
             }
+            
             return string_t();
         }
         
     private:
+        
         // ================================================================================ //
         //                                      VALUE                                       //
         // ================================================================================ //

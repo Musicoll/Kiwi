@@ -205,12 +205,30 @@ TEST_CASE("Atom Constructors", "[Atom]")
         CHECK(a_sym.getString() == str);
     }
     
-    SECTION("Copy constructor + Copy assigment operator")
+    SECTION("Copy constructor")
     {
         Atom a_null;
         Atom a_int(42);
         Atom a_float(3.14);
         Atom a_string("string");
+        
+        Atom a_null_copy = a_null;
+        CHECK(a_null_copy.getType()  == Atom::Type::Null);
+        Atom a_int_copy = a_int;
+        CHECK(a_int_copy.getType()   == Atom::Type::Int);
+        Atom a_float_copy = a_float;
+        CHECK(a_float_copy.getType() == Atom::Type::Float);
+        Atom a_string_copy = a_string;
+        CHECK(a_string_copy.getType()== Atom::Type::String);
+    }
+    
+    SECTION("Copy assigment operator")
+    {
+        Atom a_null;
+        Atom a_int(42);
+        Atom a_float(3.14);
+        Atom a_string("string");
+        Atom a_string_2("string_2");
         
         Atom a_temp;
         CHECK(a_temp.getType()       == Atom::Type::Null);
@@ -219,6 +237,8 @@ TEST_CASE("Atom Constructors", "[Atom]")
         a_temp = a_float;
         CHECK(a_temp.getType()       == Atom::Type::Float);
         a_temp = a_string;
+        CHECK(a_temp.getType()       == Atom::Type::String);
+        a_temp = a_string_2;
         CHECK(a_temp.getType()       == Atom::Type::String);
         a_temp = a_null;
         CHECK(a_temp.getType()       == Atom::Type::Null);
@@ -290,10 +310,10 @@ TEST_CASE("Atom Copy assignment", "[Atom]")
     CHECK(a_temp.getType()       == Atom::Type::Float);
     CHECK(a_temp.getFloat() == 1.23456789);
     
-    std::string sym("jujube");
-    a_temp = sym;
+    std::string str("jujube");
+    a_temp = str;
     CHECK(a_temp.getType()       == Atom::Type::String);
-    CHECK(a_temp.getString() == sym);
+    CHECK(a_temp.getString() == str);
     
     a_temp = "kiwi";
     CHECK(a_temp.getType()       == Atom::Type::String);
