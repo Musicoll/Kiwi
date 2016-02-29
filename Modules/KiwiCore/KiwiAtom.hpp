@@ -27,6 +27,7 @@
 #include <assert.h>
 #include <iostream>
 #include <cstring>
+#include <memory>
 
 
 namespace kiwi
