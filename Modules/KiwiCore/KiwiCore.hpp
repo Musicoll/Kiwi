@@ -26,7 +26,6 @@
 
 #include "KiwiSymbol.hpp"
 #include "KiwiAtom.hpp"
-#include "KiwiListenerSet.hpp"
 
 #endif // KIWI_CORE_HPP_INCLUDED
 

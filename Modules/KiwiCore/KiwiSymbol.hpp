@@ -24,7 +24,17 @@
 #ifndef KIWI_CORE_SYMBOL_HPP_INCLUDED
 #define KIWI_CORE_SYMBOL_HPP_INCLUDED
 
-#include "KiwiTools.hpp"
+#include <cstddef>
+#include <stdio.h>
+#include <stdarg.h>
+#include <assert.h>
+#include <iostream>
+#include <sstream>
+#include <cstring>
+#include <cmath>
+#include <vector>
+#include <set>
+#include <mutex>
 
 namespace kiwi
 {
@@ -56,7 +66,7 @@ namespace kiwi
         Symbol(Symbol const& symbol) : m_name(symbol.m_name) {};
         
         //! @brief Copy assignment operator
-        inline Symbol& operator = (Symbol const& rhs) noexcept
+        inline Symbol& operator=(Symbol const& rhs) noexcept
         {
             m_name = rhs.m_name;
             return *this;
@@ -69,7 +79,7 @@ namespace kiwi
         inline std::string toString() const { return m_name.get(); }
         
         //! @brief Returns true if the two symbols are equals
-        inline bool operator == (Symbol const& rhs) const noexcept
+        inline bool operator==(Symbol const& rhs) const noexcept
         {
             return (&m_name.get() == &rhs.m_name.get());
         }
