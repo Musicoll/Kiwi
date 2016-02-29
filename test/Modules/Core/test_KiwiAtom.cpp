@@ -146,12 +146,12 @@ TEST_CASE("Atom Constructors", "[Atom]")
     SECTION("Check for infinity and NaN")
     {
         // NaN produces Null
-        CHECK(Atom(NAN).isNull());
-        CHECK_FALSE(Atom(NAN).isFloat());
+        CHECK(Atom(double(NAN)).isNull());
+        CHECK_FALSE(Atom(float(NAN)).isFloat());
         
         // infinite produces Null
-        CHECK(Atom(INFINITY).isNull());
-        CHECK_FALSE(Atom(INFINITY).isFloat());
+        CHECK(Atom(double(INFINITY)).isNull());
+        CHECK_FALSE(Atom(float(INFINITY)).isFloat());
     }
     
     SECTION("float (Atom::Type::Float)")
@@ -229,7 +229,7 @@ TEST_CASE("Atom Constructors", "[Atom]")
         CHECK(a_sym.getSymbol().toString() == str);
     }
     
-    SECTION("Copy constructor")
+    SECTION("Copy constructor + Copy assigment operator")
     {
         Atom a_null;
         Atom a_int(42);
@@ -247,98 +247,104 @@ TEST_CASE("Atom Constructors", "[Atom]")
         a_temp = a_null;
         CHECK(a_temp.getType()       == Atom::Type::Null);
     }
+    
+    SECTION("Move constructor")
+    {
+        SECTION("Null")
+        {
+            Atom to_move;
+            Atom moved(std::move(to_move));
+            CHECK(to_move.isNull()          == true);
+            CHECK(moved.isNull()            == true);
+        }
+        
+        SECTION("Int")
+        {
+            Atom to_move(42);
+            Atom moved(std::move(to_move));
+            CHECK(to_move.isNull()          == true);
+            CHECK(moved.isNumber()          == true);
+            CHECK(moved.isInt()             == true);
+            CHECK(moved.getInt() == 42);
+        }
+        
+        SECTION("Float")
+        {
+            Atom to_move(3.14);
+            Atom moved(std::move(to_move));
+            CHECK(to_move.isNull()          == true);
+            CHECK(moved.isNumber()          == true);
+            CHECK(moved.isFloat()           == true);
+            CHECK(moved.getFloat() == 3.14);
+        }
+        
+        SECTION("Symbol")
+        {
+            Atom to_move("symbol");
+            Atom moved(std::move(to_move));
+            CHECK(to_move.isNull()          == true);
+            CHECK(moved.isSymbol()          == true);
+            CHECK(moved.getSymbol().toString() == "symbol");
+        }
+    }
 }
 
-TEST_CASE("Atom Null", "[Atom]")
+TEST_CASE("Check Types", "[Atom]")
 {
-    Atom atom;
-    CHECK(atom.getType()        == Atom::Type::Null);
-    CHECK(atom.isNull()         == true);
-    CHECK(atom.isNumber()       == false);
-    CHECK(atom.isInt()          == false);
-    CHECK(atom.isFloat()        == false);
-    CHECK(atom.isSymbol()       == false);
-}
-
-TEST_CASE("Atom Int", "[Atom]")
-{
-    Atom atom(1);
-    CHECK(atom.getType()          == Atom::Type::Int);
-    CHECK(atom.isNull()      == false);
+    SECTION("Check Types (Null)")
+    {
+        Atom atom;
+        CHECK(atom.getType()        == Atom::Type::Null);
+        CHECK(atom.isNull()         == true);
+        CHECK(atom.isNumber()       == false);
+        CHECK(atom.isInt()          == false);
+        CHECK(atom.isFloat()        == false);
+        CHECK(atom.isSymbol()       == false);
+    }
     
-    CHECK(atom.isNumber()         == true);
-    CHECK(atom.isInt()           == true);
-    CHECK(atom.isFloat()         == false);
-    CHECK(atom.isSymbol()            == false);
-    //CHECK(atom == true);
-    //CHECK(atom == 1);
-    //CHECK(atom == 1.);
+    SECTION("Check Types (Int)")
+    {
+        Atom atom(42);
+        CHECK(atom.getType()        == Atom::Type::Int);
+        CHECK(atom.isNull()         == false);
+        CHECK(atom.isNumber()       == true);
+        CHECK(atom.isInt()          == true);
+        CHECK(atom.isFloat()        == false);
+        CHECK(atom.isSymbol()       == false);
+    }
     
-    //CHECK(Atom(std::numeric_limits<int64_t>::max()) == std::numeric_limits<int64_t>::max());
+    SECTION("Check Types (Float)")
+    {
+        Atom atom(3.14);
+        CHECK(atom.getType()        == Atom::Type::Float);
+        CHECK(atom.isNull()         == false);
+        CHECK(atom.isNumber()       == true);
+        CHECK(atom.isInt()          == false);
+        CHECK(atom.isFloat()        == true);
+        CHECK(atom.isSymbol()       == false);
+    }
     
-    Atom to_move(42);
-    Atom moved(std::move(to_move));
-    CHECK(to_move.isNull()          == true);
-    CHECK(moved.isNumber()         == true);
-    CHECK(moved.isInt()           == true);
-    //CHECK(moved == 42);
-}
-
-TEST_CASE("Atom Float", "[Atom]")
-{
-    Atom atom(1.123);
-    CHECK(atom.getType()          == Atom::Type::Float);
-    CHECK(atom.isNull()           == false);
-    CHECK(atom.isNumber()         == true);
-    CHECK(atom.isInt()            == false);
-    CHECK(atom.isFloat()          == true);
-    CHECK(atom.isSymbol()         == false);
-    
-    CHECK(atom.getFloat() == 1.123);
-    CHECK(atom.getFloat() == Approx(1.123f));
-    
-    // Should this fail ??
-    CHECK(atom.getInt() == 1);
-    //CHECK(atom == true);
-    
-    Atom to_move(42.42);
-    Atom moved(std::move(to_move));
-    CHECK(to_move.isNull()    == true);
-    CHECK(moved.isNumber()         == true);
-    CHECK(moved.isFloat()         == true);
-    CHECK(moved.getFloat() == 42.42);
-}
-
-TEST_CASE("Atom Symbol", "[Atom]")
-{
-    Atom atom("foo");
-    CHECK(atom.getType()          == Atom::Type::Symbol);
-    CHECK(atom.isNull()      == false);
-    CHECK(atom.isNumber()         == false);
-    CHECK(atom.isInt()           == false);
-    CHECK(atom.isFloat()         == false);
-    CHECK(atom.isSymbol()            == true);
-    
-    CHECK(atom == Atom("foo"));
-    CHECK(atom != Atom("jojo"));
-    
-    Atom to_move("foo");
-    Atom moved(std::move(to_move));
-    CHECK(to_move.isNull()   == true);
-    CHECK(moved.isSymbol()   == true);
-    
-    //Atom mmmm;
-    //mmmm = Symbol("zaza");
+    SECTION("Check Types (Symbol)")
+    {
+        Atom atom("foo");
+        CHECK(atom.getType()        == Atom::Type::Symbol);
+        CHECK(atom.isNull()         == false);
+        CHECK(atom.isNumber()       == false);
+        CHECK(atom.isInt()          == false);
+        CHECK(atom.isFloat()        == false);
+        CHECK(atom.isSymbol()       == true);
+    }
 }
 
 TEST_CASE("Atom std::ostream::operator<<", "[Atom]")
 {
+    Atom a_null;
     Atom a_sym("foo");
     Atom a_int(42);
     Atom a_float(3.14);
     
     std::ostream ostr(nullptr);
-    ostr << a_sym << a_int;
+    ostr << a_null << a_sym << a_int << a_float;
     
 }
 

@@ -265,7 +265,6 @@ namespace kiwi
                   && std::is_nothrow_move_constructible<atom_value>::value
                   && std::is_nothrow_move_assignable<atom_value>::value)
         {
-            //std::cout << "Copy and swap called" << '\n';
             std::swap(m_type, other.m_type);
             std::swap(m_value, other.m_value);
             return *this;
