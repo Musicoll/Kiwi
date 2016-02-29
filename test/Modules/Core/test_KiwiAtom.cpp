@@ -358,7 +358,6 @@ TEST_CASE("Value getters", "[Atom]")
         CHECK(a_null.getInt() == 0);
         CHECK(a_null.getFloat() == 0.0);
         CHECK(a_null.getString() == "");
-        CHECK(a_null.toString() == "");
     }
     
     SECTION("When Atom is of Type::Int")
@@ -367,7 +366,6 @@ TEST_CASE("Value getters", "[Atom]")
         CHECK(a_int.getInt() == 42);
         CHECK(a_int.getFloat() == 42.);
         CHECK(a_int.getString() == "");
-        CHECK(a_int.toString() == "42");
     }
     
     SECTION("When Atom is of Type::Float")
@@ -376,13 +374,11 @@ TEST_CASE("Value getters", "[Atom]")
         CHECK(a_float.getInt() == 3);
         CHECK(a_float.getFloat() == 3.14f);
         CHECK(a_float.getString() == "");
-        CHECK(a_float.toString() == std::to_string(3.14f));
         
         Atom a_double(3.99);
         CHECK(a_double.getInt() == 3);
         CHECK(a_double.getFloat() == 3.99);
         CHECK(a_double.getString() == "");
-        CHECK(a_double.toString() == std::to_string(3.99));
     }
     
     SECTION("When Atom is of Type::String")
@@ -391,97 +387,7 @@ TEST_CASE("Value getters", "[Atom]")
         CHECK(a_sym.getInt() == 0);
         CHECK(a_sym.getFloat() == 0.0);
         CHECK(a_sym.getString() == "foo");
-        CHECK(a_sym.toString() == "foo");
     }
 }
 
-TEST_CASE("Equality operators", "[Atom]")
-{
-    Atom a_null_1, a_null_2;
-    Atom a_int_1(42), a_int_2(-26);
-    Atom a_float_1(3.14), a_float_2(666.666);
-    Atom a_string_1("string_1"), a_string_2("string_2");
-    
-    SECTION("Atom::Type::Null")
-    {
-        // Null value are equal
-        CHECK(a_null_1 == a_null_2);
-        CHECK_FALSE(a_null_1 != a_null_2);
-        
-        CHECK_FALSE(a_null_1 == a_int_1);
-        CHECK(a_null_1 != a_int_1);
-        
-        CHECK_FALSE(a_null_1 == a_float_1);
-        CHECK(a_null_1 != a_float_1);
-        
-        CHECK_FALSE(a_null_1 == a_string_1);
-        CHECK(a_null_1 != a_string_1);
-    }
-    
-    SECTION("Atom::Type::Int")
-    {
-        CHECK_FALSE(a_int_1 == a_null_1);
-        CHECK(a_int_1 != a_null_1);
-        
-        // Int with same value are equal
-        CHECK(a_int_1 == a_int_1);
-        CHECK_FALSE(a_int_1 != a_int_1);
-        
-        // Int with different values are NOT equal
-        CHECK_FALSE(a_int_1 == a_int_2);
-        CHECK(a_int_1 != a_int_2);
-        
-        // Int are NOT equal to Float
-        CHECK_FALSE(a_int_1 == a_float_1);
-        CHECK(a_int_1 != a_float_1);
-        
-        // Int are NOT equal to Strings
-        CHECK_FALSE(a_int_1 == a_string_1);
-        CHECK(a_int_1 != a_string_1);
-    }
-    
-    SECTION("Atom::Type::Float")
-    {
-        CHECK_FALSE(a_float_1 == a_null_1);
-        CHECK(a_float_1 != a_null_1);
-        
-        // Float with same value are equal
-        CHECK(a_float_1 == a_float_1);
-        CHECK_FALSE(a_float_1 != a_float_1);
-        
-        // Float with different values are NOT equal
-        CHECK_FALSE(a_float_1 == a_float_2);
-        CHECK(a_float_1 != a_float_2);
-        
-        // Float are NOT equal to Int
-        CHECK_FALSE(a_float_1 == a_int_1);
-        CHECK(a_float_1 != a_int_1);
-        
-        // Float are NOT equal to Strings
-        CHECK_FALSE(a_float_1 == a_string_1);
-        CHECK(a_float_1 != a_string_1);
-    }
-    
-    SECTION("Atom::Type::String")
-    {
-        CHECK_FALSE(a_string_1 == a_null_1);
-        CHECK(a_string_1 != a_null_1);
-        
-        // String objects with same value are equal
-        CHECK(a_string_1 == a_string_1);
-        CHECK_FALSE(a_string_1 != a_string_1);
-        
-        // String objects with different values are NOT equal
-        CHECK_FALSE(a_string_1 == a_string_2);
-        CHECK(a_float_1 != a_string_2);
-        
-        // String objects are NOT equal to Int
-        CHECK_FALSE(a_string_1 == a_int_1);
-        CHECK(a_string_1 != a_int_1);
-        
-        // String objects are NOT equal to Float
-        CHECK_FALSE(a_string_1 == a_float_1);
-        CHECK(a_string_1 != a_float_1);
-    }
-}
 

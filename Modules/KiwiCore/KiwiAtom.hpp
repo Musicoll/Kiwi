@@ -81,7 +81,7 @@ namespace kiwi
         //! @brief Constructs an int_t Atom.
         //! @details The integer value will be 1 or 0 depending on the bool value.
         //! @param value The value.
-        Atom(bool value) noexcept :
+        Atom(const bool value) noexcept :
             m_type(Type::Int),
             m_value(value ? int_t(1) : int_t(0))
         {
@@ -90,7 +90,7 @@ namespace kiwi
         
         //! @brief Constructs an int_t Atom.
         //! @param value The value.
-        Atom(int value) noexcept :
+        Atom(const int value) noexcept :
             m_type(Type::Int),
             m_value(static_cast<int_t>(value))
         {
@@ -99,7 +99,7 @@ namespace kiwi
         
         //! @brief Constructs an int_t Atom.
         //! @param value The value.
-        Atom(long value) noexcept :
+        Atom(const long value) noexcept :
             m_type(Type::Int),
             m_value(static_cast<int_t>(value))
         {
@@ -108,7 +108,7 @@ namespace kiwi
         
         //! @brief Constructs an int_t Atom.
         //! @param value The value.
-        Atom(long long value) noexcept :
+        Atom(const long long value) noexcept :
             m_type(Type::Int),
             m_value(static_cast<int_t>(value))
         {
@@ -146,9 +146,18 @@ namespace kiwi
         
         //! @brief Constructs a string_t Atom.
         //! @param sym The value.
+        Atom(string_t&& sym) :
+        m_type(Type::String),
+        m_value(std::move(sym))
+        {
+            ;
+        }
+        
+        //! @brief Constructs a string_t Atom.
+        //! @param sym The value.
         Atom(char const* sym) :
         m_type(Type::String),
-        m_value(sym)
+        m_value(std::move(std::string(sym)))
         {
             ;
         }
@@ -158,8 +167,6 @@ namespace kiwi
         //! @param other The other Atom.
         Atom(Atom const& other) : m_type(other.m_type)
         {
-            int ici_dude;
-            //std::cout << "Par là \n";
             switch(m_type)
             {
                 case Type::Int:     { m_value = other.m_value.int_v; break; }
@@ -187,18 +194,6 @@ namespace kiwi
             other.m_value = {};
         }
         
-        //! @brief Copy assigment operator.
-        //! @details Copies an Atom value with the "copy and swap" method.
-        //! @param other The Atom object to copy.
-        Atom& operator=(Atom other) noexcept
-        {
-            int zaza;
-            //std::cout << "Par ici \n";
-            std::swap(m_type, other.m_type);
-            std::swap(m_value, other.m_value);
-            return *this;
-        }
-        
         //! @brief Destructor.
         inline ~Atom()
         {
@@ -210,6 +205,47 @@ namespace kiwi
             }
         }
         
+        //! @brief Copy assigment operator.
+        //! @details Copies an Atom value with the "copy and swap" method.
+        //! @param other The Atom object to copy.
+        Atom& operator=(Atom const& other)
+        {
+            if(!other.isString())
+            {
+                if(isString())
+                {
+                    std::allocator<string_t> alloc;
+                    alloc.destroy(m_value.string_v);
+                    alloc.deallocate(m_value.string_v, 1);
+                }
+                m_type = other.m_type;
+                m_value= other.m_value;
+            }
+            else
+            {
+                if(isString())
+                {
+                    *m_value.string_v = *other.m_value.string_v;
+                }
+                else
+                {
+                    m_value.string_v = create_string_pointer(*other.m_value.string_v);
+                    m_type = other.m_type;
+                }
+            }
+            
+            return *this;
+        }
+        
+        //! @brief Copy assigment operator.
+        //! @details Copies an Atom value with the "copy and swap" method.
+        //! @param other The Atom object to copy.
+        Atom& operator=(Atom&& other) noexcept
+        {
+            std::swap(m_type, other.m_type);
+            std::swap(m_value, other.m_value);
+            return *this;
+        }
         // ================================================================================ //
         //                                   Type Getters                                   //
         // ================================================================================ //
@@ -285,7 +321,7 @@ namespace kiwi
         //! @brief Retrieves the Atom value as a string_t value.
         //! @return The current string atom value if it is a string otherwise an empty string.
         //! @see getType(), isString(), getInt(), getFloat()
-        string_t getString() const noexcept
+        string_t getString() const
         {
             if(isString())
             {
@@ -294,75 +330,27 @@ namespace kiwi
             return string_t();
         }
         
-        //! @brief Retrieves the Atom value as an std::string.
-        //! @return The current Atom value as an std::string.
-        //! @see getString(), getInt(), getFloat()
-        std::string toString() const
-        {
-            switch(m_type)
-            {
-                case Type::Int:    return std::to_string(m_value.int_v);
-                case Type::Float:  return std::to_string(m_value.float_v);
-                case Type::String: return *m_value.string_v;
-                default: break;
-            }
-            
-            return std::string();
-        }
-        
-        // ================================================================================ //
-        //                                Equality Operators                                //
-        // ================================================================================ //
-        
-        //! @brief Compare the atom with another.
-        //! @details Two Atom objects are equal if and only if :
-        //! - their types are equals.
-        //! - their values are equals
-        //! @param other The other atom.
-        //! @return True if the two Atom objects are equals otherwise false.
-        bool operator==(Atom const& other) const noexcept
-        {
-            if(other.isNull() && isNull())
-            {
-                return true;
-            }
-            else if(other.isInt() && isInt())
-            {
-                return (m_value.int_v == other.m_value.int_v);
-            }
-            else if(other.isFloat() && isFloat())
-            {
-                return (m_value.float_v == other.m_value.float_v);
-            }
-            else if(other.isString() && isString())
-            {
-                return (*m_value.string_v == *other.m_value.string_v);
-            }
-            
-            return false;
-        }
-        
-        //! @brief Compare the atom with another.
-        //! @param other The other atom.
-        //! @return True if the two Atom objects differ otherwise false.
-        inline bool operator!=(const Atom& other) const noexcept
-        {
-            return !(*this == other);
-        }
-        
     private:
         // ================================================================================ //
         //                                      VALUE                                       //
         // ================================================================================ //
         
         //! @internal Exception-safe object creation helper
-        template<typename T, typename... Args>
-        static T* create(Args&& ... args)
+        static string_t* create_string_pointer(string_t const& v)
         {
-            std::allocator<T> alloc;
-            auto deleter = [&](T * object) { alloc.deallocate(object, 1); };
-            std::unique_ptr<T, decltype(deleter)> object(alloc.allocate(1), deleter);
-            alloc.construct(object.get(), std::forward<Args>(args)...);
+            std::allocator<string_t> alloc;
+            auto deleter = [&](string_t * object) { alloc.deallocate(object, 1); };
+            std::unique_ptr<string_t, decltype(deleter)> object(alloc.allocate(1), deleter);
+            alloc.construct(object.get(), v);
+            return object.release();
+        }
+        
+        static string_t* create_string_pointer(string_t&& v)
+        {
+            std::allocator<string_t> alloc;
+            auto deleter = [&](string_t * object) { alloc.deallocate(object, 1); };
+            std::unique_ptr<string_t, decltype(deleter)> object(alloc.allocate(1), deleter);
+            alloc.construct(object.get(), std::move(v));
             return object.release();
         }
         
@@ -382,13 +370,16 @@ namespace kiwi
             atom_value() = default;
             
             //! @brief constructor for numbers (integer).
-            atom_value(int_t v) noexcept : int_v(v) {}
+            atom_value(const int_t v) noexcept : int_v(v) {}
             
             //! @brief constructor for numbers (floating-point).
-            atom_value(float_t v) noexcept : float_v(v) {}
+            atom_value(const float_t v) noexcept : float_v(v) {}
             
             //! @brief constructor for strings
-            atom_value(string_t const& value) : string_v(create<string_t>(value)) {}
+            atom_value(string_t const& v) : string_v(create_string_pointer(v)) {}
+            
+            //! @brief constructor for strings
+            atom_value(string_t&& v) : string_v(create_string_pointer(std::move(v))) {}
         };
         
         //! @internal Atom Type (Null by default)
