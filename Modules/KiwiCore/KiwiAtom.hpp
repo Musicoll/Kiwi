@@ -24,7 +24,17 @@
 #ifndef KIWI_CORE_ATOM_HPP_INCLUDED
 #define KIWI_CORE_ATOM_HPP_INCLUDED
 
-#include "KiwiSymbol.hpp"
+#include <cstddef>
+#include <stdio.h>
+#include <stdarg.h>
+#include <assert.h>
+#include <iostream>
+#include <sstream>
+#include <cstring>
+#include <cmath>
+#include <vector>
+#include <set>
+#include <mutex>
 
 namespace kiwi
 {
@@ -207,16 +217,13 @@ namespace kiwi
         //! @param sym The Symbol value.
         Atom(std::string const& sym) : Atom(Symbol(sym)) {}
         
-        //! @brief Constructs a sym_t Atom by moving a string.
-        //! @param sym The Symbol value.
-        Atom(std::string&& sym) : Atom(Symbol(std::forward<std::string>(sym))) {}
-        
         //! @brief Copy constructor.
         //! @details Constructs an Atom by copying the contents of an other Atom.
         //! @param other The other Atom.
         Atom(Atom const& other) : m_type(other.m_type)
         {
-            std::cout << "Par là \n";
+            int ici_dude;
+            //std::cout << "Par là \n";
             switch(m_type)
             {
                 case Type::Int:     { m_value = other.m_value.int_v; break; }
@@ -249,7 +256,8 @@ namespace kiwi
         //! @param other The Atom object to copy.
         Atom& operator=(Atom other) noexcept
         {
-            std::cout << "Par ici \n";
+            int zaza;
+            //std::cout << "Par ici \n";
             std::swap(m_type, other.m_type);
             std::swap(m_value, other.m_value);
             return *this;
@@ -357,9 +365,9 @@ namespace kiwi
         {
             switch(m_type)
             {
-                case Type::Symbol: return getSymbol().toString();
-                case Type::Int:    return std::to_string(getInt());
-                case Type::Float:  return std::to_string(getFloat());
+                case Type::Int:    return std::to_string(m_value.int_v);
+                case Type::Float:  return std::to_string(m_value.float_v);
+                case Type::Symbol: return m_value.sym_v->toString();
                 default: break;
             }
             

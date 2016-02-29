@@ -24,17 +24,6 @@
 #ifndef KIWI_CORE_SYMBOL_HPP_INCLUDED
 #define KIWI_CORE_SYMBOL_HPP_INCLUDED
 
-#include <cstddef>
-#include <stdio.h>
-#include <stdarg.h>
-#include <assert.h>
-#include <iostream>
-#include <sstream>
-#include <cstring>
-#include <cmath>
-#include <vector>
-#include <set>
-#include <mutex>
 
 namespace kiwi
 {
@@ -57,17 +46,18 @@ namespace kiwi
     public:
         
         //! @brief Constructs a Symbol that references an empty string.
-        Symbol() : m_name(getManager().getEmptyRef()) {};
+        explicit Symbol() : m_name(getManager().getEmptyRef()) {};
         
         //! @brief Constructs a Symbol with an std::string.
-        Symbol(std::string const& name) : m_name(getStringRef(name)) {};
+        explicit Symbol(std::string const& name) : m_name(getStringRef(name)) {std::cout << "constructor string\n";};
         
         //! @brief Copy constructor
-        Symbol(Symbol const& symbol) : m_name(symbol.m_name) {};
+        Symbol(Symbol const& symbol) : m_name(symbol.m_name) {std::cout << "constructor copy\n";};
         
         //! @brief Copy assignment operator
         inline Symbol& operator=(Symbol const& rhs) noexcept
         {
+            std::cout << "operator\n";
             m_name = rhs.m_name;
             return *this;
         }
@@ -85,7 +75,7 @@ namespace kiwi
         }
         
         //! @brief Returns true if the two symbols are NOT equals
-        inline bool operator != (Symbol const& rhs) const noexcept
+        inline bool operator!=(Symbol const& rhs) const noexcept
         {
             return ! (*this == rhs);
         }

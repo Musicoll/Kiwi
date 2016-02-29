@@ -127,6 +127,7 @@ TEST_CASE("Symbol", "[Symbol]")
     
     SECTION("std::vector<Symbol>")
     {
+        int regarde_ici;
         std::vector<Symbol> syms {Symbol("jojo"), Symbol("jaja"), Symbol("juju")};
         CHECK(syms.size() == 3);
         CHECK(syms[0].toString() == "jojo");
@@ -208,7 +209,7 @@ TEST_CASE("Symbol Benchmark", "[Symbol, Benchmark]")
         for(uint64_t i = 0; i < iter; ++i)
         {
             const auto rdstr = cstr + std::to_string(std::rand());
-            v_symbols.push_back(rdstr);
+            v_symbols.push_back(Symbol(rdstr));
             v_strings.push_back(rdstr);
         }
         
