@@ -102,13 +102,7 @@ TEST_CASE("Symbol", "[Symbol]")
         CHECK(sym_1.toString() == "foo");
         CHECK(sym_2.toString() == "jojo");
     }
-    
-    SECTION("operator std::string const&")
-    {
-        std::string const& empty = Symbols::empty;
-        CHECK(empty == "");
-    }
-    
+
     SECTION("toString()")
     {
         const std::string str = "jujube";

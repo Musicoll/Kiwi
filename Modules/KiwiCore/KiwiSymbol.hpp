@@ -55,7 +55,7 @@ namespace kiwi
     public:
         
         //! @brief Constructs a Symbol that references an empty string.
-        Symbol() : m_name(Symbols::empty) {};
+        Symbol() : m_name(Symbols::empty.m_name) {};
         
         //! @brief Constructs a Symbol with an std::string.
         Symbol(std::string const& name) : m_name(get(name)) {};
@@ -83,9 +83,6 @@ namespace kiwi
         {
             std::swap(m_name, other.m_name);
         }
-        
-        //! @brief Returns the std::string const reference that contains the Symbol.
-        inline operator std::string const&() const noexcept { return m_name.get(); }
         
         //! @brief Get the symbol as an std::string.
         inline std::string toString() const                 { return m_name.get(); }
