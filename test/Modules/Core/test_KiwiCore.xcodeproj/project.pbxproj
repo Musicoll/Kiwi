@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2CBC8AFA1C775B7600155993 /* test_KiwiSymbol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CBC8AF91C775B7600155993 /* test_KiwiSymbol.cpp */; };
 		2CBC8AFC1C775CB400155993 /* test_KiwiAtom.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CBC8AFB1C775CB400155993 /* test_KiwiAtom.cpp */; };
 		2CC9D9B41C6680F200B1F821 /* test_KiwiCore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CC9D9B31C6680F200B1F821 /* test_KiwiCore.cpp */; };
 /* End PBXBuildFile section */
@@ -26,10 +25,7 @@
 
 /* Begin PBXFileReference section */
 		2C92CECB1C7DCF3200EDF976 /* KiwiAtom.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; lineEnding = 2; path = KiwiAtom.hpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
-		2C92CECC1C7DCF3200EDF976 /* KiwiCore.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiCore.hpp; sourceTree = "<group>"; };
-		2C92CECF1C7DCF3200EDF976 /* KiwiSymbol.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiSymbol.hpp; sourceTree = "<group>"; };
 		2CBC8AF71C775A9500155993 /* KiwiBenchmark.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = KiwiBenchmark.hpp; path = ../../KiwiBenchmark.hpp; sourceTree = "<group>"; };
-		2CBC8AF91C775B7600155993 /* test_KiwiSymbol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_KiwiSymbol.cpp; sourceTree = "<group>"; };
 		2CBC8AFB1C775CB400155993 /* test_KiwiAtom.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_KiwiAtom.cpp; sourceTree = "<group>"; };
 		2CC9D99F1C66808E00B1F821 /* test_KiwiCore */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_KiwiCore; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CC9D9B31C6680F200B1F821 /* test_KiwiCore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = test_KiwiCore.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
@@ -51,7 +47,6 @@
 			children = (
 				2CBC8AF71C775A9500155993 /* KiwiBenchmark.hpp */,
 				2CBC8AFB1C775CB400155993 /* test_KiwiAtom.cpp */,
-				2CBC8AF91C775B7600155993 /* test_KiwiSymbol.cpp */,
 				2CC9D9B31C6680F200B1F821 /* test_KiwiCore.cpp */,
 			);
 			name = test;
@@ -77,8 +72,6 @@
 		2CC9DA1B1C66811B00B1F821 /* KiwiCore */ = {
 			isa = PBXGroup;
 			children = (
-				2C92CECC1C7DCF3200EDF976 /* KiwiCore.hpp */,
-				2C92CECF1C7DCF3200EDF976 /* KiwiSymbol.hpp */,
 				2C92CECB1C7DCF3200EDF976 /* KiwiAtom.hpp */,
 			);
 			name = KiwiCore;
@@ -142,7 +135,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2CC9D9B41C6680F200B1F821 /* test_KiwiCore.cpp in Sources */,
-				2CBC8AFA1C775B7600155993 /* test_KiwiSymbol.cpp in Sources */,
 				2CBC8AFC1C775CB400155993 /* test_KiwiAtom.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

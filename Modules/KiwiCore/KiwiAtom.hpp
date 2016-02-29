@@ -24,17 +24,10 @@
 #ifndef KIWI_CORE_ATOM_HPP_INCLUDED
 #define KIWI_CORE_ATOM_HPP_INCLUDED
 
-#include <cstddef>
-#include <stdio.h>
-#include <stdarg.h>
 #include <assert.h>
 #include <iostream>
-#include <sstream>
 #include <cstring>
-#include <cmath>
-#include <vector>
-#include <set>
-#include <mutex>
+
 
 namespace kiwi
 {
@@ -59,7 +52,7 @@ namespace kiwi
         using float_t = double;
         
         //! @brief The type of a Symbol in the Atom class.
-        using sym_t = Symbol;
+        using sym_t = std::string;
         
         //! @brief Enum of Atom value types
         //! @see getType(), isNull(), isInt(), isFloat(), isNumber(), isSymbol()
@@ -177,12 +170,7 @@ namespace kiwi
             m_type(Type::Float),
             m_value(static_cast<float_t>(value))
         {
-            // infinity and NAN produce an Null Atom type
-            if (! std::isfinite(value))
-            {
-                m_type = Type::Null;
-                m_value.float_v = 0.0;
-            }
+            ;
         }
         
         //! @brief Constructs a float_t Atom.
@@ -192,12 +180,7 @@ namespace kiwi
             m_type(Type::Float),
             m_value(static_cast<float_t>(value))
         {
-            // infinity and NAN produce an Null Atom type
-            if (! std::isfinite(value))
-            {
-                m_type = Type::Null;
-                m_value.float_v = 0.0;
-            }
+            ;
         }
         
         //! @brief Constructs a sym_t Atom.
@@ -208,14 +191,15 @@ namespace kiwi
         {
             ;
         }
-
-        //! @brief Constructs a sym_t Atom with a string literal.
-        //! @param sym The Symbol value.
-        Atom(char const* sym) : Atom(Symbol(sym)) {}
         
-        //! @brief Constructs a sym_t Atom with a string.
+        //! @brief Constructs a sym_t Atom.
         //! @param sym The Symbol value.
-        Atom(std::string const& sym) : Atom(Symbol(sym)) {}
+        Atom(char const* sym) :
+        m_type(Type::Symbol),
+        m_value(sym)
+        {
+            ;
+        }
         
         //! @brief Copy constructor.
         //! @details Constructs an Atom by copying the contents of an other Atom.
@@ -355,7 +339,7 @@ namespace kiwi
             {
                 return *m_value.sym_v;
             }
-            return Symbol();
+            return sym_t();
         }
         
         //! @brief Retrieves the Atom value as an std::string.
@@ -367,7 +351,7 @@ namespace kiwi
             {
                 case Type::Int:    return std::to_string(m_value.int_v);
                 case Type::Float:  return std::to_string(m_value.float_v);
-                case Type::Symbol: return m_value.sym_v->toString();
+                case Type::Symbol: return *m_value.sym_v;
                 default: break;
             }
             

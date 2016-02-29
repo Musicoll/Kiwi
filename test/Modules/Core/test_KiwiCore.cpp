@@ -25,7 +25,7 @@
 
 #define CATCH_CONFIG_RUNNER
 #include "../../catch.hpp"
-#include "KiwiCore.hpp"
+#include "KiwiAtom.hpp"
 
 int main( int argc, char* const argv[] )
 {

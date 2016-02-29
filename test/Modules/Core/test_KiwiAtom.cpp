@@ -24,6 +24,7 @@
 
 #include "../../../Modules/KiwiCore/KiwiAtom.hpp"
 #include "../../catch.hpp"
+#include <vector>
 
 using namespace kiwi;
 
@@ -34,6 +35,7 @@ using namespace kiwi;
 // ================================================================================ //
 //                                 ATOM CONSTRUCTORS                                //
 // ================================================================================ //
+
 
 TEST_CASE("Atom Constructors", "[Atom]")
 {
@@ -196,41 +198,22 @@ TEST_CASE("Atom Constructors", "[Atom]")
         CHECK(atom_4.getFloat() == std::numeric_limits<double>::lowest());
     }
     
-    SECTION("Symbol const& (Atom::Type::Symbol)")
-    {
-        const std::string str("symbol");
-        Symbol sym(str);
-        Atom a_sym(sym);
-        CHECK(a_sym.getType() == Atom::Type::Symbol);
-        CHECK(a_sym.isSymbol());
-        CHECK(a_sym.getSymbol() == sym);
-        CHECK(a_sym.getSymbol().toString() == str);
-        CHECK(a_sym.getSymbol() == sym);
-        CHECK(a_sym.getSymbol().toString() == str);
-    }
-    
     SECTION("char const* (Atom::Type::Symbol)")
     {
         const std::string str("symbol");
-        Symbol sym(str);
         Atom a_sym("symbol");
         CHECK(a_sym.getType() == Atom::Type::Symbol);
         CHECK(a_sym.isSymbol());
-        CHECK(a_sym.getSymbol() == sym);
-        CHECK(a_sym.getSymbol().toString() == str);
-        CHECK(a_sym.getSymbol() == sym);
-        CHECK(a_sym.getSymbol().toString() == str);
+        CHECK(a_sym.getSymbol() == str);
     }
     
     SECTION("std::string const& (Atom::Type::Symbol)")
     {
         const std::string str("symbol");
-        Symbol sym(str);
         Atom a_sym(str);
         CHECK(a_sym.getType() == Atom::Type::Symbol);
         CHECK(a_sym.isSymbol());
-        CHECK(a_sym.getSymbol() == sym);
-        CHECK(a_sym.getSymbol().toString() == str);
+        CHECK(a_sym.getSymbol() == str);
     }
     
     SECTION("Copy constructor + Copy assigment operator")
@@ -288,7 +271,7 @@ TEST_CASE("Atom Constructors", "[Atom]")
             Atom moved(std::move(to_move));
             CHECK(to_move.isNull()          == true);
             CHECK(moved.isSymbol()          == true);
-            CHECK(moved.getSymbol().toString() == "symbol");
+            CHECK(moved.getSymbol() == "symbol");
         }
     }
 }
@@ -318,14 +301,14 @@ TEST_CASE("Atom Copy assignment", "[Atom]")
     CHECK(a_temp.getType()       == Atom::Type::Float);
     CHECK(a_temp.getFloat() == 1.23456789);
     
-    Symbol sym("jujube");
+    std::string sym("jujube");
     a_temp = sym;
     CHECK(a_temp.getType()       == Atom::Type::Symbol);
     CHECK(a_temp.getSymbol() == sym);
     
     a_temp = "kiwi";
     CHECK(a_temp.getType()       == Atom::Type::Symbol);
-    CHECK(a_temp.getSymbol().toString() == "kiwi");
+    CHECK(a_temp.getSymbol() == "kiwi");
     
     a_temp = {};
     CHECK(a_temp.getType()       == Atom::Type::Null);
@@ -380,13 +363,12 @@ TEST_CASE("Check Types", "[Atom]")
 
 TEST_CASE("Value getters", "[Atom]")
 {
-    Symbol empty;
     SECTION("When Atom is of Type::Null")
     {
         Atom a_null;
         CHECK(a_null.getInt() == 0);
         CHECK(a_null.getFloat() == 0.0);
-        CHECK(a_null.getSymbol() == empty);
+        CHECK(a_null.getSymbol() == "");
         CHECK(a_null.toString() == "");
     }
     
@@ -395,7 +377,7 @@ TEST_CASE("Value getters", "[Atom]")
         Atom a_int(42);
         CHECK(a_int.getInt() == 42);
         CHECK(a_int.getFloat() == 42.);
-        CHECK(a_int.getSymbol() == empty);
+        CHECK(a_int.getSymbol() == "");
         CHECK(a_int.toString() == "42");
     }
     
@@ -404,13 +386,13 @@ TEST_CASE("Value getters", "[Atom]")
         Atom a_float(3.14f);
         CHECK(a_float.getInt() == 3);
         CHECK(a_float.getFloat() == 3.14f);
-        CHECK(a_float.getSymbol() == empty);
+        CHECK(a_float.getSymbol() == "");
         CHECK(a_float.toString() == std::to_string(3.14f));
         
         Atom a_double(3.99);
         CHECK(a_double.getInt() == 3);
         CHECK(a_double.getFloat() == 3.99);
-        CHECK(a_double.getSymbol() == empty);
+        CHECK(a_double.getSymbol() == "");
         CHECK(a_double.toString() == std::to_string(3.99));
     }
     
@@ -419,7 +401,7 @@ TEST_CASE("Value getters", "[Atom]")
         Atom a_sym("foo");
         CHECK(a_sym.getInt() == 0);
         CHECK(a_sym.getFloat() == 0.0);
-        CHECK(a_sym.getSymbol() == Symbol("foo"));
+        CHECK(a_sym.getSymbol() == "foo");
         CHECK(a_sym.toString() == "foo");
     }
 }
