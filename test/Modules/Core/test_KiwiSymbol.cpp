@@ -34,11 +34,12 @@ using namespace kiwi;
 
 TEST_CASE("Symbol", "[Symbol]")
 {
+    Symbol empty;
     SECTION("Default Constructor")
     {
         Symbol sym;
-        CHECK(sym == Symbols::empty);
-        CHECK(sym == Symbols::empty);
+        CHECK(sym == empty);
+        CHECK(sym == empty);
     }
     
     SECTION("(std::string const&) Constructor")
@@ -87,28 +88,6 @@ TEST_CASE("Symbol", "[Symbol]")
         CHECK(sym_1 == sym_2);
     }
     
-    SECTION("Symbol swap")
-    {
-        Symbol sym_1("foo");
-        Symbol sym_2("jojo");
-        CHECK(sym_1.toString() == "foo");
-        CHECK(sym_2.toString() == "jojo");
-        
-        sym_1.swap(sym_2);
-        CHECK(sym_1.toString() == "jojo");
-        CHECK(sym_2.toString() == "foo");
-        
-        std::swap(sym_1, sym_2);
-        CHECK(sym_1.toString() == "foo");
-        CHECK(sym_2.toString() == "jojo");
-    }
-    
-    SECTION("operator std::string const&")
-    {
-        std::string const& empty = Symbols::empty;
-        CHECK(empty == "");
-    }
-    
     SECTION("toString()")
     {
         const std::string str = "jujube";
@@ -124,7 +103,7 @@ TEST_CASE("Symbol", "[Symbol]")
         Symbol sym_bar("bar");
         
         CHECK(sym_empty_1 == sym_empty_2);
-        CHECK(sym_empty_1 == Symbols::empty);
+        CHECK(sym_empty_1 == empty);
         CHECK_FALSE(sym_empty_1 == sym_foo);
         CHECK_FALSE(sym_foo == sym_bar);
         CHECK(sym_foo == sym_foo);
@@ -139,7 +118,7 @@ TEST_CASE("Symbol", "[Symbol]")
         Symbol sym_bar("bar");
         
         CHECK_FALSE(sym_empty_1 != sym_empty_2);
-        CHECK_FALSE(sym_empty_1 != Symbols::empty);
+        CHECK_FALSE(sym_empty_1 != empty);
         CHECK(sym_empty_1 != sym_foo);
         CHECK(sym_foo != sym_bar);
         CHECK_FALSE(sym_foo != sym_foo);
@@ -156,11 +135,26 @@ TEST_CASE("Symbol", "[Symbol]")
     }
 }
 
-/*
+
 TEST_CASE("Symbol Benchmark", "[Symbol, Benchmark]")
 {
     Benchmark bench;
     const uint64_t iter = 100000;
+    
+    bench.startTestCase("Creation (copy same) (10000x)", Benchmark::Sort::ByPerfAsc);
+    {
+        Symbol("test_same");
+        Symbol("test_same");
+        std::string const nname("test_same");
+        bench.startUnit("Symbols");
+        for(uint64_t i = 0; i < iter; ++i) {Symbol t(nname);}
+        bench.endUnit();
+        
+        bench.startUnit("std::string");
+        for(uint64_t i = 0; i < iter; ++i) std::string("test_same");
+        bench.endUnit();
+    }
+    bench.endTestCase();
     
     bench.startTestCase("Creation (same) (10000x)", Benchmark::Sort::ByPerfAsc);
     {
@@ -173,6 +167,22 @@ TEST_CASE("Symbol Benchmark", "[Symbol, Benchmark]")
         
         bench.startUnit("std::string");
         for(uint64_t i = 0; i < iter; ++i) std::string("test_same");
+        bench.endUnit();
+    }
+    bench.endTestCase();
+    
+    bench.startTestCase("Creation (move Different) (10000x)", Benchmark::Sort::ByPerfAsc);
+    {
+        bench.startUnit("Symbols");
+        for(uint64_t i = 0; i < iter; ++i)
+        {
+            std::string const nome(std::to_string(i));
+            {Symbol t(nome);}
+        }
+        bench.endUnit();
+        
+        bench.startUnit("std::string");
+        for(uint64_t i = 0; i < iter; ++i) std::string(std::to_string(i));
         bench.endUnit();
     }
     bench.endTestCase();
@@ -229,4 +239,4 @@ TEST_CASE("Symbol Benchmark", "[Symbol, Benchmark]")
     
     bench.endTestCase();
 }
-*/
+

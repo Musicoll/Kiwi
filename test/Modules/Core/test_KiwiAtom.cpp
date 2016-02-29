@@ -380,12 +380,13 @@ TEST_CASE("Check Types", "[Atom]")
 
 TEST_CASE("Value getters", "[Atom]")
 {
+    Symbol empty;
     SECTION("When Atom is of Type::Null")
     {
         Atom a_null;
         CHECK(a_null.getInt() == 0);
         CHECK(a_null.getFloat() == 0.0);
-        CHECK(a_null.getSymbol() == Symbols::empty);
+        CHECK(a_null.getSymbol() == empty);
         CHECK(a_null.toString() == "");
     }
     
@@ -394,7 +395,7 @@ TEST_CASE("Value getters", "[Atom]")
         Atom a_int(42);
         CHECK(a_int.getInt() == 42);
         CHECK(a_int.getFloat() == 42.);
-        CHECK(a_int.getSymbol() == Symbols::empty);
+        CHECK(a_int.getSymbol() == empty);
         CHECK(a_int.toString() == "42");
     }
     
@@ -403,13 +404,13 @@ TEST_CASE("Value getters", "[Atom]")
         Atom a_float(3.14f);
         CHECK(a_float.getInt() == 3);
         CHECK(a_float.getFloat() == 3.14f);
-        CHECK(a_float.getSymbol() == Symbols::empty);
+        CHECK(a_float.getSymbol() == empty);
         CHECK(a_float.toString() == std::to_string(3.14f));
         
         Atom a_double(3.99);
         CHECK(a_double.getInt() == 3);
         CHECK(a_double.getFloat() == 3.99);
-        CHECK(a_double.getSymbol() == Symbols::empty);
+        CHECK(a_double.getSymbol() == empty);
         CHECK(a_double.toString() == std::to_string(3.99));
     }
     

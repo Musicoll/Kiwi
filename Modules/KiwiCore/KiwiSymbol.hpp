@@ -28,14 +28,6 @@
 
 namespace kiwi
 {
-    class Symbol;
-    
-    class Symbols
-    {
-    public:
-        static const Symbol empty;
-    };
-    
     // ================================================================================ //
     //                                      SYMBOL                                      //
     // ================================================================================ //
@@ -43,7 +35,7 @@ namespace kiwi
     //! @brief The Symbol holds a reference to a "unique" std::string in the global application scope.
     //! @details Comparing two Symbol objects is an O(1) operation, so it's much faster
     //! than comparing two std::string together. However Symbol creation is much slower than
-    //! std::string creation as it need to insert and lookup each created std::string in a set.
+    //! std::string creation as it needs to insert and lookup each created std::string in a set.
     //! So the best strategy to use the Symbol class optimally is to keep some static Symbol
     //! objects for the names you will often use or compare.
     //! @see Symbols
@@ -55,19 +47,16 @@ namespace kiwi
     public:
         
         //! @brief Constructs a Symbol that references an empty string.
-        Symbol() : m_name(Symbols::empty) {};
+        Symbol() : m_name(getManager().getEmptyRef()) {};
         
         //! @brief Constructs a Symbol with an std::string.
-        Symbol(std::string const& name) : m_name(get(name)) {};
-        
-        //! @brief Constructs a Symbol with an std::string with move semantics.
-        Symbol(std::string&& name) : m_name(get(std::forward<std::string>(name))) {};
+        Symbol(std::string const& name) : m_name(getStringRef(name)) {};
         
         //! @brief Copy constructor
         Symbol(Symbol const& symbol) : m_name(symbol.m_name) {};
         
         //! @brief Copy assignment operator
-        inline Symbol& operator = (Symbol rhs) noexcept
+        inline Symbol& operator = (Symbol const& rhs) noexcept
         {
             m_name = rhs.m_name;
             return *this;
@@ -76,19 +65,8 @@ namespace kiwi
         //! @brief Destructor.
         ~Symbol() = default;
         
-        //! @brief exchanges the internal std::string reference of two Symbol objects
-        void swap(Symbol& other)
-        noexcept (std::is_nothrow_move_constructible<stringRef>::value
-                  && std::is_nothrow_move_assignable<stringRef>::value)
-        {
-            std::swap(m_name, other.m_name);
-        }
-        
-        //! @brief Returns the std::string const reference that contains the Symbol.
-        inline operator std::string const&() const noexcept { return m_name.get(); }
-        
         //! @brief Get the symbol as an std::string.
-        inline std::string toString() const                 { return m_name.get(); }
+        inline std::string toString() const { return m_name.get(); }
         
         //! @brief Returns true if the two symbols are equals
         inline bool operator == (Symbol const& rhs) const noexcept
@@ -104,24 +82,40 @@ namespace kiwi
         
     private:
         
-        static stringRef get(const std::string& name)
+        class Manager
         {
-            std::lock_guard<std::mutex> guard(m_mutex);
-            return *m_symbols.emplace(name).first;
-        }
+        public:
+            Manager() : m_empty_ref(getStringRef("")) {}
+            
+            stringRef getStringRef(const std::string& name)
+            {
+                std::lock_guard<std::mutex> guard(m_mutex);
+                return *m_symbols.emplace(name).first;
+            }
+            
+            stringRef getEmptyRef() const noexcept
+            {
+                return m_empty_ref;
+            }
+        private:
+            std::set<std::string>  m_symbols;
+            std::mutex             m_mutex;
+            stringRef              m_empty_ref;
+        };
         
-        static stringRef get(std::string&& name)
+        static Manager& getManager()
         {
-            std::lock_guard<std::mutex> guard(m_mutex);
-            return *m_symbols.emplace(std::move(name)).first;
+            static Manager mng;
+            return mng;
         }
-        
+
+        static stringRef getStringRef(const std::string& name)
+        {
+            return getManager().getStringRef(name);
+        }
+
         //! @internal constant string reference.
         stringRef m_name;
-        
-        //! @internal
-        static std::set<std::string>  m_symbols;
-        static std::mutex             m_mutex;
     };
 }
 

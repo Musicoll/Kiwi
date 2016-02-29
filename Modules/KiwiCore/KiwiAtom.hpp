@@ -63,6 +63,7 @@ namespace kiwi
         
     private:
         
+        Symbol m_symbol_default;
         // ================================================================================ //
         //                                      VALUE                                       //
         // ================================================================================ //
@@ -350,8 +351,7 @@ namespace kiwi
             {
                 return *m_value.sym_v;
             }
-            
-            return symbol_t();
+            return m_symbol_default;
         }
         
         //! @brief Retrieves the Atom value as an std::string.
