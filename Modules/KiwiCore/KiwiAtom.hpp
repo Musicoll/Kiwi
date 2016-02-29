@@ -37,7 +37,7 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The Atom can dynamically hold different types of value
-    //! @details The Atom can hold an integer, a float or a Symbol.
+    //! @details The Atom can hold an integer, a float or a string.
     class Atom
     {
     public:
@@ -47,72 +47,23 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief The type of a signed integer number in the Atom class.
-        using int_t = int64_t;
+        using int_t     = int64_t;
         
         //! @brief The type of a floating-point number in the Atom class.
-        using float_t = double;
+        using float_t   = double;
         
-        //! @brief The type of a Symbol in the Atom class.
-        using sym_t = std::string;
+        //! @brief The type of a std::string in the Atom class.
+        using string_t  = std::string;
         
         //! @brief Enum of Atom value types
-        //! @see getType(), isNull(), isInt(), isFloat(), isNumber(), isSymbol()
+        //! @see getType(), isNull(), isInt(), isFloat(), isNumber(), isString()
         enum class Type : uint8_t
         {
             Null        = 0,
             Int         = 1,
             Float       = 2,
-            Symbol      = 3
+            String      = 3
         };
-        
-    private:
-        // ================================================================================ //
-        //                                      VALUE                                       //
-        // ================================================================================ //
-        
-        //! @internal Exception-safe object creation helper
-        template<typename T, typename... Args>
-        static T* create(Args&& ... args)
-        {
-            std::allocator<T> alloc;
-            auto deleter = [&](T * object) { alloc.deallocate(object, 1); };
-            std::unique_ptr<T, decltype(deleter)> object(alloc.allocate(1), deleter);
-            alloc.construct(object.get(), std::forward<Args>(args)...);
-            return object.release();
-        }
-        
-        //! @internal The actual storage union for an Atom value.
-        union atom_value
-        {
-            //! @brief number (integer).
-            int_t   int_v;
-            
-            //! @brief number (floating-point).
-            float_t float_v;
-            
-            //! @brief symbol.
-            sym_t*   sym_v;
-            
-            //! @brief default constructor (for null values).
-            atom_value() = default;
-            
-            //! @brief constructor for numbers (integer).
-            atom_value(int_t v) noexcept : int_v(v) {}
-            
-            //! @brief constructor for numbers (floating-point).
-            atom_value(float_t v) noexcept : float_v(v) {}
-            
-            //! @brief constructor for symbols
-            atom_value(sym_t const& value) : sym_v(create<sym_t>(value)) {}
-        };
-        
-        //! @internal Atom Type (Null by default)
-        Type        m_type = Type::Null;
-        
-        //! @internal Atom value
-        atom_value  m_value = {};
-        
-    public:
         
         // ================================================================================ //
         //                                  CONSTRUCTORS                                    //
@@ -184,19 +135,19 @@ namespace kiwi
             ;
         }
         
-        //! @brief Constructs a sym_t Atom.
-        //! @param sym The Symbol value.
-        Atom(sym_t const& sym) :
-            m_type(Type::Symbol),
+        //! @brief Constructs a string_t Atom.
+        //! @param sym The value.
+        Atom(string_t const& sym) :
+            m_type(Type::String),
             m_value(sym)
         {
             ;
         }
         
-        //! @brief Constructs a sym_t Atom.
-        //! @param sym The Symbol value.
+        //! @brief Constructs a string_t Atom.
+        //! @param sym The value.
         Atom(char const* sym) :
-        m_type(Type::Symbol),
+        m_type(Type::String),
         m_value(sym)
         {
             ;
@@ -213,10 +164,10 @@ namespace kiwi
             {
                 case Type::Int:     { m_value = other.m_value.int_v; break; }
                 case Type::Float:   { m_value = other.m_value.float_v; break; }
-                case Type::Symbol:
+                case Type::String:
                 {
-                    assert(other.m_value.sym_v != nullptr);
-                    m_value = *other.m_value.sym_v;
+                    assert(other.m_value.string_v != nullptr);
+                    m_value = *other.m_value.string_v;
                 }
                     
                 default: break;
@@ -251,11 +202,11 @@ namespace kiwi
         //! @brief Destructor.
         inline ~Atom()
         {
-            if(isSymbol())
+            if(isString())
             {
-                std::allocator<sym_t> alloc;
-                alloc.destroy(m_value.sym_v);
-                alloc.deallocate(m_value.sym_v, 1);
+                std::allocator<string_t> alloc;
+                alloc.destroy(m_value.string_v);
+                alloc.deallocate(m_value.string_v, 1);
             }
         }
         
@@ -265,33 +216,33 @@ namespace kiwi
         
         //! @brief Get the type of the Atom.
         //! @return The Type of the atom as a Type.
-        //! @see isNull(), isInt(), isFloat(), isNumber(), isSymbol()
+        //! @see isNull(), isInt(), isFloat(), isNumber(), isString()
         inline Type getType() const noexcept    { return m_type; }
         
         //! @brief Returns true if the Atom is Null.
         //! @return true if the Atom is Null.
-        //! @see getType(), isInt(), isFloat(), isNumber(), isSymbol()
+        //! @see getType(), isInt(), isFloat(), isNumber(), isString()
         inline bool isNull() const noexcept     { return (m_type == Type::Null); }
         
         //! @brief Returns true if the Atom is an int_t.
         //! @return true if the Atom is an int_t.
-        //! @see getType(), isNull(), isFloat(), isNumber(), isSymbol()
+        //! @see getType(), isNull(), isFloat(), isNumber(), isString()
         inline bool isInt() const noexcept      { return m_type == Type::Int; }
         
         //! @brief Returns true if the Atom is a float_t.
         //! @return true if the Atom is an float_t.
-        //! @see getType(), isNull(), isInt(), isNumber(), isSymbol()
+        //! @see getType(), isNull(), isInt(), isNumber(), isString()
         inline bool isFloat() const noexcept    { return m_type == Type::Float; }
         
         //! @brief Returns true if the Atom is a bool, an int_t, or a float_t.
         //! @return true if the Atom is a bool, an int_t, or a float_t.
-        //! @see getType(), isNull(), isInt(), isFloat(), isSymbol()
+        //! @see getType(), isNull(), isInt(), isFloat(), isString()
         inline bool isNumber() const noexcept   { return (isInt() || isFloat()); }
         
-        //! @brief Returns true if the Atom is a sym_t.
-        //! @return true if the Atom is a sym_t.
+        //! @brief Returns true if the Atom is a string_t.
+        //! @return true if the Atom is a string_t.
         //! @see getType(), isNull(), isInt(), isFloat(), isNumber()
-        inline bool isSymbol() const noexcept   { return m_type == Type::Symbol; }
+        inline bool isString() const noexcept   { return m_type == Type::String; }
         
         // ================================================================================ //
         //                                   Value Getters                                  //
@@ -331,28 +282,28 @@ namespace kiwi
             return float_t(0.0);
         }
         
-        //! @brief Retrieves the Atom value as a Symbol value.
-        //! @return The current Symbol atom value if it is a Symbol otherwise an empty Symbol.
-        //! @see getType(), isSymbol(), getInt(), getFloat()
-        sym_t getSymbol() const noexcept
+        //! @brief Retrieves the Atom value as a string_t value.
+        //! @return The current string atom value if it is a string otherwise an empty string.
+        //! @see getType(), isString(), getInt(), getFloat()
+        string_t getString() const noexcept
         {
-            if(isSymbol())
+            if(isString())
             {
-                return *m_value.sym_v;
+                return *m_value.string_v;
             }
-            return sym_t();
+            return string_t();
         }
         
         //! @brief Retrieves the Atom value as an std::string.
         //! @return The current Atom value as an std::string.
-        //! @see getSymbol(), getInt(), getFloat()
+        //! @see getString(), getInt(), getFloat()
         std::string toString() const
         {
             switch(m_type)
             {
                 case Type::Int:    return std::to_string(m_value.int_v);
                 case Type::Float:  return std::to_string(m_value.float_v);
-                case Type::Symbol: return *m_value.sym_v;
+                case Type::String: return *m_value.string_v;
                 default: break;
             }
             
@@ -383,9 +334,9 @@ namespace kiwi
             {
                 return (m_value.float_v == other.m_value.float_v);
             }
-            else if(other.isSymbol() && isSymbol())
+            else if(other.isString() && isString())
             {
-                return (*m_value.sym_v == *other.m_value.sym_v);
+                return (*m_value.string_v == *other.m_value.string_v);
             }
             
             return false;
@@ -398,6 +349,53 @@ namespace kiwi
         {
             return !(*this == other);
         }
+        
+    private:
+        // ================================================================================ //
+        //                                      VALUE                                       //
+        // ================================================================================ //
+        
+        //! @internal Exception-safe object creation helper
+        template<typename T, typename... Args>
+        static T* create(Args&& ... args)
+        {
+            std::allocator<T> alloc;
+            auto deleter = [&](T * object) { alloc.deallocate(object, 1); };
+            std::unique_ptr<T, decltype(deleter)> object(alloc.allocate(1), deleter);
+            alloc.construct(object.get(), std::forward<Args>(args)...);
+            return object.release();
+        }
+        
+        //! @internal The actual storage union for an Atom value.
+        union atom_value
+        {
+            //! @brief number (integer).
+            int_t   int_v;
+            
+            //! @brief number (floating-point).
+            float_t float_v;
+            
+            //! @brief string.
+            string_t*   string_v;
+            
+            //! @brief default constructor (for null values).
+            atom_value() = default;
+            
+            //! @brief constructor for numbers (integer).
+            atom_value(int_t v) noexcept : int_v(v) {}
+            
+            //! @brief constructor for numbers (floating-point).
+            atom_value(float_t v) noexcept : float_v(v) {}
+            
+            //! @brief constructor for strings
+            atom_value(string_t const& value) : string_v(create<string_t>(value)) {}
+        };
+        
+        //! @internal Atom Type (Null by default)
+        Type        m_type = Type::Null;
+        
+        //! @internal Atom value
+        atom_value  m_value = {};
     };
 }
 

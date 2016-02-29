@@ -187,22 +187,22 @@ TEST_CASE("Atom Constructors", "[Atom]")
         CHECK(atom_4.getFloat() == std::numeric_limits<double>::lowest());
     }
     
-    SECTION("char const* (Atom::Type::Symbol)")
+    SECTION("char const* (Atom::Type::String)")
     {
-        const std::string str("symbol");
-        Atom a_sym("symbol");
-        CHECK(a_sym.getType() == Atom::Type::Symbol);
-        CHECK(a_sym.isSymbol());
-        CHECK(a_sym.getSymbol() == str);
+        const std::string str("string");
+        Atom a_sym("string");
+        CHECK(a_sym.getType() == Atom::Type::String);
+        CHECK(a_sym.isString());
+        CHECK(a_sym.getString() == str);
     }
     
-    SECTION("std::string const& (Atom::Type::Symbol)")
+    SECTION("std::string const& (Atom::Type::String)")
     {
-        const std::string str("symbol");
+        const std::string str("string");
         Atom a_sym(str);
-        CHECK(a_sym.getType() == Atom::Type::Symbol);
-        CHECK(a_sym.isSymbol());
-        CHECK(a_sym.getSymbol() == str);
+        CHECK(a_sym.getType() == Atom::Type::String);
+        CHECK(a_sym.isString());
+        CHECK(a_sym.getString() == str);
     }
     
     SECTION("Copy constructor + Copy assigment operator")
@@ -210,7 +210,7 @@ TEST_CASE("Atom Constructors", "[Atom]")
         Atom a_null;
         Atom a_int(42);
         Atom a_float(3.14);
-        Atom a_symbol("symbol");
+        Atom a_string("string");
         
         Atom a_temp;
         CHECK(a_temp.getType()       == Atom::Type::Null);
@@ -218,8 +218,8 @@ TEST_CASE("Atom Constructors", "[Atom]")
         CHECK(a_temp.getType()       == Atom::Type::Int);
         a_temp = a_float;
         CHECK(a_temp.getType()       == Atom::Type::Float);
-        a_temp = a_symbol;
-        CHECK(a_temp.getType()       == Atom::Type::Symbol);
+        a_temp = a_string;
+        CHECK(a_temp.getType()       == Atom::Type::String);
         a_temp = a_null;
         CHECK(a_temp.getType()       == Atom::Type::Null);
     }
@@ -254,13 +254,13 @@ TEST_CASE("Atom Constructors", "[Atom]")
             CHECK(moved.getFloat() == 3.14);
         }
         
-        SECTION("Symbol")
+        SECTION("String")
         {
-            Atom to_move("symbol");
+            Atom to_move("string");
             Atom moved(std::move(to_move));
             CHECK(to_move.isNull()          == true);
-            CHECK(moved.isSymbol()          == true);
-            CHECK(moved.getSymbol() == "symbol");
+            CHECK(moved.isString()          == true);
+            CHECK(moved.getString() == "string");
         }
     }
 }
@@ -292,12 +292,12 @@ TEST_CASE("Atom Copy assignment", "[Atom]")
     
     std::string sym("jujube");
     a_temp = sym;
-    CHECK(a_temp.getType()       == Atom::Type::Symbol);
-    CHECK(a_temp.getSymbol() == sym);
+    CHECK(a_temp.getType()       == Atom::Type::String);
+    CHECK(a_temp.getString() == sym);
     
     a_temp = "kiwi";
-    CHECK(a_temp.getType()       == Atom::Type::Symbol);
-    CHECK(a_temp.getSymbol() == "kiwi");
+    CHECK(a_temp.getType()       == Atom::Type::String);
+    CHECK(a_temp.getString() == "kiwi");
     
     a_temp = {};
     CHECK(a_temp.getType()       == Atom::Type::Null);
@@ -313,7 +313,7 @@ TEST_CASE("Check Types", "[Atom]")
         CHECK(atom.isNumber()       == false);
         CHECK(atom.isInt()          == false);
         CHECK(atom.isFloat()        == false);
-        CHECK(atom.isSymbol()       == false);
+        CHECK(atom.isString()       == false);
     }
     
     SECTION("Check Types (Int)")
@@ -324,7 +324,7 @@ TEST_CASE("Check Types", "[Atom]")
         CHECK(atom.isNumber()       == true);
         CHECK(atom.isInt()          == true);
         CHECK(atom.isFloat()        == false);
-        CHECK(atom.isSymbol()       == false);
+        CHECK(atom.isString()       == false);
     }
     
     SECTION("Check Types (Float)")
@@ -335,18 +335,18 @@ TEST_CASE("Check Types", "[Atom]")
         CHECK(atom.isNumber()       == true);
         CHECK(atom.isInt()          == false);
         CHECK(atom.isFloat()        == true);
-        CHECK(atom.isSymbol()       == false);
+        CHECK(atom.isString()       == false);
     }
     
-    SECTION("Check Types (Symbol)")
+    SECTION("Check Types (String)")
     {
         Atom atom("foo");
-        CHECK(atom.getType()        == Atom::Type::Symbol);
+        CHECK(atom.getType()        == Atom::Type::String);
         CHECK(atom.isNull()         == false);
         CHECK(atom.isNumber()       == false);
         CHECK(atom.isInt()          == false);
         CHECK(atom.isFloat()        == false);
-        CHECK(atom.isSymbol()       == true);
+        CHECK(atom.isString()       == true);
     }
 }
 
@@ -357,7 +357,7 @@ TEST_CASE("Value getters", "[Atom]")
         Atom a_null;
         CHECK(a_null.getInt() == 0);
         CHECK(a_null.getFloat() == 0.0);
-        CHECK(a_null.getSymbol() == "");
+        CHECK(a_null.getString() == "");
         CHECK(a_null.toString() == "");
     }
     
@@ -366,7 +366,7 @@ TEST_CASE("Value getters", "[Atom]")
         Atom a_int(42);
         CHECK(a_int.getInt() == 42);
         CHECK(a_int.getFloat() == 42.);
-        CHECK(a_int.getSymbol() == "");
+        CHECK(a_int.getString() == "");
         CHECK(a_int.toString() == "42");
     }
     
@@ -375,22 +375,22 @@ TEST_CASE("Value getters", "[Atom]")
         Atom a_float(3.14f);
         CHECK(a_float.getInt() == 3);
         CHECK(a_float.getFloat() == 3.14f);
-        CHECK(a_float.getSymbol() == "");
+        CHECK(a_float.getString() == "");
         CHECK(a_float.toString() == std::to_string(3.14f));
         
         Atom a_double(3.99);
         CHECK(a_double.getInt() == 3);
         CHECK(a_double.getFloat() == 3.99);
-        CHECK(a_double.getSymbol() == "");
+        CHECK(a_double.getString() == "");
         CHECK(a_double.toString() == std::to_string(3.99));
     }
     
-    SECTION("When Atom is of Type::Symbol")
+    SECTION("When Atom is of Type::String")
     {
         Atom a_sym("foo");
         CHECK(a_sym.getInt() == 0);
         CHECK(a_sym.getFloat() == 0.0);
-        CHECK(a_sym.getSymbol() == "foo");
+        CHECK(a_sym.getString() == "foo");
         CHECK(a_sym.toString() == "foo");
     }
 }
@@ -400,7 +400,7 @@ TEST_CASE("Equality operators", "[Atom]")
     Atom a_null_1, a_null_2;
     Atom a_int_1(42), a_int_2(-26);
     Atom a_float_1(3.14), a_float_2(666.666);
-    Atom a_symbol_1("symbol_1"), a_symbol_2("symbol_2");
+    Atom a_string_1("string_1"), a_string_2("string_2");
     
     SECTION("Atom::Type::Null")
     {
@@ -414,8 +414,8 @@ TEST_CASE("Equality operators", "[Atom]")
         CHECK_FALSE(a_null_1 == a_float_1);
         CHECK(a_null_1 != a_float_1);
         
-        CHECK_FALSE(a_null_1 == a_symbol_1);
-        CHECK(a_null_1 != a_symbol_1);
+        CHECK_FALSE(a_null_1 == a_string_1);
+        CHECK(a_null_1 != a_string_1);
     }
     
     SECTION("Atom::Type::Int")
@@ -435,9 +435,9 @@ TEST_CASE("Equality operators", "[Atom]")
         CHECK_FALSE(a_int_1 == a_float_1);
         CHECK(a_int_1 != a_float_1);
         
-        // Int are NOT equal to Symbols
-        CHECK_FALSE(a_int_1 == a_symbol_1);
-        CHECK(a_int_1 != a_symbol_1);
+        // Int are NOT equal to Strings
+        CHECK_FALSE(a_int_1 == a_string_1);
+        CHECK(a_int_1 != a_string_1);
     }
     
     SECTION("Atom::Type::Float")
@@ -457,31 +457,31 @@ TEST_CASE("Equality operators", "[Atom]")
         CHECK_FALSE(a_float_1 == a_int_1);
         CHECK(a_float_1 != a_int_1);
         
-        // Float are NOT equal to Symbols
-        CHECK_FALSE(a_float_1 == a_symbol_1);
-        CHECK(a_float_1 != a_symbol_1);
+        // Float are NOT equal to Strings
+        CHECK_FALSE(a_float_1 == a_string_1);
+        CHECK(a_float_1 != a_string_1);
     }
     
-    SECTION("Atom::Type::Symbol")
+    SECTION("Atom::Type::String")
     {
-        CHECK_FALSE(a_symbol_1 == a_null_1);
-        CHECK(a_symbol_1 != a_null_1);
+        CHECK_FALSE(a_string_1 == a_null_1);
+        CHECK(a_string_1 != a_null_1);
         
-        // Symbol objects with same value are equal
-        CHECK(a_symbol_1 == a_symbol_1);
-        CHECK_FALSE(a_symbol_1 != a_symbol_1);
+        // String objects with same value are equal
+        CHECK(a_string_1 == a_string_1);
+        CHECK_FALSE(a_string_1 != a_string_1);
         
-        // Symbol objects with different values are NOT equal
-        CHECK_FALSE(a_symbol_1 == a_symbol_2);
-        CHECK(a_float_1 != a_symbol_2);
+        // String objects with different values are NOT equal
+        CHECK_FALSE(a_string_1 == a_string_2);
+        CHECK(a_float_1 != a_string_2);
         
-        // Symbol objects are NOT equal to Int
-        CHECK_FALSE(a_symbol_1 == a_int_1);
-        CHECK(a_symbol_1 != a_int_1);
+        // String objects are NOT equal to Int
+        CHECK_FALSE(a_string_1 == a_int_1);
+        CHECK(a_string_1 != a_int_1);
         
-        // Symbol objects are NOT equal to Float
-        CHECK_FALSE(a_symbol_1 == a_float_1);
-        CHECK(a_symbol_1 != a_float_1);
+        // String objects are NOT equal to Float
+        CHECK_FALSE(a_string_1 == a_float_1);
+        CHECK(a_string_1 != a_float_1);
     }
 }
 
