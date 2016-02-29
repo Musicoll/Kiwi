@@ -289,6 +289,44 @@ TEST_CASE("Atom Constructors", "[Atom]")
     }
 }
 
+TEST_CASE("Atom Copy assignment", "[Atom]")
+{
+    Atom a_temp;
+    CHECK(a_temp.getType()       == Atom::Type::Null);
+    
+    a_temp = 123456789;
+    CHECK(a_temp.getType()       == Atom::Type::Int);
+    CHECK(a_temp.getInt() == 123456789);
+    
+    a_temp = 123456789l;
+    CHECK(a_temp.getType()       == Atom::Type::Int);
+    CHECK(a_temp.getInt() == 123456789l);
+    
+    a_temp = 123456789ll;
+    CHECK(a_temp.getType()       == Atom::Type::Int);
+    CHECK(a_temp.getInt() == 123456789ll);
+    
+    a_temp = 1.23456789f;
+    CHECK(a_temp.getType()       == Atom::Type::Float);
+    CHECK(a_temp.getFloat() == 1.23456789f);
+    
+    a_temp = 1.23456789;
+    CHECK(a_temp.getType()       == Atom::Type::Float);
+    CHECK(a_temp.getFloat() == 1.23456789);
+    
+    Symbol sym("jujube");
+    a_temp = sym;
+    CHECK(a_temp.getType()       == Atom::Type::Symbol);
+    CHECK(a_temp.getSymbol() == sym);
+    
+    a_temp = "kiwi";
+    CHECK(a_temp.getType()       == Atom::Type::Symbol);
+    CHECK(a_temp.getSymbol().toString() == "kiwi");
+    
+    a_temp = {};
+    CHECK(a_temp.getType()       == Atom::Type::Null);
+}
+
 TEST_CASE("Check Types", "[Atom]")
 {
     SECTION("Check Types (Null)")
@@ -466,29 +504,45 @@ TEST_CASE("Equality operators", "[Atom]")
     }
 }
 
+TEST_CASE("Atom string parser", "[Atom]")
+{
+    SECTION("foo 42 3.14")
+    {
+        const std::string message = "foo 42 3.14";
+        
+        auto atom_vec = Atom::parse(message);
+        REQUIRE(atom_vec.size() == 3);
+        CHECK(atom_vec[0].isSymbol());
+        CHECK(atom_vec[1].isInt());
+        CHECK(atom_vec[2].isFloat());
+    }
+    
+    SECTION("foo~ \"bar 42\" 1 -4 3.14")
+    {
+        const std::string message = "foo~ \"bar 42\" 1 -4 3.14";
+        
+        auto atom_vec = Atom::parse(message);
+        REQUIRE(atom_vec.size() == 5);
+        CHECK(atom_vec[0].isSymbol());
+        CHECK(atom_vec[1].isSymbol());
+        CHECK(atom_vec[2].isInt());
+        CHECK(atom_vec[3].isInt());
+        CHECK(atom_vec[4].isFloat());
+    }
+}
+
 TEST_CASE("Atom std::ostream::operator<<", "[Atom]")
 {
     Atom a_null;
-    Atom a_sym("foo");
+    Atom a_sym("foo bar");
     Atom a_int(42);
     Atom a_float(3.14);
     
-    std::ostream ostr(nullptr);
-    ostr << a_null << a_sym << a_int << a_float;
+    std::ostringstream stream;
     
-}
-
-TEST_CASE("Atom string parser", "[Atom]")
-{
-    const std::string message = "foo \"bar 42\" 1 -4 3.14";
+    const std::string expected_str = "\"foo bar\" 42 3.14";
+    stream << a_null << a_sym << " " << a_int << " " << a_float;
+    const std::string result_str = stream.str();
     
-    std::vector<Atom> atom_vec(Atom::parse(message));
-    REQUIRE(atom_vec.size() == 5);
-    CHECK(atom_vec[0].isSymbol());
-    CHECK(atom_vec[1].isSymbol());
-    CHECK(atom_vec[2].isInt());
-    CHECK(atom_vec[3].isInt());
-    CHECK(atom_vec[4].isFloat());
+    CHECK(expected_str == result_str);
 }
-
-

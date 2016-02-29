@@ -127,7 +127,7 @@ namespace kiwi
         //! @brief Constructs an integer_t Atom.
         //! @details The integer value will be 1 or 0 depending on the bool value.
         //! @param value The value.
-        explicit Atom(bool value) noexcept :
+        Atom(bool value) noexcept :
             m_type(Type::Int),
             m_value(value ? integer_t(1) : integer_t(0))
         {
@@ -136,7 +136,7 @@ namespace kiwi
         
         //! @brief Constructs an integer_t Atom.
         //! @param value The value.
-        explicit Atom(int value) noexcept :
+        Atom(int value) noexcept :
             m_type(Type::Int),
             m_value(static_cast<integer_t>(value))
         {
@@ -145,7 +145,7 @@ namespace kiwi
         
         //! @brief Constructs an integer_t Atom.
         //! @param value The value.
-        explicit Atom(long value) noexcept :
+        Atom(long value) noexcept :
             m_type(Type::Int),
             m_value(static_cast<integer_t>(value))
         {
@@ -154,7 +154,7 @@ namespace kiwi
         
         //! @brief Constructs an integer_t Atom.
         //! @param value The value.
-        explicit Atom(long long value) noexcept :
+        Atom(long long value) noexcept :
             m_type(Type::Int),
             m_value(static_cast<integer_t>(value))
         {
@@ -164,7 +164,7 @@ namespace kiwi
         //! @brief Constructs a float_t Atom.
         //! @details infinty and NaN value both produce a Null Atom type.
         //! @param value The value.
-        explicit Atom(const float value) noexcept :
+        Atom(const float value) noexcept :
             m_type(Type::Float),
             m_value(static_cast<float_t>(value))
         {
@@ -179,7 +179,7 @@ namespace kiwi
         //! @brief Constructs a float_t Atom.
         //! @details infinty and NaN value both produce a Null Atom type.
         //! @param value The value.
-        explicit Atom(const double value) noexcept :
+        Atom(const double value) noexcept :
             m_type(Type::Float),
             m_value(static_cast<float_t>(value))
         {
