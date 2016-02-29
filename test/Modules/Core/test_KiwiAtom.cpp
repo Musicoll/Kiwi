@@ -336,6 +336,136 @@ TEST_CASE("Check Types", "[Atom]")
     }
 }
 
+TEST_CASE("Value getters", "[Atom]")
+{
+    SECTION("When Atom is of Type::Null")
+    {
+        Atom a_null;
+        CHECK(a_null.getInt() == 0);
+        CHECK(a_null.getFloat() == 0.0);
+        CHECK(a_null.getSymbol() == Symbols::empty);
+    }
+    
+    SECTION("When Atom is of Type::Int")
+    {
+        Atom a_int(42);
+        CHECK(a_int.getInt() == 42);
+        CHECK(a_int.getFloat() == 42.);
+        CHECK(a_int.getSymbol() == Symbols::empty);
+    }
+    
+    SECTION("When Atom is of Type::Float")
+    {
+        Atom a_float(3.14f);
+        CHECK(a_float.getInt() == 3);
+        CHECK(a_float.getFloat() == 3.14f);
+        CHECK(a_float.getSymbol() == Symbols::empty);
+        
+        Atom a_double(3.99);
+        CHECK(a_double.getInt() == 3);
+        CHECK(a_double.getFloat() == 3.99);
+        CHECK(a_double.getSymbol() == Symbols::empty);
+    }
+    
+    SECTION("When Atom is of Type::Symbol")
+    {
+        Atom a_sym("foo");
+        CHECK(a_sym.getInt() == 0);
+        CHECK(a_sym.getFloat() == 0.0);
+        CHECK(a_sym.getSymbol() == Symbol("foo"));
+    }
+}
+
+TEST_CASE("Equality operators", "[Atom]")
+{
+    Atom a_null_1, a_null_2;
+    Atom a_int_1(42), a_int_2(-26);
+    Atom a_float_1(3.14), a_float_2(666.666);
+    Atom a_symbol_1("symbol_1"), a_symbol_2("symbol_2");
+    
+    SECTION("Atom::Type::Null")
+    {
+        // Null value are equal
+        CHECK(a_null_1 == a_null_2);
+        CHECK_FALSE(a_null_1 != a_null_2);
+        
+        CHECK_FALSE(a_null_1 == a_int_1);
+        CHECK(a_null_1 != a_int_1);
+        
+        CHECK_FALSE(a_null_1 == a_float_1);
+        CHECK(a_null_1 != a_float_1);
+        
+        CHECK_FALSE(a_null_1 == a_symbol_1);
+        CHECK(a_null_1 != a_symbol_1);
+    }
+    
+    SECTION("Atom::Type::Int")
+    {
+        CHECK_FALSE(a_int_1 == a_null_1);
+        CHECK(a_int_1 != a_null_1);
+        
+        // Int with same value are equal
+        CHECK(a_int_1 == a_int_1);
+        CHECK_FALSE(a_int_1 != a_int_1);
+        
+        // Int with different values are NOT equal
+        CHECK_FALSE(a_int_1 == a_int_2);
+        CHECK(a_int_1 != a_int_2);
+        
+        // Int are NOT equal to Float
+        CHECK_FALSE(a_int_1 == a_float_1);
+        CHECK(a_int_1 != a_float_1);
+        
+        // Int are NOT equal to Symbols
+        CHECK_FALSE(a_int_1 == a_symbol_1);
+        CHECK(a_int_1 != a_symbol_1);
+    }
+    
+    SECTION("Atom::Type::Float")
+    {
+        CHECK_FALSE(a_float_1 == a_null_1);
+        CHECK(a_float_1 != a_null_1);
+        
+        // Float with same value are equal
+        CHECK(a_float_1 == a_float_1);
+        CHECK_FALSE(a_float_1 != a_float_1);
+        
+        // Float with different values are NOT equal
+        CHECK_FALSE(a_float_1 == a_float_2);
+        CHECK(a_float_1 != a_float_2);
+        
+        // Float are NOT equal to Int
+        CHECK_FALSE(a_float_1 == a_int_1);
+        CHECK(a_float_1 != a_int_1);
+        
+        // Float are NOT equal to Symbols
+        CHECK_FALSE(a_float_1 == a_symbol_1);
+        CHECK(a_float_1 != a_symbol_1);
+    }
+    
+    SECTION("Atom::Type::Symbol")
+    {
+        CHECK_FALSE(a_symbol_1 == a_null_1);
+        CHECK(a_symbol_1 != a_null_1);
+        
+        // Symbol objects with same value are equal
+        CHECK(a_symbol_1 == a_symbol_1);
+        CHECK_FALSE(a_symbol_1 != a_symbol_1);
+        
+        // Symbol objects with different values are NOT equal
+        CHECK_FALSE(a_symbol_1 == a_symbol_2);
+        CHECK(a_float_1 != a_symbol_2);
+        
+        // Symbol objects are NOT equal to Int
+        CHECK_FALSE(a_symbol_1 == a_int_1);
+        CHECK(a_symbol_1 != a_int_1);
+        
+        // Symbol objects are NOT equal to Float
+        CHECK_FALSE(a_symbol_1 == a_float_1);
+        CHECK(a_symbol_1 != a_float_1);
+    }
+}
+
 TEST_CASE("Atom std::ostream::operator<<", "[Atom]")
 {
     Atom a_null;

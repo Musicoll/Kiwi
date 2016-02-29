@@ -101,18 +101,6 @@ namespace kiwi
             
             //! @brief constructor for symbols
             atom_value(symbol_t const& value) : sym_v(create<symbol_t>(value)) {}
-            
-            //! @brief constructor for empty values of a given type.
-            atom_value(Type t)
-            {
-                switch (t)
-                {
-                    case Type::Symbol:  { sym_v = create<symbol_t>(); break; }
-                    case Type::Int:     { int_v = integer_t(0); break; }
-                    case Type::Float:   { float_v = float_t(0.0); break; }
-                    default: break;
-                }
-            }
         };
         
         //! @internal Atom Type (Null by default)
@@ -131,7 +119,7 @@ namespace kiwi
         //! @details Constructs an Atom of type Null.
         Atom() noexcept :
             m_type(Type::Null),
-            m_value(Type::Null)
+            m_value()
         {
             ;
         }
@@ -371,9 +359,11 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief Compare the atom with another.
-        //! @details
+        //! @details Two Atom objects are equal if and only if :
+        //! - their types are equals.
+        //! - their values are equals
         //! @param other The other atom.
-        //! @return True if the two Atom objects hold the same value otherwise false.
+        //! @return True if the two Atom objects are equals otherwise false.
         bool operator==(Atom const& other) const noexcept
         {
             if(other.isNull() && isNull())
@@ -411,8 +401,12 @@ namespace kiwi
         //! @brief Parse an std::string into an std::vector of Atom objects.
         //! @param text	The std::string to parse.
         //! @return A vector of Atom objects.
-        //! @remark For example, the std::string : "foo \"bar 42\" 1 2 3.14" will parsed into a vector of 5 atoms.
-        //! The atom types will be determined automatically as 2 #Atom::Type::Symbol atoms, 2 #Atom::Type::Int atoms, && 1 #Atom::Type::Float atom.
+        //! @remark For example, the std::string : "foo \"bar 42\" 1 2 3.14"
+        //! will parsed into an std::vector of 5 Atom objects.
+        //! The atom types will be determined automatically as
+        //! - 2 #Atom::Type::Symbol,
+        //! - 2 #Atom::Type::Int,
+        //! - 1 #Atom::Type::Float.
         static std::vector<Atom> parse(std::string const& text);
     };
     
