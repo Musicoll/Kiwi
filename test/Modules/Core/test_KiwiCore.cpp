@@ -29,7 +29,6 @@
 int main( int argc, char* const argv[] )
 {
     // global setup...
-    
     std::cout << "running Unit-Tests - Kiwi Core ..." << '\n';
     
     int result = Catch::Session().run( argc, argv );
