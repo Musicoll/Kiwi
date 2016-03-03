@@ -57,7 +57,7 @@ namespace kiwi
             //! Destructor.
             /** The function deletes the point.
              */
-            inline ~Point() noexcept {}
+            inline ~Point() noexcept = default;
             
             //! Retrieves the abscissa.
             /** The function retrieves the abscissa.
