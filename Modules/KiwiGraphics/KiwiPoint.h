@@ -63,7 +63,7 @@ namespace kiwi
             /** The function retrieves the abscissa.
              @return The abscissa.
              */
-            inline double x() const noexcept
+            constexpr inline double x() const noexcept
             {
                 return m_data[0];
             }
@@ -72,7 +72,7 @@ namespace kiwi
             /** The function retrieves the ordinate.
              @return The ordinate.
              */
-            inline double y() const noexcept
+            constexpr inline double y() const noexcept
             {
                 return m_data[1];
             }
