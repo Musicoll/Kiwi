@@ -24,7 +24,7 @@
 #ifndef __DEF_KIWI_MODEL__
 #define __DEF_KIWI_MODEL__
 
-#include "../KiwiCore/KiwiCore.h"
+#include "../KiwiCore/KiwiAtom.hpp"
 
 // ---- Flip headers ---- //
 #include "flip/DataModel.h"

@@ -24,7 +24,7 @@
 #ifndef __DEF_KIWI_MODELS__
 #define __DEF_KIWI_MODELS__
 
-#include "KiwiFactory.h"
+#include "KiwiFactory.hpp"
 
 #endif
 

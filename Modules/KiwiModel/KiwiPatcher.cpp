@@ -21,8 +21,8 @@
  ==============================================================================
 */
 
-#include "KiwiPatcherModel.h"
-#include "KiwiFactory.h"
+#include "KiwiPatcher.hpp"
+#include "KiwiFactory.hpp"
 
 namespace kiwi
 {    
@@ -30,65 +30,57 @@ namespace kiwi
     //                                   PATCHER MODEL                                  //
     // ================================================================================ //
 	
-    PatcherModel::~PatcherModel()
+    Patcher::~Patcher()
     {
         m_objects.clear();
         m_links.clear();
         m_free_ids.clear();
     }
     
-    void PatcherModel::init(Dico& dico)
+    void Patcher::init()
     {
-        addAttr(&m_bgcolor, Tags::unlocked_bgcolor, "Unlocked Background Color", "Appearance", FlipRGBA{0., 0., 0., 1.});
-        addAttr(&m_gridsize, Tags::gridsize, "Grid Size", "Editing", 20);
-        addAttr(&m_attr_bool, Tag::create("attr_bool"), "Test flip bool", "test", false);
-        addAttr(&m_attr_tag, Tag::create("attr_tag"), "Test flip tag", "test", Tag::create("test tag"));
+        addAttr(&m_bgcolor, "unlocked_bgcolor", FlipRGBA{0., 0., 0., 1.});
+        addAttr(&m_gridsize, "gridsize", 20);
+        addAttr(&m_attr_bool, "attr_bool", false);
+        addAttr(&m_attr_tag, "attr_tag", "test tag");
         
+        /*
         auto it = dico.find(Tags::patcher);
         if(it != dico.end())
         {
             add(it->second);
         }
+        */
     }
     
-    void PatcherModel::declare()
+    void Patcher::declare()
     {
-        Model::declare<PatcherModel>()
-        .name("cicm.kiwi.PatcherModel")
-        .inherit<AttributeBase::Manager>()
-        .member<flip::Array<ObjectModel>,   &PatcherModel::m_objects>   ("objects")
-        .member<flip::Array<LinkModel>,     &PatcherModel::m_links>     ("links")
-        .member<Attribute<FlipRGBA>,        &PatcherModel::m_bgcolor>   ("bgcolor")
-        .member<Attribute<flip::Int>,       &PatcherModel::m_gridsize>  ("gridsize")
-        .member<Attribute<flip::Bool>,      &PatcherModel::m_attr_bool> ("attr_bool")
-        .member<Attribute<FlipTag>,         &PatcherModel::m_attr_tag>  ("attr_tag")
-        .member<FlipAtom,                   &PatcherModel::m_atom>      ("atom");
+        Model::declare<Patcher>()
+        .name("cicm.kiwi.Patcher")
+        .member<flip::Array<kiwi::Object>,  &Patcher::m_objects>   ("objects")
+        .member<flip::Collection<Link>,     &Patcher::m_links>     ("links")
+        .member<Attribute<FlipRGBA>,        &Patcher::m_bgcolor>   ("bgcolor")
+        .member<Attribute<flip::Int>,       &Patcher::m_gridsize>  ("gridsize")
+        .member<Attribute<flip::Bool>,      &Patcher::m_attr_bool> ("attr_bool")
+        .member<Attribute<flip::String>,    &Patcher::m_attr_tag>  ("attr_tag");
     }
     
-    void PatcherModel::createObject(Dico& dico)
+    void Patcher::createObject(std::string const& name, std::string const& text)
     {
-        if(dico.count(Tags::name))
+        if(Factory::has(name))
         {
-            sTag objectName = dico[Tags::name];
-            if(FactoryModel::has(objectName))
+            const kiwi::Object* object = Factory::create(name, text);
+            
+            if(object)
             {
-                const auto infos = Infos(static_cast<int64_t>(dico[Tags::id]),
-                                         sTag(dico[Tags::name]),
-                                         sTag(dico[Tags::text])->getName(),
-                                         dico, dico[Tags::arguments]);
-                
-                const ObjectModel* object = FactoryModel::create(objectName, infos);
-                
-                if(object)
-                {
-                    m_objects.insert(m_objects.end(), *object);
-                }
+                m_objects.insert(m_objects.end(), *object);
             }
         }
     }
     
-    void PatcherModel::add(Dico const& dico)
+    void Patcher::add(std::map<const std::string, Atom> const& /*dico*/)
     {
+        /*
         Vector objects;
         const auto it = dico.find(Tags::objects);
         if(it != dico.end())
@@ -114,15 +106,16 @@ namespace kiwi
                 createObject(objdico);
             }
         }
+        */
     }
     
-    void PatcherModel::remove(ObjectModel* object)
+    void Patcher::remove(kiwi::Object* object)
     {
         if(object)
         {
             std::lock_guard<std::mutex> guard(m_mutex);
             
-            auto predicate = [object](const ObjectModel& obj) {
+            auto predicate = [object](const Object& obj) {
                 return &obj == object;
             };
             
@@ -131,7 +124,7 @@ namespace kiwi
             {
                 //m_listeners.call(&Listener::objectRemoved, getShared(), object);
                 m_objects.erase(it);
-                m_free_ids.push_back(object->getId());
+                m_free_ids.push_back(static_cast<uint64_t>(object->getId()));
             }
         }
     }

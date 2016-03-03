@@ -24,7 +24,7 @@
 #ifndef __DEF_KIWI_MODELS_LINK__
 #define __DEF_KIWI_MODELS_LINK__
 
-#include "KiwiObjectModel.h"
+#include "KiwiObject.hpp"
 
 namespace kiwi
 {
@@ -36,38 +36,38 @@ namespace kiwi
     /**
      The link is a combination of two sockets used to create the connection between objects in a patcher.
      */
-    class LinkModel : public AttributeBase::Manager
+    class Link : public flip::Object,
+                 public AttributeBase::Manager
     {
     private:
-        flip::ObjectRef<ObjectModel>  m_object_from;
-        flip::ObjectRef<ObjectModel>  m_object_to;
-        flip::Int                     m_index_outlet;
-        flip::Int                     m_index_intlet;
+        flip::ObjectRef<Object>  m_object_from;
+        flip::ObjectRef<Object>  m_object_to;
+        flip::Int                m_index_outlet;
+        flip::Int                m_index_intlet;
         
     public:
         
-        LinkModel() = default;
+        Link() = default;
         
         //! The constructor.
         /** You should never use this method.
          */
-        LinkModel(ObjectModel* from, const ulong outlet, ObjectModel* to, const ulong inlet) noexcept;
+        Link(Object* from, const uint8_t outlet, Object* to, const uint8_t inlet) noexcept;
         
         //! The destructor.
         /** You should never use this method.
          */
-        virtual ~LinkModel();
+        virtual ~Link();
         
         //! flip declare method
         static void declare()
         {
-            Model::declare<LinkModel>()
-            .name("cicm.kiwi.LinkModel")
-            .inherit<AttributeBase::Manager>()
-            .member<flip::ObjectRef<ObjectModel>, &LinkModel::m_object_from>("object_from")
-            .member<flip::ObjectRef<ObjectModel>, &LinkModel::m_object_to>("object_to")
-            .member<flip::Int, &LinkModel::m_index_outlet>("outlet_index")
-            .member<flip::Int, &LinkModel::m_index_intlet>("inlet_index");
+            Model::declare<Link>()
+            .name("cicm.kiwi.Link")
+            .member<flip::ObjectRef<Object>, &Link::m_object_from>("object_from")
+            .member<flip::ObjectRef<Object>, &Link::m_object_to>("object_to")
+            .member<flip::Int, &Link::m_index_outlet>("outlet_index")
+            .member<flip::Int, &Link::m_index_intlet>("inlet_index");
         }
         
         
@@ -75,9 +75,9 @@ namespace kiwi
         /** The function retrieves the patcher of the link.
          @return The patcher of the link.
          */
-        inline PatcherModel* getPatcher()
+        inline Patcher* getPatcher()
         {
-            PatcherModel* patcher = parent().ptr<PatcherModel>();
+            Patcher* patcher = parent().ptr<Patcher>();
             return patcher;
         }
         
@@ -85,9 +85,9 @@ namespace kiwi
         /** The function retrieves the output object of the link.
          @return The output object.
          */
-        inline ObjectModel* getObjectModelFrom() const noexcept
+        inline Object* getObjectFrom() const noexcept
         {
-            ObjectModel* objptr = m_object_from;
+            Object* objptr = m_object_from;
             return objptr;
         }
         
@@ -95,9 +95,9 @@ namespace kiwi
         /** The function retrieves the input object of the link.
          @return The input object.
          */
-        inline ObjectModel* getObjectModelTo() const noexcept
+        inline Object* getObjectTo() const noexcept
         {
-            ObjectModel* objptr = m_object_to;
+            Object* objptr = m_object_to;
             return objptr;
         }
         
@@ -105,7 +105,7 @@ namespace kiwi
         /** The function retrieves the index of the outlet of the link.
          @return The index of the outlet of the link.
          */
-        inline ulong getOutletIndex() const noexcept
+        inline int64_t getOutletIndex() const noexcept
         {
             return m_index_outlet;
         }
@@ -114,16 +114,10 @@ namespace kiwi
         /** The function retrieves the index of the inlet of the link.
          @return The index of the inlet of the link.
          */
-        inline ulong getInletIndex() const noexcept
+        inline int64_t getInletIndex() const noexcept
         {
             return m_index_intlet;
         }
-        
-        //! Write the patcher in a dico.
-        /** The function writes the link in a dico.
-         @param dico The dico.
-         */
-        void write(Dico& dico) const noexcept;
     };
 
 }

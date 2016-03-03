@@ -21,7 +21,7 @@
  ==============================================================================
 */
 
-#include "KiwiFactory.h"
+#include "KiwiFactory.hpp"
 
 namespace kiwi
 {
@@ -29,19 +29,21 @@ namespace kiwi
     //                                      FACTORY                                     //
     // ================================================================================ //
     
-    ObjectModel* FactoryModel::create(const sTag name, Infos const& detail)
+    Object* Factory::create(std::string const& name, std::string const& text)
     {
         std::lock_guard<std::mutex> guard(getMutex());
-        std::map<sTag, sCreator>& creators(getCreators());
+        const auto& creators = getCreators();
         
         const auto it = creators.find(name);
         if(it != creators.end())
         {
-            ObjectModel* obj = it->second->create(detail);
+            Object* obj = it->second->create(name, text);
+            /*
             if(obj)
             {
                 obj->read(detail.dico);
             }
+            */
             return obj;
         }
         else
@@ -51,24 +53,25 @@ namespace kiwi
         }
     }
     
-    bool FactoryModel::has(const sTag name)
+    //Object* create(std::string const& name, std::string const& text)
+    
+    bool Factory::has(std::string const& name)
     {
         std::lock_guard<std::mutex> guard(getMutex());
         const auto& creators = getCreators();
         return creators.find(name) != creators.end();
     }
     
-    void FactoryModel::remove(const sTag name)
+    void Factory::remove(std::string const& name)
     {
         std::lock_guard<std::mutex> guard(getMutex());
-        std::map<sTag, sCreator>& creators(getCreators());
-        creators.erase(name);
+        getCreators().erase(name);
     }
     
-    std::vector<sTag> FactoryModel::names()
+    std::vector<std::string const> Factory::names()
     {
         std::lock_guard<std::mutex> guard(getMutex());
-        std::vector<sTag> names;
+        std::vector<std::string const> names;
         for(auto it : getCreators())
         {
             names.push_back(it.first);

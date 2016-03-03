@@ -21,9 +21,9 @@
  ==============================================================================
 */
 
-#include "KiwiLinkModel.h"
-#include "KiwiObjectModel.h"
-#include "KiwiPatcherModel.h"
+#include "KiwiLink.hpp"
+#include "KiwiObject.hpp"
+#include "KiwiPatcher.hpp"
 
 namespace kiwi
 {
@@ -31,7 +31,7 @@ namespace kiwi
     //                                      LINK                                        //
     // ================================================================================ //
     
-    LinkModel::LinkModel(ObjectModel* from, const ulong outlet, ObjectModel* to, const ulong inlet) noexcept :
+    Link::Link(Object* from, const uint8_t outlet, Object* to, const uint8_t inlet) noexcept :
     m_object_from(from),
     m_object_to(to),
     m_index_outlet(outlet),
@@ -40,41 +40,24 @@ namespace kiwi
         ;
     }
     
-    LinkModel::~LinkModel()
+    Link::~Link()
     {
-        ObjectModel*     from    = getObjectModelFrom();
-        ObjectModel*     to      = getObjectModelTo();
+        Object*     from    = getObjectFrom();
+        Object*     to      = getObjectTo();
         if(from && to)
         {
             /*
-            ObjectModel::sOutlet outlet  = from->getOutlet(m_index_outlet);
+            Object::sOutlet outlet  = from->getOutlet(m_index_outlet);
             if(outlet)
             {
                 outlet->erase(to, m_index_outlet);
             }
-            ObjectModel::sInlet inlet    = to->getInlet(m_index_intlet);
+            Object::sInlet inlet    = to->getInlet(m_index_intlet);
             if(inlet)
             {
                 inlet->erase(from, m_index_intlet);
             }
             */
-        }
-    }
-    
-    void LinkModel::write(Dico& dico) const noexcept
-    {
-        ObjectModel*     from    = getObjectModelFrom();
-        ObjectModel*     to      = getObjectModelTo();
-        
-        if(from && to)
-        {
-            dico[Tags::from] = {(long)from->getId(), (long)getOutletIndex()};
-            dico[Tags::to] = {(long)to->getId(), (long)getInletIndex()};
-        }
-        else
-        {
-            dico.erase(Tags::from);
-            dico.erase(Tags::to);
         }
     }
 }

@@ -24,29 +24,11 @@
 #ifndef __DEF_KIWI_MODELS_OBJECT__
 #define __DEF_KIWI_MODELS_OBJECT__
 
-#include "KiwiFlipAttr.h"
+#include "KiwiFlipAttr.hpp"
 
 namespace kiwi
 {
-    class PatcherModel;
-    
-    // ================================================================================ //
-    //                                       INFO                                       //
-    // ================================================================================ //
-    
-    struct Infos
-    {
-        const ulong             lid;
-        const sTag              name;
-        const std::string       text;
-        const Dico				dico;
-        const Vector			args;
-        
-        Infos() noexcept : lid(0), name(Tags::_empty), text(""), dico(), args({}) {}
-        
-        Infos(const ulong _id, sTag _name, const std::string _text, Dico const& _dico, Vector const& _args)
-        : lid(_id), name(_name), text(_text), dico(_dico), args(_args) {}
-    };
+    class Patcher;
     
     // ================================================================================ //
     //                                      OBJECT                                      //
@@ -56,56 +38,31 @@ namespace kiwi
     /**
      The object is a graphical class that aims to be instantiated in a patcher.
      */
-    class ObjectModel : public AttributeBase::Manager
+    class Object :  public flip::Object,
+                    public AttributeBase::Manager
     {
     public:
-        friend class PatcherModel;
-        
-        struct Io
-        {
-            enum Type
-            {
-                Message = 0u,
-                Signal  = 1u,
-                Both    = 2u
-            };
-            
-            enum Polarity
-            {
-                Cold   = false,
-                Hot    = true
-            };
-        };
-        
-        class Arguments : public flip::Object
-        {
-            
-        };
+        friend class Patcher;
         
     private:
         flip::String    m_name;
         flip::String    m_text;
-        Arguments       m_args;
         flip::Int       m_id;
         
     public:
         
-        ObjectModel() = default;
+        Object() = default;
                 
-        //! Constructor.
-        /** You should never call this method except if you really know what you're doing.
-         */
-        ObjectModel(Infos const& detail, const std::string name) noexcept;
+        //! @brief Constructor.
+        Object(std::string const& name, std::string const& text, const int64_t id);
         
-        //! Copy constructor.
-        ObjectModel(const ObjectModel& rhs) noexcept;
+        //! @brief Copy constructor.
+        Object(const Object& rhs) noexcept;
         
-        //! Destructor.
-        /** You should never call this method except if you really know what you're doing.
-         */
-        virtual ~ObjectModel() noexcept;
+        //! @brief Destructor.
+        virtual ~Object() noexcept;
         
-        //! flip declare method
+        //! @brief flip declare method
         static void declare();
         
     public:
@@ -114,9 +71,9 @@ namespace kiwi
         /** The function retrieves the patcher that manages the object.
          @return The patcher that manages the object.
          */
-        inline PatcherModel* getPatcher()
+        inline Patcher* getPatcher()
         {
-            PatcherModel* patcher = parent().ptr<PatcherModel>();
+            Patcher* patcher = parent().ptr<Patcher>();
             return patcher;
         }
         
@@ -124,38 +81,27 @@ namespace kiwi
         /** The function retrieves the name of the object as a tag.
          @return The name of the object as a tag.
          */
-        inline std::string getName() const noexcept
-        {
-            return m_name;
-        }
+        inline std::string getName() const noexcept { return m_name; }
         
         //! Retrieve the text of the object.
         /** The function retrieves the text of the object.
          @return The text of the object.
          */
-        inline std::string getText() const noexcept
-        {
-            return m_text;
-        }
+        inline std::string getText() const noexcept { return m_text; }
         
         //! Retrieve the id of the object.
         /** The function retrieves the id of the object.
          @return The id of the object.
          */
-        inline ulong getId() const noexcept
-        {
-            return m_id;
-        }
-        
-    public:
-        
+        inline int64_t getId() const noexcept       { return m_id; }
+                
         //! Retrieves if the box should be hidden when the patcher is locked.
         /** The function retrieves if the box should be hidden when the patcher is locked.
          @return True if the box should be hidden when the patcher is locked, false otherwise.
          */
         inline bool isHiddenOnLock() const noexcept
         {
-            return getAttributeValue(Tags::hidden);
+            return getAttributeValue("hidden").getInt();
         }
         
         //! Retrieve if the box should be displayed in presentation.
@@ -164,7 +110,7 @@ namespace kiwi
          */
         inline bool isIncludeInPresentation() const noexcept
         {
-            return getAttributeValue(Tags::presentation);
+            return getAttributeValue("presentation").getInt();
         }
         
         //! Retrieve the "ignoreclick" attribute value of the box.
@@ -173,12 +119,10 @@ namespace kiwi
          */
         inline bool getIgnoreClick() const noexcept
         {
-            return getAttributeValue(Tags::ignoreclick);
+            return getAttributeValue("ignoreclick").getInt();
         }
     };
 }
 
 
 #endif
-
-

@@ -28,7 +28,7 @@
 #include <iostream>
 #include <cstring>
 #include <memory>
-
+#include <vector>
 
 namespace kiwi
 {
@@ -390,6 +390,11 @@ namespace kiwi
         
         //! @internal Atom value
         atom_value  m_value = {};
+    };
+    
+    struct StringHelper
+    {
+        static std::vector<Atom> toAtomVector(std::string const&);
     };
 }
 
