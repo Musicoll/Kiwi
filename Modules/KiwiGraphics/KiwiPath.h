@@ -24,12 +24,11 @@
 #ifndef KIWI_PATH_H_INCLUDED
 #define KIWI_PATH_H_INCLUDED
 
-#include <KiwiGraphics/KiwiRectangle.h>
+#include <KiwiGraphics/KiwiPoint.h>
+#include <KiwiGraphics/KiwiAffineMatrix.h>
 #include <assert.h>
 
-/**
- @Todo : (dashed line support, other shapes ?)
- */
+
 namespace kiwi
 {
     namespace graphics
@@ -40,10 +39,12 @@ namespace kiwi
         
         class Sketch;
         
-        //! The path holds a set of points.
-        /**
-         The point is used to represent a set a segment in a space and allows several modification.
-         */
+        //!@brief The path holds a set of points.
+        //!@details The path is used to represent a set a segment in a space and allows several modification.
+        //!@todo Check if constructors with shapes are needed
+        //!@todo Check if withdrawn functions are needed (addArc, addRectangle, addPieChart, addArc, overlaps)
+        //!@todo Check if bounds are needed and how they can be implemented (dizcretisation, recompute at every change)
+        //!@todo Is it usefull to have move constructors for the path
         class Path
         {
         public:
@@ -77,13 +78,13 @@ namespace kiwi
             /** The function initializes a path with another.
              @param path The other path.
              */
-            inline Path(Path const& path) noexcept : m_nodes(path.m_nodes), m_bounds(path.m_bounds) {}
+            inline Path(Path const& path) noexcept : m_nodes(path.m_nodes) {}
             
             //! Constructor.
             /** The function initializes a path with another.
              @param path The other path.
              */
-            inline Path(Path&& path) noexcept {m_nodes.swap(path.m_nodes); std::swap(m_bounds, path.m_bounds);}
+            inline Path(Path&& path) noexcept {m_nodes.swap(path.m_nodes);}
             
             //! Constructor.
             /** The function initializes a path with an origin.
@@ -96,39 +97,6 @@ namespace kiwi
              @param path The other path.
              */
             inline Path(Point&& pt) noexcept {addNode(Node(std::forward<Point>(pt), Move));}
-            
-            //! Linear constructor.
-            /** The function initializes a path with a segment.
-             @param segment The segment.
-             */
-            inline Path(Segment const& segment)
-            {
-                moveTo(segment.start());
-                addNode(Node(segment.end(), Linear));
-            }
-            
-            //! Quadratic constructor.
-            /** The function initializes a path with a quadratic bezier curve.
-             @param curve The quadratic bezier curve.
-             */
-            inline Path(BezierQuad const& curve)
-            {
-                moveTo(curve.start());
-                addNode(Node(curve.controlPoint(), Quadratic));
-                addNode(Node(curve.end(), Quadratic));
-            }
-            
-            //! Cubic constructor.
-            /** The function initializes a path with a cubic bezier curve.
-             @param curve The cubic bezier curve.
-             */
-            inline Path(BezierCubic const& curve)
-            {
-                moveTo(curve.start());
-                addNode(Node(curve.controlPoint1(), Quadratic));
-                addNode(Node(curve.controlPoint2(), Quadratic));
-                addNode(Node(curve.end(), Quadratic));
-            }
             
             //! Linear constructor.
             /** The function initializes a path with a line.
@@ -263,7 +231,6 @@ namespace kiwi
             inline Path& operator=(Path const& other) noexcept
             {
                 m_nodes = other.m_nodes;
-                m_bounds = other.m_bounds;
                 return *this;
             }
             
@@ -275,7 +242,6 @@ namespace kiwi
             inline Path& operator=(Path&& other) noexcept
             {
                 std::swap(m_nodes, other.m_nodes);
-                std::swap(m_bounds, other.m_bounds);
                 return *this;
             }
             
@@ -299,13 +265,7 @@ namespace kiwi
             //! Clears the path.
             /** The function clears a point to the path.
              */
-            inline void clear() noexcept {m_nodes.clear(); m_bounds = Rectangle();};
-            
-            //! Retrieves the bounds of the path.
-            /** The function retrieves the bounds of the path. The bounds rectangle is the smallest rectangle that contains all the points.
-             @return The bounds of the path.
-             */
-            inline Rectangle bounds() const noexcept {return m_bounds;};
+            inline void clear() noexcept {m_nodes.clear();};
             
             //! Apply a 2D affine transformation to the path.
             /** The function applies a 2D affine transformation to the path.
@@ -459,81 +419,6 @@ namespace kiwi
                 }
             }
             
-            //! Add rectangle to the path.
-            /** The function adds rectangle to the path.
-             @param rect The rectangle.
-             */
-            inline void addRectangle(Rectangle const& rect) noexcept
-            {
-                moveTo(rect.position());
-                addNode(Node(Point(rect.right(), rect.y()), Linear));
-                addNode(Node(Point(rect.right(), rect.bottom()), Linear));
-                addNode(Node(Point(rect.x(), rect.bottom()), Linear));
-                close();
-            }
-            
-            //! Add a rounded rectangle to the path.
-            /** The function adds a rounded rectangle to the path.
-             @param rect The rectangle.
-             @param roundness The roundness of rectangle's corners
-             */
-            void addRectangle(Rectangle const& rect, double roundness) noexcept;
-            
-            //! Add a rounded rectangle to the path.
-            /** The function adds a rounded rectangle to the path specifying wich corner to round.
-             @param x  The rectangle's x.
-             @param y  The rectangle's y.
-             @param w  The rectangle's width.
-             @param h  The rectangle's height.
-             @param rx The x corner size.
-             @param ry The y corner size.
-             @param ry The y corner size.
-             @param corner A flag specifying wich corner to round as defined by the #Rectangle::Corner Enum
-             */
-            void addRectangle(const double x, const double y, const double w, const double h, double rx, double ry, const char corner) noexcept;
-            
-            //! Add an ellipse to the path.
-            /** The function adds an ellipse to the path.
-             @param rect The bound rectangle of the ellipse.
-             */
-            void addEllipse(Rectangle const& rect) noexcept;
-            
-            //! Add an ellipse to the path.
-            /** The function adds an ellipse to the path.
-             @param center The center of the ellipse.
-             @param rx The x radius.
-             @param rx The y radius.
-             */
-            void addEllipse(Point const& center, const double rx, const double ry) noexcept;
-            
-            //! Add an elliptical arc to the path.
-            /** The function adds an elliptical arc to the path.
-             @param center      The center of the arc.
-             @param radius      The radius of the arc.
-             @param startAngle  The start angle.
-             @param endAngle    The end angle.
-             */
-            void addArc(Point const& center, const Point& radius, const double startAngle, const double endAngle) noexcept;
-            
-            //! Add an elliptical arc to the path.
-            /** The function adds an elliptical arc to the path.
-             @param center      The center of the arc.
-             @param radius      The radius of the arc.
-             @param startAngle  The start angle.
-             @param endAngle    The end angle.
-             @param rotAngle    The angle of rotation of the ellipse.
-             */
-            void addArc(Point const& center, const Point& radius, const double startAngle, const double endAngle, const double rotAngle) noexcept;
-            
-            //! Add a "pie-chart" shape to the path.
-            /** The function adds a "pie-chart" shape to the path.
-             @param center      The center of the arc.
-             @param radius      The radius of the arc.
-             @param startAngle  The start angle.
-             @param endAngle    The end angle.
-             */
-            void addPieChart(Point const& center, const Point& radius, const double startAngle, const double endAngle) noexcept;
-            
             //! Add a node to close the path.
             /** The function adds a node to close the path.
              */
@@ -549,8 +434,6 @@ namespace kiwi
                     addNode(Node(lastMove, Close));
                 }
             }
-            
-            bool overlaps(Rectangle const& rect) const noexcept;
             
         private:
             friend class Sketch;
@@ -570,15 +453,24 @@ namespace kiwi
             {
             public:
                 constexpr inline Node() noexcept : data{0., 0.}, m(Linear) {};
-                constexpr inline Node(Point const& pt, Mode const _m = Linear) noexcept : data{pt.m_data[0], pt.m_data[1]}, m(_m) {};
+                constexpr inline Node(Point const& pt, Mode const _m = Linear) noexcept : data{pt.x(), pt.y()}, m(_m) {};
                 constexpr inline Node(Node const& other) noexcept : data{other.data[0], other.data[1]}, m(other.m) {};
-                inline Node(Point&& pt, Mode const _m = Linear) noexcept : m(_m) {std::swap(data, pt.m_data);};
-                inline Node(Node&& other) noexcept : m(other.m) {std::swap(data, other.data);};
                 inline ~Node() noexcept {};
-                inline Node& operator=(Point const& pt) noexcept {memcpy(data, pt.m_data, sizeof(double)*2); return *this;}
-                inline Node& operator=(Node const& other) noexcept {memcpy(data, other.data, sizeof(double)*2); m = other.m; return *this;}
-                inline Node& operator=(Point&& pt) noexcept {std::swap(data, pt.m_data); return *this;}
-                inline Node& operator=(Node&& other) noexcept {std::swap(data, other.data); m = other.m; return *this;}
+                
+                inline Node& operator=(Point const& pt) noexcept
+                {
+                    data[0] = pt.x();
+                    data[1] = pt.y();
+                    return *this;
+                }
+                
+                inline Node& operator=(Node const& other) noexcept
+                {
+                    std::copy(std::begin(other.data), std::end(other.data), std::begin(data));
+                    m = other.m;
+                    return *this;
+                }
+                
                 inline bool operator!=(Point const& other) const noexcept {return (data[0] != other.x() && data[1] != other.y());}
                 inline Point point() const noexcept {return Point(data[0], data[1]);}
                 inline Mode mode() const noexcept{return m;}
@@ -590,25 +482,6 @@ namespace kiwi
             };
             
             std::vector<Node> m_nodes;
-            Rectangle    m_bounds;
-            
-            //! @internal
-            inline void rebound(Node const& newnode) noexcept
-            {
-                if(m_nodes.size() > 1)
-                {
-                    const Point pt = newnode.point();
-                    if(pt.x() < m_bounds.x()) m_bounds.left(pt.x());
-                        else if(pt.x() > m_bounds.right()) m_bounds.right(pt.x());
-                            if(pt.y() < m_bounds.y()) m_bounds.top(pt.y());
-                                else if(pt.y() > m_bounds.bottom()) m_bounds.bottom(pt.y());
-                                    }
-                else
-                {
-                    m_bounds.position(m_nodes[0].point());
-                    m_bounds.size(Size());
-                }
-            }
             
             //@internal
             inline void resize(const std::vector<Node>::size_type size) noexcept
@@ -651,28 +524,24 @@ namespace kiwi
             inline void addNode(Node const& node) noexcept
             {
                 m_nodes.push_back(node);
-                rebound(node);
             }
             
             //@internal
             inline void addNode(Node&& node) noexcept
             {
                 m_nodes.push_back(std::forward<Node>(node));
-                rebound(m_nodes[m_nodes.size() - 1]);
             }
             
             //@internal
             inline void addNode(const std::vector<Node>::size_type pos, Node const& node) noexcept
             {
                 m_nodes[pos] = node;
-                rebound(node);
             }
             
             //@internal
             inline void addNode(const std::vector<Node>::size_type pos, Node&& node) noexcept
             {
                 m_nodes[pos] = std::forward<Node>(node);
-                rebound(m_nodes[pos]);
             }
         };
     }

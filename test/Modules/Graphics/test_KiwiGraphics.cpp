@@ -31,6 +31,7 @@ namespace kiwi
 {
     namespace graphics
     {
+        
         TEST_CASE("Point", "[Point]")
         {
             SECTION("Constructors, Getters, Setters")
@@ -48,6 +49,34 @@ namespace kiwi
                 
                 CHECK((pt_copy.x() == 13. && pt_copy.y() == 12.5));
             }
+            SECTION("areNear")
+            {
+                const Point pt(1., 1.);
+                
+                //areNear standard
+                {
+                    double standard_eps = 1e-12;
+                    
+                    const Point pt_close(pt.x(), pt.y() + standard_eps - std::numeric_limits<double>::epsilon());
+                    const Point pt_not_close(pt.x(),
+                                             pt.y() + standard_eps + std::numeric_limits<double>::epsilon());
+                    
+                    CHECK(areNear(pt, pt_close));
+                    CHECK_FALSE(areNear(pt, pt_not_close));
+                }
+                //areNear with epsilon redefined
+                {
+                    const double eps = 1e-3;
+                    auto are_equal = [eps](Point const& l_pt, Point const& r_pt){return areNear(l_pt, r_pt, eps);};
+                    
+                    const Point pt_close(pt.x(), pt.y() + eps - std::numeric_limits<double>::epsilon());
+                    const Point pt_not_close(pt.x(),
+                                             pt.y() + eps + std::numeric_limits<double>::epsilon());
+                    
+                    CHECK(are_equal(pt, pt_close));
+                    CHECK_FALSE(are_equal(pt, pt_not_close));
+                }
+            }
             SECTION("Operators")
             {
                 const Point p1(3, 3);
@@ -55,68 +84,59 @@ namespace kiwi
                 const Point p3(4.5, -5.);
                 const Point p4(-1, -3.2);
                 
-                //Operator== && Operator !=
-                {
-                    Point pt(p1.x(), p1.y());
-                    CHECK(pt == p1);
-                    CHECK_FALSE(pt != p1);
-                }
-                
                 //Operator=
                 {
                     Point pt;
                     pt = p1;
-                    CHECK(pt == p1);
+                    CHECK(areNear(pt, p1));
                 }
                 
                 //Operator+ && Operator+=
                 {
-                    CHECK(p1 + p2 == Point(3 - 1,
-                                           3 + 2));
-                    CHECK(p3 + p4 == Point(4.5 - 1,
-                                           -5 - 3.2));
+                    CHECK(areNear(p1 + p2, Point(3 - 1, 3 + 2)));
+                    CHECK(areNear(p3 + p4, Point(4.5 - 1, -5 - 3.2)));
                     
                     Point pt(12.6, -11);
                     Point pt_bckup = pt;
                     pt+=p2;
                     
-                    CHECK(pt == Point(12.6 - 1, -11 + 2));
-                    CHECK(pt == p2 + pt_bckup);
+                    CHECK(areNear(pt, p2 + pt_bckup));
                 }
                 
                 //Operator- && Operator-=
                 {
-                    CHECK(-p3 == Point(-4.5, 5.));
-                    CHECK(p1 - p2 == Point(3 + 1, 3 - 2));
-                    CHECK(p4 - p3 == Point(-1 - 4.5, -3.2 + 5));
+                    
+                    CHECK(areNear(-p3, Point(-4.5, 5.)));
+                    CHECK(areNear(p1 - p2, Point(3 + 1, 3 - 2)));
+                    CHECK(areNear(p4 - p3, Point(-1 - 4.5, -3.2 + 5)));
                     
                     Point pt(10.6, 12.3);
                     Point pt_bckup = pt;
                     pt-= p1;
-                    CHECK(pt == Point(10.6 - 3, 12.3 - 3));
-                    CHECK(pt == pt_bckup - p1);
+                    CHECK(areNear(pt, Point(10.6 - 3, 12.3 - 3)));
+                    CHECK(areNear(pt, pt_bckup - p1));
                 }
                 
                 //Operator* && Operator*=
                 {
-                    CHECK(3 * p4 == Point(3 * (-1), 3 * (-3.2)));
-                    CHECK(p4 * 3 == 3 * p4);
+                    CHECK(areNear(3 * p4, Point(3 * (-1), 3 * (-3.2))));
+                    CHECK(areNear(p4 * 3, 3 * p4));
                     
                     Point pt(1.5, -2);
                     Point pt_bckup = pt;
                     pt*=5;
-                    CHECK(pt == Point(1.5 * 5, -2 * 5));
-                    CHECK(pt == pt_bckup * 5);
+                    CHECK(areNear(pt, Point(1.5 * 5, -2 * 5)));
+                    CHECK(areNear(pt, pt_bckup * 5));
                 }
                 
                 //Operator/ && Operator/=
                 {
-                    CHECK(p3 / 2 == Point(4.5 / 2, -5. / 2));
+                    CHECK(areNear(p3 / 2, Point(4.5 / 2, -5. / 2)));
                     
                     Point pt(-1.2, 3.2);
                     Point pt_bckup;
                     pt/=3.;
-                    CHECK(pt == Point(-1.2 / 3, 3.2 / 3));
+                    CHECK(areNear(pt, Point(-1.2 / 3, 3.2 / 3)));
                 }
                 
                 SECTION("Scalar product, Norm")
@@ -137,8 +157,8 @@ namespace kiwi
                 
                 SECTION("Angles, Rotations")
                 {
-                    const double angle_eps = 1e-12;
                     const double pi = M_PI;
+                    const double angle_eps = 1e-12;
                     
                     auto angle_equal = [angle_eps](double angle_l, double angle_r)
                     {
@@ -175,16 +195,16 @@ namespace kiwi
                     
                     Point to_rotate = point_30;
                     to_rotate.rotate(angle_60);
-                    CHECK(to_rotate == point_30.rotated(angle_60));
+                    CHECK(areNear(to_rotate, point_30.rotated(angle_60)));
                     
                     // Rotation around other point
                     const Point shift(1.5, 3.2);
                     const Point shift_30 = point_30 + shift;
-                    CHECK(point_30.rotated(angle_60) + shift == shift_30.rotated(shift, angle_60));
+                    CHECK(areNear(point_30.rotated(angle_60) + shift, shift_30.rotated(shift, angle_60)));
                     
                     Point to_rotate_around = shift_30;
                     to_rotate_around.rotate(shift, angle_60);
-                    CHECK(to_rotate_around == point_30.rotated(angle_60) + shift);
+                    CHECK(areNear(to_rotate_around, point_30.rotated(angle_60) + shift));
                 }
                 
             }

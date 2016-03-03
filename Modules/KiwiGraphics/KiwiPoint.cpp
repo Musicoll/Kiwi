@@ -22,7 +22,7 @@
  */
 
 #include <KiwiGraphics/KiwiPoint.h>
-#include <KiwiGraphics/KiwiPath.h>
+#include <math.h>
 
 namespace kiwi
 {
@@ -113,15 +113,15 @@ namespace kiwi
             return norm(rPt - lPt);
         }
         
-        bool operator==(Point const& lPt, Point const& rPt) noexcept
+        bool areNear(Point const& l_pt, Point const& r_pt, const double eps) noexcept
         {
-            const double epsilon = 1e-12;
-            return distance(lPt, rPt) < epsilon;
+            return distance(l_pt, r_pt) <= eps;
         }
         
-        bool operator!=(Point const& lPt, Point const& rPt) noexcept
+        bool areNear(Point const& l_pt, Point const& r_pt) noexcept
         {
-            return !(lPt == rPt);
+            const double eps = 1e-12;
+            return areNear(l_pt, r_pt, eps);
         }
         
         // =================================

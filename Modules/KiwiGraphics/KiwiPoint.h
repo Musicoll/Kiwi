@@ -24,14 +24,10 @@
 #ifndef KIWI_POINT_H_INCLUDED
 #define KIWI_POINT_H_INCLUDED
 
-#include <KiwiGraphics/KiwiAffineMatrix.h>
-
 namespace kiwi
 {
     namespace graphics
     {
-        class Path;
-        
         // ================================================================================ //
         //                                      POINT                                       //
         // ================================================================================ //
@@ -163,23 +159,15 @@ namespace kiwi
             double dot(Point const& pt) const noexcept;
             
         private:
-            friend class Path;
             double m_data[2];
         };
         
-        //! Get the equality of the point with another.
-        /** The function retrieves the equality of the point with another.
-         @param pt The other point.
-         @return true if the two points are equal, otherwise false.
-         */
-        bool operator==(Point const& lPt, Point const& rPt) noexcept;
+        //!@brief Retrun true if the distance between is less or equal to eps
+        bool areNear(Point const& l_pt, Point const& r_pt, const double eps) noexcept;
         
-        //! Get the equality of the point with another.
-        /** The function retrieves the equality of the point with another.
-         @param pt The other point.
-         @return true if the two points are not equal, otherwise false.
-         */
-        bool operator!=(Point const& lPt, Point const& rPt) noexcept;
+        //!@brief Return true if the distance between points is less or equal to an epsilon
+        //!@details The epsilon used is 1e-12
+        bool areNear(Point const& l_pt, Point const& r_pt) noexcept;
         
         //! Retrieve the distance from the origin.
         /** The function retrieves the distance from the origin.
