@@ -21,7 +21,7 @@
  ==============================================================================
  */
 
-#include <KiwiGraphics/KiwiPoint.hpp>
+#include <KiwiGraphics/KiwiPoint.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
