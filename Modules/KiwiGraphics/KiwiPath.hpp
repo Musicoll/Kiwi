@@ -24,8 +24,8 @@
 #ifndef KIWI_PATH_H_INCLUDED
 #define KIWI_PATH_H_INCLUDED
 
-#include <KiwiGraphics/KiwiPoint.h>
-#include <KiwiGraphics/KiwiAffineMatrix.h>
+#include <KiwiGraphics/KiwiPoint.hpp>
+#include <KiwiGraphics/KiwiAffineMatrix.hpp>
 #include <assert.h>
 
 

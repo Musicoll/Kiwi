@@ -87,7 +87,6 @@ set_property(TARGET KiwiDsp
 # -> Module Graphics
 
 file(GLOB KIWI_GRAPHICS_SRC                                   
-     ${PROJECT_SOURCE_DIR}/Modules/KiwiGraphics/*.h         
      ${PROJECT_SOURCE_DIR}/Modules/KiwiGraphics/*.hpp
      ${PROJECT_SOURCE_DIR}/Modules/KiwiGraphics/*.cpp
 )

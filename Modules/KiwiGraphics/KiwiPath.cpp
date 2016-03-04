@@ -21,7 +21,7 @@
  ==============================================================================
  */
 
-#include <KiwiGraphics/KiwiPath.h>
+#include <KiwiGraphics/KiwiPath.hpp>
 
 namespace kiwi
 {

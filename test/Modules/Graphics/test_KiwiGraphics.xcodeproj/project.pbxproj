@@ -29,9 +29,9 @@
 /* Begin PBXFileReference section */
 		0F0E1D4F1C71DB6900CF0989 /* test_KiwiGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_KiwiGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
 		0F0E1D591C71DBD300CF0989 /* test_KiwiGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_KiwiGraphics.cpp; sourceTree = "<group>"; };
-		0F0E1D5D1C71E4E900CF0989 /* KiwiAffineMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiAffineMatrix.h; sourceTree = "<group>"; };
+		0F0E1D5D1C71E4E900CF0989 /* KiwiAffineMatrix.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiAffineMatrix.hpp; sourceTree = "<group>"; };
 		0F0E1D691C71E4E900CF0989 /* KiwiPoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiPoint.cpp; sourceTree = "<group>"; };
-		0F0E1D6A1C71E4E900CF0989 /* KiwiPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiPoint.h; sourceTree = "<group>"; };
+		0F0E1D6A1C71E4E900CF0989 /* KiwiPoint.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiPoint.hpp; sourceTree = "<group>"; };
 		0F0E1D831C71F28000CF0989 /* KiwiAtom.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiAtom.cpp; sourceTree = "<group>"; };
 		0F0E1D841C71F28000CF0989 /* KiwiAtom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiAtom.h; sourceTree = "<group>"; };
 		0F0E1D851C71F28000CF0989 /* KiwiCore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiCore.h; sourceTree = "<group>"; };
@@ -40,7 +40,7 @@
 		0F0E1D881C71F28000CF0989 /* KiwiTag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiTag.h; sourceTree = "<group>"; };
 		0F0E1D891C71F28000CF0989 /* KiwiTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiTools.h; sourceTree = "<group>"; };
 		0F8CA7CA1C888BEF00FE96D6 /* KiwiPath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiPath.cpp; sourceTree = "<group>"; };
-		0F8CA7CB1C888BEF00FE96D6 /* KiwiPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KiwiPath.h; sourceTree = "<group>"; };
+		0F8CA7CB1C888BEF00FE96D6 /* KiwiPath.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiPath.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,10 +76,10 @@
 			isa = PBXGroup;
 			children = (
 				0F8CA7CA1C888BEF00FE96D6 /* KiwiPath.cpp */,
-				0F8CA7CB1C888BEF00FE96D6 /* KiwiPath.h */,
-				0F0E1D5D1C71E4E900CF0989 /* KiwiAffineMatrix.h */,
+				0F8CA7CB1C888BEF00FE96D6 /* KiwiPath.hpp */,
+				0F0E1D5D1C71E4E900CF0989 /* KiwiAffineMatrix.hpp */,
 				0F0E1D691C71E4E900CF0989 /* KiwiPoint.cpp */,
-				0F0E1D6A1C71E4E900CF0989 /* KiwiPoint.h */,
+				0F0E1D6A1C71E4E900CF0989 /* KiwiPoint.hpp */,
 			);
 			name = KiwiGraphics;
 			path = ../../../Modules/KiwiGraphics;
