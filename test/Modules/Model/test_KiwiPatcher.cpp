@@ -29,12 +29,92 @@
 using namespace kiwi;
 
 // ================================================================================ //
+//                                     UTILITIES                                    //
+// ================================================================================ //
+
+std::string to_string(Atom const& atom);
+std::string to_string(Atom const& atom)
+{
+    std::string output;
+    if(atom.isInt())
+    {
+        output += std::to_string(atom.getInt());
+    }
+    else if(atom.isFloat())
+    {
+        output += std::to_string(atom.getFloat());
+    }
+    else if(atom.isString())
+    {
+        output += atom.getString();
+    }
+    
+    return output;
+}
+
+std::string to_string(std::vector<Atom>& atom_vec);
+std::string to_string(std::vector<Atom>& atom_vec)
+{
+    std::string output;
+    if(!atom_vec.empty())
+    {
+        if(atom_vec.size() == 1)
+        {
+            output += to_string(atom_vec[0]);
+        }
+        else
+        {
+            output += '[';
+            for(std::vector<Atom>::size_type i = 0; i < atom_vec.size();)
+            {
+                output += to_string(atom_vec[i]);
+                if(++i != atom_vec.size())
+                {
+                    output += ", ";
+                }
+            }
+            output += ']';
+        }
+    }
+    
+    return output;
+}
+
+// ================================================================================ //
 //                                        Model                                     //
 // ================================================================================ //
 
+class PatcherObserver : public flip::DocumentObserver<Patcher>
+{
+public:
+    void document_changed(Patcher& patcher) override
+    {
+        std::cout << "Patcher : document_changed fn" << '\n';
+        
+        {
+            std::cout << "\tpatcher attributes :" << '\n';
+            
+            std::vector<Atom> color = patcher.getAttributeValue("unlocked_bgcolor");
+            
+            std::cout << "\t\t- unlocked_bgcolor : " << to_string(color) << '\n';
+            
+            auto gridsize = patcher.getAttributeValue("gridsize");
+            std::cout << "\t\t- gridSize : " << to_string(gridsize) << '\n';
+            
+            /*
+            auto val = patcher.getAttributeValue(Tag::create("attr_bool"));
+            std::cout << "\t\t- attr_bool : " << val << '\n';
+            
+            auto tag = patcher.getAttributeValue(Tag::create("attr_tag"));
+            std::cout << "\t\t- attr_tag : " << tag << '\n';
+            */
+        }
+    }
+};
 
 TEST_CASE("model", "[model]")
 {
+    // -------------------------- //
     // define current model version :
     Model::version("unit_test_model_01");
     
@@ -43,25 +123,39 @@ TEST_CASE("model", "[model]")
     FlipPoint::declare();
     
     // attributes declaration :
-    AttributeBase::declare();
-    Attribute<flip::Bool>::declare("cicm.kiwi.Attribute.Bool");
-    Attribute<flip::Int>::declare("cicm.kiwi.Attribute.Int");
-    Attribute<flip::Float>::declare("cicm.kiwi.Attribute.Float");
-    Attribute<flip::String>::declare("cicm.kiwi.Attribute.String");
-    Attribute<FlipRGBA>::declare("cicm.kiwi.Attribute.RGBA");
+    Attribute::declare();
+    //Attribute<flip::Bool>::declare("cicm.kiwi.Attribute.Bool");
+    //Attribute<flip::Int>::declare("cicm.kiwi.Attribute.Int");
+    //Attribute<flip::Float>::declare("cicm.kiwi.Attribute.Float");
+    //Attribute<flip::String>::declare("cicm.kiwi.Attribute.String");
+    //Attribute<FlipRGBA>::declare("cicm.kiwi.Attribute.RGBA");
+    
+    AttrRGBA::declare();
+    AttrInt::declare();
     
     // patcher elements declaration :
     kiwi::Object::declare();
     Link::declare();
     Patcher::declare();
+    // -------------------------- //
     
-    auto document_uptr = std::unique_ptr<flip::Document>(new flip::Document(Model::use (), 123456789ULL, uint32_t ('cicm'), uint32_t('kiwi')));
+    PatcherObserver observer;
     
-    flip::Document& document = *document_uptr;
+    auto document = std::unique_ptr<flip::Document>(new flip::Document(Model::use (), observer, 123456789ULL, uint32_t ('cicm'), uint32_t('kiwi')));
     
-    Patcher& song = document.root <Patcher>();
+    Patcher& patcher = document->root<Patcher>();
+    patcher.init();
+    document->commit();
     
-    document_uptr.reset();
+    patcher.setAttributeValue("unlocked_bgcolor", {0., 1., 0., 1.});
+    patcher.setAttributeValue("gridsize", {40});
+    document->commit();
+    
+    patcher.setAttributeValue("unlocked_bgcolor", {0.6666, 0.7777, 0.8888, 1.});
+    patcher.setAttributeValue("gridsize", {25});
+    document->commit();
+    
+    document.reset();
 }
 
 

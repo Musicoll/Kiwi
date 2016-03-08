@@ -34,7 +34,7 @@ namespace kiwi
     
     //! The patcher manages objects, links and a set of attributes
     class Patcher : public flip::Object,
-                    public AttributeBase::Manager
+                    public Attribute::Manager
     {
     private:
         
@@ -45,10 +45,10 @@ namespace kiwi
         mutable std::mutex          m_mutex;        // lock-free (grahams) ??
         
         
-        Attribute<flip::Int>        m_gridsize;
-        Attribute<FlipRGBA>         m_bgcolor;
-        Attribute<flip::Bool>       m_attr_bool;
-        Attribute<flip::String>     m_attr_tag;
+        AttrInt                     m_gridsize;
+        AttrRGBA                    m_bgcolor;
+        //Attribute<flip::Bool>       m_attr_bool;
+        //Attribute<flip::String>     m_attr_tag;
         
         void createObject(std::string const& name, std::string const& text);
         
@@ -126,7 +126,8 @@ namespace kiwi
          */
         inline Atom::int_t getGridSize() const noexcept
         {
-            return getAttributeValue("gridsize").getInt();
+            //return getAttributeValue("gridsize").getInt();
+            return 0;
         }
         
         //! Set the "gridsize" attribute value of the patcher.
@@ -135,7 +136,7 @@ namespace kiwi
          */
         inline void setGridSize(Atom const& value) noexcept
         {
-            setAttributeValue("gridsize", value);
+            //setAttributeValue<flip::Int>("gridsize", flip::Int(value.getInt()));
         }
     };
 }

@@ -37,7 +37,7 @@ namespace kiwi
      The link is a combination of two sockets used to create the connection between objects in a patcher.
      */
     class Link : public flip::Object,
-                 public AttributeBase::Manager
+                 public Attribute::Manager
     {
     private:
         flip::ObjectRef<Object>  m_object_from;

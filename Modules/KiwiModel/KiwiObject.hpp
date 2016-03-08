@@ -39,7 +39,7 @@ namespace kiwi
      The object is a graphical class that aims to be instantiated in a patcher.
      */
     class Object :  public flip::Object,
-                    public AttributeBase::Manager
+                    public Attribute::Manager
     {
     public:
         friend class Patcher;
@@ -101,7 +101,8 @@ namespace kiwi
          */
         inline bool isHiddenOnLock() const noexcept
         {
-            return getAttributeValue("hidden").getInt();
+            //return getAttributeValue("hidden").getInt();
+            return true;
         }
         
         //! Retrieve if the box should be displayed in presentation.
@@ -110,7 +111,8 @@ namespace kiwi
          */
         inline bool isIncludeInPresentation() const noexcept
         {
-            return getAttributeValue("presentation").getInt();
+            //return getAttributeValue("presentation").getInt();
+            return true;
         }
         
         //! Retrieve the "ignoreclick" attribute value of the box.
@@ -119,7 +121,8 @@ namespace kiwi
          */
         inline bool getIgnoreClick() const noexcept
         {
-            return getAttributeValue("ignoreclick").getInt();
+            //return getAttributeValue("ignoreclick").getInt();
+            return true;
         }
     };
 }
