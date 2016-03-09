@@ -68,7 +68,7 @@ namespace kiwi
         {
             if (this != &other)
             {
-                m_nodes = std::forward<std::vector<Node>>(other.m_nodes);
+                m_nodes = std::move(other.m_nodes);
             }
             return *this;
         }
@@ -90,7 +90,7 @@ namespace kiwi
             addNode(Node(point, Linear));
         }
         
-        void Path::linesTo(std::initializer_list<Point> il) noexcept
+        void Path::addLines(std::initializer_list<Point> il) noexcept
         {
             for (auto point : il)
             {
@@ -104,7 +104,7 @@ namespace kiwi
             addNode(Node(end, Quadratic));
         }
         
-        void Path::quadraticsTo(std::initializer_list<std::array<Point, 2>> il) noexcept
+        void Path::addQuadratics(std::initializer_list<std::array<Point, 2>> il) noexcept
         {
             for (auto quad_curve = il.begin(); quad_curve != il.end(); ++quad_curve)
             {
@@ -119,9 +119,9 @@ namespace kiwi
             addNode(Node(end, Cubic));
         }
         
-        void Path::cubicsTo(std::initializer_list<std::array<Point, 3>> il) noexcept
+        void Path::addCubics(std::initializer_list<std::array<Point, 3>> il) noexcept
         {
-            for (auto cubic_curve = il.begin(); cubic_curve != il.end(); cubic_curve += 3)
+            for (auto cubic_curve = il.begin(); cubic_curve != il.end(); ++cubic_curve)
             {
                 cubicTo((*cubic_curve)[0], (*cubic_curve)[1], (*cubic_curve)[2]);
             }
@@ -138,7 +138,7 @@ namespace kiwi
         
         void Path::addEllipse(Point const& center, const double radius_x, const double radius_y) noexcept
         {
-            const Point delta(std::max(0., radius_x), std::max(0., radius_y));
+            const Point delta(std::abs(radius_x), std::abs(radius_y));
             const Point top_left = center - delta;
             
             const double hw = radius_x;
@@ -156,9 +156,9 @@ namespace kiwi
             close();
         }
         
-        void Path::addPath(Path const& path) noexcept
+        void Path::addPath(Path const& other) noexcept
         {
-            for(Node node : path.m_nodes)
+            for(auto node : other.m_nodes)
             {
                 addNode(node);
             }
@@ -193,7 +193,7 @@ namespace kiwi
         
         void Path::transform(AffineMatrix const& matrix) noexcept
         {
-            for(auto&& node : m_nodes)
+            for(auto node : m_nodes)
             {
                 node.transform(matrix);
             }
