@@ -44,11 +44,8 @@ namespace kiwi
         std::vector<uint64_t>       m_free_ids;
         mutable std::mutex          m_mutex;        // lock-free (grahams) ??
         
-        
-        AttrInt                     m_gridsize;
-        AttrRGBA                    m_bgcolor;
-        //Attribute<flip::Bool>       m_attr_bool;
-        //Attribute<flip::String>     m_attr_tag;
+        Attribute::Int              m_gridsize;
+        Attribute::RGBA             m_bgcolor;
         
         void createObject(std::string const& name, std::string const& text);
         

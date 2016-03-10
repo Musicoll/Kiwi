@@ -49,9 +49,11 @@ namespace kiwi
             Attribute::declare<Model>();
             
             // attributes types
-            AttrFloat::declare<Model>();
-            AttrRGBA::declare<Model>();
-            AttrInt::declare<Model>();
+            Attribute::Int::declare<Model>();
+            Attribute::Float::declare<Model>();
+            Attribute::String::declare<Model>();
+            Attribute::RGBA::declare<Model>();
+            Attribute::Enum::declare<Model>();
             
             // patcher elements declaration :
             kiwi::Object::declare<Model>();

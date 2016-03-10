@@ -35,6 +35,7 @@
 #include "flip/Float.h"
 #include "flip/Blob.h"
 #include "flip/String.h"
+#include "flip/Enum.h"
 #include "flip/Object.h"
 #include "flip/ObjectRef.h"
 #include "flip/Variant.h"
