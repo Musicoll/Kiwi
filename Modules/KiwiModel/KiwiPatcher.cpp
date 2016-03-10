@@ -56,10 +56,9 @@ namespace kiwi
             
             //Attribute* attr = member;
         }
-        
+
         addAttr(&m_bgcolor, "bgcolor", {0., 0., 0., 1.});
         addAttr(&m_gridsize, "gridsize", {20});
-        //addAttr(&m_attr_bool, "attr_bool", false);
         //addAttr(&m_attr_tag, "attr_tag", "test tag");
         
         /*

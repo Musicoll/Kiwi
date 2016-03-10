@@ -212,7 +212,7 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief An Attribute that hold an integer value.
-    class Attribute::Int : public Attribute::Typed<flip::Int>
+    class Attribute::Int final : public Attribute::Typed<flip::Int>
     {
     public:
         
@@ -225,19 +225,19 @@ namespace kiwi
         
         //! @brief Retrieve the Type of the Attribute.
         //! @return The Type of the Attribute (Type::Int).
-        inline Type getType() const noexcept override           { return Type::Int; }
+        inline Type getType() const noexcept final           { return Type::Int; }
         
         //! @brief Get the Attribute value as a vector of atoms.
         //! @return A vector of atoms.
-        std::vector<Atom> getValue() const noexcept override    { return {m_value.value()}; }
+        std::vector<Atom> getValue() const noexcept final    { return {m_value.value()}; }
         
         //! @brief Get the Attribute default value as a vector of atoms.
         //! @return A vector of atoms.
-        std::vector<Atom> getDefaultValue() override            { return {m_default.value()}; };
+        std::vector<Atom> getDefaultValue() final            { return {m_default.value()}; };
         
         //! @brief Set the Attribute value with a vector of atoms.
         //! @param atoms A vector of atoms.
-        void setValue(std::vector<Atom> const& atoms) override
+        void setValue(std::vector<Atom> const& atoms) final
         {
             if(atoms.size() >= 1 && atoms[0].isNumber())
             {
@@ -249,7 +249,7 @@ namespace kiwi
         
         //! @brief Set the Attribute default value with a vector of atoms.
         //! @param atoms A vector of atoms.
-        void setDefaultValue(std::vector<Atom> const& atoms) override
+        void setDefaultValue(std::vector<Atom> const& atoms) final
         {
             if(atoms.size() >= 1 && atoms[0].isNumber())
             {
@@ -263,7 +263,7 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief An Attribute that hold a floating-point value.
-    class Attribute::Float : public Attribute::Typed<flip::Float>
+    class Attribute::Float final : public Attribute::Typed<flip::Float>
     {
     public:
         
@@ -276,15 +276,15 @@ namespace kiwi
         
         //! @brief Retrieve the Type of the Attribute.
         //! @return The Type of the Attribute (Type::Float).
-        inline Type getType() const noexcept override       { return Type::Float; };
+        inline Type getType() const noexcept final          { return Type::Float; };
         
         //! @brief Get the Attribute value as a vector of atoms.
         //! @return A vector of atoms.
-        std::vector<Atom> getValue() const override         {return {m_value.value()};}
+        std::vector<Atom> getValue() const final            {return {m_value.value()};}
         
         //! @brief Get the Attribute default value as a vector of atoms.
         //! @return A vector of atoms.
-        std::vector<Atom> getDefaultValue() override        { return {m_default.value()}; };
+        std::vector<Atom> getDefaultValue() final           { return {m_default.value()}; };
         
         //! @brief Set the Attribute value with a vector of atoms.
         //! @param atoms A vector of atoms.
@@ -300,7 +300,7 @@ namespace kiwi
         
         //! @brief Set the Attribute default value with a vector of atoms.
         //! @param atoms A vector of atoms.
-        void setDefaultValue(std::vector<Atom> const& atom) override
+        void setDefaultValue(std::vector<Atom> const& atom) final
         {
             if(atom.size() >= 1 && atom[0].isNumber())
             {
@@ -314,7 +314,7 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief An Attribute that hold a string value.
-    class Attribute::String : public Attribute::Typed<flip::String>
+    class Attribute::String final : public Attribute::Typed<flip::String>
     {
     public:
         
@@ -327,19 +327,19 @@ namespace kiwi
         
         //! @brief Retrieve the Type of the Attribute.
         //! @return The Type of the Attribute (Type::Int).
-        inline Type getType() const noexcept override           { return Type::String; }
+        inline Type getType() const noexcept final           { return Type::String; }
         
         //! @brief Get the Attribute value as a vector of atoms.
         //! @return A vector of atoms.
-        std::vector<Atom> getValue() const noexcept override    { return {m_value.value()}; }
+        std::vector<Atom> getValue() const noexcept final    { return {m_value.value()}; }
         
         //! @brief Get the Attribute default value as a vector of atoms.
         //! @return A vector of atoms.
-        std::vector<Atom> getDefaultValue() override            { return {m_default.value()}; };
+        std::vector<Atom> getDefaultValue() final            { return {m_default.value()}; };
         
         //! @brief Set the Attribute value with a vector of atoms.
         //! @param atoms A vector of atoms.
-        void setValue(std::vector<Atom> const& atoms) override
+        void setValue(std::vector<Atom> const& atoms) final
         {
             if(atoms.size() >= 1 && atoms[0].isString())
             {
@@ -351,7 +351,7 @@ namespace kiwi
         
         //! @brief Set the Attribute default value with a vector of atoms.
         //! @param atoms A vector of atoms.
-        void setDefaultValue(std::vector<Atom> const& atoms) override
+        void setDefaultValue(std::vector<Atom> const& atoms) final
         {
             if(atoms.size() >= 1 && atoms[0].isString())
             {
@@ -365,7 +365,7 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief An Attribute that hold a RGBA (red, green, blue, alpha) color value.
-    class Attribute::RGBA : public Attribute::Typed<FlipRGBA>
+    class Attribute::RGBA final : public Attribute::Typed<FlipRGBA>
     {
     public:
         
@@ -378,25 +378,25 @@ namespace kiwi
         
         //! @brief Retrieve the Type of the Attribute.
         //! @return The Type of the Attribute (Type::RGBA).
-        inline Type getType() const noexcept override                   { return Type::RGBA; }
+        inline Type getType() const noexcept final                   { return Type::RGBA; }
         
         //! @brief Get the Attribute value as a vector of atoms.
         //! @return A vector of atoms.
-        std::vector<Atom> getValue() const noexcept override            { return m_value; }
+        std::vector<Atom> getValue() const noexcept final            { return m_value; }
         
         //! @brief Get the Attribute default value as a vector of atoms.
         //! @return A vector of atoms.
-        std::vector<Atom> getDefaultValue() override                    { return m_default; }
+        std::vector<Atom> getDefaultValue() final                    { return m_default; }
         
         //! @brief Set the Attribute value with a vector of atoms.
         //! @param atoms A vector of atoms.
-        void setValue(std::vector<Atom> const& atom) override           { m_value = atom; }
+        void setValue(std::vector<Atom> const& atom) final           { m_value = atom; }
         
     private:
         
         //! @brief Set the Attribute default value with a vector of atoms.
         //! @param atoms A vector of atoms.
-        void setDefaultValue(std::vector<Atom> const& atom) override    { m_default = atom; }
+        void setDefaultValue(std::vector<Atom> const& atom) final    { m_default = atom; }
     };
     
     // ================================================================================ //
@@ -404,7 +404,7 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief An Attribute that hold an enum value.
-    class Attribute::Enum : public Attribute::Typed<flip::Int>
+    class Attribute::Enum final : public Attribute::Typed<flip::Int>
     {
     public:
         
@@ -417,19 +417,19 @@ namespace kiwi
         
         //! @brief Retrieve the Type of the Attribute.
         //! @return The Type of the Attribute (Type::RGBA).
-        inline Type getType() const noexcept override           { return Type::Enum; }
+        inline Type getType() const noexcept final           { return Type::Enum; }
         
         //! @brief Get the Attribute value as a vector of atoms.
         //! @return A vector of atoms.
-        std::vector<Atom> getValue() const noexcept override    { return {m_value.value()}; }
+        std::vector<Atom> getValue() const noexcept final    { return {m_value.value()}; }
         
         //! @brief Get the Attribute default value as a vector of atoms.
         //! @return A vector of atoms.
-        std::vector<Atom> getDefaultValue() override            { return {m_default.value()}; };
+        std::vector<Atom> getDefaultValue() final            { return {m_default.value()}; };
         
         //! @brief Set the Attribute value with a vector of atoms.
         //! @param atoms A vector of atoms.
-        void setValue(std::vector<Atom> const& atoms) override
+        void setValue(std::vector<Atom> const& atoms) final
         {
             if(atoms.size() >= 1 && atoms[0].isNumber())
             {
@@ -441,7 +441,7 @@ namespace kiwi
         
         //! @brief Set the Attribute default value with a vector of atoms.
         //! @param atoms A vector of atoms.
-        void setDefaultValue(std::vector<Atom> const& atoms) override
+        void setDefaultValue(std::vector<Atom> const& atoms) final
         {
             if(atoms.size() >= 1 && atoms[0].isNumber())
             {
@@ -497,21 +497,6 @@ namespace kiwi
             }
         }
         
-    protected:
-        
-        //! @brief Add an attribute to the be managed.
-        //! @param name The name of the attribute.
-        //! @param value The value of the attribute.
-        void addAttr(Attribute* attr, std::string const& name, std::vector<Atom> const& default_value)
-        {
-            attr->setName(name);
-            attr->setDefaultValue(default_value);
-            attr->setValue(default_value);
-            m_attrs[name] = attr;
-        }
-        
-    private:
-        
         //! @brief Returns an attribute by name.
         //! @param name the name of the attribute.
         //! @return The attribute pointer if found, otherwise nullptr.
@@ -527,6 +512,21 @@ namespace kiwi
             
             return nullptr;
         }
+        
+    protected:
+        
+        //! @brief Add an attribute to the be managed.
+        //! @param name The name of the attribute.
+        //! @param value The value of the attribute.
+        void addAttr(Attribute* attr, std::string const& name, std::vector<Atom> const& default_value)
+        {
+            attr->setName(name);
+            attr->setDefaultValue(default_value);
+            attr->setValue(default_value);
+            m_attrs[name] = attr;
+        }
+    
+    private:
         
         std::map<std::string, Attribute*>   m_attrs;
         mutable std::mutex                  m_attrs_mutex;

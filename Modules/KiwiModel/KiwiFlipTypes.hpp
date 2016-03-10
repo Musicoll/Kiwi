@@ -133,12 +133,12 @@ namespace kiwi
     class FlipPoint : public flip::Object
     {
     public:
-        FlipPoint() : m_x(0.), m_y(0.) {}
+        FlipPoint() = default;
         
         FlipPoint(const double x, const double y) : m_x(x), m_y(y) {}
         
         //! Create a color with a vector of atoms.
-        FlipPoint(std::array<Atom, 2> const& atoms)
+        FlipPoint(std::vector<Atom> const& atoms)
         {
             if(atoms.size() >= 2 && atoms[0].isNumber() && atoms[1].isNumber())
             {
@@ -160,9 +160,9 @@ namespace kiwi
         }
         
         //! Retrieve the attribute value as a vector of atoms.
-        operator std::array<Atom, 2>() const
+        operator std::vector<Atom>() const
         {
-            return {{static_cast<double>(m_x), static_cast<double>(m_y)}};
+            return {static_cast<Atom::float_t>(m_x), static_cast<Atom::float_t>(m_y)};
         }
         
     private:

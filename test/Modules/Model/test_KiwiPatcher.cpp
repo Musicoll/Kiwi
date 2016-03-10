@@ -101,6 +101,13 @@ public:
             auto gridsize = patcher.getAttributeValue("gridsize");
             std::cout << "\t\t- gridSize : " << to_string(gridsize) << '\n';
             
+            auto attr = patcher.getAttribute("bgcolor");
+            if (attr->getType() == Attribute::Type::RGBA)
+            {
+                Attribute::RGBA* attr_rgba = dynamic_cast<Attribute::RGBA*>(attr);
+                FlipRGBA rgba = attr_rgba->get();
+            }
+            
             /*
             auto val = patcher.getAttributeValue(Tag::create("attr_bool"));
             std::cout << "\t\t- attr_bool : " << val << '\n';
