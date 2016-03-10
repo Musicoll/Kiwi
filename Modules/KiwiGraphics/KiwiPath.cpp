@@ -21,6 +21,8 @@
  ==============================================================================
  */
 
+#include <assert.h>
+
 #include <KiwiGraphics/KiwiPath.hpp>
 
 namespace kiwi
@@ -85,20 +87,20 @@ namespace kiwi
             }
         }
         
-        void Path::lineTo(Point const& point) noexcept
+        void Path::addLine(Point const& line_edge) noexcept
         {
-            addNode(Node(point, Linear));
+            addNode(Node(line_edge, Linear));
         }
         
         void Path::addLines(std::initializer_list<Point> il) noexcept
         {
             for (auto point : il)
             {
-                lineTo(point);
+                addLine(point);
             }
         }
         
-        void Path::quadraticTo(Point const& control, Point const& end) noexcept
+        void Path::addQuadratic(Point const& control, Point const& end) noexcept
         {
             addNode(Node(control, Quadratic));
             addNode(Node(end, Quadratic));
@@ -108,11 +110,11 @@ namespace kiwi
         {
             for (auto quad_curve = il.begin(); quad_curve != il.end(); ++quad_curve)
             {
-                quadraticTo((*quad_curve)[0], (*quad_curve)[1]);
+                addQuadratic((*quad_curve)[0], (*quad_curve)[1]);
             }
         }
         
-        void Path::cubicTo(Point const& control1, Point const& control2, Point const& end) noexcept
+        void Path::addCubic(Point const& control1, Point const& control2, Point const& end) noexcept
         {
             addNode(Node(control1, Cubic));
             addNode(Node(control2, Cubic));
@@ -123,16 +125,16 @@ namespace kiwi
         {
             for (auto cubic_curve = il.begin(); cubic_curve != il.end(); ++cubic_curve)
             {
-                cubicTo((*cubic_curve)[0], (*cubic_curve)[1], (*cubic_curve)[2]);
+                addCubic((*cubic_curve)[0], (*cubic_curve)[1], (*cubic_curve)[2]);
             }
         }
         
         void Path::addRectangle(Point const& top_left, const double width, const double height) noexcept
         {
             moveTo(top_left);
-            lineTo(top_left + Point(width, 0));
-            lineTo(top_left + Point(width, height));
-            lineTo(top_left + Point(0, height));
+            addLine(top_left + Point(width, 0));
+            addLine(top_left + Point(width, height));
+            addLine(top_left + Point(0, height));
             close();
         }
         
@@ -143,16 +145,16 @@ namespace kiwi
             
             const double hw = radius_x;
             const double hw55 = hw * 0.55f;
-            const double hh = radius_y * 0.5f;
+            const double hh = radius_y;
             const double hh55 = hh * 0.55f;
             const double cx = top_left.x() + hw;
             const double cy = top_left.y() + hh;
             
             moveTo(Point(cx, cy - hh));
-            cubicTo(Point(cx + hw55, cy - hh), Point(cx + hw, cy - hh55), Point(cx + hw, cy));
-            cubicTo(Point(cx + hw, cy + hh55), Point(cx + hw55, cy + hh), Point(cx, cy + hh));
-            cubicTo(Point(cx - hw55, cy + hh), Point(cx - hw, cy + hh55), Point(cx - hw, cy));
-            cubicTo(Point(cx - hw, cy - hh55), Point(cx - hw55, cy - hh), Point(cx, cy - hh));
+            addCubic(Point(cx + hw55, cy - hh), Point(cx + hw, cy - hh55), Point(cx + hw, cy));
+            addCubic(Point(cx + hw, cy + hh55), Point(cx + hw55, cy + hh), Point(cx, cy + hh));
+            addCubic(Point(cx - hw55, cy + hh), Point(cx - hw, cy + hh55), Point(cx - hw, cy));
+            addCubic(Point(cx - hw, cy - hh55), Point(cx - hw55, cy - hh), Point(cx, cy - hh));
             close();
         }
         

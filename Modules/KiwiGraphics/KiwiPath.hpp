@@ -26,7 +26,6 @@
 
 #include <KiwiGraphics/KiwiPoint.hpp>
 #include <KiwiGraphics/KiwiAffineMatrix.hpp>
-#include <assert.h>
 
 
 namespace kiwi
@@ -38,7 +37,7 @@ namespace kiwi
         // ================================================================================ //
         
         //!@brief The path holds a set of points.
-        //!@details The path is used to represent a set of curves and shapes. It can be discontinuous and closed.
+        //!@details The path is used to represent a set of curves and shapes. It can be discontinuous.
         //!@todo Check if constructors with shapes are needed
         //!@todo Check if withdrawn functions are needed (addArc, addPieChart, addArc, overlaps)
         //!@todo Check if bounds are needed and how they can be implemented (dizcretisation, recompute at every change)
@@ -62,7 +61,7 @@ namespace kiwi
             explicit Path(Point const& position) noexcept {addNode(Node(position, Move));}
             
             //!@brief Assignment operator
-            //!@details Clear all nodes and copies all nodes from other
+            //!@details Clears all nodes and copies all nodes from other
             Path& operator=(Path const& other) noexcept;
             
             //!@brief Move assignment operator
@@ -75,10 +74,10 @@ namespace kiwi
             //!@brief Gets the number of nodes
             constexpr inline ulong size() const noexcept {return static_cast<ulong>(m_nodes.size());}
             
-            //!@brief Return true if the path is empty
+            //!@brief Returns true if the path is empty
             constexpr inline bool empty() const noexcept {return m_nodes.size() <= 1;}
             
-            //!@brief Removes all node
+            //!@brief Removes all nodes
             //!@details After clear, the path continues drawing from origin
             void clear() noexcept;
             
@@ -95,22 +94,22 @@ namespace kiwi
             void moveTo(Point const& position) noexcept;
 
             //!@brief Adds a line to the current path
-            //!@param line_hedge Draws a line from cursor to line_hedge
-            void lineTo(Point const& line_hedge) noexcept;
+            //!@param line_edge Draws a line from cursor to line_edge
+            void addLine(Point const& line_edge) noexcept;
             
             //!@brief Adds a sets of line
             //!@param il Contains the edges position of the added lines
             void addLines(std::initializer_list<Point> il) noexcept;
             
             //!@brief Adds a quadradic bezier curve
-            void quadraticTo(Point const& control, Point const& end) noexcept;
+            void addQuadratic(Point const& control, Point const& end) noexcept;
             
             //!@brief Adds a set of quadratic bezier curves
-            //!@param il Contains the control positions for every quadradic curve
+            //!@param il contains the control positions for every quadradic curve
             void addQuadratics(std::initializer_list<std::array<Point, 2>> il) noexcept;
             
             //!@brief Adds a cubic curve to the path
-            void cubicTo(Point const& control1, Point const& control2, Point const& end) noexcept;
+            void addCubic(Point const& control1, Point const& control2, Point const& end) noexcept;
             
             //!@brief Adds a set of cubic bezier curves
             //!@param il Contains the control positions for every cubic curve
@@ -119,7 +118,7 @@ namespace kiwi
             //!@brief Adds rectangle to the path
             //!@param top_left The top_left corner position of the added rectangle
             //!@param width Horizontal width of the rectangle
-            //!@param height Horizontal height of the the rectangle
+            //!@param height Vertical height of the the rectangle
             void addRectangle(Point const& top_left, const double width, const double height) noexcept;
             
             //!@brief Add an ellipse to the path
