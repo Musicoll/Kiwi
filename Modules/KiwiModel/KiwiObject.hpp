@@ -62,8 +62,18 @@ namespace kiwi
         //! @brief Destructor.
         virtual ~Object() noexcept;
         
-        //! @brief flip declare method
-        static void declare();
+        //! @internal flip static declare method
+        template<class TModel>
+        static void declare()
+        {
+            if(TModel::template has<Object>()) return;
+            
+            TModel::template declare<Object>()
+            .template name("cicm.kiwi.Object")
+            .template member<flip::String, &Object::m_name>("name")
+            .template member<flip::String, &Object::m_text>("text")
+            .template member<flip::Int, &Object::m_id>("id");
+        }
         
     public:
         

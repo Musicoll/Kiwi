@@ -59,15 +59,18 @@ namespace kiwi
          */
         virtual ~Link();
         
-        //! flip declare method
+        //! @internal flip static declare method
+        template<class TModel>
         static void declare()
         {
-            Model::declare<Link>()
-            .name("cicm.kiwi.Link")
-            .member<flip::ObjectRef<Object>, &Link::m_object_from>("object_from")
-            .member<flip::ObjectRef<Object>, &Link::m_object_to>("object_to")
-            .member<flip::Int, &Link::m_index_outlet>("outlet_index")
-            .member<flip::Int, &Link::m_index_intlet>("inlet_index");
+            if(TModel::template has<Link>()) return;
+            
+            TModel::template declare<Link>()
+            .template name("cicm.kiwi.Link")
+            .template member<flip::ObjectRef<Object>, &Link::m_object_from>("object_from")
+            .template member<flip::ObjectRef<Object>, &Link::m_object_to>("object_to")
+            .template member<flip::Int, &Link::m_index_outlet>("outlet_index")
+            .template member<flip::Int, &Link::m_index_intlet>("inlet_index");
         }
         
         

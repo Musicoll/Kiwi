@@ -64,7 +64,16 @@ namespace kiwi
         void init();
         
         //! static flip declare method
-        static void declare();
+        template<class TModel>
+        static void declare()
+        {
+            TModel::template declare<Patcher>()
+            .name("cicm.kiwi.Patcher")
+            .template member<decltype(Patcher::m_objects),   &Patcher::m_objects>   ("objects")
+            .template member<decltype(Patcher::m_links),     &Patcher::m_links>     ("links")
+            .template member<decltype(Patcher::m_bgcolor),   &Patcher::m_bgcolor>   ("bgcolor")
+            .template member<decltype(Patcher::m_gridsize),  &Patcher::m_gridsize>  ("gridsize");
+        }
 
         //! Get the objects.
         /** The function retrieves the objects from the patcher.
@@ -119,6 +128,11 @@ namespace kiwi
          @param object        The pointer to the object.
          */
         void remove(kiwi::Object* object);
+        
+        void bgcolorAttrSetter(std::vector<Atom> const& atoms)
+        {
+            std::cout << "bgcolorAttrSetter \n";
+        }
         
         //! Retrieve the "gridsize" attribute value of the patcher.
         /** The function retrieves the "gridsize" attribute value of the patcher.

@@ -39,21 +39,25 @@ namespace kiwi
     
     void Patcher::init()
     {
-        /*
         flip::Class<Patcher>::Members members = get_class().members();
         
-        flip::Class<flip::Object> attr_base_class;
+        flip::ClassBase& attr_base_class = flip::Class<Attribute>::use();
+        
+        std::string name_to_find = "bgcolor";
         
         for(const auto& member : members)
         {
+            const bool isAttr = (member._base_ptr->inherit_from(attr_base_class));
+            
             std::cout << member._name_0 << "\n";
             std::cout << "is Attr : ";
-
-            std::cout << (member._base_ptr->inherit_from(attr_base_class) ? "true" : "false") << '\n';
+            std::cout << (isAttr ? "true" : "false") << '\n';
+            
+            
+            //Attribute* attr = member;
         }
-        */
         
-        addAttr(&m_bgcolor, "unlocked_bgcolor", {0., 0., 0., 1.});
+        addAttr(&m_bgcolor, "bgcolor", {0., 0., 0., 1.});
         addAttr(&m_gridsize, "gridsize", {20});
         //addAttr(&m_attr_bool, "attr_bool", false);
         //addAttr(&m_attr_tag, "attr_tag", "test tag");
@@ -65,18 +69,6 @@ namespace kiwi
             add(it->second);
         }
         */
-    }
-    
-    void Patcher::declare()
-    {
-        Model::declare<Patcher>()
-        .name("cicm.kiwi.Patcher")
-        .member<decltype(Patcher::m_objects),   &Patcher::m_objects>   ("objects")
-        .member<flip::Collection<Link>,         &Patcher::m_links>     ("links")
-        .member<AttrRGBA,                       &Patcher::m_bgcolor>   ("bgcolor")
-        .member<AttrInt,                        &Patcher::m_gridsize>  ("gridsize");
-        //.member<Attribute<flip::Bool>,      &Patcher::m_attr_bool> ("attr_bool")
-        //.member<Attribute<flip::String>,    &Patcher::m_attr_tag>  ("attr_tag");
     }
     
     void Patcher::createObject(std::string const& name, std::string const& text)

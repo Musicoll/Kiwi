@@ -24,36 +24,40 @@
 #ifndef __DEF_KIWI_MODEL__
 #define __DEF_KIWI_MODEL__
 
-#include "../KiwiCore/KiwiAtom.hpp"
-
-// ---- Flip headers ---- //
-#include "flip/DataModel.h"
-#include "flip/Array.h"
-#include "flip/Collection.h"
-#include "flip/Bool.h"
-#include "flip/Int.h"
-#include "flip/Float.h"
-#include "flip/Blob.h"
-#include "flip/String.h"
-#include "flip/Object.h"
-#include "flip/ObjectRef.h"
-#include "flip/Variant.h"
-#include "flip/Optional.h"
-
-#include "flip/Document.h"
-#include "flip/DocumentObserver.h"
-
-#include "flip/History.h"
-#include "flip/HistoryStoreMemory.h"
-#include "flip/DataConsumerMemory.h"
-#include "flip/BackEndBinary.h"
-#include "flip/BackEndMl.h"
+#include "KiwiFactory.hpp"
 
 namespace kiwi
 {
-    //! The Model class
+    //! @brief The Patcher Model class
     class Model : public flip::DataModel<Model>
     {
+    public:
+        
+        //! @brief Initializes the model.
+        //! @details Declares all flip classes.
+        //! @param version The model version.
+        static void init(std::string const& version)
+        {
+            Model::version(version);
+            
+            // basic types declaration :
+            FlipRGBA::declare<Model>();
+            FlipPoint::declare<Model>();
+            
+            // attributes declaration :
+            Attribute::declare<Model>();
+            Attribute::declare<Model>();
+            
+            // attributes types
+            AttrFloat::declare<Model>();
+            AttrRGBA::declare<Model>();
+            AttrInt::declare<Model>();
+            
+            // patcher elements declaration :
+            kiwi::Object::declare<Model>();
+            Link::declare<Model>();
+            Patcher::declare<Model>();
+        }
     };
 }
 

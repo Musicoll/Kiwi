@@ -24,7 +24,30 @@
 #ifndef __DEF_KIWI_MODELS_FLIP_TYPES__
 #define __DEF_KIWI_MODELS_FLIP_TYPES__
 
-#include "KiwiModel.hpp"
+#include "../KiwiCore/KiwiAtom.hpp"
+
+// ---- Flip headers ---- //
+#include "flip/DataModel.h"
+#include "flip/Array.h"
+#include "flip/Collection.h"
+#include "flip/Bool.h"
+#include "flip/Int.h"
+#include "flip/Float.h"
+#include "flip/Blob.h"
+#include "flip/String.h"
+#include "flip/Object.h"
+#include "flip/ObjectRef.h"
+#include "flip/Variant.h"
+#include "flip/Optional.h"
+
+#include "flip/Document.h"
+#include "flip/DocumentObserver.h"
+
+#include "flip/History.h"
+#include "flip/HistoryStoreMemory.h"
+#include "flip/DataConsumerMemory.h"
+#include "flip/BackEndBinary.h"
+#include "flip/BackEndMl.h"
 
 namespace kiwi
 {
@@ -61,15 +84,18 @@ namespace kiwi
             }
         }
         
-        //! static flip declare method.
+        //! @internal flip static declare method
+        template<class TModel>
         static void declare()
         {
-            Model::declare<FlipRGBA>()
+            if(TModel::template has<FlipRGBA>()) return;
+            
+            TModel::template declare<FlipRGBA>()
             .name("cicm.kiwi.FlipRGBA")
-            .member<flip::Float, &FlipRGBA::m_red>      ("red")
-            .member<flip::Float, &FlipRGBA::m_green>    ("green")
-            .member<flip::Float, &FlipRGBA::m_blue>     ("blue")
-            .member<flip::Float, &FlipRGBA::m_alpha>    ("alpha");
+            .template member<flip::Float, &FlipRGBA::m_red>      ("red")
+            .template member<flip::Float, &FlipRGBA::m_green>    ("green")
+            .template member<flip::Float, &FlipRGBA::m_blue>     ("blue")
+            .template member<flip::Float, &FlipRGBA::m_alpha>    ("alpha");
         }
         
         //! Retrieve the FlipRGBA value as a vector of atoms.
@@ -120,13 +146,16 @@ namespace kiwi
             }
         }
         
-        // static flip declare method.
+        //! @internal flip static declare method
+        template<class TModel>
         static void declare()
         {
-            Model::declare<FlipPoint>()
-            .name("cicm.kiwi.FlipPoint")
-            .member<flip::Float, &FlipPoint::m_x>("x")
-            .member<flip::Float, &FlipPoint::m_y>("y");
+            if(TModel::template has<FlipPoint>()) return;
+            
+            TModel::template declare<FlipPoint>()
+            .template name("cicm.kiwi.FlipPoint")
+            .template member<flip::Float, &FlipPoint::m_x>("x")
+            .template member<flip::Float, &FlipPoint::m_y>("y");
         }
         
         //! Retrieve the attribute value as a vector of atoms.

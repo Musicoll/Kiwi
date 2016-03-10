@@ -63,15 +63,6 @@ namespace kiwi
     {
         ;
     }
-    
-    void Object::declare()
-    {
-        Model::declare<Object>()
-        .name("cicm.kiwi.Object")
-        .member<flip::String, &Object::m_name>("name")
-        .member<flip::String, &Object::m_text>("text")
-        .member<flip::Int, &Object::m_id>("id");
-    }
 }
 
 

@@ -28,16 +28,19 @@
 
 namespace kiwi
 {
+    class TModel {};
     // ================================================================================ //
     //                                      ATTRIBUTE                                   //
     // ================================================================================ //
     
-    //! The attribute is an abstract class that holds a set of values of differents kinds and differents sizes.
-    /** The attribute manages a set of values that should be displayed in an inspector. The setter and getter must be overriden.
-     */
+    //! @brief The Attribute class is an abstract class that holds a set of values of differents kinds and differents sizes.
+    //! @details The attribute manages a set of values that should be displayed in an inspector.
+    //! The setter and getter must be overritten.
     class Attribute : public flip::Object
     {
     public:
+        
+        class Manager;
         
         //! @brief Enum of Attribute types
         enum class Type : uint8_t
@@ -50,25 +53,7 @@ namespace kiwi
             Enum
         };
         
-        class Manager;
-        
-        //! @brief Sets the attribute value with an atom.
-        //! @details This method must be implemented in subclasses.
-        //! @param atom The atom.
-        virtual void setValue(std::vector<Atom> const&)          { assert(true); };
-        
-        //! Set the attribute default value with an atom.
-        /** The function sets the attribute default value with an atom.
-         @param atom The atom.
-         */
-        virtual void setDefaultValue(std::vector<Atom> const&)   { assert(true); }
-        
-        //! Resets the value to its default state.
-        virtual void resetDefault()  {};
-        
-    public:
-        
-        //! Default constructor
+        //! @brief Default constructor
         Attribute() = default;
         
         //! @brief Constructs an Attribute object.
@@ -82,69 +67,209 @@ namespace kiwi
         //! @brief Destructor.
         virtual inline ~Attribute() noexcept {};
         
-        //! Retrieve the Type of the attribute.
+        //! @brief Returns the attribute value as a vector of atoms.
+        //! @details This method must be overwritten by subclasses.
+        //! @return The attribute value as a vector of atoms.
+        virtual inline std::vector<Atom> getValue() const = 0;
+        
+        //! @brief Sets the attribute value with a vector of atoms.
+        //! @details This method must be overwritten by subclasses.
+        //! @param atoms The vector of atoms.
+        virtual void setValue(std::vector<Atom> const&) = 0;
+        
+        //! @brief Sets the attribute default value with a vector of atoms.
+        //! @details This method must be overwritten by subclasses.
+        //! @param atoms The vector of atoms.
+        virtual void setDefaultValue(std::vector<Atom> const&) = 0;
+        
+        //! @brief Returns the attribute default value as a vector of atoms.
+        //! @details This method must be overwritten by subclasses.
+        //! @return A vector of atoms.
+        virtual std::vector<Atom> getDefaultValue() = 0;
+        
+        //! @brief Resets the value to its default state.
+        //! @details This method must be overwritten by subclasses.
+        virtual void resetDefault() = 0;
+        
+        //! @brief Returns the Type of the attribute.
         //! @return The Type of the attribute.
         virtual Type getType() const noexcept = 0;
         
-        //! Retrieve the attribute value an atom.
-        /** The function retrieves the attribute value as  an atom.
-         @return The atom.
-         */
-        virtual inline std::vector<Atom> getValue() const noexcept { return std::vector<Atom>(); };
-        
-        //! Retrieve the name of the attribute.
-        /** The function retrieves the name of the attribute.
-         @return The name of the attribute.
-         */
+        //! @brief Returns the name of the attribute.
+        //! @return The name of the attribute.
         inline std::string getName() const { return m_name; }
         
-        //! Set the attribute name.
-        /** The function sets the attribute name.
-         @param label The attribute name.
-         */
-        inline Attribute& setName(std::string const& name) noexcept
+        //! @internal flip static declare method
+        template<class TModel>
+        static void declare()
+        {
+            if(TModel::template has<Attribute>()) return;
+            
+            TModel::template declare<Attribute>()
+            .template name("cicm.kiwi.Attribute")
+            .template member<flip::String, &Attribute::m_name>("name");
+        }
+        
+    protected:
+        flip::String    m_name;  ///< The name of the attribute.
+        
+    private:
+        template<class ValueType> class Typed;
+        friend class Manager;
+        friend class AttrFloat;
+        friend class AttrRGBA;
+        
+        //! @brief Set the attribute name.
+        //! @param name The attribute name.
+        inline Attribute& setName(std::string const& name)
         {
             m_name = name;
             return *this;
         }
-        
-        //! Set the attribute label.
-        /** The function sets the attribute label.
-         @param label The attribute label.
-         */
-        inline Attribute& setDefault(std::vector<Atom> const& atom) noexcept
-        {
-            setDefaultValue(atom);
-            resetDefault();
-            return *this;
-        }
-        
-        //! @internal flip static declare method
-        static void declare()
-        {
-            Model::declare<Attribute>()
-            .name("cicm.kiwi.Attribute")
-            .member<flip::String, &Attribute::m_name>("name");
-        }
+    };
+    
+    // ================================================================================ //
+    //                                  ATTRIBUTE TYPED                                 //
+    // ================================================================================ //
+    
+    template<class ValueType>
+    class Attribute::Typed : public Attribute
+    {
+    public:
+        using value_t = ValueType;
         
     protected:
+        value_t m_default;
+        value_t m_value;
         
-        flip::String    m_name;  ///< The name of the attribute.
+    public:
+        //! @brief Default constructor.
+        Typed() = default;
+        
+        //! @brief Constructs an Attribute.
+        Typed(std::string const& name, value_t const& value) :
+            Attribute(name), m_default(value), m_value(value) {}
+        
+        //! @brief Destructor.
+        virtual ~Typed() noexcept {}
+        
+        //! @internal flip static declare method
+        template<class TModel, class TSubclass>
+        static void declare(std::string const& subclass_name)
+        {
+            if(TModel::template has<Typed<value_t>>()) return;
+            
+            const std::string typed_name_str = "cicm.kiwi.AttrTyped." + subclass_name;
+            const std::string sublass_name_str = "cicm.kiwi." + subclass_name;
+            
+            TModel::template declare<Typed<value_t>>()
+            .name(typed_name_str.c_str())
+            .template inherit<Attribute>()
+            .template member<value_t, &Typed::m_default>("default_value")
+            .template member<value_t, &Typed::m_value>("value");
+            
+            TModel::template declare<TSubclass>()
+            .template name(sublass_name_str.c_str())
+            .template inherit<Attribute::Typed<value_t>>();
+        }
+        
+        //! Retrieves the values.
+        /** The current values.
+         @return The current values.
+         */
+        virtual inline value_t get() const          { return m_value; }
+        
+        //! Retrieves the default value.
+        /** Retrieve the default value.
+         @return The the default value.
+         */
+        virtual inline value_t getDefault() const   {return m_default;}
+        
+    private:
+        
+        friend Attribute::Manager;
+    
+    protected:
+        
+        //! Sets the values.
+        /** The function sets the current value.
+         @param elements The vector of elements.
+         @see get
+         */
+        virtual void set(value_t const& value) { m_value = value; }
+        
+        //! Resets the value to its default state.
+        /** Resets the value to its default state.
+         */
+        virtual void resetDefault() override  { set(m_default); }
+    };
+    
+    // ================================================================================ //
+    //                                  ATTRIBUTE FLOAT                                 //
+    // ================================================================================ //
+    
+    class AttrFloat : public Attribute::Typed<flip::Float>
+    {
+    public:
+        
+        //! @brief Default constructor.
+        AttrFloat() = default;
+        
+        //! @brief Constructs an Attribute.
+        AttrFloat(std::string const& name, value_t const& value) :
+            Attribute::Typed<value_t>(name, value) {}
+        
+        // static flip declare method.
+        template<class TModel>
+        static void declare()
+        {
+            Attribute::Typed<value_t>::declare<TModel, AttrFloat>("AttrFloat");
+        }
+        
+        inline Type getType() const noexcept override { return Type::Float; };
+        
+        //! Retrieve the attribute value as a vector of atoms.
+        /** The function retrieves the attribute value as a vector of atoms.
+         @return The vector of atoms.
+         */
+        std::vector<Atom> getValue() const noexcept override {return {m_value.value()};}
+        
+        //! Set the attribute value with an atom.
+        /** The function sets the attribute value with an atom.
+         @param atom The atom.
+         */
+        void setValue(std::vector<Atom> const& atom) final
+        {
+            if(atom.size() >= 1 && atom[0].isNumber())
+            {
+                m_value = atom[0].getFloat();
+            }
+        }
+        
+        //! Set the attribute default value with an atom.
+        /** The function sets the attribute default value with an atom.
+         @param atom The atom.
+         */
+        void setDefaultValue(std::vector<Atom> const& atom) override
+        {
+            if(atom.size() >= 1 && atom[0].isNumber())
+            {
+                m_value = atom[0].getFloat();
+            }
+        }
+        
+        //! @brief Returns the attribute default value as a vector of atoms.
+        //! @details This method must be overwritten by subclasses.
+        //! @return A vector of atoms.
+        std::vector<Atom> getDefaultValue() override { return {m_default.value()}; };
     };
     
     // ================================================================================ //
     //                                  ATTRIBUTE RGBA                                  //
     // ================================================================================ //
     
-    class AttrRGBA : public Attribute
+    class AttrRGBA : public Attribute::Typed<FlipRGBA>
     {
-    public:
-        using value_t = FlipRGBA;
-        
-    protected:
-        value_t m_default;
-        value_t m_value;
-        
     public:
         
         //! @brief Default constructor.
@@ -152,56 +277,32 @@ namespace kiwi
         
         //! @brief Constructs an Attribute.
         AttrRGBA(std::string const& name, value_t const& value) :
-            Attribute(name),
-            m_default(value),
-            m_value(value)
-        {
-            ;
-        }
+            Attribute::Typed<FlipRGBA>(name, value) {}
         
         //! @brief Destructor.
         inline ~AttrRGBA() noexcept {}
         
-        // static flip declare method.
+        //! @internal flip static declare method
+        template<class TModel>
         static void declare()
         {
-            Model::declare<AttrRGBA>()
-            .name("cicm.kiwi.AttrRGBA")
-            .inherit<Attribute>()
-            .member<value_t, &AttrRGBA::m_default>("default_value")
-            .member<value_t, &AttrRGBA::m_value>("value");
+            Attribute::Typed<value_t>::declare<TModel, AttrRGBA>("AttrRGBA");
         }
         
         inline Type getType() const noexcept override {return Type::RGBA;}
-    
-        //! Retrieves the values.
-        /** The current values.
-         @return The current values.
-         */
-        inline value_t get() const {return m_value;}
-        
-        //! Retrieves the default value.
-        /** Retrieve the default value.
-         @return The the default value.
-         */
-        inline value_t getDefault() const {return m_default;}
         
         //! Retrieve the attribute value as a vector of atoms.
         /** The function retrieves the attribute value as a vector of atoms.
          @return The vector of atoms.
          */
-        std::vector<Atom> getValue() const noexcept override {return std::vector<Atom>(m_value);}
+        std::vector<Atom> getValue() const noexcept override {return m_value;}
+        
+        //! @brief Returns the attribute default value as a vector of atoms.
+        //! @details This method must be overwritten by subclasses.
+        //! @return A vector of atoms.
+        std::vector<Atom> getDefaultValue() override {return m_default;}
         
     private:
-        
-        friend Attribute::Manager;
-        
-        //! Sets the values.
-        /** The function sets the current value.
-         @param elements The vector of elements.
-         @see get
-         */
-        inline void set(value_t const& value) { m_value = value; }
         
         //! Set the attribute value with an atom.
         /** The function sets the attribute value with an atom.
@@ -214,11 +315,6 @@ namespace kiwi
          @param atom The atom.
          */
         virtual void setDefaultValue(std::vector<Atom> const& atom) override { m_default = atom; }
-        
-        //! Resets the value to its default state.
-        /** Resets the value to its default state.
-         */
-        inline void resetDefault() override  { set(m_default); }
     };
     
     // ================================================================================ //
@@ -251,14 +347,17 @@ namespace kiwi
         //! @brief Destructor.
         inline ~AttrInt() noexcept {}
         
-        // static flip declare method.
+        //! @internal flip static declare method
+        template<class TModel>
         static void declare()
         {
-            Model::declare<AttrInt>()
-            .name("cicm.kiwi.AttrInt")
-            .inherit<Attribute>()
-            .member<value_t, &AttrInt::m_default>("default_value")
-            .member<value_t, &AttrInt::m_value>("value");
+            if(TModel::template has<AttrInt>()) return;
+            
+            TModel::template declare<AttrInt>()
+            .template name("cicm.kiwi.AttrInt")
+            .template inherit<Attribute>()
+            .template member<value_t, &AttrInt::m_default>("default_value")
+            .template member<value_t, &AttrInt::m_value>("value");
         }
         
         //! Retrieve the type index of the attribute.
@@ -283,6 +382,11 @@ namespace kiwi
          @return The vector of atoms.
          */
         std::vector<Atom> getValue() const noexcept override {return {m_value.value()};}
+        
+        //! @brief Returns the attribute default value as a vector of atoms.
+        //! @details This method must be overwritten by subclasses.
+        //! @return A vector of atoms.
+        std::vector<Atom> getDefaultValue() override { return {m_default.value()}; };
         
     private:
         
@@ -389,7 +493,8 @@ namespace kiwi
         void addAttr(Attribute* attr, std::string const& name, std::vector<Atom> const& default_value)
         {
             attr->setName(name);
-            attr->setDefault(default_value);            
+            attr->setDefaultValue(default_value);
+            attr->setValue(default_value);
             m_attrs[name] = attr;
         }
         

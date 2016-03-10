@@ -22,7 +22,7 @@
  */
 
 
-#include "../../../Modules/KiwiModel/KiwiModels.hpp"
+#include "../../../Modules/KiwiModel/KiwiModel.hpp"
 #include "../../catch.hpp"
 #include <vector>
 
@@ -94,9 +94,9 @@ public:
         {
             std::cout << "\tpatcher attributes :" << '\n';
             
-            std::vector<Atom> color = patcher.getAttributeValue("unlocked_bgcolor");
+            std::vector<Atom> color = patcher.getAttributeValue("bgcolor");
             
-            std::cout << "\t\t- unlocked_bgcolor : " << to_string(color) << '\n';
+            std::cout << "\t\t- bgcolor : " << to_string(color) << '\n';
             
             auto gridsize = patcher.getAttributeValue("gridsize");
             std::cout << "\t\t- gridSize : " << to_string(gridsize) << '\n';
@@ -114,44 +114,21 @@ public:
 
 TEST_CASE("model", "[model]")
 {
-    // -------------------------- //
-    // define current model version :
-    Model::version("unit_test_model_01");
-    
-    // basic types declaration :
-    FlipRGBA::declare();
-    FlipPoint::declare();
-    
-    // attributes declaration :
-    Attribute::declare();
-    //Attribute<flip::Bool>::declare("cicm.kiwi.Attribute.Bool");
-    //Attribute<flip::Int>::declare("cicm.kiwi.Attribute.Int");
-    //Attribute<flip::Float>::declare("cicm.kiwi.Attribute.Float");
-    //Attribute<flip::String>::declare("cicm.kiwi.Attribute.String");
-    //Attribute<FlipRGBA>::declare("cicm.kiwi.Attribute.RGBA");
-    
-    AttrRGBA::declare();
-    AttrInt::declare();
-    
-    // patcher elements declaration :
-    kiwi::Object::declare();
-    Link::declare();
-    Patcher::declare();
-    // -------------------------- //
+    Model::init("unit_test_model_01");
     
     PatcherObserver observer;
     
-    auto document = std::unique_ptr<flip::Document>(new flip::Document(Model::use (), observer, 123456789ULL, uint32_t ('cicm'), uint32_t('kiwi')));
+    auto document = std::unique_ptr<flip::Document>(new flip::Document(Model::use(), observer, 123456789ULL, uint32_t ('cicm'), uint32_t('kiwi')));
     
     Patcher& patcher = document->root<Patcher>();
     patcher.init();
     document->commit();
     
-    patcher.setAttributeValue("unlocked_bgcolor", {0., 1., 0., 1.});
+    patcher.setAttributeValue("bgcolor", {0., 1., 0., 1.});
     patcher.setAttributeValue("gridsize", {40});
     document->commit();
     
-    patcher.setAttributeValue("unlocked_bgcolor", {0.6666, 0.7777, 0.8888, 1.});
+    patcher.setAttributeValue("bgcolor", {0.6666, 0.7777, 0.8888, 1.});
     patcher.setAttributeValue("gridsize", {25});
     document->commit();
     
