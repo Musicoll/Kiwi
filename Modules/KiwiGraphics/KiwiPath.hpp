@@ -72,10 +72,10 @@ namespace kiwi
             ~Path() noexcept = default;
             
             //!@brief Gets the number of nodes
-            constexpr inline ulong size() const noexcept {return static_cast<ulong>(m_nodes.size());}
+            inline ulong size() const noexcept {return static_cast<ulong>(m_nodes.size());}
             
             //!@brief Returns true if the path is empty
-            constexpr inline bool empty() const noexcept {return m_nodes.size() <= 1;}
+            inline bool empty() const noexcept {return m_nodes.size() <= 1;}
             
             //!@brief Removes all nodes
             //!@details After clear, the path continues drawing from origin
