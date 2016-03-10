@@ -28,39 +28,51 @@
 
 namespace kiwi
 {
-    //! @brief The Patcher Model class
-    class Model : public flip::DataModel<Model>
+    namespace model
     {
-    public:
-        
-        //! @brief Initializes the model.
-        //! @details Declares all flip classes.
-        //! @param version The model version.
-        static void init(std::string const& version)
+        //! @brief The Patcher Model class
+        class Model : public flip::DataModel<Model>
         {
-            Model::version(version);
+        public:
             
-            // basic types declaration :
-            FlipRGBA::declare<Model>();
-            FlipPoint::declare<Model>();
-            
-            // attributes declaration :
-            Attribute::declare<Model>();
-            Attribute::declare<Model>();
-            
-            // attributes types
-            Attribute::Int::declare<Model>();
-            Attribute::Float::declare<Model>();
-            Attribute::String::declare<Model>();
-            Attribute::RGBA::declare<Model>();
-            Attribute::Enum::declare<Model>();
-            
-            // patcher elements declaration :
-            kiwi::Object::declare<Model>();
-            Link::declare<Model>();
-            Patcher::declare<Model>();
-        }
-    };
+            //! @brief Initializes the model.
+            //! @details Declares all flip classes.
+            //! @param version The model version.
+            static void init(std::string const& version)
+            {
+                Model::version(version);
+                
+                // basic types declaration :
+                FlipRGBA::declare<Model>();
+                FlipPoint::declare<Model>();
+                
+                // attributes declaration :
+                Attribute::declare<Model>();
+                Attribute::declare<Model>();
+                
+                // attributes types
+                Attribute::Int::declare<Model>();
+                Attribute::Float::declare<Model>();
+                Attribute::String::declare<Model>();
+                Attribute::RGBA::declare<Model>();
+                Attribute::Enum::declare<Model>();
+                
+                // patcher elements declaration :
+                model::Object::declare<Model>();
+                Link::declare<Model>();
+                Patcher::declare<Model>();
+            }
+        };
+    }
+    
+    using Model = kiwi::model::Model;
+    using FlipRGBA = kiwi::model::FlipRGBA;
+    using FlipPoint = kiwi::model::FlipPoint;
+    using Attribute = kiwi::model::Attribute;
+    using Object = kiwi::model::Object;
+    using Link = kiwi::model::Link;
+    using Patcher = kiwi::model::Patcher;
+
 }
 
 #endif // KIWI_MODEL_HPP_INCLUDED

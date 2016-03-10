@@ -52,123 +52,126 @@
 
 namespace kiwi
 {
-    // ================================================================================ //
-    //                                  FLIP RGBA COLOR                                 //
-    // ================================================================================ //
-    
-    class FlipRGBA : public flip::Object
+    namespace model
     {
-    public:
+        // ================================================================================ //
+        //                                  FLIP RGBA COLOR                                 //
+        // ================================================================================ //
         
-        FlipRGBA() = default;
-
-        FlipRGBA(const double red, const double green, const double blue, const double alpha = 1.)
-        : m_red(cclip(red)), m_green(cclip(green)), m_blue(cclip(blue)), m_alpha(cclip(alpha)) {}
-        
-        //! Create a color with a vector of atoms.
-        FlipRGBA(std::vector<Atom> const& atoms)
+        class FlipRGBA : public flip::Object
         {
-            if(atoms.size() > 2 &&
-               atoms[0].isNumber() &&
-               atoms[1].isNumber() &&
-               atoms[2].isNumber())
+        public:
+            
+            FlipRGBA() = default;
+            
+            FlipRGBA(const double red, const double green, const double blue, const double alpha = 1.)
+            : m_red(cclip(red)), m_green(cclip(green)), m_blue(cclip(blue)), m_alpha(cclip(alpha)) {}
+            
+            //! Create a color with a vector of atoms.
+            FlipRGBA(std::vector<Atom> const& atoms)
             {
-                red(cclip(atoms[0].getFloat()));
-                green(cclip(atoms[1].getFloat()));
-                blue(cclip(atoms[2].getFloat()));
-                
-                if(atoms.size() >= 4 &&
-                   atoms[3].isNumber())
+                if(atoms.size() > 2 &&
+                   atoms[0].isNumber() &&
+                   atoms[1].isNumber() &&
+                   atoms[2].isNumber())
                 {
-                    alpha(cclip(atoms[3].getFloat()));
+                    red(cclip(atoms[0].getFloat()));
+                    green(cclip(atoms[1].getFloat()));
+                    blue(cclip(atoms[2].getFloat()));
+                    
+                    if(atoms.size() >= 4 &&
+                       atoms[3].isNumber())
+                    {
+                        alpha(cclip(atoms[3].getFloat()));
+                    }
                 }
             }
-        }
-        
-        //! @internal flip static declare method
-        template<class TModel>
-        static void declare()
-        {
-            if(TModel::template has<FlipRGBA>()) return;
             
-            TModel::template declare<FlipRGBA>()
-            .name("cicm.kiwi.FlipRGBA")
-            .template member<flip::Float, &FlipRGBA::m_red>      ("red")
-            .template member<flip::Float, &FlipRGBA::m_green>    ("green")
-            .template member<flip::Float, &FlipRGBA::m_blue>     ("blue")
-            .template member<flip::Float, &FlipRGBA::m_alpha>    ("alpha");
-        }
-        
-        //! Retrieve the FlipRGBA value as a vector of atoms.
-        operator std::vector<Atom>() const
-        {
-            return {red(), green(), blue(), alpha()};
-        }
-        
-        double red() const noexcept                 {return m_red;}
-        double green() const noexcept               {return m_green;}
-        double blue() const noexcept                {return m_blue;}
-        double alpha() const noexcept               {return m_alpha;}
-        
-        void red(const double _red) noexcept        {m_red = _red;}
-        void green(const double _green) noexcept    {m_green = _green;}
-        void blue(const double _blue) noexcept      {m_blue = _blue;}
-        void alpha(const double _alpha) noexcept    {m_alpha = _alpha;}
-        
-    private:
-        
-        //! @internal clip value between 0 and 1
-        static constexpr inline double cclip(const double val){return (val > 1.) ? 1. : ((val > 0.) ? val : 0.);}
-        
-        flip::Float m_red;
-        flip::Float m_green;
-        flip::Float m_blue;
-        flip::Float m_alpha;
-    };
-    
-    // ================================================================================ //
-    //                                    FLIP POINT                                    //
-    // ================================================================================ //
-    
-    class FlipPoint : public flip::Object
-    {
-    public:
-        FlipPoint() = default;
-        
-        FlipPoint(const double x, const double y) : m_x(x), m_y(y) {}
-        
-        //! Create a color with a vector of atoms.
-        FlipPoint(std::vector<Atom> const& atoms)
-        {
-            if(atoms.size() >= 2 && atoms[0].isNumber() && atoms[1].isNumber())
+            //! @internal flip static declare method
+            template<class TModel>
+            static void declare()
             {
-                m_x = atoms[0].getFloat();
-                m_y = atoms[1].getFloat();
+                if(TModel::template has<FlipRGBA>()) return;
+                
+                TModel::template declare<FlipRGBA>()
+                .name("cicm.kiwi.FlipRGBA")
+                .template member<flip::Float, &FlipRGBA::m_red>      ("red")
+                .template member<flip::Float, &FlipRGBA::m_green>    ("green")
+                .template member<flip::Float, &FlipRGBA::m_blue>     ("blue")
+                .template member<flip::Float, &FlipRGBA::m_alpha>    ("alpha");
             }
-        }
-        
-        //! @internal flip static declare method
-        template<class TModel>
-        static void declare()
-        {
-            if(TModel::template has<FlipPoint>()) return;
             
-            TModel::template declare<FlipPoint>()
-            .template name("cicm.kiwi.FlipPoint")
-            .template member<flip::Float, &FlipPoint::m_x>("x")
-            .template member<flip::Float, &FlipPoint::m_y>("y");
-        }
+            //! Retrieve the FlipRGBA value as a vector of atoms.
+            operator std::vector<Atom>() const
+            {
+                return {red(), green(), blue(), alpha()};
+            }
+            
+            double red() const noexcept                 {return m_red;}
+            double green() const noexcept               {return m_green;}
+            double blue() const noexcept                {return m_blue;}
+            double alpha() const noexcept               {return m_alpha;}
+            
+            void red(const double _red) noexcept        {m_red = _red;}
+            void green(const double _green) noexcept    {m_green = _green;}
+            void blue(const double _blue) noexcept      {m_blue = _blue;}
+            void alpha(const double _alpha) noexcept    {m_alpha = _alpha;}
+            
+        private:
+            
+            //! @internal clip value between 0 and 1
+            static constexpr inline double cclip(const double val){return (val > 1.) ? 1. : ((val > 0.) ? val : 0.);}
+            
+            flip::Float m_red;
+            flip::Float m_green;
+            flip::Float m_blue;
+            flip::Float m_alpha;
+        };
         
-        //! Retrieve the attribute value as a vector of atoms.
-        operator std::vector<Atom>() const
+        // ================================================================================ //
+        //                                    FLIP POINT                                    //
+        // ================================================================================ //
+        
+        class FlipPoint : public flip::Object
         {
-            return {static_cast<Atom::float_t>(m_x), static_cast<Atom::float_t>(m_y)};
-        }
-        
-    private:
-        flip::Float m_x;
-        flip::Float m_y;
-    };
+        public:
+            FlipPoint() = default;
+            
+            FlipPoint(const double x, const double y) : m_x(x), m_y(y) {}
+            
+            //! Create a color with a vector of atoms.
+            FlipPoint(std::vector<Atom> const& atoms)
+            {
+                if(atoms.size() >= 2 && atoms[0].isNumber() && atoms[1].isNumber())
+                {
+                    m_x = atoms[0].getFloat();
+                    m_y = atoms[1].getFloat();
+                }
+            }
+            
+            //! @internal flip static declare method
+            template<class TModel>
+            static void declare()
+            {
+                if(TModel::template has<FlipPoint>()) return;
+                
+                TModel::template declare<FlipPoint>()
+                .template name("cicm.kiwi.FlipPoint")
+                .template member<flip::Float, &FlipPoint::m_x>("x")
+                .template member<flip::Float, &FlipPoint::m_y>("y");
+            }
+            
+            //! Retrieve the attribute value as a vector of atoms.
+            operator std::vector<Atom>() const
+            {
+                return {static_cast<Atom::float_t>(m_x), static_cast<Atom::float_t>(m_y)};
+            }
+            
+        private:
+            flip::Float m_x;
+            flip::Float m_y;
+        };
+    }
 }
 
 #endif // KIWI_MODEL_FLIP_TYPES_HPP_INCLUDED

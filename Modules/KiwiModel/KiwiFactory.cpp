@@ -25,59 +25,61 @@
 
 namespace kiwi
 {
-    // ================================================================================ //
-    //                                      FACTORY                                     //
-    // ================================================================================ //
-    
-    Object* Factory::create(std::string const& name, std::string const& text)
+    namespace model
     {
-        std::lock_guard<std::mutex> guard(getMutex());
-        const auto& creators = getCreators();
+        // ================================================================================ //
+        //                                      FACTORY                                     //
+        // ================================================================================ //
         
-        const auto it = creators.find(name);
-        if(it != creators.end())
+        Object* Factory::create(std::string const& name, std::string const& text)
         {
-            Object* obj = it->second->create(name, text);
-            /*
-            if(obj)
+            std::lock_guard<std::mutex> guard(getMutex());
+            const auto& creators = getCreators();
+            
+            const auto it = creators.find(name);
+            if(it != creators.end())
             {
-                obj->read(detail.dico);
+                Object* obj = it->second->create(name, text);
+                /*
+                 if(obj)
+                 {
+                 obj->read(detail.dico);
+                 }
+                 */
+                return obj;
             }
-            */
-            return obj;
+            else
+            {
+                //Console::error("The factory doesn't know the object " + name->getName());
+                return nullptr;
+            }
         }
-        else
+        
+        //Object* create(std::string const& name, std::string const& text)
+        
+        bool Factory::has(std::string const& name)
         {
-            //Console::error("The factory doesn't know the object " + name->getName());
-            return nullptr;
+            std::lock_guard<std::mutex> guard(getMutex());
+            const auto& creators = getCreators();
+            return creators.find(name) != creators.end();
         }
-    }
-    
-    //Object* create(std::string const& name, std::string const& text)
-    
-    bool Factory::has(std::string const& name)
-    {
-        std::lock_guard<std::mutex> guard(getMutex());
-        const auto& creators = getCreators();
-        return creators.find(name) != creators.end();
-    }
-    
-    void Factory::remove(std::string const& name)
-    {
-        std::lock_guard<std::mutex> guard(getMutex());
-        getCreators().erase(name);
-    }
-    
-    std::vector<std::string const> Factory::names()
-    {
-        std::lock_guard<std::mutex> guard(getMutex());
-        std::vector<std::string const> names;
-        for(auto it : getCreators())
+        
+        void Factory::remove(std::string const& name)
         {
-            names.push_back(it.first);
+            std::lock_guard<std::mutex> guard(getMutex());
+            getCreators().erase(name);
         }
-        return names;
+        
+        std::vector<std::string const> Factory::names()
+        {
+            std::lock_guard<std::mutex> guard(getMutex());
+            std::vector<std::string const> names;
+            for(auto it : getCreators())
+            {
+                names.push_back(it.first);
+            }
+            return names;
+        }
     }
-    
 }
 

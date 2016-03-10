@@ -27,53 +27,40 @@
 
 namespace kiwi
 {
-    // ================================================================================ //
-    //                                      LINK                                        //
-    // ================================================================================ //
-    
-    Link::Link(Object* from, const uint8_t outlet, Object* to, const uint8_t inlet) noexcept :
-    m_object_from(from),
-    m_object_to(to),
-    m_index_outlet(outlet),
-    m_index_intlet(inlet)
+    namespace model
     {
-        ;
-    }
-    
-    Link::~Link()
-    {
-        Object*     from    = getObjectFrom();
-        Object*     to      = getObjectTo();
-        if(from && to)
+        // ================================================================================ //
+        //                                      LINK                                        //
+        // ================================================================================ //
+        
+        Link::Link(Object* from, const uint8_t outlet, Object* to, const uint8_t inlet) noexcept :
+        m_object_from(from),
+        m_object_to(to),
+        m_index_outlet(outlet),
+        m_index_intlet(inlet)
         {
-            /*
-            Object::sOutlet outlet  = from->getOutlet(m_index_outlet);
-            if(outlet)
+            ;
+        }
+        
+        Link::~Link()
+        {
+            Object*     from    = getObjectFrom();
+            Object*     to      = getObjectTo();
+            if(from && to)
             {
-                outlet->erase(to, m_index_outlet);
+                /*
+                 Object::sOutlet outlet  = from->getOutlet(m_index_outlet);
+                 if(outlet)
+                 {
+                 outlet->erase(to, m_index_outlet);
+                 }
+                 Object::sInlet inlet    = to->getInlet(m_index_intlet);
+                 if(inlet)
+                 {
+                 inlet->erase(from, m_index_intlet);
+                 }
+                 */
             }
-            Object::sInlet inlet    = to->getInlet(m_index_intlet);
-            if(inlet)
-            {
-                inlet->erase(from, m_index_intlet);
-            }
-            */
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
