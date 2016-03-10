@@ -36,23 +36,32 @@ namespace kiwi
         //                                      OBJECT                                      //
         // ================================================================================ //
         
-        //! The object is a graphical object.
-        /**
-         The object is a graphical class that aims to be instantiated in a patcher.
-         */
+        //! @brief The Object is an abstract base class for kiwi objects.
+        //! @details objects can be instantiated in a Patcher.
         class Object :  public flip::Object,
-        public Attribute::Manager
+                        public Attribute::Manager
         {
         public:
             friend class Patcher;
             
-        private:
-            flip::String    m_name;
-            flip::String    m_text;
-            flip::Int       m_id;
+            class Classic;
+            friend class Classic;
             
-        public:
+            //! @brief Enum of Object types
+            //! @remark Can't use Type because of flip::Object::Type conflict
+            enum class aType : uint8_t
+            {
+                Invalid = 0,
+                Default,
+                Classic,
+                Gui,
+                Dsp,
+                DspGUi
+            };
             
+            using Type = kiwi::model::Object::Type;
+            
+            //! @brief Default constructor.
             Object() = default;
             
             //! @brief Constructor.
@@ -68,74 +77,64 @@ namespace kiwi
             template<class TModel>
             static void declare()
             {
-                if(TModel::template has<Object>()) return;
+                if(TModel::template has<model::Object>()) return;
                 
-                TModel::template declare<Object>()
+                TModel::template declare<model::Object>()
                 .template name("cicm.kiwi.Object")
                 .template member<flip::String, &Object::m_name>("name")
                 .template member<flip::String, &Object::m_text>("text")
                 .template member<flip::Int, &Object::m_id>("id");
             }
             
-        public:
+            virtual inline aType getType() const noexcept { return aType::Invalid; };
             
-            //! Retrieve the patcher that manages the object.
-            /** The function retrieves the patcher that manages the object.
-             @return The patcher that manages the object.
-             */
-            inline Patcher* getPatcher()
-            {
-                Patcher* patcher = parent().ptr<Patcher>();
-                return patcher;
-            }
+            //! @brief Returns the patcher that manages the object.
+            //! @return The Patcher's pointer.
+            inline Patcher* getPatcher() { return parent().ptr<Patcher>(); }
             
-            //! Retrieve the name of the object.
-            /** The function retrieves the name of the object as a tag.
-             @return The name of the object as a tag.
-             */
+            //! @brief Returns the name of the Object.
+            //! @return The name of the Object.
             inline std::string getName() const noexcept { return m_name; }
             
-            //! Retrieve the text of the object.
-            /** The function retrieves the text of the object.
-             @return The text of the object.
-             */
+            //! @brief Returns the text of the Object.
+            //! @return The text of the Object.
             inline std::string getText() const noexcept { return m_text; }
             
-            //! Retrieve the id of the object.
-            /** The function retrieves the id of the object.
-             @return The id of the object.
-             */
+            //! @brief Returns the id of the Object.
+            //! @return The id of the Object.
             inline int64_t getId() const noexcept       { return m_id; }
             
-            //! Retrieves if the box should be hidden when the patcher is locked.
-            /** The function retrieves if the box should be hidden when the patcher is locked.
-             @return True if the box should be hidden when the patcher is locked, false otherwise.
-             */
-            inline bool isHiddenOnLock() const noexcept
+        private:
+            flip::String    m_name;
+            flip::String    m_text;
+            flip::Int       m_id;
+        };
+        
+        // ================================================================================ //
+        //                                  OBJECT CLASSIC                                  //
+        // ================================================================================ //
+        
+        class Object::Classic : public model::Object
+        {
+        public:
+            inline aType getType() const noexcept final { return aType::Classic; };
+            
+            //! @internal flip static declare method
+            template<class TModel>
+            static void declare()
             {
-                //return getAttributeValue("hidden").getInt();
-                return true;
+                if(TModel::template has<Object::Classic>()) return;
+                
+                TModel::template declare<Object::Classic>()
+                .template name("cicm.kiwi.Object.Classic")
+                .template inherit<model::Object>()
+                .template member<decltype(Classic::m_bgcolor), &Classic::m_bgcolor>("bgcolor")
+                .template member<decltype(Classic::m_color), &Classic::m_color>("color");
             }
             
-            //! Retrieve if the box should be displayed in presentation.
-            /** The function retrieves if the box should be displayed in presentation.
-             @return True if the box should be displayed in presentation, otherwise false.
-             */
-            inline bool isIncludeInPresentation() const noexcept
-            {
-                //return getAttributeValue("presentation").getInt();
-                return true;
-            }
-            
-            //! Retrieve the "ignoreclick" attribute value of the box.
-            /** The function retrieves the "ignoreclick" attribute value of the box.
-             @return The "ignoreclick" attribute value of the box.
-             */
-            inline bool getIgnoreClick() const noexcept
-            {
-                //return getAttributeValue("ignoreclick").getInt();
-                return true;
-            }
+        private:
+            Attribute::RGBA             m_bgcolor;    ///< background color of the box
+            Attribute::RGBA             m_color;      ///< text color of the box
         };
     }
 }
