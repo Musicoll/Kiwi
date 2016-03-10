@@ -21,8 +21,8 @@
  ==============================================================================
 */
 
-#ifndef __DEF_KIWI_MODELS_FLIP_TYPES__
-#define __DEF_KIWI_MODELS_FLIP_TYPES__
+#ifndef KIWI_MODEL_FLIP_TYPES_HPP_INCLUDED
+#define KIWI_MODEL_FLIP_TYPES_HPP_INCLUDED
 
 #include "../KiwiCore/KiwiAtom.hpp"
 
@@ -127,7 +127,7 @@ namespace kiwi
     };
     
     // ================================================================================ //
-    //                                  FLIP RGBA COLOR                                 //
+    //                                    FLIP POINT                                    //
     // ================================================================================ //
     
     class FlipPoint : public flip::Object
@@ -171,6 +171,4 @@ namespace kiwi
     };
 }
 
-#endif
-
-
+#endif // KIWI_MODEL_FLIP_TYPES_HPP_INCLUDED

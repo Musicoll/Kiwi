@@ -21,8 +21,8 @@
  ==============================================================================
 */
 
-#ifndef __DEF_KIWI_MODELS_OBJECT__
-#define __DEF_KIWI_MODELS_OBJECT__
+#ifndef KIWI_MODEL_OBJECT_HPP_INCLUDED
+#define KIWI_MODEL_OBJECT_HPP_INCLUDED
 
 #include "KiwiAttribute.hpp"
 
@@ -138,4 +138,4 @@ namespace kiwi
 }
 
 
-#endif
+#endif // KIWI_MODEL_OBJECT_HPP_INCLUDED

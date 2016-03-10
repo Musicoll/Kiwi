@@ -21,8 +21,8 @@
  ==============================================================================
 */
 
-#ifndef __DEF_KIWI_MODELS_FACTORY__
-#define __DEF_KIWI_MODELS_FACTORY__
+#ifndef KIWI_MODEL_FACTORY_HPP_INCLUDED
+#define KIWI_MODEL_FACTORY_HPP_INCLUDED
 
 #include "KiwiPatcher.hpp"
 
@@ -146,6 +146,4 @@ namespace kiwi
 }
 
 
-#endif
-
-
+#endif // KIWI_MODEL_FACTORY_HPP_INCLUDED

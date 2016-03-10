@@ -21,8 +21,8 @@
  ==============================================================================
 */
 
-#ifndef __DEF_KIWI_MODELS_PATCHER__
-#define __DEF_KIWI_MODELS_PATCHER__
+#ifndef KIWI_MODEL_PATCHER_HPP_INCLUDED
+#define KIWI_MODEL_PATCHER_HPP_INCLUDED
 
 #include "KiwiLink.hpp"
 
@@ -153,6 +153,4 @@ namespace kiwi
 }
 
 
-#endif
-
-
+#endif // KIWI_MODEL_PATCHER_HPP_INCLUDED
