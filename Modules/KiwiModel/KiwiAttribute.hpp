@@ -21,14 +21,13 @@
  ==============================================================================
 */
 
-#ifndef __DEF_KIWI_MODELS_FLIPATTR__
-#define __DEF_KIWI_MODELS_FLIPATTR__
+#ifndef KIWI_MODEL_ATTRIBUTE_HPP_INCLUDED
+#define KIWI_MODEL_ATTRIBUTE_HPP_INCLUDED
 
 #include "KiwiFlipTypes.hpp"
 
 namespace kiwi
 {
-    class TModel {};
     // ================================================================================ //
     //                                      ATTRIBUTE                                   //
     // ================================================================================ //
@@ -533,4 +532,4 @@ namespace kiwi
     };
 }
 
-#endif
+#endif // KIWI_MODEL_ATTRIBUTE_HPP_INCLUDED

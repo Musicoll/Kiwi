@@ -24,7 +24,7 @@
 #ifndef __DEF_KIWI_MODELS_OBJECT__
 #define __DEF_KIWI_MODELS_OBJECT__
 
-#include "KiwiFlipAttr.hpp"
+#include "KiwiAttribute.hpp"
 
 namespace kiwi
 {

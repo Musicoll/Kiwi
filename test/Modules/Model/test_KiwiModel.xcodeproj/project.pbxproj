@@ -94,7 +94,6 @@
 		2C2D0E201C870953009BED7B /* String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C2D0DC01C870953009BED7B /* String.cpp */; };
 		2C2D0E211C870953009BED7B /* Transaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C2D0DC11C870953009BED7B /* Transaction.cpp */; };
 		2C2D0E221C870B51009BED7B /* KiwiPatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C2D08FE1C866D00009BED7B /* KiwiPatcher.cpp */; };
-		2C2D0E231C872439009BED7B /* KiwiFlipAttr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C2D08F51C866D00009BED7B /* KiwiFlipAttr.cpp */; };
 		2C2D0E241C87243F009BED7B /* KiwiObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C2D08FC1C866D00009BED7B /* KiwiObject.cpp */; };
 		2C2D0E251C872442009BED7B /* KiwiLink.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C2D08F81C866D00009BED7B /* KiwiLink.cpp */; };
 		2C2D0E261C872447009BED7B /* KiwiFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C2D08F11C866D00009BED7B /* KiwiFactory.cpp */; };
@@ -118,8 +117,7 @@
 		2C2D08EB1C866C8C009BED7B /* test_KiwiPatcher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_KiwiPatcher.cpp; sourceTree = "<group>"; };
 		2C2D08F11C866D00009BED7B /* KiwiFactory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiFactory.cpp; sourceTree = "<group>"; };
 		2C2D08F21C866D00009BED7B /* KiwiFactory.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = KiwiFactory.hpp; sourceTree = "<group>"; };
-		2C2D08F51C866D00009BED7B /* KiwiFlipAttr.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiFlipAttr.cpp; sourceTree = "<group>"; };
-		2C2D08F61C866D00009BED7B /* KiwiFlipAttr.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = KiwiFlipAttr.hpp; sourceTree = "<group>"; };
+		2C2D08F61C866D00009BED7B /* KiwiAttribute.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = KiwiAttribute.hpp; sourceTree = "<group>"; };
 		2C2D08F71C866D00009BED7B /* KiwiFlipTypes.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = KiwiFlipTypes.hpp; sourceTree = "<group>"; };
 		2C2D08F81C866D00009BED7B /* KiwiLink.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiLink.cpp; sourceTree = "<group>"; };
 		2C2D08F91C866D00009BED7B /* KiwiLink.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = KiwiLink.hpp; sourceTree = "<group>"; };
@@ -399,8 +397,7 @@
 			isa = PBXGroup;
 			children = (
 				2C2D08F71C866D00009BED7B /* KiwiFlipTypes.hpp */,
-				2C2D08F51C866D00009BED7B /* KiwiFlipAttr.cpp */,
-				2C2D08F61C866D00009BED7B /* KiwiFlipAttr.hpp */,
+				2C2D08F61C866D00009BED7B /* KiwiAttribute.hpp */,
 				2C2D08FC1C866D00009BED7B /* KiwiObject.cpp */,
 				2C2D08FD1C866D00009BED7B /* KiwiObject.hpp */,
 				2C2D08F81C866D00009BED7B /* KiwiLink.cpp */,
@@ -919,7 +916,6 @@
 				2C2D0DD51C870953009BED7B /* CarrierSocketTcp.cpp in Sources */,
 				2C2D0E161C870953009BED7B /* Entity.cpp in Sources */,
 				2C2D0DFA1C870953009BED7B /* Direction.cpp in Sources */,
-				2C2D0E231C872439009BED7B /* KiwiFlipAttr.cpp in Sources */,
 				2C2D0E1F1C870953009BED7B /* SignalConnection.cpp in Sources */,
 				2C2D0DFF1C870953009BED7B /* KeyFloat.cpp in Sources */,
 				2C2D0DE71C870953009BED7B /* CarrierTransportSocketTcp.cpp in Sources */,
