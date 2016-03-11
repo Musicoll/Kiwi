@@ -21,8 +21,10 @@
  ==============================================================================
  */
 
-#ifndef KIWI_POINT_H_INCLUDED
-#define KIWI_POINT_H_INCLUDED
+#ifndef KIWI_GRAPHICS_POINT_HPP_INCLUDED
+#define KIWI_GRAPHICS_POINT_HPP_INCLUDED
+
+#include <math.h>
 
 namespace kiwi
 {
@@ -33,7 +35,7 @@ namespace kiwi
         // ================================================================================ //
         
         //!@todo create a class angle and define constants like pi or angle precision
-        class Point
+        class Point final
         {
         public:
             
@@ -53,39 +55,19 @@ namespace kiwi
             inline ~Point() noexcept = default;
             
             //! @brief Gets the abscissa
-            constexpr inline double x() const noexcept
-            {
-                return m_data[0];
-            }
+            constexpr double x() const noexcept;
             
             // @brief Gets the ordinate
-            constexpr inline double y() const noexcept
-            {
-                return m_data[1];
-            }
+            constexpr double y() const noexcept;
             
             //! @brief Sets the abscissa
-            inline void x(const double x) noexcept
-            {
-                m_data[0] = x;
-            }
+            inline void x(const double x) noexcept;
             
             //! @brief Sets the ordinate
-            inline void y(const double y) noexcept
-            {
-                m_data[1] = y;
-            }
+            inline void y(const double y) noexcept;
             
             //! @brief Copies the coordinate of another point
-            Point& operator=(Point const& pt) noexcept
-            {
-                if (&pt != this)
-                {
-                    m_data[0] = pt.m_data[0];
-                    m_data[1] = pt.m_data[1];
-                }
-                return *this;
-            }
+            inline Point& operator=(Point const& pt) noexcept;
             
             //! @brief Retrieves a copy of the rotated point around the origin
             //! @return A copy of the rotated Point
@@ -112,7 +94,7 @@ namespace kiwi
             double angleToPoint(Point const& pt) const noexcept;
             
             //! @brief Returns the scalar product of two points
-            double dot(Point const& pt) const noexcept;
+            constexpr double dot(Point const& pt) const noexcept;
             
         private:
             double m_data[2];
@@ -120,10 +102,6 @@ namespace kiwi
         
         //! @brief Retrun true if the distance between the points is less or equal to eps
         bool areNear(Point const& l_pt, Point const& r_pt, const double eps) noexcept;
-        
-        //! @brief Return true if the distance between points is less or equal to an epsilon
-        //! @details The default epsilon used is 1e-12
-        bool areNear(Point const& l_pt, Point const& r_pt) noexcept;
         
         //! @brief Retrieves the distance from the origin
         double norm(Point const& pt) noexcept;
@@ -133,39 +111,112 @@ namespace kiwi
         
         //! @brief Multiplies point with scalar value
         //! @details Returns a point with both coordinates multiplied by value
-        Point operator*(const double value, Point const& pt) noexcept;
+        constexpr Point operator*(const double value, Point const& pt) noexcept;
         
         //! @brief Multiplies point with scalar value
         //! @details Returns a point with both coordinates multiplied by value
-        Point operator*(Point const& pt, double const value) noexcept;
+        constexpr Point operator*(Point const& pt, double const value) noexcept;
         
         //! @brief Mutltiplies the coordinates by value
         Point& operator*=(Point &pt, double const value) noexcept;
         
         //! @brief Divides point with scalar value
         //! @details Returns a point with both coordinates divided by value
-        Point operator/(Point const& pt, const double value);
+        constexpr Point operator/(Point const& pt, const double value);
         
         //! @brief Divides the abscissa and the ordinate with a value.
         Point& operator/=(Point & pt, double const value);
         
         //! @brief Retrieves a point with the added ccordinates of lPt and rPt
         //! @details l_pt + r_pt
-        Point operator+(Point const& lPt, Point const & rPt) noexcept;
+        constexpr Point operator+(Point const& lPt, Point const & rPt) noexcept;
         
         //! @brief Increments the coordinates with another point's coordinates
-        Point& operator+=(Point &lPt, Point const& rPt);
+        Point& operator+=(Point &lPt, Point const& rPt) noexcept;
         
         //! @brief Retrieves a point with the substraction of lPt and rPt coordinates
         //! @details l_pt - r_pt
-        Point operator-(Point const& lPt, Point const& rPt) noexcept;
+        constexpr Point operator-(Point const& lPt, Point const& rPt) noexcept;
         
         //! @brief Decrements the coordinates with another point's coordinates
         Point& operator-=(Point &lPt, Point const& rPt) noexcept;
         
         //! @brief Returns a point with -abscissa and -ordinate
-        Point operator-(Point const& pt) noexcept;
+        constexpr Point operator-(Point const& pt) noexcept;
+        
+        // =================================
+        // Implementation
+        // =================================
+        
+        constexpr double Point::x() const noexcept
+        {
+            return m_data[0];
+        }
+        
+        constexpr double Point::y() const noexcept
+        {
+            return m_data[1];
+        }
+        
+        inline void Point::x(const double x) noexcept
+        {
+            m_data[0] = x;
+        }
+        
+        inline void Point::y(const double y) noexcept
+        {
+            m_data[1] = y;
+        }
+        
+        inline Point& Point::operator=(Point const& pt) noexcept
+        {
+            if (&pt != this)
+            {
+                m_data[0] = pt.m_data[0];
+                m_data[1] = pt.m_data[1];
+            }
+            return *this;
+        }
+        
+        constexpr double Point::dot(Point const& pt) const noexcept
+        {
+            return x() * pt.x() + y() * pt.y();
+        }
+        
+        constexpr Point operator*(Point const& pt, double const value) noexcept
+        {
+            return value * pt;
+        }
+        
+        constexpr Point operator*(const double value, Point const& pt) noexcept
+        {
+            return Point(value * pt.x(),
+                         value * pt.y());
+        };
+        
+        constexpr Point operator-(Point const& lPt, Point const& rPt) noexcept
+        {
+            return Point(lPt.x() - rPt.x(),
+                         lPt.y() - rPt.y());
+        }
+        
+        constexpr Point operator-(Point const& pt) noexcept
+        {
+            return Point(-pt.x(), -pt.y());
+        };
+        
+        constexpr Point operator+(Point const& lPt, Point const & rPt) noexcept
+        {
+            return Point(lPt.x() + rPt.x(),
+                         lPt.y() + rPt.y());
+        };
+        
+        constexpr Point operator/(Point const& pt, const double value)
+        {
+            return Point(pt.x() / value,
+                         pt.y() / value);
+        };
     }
 }
 
-#endif // KIWI_POINT_H_INCLUDED
+#endif // KIWI_GRAPHICS_POINT_HPP_INCLUDED

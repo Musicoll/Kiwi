@@ -36,56 +36,22 @@ namespace kiwi
         // Operators
         // =================================
         
-        Point operator*(const double value, Point const& pt) noexcept
-        {
-            return Point(value * pt.x(),
-                         value * pt.y());
-        }
-        
-        Point operator*(Point const& pt, double const value) noexcept
-        {
-            return value * pt;
-        }
-        
         Point& operator*=(Point &pt, double const value) noexcept
         {
             pt = value * pt;
             return pt;
         }
         
-        Point operator+(Point const& lPt, Point const & rPt) noexcept
-        {
-            return Point(lPt.x() + rPt.x(),
-                         lPt.y() + rPt.y());
-        }
-        
-        Point& operator+=(Point &lPt, Point const& rPt)
+        Point& operator+=(Point &lPt, Point const& rPt) noexcept
         {
             lPt = lPt + rPt;
             return lPt;
-        }
-        
-        Point operator-(Point const& lPt, Point const& rPt) noexcept
-        {
-            return Point(lPt.x() - rPt.x(),
-                         lPt.y() - rPt.y());
         }
         
         Point& operator-=(Point &lPt, Point const& rPt) noexcept
         {
             lPt = lPt - rPt;
             return lPt;
-        }
-        
-        Point operator-(Point const& pt) noexcept
-        {
-            return Point(-pt.x(), -pt.y());
-        }
-        
-        Point operator/(Point const& pt, const double value)
-        {
-            return Point(pt.x() / value,
-                         pt.y() / value);
         }
         
         Point& operator/=(Point & pt, double const value)
@@ -97,11 +63,6 @@ namespace kiwi
         // =================================
         // Scalar product, Norm
         // =================================
-        
-        double Point::dot(Point const& pt) const noexcept
-        {
-            return this->x() * pt.x() + this->y() * pt.y();
-        }
         
         double norm(Point const& pt) noexcept
         {
@@ -116,12 +77,6 @@ namespace kiwi
         bool areNear(Point const& l_pt, Point const& r_pt, const double eps) noexcept
         {
             return distance(l_pt, r_pt) <= eps;
-        }
-        
-        bool areNear(Point const& l_pt, Point const& r_pt) noexcept
-        {
-            const double eps = 1e-12;
-            return areNear(l_pt, r_pt, eps);
         }
         
         // =================================
@@ -146,8 +101,11 @@ namespace kiwi
         Point Point::rotated(Point const& pt, double const angle) const noexcept
         {
             const Point newpt = *this - pt;
-            return Point(newpt.x() * cos (angle) - newpt.y() * sin (angle) + pt.x(), newpt.x() * sin (angle) + newpt.y() * cos (angle) + pt.y());
+            
+            return Point(newpt.x() * cos (angle) - newpt.y() * sin (angle) + pt.x(),
+                         newpt.x() * sin (angle) + newpt.y() * cos (angle) + pt.y());
         }
+
         
         void Point::rotate(double const angle) noexcept
         {

@@ -33,6 +33,11 @@ namespace kiwi
 {
     namespace graphics
     {
+     
+        bool areNear(Point const& pt_left, Point const& pt_right)
+        {
+            return areNear(pt_left, pt_right, 1e-12);
+        }
         
         TEST_CASE("Point", "[Point]")
         {
@@ -208,7 +213,6 @@ namespace kiwi
                     to_rotate_around.rotate(shift, angle_60);
                     CHECK(areNear(to_rotate_around, point_30.rotated(angle_60) + shift));
                 }
-                
             }
         }
     }

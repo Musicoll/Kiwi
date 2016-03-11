@@ -166,7 +166,7 @@ namespace kiwi
             }
         }
         
-        void Path::clear() noexcept
+        void Path::clear()
         {
             m_nodes.clear();
             m_nodes.emplace_back(Point(0, 0), Move);

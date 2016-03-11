@@ -21,8 +21,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_PATH_H_INCLUDED
-#define KIWI_PATH_H_INCLUDED
+#ifndef KIWI_GRAPHICS_PATH_HPP_INCLUDED
+#define KIWI_GRAPHICS_PATH_HPP_INCLUDED
 
 #include <KiwiGraphics/KiwiPoint.hpp>
 #include <KiwiGraphics/KiwiAffineMatrix.hpp>
@@ -79,7 +79,7 @@ namespace kiwi
             
             //! @brief Removes all nodes
             //! @details After clear, the path continues drawing from origin
-            void clear() noexcept;
+            void clear();
             
             //! @brief Applies an affine transform to the path
             //! @details AffineTransform is applied to all nodes
@@ -184,4 +184,4 @@ namespace kiwi
     }
 }
 
-#endif // KIWI_PATH_H_INCLUDED
+#endif // KIWI_GRAPHICS_PATH_HPP_INCLUDED
