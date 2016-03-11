@@ -183,16 +183,16 @@ namespace kiwi
             return x() * pt.x() + y() * pt.y();
         }
         
-        constexpr Point operator*(Point const& pt, double const value) noexcept
-        {
-            return value * pt;
-        }
-        
         constexpr Point operator*(const double value, Point const& pt) noexcept
         {
             return Point(value * pt.x(),
                          value * pt.y());
         };
+        
+        constexpr Point operator*(Point const& pt, double const value) noexcept
+        {
+            return value * pt;
+        }
         
         constexpr Point operator-(Point const& lPt, Point const& rPt) noexcept
         {

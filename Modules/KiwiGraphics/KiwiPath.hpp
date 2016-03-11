@@ -72,7 +72,7 @@ namespace kiwi
             ~Path() noexcept = default;
             
             //! @brief Gets the number of nodes
-            inline ulong size() const noexcept {return static_cast<ulong>(m_nodes.size());}
+            inline size_t size() const noexcept {return m_nodes.size();}
             
             //! @brief Returns true if the path is empty
             inline bool empty() const noexcept {return m_nodes.size() <= 1;}
