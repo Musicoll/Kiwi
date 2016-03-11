@@ -57,7 +57,7 @@ namespace kiwi
         // Path
         // =================================
         
-        inline Path& Path::operator=(Path const& other) noexcept
+        Path& Path::operator=(Path const& other) noexcept
         {
             if (this != &other)
             {
@@ -66,7 +66,7 @@ namespace kiwi
             return *this;
         }
         
-        inline Path& Path::operator=(Path&& other) noexcept
+        Path& Path::operator=(Path&& other) noexcept
         {
             if (this != &other)
             {

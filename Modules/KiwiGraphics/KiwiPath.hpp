@@ -156,8 +156,8 @@ namespace kiwi
                 
                 ~Node() noexcept = default;
                 
-                constexpr inline Point getPos() const noexcept{return m_pos;}
-                constexpr inline Mode getMode() const noexcept{return m_mode;}
+                constexpr Point getPos() const noexcept{return m_pos;}
+                constexpr Mode getMode() const noexcept{return m_mode;}
                 
                 inline void setPos(const Point pos) noexcept {m_pos = pos;};
                 
