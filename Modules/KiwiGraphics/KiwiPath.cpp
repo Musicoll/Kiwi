@@ -21,328 +21,191 @@
  ==============================================================================
  */
 
-#include "KiwiPath.h"
+#include <assert.h>
+
+#include <KiwiGraphics/KiwiPath.hpp>
 
 namespace kiwi
 {
-    void Path::transform(AffineMatrix const& matrix) noexcept
+    namespace graphics
     {
-        for(auto&& node : m_nodes)
-        {
-            node.transform(matrix);
-        }
-        //m_bounds update
-    }
-    
-    Path Path::transformed(AffineMatrix const& matrix) const noexcept
-    {
-        Path p = *this;
-        p.transform(matrix);
-        return p;
-    }
-    
-    void Path::addRectangle(Rectangle const& rect, const double r) noexcept
-    {
-        addRectangle(rect.x(), rect.y(), rect.width(), rect.height(), r, r,
-                     Rectangle::TopLeft | Rectangle::TopRight | Rectangle::BottomLeft | Rectangle::BottomRight);
-    }
-    
-    void Path::addRectangle(const double x, const double y, const double w, const double h,
-                            double rx, double ry, const char corner) noexcept
-    {
-        rx = clip(rx, 0., w * 0.5f);
-        ry = clip(ry, 0., h * 0.5f);
-        const double r45x = rx * 0.45f;
-        const double r45y = ry * 0.45f;
-        const double x2 = x + w;
-        const double y2 = y + h;
         
-        if (corner & Rectangle::TopLeft)
-        {
-            addNode(Node(Point(x, y + ry), Move));
-            cubicTo(Point(x, y + r45y), Point(x + r45x, y), Point(x + rx, y));
-        }
-        else
-        {
-            addNode(Node(Point(x, y), Move));
-        }
+        // =================================
+        // Node
+        // =================================
         
-        if (corner & Rectangle::TopRight)
+        Path::Node& Path::Node::operator=(Node const& other) noexcept
         {
-            lineTo(Point(x2 - rx, y));
-            cubicTo(Point(x2 - r45x, y), Point(x2, y + r45y), Point(x2, y + ry));
-        }
-        else
-        {
-            lineTo(Point(x2, y));
-        }
-        
-        if (corner & Rectangle::BottomRight)
-        {
-            lineTo(Point(x2, y2 - ry));
-            cubicTo(Point(x2, y2 - r45y), Point(x2 - r45x, y2), Point(x2 - rx, y2));
-        }
-        else
-        {
-            lineTo(Point(x2, y2));
-        }
-        
-        if (corner & Rectangle::BottomLeft)
-        {
-            lineTo(Point(x + rx, y2));
-            cubicTo(Point(x + r45x, y2), Point(x, y2 - r45y), Point(x, y2 - ry));
-        }
-        else
-        {
-            lineTo(Point(x, y2));
-        }
-        
-        close();
-    }
-    
-    void Path::addEllipse(Rectangle const& rect) noexcept
-    {
-        const double hw = rect.width() * 0.5f;
-        const double hw55 = hw * 0.55f;
-        const double hh = rect.height() * 0.5f;
-        const double hh55 = hh * 0.55f;
-        const double cx = rect.x() + hw;
-        const double cy = rect.y() + hh;
-        
-        moveTo(Point(cx, cy - hh));
-        cubicTo(Point(cx + hw55, cy - hh), Point(cx + hw, cy - hh55), Point(cx + hw, cy));
-        cubicTo(Point(cx + hw, cy + hh55), Point(cx + hw55, cy + hh), Point(cx, cy + hh));
-        cubicTo(Point(cx - hw55, cy + hh), Point(cx - hw, cy + hh55), Point(cx - hw, cy));
-        cubicTo(Point(cx - hw, cy - hh55), Point(cx - hw55, cy - hh), Point(cx, cy - hh));
-        close();
-    }
-    
-    void Path::addEllipse(Point const& center, const double rx, const double ry) noexcept
-    {
-        const Point delta(std::max(0., rx), std::max(0., ry));
-        addEllipse(Rectangle::withCorners(center - delta, center + delta));
-    }
-    
-    void Path::addArc(Point const& center, const Point& radius, const double start, const double end) noexcept
-    {
-        const std::vector<Point> points = BezierCubic::fromArc(center, radius, start, end);
-        moveTo(points[0]);
-        for(std::vector<Point>::size_type i = 1; i < points.size(); i++)
-        {
-            addNode(Node(points[i], Cubic));
-        }
-    }
-    
-    void Path::addArc(Point const& center, const Point& radius, const double start, const double end, const double rot) noexcept
-    {
-        const std::vector<Point> points = BezierCubic::fromArc(center, radius, start, end);
-        moveTo(points[0].rotated(center, rot));
-        for(std::vector<Point>::size_type i = 1; i < points.size(); i++)
-        {
-            addNode(Node(points[i].rotated(center, rot), Cubic));
-        }
-    }
-    
-    void Path::addPieChart(Point const& center, const Point& radius, const double start, const double end) noexcept
-    {
-        const std::vector<Point> points = BezierCubic::fromArc(center, radius, start, end);
-        moveTo(center);
-        lineTo(points[0]);
-        for(std::vector<Point>::size_type i = 1; i < points.size(); i++)
-        {
-            addNode(Node(points[i], Cubic));
-        }
-        lineTo(center);
-        close();
-    }
-    
-    double Path::distance(Point const& pt) const noexcept
-    {
-        if(m_nodes.size() == 1)
-        {
-            return pt.distance(m_nodes[0].point());
-        }
-        else if(m_nodes.size() > 1)
-        {
-            double dist = std::numeric_limits<double>::max();
-            Point previous;
-            for(std::vector<Node>::size_type i = 0; i < m_nodes.size(); i++)
+            if (this != &other)
             {
-                Point current = m_nodes[i].point();
-                switch(m_nodes[i].mode())
-                {
-                    case Move:
-                    {
-                        const double newdist = pt.distance(current);
-                        if(newdist < dist)
-                        {
-                            dist = newdist;
-                        }
-                        break;
-                    }
-                    case Linear:
-                    {
-                        const double newdist = pt.distance(previous, current);
-                        if(newdist < dist)
-                        {
-                            dist = newdist;
-                        }
-                        break;
-                    }
-                    case Quadratic:
-                    {
-                        i++;
-                        if(i < m_nodes.size())
-                        {
-                            const Point ctrl = current;
-                            current = m_nodes[i].point();
-                            const double newdist = pt.distance(previous, ctrl, current);
-                            if(newdist < dist)
-                            {
-                                dist = newdist;
-                            }
-                        }
-                        break;
-                    }
-                    case Cubic:
-                    {
-                        i += 2;
-                        if(i < m_nodes.size())
-                        {
-                            const Point ctrl1 = current;
-                            const Point ctrl2 = m_nodes[i-1].point();
-                            current = m_nodes[i].point();
-                            const double newdist = pt.distance(previous, ctrl1, ctrl2, current);
-                            if(newdist < dist)
-                            {
-                                dist = newdist;
-                            }
-                        }
-                        break;
-                    }
-                    default:
-                        break;
-                }
-                previous = current;
+                m_pos = other.m_pos;
+                m_mode = other.m_mode;
             }
-            return dist;
+            
+            return *this;
         }
-        return 0.;
-    }
-    
-    bool Path::near(Point const& pt, double const distance) const noexcept
-    {
-        if(m_nodes.size() == 1)
+        
+        bool Path::haveSamePos(Node const& node_l, Node const& node_r) const noexcept
         {
-            return pt.near(m_nodes[0].point(), distance);
+            Point pos_left(node_l.getPos());
+            Point pos_right(node_r.getPos());
+            
+            return pos_left.x() == pos_right.x() && pos_left.y() == pos_right.y();
         }
-        else if(m_nodes.size() > 1)
+        
+        // =================================
+        // Path
+        // =================================
+        
+        Path& Path::operator=(Path const& other) noexcept
         {
-            for(std::vector<Node>::size_type i = 1; i < m_nodes.size(); i++)
+            if (this != &other)
             {
-                switch(m_nodes[i].mode())
-                {
-                    case Move:
-                        if(pt.near(m_nodes[i].point(), distance))
-                        {
-                            return true;
-                        }
-                        break;
-                    case Linear:
-                        if(pt.near(m_nodes[i-1].point(), m_nodes[i].point(), distance))
-                        {
-                            return true;
-                        }
-                        break;
-                    case Quadratic:
-                        i++;
-                        if(i < m_nodes.size())
-                        {
-                            if(pt.near(m_nodes[i-2].point(), m_nodes[i-1].point(), m_nodes[i].point(), distance))
-                            {
-                                return true;
-                            }
-                        }
-                        break;
-                    case Cubic:
-                        i += 2;
-                        if(i < m_nodes.size())
-                        {
-                            if(pt.near(m_nodes[i-3].point(), m_nodes[i-2].point(), m_nodes[i-1].point(), m_nodes[i].point(), distance))
-                            {
-                                return true;
-                            }
-                        }
-                        break;
-                    default:
-                        break;
-                }
+                m_nodes = other.m_nodes;
+            }
+            return *this;
+        }
+        
+        Path& Path::operator=(Path&& other) noexcept
+        {
+            if (this != &other)
+            {
+                m_nodes = std::move(other.m_nodes);
+            }
+            return *this;
+        }
+        
+        void Path::moveTo(Point const& point) noexcept
+        {
+            if(m_nodes.back().getMode() == Move)
+            {
+                m_nodes.back().setPos(point);
+            }
+            else
+            {
+                addNode(Node(point, Move));
             }
         }
-        return false;
-    }
-    
-    
-    bool Path::overlaps(Rectangle const& rect) const noexcept
-    {
-        if(m_nodes.size() == 1)
+        
+        void Path::addLine(Point const& line_edge) noexcept
         {
-            return rect.contains(m_nodes[0].point());
+            addNode(Node(line_edge, Linear));
         }
-        else if(m_nodes.size() > 1)
+        
+        void Path::addLines(std::initializer_list<Point> il) noexcept
         {
-            Point previous;
-            for(std::vector<Node>::size_type i = 0; i < m_nodes.size(); i++)
+            for (auto point : il)
             {
-                Point current = m_nodes[i].point();
-                switch(m_nodes[i].mode())
-                {
-                    case Move:
-                        if(rect.contains(current))
-                        {
-                            return true;
-                        }
-                        break;
-                    case Linear:
-                        if(rect.overlaps(Segment(previous, current)))
-                        {
-                            return true;
-                        }
-                        break;
-                    case Quadratic:
-                        i++;
-                        if(i < m_nodes.size())
-                        {
-                            const Point ctrl = current;
-                            current = m_nodes[i].point();
-                            if(rect.overlaps(BezierQuad(previous, ctrl, current)))
-                            {
-                                return true;
-                            }
-                            
-                        }
-                        break;
-                    case Cubic:
-                        i += 2;
-                        if(i < m_nodes.size())
-                        {
-                            const Point ctrl1 = current;
-                            const Point ctrl2 = m_nodes[i-1].point();
-                            current = m_nodes[i].point();
-                            if(rect.overlaps(BezierCubic(previous, ctrl1, ctrl2, current)))
-                            {
-                                return true;
-                            }
-                            
-                        }
-                        break;
-                        
-                    default:
-                        break;
-                }
-                previous = current;
+                addLine(point);
             }
         }
-        return false;
+        
+        void Path::addQuadratic(Point const& control, Point const& end) noexcept
+        {
+            addNode(Node(control, Quadratic));
+            addNode(Node(end, Quadratic));
+        }
+        
+        void Path::addQuadratics(std::initializer_list<std::array<Point, 2>> il) noexcept
+        {
+            for (auto quad_curve = il.begin(); quad_curve != il.end(); ++quad_curve)
+            {
+                addQuadratic((*quad_curve)[0], (*quad_curve)[1]);
+            }
+        }
+        
+        void Path::addCubic(Point const& control1, Point const& control2, Point const& end) noexcept
+        {
+            addNode(Node(control1, Cubic));
+            addNode(Node(control2, Cubic));
+            addNode(Node(end, Cubic));
+        }
+        
+        void Path::addCubics(std::initializer_list<std::array<Point, 3>> il) noexcept
+        {
+            for (auto cubic_curve = il.begin(); cubic_curve != il.end(); ++cubic_curve)
+            {
+                addCubic((*cubic_curve)[0], (*cubic_curve)[1], (*cubic_curve)[2]);
+            }
+        }
+        
+        void Path::addRectangle(Point const& top_left, const double width, const double height) noexcept
+        {
+            moveTo(top_left);
+            addLine(top_left + Point(width, 0));
+            addLine(top_left + Point(width, height));
+            addLine(top_left + Point(0, height));
+            close();
+        }
+        
+        void Path::addEllipse(Point const& center, const double radius_x, const double radius_y) noexcept
+        {
+            const Point delta(std::abs(radius_x), std::abs(radius_y));
+            const Point top_left = center - delta;
+            
+            const double hw = radius_x;
+            const double hw55 = hw * 0.55f;
+            const double hh = radius_y;
+            const double hh55 = hh * 0.55f;
+            const double cx = top_left.x() + hw;
+            const double cy = top_left.y() + hh;
+            
+            moveTo(Point(cx, cy - hh));
+            addCubic(Point(cx + hw55, cy - hh), Point(cx + hw, cy - hh55), Point(cx + hw, cy));
+            addCubic(Point(cx + hw, cy + hh55), Point(cx + hw55, cy + hh), Point(cx, cy + hh));
+            addCubic(Point(cx - hw55, cy + hh), Point(cx - hw, cy + hh55), Point(cx - hw, cy));
+            addCubic(Point(cx - hw, cy - hh55), Point(cx - hw55, cy - hh), Point(cx, cy - hh));
+            close();
+        }
+        
+        void Path::addPath(Path const& other) noexcept
+        {
+            for(auto node : other.m_nodes)
+            {
+                addNode(node);
+            }
+        }
+        
+        void Path::clear()
+        {
+            m_nodes.clear();
+            m_nodes.emplace_back(Point(0, 0), Move);
+        }
+        
+        void Path::close() noexcept
+        {
+            const Node last_move = lastMoveNode();
+            
+            if(!haveSamePos(last_move, m_nodes.back()))
+            {
+                addNode(Node(last_move.getPos(), Linear));
+            }
+            
+            addNode(Node(last_move.getPos(), Close));
+        }
+        
+        Path::Node Path::lastMoveNode() const noexcept
+        {
+            //! By construction Path::m_nodes is never empty
+            assert(m_nodes.size() > 0);
+            
+            auto isMoveNode = [](Node const& current_node){return current_node.getMode() == Move;};
+            return *std::find_if(m_nodes.rend(), m_nodes.rbegin(), isMoveNode);
+        }
+        
+        void Path::transform(AffineMatrix const& matrix) noexcept
+        {
+            for(auto node : m_nodes)
+            {
+                node.transform(matrix);
+            }
+        }
+        
+        Path Path::transformed(AffineMatrix const& matrix) const noexcept
+        {
+            Path p(*this);
+            p.transform(matrix);
+            return p;
+        }
     }
 }
