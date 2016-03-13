@@ -50,7 +50,7 @@ namespace kiwi
                 Attribute::declare<Model>();
                 Attribute::declare<Model>();
                 
-                // attributes types
+                // Attributes types
                 Attribute::Int::declare<Model>();
                 Attribute::Float::declare<Model>();
                 Attribute::String::declare<Model>();
@@ -59,7 +59,13 @@ namespace kiwi
                 
                 // patcher elements declaration :
                 model::Object::declare<Model>();
+                
+                // Links
                 Link::declare<Model>();
+                Link::Control::declare<Model>();
+                Link::Dsp::declare<Model>();
+                
+                // Patcher
                 Patcher::declare<Model>();
             }
         };

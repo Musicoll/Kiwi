@@ -48,8 +48,8 @@ namespace kiwi
             friend class Classic;
             
             //! @brief Enum of Object types
-            //! @remark Can't use Type because of flip::Object::Type conflict
-            enum class aType : uint8_t
+            //! @remark Can't use Type because of flip::Type conflict
+            enum class ObjectType : uint8_t
             {
                 Invalid = 0,
                 Default,
@@ -59,8 +59,6 @@ namespace kiwi
                 DspGUi
             };
             
-            using Type = kiwi::model::Object::Type;
-            
             //! @brief Default constructor.
             Object() = default;
             
@@ -68,7 +66,8 @@ namespace kiwi
             Object(std::string const& name, std::string const& text, const int64_t id);
             
             //! @brief Copy constructor.
-            Object(const Object& rhs) noexcept;
+            //! @remark Needed to be inserted in a flip::Array
+            Object(const model::Object& rhs) noexcept;
             
             //! @brief Destructor.
             virtual ~Object() noexcept;
@@ -86,7 +85,9 @@ namespace kiwi
                 .template member<flip::Int, &Object::m_id>("id");
             }
             
-            virtual inline aType getType() const noexcept { return aType::Invalid; };
+            //! @brief Get the type of the Object.
+            //! @return The type of the Object.
+            virtual inline ObjectType getType() const noexcept { return ObjectType::Invalid; };
             
             //! @brief Returns the patcher that manages the object.
             //! @return The Patcher's pointer.
@@ -117,7 +118,10 @@ namespace kiwi
         class Object::Classic : public model::Object
         {
         public:
-            inline aType getType() const noexcept final { return aType::Classic; };
+            
+            //! @brief Get the type of the Object.
+            //! @return The type of the Object.
+            inline ObjectType getType() const noexcept override { return ObjectType::Classic; };
             
             //! @internal flip static declare method
             template<class TModel>
@@ -128,8 +132,8 @@ namespace kiwi
                 TModel::template declare<Object::Classic>()
                 .template name("cicm.kiwi.Object.Classic")
                 .template inherit<model::Object>()
-                .template member<decltype(Classic::m_bgcolor), &Classic::m_bgcolor>("bgcolor")
-                .template member<decltype(Classic::m_color), &Classic::m_color>("color");
+                .template member<decltype(Classic::m_bgcolor),  &Classic::m_bgcolor>("bgcolor")
+                .template member<decltype(Classic::m_color),    &Classic::m_color>("color");
             }
             
         private:

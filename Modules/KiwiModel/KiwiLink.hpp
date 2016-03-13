@@ -34,31 +34,39 @@ namespace kiwi
         //                                      LINK                                        //
         // ================================================================================ //
         
-        //! The link is used to create a connection between objects.
-        /**
-         The link is a combination of two sockets used to create the connection between objects in a patcher.
-         */
+        //! @brief The Link is used to create a connection between objects.
+        //! @details The Link holds a reference from the origin Object and to the destination Object
+        //! as well as IO indexes.
         class Link : public flip::Object,
-        public Attribute::Manager
+                     public Attribute::Manager
         {
-        private:
-            flip::ObjectRef<Object>  m_object_from;
-            flip::ObjectRef<Object>  m_object_to;
-            flip::Int                m_index_outlet;
-            flip::Int                m_index_intlet;
-            
         public:
             
+            class Control;
+            class Dsp;
+            
+            //! @brief Enum of Link types
+            //! @remark Can't use Type because of flip::Type conflict
+            enum class LinkType : uint8_t
+            {
+                Invalid = 0,
+                Control,
+                Dsp
+            };
+            
+            //! @brief default constructor.
             Link() = default;
             
-            //! The constructor.
-            /** You should never use this method.
-             */
-            Link(Object* from, const uint8_t outlet, Object* to, const uint8_t inlet) noexcept;
+            //! @brief Constructs a Link.
+            //! @details Constructs a Link with given origin and destination Object pointers
+            //! and IO indexes.
+            //! @param from     The origin Object pointer.
+            //! @param outlet   The origin outlet index.
+            //! @param to       The destination Object pointer.
+            //! @param inlet    The destination inlet index.
+            Link(Object* from, const uint8_t outlet, Object* to, const uint8_t inlet);
             
-            //! The destructor.
-            /** You should never use this method.
-             */
+            //! @brief Destructor.
             virtual ~Link();
             
             //! @internal flip static declare method
@@ -69,59 +77,91 @@ namespace kiwi
                 
                 TModel::template declare<Link>()
                 .template name("cicm.kiwi.Link")
-                .template member<flip::ObjectRef<Object>, &Link::m_object_from>("object_from")
-                .template member<flip::ObjectRef<Object>, &Link::m_object_to>("object_to")
-                .template member<flip::Int, &Link::m_index_outlet>("outlet_index")
-                .template member<flip::Int, &Link::m_index_intlet>("inlet_index");
+                .template member<decltype(Link::m_object_from), &Link::m_object_from>("object_from")
+                .template member<decltype(Link::m_object_to),   &Link::m_object_to>("object_to")
+                .template member<decltype(Link::m_index_outlet),&Link::m_index_outlet>("outlet_index")
+                .template member<decltype(Link::m_index_inlet), &Link::m_index_inlet>("inlet_index")
+                .template member<decltype(Link::m_color),       &Link::m_color>("color");
             }
             
+            //! @brief Get the type of the Object.
+            //! @return The type of the Object.
+            virtual inline LinkType getType() const noexcept { return LinkType::Invalid; };
             
-            //! Retrieve the patcher of the link.
-            /** The function retrieves the patcher of the link.
-             @return The patcher of the link.
-             */
-            inline Patcher* getPatcher()
+            //! @brief Get the parent Patcher of the link.
+            //! @return The parent Patcher of the link.
+            inline Patcher* getPatcher() { return parent().ptr<Patcher>(); }
+            
+            //! @brief Get the origin Object of the link.
+            //! @return The origin Object of the link.
+            inline Object* getObjectFrom() const noexcept   { return m_object_from; }
+            
+            //! @brief Get the destination Object of the link.
+            //! @return The destination Object of the link.
+            inline Object* getObjectTo() const noexcept     { return m_object_to; }
+            
+            //! @brief Get the origin outlet index of the link.
+            //! @return The origin outlet index of the link.
+            inline int64_t getOutletIndex() const noexcept  { return m_index_outlet; }
+            
+            //! @brief Get the destination inlet index of the link.
+            //! @return The destination inlet index of the link.
+            inline int64_t getInletIndex() const noexcept   { return m_index_inlet; }
+            
+        private:
+            flip::ObjectRef<Object>  m_object_from;
+            flip::ObjectRef<Object>  m_object_to;
+            flip::Int                m_index_outlet;
+            flip::Int                m_index_inlet;
+            
+            Attribute::RGBA          m_color;           ///< The Link color
+        };
+        
+        // ================================================================================ //
+        //                                   LINK CONTROL                                   //
+        // ================================================================================ //
+        
+        class Link::Control : public Link
+        {
+        public:
+            
+            //! @brief Get the type of the Object.
+            //! @return The type of the Object.
+            inline LinkType getType() const noexcept final { return LinkType::Control; };
+            
+            //! @internal flip static declare method
+            template<class TModel>
+            static void declare()
             {
-                Patcher* patcher = parent().ptr<Patcher>();
-                return patcher;
+                if(TModel::template has<Link::Control>()) return;
+                
+                TModel::template declare<Link::Control>()
+                .template name("cicm.kiwi.Link.Control")
+                .template inherit<Link>();
             }
+        };
+        
+        // ================================================================================ //
+        //                                     LINK DSP                                     //
+        // ================================================================================ //
+        
+        class Link::Dsp : public Link
+        {
+        public:
             
-            //! Retrieve the output object.
-            /** The function retrieves the output object of the link.
-             @return The output object.
-             */
-            inline Object* getObjectFrom() const noexcept
-            {
-                Object* objptr = m_object_from;
-                return objptr;
-            }
+            //! @brief Get the type of the Object.
+            //! @return The type of the Object.
+            inline LinkType getType() const noexcept final { return LinkType::Dsp; };
             
-            //! Retrieve the input object.
-            /** The function retrieves the input object of the link.
-             @return The input object.
-             */
-            inline Object* getObjectTo() const noexcept
+            //! @internal flip static declare method
+            template<class TModel>
+            static void declare()
             {
-                Object* objptr = m_object_to;
-                return objptr;
-            }
-            
-            //! Retrieve the index of the outlet of the link.
-            /** The function retrieves the index of the outlet of the link.
-             @return The index of the outlet of the link.
-             */
-            inline int64_t getOutletIndex() const noexcept
-            {
-                return m_index_outlet;
-            }
-            
-            //! Retrieve the index of the inlet of the link.
-            /** The function retrieves the index of the inlet of the link.
-             @return The index of the inlet of the link.
-             */
-            inline int64_t getInletIndex() const noexcept
-            {
-                return m_index_intlet;
+                if(TModel::template has<Link::Dsp>()) return;
+                
+                TModel::template declare<Link::Dsp>()
+                .template name("cicm.kiwi.Link.Dsp")
+                .template inherit<Link>();
             }
         };
     }

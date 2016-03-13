@@ -120,7 +120,6 @@ namespace kiwi
             
         private:
             template<class ValueType> class Typed;
-            friend class Manager;
             friend class Int;
             friend class Float;
             friend class String;

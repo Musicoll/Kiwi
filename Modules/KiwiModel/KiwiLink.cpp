@@ -33,11 +33,11 @@ namespace kiwi
         //                                      LINK                                        //
         // ================================================================================ //
         
-        Link::Link(Object* from, const uint8_t outlet, Object* to, const uint8_t inlet) noexcept :
+        Link::Link(Object* from, const uint8_t outlet, Object* to, const uint8_t inlet) :
         m_object_from(from),
         m_object_to(to),
         m_index_outlet(outlet),
-        m_index_intlet(inlet)
+        m_index_inlet(inlet)
         {
             ;
         }

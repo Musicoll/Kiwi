@@ -41,26 +41,32 @@ namespace kiwi
         
         void Patcher::init()
         {
-            flip::Class<Patcher>::Members members = get_class().members();
+            addAttr(&m_bgcolor, "bgcolor", {0., 0., 0., 1.});
+            addAttr(&m_gridsize, "gridsize", {20});
             
-            flip::ClassBase& attr_base_class = flip::Class<Attribute>::use();
+            /*
+            flip::Class<Patcher>::Members members = get_class().members();
             
             std::string name_to_find = "bgcolor";
             
             for(const auto& member : members)
             {
-                const bool isAttr = (member._base_ptr->inherit_from(attr_base_class));
+                const bool isAttr = (member._base_ptr->inherit_from(flip::Class<Attribute>::use()));
                 
                 std::cout << member._name_0 << "\n";
                 std::cout << "is Attr : ";
                 std::cout << (isAttr ? "true" : "false") << '\n';
                 
-                
-                //Attribute* attr = member;
+                if (isAttr && std::string(member._name_0) == "bgcolor")
+                {
+                    flip::Type &type = member._representative.from(*this);
+                    Attribute::RGBA& attr = type.ancestor<Attribute::RGBA>();
+                    attr.set(FlipRGBA(0.2, 0.4, 0.5, 0.6));
+                }
             }
+            */
             
-            addAttr(&m_bgcolor, "bgcolor", {0., 0., 0., 1.});
-            addAttr(&m_gridsize, "gridsize", {20});
+            
             //addAttr(&m_attr_tag, "attr_tag", "test tag");
             
             /*

@@ -34,7 +34,7 @@ namespace kiwi
         //                                      PATCHER                                     //
         // ================================================================================ //
         
-        //! The patcher manages objects, links and a set of attributes
+        //! @brief The patcher manages a set of objects, links and attributes
         class Patcher : public flip::Object,
                         public Attribute::Manager
         {
@@ -49,7 +49,7 @@ namespace kiwi
             //! @brief initialize the Patcher model
             void init();
             
-            //! static flip declare method
+            //! @internal flip static declare method
             template<class TModel>
             static void declare()
             {
@@ -109,11 +109,9 @@ namespace kiwi
              */
             void add(std::map<const std::string, Atom> const& dico);
             
-            //! Free a object.
-            /** The function removes a object from the patcher.
-             @param object        The pointer to the object.
-             */
-            void remove(model::Object* object);
+            //! @brief Removes an object from the Patcher.
+            //! @param obj The pointer to the object to remove.
+            void remove(model::Object* obj);
             
         private:
             
@@ -123,8 +121,9 @@ namespace kiwi
             std::vector<uint64_t>       m_free_ids;
             mutable std::mutex          m_mutex;        // lock-free (grahams) ??
             
-            Attribute::Int              m_gridsize;
+            Attribute::String           m_patcher_name;
             Attribute::RGBA             m_bgcolor;
+            Attribute::Int              m_gridsize;
             
             void createObject(std::string const& name, std::string const& text);
         };
