@@ -63,7 +63,7 @@ namespace kiwi
             Object() = default;
             
             //! @brief Constructor.
-            Object(std::string const& name, std::string const& text, const int64_t id);
+            Object(std::string const& name, std::string const& text);
             
             //! @brief Copy constructor.
             //! @remark Needed to be inserted in a flip::Array
@@ -118,6 +118,13 @@ namespace kiwi
         class Object::Classic : public model::Object
         {
         public:
+            
+            Classic() = default;
+            
+            Classic(std::string name, std::string text)
+            : model::Object(name, text),
+            m_bgcolor("bgcolor", FlipRGBA{1., 1., 1., 1.}),
+            m_color("color", FlipRGBA{0., 0., 0., 1.}) {}
             
             //! @brief Get the type of the Object.
             //! @return The type of the Object.

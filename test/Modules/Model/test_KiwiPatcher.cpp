@@ -91,6 +91,18 @@ public:
     {
         std::cout << "Patcher : document_changed fn" << '\n';
         
+        if(patcher.getObjects().changed())
+        {
+            std::cout << "\tpatcher object container changed :" << '\n';
+            
+            const auto& objects = patcher.getObjects();
+            
+            for(const auto& obj : objects)
+            {
+                std::cout << "\t\t- object name : " << obj.getName() << '\n';
+            }
+        }
+
         {
             std::cout << "\tpatcher attributes :" << '\n';
             
@@ -122,14 +134,32 @@ public:
 TEST_CASE("model", "[model]")
 {
     Model::init("unit_test_model_01");
+    kiwi::model::initializeBasicObjects();
     
     PatcherObserver observer;
     
     auto document = std::unique_ptr<flip::Document>(new flip::Document(Model::use(), observer, 123456789ULL, uint32_t ('cicm'), uint32_t('kiwi')));
     
+    // Set up an history for this document
+    auto history = std::unique_ptr<flip::History<flip::HistoryStoreMemory>>(new flip::History<flip::HistoryStoreMemory>(*document.get()));
+    
     Patcher& patcher = document->root<Patcher>();
     patcher.init();
     document->commit();
+    
+    //model::Object* obj_plus = kiwi::model::Factory::create("plus", "1");
+    model::Object* obj_plus = patcher.addObject("plus", "1");
+    document->commit();
+    model::Object* obj_plus_alias = patcher.addObject("plus", "42");
+    document->commit();
+    
+    /*
+    //document->commit();
+    std::cout << "obj_plus name : " << obj_plus->getName() << '\n';
+    std::cout << "obj_plus text : " << obj_plus->getText() << '\n';
+    std::cout << "obj_plus alias name : " << obj_plus_alias->getName() << '\n';
+    std::cout << "obj_plus alias text : " << obj_plus_alias->getText() << '\n';
+    */
     
     patcher.setAttributeValue("bgcolor", {0., 1., 0., 1.});
     patcher.setAttributeValue("gridsize", {40});

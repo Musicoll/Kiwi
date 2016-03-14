@@ -34,47 +34,24 @@ namespace kiwi
         //                                      FACTORY                                     //
         // ================================================================================ //
         
-        //! The factory
-        /** The factory is the kiwi's counterpart of Andy Warhol's factory.
-         */
+        //! @brief The Object's factory
         class Factory
         {
         private:
             
-            //! The full virtual object's creator.
-            class Creator
-            {
-            public:
-                virtual ~Creator() {};
-                virtual Object* create(std::string const& name, std::string const& text) = 0;
-            };
+            using creator_function_t = std::function<Object*(std::string)>;
+            using creator_map_t = std::map<std::string, creator_function_t>;
             
-            typedef std::shared_ptr<Creator> sCreator;
-            
-            //! The full virtual object's creator.
-            template <class T> class CreatorTyped : public Creator
+            //! @brief Returns the static map of creators.
+            //! @return The static map of creators.
+            static creator_map_t& getCreators() noexcept
             {
-            public:
-                inline Object* create(std::string const& name, std::string const& text) override
-                {
-                    return new T(name, text);
-                }
-            };
-            
-            //! Retrieves the static map of creators.
-            /** This function retrieves  the static map of creators.
-             @return The map of creators.
-             */
-            static std::map<std::string const, std::shared_ptr<Creator>>& getCreators() noexcept
-            {
-                static std::map<std::string const, sCreator> static_creators;
+                static creator_map_t static_creators;
                 return static_creators;
             }
             
-            //! Retrieves the static mutex.
-            /** This function retrieves the static mutex.
-             @return The mutex.
-             */
+            //! @brief Returns the static mutex.
+            //! @return The static mutex.
             static inline std::mutex& getMutex() noexcept
             {
                 static std::mutex static_mutex;
@@ -83,67 +60,56 @@ namespace kiwi
             
         public:
             
-            //! Add an object to the factory.
-            /** This function adds a new object to the factory. If the name of the object already exists, the function doesn't do anything otherwise the object is added to the factory.
-             @name  An alias name of the object or nothing if you want yo use the default object name.
-             */
+            //! @brief Add an object to the Factory.
+            //! @details This function adds a new object to the factory. If the name of the object already exists,
+            //! the function doesn't do anything otherwise the object is added to the factory.
+            //! @param name An alias name of the object or nothing if you want yo use the default object name.
             template <class T>
-            static void add(std::string name = "")
+            static void add(std::string name)
             {
-                static_assert(std::is_base_of<Object, T>::value, "The class must inherit from object.");
+                static_assert(std::is_base_of<model::Object, T>::value, "The class must inherit from object.");
                 static_assert(!std::is_abstract<T>::value, "The class must not be abstract.");
-                //static_assert(std::is_constructible<T, Infos const&>::value, "The class must be constructible with Infos.");
-                /*
-                 std::shared_ptr<Object> object = std::make_shared<T>(Infos());
-                 if(object)
-                 {
-                 std::lock_guard<std::mutex> guard(getMutex());
-                 
-                 auto creators = getCreators();
-                 
-                 if(name == Tags::_empty) {name = Tag::create(object->getName());}
-                 if(creators.find(name) != creators.end())
-                 {
-                 //Console::error("The object " + name->getName() + " already exist !");
-                 }
-                 else
-                 {
-                 creators[name] = std::make_shared<CreatorTyped<T>>();
-                 }
-                 }
-                 else
-                 {
-                 //Console::error("The prototype of an object has a bad ctor !");
-                 }
-                 */
+                
+                if(!name.empty())
+                {
+                    std::lock_guard<std::mutex> guard(getMutex());
+                    
+                    creator_map_t& creators = getCreators();
+
+                    if(creators.find(name) != creators.end())
+                    {
+                        //Console::error("The object " + name->getName() + " already exist !");
+                    }
+                    else
+                    {
+                        creator_function_t func = [name](std::string text) -> Object*
+                        {
+                            return new T(name, text);
+                        };
+                        
+                        creators[name] = func;
+                    }
+                }
             }
             
-            //! Create an object.
-            /** This function creates an object.
-             @param name The name of the object.
-             @param infos The informations to initialize the object.
-             @return An object.
-             */
+            //! @brief Creates a new Object.
+            //! @param name The name of the Object.
+            //! @param text The text of the Object.
+            //! @return An object (if the name matches a registered Object name).
             static Object* create(std::string const& name, std::string const& text);
             
-            //! Retrieves if an object exist.
-            /** This function retrieves if an object exist.
-             @param name The name of the object.
-             @return true if the object exist, otherwise false.
-             */
+            //! @brief Returns true if a given string match a registered Object name.
+            //! @param name The name of the object.
+            //! @return true if the object has been registered, otherwise false.
             static bool has(std::string const& name);
             
-            //! Removes an object from the factory.
-            /** This function remoes an object from the factory.
-             @param name The name of the object.
-             */
+            //! @brief Removes an object from the factory.
+            //! @param name The name of the object to be removed.
             static void remove(std::string const& name);
             
-            //! Retrieves all the names of the objects.
-            /** This function retrieves all the names of the object.
-             @return A vector of tags with the names.
-             */
-            static std::vector<std::string const> names();
+            //! @brief Returns all the registered Object names.
+            //! @return A vector of Object names.
+            static std::vector<std::string> getNames();
         };
     }
 }

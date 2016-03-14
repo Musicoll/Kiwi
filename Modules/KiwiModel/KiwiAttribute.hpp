@@ -216,6 +216,11 @@ namespace kiwi
         {
         public:
             
+            Int() = default;
+            
+            Int(std::string const& name, value_t const& value) :
+            Attribute::Typed<value_t>(name, value) {}
+            
             //! @internal flip static declare method
             template<class TModel>
             static void declare()
@@ -266,6 +271,11 @@ namespace kiwi
         class Attribute::Float final : public Attribute::Typed<flip::Float>
         {
         public:
+            
+            Float() = default;
+            
+            Float(std::string const& name, value_t const& value) :
+            Attribute::Typed<value_t>(name, value) {}
             
             //! @internal flip static declare method
             template<class TModel>
@@ -318,6 +328,11 @@ namespace kiwi
         {
         public:
             
+            String() = default;
+            
+            String(std::string const& name, value_t const& value) :
+            Attribute::Typed<value_t>(name, value) {}
+            
             //! @internal flip static declare method
             template<class TModel>
             static void declare()
@@ -369,6 +384,11 @@ namespace kiwi
         {
         public:
             
+            RGBA() = default;
+            
+            RGBA(std::string const& name, value_t const& value) :
+            Attribute::Typed<value_t>(name, value) {}
+            
             //! @internal flip static declare method
             template<class TModel>
             static void declare()
@@ -407,6 +427,11 @@ namespace kiwi
         class Attribute::Enum final : public Attribute::Typed<flip::Int>
         {
         public:
+            
+            Enum() = default;
+            
+            Enum(std::string const& name, value_t const& value) :
+            Attribute::Typed<value_t>(name, value) {}
             
             //! @internal flip static declare method
             template<class TModel>
@@ -514,6 +539,15 @@ namespace kiwi
             }
             
         protected:
+            
+            //! @brief Add an attribute to the be managed.
+            //! @param name The name of the attribute.
+            //! @param value The value of the attribute.
+            void addAttr(Attribute* attr, std::string const& name)
+            {
+                attr->setName(name);
+                m_attrs[name] = attr;
+            }
             
             //! @brief Add an attribute to the be managed.
             //! @param name The name of the attribute.

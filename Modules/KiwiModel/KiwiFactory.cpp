@@ -39,13 +39,7 @@ namespace kiwi
             const auto it = creators.find(name);
             if(it != creators.end())
             {
-                Object* obj = it->second->create(name, text);
-                /*
-                 if(obj)
-                 {
-                 obj->read(detail.dico);
-                 }
-                 */
+                Object* obj = it->second(text);
                 return obj;
             }
             else
@@ -54,14 +48,12 @@ namespace kiwi
                 return nullptr;
             }
         }
-        
-        //Object* create(std::string const& name, std::string const& text)
-        
+                
         bool Factory::has(std::string const& name)
         {
             std::lock_guard<std::mutex> guard(getMutex());
             const auto& creators = getCreators();
-            return creators.find(name) != creators.end();
+            return (creators.find(name) != creators.end());
         }
         
         void Factory::remove(std::string const& name)
@@ -70,14 +62,16 @@ namespace kiwi
             getCreators().erase(name);
         }
         
-        std::vector<std::string const> Factory::names()
+        std::vector<std::string> Factory::getNames()
         {
             std::lock_guard<std::mutex> guard(getMutex());
-            std::vector<std::string const> names;
-            for(auto it : getCreators())
+            
+            std::vector<std::string> names;
+            for(const auto& creator : getCreators())
             {
-                names.push_back(it.first);
+                names.emplace_back(creator.first);
             }
+            
             return names;
         }
     }

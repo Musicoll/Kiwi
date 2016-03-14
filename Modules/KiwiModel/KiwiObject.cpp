@@ -32,10 +32,9 @@ namespace kiwi
         //                                      OBJECT                                      //
         // ================================================================================ //
         
-        Object::Object(std::string const& name, std::string const& text, const int64_t id) :
+        Object::Object(std::string const& name, std::string const& text) :
         m_name(name),
-        m_text(text),
-        m_id(id)
+        m_text(text)
         {
             /*
              createFlipAttr(Tags::position,              "Position",                 "Appearance", flip::Array<flip::String>("", ""));
@@ -55,8 +54,7 @@ namespace kiwi
         
         Object::Object(const Object& rhs) noexcept :
         m_name(rhs.m_name),
-        m_text(rhs.m_text),
-        m_id(rhs.m_id)
+        m_text(rhs.m_text)
         {
             //m_attributes = rhs.m_attributes;
         }
@@ -65,5 +63,6 @@ namespace kiwi
         {
             ;
         }
+            
     }
 }

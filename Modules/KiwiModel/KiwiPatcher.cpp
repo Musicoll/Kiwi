@@ -78,17 +78,21 @@ namespace kiwi
              */
         }
         
-        void Patcher::createObject(std::string const& name, std::string const& text)
+        model::Object* Patcher::addObject(std::string const& name, std::string const& text)
         {
+            model::Object* object = nullptr;
+            
             if(Factory::has(name))
             {
-                const model::Object* object = Factory::create(name, text);
+                object = Factory::create(name, text);
                 
-                if(object)
+                if(object != nullptr)
                 {
-                    m_objects.insert(m_objects.end(), *object);
+                    auto it = m_objects.insert(m_objects.end(), *object);
                 }
             }
+            
+            return object;
         }
         
         void Patcher::add(std::map<const std::string, Atom> const& /*dico*/)

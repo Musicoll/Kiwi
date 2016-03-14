@@ -24,7 +24,7 @@
 #ifndef KIWI_MODEL_HPP_INCLUDED
 #define KIWI_MODEL_HPP_INCLUDED
 
-#include "KiwiFactory.hpp"
+#include "Objects/KiwiObjects.hpp"
 
 namespace kiwi
 {
@@ -59,6 +59,10 @@ namespace kiwi
                 
                 // patcher elements declaration :
                 model::Object::declare<Model>();
+                model::Object::Classic::declare<Model>();
+                
+                // Objects
+                model::ObjectPlus::declare<Model>();
                 
                 // Links
                 Link::declare<Model>();

@@ -57,6 +57,7 @@ namespace kiwi
                 .name("cicm.kiwi.Patcher")
                 .template member<decltype(Patcher::m_objects),   &Patcher::m_objects>   ("objects")
                 .template member<decltype(Patcher::m_links),     &Patcher::m_links>     ("links")
+                .template member<decltype(Patcher::m_patcher_name), &Patcher::m_patcher_name> ("name")
                 .template member<decltype(Patcher::m_bgcolor),   &Patcher::m_bgcolor>   ("bgcolor")
                 .template member<decltype(Patcher::m_gridsize),  &Patcher::m_gridsize>  ("gridsize");
             }
@@ -75,7 +76,7 @@ namespace kiwi
             /** The function retrieves the objects from the patcher.
              @return A vector with the objects.
              */
-            flip::Array<model::Object>& getObjects() noexcept
+            flip::Array<model::Object> const& getObjects() noexcept
             {
                 std::lock_guard<std::mutex> guard(m_mutex);
                 return m_objects;
@@ -103,6 +104,9 @@ namespace kiwi
                 return nullptr;
             }
             
+            //! @brief Adds an object to the Patcher.
+            model::Object* addObject(std::string const& name, std::string const& text = "");
+            
             //! Append a dico.
             /** The function reads a dico and add the objects and links to the patcher.
              @param dico The dico.
@@ -124,8 +128,6 @@ namespace kiwi
             Attribute::String           m_patcher_name;
             Attribute::RGBA             m_bgcolor;
             Attribute::Int              m_gridsize;
-            
-            void createObject(std::string const& name, std::string const& text);
         };
     }
 }
