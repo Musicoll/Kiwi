@@ -89,7 +89,7 @@ class PatcherObserver : public flip::DocumentObserver<Patcher>
 public:
     void document_changed(Patcher& patcher) override
     {
-        std::cout << "Patcher : document_changed fn" << '\n';
+        std::cout << "  Document changed :" << '\n';
         
         if(patcher.getObjects().changed())
         {
@@ -99,7 +99,16 @@ public:
             
             for(const auto& obj : objects)
             {
-                std::cout << "\t\t- object name : " << obj.getName() << '\n';
+                const auto change_status_str = (obj.changed() ? "changed" : "no change");
+                std::cout << "\t\t- object \"" << obj.getName() << "\" (" << change_status_str << ")\n";
+                
+                const auto status_str = (obj.resident() ? "resident" : (obj.added() ? "added" : "removed"));
+                std::cout << "\t\t\t- status : " << status_str << '\n';
+                
+                if(obj.changed())
+                {
+                    std::cout << "\t\t\t- name : " << obj.getName() << '\n';
+                }
             }
         }
 
@@ -119,15 +128,9 @@ public:
                 Attribute::RGBA* attr_rgba = dynamic_cast<Attribute::RGBA*>(attr);
                 FlipRGBA rgba = attr_rgba->get();
             }
-            
-            /*
-            auto val = patcher.getAttributeValue(Tag::create("attr_bool"));
-            std::cout << "\t\t- attr_bool : " << val << '\n';
-            
-            auto tag = patcher.getAttributeValue(Tag::create("attr_tag"));
-            std::cout << "\t\t- attr_tag : " << tag << '\n';
-            */
         }
+        
+        std::cout << "- - - - - - - - - - - - - - - - - - -\n";
     }
 };
 
@@ -145,29 +148,52 @@ TEST_CASE("model", "[model]")
     
     Patcher& patcher = document->root<Patcher>();
     patcher.init();
-    document->commit();
+    auto tx = document->commit();
     
-    //model::Object* obj_plus = kiwi::model::Factory::create("plus", "1");
+    const auto commitWithUndoStep = [&tx, &document, &history] (std::string const& label)
+    {
+        std::cout << "* " << label << '\n';
+        document->set_label(label);
+        tx = document->commit();
+        history->add_undo_step(tx);
+    };
+    
+    const auto Undo = [&document, &history] ()
+    {
+        std::cout << "* " << "Undo" << '\n';
+        history->execute_undo();
+        document->commit();
+    };
+    
+    const auto Redo = [&document, &history] ()
+    {
+        std::cout << "* " << "Redo" << '\n';
+        history->execute_redo();
+        document->commit();
+    };
+    
     model::Object* obj_plus = patcher.addObject("plus", "1");
-    document->commit();
-    model::Object* obj_plus_alias = patcher.addObject("plus", "42");
-    document->commit();
+    commitWithUndoStep("Add Object \"plus\"");
     
-    /*
-    //document->commit();
-    std::cout << "obj_plus name : " << obj_plus->getName() << '\n';
-    std::cout << "obj_plus text : " << obj_plus->getText() << '\n';
-    std::cout << "obj_plus alias name : " << obj_plus_alias->getName() << '\n';
-    std::cout << "obj_plus alias text : " << obj_plus_alias->getText() << '\n';
-    */
+    Undo();
+    Redo();
+    
+    model::Object* obj_plus_alias = patcher.addObject("+", "42");
+    commitWithUndoStep("Add Object \"+\"");
+    
+    Undo();
+    Redo();
     
     patcher.setAttributeValue("bgcolor", {0., 1., 0., 1.});
     patcher.setAttributeValue("gridsize", {40});
-    document->commit();
+    commitWithUndoStep("Change Patcher attributes value #1");
+    
+    Undo();
+    Redo();
     
     patcher.setAttributeValue("bgcolor", {0.6666, 0.7777, 0.8888, 1.});
     patcher.setAttributeValue("gridsize", {25});
-    document->commit();
+    commitWithUndoStep("Change Patcher attributes value #2");
     
     document.reset();
 }
