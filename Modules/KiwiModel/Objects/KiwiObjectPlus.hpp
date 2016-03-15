@@ -38,7 +38,10 @@ namespace kiwi
         {
         public:
             
-            ObjectPlus() = default;
+            ObjectPlus()
+            {
+                std::cout << "ObjectPlus : Default ctor called\n";
+            }
             
             ObjectPlus(std::string name, std::string text) : Object::Classic(name, text) {}
 

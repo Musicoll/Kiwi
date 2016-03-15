@@ -87,48 +87,55 @@ std::string to_string(std::vector<Atom>& atom_vec)
 class PatcherObserver : public flip::DocumentObserver<Patcher>
 {
 public:
+    
+    void indent(const int level)
+    {
+        if(level >= 1) for(int i = 0; i < level; ++i) std::cout << "  |---";
+    }
+    
+    void processAttributes(Attribute::Manager const& obj, const int indent_level = 0)
+    {
+        indent(indent_level);
+        std::cout << "- attrs";
+        std::vector<Attribute*> attrs = obj.getAttributes();
+        std::cout << " (" << attrs.size() << ") :\n";
+        
+        for(auto* attr : obj.getAttributes())
+        {
+            indent(indent_level + 1);
+            std::cout << "- " << attr->getName();
+            std::vector<Atom> value = attr->getValue();
+            std::cout << " : " << to_string(value) << '\n';
+        }
+    }
+    
     void document_changed(Patcher& patcher) override
     {
         std::cout << "  Document changed :" << '\n';
         
         if(patcher.getObjects().changed())
         {
-            std::cout << "\tpatcher object container changed :" << '\n';
+            indent(1);
+            std::cout << "- patcher object container changed :" << '\n';
             
             const auto& objects = patcher.getObjects();
             
             for(const auto& obj : objects)
             {
                 const auto change_status_str = (obj.changed() ? "changed" : "no change");
-                std::cout << "\t\t- object \"" << obj.getName() << "\" (" << change_status_str << ")\n";
+                indent(2);
+                std::cout << "- object \"" << obj.getName() << "\" (" << change_status_str << ")\n";
                 
                 const auto status_str = (obj.resident() ? "resident" : (obj.added() ? "added" : "removed"));
-                std::cout << "\t\t\t- status : " << status_str << '\n';
                 
-                if(obj.changed())
-                {
-                    std::cout << "\t\t\t- name : " << obj.getName() << '\n';
-                }
+                indent(3); std::cout << "- status : " << status_str << '\n';
+                indent(3); std::cout << "- text : " << obj.getText() << '\n';
+                
+                processAttributes(obj, 3);
             }
         }
 
-        {
-            std::cout << "\tpatcher attributes :" << '\n';
-            
-            std::vector<Atom> color = patcher.getAttributeValue("bgcolor");
-            
-            std::cout << "\t\t- bgcolor : " << to_string(color) << '\n';
-            
-            auto gridsize = patcher.getAttributeValue("gridsize");
-            std::cout << "\t\t- gridSize : " << to_string(gridsize) << '\n';
-            
-            auto attr = patcher.getAttribute("bgcolor");
-            if (attr && attr->getType() == Attribute::Type::RGBA)
-            {
-                Attribute::RGBA* attr_rgba = dynamic_cast<Attribute::RGBA*>(attr);
-                FlipRGBA rgba = attr_rgba->get();
-            }
-        }
+        processAttributes(patcher, 1);
         
         std::cout << "- - - - - - - - - - - - - - - - - - -\n";
     }
@@ -195,6 +202,7 @@ TEST_CASE("model", "[model]")
     patcher.setAttributeValue("gridsize", {25});
     commitWithUndoStep("Change Patcher attributes value #2");
     
+    history.reset();
     document.reset();
 }
 

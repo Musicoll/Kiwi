@@ -60,7 +60,10 @@ namespace kiwi
             };
             
             //! @brief Default constructor.
-            Object() = default;
+            Object()
+            {
+                std::cout << "Object Default ctor called\n";
+            }
             
             //! @brief Constructor.
             Object(std::string const& name, std::string const& text);
@@ -119,12 +122,20 @@ namespace kiwi
         {
         public:
             
-            Classic() = default;
+            Classic()
+            {
+                std::cout << "Classic Default ctor called\n";
+                addAttr(&m_bgcolor, "bgcolor");
+                addAttr(&m_color,   "color");
+            }
             
             Classic(std::string name, std::string text)
-            : model::Object(name, text),
-            m_bgcolor("bgcolor", FlipRGBA{1., 1., 1., 1.}),
-            m_color("color", FlipRGBA{0., 0., 0., 1.}) {}
+            : model::Object(name, text)
+            {
+                std::cout << "Classic ctor called\n";
+                addAttr(&m_bgcolor, "bgcolor",  {1., 1., 1., 1.});
+                addAttr(&m_color,   "color",    {0., 0., 0., 1.});
+            }
             
             //! @brief Get the type of the Object.
             //! @return The type of the Object.

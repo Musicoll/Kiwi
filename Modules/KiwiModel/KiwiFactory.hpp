@@ -37,28 +37,10 @@ namespace kiwi
         //! @brief The Object's factory
         class Factory
         {
-        private:
+        public:
             
             using creator_function_t = std::function<Object*(std::string)>;
             using creator_map_t = std::map<std::string, creator_function_t>;
-            
-            //! @brief Returns the static map of creators.
-            //! @return The static map of creators.
-            static creator_map_t& getCreators() noexcept
-            {
-                static creator_map_t static_creators;
-                return static_creators;
-            }
-            
-            //! @brief Returns the static mutex.
-            //! @return The static mutex.
-            static inline std::mutex& getMutex() noexcept
-            {
-                static std::mutex static_mutex;
-                return static_mutex;
-            }
-            
-        public:
             
             //! @brief Add an object to the Factory.
             //! @details This function adds a new object to the factory. If the name of the object already exists,
@@ -96,7 +78,7 @@ namespace kiwi
             //! @param name The name of the Object.
             //! @param text The text of the Object.
             //! @return An object (if the name matches a registered Object name).
-            static Object* create(std::string const& name, std::string const& text);
+            static std::unique_ptr<Object> create(std::string const& name, std::string const& text);
             
             //! @brief Returns true if a given string match a registered Object name.
             //! @param name The name of the object.
@@ -110,6 +92,24 @@ namespace kiwi
             //! @brief Returns all the registered Object names.
             //! @return A vector of Object names.
             static std::vector<std::string> getNames();
+            
+        private:
+            
+            //! @brief Returns the static map of creators.
+            //! @return The static map of creators.
+            static creator_map_t& getCreators() noexcept
+            {
+                static creator_map_t static_creators;
+                return static_creators;
+            }
+            
+            //! @brief Returns the static mutex.
+            //! @return The static mutex.
+            static inline std::mutex& getMutex() noexcept
+            {
+                static std::mutex static_mutex;
+                return static_mutex;
+            }
         };
     }
 }

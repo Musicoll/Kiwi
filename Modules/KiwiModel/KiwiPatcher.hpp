@@ -57,7 +57,7 @@ namespace kiwi
                 .name("cicm.kiwi.Patcher")
                 .template member<decltype(Patcher::m_objects),   &Patcher::m_objects>   ("objects")
                 .template member<decltype(Patcher::m_links),     &Patcher::m_links>     ("links")
-                .template member<decltype(Patcher::m_patcher_name), &Patcher::m_patcher_name> ("name")
+                .template member<decltype(Patcher::m_name),      &Patcher::m_name>      ("name")
                 .template member<decltype(Patcher::m_bgcolor),   &Patcher::m_bgcolor>   ("bgcolor")
                 .template member<decltype(Patcher::m_gridsize),  &Patcher::m_gridsize>  ("gridsize");
             }
@@ -79,6 +79,7 @@ namespace kiwi
             flip::Array<model::Object> const& getObjects() noexcept
             {
                 std::lock_guard<std::mutex> guard(m_mutex);
+                
                 return m_objects;
             }
             
@@ -120,12 +121,13 @@ namespace kiwi
         private:
             
             //! object are stored in a flip::Array to maintain a z-order.
+            //flip::Array<model::Object>  m_objects;
             flip::Array<model::Object>  m_objects;
             flip::Collection<Link>      m_links;
             std::vector<uint64_t>       m_free_ids;
             mutable std::mutex          m_mutex;        // lock-free (grahams) ??
             
-            Attribute::String           m_patcher_name;
+            Attribute::String           m_name;
             Attribute::RGBA             m_bgcolor;
             Attribute::Int              m_gridsize;
         };

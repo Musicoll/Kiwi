@@ -538,6 +538,20 @@ namespace kiwi
                 return nullptr;
             }
             
+            //! @brief Returns all the attributes.
+            std::vector<Attribute*> getAttributes() const noexcept
+            {
+                std::lock_guard<std::mutex> guard(m_attrs_mutex);
+                std::vector<Attribute*> attrs;
+                
+                for(auto it = m_attrs.begin(); it != m_attrs.end(); ++it)
+                {
+                    attrs.push_back( it->second );
+                }
+                
+                return attrs;
+            }
+            
         protected:
             
             //! @brief Add an attribute to the be managed.
@@ -545,7 +559,6 @@ namespace kiwi
             //! @param value The value of the attribute.
             void addAttr(Attribute* attr, std::string const& name)
             {
-                attr->setName(name);
                 m_attrs[name] = attr;
             }
             
