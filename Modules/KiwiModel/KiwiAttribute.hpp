@@ -182,7 +182,6 @@ namespace kiwi
                     .template name(sublass_name_str.c_str())
                     .template inherit<Attribute::Typed<value_t>>();
                 }
-                
             }
             
             //! @brief Get the Attribute value.

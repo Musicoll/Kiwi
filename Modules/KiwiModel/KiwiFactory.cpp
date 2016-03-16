@@ -42,7 +42,7 @@ namespace kiwi
                 return std::unique_ptr<Object>(it->second(text));
             }
             
-            return std::unique_ptr<Object>(nullptr);
+            return nullptr;
         }
                 
         bool Factory::has(std::string const& name)
@@ -72,4 +72,3 @@ namespace kiwi
         }
     }
 }
-

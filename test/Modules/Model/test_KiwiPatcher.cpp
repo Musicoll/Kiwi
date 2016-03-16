@@ -141,14 +141,33 @@ public:
     }
 };
 
+class PatcherValidator : public flip::DocumentValidator<Patcher>
+{
+public:
+    
+    void validate(Patcher& patcher)
+    {
+        
+        std::cout << "  Document Validate :" << '\n';
+        
+        //throw std::runtime_error("ERROOOOOORRRR !!!");
+        
+        if(patcher.getObjects().changed())
+        {
+            //throw std::runtime_error("ERROOOOOORRRR !!!");
+        }
+    };
+};
+
 TEST_CASE("model", "[model]")
 {
     Model::init("unit_test_model_01");
     kiwi::model::initializeBasicObjects();
     
-    PatcherObserver observer;
+    PatcherObserver     observer;
+    PatcherValidator    validator;
     
-    auto document = std::unique_ptr<flip::Document>(new flip::Document(Model::use(), observer, 123456789ULL, uint32_t ('cicm'), uint32_t('kiwi')));
+    auto document = std::unique_ptr<flip::Document>(new flip::Document(Model::use(), observer, validator, 123456789ULL, uint32_t ('cicm'), uint32_t('kiwi')));
     
     // Set up an history for this document
     auto history = std::unique_ptr<flip::History<flip::HistoryStoreMemory>>(new flip::History<flip::HistoryStoreMemory>(*document.get()));

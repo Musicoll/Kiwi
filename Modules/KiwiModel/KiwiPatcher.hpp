@@ -121,7 +121,6 @@ namespace kiwi
         private:
             
             //! object are stored in a flip::Array to maintain a z-order.
-            //flip::Array<model::Object>  m_objects;
             flip::Array<model::Object>  m_objects;
             flip::Collection<Link>      m_links;
             std::vector<uint64_t>       m_free_ids;

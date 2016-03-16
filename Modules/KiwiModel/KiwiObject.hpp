@@ -69,7 +69,7 @@ namespace kiwi
             Object(std::string const& name, std::string const& text);
             
             //! @brief Copy constructor.
-            //! @remark Needed to be inserted in a flip::Array
+            //! @remark Needed to be inserted in a flip::Array (Verify)
             Object(const model::Object& rhs) noexcept;
             
             //! @brief Destructor.
