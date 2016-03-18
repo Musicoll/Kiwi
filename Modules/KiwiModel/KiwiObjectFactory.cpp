@@ -21,7 +21,7 @@
  ==============================================================================
 */
 
-#include "KiwiFactory.hpp"
+#include "KiwiObjectFactory.hpp"
 
 namespace kiwi
 {
@@ -31,7 +31,7 @@ namespace kiwi
         //                                      FACTORY                                     //
         // ================================================================================ //
         
-        std::unique_ptr<Object> Factory::create(std::string const& name, std::string const& text)
+        std::unique_ptr<Object> ObjectFactory::create(std::string const& name, std::string const& text)
         {
             std::lock_guard<std::mutex> guard(getMutex());
                         
@@ -45,20 +45,20 @@ namespace kiwi
             return nullptr;
         }
                 
-        bool Factory::has(std::string const& name)
+        bool ObjectFactory::has(std::string const& name)
         {
             std::lock_guard<std::mutex> guard(getMutex());
             const auto& creators = getCreators();
             return (creators.find(name) != creators.end());
         }
         
-        void Factory::remove(std::string const& name)
+        void ObjectFactory::remove(std::string const& name)
         {
             std::lock_guard<std::mutex> guard(getMutex());
             getCreators().erase(name);
         }
         
-        std::vector<std::string> Factory::getNames()
+        std::vector<std::string> ObjectFactory::getNames()
         {
             std::lock_guard<std::mutex> guard(getMutex());
             

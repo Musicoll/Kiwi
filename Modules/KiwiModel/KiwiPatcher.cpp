@@ -22,7 +22,7 @@
 */
 
 #include "KiwiPatcher.hpp"
-#include "KiwiFactory.hpp"
+#include "KiwiObjectFactory.hpp"
 
 namespace kiwi
 {
@@ -80,9 +80,9 @@ namespace kiwi
         
         model::Object* Patcher::addObject(std::string const& name, std::string const& text)
         {
-            if(Factory::has(name))
+            if(ObjectFactory::has(name))
             {
-                std::unique_ptr<model::Object> object = Factory::create(name, text);
+                std::unique_ptr<model::Object> object = ObjectFactory::create(name, text);
                 
                 if(object)
                 {

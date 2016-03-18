@@ -86,7 +86,7 @@ namespace kiwi
             
             //! @brief Get the type of the Object.
             //! @return The type of the Object.
-            virtual inline LinkType getType() const noexcept { return LinkType::Invalid; };
+            virtual LinkType getType() const noexcept = 0;
             
             //! @brief Get the parent Patcher of the link.
             //! @return The parent Patcher of the link.

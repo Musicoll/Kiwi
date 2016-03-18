@@ -26,6 +26,15 @@
 #include "../../catch.hpp"
 #include <vector>
 
+#include "flip/Document.h"
+#include "flip/DocumentObserver.h"
+
+#include "flip/History.h"
+#include "flip/HistoryStoreMemory.h"
+#include "flip/DataConsumerMemory.h"
+#include "flip/BackEndBinary.h"
+#include "flip/BackEndMl.h"
+
 using namespace kiwi;
 
 // ================================================================================ //

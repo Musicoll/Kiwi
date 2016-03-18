@@ -28,27 +28,18 @@
 
 // ---- Flip headers ---- //
 #include "flip/DataModel.h"
-#include "flip/Array.h"
-#include "flip/Collection.h"
 #include "flip/Bool.h"
 #include "flip/Int.h"
 #include "flip/Float.h"
 #include "flip/Blob.h"
 #include "flip/String.h"
 #include "flip/Enum.h"
-#include "flip/Object.h"
-#include "flip/ObjectRef.h"
+#include "flip/Array.h"
+#include "flip/Collection.h"
 #include "flip/Variant.h"
 #include "flip/Optional.h"
-
-#include "flip/Document.h"
-#include "flip/DocumentObserver.h"
-
-#include "flip/History.h"
-#include "flip/HistoryStoreMemory.h"
-#include "flip/DataConsumerMemory.h"
-#include "flip/BackEndBinary.h"
-#include "flip/BackEndMl.h"
+#include "flip/Object.h"
+#include "flip/ObjectRef.h"
 
 namespace kiwi
 {
@@ -105,6 +96,12 @@ namespace kiwi
             operator std::vector<Atom>() const
             {
                 return {red(), green(), blue(), alpha()};
+            }
+            
+            //! Retrieve the FlipRGBA value as a vector of atoms.
+            std::vector<Atom> before() const
+            {
+                return {m_red.before(), m_green.before(), m_blue.before(), m_alpha.before()};
             }
             
             double red() const noexcept                 {return m_red;}

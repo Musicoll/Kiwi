@@ -67,15 +67,20 @@ namespace kiwi
             
             //! @brief Move constructor.
             //! @param name The name of the attribute (usually only letters and undescore characters).
-            inline Attribute(std::string&& name) noexcept : m_name(std::forward<std::string>(name)) {};
+            Attribute(std::string&& name) noexcept : m_name(std::forward<std::string>(name)) {};
             
             //! @brief Destructor.
-            virtual inline ~Attribute() noexcept {};
+            virtual ~Attribute() noexcept {};
             
             //! @brief Returns the attribute value as a vector of atoms.
             //! @details This method must be overwritten by subclasses.
             //! @return The attribute value as a vector of atoms.
-            virtual inline std::vector<Atom> getValue() const = 0;
+            virtual std::vector<Atom> getValue() const = 0;
+            
+            //! @brief Returns the attribute's before value as a vector of atoms.
+            //! @details This method must be overwritten by subclasses.
+            //! @return The attribute's before value as a vector of atoms.
+            virtual std::vector<Atom> getBeforeValue() const = 0;
             
             //! @brief Sets the attribute value with a vector of atoms.
             //! @details This method must be overwritten by subclasses.
@@ -111,7 +116,7 @@ namespace kiwi
                 if(TModel::template has<Attribute>()) return;
                 
                 TModel::template declare<Attribute>()
-                .template name("cicm.kiwi.Attribute")
+                .name("cicm.kiwi.Attribute")
                 .template member<flip::String, &Attribute::m_name>("name");
             }
             
@@ -120,11 +125,6 @@ namespace kiwi
             
         private:
             template<class ValueType> class Typed;
-            friend class Int;
-            friend class Float;
-            friend class String;
-            friend class RGBA;
-            friend class Enum;
             
             //! @brief Set the attribute name.
             //! @param name The attribute name.
@@ -183,6 +183,11 @@ namespace kiwi
                     .template inherit<Attribute::Typed<value_t>>();
                 }
             }
+            
+            //! @brief Returns the attribute's before value as a vector of atoms.
+            //! @details This method must be overwritten by subclasses.
+            //! @return The attribute's before value as a vector of atoms.
+            std::vector<Atom> getBeforeValue() const override {return {m_value.before()}; };
             
             //! @brief Get the Attribute value.
             //! @return The current value as a value_t.
@@ -289,7 +294,7 @@ namespace kiwi
             
             //! @brief Get the Attribute value as a vector of atoms.
             //! @return A vector of atoms.
-            std::vector<Atom> getValue() const final            {return {m_value.value()};}
+            std::vector<Atom> getValue() const final            { return {m_value.value()};}
             
             //! @brief Get the Attribute default value as a vector of atoms.
             //! @return A vector of atoms.

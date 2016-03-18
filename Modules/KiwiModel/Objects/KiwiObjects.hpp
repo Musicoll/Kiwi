@@ -33,8 +33,8 @@ namespace kiwi
         void initializeBasicObjects();
         void initializeBasicObjects()
         {
-            Factory::add<ObjectPlus>("plus");
-            Factory::add<ObjectPlus>("+");
+            ObjectFactory::add<ObjectPlus>("plus");
+            ObjectFactory::add<ObjectPlus>("+");
         }
     }
 }

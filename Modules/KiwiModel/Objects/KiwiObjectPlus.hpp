@@ -24,7 +24,7 @@
 #ifndef KIWI_MODEL_OBJECTS_OBJECTPLUS_HPP_INCLUDED
 #define KIWI_MODEL_OBJECTS_OBJECTPLUS_HPP_INCLUDED
 
-#include "../KiwiFactory.hpp"
+#include "../KiwiObjectFactory.hpp"
 
 namespace kiwi
 {

@@ -35,14 +35,14 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief The Object's factory
-        class Factory
+        class ObjectFactory
         {
         public:
             
             using creator_function_t = std::function<Object*(std::string)>;
             using creator_map_t = std::map<std::string, creator_function_t>;
             
-            //! @brief Add an object to the Factory.
+            //! @brief Add an object to the ObjectFactory.
             //! @details This function adds a new object to the factory. If the name of the object already exists,
             //! the function doesn't do anything otherwise the object is added to the factory.
             //! @param name An alias name of the object or nothing if you want yo use the default object name.
