@@ -65,17 +65,6 @@ namespace kiwi
                 }
             }
             */
-            
-            
-            //addAttr(&m_attr_tag, "attr_tag", "test tag");
-            
-            /*
-             auto it = dico.find(Tags::patcher);
-             if(it != dico.end())
-             {
-             add(it->second);
-             }
-             */
         }
         
         model::Object* Patcher::addObject(std::string const& name, std::string const& text)
@@ -86,9 +75,22 @@ namespace kiwi
                 
                 if(object)
                 {
-                    const auto it = m_objects.insert(m_objects.begin(), std::move(object));
+                    const auto it = m_objects.insert(m_objects.end(), std::move(object));
                     return it.operator->();
                 }
+            }
+            
+            return nullptr;
+        }
+        
+        Link* Patcher::addLink(model::Object* from, const uint8_t outlet, model::Object* to, const uint8_t inlet)
+        {
+            std::unique_ptr<Link> link = Link::create(from, outlet, to, inlet);
+            
+            if(link)
+            {
+                const auto it = m_links.insert(std::move(link));
+                return it.operator->();
             }
             
             return nullptr;

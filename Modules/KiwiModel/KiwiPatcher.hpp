@@ -83,6 +83,17 @@ namespace kiwi
                 return m_objects;
             }
             
+            //! Get the objects.
+            /** The function retrieves the objects from the patcher.
+             @return A vector with the objects.
+             */
+            flip::Collection<Link> const& getLinks() noexcept
+            {
+                std::lock_guard<std::mutex> guard(m_mutex);
+                
+                return m_links;
+            }
+            
             //! Get an object with the id.
             /** The function retrieves an object with an id.
              @param id   The id of the object.
@@ -107,6 +118,15 @@ namespace kiwi
             
             //! @brief Adds an object to the Patcher.
             model::Object* addObject(std::string const& name, std::string const& text = "");
+            
+            //! @brief Constructs and add a Link to the Patcher.
+            //! @details Constructs a Link with given origin and destination Object pointers
+            //! and IO indexes then adds it in the Patcher.
+            //! @param from     The origin Object pointer.
+            //! @param outlet   The origin outlet index.
+            //! @param to       The destination Object pointer.
+            //! @param inlet    The destination inlet index.
+            Link* addLink(model::Object* from, const uint8_t outlet, model::Object* to, const uint8_t inlet);
             
             //! Append a dico.
             /** The function reads a dico and add the objects and links to the patcher.

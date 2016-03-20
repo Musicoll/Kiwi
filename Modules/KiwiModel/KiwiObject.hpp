@@ -56,7 +56,7 @@ namespace kiwi
                 Classic,
                 Gui,
                 Dsp,
-                DspGUi
+                DspGui
             };
             
             //! @brief Default constructor.
@@ -82,7 +82,7 @@ namespace kiwi
                 if(TModel::template has<model::Object>()) return;
                 
                 TModel::template declare<model::Object>()
-                .template name("cicm.kiwi.Object")
+                .name("cicm.kiwi.Object")
                 .template member<flip::String, &Object::m_name>("name")
                 .template member<flip::String, &Object::m_text>("text")
                 .template member<flip::Int, &Object::m_id>("id");
@@ -137,6 +137,11 @@ namespace kiwi
                 addAttr(&m_color,   "color",    {0., 0., 0., 1.});
             }
             
+            ~Classic()
+            {
+                std::cout << "Classic dtor called\n";
+            }
+            
             //! @brief Get the type of the Object.
             //! @return The type of the Object.
             inline ObjectType getType() const noexcept override { return ObjectType::Classic; };
@@ -148,7 +153,7 @@ namespace kiwi
                 if(TModel::template has<Object::Classic>()) return;
                 
                 TModel::template declare<Object::Classic>()
-                .template name("cicm.kiwi.Object.Classic")
+                .name("cicm.kiwi.Object.Classic")
                 .template inherit<model::Object>()
                 .template member<decltype(Classic::m_bgcolor),  &Classic::m_bgcolor>("bgcolor")
                 .template member<decltype(Classic::m_color),    &Classic::m_color>("color");

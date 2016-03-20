@@ -46,6 +46,59 @@ namespace kiwi
     namespace model
     {
         // ================================================================================ //
+        //                                  FLIP Int Wrapper                                //
+        // ================================================================================ //
+        
+        class FlipInt : public flip::Object
+        {
+        public:
+            
+            //! @brief Default constructor
+            FlipInt() = default;
+            
+            //! @brief Construct a FlipInt with a default value
+            //! @param value The default value.
+            FlipInt(const flip::Int::internal_type value)
+            : m_value(value) {}
+            
+            //! Create a color with a vector of atoms.
+            FlipInt(std::vector<Atom> const& atoms)
+            {
+                if(atoms.size() > 0 && atoms[0].isNumber())
+                {
+                    m_value = atoms[0].getInt();
+                }
+            }
+            
+            //! @internal flip static declare method
+            template<class TModel>
+            static void declare()
+            {
+                if(TModel::template has<FlipInt>()) return;
+                
+                TModel::template declare<FlipInt>()
+                .name("cicm.kiwi.FlipInt")
+                .template member<decltype(FlipInt::m_value), &FlipInt::m_value>  ("value");
+            }
+            
+            //! @brief Retrieve the value as a vector of atoms.
+            operator std::vector<Atom>() const
+            {
+                return {m_value.value()};
+            }
+            
+            //! @brief Retrieve the value as a vector of atoms.
+            std::vector<Atom> before() const
+            {
+                return {m_value.before()};
+            }
+            
+        private:
+            
+            flip::Int m_value;
+        };
+        
+        // ================================================================================ //
         //                                  FLIP RGBA COLOR                                 //
         // ================================================================================ //
         

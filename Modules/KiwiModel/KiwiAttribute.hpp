@@ -578,7 +578,6 @@ namespace kiwi
             }
             
         private:
-            
             std::map<std::string, Attribute*>   m_attrs;
             mutable std::mutex                  m_attrs_mutex;
         };

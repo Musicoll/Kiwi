@@ -37,6 +37,8 @@
 
 using namespace kiwi;
 
+flip_DISABLE_WARNINGS_FOUR_CHAR_CONSTANTS
+
 // ================================================================================ //
 //                                     UTILITIES                                    //
 // ================================================================================ //
@@ -135,12 +137,58 @@ public:
                 indent(2);
                 std::cout << "- object \"" << obj.getName() << "\" (" << change_status_str << ")\n";
                 
+                const auto type_str = [&obj]()
+                {
+                    switch (obj.getType())
+                    {
+                        case Object::ObjectType::Default:   { return "Default"; }
+                        case Object::ObjectType::Classic:   { return "Classic"; }
+                        case Object::ObjectType::Gui:       { return "Gui"; }
+                        case Object::ObjectType::Dsp:       { return "Dsp"; }
+                        case Object::ObjectType::DspGui:    { return "DspGui"; }
+                        default: return "undefined";
+                    }
+                };
+                
+                indent(3); std::cout << "- type : " << type_str() << '\n';
+                
                 const auto status_str = (obj.resident() ? "resident" : (obj.added() ? "added" : "removed"));
                 
                 indent(3); std::cout << "- status : " << status_str << '\n';
                 indent(3); std::cout << "- text : " << obj.getText() << '\n';
                 
                 processAttributes(obj, 3);
+            }
+            
+            // ---------------
+            
+            indent(1);
+            std::cout << "- patcher link container changed :" << '\n';
+            
+            const auto& links = patcher.getLinks();
+            
+            for(const auto& link : links)
+            {
+                const auto change_status_str = (link.changed() ? "changed" : "no change");
+                
+                const auto type_str = [&link]()
+                {
+                    switch (link.getType())
+                    {
+                        case Link::LinkType::Invalid:   { return "Invalid"; }
+                        case Link::LinkType::Control:   { return "Control"; }
+                        case Link::LinkType::Dsp:       { return "Dsp"; }
+                        default: return "undefined";
+                    }
+                };
+                
+                indent(3); std::cout << "- type : " << type_str() << '\n';
+                
+                const auto status_str = (link.resident() ? "resident" : (link.added() ? "added" : "removed"));
+                
+                indent(3); std::cout << "- status : " << status_str << '\n';
+                
+                processAttributes(link, 3);
             }
         }
 
@@ -207,18 +255,6 @@ TEST_CASE("model", "[model]")
         document->commit();
     };
     
-    model::Object* obj_plus = patcher.addObject("plus", "1");
-    commitWithUndoStep("Add Object \"plus\"");
-    
-    Undo();
-    Redo();
-    
-    model::Object* obj_plus_alias = patcher.addObject("+", "42");
-    commitWithUndoStep("Add Object \"+\"");
-    
-    Undo();
-    Redo();
-    
     patcher.setAttributeValue("bgcolor", {0., 1., 0., 1.});
     patcher.setAttributeValue("gridsize", {40});
     commitWithUndoStep("Change Patcher attributes value #1");
@@ -229,6 +265,30 @@ TEST_CASE("model", "[model]")
     patcher.setAttributeValue("bgcolor", {0.6666, 0.7777, 0.8888, 1.});
     patcher.setAttributeValue("gridsize", {25});
     commitWithUndoStep("Change Patcher attributes value #2");
+    
+    Undo();
+    Redo();
+    
+    model::Object* obj_plus = patcher.addObject("plus", "1");
+    auto obj_plus_ref = obj_plus->ref();
+    obj_plus->setAttributeValue("bgcolor", {0.6666, 0.7777, 0.8888, 1.});
+    obj_plus->setAttributeValue("color", {1., 0.0, 1., 1.});
+    commitWithUndoStep("Add Object \"plus\"");
+    
+    Undo();
+    Redo();
+    
+    model::Object* obj_plus_alias = patcher.addObject("+", "42");
+    commitWithUndoStep("Add Object \"+\"");
+    
+    //Undo();
+    //Redo();
+    
+    //Link* plus_link = patcher.addLink(obj_plus, 0, obj_plus_alias, 0);
+    //commitWithUndoStep("Add Link between plus objects");
+    
+    Undo();
+    Redo();
     
     history.reset();
     document.reset();

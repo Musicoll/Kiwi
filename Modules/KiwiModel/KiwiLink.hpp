@@ -55,7 +55,10 @@ namespace kiwi
             };
             
             //! @brief default constructor.
-            Link() = default;
+            Link()
+            {
+                addAttr(&m_color, "color");
+            }
             
             //! @brief Constructs a Link.
             //! @details Constructs a Link with given origin and destination Object pointers
@@ -64,10 +67,18 @@ namespace kiwi
             //! @param outlet   The origin outlet index.
             //! @param to       The destination Object pointer.
             //! @param inlet    The destination inlet index.
-            Link(Object* from, const uint8_t outlet, Object* to, const uint8_t inlet);
+            Link(model::Object* from, const uint8_t outlet, model::Object* to, const uint8_t inlet);
             
             //! @brief Destructor.
             virtual ~Link();
+            
+            //! @brief Creates and returns a new Link
+            //! @param from     The origin Object pointer.
+            //! @param outlet   The origin outlet index.
+            //! @param to       The destination Object pointer.
+            //! @param inlet    The destination inlet index.
+            static std::unique_ptr<Link> create(model::Object* from, const uint8_t outlet,
+                                                model::Object* to, const uint8_t inlet);
             
             //! @internal flip static declare method
             template<class TModel>
@@ -76,7 +87,7 @@ namespace kiwi
                 if(TModel::template has<Link>()) return;
                 
                 TModel::template declare<Link>()
-                .template name("cicm.kiwi.Link")
+                .name("cicm.kiwi.Link")
                 .template member<decltype(Link::m_object_from), &Link::m_object_from>("object_from")
                 .template member<decltype(Link::m_object_to),   &Link::m_object_to>("object_to")
                 .template member<decltype(Link::m_index_outlet),&Link::m_index_outlet>("outlet_index")
@@ -94,27 +105,27 @@ namespace kiwi
             
             //! @brief Get the origin Object of the link.
             //! @return The origin Object of the link.
-            inline Object* getObjectFrom() const noexcept   { return m_object_from; }
+            inline model::Object* getObjectFrom() const noexcept    { return m_object_from; }
             
             //! @brief Get the destination Object of the link.
             //! @return The destination Object of the link.
-            inline Object* getObjectTo() const noexcept     { return m_object_to; }
+            inline model::Object* getObjectTo() const noexcept      { return m_object_to; }
             
             //! @brief Get the origin outlet index of the link.
             //! @return The origin outlet index of the link.
-            inline int64_t getOutletIndex() const noexcept  { return m_index_outlet; }
+            inline flip::Int::internal_type getOutletIndex() const noexcept  { return m_index_outlet; }
             
             //! @brief Get the destination inlet index of the link.
             //! @return The destination inlet index of the link.
-            inline int64_t getInletIndex() const noexcept   { return m_index_inlet; }
+            inline int64_t getInletIndex() const noexcept           { return m_index_inlet; }
             
         private:
-            flip::ObjectRef<Object>  m_object_from;
-            flip::ObjectRef<Object>  m_object_to;
-            flip::Int                m_index_outlet;
-            flip::Int                m_index_inlet;
+            flip::ObjectRef<model::Object>  m_object_from;
+            flip::ObjectRef<model::Object>  m_object_to;
+            flip::Int                       m_index_outlet;
+            flip::Int                       m_index_inlet;
             
-            Attribute::RGBA          m_color;           ///< The Link color
+            Attribute::RGBA                 m_color;           ///< The Link color
         };
         
         // ================================================================================ //
@@ -124,6 +135,19 @@ namespace kiwi
         class Link::Control : public Link
         {
         public:
+            
+            //! @brief default constructor.
+            Control() : Link() {};
+            
+            //! @brief Constructs a Control Link.
+            //! @details Constructs a Link with given origin and destination Object pointers
+            //! and IO indexes.
+            //! @param from     The origin Object pointer.
+            //! @param outlet   The origin outlet index.
+            //! @param to       The destination Object pointer.
+            //! @param inlet    The destination inlet index.
+            Control(model::Object* from, const uint8_t outlet, model::Object* to, const uint8_t inlet)
+            : Link(from, outlet, to, inlet) {};
             
             //! @brief Get the type of the Object.
             //! @return The type of the Object.
@@ -136,7 +160,7 @@ namespace kiwi
                 if(TModel::template has<Link::Control>()) return;
                 
                 TModel::template declare<Link::Control>()
-                .template name("cicm.kiwi.Link.Control")
+                .name("cicm.kiwi.Link.Control")
                 .template inherit<Link>();
             }
         };
@@ -149,6 +173,19 @@ namespace kiwi
         {
         public:
             
+            //! @brief default constructor.
+            Dsp() = default;
+            
+            //! @brief Constructs a Dsp Link.
+            //! @details Constructs a Link with given origin and destination Object pointers
+            //! and IO indexes.
+            //! @param from     The origin Object pointer.
+            //! @param outlet   The origin outlet index.
+            //! @param to       The destination Object pointer.
+            //! @param inlet    The destination inlet index.
+            Dsp(model::Object* from, const uint8_t outlet, model::Object* to, const uint8_t inlet)
+            : Link(from, outlet, to, inlet) {};
+            
             //! @brief Get the type of the Object.
             //! @return The type of the Object.
             inline LinkType getType() const noexcept final { return LinkType::Dsp; };
@@ -160,7 +197,7 @@ namespace kiwi
                 if(TModel::template has<Link::Dsp>()) return;
                 
                 TModel::template declare<Link::Dsp>()
-                .template name("cicm.kiwi.Link.Dsp")
+                .name("cicm.kiwi.Link.Dsp")
                 .template inherit<Link>();
             }
         };

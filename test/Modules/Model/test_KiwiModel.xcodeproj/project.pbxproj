@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2C1235351C9C4B3A003A93DF /* KiwiObjectFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C2D08F11C866D00009BED7B /* KiwiObjectFactory.cpp */; };
 		2C2BF6BA1C96EC9C006E88B6 /* KiwiObjectPlus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C2BF6B71C96EC9C006E88B6 /* KiwiObjectPlus.cpp */; };
 		2C2D08EC1C866C8C009BED7B /* test_KiwiModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C2D08EA1C866C8C009BED7B /* test_KiwiModel.cpp */; };
 		2C2D08ED1C866C8C009BED7B /* test_KiwiPatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C2D08EB1C866C8C009BED7B /* test_KiwiPatcher.cpp */; };
@@ -97,7 +98,6 @@
 		2C2D0E221C870B51009BED7B /* KiwiPatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C2D08FE1C866D00009BED7B /* KiwiPatcher.cpp */; };
 		2C2D0E241C87243F009BED7B /* KiwiObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C2D08FC1C866D00009BED7B /* KiwiObject.cpp */; };
 		2C2D0E251C872442009BED7B /* KiwiLink.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C2D08F81C866D00009BED7B /* KiwiLink.cpp */; };
-		2C2D0E261C872447009BED7B /* KiwiObjectFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C2D08F11C866D00009BED7B /* KiwiObjectFactory.cpp */; };
 		2C2D0E281C87C370009BED7B /* sqlite3.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C2D0E271C87C370009BED7B /* sqlite3.c */; };
 /* End PBXBuildFile section */
 
@@ -894,7 +894,6 @@
 				2C2D0DDD1C870953009BED7B /* PacketStreamSender.cpp in Sources */,
 				2C2D08EC1C866C8C009BED7B /* test_KiwiModel.cpp in Sources */,
 				2C2D0E201C870953009BED7B /* String.cpp in Sources */,
-				2C2D0E261C872447009BED7B /* KiwiObjectFactory.cpp in Sources */,
 				2C2D0E091C870953009BED7B /* Representative.cpp in Sources */,
 				2C2D0DDA1C870953009BED7B /* MulticastServiceSocket.cpp in Sources */,
 				2C2D0E0A1C870953009BED7B /* SignalBase.cpp in Sources */,
@@ -917,6 +916,7 @@
 				2C2D0DD61C870953009BED7B /* PortSocketTcp.cpp in Sources */,
 				2C2D0E171C870953009BED7B /* Float.cpp in Sources */,
 				2C2D0DD21C870953009BED7B /* DataProviderFile.cpp in Sources */,
+				2C1235351C9C4B3A003A93DF /* KiwiObjectFactory.cpp in Sources */,
 				2C2D0E251C872442009BED7B /* KiwiLink.cpp in Sources */,
 				2C2D0DF51C870953009BED7B /* Codec.cpp in Sources */,
 				2C2D0E241C87243F009BED7B /* KiwiObject.cpp in Sources */,

@@ -39,7 +39,8 @@ namespace kiwi
         {
         public:
             
-            using creator_function_t = std::function<Object*(std::string)>;
+            using object_t = model::Object;
+            using creator_function_t = std::function<object_t*(std::string)>;
             using creator_map_t = std::map<std::string, creator_function_t>;
             
             //! @brief Add an object to the ObjectFactory.
@@ -49,7 +50,7 @@ namespace kiwi
             template <class T>
             static void add(std::string name)
             {
-                static_assert(std::is_base_of<model::Object, T>::value, "The class must inherit from object.");
+                static_assert(std::is_base_of<object_t, T>::value, "The class must inherit from object.");
                 static_assert(!std::is_abstract<T>::value, "The class must not be abstract.");
                 
                 if(!name.empty())
@@ -64,7 +65,7 @@ namespace kiwi
                     }
                     else
                     {
-                        creator_function_t func = [name](std::string text) -> Object*
+                        creator_function_t func = [name](std::string text) -> object_t*
                         {
                             return new T(name, text);
                         };
@@ -78,7 +79,7 @@ namespace kiwi
             //! @param name The name of the Object.
             //! @param text The text of the Object.
             //! @return An object (if the name matches a registered Object name).
-            static std::unique_ptr<Object> create(std::string const& name, std::string const& text);
+            static std::unique_ptr<object_t> create(std::string const& name, std::string const& text);
             
             //! @brief Returns true if a given string match a registered Object name.
             //! @param name The name of the object.

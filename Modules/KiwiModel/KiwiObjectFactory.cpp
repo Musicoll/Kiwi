@@ -31,7 +31,7 @@ namespace kiwi
         //                                      FACTORY                                     //
         // ================================================================================ //
         
-        std::unique_ptr<Object> ObjectFactory::create(std::string const& name, std::string const& text)
+        auto ObjectFactory::create(std::string const& name, std::string const& text) -> std::unique_ptr<object_t>
         {
             std::lock_guard<std::mutex> guard(getMutex());
                         
@@ -39,7 +39,7 @@ namespace kiwi
             const auto it = creators.find(name);
             if(it != creators.end())
             {
-                return std::unique_ptr<Object>(it->second(text));
+                return std::unique_ptr<object_t>(it->second(text));
             }
             
             return nullptr;

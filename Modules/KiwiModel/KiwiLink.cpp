@@ -33,34 +33,30 @@ namespace kiwi
         //                                      LINK                                        //
         // ================================================================================ //
         
-        Link::Link(Object* from, const uint8_t outlet, Object* to, const uint8_t inlet) :
+        Link::Link(model::Object* from, const uint8_t outlet, model::Object* to, const uint8_t inlet) :
         m_object_from(from),
         m_object_to(to),
         m_index_outlet(outlet),
         m_index_inlet(inlet)
         {
-            ;
+            addAttr(&m_color, "color", {0., 0., 0., 1.});
         }
         
         Link::~Link()
         {
-            Object*     from    = getObjectFrom();
-            Object*     to      = getObjectTo();
-            if(from && to)
+            ;
+        }
+        
+        std::unique_ptr<Link> Link::create(model::Object* from, const uint8_t outlet,
+                                           model::Object* to, const uint8_t inlet)
+        {
+            if(from != to)
             {
-                /*
-                 Object::sOutlet outlet  = from->getOutlet(m_index_outlet);
-                 if(outlet)
-                 {
-                 outlet->erase(to, m_index_outlet);
-                 }
-                 Object::sInlet inlet    = to->getInlet(m_index_intlet);
-                 if(inlet)
-                 {
-                 inlet->erase(from, m_index_intlet);
-                 }
-                 */
+                //! @todo need to implement conditionnal return type
+                return std::unique_ptr<Link>(new Link::Control(from, outlet, to, inlet));
             }
+            
+            return nullptr;
         }
     }
 }
