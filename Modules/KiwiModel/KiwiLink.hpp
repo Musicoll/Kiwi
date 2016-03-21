@@ -120,8 +120,8 @@ namespace kiwi
             inline int64_t getInletIndex() const noexcept           { return m_index_inlet; }
             
         private:
-            flip::ObjectRef<model::Object>  m_object_from;
-            flip::ObjectRef<model::Object>  m_object_to;
+            model::Object::Ref              m_object_from;
+            model::Object::Ref              m_object_to;
             flip::Int                       m_index_outlet;
             flip::Int                       m_index_inlet;
             

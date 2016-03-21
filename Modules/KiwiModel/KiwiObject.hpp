@@ -47,6 +47,8 @@ namespace kiwi
             class Classic;
             friend class Classic;
             
+            using Ref = flip::ObjectRef<model::Object>;
+            
             //! @brief Enum of Object types
             //! @remark Can't use Type because of flip::Type conflict
             enum class ObjectType : uint8_t

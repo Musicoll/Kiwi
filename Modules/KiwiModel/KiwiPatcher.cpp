@@ -86,7 +86,7 @@ namespace kiwi
         Link* Patcher::addLink(model::Object* from, const uint8_t outlet, model::Object* to, const uint8_t inlet)
         {
             std::unique_ptr<Link> link = Link::create(from, outlet, to, inlet);
-            
+
             if(link)
             {
                 const auto it = m_links.insert(std::move(link));
@@ -94,37 +94,6 @@ namespace kiwi
             }
             
             return nullptr;
-        }
-        
-        void Patcher::add(std::map<const std::string, Atom> const& /*dico*/)
-        {
-            /*
-             Vector objects;
-             const auto it = dico.find(Tags::objects);
-             if(it != dico.end())
-             {
-             objects = it->second;
-             }
-             
-             std::lock_guard<std::mutex> guard(m_mutex);
-             
-             for(Dico objdico : objects)
-             {
-             if(!objdico.empty())
-             {
-             //const ulong r_id = objdico[Tags::id];
-             const ulong n_id = m_free_ids.empty() ? getNumberOfObjects() + 1 : m_free_ids[0];
-             if(!m_free_ids.empty())
-             {
-             m_free_ids.erase(m_free_ids.begin());
-             }
-             //@todo : no need to cast here
-             objdico[Tags::id] = static_cast<int64_t>(n_id);
-             
-             createObject(objdico);
-             }
-             }
-             */
         }
         
         void Patcher::remove(model::Object* object)

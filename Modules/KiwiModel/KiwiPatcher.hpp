@@ -94,28 +94,6 @@ namespace kiwi
                 return m_links;
             }
             
-            //! Get an object with the id.
-            /** The function retrieves an object with an id.
-             @param id   The id of the object.
-             */
-            inline model::Object* getObjectWithId(const int64_t ID) const noexcept
-            {
-                std::lock_guard<std::mutex> guard(m_mutex);
-                
-                auto predicate = [&ID](const model::Object& object)
-                {
-                    return (object.getId() == ID);
-                };
-                
-                const auto it = find_if(m_objects.begin(), m_objects.end(), predicate);
-                if(it != m_objects.cend())
-                {
-                    return it.operator->();
-                }
-                
-                return nullptr;
-            }
-            
             //! @brief Adds an object to the Patcher.
             model::Object* addObject(std::string const& name, std::string const& text = "");
             
@@ -127,12 +105,6 @@ namespace kiwi
             //! @param to       The destination Object pointer.
             //! @param inlet    The destination inlet index.
             Link* addLink(model::Object* from, const uint8_t outlet, model::Object* to, const uint8_t inlet);
-            
-            //! Append a dico.
-            /** The function reads a dico and add the objects and links to the patcher.
-             @param dico The dico.
-             */
-            void add(std::map<const std::string, Atom> const& dico);
             
             //! @brief Removes an object from the Patcher.
             //! @param obj The pointer to the object to remove.

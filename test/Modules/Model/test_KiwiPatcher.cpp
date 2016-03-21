@@ -35,6 +35,8 @@
 #include "flip/BackEndBinary.h"
 #include "flip/BackEndMl.h"
 
+#include "flip/Signal.h"
+
 using namespace kiwi;
 
 flip_DISABLE_WARNINGS_FOUR_CHAR_CONSTANTS
@@ -122,12 +124,14 @@ public:
     
     void document_changed(Patcher& patcher) override
     {
-        std::cout << "  Document changed :" << '\n';
+        std::cout << "  Patcher changed :" << '\n';
         
-        if(patcher.getObjects().changed())
+        //if(patcher.getObjects().changed())
+        if(true)
         {
+            const auto objs_change_status_str = (patcher.getObjects().changed() ? "changed" : "no change");
             indent(1);
-            std::cout << "- patcher object container changed :" << '\n';
+            std::cout << "- Objects : (" << objs_change_status_str << ")\n";
             
             const auto& objects = patcher.getObjects();
             
@@ -159,11 +163,14 @@ public:
                 
                 processAttributes(obj, 3);
             }
-            
-            // ---------------
-            
+        }
+        
+        //if(patcher.getLinks().changed())
+        if(true)
+        {
+            const auto links_change_status_str = (patcher.getLinks().changed() ? "changed" : "no change");
             indent(1);
-            std::cout << "- patcher link container changed :" << '\n';
+            std::cout << "- Links : (" << links_change_status_str << ")\n";
             
             const auto& links = patcher.getLinks();
             
@@ -187,6 +194,9 @@ public:
                 const auto status_str = (link.resident() ? "resident" : (link.added() ? "added" : "removed"));
                 
                 indent(3); std::cout << "- status : " << status_str << '\n';
+                
+                //indent(3); std::cout << "- from : " << link.getObjectFrom()->getName() << '\n';
+                //indent(3); std::cout << "- to : " << link.getObjectTo()->getName() << '\n';
                 
                 processAttributes(link, 3);
             }
@@ -236,23 +246,51 @@ TEST_CASE("model", "[model]")
     const auto commitWithUndoStep = [&tx, &document, &history] (std::string const& label)
     {
         std::cout << "* " << label << '\n';
+        
         document->set_label(label);
-        tx = document->commit();
+        
+        try
+        {
+            tx = document->commit();
+        }
+        catch (std::runtime_error e)
+        {
+            std::cerr << e.what();
+        }
+        
         history->add_undo_step(tx);
     };
     
     const auto Undo = [&document, &history] ()
     {
-        std::cout << "* " << "Undo" << '\n';
-        history->execute_undo();
-        document->commit();
+        const auto last_undo = history->last_undo();
+        
+        if(last_undo != history->end())
+        {
+            std::cout << "* " << "Undo \"" << last_undo->label() << "\"\n";
+            history->execute_undo();
+            document->commit();
+        }
+        else
+        {
+            std::cout << "* Undo impossible\n";
+        }
     };
     
     const auto Redo = [&document, &history] ()
     {
-        std::cout << "* " << "Redo" << '\n';
-        history->execute_redo();
-        document->commit();
+        const auto first_redo = history->first_redo();
+        
+        if(first_redo != history->end())
+        {
+            std::cout << "* " << "Redo \"" << history->first_redo()->label() << "\"\n";
+            history->execute_redo();
+            document->commit();
+        }
+        else
+        {
+            std::cout << "* Redo impossible\n";
+        }
     };
     
     patcher.setAttributeValue("bgcolor", {0., 1., 0., 1.});
@@ -260,7 +298,9 @@ TEST_CASE("model", "[model]")
     commitWithUndoStep("Change Patcher attributes value #1");
     
     Undo();
+    Undo(); // test impossible undo use case
     Redo();
+    Redo(); // test impossible redo use case
     
     patcher.setAttributeValue("bgcolor", {0.6666, 0.7777, 0.8888, 1.});
     patcher.setAttributeValue("gridsize", {25});
@@ -269,23 +309,39 @@ TEST_CASE("model", "[model]")
     Undo();
     Redo();
     
-    model::Object* obj_plus = patcher.addObject("plus", "1");
-    auto obj_plus_ref = obj_plus->ref();
-    obj_plus->setAttributeValue("bgcolor", {0.6666, 0.7777, 0.8888, 1.});
-    obj_plus->setAttributeValue("color", {1., 0.0, 1., 1.});
+    model::Object* obj_plus_ptr = patcher.addObject("plus", "1");
+    auto obj_plus_ref = obj_plus_ptr->ref();
+    obj_plus_ptr->setAttributeValue("bgcolor", {0.6666, 0.7777, 0.8888, 1.});
+    obj_plus_ptr->setAttributeValue("color", {1., 0.0, 1., 1.});
     commitWithUndoStep("Add Object \"plus\"");
     
     Undo();
     Redo();
     
+    obj_plus_ptr = document->object_ptr<model::Object>(obj_plus_ref);
+    if(obj_plus_ptr)
+    {
+        obj_plus_ptr->setAttributeValue("bgcolor", {.123456, 0.7777, 0.8888, 1.});
+    }
+    
+    commitWithUndoStep("Change \"plus\" object bgcolor");
+    
+    patcher.remove(obj_plus_ptr);
+    commitWithUndoStep("Remove Object \"plus\"");
+    Undo();
+    
     model::Object* obj_plus_alias = patcher.addObject("+", "42");
+    auto obj_plus_alias_ref = obj_plus_alias->ref();
     commitWithUndoStep("Add Object \"+\"");
     
-    //Undo();
-    //Redo();
+    Undo();
+    Redo();
     
-    //Link* plus_link = patcher.addLink(obj_plus, 0, obj_plus_alias, 0);
-    //commitWithUndoStep("Add Link between plus objects");
+    obj_plus_ptr = document->object_ptr<model::Object>(obj_plus_ref);
+    auto obj_plus_alias_ptr = document->object_ptr<model::Object>(obj_plus_alias_ref);
+        
+    Link* plus_link = patcher.addLink(obj_plus_ptr, 0, obj_plus_alias_ptr, 0);
+    commitWithUndoStep("Add Link between plus objects");
     
     Undo();
     Redo();
