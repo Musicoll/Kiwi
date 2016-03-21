@@ -35,8 +35,6 @@
 #include "flip/BackEndBinary.h"
 #include "flip/BackEndMl.h"
 
-#include "flip/Signal.h"
-
 using namespace kiwi;
 
 flip_DISABLE_WARNINGS_FOUR_CHAR_CONSTANTS
@@ -359,4 +357,4 @@ TEST_CASE("model", "[model]")
     document.reset();
 }
 
-
+flip_RESTORE_WARNINGS
