@@ -26,6 +26,7 @@
 
 #include "../KiwiCore/KiwiAtom.hpp"
 #include <mutex>
+#include <algorithm>
 
 // ---- Flip headers ---- //
 #include "flip/DataModel.h"
