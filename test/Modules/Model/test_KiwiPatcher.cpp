@@ -145,7 +145,7 @@ public:
                 {
                     switch (obj.getType())
                     {
-                        case Object::ObjectType::Default:   { return "Default"; }
+                        case Object::ObjectType::Invalid:   { return "Invalid"; }
                         case Object::ObjectType::Classic:   { return "Classic"; }
                         case Object::ObjectType::Gui:       { return "Gui"; }
                         case Object::ObjectType::Dsp:       { return "Dsp"; }
@@ -195,8 +195,18 @@ public:
                 
                 indent(3); std::cout << "- status : " << status_str << '\n';
                 
-                //indent(3); std::cout << "- from : " << link.getObjectFrom()->getName() << '\n';
-                //indent(3); std::cout << "- to : " << link.getObjectTo()->getName() << '\n';
+                const auto from = link.getObjectFrom();
+                const auto to = link.getObjectTo();
+                if(from && to)
+                {
+                    indent(3); std::cout    << "- from object : \""
+                                            << from->getName() << "\" ("
+                                            << link.getOutletIndex() << ")" << '\n';
+                    
+                    indent(3); std::cout    << "- to object : \""
+                                            << to->getName() << "\" ("
+                                            << link.getInletIndex() << ")" << '\n';
+                }
                 
                 processAttributes(link, 3);
             }
@@ -212,17 +222,18 @@ class PatcherValidator : public flip::DocumentValidator<Patcher>
 {
 public:
     
-    void validate(Patcher& patcher)
+    void validate(Patcher& patcher) override
     {
         
         std::cout << "  Document Validate :" << '\n';
         
         //throw std::runtime_error("ERROOOOOORRRR !!!");
         
+        /*
         if(patcher.getObjects().changed())
         {
             //throw std::runtime_error("ERROOOOOORRRR !!!");
-        }
+        }*/
     };
 };
 
@@ -241,9 +252,8 @@ TEST_CASE("model", "[model]")
     
     Patcher& patcher = document->root<Patcher>();
     patcher.init();
-    auto tx = document->commit();
     
-    const auto commitWithUndoStep = [&tx, &document, &history] (std::string const& label)
+    const auto commitWithUndoStep = [&document, &history] (std::string const& label)
     {
         std::cout << "* " << label << '\n';
         
@@ -251,14 +261,13 @@ TEST_CASE("model", "[model]")
         
         try
         {
-            tx = document->commit();
+            auto tx = document->commit();
+            history->add_undo_step(tx);
         }
-        catch (std::runtime_error e)
+        catch(std::runtime_error& e)
         {
-            std::cerr << e.what();
+            std::cerr << "aki" << e.what();
         }
-        
-        history->add_undo_step(tx);
     };
     
     const auto Undo = [&document, &history] ()

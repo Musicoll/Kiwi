@@ -54,7 +54,6 @@ namespace kiwi
             enum class ObjectType : uint8_t
             {
                 Invalid = 0,
-                Default,
                 Classic,
                 Gui,
                 Dsp,
