@@ -25,6 +25,7 @@
 #define KIWI_MODEL_FLIP_TYPES_HPP_INCLUDED
 
 #include "../KiwiCore/KiwiAtom.hpp"
+#include <mutex>
 
 // ---- Flip headers ---- //
 #include "flip/DataModel.h"
