@@ -8,6 +8,7 @@ notifications:
 
 git:
   submodules: true
+  depth: 5
   on:
     branch: ['dev-dsp', 'dev-core', 'dev-graphics', 'dev-model']
 
