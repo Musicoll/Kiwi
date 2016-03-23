@@ -36,33 +36,11 @@ namespace kiwi
         m_name(name),
         m_text(text)
         {
-            /*
-             createFlipAttr(Tags::position,              "Position",                 "Appearance", flip::Array<flip::String>("", ""));
-             createFlipAttr(Tags::position,              "Position",                 "Appearance", Point(0., 0.));
-             createFlipAttr(Tags::size,                  "Size",                     "Appearance", Size(10., 10.));
-             createFlipAttr(Tags::presentation_position, "Presentation Position",    "Appearance", Point(0., 0.));
-             createFlipAttr(Tags::presentation_size,     "Presentation Size",        "Appearance", Size(10., 10.));
-             */
-            //createFlipAttr(Tags::position, "Position", "Appearance", FlipPoint(0., 0.));
-            //createFlipAttr(Tags::presentation_position, "Presentation Position", "Appearance", FlipPoint(0., 0.));
-            /*
-             createFlipAttr(Tags::hidden,        "Hide on Lock",             "Appearance", flip::Bool(false));
-             createFlipAttr(Tags::presentation,  "Include in presentation",  "Appearance", flip::Bool(false));
-             createFlipAttr(Tags::ignoreclick,   "Ignore Click",             "Behavior",   flip::Bool(false));
-             */
-        }
-        
-        Object::Object(const Object& rhs) noexcept :
-        m_name(rhs.m_name),
-        m_text(rhs.m_text)
-        {
-            //m_attributes = rhs.m_attributes;
-        }
-        
-        Object::~Object() noexcept
-        {
-            ;
-        }
+            addAttr<Attribute::RGBA>("bgcolor",  FlipRGBA{1., 1., 1., 1.});
+            addAttr<Attribute::RGBA>("color",    FlipRGBA{0., 0., 0., 1.});
             
+            //createFlipAttr(Tags::position,              "Position",                 "Appearance", Point(0., 0.));
+            //createFlipAttr(Tags::size,                  "Size",                     "Appearance", Size(10., 10.));
+        }
     }
 }

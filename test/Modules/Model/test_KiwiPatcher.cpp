@@ -139,21 +139,6 @@ public:
                 indent(2);
                 std::cout << "- object \"" << obj.getName() << "\" (" << change_status_str << ")\n";
                 
-                const auto type_str = [&obj]()
-                {
-                    switch (obj.getType())
-                    {
-                        case Object::ObjectType::Invalid:   { return "Invalid"; }
-                        case Object::ObjectType::Classic:   { return "Classic"; }
-                        case Object::ObjectType::Gui:       { return "Gui"; }
-                        case Object::ObjectType::Dsp:       { return "Dsp"; }
-                        case Object::ObjectType::DspGui:    { return "DspGui"; }
-                        default: return "undefined";
-                    }
-                };
-                
-                indent(3); std::cout << "- type : " << type_str() << '\n';
-                
                 const auto status_str = (obj.resident() ? "resident" : (obj.added() ? "added" : "removed"));
                 
                 indent(3); std::cout << "- status : " << status_str << '\n';
@@ -175,19 +160,6 @@ public:
             for(const auto& link : links)
             {
                 const auto change_status_str = (link.changed() ? "changed" : "no change");
-                
-                const auto type_str = [&link]()
-                {
-                    switch (link.getType())
-                    {
-                        case Link::LinkType::Invalid:   { return "Invalid"; }
-                        case Link::LinkType::Control:   { return "Control"; }
-                        case Link::LinkType::Dsp:       { return "Dsp"; }
-                        default: return "undefined";
-                    }
-                };
-                
-                indent(3); std::cout << "- type : " << type_str() << '\n';
                 
                 const auto status_str = (link.resident() ? "resident" : (link.added() ? "added" : "removed"));
                 

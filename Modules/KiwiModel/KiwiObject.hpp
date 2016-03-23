@@ -41,23 +41,8 @@ namespace kiwi
         class Object : public Attribute::Manager
         {
         public:
-            friend class Patcher;
-            
-            class Classic;
-            friend class Classic;
             
             using Ref = flip::ObjectRef<model::Object>;
-            
-            //! @brief Enum of Object types
-            //! @remark Can't use Type because of flip::Type conflict
-            enum class ObjectType : uint8_t
-            {
-                Invalid = 0,
-                Classic,
-                Gui,
-                Dsp,
-                DspGui
-            };
             
             //! @brief Default constructor.
             Object()
@@ -68,12 +53,8 @@ namespace kiwi
             //! @brief Constructor.
             Object(std::string const& name, std::string const& text);
             
-            //! @brief Copy constructor.
-            //! @remark Needed to be inserted in a flip::Array (Verify)
-            Object(const model::Object& rhs) noexcept;
-            
             //! @brief Destructor.
-            virtual ~Object() noexcept;
+            virtual ~Object() noexcept {}
             
             //! @internal flip static declare method
             template<class TModel>
@@ -87,10 +68,6 @@ namespace kiwi
                 .template member<flip::String, &Object::m_name>("name")
                 .template member<flip::String, &Object::m_text>("text");
             }
-            
-            //! @brief Get the type of the Object.
-            //! @return The type of the Object.
-            virtual inline ObjectType getType() const noexcept { return ObjectType::Invalid; };
             
             //! @brief Returns the patcher that manages the object.
             //! @return The Patcher's pointer.
@@ -107,48 +84,6 @@ namespace kiwi
         private:
             flip::String    m_name;
             flip::String    m_text;
-        };
-        
-        // ================================================================================ //
-        //                                  OBJECT CLASSIC                                  //
-        // ================================================================================ //
-        
-        class Object::Classic : public model::Object
-        {
-        public:
-            
-            Classic()
-            {
-                std::cout << "Classic Default ctor called\n";
-            }
-            
-            Classic(std::string name, std::string text)
-            : model::Object(name, text)
-            {
-                std::cout << "Classic ctor called\n";
-                addAttr<Attribute::RGBA>("bgcolor",  FlipRGBA{1., 1., 1., 1.});
-                addAttr<Attribute::RGBA>("color",    FlipRGBA{0., 0., 0., 1.});
-            }
-            
-            ~Classic()
-            {
-                std::cout << "Classic dtor called\n";
-            }
-            
-            //! @brief Get the type of the Object.
-            //! @return The type of the Object.
-            inline ObjectType getType() const noexcept override { return ObjectType::Classic; };
-            
-            //! @internal flip static declare method
-            template<class TModel>
-            static void declare()
-            {
-                if(TModel::template has<Object::Classic>()) return;
-                
-                TModel::template declare<Object::Classic>()
-                .name("cicm.kiwi.Object.Classic")
-                .template inherit<model::Object>();
-            }
         };
     }
 }

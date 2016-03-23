@@ -34,7 +34,7 @@ namespace kiwi
         //                                    OBJECT PLUS                                   //
         // ================================================================================ //
         
-        class ObjectPlus : public Object::Classic
+        class ObjectPlus : public model::Object
         {
         public:
             
@@ -43,7 +43,7 @@ namespace kiwi
                 std::cout << "ObjectPlus : Default ctor called\n";
             }
             
-            ObjectPlus(std::string name, std::string text) : Object::Classic(name, text) {}
+            ObjectPlus(std::string name, std::string text) : model::Object(name, text) {}
 
             //! @internal flip static declare method
             template<class TModel>
@@ -53,7 +53,7 @@ namespace kiwi
                 
                 TModel::template declare<ObjectPlus>()
                 .template name("cicm.kiwi.ObjectPlus")
-                .template inherit<Object::Classic>();
+                .template inherit<model::Object>();
             }
         };
     }

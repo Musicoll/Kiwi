@@ -61,15 +61,12 @@ namespace kiwi
                 
                 // patcher elements declaration :
                 model::Object::declare<Model>();
-                model::Object::Classic::declare<Model>();
                 
                 // Objects
                 model::ObjectPlus::declare<Model>();
                 
                 // Links
                 Link::declare<Model>();
-                Link::Control::declare<Model>();
-                Link::Dsp::declare<Model>();
                 
                 // Patcher
                 Patcher::declare<Model>();

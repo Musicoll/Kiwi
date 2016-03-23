@@ -41,18 +41,6 @@ namespace kiwi
         {
         public:
             
-            class Control;
-            class Dsp;
-            
-            //! @brief Enum of Link types
-            //! @remark Can't use Type because of flip::Type conflict
-            enum class LinkType : uint8_t
-            {
-                Invalid = 0,
-                Control,
-                Dsp
-            };
-            
             //! @brief default constructor.
             Link() {}
             
@@ -91,13 +79,9 @@ namespace kiwi
                 .template member<decltype(Link::m_index_inlet), &Link::m_index_inlet>("inlet_index");
             }
             
-            //! @brief Get the type of the Object.
-            //! @return The type of the Object.
-            virtual LinkType getType() const noexcept = 0;
-            
             //! @brief Get the parent Patcher of the link.
             //! @return The parent Patcher of the link.
-            inline Patcher* getPatcher() { return parent().ptr<Patcher>(); }
+            inline Patcher* getParentPatcher()                      { return parent().ptr<Patcher>(); }
             
             //! @brief Get the origin Object of the link.
             //! @return The origin Object of the link.
@@ -120,80 +104,6 @@ namespace kiwi
             model::Object::Ref              m_object_to;
             flip::Int                       m_index_outlet;
             flip::Int                       m_index_inlet;
-        };
-        
-        // ================================================================================ //
-        //                                   LINK CONTROL                                   //
-        // ================================================================================ //
-        
-        class Link::Control : public Link
-        {
-        public:
-            
-            //! @brief default constructor.
-            Control() : Link() {};
-            
-            //! @brief Constructs a Control Link.
-            //! @details Constructs a Link with given origin and destination Object pointers
-            //! and IO indexes.
-            //! @param from     The origin Object pointer.
-            //! @param outlet   The origin outlet index.
-            //! @param to       The destination Object pointer.
-            //! @param inlet    The destination inlet index.
-            Control(model::Object* from, const uint8_t outlet, model::Object* to, const uint8_t inlet)
-            : Link(from, outlet, to, inlet) {};
-            
-            //! @brief Get the type of the Object.
-            //! @return The type of the Object.
-            inline LinkType getType() const noexcept final { return LinkType::Control; };
-            
-            //! @internal flip static declare method
-            template<class TModel>
-            static void declare()
-            {
-                if(TModel::template has<Link::Control>()) return;
-                
-                TModel::template declare<Link::Control>()
-                .name("cicm.kiwi.Link.Control")
-                .template inherit<Link>();
-            }
-        };
-        
-        // ================================================================================ //
-        //                                     LINK DSP                                     //
-        // ================================================================================ //
-        
-        class Link::Dsp : public Link
-        {
-        public:
-            
-            //! @brief default constructor.
-            Dsp() = default;
-            
-            //! @brief Constructs a Dsp Link.
-            //! @details Constructs a Link with given origin and destination Object pointers
-            //! and IO indexes.
-            //! @param from     The origin Object pointer.
-            //! @param outlet   The origin outlet index.
-            //! @param to       The destination Object pointer.
-            //! @param inlet    The destination inlet index.
-            Dsp(model::Object* from, const uint8_t outlet, model::Object* to, const uint8_t inlet)
-            : Link(from, outlet, to, inlet) {};
-            
-            //! @brief Get the type of the Object.
-            //! @return The type of the Object.
-            inline LinkType getType() const noexcept final { return LinkType::Dsp; };
-            
-            //! @internal flip static declare method
-            template<class TModel>
-            static void declare()
-            {
-                if(TModel::template has<Link::Dsp>()) return;
-                
-                TModel::template declare<Link::Dsp>()
-                .name("cicm.kiwi.Link.Dsp")
-                .template inherit<Link>();
-            }
         };
     }
 }

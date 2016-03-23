@@ -48,7 +48,7 @@ namespace kiwi
             if(from != to)
             {
                 //! @todo need to implement conditionnal return type
-                return std::unique_ptr<Link>(new Link::Control(from, outlet, to, inlet));
+                return std::unique_ptr<Link>(new Link(from, outlet, to, inlet));
             }
             
             return nullptr;
