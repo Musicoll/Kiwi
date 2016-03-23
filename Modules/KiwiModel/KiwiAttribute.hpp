@@ -443,6 +443,9 @@ namespace kiwi
                                  &Attribute::Manager::m_attributes>("attributes");
             }
             
+            //! @brief Returns true if an attribute value changed.
+            inline bool attributeChanged() const noexcept { return m_attributes.changed(); }
+            
             //! @brief Get the value of a given attribute by name.
             //! @param name the name of the attribute.
             //! @return The value of the attribute as a vector of atoms,
