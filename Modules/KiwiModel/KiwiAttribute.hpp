@@ -59,8 +59,8 @@ namespace kiwi
                 Enum
             };
             
-            //! @brief Default constructor
-            Attribute() = default;
+            //! @internal flip Default constructor
+            Attribute(flip::Default&) {};
             
             //! @brief Constructs an Attribute object.
             //! @param name The name of the attribute (usually only letters and undescore characters).
@@ -87,11 +87,6 @@ namespace kiwi
             //! @details This method must be overwritten by subclasses.
             //! @param atoms The vector of atoms.
             virtual void setValue(std::vector<Atom> const&) = 0;
-            
-            //! @brief Sets the attribute default value with a vector of atoms.
-            //! @details This method must be overwritten by subclasses.
-            //! @param atoms The vector of atoms.
-            virtual void setDefaultValue(std::vector<Atom> const&) = 0;
             
             //! @brief Returns the attribute default value as a vector of atoms.
             //! @details This method must be overwritten by subclasses.
@@ -121,19 +116,9 @@ namespace kiwi
                 .template member<flip::String, &Attribute::m_name>("name");
             }
             
-        protected:
-            flip::String    m_name;
-            
         private:
             template<class ValueType> class Typed;
-            
-            //! @brief Set the attribute name.
-            //! @param name The attribute name.
-            inline Attribute& setName(std::string const& name)
-            {
-                m_name = name;
-                return *this;
-            }
+            flip::String    m_name;
         };
         
         // ================================================================================ //
@@ -152,8 +137,9 @@ namespace kiwi
             value_t m_value;
             
         public:
-            //! @brief Default constructor.
-            Typed() = default;
+            
+            //! @internal flip Default constructor
+            Typed(flip::Default& d) : Attribute(d) {};
             
             //! @brief Constructs an Attribute.
             Typed(std::string const& name, value_t const& value) :
@@ -221,7 +207,8 @@ namespace kiwi
         {
         public:
             
-            Int() = default;
+            //! @internal flip Default constructor
+            Int(flip::Default& d) : Attribute::Typed<value_t>(d) {};
             
             Int(std::string const& name, value_t const& value) :
             Attribute::Typed<value_t>(name, value) {}
@@ -254,18 +241,6 @@ namespace kiwi
                     m_value = atoms[0].getInt();
                 }
             }
-            
-        private:
-            
-            //! @brief Set the Attribute default value with a vector of atoms.
-            //! @param atoms A vector of atoms.
-            void setDefaultValue(std::vector<Atom> const& atoms) final
-            {
-                if(atoms.size() >= 1 && atoms[0].isNumber())
-                {
-                    m_default = atoms[0].getInt();
-                }
-            }
         };
         
         // ================================================================================ //
@@ -277,7 +252,8 @@ namespace kiwi
         {
         public:
             
-            Float() = default;
+            //! @internal flip Default constructor
+            Float(flip::Default& d) : Attribute::Typed<value_t>(d) {};
             
             Float(std::string const& name, value_t const& value) :
             Attribute::Typed<value_t>(name, value) {}
@@ -310,18 +286,6 @@ namespace kiwi
                     m_value = atom[0].getFloat();
                 }
             }
-            
-        private:
-            
-            //! @brief Set the Attribute default value with a vector of atoms.
-            //! @param atoms A vector of atoms.
-            void setDefaultValue(std::vector<Atom> const& atom) final
-            {
-                if(atom.size() >= 1 && atom[0].isNumber())
-                {
-                    m_value = atom[0].getFloat();
-                }
-            }
         };
         
         // ================================================================================ //
@@ -333,7 +297,8 @@ namespace kiwi
         {
         public:
             
-            String() = default;
+            //! @internal flip Default constructor
+            String(flip::Default& d) : Attribute::Typed<value_t>(d) {};
             
             String(std::string const& name, value_t const& value) :
             Attribute::Typed<value_t>(name, value) {}
@@ -366,18 +331,6 @@ namespace kiwi
                     m_value = atoms[0].getString();
                 }
             }
-            
-        private:
-            
-            //! @brief Set the Attribute default value with a vector of atoms.
-            //! @param atoms A vector of atoms.
-            void setDefaultValue(std::vector<Atom> const& atoms) final
-            {
-                if(atoms.size() >= 1 && atoms[0].isString())
-                {
-                    m_default = atoms[0].getString();
-                }
-            }
         };
         
         // ================================================================================ //
@@ -389,7 +342,8 @@ namespace kiwi
         {
         public:
             
-            RGBA() = default;
+            //! @internal flip Default constructor
+            RGBA(flip::Default& d) : Attribute::Typed<value_t>(d) {};
             
             RGBA(std::string const& name, value_t const& value) :
             Attribute::Typed<value_t>(name, value) {}
@@ -416,12 +370,6 @@ namespace kiwi
             //! @brief Set the Attribute value with a vector of atoms.
             //! @param atoms A vector of atoms.
             void setValue(std::vector<Atom> const& atom) final           { m_value = atom; }
-            
-        private:
-            
-            //! @brief Set the Attribute default value with a vector of atoms.
-            //! @param atoms A vector of atoms.
-            void setDefaultValue(std::vector<Atom> const& atom) final    { m_default = atom; }
         };
         
         // ================================================================================ //
@@ -433,7 +381,8 @@ namespace kiwi
         {
         public:
             
-            Enum() = default;
+            //! @internal flip Default constructor
+            Enum(flip::Default& d) : Attribute::Typed<value_t>(d) {};
             
             Enum(std::string const& name, value_t const& value) :
             Attribute::Typed<value_t>(name, value) {}
@@ -464,18 +413,6 @@ namespace kiwi
                 if(atoms.size() >= 1 && atoms[0].isNumber())
                 {
                     m_value = atoms[0].getInt();
-                }
-            }
-            
-        private:
-            
-            //! @brief Set the Attribute default value with a vector of atoms.
-            //! @param atoms A vector of atoms.
-            void setDefaultValue(std::vector<Atom> const& atoms) final
-            {
-                if(atoms.size() >= 1 && atoms[0].isNumber())
-                {
-                    m_default = atoms[0].getInt();
                 }
             }
         };
@@ -547,7 +484,7 @@ namespace kiwi
                 
                 if(!name.empty())
                 {
-                    auto predicate = [&name](Attribute const& attr)
+                    const auto predicate = [&name](Attribute const& attr)
                     {
                         return (attr.getName() == name);
                     };
@@ -586,7 +523,6 @@ namespace kiwi
             void addAttr(std::string const& name, std::vector<Atom> const& default_value)
             {
                 static_assert(std::is_base_of<Attribute, AttrType>::value, "The class must inherit from Attribute.");
-                
                 m_attrs.emplace<AttrType>(name, default_value);
             }
             
