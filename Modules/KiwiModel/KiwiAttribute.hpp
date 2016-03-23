@@ -190,12 +190,6 @@ namespace kiwi
             
             //! @brief Resets the value to its default state.
             void resetDefault() override                    { set(m_default); }
-            
-        private:
-            
-            //! @brief Set the Attribute default value.
-            //! @param value The new default value as a value_t.
-            virtual void setDefault(value_t const& value)   { m_default = value; }
         };
         
         // ================================================================================ //
@@ -434,7 +428,7 @@ namespace kiwi
             virtual inline ~Manager() noexcept
             {
                 std::lock_guard<std::mutex> guard(m_attrs_mutex);
-                m_attrs.clear();
+                m_attributes.clear();
             }
             
             //! @internal flip static declare method
@@ -445,7 +439,8 @@ namespace kiwi
                 
                 TModel::template declare<Attribute::Manager>()
                 .name("cicm.kiwi.Attribute.Manager")
-                .template member<decltype(Attribute::Manager::m_attrs), &Attribute::Manager::m_attrs>("attributes");
+                .template member<decltype(Attribute::Manager::m_attributes),
+                                 &Attribute::Manager::m_attributes>("attributes");
             }
             
             //! @brief Get the value of a given attribute by name.
@@ -489,8 +484,8 @@ namespace kiwi
                         return (attr.getName() == name);
                     };
                     
-                    const auto it = find_if(m_attrs.begin(), m_attrs.end(), predicate);
-                    if(it != m_attrs.cend())
+                    const auto it = find_if(m_attributes.begin(), m_attributes.end(), predicate);
+                    if(it != m_attributes.cend())
                     {
                         return it.operator->();
                     }
@@ -506,9 +501,9 @@ namespace kiwi
                 
                 std::vector<Attribute*> attrs;
                 
-                for(auto it = m_attrs.begin(); it != m_attrs.end(); ++it)
+                for(auto& attr : m_attributes)
                 {
-                    attrs.push_back( it.operator->() );
+                    attrs.push_back( &attr );
                 }
                 
                 return attrs;
@@ -519,15 +514,17 @@ namespace kiwi
             //! @brief Add an attribute to the be managed.
             //! @param name The name of the attribute.
             //! @param value The value of the attribute.
-            template<class AttrType>
-            void addAttr(std::string const& name, std::vector<Atom> const& default_value)
+            template<class AttrType, class... Args>
+            void addAttr(std::string const& name, Args&&... args)
             {
                 static_assert(std::is_base_of<Attribute, AttrType>::value, "The class must inherit from Attribute.");
-                m_attrs.emplace<AttrType>(name, default_value);
+                static_assert(std::is_constructible<AttrType, std::string, Args...>::value, "Bad Attribute arguments");
+                
+                m_attributes.emplace<AttrType>(name, std::forward<Args>(args)...);
             }
             
         private:
-            flip::Collection<Attribute>         m_attrs;
+            flip::Collection<Attribute>         m_attributes;
             mutable std::mutex                  m_attrs_mutex;
         };
     }

@@ -248,24 +248,13 @@ TEST_CASE("model", "[model]")
     // Set up an history for this document
     auto history = std::unique_ptr<flip::History<flip::HistoryStoreMemory>>(new flip::History<flip::HistoryStoreMemory>(*document.get()));
     
-    Patcher& patcher = document->root<Patcher>();
-    patcher.init();
-    
     const auto commitWithUndoStep = [&document, &history] (std::string const& label)
     {
         std::cout << "* " << label << '\n';
         
         document->set_label(label);
-        
-        try
-        {
-            auto tx = document->commit();
-            history->add_undo_step(tx);
-        }
-        catch(std::runtime_error& e)
-        {
-            std::cerr << "aki" << e.what();
-        }
+        auto tx = document->commit();
+        history->add_undo_step(tx);
     };
     
     const auto Undo = [&document, &history] ()
@@ -300,6 +289,10 @@ TEST_CASE("model", "[model]")
         }
     };
     
+    Patcher& patcher = document->root<Patcher>();
+    patcher.init();
+    document->commit();
+    
     patcher.setAttributeValue("bgcolor", {0., 1., 0., 1.});
     patcher.setAttributeValue("gridsize", {40});
     commitWithUndoStep("Change Patcher attributes value #1");
@@ -315,6 +308,14 @@ TEST_CASE("model", "[model]")
     
     Undo();
     Redo();
+    
+    auto* attr = patcher.getAttribute("bgcolor");
+    if(attr)
+    {
+        attr->resetDefault();
+        commitWithUndoStep("Reset Patcher bgcolor attribute");
+        Undo();
+    }
     
     model::Object* obj_plus_ptr = patcher.addObject("plus", "1");
     auto obj_plus_ref = obj_plus_ptr->ref();

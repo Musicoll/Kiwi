@@ -132,8 +132,8 @@ namespace kiwi
             : model::Object(name, text)
             {
                 std::cout << "Classic ctor called\n";
-                addAttr<Attribute::RGBA>("bgcolor",  {1., 1., 1., 1.});
-                addAttr<Attribute::RGBA>("color",    {0., 0., 0., 1.});
+                addAttr<Attribute::RGBA>("bgcolor",  FlipRGBA{1., 1., 1., 1.});
+                addAttr<Attribute::RGBA>("color",    FlipRGBA{0., 0., 0., 1.});
             }
             
             ~Classic()
