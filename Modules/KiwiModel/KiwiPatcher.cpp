@@ -34,13 +34,13 @@ namespace kiwi
         
         Patcher::Patcher()
         {
+            ;
         }
         
         Patcher::~Patcher()
         {
             m_objects.clear();
             m_links.clear();
-            m_free_ids.clear();
         }
         
         void Patcher::init()
@@ -84,16 +84,15 @@ namespace kiwi
             {
                 std::lock_guard<std::mutex> guard(m_mutex);
                 
-                auto predicate = [object](const Object& obj) {
+                auto predicate = [object](Object const& obj)
+                {
                     return &obj == object;
                 };
                 
                 auto it = find_if(m_objects.begin(), m_objects.end(), predicate);
                 if(it != m_objects.end())
                 {
-                    //m_listeners.call(&Listener::objectRemoved, getShared(), object);
                     m_objects.erase(it);
-                    m_free_ids.push_back(static_cast<uint64_t>(object->getId()));
                 }
             }
         }

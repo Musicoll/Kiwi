@@ -85,8 +85,7 @@ namespace kiwi
                 .name("cicm.kiwi.Object")
                 .template inherit<Attribute::Manager>()
                 .template member<flip::String, &Object::m_name>("name")
-                .template member<flip::String, &Object::m_text>("text")
-                .template member<flip::Int, &Object::m_id>("id");
+                .template member<flip::String, &Object::m_text>("text");
             }
             
             //! @brief Get the type of the Object.
@@ -95,7 +94,7 @@ namespace kiwi
             
             //! @brief Returns the patcher that manages the object.
             //! @return The Patcher's pointer.
-            inline Patcher* getPatcher() { return parent().ptr<Patcher>(); }
+            inline Patcher* getParentPatcher() { return parent().ptr<Patcher>(); }
             
             //! @brief Returns the name of the Object.
             //! @return The name of the Object.
@@ -105,14 +104,9 @@ namespace kiwi
             //! @return The text of the Object.
             inline std::string getText() const noexcept { return m_text; }
             
-            //! @brief Returns the id of the Object.
-            //! @return The id of the Object.
-            inline int64_t getId() const noexcept       { return m_id; }
-            
         private:
             flip::String    m_name;
             flip::String    m_text;
-            flip::Int       m_id;
         };
         
         // ================================================================================ //
