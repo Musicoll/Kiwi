@@ -38,8 +38,7 @@ namespace kiwi
         
         //! @brief The Object is an abstract base class for kiwi objects.
         //! @details objects can be instantiated in a Patcher.
-        class Object :  public flip::Object,
-                        public Attribute::Manager
+        class Object : public Attribute::Manager
         {
         public:
             friend class Patcher;
@@ -84,6 +83,7 @@ namespace kiwi
                 
                 TModel::template declare<model::Object>()
                 .name("cicm.kiwi.Object")
+                .template inherit<Attribute::Manager>()
                 .template member<flip::String, &Object::m_name>("name")
                 .template member<flip::String, &Object::m_text>("text")
                 .template member<flip::Int, &Object::m_id>("id");
@@ -126,16 +126,14 @@ namespace kiwi
             Classic()
             {
                 std::cout << "Classic Default ctor called\n";
-                addAttr(&m_bgcolor, "bgcolor");
-                addAttr(&m_color,   "color");
             }
             
             Classic(std::string name, std::string text)
             : model::Object(name, text)
             {
                 std::cout << "Classic ctor called\n";
-                addAttr(&m_bgcolor, "bgcolor",  {1., 1., 1., 1.});
-                addAttr(&m_color,   "color",    {0., 0., 0., 1.});
+                addAttr<Attribute::RGBA>("bgcolor",  {1., 1., 1., 1.});
+                addAttr<Attribute::RGBA>("color",    {0., 0., 0., 1.});
             }
             
             ~Classic()
@@ -155,14 +153,8 @@ namespace kiwi
                 
                 TModel::template declare<Object::Classic>()
                 .name("cicm.kiwi.Object.Classic")
-                .template inherit<model::Object>()
-                .template member<decltype(Classic::m_bgcolor),  &Classic::m_bgcolor>("bgcolor")
-                .template member<decltype(Classic::m_color),    &Classic::m_color>("color");
+                .template inherit<model::Object>();
             }
-            
-        private:
-            Attribute::RGBA             m_bgcolor;    ///< background color of the box
-            Attribute::RGBA             m_color;      ///< text color of the box
         };
     }
 }

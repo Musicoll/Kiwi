@@ -57,6 +57,8 @@ namespace kiwi
                 Attribute::RGBA::declare<Model>();
                 Attribute::Enum::declare<Model>();
                 
+                Attribute::Manager::declare<Model>();
+                
                 // patcher elements declaration :
                 model::Object::declare<Model>();
                 model::Object::Classic::declare<Model>();

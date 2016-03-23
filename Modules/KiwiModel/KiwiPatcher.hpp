@@ -35,13 +35,14 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief The patcher manages a set of objects, links and attributes
-        class Patcher : public flip::Object,
-                        public Attribute::Manager
+        class Patcher : public Attribute::Manager
         {
         public:
             
             //! @brief Default constructor.
-            Patcher() = default;
+            Patcher();
+            
+            Patcher(flip::Default&) {}
             
             //! @brief Destructor.
             ~Patcher();
@@ -55,11 +56,9 @@ namespace kiwi
             {
                 TModel::template declare<Patcher>()
                 .name("cicm.kiwi.Patcher")
+                .template inherit<Attribute::Manager>()
                 .template member<decltype(Patcher::m_objects),   &Patcher::m_objects>   ("objects")
-                .template member<decltype(Patcher::m_links),     &Patcher::m_links>     ("links")
-                .template member<decltype(Patcher::m_name),      &Patcher::m_name>      ("name")
-                .template member<decltype(Patcher::m_bgcolor),   &Patcher::m_bgcolor>   ("bgcolor")
-                .template member<decltype(Patcher::m_gridsize),  &Patcher::m_gridsize>  ("gridsize");
+                .template member<decltype(Patcher::m_links),     &Patcher::m_links>     ("links");
             }
             
             //! Get the objects.
@@ -117,10 +116,6 @@ namespace kiwi
             flip::Collection<Link>      m_links;
             std::vector<uint64_t>       m_free_ids;
             mutable std::mutex          m_mutex;        // lock-free (grahams) ??
-            
-            Attribute::String           m_name;
-            Attribute::RGBA             m_bgcolor;
-            Attribute::Int              m_gridsize;
         };
     }
 }

@@ -39,12 +39,7 @@ namespace kiwi
         m_index_outlet(outlet),
         m_index_inlet(inlet)
         {
-            addAttr(&m_color, "color", {0., 0., 0., 1.});
-        }
-        
-        Link::~Link()
-        {
-            ;
+            addAttr<Attribute::RGBA>("color",    {0., 0., 0., 1.});
         }
         
         std::unique_ptr<Link> Link::create(model::Object* from, const uint8_t outlet,

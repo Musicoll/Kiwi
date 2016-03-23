@@ -32,6 +32,11 @@ namespace kiwi
         //                                   PATCHER MODEL                                  //
         // ================================================================================ //
         
+        Patcher::Patcher()
+        {
+            
+        }
+        
         Patcher::~Patcher()
         {
             m_objects.clear();
@@ -41,8 +46,10 @@ namespace kiwi
         
         void Patcher::init()
         {
-            addAttr(&m_bgcolor, "bgcolor", {0., 0., 0., 1.});
-            addAttr(&m_gridsize, "gridsize", {20});
+            //addAttr(&m_bgcolor, "bgcolor", {0., 0., 0., 1.});
+            //addAttr(&m_gridsize, "gridsize", {20});
+            
+            addAttr<Attribute::RGBA>("bgcolor", {0., 0., 0., 1.});
             
             /*
             flip::Class<Patcher>::Members members = get_class().members();

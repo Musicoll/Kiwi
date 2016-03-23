@@ -48,7 +48,8 @@ namespace kiwi
             
             
             //! @brief Enum of Attribute types
-            enum class Type : uint8_t
+            //! @remark Can't use Type because of the flip::Type conflict
+            enum class AttrType : uint8_t
             {
                 Invalid = 0,
                 Int,
@@ -103,7 +104,7 @@ namespace kiwi
             
             //! @brief Returns the Type of the attribute.
             //! @return The Type of the attribute.
-            virtual Type getType() const noexcept = 0;
+            virtual AttrType getType() const noexcept = 0;
             
             //! @brief Returns the name of the attribute.
             //! @return The name of the attribute.
@@ -234,7 +235,7 @@ namespace kiwi
             
             //! @brief Retrieve the Type of the Attribute.
             //! @return The Type of the Attribute (Type::Int).
-            inline Type getType() const noexcept final           { return Type::Int; }
+            inline AttrType getType() const noexcept final       { return AttrType::Int; }
             
             //! @brief Get the Attribute value as a vector of atoms.
             //! @return A vector of atoms.
@@ -290,7 +291,7 @@ namespace kiwi
             
             //! @brief Retrieve the Type of the Attribute.
             //! @return The Type of the Attribute (Type::Float).
-            inline Type getType() const noexcept final          { return Type::Float; };
+            inline AttrType getType() const noexcept final      { return AttrType::Float; };
             
             //! @brief Get the Attribute value as a vector of atoms.
             //! @return A vector of atoms.
@@ -346,7 +347,7 @@ namespace kiwi
             
             //! @brief Retrieve the Type of the Attribute.
             //! @return The Type of the Attribute (Type::Int).
-            inline Type getType() const noexcept final           { return Type::String; }
+            inline AttrType getType() const noexcept final       { return AttrType::String; }
             
             //! @brief Get the Attribute value as a vector of atoms.
             //! @return A vector of atoms.
@@ -402,7 +403,7 @@ namespace kiwi
             
             //! @brief Retrieve the Type of the Attribute.
             //! @return The Type of the Attribute (Type::RGBA).
-            inline Type getType() const noexcept final                   { return Type::RGBA; }
+            inline AttrType getType() const noexcept final               { return AttrType::RGBA; }
             
             //! @brief Get the Attribute value as a vector of atoms.
             //! @return A vector of atoms.
@@ -446,7 +447,7 @@ namespace kiwi
             
             //! @brief Retrieve the Type of the Attribute.
             //! @return The Type of the Attribute (Type::RGBA).
-            inline Type getType() const noexcept final           { return Type::Enum; }
+            inline AttrType getType() const noexcept final       { return AttrType::Enum; }
             
             //! @brief Get the Attribute value as a vector of atoms.
             //! @return A vector of atoms.
@@ -485,7 +486,7 @@ namespace kiwi
         
         //! @brief The attribute manager manages a set of attributes.
         //! @details it allows to retrieve or set the attribute value by name.
-        class Attribute::Manager
+        class Attribute::Manager : public flip::Object
         {
         public:
             
@@ -497,6 +498,17 @@ namespace kiwi
             {
                 std::lock_guard<std::mutex> guard(m_attrs_mutex);
                 m_attrs.clear();
+            }
+            
+            //! @internal flip static declare method
+            template<class TModel>
+            static void declare()
+            {
+                if(TModel::template has<Attribute::Manager>()) return;
+                
+                TModel::template declare<Attribute::Manager>()
+                .name("cicm.kiwi.Attribute.Manager")
+                .template member<decltype(Attribute::Manager::m_attrs), &Attribute::Manager::m_attrs>("attributes");
             }
             
             //! @brief Get the value of a given attribute by name.
@@ -533,10 +545,18 @@ namespace kiwi
             {
                 std::lock_guard<std::mutex> guard(m_attrs_mutex);
                 
-                const auto it = m_attrs.find(name);
-                if(it != m_attrs.cend())
+                if(!name.empty())
                 {
-                    return it->second;
+                    auto predicate = [&name](Attribute const& attr)
+                    {
+                        return (attr.getName() == name);
+                    };
+                    
+                    const auto it = find_if(m_attrs.begin(), m_attrs.end(), predicate);
+                    if(it != m_attrs.cend())
+                    {
+                        return it.operator->();
+                    }
                 }
                 
                 return nullptr;
@@ -546,11 +566,12 @@ namespace kiwi
             std::vector<Attribute*> getAttributes() const noexcept
             {
                 std::lock_guard<std::mutex> guard(m_attrs_mutex);
+                
                 std::vector<Attribute*> attrs;
                 
                 for(auto it = m_attrs.begin(); it != m_attrs.end(); ++it)
                 {
-                    attrs.push_back( it->second );
+                    attrs.push_back( it.operator->() );
                 }
                 
                 return attrs;
@@ -561,24 +582,16 @@ namespace kiwi
             //! @brief Add an attribute to the be managed.
             //! @param name The name of the attribute.
             //! @param value The value of the attribute.
-            void addAttr(Attribute* attr, std::string const& name)
+            template<class AttrType>
+            void addAttr(std::string const& name, std::vector<Atom> const& default_value)
             {
-                m_attrs[name] = attr;
-            }
-            
-            //! @brief Add an attribute to the be managed.
-            //! @param name The name of the attribute.
-            //! @param value The value of the attribute.
-            void addAttr(Attribute* attr, std::string const& name, std::vector<Atom> const& default_value)
-            {
-                attr->setName(name);
-                attr->setDefaultValue(default_value);
-                attr->setValue(default_value);
-                m_attrs[name] = attr;
+                static_assert(std::is_base_of<Attribute, AttrType>::value, "The class must inherit from Attribute.");
+                
+                m_attrs.emplace<AttrType>(name, default_value);
             }
             
         private:
-            std::map<std::string, Attribute*>   m_attrs;
+            flip::Collection<Attribute>         m_attrs;
             mutable std::mutex                  m_attrs_mutex;
         };
     }

@@ -37,8 +37,7 @@ namespace kiwi
         //! @brief The Link is used to create a connection between objects.
         //! @details The Link holds a reference from the origin Object and to the destination Object
         //! as well as IO indexes.
-        class Link : public flip::Object,
-                     public Attribute::Manager
+        class Link : public Attribute::Manager
         {
         public:
             
@@ -55,10 +54,7 @@ namespace kiwi
             };
             
             //! @brief default constructor.
-            Link()
-            {
-                addAttr(&m_color, "color");
-            }
+            Link() {}
             
             //! @brief Constructs a Link.
             //! @details Constructs a Link with given origin and destination Object pointers
@@ -70,7 +66,7 @@ namespace kiwi
             Link(model::Object* from, const uint8_t outlet, model::Object* to, const uint8_t inlet);
             
             //! @brief Destructor.
-            virtual ~Link();
+            virtual ~Link() {}
             
             //! @brief Creates and returns a new Link
             //! @param from     The origin Object pointer.
@@ -88,11 +84,11 @@ namespace kiwi
                 
                 TModel::template declare<Link>()
                 .name("cicm.kiwi.Link")
+                .template inherit<Attribute::Manager>()
                 .template member<decltype(Link::m_object_from), &Link::m_object_from>("object_from")
                 .template member<decltype(Link::m_object_to),   &Link::m_object_to>("object_to")
                 .template member<decltype(Link::m_index_outlet),&Link::m_index_outlet>("outlet_index")
-                .template member<decltype(Link::m_index_inlet), &Link::m_index_inlet>("inlet_index")
-                .template member<decltype(Link::m_color),       &Link::m_color>("color");
+                .template member<decltype(Link::m_index_inlet), &Link::m_index_inlet>("inlet_index");
             }
             
             //! @brief Get the type of the Object.
@@ -124,8 +120,6 @@ namespace kiwi
             model::Object::Ref              m_object_to;
             flip::Int                       m_index_outlet;
             flip::Int                       m_index_inlet;
-            
-            Attribute::RGBA                 m_color;           ///< The Link color
         };
         
         // ================================================================================ //
