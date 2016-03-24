@@ -42,6 +42,7 @@ namespace kiwi
             //! @brief Default constructor.
             Patcher();
             
+            //! @internal flip Default constructor.
             Patcher(flip::Default&) {}
             
             //! @brief Destructor.
@@ -78,7 +79,6 @@ namespace kiwi
             flip::Array<model::Object> const& getObjects() noexcept
             {
                 std::lock_guard<std::mutex> guard(m_mutex);
-                
                 return m_objects;
             }
             
@@ -89,7 +89,6 @@ namespace kiwi
             flip::Collection<Link> const& getLinks() noexcept
             {
                 std::lock_guard<std::mutex> guard(m_mutex);
-                
                 return m_links;
             }
             
@@ -108,6 +107,12 @@ namespace kiwi
             //! @brief Removes an object from the Patcher.
             //! @param obj The pointer to the object to remove.
             void remove(model::Object* obj);
+            
+            //! @brief Returns true if an Object has been added, removed or changed.
+            inline bool objectsChanged() const noexcept { return m_objects.changed(); }
+            
+            //! @brief Returns true if a Link has been added, removed or changed.
+            inline bool linksChanged() const noexcept   { return m_links.changed(); }
             
         private:
             

@@ -127,7 +127,7 @@ public:
         //if(patcher.getObjects().changed())
         if(true)
         {
-            const auto objs_change_status_str = (patcher.getObjects().changed() ? "changed" : "no change");
+            const auto objs_change_status_str = (patcher.objectsChanged() ? "changed" : "no change");
             indent(1);
             std::cout << "- Objects : (" << objs_change_status_str << ")\n";
             
@@ -151,7 +151,7 @@ public:
         //if(patcher.getLinks().changed())
         if(true)
         {
-            const auto links_change_status_str = (patcher.getLinks().changed() ? "changed" : "no change");
+            const auto links_change_status_str = (patcher.linksChanged() ? "changed" : "no change");
             indent(1);
             std::cout << "- Links : (" << links_change_status_str << ")\n";
             

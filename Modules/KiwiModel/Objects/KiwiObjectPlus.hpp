@@ -38,12 +38,15 @@ namespace kiwi
         {
         public:
             
-            ObjectPlus()
+            ObjectPlus(flip::Default& d) : model::Object(d)
             {
                 std::cout << "ObjectPlus : Default ctor called\n";
             }
             
-            ObjectPlus(std::string name, std::string text) : model::Object(name, text) {}
+            ObjectPlus(std::string name, std::string text) : model::Object(name, text)
+            {
+                ;
+            }
 
             //! @internal flip static declare method
             template<class TModel>
@@ -52,7 +55,7 @@ namespace kiwi
                 if(TModel::template has<ObjectPlus>()) return;
                 
                 TModel::template declare<ObjectPlus>()
-                .template name("cicm.kiwi.ObjectPlus")
+                .name("cicm.kiwi.ObjectPlus")
                 .template inherit<model::Object>();
             }
         };

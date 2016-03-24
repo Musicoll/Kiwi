@@ -48,7 +48,6 @@ namespace kiwi
                 
                 // attributes declaration :
                 Attribute::declare<Model>();
-                Attribute::declare<Model>();
                 
                 // Attributes types
                 Attribute::Int::declare<Model>();

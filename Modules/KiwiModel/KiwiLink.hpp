@@ -79,25 +79,29 @@ namespace kiwi
                 .template member<decltype(Link::m_index_inlet), &Link::m_index_inlet>("inlet_index");
             }
             
-            //! @brief Get the parent Patcher of the link.
-            //! @return The parent Patcher of the link.
-            inline Patcher* getParentPatcher()                      { return parent().ptr<Patcher>(); }
+            //! @brief Returns the patcher that manages the link.
+            //! @return The Patcher reference.
+            inline Patcher& getParentPatcher()                              { return ancestor<Patcher>(); }
+            
+            //! @brief Returns the patcher that manages the link.
+            //! @return The Patcher reference.
+            inline Patcher const& getParentPatcher() const                  { return ancestor<Patcher>(); }
             
             //! @brief Get the origin Object of the link.
             //! @return The origin Object of the link.
-            inline model::Object* getObjectFrom() const noexcept    { return m_object_from; }
+            inline model::Object* getObjectFrom() const noexcept            { return m_object_from; }
             
             //! @brief Get the destination Object of the link.
             //! @return The destination Object of the link.
-            inline model::Object* getObjectTo() const noexcept      { return m_object_to; }
+            inline model::Object* getObjectTo() const noexcept              { return m_object_to; }
             
             //! @brief Get the origin outlet index of the link.
             //! @return The origin outlet index of the link.
-            inline flip::Int::internal_type getOutletIndex() const noexcept  { return m_index_outlet; }
+            inline flip::Int::internal_type getOutletIndex() const noexcept { return m_index_outlet; }
             
             //! @brief Get the destination inlet index of the link.
             //! @return The destination inlet index of the link.
-            inline int64_t getInletIndex() const noexcept           { return m_index_inlet; }
+            inline flip::Int::internal_type getInletIndex() const noexcept  { return m_index_inlet; }
             
         private:
             model::Object::Ref              m_object_from;
