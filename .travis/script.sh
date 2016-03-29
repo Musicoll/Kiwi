@@ -13,6 +13,8 @@ elif [ $TRAVIS_BRANCH == 'dev-core' ]; then
   TARGETS=test_core
 elif [ $TRAVIS_BRANCH == 'dev-graphics' ]; then
   TARGETS=test_graphics
+elif [ $TRAVIS_BRANCH == 'dev-model' ] && [ $TRAVIS_OS_NAME == 'osx' ]; then
+  TARGETS=test_model
 else
   TARGETS=(test_core test_dsp)
 fi

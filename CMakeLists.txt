@@ -60,6 +60,9 @@ endif()
 # Modules
 #----------------------------------
 
+# -> ThirdParty
+
+#find_library(Flip NAMES flip_macos HINTS ${PROJECT_SOURCE_DIR}/ThirdParty/flip-public/bin)
 
 # -> Module Core
 
@@ -71,6 +74,22 @@ file(GLOB KIWI_CORE_SRC
 #add_library(KiwiCore STATIC ${KIWI_CORE_SRC})
 #set_property(TARGET KiwiCore
 #             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
+
+# -> Module Model (only Mac for now)
+if(${APPLE})
+    file(GLOB KIWI_MODEL_SRC
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiModel/*.h
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiModel/*.hpp
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiModel/*.cpp
+    )
+
+    add_library(KiwiModel STATIC ${KIWI_MODEL_SRC})
+    set_property(TARGET KiwiModel
+                 PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules
+                                              ${PROJECT_SOURCE_DIR}/ThirdParty/flip-public/include)
+
+    target_link_libraries(KiwiModel ${PROJECT_SOURCE_DIR}/ThirdParty/flip-public/bin/flip_macos.a)
+endif()
 
 # -> Module DSP
 
@@ -103,11 +122,23 @@ set_property(TARGET KiwiGraphics
 # -> Core Unit Tests
 
 file(GLOB TEST_CORE_SRC
-     ${PROJECT_SOURCE_DIR}/test/Modules/Core/*.cpp)
+    ${PROJECT_SOURCE_DIR}/test/Modules/Core/*.cpp)
 add_executable(test_core ${TEST_CORE_SRC})
 #target_link_libraries(test_core KiwiCore)
 set_property(TARGET test_core
              PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
+
+# -> Model Unit Tests (only Mac for now)
+if(${APPLE})
+    file(GLOB TEST_MODEL_SRC
+        ${PROJECT_SOURCE_DIR}/test/Modules/Model/*.cpp)
+    add_executable(test_model ${TEST_MODEL_SRC})
+
+    target_link_libraries(test_model KiwiModel ${PROJECT_SOURCE_DIR}/ThirdParty/flip-public/bin/flip_macos.a)
+    set_property(TARGET test_model
+                 PROPERTY INCLUDE_DIRECTORIES   ${PROJECT_SOURCE_DIR}/Modules
+                                                ${PROJECT_SOURCE_DIR}/ThirdParty/flip-public/include)
+endif()
 
 # -> Dsp Unit Tests
 

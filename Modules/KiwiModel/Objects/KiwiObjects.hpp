@@ -21,11 +21,23 @@
  ==============================================================================
 */
 
-#ifndef __DEF_KIWI_MODELS__
-#define __DEF_KIWI_MODELS__
+#ifndef KIWI_MODEL_OBJECTS_HPP_INCLUDED
+#define KIWI_MODEL_OBJECTS_HPP_INCLUDED
 
-#include "KiwiFactory.h"
+#include "KiwiObjectPlus.hpp"
 
-#endif
+namespace kiwi
+{
+    namespace model
+    {
+        void initializeBasicObjects();
+        void initializeBasicObjects()
+        {
+            ObjectFactory::add<ObjectPlus>("plus");
+            ObjectFactory::add<ObjectPlus>("+");
+        }
+    }
+}
 
 
+#endif // KIWI_MODEL_OBJECTS_HPP_INCLUDED

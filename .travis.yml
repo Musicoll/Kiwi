@@ -7,9 +7,10 @@ notifications:
   email: false
 
 git:
-  submodules: false
+  submodules: true
+  depth: 5
   on:
-    branch: ['dev-dsp', 'dev-core', 'dev-graphics']
+    branch: ['dev-dsp', 'dev-core', 'dev-graphics', 'dev-model']
 
 matrix:
   include:
