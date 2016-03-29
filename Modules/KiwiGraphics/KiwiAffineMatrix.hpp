@@ -24,7 +24,9 @@
 #ifndef KIWI_AFFINEMATRIX_H_INCLUDED
 #define KIWI_AFFINEMATRIX_H_INCLUDED
 
-#include <KiwiCore/KiwiCore.h>
+#include <array>
+
+#include <KiwiCore/KiwiAtom.hpp>
 
 namespace kiwi
 {

@@ -22,6 +22,7 @@
  */
 
 #include <assert.h>
+#include <cmath>
 
 #include <KiwiGraphics/KiwiPath.hpp>
 

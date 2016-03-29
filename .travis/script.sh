@@ -16,7 +16,7 @@ elif [ $TRAVIS_BRANCH == 'dev-graphics' ]; then
 elif [ $TRAVIS_BRANCH == 'dev-model' ] && [ $TRAVIS_OS_NAME == 'osx' ]; then
   TARGETS=test_model
 else
-  TARGETS=(test_core test_dsp)
+  TARGETS=(test_core test_dsp test_graphics)
 fi
 
 echo ""
