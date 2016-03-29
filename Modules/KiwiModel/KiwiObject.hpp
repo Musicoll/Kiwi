@@ -73,8 +73,6 @@ namespace kiwi
                 }
             };
             
-            using Ref = flip::ObjectRef<model::Object>;
-            
             //! @internal flip Default constructor
             Object(flip::Default&) {}
             
@@ -108,30 +106,30 @@ namespace kiwi
             
             //! @brief Returns the number of inlets.
             //! @return The number of inlets.
-            inline flip::Int::internal_type getNumberOfInlets() const noexcept
+            inline uint32_t getNumberOfInlets() const noexcept
             {
-                return m_number_of_inlets;
+                return static_cast<uint32_t>(m_number_of_inlets);
             }
             
             //! @brief Sets the number of inlets.
             //! @param value The new number of inlets.
             void setNumberOfInlets(uint32_t value) noexcept
             {
-                m_number_of_inlets = reinterpret_cast<flip::Int::internal_type&>(value);
+                m_number_of_inlets = static_cast<flip::Int::internal_type>(value);
             }
             
             //! @brief Returns the number of outlets.
             //! @return The number of outlets.
-            inline flip::Int::internal_type getNumberOfOutlets() const noexcept
+            inline uint32_t getNumberOfOutlets() const noexcept
             {
-                return m_number_of_outlets;
+                return static_cast<uint32_t>(m_number_of_outlets);
             }
             
             //! @brief Sets the number of outlets.
             //! @param value The new number of outlets.
             void setNumberOfOutlets(uint32_t value) noexcept
             {
-                m_number_of_outlets = reinterpret_cast<flip::Int::internal_type&>(value);
+                m_number_of_outlets = static_cast<flip::Int::internal_type>(value);
             }
             
         private:

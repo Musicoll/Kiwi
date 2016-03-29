@@ -145,16 +145,17 @@ public:
                 
                 indent(3); std::cout << "- status : " << status_str << '\n';
                 
-                const auto from = link.getObjectFrom();
-                const auto to = link.getObjectTo();
-                if(from && to)
+                if(link.resident() || link.added())
                 {
+                    const auto& from = link.getObjectFrom();
+                    const auto& to = link.getObjectTo();
+                    
                     indent(3); std::cout    << "- from object : \""
-                                            << from->getName() << "\" ("
+                                            << from.getName() << "\" ("
                                             << link.getOutletIndex() << ")" << '\n';
                     
                     indent(3); std::cout    << "- to object : \""
-                                            << to->getName() << "\" ("
+                                            << to.getName() << "\" ("
                                             << link.getInletIndex() << ")" << '\n';
                 }
             }
@@ -265,20 +266,23 @@ TEST_CASE("model", "[model]")
     
     obj_plus_ptr = document->object_ptr<model::Object>(obj_plus_ref);
     auto obj_plus_alias_ptr = document->object_ptr<model::Object>(obj_plus_alias_ref);
-        
-    Link* link = patcher.addLink(obj_plus_ptr, 0, obj_plus_alias_ptr, 0);
-    auto link_ref = link->ref();
-    commitWithUndoStep("Add Link between plus objects");
     
-    Undo();
-    Redo();
-    
-    auto link_ptr = document->object_ptr<model::Link>(link_ref);
-    if(link_ptr)
+    if(obj_plus_ptr && obj_plus_alias_ptr)
     {
-        patcher.removeLink(*link_ptr);
-        commitWithUndoStep("Remove Link");
+        Link* link = patcher.addLink(*obj_plus_ptr, 0, *obj_plus_alias_ptr, 0);
+        auto link_ref = link->ref();
+        commitWithUndoStep("Add Link between plus objects");
+        
         Undo();
+        Redo();
+        
+        auto link_ptr = document->object_ptr<model::Link>(link_ref);
+        if(link_ptr)
+        {
+            patcher.removeLink(*link_ptr);
+            commitWithUndoStep("Remove Link");
+            Undo();
+        }
     }
     
     history.reset();

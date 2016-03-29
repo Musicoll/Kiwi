@@ -218,7 +218,6 @@
 		2C7F54D41CA0428B00917D46 /* Vector.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Vector.hpp; path = "../../../ThirdParty/flip-public/include/flip/Vector.hpp"; sourceTree = "<group>"; };
 		2C7F54D51CA0432000917D46 /* flip_macos.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = flip_macos.a; path = "../../../ThirdParty/flip-public/bin/flip_macos.a"; sourceTree = "<group>"; };
 		2C92CECB1C7DCF3200EDF976 /* KiwiAtom.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; lineEnding = 2; path = KiwiAtom.hpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
-		2CBC8AF71C775A9500155993 /* KiwiBenchmark.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = KiwiBenchmark.hpp; path = ../../KiwiBenchmark.hpp; sourceTree = "<group>"; };
 		2CC9D99F1C66808E00B1F821 /* test_KiwiModel */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_KiwiModel; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -503,7 +502,6 @@
 		2C92CED31C7E116200EDF976 /* test */ = {
 			isa = PBXGroup;
 			children = (
-				2CBC8AF71C775A9500155993 /* KiwiBenchmark.hpp */,
 				2C2D08EA1C866C8C009BED7B /* test_KiwiModel.cpp */,
 				2C2D08EB1C866C8C009BED7B /* test_KiwiPatcher.cpp */,
 			);

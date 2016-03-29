@@ -55,23 +55,11 @@ namespace kiwi
                 .template member<decltype(Patcher::m_links),     &Patcher::m_links>     ("links");
             }
             
-            //! Get the objects.
-            /** The function retrieves the objects from the patcher.
-             @return A vector with the objects.
-             */
-            flip::Array<model::Object> const& getObjects() noexcept
-            {
-                return m_objects;
-            }
+            //! @brief Get the objects.
+            flip::Array<model::Object> const& getObjects() noexcept { return m_objects; }
             
-            //! Get the objects.
-            /** The function retrieves the objects from the patcher.
-             @return A vector with the objects.
-             */
-            flip::Array<Link> const& getLinks() noexcept
-            {
-                return m_links;
-            }
+            //! @brief Get the links.
+            flip::Array<Link> const& getLinks() noexcept            { return m_links; }
             
             //! @brief Adds an object to the Patcher.
             model::Object* addObject(std::string const& name, std::string const& text = "");
@@ -83,7 +71,7 @@ namespace kiwi
             //! @param outlet   The origin outlet index.
             //! @param to       The destination Object pointer.
             //! @param inlet    The destination inlet index.
-            Link* addLink(model::Object* from, const uint8_t outlet, model::Object* to, const uint8_t inlet);
+            Link* addLink(model::Object& from, const uint8_t outlet, model::Object& to, const uint8_t inlet);
             
             //! @brief Removes an object from the Patcher.
             //! @param obj A reference to the object to remove.
@@ -103,10 +91,6 @@ namespace kiwi
             
             //! @internal create an object
             std::unique_ptr<model::Object> createObject(std::string const& name, std::string const& text = "");
-            
-            //! @internal create a link
-            static std::unique_ptr<Link> createLink(model::Object* from, const uint8_t outlet,
-                                                    model::Object* to, const uint8_t inlet);
             
             //! objects and links are stored in a flip::Array to maintain a graphical z-order.
             flip::Array<model::Object>  m_objects;

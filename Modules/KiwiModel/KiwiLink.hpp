@@ -41,8 +41,8 @@ namespace kiwi
         {
         public:
             
-            //! @brief default constructor.
-            Link() {}
+            //! @internal flip Default constructor
+            Link(flip::Default&) {}
             
             //! @brief Constructs a Link.
             //! @details Constructs a Link with given origin and destination Object pointers
@@ -51,7 +51,7 @@ namespace kiwi
             //! @param outlet   The origin outlet index.
             //! @param to       The destination Object pointer.
             //! @param inlet    The destination inlet index.
-            Link(model::Object* from, const uint8_t outlet, model::Object* to, const uint8_t inlet);
+            Link(model::Object& from, const uint32_t outlet, model::Object& to, const uint32_t inlet);
             
             //! @brief Destructor.
             virtual ~Link() {}
@@ -64,19 +64,19 @@ namespace kiwi
                 
                 TModel::template declare<Link>()
                 .name("cicm.kiwi.Link")
-                .template member<decltype(Link::m_object_from), &Link::m_object_from>("object_from")
-                .template member<decltype(Link::m_object_to),   &Link::m_object_to>("object_to")
-                .template member<decltype(Link::m_index_outlet),&Link::m_index_outlet>("outlet_index")
-                .template member<decltype(Link::m_index_inlet), &Link::m_index_inlet>("inlet_index");
+                .template member<flip::ObjectRef<model::Object>, &Link::m_object_from>("object_from")
+                .template member<flip::ObjectRef<model::Object>, &Link::m_object_to>("object_to")
+                .template member<flip::Int, &Link::m_index_outlet>("outlet_index")
+                .template member<flip::Int, &Link::m_index_inlet>("inlet_index");
             }
             
             //! @brief Get the origin Object of the link.
             //! @return The origin Object of the link.
-            inline model::Object* getObjectFrom() const noexcept            { return m_object_from; }
+            inline model::Object& getObjectFrom() const noexcept            { return *m_object_from; }
             
             //! @brief Get the destination Object of the link.
             //! @return The destination Object of the link.
-            inline model::Object* getObjectTo() const noexcept              { return m_object_to; }
+            inline model::Object& getObjectTo() const noexcept              { return *m_object_to; }
             
             //! @brief Get the origin outlet index of the link.
             //! @return The origin outlet index of the link.
