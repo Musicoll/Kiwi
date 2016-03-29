@@ -110,7 +110,6 @@ file(GLOB KIWI_GRAPHICS_SRC
      ${PROJECT_SOURCE_DIR}/Modules/KiwiGraphics/*.cpp
 )
 add_library(KiwiGraphics STATIC ${KIWI_GRAPHICS_SRC})
-target_link_libraries(KiwiGraphics KiwiCore)
 set_property(TARGET KiwiGraphics
              PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
 
