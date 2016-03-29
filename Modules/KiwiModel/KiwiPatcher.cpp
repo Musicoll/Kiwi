@@ -75,7 +75,7 @@ namespace kiwi
 
             if(link)
             {
-                const auto it = m_links.insert(std::move(link));
+                const auto it = m_links.insert(m_links.end(), std::move(link));
                 return it.operator->();
             }
             
@@ -86,8 +86,6 @@ namespace kiwi
         {
             if(object)
             {
-                std::lock_guard<std::mutex> guard(m_mutex);
-                
                 auto predicate = [object](Object const& obj)
                 {
                     return &obj == object;

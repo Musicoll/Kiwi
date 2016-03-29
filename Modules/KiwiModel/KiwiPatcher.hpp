@@ -59,19 +59,8 @@ namespace kiwi
             /** The function retrieves the objects from the patcher.
              @return A vector with the objects.
              */
-            flip::Array<flip::Object>::difference_type getNumberOfObjects() const
-            {
-                std::lock_guard<std::mutex> guard(m_mutex);
-                return std::count_if(m_objects.begin(), m_objects.end(), [](flip::Object const&){return true;});
-            }
-            
-            //! Get the objects.
-            /** The function retrieves the objects from the patcher.
-             @return A vector with the objects.
-             */
             flip::Array<model::Object> const& getObjects() noexcept
             {
-                std::lock_guard<std::mutex> guard(m_mutex);
                 return m_objects;
             }
             
@@ -79,9 +68,8 @@ namespace kiwi
             /** The function retrieves the objects from the patcher.
              @return A vector with the objects.
              */
-            flip::Collection<Link> const& getLinks() noexcept
+            flip::Array<Link> const& getLinks() noexcept
             {
-                std::lock_guard<std::mutex> guard(m_mutex);
                 return m_links;
             }
             
@@ -112,10 +100,9 @@ namespace kiwi
             //! @internal create an object
             std::unique_ptr<model::Object> createObject(std::string const& name, std::string const& text = "");
             
-            //! object are stored in a flip::Array to maintain a z-order.
+            //! objects and links are stored in a flip::Array to maintain a graphical z-order.
             flip::Array<model::Object>  m_objects;
-            flip::Collection<Link>      m_links;
-            mutable std::mutex          m_mutex;        // lock-free (grahams) ??
+            flip::Array<Link>           m_links;
         };
     }
 }
