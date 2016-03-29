@@ -41,17 +41,5 @@ namespace kiwi
         {
             ;
         }
-        
-        std::unique_ptr<Link> Link::create(model::Object* from, const uint8_t outlet,
-                                           model::Object* to, const uint8_t inlet)
-        {
-            if(from != to)
-            {
-                //! @todo need to implement conditionnal return type
-                return std::unique_ptr<Link>(new Link(from, outlet, to, inlet));
-            }
-            
-            return nullptr;
-        }
     }
 }

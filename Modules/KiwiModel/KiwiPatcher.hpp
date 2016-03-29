@@ -86,8 +86,12 @@ namespace kiwi
             Link* addLink(model::Object* from, const uint8_t outlet, model::Object* to, const uint8_t inlet);
             
             //! @brief Removes an object from the Patcher.
-            //! @param obj The pointer to the object to remove.
-            void remove(model::Object* obj);
+            //! @param obj A reference to the object to remove.
+            void removeObject(model::Object& obj);
+            
+            //! @brief Removes a link from the Patcher.
+            //! @param link A reference to the link to remove.
+            void removeLink(model::Link& link);
             
             //! @brief Returns true if an Object has been added, removed or changed.
             inline bool objectsChanged() const noexcept { return m_objects.changed(); }
@@ -99,6 +103,10 @@ namespace kiwi
             
             //! @internal create an object
             std::unique_ptr<model::Object> createObject(std::string const& name, std::string const& text = "");
+            
+            //! @internal create a link
+            static std::unique_ptr<Link> createLink(model::Object* from, const uint8_t outlet,
+                                                    model::Object* to, const uint8_t inlet);
             
             //! objects and links are stored in a flip::Array to maintain a graphical z-order.
             flip::Array<model::Object>  m_objects;

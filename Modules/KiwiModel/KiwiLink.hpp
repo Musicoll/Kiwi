@@ -56,14 +56,6 @@ namespace kiwi
             //! @brief Destructor.
             virtual ~Link() {}
             
-            //! @brief Creates and returns a new Link
-            //! @param from     The origin Object pointer.
-            //! @param outlet   The origin outlet index.
-            //! @param to       The destination Object pointer.
-            //! @param inlet    The destination inlet index.
-            static std::unique_ptr<Link> create(model::Object* from, const uint8_t outlet,
-                                                model::Object* to, const uint8_t inlet);
-            
             //! @internal flip static declare method
             template<class TModel>
             static void declare()

@@ -37,8 +37,6 @@
 
 using namespace kiwi;
 
-flip_DISABLE_WARNINGS_FOUR_CHAR_CONSTANTS
-
 // ================================================================================ //
 //                                     UTILITIES                                    //
 // ================================================================================ //
@@ -192,7 +190,9 @@ TEST_CASE("model", "[model]")
     PatcherObserver     observer;
     PatcherValidator    validator;
     
-    auto document = std::unique_ptr<flip::Document>(new flip::Document(Model::use(), observer, validator, 123456789ULL, uint32_t ('cicm'), uint32_t('kiwi')));
+    flip_DISABLE_WARNINGS_FOUR_CHAR_CONSTANTS
+    auto document = std::unique_ptr<flip::Document>(new flip::Document(Model::use(), observer, validator, 123456789ULL, uint32_t('cicm'), uint32_t('kiwi')));
+    flip_RESTORE_WARNINGS
     
     // Set up an history for this document
     auto history = std::unique_ptr<flip::History<flip::HistoryStoreMemory>>(new flip::History<flip::HistoryStoreMemory>(*document.get()));
@@ -251,7 +251,7 @@ TEST_CASE("model", "[model]")
     obj_plus_ptr = document->object_ptr<model::Object>(obj_plus_ref);
     if(obj_plus_ptr)
     {
-        patcher.remove(obj_plus_ptr);
+        patcher.removeObject(*obj_plus_ptr);
         commitWithUndoStep("Remove Object \"plus\"");
         Undo();
     }
@@ -266,14 +266,21 @@ TEST_CASE("model", "[model]")
     obj_plus_ptr = document->object_ptr<model::Object>(obj_plus_ref);
     auto obj_plus_alias_ptr = document->object_ptr<model::Object>(obj_plus_alias_ref);
         
-    Link* plus_link = patcher.addLink(obj_plus_ptr, 0, obj_plus_alias_ptr, 0);
+    Link* link = patcher.addLink(obj_plus_ptr, 0, obj_plus_alias_ptr, 0);
+    auto link_ref = link->ref();
     commitWithUndoStep("Add Link between plus objects");
     
     Undo();
     Redo();
     
+    auto link_ptr = document->object_ptr<model::Link>(link_ref);
+    if(link_ptr)
+    {
+        patcher.removeLink(*link_ptr);
+        commitWithUndoStep("Remove Link");
+        Undo();
+    }
+    
     history.reset();
     document.reset();
 }
-
-flip_RESTORE_WARNINGS

@@ -56,6 +56,18 @@ namespace kiwi
             return nullptr;
         }
         
+        std::unique_ptr<Link> Patcher::createLink(model::Object* from, const uint8_t outlet,
+                                                  model::Object* to, const uint8_t inlet)
+        {
+            if(from != to)
+            {
+                //! @todo need to implement conditionnal return type
+                return std::unique_ptr<Link>(new Link(from, outlet, to, inlet));
+            }
+            
+            return nullptr;
+        }
+        
         model::Object* Patcher::addObject(std::string const& name, std::string const& text)
         {
             auto object = createObject(name, text);
@@ -71,7 +83,7 @@ namespace kiwi
         
         Link* Patcher::addLink(model::Object* from, const uint8_t outlet, model::Object* to, const uint8_t inlet)
         {
-            std::unique_ptr<Link> link = Link::create(from, outlet, to, inlet);
+            std::unique_ptr<Link> link = createLink(from, outlet, to, inlet);
 
             if(link)
             {
@@ -82,20 +94,31 @@ namespace kiwi
             return nullptr;
         }
         
-        void Patcher::remove(model::Object* object)
+        void Patcher::removeObject(model::Object& object)
         {
-            if(object)
+            auto predicate = [&object](model::Object const& obj)
             {
-                auto predicate = [object](Object const& obj)
-                {
-                    return &obj == object;
-                };
-                
-                auto it = find_if(m_objects.begin(), m_objects.end(), predicate);
-                if(it != m_objects.end())
-                {
-                    m_objects.erase(it);
-                }
+                return &obj == &object;
+            };
+            
+            auto it = find_if(m_objects.begin(), m_objects.end(), predicate);
+            if(it != m_objects.end())
+            {
+                m_objects.erase(it);
+            }
+        }
+        
+        void Patcher::removeLink(model::Link& link)
+        {
+            auto predicate = [&link](model::Link const& link_compare)
+            {
+                return &link_compare == &link;
+            };
+            
+            auto it = find_if(m_links.begin(), m_links.end(), predicate);
+            if(it != m_links.end())
+            {
+                m_links.erase(it);
             }
         }
     }

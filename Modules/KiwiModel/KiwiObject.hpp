@@ -100,11 +100,11 @@ namespace kiwi
             
             //! @brief Returns the name of the Object.
             //! @return The name of the Object.
-            inline std::string getName() const noexcept     { return m_name; }
+            inline std::string getName() const     { return m_name; }
             
             //! @brief Returns the text of the Object.
             //! @return The text of the Object.
-            inline std::string getText() const noexcept     { return m_text; }
+            inline std::string getText() const     { return m_text; }
             
             //! @brief Returns the number of inlets.
             //! @return The number of inlets.
