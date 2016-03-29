@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2C1235351C9C4B3A003A93DF /* KiwiObjectFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C2D08F11C866D00009BED7B /* KiwiObjectFactory.cpp */; };
 		2C2BF6BA1C96EC9C006E88B6 /* KiwiObjectPlus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C2BF6B71C96EC9C006E88B6 /* KiwiObjectPlus.cpp */; };
 		2C2D08EC1C866C8C009BED7B /* test_KiwiModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C2D08EA1C866C8C009BED7B /* test_KiwiModel.cpp */; };
 		2C2D08ED1C866C8C009BED7B /* test_KiwiPatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C2D08EB1C866C8C009BED7B /* test_KiwiPatcher.cpp */; };
@@ -35,10 +34,6 @@
 		2C2BF6B91C96EC9C006E88B6 /* KiwiObjects.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiObjects.hpp; sourceTree = "<group>"; };
 		2C2D08EA1C866C8C009BED7B /* test_KiwiModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_KiwiModel.cpp; sourceTree = "<group>"; };
 		2C2D08EB1C866C8C009BED7B /* test_KiwiPatcher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_KiwiPatcher.cpp; sourceTree = "<group>"; };
-		2C2D08F11C866D00009BED7B /* KiwiObjectFactory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiObjectFactory.cpp; sourceTree = "<group>"; };
-		2C2D08F21C866D00009BED7B /* KiwiObjectFactory.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = KiwiObjectFactory.hpp; sourceTree = "<group>"; };
-		2C2D08F61C866D00009BED7B /* KiwiAttribute.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = KiwiAttribute.hpp; sourceTree = "<group>"; };
-		2C2D08F71C866D00009BED7B /* KiwiFlipTypes.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = KiwiFlipTypes.hpp; sourceTree = "<group>"; };
 		2C2D08F81C866D00009BED7B /* KiwiLink.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiLink.cpp; sourceTree = "<group>"; };
 		2C2D08F91C866D00009BED7B /* KiwiLink.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = KiwiLink.hpp; sourceTree = "<group>"; };
 		2C2D08FA1C866D00009BED7B /* KiwiModel.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = KiwiModel.hpp; path = ../../../Modules/KiwiModel/KiwiModel.hpp; sourceTree = "<group>"; };
@@ -252,17 +247,13 @@
 		2C2D08EE1C866D00009BED7B /* KiwiModel */ = {
 			isa = PBXGroup;
 			children = (
-				2C2D08F71C866D00009BED7B /* KiwiFlipTypes.hpp */,
-				2C2D08F61C866D00009BED7B /* KiwiAttribute.hpp */,
 				2C2D08FC1C866D00009BED7B /* KiwiObject.cpp */,
 				2C2D08FD1C866D00009BED7B /* KiwiObject.hpp */,
 				2C2D08F81C866D00009BED7B /* KiwiLink.cpp */,
 				2C2D08F91C866D00009BED7B /* KiwiLink.hpp */,
+				2C2BF6B61C96EC9C006E88B6 /* Objects */,
 				2C2D08FE1C866D00009BED7B /* KiwiPatcher.cpp */,
 				2C2D08FF1C866D00009BED7B /* KiwiPatcher.hpp */,
-				2C2D08F11C866D00009BED7B /* KiwiObjectFactory.cpp */,
-				2C2D08F21C866D00009BED7B /* KiwiObjectFactory.hpp */,
-				2C2BF6B61C96EC9C006E88B6 /* Objects */,
 			);
 			name = KiwiModel;
 			path = ../../../Modules/KiwiModel;
@@ -606,7 +597,6 @@
 			files = (
 				2C2D08EC1C866C8C009BED7B /* test_KiwiModel.cpp in Sources */,
 				2C2D08ED1C866C8C009BED7B /* test_KiwiPatcher.cpp in Sources */,
-				2C1235351C9C4B3A003A93DF /* KiwiObjectFactory.cpp in Sources */,
 				2C2D0E251C872442009BED7B /* KiwiLink.cpp in Sources */,
 				2C2D0E241C87243F009BED7B /* KiwiObject.cpp in Sources */,
 				2C2D0E221C870B51009BED7B /* KiwiPatcher.cpp in Sources */,

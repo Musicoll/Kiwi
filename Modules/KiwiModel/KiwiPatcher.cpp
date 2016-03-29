@@ -22,7 +22,6 @@
 */
 
 #include "KiwiPatcher.hpp"
-#include "KiwiObjectFactory.hpp"
 
 namespace kiwi
 {
@@ -43,23 +42,28 @@ namespace kiwi
             m_links.clear();
         }
         
-        void Patcher::init()
+        std::unique_ptr<model::Object> Patcher::createObject(std::string const& name, std::string const& text)
         {
-            addAttr<Attribute::RGBA>("bgcolor", FlipRGBA{0., 0., 0., 1.});
-            addAttr<Attribute::Int>("gridsize", 20);
+            if(name == "plus" || name == "+")
+            {
+                return std::unique_ptr<ObjectPlus>(new ObjectPlus(name, text));
+            }
+            else if(name == "print")
+            {
+                //return std::unique_ptr<ObjectPrint>(new ObjectPrint(name, text));
+            }
+            
+            return nullptr;
         }
         
         model::Object* Patcher::addObject(std::string const& name, std::string const& text)
         {
-            if(ObjectFactory::has(name))
+            auto object = createObject(name, text);
+            
+            if(object)
             {
-                std::unique_ptr<model::Object> object = ObjectFactory::create(name, text);
-                
-                if(object)
-                {
-                    const auto it = m_objects.insert(m_objects.end(), std::move(object));
-                    return it.operator->();
-                }
+                const auto it = m_objects.insert(m_objects.end(), std::move(object));
+                return it.operator->();
             }
             
             return nullptr;

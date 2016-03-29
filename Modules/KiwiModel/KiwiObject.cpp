@@ -36,8 +36,7 @@ namespace kiwi
         m_name(name),
         m_text(text)
         {
-            addAttr<Attribute::RGBA>("bgcolor",  FlipRGBA{1., 1., 1., 1.});
-            addAttr<Attribute::RGBA>("color",    FlipRGBA{0., 0., 0., 1.});
+            ;
         }
     }
 }

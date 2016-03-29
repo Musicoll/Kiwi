@@ -104,22 +104,6 @@ public:
         if(level >= 1) for(int i = 0; i < level; ++i) std::cout << "  |---";
     }
     
-    void processAttributes(Attribute::Manager const& obj, const int indent_level = 0)
-    {
-        indent(indent_level);
-        std::cout << "- attrs";
-        std::vector<Attribute*> attrs = obj.getAttributes();
-        std::cout << " (" << attrs.size() << ") :\n";
-        
-        for(auto* attr : obj.getAttributes())
-        {
-            indent(indent_level + 1);
-            std::cout << "- " << attr->getName();
-            std::vector<Atom> value = attr->getValue();
-            std::cout << " : " << to_string(value) << '\n';
-        }
-    }
-    
     void document_changed(Patcher& patcher) override
     {
         std::cout << "  Patcher changed :" << '\n';
@@ -143,8 +127,6 @@ public:
                 
                 indent(3); std::cout << "- status : " << status_str << '\n';
                 indent(3); std::cout << "- text : " << obj.getText() << '\n';
-                
-                processAttributes(obj, 3);
             }
         }
         
@@ -177,12 +159,8 @@ public:
                                             << to->getName() << "\" ("
                                             << link.getInletIndex() << ")" << '\n';
                 }
-                
-                processAttributes(link, 3);
             }
         }
-
-        processAttributes(patcher, 1);
         
         std::cout << "- - - - - - - - - - - - - - - - - - -\n";
     }
@@ -210,7 +188,6 @@ public:
 TEST_CASE("model", "[model]")
 {
     Model::init("unit_test_model_01");
-    kiwi::model::initializeBasicObjects();
     
     PatcherObserver     observer;
     PatcherValidator    validator;
@@ -262,37 +239,10 @@ TEST_CASE("model", "[model]")
     };
     
     Patcher& patcher = document->root<Patcher>();
-    patcher.init();
     document->commit();
-    
-    patcher.setAttributeValue("bgcolor", {0., 1., 0., 1.});
-    patcher.setAttributeValue("gridsize", {40});
-    commitWithUndoStep("Change Patcher attributes value #1");
-    
-    Undo();
-    Undo(); // test impossible undo use case
-    Redo();
-    Redo(); // test impossible redo use case
-    
-    patcher.setAttributeValue("bgcolor", {0.6666, 0.7777, 0.8888, 1.});
-    patcher.setAttributeValue("gridsize", {25});
-    commitWithUndoStep("Change Patcher attributes value #2");
-    
-    Undo();
-    Redo();
-    
-    auto* attr = patcher.getAttribute("bgcolor");
-    if(attr)
-    {
-        attr->resetDefault();
-        commitWithUndoStep("Reset Patcher bgcolor attribute");
-        Undo();
-    }
     
     model::Object* obj_plus_ptr = patcher.addObject("plus", "1");
     auto obj_plus_ref = obj_plus_ptr->ref();
-    obj_plus_ptr->setAttributeValue("bgcolor", {0.6666, 0.7777, 0.8888, 1.});
-    obj_plus_ptr->setAttributeValue("color", {1., 0.0, 1., 1.});
     commitWithUndoStep("Add Object \"plus\"");
     
     Undo();
@@ -301,14 +251,10 @@ TEST_CASE("model", "[model]")
     obj_plus_ptr = document->object_ptr<model::Object>(obj_plus_ref);
     if(obj_plus_ptr)
     {
-        obj_plus_ptr->setAttributeValue("bgcolor", {.123456, 0.7777, 0.8888, 1.});
+        patcher.remove(obj_plus_ptr);
+        commitWithUndoStep("Remove Object \"plus\"");
+        Undo();
     }
-    
-    commitWithUndoStep("Change \"plus\" object bgcolor");
-    
-    patcher.remove(obj_plus_ptr);
-    commitWithUndoStep("Remove Object \"plus\"");
-    Undo();
     
     model::Object* obj_plus_alias = patcher.addObject("+", "42");
     auto obj_plus_alias_ref = obj_plus_alias->ref();

@@ -24,7 +24,7 @@
 #ifndef KIWI_MODEL_PATCHER_HPP_INCLUDED
 #define KIWI_MODEL_PATCHER_HPP_INCLUDED
 
-#include "KiwiLink.hpp"
+#include "Objects/KiwiObjects.hpp"
 
 namespace kiwi
 {
@@ -35,21 +35,15 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief The patcher manages a set of objects, links and attributes
-        class Patcher : public Attribute::Manager
+        class Patcher : public flip::Object
         {
         public:
             
             //! @brief Default constructor.
             Patcher();
             
-            //! @internal flip Default constructor.
-            Patcher(flip::Default&) {}
-            
             //! @brief Destructor.
             ~Patcher();
-            
-            //! @brief initialize the Patcher model
-            void init();
             
             //! @internal flip static declare method
             template<class TModel>
@@ -57,7 +51,6 @@ namespace kiwi
             {
                 TModel::template declare<Patcher>()
                 .name("cicm.kiwi.Patcher")
-                .template inherit<Attribute::Manager>()
                 .template member<decltype(Patcher::m_objects),   &Patcher::m_objects>   ("objects")
                 .template member<decltype(Patcher::m_links),     &Patcher::m_links>     ("links");
             }
@@ -115,6 +108,9 @@ namespace kiwi
             inline bool linksChanged() const noexcept   { return m_links.changed(); }
             
         private:
+            
+            //! @internal create an object
+            std::unique_ptr<model::Object> createObject(std::string const& name, std::string const& text = "");
             
             //! object are stored in a flip::Array to maintain a z-order.
             flip::Array<model::Object>  m_objects;

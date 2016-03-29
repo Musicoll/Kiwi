@@ -24,7 +24,24 @@
 #ifndef KIWI_MODEL_OBJECT_HPP_INCLUDED
 #define KIWI_MODEL_OBJECT_HPP_INCLUDED
 
-#include "KiwiAttribute.hpp"
+#include "../KiwiCore/KiwiAtom.hpp"
+#include <mutex>
+#include <algorithm>
+
+// ---- Flip headers ---- //
+#include "flip/DataModel.h"
+#include "flip/Bool.h"
+#include "flip/Int.h"
+#include "flip/Float.h"
+#include "flip/Blob.h"
+#include "flip/String.h"
+#include "flip/Enum.h"
+#include "flip/Array.h"
+#include "flip/Collection.h"
+#include "flip/Variant.h"
+#include "flip/Optional.h"
+#include "flip/Object.h"
+#include "flip/ObjectRef.h"
 
 namespace kiwi
 {
@@ -38,7 +55,7 @@ namespace kiwi
         
         //! @brief The Object is an abstract base class for kiwi objects.
         //! @details objects can be instantiated in a Patcher.
-        class Object : public Attribute::Manager
+        class Object : public flip::Object
         {
         public:
             
@@ -75,20 +92,11 @@ namespace kiwi
                 
                 TModel::template declare<model::Object>()
                 .name("cicm.kiwi.Object")
-                .template inherit<Attribute::Manager>()
                 .template member<flip::String, &Object::m_name>("name")
                 .template member<flip::String, &Object::m_text>("text")
                 .template member<flip::Int,    &Object::m_number_of_inlets>("ninlets")
                 .template member<flip::Int,    &Object::m_number_of_outlets>("noutlets");
             }
-            
-            //! @brief Returns the patcher that manages the object.
-            //! @return The Patcher reference.
-            inline Patcher& getParentPatcher()              { return ancestor<Patcher>(); }
-            
-            //! @brief Returns the patcher that manages the object.
-            //! @return The Patcher reference.
-            inline Patcher const& getParentPatcher() const  { return ancestor<Patcher>(); }
             
             //! @brief Returns the name of the Object.
             //! @return The name of the Object.

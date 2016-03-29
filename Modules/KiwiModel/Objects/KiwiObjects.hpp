@@ -30,12 +30,7 @@ namespace kiwi
 {
     namespace model
     {
-        void initializeBasicObjects();
-        void initializeBasicObjects()
-        {
-            ObjectFactory::add<ObjectPlus>("plus");
-            ObjectFactory::add<ObjectPlus>("+");
-        }
+        ;
     }
 }
 
