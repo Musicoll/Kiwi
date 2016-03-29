@@ -523,7 +523,20 @@ namespace kiwi
                 static_assert(std::is_base_of<Attribute, AttrType>::value, "The class must inherit from Attribute.");
                 static_assert(std::is_constructible<AttrType, std::string, Args...>::value, "Bad Attribute arguments");
                 
-                m_attributes.emplace<AttrType>(name, std::forward<Args>(args)...);
+                std::lock_guard<std::mutex> guard(m_attrs_mutex);
+                
+                if(!name.empty())
+                {
+                    auto it = find_if(m_attributes.begin(), m_attributes.end(), [&name](Attribute const& attr)
+                    {
+                        return (attr.getName() == name);
+                    });
+                    
+                    if(it == m_attributes.end())
+                    {
+                        m_attributes.emplace<AttrType>(name, std::forward<Args>(args)...);
+                    }
+                }
             }
             
         private:

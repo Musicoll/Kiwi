@@ -38,9 +38,6 @@ namespace kiwi
         {
             addAttr<Attribute::RGBA>("bgcolor",  FlipRGBA{1., 1., 1., 1.});
             addAttr<Attribute::RGBA>("color",    FlipRGBA{0., 0., 0., 1.});
-            
-            //createFlipAttr(Tags::position,              "Position",                 "Appearance", Point(0., 0.));
-            //createFlipAttr(Tags::size,                  "Size",                     "Appearance", Size(10., 10.));
         }
     }
 }

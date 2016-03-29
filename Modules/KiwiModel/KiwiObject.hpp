@@ -42,13 +42,24 @@ namespace kiwi
         {
         public:
             
+            struct initInfos
+            {
+                std::string         name;
+                std::string         text;
+                std::vector<Atom>   args;
+                
+                initInfos(std::string const& object_name, std::string const& object_text) :
+                name(object_name),
+                text(object_text)
+                {
+                    ;
+                }
+            };
+            
             using Ref = flip::ObjectRef<model::Object>;
             
             //! @internal flip Default constructor
-            Object(flip::Default&)
-            {
-                std::cout << "Object Default ctor called\n";
-            }
+            Object(flip::Default&) {}
             
             //! @brief Constructor.
             Object(std::string const& name, std::string const& text);
@@ -96,9 +107,9 @@ namespace kiwi
             
             //! @brief Sets the number of inlets.
             //! @param value The new number of inlets.
-            void setNumberOfInlets(uint32_t const& value) noexcept
+            void setNumberOfInlets(uint32_t value) noexcept
             {
-                m_number_of_inlets = static_cast<flip::Int::internal_type>(value);
+                m_number_of_inlets = reinterpret_cast<flip::Int::internal_type&>(value);
             }
             
             //! @brief Returns the number of outlets.
@@ -110,9 +121,9 @@ namespace kiwi
             
             //! @brief Sets the number of outlets.
             //! @param value The new number of outlets.
-            void setNumberOfOutlets(uint32_t const& value) noexcept
+            void setNumberOfOutlets(uint32_t value) noexcept
             {
-                m_number_of_outlets = static_cast<flip::Int::internal_type>(value);
+                m_number_of_outlets = reinterpret_cast<flip::Int::internal_type&>(value);
             }
             
         private:
