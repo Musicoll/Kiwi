@@ -38,10 +38,7 @@ namespace kiwi
         {
         public:
             
-            ObjectPlus(flip::Default& d) : model::Object(d)
-            {
-                std::cout << "ObjectPlus : Default ctor called\n";
-            }
+            ObjectPlus(flip::Default& d) : model::Object(d) {}
             
             ObjectPlus(std::string name, std::string text) : model::Object(name, text)
             {

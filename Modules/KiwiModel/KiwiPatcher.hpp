@@ -64,6 +64,10 @@ namespace kiwi
             //! @brief Adds an object to the Patcher.
             model::Object* addObject(std::string const& name, std::string const& text = "");
             
+            //! @brief Adds an object to the Patcher.
+            //! @param link a unique pointer of object.
+            model::Object* addObject(std::unique_ptr<model::Object> object);
+            
             //! @brief Constructs and add a Link to the Patcher.
             //! @details Constructs a Link with given origin and destination Object pointers
             //! and IO indexes then adds it in the Patcher.
@@ -72,6 +76,10 @@ namespace kiwi
             //! @param to       The destination Object pointer.
             //! @param inlet    The destination inlet index.
             Link* addLink(model::Object& from, const uint8_t outlet, model::Object& to, const uint8_t inlet);
+            
+            //! @brief Adds a Link to the Patcher.
+            //! @param link a unique pointer of Link.
+            Link* addLink(std::unique_ptr<model::Link> link);
             
             //! @brief Removes an object from the Patcher.
             //! @param obj A reference to the object to remove.
@@ -88,9 +96,6 @@ namespace kiwi
             inline bool linksChanged() const noexcept   { return m_links.changed(); }
             
         private:
-            
-            //! @internal create an object
-            std::unique_ptr<model::Object> createObject(std::string const& name, std::string const& text = "");
             
             //! objects and links are stored in a flip::Array to maintain a graphical z-order.
             flip::Array<model::Object>  m_objects;

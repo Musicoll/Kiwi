@@ -42,24 +42,25 @@ namespace kiwi
             m_links.clear();
         }
         
-        std::unique_ptr<model::Object> Patcher::createObject(std::string const& name, std::string const& text)
+        model::Object* Patcher::addObject(std::string const& name, std::string const& text)
         {
+            std::unique_ptr<model::Object> up_object = nullptr;
+            
             if(name == "plus" || name == "+")
             {
-                return std::unique_ptr<ObjectPlus>(new ObjectPlus(name, text));
+                up_object = std::unique_ptr<ObjectPlus>(new ObjectPlus(name, text));
             }
             else if(name == "print")
             {
                 //return std::unique_ptr<ObjectPrint>(new ObjectPrint(name, text));
             }
             
-            return nullptr;
+            return addObject(std::move(up_object));
         }
         
-        model::Object* Patcher::addObject(std::string const& name, std::string const& text)
+        //! @brief Adds an object to the Patcher.
+        model::Object* Patcher::addObject(std::unique_ptr<model::Object> object)
         {
-            auto object = createObject(name, text);
-            
             if(object)
             {
                 const auto it = m_objects.insert(m_objects.end(), std::move(object));
@@ -73,13 +74,18 @@ namespace kiwi
         {
             if(&from != &to)
             {
-                std::unique_ptr<Link> link(new Link(from, outlet, to, inlet));
-                
-                if(link)
-                {
-                    const auto it = m_links.insert(m_links.end(), std::move(link));
-                    return it.operator->();
-                }
+                return addLink(std::unique_ptr<Link>(new Link(from, outlet, to, inlet)));
+            }
+            
+            return nullptr;
+        }
+        
+        Link* Patcher::addLink(std::unique_ptr<model::Link> link)
+        {
+            if(link)
+            {
+                const auto it = m_links.insert(m_links.end(), std::move(link));
+                return it.operator->();
             }
             
             return nullptr;
