@@ -93,7 +93,7 @@ std::string to_string(std::vector<Atom>& atom_vec)
 //                                        Model                                     //
 // ================================================================================ //
 
-class PatcherObserver : public flip::DocumentObserver<Patcher>
+class PatcherObserver : public flip::DocumentObserver<model::Patcher>
 {
 public:
     
@@ -102,7 +102,7 @@ public:
         if(level >= 1) for(int i = 0; i < level; ++i) std::cout << "  |---";
     }
     
-    void document_changed(Patcher& patcher) override
+    void document_changed(model::Patcher& patcher) override
     {
         std::cout << "  Patcher changed :" << '\n';
         
@@ -165,11 +165,11 @@ public:
     }
 };
 
-class PatcherValidator : public flip::DocumentValidator<Patcher>
+class PatcherValidator : public flip::DocumentValidator<model::Patcher>
 {
 public:
     
-    void validate(Patcher& patcher) override
+    void validate(model::Patcher& patcher) override
     {
         
         std::cout << "  Document Validate :" << '\n';
@@ -186,13 +186,13 @@ public:
 
 TEST_CASE("model", "[model]")
 {
-    Model::init("unit_test_model_01");
+    model::Model::init("unit_test_model_01");
     
     PatcherObserver     observer;
     PatcherValidator    validator;
     
     flip_DISABLE_WARNINGS_FOUR_CHAR_CONSTANTS
-    auto document = std::unique_ptr<flip::Document>(new flip::Document(Model::use(), observer, validator, 123456789ULL, uint32_t('cicm'), uint32_t('kiwi')));
+    auto document = std::unique_ptr<flip::Document>(new flip::Document(model::Model::use(), observer, validator, 123456789ULL, uint32_t('cicm'), uint32_t('kiwi')));
     flip_RESTORE_WARNINGS
     
     // Set up an history for this document
@@ -239,7 +239,7 @@ TEST_CASE("model", "[model]")
         }
     };
     
-    Patcher& patcher = document->root<Patcher>();
+    model::Patcher& patcher = document->root<model::Patcher>();
     document->commit();
     
     auto obj_plus_ptr = patcher.addObject(std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus("plus", "1")));
@@ -269,7 +269,7 @@ TEST_CASE("model", "[model]")
     
     if(obj_plus_ptr && obj_plus_alias_ptr)
     {
-        auto link = patcher.addLink(std::unique_ptr<Link>(new Link(*obj_plus_ptr, 0, *obj_plus_alias_ptr, 0)));
+        auto link = patcher.addLink(std::unique_ptr<model::Link>(new model::Link(*obj_plus_ptr, 0, *obj_plus_alias_ptr, 0)));
         auto link_ref = link->ref();
         commitWithUndoStep("Add Link between plus objects");
         

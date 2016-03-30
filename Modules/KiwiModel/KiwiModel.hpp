@@ -56,12 +56,6 @@ namespace kiwi
             }
         };
     }
-    
-    using Model = kiwi::model::Model;
-    using Object = kiwi::model::Object;
-    using Link = kiwi::model::Link;
-    using Patcher = kiwi::model::Patcher;
-
 }
 
 #endif // KIWI_MODEL_HPP_INCLUDED
