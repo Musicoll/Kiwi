@@ -29,7 +29,7 @@
 
 namespace kiwi
 {
-    namespace graphics
+    namespace gui
     {
         
         // =================================

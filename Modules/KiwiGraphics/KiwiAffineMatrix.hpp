@@ -30,7 +30,7 @@
 
 namespace kiwi
 {
-    namespace graphics
+    namespace gui
     {
         // ================================================================================ //
         //                                  AFFINE MATRIX                                   //
