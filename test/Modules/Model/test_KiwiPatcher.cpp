@@ -242,7 +242,7 @@ TEST_CASE("model", "[model]")
     Patcher& patcher = document->root<Patcher>();
     document->commit();
     
-    model::Object* obj_plus_ptr = patcher.addObject("plus", "1");
+    auto obj_plus_ptr = patcher.addObject(std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus("plus", "1")));
     auto obj_plus_ref = obj_plus_ptr->ref();
     commitWithUndoStep("Add Object \"plus\"");
     
@@ -257,7 +257,7 @@ TEST_CASE("model", "[model]")
         Undo();
     }
     
-    model::Object* obj_plus_alias = patcher.addObject("+", "42");
+    auto obj_plus_alias = patcher.addObject(std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus("+", "42")));
     auto obj_plus_alias_ref = obj_plus_alias->ref();
     commitWithUndoStep("Add Object \"+\"");
     
@@ -269,7 +269,7 @@ TEST_CASE("model", "[model]")
     
     if(obj_plus_ptr && obj_plus_alias_ptr)
     {
-        Link* link = patcher.addLink(*obj_plus_ptr, 0, *obj_plus_alias_ptr, 0);
+        auto link = patcher.addLink(std::unique_ptr<Link>(new Link(*obj_plus_ptr, 0, *obj_plus_alias_ptr, 0)));
         auto link_ref = link->ref();
         commitWithUndoStep("Add Link between plus objects");
         

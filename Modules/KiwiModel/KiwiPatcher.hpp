@@ -62,10 +62,7 @@ namespace kiwi
             flip::Array<Link> const& getLinks() noexcept            { return m_links; }
             
             //! @brief Adds an object to the Patcher.
-            model::Object* addObject(std::string const& name, std::string const& text = "");
-            
-            //! @brief Adds an object to the Patcher.
-            //! @param link a unique pointer of object.
+            //! @param object A unique pointer of object.
             model::Object* addObject(std::unique_ptr<model::Object> object);
             
             //! @brief Constructs and add a Link to the Patcher.
@@ -75,10 +72,10 @@ namespace kiwi
             //! @param outlet   The origin outlet index.
             //! @param to       The destination Object pointer.
             //! @param inlet    The destination inlet index.
-            Link* addLink(model::Object& from, const uint8_t outlet, model::Object& to, const uint8_t inlet);
+            //Link* addLink(model::Object& from, const uint32_t outlet, model::Object& to, const uint32_t inlet);
             
             //! @brief Adds a Link to the Patcher.
-            //! @param link a unique pointer of Link.
+            //! @param link A unique pointer of Link.
             Link* addLink(std::unique_ptr<model::Link> link);
             
             //! @brief Removes an object from the Patcher.
