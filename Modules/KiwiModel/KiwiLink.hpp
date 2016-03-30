@@ -80,11 +80,11 @@ namespace kiwi
             
             //! @brief Get the origin outlet index of the link.
             //! @return The origin outlet index of the link.
-            inline flip::Int::internal_type getOutletIndex() const noexcept { return m_index_outlet; }
+            inline uint32_t getOutletIndex() const noexcept { return static_cast<uint32_t>(m_index_outlet); }
             
             //! @brief Get the destination inlet index of the link.
             //! @return The destination inlet index of the link.
-            inline flip::Int::internal_type getInletIndex() const noexcept  { return m_index_inlet; }
+            inline uint32_t getInletIndex() const noexcept  { return static_cast<uint32_t>(m_index_inlet); }
             
         private:
             flip::ObjectRef<model::Object>  m_object_from;

@@ -23,6 +23,7 @@
 
 
 #include "../../../Modules/KiwiModel/KiwiModel.hpp"
+#include "../../../Modules/KiwiController/KiwiController.hpp"
 #include "../../catch.hpp"
 #include <vector>
 
@@ -256,6 +257,8 @@ TEST_CASE("model", "[model]")
         commitWithUndoStep("Remove Object \"plus\"");
         Undo();
     }
+    
+    model::ObjectPlus("+", "42 @bgcolor 0. 0. 0. 1.");
     
     auto obj_plus_alias = patcher.addObject(std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus("+", "42")));
     auto obj_plus_alias_ref = obj_plus_alias->ref();

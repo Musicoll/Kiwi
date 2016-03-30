@@ -21,76 +21,45 @@
  ==============================================================================
 */
 
-#include "KiwiLink.h"
-#include "KiwiObject.h"
-#include "KiwiPatcher.h"
+#include "KiwiLink.hpp"
+#include "KiwiObject.hpp"
+#include "KiwiPatcher.hpp"
 
 namespace kiwi
 {
-    // ================================================================================ //
-    //                                      LINK                                        //
-    // ================================================================================ //
-    
-    Link::Link(Object* from, const ulong outlet, Object* to, const ulong inlet) noexcept :
-    m_object_from(from),
-    m_object_to(to),
-    m_index_outlet(outlet),
-    m_index_intlet(inlet)
+    namespace controller
     {
-        ;
-    }
-    
-    Link::~Link()
-    {
-        Object*     from    = getObjectFrom();
-        Object*     to      = getObjectTo();
-        if(from && to)
-        {
-            /*
-            Object::sOutlet outlet  = from->getOutlet(m_index_outlet);
-            if(outlet)
-            {
-                outlet->erase(to, m_index_outlet);
-            }
-            Object::sInlet inlet    = to->getInlet(m_index_intlet);
-            if(inlet)
-            {
-                inlet->erase(from, m_index_intlet);
-            }
-            */
-        }
-    }
-    
-    void Link::write(Dico& dico) const noexcept
-    {
-        Object*     from    = getObjectFrom();
-        Object*     to      = getObjectTo();
+        // ================================================================================ //
+        //                                      LINK                                        //
+        // ================================================================================ //
         
-        if(from && to)
+        Link::Link(model::Link model, Object* from, Object* to) :
+        m_model(model),
+        m_object_from(from),
+        m_object_to(to)
         {
-            //dico[Tags::from] = {(long)from->getId(), (long)getOutletIndex()};
-            //dico[Tags::to] = {(long)to->getId(), (long)getInletIndex()};
+            ;
         }
-        else
+        
+        Link::~Link()
         {
-            dico.erase(Tags::from);
-            dico.erase(Tags::to);
+            Object*     from    = getObjectFrom();
+            Object*     to      = getObjectTo();
+            if(from && to)
+            {
+                /*
+                 Object::sOutlet outlet  = from->getOutlet(m_index_outlet);
+                 if(outlet)
+                 {
+                 outlet->erase(to, m_index_outlet);
+                 }
+                 Object::sInlet inlet    = to->getInlet(m_index_intlet);
+                 if(inlet)
+                 {
+                 inlet->erase(from, m_index_intlet);
+                 }
+                 */
+            }
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

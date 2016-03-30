@@ -21,199 +21,133 @@
  ==============================================================================
 */
 
-#ifndef __DEF_KIWI_PATCHER__
-#define __DEF_KIWI_PATCHER__
+#ifndef KIWI_CONTROLLER_PATCHER_HPP_INCLUDED
+#define KIWI_CONTROLLER_PATCHER_HPP_INCLUDED
 
-#include "KiwiLink.h"
+#include "KiwiLink.hpp"
+
+#include "flip/Document.h"
+#include "flip/DocumentObserver.h"
+#include "flip/History.h"
+#include "flip/HistoryStoreMemory.h"
 
 namespace kiwi
 {
-    // ================================================================================ //
-    //                                  PATCHER DOCUMENT                                //
-    // ================================================================================ //
-    
-    class PatcherDocument : public flip::Document
+    namespace controller
     {
-    public:
-        PatcherDocument(const flip::DataModelBase& data_model,
-                        flip::DocumentObserverBase& observer,
-                        flip::DocumentValidatorBase& validator,
-                        uint64_t user_id)
-        : flip::Document(data_model, observer, validator, user_id, 'cicm', 'kpat') {}
-    };
-    
-    // ================================================================================ //
-    //                                      PATCHER                                     //
-    // ================================================================================ //
-    
-    //! The patcher manages objects and links.
-    /**
-     The patcher is... ??
-     */
-    class Patcher : public flip::DocumentObserver<PatcherModel>
-    {
-    private:
-        Instance*                               m_instance = nullptr;
-        PatcherModel*                           m_model = nullptr;
+        // ================================================================================ //
+        //                                      PATCHER                                     //
+        // ================================================================================ //
         
-        std::shared_ptr<flip::Document>              m_document;     // std::unique_ptr
-        std::shared_ptr<flip::History<flip::HistoryStoreMemory>>
-                                                m_history;
-        
-        std::vector<sObject>                         m_objects;
-        std::vector<sLink>                           m_links;
-        
-        mutable std::mutex                           m_mutex;
-        
-        void createObject(Dico& dico);
-        
-        //! flip::DocumentObserver<PatcherModel>
-        void document_changed(PatcherModel& patcher) override;
-        
-        //! Constructor.
-        Patcher(Instance* instance) noexcept;
-        
-    public:
-        //! Destructor.
-        ~Patcher();
-        
-        static std::unique_ptr<Patcher> create(Instance* instance);
-
-        //! Get the objects.
-        /** The function retrieves the objects from the patcher.
-         @return A vector with the objects.
+        //! The patcher manages objects and links.
+        /**
+         The patcher is... ??
          */
-        inline ulong getNumberOfObjects() const
+        class Patcher : public flip::DocumentObserver<model::Patcher>
         {
-            std::lock_guard<std::mutex> guard(m_mutex);
-            return m_objects.size();
-        }
-        
-        //! Get the objects.
-        /** The function retrieves the objects from the patcher.
-         @return A vector with the objects.
-         */
-        inline std::vector<sObject>& getObjects() noexcept
-        {
-            std::lock_guard<std::mutex> guard(m_mutex);
-            return m_objects;
-        }
-        
-        //! Get an object with the id.
-        /** The function retrieves an object with an id.
-         @param id   The id of the object.
-         */
-        inline sObject getObjectWithId(const ulong ID) const noexcept
-        {
-            std::lock_guard<std::mutex> guard(m_mutex);
-            return nullptr;
-        }
-        
-        //! Append a dico.
-        /** The function reads a dico and add the objects and links to the patcher.
-         @param dico The dico.
-         */
-        void add(Dico const& dico);
-        
-        //! Free a object.
-        /** The function removes a object from the patcher.
-         @param object        The pointer to the object.
-         */
-        void remove(sObject object);
-        
-        //! Begin a new transaction
-        /** Each call to this function must be followed by a call to endTransaction.
-         @param transaction_name The name of the current transaction
-         @see endTransaction
-         */
-        void beginTransaction(std::string transaction_name)
-        {
-            m_document->set_label(transaction_name);
-        }
-        
-        //! Ends a transaction
-        /** Each call to this function must be preceded by a call to beginTransaction.
-         @see beginTransaction
-         */
-        void endTransaction()
-        {
-            auto tx = m_document->commit();
-            m_history->add_undo_step(tx);
-        }
-        
-        //! Undo the last transaction and optionally commit
-        void undo(const bool commit = false)
-        {
-            m_history->execute_undo();
+        private:
+            Instance*           m_instance = nullptr;
+            model::Patcher*     m_model = nullptr;
             
-            if(commit)
-            {
-                m_document->commit();
-            }
-        }
-        
-        //! Redo the next transaction and optionally commit
-        void redo(const bool commit = false)
-        {
-            m_history->execute_redo();
+            std::shared_ptr<flip::Document>              m_document;     // std::unique_ptr
+            std::shared_ptr<flip::History<flip::HistoryStoreMemory>>
+            m_history;
             
-            if(commit)
+            std::vector<sObject>                         m_objects;
+            std::vector<sLink>                           m_links;
+                        
+            void document_changed(model::Patcher& patcher) override;
+            
+            //! Constructor.
+            Patcher(Instance* instance) noexcept;
+            
+        public:
+            
+            //! Destructor.
+            ~Patcher();
+            
+            static std::unique_ptr<Patcher> create(Instance* instance);
+            
+            //! Get the objects.
+            /** The function retrieves the objects from the patcher.
+             @return A vector with the objects.
+             */
+            inline std::vector<sObject>::size_type getNumberOfObjects() const
             {
-                m_document->commit();
-            }
-        }
-        
-        //! Set a patcher attribute value.
-        /** The function sets a patcher attribute value.
-         @param name the name of the attribute.
-         @param value The new attribute value.
-         */
-        inline void setAttributeValue(const sTag name, Atom const& value, const bool commit = false) noexcept
-        {
-            if(commit)
-            {
-                beginTransaction("Patcher's " + name->getName() + " attribute changed");
+                return m_objects.size();
             }
             
-            m_model->setAttributeValue(name, value);
-            
-            if(commit)
+            //! Get the objects.
+            /** The function retrieves the objects from the patcher.
+             @return A vector with the objects.
+             */
+            inline std::vector<sObject> const& getObjects() noexcept
             {
-                endTransaction();
+                return m_objects;
             }
-        }
-        
-        //! Retrieve a patcher attribute value.
-        /** The function retrieves a patcher attribute value.
-         @param name the name of the attribute.
-         @return The value of the attribute as an Atom.
-         */
-        inline Atom getAttributeValue(const sTag name) const noexcept
-        {
-            return m_model->getAttributeValue(name);
-        }
-        
-        //! Retrieve the "gridsize" attribute value of the patcher.
-        /** The function retrieves the "gridsize" attribute value of the patcher.
-         @return The "gridsize" attribute value of the patcher.
-         */
-        inline Atom getGridSize() const noexcept
-        {
-            return m_model->getAttributeValue(Tags::gridsize);
-        }
-        
-        //! Set the "gridsize" attribute value of the patcher.
-        /** The function sets the "gridsize" attribute value of the patcher.
-         @param value The "gridsize" attribute value of the patcher.
-         */
-        inline void setGridSize(Atom const& value, const bool commit = false) noexcept
-        {
-            setAttributeValue(Tags::gridsize, value, commit);
-        }
-    };
+            
+            //! Get an object with the id.
+            /** The function retrieves an object with an id.
+             @param id   The id of the object.
+             */
+            inline sObject getObjectWithId(const uint64_t ID) const noexcept
+            {
+                return nullptr;
+            }
+            
+            //! @brief Creates and add an object to the Patcher.
+            void addObject(std::string const& name, std::string const& text);
+            
+            //! Free a object.
+            /** The function removes a object from the patcher.
+             @param object        The pointer to the object.
+             */
+            void remove(sObject object);
+            
+            //! Begin a new transaction
+            /** Each call to this function must be followed by a call to endTransaction.
+             @param transaction_name The name of the current transaction
+             @see endTransaction
+             */
+            void beginTransaction(std::string transaction_name)
+            {
+                m_document->set_label(transaction_name);
+            }
+            
+            //! Ends a transaction
+            /** Each call to this function must be preceded by a call to beginTransaction.
+             @see beginTransaction
+             */
+            void endTransaction()
+            {
+                auto tx = m_document->commit();
+                m_history->add_undo_step(tx);
+            }
+            
+            //! Undo the last transaction and optionally commit
+            void undo(const bool commit = false)
+            {
+                m_history->execute_undo();
+                
+                if(commit)
+                {
+                    m_document->commit();
+                }
+            }
+            
+            //! Redo the next transaction and optionally commit
+            void redo(const bool commit = false)
+            {
+                m_history->execute_redo();
+                
+                if(commit)
+                {
+                    m_document->commit();
+                }
+            }
+        };
+    }
 }
 
 
-#endif
-
-
+#endif // KIWI_CONTROLLER_PATCHER_HPP_INCLUDED

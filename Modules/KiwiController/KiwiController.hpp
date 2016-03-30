@@ -21,17 +21,14 @@
  ==============================================================================
 */
 
-#ifndef __DEF_KIWI_ENGINE__
-#define __DEF_KIWI_ENGINE__
+#ifndef KIWI_CONTROLLER_HPP_INCLUDED
+#define KIWI_CONTROLLER_HPP_INCLUDED
 
-#include "KiwiFactory.h"
+#include "KiwiInstance.hpp"
 
 namespace kiwi
 {
     
 }
 
-
-#endif
-
-
+#endif // KIWI_CONTROLLER_HPP_INCLUDED

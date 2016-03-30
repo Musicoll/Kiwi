@@ -137,6 +137,8 @@ namespace kiwi
             flip::String    m_text;
             flip::Int       m_number_of_inlets;
             flip::Int       m_number_of_outlets;
+            
+            //Object(Object const&) = delete;
         };
     }
 }

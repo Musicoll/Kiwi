@@ -21,139 +21,71 @@
  ==============================================================================
 */
 
-#include "KiwiInstance.h"
+#include "KiwiInstance.hpp"
 
 namespace kiwi
 {
-    // ================================================================================ //
-    //                                      INSTANCE                                    //
-    // ================================================================================ //
-    
-    bool Instance::m_declared_flag = false;
-    
-    Instance::Instance(uint64_t user_id, sTag name) noexcept : m_user_id(user_id), m_name(name)
+    namespace controller
     {
-		;
-    }
-    
-    Instance::~Instance()
-    {
-        std::lock_guard<std::mutex> guard(m_patchers_mutex);
-        m_patchers.clear();
-        m_listeners.clear();
-    }
-    
-    std::unique_ptr<Instance> Instance::create(uint64_t user_id, std::string const& name)
-    {
-        declare();
-        sTag tagname = Tag::create(name);
+        // ================================================================================ //
+        //                                      INSTANCE                                    //
+        // ================================================================================ //
         
-        //@todo assert unique instance's name
+        bool Instance::m_declared_flag = false;
         
-        return std::unique_ptr<Instance>(new Instance(user_id, tagname));
-    }
-    
-    void Instance::declare()
-    {
-        if(m_declared_flag)
-            return;
-        
-        // define current model version :
-        Model::version("1.0_dev");
-        
-        // basic types declaration :
-        FlipTag::declare();
-        FlipRGBA::declare();
-        FlipAtom::declare();
-        
-        // attributes declaration :
-        AttributeBase::declare();
-        Attribute<flip::Bool>::declare("cicm.kiwi.Attribute.Bool");
-        Attribute<flip::Int>::declare("cicm.kiwi.Attribute.Int");
-        Attribute<flip::Float>::declare("cicm.kiwi.Attribute.Float");
-        Attribute<FlipTag>::declare("cicm.kiwi.Attribute.Tag");
-        Attribute<FlipRGBA>::declare("cicm.kiwi.Attribute.RGBA");
-        
-        FlipArray<FlipTag>::declare();
-        Attribute<FlipArray<FlipTag>>::declare("cicm.kiwi.Attribute.TagArray");
-        
-        // patcher elements declaration :
-        AttributeBase::Manager::declare();
-        
-        ObjectModel::declare();
-        LinkModel::declare();
-        PatcherModel::declare();
-        
-        m_declared_flag = true;
-    }
-    
-    sPatcher Instance::createPatcher()
-    {
-        auto success = false;
-        sPatcher patcher = Patcher::create(this);
-        
-        if(patcher)
+        Instance::Instance(uint64_t user_id, std::string const& name) noexcept : m_user_id(user_id), m_name(name)
         {
-            std::lock_guard<std::mutex> guard(m_patchers_mutex);
-            success = m_patchers.insert(patcher).second;
+            ;
         }
         
-        if(success)
+        Instance::~Instance()
         {
-            m_listeners.call(&Listener::patcherCreated, this, patcher);
+            m_patchers.clear();
         }
         
-        return patcher;
-    }
-
-    sPatcher Instance::createPatcher(Dico& dico)
-    {
-        sPatcher patcher;
-        /*
-        bool state(false);
+        std::unique_ptr<Instance> Instance::create(uint64_t user_id, std::string const& name)
         {
-            patcher = Patcher::create(getShared());
-            std::lock_guard<std::mutex> guard(m_patchers_mutex);
-            if(patcher && m_patchers.insert(patcher).second)
+            declare();
+            
+            //@todo assert unique instance's name
+            return std::unique_ptr<Instance>(new Instance(user_id, name));
+        }
+        
+        void Instance::declare()
+        {
+            if(m_declared_flag) return;
+            
+            // define current model version :
+            model::Model::init("1.0_dev");
+            
+            m_declared_flag = true;
+        }
+        
+        sPatcher Instance::createPatcher()
+        {
+            auto success = false;
+            sPatcher patcher = Patcher::create(this);
+            
+            if(patcher)
             {
-                state = true;
+                success = m_patchers.insert(patcher).second;
+            }
+            
+            return patcher;
+        }
+        
+        void Instance::removePatcher(sPatcher patcher)
+        {
+            bool success = false;
+            {
+                //success = m_patchers.erase(patcher);
             }
         }
-        if(state)
+        
+        std::vector<sPatcher> Instance::getPatchers()
         {
-            m_listeners.call(&Listener::patcherCreated, getShared(), patcher);
+            return std::vector<sPatcher>();
+            //return std::vector<sPatcher>(m_patchers.begin(), m_patchers.end());
         }
-        */
-        return patcher;
-    }
-    
-    void Instance::removePatcher(sPatcher patcher)
-    {
-        bool success = false;
-        {
-            std::lock_guard<std::mutex> guard(m_patchers_mutex);
-            //success = m_patchers.erase(patcher);
-        }
-        if(success)
-        {
-            m_listeners.call(&Listener::patcherRemoved, this, patcher);
-        }
-    }
-    
-    std::vector<sPatcher> Instance::getPatchers()
-    {
-        std::lock_guard<std::mutex> guard(m_patchers_mutex);
-        //return std::vector<sPatcher>(m_patchers.begin(), m_patchers.end());
-    }
-    
-    void Instance::addListener(sListener listener)
-    {
-        m_listeners.add(listener);
-    }
-    
-    void Instance::removeListener(sListener listener)
-    {
-        m_listeners.remove(listener);
     }
 }
-

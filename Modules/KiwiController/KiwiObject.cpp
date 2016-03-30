@@ -21,43 +21,31 @@
  ==============================================================================
 */
 
-#include "KiwiObject.h"
-#include "KiwiPatcher.h"
-#include "KiwiInstance.h"
+#include "KiwiObject.hpp"
+#include "KiwiPatcher.hpp"
+#include "KiwiInstance.hpp"
 
 namespace kiwi
 {
-    // ================================================================================ //
-    //                                      OBJECT                                      //
-    // ================================================================================ //
-    
-    Object::Object(ObjectModel& model) noexcept : m_model(model)
+    namespace controller
     {
-        /*
-        createFlipAttr(Tags::position,              "Position",                 "Appearance", flip::Array<FlipTag>("", ""));
-        createFlipAttr(Tags::position,              "Position",                 "Appearance", Point(0., 0.));
-        createFlipAttr(Tags::size,                  "Size",                     "Appearance", Size(10., 10.));
-        createFlipAttr(Tags::presentation_position, "Presentation Position",    "Appearance", Point(0., 0.));
-        createFlipAttr(Tags::presentation_size,     "Presentation Size",        "Appearance", Size(10., 10.));
-        */
-        //createFlipAttr(Tags::position, "Position", "Appearance", FlipPoint(0., 0.));
-        //createFlipAttr(Tags::presentation_position, "Presentation Position", "Appearance", FlipPoint(0., 0.));
-        /*
-        createFlipAttr(Tags::hidden,        "Hide on Lock",             "Appearance", flip::Bool(false));
-        createFlipAttr(Tags::presentation,  "Include in presentation",  "Appearance", flip::Bool(false));
-        createFlipAttr(Tags::ignoreclick,   "Ignore Click",             "Behavior",   flip::Bool(false));
-        */
-    }
-    
-    Object::Object(const Object& rhs) noexcept : m_model(rhs.m_model)
-    {
-        //m_attributes = rhs.m_attributes;
-    }
-    
-    Object::~Object() noexcept
-    {
-        ;
+        // ================================================================================ //
+        //                                      OBJECT                                      //
+        // ================================================================================ //
+        
+        Object::Object(model::Object& model) noexcept : m_model(model)
+        {
+            ;
+        }
+        
+        Object::Object(const Object& rhs) noexcept : m_model(rhs.m_model)
+        {
+            //m_attributes = rhs.m_attributes;
+        }
+        
+        Object::~Object() noexcept
+        {
+            ;
+        }
     }
 }
-
-
