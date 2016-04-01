@@ -30,7 +30,7 @@ namespace kiwi
     namespace controller
     {
         // ================================================================================ //
-        //                                      PAGE                                        //
+        //                                      PATCHER                                     //
         // ================================================================================ //
         
         //Patcher::Patcher(sInstance instance, PatcherModel& model) noexcept : m_instance(instance), m_model(model)
@@ -83,7 +83,23 @@ namespace kiwi
                 //uptr_object = std::unique_ptr<ObjectPrint>(new ObjectPrint(name, text));
             }
             
-            //m_model->addObject(std::move(uptr_object));
+            return nullptr;
+        }
+        
+        controller::Link* Patcher::addLink(controller::Object& from, const uint32_t outlet, controller::Object& to, const uint32_t inlet)
+        {
+            if(&from != &to)
+            {
+                auto& model_from = from.m_model;
+                auto& model_to = to.m_model;
+                auto& link_model = *m_model->addLink(std::unique_ptr<model::Link>(new model::Link(model_from, outlet, model_to, inlet)));
+                
+                auto uptr_link_ctrl = std::unique_ptr<controller::Link>(new controller::Link(link_model, &from, &to));
+                auto saved_uptr_link_ctrl = uptr_link_ctrl.get();
+                m_links.emplace_back(std::move(saved_uptr_link_ctrl));
+                return saved_uptr_link_ctrl;
+            }
+            
             return nullptr;
         }
         

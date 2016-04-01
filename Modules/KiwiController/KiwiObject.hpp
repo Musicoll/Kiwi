@@ -25,6 +25,7 @@
 #define KIWI_CONTROLLER_OBJECT_HPP_INCLUDED
 
 #include "../KiwiModel/KiwiModel.hpp"
+#include <utility>
 
 namespace kiwi
 {
@@ -119,21 +120,19 @@ namespace kiwi
             
         protected:
             
-            //! @brief The receive method.
-            void output(uint32_t index, std::vector<Atom> args);
+            //! @brief Send a message to at a given outlet index.
+            void send(const uint32_t index, std::vector<Atom> args);
             
             //! @brief The receive method.
             virtual void receive(uint32_t index, std::vector<Atom> args) = 0;
             
-        private:
-            struct Connection
-            {
-                wObject object;
-                uint32_t index;
-            };
+        private:            
+            wPatcher                m_patcher;
+            model::Object&          m_model;
             
-            wPatcher            m_patcher;
-            model::Object&      m_model;
+            std::vector<Outlet>     m_outlets;
+            std::vector<Inlet>      m_inlets;
+            std::atomic_ushort      m_stack_count;
         };
         
         //! The outlet owns a set of links.
@@ -143,7 +142,10 @@ namespace kiwi
         class Object::Iolet
         {
         protected:
-            std::vector<Connection>  m_connections;
+            using connection_t      = std::pair<Object*, uint32_t>;
+            using connection_vec_t  = std::vector<connection_t>;
+            
+            connection_vec_t    m_connections;
             const Io::Type      m_type;
             
         public:
@@ -153,7 +155,7 @@ namespace kiwi
              @param index the iolet's index.
              @return true if the connection is in the iolet, otherwise false.
              */
-            bool has(sObject object, uint32_t index) const noexcept;
+            bool has(Object const* const object, const uint32_t index) const noexcept;
             
             //! Append a new connection to the iolet.
             /** The functions appends a new connection to the iolet.
@@ -161,7 +163,7 @@ namespace kiwi
              @param index the iolet's index.
              @return true if the connection has been added, otherwise false.
              */
-            bool append(sObject object, uint32_t index) noexcept;
+            bool append(Object* object, const uint32_t index) noexcept;
             
             //! Remove a connection from the iolet.
             /** The functions removes a connection from the iolet.
@@ -169,14 +171,10 @@ namespace kiwi
              @param index the iolet's index.
              @return true if the connection has been removed, otherwise false.
              */
-            bool erase(sObject object, uint32_t index) noexcept;
+            bool erase(Object* object, const uint32_t index) noexcept;
             
             //! Constructor.
-            inline Iolet(Io::Type type) noexcept :
-            m_type(type)
-            {
-                ;
-            }
+            inline Iolet(Io::Type type) noexcept : m_type(type) {}
             
             //! Destructor.
             inline ~Iolet() noexcept
@@ -197,38 +195,24 @@ namespace kiwi
             /** The functions retrieves the number of connections of the iolet.
              @return The number of connections.
              */
-            inline uint32_t getNumberOfConnection() const noexcept
+            inline uint32_t getNumberOfConnections() const noexcept
             {
                 return static_cast<uint32_t>(m_connections.size());
             }
             
-            //! Retrieve a connection.
-            /** The functions retrieves a connection.
+            //! Retrieve the object of a connection.
+            /** The functions retrieves the object of a connection.
              @param index The index of the connection.
-             @return The connection.
+             @return The object of a connection.
              */
-            const Connection getConnection(const uint32_t index) const noexcept;
-            
-            //! Retrieve a connection.
-            /** The functions retrieves a connection.
-             @param index The index of the connection.
-             @return The connection.
-             */
-            Connection getConnection(const uint32_t index) noexcept;
+            Object const* getObject(const uint32_t index) const noexcept;
             
             //! Retrieve the object of a connection.
             /** The functions retrieves the object of a connection.
              @param index The index of the connection.
              @return The object of a connection.
              */
-            scObject getObject(const uint32_t index) const noexcept;
-            
-            //! Retrieve the object of a connection.
-            /** The functions retrieves the object of a connection.
-             @param index The index of the connection.
-             @return The object of a connection.
-             */
-            sObject getObject(const uint32_t index) noexcept;
+            Object* getObject(const uint32_t index) noexcept;
             
             //! Retrieve the iolet's index of a connection.
             /** The functions retrieves the iolet's index of a connection.
@@ -275,7 +259,6 @@ namespace kiwi
             //! Constructor.
             /** You should never call this method except if you really know what you're doing.
              @param type        The type of the outlet.
-             @param description The description of the outlet.
              */
             Outlet(Io::Type type) noexcept;
             
@@ -288,7 +271,7 @@ namespace kiwi
             /** The function sends of atoms to the connected inlets.
              @param atoms The vector of atoms.
              */
-            void output(std::vector<Atom> const& atoms) const noexcept;
+            void send(std::vector<Atom> const& atoms) const noexcept;
         };
     }
 }

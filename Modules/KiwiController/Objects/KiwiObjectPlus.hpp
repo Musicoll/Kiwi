@@ -75,7 +75,7 @@ namespace kiwi
             
             void bang()
             {
-                output(0, {m_current_value});
+                send(0, {m_current_value});
             }
             
         private:

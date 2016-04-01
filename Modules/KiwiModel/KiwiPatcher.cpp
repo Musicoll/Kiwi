@@ -42,24 +42,6 @@ namespace kiwi
             m_links.clear();
         }
         
-        /*
-        model::Object* Patcher::addObject(std::string const& name, std::string const& text)
-        {
-            std::unique_ptr<model::Object> uptr_object = nullptr;
-            
-            if(name == "plus" || name == "+")
-            {
-                uptr_object = std::unique_ptr<ObjectPlus>(new ObjectPlus(name, text));
-            }
-            else if(name == "print")
-            {
-                //uptr_object = std::unique_ptr<ObjectPrint>(new ObjectPrint(name, text));
-            }
-            
-            return addObject(std::move(uptr_object));
-        }
-        */
-        
         model::Object* Patcher::addObject(std::unique_ptr<model::Object> && object)
         {
             if(object)
@@ -70,18 +52,6 @@ namespace kiwi
             
             return nullptr;
         }
-        
-        /*
-        Link* Patcher::addLink(model::Object& from, const uint32_t outlet, model::Object& to, const uint32_t inlet)
-        {
-            if(&from != &to)
-            {
-                return addLink(std::unique_ptr<Link>(new Link(from, outlet, to, inlet)));
-            }
-            
-            return nullptr;
-        }
-        */
         
         Link* Patcher::addLink(std::unique_ptr<model::Link> link)
         {

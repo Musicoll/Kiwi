@@ -30,6 +30,153 @@ namespace kiwi
     namespace controller
     {
         // ================================================================================ //
+        //                                      IOLET                                       //
+        // ================================================================================ //
+        
+        Object const* Object::Iolet::getObject(const uint32_t index) const noexcept
+        {
+            const auto idx = static_cast<connection_vec_t::size_type>(index);
+            
+            if(idx < m_connections.size())
+            {
+                return m_connections[idx].first;
+            }
+            
+            return nullptr;
+        }
+        
+        Object* Object::Iolet::getObject(const uint32_t index) noexcept
+        {
+            const auto idx = static_cast<connection_vec_t::size_type>(index);
+            
+            if(idx < m_connections.size())
+            {
+                return m_connections[idx].first;
+            }
+            
+            return nullptr;
+        }
+        
+        
+        uint32_t Object::Iolet::getIndex(const uint32_t index) const noexcept
+        {
+            const auto idx = static_cast<connection_vec_t::size_type>(index);
+            
+            if(idx < m_connections.size())
+            {
+                return m_connections[idx].second;
+            }
+            
+            return 0;
+        }
+        
+        bool Object::Iolet::has(Object const* const object, const uint32_t index) const noexcept
+        {
+            if(object)
+            {
+                const auto idx = static_cast<connection_vec_t::size_type>(index);
+                
+                const auto it = std::find_if(m_connections.begin(), m_connections.end(), [&idx, object](connection_t const& con)
+                {
+                    return (idx == con.second && object == con.first);
+                });
+                
+                return (it != m_connections.end());
+            }
+            
+            return false;
+        }
+        
+        bool Object::Iolet::append(Object* object, const uint32_t index) noexcept
+        {
+            if(object && !has(object, index))
+            {
+                m_connections.emplace_back(object, index);
+                return true;
+            }
+            
+            return false;
+        }
+        
+        bool Object::Iolet::erase(Object* object, uint32_t index) noexcept
+        {
+            if(object)
+            {
+                const auto idx = static_cast<connection_vec_t::size_type>(index);
+                
+                const auto connection_exists = [&idx, object](connection_t const& con)
+                {
+                    return (idx == con.second && object == con.first);
+                };
+                
+                const auto it = std::find_if(m_connections.begin(), m_connections.end(), connection_exists);
+                
+                if(it != m_connections.end())
+                {
+                    m_connections.erase(it);
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // ================================================================================ //
+        //                                      OUTLET                                      //
+        // ================================================================================ //
+        
+        Object::Outlet::Outlet(Io::Type type) noexcept :
+        Iolet(type)
+        {
+            ;
+        }
+        
+        Object::Outlet::~Outlet()
+        {
+            ;
+        }
+        
+        void Object::Outlet::send(std::vector<Atom> const& atoms) const noexcept
+        {
+            for(auto& connection : m_connections)
+            {
+                Object* const receiver = connection.first;
+                
+                if(receiver)
+                {
+                    if(++receiver->m_stack_count < 256)
+                    {
+                        receiver->receive(connection.second, atoms);
+                    }
+                    else if(receiver->m_stack_count == 256)
+                    {
+                        receiver->receive(connection.second, atoms);
+                    }
+                    else
+                    {
+                        std::cout << "object " << receiver->getName() << "Stack overflow";
+                    }
+                    
+                    receiver->m_stack_count--;
+                }
+            }
+        }
+        
+        // ================================================================================ //
+        //                                      INLET                                       //
+        // ================================================================================ //
+        
+        Object::Inlet::Inlet(Io::Type type) noexcept :
+        Iolet(type)
+        {
+            ;
+        }
+        
+        Object::Inlet::~Inlet()
+        {
+            ;
+        }
+        
+        // ================================================================================ //
         //                                      OBJECT                                      //
         // ================================================================================ //
         
@@ -43,13 +190,15 @@ namespace kiwi
             ;
         }
         
-        void Object::output(uint32_t index, std::vector<Atom> args)
+        void Object::send(const uint32_t index, std::vector<Atom> args)
         {
             std::cout << "output method called \n";
             
-            if(index < m_model.getNumberOfOutlets() && !args.empty())
+            const auto idx = static_cast<std::vector<Outlet>::size_type>(index);
+            
+            if(idx < m_outlets.size())
             {
-                ;
+                m_outlets[idx].send(args);
             }
         }
     }
