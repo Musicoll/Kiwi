@@ -187,8 +187,29 @@ public:
 
 TEST_CASE("model", "[model]")
 {
-    model::Model::init("unit_test_model_01");
+    auto instance = controller::Instance::create(123456789ULL, "kiwi");
+    auto patcher = instance->createPatcher();
     
+    patcher->beginTransaction("Add Object \"plus\"");
+    
+    auto obj_plus = patcher->addObject("plus", "1");
+    CHECK(obj_plus->getText() == "1");
+    CHECK(obj_plus->getNumberOfInlets() == 1);
+    
+    auto obj_plus_2 = patcher->addObject("plus");
+    CHECK(obj_plus_2->getText() == "");
+    CHECK(obj_plus_2->getNumberOfInlets() == 2);
+    
+    auto obj_plus_3 = patcher->addObject("plus", "1 44 ZOZO");
+    CHECK(obj_plus_3->getText() == "1 44 ZOZO");
+    CHECK(obj_plus_3->getNumberOfInlets() == 1);
+    
+    patcher->endTransaction();
+    
+    patcher->undo(true);
+    patcher->redo(true);
+    
+    /*
     PatcherObserver     observer;
     PatcherValidator    validator;
     
@@ -243,7 +264,13 @@ TEST_CASE("model", "[model]")
     model::Patcher& patcher = document->root<model::Patcher>();
     document->commit();
     
-    auto obj_plus_ptr = patcher.addObject(std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus("plus", "1")));
+    model::Object::initInfos("plus", "1");
+    
+    auto plus_uptr = std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus({"plus", "1"}));
+    plus_uptr->setNumberOfInlets(2);
+    
+    auto obj_plus_ptr = patcher.addObject(std::move(plus_uptr));
+    //auto obj_plus_ptr = patcher.addObject(std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus("plus", "1")));
     auto obj_plus_ref = obj_plus_ptr->ref();
     commitWithUndoStep("Add Object \"plus\"");
     
@@ -258,9 +285,7 @@ TEST_CASE("model", "[model]")
         Undo();
     }
     
-    model::ObjectPlus("+", "42 @bgcolor 0. 0. 0. 1.");
-    
-    auto obj_plus_alias = patcher.addObject(std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus("+", "42")));
+    auto obj_plus_alias = patcher.addObject(std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus({"+", "42"})));
     auto obj_plus_alias_ref = obj_plus_alias->ref();
     commitWithUndoStep("Add Object \"+\"");
     
@@ -290,4 +315,5 @@ TEST_CASE("model", "[model]")
     
     history.reset();
     document.reset();
+    */
 }

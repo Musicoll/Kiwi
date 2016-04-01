@@ -40,9 +40,11 @@ namespace kiwi
             
             ObjectPlus(flip::Default& d) : model::Object(d) {}
             
-            ObjectPlus(std::string name, std::string text) : model::Object(name, text)
+            ObjectPlus(initInfos const& infos) : model::Object(infos)
             {
-                ;
+                const bool singleInlet = (infos.args.size() > 0 && infos.args[0].isNumber());
+                setNumberOfInlets(singleInlet ? 1 : 2);
+                setNumberOfOutlets(1);
             }
 
             //! @internal flip static declare method

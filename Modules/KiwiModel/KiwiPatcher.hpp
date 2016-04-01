@@ -63,16 +63,7 @@ namespace kiwi
             
             //! @brief Adds an object to the Patcher.
             //! @param object A unique pointer of object.
-            model::Object* addObject(std::unique_ptr<model::Object> object);
-            
-            //! @brief Constructs and add a Link to the Patcher.
-            //! @details Constructs a Link with given origin and destination Object pointers
-            //! and IO indexes then adds it in the Patcher.
-            //! @param from     The origin Object pointer.
-            //! @param outlet   The origin outlet index.
-            //! @param to       The destination Object pointer.
-            //! @param inlet    The destination inlet index.
-            //Link* addLink(model::Object& from, const uint32_t outlet, model::Object& to, const uint32_t inlet);
+            model::Object* addObject(std::unique_ptr<model::Object> && object);
             
             //! @brief Adds a Link to the Patcher.
             //! @param link A unique pointer of Link.

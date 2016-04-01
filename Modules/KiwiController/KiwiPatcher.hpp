@@ -45,22 +45,6 @@ namespace kiwi
          */
         class Patcher : public flip::DocumentObserver<model::Patcher>
         {
-        private:
-            Instance*           m_instance = nullptr;
-            model::Patcher*     m_model = nullptr;
-            
-            std::shared_ptr<flip::Document>              m_document;     // std::unique_ptr
-            std::shared_ptr<flip::History<flip::HistoryStoreMemory>>
-            m_history;
-            
-            std::vector<sObject>                         m_objects;
-            std::vector<sLink>                           m_links;
-                        
-            void document_changed(model::Patcher& patcher) override;
-            
-            //! Constructor.
-            Patcher(Instance* instance) noexcept;
-            
         public:
             
             //! Destructor.
@@ -81,7 +65,7 @@ namespace kiwi
             /** The function retrieves the objects from the patcher.
              @return A vector with the objects.
              */
-            inline std::vector<sObject> const& getObjects() noexcept
+            inline std::vector<std::unique_ptr<Object>> const& getObjects() noexcept
             {
                 return m_objects;
             }
@@ -90,13 +74,35 @@ namespace kiwi
             /** The function retrieves an object with an id.
              @param id   The id of the object.
              */
+            inline Object* getObjectByModel(const model::Object& object_model) const noexcept
+            {
+                for(auto& obj : m_objects)
+                {
+                    if(&obj.get()->m_model == &object_model)
+                        return obj.get();
+                }
+                
+                return nullptr;
+            }
+            
+            //! @brief Get an object from its model.
+            //! @param id   The id of the object.
             inline sObject getObjectWithId(const uint64_t ID) const noexcept
             {
                 return nullptr;
             }
             
             //! @brief Creates and add an object to the Patcher.
-            void addObject(std::string const& name, std::string const& text);
+            controller::Object* addObject(std::string const& name, std::string const& text = "");
+            
+            //! @brief Constructs and add a Link to the Patcher.
+            //! @details Constructs a Link with given origin and destination Object pointers
+            //! and IO indexes then adds it in the Patcher.
+            //! @param from     The origin Object pointer.
+            //! @param outlet   The origin outlet index.
+            //! @param to       The destination Object pointer.
+            //! @param inlet    The destination inlet index.
+            controller::Link* addLink(controller::Object& from, const uint32_t outlet, controller::Object& to, const uint32_t inlet);
             
             //! Free a object.
             /** The function removes a object from the patcher.
@@ -112,6 +118,7 @@ namespace kiwi
             void beginTransaction(std::string transaction_name)
             {
                 m_document->set_label(transaction_name);
+                std::cout << "* " << transaction_name << '\n';
             }
             
             //! Ends a transaction
@@ -125,26 +132,30 @@ namespace kiwi
             }
             
             //! Undo the last transaction and optionally commit
-            void undo(const bool commit = false)
-            {
-                m_history->execute_undo();
-                
-                if(commit)
-                {
-                    m_document->commit();
-                }
-            }
+            void undo(const bool commit = false);
             
             //! Redo the next transaction and optionally commit
-            void redo(const bool commit = false)
-            {
-                m_history->execute_redo();
-                
-                if(commit)
-                {
-                    m_document->commit();
-                }
-            }
+            void redo(const bool commit = false);
+            
+        private:
+            
+            void debug_document(model::Patcher& patcher);
+            
+            Instance*           m_instance = nullptr;
+            model::Patcher*     m_model = nullptr;
+            
+            std::unique_ptr<flip::Document>         m_document;     // std::unique_ptr
+            
+            std::unique_ptr<flip::History<flip::HistoryStoreMemory>>
+                                                    m_history;
+            
+            std::vector<std::unique_ptr<Object>>    m_objects;
+            std::vector<std::unique_ptr<Link>>      m_links;
+            
+            void document_changed(model::Patcher& patcher) override;
+            
+            //! Constructor.
+            Patcher(Instance* instance) noexcept;
         };
     }
 }

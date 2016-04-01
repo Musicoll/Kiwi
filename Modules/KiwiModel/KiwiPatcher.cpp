@@ -60,7 +60,7 @@ namespace kiwi
         }
         */
         
-        model::Object* Patcher::addObject(std::unique_ptr<model::Object> object)
+        model::Object* Patcher::addObject(std::unique_ptr<model::Object> && object)
         {
             if(object)
             {

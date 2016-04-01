@@ -61,13 +61,14 @@ namespace kiwi
             
             struct initInfos
             {
-                std::string         name;
-                std::string         text;
-                std::vector<Atom>   args;
+                const std::string         name;
+                const std::string         text;
+                const std::vector<Atom>   args;
                 
                 initInfos(std::string const& object_name, std::string const& object_text) :
                 name(object_name),
-                text(object_text)
+                text(object_text),
+                args(AtomHelper::parse(text))
                 {
                     ;
                 }
@@ -77,7 +78,7 @@ namespace kiwi
             Object(flip::Default&) {}
             
             //! @brief Constructor.
-            Object(std::string const& name, std::string const& text);
+            Object(initInfos const& infos);
             
             //! @brief Destructor.
             virtual ~Object() noexcept {}
@@ -137,8 +138,6 @@ namespace kiwi
             flip::String    m_text;
             flip::Int       m_number_of_inlets;
             flip::Int       m_number_of_outlets;
-            
-            //Object(Object const&) = delete;
         };
     }
 }

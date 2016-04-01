@@ -21,36 +21,16 @@
  ==============================================================================
 */
 
-#include "KiwiObject.hpp"
-#include "KiwiPatcher.hpp"
-#include "KiwiInstance.hpp"
+#include "KiwiObjectPlus.hpp"
 
 namespace kiwi
 {
     namespace controller
     {
         // ================================================================================ //
-        //                                      OBJECT                                      //
+        //                                  OBJECT PLUS                                     //
         // ================================================================================ //
         
-        Object::Object(model::Object& model) noexcept : m_model(model)
-        {
-            ;
-        }
         
-        Object::~Object() noexcept
-        {
-            ;
-        }
-        
-        void Object::output(uint32_t index, std::vector<Atom> args)
-        {
-            std::cout << "output method called \n";
-            
-            if(index < m_model.getNumberOfOutlets() && !args.empty())
-            {
-                ;
-            }
-        }
     }
 }

@@ -32,9 +32,9 @@ namespace kiwi
         //                                      OBJECT                                      //
         // ================================================================================ //
         
-        Object::Object(std::string const& name, std::string const& text) :
-        m_name(name),
-        m_text(text)
+        Object::Object(const initInfos& infos) :
+        m_name(infos.name),
+        m_text(infos.text)
         {
             ;
         }
