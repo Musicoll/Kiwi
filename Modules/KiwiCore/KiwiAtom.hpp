@@ -26,6 +26,7 @@
 
 #include <assert.h>
 #include <iostream>
+#include <sstream>
 #include <cstring>
 #include <memory>
 #include <vector>
@@ -394,7 +395,145 @@ namespace kiwi
     
     struct StringHelper
     {
-        static std::vector<Atom> toAtomVector(std::string const&);
+        static std::string unescape(std::string const& text)
+        {
+            bool state = false;
+            std::ostringstream ss;
+            for(const auto& iter : text)
+            {
+                if(state)
+                {
+                    switch(iter)
+                    {
+                        case '"': ss << '\"'; break;
+                        case '/': ss << '/'; break;
+                        case 'b': ss << '\b'; break;
+                        case 'f': ss << '\f'; break;
+                        case 'n': ss << '\n'; break;
+                        case 'r': ss << '\r'; break;
+                        case 't': ss << '\t'; break;
+                        case '\\': ss << '\\'; break;
+                        default: ss << iter; break;
+                    }
+                    state = false;
+                }
+                else
+                {
+                    switch(iter)
+                    {
+                        case '"':   { return ss.str(); }
+                        case '\\':  { state = true; break; }
+                        default:    { ss << iter; break; }
+                    }
+                }
+            }
+            return ss.str();
+        }
+    };
+    
+    struct AtomHelper
+    {
+        static std::vector<Atom> parse(std::string const& text)
+        {
+            std::vector<Atom> atoms;
+            const auto textlen = text.length();
+            auto pos = text.find_first_not_of(' ', 0);
+            
+            while(pos < textlen)
+            {
+                std::string word;
+                word.reserve(20); // is it more efficient ?
+                bool is_tag      = false;
+                bool is_number   = false;
+                bool is_float    = false;
+                bool is_negative = false;
+                bool is_quoted   = false;
+                
+                while(pos < textlen)
+                {
+                    const char c = text[pos];
+                    
+                    if(c == ' ')
+                    {
+                        if(!is_quoted)
+                        {
+                            if(word.empty()) // delete useless white spaces
+                            {
+                                pos++;
+                                continue;
+                            }
+                            else // preserve white space in quoted tags, otherwise break word
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    else if(c == '\"')
+                    {
+                        if(is_quoted) // closing quote
+                        {
+                            pos++;
+                            break;
+                        }
+                        
+                        if(word.empty()) // begin quote
+                        {
+                            pos++;
+                            
+                            // ignore if it can not be closed
+                            if(text.find_first_of('\"', pos) != std::string::npos)
+                                is_quoted = is_tag = true;
+                            
+                            continue;
+                        }
+                    }
+                    else if(!is_tag)
+                    {
+                        if(word.empty() && c == '-')
+                        {
+                            is_negative = true;
+                        }
+                        else if(!is_float && (word.empty() || is_number || is_negative) && c == '.')
+                        {
+                            is_float = true;
+                        }
+                        else if(isdigit(c) && (is_number || (word.empty() || is_negative || is_float)))
+                        {
+                            is_number = true;
+                        }
+                        else
+                        {
+                            is_tag = true;
+                            is_number = is_negative = is_float = false;
+                        }
+                    }
+                    
+                    word += c;
+                    pos++;
+                }
+                
+                if(!word.empty())
+                {
+                    if(is_number)
+                    {
+                        if(is_float)
+                        {
+                            atoms.emplace_back(std::stod(word.c_str()));
+                        }
+                        else
+                        {
+                            atoms.emplace_back(std::stol(word.c_str()));
+                        }
+                    }
+                    else
+                    {
+                        atoms.emplace_back(StringHelper::unescape(word));
+                    }
+                }
+            }
+            
+            return atoms;
+        }
     };
 }
 
