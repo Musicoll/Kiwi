@@ -38,24 +38,13 @@ namespace kiwi
         //                                      OBJECT                                      //
         // ================================================================================ //
         
-        //! The object is a graphical object.
-        /**
-         The object is a graphical class that aims to be instantiated in a patcher.
-         */
+        //! @brief The model::Object controller.
         class Object
         {
         public:
             friend class controller::Patcher;
             
-            struct Io
-            {
-                enum class Type : unsigned char
-                {
-                    Message = 0u,
-                    Signal  = 1u,
-                    Both    = 2u
-                };
-            };
+            using IoType = model::Object::IoType;
             
             class Iolet;
             class Inlet;
@@ -121,7 +110,7 @@ namespace kiwi
             using connection_vec_t  = std::vector<connection_t>;
             
             connection_vec_t    m_connections;
-            const Io::Type      m_type;
+            const IoType      m_type;
             
         public:
             //! Check if a connection is in the iolet.
@@ -149,7 +138,7 @@ namespace kiwi
             bool erase(Object* object, const uint32_t index) noexcept;
             
             //! Constructor.
-            inline Iolet(Io::Type type) noexcept : m_type(type) {}
+            inline Iolet(IoType type) noexcept : m_type(type) {}
             
             //! Destructor.
             inline ~Iolet() noexcept
@@ -161,7 +150,7 @@ namespace kiwi
             /** The functions retrieves the type of the iolet.
              @return The type of the iolet.
              */
-            inline Io::Type getType() const noexcept
+            inline IoType getType() const noexcept
             {
                 return m_type;
             }
@@ -212,7 +201,7 @@ namespace kiwi
             //! Constructor.
             /** You should never call this method except if you really know what you're doing.
              */
-            Inlet(Io::Type type) noexcept;
+            Inlet(IoType type) noexcept;
             
             //! Destructor.
             /** You should never call this method except if you really know what you're doing.
@@ -235,7 +224,7 @@ namespace kiwi
             /** You should never call this method except if you really know what you're doing.
              @param type        The type of the outlet.
              */
-            Outlet(Io::Type type) noexcept;
+            Outlet(IoType type) noexcept;
             
             //! Destructor.
             /** You should never call this method except if you really know what you're doing.

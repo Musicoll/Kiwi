@@ -124,7 +124,7 @@ namespace kiwi
         //                                      OUTLET                                      //
         // ================================================================================ //
         
-        Object::Outlet::Outlet(Io::Type type) noexcept :
+        Object::Outlet::Outlet(IoType type) noexcept :
         Iolet(type)
         {
             ;
@@ -166,7 +166,7 @@ namespace kiwi
         //                                      INLET                                       //
         // ================================================================================ //
         
-        Object::Inlet::Inlet(Io::Type type) noexcept :
+        Object::Inlet::Inlet(IoType type) noexcept :
         Iolet(type)
         {
             ;
@@ -186,25 +186,13 @@ namespace kiwi
             // populate inlets from model
             for(auto const& inlet : m_model.getInlets())
             {
-                switch(inlet.getType())
-                {
-                    case model::Object::IoType::Message:    { m_inlets.emplace_back(Io::Type::Message); break; }
-                    case model::Object::IoType::Signal:     { m_inlets.emplace_back(Io::Type::Signal); break; }
-                    case model::Object::IoType::Both:       { m_inlets.emplace_back(Io::Type::Both); break; }
-                    default: break;
-                }
+                m_outlets.emplace_back(inlet.getType());
             }
             
             // populate outlets from model
-            for(auto const& inlet : m_model.getInlets())
+            for(auto const& outlet : m_model.getOutlets())
             {
-                switch(inlet.getType())
-                {
-                    case model::Object::IoType::Message:    { m_inlets.emplace_back(Io::Type::Message); break; }
-                    case model::Object::IoType::Signal:     { m_inlets.emplace_back(Io::Type::Signal); break; }
-                    case model::Object::IoType::Both:       { m_inlets.emplace_back(Io::Type::Both); break; }
-                    default: break;
-                }
+                m_outlets.emplace_back(outlet.getType());
             }
         }
         
