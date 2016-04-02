@@ -38,71 +38,46 @@ namespace kiwi
         {
         public:
             
-            using patcher_container_t = std::vector<std::unique_ptr<Patcher>>;
+            using patchers_t = std::vector<std::unique_ptr<Patcher>>;
             
-            //! The constructor.
-            /** You should never use this method.
-             @param guiDevice The gui device manager.
-             @param dspDevice The dsp device manager.
-             @param name      The instance name.
-             */
-            Instance(uint64_t user_id, std::string const& name) noexcept;
-            
-            //! The destructor.
-            ~Instance();
-            
-            //! The instance creation method.
-            /** The function allocates an instance and initialize the prototypes of objects.
-             @param guiDevice The gui device manager.
-             @param dspDevice The dsp device manager.
-             @param name      The instance name.
-             @return          The instance.
-             */
+            //! @brief Creates and returns an Instance.
+            //! @param user_id The user ID.
+            //! @param name The instance name.
+            //! @return A new instance.
             static std::unique_ptr<Instance> create(uint64_t user_id, std::string const& name);
             
-            //! Retrieve the name of the instance.
-            /** The function retrieves the name of the instance.
-             @return The name of the instance.
-             */
-            inline std::string getName() const
-            {
-                return m_name;
-            }
+            //! @brief Destructor.
+            ~Instance();
             
-            /** Returns the user id of the instance.
-             @return The user id.
-             */
-            inline uint64_t getUserId() const noexcept
-            {
-                return m_user_id;
-            }
+            //! @brief Get the name of the Instance.
+            inline std::string getName() const          { return m_name; }
             
-            //! Create a patcher with a dict.
-            /** The function creates a patcher with a dict.
-             @param dico The dico that defines of the patcher.
-             @return The patcher.
-             @see removePatcher, getPatchers
-             */
+            //! @brief Get the user ID of the Instance.
+            inline uint64_t getUserId() const noexcept  { return m_user_id; }
+            
+            //! @brief Creates and adds a new patcher to the Instance.
+            //! @return A reference to the created Patcher.
+            //! @see removePatcher, getPatchers
             Patcher& createPatcher();
             
-            //! Close a patcher.
-            /** The function closes patcher.
-             @param patcher The patcher.
-             @see createPatcher, getPatchers
-             */
+            //! @brief Removes a patcher from the Instance.
+            //! @param patcher The patcher to remove.
+            //! @see createPatcher, getPatchers
             void removePatcher(Patcher* patcher);
             
-            //! Retreive all the patchers of the instance.
-            /** The function retreives all the patchers of the instance.
-             @return A vector of patchers.
-             @see createPatcher, removePatcher
-             */
-            patcher_container_t const& getPatchers();
+            //! @brief Get the patchers of the Instance.
+            //! @return A vector of patchers.
+            //! @see createPatcher, removePatcher
+            patchers_t const& getPatchers();
             
         private:
+            
+            //! @internal Constructor.
+            Instance(uint64_t user_id, std::string const& name) noexcept;
+            
             const uint64_t          m_user_id;
             const std::string       m_name;
-            patcher_container_t     m_patchers;
+            patchers_t              m_patchers;
             
             static bool             m_declared_flag;
             

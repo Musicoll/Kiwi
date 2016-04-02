@@ -69,13 +69,19 @@ namespace kiwi
         
         void Instance::removePatcher(Patcher* patcher)
         {
-            bool success = false;
+            const auto it = std::find_if(m_patchers.begin(), m_patchers.end(),
+                                         [patcher](patchers_t::value_type const& p) -> bool
             {
-                //success = m_patchers.erase(patcher);
+                return (patcher == p.get());
+            });
+            
+            if (it != m_patchers.cend())
+            {
+                m_patchers.erase(it);
             }
         }
         
-        auto Instance::getPatchers() -> patcher_container_t const&
+        auto Instance::getPatchers() -> patchers_t const&
         {
             return m_patchers;
         }
