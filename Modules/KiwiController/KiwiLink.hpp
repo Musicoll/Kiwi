@@ -34,10 +34,7 @@ namespace kiwi
         //                                      LINK                                        //
         // ================================================================================ //
         
-        //! The link is used to create a connection between objects.
-        /**
-         The link is a combination of two sockets used to create the connection between objects in a patcher.
-         */
+        //! @brief The link holds a connection between two objects.
         class Link
         {
         public:
@@ -54,28 +51,16 @@ namespace kiwi
             //! @brief Get the Patcher model
             inline model::Link const& getModel() const { return m_model; }
             
-            //! Retrieve the output object.
-            /** The function retrieves the output object of the link.
-             @return The output object.
-             */
+            //! @brief Get the object that send messages.
             inline Object* getObjectFrom() const noexcept   { return m_object_from; }
             
-            //! Retrieve the input object.
-            /** The function retrieves the input object of the link.
-             @return The input object.
-             */
+            //! @brief Get the object that receive messages.
             inline Object* getObjectTo() const noexcept     { return m_object_to; }
             
-            //! Retrieve the index of the outlet of the link.
-            /** The function retrieves the index of the outlet of the link.
-             @return The index of the outlet of the link.
-             */
+            //! @brief Retrieve the index of the outlet of the link.
             inline uint32_t getOutletIndex() const noexcept { return m_model.getOutletIndex(); }
             
-            //! Retrieve the index of the inlet of the link.
-            /** The function retrieves the index of the inlet of the link.
-             @return The index of the inlet of the link.
-             */
+            //! @brief Retrieve the index of the inlet of the link.
             inline uint32_t getInletIndex() const noexcept  { return m_model.getInletIndex(); }
             
         private:
