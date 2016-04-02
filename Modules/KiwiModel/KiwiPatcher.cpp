@@ -38,8 +38,8 @@ namespace kiwi
         
         Patcher::~Patcher()
         {
-            m_objects.clear();
             m_links.clear();
+            m_objects.clear();
         }
         
         model::Object* Patcher::addObject(std::unique_ptr<model::Object> && object)
@@ -64,7 +64,7 @@ namespace kiwi
             return nullptr;
         }
         
-        void Patcher::removeObject(model::Object& object)
+        void Patcher::removeObject(model::Object const& object)
         {
             auto predicate = [&object](model::Object const& obj)
             {
@@ -78,7 +78,7 @@ namespace kiwi
             }
         }
         
-        void Patcher::removeLink(model::Link& link)
+        void Patcher::removeLink(model::Link const& link)
         {
             auto predicate = [&link](model::Link const& link_compare)
             {

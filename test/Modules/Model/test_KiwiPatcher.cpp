@@ -46,12 +46,8 @@ TEST_CASE("model", "[model]")
     patcher.beginTransaction("Add Object \"plus\"");
     
     auto obj_plus = patcher.addObject("plus");
-    CHECK(obj_plus->getText() == "");
-    CHECK(obj_plus->getNumberOfInlets() == 2);
-    
-    //obj_plus->receive(0, {30});
-    //obj_plus->receive(1, {100});
-    //obj_plus->receive(0, {400});
+    //CHECK(obj_plus->getText() == "");
+    //CHECK(obj_plus->getNumberOfInlets() == 2);
     
     auto obj_plus_2 = patcher.addObject("plus", "10");
     //CHECK(obj_plus_2->getText() == "10");
@@ -60,9 +56,7 @@ TEST_CASE("model", "[model]")
     auto link_1 = patcher.addLink(*obj_plus, 0, *obj_plus_2, 0);
     
     obj_plus->receive(0, {"bang"}); // output 10
-    
     obj_plus->receive(1, {10});
-    
     obj_plus->receive(0, {"bang"}); // output 20
     
     auto link_2 = patcher.addLink(*obj_plus_2, 0, *obj_plus, 1);
@@ -80,6 +74,6 @@ TEST_CASE("model", "[model]")
     
     patcher.endTransaction();
     
-    patcher.undo(true);
-    patcher.redo(true);
+    //patcher.undo(true);
+    //patcher.redo(true);
 }

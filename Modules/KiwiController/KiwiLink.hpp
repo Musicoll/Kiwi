@@ -46,7 +46,13 @@ namespace kiwi
             Link(model::Link& model, Object* from, Object* to);
             
             //! @brief Destructor.
-            virtual ~Link();
+            ~Link();
+            
+            //! @brief Get the Patcher model
+            inline model::Link& getModel() { return m_model; }
+            
+            //! @brief Get the Patcher model
+            inline model::Link const& getModel() const { return m_model; }
             
             //! Retrieve the output object.
             /** The function retrieves the output object of the link.

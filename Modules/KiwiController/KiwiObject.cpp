@@ -35,7 +35,7 @@ namespace kiwi
         
         Object const* Object::Iolet::getObject(const uint32_t index) const noexcept
         {
-            const auto idx = static_cast<connection_vec_t::size_type>(index);
+            const auto idx = static_cast<connections_t::size_type>(index);
             
             if(idx < m_connections.size())
             {
@@ -47,7 +47,7 @@ namespace kiwi
         
         Object* Object::Iolet::getObject(const uint32_t index) noexcept
         {
-            const auto idx = static_cast<connection_vec_t::size_type>(index);
+            const auto idx = static_cast<connections_t::size_type>(index);
             
             if(idx < m_connections.size())
             {
@@ -60,7 +60,7 @@ namespace kiwi
         
         uint32_t Object::Iolet::getIndex(const uint32_t index) const noexcept
         {
-            const auto idx = static_cast<connection_vec_t::size_type>(index);
+            const auto idx = static_cast<connections_t::size_type>(index);
             
             if(idx < m_connections.size())
             {
@@ -74,9 +74,9 @@ namespace kiwi
         {
             if(object)
             {
-                const auto idx = static_cast<connection_vec_t::size_type>(index);
+                const auto idx = static_cast<connections_t::size_type>(index);
                 
-                const auto it = std::find_if(m_connections.begin(), m_connections.end(), [&idx, object](connection_t const& con)
+                const auto it = std::find_if(m_connections.begin(), m_connections.end(), [&idx, object](connections_t::value_type const& con)
                 {
                     return (idx == con.second && object == con.first);
                 });
@@ -87,7 +87,7 @@ namespace kiwi
             return false;
         }
         
-        bool Object::Iolet::append(Object* object, const uint32_t index) noexcept
+        bool Object::Iolet::append(Object* object, const uint32_t index)
         {
             if(object && !has(object, index))
             {
@@ -99,25 +99,49 @@ namespace kiwi
             return false;
         }
         
-        bool Object::Iolet::erase(Object* object, uint32_t index) noexcept
+        bool Object::Iolet::erase(controller::Object* object, uint32_t index)
         {
-            if(object)
+            std::cout << "Iolet::erase" << '\n';
+            std::cout << "- has " << m_connections.size() << " connections" << '\n';
+            
+            std::cout << "- has connection : " << has(object, index) << '\n';
+            
+            const auto idx = static_cast<connections_t::size_type>(index);
+            
+            for(auto it = m_connections.begin(); it != m_connections.end(); ++it)
             {
-                const auto idx = static_cast<connection_vec_t::size_type>(index);
-                
-                const auto connection_exists = [&idx, object](connection_t const& con)
-                {
-                    return (idx == con.second && object == con.first);
-                };
-                
-                const auto it = std::find_if(m_connections.begin(), m_connections.end(), connection_exists);
-                
-                if(it != m_connections.end())
+                //std::cout << "- it->second = " << it->second << '\n';
+                if(it->second == idx && object == it->first)
                 {
                     m_connections.erase(it);
+                    std::cout << "- has " << m_connections.size() << " connections" << '\n';
                     return true;
                 }
             }
+            
+            /*
+            if(object && !m_connections.empty())
+            {
+                const auto idx = static_cast<connections_t::size_type>(index);
+                
+                const auto connection_exists = [&idx, object](connections_t::value_type const& con)
+                {
+                    return (object == con.first && idx == con.second);
+                };
+                
+                const auto it = std::find_if(m_connections.begin(), m_connections.end(), connection_exists);
+                if(it != m_connections.cend())
+                {
+                    m_connections.erase(it);
+                    
+                    std::cout << "- has " << m_connections.size() << " connections" << '\n';
+                    return true;
+                }
+            }
+            */
+            
+            std::cout << "- fail to erase Iolet" << '\n';
+            
             return false;
         }
         
@@ -133,11 +157,12 @@ namespace kiwi
         
         Object::Outlet::~Outlet()
         {
-            ;
+            m_connections.clear();
         }
         
         void Object::Outlet::send(std::vector<Atom> const& atoms) const noexcept
         {
+            std::cout << "- has " << m_connections.size() << " connections" << '\n';
             for(auto& connection : m_connections)
             {
                 Object* const receiver = connection.first;
@@ -175,7 +200,7 @@ namespace kiwi
         
         Object::Inlet::~Inlet()
         {
-            ;
+            m_connections.clear();
         }
         
         // ================================================================================ //
@@ -199,7 +224,8 @@ namespace kiwi
         
         Object::~Object() noexcept
         {
-            ;
+            m_inlets.clear();
+            m_outlets.clear();
         }
         
         Object::Inlet* Object::getInlet(const uint32_t index) noexcept

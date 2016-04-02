@@ -106,16 +106,16 @@ namespace kiwi
         {
         public:
             
-            using connection_t      = std::pair<Object*, uint32_t>;
-            using connection_vec_t  = std::vector<connection_t>;
+            using connections_t  = std::vector<std::pair<Object*, uint32_t>>;
             
             //! @brief Constructor.
             inline Iolet(IoType type) noexcept : m_type(type) {}
             
             //! @brief Destructor.
-            inline ~Iolet() noexcept
+            virtual ~Iolet() noexcept
             {
-                m_connections.clear();
+                // m_connections is cleared by Inlet and Outlet classes
+                // m_connections.clear();
             }
             
             //! @brief Returns the IoType of the iolet.
@@ -153,18 +153,18 @@ namespace kiwi
             //! @param object A pointer to the Object to which the iolet belongs.
             //! @param index the iolet's index.
             //! @return true if the connection has been added, otherwise false.
-            bool append(Object* object, const uint32_t index) noexcept;
+            bool append(Object* object, const uint32_t index);
             
             //! @brief Remove a connection from the iolet.
             //! @param object A pointer to the Object to which the iolet belongs.
             //! @param index the iolet's index.
             //! @return true if the connection has been removed, otherwise false.
-            bool erase(Object* object, const uint32_t index) noexcept;
+            bool erase(Object* object, const uint32_t index);
             
         protected:
             
-            connection_vec_t    m_connections;
-            const IoType        m_type;
+            connections_t   m_connections;
+            const IoType    m_type;
         };
         
         // ================================================================================ //

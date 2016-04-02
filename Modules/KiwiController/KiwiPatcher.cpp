@@ -37,21 +37,21 @@ namespace kiwi
         Patcher::Patcher(Instance& instance) noexcept : m_instance(instance)
         {
             // Set up a document
-            m_document = std::unique_ptr<flip::Document>(new flip::Document(model::Model::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'));
+            m_document = document_t(new flip::Document(model::Model::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'));
             
             // Set up an history for this document
-            m_history = std::unique_ptr<flip::History<flip::HistoryStoreMemory>>(new flip::History<flip::HistoryStoreMemory>(*m_document.get()));
-            
-            // Get our document's root model
-            //m_model = m_document->root<model::Patcher>();
+            m_history = history_t(new flip::History<flip::HistoryStoreMemory>(*m_document.get()));
             
             m_document->commit();
         }
         
         Patcher::~Patcher()
         {
-            m_objects.clear();
             m_links.clear();
+            m_objects.clear();
+            
+            m_history.reset();
+            m_document.reset();
         }
         
         std::unique_ptr<Patcher> Patcher::create(Instance& instance)
@@ -65,8 +65,7 @@ namespace kiwi
             if(name == "plus" || name == "+")
             {
                 model::Object::initInfos infos{name, text};
-                auto uptr_object = std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus(infos));
-                auto& obj = *getModel().addObject(std::move(uptr_object));
+                auto& obj = *getModel().addObject(std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus(infos)));
                 
                 return addObjectController<controller::ObjectPlus, model::ObjectPlus>(obj, infos.args);
             }
@@ -94,9 +93,27 @@ namespace kiwi
             return nullptr;
         }
         
-        void Patcher::remove(Object* object)
+        void Patcher::removeObject(Object* object)
         {
             ;
+        }
+        
+        void Patcher::removeLink(Link* link)
+        {
+            if(link)
+            {
+                auto it = find_if(m_links.begin(), m_links.end(), [link](link_container_t::value_type const& p)
+                {
+                    return (link == p.get());
+                });
+                
+                if(it != m_links.end())
+                {
+                    m_links.erase(it);
+                }
+                
+                getModel().removeLink(link->getModel());
+            }
         }
         
         void Patcher::undo(const bool commit)
@@ -234,8 +251,6 @@ namespace kiwi
                                     addObjectController<controller::ObjectPlus, model::ObjectPlus>(obj, args);
                                 }
                             }
-                            
-                            //createControllerForModel(obj);
                         }
                         else if(obj.removed())
                         {

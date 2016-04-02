@@ -93,7 +93,11 @@ namespace kiwi
             Object(initInfos const& infos);
             
             //! @brief Destructor.
-            virtual ~Object() noexcept {}
+            virtual ~Object()
+            {
+                m_inlets.clear();
+                m_outlets.clear();
+            }
             
             //! @internal flip static declare method
             template<class TModel> static void declare();
@@ -123,16 +127,14 @@ namespace kiwi
             //! @brief Retrieves the inlets of the Object.
             flip::Array<Iolet> const& getInlets() const noexcept { return m_inlets; }
             
-            /*
             //! @brief Removes the rightmost inlet of the Object.
             void removeInlet()
             {
                 if(m_inlets.cbegin() != m_inlets.cend())
                 {
-                    m_inlets.erase(m_inlets.rbegin());
+                    m_inlets.erase(--m_inlets.end());
                 }
             }
-            */
             
             //! @brief Adds an outlet to the Object.
             //! @param type The type of output this outlet accepts.
@@ -144,16 +146,16 @@ namespace kiwi
             //! @brief Retrieves the inlets of the Object.
             flip::Array<Iolet> const& getOutlets() const noexcept { return m_outlets; }
             
-            /*
+            
             //! @brief Removes the rightmost outlet of the Object.
             void removeOutlet()
             {
                 if(m_outlets.cbegin() != m_outlets.cend())
                 {
-                    m_outlets.erase(m_outlets.crbegin());
+                    m_outlets.erase(--m_outlets.end());
                 }
             }
-            */
+            
             
             //! @brief Returns the number of outlets.
             //! @return The number of outlets.

@@ -38,10 +38,10 @@ namespace kiwi
         m_object_from(from),
         m_object_to(to)
         {
-            const auto from_idx = m_model.getOutletIndex();
-            const auto to_idx   = m_model.getInletIndex();
-            controller::Object::Outlet* outlet = m_object_from->getOutlet(from_idx);
-            controller::Object::Inlet* inlet   = m_object_to->getInlet(to_idx);
+            const auto  from_idx = m_model.getOutletIndex();
+            const auto  to_idx   = m_model.getInletIndex();
+            auto* const outlet   = m_object_from->getOutlet(from_idx);
+            auto* const inlet    = m_object_to->getInlet(to_idx);
 
             if(outlet && inlet)
             {
@@ -52,22 +52,22 @@ namespace kiwi
         
         Link::~Link()
         {
-            Object*     from    = getObjectFrom();
-            Object*     to      = getObjectTo();
-            if(from && to)
+            if(m_object_from && m_object_to)
             {
-                /*
-                 Object::sOutlet outlet  = from->getOutlet(m_index_outlet);
-                 if(outlet)
-                 {
-                 outlet->erase(to, m_index_outlet);
-                 }
-                 Object::sInlet inlet    = to->getInlet(m_index_intlet);
-                 if(inlet)
-                 {
-                 inlet->erase(from, m_index_intlet);
-                 }
-                 */
+                const auto  from_idx = m_model.getOutletIndex();
+                const auto  to_idx   = m_model.getInletIndex();
+                auto* const outlet   = m_object_from->getOutlet(from_idx);
+                auto* const inlet    = m_object_to->getInlet(to_idx);
+                
+                if(inlet)
+                {
+                    inlet->erase(m_object_from, from_idx);
+                }
+                
+                if(outlet)
+                {
+                    outlet->erase(m_object_to, to_idx);
+                }
             }
         }
     }

@@ -71,11 +71,11 @@ namespace kiwi
             
             //! @brief Removes an object from the Patcher.
             //! @param obj A reference to the object to remove.
-            void removeObject(model::Object& obj);
+            void removeObject(model::Object const& obj);
             
             //! @brief Removes a link from the Patcher.
             //! @param link A reference to the link to remove.
-            void removeLink(model::Link& link);
+            void removeLink(model::Link const& link);
             
             //! @brief Returns true if an Object has been added, removed or changed.
             inline bool objectsChanged() const noexcept { return m_objects.changed(); }

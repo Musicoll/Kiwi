@@ -50,9 +50,11 @@ namespace kiwi
             
             void receive(uint32_t index, std::vector<Atom> args) override
             {
+                /*
                 std::cout << "objectPlus receive msg : {"
                 << AtomHelper::toString(args)
                 << "} in inlet " << index << '\n';
+                */
                 
                 if(args.size() > 0)
                 {
