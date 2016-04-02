@@ -38,16 +38,7 @@ namespace kiwi
         {
         public:
             
-        private:
-            const uint64_t          m_user_id;
-            const std::string       m_name;
-            std::set<sPatcher>      m_patchers;
-            
-            static bool m_declared_flag;
-            
-            static void declare();
-            
-        public:
+            using patcher_container_t = std::vector<std::unique_ptr<Patcher>>;
             
             //! The constructor.
             /** You should never use this method.
@@ -58,8 +49,6 @@ namespace kiwi
             Instance(uint64_t user_id, std::string const& name) noexcept;
             
             //! The destructor.
-            /** You should never use this method.
-             */
             ~Instance();
             
             //! The instance creation method.
@@ -75,7 +64,7 @@ namespace kiwi
             /** The function retrieves the name of the instance.
              @return The name of the instance.
              */
-            inline std::string getName() const noexcept
+            inline std::string getName() const
             {
                 return m_name;
             }
@@ -94,21 +83,30 @@ namespace kiwi
              @return The patcher.
              @see removePatcher, getPatchers
              */
-            sPatcher createPatcher();
+            Patcher& createPatcher();
             
             //! Close a patcher.
             /** The function closes patcher.
              @param patcher The patcher.
              @see createPatcher, getPatchers
              */
-            void removePatcher(sPatcher patcher);
+            void removePatcher(Patcher* patcher);
             
             //! Retreive all the patchers of the instance.
             /** The function retreives all the patchers of the instance.
              @return A vector of patchers.
              @see createPatcher, removePatcher
              */
-            std::vector<sPatcher> getPatchers();
+            patcher_container_t const& getPatchers();
+            
+        private:
+            const uint64_t          m_user_id;
+            const std::string       m_name;
+            patcher_container_t     m_patchers;
+            
+            static bool             m_declared_flag;
+            
+            static void declare();
         };
     }
 }

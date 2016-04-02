@@ -56,25 +56,18 @@ namespace kiwi
             if(m_declared_flag) return;
             
             // define current model version :
-            model::Model::init("1.0_dev");
+            model::Model::init("v0.0.1");
             
             m_declared_flag = true;
         }
         
-        sPatcher Instance::createPatcher()
+        Patcher& Instance::createPatcher()
         {
-            auto success = false;
-            sPatcher patcher = Patcher::create(this);
-            
-            if(patcher)
-            {
-                success = m_patchers.insert(patcher).second;
-            }
-            
-            return patcher;
+            auto it = m_patchers.emplace(m_patchers.cend(), Patcher::create(*this));
+            return *it->get();
         }
         
-        void Instance::removePatcher(sPatcher patcher)
+        void Instance::removePatcher(Patcher* patcher)
         {
             bool success = false;
             {
@@ -82,10 +75,9 @@ namespace kiwi
             }
         }
         
-        std::vector<sPatcher> Instance::getPatchers()
+        auto Instance::getPatchers() -> patcher_container_t const&
         {
-            return std::vector<sPatcher>();
-            //return std::vector<sPatcher>(m_patchers.begin(), m_patchers.end());
+            return m_patchers;
         }
     }
 }

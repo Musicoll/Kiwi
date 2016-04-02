@@ -188,11 +188,11 @@ public:
 TEST_CASE("model", "[model]")
 {
     auto instance = controller::Instance::create(123456789ULL, "kiwi");
-    auto patcher = instance->createPatcher();
+    auto& patcher = instance->createPatcher();
     
-    patcher->beginTransaction("Add Object \"plus\"");
+    patcher.beginTransaction("Add Object \"plus\"");
     
-    auto obj_plus = patcher->addObject("plus", "12");
+    auto obj_plus = patcher.addObject("plus", "12");
     CHECK(obj_plus->getText() == "12");
     CHECK(obj_plus->getNumberOfInlets() == 1);
     
@@ -200,18 +200,18 @@ TEST_CASE("model", "[model]")
     obj_plus->receive(1, {100});
     obj_plus->receive(0, {400});
     
-    auto obj_plus_2 = patcher->addObject("plus");
+    auto obj_plus_2 = patcher.addObject("plus");
     CHECK(obj_plus_2->getText() == "");
     CHECK(obj_plus_2->getNumberOfInlets() == 2);
     
-    auto obj_plus_3 = patcher->addObject("plus", "1 44 ZOZO");
+    auto obj_plus_3 = patcher.addObject("plus", "1 44 ZOZO");
     CHECK(obj_plus_3->getText() == "1 44 ZOZO");
     CHECK(obj_plus_3->getNumberOfInlets() == 1);
     
-    patcher->endTransaction();
+    patcher.endTransaction();
     
-    patcher->undo(true);
-    patcher->redo(true);
+    patcher.undo(true);
+    patcher.redo(true);
     
     /*
     PatcherObserver     observer;

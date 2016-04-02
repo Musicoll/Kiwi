@@ -31,33 +31,8 @@ namespace kiwi
 {
     namespace controller
     {
-        // ================================================================================ //
-        //                                      DEFINES                                     //
-        // ================================================================================ //
-        
-        class Object;
-        typedef std::shared_ptr<Object>          sObject;
-        typedef std::weak_ptr<Object>            wObject;
-        typedef std::shared_ptr<const Object>    scObject;
-        typedef std::weak_ptr<const Object>      wcObject;
-        
-        class Link;
-        typedef std::shared_ptr<Link>            sLink;
-        typedef std::shared_ptr<const Link>      scLink;
-        typedef std::weak_ptr<Link>              wLink;
-        typedef std::weak_ptr<const Link>        wcLink;
-        
         class Patcher;
-        typedef std::shared_ptr<Patcher>        sPatcher;
-        typedef std::weak_ptr<Patcher>          wPatcher;
-        typedef std::shared_ptr<const Patcher>  scPatcher;
-        typedef std::weak_ptr<const Patcher>    wcPatcher;
-        
         class Instance;
-        typedef std::shared_ptr<Instance>        sInstance;
-        typedef std::weak_ptr<Instance>          wInstance;
-        typedef std::shared_ptr<const Instance>  scInstance;
-        typedef std::weak_ptr<const Instance>    wcInstance;
         
         // ================================================================================ //
         //                                      OBJECT                                      //
@@ -70,7 +45,7 @@ namespace kiwi
         class Object
         {
         public:
-            friend class Patcher;
+            friend class controller::Patcher;
             
             struct Io
             {
@@ -96,7 +71,7 @@ namespace kiwi
             /** The function retrieves the patcher that manages the object.
              @return The patcher that manages the object.
              */
-            inline sPatcher getPatcher() const              { return m_patcher.lock(); }
+            inline controller::Patcher* getPatcher() const  { return m_patcher; }
             
             //! Retrieve the name of the object.
             /** The function retrieves the name of the object as a tag.
@@ -126,9 +101,9 @@ namespace kiwi
             //! @brief Send a message to at a given outlet index.
             void send(const uint32_t index, std::vector<Atom> args);
             
-        private:            
-            wPatcher                m_patcher;
+        private:
             model::Object&          m_model;
+            controller::Patcher*    m_patcher;
             
             std::vector<Outlet>     m_outlets;
             std::vector<Inlet>      m_inlets;

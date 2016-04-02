@@ -34,21 +34,18 @@ namespace kiwi
         // ================================================================================ //
         
         //Patcher::Patcher(sInstance instance, PatcherModel& model) noexcept : m_instance(instance), m_model(model)
-        Patcher::Patcher(Instance* instance) noexcept : m_instance(instance)
+        Patcher::Patcher(Instance& instance) noexcept : m_instance(instance)
         {
-            if(m_instance != nullptr)
-            {
-                // Set up a document
-                m_document = std::unique_ptr<flip::Document>(new flip::Document(model::Model::use(), *this, m_instance->getUserId(), 'cicm', 'kpat'));
-                
-                // Set up an history for this document
-                m_history = std::unique_ptr<flip::History<flip::HistoryStoreMemory>>(new flip::History<flip::HistoryStoreMemory>(*m_document.get()));
-                
-                // Get our document's root model
-                m_model = &m_document->root<model::Patcher>();
-                
-                m_document->commit();
-            }
+            // Set up a document
+            m_document = std::unique_ptr<flip::Document>(new flip::Document(model::Model::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'));
+            
+            // Set up an history for this document
+            m_history = std::unique_ptr<flip::History<flip::HistoryStoreMemory>>(new flip::History<flip::HistoryStoreMemory>(*m_document.get()));
+            
+            // Get our document's root model
+            //m_model = m_document->root<model::Patcher>();
+            
+            m_document->commit();
         }
         
         Patcher::~Patcher()
@@ -57,7 +54,7 @@ namespace kiwi
             m_links.clear();
         }
         
-        std::unique_ptr<Patcher> Patcher::create(Instance* instance)
+        std::unique_ptr<Patcher> Patcher::create(Instance& instance)
         {
             std::unique_ptr<Patcher> patcher(new Patcher(instance));
             return patcher;
@@ -71,7 +68,7 @@ namespace kiwi
             {
                 model::Object::initInfos infos{name, text};
                 uptr_object = std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus(infos));
-                auto& obj = *m_model->addObject(std::move(uptr_object));
+                auto& obj = *getModel().addObject(std::move(uptr_object));
                 
                 std::unique_ptr<controller::Object> uptr_object_ctrl = std::unique_ptr<controller::ObjectPlus>(new controller::ObjectPlus(static_cast<model::ObjectPlus&>(obj), infos.args));
                 auto saved_uptr_object_ctrl = uptr_object_ctrl.get();
@@ -92,7 +89,7 @@ namespace kiwi
             {
                 auto& model_from = from.m_model;
                 auto& model_to = to.m_model;
-                auto& link_model = *m_model->addLink(std::unique_ptr<model::Link>(new model::Link(model_from, outlet, model_to, inlet)));
+                auto& link_model = *getModel().addLink(std::unique_ptr<model::Link>(new model::Link(model_from, outlet, model_to, inlet)));
                 
                 auto uptr_link_ctrl = std::unique_ptr<controller::Link>(new controller::Link(link_model, &from, &to));
                 auto saved_uptr_link_ctrl = uptr_link_ctrl.get();
@@ -103,7 +100,7 @@ namespace kiwi
             return nullptr;
         }
         
-        void Patcher::remove(sObject object)
+        void Patcher::remove(Object* object)
         {
             ;
         }

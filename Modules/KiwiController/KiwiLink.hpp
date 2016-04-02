@@ -56,13 +56,13 @@ namespace kiwi
             /** The function retrieves the output object of the link.
              @return The output object.
              */
-            inline Object* getObjectFrom() const noexcept   { return m_object_from.get(); }
+            inline Object* getObjectFrom() const noexcept   { return m_object_from; }
             
             //! Retrieve the input object.
             /** The function retrieves the input object of the link.
              @return The input object.
              */
-            inline Object* getObjectTo() const noexcept     { return m_object_to.get(); }
+            inline Object* getObjectTo() const noexcept     { return m_object_to; }
             
             //! Retrieve the index of the outlet of the link.
             /** The function retrieves the index of the outlet of the link.
@@ -78,8 +78,8 @@ namespace kiwi
             
         private:
             model::Link&    m_model;
-            sObject         m_object_from;
-            sObject         m_object_to;
+            Object*         m_object_from;
+            Object*         m_object_to;
         };
     }
 }
