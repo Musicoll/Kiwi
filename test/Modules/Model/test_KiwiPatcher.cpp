@@ -62,6 +62,6 @@ TEST_CASE("Patcher", "[patcher]")
     
     patcher.endTransaction();
     
-    //patcher.undo(true);
-    //patcher.redo(true);
+    patcher.undo(true);
+    patcher.redo(true);
 }

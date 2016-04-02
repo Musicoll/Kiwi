@@ -169,17 +169,29 @@ namespace kiwi
                     {
                         if(link.added())
                         {
-                            /*
-                             auto* from = getCtrlForModel(link.getObjectFrom());
-                             auto* to = getCtrlFromID(link.getObjectTo().ref());
-                             auto link_ctrl = controller::Link(link, from, to);
-                             m_links.push_back(link_ctrl);
-                             */
-                            //createControllerForModel(link);
+                            auto link_ptr = getLink(link);
+                            if(link_ptr == nullptr)
+                            {
+                                auto* from = getObject(link.getObjectFrom());
+                                auto* to = getObject(link.getObjectTo());
+                                
+                                if(from && to)
+                                {
+                                    m_links.emplace(m_links.cend(), std::unique_ptr<controller::Link>(new controller::Link(link, from, to)));
+                                }
+                            }
                         }
                         else if(link.removed())
                         {
-                            //removeControllerForModel(link);
+                            const auto it = std::find_if(m_links.begin(), m_links.end(), [&link](std::unique_ptr<controller::Link>& ctrl)
+                            {
+                                return (&ctrl.get()->getModel() == &link);
+                            });
+                            
+                            if(it != m_links.cend())
+                            {
+                                m_links.erase(it);
+                            }
                         }
                     }
                 }
@@ -190,7 +202,7 @@ namespace kiwi
                     {
                         if(obj.added())
                         {
-                            auto obj_ptr = getObjectByModel(obj);
+                            auto obj_ptr = getObject(obj);
                             if(obj_ptr == nullptr)
                             {
                                 const auto name = obj.getName();
@@ -208,12 +220,12 @@ namespace kiwi
                         }
                         else if(obj.removed())
                         {
-                            auto it = std::find_if(m_objects.begin(), m_objects.end(), [&obj](std::unique_ptr<controller::Object>& ctrl)
+                            const auto it = std::find_if(m_objects.begin(), m_objects.end(), [&obj](std::unique_ptr<controller::Object>& ctrl)
                             {
                                 return (&ctrl.get()->m_model == &obj);
                             });
                             
-                            if(it != m_objects.end())
+                            if(it != m_objects.cend())
                             {
                                 m_objects.erase(it);
                             }

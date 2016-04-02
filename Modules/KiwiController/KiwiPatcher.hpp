@@ -70,22 +70,37 @@ namespace kiwi
             //! @return A const reference to the object container.
             inline object_container_t const& getObjects() const noexcept { return m_objects; }
             
-            //! Get an object with the id.
-            /** The function retrieves an object with an id.
-             @param id   The id of the object.
-             */
-            inline Object* getObjectByModel(const model::Object& object_model) const noexcept
+            //! @brief Get an object controller from its model.
+            //! @param model The object model.
+            inline Object* getObject(const model::Object& model) const noexcept
             {
                 for(auto& obj : m_objects)
                 {
-                    if(&obj.get()->m_model == &object_model)
+                    if(&obj.get()->m_model == &model)
+                    {
                         return obj.get();
+                    }
                 }
                 
                 return nullptr;
             }
             
-            //! @brief Get an object from its model.
+            //! @brief Get a link controller from its model.
+            //! @param model The link model.
+            inline Link* getLink(const model::Link& model) const noexcept
+            {
+                for(auto& link : m_links)
+                {
+                    if(&link.get()->getModel() == &model)
+                    {
+                        return link.get();
+                    }
+                }
+                
+                return nullptr;
+            }
+            
+            //! @brief Get an object with the id.
             //! @param id   The id of the object.
             inline Object* getObjectWithId(const uint64_t /*ID*/) const noexcept
             {
