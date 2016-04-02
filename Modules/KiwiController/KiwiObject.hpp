@@ -50,44 +50,34 @@ namespace kiwi
             class Inlet;
             class Outlet;
             
-            //! Constructor.
+            //! @brief Constructor.
             Object(model::Object& model) noexcept;
             
-            //! Destructor.
+            //! @brief Destructor.
             virtual ~Object() noexcept;
             
-            //! Retrieve the patcher that manages the object.
-            /** The function retrieves the patcher that manages the object.
-             @return The patcher that manages the object.
-             */
-            inline controller::Patcher* getPatcher() const  { return m_patcher; }
+            //! @brief Returns the patcher in which this Object is instantiated.
+            inline controller::Patcher* getPatcher() const      { return m_patcher; }
             
-            //! Retrieve the name of the object.
-            /** The function retrieves the name of the object as a tag.
-             @return The name of the object as a tag.
-             */
-            inline std::string getName() const noexcept     { return m_model.getName(); }
+            //! @brief Returns the name of the Object.
+            inline std::string getName() const noexcept         { return m_model.getName(); }
             
-            //! Retrieve the text of the object.
-            /** The function retrieves the text of the object.
-             @return The text of the object.
-             */
-            inline std::string getText() const noexcept     { return m_model.getText(); }
+            //! @brief Returns the text of the object.
+            inline std::string getText() const noexcept         { return m_model.getText(); }
+            
+            //! @brief Get the number of inlets of the Object.
+            inline uint32_t getNumberOfInlets() const noexcept  { return m_model.getNumberOfInlets(); }
             
             //! @brief Get the number of inlets of the object.
-            //! @return The text of the object.
-            inline uint32_t getNumberOfInlets() const noexcept      { return m_model.getNumberOfInlets(); }
-            
-            //! @brief Get the number of inlets of the object.
-            //! @return The text of the object.
-            inline uint32_t getNumberOfOutlets() const noexcept     { return m_model.getNumberOfOutlets(); }
+            inline uint32_t getNumberOfOutlets() const noexcept { return m_model.getNumberOfOutlets(); }
             
             //! @brief The receive method.
+            //! @details This method must be overriden by object's subclasses.
             virtual void receive(uint32_t index, std::vector<Atom> args) = 0;
             
         protected:
             
-            //! @brief Send a message to at a given outlet index.
+            //! @brief Send a message through a given outlet index.
             void send(const uint32_t index, std::vector<Atom> args);
             
         private:
@@ -99,142 +89,112 @@ namespace kiwi
             std::atomic_ushort      m_stack_count;
         };
         
-        //! The outlet owns a set of links.
-        /**
-         The outlet owns a set of links that are used to manage links in a object. It also have a type and a description.
-         */
+        // ================================================================================ //
+        //                                  Object::Iolet                                   //
+        // ================================================================================ //
+        
+        //! @brief The base class of Inlet and Outlet.
+        //! @details The Iolet can be of a given IoType
+        //! and owns a vector of connections between inlets and outlets.
         class Object::Iolet
         {
-        protected:
+        public:
+            
             using connection_t      = std::pair<Object*, uint32_t>;
             using connection_vec_t  = std::vector<connection_t>;
             
-            connection_vec_t    m_connections;
-            const IoType      m_type;
-            
-        public:
-            //! Check if a connection is in the iolet.
-            /** The functions checks if a connection is in the iolet.
-             @param object The object.
-             @param index the iolet's index.
-             @return true if the connection is in the iolet, otherwise false.
-             */
-            bool has(Object const* const object, const uint32_t index) const noexcept;
-            
-            //! Append a new connection to the iolet.
-            /** The functions appends a new connection to the iolet.
-             @param object The object.
-             @param index the iolet's index.
-             @return true if the connection has been added, otherwise false.
-             */
-            bool append(Object* object, const uint32_t index) noexcept;
-            
-            //! Remove a connection from the iolet.
-            /** The functions removes a connection from the iolet.
-             @param object The object.
-             @param index the iolet's index.
-             @return true if the connection has been removed, otherwise false.
-             */
-            bool erase(Object* object, const uint32_t index) noexcept;
-            
-            //! Constructor.
+            //! @brief Constructor.
             inline Iolet(IoType type) noexcept : m_type(type) {}
             
-            //! Destructor.
+            //! @brief Destructor.
             inline ~Iolet() noexcept
             {
                 m_connections.clear();
             }
             
-            //! Retrieve the type of the iolet.
-            /** The functions retrieves the type of the iolet.
-             @return The type of the iolet.
-             */
-            inline IoType getType() const noexcept
-            {
-                return m_type;
-            }
+            //! @brief Returns the IoType of the iolet.
+            inline IoType getType() const noexcept { return m_type; }
             
-            //! Retrieve the number of connections.
-            /** The functions retrieves the number of connections of the iolet.
-             @return The number of connections.
-             */
+            //! @brief Get the number of connections.
+            //! @return The number of connections.
             inline uint32_t getNumberOfConnections() const noexcept
             {
                 return static_cast<uint32_t>(m_connections.size());
             }
             
-            //! Retrieve the object of a connection.
-            /** The functions retrieves the object of a connection.
-             @param index The index of the connection.
-             @return The object of a connection.
-             */
+            //! @brief Get the object of a connection at a given index.
+            //! @param index The index of the connection.
+            //! @return The object of a connection.
             Object const* getObject(const uint32_t index) const noexcept;
             
-            //! Retrieve the object of a connection.
-            /** The functions retrieves the object of a connection.
-             @param index The index of the connection.
-             @return The object of a connection.
-             */
+            //! @brief Get the object of a connection at a given index.
+            //! @param index The index of the connection.
+            //! @return The object of a connection.
             Object* getObject(const uint32_t index) noexcept;
             
-            //! Retrieve the iolet's index of a connection.
-            /** The functions retrieves the iolet's index of a connection.
-             @param index The index of the connection.
-             @return The iolet's index of a connection.
-             */
+            //! @brief Get the iolet's index of a connection at a given index.
+            //! @param index The index of the connection.
+            //! @return The iolet's index of a connection.
             uint32_t getIndex(const uint32_t index) const noexcept;
+            
+            //! @brief Check if a connection is in the iolet.
+            //! @param object A pointer to the Object to which the iolet belongs.
+            //! @param index the iolet's index.
+            //! @return true if the connection is in the iolet, otherwise false.
+            bool has(Object const* const object, const uint32_t index) const noexcept;
+            
+            //! @brief Append a new connection to the iolet.
+            //! @param object A pointer to the Object to which the iolet belongs.
+            //! @param index the iolet's index.
+            //! @return true if the connection has been added, otherwise false.
+            bool append(Object* object, const uint32_t index) noexcept;
+            
+            //! @brief Remove a connection from the iolet.
+            //! @param object A pointer to the Object to which the iolet belongs.
+            //! @param index the iolet's index.
+            //! @return true if the connection has been removed, otherwise false.
+            bool erase(Object* object, const uint32_t index) noexcept;
+            
+        protected:
+            
+            connection_vec_t    m_connections;
+            const IoType        m_type;
         };
         
         // ================================================================================ //
-        //                                      INLET                                       //
+        //                                   Object::INLET                                  //
         // ================================================================================ //
         
-        //! The inlet owns a set of links.
-        /**
-         The inlet owns a set of links that are used to manage links in a object. It also have a type and a description.
-         */
+        //! @brief The Inlet.
         class Object::Inlet : public Iolet
         {
         public:
             
-            //! Constructor.
-            /** You should never call this method except if you really know what you're doing.
-             */
+            //! @brief Constructor.
+            //! @param type The IoType of the inlet.
             Inlet(IoType type) noexcept;
             
-            //! Destructor.
-            /** You should never call this method except if you really know what you're doing.
-             */
+            //! @brief Destructor.
             ~Inlet();
         };
         
         // ================================================================================ //
-        //                                      OUTLET                                      //
+        //                                  Object::OUTLET                                  //
         // ================================================================================ //
         
-        //! The outlet owns a set of links.
-        /**
-         The outlet owns a set of links that are used to manage links in a object. It also have a type and a description.
-         */
+        //! @brief The outlet is a specific Iolet that can send messages to Inlet.
         class Object::Outlet : public Iolet
         {
         public:
             //! Constructor.
-            /** You should never call this method except if you really know what you're doing.
-             @param type        The type of the outlet.
-             */
+            //! @param type The type of the outlet.
             Outlet(IoType type) noexcept;
             
-            //! Destructor.
-            /** You should never call this method except if you really know what you're doing.
-             */
+            //! @brief Destructor.
             ~Outlet();
             
-            //! Send a vector of atoms to the connected inlets.
-            /** The function sends of atoms to the connected inlets.
-             @param atoms The vector of atoms.
-             */
+            //! @brief Sends a vector of atoms to the connected inlets.
+            //! @param atoms The vector of atoms.
             void send(std::vector<Atom> const& atoms) const noexcept;
         };
     }
