@@ -92,7 +92,6 @@ namespace kiwi
             if(object && !has(object, index))
             {
                 m_connections.emplace_back(object, index);
-                std::cout << "append iolet" << '\n';
                 return true;
             }
             
@@ -101,25 +100,10 @@ namespace kiwi
         
         bool Object::Iolet::erase(controller::Object* object, uint32_t index)
         {
-            std::cout << "Iolet::erase" << '\n';
-            std::cout << "- has " << m_connections.size() << " connections" << '\n';
+            //std::cout << "Iolet::erase" << '\n';
+            //std::cout << "- has " << m_connections.size() << " connections" << '\n';
+            //std::cout << "- has connection : " << has(object, index) << '\n';
             
-            std::cout << "- has connection : " << has(object, index) << '\n';
-            
-            const auto idx = static_cast<connections_t::size_type>(index);
-            
-            for(auto it = m_connections.begin(); it != m_connections.end(); ++it)
-            {
-                //std::cout << "- it->second = " << it->second << '\n';
-                if(it->second == idx && object == it->first)
-                {
-                    m_connections.erase(it);
-                    std::cout << "- has " << m_connections.size() << " connections" << '\n';
-                    return true;
-                }
-            }
-            
-            /*
             if(object && !m_connections.empty())
             {
                 const auto idx = static_cast<connections_t::size_type>(index);
@@ -134,13 +118,12 @@ namespace kiwi
                 {
                     m_connections.erase(it);
                     
-                    std::cout << "- has " << m_connections.size() << " connections" << '\n';
+                    //std::cout << "- has " << m_connections.size() << " connections" << '\n';
                     return true;
                 }
             }
-            */
             
-            std::cout << "- fail to erase Iolet" << '\n';
+            //std::cout << "- fail to erase Iolet" << '\n';
             
             return false;
         }
@@ -162,7 +145,6 @@ namespace kiwi
         
         void Object::Outlet::send(std::vector<Atom> const& atoms) const noexcept
         {
-            std::cout << "- has " << m_connections.size() << " connections" << '\n';
             for(auto& connection : m_connections)
             {
                 Object* const receiver = connection.first;
@@ -258,9 +240,11 @@ namespace kiwi
         
         void Object::send(const uint32_t index, std::vector<Atom> args)
         {
+            /*
             std::cout << "Object " << getName() << " send msg : {"
             << AtomHelper::toString(args)
             << "} through outlet " << index << '\n';
+            */
             
             const auto idx = static_cast<std::vector<Outlet>::size_type>(index);
             

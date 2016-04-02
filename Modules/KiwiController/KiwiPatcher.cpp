@@ -71,7 +71,9 @@ namespace kiwi
             }
             else if(name == "print")
             {
-                //uptr_object = std::unique_ptr<ObjectPrint>(new ObjectPrint(name, text));
+                model::Object::initInfos infos{name, text};
+                auto& obj = *getModel().addObject(std::unique_ptr<model::ObjectPrint>(new model::ObjectPrint(infos)));
+                return addObjectController<controller::ObjectPrint, model::ObjectPrint>(obj, infos.args);
             }
             
             return nullptr;
@@ -93,7 +95,7 @@ namespace kiwi
             return nullptr;
         }
         
-        void Patcher::removeObject(Object* object)
+        void Patcher::removeObject(Object* /*object*/)
         {
             ;
         }
@@ -110,9 +112,8 @@ namespace kiwi
                 if(it != m_links.end())
                 {
                     m_links.erase(it);
+                    getModel().removeLink(link->getModel());
                 }
-                
-                getModel().removeLink(link->getModel());
             }
         }
         
@@ -154,6 +155,77 @@ namespace kiwi
                 std::cout << "* Redo impossible\n";
             }
         }
+        
+        void Patcher::document_changed(model::Patcher& patcher)
+        {
+            debug_document(patcher);
+            
+            if(patcher.changed())
+            {
+                // check links before objects
+                if(patcher.linksChanged())
+                {
+                    for(auto& link : patcher.getLinks())
+                    {
+                        if(link.added())
+                        {
+                            /*
+                             auto* from = getCtrlForModel(link.getObjectFrom());
+                             auto* to = getCtrlFromID(link.getObjectTo().ref());
+                             auto link_ctrl = controller::Link(link, from, to);
+                             m_links.push_back(link_ctrl);
+                             */
+                            //createControllerForModel(link);
+                        }
+                        else if(link.removed())
+                        {
+                            //removeControllerForModel(link);
+                        }
+                    }
+                }
+                
+                if(patcher.objectsChanged())
+                {
+                    for(auto& obj : patcher.getObjects())
+                    {
+                        if(obj.added())
+                        {
+                            auto obj_ptr = getObjectByModel(obj);
+                            if(obj_ptr == nullptr)
+                            {
+                                const auto name = obj.getName();
+                                std::vector<Atom> args = AtomHelper::parse(obj.getText());
+                                
+                                if(name == "plus" || name == "+")
+                                {
+                                    addObjectController<controller::ObjectPlus, model::ObjectPlus>(obj, args);
+                                }
+                                else if(name == "print")
+                                {
+                                    addObjectController<controller::ObjectPrint, model::ObjectPrint>(obj, args);
+                                }
+                            }
+                        }
+                        else if(obj.removed())
+                        {
+                            auto it = std::find_if(m_objects.begin(), m_objects.end(), [&obj](std::unique_ptr<controller::Object>& ctrl)
+                            {
+                                return (&ctrl.get()->m_model == &obj);
+                            });
+                            
+                            if(it != m_objects.end())
+                            {
+                                m_objects.erase(it);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // ================================================================================ //
+        //                                  PATCHER DEBUG                                   //
+        // ================================================================================ //
         
         void Patcher::debug_document(model::Patcher& patcher)
         {
@@ -226,68 +298,6 @@ namespace kiwi
             }
             
             std::cout << "- - - - - - - - - - - - - - - - - - -\n";
-        }
-        
-        void Patcher::document_changed(model::Patcher& patcher)
-        {
-            debug_document(patcher);
-            
-            if(patcher.changed())
-            {
-                if(patcher.objectsChanged())
-                {
-                    for(auto& obj : patcher.getObjects())
-                    {
-                        if(obj.added())
-                        {
-                            auto obj_ptr = getObjectByModel(obj);
-                            if(obj_ptr == nullptr)
-                            {
-                                const auto name = obj.getName();
-                                std::vector<Atom> args = AtomHelper::parse(obj.getText());
-                                
-                                if(name == "plus" || name == "+")
-                                {
-                                    addObjectController<controller::ObjectPlus, model::ObjectPlus>(obj, args);
-                                }
-                            }
-                        }
-                        else if(obj.removed())
-                        {
-                            auto it = std::find_if(m_objects.begin(), m_objects.end(), [&obj](std::unique_ptr<controller::Object>& ctrl)
-                            {
-                                return (&ctrl.get()->m_model == &obj);
-                            });
-                            
-                            if(it != m_objects.end())
-                            {
-                                m_objects.erase(it);
-                            }
-                        }
-                    }
-                }
-                
-                if(patcher.linksChanged())
-                {
-                    for(auto& link : patcher.getLinks())
-                    {
-                        if(link.added())
-                        {
-                            /*
-                            auto* from = getCtrlForModel(link.getObjectFrom());
-                            auto* to = getCtrlFromID(link.getObjectTo().ref());
-                            auto link_ctrl = controller::Link(link, from, to);
-                            m_links.push_back(link_ctrl);
-                            */
-                            //createControllerForModel(link);
-                        }
-                        else if(link.removed())
-                        {
-                            //removeControllerForModel(link);
-                        }
-                    }
-                }
-            }
         }
     }
 }

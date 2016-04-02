@@ -47,6 +47,7 @@ namespace kiwi
                 
                 // Objects
                 ObjectPlus::declare<Model>();
+                ObjectPrint::declare<Model>();
                 
                 // Links
                 Link::declare<Model>();

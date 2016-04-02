@@ -38,39 +38,38 @@
 
 using namespace kiwi;
 
-TEST_CASE("model", "[model]")
+TEST_CASE("Patcher", "[patcher]")
 {
     auto instance = controller::Instance::create(123456789ULL, "kiwi");
     auto& patcher = instance->createPatcher();
     
+    const std::vector<Atom> bang_msg{"bang"};
+    
     patcher.beginTransaction("Add Object \"plus\"");
     
-    auto obj_plus = patcher.addObject("plus");
-    //CHECK(obj_plus->getText() == "");
-    //CHECK(obj_plus->getNumberOfInlets() == 2);
+    auto* plus_obj_1 = patcher.addObject("plus");
+    auto* plus_obj_2 = patcher.addObject("plus", "10.");
+    auto* print_obj  = patcher.addObject("print", "result");
     
-    auto obj_plus_2 = patcher.addObject("plus", "10");
-    //CHECK(obj_plus_2->getText() == "10");
-    //CHECK(obj_plus_2->getNumberOfInlets() == 1);
+    auto* plus_link_1 = patcher.addLink(*plus_obj_1, 0, *plus_obj_2, 0);
+    auto* print_link = patcher.addLink(*plus_obj_2, 0, *print_obj, 0);
     
-    auto link_1 = patcher.addLink(*obj_plus, 0, *obj_plus_2, 0);
+    plus_obj_1->receive(0, bang_msg);
+    plus_obj_1->receive(1, {10.});
+    plus_obj_1->receive(0, bang_msg);
     
-    obj_plus->receive(0, {"bang"}); // output 10
-    obj_plus->receive(1, {10});
-    obj_plus->receive(0, {"bang"}); // output 20
+    auto* recursive_plus_link = patcher.addLink(*plus_obj_2, 0, *plus_obj_1, 1);
     
-    auto link_2 = patcher.addLink(*obj_plus_2, 0, *obj_plus, 1);
+    plus_obj_1->receive(0, bang_msg);
+    plus_obj_1->receive(0, bang_msg);
+    plus_obj_1->receive(0, bang_msg);
+    plus_obj_1->receive(0, bang_msg);
     
-    obj_plus->receive(0, {"bang"}); // output 20
-    obj_plus->receive(0, {"bang"}); // output 30
-    obj_plus->receive(0, {"bang"}); // output 40
-    obj_plus->receive(0, {"bang"}); // output 50
+    patcher.removeLink(recursive_plus_link);
     
-    patcher.removeLink(link_2);
-    
-    obj_plus->receive(0, {"bang"}); // output 60
-    obj_plus->receive(0, {"bang"}); // output 60
-    obj_plus->receive(0, {"bang"}); // output 60
+    plus_obj_1->receive(0, bang_msg);
+    plus_obj_1->receive(0, bang_msg);
+    plus_obj_1->receive(0, bang_msg);
     
     patcher.endTransaction();
     
