@@ -534,6 +534,52 @@ namespace kiwi
             
             return atoms;
         }
+        
+        static std::string toString(Atom const& atom)
+        {
+            std::string output;
+            if(atom.isInt())
+            {
+                output += std::to_string(atom.getInt());
+            }
+            else if(atom.isFloat())
+            {
+                output += std::to_string(atom.getFloat());
+            }
+            else if(atom.isString())
+            {
+                output += atom.getString();
+            }
+            
+            return output;
+        }
+        
+        static std::string toString(std::vector<Atom> const& atom_vec)
+        {
+            std::string output;
+            if(!atom_vec.empty())
+            {
+                if(atom_vec.size() == 1)
+                {
+                    output += toString(atom_vec[0]);
+                }
+                else
+                {
+                    output += '[';
+                    for(std::vector<Atom>::size_type i = 0; i < atom_vec.size();)
+                    {
+                        output += toString(atom_vec[i]);
+                        if(++i != atom_vec.size())
+                        {
+                            output += ", ";
+                        }
+                    }
+                    output += ']';
+                }
+            }
+            
+            return output;
+        }
     };
 }
 
