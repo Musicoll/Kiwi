@@ -71,6 +71,12 @@ namespace kiwi
             //! @brief Get the number of inlets of the object.
             inline uint32_t getNumberOfOutlets() const noexcept { return m_model.getNumberOfOutlets(); }
             
+            //! @brief Returns the Inlet at a given index.
+            Object::Inlet* getInlet(const uint32_t index) noexcept;
+            
+            //! @brief Returns the Outlet at a given index.
+            Object::Outlet* getOutlet(const uint32_t index) noexcept;
+            
             //! @brief The receive method.
             //! @details This method must be overriden by object's subclasses.
             virtual void receive(uint32_t index, std::vector<Atom> args) = 0;

@@ -144,6 +144,15 @@ namespace kiwi
             
         private:
             
+            template <class TControllerClass, class TModelClass = model::Object>
+            controller::Object* addObjectController(model::Object& obj_model,
+                                                    std::vector<Atom> const& args)
+            {
+                auto ctrl = m_objects.emplace(m_objects.cend(), std::unique_ptr<TControllerClass>(new TControllerClass(static_cast<TModelClass&>(obj_model), args)));
+                
+                return ctrl->get();
+            }
+            
             void debug_document(model::Patcher& patcher);
             
             Instance&           m_instance;
@@ -153,8 +162,8 @@ namespace kiwi
             std::unique_ptr<flip::History<flip::HistoryStoreMemory>>
                                                     m_history;
             
-            std::vector<std::unique_ptr<Object>>    m_objects;
-            std::vector<std::unique_ptr<Link>>      m_links;
+            std::vector<std::unique_ptr<controller::Object>>    m_objects;
+            std::vector<std::unique_ptr<controller::Link>>      m_links;
             
             void document_changed(model::Patcher& patcher) override;
             

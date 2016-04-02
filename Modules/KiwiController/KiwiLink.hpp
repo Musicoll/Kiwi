@@ -42,14 +42,10 @@ namespace kiwi
         {
         public:
             
-            //! The constructor.
-            /** You should never use this method.
-             */
-            Link(model::Link model, Object* from, Object* to);
+            //! @brief Constructor.
+            Link(model::Link& model, Object* from, Object* to);
             
-            //! The destructor.
-            /** You should never use this method.
-             */
+            //! @brief Destructor.
             virtual ~Link();
             
             //! Retrieve the output object.

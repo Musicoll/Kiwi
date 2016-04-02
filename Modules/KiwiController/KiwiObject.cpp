@@ -92,6 +92,7 @@ namespace kiwi
             if(object && !has(object, index))
             {
                 m_connections.emplace_back(object, index);
+                std::cout << "append iolet" << '\n';
                 return true;
             }
             
@@ -186,7 +187,7 @@ namespace kiwi
             // populate inlets from model
             for(auto const& inlet : m_model.getInlets())
             {
-                m_outlets.emplace_back(inlet.getType());
+                m_inlets.emplace_back(inlet.getType());
             }
             
             // populate outlets from model
@@ -199,6 +200,34 @@ namespace kiwi
         Object::~Object() noexcept
         {
             ;
+        }
+        
+        Object::Inlet* Object::getInlet(const uint32_t index) noexcept
+        {
+            const auto idx = static_cast<std::vector<Inlet>::size_type>(index);
+            
+            if(idx < m_inlets.size())
+            {
+                return &m_inlets[idx];
+            }
+            else
+            {
+                return nullptr;
+            }
+        }
+        
+        Object::Outlet* Object::getOutlet(const uint32_t index) noexcept
+        {
+            const auto idx = static_cast<std::vector<Outlet>::size_type>(index);
+            
+            if(idx < m_outlets.size())
+            {
+                return &m_outlets[idx];
+            }
+            else
+            {
+                return nullptr;
+            }
         }
         
         void Object::send(const uint32_t index, std::vector<Atom> args)

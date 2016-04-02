@@ -62,18 +62,13 @@ namespace kiwi
         
         controller::Object* Patcher::addObject(std::string const& name, std::string const& text)
         {
-            std::unique_ptr<model::Object> uptr_object = nullptr;
-            
             if(name == "plus" || name == "+")
             {
                 model::Object::initInfos infos{name, text};
-                uptr_object = std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus(infos));
+                auto uptr_object = std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus(infos));
                 auto& obj = *getModel().addObject(std::move(uptr_object));
                 
-                std::unique_ptr<controller::Object> uptr_object_ctrl = std::unique_ptr<controller::ObjectPlus>(new controller::ObjectPlus(static_cast<model::ObjectPlus&>(obj), infos.args));
-                auto saved_uptr_object_ctrl = uptr_object_ctrl.get();
-                m_objects.emplace_back(std::move(uptr_object_ctrl));
-                return saved_uptr_object_ctrl;
+                return addObjectController<controller::ObjectPlus, model::ObjectPlus>(obj, infos.args);
             }
             else if(name == "print")
             {
@@ -91,10 +86,9 @@ namespace kiwi
                 auto& model_to = to.m_model;
                 auto& link_model = *getModel().addLink(std::unique_ptr<model::Link>(new model::Link(model_from, outlet, model_to, inlet)));
                 
-                auto uptr_link_ctrl = std::unique_ptr<controller::Link>(new controller::Link(link_model, &from, &to));
-                auto saved_uptr_link_ctrl = uptr_link_ctrl.get();
-                m_links.emplace_back(std::move(saved_uptr_link_ctrl));
-                return saved_uptr_link_ctrl;
+                auto link_ctrl = m_links.emplace(m_links.cend(), std::unique_ptr<controller::Link>(new controller::Link(link_model, &from, &to)));
+                
+                return link_ctrl->get();
             }
             
             return nullptr;
@@ -237,7 +231,7 @@ namespace kiwi
                                 
                                 if(name == "plus" || name == "+")
                                 {
-                                    m_objects.emplace_back(new ObjectPlus(static_cast<model::ObjectPlus&>(obj), args));
+                                    addObjectController<controller::ObjectPlus, model::ObjectPlus>(obj, args);
                                 }
                             }
                             

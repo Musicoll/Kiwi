@@ -42,10 +42,10 @@ namespace kiwi
             {
                 if(args.size() > 0 && args[0].isNumber())
                 {
-                    m_operand = args[0].getFloat();
+                    m_rhs = args[0].getFloat();
                 }
                 
-                std::cout << "m_operand = " << m_operand << '\n';
+                std::cout << "m_rhs = " << m_rhs << '\n';
             }
             
             void receive(uint32_t index, std::vector<Atom> args) override
@@ -60,12 +60,12 @@ namespace kiwi
                     {
                         if(index == 0)
                         {
-                            m_current_value = m_operand + args[0].getFloat();
+                            m_lhs = args[0].getFloat();
                             bang();
                         }
                         else if(index == 1)
                         {
-                            m_operand = args[0].getFloat();
+                            m_rhs = args[0].getFloat();
                         }
                     }
                     else if(index == 0
@@ -79,12 +79,12 @@ namespace kiwi
             
             void bang()
             {
-                send(0, {m_current_value});
+                send(0, {m_rhs + m_lhs});
             }
             
         private:
-            double m_operand = 0.0;
-            double m_current_value = 0.0;
+            double m_rhs = 0.0;
+            double m_lhs = 0.0;
         };
     }
 }

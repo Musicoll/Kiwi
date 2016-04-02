@@ -33,12 +33,21 @@ namespace kiwi
         //                                      LINK                                        //
         // ================================================================================ //
         
-        Link::Link(model::Link model, Object* from, Object* to) :
+        Link::Link(model::Link& model, Object* from, Object* to) :
         m_model(model),
         m_object_from(from),
         m_object_to(to)
         {
-            ;
+            const auto from_idx = m_model.getOutletIndex();
+            const auto to_idx   = m_model.getInletIndex();
+            controller::Object::Outlet* outlet = m_object_from->getOutlet(from_idx);
+            controller::Object::Inlet* inlet   = m_object_to->getInlet(to_idx);
+
+            if(outlet && inlet)
+            {
+                outlet->append(m_object_to, to_idx);
+                inlet->append(m_object_from, from_idx);
+            }
         }
         
         Link::~Link()

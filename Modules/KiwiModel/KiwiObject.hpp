@@ -82,21 +82,9 @@ namespace kiwi
                 Both    = 2
             };
             
-            //! @brief Represents either an Inlet or an Outlet of a given type.
-            class Iolet : public flip::Object
-            {
-            public:
-                Iolet(flip::Default&) {}
-                Iolet(IoType type, bool is_inlet) : m_io_type(type), m_is_inlet(is_inlet) {}
-                ~Iolet() = default;
-                
-                IoType getType() const noexcept {return m_io_type;}
-                
-            private:
-                friend class model::Object;
-                flip::Enum<IoType>  m_io_type;
-                flip::Bool          m_is_inlet;
-            };
+            class Iolet;
+            class Inlet;
+            class Outlet;
             
             //! @internal flip Default constructor
             Object(flip::Default&) {}
@@ -108,34 +96,7 @@ namespace kiwi
             virtual ~Object() noexcept {}
             
             //! @internal flip static declare method
-            template<class TModel>
-            static void declare()
-            {
-                if(! TModel::template has<model::Object::IoType>())
-                {
-                    TModel::template declare<model::Object::IoType>()
-                    .name("IoType")
-                    .template enumerator<IoType::Message>("Message")
-                    .template enumerator<IoType::Signal>("Signal");
-                }
-                
-                if(! TModel::template has<model::Object::Iolet>())
-                {
-                    TModel::template declare<model::Object::Iolet>()
-                    .name("Iolet")
-                    .template member<flip::Enum<IoType>, &Iolet::m_io_type>("type")
-                    .template member<flip::Bool, &Iolet::m_is_inlet>("is_inlet");
-                }
-                
-                if(TModel::template has<model::Object>()) return;
-                
-                TModel::template declare<model::Object>()
-                .name("cicm.kiwi.Object")
-                .template member<flip::String, &Object::m_name>("name")
-                .template member<flip::String, &Object::m_text>("text")
-                .template member<flip::Array<Iolet>, &Object::m_inlets>("inlets")
-                .template member<flip::Array<Iolet>, &Object::m_outlets>("outlets");
-            }
+            template<class TModel> static void declare();
             
             //! @brief Returns the name of the Object.
             //! @return The name of the Object.
@@ -207,6 +168,59 @@ namespace kiwi
             flip::Array<Iolet>  m_inlets;
             flip::Array<Iolet>  m_outlets;
         };
+        
+        // ================================================================================ //
+        //                                  OBJECT::IOLET                                   //
+        // ================================================================================ //
+        
+        //! @brief Represents either an Inlet or an Outlet of a given type.
+        class Object::Iolet : public flip::Object
+        {
+        public:
+            Iolet(flip::Default&) {}
+            Iolet(IoType type, bool is_inlet) : m_io_type(type), m_is_inlet(is_inlet) {}
+            ~Iolet() = default;
+            
+            IoType getType() const noexcept {return m_io_type;}
+            
+        private:
+            friend class model::Object;
+            flip::Enum<IoType>  m_io_type;
+            flip::Bool          m_is_inlet;
+        };
+        
+        // ================================================================================ //
+        //                                  Object::declare                                 //
+        // ================================================================================ //
+        
+        template<class TModel>
+        void Object::declare()
+        {
+            if(! TModel::template has<model::Object::IoType>())
+            {
+                TModel::template declare<model::Object::IoType>()
+                .name("IoType")
+                .template enumerator<IoType::Message>("Message")
+                .template enumerator<IoType::Signal>("Signal");
+            }
+            
+            if(! TModel::template has<model::Object::Iolet>())
+            {
+                TModel::template declare<model::Object::Iolet>()
+                .name("Iolet")
+                .template member<flip::Enum<IoType>, &Iolet::m_io_type>("type")
+                .template member<flip::Bool, &Iolet::m_is_inlet>("is_inlet");
+            }
+            
+            if(TModel::template has<model::Object>()) return;
+            
+            TModel::template declare<model::Object>()
+            .name("cicm.kiwi.Object")
+            .template member<flip::String, &Object::m_name>("name")
+            .template member<flip::String, &Object::m_text>("text")
+            .template member<flip::Array<Iolet>, &Object::m_inlets>("inlets")
+            .template member<flip::Array<Iolet>, &Object::m_outlets>("outlets");
+        }
     }
 }
 
