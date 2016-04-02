@@ -175,6 +175,9 @@ namespace kiwi
                     
                     indent(3); std::cout << "- status : " << status_str << '\n';
                     indent(3); std::cout << "- text : " << obj.getText() << '\n';
+                    
+                    indent(3); std::cout << "- n°inlet : " << obj.getNumberOfInlets() << '\n';
+                    indent(3); std::cout << "- n°outlet : " << obj.getNumberOfOutlets() << '\n';
                 }
             }
             

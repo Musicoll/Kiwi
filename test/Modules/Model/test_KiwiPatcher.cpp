@@ -192,9 +192,13 @@ TEST_CASE("model", "[model]")
     
     patcher->beginTransaction("Add Object \"plus\"");
     
-    auto obj_plus = patcher->addObject("plus", "1");
-    CHECK(obj_plus->getText() == "1");
+    auto obj_plus = patcher->addObject("plus", "12");
+    CHECK(obj_plus->getText() == "12");
     CHECK(obj_plus->getNumberOfInlets() == 1);
+    
+    obj_plus->receive(0, {30});
+    obj_plus->receive(1, {100});
+    obj_plus->receive(0, {400});
     
     auto obj_plus_2 = patcher->addObject("plus");
     CHECK(obj_plus_2->getText() == "");

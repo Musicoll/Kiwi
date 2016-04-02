@@ -118,13 +118,13 @@ namespace kiwi
             //! @return The text of the object.
             inline uint32_t getNumberOfOutlets() const noexcept     { return m_model.getNumberOfOutlets(); }
             
+            //! @brief The receive method.
+            virtual void receive(uint32_t index, std::vector<Atom> args) = 0;
+            
         protected:
             
             //! @brief Send a message to at a given outlet index.
             void send(const uint32_t index, std::vector<Atom> args);
-            
-            //! @brief The receive method.
-            virtual void receive(uint32_t index, std::vector<Atom> args) = 0;
             
         private:            
             wPatcher                m_patcher;

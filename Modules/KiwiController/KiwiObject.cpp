@@ -153,7 +153,8 @@ namespace kiwi
                     }
                     else
                     {
-                        std::cout << "object " << receiver->getName() << "Stack overflow";
+                        // commented because of an xcode f*c*i*g indentation bug
+                        //std::cout << "object " << receiver->getName() << "Stack overflow";
                     }
                     
                     receiver->m_stack_count--;
@@ -182,7 +183,29 @@ namespace kiwi
         
         Object::Object(model::Object& model) noexcept : m_model(model)
         {
-            ;
+            // populate inlets from model
+            for(auto const& inlet : m_model.getInlets())
+            {
+                switch(inlet.getType())
+                {
+                    case model::Object::IoType::Message:    { m_inlets.emplace_back(Io::Type::Message); break; }
+                    case model::Object::IoType::Signal:     { m_inlets.emplace_back(Io::Type::Signal); break; }
+                    case model::Object::IoType::Both:       { m_inlets.emplace_back(Io::Type::Both); break; }
+                    default: break;
+                }
+            }
+            
+            // populate outlets from model
+            for(auto const& inlet : m_model.getInlets())
+            {
+                switch(inlet.getType())
+                {
+                    case model::Object::IoType::Message:    { m_inlets.emplace_back(Io::Type::Message); break; }
+                    case model::Object::IoType::Signal:     { m_inlets.emplace_back(Io::Type::Signal); break; }
+                    case model::Object::IoType::Both:       { m_inlets.emplace_back(Io::Type::Both); break; }
+                    default: break;
+                }
+            }
         }
         
         Object::~Object() noexcept
@@ -192,7 +215,9 @@ namespace kiwi
         
         void Object::send(const uint32_t index, std::vector<Atom> args)
         {
-            std::cout << "output method called \n";
+            std::cout << "Object " << getName() << " send msg : {"
+            << AtomHelper::toString(args)
+            << "} through outlet " << index << '\n';
             
             const auto idx = static_cast<std::vector<Outlet>::size_type>(index);
             
