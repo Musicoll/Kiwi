@@ -22,7 +22,6 @@
 */
 
 #include "KiwiObject.hpp"
-#include "KiwiPatcher.hpp"
 
 namespace kiwi
 {

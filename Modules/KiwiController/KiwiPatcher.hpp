@@ -134,20 +134,12 @@ namespace kiwi
             //! @details Each call to this function must be followed by a call to endTransaction.
             //! @param transaction_name The name of the current transaction
             //! @see endTransaction
-            void beginTransaction(std::string transaction_name)
-            {
-                m_document->set_label(transaction_name);
-                std::cout << "* " << transaction_name << '\n';
-            }
+            void beginTransaction(std::string transaction_name);
             
             //! @brief Ends a transaction
             //! @details Each call to this function must be preceded by a call to beginTransaction.
             //! @see beginTransaction
-            void endTransaction()
-            {
-                auto tx = m_document->commit();
-                m_history->add_undo_step(tx);
-            }
+            void endTransaction();
             
             //! @brief Undo the last transaction and optionally commit
             void undo(const bool commit = false);
@@ -158,15 +150,10 @@ namespace kiwi
         private:
             
             //! @brief Constructor.
+            //! @details use the create method instead.
             Patcher(Instance& instance) noexcept;
             
-            //! @internal flip::DocumentObserver<model::Patcher>::document_changed
-            void document_changed(model::Patcher& patcher) final;
-            
-            //! @internal for debugging purpose.
-            void debug_document(model::Patcher& patcher);
-            
-            template <class TControllerClass, class TModelClass = model::Object>
+            template <class TControllerClass, class TModelClass>
             controller::Object* addObjectController(model::Object& obj_model,
                                                     std::vector<Atom> const& args)
             {
@@ -174,6 +161,29 @@ namespace kiwi
                 
                 return ctrl->get();
             }
+            
+            //! @internal flip::DocumentObserver<model::Patcher>::document_changed
+            void document_changed(model::Patcher& patcher) final;
+            //! @internal for debugging purpose.
+            void debug_document(model::Patcher& patcher);
+            
+            //! @internal Object has just been added to the document.
+            void objectHasBeenAdded(model::Object& object);
+            
+            //! @internal Object is resident and internal value changed.
+            void objectChanged(model::Object& object);
+            
+            //! @internal Object will be removed from the document.
+            void objectWillBeRemoved(model::Object& object);
+            
+            //! @internal Link has just been added to the document.
+            void linkHasBeenAdded(model::Link& link);
+            
+            //! @internal Link is resident and internal value changed.
+            void linkChanged(model::Link& link);
+            
+            //! @internal Link will be removed from the document.
+            void linkWillBeRemoved(model::Link& link);
             
             // -----------------------------
             

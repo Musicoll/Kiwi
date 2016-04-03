@@ -140,7 +140,7 @@ namespace kiwi
         
         Object::Outlet::~Outlet()
         {
-            m_connections.clear();
+            ;
         }
         
         void Object::Outlet::send(std::vector<Atom> const& atoms) const noexcept
@@ -182,7 +182,7 @@ namespace kiwi
         
         Object::Inlet::~Inlet()
         {
-            m_connections.clear();
+            ;
         }
         
         // ================================================================================ //

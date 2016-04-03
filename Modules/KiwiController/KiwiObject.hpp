@@ -114,8 +114,7 @@ namespace kiwi
             //! @brief Destructor.
             virtual ~Iolet() noexcept
             {
-                // m_connections is cleared by Inlet and Outlet classes
-                // m_connections.clear();
+                m_connections.clear();
             }
             
             //! @brief Returns the IoType of the iolet.
