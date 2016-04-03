@@ -39,6 +39,9 @@ namespace kiwi
         {
         public:
             
+            using objects_t = flip::Array<model::Object>;
+            using links_t   = flip::Array<Link>;
+            
             //! @brief Default constructor.
             Patcher();
             
@@ -51,15 +54,18 @@ namespace kiwi
             {
                 TModel::template declare<Patcher>()
                 .name("cicm.kiwi.Patcher")
-                .template member<decltype(Patcher::m_objects),   &Patcher::m_objects>   ("objects")
-                .template member<decltype(Patcher::m_links),     &Patcher::m_links>     ("links");
+                .template member<objects_t,   &Patcher::m_objects>   ("objects")
+                .template member<links_t,     &Patcher::m_links>     ("links");
             }
             
             //! @brief Get the objects.
             flip::Array<model::Object> const& getObjects() noexcept { return m_objects; }
             
             //! @brief Get the links.
-            flip::Array<Link> const& getLinks() noexcept            { return m_links; }
+            flip::Array<Link> const& getLinks() const noexcept      { return m_links; }
+            
+            //! @brief Get the links.
+            flip::Array<Link>& getLinks() noexcept                  { return m_links; }
             
             //! @brief Adds an object to the Patcher.
             //! @param object A unique pointer of object.
@@ -77,6 +83,10 @@ namespace kiwi
             //! @param link A reference to the link to remove.
             void removeLink(model::Link const& link);
             
+            //! @brief Removes a link from the Patcher.
+            //! @param link A reference to the link to remove.
+            links_t::iterator removeLink(links_t::iterator it);
+            
             //! @brief Returns true if an Object has been added, removed or changed.
             inline bool objectsChanged() const noexcept { return m_objects.changed(); }
             
@@ -86,8 +96,8 @@ namespace kiwi
         private:
             
             //! objects and links are stored in a flip::Array to maintain a graphical z-order.
-            flip::Array<model::Object>  m_objects;
-            flip::Array<Link>           m_links;
+            objects_t   m_objects;
+            links_t     m_links;
         };
     }
 }

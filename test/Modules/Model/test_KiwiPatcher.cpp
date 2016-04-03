@@ -78,7 +78,7 @@ TEST_CASE("Patcher - testcase : counter", "[Patcher]")
 TEST_CASE("Patcher - test Object delete", "[Patcher]")
 {
     auto instance = controller::Instance::create(123456789ULL, "kiwi");
-    instance->setDebug(true);
+    instance->setDebug(false);
     auto& patcher = instance->createPatcher();
     const std::vector<Atom> bang_msg{"bang"};
     
@@ -93,6 +93,16 @@ TEST_CASE("Patcher - test Object delete", "[Patcher]")
     
     patcher.endTransaction();
     
+    CHECK(patcher.getNumberOfObjects() == 3);
+    CHECK(patcher.getNumberOfLinks() == 2);
+    
+    patcher.beginTransaction("remove plus object 2 (should remove links too)");
+    patcher.removeObject(plus_obj_2);
+    patcher.endTransaction();
+    CHECK(patcher.getNumberOfObjects() == 2);
+    CHECK(patcher.getNumberOfLinks() == 0);
+    
+    patcher.undo(true);
     CHECK(patcher.getNumberOfObjects() == 3);
     CHECK(patcher.getNumberOfLinks() == 2);
     
@@ -120,7 +130,6 @@ TEST_CASE("Patcher - test Object delete", "[Patcher]")
     patcher.beginTransaction("remove last + object");
     patcher.removeObject(plus_obj_4);
     patcher.endTransaction();
-    
     CHECK(patcher.getNumberOfObjects() == 4);
     CHECK(patcher.getNumberOfLinks() == 2);
 }

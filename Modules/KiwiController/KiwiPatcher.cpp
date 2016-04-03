@@ -99,7 +99,23 @@ namespace kiwi
         {
             if(object)
             {
-                getModel().removeObject(object->getModel());
+                // remove links connected to this object
+                auto& model = object->getModel();
+                auto& links = getModel().getLinks();
+                for(auto it = links.begin(); it != links.end();)
+                {
+                    if(&it->getObjectFrom() == &model || &it->getObjectTo() == &model)
+                    {
+                        it = getModel().removeLink(it);
+                    }
+                    else
+                    {
+                        ++it;
+                    }
+                }
+                
+
+                getModel().removeObject(model);
             }
         }
         

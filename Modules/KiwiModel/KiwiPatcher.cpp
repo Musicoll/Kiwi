@@ -74,6 +74,21 @@ namespace kiwi
             auto it = find_if(m_objects.begin(), m_objects.end(), predicate);
             if(it != m_objects.end())
             {
+                /*
+                // first remove links connected to this object
+                for(auto it = m_links.begin(); it != m_links.end();)
+                {
+                    if(&it->getObjectFrom() == &object || &it->getObjectTo() == &object)
+                    {
+                        it = removeLink(it);
+                    }
+                    else
+                    {
+                        ++it;
+                    }
+                }
+                */
+                
                 m_objects.erase(it);
             }
         }
@@ -90,6 +105,11 @@ namespace kiwi
             {
                 m_links.erase(it);
             }
+        }
+        
+        auto Patcher::removeLink(links_t::iterator it) -> links_t::iterator
+        {
+            return m_links.erase(it);
         }
     }
     
