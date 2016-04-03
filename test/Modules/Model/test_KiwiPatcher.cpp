@@ -34,7 +34,7 @@ TEST_CASE("Patcher", "[patcher]")
     
     const std::vector<Atom> bang_msg{"bang"};
     
-    patcher.beginTransaction("Add Object \"plus\"");
+    patcher.beginTransaction("Add two plus objects, a print object, and link them together\"");
     
     auto* plus_obj_1 = patcher.addObject("plus");
     auto* plus_obj_2 = patcher.addObject("plus", "10.");
@@ -43,10 +43,13 @@ TEST_CASE("Patcher", "[patcher]")
     auto* plus_link_1 = patcher.addLink(*plus_obj_1, 0, *plus_obj_2, 0);
     auto* print_link = patcher.addLink(*plus_obj_2, 0, *print_obj, 0);
     
-    plus_obj_1->receive(0, bang_msg);
-    plus_obj_1->receive(1, {10.});
-    plus_obj_1->receive(0, bang_msg);
+    patcher.endTransaction();
     
+    plus_obj_1->receive(0, bang_msg);
+    //plus_obj_1->receive(1, {10.});
+    //plus_obj_1->receive(0, bang_msg);
+    
+    patcher.beginTransaction("Add recursive_plus_link");
     auto* recursive_plus_link = patcher.addLink(*plus_obj_2, 0, *plus_obj_1, 1);
     
     plus_obj_1->receive(0, bang_msg);
@@ -54,14 +57,18 @@ TEST_CASE("Patcher", "[patcher]")
     plus_obj_1->receive(0, bang_msg);
     plus_obj_1->receive(0, bang_msg);
     
-    patcher.removeLink(recursive_plus_link);
-    
-    plus_obj_1->receive(0, bang_msg);
-    plus_obj_1->receive(0, bang_msg);
-    plus_obj_1->receive(0, bang_msg);
-    
     patcher.endTransaction();
     
     patcher.undo(true);
-    patcher.redo(true);
+    /*
+    patcher.beginTransaction("Remove recursive_plus_link");
+    patcher.removeLink(recursive_plus_link);
+    patcher.endTransaction();
+    */
+    plus_obj_1->receive(0, bang_msg);
+    plus_obj_1->receive(0, bang_msg);
+    plus_obj_1->receive(0, bang_msg);
+    
+    //patcher.undo(true);
+    //patcher.redo(true);
 }

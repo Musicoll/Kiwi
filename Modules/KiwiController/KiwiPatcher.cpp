@@ -42,7 +42,7 @@ namespace kiwi
             // Set up an history for this document
             m_history = history_t(new flip::History<flip::HistoryStoreMemory>(*m_document.get()));
             
-            m_document->commit();
+            //m_document->commit();
         }
         
         Patcher::~Patcher()
@@ -87,7 +87,7 @@ namespace kiwi
                 auto& model_to = to.m_model;
                 auto& link_model = *getModel().addLink(std::unique_ptr<model::Link>(new model::Link(model_from, outlet, model_to, inlet)));
                 
-                auto link_ctrl = m_links.emplace(m_links.cend(), std::unique_ptr<controller::Link>(new controller::Link(link_model, &from, &to)));
+                auto link_ctrl = m_links.emplace(m_links.cend(), links_t::value_type(new controller::Link(link_model, &from, &to)));
                 
                 return link_ctrl->get();
             }
@@ -104,16 +104,7 @@ namespace kiwi
         {
             if(link)
             {
-                auto it = find_if(m_links.begin(), m_links.end(), [link](link_container_t::value_type const& p)
-                {
-                    return (link == p.get());
-                });
-                
-                if(it != m_links.end())
-                {
-                    m_links.erase(it);
-                    getModel().removeLink(link->getModel());
-                }
+                getModel().removeLink(link->getModel());
             }
         }
         
@@ -178,29 +169,20 @@ namespace kiwi
             
             if(patcher.changed())
             {
+                const bool link_changed = patcher.linksChanged();
+                
                 // check links before objects
-                if(patcher.linksChanged())
+                if(link_changed)
                 {
                     for(auto& link : patcher.getLinks())
                     {
-                        if(link.changed())
+                        if(link.changed() && link.removed())
                         {
-                            if(link.added())
-                            {
-                                linkHasBeenAdded(link);
-                            }
-                            else if(link.removed())
-                            {
-                                linkWillBeRemoved(link);
-                            }
-                            else
-                            {
-                                linkChanged(link);
-                            }
+                            linkWillBeRemoved(link);
                         }
                     }
                 }
-                
+
                 if(patcher.objectsChanged())
                 {
                     for(auto& object : patcher.getObjects())
@@ -222,6 +204,25 @@ namespace kiwi
                         }
                     }
                 }
+                
+                // check links before objects
+                if(link_changed)
+                {
+                    for(auto& link : patcher.getLinks())
+                    {
+                        if(link.changed())
+                        {
+                            if(link.added())
+                            {
+                                linkHasBeenAdded(link);
+                            }
+                            else if(link.resident())
+                            {
+                                linkChanged(link);
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -231,7 +232,7 @@ namespace kiwi
             if(obj_ptr == nullptr)
             {
                 const auto name = object.getName();
-                std::vector<Atom> args = AtomHelper::parse(object.getText());
+                const auto args = AtomHelper::parse(object.getText());
                 
                 if(name == "plus" || name == "+")
                 {
@@ -251,7 +252,7 @@ namespace kiwi
 
         void Patcher::objectWillBeRemoved(model::Object& object)
         {
-            const auto it = std::find_if(m_objects.begin(), m_objects.end(), [&object](std::unique_ptr<controller::Object>& ctrl)
+            const auto it = std::find_if(m_objects.begin(), m_objects.end(), [&object](objects_t::value_type const& ctrl)
             {
                 return (&ctrl.get()->m_model == &object);
             });
@@ -272,7 +273,7 @@ namespace kiwi
                 
                 if(from && to)
                 {
-                    m_links.emplace(m_links.cend(), std::unique_ptr<controller::Link>(new controller::Link(link, from, to)));
+                    m_links.emplace_back(links_t::value_type(new controller::Link(link, from, to)));
                 }
             }
         }
@@ -284,13 +285,15 @@ namespace kiwi
         
         void Patcher::linkWillBeRemoved(model::Link& link)
         {
-            const auto it = std::find_if(m_links.begin(), m_links.end(), [&link](std::unique_ptr<controller::Link>& ctrl)
+            //std::cout << "linkWillBeRemoved" << '\n';
+            const auto it = std::find_if(m_links.begin(), m_links.end(), [&link](links_t::value_type const& ctrl)
             {
                 return (&ctrl.get()->getModel() == &link);
             });
             
             if(it != m_links.cend())
             {
+                //std::cout << "linkWillBeRemoved found" << '\n';
                 m_links.erase(it);
             }
         }
@@ -363,6 +366,19 @@ namespace kiwi
                         << link.getOutletIndex() << ")" << '\n';
                         
                         indent(3); std::cout    << "- to object : \""
+                        << to.getName() << "\" ("
+                        << link.getInletIndex() << ")" << '\n';
+                    }
+                    else if(link.removed())
+                    {
+                        const auto& from = link.getObjectFromBefore();
+                        const auto& to = link.getObjectToBefore();
+                        
+                        indent(3); std::cout    << "- from object (before) : \""
+                        << from.getName() << "\" ("
+                        << link.getOutletIndex() << ")" << '\n';
+                        
+                        indent(3); std::cout    << "- to object (before) : \""
                         << to.getName() << "\" ("
                         << link.getInletIndex() << ")" << '\n';
                     }

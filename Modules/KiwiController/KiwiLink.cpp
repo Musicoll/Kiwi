@@ -54,8 +54,9 @@ namespace kiwi
         {
             if(m_object_from && m_object_to)
             {
-                const auto  from_idx = m_model.getOutletIndex();
-                const auto  to_idx   = m_model.getInletIndex();
+                const bool  removed = m_model.removed();
+                const auto  from_idx = removed ? m_model.getOutletIndexBefore() : m_model.getOutletIndex();
+                const auto  to_idx   = removed ? m_model.getInletIndexBefore() : m_model.getInletIndex();
                 auto* const outlet   = m_object_from->getOutlet(from_idx);
                 auto* const inlet    = m_object_to->getInlet(to_idx);
                 

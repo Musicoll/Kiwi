@@ -47,8 +47,8 @@ namespace kiwi
             
             using document_t = std::unique_ptr<flip::Document>;
             using history_t = std::unique_ptr<flip::History<flip::HistoryStoreMemory>>;
-            using object_container_t = std::vector<std::unique_ptr<controller::Object>>;
-            using link_container_t = std::vector<std::unique_ptr<controller::Link>>;
+            using objects_t = std::vector<std::unique_ptr<controller::Object>>;
+            using links_t = std::vector<std::unique_ptr<controller::Link>>;
             
             //! @brief Destructor.
             ~Patcher();
@@ -68,7 +68,7 @@ namespace kiwi
             
             //! @brief Get the object container.
             //! @return A const reference to the object container.
-            inline object_container_t const& getObjects() const noexcept { return m_objects; }
+            inline objects_t const& getObjects() const noexcept { return m_objects; }
             
             //! @brief Get an object controller from its model.
             //! @param model The object model.
@@ -187,13 +187,13 @@ namespace kiwi
             
             // -----------------------------
             
-            Instance&           m_instance;
+            Instance&   m_instance;
             
-            document_t          m_document;
-            history_t           m_history;
+            document_t  m_document;
+            history_t   m_history;
             
-            object_container_t  m_objects;
-            link_container_t    m_links;
+            objects_t   m_objects;
+            links_t     m_links;
         };
     }
 }

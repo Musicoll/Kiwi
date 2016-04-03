@@ -100,10 +100,11 @@ namespace kiwi
         
         bool Object::Iolet::erase(controller::Object* object, uint32_t index)
         {
-            //std::cout << "Iolet::erase" << '\n';
-            //std::cout << "- has " << m_connections.size() << " connections" << '\n';
-            //std::cout << "- has connection : " << has(object, index) << '\n';
-            
+            /*
+            std::cout << "Iolet::erase" << '\n';
+            std::cout << "- has " << m_connections.size() << " connections" << '\n';
+            std::cout << "- has connection : " << has(object, index) << '\n';
+            */
             if(object && !m_connections.empty())
             {
                 const auto idx = static_cast<connections_t::size_type>(index);
