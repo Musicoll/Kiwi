@@ -47,9 +47,9 @@ namespace kiwi
             //! @brief Constructs a Link.
             //! @details Constructs a Link with given origin and destination Object pointers
             //! and IO indexes.
-            //! @param from     The origin Object pointer.
+            //! @param from     The origin Object.
             //! @param outlet   The origin outlet index.
-            //! @param to       The destination Object pointer.
+            //! @param to       The destination Object.
             //! @param inlet    The destination inlet index.
             Link(model::Object& from, const uint32_t outlet, model::Object& to, const uint32_t inlet);
             
@@ -70,21 +70,69 @@ namespace kiwi
                 .template member<flip::Int, &Link::m_index_inlet>("inlet_index");
             }
             
-            //! @brief Get the origin Object of the link.
-            //! @return The origin Object of the link.
-            inline model::Object& getObjectFrom() const noexcept            { return *m_object_from; }
+            //! @brief Get the actual origin Object of the link.
+            //! @return The actual origin Object of the link.
+            inline model::Object& getObjectFrom() const noexcept
+            {
+                return *m_object_from;
+            }
             
-            //! @brief Get the destination Object of the link.
-            //! @return The destination Object of the link.
-            inline model::Object& getObjectTo() const noexcept              { return *m_object_to; }
+            //! @brief Get the previous origin Object of the link.
+            //! @details Use this method when the link is in a \"removed\" state.
+            //! @return The previous origin Object of the link.
+            //! @see flip::Object::removed()
+            inline model::Object& getObjectFromBefore() const noexcept
+            {
+                return *m_object_from.before();
+            }
             
-            //! @brief Get the origin outlet index of the link.
-            //! @return The origin outlet index of the link.
-            inline uint32_t getOutletIndex() const noexcept { return static_cast<uint32_t>(m_index_outlet); }
+            //! @brief Get the actual destination Object of the link.
+            //! @return The actual destination Object of the link.
+            inline model::Object& getObjectTo() const noexcept
+            {
+                return *m_object_to;
+            }
             
-            //! @brief Get the destination inlet index of the link.
-            //! @return The destination inlet index of the link.
-            inline uint32_t getInletIndex() const noexcept  { return static_cast<uint32_t>(m_index_inlet); }
+            //! @brief Get the previous destination Object of the link.
+            //! @details Use this method when the link is in a \"removed\" state.
+            //! @return The previous destination Object of the link.
+            //! @see flip::Object::removed()
+            inline model::Object& getObjectToBefore() const noexcept
+            {
+                return *m_object_to.before();
+            }
+            
+            //! @brief Get the actual origin outlet index of the link.
+            //! @return The actual origin outlet index of the link.
+            inline uint32_t getOutletIndex() const noexcept
+            {
+                return static_cast<uint32_t>(m_index_outlet);
+            }
+            
+            //! @brief Get the previous origin outlet index of the link.
+            //! @details Use this method when the link is in a \"removed\" state.
+            //! @return The previous origin outlet index of the link.
+            //! @see flip::Object::removed()
+            inline uint32_t getOutletIndexBefore() const noexcept
+            {
+                return static_cast<uint32_t>(m_index_outlet.before());
+            }
+            
+            //! @brief Get the actual destination inlet index of the link.
+            //! @return The actual destination inlet index of the link.
+            inline uint32_t getInletIndex() const noexcept
+            {
+                return static_cast<uint32_t>(m_index_inlet);
+            }
+            
+            //! @brief Get the previous destination inlet index of the link.
+            //! @details Use this method when the link is in a \"removed\" state.
+            //! @return The previous destination inlet index of the link.
+            //! @see flip::Object::removed()
+            inline uint32_t getInletIndexBefore() const noexcept
+            {
+                return static_cast<uint32_t>(m_index_inlet.before());
+            }
             
         private:
             flip::ObjectRef<model::Object>  m_object_from;
