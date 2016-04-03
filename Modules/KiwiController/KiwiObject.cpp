@@ -163,7 +163,8 @@ namespace kiwi
                     else
                     {
                         // commented because of an xcode f*c*i*g indentation bug
-                        //std::cout << "object " << receiver->getName() << "Stack overflow";
+                        std::cout << "object " << receiver->getName() << " => Stack overflow !" << '\n';
+                        return;
                     }
                     
                     receiver->m_stack_count--;

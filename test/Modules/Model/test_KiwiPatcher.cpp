@@ -133,3 +133,28 @@ TEST_CASE("Patcher - test Object delete", "[Patcher]")
     CHECK(patcher.getNumberOfObjects() == 4);
     CHECK(patcher.getNumberOfLinks() == 2);
 }
+
+TEST_CASE("Patcher - test stack overflow", "[Patcher]")
+{
+    auto instance = controller::Instance::create(123456789ULL, "kiwi");
+    instance->setDebug(false);
+    auto& patcher = instance->createPatcher();
+    const std::vector<Atom> bang_msg{"bang"};
+    
+    patcher.beginTransaction("Add two plus objects, a print object, and link them together");
+    
+    auto* plus_obj_1 = patcher.addObject("plus");
+    auto* plus_obj_2 = patcher.addObject("plus", "10.");
+    auto* print_obj  = patcher.addObject("print", "result");
+    
+    auto* plus_link_1 = patcher.addLink(*plus_obj_1, 0, *plus_obj_2, 0);
+    auto* print_link = patcher.addLink(*plus_obj_2, 0, *print_obj, 0);
+    auto* stackoverflow_link = patcher.addLink(*plus_obj_2, 0, *plus_obj_1, 0);
+    
+    patcher.endTransaction();
+    
+    CHECK(patcher.getNumberOfObjects() == 3);
+    CHECK(patcher.getNumberOfLinks() == 3);
+    
+    plus_obj_1->receive(0, bang_msg);
+}
