@@ -56,6 +56,12 @@ namespace kiwi
             //! @brief Destructor.
             virtual ~Object() noexcept;
             
+            //! @brief Get the Object model
+            inline model::Object& getModel()                    { return m_model; }
+            
+            //! @brief Get the Object model
+            inline model::Object const& getModel() const        { return m_model; }
+            
             //! @brief Returns the patcher in which this Object is instantiated.
             inline controller::Patcher* getPatcher() const      { return m_patcher; }
             
