@@ -38,7 +38,9 @@ namespace kiwi
         {
         public:
 
-            ObjectPlus(model::ObjectPlus& model, std::vector<Atom> const& args) : controller::Object(model)
+            ObjectPlus(model::ObjectPlus& model, std::vector<Atom> const& args) : controller::Object(model),
+            m_lhs(0.0),
+            m_rhs(0.0)
             {
                 if(args.size() > 0 && args[0].isNumber())
                 {
