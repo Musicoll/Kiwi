@@ -30,6 +30,8 @@ using namespace kiwi;
 TEST_CASE("Patcher", "[patcher]")
 {
     auto instance = controller::Instance::create(123456789ULL, "kiwi");
+    instance->setDebug(true);
+    
     auto& patcher = instance->createPatcher();
     
     const std::vector<Atom> bang_msg{"bang"};

@@ -50,10 +50,16 @@ namespace kiwi
             ~Instance();
             
             //! @brief Get the name of the Instance.
-            inline std::string getName() const          { return m_name; }
+            inline std::string getName() const                  { return m_name; }
             
             //! @brief Get the user ID of the Instance.
-            inline uint64_t getUserId() const noexcept  { return m_user_id; }
+            inline uint64_t getUserId() const noexcept          { return m_user_id; }
+            
+            //! @brief Set debug mode.
+            inline void setDebug(bool active_debug) noexcept    { m_debug = active_debug; }
+            
+            //! @brief Set debug mode.
+            inline bool isInDebugMode() const noexcept          { return m_debug; }
             
             //! @brief Creates and adds a new patcher to the Instance.
             //! @return A reference to the created Patcher.
@@ -80,6 +86,8 @@ namespace kiwi
             patchers_t              m_patchers;
             
             static bool             m_declared_flag;
+            
+            bool                    m_debug;
             
             static void declare();
         };

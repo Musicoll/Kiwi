@@ -304,6 +304,8 @@ namespace kiwi
         
         void Patcher::debug_document(model::Patcher& patcher)
         {
+            if(!m_instance.isInDebugMode()) return;
+            
             const auto indent = [](const int level)
             {
                 if(level >= 1) for(int i = 0; i < level; ++i) std::cout << "  |---";

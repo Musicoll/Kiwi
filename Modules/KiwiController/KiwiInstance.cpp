@@ -33,7 +33,10 @@ namespace kiwi
         
         bool Instance::m_declared_flag = false;
         
-        Instance::Instance(uint64_t user_id, std::string const& name) noexcept : m_user_id(user_id), m_name(name)
+        Instance::Instance(uint64_t user_id, std::string const& name) noexcept :
+        m_user_id(user_id),
+        m_name(name),
+        m_debug(false)
         {
             ;
         }

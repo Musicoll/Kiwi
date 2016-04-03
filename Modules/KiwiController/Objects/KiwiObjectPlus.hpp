@@ -46,8 +46,6 @@ namespace kiwi
                 {
                     m_rhs = args[0].getFloat();
                 }
-                
-                std::cout << "m_rhs = " << m_rhs << '\n';
             }
             
             void receive(uint32_t index, std::vector<Atom> args) override
