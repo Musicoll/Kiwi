@@ -85,6 +85,10 @@ namespace kiwi
                 return nullptr;
             }
             
+            //! @brief Get the number of links.
+            //! @return The number of links.
+            inline uint64_t getNumberOfLinks() const { return static_cast<uint64_t>(m_links.size()); };
+            
             //! @brief Get a link controller from its model.
             //! @param model The link model.
             inline Link* getLink(const model::Link& model) const noexcept

@@ -95,9 +95,12 @@ namespace kiwi
             return nullptr;
         }
         
-        void Patcher::removeObject(Object* /*object*/)
+        void Patcher::removeObject(Object* object)
         {
-            ;
+            if(object)
+            {
+                getModel().removeObject(object->getModel());
+            }
         }
         
         void Patcher::removeLink(Link* link)
@@ -245,7 +248,7 @@ namespace kiwi
             }
         }
 
-        void Patcher::objectChanged(model::Object& object)
+        void Patcher::objectChanged(model::Object& /*object*/)
         {
             
         }
@@ -278,7 +281,7 @@ namespace kiwi
             }
         }
         
-        void Patcher::linkChanged(model::Link& link)
+        void Patcher::linkChanged(model::Link& /*link*/)
         {
             ;
         }

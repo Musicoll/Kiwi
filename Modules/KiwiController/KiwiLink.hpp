@@ -46,10 +46,10 @@ namespace kiwi
             ~Link();
             
             //! @brief Get the Link model
-            inline model::Link& getModel() { return m_model; }
+            inline model::Link& getModel()                  { return m_model; }
             
             //! @brief Get the Link model
-            inline model::Link const& getModel() const { return m_model; }
+            inline model::Link const& getModel() const      { return m_model; }
             
             //! @brief Get the object that send messages.
             inline Object* getObjectFrom() const noexcept   { return m_object_from; }
