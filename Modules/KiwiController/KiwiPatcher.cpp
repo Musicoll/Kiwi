@@ -34,24 +34,18 @@ namespace kiwi
         // ================================================================================ //
         
         //Patcher::Patcher(sInstance instance, PatcherModel& model) noexcept : m_instance(instance), m_model(model)
-        Patcher::Patcher(Instance& instance) noexcept : m_instance(instance)
+        Patcher::Patcher(Instance& instance) noexcept :
+        m_instance(instance),
+        m_document(model::Model::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
+        m_history(m_document)
         {
-            // Set up a document
-            m_document = document_t(new flip::Document(model::Model::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'));
-            
-            // Set up an history for this document
-            m_history = history_t(new flip::History<flip::HistoryStoreMemory>(*m_document.get()));
-            
-            //m_document->commit();
+            ;
         }
         
         Patcher::~Patcher()
         {
             m_links.clear();
             m_objects.clear();
-            
-            m_history.reset();
-            m_document.reset();
         }
         
         std::unique_ptr<Patcher> Patcher::create(Instance& instance)
@@ -60,96 +54,65 @@ namespace kiwi
             return patcher;
         }
         
-        controller::Object* Patcher::addObject(std::string const& name, std::string const& text)
+        ID Patcher::addObject(std::string const& name, std::string const& text)
         {
             if(name == "plus" || name == "+")
             {
-                model::Object::initInfos infos{name, text};
-                auto& obj = *getModel().addObject(std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus(infos)));
-                
-                return addObjectController<controller::ObjectPlus, model::ObjectPlus>(obj, infos.args);
+                return getModel().addObject(std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus({name, text})));
             }
             else if(name == "print")
             {
-                model::Object::initInfos infos{name, text};
-                auto& obj = *getModel().addObject(std::unique_ptr<model::ObjectPrint>(new model::ObjectPrint(infos)));
-                return addObjectController<controller::ObjectPrint, model::ObjectPrint>(obj, infos.args);
+                return getModel().addObject(std::unique_ptr<model::ObjectPrint>(new model::ObjectPrint({name, text})));
             }
             
-            return nullptr;
+            return ID();
         }
         
-        controller::Link* Patcher::addLink(controller::Object& from, const uint32_t outlet, controller::Object& to, const uint32_t inlet)
+        ID Patcher::addLink(ID const& from, const uint32_t outlet, ID const& to, const uint32_t inlet)
         {
-            if(&from != &to)
+            auto* from_model = getObjectModel(from);
+            auto* to_model = getObjectModel(to);
+            if(from_model && to_model)
             {
-                auto& model_from = from.m_model;
-                auto& model_to = to.m_model;
-                auto& link_model = *getModel().addLink(std::unique_ptr<model::Link>(new model::Link(model_from, outlet, model_to, inlet)));
-                
-                auto link_ctrl = m_links.emplace(m_links.cend(), links_t::value_type(new controller::Link(link_model, &from, &to)));
-                
-                return link_ctrl->get();
+                return getModel().addLink(std::unique_ptr<model::Link>(new model::Link(*from_model, outlet, *to_model, inlet)));
             }
             
-            return nullptr;
+            return ID();
         }
         
-        void Patcher::removeObject(Object* object)
+        void Patcher::removeObject(ID const& object_id)
         {
-            if(object)
-            {
-                // remove links connected to this object
-                auto& model = object->getModel();
-                auto& links = getModel().getLinks();
-                for(auto it = links.begin(); it != links.end();)
-                {
-                    if(&it->getObjectFrom() == &model || &it->getObjectTo() == &model)
-                    {
-                        it = getModel().removeLink(it);
-                    }
-                    else
-                    {
-                        ++it;
-                    }
-                }
-                
-
-                getModel().removeObject(model);
-            }
+            getModel().removeObject(object_id);
         }
         
-        void Patcher::removeLink(Link* link)
+        void Patcher::removeLink(ID const& link_id)
         {
-            if(link)
-            {
-                getModel().removeLink(link->getModel());
-            }
+            getModel().removeLink(link_id);
         }
         
-        void Patcher::beginTransaction(std::string transaction_name)
+        void Patcher::beginTransaction(std::string const& label)
         {
-            m_document->set_label(transaction_name);
-            std::cout << "* " << transaction_name << '\n';
+            m_document.set_label(label);
+            std::cout << "* " << label << '\n';
         }
         
         void Patcher::endTransaction()
         {
-            auto tx = m_document->commit();
-            m_history->add_undo_step(tx);
+            auto tx = m_document.commit();
+            m_history.add_undo_step(tx);
         }
         
         void Patcher::undo(const bool commit)
         {
-            const auto last_undo = m_history->last_undo();
+            const auto last_undo = m_history.last_undo();
             
-            if(last_undo != m_history->end())
+            if(last_undo != m_history.end())
             {
                 std::cout << "* " << "Undo \"" << last_undo->label() << "\"\n";
-                m_history->execute_undo();
+                m_history.execute_undo();
                 if(commit)
                 {
-                    m_document->commit();
+                    m_document.commit();
                 }
             }
             else
@@ -160,21 +123,30 @@ namespace kiwi
         
         void Patcher::redo(const bool commit)
         {
-            const auto first_redo = m_history->first_redo();
+            const auto first_redo = m_history.first_redo();
             
-            if(first_redo != m_history->end())
+            if(first_redo != m_history.end())
             {
-                std::cout << "* " << "Redo \"" << m_history->first_redo()->label() << "\"\n";
-                m_history->execute_redo();
+                std::cout << "* " << "Redo \"" << m_history.first_redo()->label() << "\"\n";
+                m_history.execute_redo();
                 
                 if(commit)
                 {
-                    m_document->commit();
+                    m_document.commit();
                 }
             }
             else
             {
                 std::cout << "* Redo impossible\n";
+            }
+        }
+        
+        void Patcher::sendToObject(ID const& object_id, const uint32_t inlet, std::vector<Atom> args)
+        {
+            auto* object_ctrl = getObjectController(object_id);
+            if(object_ctrl)
+            {
+                object_ctrl->receive(inlet, args);
             }
         }
         
@@ -247,20 +219,16 @@ namespace kiwi
 
         void Patcher::objectHasBeenAdded(model::Object& object)
         {
-            auto obj_ptr = getObject(object);
-            if(obj_ptr == nullptr)
+            const auto name = object.getName();
+            const auto args = AtomHelper::parse(object.getText());
+            
+            if(name == "plus" || name == "+")
             {
-                const auto name = object.getName();
-                const auto args = AtomHelper::parse(object.getText());
-                
-                if(name == "plus" || name == "+")
-                {
-                    addObjectController<controller::ObjectPlus, model::ObjectPlus>(object, args);
-                }
-                else if(name == "print")
-                {
-                    addObjectController<controller::ObjectPrint, model::ObjectPrint>(object, args);
-                }
+                addObjectController<controller::ObjectPlus, model::ObjectPlus>(object, args);
+            }
+            else if(name == "print")
+            {
+                addObjectController<controller::ObjectPrint, model::ObjectPrint>(object, args);
             }
         }
 
@@ -284,16 +252,12 @@ namespace kiwi
 
         void Patcher::linkHasBeenAdded(model::Link& link)
         {
-            auto link_ptr = getLink(link);
-            if(link_ptr == nullptr)
+            auto* from = getObjectController(link.getObjectFrom());
+            auto* to = getObjectController(link.getObjectTo());
+            
+            if(from && to)
             {
-                auto* from = getObject(link.getObjectFrom());
-                auto* to = getObject(link.getObjectTo());
-                
-                if(from && to)
-                {
-                    m_links.emplace_back(links_t::value_type(new controller::Link(link, from, to)));
-                }
+                m_links.emplace_back(links_t::value_type(new controller::Link(link, from, to)));
             }
         }
         
@@ -339,7 +303,7 @@ namespace kiwi
                 indent(1);
                 std::cout << "- Objects : (" << objs_change_status_str << ")\n";
                 
-                const auto& objects = patcher.getObjects();
+                auto const& objects = patcher.getObjects();
                 
                 for(const auto& obj : objects)
                 {
@@ -364,7 +328,7 @@ namespace kiwi
                 indent(1);
                 std::cout << "- Links : (" << links_change_status_str << ")\n";
                 
-                const auto& links = patcher.getLinks();
+                auto const& links = patcher.getLinks();
                 
                 for(const auto& link : links)
                 {

@@ -30,6 +30,45 @@ using namespace kiwi;
 TEST_CASE("Patcher - testcase : counter", "[Patcher]")
 {
     auto instance = controller::Instance::create(123456789ULL, "kiwi");
+    instance->setDebug(false);
+    
+    auto& patcher = instance->createPatcher();
+    
+    const std::vector<Atom> bang_msg{"bang"};
+    
+    patcher.beginTransaction("Add two plus objects, a print object, and link them together");
+    
+    ID plus_obj_1 = patcher.addObject("plus");
+    ID plus_obj_2 = patcher.addObject("plus", "10.");
+    ID print_obj  = patcher.addObject("print", "result");
+    
+    patcher.addLink(plus_obj_1, 0, plus_obj_2, 0);
+    patcher.addLink(plus_obj_2, 0, print_obj, 0);
+    
+    patcher.endTransaction();
+    
+    patcher.sendToObject(plus_obj_1, 0, bang_msg);
+    
+    CHECK(patcher.getNumberOfObjects() == 3);
+    CHECK(patcher.getNumberOfLinks() == 2);
+    
+    patcher.beginTransaction("remove object plus 2 (and links too)");
+    patcher.removeObject(plus_obj_2);
+    patcher.endTransaction();
+    CHECK(patcher.getNumberOfObjects() == 2);
+    CHECK(patcher.getNumberOfLinks() == 0);
+    
+    patcher.undo(true);
+    CHECK(patcher.getNumberOfObjects() == 3);
+    CHECK(patcher.getNumberOfLinks() == 2);
+    
+    patcher.sendToObject(plus_obj_1, 0, {92});
+}
+
+/*
+TEST_CASE("Patcher - testcase : counter", "[Patcher]")
+{
+    auto instance = controller::Instance::create(123456789ULL, "kiwi");
     instance->setDebug(true);
     
     auto& patcher = instance->createPatcher();
@@ -47,6 +86,19 @@ TEST_CASE("Patcher - testcase : counter", "[Patcher]")
     
     patcher.endTransaction();
     
+    std::cout << "plus_obj_1 ref obj : " << plus_obj_1->getModel().ref().obj() << '\n';
+    std::cout << "plus_obj_1 ref user : " << plus_obj_1->getModel().ref().user() << '\n';
+    std::cout << "plus_obj_1 ref actor : " << plus_obj_1->getModel().ref().actor() << '\n';
+    
+    std::cout << "plus_obj_2 ref obj : " << plus_obj_2->getModel().ref().obj() << '\n';
+    std::cout << "plus_obj_2 ref user : " << plus_obj_2->getModel().ref().user() << '\n';
+    std::cout << "plus_obj_2 ref actor : " << plus_obj_2->getModel().ref().actor() << '\n';
+    
+    std::cout << "print_obj ref obj : " << print_obj->getModel().ref().obj() << '\n';
+    std::cout << "print_obj ref user : " << print_obj->getModel().ref().user() << '\n';
+    std::cout << "print_obj ref actor : " << print_obj->getModel().ref().actor() << '\n';
+    
+    
     plus_obj_1->receive(0, bang_msg);
     //plus_obj_1->receive(1, {10.});
     //plus_obj_1->receive(0, bang_msg);
@@ -62,11 +114,11 @@ TEST_CASE("Patcher - testcase : counter", "[Patcher]")
     patcher.endTransaction();
     
     patcher.undo(true);
-    /*
-    patcher.beginTransaction("Remove recursive_plus_link");
-    patcher.removeLink(recursive_plus_link);
-    patcher.endTransaction();
-    */
+
+    //patcher.beginTransaction("Remove recursive_plus_link");
+    //patcher.removeLink(recursive_plus_link);
+    //patcher.endTransaction();
+
     plus_obj_1->receive(0, bang_msg);
     plus_obj_1->receive(0, bang_msg);
     plus_obj_1->receive(0, bang_msg);
@@ -74,7 +126,9 @@ TEST_CASE("Patcher - testcase : counter", "[Patcher]")
     //patcher.undo(true);
     //patcher.redo(true);
 }
+*/
 
+/*
 TEST_CASE("Patcher - test Object delete", "[Patcher]")
 {
     auto instance = controller::Instance::create(123456789ULL, "kiwi");
@@ -158,3 +212,4 @@ TEST_CASE("Patcher - test stack overflow", "[Patcher]")
     
     plus_obj_1->receive(0, bang_msg);
 }
+*/

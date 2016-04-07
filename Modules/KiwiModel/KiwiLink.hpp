@@ -72,7 +72,21 @@ namespace kiwi
             
             //! @brief Get the actual origin Object of the link.
             //! @return The actual origin Object of the link.
-            inline model::Object& getObjectFrom() const noexcept
+            inline ID getSourceId() const noexcept
+            {
+                return m_object_from.get();
+            }
+            
+            //! @brief Get the actual origin Object of the link.
+            //! @return The actual origin Object of the link.
+            inline ID getDestinationId() const noexcept
+            {
+                return m_object_to.get();
+            }
+            
+            //! @brief Get the actual origin Object of the link.
+            //! @return The actual origin Object of the link.
+            inline model::Object const& getObjectFrom() const noexcept
             {
                 return *m_object_from;
             }
@@ -81,14 +95,14 @@ namespace kiwi
             //! @details Use this method when the link is in a \"removed\" state.
             //! @return The previous origin Object of the link.
             //! @see flip::Object::removed()
-            inline model::Object& getObjectFromBefore() const noexcept
+            inline model::Object const& getObjectFromBefore() const noexcept
             {
                 return *m_object_from.before();
             }
             
             //! @brief Get the actual destination Object of the link.
             //! @return The actual destination Object of the link.
-            inline model::Object& getObjectTo() const noexcept
+            inline model::Object const& getObjectTo() const noexcept
             {
                 return *m_object_to;
             }
@@ -97,7 +111,7 @@ namespace kiwi
             //! @details Use this method when the link is in a \"removed\" state.
             //! @return The previous destination Object of the link.
             //! @see flip::Object::removed()
-            inline model::Object& getObjectToBefore() const noexcept
+            inline model::Object const& getObjectToBefore() const noexcept
             {
                 return *m_object_to.before();
             }

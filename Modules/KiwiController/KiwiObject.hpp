@@ -55,16 +55,7 @@ namespace kiwi
             
             //! @brief Destructor.
             virtual ~Object() noexcept;
-            
-            //! @brief Get the Object model
-            inline model::Object& getModel()                    { return m_model; }
-            
-            //! @brief Get the Object model
-            inline model::Object const& getModel() const        { return m_model; }
-            
-            //! @brief Returns the patcher in which this Object is instantiated.
-            inline controller::Patcher* getPatcher() const      { return m_patcher; }
-            
+
             //! @brief Returns the name of the Object.
             inline std::string getName() const noexcept         { return m_model.getName(); }
             
@@ -93,12 +84,18 @@ namespace kiwi
             void send(const uint32_t index, std::vector<Atom> args);
             
         private:
+            
+            //! @brief Get the Object model
+            inline model::Object& getModel()                    { return m_model; }
+            
+            //! @brief Get the Object model
+            inline model::Object const& getModel() const        { return m_model; }
+            
             model::Object&          m_model;
-            controller::Patcher*    m_patcher;
             
             std::vector<Outlet>     m_outlets;
             std::vector<Inlet>      m_inlets;
-            std::atomic_ushort      m_stack_count;
+            uint32_t                m_stack_count = 0;
         };
         
         // ================================================================================ //

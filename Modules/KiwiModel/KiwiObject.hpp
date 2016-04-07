@@ -45,6 +45,31 @@
 
 namespace kiwi
 {
+    //! @brief kiwi wrapper of the flip::Ref class
+    struct ID
+    {
+        //! Construct a null ID
+        ID() = default;
+        
+        //! @brief Constructs an ID with a flip::Ref
+        ID(flip::Ref const& ref) : m_ref(ref) {}
+        
+        //! @brief Move constructor
+        ID(ID&& id) : m_ref(std::move(id.m_ref)) {}
+        
+        //! @brief Destructor
+        ~ID() = default;
+        
+        bool operator == (ID const& id) const { return (m_ref == id.m_ref); }
+        bool operator == (flip::Ref const& ref) const { return (m_ref == ref); }
+        
+        //! @brief Returns a flip::Ref from the ID
+        operator flip::Ref() const { return m_ref; }
+        
+    private:
+        const flip::Ref m_ref;
+    };
+    
     namespace model
     {
         class Patcher;

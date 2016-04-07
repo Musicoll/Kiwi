@@ -40,7 +40,7 @@ namespace kiwi
         public:
             
             using objects_t = flip::Array<model::Object>;
-            using links_t   = flip::Array<Link>;
+            using links_t   = flip::Array<model::Link>;
             
             //! @brief Default constructor.
             Patcher();
@@ -59,33 +59,29 @@ namespace kiwi
             }
             
             //! @brief Get the objects.
-            flip::Array<model::Object> const& getObjects() noexcept { return m_objects; }
+            objects_t const& getObjects() noexcept      { return m_objects; }
             
             //! @brief Get the links.
-            flip::Array<Link> const& getLinks() const noexcept      { return m_links; }
-            
-            //! @brief Get the links.
-            flip::Array<Link>& getLinks() noexcept                  { return m_links; }
+            links_t const& getLinks() const noexcept    { return m_links; }
             
             //! @brief Adds an object to the Patcher.
             //! @param object A unique pointer of object.
-            model::Object* addObject(std::unique_ptr<model::Object> && object);
+            ID addObject(std::unique_ptr<model::Object> object);
             
             //! @brief Adds a Link to the Patcher.
             //! @param link A unique pointer of Link.
-            Link* addLink(std::unique_ptr<model::Link> link);
+            ID addLink(std::unique_ptr<model::Link> link);
             
             //! @brief Removes an object from the Patcher.
-            //! @param obj A reference to the object to remove.
-            void removeObject(model::Object const& obj);
+            //! @details This will also remove all links connected to this object.
+            //! @param id The ID of the object to remove.
+            //! @return true if success, otherwise false.
+            bool removeObject(ID const& id);
             
             //! @brief Removes a link from the Patcher.
-            //! @param link A reference to the link to remove.
-            void removeLink(model::Link const& link);
-            
-            //! @brief Removes a link from the Patcher.
-            //! @param link A reference to the link to remove.
-            links_t::iterator removeLink(links_t::iterator it);
+            //! @param id The ID of the link to remove.
+            //! @return true if success, otherwise false.
+            bool removeLink(ID const& id);
             
             //! @brief Returns true if an Object has been added, removed or changed.
             inline bool objectsChanged() const noexcept { return m_objects.changed(); }

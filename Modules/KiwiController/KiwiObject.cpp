@@ -100,11 +100,6 @@ namespace kiwi
         
         bool Object::Iolet::erase(controller::Object* object, uint32_t index)
         {
-            /*
-            std::cout << "Iolet::erase" << '\n';
-            std::cout << "- has " << m_connections.size() << " connections" << '\n';
-            std::cout << "- has connection : " << has(object, index) << '\n';
-            */
             if(object && !m_connections.empty())
             {
                 const auto idx = static_cast<connections_t::size_type>(index);
@@ -118,13 +113,9 @@ namespace kiwi
                 if(it != m_connections.cend())
                 {
                     m_connections.erase(it);
-                    
-                    //std::cout << "- has " << m_connections.size() << " connections" << '\n';
                     return true;
                 }
             }
-            
-            //std::cout << "- fail to erase Iolet" << '\n';
             
             return false;
         }
@@ -152,11 +143,7 @@ namespace kiwi
                 
                 if(receiver)
                 {
-                    if(++receiver->m_stack_count < 256)
-                    {
-                        receiver->receive(connection.second, atoms);
-                    }
-                    else if(receiver->m_stack_count == 256)
+                    if(++receiver->m_stack_count <= 256)
                     {
                         receiver->receive(connection.second, atoms);
                     }
@@ -164,7 +151,6 @@ namespace kiwi
                     {
                         // commented because of an xcode f*c*i*g indentation bug
                         std::cout << "object " << receiver->getName() << " => Stack overflow !" << '\n';
-                        return;
                     }
                     
                     receiver->m_stack_count--;
@@ -242,12 +228,6 @@ namespace kiwi
         
         void Object::send(const uint32_t index, std::vector<Atom> args)
         {
-            /*
-            std::cout << "Object " << getName() << " send msg : {"
-            << AtomHelper::toString(args)
-            << "} through outlet " << index << '\n';
-            */
-            
             const auto idx = static_cast<std::vector<Outlet>::size_type>(index);
             
             if(idx < m_outlets.size())

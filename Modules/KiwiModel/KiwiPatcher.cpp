@@ -42,75 +42,72 @@ namespace kiwi
             m_objects.clear();
         }
         
-        model::Object* Patcher::addObject(std::unique_ptr<model::Object> && object)
+        ID Patcher::addObject(std::unique_ptr<model::Object> object)
         {
             if(object)
             {
                 const auto it = m_objects.insert(m_objects.end(), std::move(object));
-                return it.operator->();
+                return it->ref();
             }
             
-            return nullptr;
+            return flip::Ref::null;
         }
         
-        Link* Patcher::addLink(std::unique_ptr<model::Link> link)
+        ID Patcher::addLink(std::unique_ptr<model::Link> link)
         {
             if(link)
             {
                 const auto it = m_links.insert(m_links.end(), std::move(link));
-                return it.operator->();
+                return it->ref();
             }
             
-            return nullptr;
+            return flip::Ref::null;
         }
         
-        void Patcher::removeObject(model::Object const& object)
+        bool Patcher::removeObject(ID const& object_id)
         {
-            auto predicate = [&object](model::Object const& obj)
+            auto obj_it = m_objects.find_if([&object_id](model::Object const& obj)
             {
-                return &obj == &object;
-            };
+                return obj.ref() == object_id;
+            });
             
-            auto it = find_if(m_objects.begin(), m_objects.end(), predicate);
-            if(it != m_objects.end())
+            if(obj_it != m_objects.end())
             {
-                /*
                 // first remove links connected to this object
-                for(auto it = m_links.begin(); it != m_links.end();)
+                for(auto link_it = m_links.begin(); link_it != m_links.end();)
                 {
-                    if(&it->getObjectFrom() == &object || &it->getObjectTo() == &object)
+                    if(link_it->getSourceId() == object_id
+                       || link_it->getDestinationId() == object_id)
                     {
-                        it = removeLink(it);
+                        link_it = m_links.erase(link_it);
                     }
                     else
                     {
-                        ++it;
+                        ++link_it;
                     }
                 }
-                */
                 
-                m_objects.erase(it);
+                m_objects.erase(obj_it);
+                return true;
             }
-        }
-        
-        void Patcher::removeLink(model::Link const& link)
-        {
-            auto predicate = [&link](model::Link const& link_compare)
-            {
-                return &link_compare == &link;
-            };
             
-            auto it = find_if(m_links.begin(), m_links.end(), predicate);
-            if(it != m_links.end())
-            {
-                m_links.erase(it);
-            }
+            return false;
         }
         
-        auto Patcher::removeLink(links_t::iterator it) -> links_t::iterator
+        bool Patcher::removeLink(ID const& link_id)
         {
-            return m_links.erase(it);
+            auto link_it = m_links.find_if([&link_id](model::Link const& link)
+            {
+                return link.ref() == link_id;
+            });
+
+            if(link_it != m_links.end())
+            {
+                m_links.erase(link_it);
+                return true;
+            }
+            
+            return false;
         }
     }
-    
 }
