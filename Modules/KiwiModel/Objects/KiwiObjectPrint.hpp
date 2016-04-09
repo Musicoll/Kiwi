@@ -42,7 +42,7 @@ namespace kiwi
             
             ObjectPrint(initInfos const& infos) : model::Object(infos)
             {
-                addInlet(IoType::Message);
+                addInlet();
             }
 
             //! @internal flip static declare method

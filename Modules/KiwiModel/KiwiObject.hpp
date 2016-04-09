@@ -49,23 +49,10 @@ namespace kiwi
                 initInfos(std::string const& object_name, std::string const& object_text) :
                 name(object_name),
                 text(object_text),
-                args(AtomHelper::parse(text))
-                {
-                    ;
-                }
-            };
-
-            //! @brief The type of input/output this IO accepts.
-            enum class IoType : uint8_t
-            {
-                Message = 0,
-                Signal  = 1,
-                Both    = 2
+                args(AtomHelper::parse(text)) {}
             };
             
             class Iolet;
-            class Inlet;
-            class Outlet;
             
             //! @internal flip Default constructor
             Object(flip::Default&) {}
@@ -77,7 +64,17 @@ namespace kiwi
             virtual ~Object();
             
             //! @internal flip static declare method
-            template<class TModel> static void declare();
+            template<class TModel> static void declare()
+            {
+                if(TModel::template has<model::Object>()) return;
+                
+                TModel::template declare<model::Object>()
+                .name("cicm.kiwi.Object")
+                .template member<flip::String, &Object::m_name>("name")
+                .template member<flip::String, &Object::m_text>("text")
+                .template member<flip::Int, &Object::m_inlets>("inlets")
+                .template member<flip::Int, &Object::m_outlets>("outlets");
+            }
             
             //! @brief Returns the Object Id
             inline ObjectId getId() const {return this;}
@@ -94,107 +91,36 @@ namespace kiwi
             //! @return The number of inlets.
             inline uint32_t getNumberOfInlets() const noexcept
             {
-                return static_cast<uint32_t>(m_inlets.count_if([](Iolet const&){return true;}));
+                return static_cast<uint32_t>(m_inlets);
             }
             
             //! @brief Returns the number of outlets.
             //! @return The number of outlets.
             inline uint32_t getNumberOfOutlets() const noexcept
             {
-                return static_cast<uint32_t>(m_outlets.count_if([](Iolet const&){return true;}));
+                return static_cast<uint32_t>(m_outlets);
             }
             
             //! @brief Adds an inlet to the Object.
             //! @param type The type of input this inlet accepts.
-            void addInlet(IoType type)
-            {
-                m_inlets.emplace(m_inlets.end(), type, true);
-            }
+            void addInlet() { m_inlets += 1; }
             
             //! @brief Removes the rightmost inlet of the Object.
-            void removeInlet()
-            {
-                if(m_inlets.cbegin() != m_inlets.cend())
-                {
-                    m_inlets.erase(--m_inlets.end());
-                }
-            }
+            void removeInlet() { if(m_inlets > 0) m_inlets -= 1; }
             
             //! @brief Adds an outlet to the Object.
             //! @param type The type of output this outlet accepts.
-            void addOutlet(IoType type)
-            {
-                m_outlets.emplace(m_outlets.end(), type, false);
-            }
+            void addOutlet() { m_outlets += 1; }
             
             //! @brief Removes the rightmost outlet of the Object.
-            void removeOutlet()
-            {
-                if(m_outlets.cbegin() != m_outlets.cend())
-                {
-                    m_outlets.erase(--m_outlets.end());
-                }
-            }
+            void removeOutlet() { if(m_outlets > 0) m_outlets -= 1; }
             
         private:
-            flip::String        m_name;
-            flip::String        m_text;
-            flip::Array<Iolet>  m_inlets;
-            flip::Array<Iolet>  m_outlets;
+            flip::String    m_name;
+            flip::String    m_text;
+            flip::Int       m_inlets;
+            flip::Int       m_outlets;
         };
-        
-        // ================================================================================ //
-        //                                  OBJECT::IOLET                                   //
-        // ================================================================================ //
-        
-        //! @brief Represents either an Inlet or an Outlet of a given type.
-        class Object::Iolet : public flip::Object
-        {
-        public:
-            Iolet(flip::Default&) {}
-            Iolet(IoType type, bool is_inlet) : m_io_type(type), m_is_inlet(is_inlet) {}
-            ~Iolet() = default;
-            
-            IoType getType() const noexcept {return m_io_type;}
-            
-        private:
-            friend class model::Object;
-            flip::Enum<IoType>  m_io_type;
-            flip::Bool          m_is_inlet;
-        };
-        
-        // ================================================================================ //
-        //                                  Object::declare                                 //
-        // ================================================================================ //
-        
-        template<class TModel>
-        void Object::declare()
-        {
-            if(! TModel::template has<model::Object::IoType>())
-            {
-                TModel::template declare<model::Object::IoType>()
-                .name("IoType")
-                .template enumerator<IoType::Message>("Message")
-                .template enumerator<IoType::Signal>("Signal");
-            }
-            
-            if(! TModel::template has<model::Object::Iolet>())
-            {
-                TModel::template declare<model::Object::Iolet>()
-                .name("Iolet")
-                .template member<flip::Enum<IoType>, &Iolet::m_io_type>("type")
-                .template member<flip::Bool, &Iolet::m_is_inlet>("is_inlet");
-            }
-            
-            if(TModel::template has<model::Object>()) return;
-            
-            TModel::template declare<model::Object>()
-            .name("cicm.kiwi.Object")
-            .template member<flip::String, &Object::m_name>("name")
-            .template member<flip::String, &Object::m_text>("text")
-            .template member<flip::Array<Iolet>, &Object::m_inlets>("inlets")
-            .template member<flip::Array<Iolet>, &Object::m_outlets>("outlets");
-        }
     }
 }
 
