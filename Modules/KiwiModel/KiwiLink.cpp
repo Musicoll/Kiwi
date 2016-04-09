@@ -33,9 +33,9 @@ namespace kiwi
         //                                      LINK                                        //
         // ================================================================================ //
         
-        Link::Link(model::Object& from, const uint32_t outlet, model::Object& to, const uint32_t inlet) :
-        m_object_from(&from),
-        m_object_to(&to),
+        Link::Link(ObjectId const& from, const uint32_t outlet, ObjectId const& to, const uint32_t inlet) :
+        m_sender(from),
+        m_receiver(to),
         m_index_outlet(outlet),
         m_index_inlet(inlet)
         {

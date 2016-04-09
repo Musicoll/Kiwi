@@ -24,56 +24,12 @@
 #ifndef KIWI_MODEL_OBJECT_HPP_INCLUDED
 #define KIWI_MODEL_OBJECT_HPP_INCLUDED
 
-#include "../KiwiCore/KiwiAtom.hpp"
-#include <mutex>
-#include <algorithm>
-
-// ---- Flip headers ---- //
-#include "flip/DataModel.h"
-#include "flip/Bool.h"
-#include "flip/Int.h"
-#include "flip/Float.h"
-#include "flip/Blob.h"
-#include "flip/String.h"
-#include "flip/Enum.h"
-#include "flip/Array.h"
-#include "flip/Collection.h"
-#include "flip/Variant.h"
-#include "flip/Optional.h"
-#include "flip/Object.h"
-#include "flip/ObjectRef.h"
+#include "KiwiId.hpp"
 
 namespace kiwi
 {
-    //! @brief kiwi wrapper of the flip::Ref class
-    struct ID
-    {
-        //! Construct a null ID
-        ID() = default;
-        
-        //! @brief Constructs an ID with a flip::Ref
-        ID(flip::Ref const& ref) : m_ref(ref) {}
-        
-        //! @brief Move constructor
-        ID(ID&& id) : m_ref(std::move(id.m_ref)) {}
-        
-        //! @brief Destructor
-        ~ID() = default;
-        
-        bool operator == (ID const& id) const { return (m_ref == id.m_ref); }
-        bool operator == (flip::Ref const& ref) const { return (m_ref == ref); }
-        
-        //! @brief Returns a flip::Ref from the ID
-        operator flip::Ref() const { return m_ref; }
-        
-    private:
-        const flip::Ref m_ref;
-    };
-    
     namespace model
     {
-        class Patcher;
-        
         // ================================================================================ //
         //                                      OBJECT                                      //
         // ================================================================================ //
@@ -118,14 +74,13 @@ namespace kiwi
             Object(initInfos const& infos);
             
             //! @brief Destructor.
-            virtual ~Object()
-            {
-                m_inlets.clear();
-                m_outlets.clear();
-            }
+            virtual ~Object();
             
             //! @internal flip static declare method
             template<class TModel> static void declare();
+            
+            //! @brief Returns the Object Id
+            inline ObjectId getId() const {return this;}
             
             //! @brief Returns the name of the Object.
             //! @return The name of the Object.
@@ -142,15 +97,19 @@ namespace kiwi
                 return static_cast<uint32_t>(m_inlets.count_if([](Iolet const&){return true;}));
             }
             
+            //! @brief Returns the number of outlets.
+            //! @return The number of outlets.
+            inline uint32_t getNumberOfOutlets() const noexcept
+            {
+                return static_cast<uint32_t>(m_outlets.count_if([](Iolet const&){return true;}));
+            }
+            
             //! @brief Adds an inlet to the Object.
             //! @param type The type of input this inlet accepts.
             void addInlet(IoType type)
             {
                 m_inlets.emplace(m_inlets.end(), type, true);
             }
-            
-            //! @brief Retrieves the inlets of the Object.
-            flip::Array<Iolet> const& getInlets() const noexcept { return m_inlets; }
             
             //! @brief Removes the rightmost inlet of the Object.
             void removeInlet()
@@ -168,10 +127,6 @@ namespace kiwi
                 m_outlets.emplace(m_outlets.end(), type, false);
             }
             
-            //! @brief Retrieves the inlets of the Object.
-            flip::Array<Iolet> const& getOutlets() const noexcept { return m_outlets; }
-            
-            
             //! @brief Removes the rightmost outlet of the Object.
             void removeOutlet()
             {
@@ -179,14 +134,6 @@ namespace kiwi
                 {
                     m_outlets.erase(--m_outlets.end());
                 }
-            }
-            
-            
-            //! @brief Returns the number of outlets.
-            //! @return The number of outlets.
-            inline uint32_t getNumberOfOutlets() const noexcept
-            {
-                return static_cast<uint32_t>(m_outlets.count_if([](Iolet const&){return true;}));
             }
             
         private:

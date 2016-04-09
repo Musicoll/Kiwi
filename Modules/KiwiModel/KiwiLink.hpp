@@ -51,7 +51,7 @@ namespace kiwi
             //! @param outlet   The origin outlet index.
             //! @param to       The destination Object.
             //! @param inlet    The destination inlet index.
-            Link(model::Object& from, const uint32_t outlet, model::Object& to, const uint32_t inlet);
+            Link(ObjectId const& from, const uint32_t outlet, ObjectId const& to, const uint32_t inlet);
             
             //! @brief Destructor.
             virtual ~Link() {}
@@ -64,93 +64,48 @@ namespace kiwi
                 
                 TModel::template declare<Link>()
                 .name("cicm.kiwi.Link")
-                .template member<flip::ObjectRef<model::Object>, &Link::m_object_from>("object_from")
-                .template member<flip::ObjectRef<model::Object>, &Link::m_object_to>("object_to")
+                .template member<flip::ObjectRef<model::Object>, &Link::m_sender>("sender_obj")
+                .template member<flip::ObjectRef<model::Object>, &Link::m_receiver>("receiver_obj")
                 .template member<flip::Int, &Link::m_index_outlet>("outlet_index")
                 .template member<flip::Int, &Link::m_index_inlet>("inlet_index");
             }
             
-            //! @brief Get the actual origin Object of the link.
-            //! @return The actual origin Object of the link.
-            inline ID getSourceId() const noexcept
+            //! @brief Returns the Link Id
+            inline LinkId getId() const {return this;}
+            
+            //! @brief Get the source Object ID of the link.
+            //! @return The source Object ID of the link.
+            inline ObjectId getSenderId() const noexcept
             {
-                return m_object_from.get();
+                return !removed() ? m_sender.value() : m_sender.before();
             }
             
-            //! @brief Get the actual origin Object of the link.
-            //! @return The actual origin Object of the link.
-            inline ID getDestinationId() const noexcept
+            //! @brief Get the destination Object of the link.
+            //! @return The destination Object of the link.
+            inline ObjectId getReceiverId() const noexcept
             {
-                return m_object_to.get();
-            }
-            
-            //! @brief Get the actual origin Object of the link.
-            //! @return The actual origin Object of the link.
-            inline model::Object const& getObjectFrom() const noexcept
-            {
-                return *m_object_from;
-            }
-            
-            //! @brief Get the previous origin Object of the link.
-            //! @details Use this method when the link is in a \"removed\" state.
-            //! @return The previous origin Object of the link.
-            //! @see flip::Object::removed()
-            inline model::Object const& getObjectFromBefore() const noexcept
-            {
-                return *m_object_from.before();
-            }
-            
-            //! @brief Get the actual destination Object of the link.
-            //! @return The actual destination Object of the link.
-            inline model::Object const& getObjectTo() const noexcept
-            {
-                return *m_object_to;
-            }
-            
-            //! @brief Get the previous destination Object of the link.
-            //! @details Use this method when the link is in a \"removed\" state.
-            //! @return The previous destination Object of the link.
-            //! @see flip::Object::removed()
-            inline model::Object const& getObjectToBefore() const noexcept
-            {
-                return *m_object_to.before();
+                return !removed() ? m_receiver.value() : m_receiver.before();
             }
             
             //! @brief Get the actual origin outlet index of the link.
             //! @return The actual origin outlet index of the link.
-            inline uint32_t getOutletIndex() const noexcept
+            inline uint32_t getSenderIndex() const noexcept
             {
-                return static_cast<uint32_t>(m_index_outlet);
-            }
-            
-            //! @brief Get the previous origin outlet index of the link.
-            //! @details Use this method when the link is in a \"removed\" state.
-            //! @return The previous origin outlet index of the link.
-            //! @see flip::Object::removed()
-            inline uint32_t getOutletIndexBefore() const noexcept
-            {
-                return static_cast<uint32_t>(m_index_outlet.before());
+                int64_t value = (!removed()) ? m_index_outlet.value() : m_index_outlet.before();
+                return static_cast<uint32_t>(value);
             }
             
             //! @brief Get the actual destination inlet index of the link.
             //! @return The actual destination inlet index of the link.
-            inline uint32_t getInletIndex() const noexcept
+            inline uint32_t getReceiverIndex() const noexcept
             {
-                return static_cast<uint32_t>(m_index_inlet);
-            }
-            
-            //! @brief Get the previous destination inlet index of the link.
-            //! @details Use this method when the link is in a \"removed\" state.
-            //! @return The previous destination inlet index of the link.
-            //! @see flip::Object::removed()
-            inline uint32_t getInletIndexBefore() const noexcept
-            {
-                return static_cast<uint32_t>(m_index_inlet.before());
+                int64_t value = (!removed()) ? m_index_inlet.value() : m_index_inlet.before();
+                return static_cast<uint32_t>(value);
             }
             
         private:
-            flip::ObjectRef<model::Object>  m_object_from;
-            flip::ObjectRef<model::Object>  m_object_to;
+            flip::ObjectRef<model::Object>  m_sender;
+            flip::ObjectRef<model::Object>  m_receiver;
             flip::Int                       m_index_outlet;
             flip::Int                       m_index_inlet;
         };

@@ -40,33 +40,31 @@ namespace kiwi
         public:
             
             //! @brief Constructor.
-            Link(model::Link& model, Object* from, Object* to);
+            Link(model::Link& model, Object& sender_object, Object& receiver_object);
             
             //! @brief Destructor.
             ~Link();
             
-            //! @brief Get the Link model
-            inline model::Link& getModel()                  { return m_model; }
-            
-            //! @brief Get the Link model
-            inline model::Link const& getModel() const      { return m_model; }
+            //! @brief Returns the Link Id
+            inline LinkId getId() const {return m_model.getId();}
             
             //! @brief Get the object that send messages.
-            inline Object* getObjectFrom() const noexcept   { return m_object_from; }
+            inline Object& getSenderObject() const noexcept     { return m_sender; }
             
             //! @brief Get the object that receive messages.
-            inline Object* getObjectTo() const noexcept     { return m_object_to; }
+            inline Object& getReceiverObject() const noexcept   { return m_receiver; }
             
             //! @brief Retrieve the index of the outlet of the link.
-            inline uint32_t getOutletIndex() const noexcept { return m_model.getOutletIndex(); }
+            inline uint32_t getSenderIndex() const noexcept     { return m_model.getSenderIndex(); }
             
             //! @brief Retrieve the index of the inlet of the link.
-            inline uint32_t getInletIndex() const noexcept  { return m_model.getInletIndex(); }
+            inline uint32_t getReceiverIndex() const noexcept   { return m_model.getReceiverIndex(); }
             
         private:
-            model::Link&    m_model;
-            Object*         m_object_from;
-            Object*         m_object_to;
+            
+            model::Link const&  m_model;
+            Object&             m_sender;
+            Object&             m_receiver;
         };
     }
 }

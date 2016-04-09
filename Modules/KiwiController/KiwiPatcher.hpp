@@ -54,20 +54,8 @@ namespace kiwi
             //! @brief Creates and returns a new Patcher.
             static std::unique_ptr<Patcher> create(Instance& instance);
             
-            //! @brief Get the number of objects.
-            //! @return The number of objects.
-            inline uint64_t getNumberOfObjects() const { return static_cast<uint64_t>(m_objects.size()); };
-            
-            //! @brief Get the object container.
-            //! @return A const reference to the object container.
-            //inline objects_t const& getObjects() const noexcept { return m_objects; }
-            
-            //! @brief Get the number of links.
-            //! @return The number of links.
-            inline uint64_t getNumberOfLinks() const { return static_cast<uint64_t>(m_links.size()); };
-            
             //! @brief Creates and adds an object to the Patcher.
-            ID addObject(std::string const& name, std::string const& text = "");
+            ObjectId addObject(std::string const& name, std::string const& text = "");
             
             //! @brief Constructs and add a Link to the Patcher.
             //! @details Constructs a Link with given origin and destination Object pointers
@@ -76,15 +64,26 @@ namespace kiwi
             //! @param outlet   The origin outlet index.
             //! @param to       The destination Object pointer.
             //! @param inlet    The destination inlet index.
-            ID addLink(ID const& from, const uint32_t outlet, ID const& to, const uint32_t inlet);
+            LinkId addLink(ObjectId const& from, const uint32_t outlet, ObjectId const& to, const uint32_t inlet);
             
             //! @brief Removes an Object from the Patcher.
             //! @param id The ID of the object to be removed.
-            void removeObject(ID const& id);
+            void removeObject(ObjectId const& id);
             
             //! @brief Removes an Object from the Patcher.
             //! @param object The pointer to the object to be removed.
-            void removeLink(ID const& link);
+            void removeLink(LinkId const& link);
+            
+            //! @brief Get the number of objects.
+            //! @return The number of objects.
+            inline uint64_t getNumberOfObjects() const { return static_cast<uint64_t>(m_objects.size()); };
+            
+            //! @brief Get the number of links.
+            //! @return The number of links.
+            inline uint64_t getNumberOfLinks() const { return static_cast<uint64_t>(m_links.size()); };
+            
+            //! @brief Send a message to an object
+            void sendToObject(ObjectId const& object_id, uint32_t inlet, std::vector<Atom> args);
             
             //! @brief Begins a new transaction
             //! @details Each call to this function must be followed by a call to endTransaction.
@@ -103,9 +102,6 @@ namespace kiwi
             //! @brief Redo the next transaction and optionally commit
             void redo(const bool commit = false);
             
-            //! @brief Send a message to an object
-            void sendToObject(ID const& object_id, uint32_t inlet, std::vector<Atom> args);
-            
         private:
             
             //! @brief Constructor.
@@ -120,53 +116,19 @@ namespace kiwi
             
             //! @brief Get an object model with an id.
             //! @param id The id of the object.
-            inline model::Object* getObjectModel(ID const& id)
-            {
-                return m_document.object_ptr<model::Object>(id);
-            }
+            model::Object* getModel(ObjectId const& id);
             
             //! @brief Get an object controller with an id.
             //! @param id The id of the object.
-            inline Object* getObjectController(ID const& id)
-            {
-                auto* model = getObjectModel(id);
-                if(model)
-                {
-                    return getObjectController(*model);
-                }
-                
-                return nullptr;
-            }
+            Object* getController(ObjectId const& id);
             
             //! @brief Get an object controller with a model.
             //! @param id The id of the object.
-            inline Object* getObjectController(model::Object const& model)
-            {
-                const auto it = std::find_if(m_objects.begin(), m_objects.end(),
-                                             [&model](objects_t::value_type const& ctrl)
-                {
-                    return (&model == &ctrl->getModel());
-                });
-                
-                if(it != m_objects.end())
-                {
-                    return it->get();
-                }
-                
-                return nullptr;
-            }
-            
-            //! @brief Add an object controller
-            template <class TControllerClass, class TModelClass>
-            controller::Object* addObjectController(model::Object& obj_model, std::vector<Atom> const& args)
-            {
-                const auto it = m_objects.emplace(m_objects.cend(), std::unique_ptr<TControllerClass>(new TControllerClass(static_cast<TModelClass&>(obj_model), args)));
-                
-                return it->get();
-            }
+            Object* getController(model::Object const& model);
             
             //! @internal flip::DocumentObserver<model::Patcher>::document_changed
             void document_changed(model::Patcher& patcher) final;
+            
             //! @internal for debugging purpose.
             void debug_document(model::Patcher& patcher);
             

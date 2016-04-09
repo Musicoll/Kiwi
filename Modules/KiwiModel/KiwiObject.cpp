@@ -25,8 +25,6 @@
 
 namespace kiwi
 {
-    //const ID ID::null{};
-    
     namespace model
     {
         // ================================================================================ //
@@ -38,6 +36,12 @@ namespace kiwi
         m_text(infos.text)
         {
             ;
+        }
+        
+        Object::~Object()
+        {
+            m_inlets.clear();
+            m_outlets.clear();
         }
     }
 }

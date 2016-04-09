@@ -54,41 +54,38 @@ namespace kiwi
             return patcher;
         }
         
-        ID Patcher::addObject(std::string const& name, std::string const& text)
+        ObjectId Patcher::addObject(std::string const& name, std::string const& text)
         {
-            if(name == "plus" || name == "+")
-            {
-                return getModel().addObject(std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus({name, text})));
-            }
-            else if(name == "print")
-            {
-                return getModel().addObject(std::unique_ptr<model::ObjectPrint>(new model::ObjectPrint({name, text})));
-            }
-            
-            return ID();
+            return getModel().addObject(name, text);
         }
         
-        ID Patcher::addLink(ID const& from, const uint32_t outlet, ID const& to, const uint32_t inlet)
+        LinkId Patcher::addLink(ObjectId const& from, const uint32_t outlet, ObjectId const& to, const uint32_t inlet)
         {
-            auto* from_model = getObjectModel(from);
-            auto* to_model = getObjectModel(to);
-            if(from_model && to_model)
-            {
-                return getModel().addLink(std::unique_ptr<model::Link>(new model::Link(*from_model, outlet, *to_model, inlet)));
-            }
-            
-            return ID();
+            return getModel().addLink(from, outlet, to, inlet);
         }
         
-        void Patcher::removeObject(ID const& object_id)
+        void Patcher::removeObject(ObjectId const& object_id)
         {
             getModel().removeObject(object_id);
         }
         
-        void Patcher::removeLink(ID const& link_id)
+        void Patcher::removeLink(LinkId const& link_id)
         {
             getModel().removeLink(link_id);
         }
+        
+        void Patcher::sendToObject(ObjectId const& object_id, const uint32_t inlet, std::vector<Atom> args)
+        {
+            auto* object_ctrl = getController(object_id);
+            if(object_ctrl)
+            {
+                object_ctrl->receive(inlet, args);
+            }
+        }
+        
+        // ================================================================================ //
+        //                              DOCUMENT TRANSACTIONS                               //
+        // ================================================================================ //
         
         void Patcher::beginTransaction(std::string const& label)
         {
@@ -141,13 +138,37 @@ namespace kiwi
             }
         }
         
-        void Patcher::sendToObject(ID const& object_id, const uint32_t inlet, std::vector<Atom> args)
+        model::Object* Patcher::getModel(ObjectId const& id)
         {
-            auto* object_ctrl = getObjectController(object_id);
-            if(object_ctrl)
+            return m_document.object_ptr<model::Object>(id);
+        }
+        
+        Object* Patcher::getController(ObjectId const& id)
+        {
+            auto* model = getModel(id);
+            if(model)
             {
-                object_ctrl->receive(inlet, args);
+                return getController(*model);
             }
+            
+            return nullptr;
+        }
+        
+        Object* Patcher::getController(model::Object const& model)
+        {
+            const auto equal_ids = [&model](objects_t::value_type const& ctrl)
+            {
+                return (model.getId() == ctrl->getId());
+            };
+            
+            const auto it = std::find_if(m_objects.begin(), m_objects.end(), equal_ids);
+            
+            if(it != m_objects.cend())
+            {
+                return it->get();
+            }
+            
+            return nullptr;
         }
         
         // ================================================================================ //
@@ -224,11 +245,11 @@ namespace kiwi
             
             if(name == "plus" || name == "+")
             {
-                addObjectController<controller::ObjectPlus, model::ObjectPlus>(object, args);
+                m_objects.emplace_back(std::unique_ptr<controller::ObjectPlus>(new controller::ObjectPlus(static_cast<model::ObjectPlus&>(object), args)));
             }
             else if(name == "print")
             {
-                addObjectController<controller::ObjectPrint, model::ObjectPrint>(object, args);
+                m_objects.emplace_back(std::unique_ptr<controller::ObjectPrint>(new controller::ObjectPrint(static_cast<model::ObjectPrint&>(object), args)));
             }
         }
 
@@ -241,7 +262,7 @@ namespace kiwi
         {
             const auto it = std::find_if(m_objects.begin(), m_objects.end(), [&object](objects_t::value_type const& ctrl)
             {
-                return (&ctrl.get()->m_model == &object);
+                return (ctrl->getId() == object.getId());
             });
             
             if(it != m_objects.cend())
@@ -252,12 +273,14 @@ namespace kiwi
 
         void Patcher::linkHasBeenAdded(model::Link& link)
         {
-            auto* from = getObjectController(link.getObjectFrom());
-            auto* to = getObjectController(link.getObjectTo());
+            auto* from = getController(link.getSenderId());
+            auto* to = getController(link.getReceiverId());
             
             if(from && to)
             {
-                m_links.emplace_back(links_t::value_type(new controller::Link(link, from, to)));
+                const auto it = m_links.emplace(m_links.end(), links_t::value_type(new controller::Link(link, *from, *to)));
+                
+                from->addOutputLink(it->get());
             }
         }
         
@@ -268,15 +291,17 @@ namespace kiwi
         
         void Patcher::linkWillBeRemoved(model::Link& link)
         {
-            //std::cout << "linkWillBeRemoved" << '\n';
-            const auto it = std::find_if(m_links.begin(), m_links.end(), [&link](links_t::value_type const& ctrl)
+            const auto pred = [&link](links_t::value_type const& ctrl)
             {
-                return (&ctrl.get()->getModel() == &link);
-            });
+                return (ctrl->getId() == link.getId());
+            };
+            
+            const auto it = std::find_if(m_links.begin(), m_links.end(), pred);
             
             if(it != m_links.cend())
             {
-                //std::cout << "linkWillBeRemoved found" << '\n';
+                Object& from = (*it)->getSenderObject();
+                from.removeOutputLink(it->get());
                 m_links.erase(it);
             }
         }
@@ -341,31 +366,21 @@ namespace kiwi
                     
                     indent(3); std::cout << "- status : " << status_str << '\n';
                     
-                    if(link.resident() || link.added())
+                    auto const* const from = getModel(link.getSenderId());
+                    auto const* const to = getModel(link.getReceiverId());
+                    
+                    if(from)
                     {
-                        const auto& from = link.getObjectFrom();
-                        const auto& to = link.getObjectTo();
-                        
-                        indent(3); std::cout    << "- from object : \""
-                        << from.getName() << "\" ("
-                        << link.getOutletIndex() << ")" << '\n';
-                        
-                        indent(3); std::cout    << "- to object : \""
-                        << to.getName() << "\" ("
-                        << link.getInletIndex() << ")" << '\n';
+                        indent(3); std::cout << "- from object : \""
+                        << from->getName() << "\" ("
+                        << link.getSenderIndex() << ")" << '\n';
                     }
-                    else if(link.removed())
+                    
+                    if(to)
                     {
-                        const auto& from = link.getObjectFromBefore();
-                        const auto& to = link.getObjectToBefore();
-                        
-                        indent(3); std::cout    << "- from object (before) : \""
-                        << from.getName() << "\" ("
-                        << link.getOutletIndex() << ")" << '\n';
-                        
-                        indent(3); std::cout    << "- to object (before) : \""
-                        << to.getName() << "\" ("
-                        << link.getInletIndex() << ")" << '\n';
+                        indent(3); std::cout << "- to object : \""
+                        << to->getName() << "\" ("
+                        << link.getReceiverIndex() << ")" << '\n';
                     }
                 }
             }

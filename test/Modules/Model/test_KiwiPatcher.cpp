@@ -30,7 +30,7 @@ using namespace kiwi;
 TEST_CASE("Patcher - testcase : counter", "[Patcher]")
 {
     auto instance = controller::Instance::create(123456789ULL, "kiwi");
-    instance->setDebug(false);
+    //instance->setDebug(true);
     
     auto& patcher = instance->createPatcher();
     
@@ -38,12 +38,12 @@ TEST_CASE("Patcher - testcase : counter", "[Patcher]")
     
     patcher.beginTransaction("Add two plus objects, a print object, and link them together");
     
-    ID plus_obj_1 = patcher.addObject("plus");
-    ID plus_obj_2 = patcher.addObject("plus", "10.");
-    ID print_obj  = patcher.addObject("print", "result");
+    auto plus_obj_1 = patcher.addObject("plus");
+    auto plus_obj_2 = patcher.addObject("+", "10.");
+    auto print_obj  = patcher.addObject("print", "result");
     
-    patcher.addLink(plus_obj_1, 0, plus_obj_2, 0);
-    patcher.addLink(plus_obj_2, 0, print_obj, 0);
+    auto plus_link_id = patcher.addLink(plus_obj_1, 0, plus_obj_2, 0);
+    auto print_link_id = patcher.addLink(plus_obj_2, 0, print_obj, 0);
     
     patcher.endTransaction();
     
@@ -63,6 +63,13 @@ TEST_CASE("Patcher - testcase : counter", "[Patcher]")
     CHECK(patcher.getNumberOfLinks() == 2);
     
     patcher.sendToObject(plus_obj_1, 0, {92});
+    
+    // test stack overflow :
+    patcher.beginTransaction("add recursive link");
+    patcher.addLink(plus_obj_2, 0, plus_obj_1, 0);
+    patcher.endTransaction();
+    
+    patcher.sendToObject(plus_obj_1, 0, {10});
 }
 
 /*

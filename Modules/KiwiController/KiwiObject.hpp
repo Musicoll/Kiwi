@@ -33,6 +33,7 @@ namespace kiwi
     {
         class Patcher;
         class Instance;
+        class Link;
         
         // ================================================================================ //
         //                                      OBJECT                                      //
@@ -42,19 +43,15 @@ namespace kiwi
         class Object
         {
         public:
-            friend class controller::Patcher;
-            
-            using IoType = model::Object::IoType;
-            
-            class Iolet;
-            class Inlet;
-            class Outlet;
             
             //! @brief Constructor.
             Object(model::Object& model) noexcept;
             
             //! @brief Destructor.
             virtual ~Object() noexcept;
+            
+            //! @brief Returns the Link Id
+            inline ObjectId getId() const {return m_model.getId();}
 
             //! @brief Returns the name of the Object.
             inline std::string getName() const noexcept         { return m_model.getName(); }
@@ -68,12 +65,6 @@ namespace kiwi
             //! @brief Get the number of inlets of the object.
             inline uint32_t getNumberOfOutlets() const noexcept { return m_model.getNumberOfOutlets(); }
             
-            //! @brief Returns the Inlet at a given index.
-            Object::Inlet* getInlet(const uint32_t index) noexcept;
-            
-            //! @brief Returns the Outlet at a given index.
-            Object::Outlet* getOutlet(const uint32_t index) noexcept;
-            
             //! @brief The receive method.
             //! @details This method must be overriden by object's subclasses.
             virtual void receive(uint32_t index, std::vector<Atom> args) = 0;
@@ -84,126 +75,21 @@ namespace kiwi
             void send(const uint32_t index, std::vector<Atom> args);
             
         private:
+            typedef std::set<Link*> Outlet;
             
-            //! @brief Get the Object model
-            inline model::Object& getModel()                    { return m_model; }
+            //! @brief Append a new link to an outlet.
+            void addOutputLink(Link* link);
             
-            //! @brief Get the Object model
-            inline model::Object const& getModel() const        { return m_model; }
+            //! @brief Remove a link from an outlet.
+            void removeOutputLink(Link* link);
             
-            model::Object&          m_model;
+            model::Object const&    m_model;
             
+            //std::vector<Inlet>      m_inlets;
             std::vector<Outlet>     m_outlets;
-            std::vector<Inlet>      m_inlets;
-            uint32_t                m_stack_count = 0;
-        };
-        
-        // ================================================================================ //
-        //                                  Object::Iolet                                   //
-        // ================================================================================ //
-        
-        //! @brief The base class of Inlet and Outlet.
-        //! @details The Iolet can be of a given IoType
-        //! and owns a vector of connections between inlets and outlets.
-        class Object::Iolet
-        {
-        public:
+            uint32_t                m_stack_count = 0ul;
             
-            using connections_t  = std::vector<std::pair<Object*, uint32_t>>;
-            
-            //! @brief Constructor.
-            inline Iolet(IoType type) noexcept : m_type(type) {}
-            
-            //! @brief Destructor.
-            virtual ~Iolet() noexcept
-            {
-                m_connections.clear();
-            }
-            
-            //! @brief Returns the IoType of the iolet.
-            inline IoType getType() const noexcept { return m_type; }
-            
-            //! @brief Get the number of connections.
-            //! @return The number of connections.
-            inline uint32_t getNumberOfConnections() const noexcept
-            {
-                return static_cast<uint32_t>(m_connections.size());
-            }
-            
-            //! @brief Get the object of a connection at a given index.
-            //! @param index The index of the connection.
-            //! @return The object of a connection.
-            Object const* getObject(const uint32_t index) const noexcept;
-            
-            //! @brief Get the object of a connection at a given index.
-            //! @param index The index of the connection.
-            //! @return The object of a connection.
-            Object* getObject(const uint32_t index) noexcept;
-            
-            //! @brief Get the iolet's index of a connection at a given index.
-            //! @param index The index of the connection.
-            //! @return The iolet's index of a connection.
-            uint32_t getIndex(const uint32_t index) const noexcept;
-            
-            //! @brief Check if a connection is in the iolet.
-            //! @param object A pointer to the Object to which the iolet belongs.
-            //! @param index the iolet's index.
-            //! @return true if the connection is in the iolet, otherwise false.
-            bool has(Object const* const object, const uint32_t index) const noexcept;
-            
-            //! @brief Append a new connection to the iolet.
-            //! @param object A pointer to the Object to which the iolet belongs.
-            //! @param index the iolet's index.
-            //! @return true if the connection has been added, otherwise false.
-            bool append(Object* object, const uint32_t index);
-            
-            //! @brief Remove a connection from the iolet.
-            //! @param object A pointer to the Object to which the iolet belongs.
-            //! @param index the iolet's index.
-            //! @return true if the connection has been removed, otherwise false.
-            bool erase(Object* object, const uint32_t index);
-            
-        protected:
-            
-            connections_t   m_connections;
-            const IoType    m_type;
-        };
-        
-        // ================================================================================ //
-        //                                   Object::INLET                                  //
-        // ================================================================================ //
-        
-        //! @brief The Inlet.
-        class Object::Inlet : public Iolet
-        {
-        public:
-            
-            //! @brief Constructor.
-            //! @param type The IoType of the inlet.
-            Inlet(IoType type) noexcept;
-            
-            //! @brief Destructor.
-            ~Inlet();
-        };
-        
-        // ================================================================================ //
-        //                                  Object::OUTLET                                  //
-        // ================================================================================ //
-        
-        //! @brief The outlet is a specific Iolet that can send messages to Inlet.
-        class Object::Outlet : public Iolet
-        {
-        public:
-            //! Constructor.
-            //! @param type The type of the outlet.
-            Outlet(IoType type) noexcept;
-            
-            //! @brief Destructor.
-            ~Outlet();
-            
-            //! @brief Sends a vector of atoms to the connected inlets.
-            //! @param atoms The vector of atoms.
-            void send(std::vector<Atom> const& atoms) const noexcept;
+            friend class controller::Patcher;
         };
     }
 }
