@@ -33,7 +33,7 @@ namespace kiwi
         //                                      LINK                                        //
         // ================================================================================ //
         
-        Link::Link(model::Link& model, Object& sender, Object& receiver) :
+        Link::Link(model::Link& model, std::shared_ptr<Object> sender, std::shared_ptr<Object> receiver) :
         m_model(model),
         m_sender(sender),
         m_receiver(receiver)
