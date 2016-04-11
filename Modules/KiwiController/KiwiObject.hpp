@@ -49,9 +49,6 @@ namespace kiwi
             
             //! @brief Destructor.
             virtual ~Object() noexcept;
-            
-            //! @brief Returns the Link Id
-            inline ObjectId getId() const {return m_model.getId();}
 
             //! @brief Returns the name of the Object.
             inline std::string getName() const noexcept         { return m_model.getName(); }

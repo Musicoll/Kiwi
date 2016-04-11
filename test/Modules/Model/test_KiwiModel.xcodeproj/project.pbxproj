@@ -232,7 +232,6 @@
 		2C7F54D51CA0432000917D46 /* flip_macos.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = flip_macos.a; path = "../../../ThirdParty/flip-public/bin/flip_macos.a"; sourceTree = "<group>"; };
 		2C85B2BD1CB051770038A291 /* KiwiObjectPrint.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = KiwiObjectPrint.hpp; sourceTree = "<group>"; };
 		2C85B2BE1CB052440038A291 /* KiwiObjectPrint.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = KiwiObjectPrint.hpp; sourceTree = "<group>"; };
-		2C90F0511CB95CD60032F5E9 /* KiwiId.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = KiwiId.hpp; sourceTree = "<group>"; };
 		2C92CECB1C7DCF3200EDF976 /* KiwiAtom.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; lineEnding = 2; path = KiwiAtom.hpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		2CC9D99F1C66808E00B1F821 /* test_KiwiModel */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_KiwiModel; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -263,7 +262,6 @@
 			isa = PBXGroup;
 			children = (
 				2C2D08FA1C866D00009BED7B /* KiwiModel.hpp */,
-				2C90F0511CB95CD60032F5E9 /* KiwiId.hpp */,
 				2C2D08FC1C866D00009BED7B /* KiwiObject.cpp */,
 				2C2D08FD1C866D00009BED7B /* KiwiObject.hpp */,
 				2C2D08F81C866D00009BED7B /* KiwiLink.cpp */,

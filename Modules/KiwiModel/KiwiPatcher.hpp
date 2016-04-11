@@ -65,10 +65,10 @@ namespace kiwi
             links_t const& getLinks() const noexcept    { return m_links; }
             
             //! @brief Creates and adds a "plus" object to the Patcher.
-            ObjectId addPlus();
+            void addPlus();
             
             //! @brief Creates and adds a "print" object to the Patcher.
-            ObjectId addPrint();
+            void addPrint();
             
             //! @brief Constructs and add a Link to the Patcher.
             //! @details Constructs a Link with given origin and destination Object pointers
@@ -77,21 +77,21 @@ namespace kiwi
             //! @param outlet   The origin outlet index.
             //! @param to       The destination Object pointer.
             //! @param inlet    The destination inlet index.
-            LinkId addLink(ObjectId const& from,
-                           const uint32_t outlet,
-                           ObjectId const& to,
-                           const uint32_t inlet);
+            void addLink(model::Object const& from,
+                         const uint32_t outlet,
+                         model::Object const& to,
+                         const uint32_t inlet);
             
             //! @brief Removes an object from the Patcher.
             //! @details This will also remove all links connected to this object.
             //! @param id The ID of the object to remove.
             //! @return true if success, otherwise false.
-            bool removeObject(ObjectId const& id);
+            void removeObject(model::Object const& object);
             
             //! @brief Removes a link from the Patcher.
             //! @param id The ID of the link to remove.
             //! @return true if success, otherwise false.
-            bool removeLink(LinkId const& id);
+            void removeLink(model::Link const& link);
             
             //! @brief Returns true if an Object has been added, removed or changed.
             inline bool objectsChanged() const noexcept { return m_objects.changed(); }
@@ -101,18 +101,16 @@ namespace kiwi
             
         private:
             
-            bool canConnect(ObjectId const& from,
+            bool canConnect(model::Object const& from,
                             const uint32_t outlet,
-                            ObjectId const& to,
+                            model::Object const& to,
                             const uint32_t inlet) const;
             
-            //! @brief Adds an object to the Patcher.
-            //! @param object A unique pointer of object.
-            ObjectId addObject(std::unique_ptr<model::Object> object);
+            objects_t::const_iterator findObject(model::Object const& object) const;
+            objects_t::iterator findObject(model::Object const& object);
             
-            //! @brief Adds a Link to the Patcher.
-            //! @param link A unique pointer of Link.
-            LinkId addLink(std::unique_ptr<model::Link> link);
+            links_t::const_iterator findLink(model::Link const& object) const;
+            links_t::iterator findLink(model::Link const& object);
             
             //! objects and links are stored in a flip::Array to maintain a graphical z-order.
             objects_t   m_objects;

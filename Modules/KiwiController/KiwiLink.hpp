@@ -45,9 +45,6 @@ namespace kiwi
             //! @brief Destructor.
             ~Link();
             
-            //! @brief Returns the Link Id
-            inline LinkId getId() const {return m_model.getId();}
-            
             //! @brief Get the object that send messages.
             inline Object& getSenderObject() const noexcept     { return m_sender; }
             
@@ -65,6 +62,8 @@ namespace kiwi
             model::Link const&  m_model;
             Object&             m_sender;
             Object&             m_receiver;
+            
+            friend class Patcher;
         };
     }
 }

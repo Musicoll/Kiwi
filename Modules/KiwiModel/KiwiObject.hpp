@@ -24,7 +24,22 @@
 #ifndef KIWI_MODEL_OBJECT_HPP_INCLUDED
 #define KIWI_MODEL_OBJECT_HPP_INCLUDED
 
-#include "KiwiId.hpp"
+#include "../KiwiCore/KiwiAtom.hpp"
+#include <mutex>
+#include <algorithm>
+
+// ---- Flip headers ---- //
+#include "flip/DataModel.h"
+#include "flip/Bool.h"
+#include "flip/Int.h"
+#include "flip/Float.h"
+#include "flip/Blob.h"
+#include "flip/String.h"
+#include "flip/Enum.h"
+#include "flip/Array.h"
+#include "flip/Collection.h"
+#include "flip/Object.h"
+#include "flip/ObjectRef.h"
 
 namespace kiwi
 {
@@ -60,9 +75,6 @@ namespace kiwi
                 .template member<flip::Int, &Object::m_inlets>("inlets")
                 .template member<flip::Int, &Object::m_outlets>("outlets");
             }
-            
-            //! @brief Returns the Object Id
-            inline ObjectId getId() const {return this;}
             
             //! @brief Returns the name of the Object.
             //! @return The name of the Object.

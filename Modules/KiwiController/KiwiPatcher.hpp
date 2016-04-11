@@ -55,10 +55,10 @@ namespace kiwi
             static std::unique_ptr<Patcher> create(Instance& instance);
             
             //! @brief Creates and adds a "plus" object to the Patcher.
-            ObjectId addPlus();
+            void addPlus();
             
             //! @brief Creates and adds a "print" object to the Patcher.
-            ObjectId addPrint();
+            void addPrint();
             
             //! @brief Constructs and add a Link to the Patcher.
             //! @details Constructs a Link with given origin and destination Object pointers
@@ -67,26 +67,24 @@ namespace kiwi
             //! @param outlet   The origin outlet index.
             //! @param to       The destination Object pointer.
             //! @param inlet    The destination inlet index.
-            LinkId addLink(ObjectId const& from, const uint32_t outlet, ObjectId const& to, const uint32_t inlet);
+            void addLink(Object const& from, const uint32_t outlet, Object const& to, const uint32_t inlet);
             
             //! @brief Removes an Object from the Patcher.
             //! @param id The ID of the object to be removed.
-            void removeObject(ObjectId const& id);
+            void removeObject(Object const& id);
             
             //! @brief Removes an Object from the Patcher.
             //! @param object The pointer to the object to be removed.
-            void removeLink(LinkId const& link);
+            void removeLink(Link const& link);
             
-            //! @brief Get the number of objects.
-            //! @return The number of objects.
-            inline uint64_t getNumberOfObjects() const { return static_cast<uint64_t>(m_objects.size()); };
+            //! @brief Returns the objects.
+            objects_t const& getObjects() const { return m_objects; }
             
-            //! @brief Get the number of links.
-            //! @return The number of links.
-            inline uint64_t getNumberOfLinks() const { return static_cast<uint64_t>(m_links.size()); };
+            //! @brief Returns the objects.
+            links_t const& getLinks() const { return m_links; }
             
             //! @brief Send a message to an object
-            void sendToObject(ObjectId const& object_id, uint32_t inlet, std::vector<Atom> args);
+            void sendToObject(Object& object_id, uint32_t inlet, std::vector<Atom> args);
             
             //! @brief Begins a new transaction
             //! @details Each call to this function must be followed by a call to endTransaction.
@@ -117,17 +115,17 @@ namespace kiwi
             //! @brief Get the Patcher model
             inline model::Patcher const& getModel() const { return m_document.root<model::Patcher>(); }
             
-            //! @brief Get an object model with an id.
-            //! @param id The id of the object.
-            model::Object* getModel(ObjectId const& id);
+            //! @brief Find an object controller with an Object model.
+            objects_t::const_iterator findController(model::Object const& object) const;
             
-            //! @brief Get an object controller with an id.
-            //! @param id The id of the object.
-            Object* getController(ObjectId const& id);
+            //! @brief Find a Link controller with a Link model.
+            links_t::const_iterator findController(model::Link const& link) const;
             
-            //! @brief Get an object controller with a model.
-            //! @param id The id of the object.
-            Object* getController(model::Object const& model);
+            //! @brief Find an object controller.
+            objects_t::const_iterator findController(Object const& object) const;
+            
+            //! @brief Find a link controller.
+            links_t::const_iterator findController(Link const& link) const;
             
             //! @internal flip::DocumentObserver<model::Patcher>::document_changed
             void document_changed(model::Patcher& patcher) final;

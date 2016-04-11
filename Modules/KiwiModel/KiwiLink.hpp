@@ -51,7 +51,7 @@ namespace kiwi
             //! @param outlet   The origin outlet index.
             //! @param to       The destination Object.
             //! @param inlet    The destination inlet index.
-            Link(ObjectId const& from, const uint32_t outlet, ObjectId const& to, const uint32_t inlet);
+            Link(model::Object const& from, const uint32_t outlet, model::Object const& to, const uint32_t inlet);
             
             //! @brief Destructor.
             virtual ~Link() {}
@@ -70,21 +70,18 @@ namespace kiwi
                 .template member<flip::Int, &Link::m_index_inlet>("inlet_index");
             }
             
-            //! @brief Returns the Link Id
-            inline LinkId getId() const {return this;}
-            
             //! @brief Get the source Object ID of the link.
             //! @return The source Object ID of the link.
-            inline ObjectId getSenderId() const noexcept
+            inline model::Object const& getSenderId() const noexcept
             {
-                return !removed() ? m_sender.value() : m_sender.before();
+                return !removed() ? *m_sender.value() : *m_sender.before();
             }
             
             //! @brief Get the destination Object of the link.
             //! @return The destination Object of the link.
-            inline ObjectId getReceiverId() const noexcept
+            inline model::Object const& getReceiverId() const noexcept
             {
-                return !removed() ? m_receiver.value() : m_receiver.before();
+                return !removed() ? *m_receiver.value() : *m_receiver.before();
             }
             
             //! @brief Get the actual origin outlet index of the link.

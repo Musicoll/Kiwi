@@ -30,45 +30,52 @@ using namespace kiwi;
 TEST_CASE("Patcher - testcase : counter", "[Patcher]")
 {
     auto instance = controller::Instance::create(123456789ULL, "kiwi");
-    //instance->setDebug(true);
+    instance->setDebug(true);
     
     auto& patcher = instance->createPatcher();
     
     const std::vector<Atom> bang_msg{"bang"};
     
-    patcher.beginTransaction("Add two plus objects, a print object, and link them together");
-    
-    auto plus_obj_1 = patcher.addPlus();
-    auto plus_obj_2 = patcher.addPlus();
-    auto print_obj  = patcher.addPrint();
-    
-    auto plus_link_id = patcher.addLink(plus_obj_1, 0, plus_obj_2, 0);
-    auto print_link_id = patcher.addLink(plus_obj_2, 0, print_obj, 0);
-    
+    patcher.beginTransaction("Add two plus objects, and a print object");
+    patcher.addPlus();
+    patcher.addPlus();
+    patcher.addPrint();
     patcher.endTransaction();
     
-    patcher.sendToObject(plus_obj_1, 0, bang_msg);
+    auto& objects = patcher.getObjects();
+    REQUIRE(objects.size() == 3);
     
-    CHECK(patcher.getNumberOfObjects() == 3);
-    CHECK(patcher.getNumberOfLinks() == 2);
+    patcher.beginTransaction("connect objects");
+    patcher.addLink(*objects[0], 0, *objects[1], 0);
+    patcher.addLink(*objects[1], 0, *objects[2], 0);
+    patcher.endTransaction();
+    
+    auto& links = patcher.getLinks();
+    REQUIRE(links.size() == 2);
+    
+    patcher.sendToObject(*objects[0], 1, {10});
+    patcher.sendToObject(*objects[0], 0, {10});
     
     patcher.beginTransaction("remove object plus 2 (and links too)");
-    patcher.removeObject(plus_obj_2);
+    patcher.removeObject(*objects[1]);
     patcher.endTransaction();
-    CHECK(patcher.getNumberOfObjects() == 2);
-    CHECK(patcher.getNumberOfLinks() == 0);
+    
+    CHECK(objects.size() == 2);
+    CHECK(links.size() == 0);
     
     patcher.undo(true);
-    CHECK(patcher.getNumberOfObjects() == 3);
-    CHECK(patcher.getNumberOfLinks() == 2);
-    
-    patcher.sendToObject(plus_obj_1, 0, {92});
+    REQUIRE(objects.size() == 3);
+    REQUIRE(links.size() == 2);
     
     // test stack overflow :
     patcher.beginTransaction("add recursive link");
-    patcher.addLink(plus_obj_2, 0, plus_obj_1, 0);
+    patcher.addLink(*objects[2], 0, *objects[0], 0);
     patcher.endTransaction();
     
-    patcher.sendToObject(plus_obj_2, 1, {1});
-    patcher.sendToObject(plus_obj_1, 0, {10});
+    REQUIRE(links.size() == 3);
+    
+    patcher.sendToObject(*objects[0], 1, {1});
+    patcher.sendToObject(*objects[1], 1, {1});
+    
+    patcher.sendToObject(*objects[0], 0, bang_msg);
 }
