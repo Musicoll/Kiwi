@@ -38,22 +38,18 @@ namespace kiwi
         {
         public:
 
-            ObjectPrint(model::ObjectPrint& model, std::vector<Atom> const& args) : controller::Object(model)
+            ObjectPrint(model::ObjectPrint& model) : controller::Object(model)
             {
-                m_print_prefix = (args.size() > 0) ? AtomHelper::toString(args[0]) : "print";
+                ;
             }
             
             void receive(uint32_t, std::vector<Atom> args) override
             {
                 if(!args.empty())
                 {
-                    std::cout << "\u2022 " << m_print_prefix << " : "
-                    << AtomHelper::toString(args) << '\n';
+                    std::cout << "\u2022 " << AtomHelper::toString(args) << '\n';
                 }
             }
-            
-        private:
-            std::string m_print_prefix;
         };
     }
 }

@@ -42,18 +42,14 @@ namespace kiwi
             m_objects.clear();
         }
         
-        ObjectId Patcher::addObject(std::string const& name, std::string const& text)
+        ObjectId Patcher::addPlus()
         {
-            if(name == "plus" || name == "+")
-            {
-                return addObject(std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus({name, text})));
-            }
-            else if(name == "print")
-            {
-                return addObject(std::unique_ptr<model::ObjectPrint>(new model::ObjectPrint({name, text})));
-            }
-            
-            return nullptr;
+            return addObject(std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus()));
+        }
+        
+        ObjectId Patcher::addPrint()
+        {
+            return addObject(std::unique_ptr<model::ObjectPrint>(new model::ObjectPrint()));
         }
         
         ObjectId Patcher::addObject(std::unique_ptr<model::Object> object)

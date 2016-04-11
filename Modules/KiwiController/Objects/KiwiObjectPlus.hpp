@@ -38,14 +38,9 @@ namespace kiwi
         {
         public:
 
-            ObjectPlus(model::ObjectPlus& model, std::vector<Atom> const& args) : controller::Object(model),
-            m_lhs(0.0),
-            m_rhs(0.0)
+            ObjectPlus(model::ObjectPlus& model) : controller::Object(model), m_lhs(0.0), m_rhs(0.0)
             {
-                if(args.size() > 0 && args[0].isNumber())
-                {
-                    m_rhs = args[0].getFloat();
-                }
+                ;
             }
             
             void receive(uint32_t index, std::vector<Atom> args) override

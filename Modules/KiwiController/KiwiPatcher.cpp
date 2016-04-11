@@ -54,9 +54,14 @@ namespace kiwi
             return patcher;
         }
         
-        ObjectId Patcher::addObject(std::string const& name, std::string const& text)
+        ObjectId Patcher::addPlus()
         {
-            return getModel().addObject(name, text);
+            return getModel().addPlus();
+        }
+        
+        ObjectId Patcher::addPrint()
+        {
+            return getModel().addPrint();
         }
         
         LinkId Patcher::addLink(ObjectId const& from, const uint32_t outlet, ObjectId const& to, const uint32_t inlet)
@@ -241,15 +246,14 @@ namespace kiwi
         void Patcher::objectHasBeenAdded(model::Object& object)
         {
             const auto name = object.getName();
-            const auto args = AtomHelper::parse(object.getText());
             
-            if(name == "plus" || name == "+")
+            if(name == "plus")
             {
-                m_objects.emplace_back(std::unique_ptr<controller::ObjectPlus>(new controller::ObjectPlus(static_cast<model::ObjectPlus&>(object), args)));
+                m_objects.emplace_back(std::unique_ptr<controller::ObjectPlus>(new controller::ObjectPlus(static_cast<model::ObjectPlus&>(object))));
             }
             else if(name == "print")
             {
-                m_objects.emplace_back(std::unique_ptr<controller::ObjectPrint>(new controller::ObjectPrint(static_cast<model::ObjectPrint&>(object), args)));
+                m_objects.emplace_back(std::unique_ptr<controller::ObjectPrint>(new controller::ObjectPrint(static_cast<model::ObjectPrint&>(object))));
             }
         }
 
@@ -339,7 +343,6 @@ namespace kiwi
                     const auto status_str = (obj.resident() ? "resident" : (obj.added() ? "added" : "removed"));
                     
                     indent(3); std::cout << "- status : " << status_str << '\n';
-                    indent(3); std::cout << "- text : " << obj.getText() << '\n';
                     
                     indent(3); std::cout << "- n°inlet : " << obj.getNumberOfInlets() << '\n';
                     indent(3); std::cout << "- n°outlet : " << obj.getNumberOfOutlets() << '\n';

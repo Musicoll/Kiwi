@@ -40,9 +40,9 @@ namespace kiwi
             
             ObjectPrint(flip::Default& d) : model::Object(d) {}
             
-            ObjectPrint(initInfos const& infos) : model::Object(infos)
+            ObjectPrint() : model::Object("print", 1, 0)
             {
-                addInlet();
+                ;
             }
 
             //! @internal flip static declare method

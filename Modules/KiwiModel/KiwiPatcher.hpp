@@ -64,8 +64,11 @@ namespace kiwi
             //! @brief Get the links.
             links_t const& getLinks() const noexcept    { return m_links; }
             
-            //! @brief Creates and adds an object to the Patcher.
-            ObjectId addObject(std::string const& name, std::string const& text = "");
+            //! @brief Creates and adds a "plus" object to the Patcher.
+            ObjectId addPlus();
+            
+            //! @brief Creates and adds a "print" object to the Patcher.
+            ObjectId addPrint();
             
             //! @brief Constructs and add a Link to the Patcher.
             //! @details Constructs a Link with given origin and destination Object pointers

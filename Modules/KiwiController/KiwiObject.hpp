@@ -56,9 +56,6 @@ namespace kiwi
             //! @brief Returns the name of the Object.
             inline std::string getName() const noexcept         { return m_model.getName(); }
             
-            //! @brief Returns the text of the object.
-            inline std::string getText() const noexcept         { return m_model.getText(); }
-            
             //! @brief Get the number of inlets of the Object.
             inline uint32_t getNumberOfInlets() const noexcept  { return m_model.getNumberOfInlets(); }
             

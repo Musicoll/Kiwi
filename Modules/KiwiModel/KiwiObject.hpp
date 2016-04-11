@@ -39,24 +39,12 @@ namespace kiwi
         class Object : public flip::Object
         {
         public:
-            
-            struct initInfos
-            {
-                const std::string         name;
-                const std::string         text;
-                const std::vector<Atom>   args;
-                
-                initInfos(std::string const& object_name, std::string const& object_text) :
-                name(object_name),
-                text(object_text),
-                args(AtomHelper::parse(text)) {}
-            };
-            
+
             //! @internal flip Default constructor
             Object(flip::Default&) {}
             
             //! @brief Constructor.
-            Object(initInfos const& infos);
+            Object(std::string const& name, const uint32_t inlets, const uint32_t outlets);
             
             //! @brief Destructor.
             virtual ~Object();
@@ -69,7 +57,6 @@ namespace kiwi
                 TModel::template declare<model::Object>()
                 .name("cicm.kiwi.Object")
                 .template member<flip::String, &Object::m_name>("name")
-                .template member<flip::String, &Object::m_text>("text")
                 .template member<flip::Int, &Object::m_inlets>("inlets")
                 .template member<flip::Int, &Object::m_outlets>("outlets");
             }
@@ -80,10 +67,6 @@ namespace kiwi
             //! @brief Returns the name of the Object.
             //! @return The name of the Object.
             inline std::string getName() const     { return m_name; }
-            
-            //! @brief Returns the text of the Object.
-            //! @return The text of the Object.
-            inline std::string getText() const     { return m_text; }
             
             //! @brief Returns the number of inlets.
             //! @return The number of inlets.
@@ -99,23 +82,8 @@ namespace kiwi
                 return static_cast<uint32_t>(m_outlets);
             }
             
-            //! @brief Adds an inlet to the Object.
-            //! @param type The type of input this inlet accepts.
-            void addInlet() { m_inlets += 1; }
-            
-            //! @brief Removes the rightmost inlet of the Object.
-            void removeInlet() { if(m_inlets > 0) m_inlets -= 1; }
-            
-            //! @brief Adds an outlet to the Object.
-            //! @param type The type of output this outlet accepts.
-            void addOutlet() { m_outlets += 1; }
-            
-            //! @brief Removes the rightmost outlet of the Object.
-            void removeOutlet() { if(m_outlets > 0) m_outlets -= 1; }
-            
         private:
             flip::String    m_name;
-            flip::String    m_text;
             flip::Int       m_inlets;
             flip::Int       m_outlets;
         };

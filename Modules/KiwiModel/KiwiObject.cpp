@@ -31,9 +31,10 @@ namespace kiwi
         //                                      OBJECT                                      //
         // ================================================================================ //
         
-        Object::Object(const initInfos& infos) :
-        m_name(infos.name),
-        m_text(infos.text)
+        Object::Object(std::string const& name, const uint32_t inlets, const uint32_t outlets) :
+        m_name(name),
+        m_inlets(inlets),
+        m_outlets(outlets)
         {
             ;
         }

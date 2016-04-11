@@ -40,16 +40,9 @@ namespace kiwi
             
             ObjectPlus(flip::Default& d) : model::Object(d) {}
             
-            ObjectPlus(initInfos const& infos) : model::Object(infos)
+            ObjectPlus() : model::Object("plus", 2, 1)
             {
-                addInlet();
-                
-                if(infos.args.size() == 0 || !infos.args[0].isNumber())
-                {
-                    addInlet();
-                }
-                
-                addOutlet();
+                ;
             }
 
             //! @internal flip static declare method
