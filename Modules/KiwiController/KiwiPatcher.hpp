@@ -46,7 +46,7 @@ namespace kiwi
         public:
             
             using objects_t = std::vector<std::unique_ptr<controller::Object>>;
-            using links_t = std::vector<std::shared_ptr<controller::Link>>;
+            using links_t = std::vector<std::unique_ptr<controller::Link>>;
             
             //! @brief Destructor.
             ~Patcher();

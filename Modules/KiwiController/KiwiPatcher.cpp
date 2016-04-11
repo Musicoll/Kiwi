@@ -278,10 +278,9 @@ namespace kiwi
             
             if(from && to)
             {
-                const auto it = m_links.emplace(m_links.end(), std::make_shared<Link>(link, *from, *to));
+                const auto it = m_links.emplace(m_links.end(), links_t::value_type(new controller::Link(link, *from, *to)));
                 
-                // add link to the sender object
-                from->addOutputLink(*it);
+                from->addOutputLink(it->get());
             }
         }
         
@@ -301,10 +300,8 @@ namespace kiwi
             
             if(it != m_links.cend())
             {
-                // remove link from the sender object before delete it
                 Object& from = (*it)->getSenderObject();
-                from.removeOutputLink(*it);
-                
+                from.removeOutputLink(it->get());
                 m_links.erase(it);
             }
         }

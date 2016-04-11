@@ -75,13 +75,13 @@ namespace kiwi
             void send(const uint32_t index, std::vector<Atom> args);
             
         private:
-            typedef std::set<std::weak_ptr<Link>, std::owner_less<std::weak_ptr<Link>>> Outlet;
+            typedef std::set<Link*> Outlet;
             
             //! @brief Append a new link to an outlet.
-            void addOutputLink(std::shared_ptr<Link> link);
+            void addOutputLink(Link* link);
             
             //! @brief Remove a link from an outlet.
-            void removeOutputLink(std::shared_ptr<Link> link);
+            void removeOutputLink(Link* link);
             
             model::Object const&    m_model;
             std::vector<Outlet>     m_outlets;

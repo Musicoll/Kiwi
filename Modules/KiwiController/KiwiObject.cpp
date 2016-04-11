@@ -43,13 +43,13 @@ namespace kiwi
             m_outlets.clear();
         }
         
-        void Object::addOutputLink(std::shared_ptr<Link> link)
+        void Object::addOutputLink(Link* link)
         {
             const size_t idx = link->getSenderIndex();
             m_outlets[idx].insert(link);
         }
         
-        void Object::removeOutputLink(std::shared_ptr<Link> link)
+        void Object::removeOutputLink(Link* link)
         {
             const size_t idx = link->getSenderIndex();
             m_outlets[idx].erase(link);
@@ -61,26 +61,23 @@ namespace kiwi
             
             if(idx < m_outlets.size())
             {
-                for(auto wk_link : m_outlets[idx])
+                for(auto* link : m_outlets[idx])
                 {
-                    auto link = wk_link.lock();
-                    if(link)
+                    Object& receiver = link->getReceiverObject();
+                    
+                    if(++receiver.m_stack_count < 256)
                     {
-                        Object& receiver = link->getReceiverObject();
-                        
-                        if(++receiver.m_stack_count < 256)
-                        {
-                            receiver.receive(link->getReceiverIndex(), args);
-                        }
-                        else
-                        {
-                            // commented because of an xcode f*c*i*g indentation bug
-                            std::cout << "object " << getName() << " => Stack overflow !" << '\n';
-                        }
-                        
-                        receiver.m_stack_count--;
+                        receiver.receive(link->getReceiverIndex(), args);
                     }
+                    else
+                    {
+                        // commented because of an xcode f*c*i*g indentation bug
+                        std::cout << "object " << getName() << " => Stack overflow !" << '\n';
+                    }
+                    
+                    receiver.m_stack_count--;
                 }
+            
             }
         }
     }
