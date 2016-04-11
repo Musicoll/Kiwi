@@ -72,14 +72,14 @@ namespace kiwi
             
             //! @brief Get the source Object ID of the link.
             //! @return The source Object ID of the link.
-            inline model::Object const& getSenderId() const noexcept
+            inline model::Object const& getSenderObject() const noexcept
             {
                 return !removed() ? *m_sender.value() : *m_sender.before();
             }
             
             //! @brief Get the destination Object of the link.
             //! @return The destination Object of the link.
-            inline model::Object const& getReceiverId() const noexcept
+            inline model::Object const& getReceiverObject() const noexcept
             {
                 return !removed() ? *m_receiver.value() : *m_receiver.before();
             }

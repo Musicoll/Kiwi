@@ -227,7 +227,7 @@ namespace kiwi
 
         void Patcher::objectWillBeRemoved(model::Object& object)
         {
-            const auto it = findController(object);
+            const auto it = findObject(object);
             if(it != m_objects.cend())
             {
                 m_objects.erase(it);
@@ -236,8 +236,8 @@ namespace kiwi
 
         void Patcher::linkHasBeenAdded(model::Link& link)
         {
-            auto from = findController(link.getSenderId());
-            auto to = findController(link.getReceiverId());
+            auto from = findObject(link.getSenderObject());
+            auto to = findObject(link.getReceiverObject());
             
             if(from != m_objects.end()
                && to != m_objects.end())
@@ -255,7 +255,7 @@ namespace kiwi
         
         void Patcher::linkWillBeRemoved(model::Link& link)
         {
-            const auto it = findController(link);
+            const auto it = findLink(link);
             if(it != m_links.cend())
             {
                 Object& from = (*it)->getSenderObject();
@@ -264,7 +264,7 @@ namespace kiwi
             }
         }
         
-        Patcher::objects_t::const_iterator Patcher::findController(model::Object const& object) const
+        Patcher::objects_t::const_iterator Patcher::findObject(model::Object const& object) const
         {
             const auto pred = [&object](std::unique_ptr<engine::Object> const& ctrl)
             {
@@ -274,7 +274,7 @@ namespace kiwi
             return std::find_if(m_objects.begin(), m_objects.end(), pred);
         }
         
-        Patcher::links_t::const_iterator Patcher::findController(model::Link const& link) const
+        Patcher::links_t::const_iterator Patcher::findLink(model::Link const& link) const
         {
             const auto pred = [&link](std::unique_ptr<engine::Link> const& ctrl)
             {
@@ -284,7 +284,7 @@ namespace kiwi
             return std::find_if(m_links.begin(), m_links.end(), pred);
         }
         
-        Patcher::objects_t::const_iterator Patcher::findController(Object const& object) const
+        Patcher::objects_t::const_iterator Patcher::findObject(Object const& object) const
         {
             const auto pred = [&object](std::unique_ptr<engine::Object> const& ctrl)
             {
@@ -294,7 +294,7 @@ namespace kiwi
             return std::find_if(m_objects.begin(), m_objects.end(), pred);
         }
         
-        Patcher::links_t::const_iterator Patcher::findController(Link const& link) const
+        Patcher::links_t::const_iterator Patcher::findLink(Link const& link) const
         {
             const auto pred = [&link](std::unique_ptr<engine::Link> const& ctrl)
             {
@@ -363,8 +363,8 @@ namespace kiwi
                     
                     indent(3); std::cout << "- status : " << status_str << '\n';
                     
-                    auto const& from = link.getSenderId();
-                    auto const& to = link.getReceiverId();
+                    auto const& from = link.getSenderObject();
+                    auto const& to = link.getReceiverObject();
                     
                     indent(3); std::cout << "- from object : \""
                     << from.getName() << "\" ("

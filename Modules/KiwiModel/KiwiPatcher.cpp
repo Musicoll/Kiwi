@@ -69,8 +69,8 @@ namespace kiwi
                 // Check if link does not exists.
                 const auto find_link = [&from, &outlet, &to, &inlet](model::Link const& link_model)
                 {
-                    return (link_model.getSenderId().ref()      == from.ref() &&
-                            link_model.getReceiverId().ref()    == to.ref() &&
+                    return (link_model.getSenderObject().ref()      == from.ref() &&
+                            link_model.getReceiverObject().ref()    == to.ref() &&
                             link_model.getSenderIndex()         == outlet &&
                             link_model.getReceiverIndex()       == inlet);
                 };
@@ -97,8 +97,8 @@ namespace kiwi
                 // first remove links connected to this object
                 for(auto link_it = m_links.begin(); link_it != m_links.end();)
                 {
-                    if(link_it->getSenderId().ref() == object.ref()
-                       || link_it->getReceiverId().ref() == object.ref())
+                    if(link_it->getSenderObject().ref() == object.ref()
+                       || link_it->getReceiverObject().ref() == object.ref())
                     {
                         link_it = m_links.erase(link_it);
                     }
