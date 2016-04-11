@@ -21,8 +21,8 @@
  ==============================================================================
 */
 
-#ifndef KIWI_CONTROLLER_PATCHER_HPP_INCLUDED
-#define KIWI_CONTROLLER_PATCHER_HPP_INCLUDED
+#ifndef KIWI_ENGINE_PATCHER_HPP_INCLUDED
+#define KIWI_ENGINE_PATCHER_HPP_INCLUDED
 
 #include "KiwiLink.hpp"
 
@@ -33,20 +33,20 @@
 
 namespace kiwi
 {
-    namespace controller
+    namespace engine
     {
         // ================================================================================ //
         //                                      PATCHER                                     //
         // ================================================================================ //
         
         //! @brief The Patcher manages object and link controllers.
-        //! @details The patcher controller observes the Patcher mode for changes.
+        //! @details The patcher engine observes the Patcher mode for changes.
         class Patcher : public flip::DocumentObserver<model::Patcher>
         {
         public:
             
-            using objects_t = std::vector<std::unique_ptr<controller::Object>>;
-            using links_t = std::vector<std::unique_ptr<controller::Link>>;
+            using objects_t = std::vector<std::unique_ptr<engine::Object>>;
+            using links_t = std::vector<std::unique_ptr<engine::Link>>;
             
             //! @brief Destructor.
             ~Patcher();
@@ -115,16 +115,16 @@ namespace kiwi
             //! @brief Get the Patcher model
             inline model::Patcher const& getModel() const { return m_document.root<model::Patcher>(); }
             
-            //! @brief Find an object controller with an Object model.
+            //! @brief Find an object engine with an Object model.
             objects_t::const_iterator findController(model::Object const& object) const;
             
-            //! @brief Find a Link controller with a Link model.
+            //! @brief Find a Link engine with a Link model.
             links_t::const_iterator findController(model::Link const& link) const;
             
-            //! @brief Find an object controller.
+            //! @brief Find an object engine.
             objects_t::const_iterator findController(Object const& object) const;
             
-            //! @brief Find a link controller.
+            //! @brief Find a link engine.
             links_t::const_iterator findController(Link const& link) const;
             
             //! @internal flip::DocumentObserver<model::Patcher>::document_changed
@@ -167,4 +167,4 @@ namespace kiwi
 }
 
 
-#endif // KIWI_CONTROLLER_PATCHER_HPP_INCLUDED
+#endif // KIWI_ENGINE_PATCHER_HPP_INCLUDED

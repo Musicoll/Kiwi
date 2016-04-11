@@ -21,29 +21,38 @@
  ==============================================================================
 */
 
-#include "KiwiLink.hpp"
-#include "KiwiObject.hpp"
-#include "KiwiPatcher.hpp"
+#ifndef KIWI_ENGINE_OBJECTS_OBJECTPRINT_HPP_INCLUDED
+#define KIWI_ENGINE_OBJECTS_OBJECTPRINT_HPP_INCLUDED
+
+#include "KiwiObjectPlus.hpp"
 
 namespace kiwi
 {
-    namespace controller
+    namespace engine
     {
         // ================================================================================ //
-        //                                      LINK                                        //
+        //                                    OBJECT PLUS                                   //
         // ================================================================================ //
         
-        Link::Link(model::Link& model, Object& sender, Object& receiver) :
-        m_model(model),
-        m_sender(sender),
-        m_receiver(receiver)
+        class ObjectPrint : public engine::Object
         {
-            ;
-        }
-        
-        Link::~Link()
-        {
-            ;
-        }
+        public:
+
+            ObjectPrint(model::ObjectPrint& model) : engine::Object(model)
+            {
+                ;
+            }
+            
+            void receive(uint32_t, std::vector<Atom> args) override
+            {
+                if(!args.empty())
+                {
+                    std::cout << "\u2022 " << AtomHelper::toString(args) << '\n';
+                }
+            }
+        };
     }
 }
+
+
+#endif // KIWI_ENGINE_OBJECTS_OBJECTPRINT_HPP_INCLUDED

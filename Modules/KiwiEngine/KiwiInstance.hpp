@@ -21,14 +21,14 @@
  ==============================================================================
 */
 
-#ifndef KIWI_CONTROLLER_INSTANCE_HPP_INCLUDED
-#define KIWI_CONTROLLER_INSTANCE_HPP_INCLUDED
+#ifndef KIWI_ENGINE_INSTANCE_HPP_INCLUDED
+#define KIWI_ENGINE_INSTANCE_HPP_INCLUDED
 
 #include "KiwiPatcher.hpp"
 
 namespace kiwi
 {
-    namespace controller
+    namespace engine
     {
         // ================================================================================ //
         //                                      INSTANCE                                    //
@@ -95,4 +95,4 @@ namespace kiwi
 }
 
 
-#endif // KIWI_CONTROLLER_INSTANCE_HPP_INCLUDED
+#endif // KIWI_ENGINE_INSTANCE_HPP_INCLUDED

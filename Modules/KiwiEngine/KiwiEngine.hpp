@@ -21,8 +21,8 @@
  ==============================================================================
 */
 
-#ifndef KIWI_CONTROLLER_HPP_INCLUDED
-#define KIWI_CONTROLLER_HPP_INCLUDED
+#ifndef KIWI_ENGINE_HPP_INCLUDED
+#define KIWI_ENGINE_HPP_INCLUDED
 
 #include "KiwiInstance.hpp"
 
@@ -31,4 +31,4 @@ namespace kiwi
     
 }
 
-#endif // KIWI_CONTROLLER_HPP_INCLUDED
+#endif // KIWI_ENGINE_HPP_INCLUDED

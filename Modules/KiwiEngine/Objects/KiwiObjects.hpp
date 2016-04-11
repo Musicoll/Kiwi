@@ -21,18 +21,18 @@
  ==============================================================================
 */
 
-#ifndef KIWI_CONTROLLER_OBJECTS_HPP_INCLUDED
-#define KIWI_CONTROLLER_OBJECTS_HPP_INCLUDED
+#ifndef KIWI_ENGINE_OBJECTS_HPP_INCLUDED
+#define KIWI_ENGINE_OBJECTS_HPP_INCLUDED
 
 #include "KiwiObjectPrint.hpp"
 
 namespace kiwi
 {
-    namespace controller
+    namespace engine
     {
         ;
     }
 }
 
 
-#endif // KIWI_CONTROLLER_OBJECTS_HPP_INCLUDED
+#endif // KIWI_ENGINE_OBJECTS_HPP_INCLUDED

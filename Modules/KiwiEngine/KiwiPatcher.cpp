@@ -27,7 +27,7 @@
 
 namespace kiwi
 {
-    namespace controller
+    namespace engine
     {
         // ================================================================================ //
         //                                      PATCHER                                     //
@@ -125,7 +125,7 @@ namespace kiwi
             
             if(first_redo != m_history.end())
             {
-                std::cout << "* " << "Redo \"" << m_history.first_redo()->label() << "\"\n";
+                std::cout << "* " << "Redo \"" << first_redo->label() << "\"\n";
                 m_history.execute_redo();
                 
                 if(commit)
@@ -212,11 +212,11 @@ namespace kiwi
             
             if(name == "plus")
             {
-                m_objects.emplace_back(std::unique_ptr<controller::ObjectPlus>(new controller::ObjectPlus(static_cast<model::ObjectPlus&>(object))));
+                m_objects.emplace_back(std::unique_ptr<engine::ObjectPlus>(new engine::ObjectPlus(static_cast<model::ObjectPlus&>(object))));
             }
             else if(name == "print")
             {
-                m_objects.emplace_back(std::unique_ptr<controller::ObjectPrint>(new controller::ObjectPrint(static_cast<model::ObjectPrint&>(object))));
+                m_objects.emplace_back(std::unique_ptr<engine::ObjectPrint>(new engine::ObjectPrint(static_cast<model::ObjectPrint&>(object))));
             }
         }
 
@@ -242,7 +242,7 @@ namespace kiwi
             if(from != m_objects.end()
                && to != m_objects.end())
             {
-                const auto it = m_links.emplace(m_links.end(), std::unique_ptr<controller::Link>(new controller::Link(link, *from->get(), *to->get())));
+                const auto it = m_links.emplace(m_links.end(), std::unique_ptr<engine::Link>(new engine::Link(link, *from->get(), *to->get())));
                 
                 (*from)->addOutputLink(it->get());
             }
@@ -266,7 +266,7 @@ namespace kiwi
         
         Patcher::objects_t::const_iterator Patcher::findController(model::Object const& object) const
         {
-            const auto pred = [&object](std::unique_ptr<controller::Object> const& ctrl)
+            const auto pred = [&object](std::unique_ptr<engine::Object> const& ctrl)
             {
                 return (ctrl->m_model.ref() == object.ref());
             };
@@ -274,19 +274,9 @@ namespace kiwi
             return std::find_if(m_objects.begin(), m_objects.end(), pred);
         }
         
-        Patcher::objects_t::const_iterator Patcher::findController(Object const& object) const
-        {
-            const auto pred = [&object](std::unique_ptr<controller::Object> const& ctrl)
-            {
-                return (ctrl->m_model.ref() == object.m_model.ref());
-            };
-            
-            return std::find_if(m_objects.begin(), m_objects.end(), pred);
-        }
-        
         Patcher::links_t::const_iterator Patcher::findController(model::Link const& link) const
         {
-            const auto pred = [&link](std::unique_ptr<controller::Link> const& ctrl)
+            const auto pred = [&link](std::unique_ptr<engine::Link> const& ctrl)
             {
                 return (ctrl->m_model.ref() == link.ref());
             };
@@ -294,9 +284,19 @@ namespace kiwi
             return std::find_if(m_links.begin(), m_links.end(), pred);
         }
         
+        Patcher::objects_t::const_iterator Patcher::findController(Object const& object) const
+        {
+            const auto pred = [&object](std::unique_ptr<engine::Object> const& ctrl)
+            {
+                return (ctrl->m_model.ref() == object.m_model.ref());
+            };
+            
+            return std::find_if(m_objects.begin(), m_objects.end(), pred);
+        }
+        
         Patcher::links_t::const_iterator Patcher::findController(Link const& link) const
         {
-            const auto pred = [&link](std::unique_ptr<controller::Link> const& ctrl)
+            const auto pred = [&link](std::unique_ptr<engine::Link> const& ctrl)
             {
                 return (ctrl->m_model.ref() == link.m_model.ref());
             };

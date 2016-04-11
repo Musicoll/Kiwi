@@ -21,38 +21,64 @@
  ==============================================================================
 */
 
-#ifndef KIWI_CONTROLLERS_OBJECTS_OBJECTPRINT_HPP_INCLUDED
-#define KIWI_CONTROLLERS_OBJECTS_OBJECTPRINT_HPP_INCLUDED
+#ifndef KIWI_ENGINE_OBJECTS_OBJECTPLUS_HPP_INCLUDED
+#define KIWI_ENGINE_OBJECTS_OBJECTPLUS_HPP_INCLUDED
 
-#include "KiwiObjectPlus.hpp"
+#include "../KiwiLink.hpp"
 
 namespace kiwi
 {
-    namespace controller
+    namespace engine
     {
         // ================================================================================ //
         //                                    OBJECT PLUS                                   //
         // ================================================================================ //
         
-        class ObjectPrint : public controller::Object
+        class ObjectPlus : public engine::Object
         {
         public:
 
-            ObjectPrint(model::ObjectPrint& model) : controller::Object(model)
+            ObjectPlus(model::ObjectPlus& model) : engine::Object(model), m_lhs(0.0), m_rhs(0.0)
             {
                 ;
             }
             
-            void receive(uint32_t, std::vector<Atom> args) override
+            void receive(uint32_t index, std::vector<Atom> args) override
             {
-                if(!args.empty())
+                if(args.size() > 0)
                 {
-                    std::cout << "\u2022 " << AtomHelper::toString(args) << '\n';
+                    if(args[0].isNumber())
+                    {
+                        if(index == 0)
+                        {
+                            m_lhs = args[0].getFloat();
+                            bang();
+                        }
+                        else if(index == 1)
+                        {
+                            m_rhs = args[0].getFloat();
+                        }
+                    }
+                    else if(index == 0
+                            && args[0].isString()
+                            && (args[0].getString() == "bang"))
+                    {
+                        bang();
+                    }
                 }
             }
+            
+            void bang()
+            {
+                send(0, {m_rhs + m_lhs});
+            }
+            
+        private:
+            double m_rhs = 0.0;
+            double m_lhs = 0.0;
         };
     }
 }
 
 
-#endif // KIWI_CONTROLLERS_OBJECTS_OBJECTPRINT_HPP_INCLUDED
+#endif // KIWI_MODEL_OBJECTS_OBJECTPLUS_HPP_INCLUDED

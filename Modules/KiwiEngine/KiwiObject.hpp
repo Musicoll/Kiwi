@@ -21,15 +21,15 @@
  ==============================================================================
 */
 
-#ifndef KIWI_CONTROLLER_OBJECT_HPP_INCLUDED
-#define KIWI_CONTROLLER_OBJECT_HPP_INCLUDED
+#ifndef KIWI_ENGINE_OBJECT_HPP_INCLUDED
+#define KIWI_ENGINE_OBJECT_HPP_INCLUDED
 
 #include "../KiwiModel/KiwiModel.hpp"
 #include <utility>
 
 namespace kiwi
 {
-    namespace controller
+    namespace engine
     {
         class Patcher;
         class Instance;
@@ -39,7 +39,7 @@ namespace kiwi
         //                                      OBJECT                                      //
         // ================================================================================ //
         
-        //! @brief The model::Object controller.
+        //! @brief The model::Object engine.
         class Object
         {
         public:
@@ -81,9 +81,9 @@ namespace kiwi
             std::vector<Outlet>     m_outlets;
             uint32_t                m_stack_count = 0ul;
             
-            friend class controller::Patcher;
+            friend class engine::Patcher;
         };
     }
 }
 
-#endif // KIWI_CONTROLLER_OBJECT_HPP_INCLUDED
+#endif // KIWI_ENGINE_OBJECT_HPP_INCLUDED

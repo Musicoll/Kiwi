@@ -21,14 +21,14 @@
  ==============================================================================
 */
 
-#ifndef KIWI_CONTROLLER_LINK_HPP_INCLUDED
-#define KIWI_CONTROLLER_LINK_HPP_INCLUDED
+#ifndef KIWI_ENGINE_LINK_HPP_INCLUDED
+#define KIWI_ENGINE_LINK_HPP_INCLUDED
 
 #include "KiwiObject.hpp"
 
 namespace kiwi
 {
-    namespace controller
+    namespace engine
     {
         // ================================================================================ //
         //                                      LINK                                        //
@@ -68,4 +68,4 @@ namespace kiwi
     }
 }
 
-#endif // KIWI_CONTROLLER_LINK_HPP_INCLUDED
+#endif // KIWI_ENGINE_LINK_HPP_INCLUDED

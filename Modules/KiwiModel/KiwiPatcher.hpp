@@ -71,11 +71,11 @@ namespace kiwi
             void addPrint();
             
             //! @brief Constructs and add a Link to the Patcher.
-            //! @details Constructs a Link with given origin and destination Object pointers
+            //! @details Constructs a Link with given origin and destination Object
             //! and IO indexes then adds it in the Patcher.
-            //! @param from     The origin Object pointer.
+            //! @param from     The origin Object.
             //! @param outlet   The origin outlet index.
-            //! @param to       The destination Object pointer.
+            //! @param to       The destination Object.
             //! @param inlet    The destination inlet index.
             void addLink(model::Object const& from,
                          const uint32_t outlet,
@@ -84,13 +84,11 @@ namespace kiwi
             
             //! @brief Removes an object from the Patcher.
             //! @details This will also remove all links connected to this object.
-            //! @param id The ID of the object to remove.
-            //! @return true if success, otherwise false.
+            //! @param object The Object to remove.
             void removeObject(model::Object const& object);
             
             //! @brief Removes a link from the Patcher.
-            //! @param id The ID of the link to remove.
-            //! @return true if success, otherwise false.
+            //! @param link The Link to remove.
             void removeLink(model::Link const& link);
             
             //! @brief Returns true if an Object has been added, removed or changed.
@@ -101,10 +99,8 @@ namespace kiwi
             
         private:
             
-            bool canConnect(model::Object const& from,
-                            const uint32_t outlet,
-                            model::Object const& to,
-                            const uint32_t inlet) const;
+            bool canConnect(model::Object const& from, const uint32_t outlet,
+                            model::Object const& to, const uint32_t inlet) const;
             
             objects_t::const_iterator findObject(model::Object const& object) const;
             objects_t::iterator findObject(model::Object const& object);

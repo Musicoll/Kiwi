@@ -21,15 +21,14 @@
  ==============================================================================
  */
 
-#include "../../../Modules/KiwiModel/KiwiModel.hpp"
-#include "../../../Modules/KiwiController/KiwiController.hpp"
+#include "../../../Modules/KiwiEngine/KiwiEngine.hpp"
 #include "../../catch.hpp"
 
 using namespace kiwi;
 
-TEST_CASE("Patcher - testcase : counter", "[Patcher]")
+TEST_CASE("Patcher", "[Patcher]")
 {
-    auto instance = controller::Instance::create(123456789ULL, "kiwi");
+    auto instance = engine::Instance::create(123456789ULL, "kiwi");
     instance->setDebug(true);
     
     auto& patcher = instance->createPatcher();
@@ -68,6 +67,7 @@ TEST_CASE("Patcher - testcase : counter", "[Patcher]")
     REQUIRE(links.size() == 2);
     
     // test stack overflow :
+    // Warning object container index changed and is not coherent with model (to be fixed)
     patcher.beginTransaction("add recursive link");
     patcher.addLink(*objects[2], 0, *objects[0], 0);
     patcher.endTransaction();
