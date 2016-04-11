@@ -66,21 +66,19 @@ namespace kiwi
                     auto link = wk_link.lock();
                     if(link)
                     {
-                        auto receiver = link->getReceiverObject();
-                        if(receiver)
+                        Object& receiver = link->getReceiverObject();
+                        
+                        if(++receiver.m_stack_count < 256)
                         {
-                            if(++receiver->m_stack_count < 256)
-                            {
-                                receiver->receive(link->getReceiverIndex(), args);
-                            }
-                            else
-                            {
-                                // commented because of an xcode f*c*i*g indentation bug
-                                std::cout << "object " << getName() << " => Stack overflow !" << '\n';
-                            }
-                            
-                            receiver->m_stack_count--;
+                            receiver.receive(link->getReceiverIndex(), args);
                         }
+                        else
+                        {
+                            // commented because of an xcode f*c*i*g indentation bug
+                            std::cout << "object " << getName() << " => Stack overflow !" << '\n';
+                        }
+                        
+                        receiver.m_stack_count--;
                     }
                 }
             }

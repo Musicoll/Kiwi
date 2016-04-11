@@ -40,7 +40,7 @@ namespace kiwi
         public:
             
             //! @brief Constructor.
-            Link(model::Link& model, std::shared_ptr<Object> sender_object, std::shared_ptr<Object> receiver_object);
+            Link(model::Link& model, Object& sender_object, Object& receiver_object);
             
             //! @brief Destructor.
             ~Link();
@@ -49,10 +49,10 @@ namespace kiwi
             inline LinkId getId() const {return m_model.getId();}
             
             //! @brief Get the object that send messages.
-            inline std::shared_ptr<Object> getSenderObject() const noexcept   { return m_sender.lock(); }
+            inline Object& getSenderObject() const noexcept     { return m_sender; }
             
             //! @brief Get the object that receive messages.
-            inline std::shared_ptr<Object> getReceiverObject() const noexcept { return m_receiver.lock(); }
+            inline Object& getReceiverObject() const noexcept   { return m_receiver; }
             
             //! @brief Retrieve the index of the outlet of the link.
             inline uint32_t getSenderIndex() const noexcept     { return m_model.getSenderIndex(); }
@@ -62,9 +62,9 @@ namespace kiwi
             
         private:
             
-            model::Link const&      m_model;
-            std::weak_ptr<Object>   m_sender;
-            std::weak_ptr<Object>   m_receiver;
+            model::Link const&  m_model;
+            Object&             m_sender;
+            Object&             m_receiver;
         };
     }
 }
