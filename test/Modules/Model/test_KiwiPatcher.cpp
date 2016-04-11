@@ -62,7 +62,7 @@ TEST_CASE("Patcher - testcase : counter", "[Patcher]")
     CHECK(patcher.getNumberOfObjects() == 3);
     CHECK(patcher.getNumberOfLinks() == 2);
     
-    patcher.sendToObject(plus_obj_1, 0, {92});
+    patcher.sendToObject(plus_obj_1, 0, {32});
     
     // test stack overflow :
     patcher.beginTransaction("add recursive link");

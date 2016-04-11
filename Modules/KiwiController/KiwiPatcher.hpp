@@ -45,8 +45,8 @@ namespace kiwi
         {
         public:
             
-            using objects_t = std::vector<std::unique_ptr<controller::Object>>;
-            using links_t = std::vector<std::unique_ptr<controller::Link>>;
+            using objects_t = std::vector<std::shared_ptr<controller::Object>>;
+            using links_t = std::vector<std::shared_ptr<controller::Link>>;
             
             //! @brief Destructor.
             ~Patcher();
@@ -120,11 +120,11 @@ namespace kiwi
             
             //! @brief Get an object controller with an id.
             //! @param id The id of the object.
-            Object* getController(ObjectId const& id);
+            std::shared_ptr<Object> getController(ObjectId const& id);
             
             //! @brief Get an object controller with a model.
             //! @param id The id of the object.
-            Object* getController(model::Object const& model);
+            std::shared_ptr<Object> getController(model::Object const& model);
             
             //! @internal flip::DocumentObserver<model::Patcher>::document_changed
             void document_changed(model::Patcher& patcher) final;

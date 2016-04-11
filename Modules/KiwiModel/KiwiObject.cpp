@@ -40,8 +40,7 @@ namespace kiwi
         
         Object::~Object()
         {
-            m_inlets.clear();
-            m_outlets.clear();
+            ;
         }
     }
 }

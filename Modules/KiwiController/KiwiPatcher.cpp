@@ -76,7 +76,7 @@ namespace kiwi
         
         void Patcher::sendToObject(ObjectId const& object_id, const uint32_t inlet, std::vector<Atom> args)
         {
-            auto* object_ctrl = getController(object_id);
+            auto object_ctrl = getController(object_id);
             if(object_ctrl)
             {
                 object_ctrl->receive(inlet, args);
@@ -143,7 +143,7 @@ namespace kiwi
             return m_document.object_ptr<model::Object>(id);
         }
         
-        Object* Patcher::getController(ObjectId const& id)
+        std::shared_ptr<Object> Patcher::getController(ObjectId const& id)
         {
             auto* model = getModel(id);
             if(model)
@@ -154,7 +154,7 @@ namespace kiwi
             return nullptr;
         }
         
-        Object* Patcher::getController(model::Object const& model)
+        std::shared_ptr<Object> Patcher::getController(model::Object const& model)
         {
             const auto equal_ids = [&model](objects_t::value_type const& ctrl)
             {
@@ -165,7 +165,7 @@ namespace kiwi
             
             if(it != m_objects.cend())
             {
-                return it->get();
+                return *it;
             }
             
             return nullptr;
@@ -245,11 +245,11 @@ namespace kiwi
             
             if(name == "plus" || name == "+")
             {
-                m_objects.emplace_back(std::unique_ptr<controller::ObjectPlus>(new controller::ObjectPlus(static_cast<model::ObjectPlus&>(object), args)));
+                m_objects.emplace_back(std::make_shared<controller::ObjectPlus>(static_cast<model::ObjectPlus&>(object), args));
             }
             else if(name == "print")
             {
-                m_objects.emplace_back(std::unique_ptr<controller::ObjectPrint>(new controller::ObjectPrint(static_cast<model::ObjectPrint&>(object), args)));
+                m_objects.emplace_back(std::make_shared<controller::ObjectPrint>(static_cast<model::ObjectPrint&>(object), args));
             }
         }
 
@@ -260,10 +260,12 @@ namespace kiwi
 
         void Patcher::objectWillBeRemoved(model::Object& object)
         {
-            const auto it = std::find_if(m_objects.begin(), m_objects.end(), [&object](objects_t::value_type const& ctrl)
+            const auto pred = [&object](objects_t::value_type const& ctrl)
             {
                 return (ctrl->getId() == object.getId());
-            });
+            };
+            
+            const auto it = std::find_if(m_objects.begin(), m_objects.end(), pred);
             
             if(it != m_objects.cend())
             {
@@ -272,15 +274,17 @@ namespace kiwi
         }
 
         void Patcher::linkHasBeenAdded(model::Link& link)
+        // precondition : sender and receiver object controllers must exist.
         {
-            auto* from = getController(link.getSenderId());
-            auto* to = getController(link.getReceiverId());
+            auto from = getController(link.getSenderId());
+            auto to = getController(link.getReceiverId());
             
             if(from && to)
             {
-                const auto it = m_links.emplace(m_links.end(), links_t::value_type(new controller::Link(link, *from, *to)));
+                const auto it = m_links.emplace(m_links.end(), std::make_shared<Link>(link, from, to));
                 
-                from->addOutputLink(it->get());
+                // add link to the sender object
+                from->addOutputLink(*it);
             }
         }
         
@@ -300,8 +304,13 @@ namespace kiwi
             
             if(it != m_links.cend())
             {
-                Object& from = (*it)->getSenderObject();
-                from.removeOutputLink(it->get());
+                // remove link from the sender object before delete it
+                auto from = (*it)->getSenderObject();
+                if(from)
+                {
+                    from->removeOutputLink(*it);
+                }
+                
                 m_links.erase(it);
             }
         }

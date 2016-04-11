@@ -78,7 +78,7 @@ namespace kiwi
             
             const auto from_it = std::find_if(m_objects.begin(), m_objects.end(), p_from);
             
-            const bool from_valid = (from_it != m_objects.cend() && from_it->getNumberOfOutlets() >= outlet);
+            const bool from_valid = (from_it != m_objects.cend() && from_it->getNumberOfOutlets() > outlet);
             
 
             // check destination object
@@ -89,7 +89,7 @@ namespace kiwi
             
             const auto to_it = std::find_if(m_objects.begin(), m_objects.end(), p_to);
             
-            const bool to_valid = (to_it != m_objects.cend() && to_it->getNumberOfInlets() >= inlet);
+            const bool to_valid = (to_it != m_objects.cend() && to_it->getNumberOfInlets() > inlet);
             
             
             if(from_valid && to_valid)

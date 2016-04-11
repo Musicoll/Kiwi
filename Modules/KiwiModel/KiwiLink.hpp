@@ -91,7 +91,7 @@ namespace kiwi
             //! @return The actual origin outlet index of the link.
             inline uint32_t getSenderIndex() const noexcept
             {
-                int64_t value = (!removed()) ? m_index_outlet.value() : m_index_outlet.before();
+                int64_t value = !removed() ? m_index_outlet.value() : m_index_outlet.before();
                 return static_cast<uint32_t>(value);
             }
             
@@ -99,7 +99,7 @@ namespace kiwi
             //! @return The actual destination inlet index of the link.
             inline uint32_t getReceiverIndex() const noexcept
             {
-                int64_t value = (!removed()) ? m_index_inlet.value() : m_index_inlet.before();
+                int64_t value = !removed() ? m_index_inlet.value() : m_index_inlet.before();
                 return static_cast<uint32_t>(value);
             }
             

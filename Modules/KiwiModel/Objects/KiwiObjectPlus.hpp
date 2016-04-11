@@ -42,14 +42,14 @@ namespace kiwi
             
             ObjectPlus(initInfos const& infos) : model::Object(infos)
             {
-                addInlet(IoType::Message);
+                addInlet();
                 
                 if(infos.args.size() == 0 || !infos.args[0].isNumber())
                 {
-                    addInlet(IoType::Message);
+                    addInlet();
                 }
                 
-                addOutlet(IoType::Message);
+                addOutlet();
             }
 
             //! @internal flip static declare method
