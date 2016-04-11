@@ -84,8 +84,6 @@ namespace kiwi
             void removeOutputLink(std::shared_ptr<Link> link);
             
             model::Object const&    m_model;
-            
-            //std::vector<Inlet>      m_inlets;
             std::vector<Outlet>     m_outlets;
             uint32_t                m_stack_count = 0ul;
             

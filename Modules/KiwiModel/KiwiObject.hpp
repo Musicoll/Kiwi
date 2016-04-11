@@ -52,8 +52,6 @@ namespace kiwi
                 args(AtomHelper::parse(text)) {}
             };
             
-            class Iolet;
-            
             //! @internal flip Default constructor
             Object(flip::Default&) {}
             
