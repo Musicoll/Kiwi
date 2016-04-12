@@ -48,12 +48,6 @@ namespace kiwi
             m_objects.clear();
         }
         
-        std::unique_ptr<Patcher> Patcher::create(Instance& instance)
-        {
-            std::unique_ptr<Patcher> patcher(new Patcher(instance));
-            return patcher;
-        }
-        
         void Patcher::addPlus()
         {
             getModel().addPlus();
@@ -77,6 +71,26 @@ namespace kiwi
         void Patcher::removeLink(Link const& link)
         {
             getModel().removeLink(link.m_model);
+        }
+        
+        std::vector<engine::Object const*> Patcher::getObjects() const
+        {
+            std::vector<engine::Object const*> objs(m_objects.size());
+            for(size_t i = 0; i < m_objects.size(); ++i)
+            {
+                objs[i] = m_objects[i].get();
+            }
+            return objs;
+        }
+        
+        std::vector<engine::Link const*> Patcher::getLinks() const
+        {
+            std::vector<engine::Link const*> links(m_links.size());
+            for(size_t i = 0; i < m_links.size(); ++i)
+            {
+                links[i] = m_links[i].get();
+            }
+            return links;
         }
         
         void Patcher::sendToObject(Object& object, const uint32_t inlet, std::vector<Atom> args)
@@ -177,7 +191,7 @@ namespace kiwi
                             {
                                 objectWillBeRemoved(object);
                             }
-                            else
+                            else // resident
                             {
                                 objectChanged(object);
                             }
@@ -239,8 +253,7 @@ namespace kiwi
             auto from = findObject(link.getSenderObject());
             auto to = findObject(link.getReceiverObject());
             
-            if(from != m_objects.end()
-               && to != m_objects.end())
+            if(from != m_objects.end() && to != m_objects.end())
             {
                 const auto it = m_links.emplace(m_links.end(), std::unique_ptr<engine::Link>(new engine::Link(link, *from->get(), *to->get())));
                 
@@ -264,7 +277,7 @@ namespace kiwi
             }
         }
         
-        Patcher::objects_t::const_iterator Patcher::findObject(model::Object const& object) const
+        std::vector<Patcher::uobject_t>::const_iterator Patcher::findObject(model::Object const& object) const
         {
             const auto pred = [&object](std::unique_ptr<engine::Object> const& ctrl)
             {
@@ -274,7 +287,7 @@ namespace kiwi
             return std::find_if(m_objects.begin(), m_objects.end(), pred);
         }
         
-        Patcher::links_t::const_iterator Patcher::findLink(model::Link const& link) const
+        std::vector<Patcher::ulink_t>::const_iterator Patcher::findLink(model::Link const& link) const
         {
             const auto pred = [&link](std::unique_ptr<engine::Link> const& ctrl)
             {
@@ -284,7 +297,7 @@ namespace kiwi
             return std::find_if(m_links.begin(), m_links.end(), pred);
         }
         
-        Patcher::objects_t::const_iterator Patcher::findObject(Object const& object) const
+        std::vector<Patcher::uobject_t>::const_iterator Patcher::findObject(Object const& object) const
         {
             const auto pred = [&object](std::unique_ptr<engine::Object> const& ctrl)
             {
@@ -294,7 +307,7 @@ namespace kiwi
             return std::find_if(m_objects.begin(), m_objects.end(), pred);
         }
         
-        Patcher::links_t::const_iterator Patcher::findLink(Link const& link) const
+        std::vector<Patcher::ulink_t>::const_iterator Patcher::findLink(Link const& link) const
         {
             const auto pred = [&link](std::unique_ptr<engine::Link> const& ctrl)
             {

@@ -66,7 +66,7 @@ namespace kiwi
         
         Patcher& Instance::createPatcher()
         {
-            auto it = m_patchers.emplace(m_patchers.cend(), Patcher::create(*this));
+            auto it = m_patchers.emplace(m_patchers.cend(), std::unique_ptr<Patcher>(new Patcher(*this)));
             return *it->get();
         }
         

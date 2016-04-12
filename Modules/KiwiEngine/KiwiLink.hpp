@@ -34,7 +34,7 @@ namespace kiwi
         //                                      LINK                                        //
         // ================================================================================ //
         
-        //! @brief The link holds a connection between two objects.
+        //! @brief The link represents a connection between two objects.
         class Link
         {
         public:

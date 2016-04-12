@@ -45,14 +45,12 @@ namespace kiwi
         {
         public:
             
-            using objects_t = std::vector<std::unique_ptr<engine::Object>>;
-            using links_t = std::vector<std::unique_ptr<engine::Link>>;
+            //! @brief Constructor.
+            //! @details use the create method instead.
+            Patcher(Instance& instance) noexcept;
             
             //! @brief Destructor.
             ~Patcher();
-            
-            //! @brief Creates and returns a new Patcher.
-            static std::unique_ptr<Patcher> create(Instance& instance);
             
             //! @brief Creates and adds a "plus" object to the Patcher.
             void addPlus();
@@ -71,20 +69,17 @@ namespace kiwi
             
             //! @brief Removes an Object from the Patcher.
             //! @param id The ID of the object to be removed.
-            void removeObject(Object const& id);
+            void removeObject(Object const& object);
             
             //! @brief Removes an Object from the Patcher.
             //! @param object The pointer to the object to be removed.
             void removeLink(Link const& link);
             
             //! @brief Returns the objects.
-            objects_t const& getObjects() const { return m_objects; }
+            std::vector<engine::Object const*> getObjects() const;
             
             //! @brief Returns the objects.
-            links_t const& getLinks() const { return m_links; }
-            
-            //! @brief Send a message to an object
-            void sendToObject(Object& object_id, uint32_t inlet, std::vector<Atom> args);
+            std::vector<engine::Link const*> getLinks() const;
             
             //! @brief Begins a new transaction
             //! @details Each call to this function must be followed by a call to endTransaction.
@@ -103,11 +98,14 @@ namespace kiwi
             //! @brief Redo the next transaction and optionally commit
             void redo(const bool commit = false);
             
-        private:
+            // Rebouger et refaire
+            //! @brief Send a message to an object
+            void sendToObject(Object& object, uint32_t inlet, std::vector<Atom> args);
             
-            //! @brief Constructor.
-            //! @details use the create method instead.
-            Patcher(Instance& instance) noexcept;
+        private:
+
+            using uobject_t = std::unique_ptr<engine::Object>;
+            using ulink_t   = std::unique_ptr<engine::Link>;
             
             //! @brief Get the Patcher model
             inline model::Patcher& getModel() { return m_document.root<model::Patcher>(); }
@@ -116,16 +114,16 @@ namespace kiwi
             inline model::Patcher const& getModel() const { return m_document.root<model::Patcher>(); }
             
             //! @brief Find an object engine with an Object model.
-            objects_t::const_iterator findObject(model::Object const& object) const;
+            std::vector<uobject_t>::const_iterator findObject(model::Object const& object) const;
             
             //! @brief Find a Link engine with a Link model.
-            links_t::const_iterator findLink(model::Link const& link) const;
+            std::vector<ulink_t>::const_iterator findLink(model::Link const& link) const;
             
             //! @brief Find an object engine.
-            objects_t::const_iterator findObject(Object const& object) const;
+            std::vector<uobject_t>::const_iterator findObject(Object const& object) const;
             
             //! @brief Find a link engine.
-            links_t::const_iterator findLink(Link const& link) const;
+            std::vector<ulink_t>::const_iterator findLink(Link const& link) const;
             
             //! @internal flip::DocumentObserver<model::Patcher>::document_changed
             void document_changed(model::Patcher& patcher) final;
@@ -160,8 +158,8 @@ namespace kiwi
             <flip::HistoryStoreMemory>
                             m_history;
             
-            objects_t       m_objects;
-            links_t         m_links;
+            std::vector<uobject_t>  m_objects;
+            std::vector<ulink_t>    m_links;
         };
     }
 }
