@@ -121,7 +121,7 @@ namespace kiwi
             }
         }
         
-        Patcher::objects_t::const_iterator Patcher::findObject(model::Object const& object) const
+        flip::Array<model::Object>::const_iterator Patcher::findObject(model::Object const& object) const
         {
             const auto find_it = [&object](model::Object const& object_model)
             {
@@ -131,7 +131,7 @@ namespace kiwi
             return std::find_if(m_objects.begin(), m_objects.end(), find_it);
         }
         
-        Patcher::links_t::const_iterator Patcher::findLink(model::Link const& link) const
+        flip::Array<model::Link>::const_iterator Patcher::findLink(model::Link const& link) const
         {
             const auto find_it = [&link](model::Link const& link_model)
             {
@@ -141,7 +141,7 @@ namespace kiwi
             return std::find_if(m_links.begin(), m_links.end(), find_it);
         }
         
-        Patcher::objects_t::iterator Patcher::findObject(model::Object const& object)
+        flip::Array<model::Object>::iterator Patcher::findObject(model::Object const& object)
         {
             const auto find_it = [&object](model::Object const& object_model)
             {
@@ -151,7 +151,7 @@ namespace kiwi
             return std::find_if(m_objects.begin(), m_objects.end(), find_it);
         }
         
-        Patcher::links_t::iterator Patcher::findLink(model::Link const& link)
+        flip::Array<model::Link>::iterator Patcher::findLink(model::Link const& link)
         {
             const auto find_it = [&link](model::Link const& link_model)
             {

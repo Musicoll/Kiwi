@@ -39,9 +39,6 @@ namespace kiwi
         {
         public:
             
-            using objects_t = flip::Array<model::Object>;
-            using links_t   = flip::Array<model::Link>;
-            
             //! @brief Default constructor.
             Patcher();
             
@@ -54,15 +51,15 @@ namespace kiwi
             {
                 TModel::template declare<Patcher>()
                 .name("cicm.kiwi.Patcher")
-                .template member<objects_t,   &Patcher::m_objects>   ("objects")
-                .template member<links_t,     &Patcher::m_links>     ("links");
+                .template member<flip::Array<model::Object>,   &Patcher::m_objects>   ("objects")
+                .template member<flip::Array<model::Link>,     &Patcher::m_links>     ("links");
             }
             
             //! @brief Get the objects.
-            objects_t const& getObjects() noexcept      { return m_objects; }
+            flip::Array<model::Object> const& getObjects() noexcept      { return m_objects; }
             
             //! @brief Get the links.
-            links_t const& getLinks() const noexcept    { return m_links; }
+            flip::Array<model::Link> const& getLinks() const noexcept    { return m_links; }
             
             //! @brief Creates and adds a "plus" object to the Patcher.
             void addPlus();
@@ -102,15 +99,15 @@ namespace kiwi
             bool canConnect(model::Object const& from, const uint32_t outlet,
                             model::Object const& to, const uint32_t inlet) const;
             
-            objects_t::const_iterator findObject(model::Object const& object) const;
-            objects_t::iterator findObject(model::Object const& object);
+            flip::Array<model::Object>::const_iterator findObject(model::Object const& object) const;
+            flip::Array<model::Object>::iterator findObject(model::Object const& object);
             
-            links_t::const_iterator findLink(model::Link const& object) const;
-            links_t::iterator findLink(model::Link const& object);
+            flip::Array<model::Link>::const_iterator findLink(model::Link const& object) const;
+            flip::Array<model::Link>::iterator findLink(model::Link const& object);
             
             //! objects and links are stored in a flip::Array to maintain a graphical z-order.
-            objects_t   m_objects;
-            links_t     m_links;
+            flip::Array<model::Object>   m_objects;
+            flip::Array<model::Link>     m_links;
         };
     }
 }
