@@ -99,6 +99,50 @@ namespace kiwi
         }
         
         // ================================================================================ //
+        //                              PATCHER LISTENER                                    //
+        // ================================================================================ //
+        
+        PatcherListener::PatcherListener(Patcher &patcher):m_patcher(patcher), m_id(getNewId())
+        {
+            m_patcher.addListener(this);
+            
+        };
+        
+        PatcherListener::~PatcherListener()
+        {
+            m_patcher.removeListener(this);
+        }
+        
+        uint64_t PatcherListener::getNewId()
+        {
+            static uint64_t counter_id = 0;
+            return ++counter_id;
+        }
+        
+        uint64_t PatcherListener::getId() const
+        {
+            return m_id;
+        }
+        
+        void Patcher::addListener(PatcherListener * listener)
+        {
+            m_listeners.insert(listener);
+        }
+        
+        void Patcher::removeListener(PatcherListener * listener)
+        {
+            m_listeners.erase(listener);
+        }
+        
+        void Patcher::notify()
+        {
+            for (auto listener : m_listeners)
+            {
+                listener->patcherChanged();
+            }
+        }
+        
+        // ================================================================================ //
         //                              DOCUMENT TRANSACTIONS                               //
         // ================================================================================ //
         
@@ -218,6 +262,8 @@ namespace kiwi
                     }
                 }
             }
+            
+            notify();
         }
 
         void Patcher::objectHasBeenAdded(model::Object& object)

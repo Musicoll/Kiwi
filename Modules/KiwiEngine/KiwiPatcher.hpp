@@ -39,6 +39,22 @@ namespace kiwi
         //                                      PATCHER                                     //
         // ================================================================================ //
         
+        class PatcherListener
+        {
+        public:
+            PatcherListener(Patcher &patcher);
+            
+            virtual void patcherChanged() = 0;
+            uint64_t getId() const;
+            
+            virtual ~PatcherListener();
+        protected:
+            Patcher &m_patcher;
+        private:
+            uint64_t m_id;
+            static uint64_t getNewId();
+        };
+        
         //! @brief The Patcher manages object and link controllers.
         //! @details The patcher engine observes the Patcher mode for changes.
         class Patcher : public flip::DocumentObserver<model::Patcher>
@@ -102,6 +118,12 @@ namespace kiwi
             //! @brief Send a message to an object
             void sendToObject(Object& object, uint32_t inlet, std::vector<Atom> args);
             
+            //! @brief Add a listener to the patcher
+            void addListener(PatcherListener *listener);
+            
+            //! @brief Remove a listener from the patcher
+            void removeListener(PatcherListener *listener);
+            
         private:
 
             using uobject_t = std::unique_ptr<engine::Object>;
@@ -124,6 +146,9 @@ namespace kiwi
             
             //! @brief Find a link engine.
             std::vector<ulink_t>::const_iterator findLink(Link const& link) const;
+            
+            //! @brief Notify the listeners that the patcher has changed
+            void notify();
             
             //! @internal flip::DocumentObserver<model::Patcher>::document_changed
             void document_changed(model::Patcher& patcher) final;
@@ -151,7 +176,15 @@ namespace kiwi
             
             // -----------------------------
             
-            Instance&       m_instance;
+            Instance&                         m_instance;
+            
+            struct compareListeners
+            {
+                bool operator()(PatcherListener const* lhs, PatcherListener const* rhs){
+                    return lhs->getId() < rhs->getId();
+                };
+            };
+            std::set<PatcherListener *, compareListeners>  m_listeners;
             
             flip::Document  m_document;
             flip::History
