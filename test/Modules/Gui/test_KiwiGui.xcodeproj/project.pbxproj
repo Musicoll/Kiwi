@@ -1,0 +1,265 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0FA023B91CBFA545007C94E7 /* KiwiPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FA023A81CBFA327007C94E7 /* KiwiPath.cpp */; };
+		0FA023BA1CBFA547007C94E7 /* KiwiPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FA023AA1CBFA327007C94E7 /* KiwiPoint.cpp */; };
+		0FA023BB1CBFA54A007C94E7 /* test_KiwiGui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E1D591C71DBD300CF0989 /* test_KiwiGui.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		0FA023B01CBFA476007C94E7 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0F0E1D591C71DBD300CF0989 /* test_KiwiGui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_KiwiGui.cpp; sourceTree = "<group>"; };
+		0FA023A71CBFA327007C94E7 /* KiwiAffineMatrix.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiAffineMatrix.hpp; sourceTree = "<group>"; };
+		0FA023A81CBFA327007C94E7 /* KiwiPath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiPath.cpp; sourceTree = "<group>"; };
+		0FA023A91CBFA327007C94E7 /* KiwiPath.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiPath.hpp; sourceTree = "<group>"; };
+		0FA023AA1CBFA327007C94E7 /* KiwiPoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiPoint.cpp; sourceTree = "<group>"; };
+		0FA023AB1CBFA327007C94E7 /* KiwiPoint.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiPoint.hpp; sourceTree = "<group>"; };
+		0FA023B21CBFA476007C94E7 /* test_KiwiGui */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_KiwiGui; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0FA023AF1CBFA476007C94E7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0F0E1D461C71DB6900CF0989 = {
+			isa = PBXGroup;
+			children = (
+				0F0E1D591C71DBD300CF0989 /* test_KiwiGui.cpp */,
+				0FA023A61CBFA327007C94E7 /* KiwiGui */,
+				0F0E1D501C71DB6900CF0989 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		0F0E1D501C71DB6900CF0989 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0FA023B21CBFA476007C94E7 /* test_KiwiGui */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0FA023A61CBFA327007C94E7 /* KiwiGui */ = {
+			isa = PBXGroup;
+			children = (
+				0FA023A71CBFA327007C94E7 /* KiwiAffineMatrix.hpp */,
+				0FA023A81CBFA327007C94E7 /* KiwiPath.cpp */,
+				0FA023A91CBFA327007C94E7 /* KiwiPath.hpp */,
+				0FA023AA1CBFA327007C94E7 /* KiwiPoint.cpp */,
+				0FA023AB1CBFA327007C94E7 /* KiwiPoint.hpp */,
+			);
+			name = KiwiGui;
+			path = ../../../Modules/KiwiGui;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0FA023B11CBFA476007C94E7 /* test_KiwiGui */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0FA023B81CBFA476007C94E7 /* Build configuration list for PBXNativeTarget "test_KiwiGui" */;
+			buildPhases = (
+				0FA023AE1CBFA476007C94E7 /* Sources */,
+				0FA023AF1CBFA476007C94E7 /* Frameworks */,
+				0FA023B01CBFA476007C94E7 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = test_KiwiGui;
+			productName = test_KiwiGui;
+			productReference = 0FA023B21CBFA476007C94E7 /* test_KiwiGui */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0F0E1D471C71DB6900CF0989 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0720;
+				ORGANIZATIONNAME = MUSICOLL;
+				TargetAttributes = {
+					0FA023B11CBFA476007C94E7 = {
+						CreatedOnToolsVersion = 7.2.1;
+					};
+				};
+			};
+			buildConfigurationList = 0F0E1D4A1C71DB6900CF0989 /* Build configuration list for PBXProject "test_KiwiGui" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 0F0E1D461C71DB6900CF0989;
+			productRefGroup = 0F0E1D501C71DB6900CF0989 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0FA023B11CBFA476007C94E7 /* test_KiwiGui */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0FA023AE1CBFA476007C94E7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0FA023B91CBFA545007C94E7 /* KiwiPath.cpp in Sources */,
+				0FA023BA1CBFA547007C94E7 /* KiwiPoint.cpp in Sources */,
+				0FA023BB1CBFA54A007C94E7 /* test_KiwiGui.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		0F0E1D541C71DB6900CF0989 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		0F0E1D551C71DB6900CF0989 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		0FA023B61CBFA476007C94E7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = "${KIWI_DIR}/Modules/**";
+				KIWI_DIR = ../../..;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		0FA023B71CBFA476007C94E7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = "${KIWI_DIR}/Modules/**";
+				KIWI_DIR = ../../..;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0F0E1D4A1C71DB6900CF0989 /* Build configuration list for PBXProject "test_KiwiGui" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0F0E1D541C71DB6900CF0989 /* Debug */,
+				0F0E1D551C71DB6900CF0989 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0FA023B81CBFA476007C94E7 /* Build configuration list for PBXNativeTarget "test_KiwiGui" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0FA023B61CBFA476007C94E7 /* Debug */,
+				0FA023B71CBFA476007C94E7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0F0E1D471C71DB6900CF0989 /* Project object */;
+}

@@ -21,12 +21,12 @@
  ==============================================================================
  */
 
-#include <KiwiGraphics/KiwiPoint.hpp>
+#include <KiwiGui/KiwiPoint.hpp>
 #include <math.h>
 
 namespace kiwi
 {
-    namespace graphics
+    namespace gui
     {
         // ================================================================================ //
         //                                      POINT                                       //

@@ -21,7 +21,7 @@
  ==============================================================================
  */
 
-#include <KiwiGraphics/KiwiPoint.hpp>
+#include <KiwiGui/KiwiPoint.hpp>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -31,7 +31,7 @@
 
 namespace kiwi
 {
-    namespace graphics
+    namespace gui
     {
      
         bool areNear(Point const& pt_left, Point const& pt_right)

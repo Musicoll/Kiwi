@@ -103,15 +103,15 @@ set_property(TARGET KiwiDsp
 set_property(TARGET KiwiDsp
              APPEND PROPERTY COMPILE_DEFINITIONS KIWI_DSP_FLOAT)
 
-# -> Module Graphics
+# -> Module Gui
 
 file(GLOB KIWI_GRAPHICS_SRC                                   
-     ${PROJECT_SOURCE_DIR}/Modules/KiwiGraphics/*.hpp
-     ${PROJECT_SOURCE_DIR}/Modules/KiwiGraphics/*.cpp
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiGui/*.hpp
+     ${PROJECT_SOURCE_DIR}/Modules/KiwiGui/*.cpp
 )
-add_library(KiwiGraphics STATIC ${KIWI_GRAPHICS_SRC})
-target_link_libraries(KiwiGraphics KiwiCore)
-set_property(TARGET KiwiGraphics
+add_library(KiwiGui STATIC ${KIWI_GRAPHICS_SRC})
+target_link_libraries(KiwiGui)
+set_property(TARGET KiwiGui
              PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
 
 
@@ -150,10 +150,10 @@ set_property(TARGET test_dsp
 set_property(TARGET test_dsp
              APPEND PROPERTY COMPILE_DEFINITIONS KIWI_DSP_FLOAT)
 
-# -> Graphics Unit Tests
+# -> Gui Unit Tests
 
-file(GLOB TEST_GRAPHICS_SRC ${PROJECT_SOURCE_DIR}/test/Modules/Graphics/*.cpp)
-add_executable(test_graphics ${TEST_GRAPHICS_SRC})
-target_link_libraries(test_graphics KiwiGraphics)
-set_property(TARGET test_graphics
+file(GLOB TEST_GUI_SRC ${PROJECT_SOURCE_DIR}/test/Modules/Gui/*.cpp)
+add_executable(test_gui ${TEST_GUI_SRC})
+target_link_libraries(test_gui KiwiGui)
+set_property(TARGET test_gui
              PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)

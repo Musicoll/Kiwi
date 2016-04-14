@@ -24,13 +24,15 @@
 #ifndef KIWI_GRAPHICS_PATH_HPP_INCLUDED
 #define KIWI_GRAPHICS_PATH_HPP_INCLUDED
 
-#include <KiwiGraphics/KiwiPoint.hpp>
-#include <KiwiGraphics/KiwiAffineMatrix.hpp>
+#include <array>
+
+#include <KiwiGui/KiwiPoint.hpp>
+#include <KiwiGui/KiwiAffineMatrix.hpp>
 
 
 namespace kiwi
 {
-    namespace graphics
+    namespace gui
     {
         // ================================================================================ //
         //                                      PATH                                        //

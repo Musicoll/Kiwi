@@ -28,7 +28,7 @@
 
 namespace kiwi
 {
-    namespace graphics
+    namespace gui
     {
         // ================================================================================ //
         //                                      POINT                                       //

@@ -22,12 +22,13 @@
  */
 
 #include <assert.h>
+#include <cmath>
 
-#include <KiwiGraphics/KiwiPath.hpp>
+#include <KiwiGui/KiwiPath.hpp>
 
 namespace kiwi
 {
-    namespace graphics
+    namespace gui
     {
         
         // =================================

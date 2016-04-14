@@ -24,11 +24,12 @@
 #ifndef KIWI_AFFINEMATRIX_H_INCLUDED
 #define KIWI_AFFINEMATRIX_H_INCLUDED
 
-#include <KiwiCore/KiwiCore.h>
+#include <KiwiCore/KiwiAtom.hpp>
+#include <array>
 
 namespace kiwi
 {
-    namespace graphics
+    namespace gui
     {
         // ================================================================================ //
         //                                  AFFINE MATRIX                                   //
