@@ -59,12 +59,12 @@ TEST_CASE("Patcher", "[Patcher]")
     patcher.removeObject(*objects[1]);
     patcher.endTransaction();
     
-    CHECK(objects.size() == 2);
-    CHECK(links.size() == 0);
+    CHECK(patcher.getObjects().size() == 2);
+    CHECK(patcher.getLinks().size() == 0);
     
     patcher.undo(true);
-    REQUIRE(objects.size() == 3);
-    REQUIRE(links.size() == 2);
+    REQUIRE(patcher.getObjects().size() == 3);
+    REQUIRE(patcher.getLinks().size() == 2);
     
     
     /*
