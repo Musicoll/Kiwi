@@ -32,6 +32,7 @@ xcshareddata/
 *.xcuserdata
 *.xcuserdatad
 MacOSX/
+DerivedData/
 
 # Juce
 JuceLibraryCode/
