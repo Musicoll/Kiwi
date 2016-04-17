@@ -22,29 +22,78 @@
  */
 
 #include <iostream>
+#include <atomic>
+#include <string>
+#include <thread>
+#include <mutex>
+
+#include "flip/Document.h"
 #include "KiwiServer.hpp"
 
 namespace kiwi
 {
-    Server::Server()
+    Server::Server() :
+    m_bundle(std::unique_ptr<Bundle>(new Bundle(123456789ULL, 9090))),
+    m_running(false)
     {
-        Model::version ("test.server");
-        
-        Model::declare<Root>()
-        .name ("Root")
-        .member <flip::Int, &Root::m_value>("value");
-        
-        m_bundle = std::unique_ptr<Bundle>(new Bundle(123456789ULL, 9090));
+        ;
     }
     
     void Server::run()
     {
-        for (;;)
+        m_running.store(true);
+        
+        std::thread process_loop(&Server::runProcessLoop, this);
+        std::thread event_loop(&Server::runEventLoop, this);
+        
+        process_loop.join();
+        event_loop.join();
+    }
+    
+    void Server::runProcessLoop()
+    {
+        while(m_running.load())
         {
             m_bundle->m_transport.process();
             m_bundle->m_document.pull();
             m_bundle->m_document.push();
             m_bundle->m_transport.process();
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+    }
+    
+    void Server::runEventLoop()
+    {
+        while(m_running.load())
+        {
+            std::string mystr;
+            std::getline (std::cin, mystr);
+            
+            if(mystr == "quit")
+            {
+                m_running.store(false);
+                break;
+            }
+            else if(mystr == "getvalue")
+            {
+                Root& root = m_bundle->m_document.root<Root>();
+                std::cout << "value : " << root.m_value << "\n";
+            }
+            else if(mystr == "setvalue")
+            {
+                Root& root = m_bundle->m_document.root<Root>();
+                
+                int val;
+                std::cout << "enter a new value : ";
+                std::cin >> val;
+                root.m_value = val;
+                
+                m_bundle->m_document.commit();
+            }
+            else
+            {
+                std::cout << mystr << " is not a valid command. \n";
+            }
         }
     }
     
@@ -81,6 +130,16 @@ namespace kiwi
     m_transport(m_document, port),
     m_backend()
     {
+        {
+            /* // intitialize with data
+            flip::Document document(Model::use(), 123ULL, 'appl', 'gui ');
+            Root& root = document.root<Root>();
+            root.m_value = 123;
+            
+            m_backend = document.write();
+            */
+        }
+        
         Server::init(m_document, m_backend);
     }
 }

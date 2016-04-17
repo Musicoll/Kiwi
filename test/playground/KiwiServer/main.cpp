@@ -25,6 +25,7 @@
 
 int main(int argc, const char * argv[])
 {
+    kiwi::Model::init("test.server");
     kiwi::Server server;
     server.run();
 }

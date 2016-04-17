@@ -24,24 +24,92 @@
 #include "KiwiClient.hpp"
 
 #include <iostream>
-#include <memory>
+#include <atomic>
 #include <string>
-#include <future>
 #include <thread>
 #include <mutex>
-#include <condition_variable>
-#include <deque>
 
 namespace kiwi
 {
     Client::Client(const std::string & host, uint16_t port, uint16_t client_id) :
     m_document(Model::use(), *this, client_id, 'appl', 'gui '),
-    m_transport(m_document, host, port)
+    m_transport(m_document, host, port),
+    m_running(false)
     {
         ;
     }
     
+    void Client::document_changed(Root& root)
+    {
+        if(root.changed())
+        {
+            if(root.m_value.changed())
+            {
+                std::cout << "-> value changed : " << root.m_value << '\n';
+            }
+        }
+    }
+    
     void Client::run()
+    {
+        init();
+        
+        m_running.store(true);
+        
+        std::thread process_loop(&Client::runProcessLoop, this);
+        std::thread event_loop(&Client::runEventLoop, this);
+        
+        process_loop.join();
+        event_loop.join();
+    }
+    
+    void Client::runProcessLoop()
+    {
+        while(m_running.load())
+        {
+            m_transport.process();
+            m_document.push();
+            m_document.pull();
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+    }
+    
+    void Client::runEventLoop()
+    {
+        while(m_running.load())
+        {
+            std::string mystr;
+            std::getline (std::cin, mystr);
+            
+            if(mystr == "quit")
+            {
+                m_running.store(false);
+                break;
+            }
+            else if(mystr == "getvalue")
+            {
+                Root& root = m_document.root<Root>();
+                std::cout << "value : " << root.m_value << "\n";
+            }
+            else if(mystr == "setvalue")
+            {
+                Root& root = m_document.root<Root>();
+                
+                int val;
+                std::cout << "enter a new value : ";
+                std::cin >> val;
+                root.m_value = val;
+                
+                m_document.commit();
+            }
+            else
+            {
+                std::cout << mystr << " is not a valid command. \n";
+            }
+        }
+    }
+    
+    void Client::init()
     {
         flip::CarrierBase::Transition transition = flip::CarrierBase::Transition::Disconnected;
         
@@ -64,56 +132,6 @@ namespace kiwi
         });
         
         waitTransferBackend();
-        
-        for (;;)
-        {
-            m_transport.process();
-            
-            std::string mystr;
-            //std::getline (std::cin, mystr);
-            std::cin >> mystr;
-            
-            if(mystr == "quit")
-            {
-                break;
-            }
-            else if(mystr == "getvalue")
-            {
-                m_transport.process();
-                m_document.pull();
-                Root& root = m_document.root<Root>();
-                std::cout << "value : " << root.m_value << "\n";
-            }
-            else if(mystr == "setvalue")
-            {
-                
-                Root& root = m_document.root<Root>();
-                
-                int val;
-                std::cout << "enter a new value : ";
-                std::cin >> val;
-                root.m_value = val;
-                
-                m_document.commit();
-                m_document.push();
-                m_transport.process();
-            }
-            else
-            {
-                std::cout << mystr << " is not a valid command. \n";
-            }
-        }
-    }
-    
-    void Client::document_changed(Root& root)
-    {
-        if(root.changed())
-        {
-            if(root.m_value.changed())
-            {
-                std::cout << "-> value changed : " << root.m_value << '\n';
-            }
-        }
     }
     
     void Client::waitTransferBackend()

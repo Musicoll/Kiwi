@@ -44,11 +44,17 @@ namespace kiwi
         void run();
         
     private:
+        void runProcessLoop();
+        void runEventLoop();
+        
         void document_changed(Root& root) override;
+        
+        void init();
         void waitTransferBackend();
         
         flip::Document                  m_document;
         flip::CarrierTransportSocketTcp m_transport;
+        std::atomic_bool                m_running;
     };
 }
 

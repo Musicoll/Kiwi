@@ -44,6 +44,9 @@ namespace kiwi
         void run();
         
     private:
+        void runProcessLoop();
+        void runEventLoop();
+        
         static void init(flip::DocumentServer& document, flip::BackEndIR& backend);
         
         struct Bundle
@@ -57,8 +60,8 @@ namespace kiwi
             flip::BackEndIR                 m_backend;
         };
         
-        //std::vector<std::unique_ptr<Bundle>> m_bundles;
         std::unique_ptr<Bundle> m_bundle;
+        std::atomic_bool        m_running;
     };
 }
 
