@@ -68,8 +68,12 @@ namespace kiwi
         while(m_running.load())
         {
             m_transport.process();
-            m_document.push();
-            m_document.pull();
+            
+            if(m_transport.is_connected())
+            {
+                m_document.pull();
+            }
+            
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }
@@ -101,6 +105,7 @@ namespace kiwi
                 root.m_value = val;
                 
                 m_document.commit();
+                m_document.push();
             }
             else
             {
@@ -130,21 +135,5 @@ namespace kiwi
                 transition = sub_transition;
             }
         });
-        
-        waitTransferBackend();
-    }
-    
-    void Client::waitTransferBackend()
-    {
-        bool loop_flag = true;
-        
-        m_transport.listen_transfer_backend([&loop_flag](size_t cur, size_t total){
-            loop_flag = cur != total;
-        });
-        
-        while(loop_flag)
-        {
-            m_transport.process();
-        }
     }
 }

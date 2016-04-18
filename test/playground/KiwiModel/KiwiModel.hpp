@@ -39,6 +39,7 @@ namespace kiwi
         
         flip::Int       m_value;
     };
+    
     //! @brief The Patcher Model class
     class Model : public flip::DataModel<Model>
     {

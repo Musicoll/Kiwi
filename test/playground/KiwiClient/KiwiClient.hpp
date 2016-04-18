@@ -25,6 +25,7 @@
 #define KIWI_CLIENT_HPP_INCLUDED
 
 #include <iostream>
+#include <mutex>
 #include "../KiwiModel/KiwiModel.hpp"
 
 #include "flip/CarrierDirect.h"
@@ -51,10 +52,10 @@ namespace kiwi
         
         void init();
         void waitTransferBackend();
-        
+                
         flip::Document                  m_document;
         flip::CarrierTransportSocketTcp m_transport;
-        std::atomic_bool                m_running;
+        std::atomic_bool                m_running;        
     };
 }
 

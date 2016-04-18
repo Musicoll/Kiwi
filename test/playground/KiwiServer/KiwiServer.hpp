@@ -39,7 +39,7 @@ namespace kiwi
     class Server
     {
     public:
-        Server();
+        Server(uint64_t session_id, uint16_t port);
         
         void run();
         
@@ -47,21 +47,18 @@ namespace kiwi
         void runProcessLoop();
         void runEventLoop();
         
-        static void init(flip::DocumentServer& document, flip::BackEndIR& backend);
+        void init();
         
-        struct Bundle
-        {
-            Bundle(uint64_t session_id, uint16_t port);
-            
-        //private:
-            flip::DocumentValidatorVoid     m_validator;
-            flip::DocumentServer            m_document;
-            flip::PortTransportServerTcp    m_transport;
-            flip::BackEndIR                 m_backend;
-        };
+        // DocumentServer listener
+        void on_connecting(flip::PortBase& port);
+        void on_connected(flip::PortBase& port);
+        void on_disconnected(flip::PortBase& port);
         
-        std::unique_ptr<Bundle> m_bundle;
-        std::atomic_bool        m_running;
+        flip::DocumentValidatorVoid     m_validator;
+        flip::DocumentServer            m_document;
+        flip::PortTransportServerTcp    m_transport;
+        flip::BackEndIR                 m_backend;
+        std::atomic_bool                m_running;
     };
 }
 

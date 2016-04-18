@@ -28,15 +28,28 @@
 #include <mutex>
 
 #include "flip/Document.h"
+#include "flip/DataConsumerMemory.h"
+#include "flip/BackendMl.h"
+
 #include "KiwiServer.hpp"
 
 namespace kiwi
 {
-    Server::Server() :
-    m_bundle(std::unique_ptr<Bundle>(new Bundle(123456789ULL, 9090))),
+    Server::Server(uint64_t session_id, uint16_t port) :
+    m_validator(),
+    m_document(Model::use(), m_validator, session_id),
+    m_transport(m_document, port),
+    m_backend(),
     m_running(false)
     {
-        ;
+        {
+            flip::Document doc_temp(Model::use(), 123UL, 'appl', 'gui ');
+            Root& root = doc_temp.root<Root>();
+            root.m_value = 99999;
+            m_backend.write(doc_temp);
+        }
+        
+        init();
     }
     
     void Server::run()
@@ -54,10 +67,10 @@ namespace kiwi
     {
         while(m_running.load())
         {
-            m_bundle->m_transport.process();
-            m_bundle->m_document.pull();
-            m_bundle->m_document.push();
-            m_bundle->m_transport.process();
+            m_transport.process();
+            m_document.pull();
+            m_document.push();
+            m_transport.process();
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }
@@ -76,19 +89,31 @@ namespace kiwi
             }
             else if(mystr == "getvalue")
             {
-                Root& root = m_bundle->m_document.root<Root>();
+                Root& root = m_document.root<Root>();
                 std::cout << "value : " << root.m_value << "\n";
             }
             else if(mystr == "setvalue")
             {
-                Root& root = m_bundle->m_document.root<Root>();
+                Root& root = m_document.root<Root>();
                 
                 int val;
                 std::cout << "enter a new value : ";
                 std::cin >> val;
                 root.m_value = val;
                 
-                m_bundle->m_document.commit();
+                m_document.commit();
+            }
+            else if (mystr == "save")
+            {
+                std::vector <uint8_t> data;
+                flip::DataConsumerMemory consumer(data);
+                
+                flip::BackEndIR backup = m_document.write();
+                backup.write<flip::BackEndMl>(consumer);
+                
+                std::string backup_str(data.begin (), data.end ());
+                std::cout << backup_str << std::endl;
+                // save to file here
             }
             else
             {
@@ -97,49 +122,38 @@ namespace kiwi
         }
     }
     
-    void Server::init(flip::DocumentServer& document, flip::BackEndIR& backend)
+    void Server::on_connecting(flip::PortBase& port)
     {
-        document.listen_connecting([](flip::PortBase& port){
-            std::cout << "client [" << port.user() << "] -> connecting" << '\n';
-        });
-        
-        document.listen_connected([](flip::PortBase& port){
-            std::cout << "client [" << port.user() << "] -> connected" << '\n';
-        });
-        
-        document.listen_disconnected([](flip::PortBase& port){
-            std::cout << "client [" << port.user() << "] -> disconnected" << '\n';
-        });
-        
-        if(backend.empty())
+        std::cout << "client [" << port.user() << "] -> connecting" << '\n';
+    }
+    
+    void Server::on_connected(flip::PortBase& port)
+    {
+        std::cout << "client [" << port.user() << "] -> connected" << '\n';
+    }
+    
+    void Server::on_disconnected(flip::PortBase& port)
+    {
+        std::cout << "client [" << port.user() << "] -> disconnected" << '\n';
+    }
+    
+    void Server::init()
+    {
+        using namespace std::placeholders;
+        m_document.listen_connecting    (std::bind(&Server::on_connecting, this, _1));
+        m_document.listen_connected     (std::bind(&Server::on_connected, this, _1));
+        m_document.listen_disconnected  (std::bind(&Server::on_disconnected, this, _1));
+
+        if(m_backend.empty())
         {
-            Root & root = document.root<Root>();
+            Root& root = m_document.root<Root>();
             root.m_value = 42;
             
-            document.commit();
+            m_document.commit();
         }
         else
         {
-            document.read(backend);
+            m_document.read(m_backend);
         }
-    }
-    
-    Server::Bundle::Bundle(uint64_t session_id, uint16_t port) :
-    m_validator(),
-    m_document(Model::use(), m_validator, session_id),
-    m_transport(m_document, port),
-    m_backend()
-    {
-        {
-            /* // intitialize with data
-            flip::Document document(Model::use(), 123ULL, 'appl', 'gui ');
-            Root& root = document.root<Root>();
-            root.m_value = 123;
-            
-            m_backend = document.write();
-            */
-        }
-        
-        Server::init(m_document, m_backend);
     }
 }
