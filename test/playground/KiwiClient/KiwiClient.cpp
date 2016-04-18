@@ -45,7 +45,7 @@ namespace kiwi
         {
             if(root.m_value.changed())
             {
-                std::cout << "-> value changed : " << root.m_value << '\n';
+                Console::post("-> value changed : ", root.m_value);
             }
         }
     }
@@ -83,7 +83,7 @@ namespace kiwi
         while(m_running.load())
         {
             std::string mystr;
-            std::getline (std::cin, mystr);
+            std::cin >> mystr;
             
             if(mystr == "quit")
             {
@@ -93,15 +93,16 @@ namespace kiwi
             else if(mystr == "getvalue")
             {
                 Root& root = m_document.root<Root>();
-                std::cout << "value : " << root.m_value << "\n";
+                Console::post("value = ", root.m_value);
             }
             else if(mystr == "setvalue")
             {
-                Root& root = m_document.root<Root>();
+                Console::post("Enter a new integer value :");
                 
                 int val;
-                std::cout << "enter a new value : ";
                 std::cin >> val;
+                
+                Root& root = m_document.root<Root>();
                 root.m_value = val;
                 
                 m_document.commit();
@@ -109,7 +110,7 @@ namespace kiwi
             }
             else
             {
-                std::cout << mystr << " is not a valid command. \n";
+                Console::error("\"", mystr, "\" is not a valid command.");
             }
         }
     }
@@ -121,17 +122,17 @@ namespace kiwi
         m_transport.listen_state_transition([&transition](flip::CarrierBase::Transition sub_transition, int err){
             if(transition == flip::CarrierBase::Transition::Disconnected)
             {
-                std::cout << "client disconnected" << '\n';
+                Console::log("client disconnected");
                 transition = sub_transition;
             }
             else if(transition == flip::CarrierBase::Transition::Connecting)
             {
-                std::cout << "client connecting" << '\n';
+                Console::log("client connecting");
                 transition = sub_transition;
             }
             else if(transition == flip::CarrierBase::Transition::Connected)
             {
-                std::cout << "client connected" << '\n';
+                Console::log("client connected");
                 transition = sub_transition;
             }
         });

@@ -25,7 +25,6 @@
 #include <atomic>
 #include <string>
 #include <thread>
-#include <mutex>
 
 #include "flip/Document.h"
 #include "flip/DataConsumerMemory.h"
@@ -46,7 +45,9 @@ namespace kiwi
             flip::Document doc_temp(Model::use(), 123UL, 'appl', 'gui ');
             Root& root = doc_temp.root<Root>();
             root.m_value = 99999;
-            m_backend.write(doc_temp);
+            
+            // load backend
+            // m_backend.write(doc_temp);
         }
         
         init();
@@ -80,7 +81,7 @@ namespace kiwi
         while(m_running.load())
         {
             std::string mystr;
-            std::getline (std::cin, mystr);
+            std::cin >> mystr;
             
             if(mystr == "quit")
             {
@@ -90,17 +91,17 @@ namespace kiwi
             else if(mystr == "getvalue")
             {
                 Root& root = m_document.root<Root>();
-                std::cout << "value : " << root.m_value << "\n";
+                Console::post("value = ", root.m_value);
             }
             else if(mystr == "setvalue")
             {
-                Root& root = m_document.root<Root>();
+                Console::post("Enter a new integer value :");
                 
                 int val;
-                std::cout << "enter a new value : ";
                 std::cin >> val;
-                root.m_value = val;
                 
+                Root& root = m_document.root<Root>();
+                root.m_value = val;
                 m_document.commit();
             }
             else if (mystr == "save")
@@ -112,29 +113,29 @@ namespace kiwi
                 backup.write<flip::BackEndMl>(consumer);
                 
                 std::string backup_str(data.begin (), data.end ());
-                std::cout << backup_str << std::endl;
+                Console::log(backup_str);
                 // save to file here
             }
             else
             {
-                std::cout << mystr << " is not a valid command. \n";
+                Console::error("\"", mystr, "\" is not a valid command.");
             }
         }
     }
     
     void Server::on_connecting(flip::PortBase& port)
     {
-        std::cout << "client [" << port.user() << "] -> connecting" << '\n';
+        Console::log("client [", port.user(), "] -> connecting");
     }
     
     void Server::on_connected(flip::PortBase& port)
     {
-        std::cout << "client [" << port.user() << "] -> connected" << '\n';
+        Console::log("client [", port.user(), "] -> connected");
     }
     
     void Server::on_disconnected(flip::PortBase& port)
     {
-        std::cout << "client [" << port.user() << "] -> disconnected" << '\n';
+        Console::log("client [", port.user(), "] -> disconnected");
     }
     
     void Server::init()

@@ -24,8 +24,7 @@
 #ifndef KIWI_CLIENT_HPP_INCLUDED
 #define KIWI_CLIENT_HPP_INCLUDED
 
-#include <iostream>
-#include <mutex>
+#include "../KiwiCore/KiwiConsole.hpp"
 #include "../KiwiModel/KiwiModel.hpp"
 
 #include "flip/CarrierDirect.h"

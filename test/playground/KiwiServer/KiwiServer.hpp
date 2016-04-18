@@ -24,6 +24,7 @@
 #ifndef KIWI_SERVER_HPP_INCLUDED
 #define KIWI_SERVER_HPP_INCLUDED
 
+#include "../KiwiCore/KiwiConsole.hpp"
 #include "../KiwiModel/KiwiModel.hpp"
 
 #include "flip/BackEndIR.h"

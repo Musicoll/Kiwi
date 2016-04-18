@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2C7C46461CC5980A002EF37B /* KiwiConsole.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C7C46441CC5980A002EF37B /* KiwiConsole.cpp */; };
 		2CBC37011CC037020080FF4D /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CBC37001CC037020080FF4D /* main.cpp */; };
 		2CBC37BA1CC0391D0080FF4D /* flip_macos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CBC37B91CC0391D0080FF4D /* flip_macos.a */; };
 		2CBC37C51CC3C8C00080FF4D /* KiwiModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CBC37C31CC3C8C00080FF4D /* KiwiModel.cpp */; };
@@ -26,6 +27,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2C7C46441CC5980A002EF37B /* KiwiConsole.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiConsole.cpp; sourceTree = "<group>"; };
+		2C7C46451CC5980A002EF37B /* KiwiConsole.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiConsole.hpp; sourceTree = "<group>"; };
 		2CBC36F61CC036E60080FF4D /* KiwiClient */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = KiwiClient; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CBC37001CC037020080FF4D /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = SOURCE_ROOT; };
 		2CBC37041CC038E50080FF4D /* Array.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Array.h; path = "../../../ThirdParty/flip-public/include/flip/Array.h"; sourceTree = "<group>"; };
@@ -221,9 +224,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2C7C46431CC5980A002EF37B /* KiwiCore */ = {
+			isa = PBXGroup;
+			children = (
+				2C7C46441CC5980A002EF37B /* KiwiConsole.cpp */,
+				2C7C46451CC5980A002EF37B /* KiwiConsole.hpp */,
+			);
+			name = KiwiCore;
+			path = ../KiwiCore;
+			sourceTree = "<group>";
+		};
 		2CBC36ED1CC036E60080FF4D = {
 			isa = PBXGroup;
 			children = (
+				2C7C46431CC5980A002EF37B /* KiwiCore */,
 				2CBC37C21CC3C8C00080FF4D /* KiwiModel */,
 				2CBC36F81CC036E60080FF4D /* KiwiClient */,
 				2CBC37021CC038C30080FF4D /* flip */,
@@ -551,6 +565,7 @@
 				2CBC37011CC037020080FF4D /* main.cpp in Sources */,
 				2CBC37C51CC3C8C00080FF4D /* KiwiModel.cpp in Sources */,
 				2CBC37C81CC3C9050080FF4D /* KiwiClient.cpp in Sources */,
+				2C7C46461CC5980A002EF37B /* KiwiConsole.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
