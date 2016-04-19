@@ -29,6 +29,7 @@
 #include <mutex>
 #include <string>
 #include <thread>
+#include <future>
 
 namespace kiwi
 {
@@ -52,6 +53,18 @@ namespace kiwi
         static void log(Arg&& arg, Args&&... args)
         {
             output(std::clog, "- log: ", std::forward<Arg>(arg), std::forward<Args>(args)...);
+        }
+        
+        template<class InputType>
+        static InputType getInput()
+        {
+            std::future<InputType> ret = std::async([]() -> InputType {
+                InputType str;
+                std::cin >> str;
+                return str;
+            });
+            
+            return ret.get();
         }
         
     private:

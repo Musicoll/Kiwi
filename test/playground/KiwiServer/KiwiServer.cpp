@@ -80,8 +80,7 @@ namespace kiwi
     {
         while(m_running.load())
         {
-            std::string mystr;
-            std::cin >> mystr;
+            std::string mystr = Console::getInput<std::string>();
             
             if(mystr == "quit")
             {
@@ -97,12 +96,12 @@ namespace kiwi
             {
                 Console::post("Enter a new integer value :");
                 
-                int val;
-                std::cin >> val;
+                int64_t val = Console::getInput<int64_t>();
                 
                 Root& root = m_document.root<Root>();
                 root.m_value = val;
                 m_document.commit();
+                m_document.push();
             }
             else if (mystr == "save")
             {

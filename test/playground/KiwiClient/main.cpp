@@ -32,13 +32,12 @@ int main(int argc, const char * argv[])
     
     std::string ip = (argc > 1) ? argv[1] : "localhost";
     
-    std::cout << "ip : " << ip << std::endl;
+    Console::post("ip : ", ip);
+    Console::post("Enter client user ID : ");
     
-    uint16_t cin_user_id;
-    std::cout << "Enter client user ID : ";
-    std::cin >> cin_user_id;
+    uint16_t user_id = Console::getInput<uint16_t>();
     
-    Client client(ip, 9090, cin_user_id);
+    Client client(ip, 9090, user_id);
     client.run();
     
     return 0;
