@@ -102,34 +102,23 @@ namespace kiwi
         //                              PATCHER LISTENER                                    //
         // ================================================================================ //
         
-        PatcherListener::PatcherListener(Patcher &patcher):m_patcher(patcher), m_id(getNewId())
+        Patcher::Listener::Listener(Patcher &patcher):m_patcher(patcher)
         {
             m_patcher.addListener(this);
             
         };
         
-        PatcherListener::~PatcherListener()
+        Patcher::Listener::~Listener()
         {
             m_patcher.removeListener(this);
         }
         
-        uint64_t PatcherListener::getNewId()
-        {
-            static uint64_t counter_id = 0;
-            return ++counter_id;
-        }
-        
-        uint64_t PatcherListener::getId() const
-        {
-            return m_id;
-        }
-        
-        void Patcher::addListener(PatcherListener * listener)
+        void Patcher::addListener(Patcher::Listener * listener)
         {
             m_listeners.insert(listener);
         }
         
-        void Patcher::removeListener(PatcherListener * listener)
+        void Patcher::removeListener(Patcher::Listener * listener)
         {
             m_listeners.erase(listener);
         }
