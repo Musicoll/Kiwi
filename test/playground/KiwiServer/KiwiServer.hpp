@@ -36,7 +36,7 @@
 #include "flip/contrib/transport_tcp/PortTransportServerTcp.h"
 
 namespace kiwi
-{
+{    
     class Server
     {
     public:

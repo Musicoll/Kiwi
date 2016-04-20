@@ -59,9 +59,9 @@ namespace kiwi
         static InputType getInput()
         {
             std::future<InputType> ret = std::async([]() -> InputType {
-                InputType str;
-                std::cin >> str;
-                return str;
+                InputType val;
+                std::cin >> val;
+                return val;
             });
             
             return ret.get();
@@ -74,6 +74,7 @@ namespace kiwi
         {
             std::ostringstream oss;
             
+            // braced-init-list expansion trick
             using expander = int[];
             (void) expander{ (oss << std::forward<Args>(args), void(), 0)... };
 
