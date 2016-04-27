@@ -72,7 +72,7 @@ namespace kiwi
         
         void Instance::removePatcher(Patcher* patcher)
         {
-            const auto find_patcher = [patcher](patchers_t::value_type const& p) -> bool
+            const auto find_patcher = [patcher](std::unique_ptr<Patcher> const& p) -> bool
             {
                 return (patcher == p.get());
             };
@@ -85,7 +85,7 @@ namespace kiwi
             }
         }
         
-        auto Instance::getPatchers() -> patchers_t const&
+        auto Instance::getPatchers() -> std::vector<std::unique_ptr<Patcher>> const&
         {
             return m_patchers;
         }

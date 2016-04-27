@@ -260,12 +260,16 @@ namespace kiwi
             const auto name = object.getName();
             
             if(name == "plus")
-            {
+            {    
                 m_objects.emplace_back(std::unique_ptr<engine::ObjectPlus>(new engine::ObjectPlus(static_cast<model::ObjectPlus&>(object))));
             }
             else if(name == "print")
             {
                 m_objects.emplace_back(std::unique_ptr<engine::ObjectPrint>(new engine::ObjectPrint(static_cast<model::ObjectPrint&>(object))));
+            }
+            else
+            {
+                assert(false && "Object does not exists");
             }
         }
 

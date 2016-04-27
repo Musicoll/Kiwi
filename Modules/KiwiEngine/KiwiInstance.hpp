@@ -38,8 +38,6 @@ namespace kiwi
         {
         public:
             
-            using patchers_t = std::vector<std::unique_ptr<Patcher>>;
-            
             //! @brief Creates and returns an Instance.
             //! @param user_id The user ID.
             //! @param name The instance name.
@@ -74,7 +72,7 @@ namespace kiwi
             //! @brief Get the patchers of the Instance.
             //! @return A vector of patchers.
             //! @see createPatcher, removePatcher
-            patchers_t const& getPatchers();
+            std::vector<std::unique_ptr<Patcher>> const& getPatchers();
             
         private:
             
@@ -83,7 +81,9 @@ namespace kiwi
             
             const uint64_t          m_user_id;
             const std::string       m_name;
-            patchers_t              m_patchers;
+            
+            std::vector<std::unique_ptr<Patcher>>
+                                    m_patchers;
             
             static bool             m_declared_flag;
             
