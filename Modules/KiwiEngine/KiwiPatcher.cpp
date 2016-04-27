@@ -44,8 +44,7 @@ namespace kiwi
         
         Patcher::~Patcher()
         {
-            m_links.clear();
-            m_objects.clear();
+            ;
         }
         
         void Patcher::addPlus()
@@ -75,21 +74,46 @@ namespace kiwi
         
         std::vector<engine::Object const*> Patcher::getObjects() const
         {
-            std::vector<engine::Object const*> objs(m_objects.size());
-            for(size_t i = 0; i < m_objects.size(); ++i)
+            std::vector<engine::Object const*> objects;
+            for(auto& obj : getModel().getObjects())
             {
-                objs[i] = m_objects[i].get();
+                if(obj.resident())
+                {
+                    engine::Object const* object_engine = obj.entity().use<engine::Object*>();
+                    objects.push_back(object_engine);
+                }
             }
-            return objs;
+            
+            return objects;
+        }
+        
+        std::vector<engine::Object*> Patcher::getObjects()
+        {
+            std::vector<engine::Object*> objects;
+            for(auto& obj : getModel().getObjects())
+            {
+                if(obj.resident())
+                {
+                    engine::Object* object_engine = obj.entity().use<engine::Object*>();
+                    objects.push_back(object_engine);
+                }
+            }
+            
+            return objects;
         }
         
         std::vector<engine::Link const*> Patcher::getLinks() const
         {
-            std::vector<engine::Link const*> links(m_links.size());
-            for(size_t i = 0; i < m_links.size(); ++i)
+            std::vector<engine::Link const*> links;
+            for(auto& link : getModel().getLinks())
             {
-                links[i] = m_links[i].get();
+                if(link.resident())
+                {
+                    engine::Link const* link_engine = link.entity().get<Link>();
+                    links.push_back(link_engine);
+                }
             }
+            
             return links;
         }
         
@@ -259,17 +283,24 @@ namespace kiwi
         {
             const auto name = object.getName();
             
+            engine::Object* object_engine_ptr = nullptr;
+            
             if(name == "plus")
-            {    
-                m_objects.emplace_back(std::unique_ptr<engine::ObjectPlus>(new engine::ObjectPlus(static_cast<model::ObjectPlus&>(object))));
+            {
+                object_engine_ptr = &object.entity().emplace<engine::ObjectPlus>(static_cast<model::ObjectPlus&>(object));
             }
             else if(name == "print")
             {
-                m_objects.emplace_back(std::unique_ptr<engine::ObjectPrint>(new engine::ObjectPrint(static_cast<model::ObjectPrint&>(object))));
+                object_engine_ptr = &object.entity().emplace<engine::ObjectPrint>(static_cast<model::ObjectPrint&>(object));
+            }
+            
+            if(object_engine_ptr)
+            {
+                object.entity().emplace<engine::Object*>(object_engine_ptr);
             }
             else
             {
-                assert(false && "Object does not exists");
+                assert(false && "Object engine creation fail");
             }
         }
 
@@ -280,23 +311,34 @@ namespace kiwi
 
         void Patcher::objectWillBeRemoved(model::Object& object)
         {
-            const auto it = findObject(object);
-            if(it != m_objects.cend())
+            object.entity().erase<engine::Object*>();
+            
+            const auto name = object.getName();
+            
+            if(name == "plus")
             {
-                m_objects.erase(it);
+                object.entity().erase<engine::ObjectPlus>();
+            }
+            else if(name == "print")
+            {
+                object.entity().erase<engine::ObjectPrint>();
+            }
+            else
+            {
+                assert(false && "Object engine destruction fail");
+                return;
             }
         }
 
         void Patcher::linkHasBeenAdded(model::Link& link)
         {
-            auto from = findObject(link.getSenderObject());
-            auto to = findObject(link.getReceiverObject());
+            engine::Object* from = link.getSenderObject().entity().use<engine::Object*>();
+            engine::Object* to = link.getReceiverObject().entity().use<engine::Object*>();
             
-            if(from != m_objects.end() && to != m_objects.end())
+            if(from && to)
             {
-                const auto it = m_links.emplace(m_links.end(), std::unique_ptr<engine::Link>(new engine::Link(link, *from->get(), *to->get())));
-                
-                (*from)->addOutputLink(it->get());
+                auto& link_engine = link.entity().emplace<Link>(link, *from, *to);
+                from->addOutputLink(&link_engine);
             }
         }
         
@@ -307,53 +349,10 @@ namespace kiwi
         
         void Patcher::linkWillBeRemoved(model::Link& link)
         {
-            const auto it = findLink(link);
-            if(it != m_links.cend())
-            {
-                Object& from = (*it)->getSenderObject();
-                from.removeOutputLink(it->get());
-                m_links.erase(it);
-            }
-        }
-        
-        std::vector<Patcher::uobject_t>::const_iterator Patcher::findObject(model::Object const& object) const
-        {
-            const auto pred = [&object](std::unique_ptr<engine::Object> const& ctrl)
-            {
-                return (ctrl->m_model.ref() == object.ref());
-            };
-            
-            return std::find_if(m_objects.begin(), m_objects.end(), pred);
-        }
-        
-        std::vector<Patcher::ulink_t>::const_iterator Patcher::findLink(model::Link const& link) const
-        {
-            const auto pred = [&link](std::unique_ptr<engine::Link> const& ctrl)
-            {
-                return (ctrl->m_model.ref() == link.ref());
-            };
-            
-            return std::find_if(m_links.begin(), m_links.end(), pred);
-        }
-        
-        std::vector<Patcher::uobject_t>::const_iterator Patcher::findObject(Object const& object) const
-        {
-            const auto pred = [&object](std::unique_ptr<engine::Object> const& ctrl)
-            {
-                return (ctrl->m_model.ref() == object.m_model.ref());
-            };
-            
-            return std::find_if(m_objects.begin(), m_objects.end(), pred);
-        }
-        
-        std::vector<Patcher::ulink_t>::const_iterator Patcher::findLink(Link const& link) const
-        {
-            const auto pred = [&link](std::unique_ptr<engine::Link> const& ctrl)
-            {
-                return (ctrl->m_model.ref() == link.m_model.ref());
-            };
-            
-            return std::find_if(m_links.begin(), m_links.end(), pred);
+            auto& link_engine = link.entity().use<Link>();
+            engine::Object* from = link.getSenderObject().entity().use<engine::Object*>();
+            from->removeOutputLink(&link_engine);
+            link.entity().erase<Link>();
         }
         
         // ================================================================================ //

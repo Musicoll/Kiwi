@@ -56,7 +56,7 @@ namespace kiwi
             }
             
             //! @brief Get the objects.
-            flip::Array<model::Object> const& getObjects() noexcept      { return m_objects; }
+            flip::Array<model::Object> const& getObjects() const noexcept  { return m_objects; }
             
             //! @brief Get the links.
             flip::Array<model::Link> const& getLinks() const noexcept    { return m_links; }

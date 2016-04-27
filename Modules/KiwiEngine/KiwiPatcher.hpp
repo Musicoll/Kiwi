@@ -79,6 +79,9 @@ namespace kiwi
             std::vector<engine::Object const*> getObjects() const;
             
             //! @brief Returns the objects.
+            std::vector<engine::Object*> getObjects();
+            
+            //! @brief Returns the objects.
             std::vector<engine::Link const*> getLinks() const;
             
             //! @brief Begins a new transaction
@@ -121,27 +124,12 @@ namespace kiwi
             void removeListener(Listener *listener);
             
         private:
-
-            using uobject_t = std::unique_ptr<engine::Object>;
-            using ulink_t   = std::unique_ptr<engine::Link>;
             
             //! @brief Get the Patcher model
             inline model::Patcher& getModel() { return m_document.root<model::Patcher>(); }
             
             //! @brief Get the Patcher model
             inline model::Patcher const& getModel() const { return m_document.root<model::Patcher>(); }
-            
-            //! @brief Find an object engine with an Object model.
-            std::vector<uobject_t>::const_iterator findObject(model::Object const& object) const;
-            
-            //! @brief Find a Link engine with a Link model.
-            std::vector<ulink_t>::const_iterator findLink(model::Link const& link) const;
-            
-            //! @brief Find an object engine.
-            std::vector<uobject_t>::const_iterator findObject(Object const& object) const;
-            
-            //! @brief Find a link engine.
-            std::vector<ulink_t>::const_iterator findLink(Link const& link) const;
             
             //! @brief Notify the listeners that the patcher has changed
             void notify();
@@ -172,7 +160,7 @@ namespace kiwi
             
             // -----------------------------
             
-            Instance&                         m_instance;
+            Instance&                     m_instance;
             
             std::set<Patcher::Listener*>  m_listeners;
             
@@ -180,9 +168,6 @@ namespace kiwi
             flip::History
             <flip::HistoryStoreMemory>
                             m_history;
-            
-            std::vector<uobject_t>  m_objects;
-            std::vector<ulink_t>    m_links;
         };
     }
 }
