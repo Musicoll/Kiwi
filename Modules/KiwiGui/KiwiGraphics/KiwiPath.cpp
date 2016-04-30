@@ -24,7 +24,7 @@
 #include <assert.h>
 #include <cmath>
 
-#include <KiwiGui/KiwiPath.hpp>
+#include <KiwiGui/KiwiGraphics/KiwiPath.hpp>
 
 namespace kiwi
 {

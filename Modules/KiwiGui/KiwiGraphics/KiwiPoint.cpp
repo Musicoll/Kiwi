@@ -21,7 +21,7 @@
  ==============================================================================
  */
 
-#include <KiwiGui/KiwiPoint.hpp>
+#include <KiwiGui/KiwiGraphics/KiwiPoint.hpp>
 #include <math.h>
 
 namespace kiwi

@@ -74,8 +74,8 @@ namespace kiwi
             }
             
         private:
-            double m_rhs = 0.0;
             double m_lhs = 0.0;
+            double m_rhs = 0.0;
         };
     }
 }

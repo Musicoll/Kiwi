@@ -26,8 +26,8 @@
 
 #include <array>
 
-#include <KiwiGui/KiwiPoint.hpp>
-#include <KiwiGui/KiwiAffineMatrix.hpp>
+#include <KiwiGui/KiwiGraphics/KiwiPoint.hpp>
+#include <KiwiGui/KiwiGraphics/KiwiAffineMatrix.hpp>
 
 
 namespace kiwi

@@ -5,474 +5,324 @@
               jucerVersion="4.1.0" companyName="CICM" companyWebsite="cicm.mshparisnord.org"
               companyEmail="cicm.mshparisnord@gmail.com">
   <MAINGROUP id="HfN8up" name="Kiwi">
-    <GROUP id="{E476D5A0-2E9D-DD18-D007-54A51ACF9459}" name="Source">
-      <GROUP id="{39F46962-498C-A15A-45B4-880F46DB8F1A}" name="KiwiCore">
-        <FILE id="jAsRWV" name="KiwiCore.h" compile="0" resource="0" file="../Modules/KiwiCore/KiwiCore.h"/>
-        <FILE id="gYrzIJ" name="KiwiTools.h" compile="0" resource="0" file="../Modules/KiwiCore/KiwiTools.h"/>
-        <FILE id="MST7WZ" name="KiwiTag.cpp" compile="1" resource="0" file="../Modules/KiwiCore/KiwiTag.cpp"/>
-        <FILE id="UXqGh0" name="KiwiTag.h" compile="0" resource="0" file="../Modules/KiwiCore/KiwiTag.h"/>
-        <FILE id="EByetQ" name="KiwiAtom.cpp" compile="1" resource="0" file="../Modules/KiwiCore/KiwiAtom.cpp"/>
-        <FILE id="VgYlNp" name="KiwiAtom.h" compile="0" resource="0" file="../Modules/KiwiCore/KiwiAtom.h"/>
-        <FILE id="gZxgiT" name="KiwiListenerSet.h" compile="0" resource="0"
-              file="../Modules/KiwiCore/KiwiListenerSet.h"/>
-      </GROUP>
-      <GROUP id="{91AF2FB1-AB9E-B019-60F0-B44BDDB476D4}" name="KiwiModels">
-        <GROUP id="{6D3BAD57-4D3D-00E0-AAE1-8D3A45D44B02}" name="conv">
-          <FILE id="bhca0X" name="Converter.txt" compile="0" resource="1" file="../Modules/KiwiModels/conv/Converter.txt"/>
-        </GROUP>
-        <FILE id="TXFfXd" name="KiwiModels.h" compile="0" resource="0" file="../Modules/KiwiModels/KiwiModels.h"/>
-        <FILE id="qf2WX3" name="KiwiModel.h" compile="0" resource="0" file="../Modules/KiwiModels/KiwiModel.h"/>
-        <FILE id="bdprSj" name="KiwiFlipTypes.h" compile="0" resource="0" file="../Modules/KiwiModels/KiwiFlipTypes.h"/>
-        <FILE id="cOiqoa" name="KiwiFlipAtom.cpp" compile="1" resource="0"
-              file="../Modules/KiwiModels/KiwiFlipAtom.cpp"/>
-        <FILE id="gtTVmr" name="KiwiFlipAtom.h" compile="0" resource="0" file="../Modules/KiwiModels/KiwiFlipAtom.h"/>
-        <FILE id="kFSix4" name="KiwiFlipAttr.cpp" compile="1" resource="0"
-              file="../Modules/KiwiModels/KiwiFlipAttr.cpp"/>
-        <FILE id="d2e6Gb" name="KiwiFlipAttr.h" compile="0" resource="0" file="../Modules/KiwiModels/KiwiFlipAttr.h"/>
-        <FILE id="izGcue" name="KiwiObjectModel.cpp" compile="1" resource="0"
-              file="../Modules/KiwiModels/KiwiObjectModel.cpp"/>
-        <FILE id="EigXYP" name="KiwiObjectModel.h" compile="0" resource="0"
-              file="../Modules/KiwiModels/KiwiObjectModel.h"/>
-        <FILE id="nU8Wg9" name="KiwiLinkModel.cpp" compile="1" resource="0"
-              file="../Modules/KiwiModels/KiwiLinkModel.cpp"/>
-        <FILE id="mHWYLs" name="KiwiLinkModel.h" compile="0" resource="0" file="../Modules/KiwiModels/KiwiLinkModel.h"/>
-        <FILE id="PNvewp" name="KiwiPatcherModel.cpp" compile="1" resource="0"
-              file="../Modules/KiwiModels/KiwiPatcherModel.cpp"/>
-        <FILE id="PuvwOX" name="KiwiPatcherModel.h" compile="0" resource="0"
-              file="../Modules/KiwiModels/KiwiPatcherModel.h"/>
-        <FILE id="SRmi2V" name="KiwiFactory.cpp" compile="1" resource="0" file="../Modules/KiwiModels/KiwiFactory.cpp"/>
-        <FILE id="z08bY2" name="KiwiFactory.h" compile="0" resource="0" file="../Modules/KiwiModels/KiwiFactory.h"/>
-      </GROUP>
-      <GROUP id="{4F2C7B08-ED02-1D7A-7083-0CE0AFA8DC65}" name="KiwiGraphics">
-        <FILE id="FzLGxS" name="KiwiGraphics.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiGraphics.h"/>
-        <FILE id="ugm41O" name="KiwiAffineMatrix.cpp" compile="1" resource="0"
-              file="../Modules/KiwiGraphics/KiwiAffineMatrix.cpp"/>
-        <FILE id="gz9Vqv" name="KiwiAffineMatrix.h" compile="0" resource="0"
-              file="../Modules/KiwiGraphics/KiwiAffineMatrix.h"/>
-        <FILE id="oK1hjR" name="KiwiMouseCursor.cpp" compile="1" resource="0"
-              file="../Modules/KiwiGraphics/KiwiMouseCursor.cpp"/>
-        <FILE id="psERgp" name="KiwiMouseCursor.h" compile="0" resource="0"
-              file="../Modules/KiwiGraphics/KiwiMouseCursor.h"/>
-        <FILE id="edJFey" name="KiwiPoint.cpp" compile="1" resource="0" file="../Modules/KiwiGraphics/KiwiPoint.cpp"/>
-        <FILE id="jh6M1o" name="KiwiPoint.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiPoint.h"/>
-        <FILE id="XR3U3O" name="KiwiLine.cpp" compile="1" resource="0" file="../Modules/KiwiGraphics/KiwiLine.cpp"/>
-        <FILE id="bOgQay" name="KiwiLine.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiLine.h"/>
-        <FILE id="N7y60d" name="KiwiSize.cpp" compile="1" resource="0" file="../Modules/KiwiGraphics/KiwiSize.cpp"/>
-        <FILE id="iMDvSz" name="KiwiSize.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiSize.h"/>
-        <FILE id="h9E70Z" name="KiwiRectangle.cpp" compile="1" resource="0"
-              file="../Modules/KiwiGraphics/KiwiRectangle.cpp"/>
-        <FILE id="hrfhd1" name="KiwiRectangle.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiRectangle.h"/>
-        <FILE id="RxHukZ" name="KiwiPath.cpp" compile="1" resource="0" file="../Modules/KiwiGraphics/KiwiPath.cpp"/>
-        <FILE id="KLRBpc" name="KiwiPath.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiPath.h"/>
-        <FILE id="HAJ1J4" name="KiwiColor.cpp" compile="1" resource="0" file="../Modules/KiwiGraphics/KiwiColor.cpp"/>
-        <FILE id="MbTJgb" name="KiwiColor.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiColor.h"/>
-        <FILE id="JckRsc" name="KiwiFont.cpp" compile="1" resource="0" file="../Modules/KiwiGraphics/KiwiFont.cpp"/>
-        <FILE id="mkLMlE" name="KiwiFont.h" compile="0" resource="0" file="../Modules/KiwiGraphics/KiwiFont.h"/>
-      </GROUP>
-      <GROUP id="{7975B265-C2A6-7405-C4B3-B0CF5D13EC70}" name="KiwiEngine">
-        <FILE id="DIO2Zf" name="KiwiEngine.h" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiEngine.h"/>
-        <FILE id="YMunc3" name="KiwiObject.cpp" compile="1" resource="0" file="../Modules/KiwiEngine/KiwiObject.cpp"/>
-        <FILE id="KYDqI4" name="KiwiObject.h" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiObject.h"/>
-        <FILE id="kV6JJ2" name="KiwiLink.cpp" compile="1" resource="0" file="../Modules/KiwiEngine/KiwiLink.cpp"/>
-        <FILE id="EREwjC" name="KiwiLink.h" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiLink.h"/>
-        <FILE id="sFNoVH" name="KiwiPatcher.cpp" compile="1" resource="0" file="../Modules/KiwiEngine/KiwiPatcher.cpp"/>
-        <FILE id="HWZQ9y" name="KiwiPatcher.h" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiPatcher.h"/>
-        <FILE id="UKSmK6" name="KiwiInstance.cpp" compile="1" resource="0"
-              file="../Modules/KiwiEngine/KiwiInstance.cpp"/>
-        <FILE id="lhlZ67" name="KiwiInstance.h" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiInstance.h"/>
-        <FILE id="BlJv74" name="KiwiFactory.cpp" compile="1" resource="0" file="../Modules/KiwiEngine/KiwiFactory.cpp"/>
-        <FILE id="BlqrPj" name="KiwiFactory.h" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiFactory.h"/>
-      </GROUP>
+    <GROUP id="{E476D5A0-2E9D-DD18-D007-54A51ACF9459}" name="Application">
       <FILE id="wfKKwK" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
     </GROUP>
-    <GROUP id="{E3949D66-98C4-5D64-C2A2-C49914E7725D}" name="Flip">
-      <GROUP id="{12399E6B-FDF8-77CA-73DC-15D1C456AFF5}" name="include">
-        <FILE id="HWGhvi" name="Array.h" compile="0" resource="0" file="../../Flip/include/flip/Array.h"/>
-        <FILE id="qsKrzV" name="Array.hpp" compile="0" resource="0" file="../../Flip/include/flip/Array.hpp"/>
-        <FILE id="GswRzg" name="BackEndBinary.h" compile="0" resource="0" file="../../Flip/include/flip/BackEndBinary.h"/>
-        <FILE id="x2exVF" name="BackEndIR.h" compile="0" resource="0" file="../../Flip/include/flip/BackEndIR.h"/>
-        <FILE id="U80kSo" name="BackEndIR.hpp" compile="0" resource="0" file="../../Flip/include/flip/BackEndIR.hpp"/>
-        <FILE id="yZuhEZ" name="BackEndMl.h" compile="0" resource="0" file="../../Flip/include/flip/BackEndMl.h"/>
-        <FILE id="SYzO6t" name="Blob.h" compile="0" resource="0" file="../../Flip/include/flip/Blob.h"/>
-        <FILE id="Ho2KvZ" name="Bool.h" compile="0" resource="0" file="../../Flip/include/flip/Bool.h"/>
-        <FILE id="nbS6C9" name="CarrierDirect.h" compile="0" resource="0" file="../../Flip/include/flip/CarrierDirect.h"/>
-        <FILE id="vDZcpI" name="Class.h" compile="0" resource="0" file="../../Flip/include/flip/Class.h"/>
-        <FILE id="zYgLal" name="Class.hpp" compile="0" resource="0" file="../../Flip/include/flip/Class.hpp"/>
-        <FILE id="xJCG2D" name="Collection.h" compile="0" resource="0" file="../../Flip/include/flip/Collection.h"/>
-        <FILE id="nLtbaB" name="Collection.hpp" compile="0" resource="0" file="../../Flip/include/flip/Collection.hpp"/>
-        <FILE id="oz4nLG" name="config.h" compile="0" resource="0" file="../../Flip/include/flip/config.h"/>
-        <GROUP id="{B9866E9B-724C-D23E-5A18-8348CF5A5FAF}" name="contrib">
-          <GROUP id="{D19EBCBA-4E72-06AC-B918-98ACDC46C114}" name="local_tcp">
-            <FILE id="CGBpXy" name="CarrierSocketTcp.h" compile="0" resource="0"
-                  file="../../Flip/include/flip/contrib/local_tcp/CarrierSocketTcp.h"/>
-            <FILE id="eQLNWM" name="PortSocketTcp.h" compile="0" resource="0" file="../../Flip/include/flip/contrib/local_tcp/PortSocketTcp.h"/>
-          </GROUP>
-          <GROUP id="{AF820230-FC92-D3E8-535A-F4FC9A71BD9A}" name="shared">
-            <FILE id="coXx8a" name="Filesystem.h" compile="0" resource="0" file="../../Flip/include/flip/contrib/shared/Filesystem.h"/>
-            <FILE id="sVjcNo" name="HttpRequestParser.h" compile="0" resource="0"
-                  file="../../Flip/include/flip/contrib/shared/HttpRequestParser.h"/>
-          </GROUP>
-          <GROUP id="{F932F5BA-FA21-B883-8D2D-3A5F48C8BE5A}" name="transport_tcp">
-            <FILE id="wfFLvt" name="CarrierTransportSocketTcp.h" compile="0" resource="0"
-                  file="../../Flip/include/flip/contrib/transport_tcp/CarrierTransportSocketTcp.h"/>
-            <FILE id="tkg3uH" name="PortTransportServerTcp.h" compile="0" resource="0"
-                  file="../../Flip/include/flip/contrib/transport_tcp/PortTransportServerTcp.h"/>
-            <FILE id="qKF5y4" name="PortTransportSocketTcp.h" compile="0" resource="0"
-                  file="../../Flip/include/flip/contrib/transport_tcp/PortTransportSocketTcp.h"/>
-          </GROUP>
-          <FILE id="zDuQ5B" name="DataConsumerFile.h" compile="0" resource="0"
-                file="../../Flip/include/flip/contrib/DataConsumerFile.h"/>
-          <FILE id="l87cN2" name="DataProviderFile.h" compile="0" resource="0"
-                file="../../Flip/include/flip/contrib/DataProviderFile.h"/>
-          <FILE id="nWClzL" name="Dns.h" compile="0" resource="0" file="../../Flip/include/flip/contrib/Dns.h"/>
-          <FILE id="w8eapY" name="HistoryStoreFile.h" compile="0" resource="0"
-                file="../../Flip/include/flip/contrib/HistoryStoreFile.h"/>
-          <FILE id="sVybjr" name="MulticastService.h" compile="0" resource="0"
-                file="../../Flip/include/flip/contrib/MulticastService.h"/>
-          <FILE id="DTW7iZ" name="MulticastServiceExplorer.h" compile="0" resource="0"
-                file="../../Flip/include/flip/contrib/MulticastServiceExplorer.h"/>
-          <FILE id="DHZG4N" name="MulticastServiceProvider.h" compile="0" resource="0"
-                file="../../Flip/include/flip/contrib/MulticastServiceProvider.h"/>
-          <FILE id="PANzON" name="MulticastServiceSocket.h" compile="0" resource="0"
-                file="../../Flip/include/flip/contrib/MulticastServiceSocket.h"/>
-          <FILE id="z0YLOD" name="PacketStreamPinger.h" compile="0" resource="0"
-                file="../../Flip/include/flip/contrib/PacketStreamPinger.h"/>
-          <FILE id="Z2vD8z" name="PacketStreamReceiver.h" compile="0" resource="0"
-                file="../../Flip/include/flip/contrib/PacketStreamReceiver.h"/>
-          <FILE id="FtuNZs" name="PacketStreamSender.h" compile="0" resource="0"
-                file="../../Flip/include/flip/contrib/PacketStreamSender.h"/>
-          <FILE id="zltA6C" name="ServerHttp.h" compile="0" resource="0" file="../../Flip/include/flip/contrib/ServerHttp.h"/>
-          <FILE id="c8xcgy" name="Socket.h" compile="0" resource="0" file="../../Flip/include/flip/contrib/Socket.h"/>
-          <FILE id="BpilaY" name="SqlDatabase.h" compile="0" resource="0" file="../../Flip/include/flip/contrib/SqlDatabase.h"/>
-          <FILE id="CYJxuy" name="sqlite3.h" compile="0" resource="0" file="../../Flip/include/flip/contrib/sqlite3.h"/>
-          <FILE id="Fj8d1e" name="sqlite3ext.h" compile="0" resource="0" file="../../Flip/include/flip/contrib/sqlite3ext.h"/>
-          <FILE id="Nc9d1w" name="SqlStatement.h" compile="0" resource="0" file="../../Flip/include/flip/contrib/SqlStatement.h"/>
-          <FILE id="k5AHMr" name="Utml.h" compile="0" resource="0" file="../../Flip/include/flip/contrib/Utml.h"/>
+    <GROUP id="{8FA1C9D1-9F39-6B48-4CD5-95C1B98E14A6}" name="Modules">
+      <GROUP id="{BE538FC5-8082-DC84-062F-90CBBF6F2E7D}" name="KiwiGui">
+        <GROUP id="{979E45D0-E9AF-B23D-DDAA-40022416C173}" name="KiwiEvents"/>
+        <GROUP id="{6420AB87-8BD2-6589-8F31-9943240B6025}" name="KiwiGraphics">
+          <FILE id="uEcTTD" name="KiwiAffineMatrix.hpp" compile="0" resource="0"
+                file="../Modules/KiwiGui/KiwiGraphics/KiwiAffineMatrix.hpp"/>
+          <FILE id="MCN96D" name="KiwiPath.cpp" compile="1" resource="0" file="../Modules/KiwiGui/KiwiGraphics/KiwiPath.cpp"/>
+          <FILE id="aSo2LS" name="KiwiPath.hpp" compile="0" resource="0" file="../Modules/KiwiGui/KiwiGraphics/KiwiPath.hpp"/>
+          <FILE id="O7XNeN" name="KiwiPoint.cpp" compile="1" resource="0" file="../Modules/KiwiGui/KiwiGraphics/KiwiPoint.cpp"/>
+          <FILE id="jUKtFc" name="KiwiPoint.hpp" compile="0" resource="0" file="../Modules/KiwiGui/KiwiGraphics/KiwiPoint.hpp"/>
         </GROUP>
-        <FILE id="WyqBdd" name="Controller.h" compile="0" resource="0" file="../../Flip/include/flip/Controller.h"/>
-        <FILE id="GSyiCT" name="DataConsumerMemory.h" compile="0" resource="0"
-              file="../../Flip/include/flip/DataConsumerMemory.h"/>
-        <FILE id="O3J8ZV" name="DataModel.h" compile="0" resource="0" file="../../Flip/include/flip/DataModel.h"/>
-        <FILE id="fsvqrJ" name="DataModel.hpp" compile="0" resource="0" file="../../Flip/include/flip/DataModel.hpp"/>
-        <FILE id="gmA4g8" name="DataProviderMemory.h" compile="0" resource="0"
-              file="../../Flip/include/flip/DataProviderMemory.h"/>
-        <GROUP id="{55DBD2FD-CD8A-6EAE-2A36-0BCDAE9DC7C8}" name="detail">
-          <FILE id="sGg8tu" name="ArrayBase.h" compile="0" resource="0" file="../../Flip/include/flip/detail/ArrayBase.h"/>
-          <FILE id="ubquHz" name="ArrayIteratorBase.h" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/ArrayIteratorBase.h"/>
-          <FILE id="GF6O3X" name="ArrayIteratorBase.hpp" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/ArrayIteratorBase.hpp"/>
-          <FILE id="JGzSxF" name="BackEndBase.h" compile="0" resource="0" file="../../Flip/include/flip/detail/BackEndBase.h"/>
-          <FILE id="nIzLwY" name="BackEndMlCodec.h" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/BackEndMlCodec.h"/>
-          <FILE id="N8giGb" name="BasicType.h" compile="0" resource="0" file="../../Flip/include/flip/detail/BasicType.h"/>
-          <FILE id="zGg5jD" name="CarrierBase.h" compile="0" resource="0" file="../../Flip/include/flip/detail/CarrierBase.h"/>
-          <FILE id="innmbI" name="CarrierListener.h" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/CarrierListener.h"/>
-          <FILE id="nZK3d9" name="CarrierTransportBase.h" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/CarrierTransportBase.h"/>
-          <FILE id="bLFtPr" name="CarrierTransportBase.hpp" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/CarrierTransportBase.hpp"/>
-          <FILE id="d6j62y" name="ClassBase.h" compile="0" resource="0" file="../../Flip/include/flip/detail/ClassBase.h"/>
-          <FILE id="fAMt3d" name="ClassRegistry.h" compile="0" resource="0" file="../../Flip/include/flip/detail/ClassRegistry.h"/>
-          <FILE id="s2DwfZ" name="Codec.h" compile="0" resource="0" file="../../Flip/include/flip/detail/Codec.h"/>
-          <FILE id="luMCx9" name="CollectionBase.h" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/CollectionBase.h"/>
-          <FILE id="JUXjd3" name="CollectionIteratorBase.h" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/CollectionIteratorBase.h"/>
-          <FILE id="xgaXf3" name="CollectionIteratorBase.hpp" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/CollectionIteratorBase.hpp"/>
-          <FILE id="oWc5Wi" name="ConsumerTextOut.h" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/ConsumerTextOut.h"/>
-          <FILE id="Jqv9D9" name="ConsumerTextOut.hpp" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/ConsumerTextOut.hpp"/>
-          <FILE id="LYde1E" name="ContainerIterator.h" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/ContainerIterator.h"/>
-          <FILE id="RyANYo" name="ContainerIterator.hpp" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/ContainerIterator.hpp"/>
-          <FILE id="EMzs6I" name="ContainerType.h" compile="0" resource="0" file="../../Flip/include/flip/detail/ContainerType.h"/>
-          <FILE id="NWoq13" name="DataConsumerBase.h" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/DataConsumerBase.h"/>
-          <FILE id="YLcYxY" name="DataModelBase.h" compile="0" resource="0" file="../../Flip/include/flip/detail/DataModelBase.h"/>
-          <FILE id="mlGLDm" name="DataProviderBase.h" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/DataProviderBase.h"/>
-          <FILE id="LafVKV" name="def.h" compile="0" resource="0" file="../../Flip/include/flip/detail/def.h"/>
-          <FILE id="AWdBoR" name="Default.h" compile="0" resource="0" file="../../Flip/include/flip/detail/Default.h"/>
-          <FILE id="J0MSQa" name="Direction.h" compile="0" resource="0" file="../../Flip/include/flip/detail/Direction.h"/>
-          <FILE id="ldlQ12" name="DocumentBase.h" compile="0" resource="0" file="../../Flip/include/flip/detail/DocumentBase.h"/>
-          <FILE id="TwB6UK" name="DocumentBase.hpp" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/DocumentBase.hpp"/>
-          <FILE id="bwChG9" name="DocumentObserverBase.h" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/DocumentObserverBase.h"/>
-          <FILE id="KhmTWP" name="DocumentValidatorBase.h" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/DocumentValidatorBase.h"/>
-          <FILE id="HM0r63" name="ElementState.h" compile="0" resource="0" file="../../Flip/include/flip/detail/ElementState.h"/>
-          <FILE id="PXETT8" name="EnumBase.h" compile="0" resource="0" file="../../Flip/include/flip/detail/EnumBase.h"/>
-          <FILE id="LU1kls" name="EnumClassBase.h" compile="0" resource="0" file="../../Flip/include/flip/detail/EnumClassBase.h"/>
-          <FILE id="SsptOC" name="ExecFlags.h" compile="0" resource="0" file="../../Flip/include/flip/detail/ExecFlags.h"/>
-          <FILE id="yQbs86" name="fnc.h" compile="0" resource="0" file="../../Flip/include/flip/detail/fnc.h"/>
-          <FILE id="fMBsgz" name="fnc.hpp" compile="0" resource="0" file="../../Flip/include/flip/detail/fnc.hpp"/>
-          <FILE id="DLi1nT" name="Journal.h" compile="0" resource="0" file="../../Flip/include/flip/detail/Journal.h"/>
-          <FILE id="JfpEoa" name="KeyFloat.h" compile="0" resource="0" file="../../Flip/include/flip/detail/KeyFloat.h"/>
-          <FILE id="yjuUj8" name="KeyRandom.h" compile="0" resource="0" file="../../Flip/include/flip/detail/KeyRandom.h"/>
-          <FILE id="vkAMwi" name="LockFreeQueue.h" compile="0" resource="0" file="../../Flip/include/flip/detail/LockFreeQueue.h"/>
-          <FILE id="OfeGqm" name="LockFreeQueue.hpp" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/LockFreeQueue.hpp"/>
-          <FILE id="BnWXJp" name="MessageBase.h" compile="0" resource="0" file="../../Flip/include/flip/detail/MessageBase.h"/>
-          <FILE id="EZ8X0i" name="ObjectRefBase.h" compile="0" resource="0" file="../../Flip/include/flip/detail/ObjectRefBase.h"/>
-          <FILE id="C7pMsr" name="ObjectWrapper.h" compile="0" resource="0" file="../../Flip/include/flip/detail/ObjectWrapper.h"/>
-          <FILE id="UujP9e" name="ObjectWrapper.hpp" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/ObjectWrapper.hpp"/>
-          <FILE id="PSDeQM" name="Opcode.h" compile="0" resource="0" file="../../Flip/include/flip/detail/Opcode.h"/>
-          <FILE id="f85XN6" name="PortBase.h" compile="0" resource="0" file="../../Flip/include/flip/detail/PortBase.h"/>
-          <FILE id="aoogjX" name="PortFactoryListener.h" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/PortFactoryListener.h"/>
-          <FILE id="qUaeg0" name="PortListener.h" compile="0" resource="0" file="../../Flip/include/flip/detail/PortListener.h"/>
-          <FILE id="pcFpCO" name="PortTransportBase.h" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/PortTransportBase.h"/>
-          <FILE id="JmZ3qn" name="PullStack.h" compile="0" resource="0" file="../../Flip/include/flip/detail/PullStack.h"/>
-          <FILE id="IEl4Lm" name="RandomDevice.h" compile="0" resource="0" file="../../Flip/include/flip/detail/RandomDevice.h"/>
-          <FILE id="QSSBu5" name="RandomDevice.hpp" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/RandomDevice.hpp"/>
-          <FILE id="OUt1ML" name="RefAllocator.h" compile="0" resource="0" file="../../Flip/include/flip/detail/RefAllocator.h"/>
-          <FILE id="MbQXs0" name="Representative.h" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/Representative.h"/>
-          <FILE id="rXgvyx" name="Representative.hpp" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/Representative.hpp"/>
-          <FILE id="COYtnf" name="SignalBase.h" compile="0" resource="0" file="../../Flip/include/flip/detail/SignalBase.h"/>
-          <FILE id="EPGUrr" name="SignalData.h" compile="0" resource="0" file="../../Flip/include/flip/detail/SignalData.h"/>
-          <FILE id="u3NKxe" name="specs.h" compile="0" resource="0" file="../../Flip/include/flip/detail/specs.h"/>
-          <FILE id="EIWpJS" name="StreamBinIn.h" compile="0" resource="0" file="../../Flip/include/flip/detail/StreamBinIn.h"/>
-          <FILE id="mt8HOl" name="StreamBinIn.hpp" compile="0" resource="0" file="../../Flip/include/flip/detail/StreamBinIn.hpp"/>
-          <FILE id="eetGFA" name="StreamBinOut.h" compile="0" resource="0" file="../../Flip/include/flip/detail/StreamBinOut.h"/>
-          <FILE id="vB0PnI" name="StreamBinOut.hpp" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/StreamBinOut.hpp"/>
-          <FILE id="v8F8Sf" name="TransactionStack.h" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/TransactionStack.h"/>
-          <FILE id="ac1SqB" name="TxId.h" compile="0" resource="0" file="../../Flip/include/flip/detail/TxId.h"/>
-          <FILE id="naVU1v" name="TxIdRange.h" compile="0" resource="0" file="../../Flip/include/flip/detail/TxIdRange.h"/>
-          <FILE id="g6ZBXK" name="Type.h" compile="0" resource="0" file="../../Flip/include/flip/detail/Type.h"/>
-          <FILE id="jCLrfc" name="Type.hpp" compile="0" resource="0" file="../../Flip/include/flip/detail/Type.hpp"/>
-          <FILE id="tr5VMt" name="TypeId.h" compile="0" resource="0" file="../../Flip/include/flip/detail/TypeId.h"/>
-          <FILE id="FWyXze" name="TypeRegistry.h" compile="0" resource="0" file="../../Flip/include/flip/detail/TypeRegistry.h"/>
-          <FILE id="Isfnfu" name="TypeRegistry.hpp" compile="0" resource="0"
-                file="../../Flip/include/flip/detail/TypeRegistry.hpp"/>
-          <FILE id="Up6LeT" name="TypeTraits.h" compile="0" resource="0" file="../../Flip/include/flip/detail/TypeTraits.h"/>
-          <FILE id="ZKvWp6" name="VMErr.h" compile="0" resource="0" file="../../Flip/include/flip/detail/VMErr.h"/>
-        </GROUP>
-        <FILE id="bIEmrK" name="Document.h" compile="0" resource="0" file="../../Flip/include/flip/Document.h"/>
-        <FILE id="TeTGdB" name="DocumentObserver.h" compile="0" resource="0"
-              file="../../Flip/include/flip/DocumentObserver.h"/>
-        <FILE id="RWPFwA" name="DocumentObserver.hpp" compile="0" resource="0"
-              file="../../Flip/include/flip/DocumentObserver.hpp"/>
-        <FILE id="KcUHMU" name="DocumentObserverLambda.h" compile="0" resource="0"
-              file="../../Flip/include/flip/DocumentObserverLambda.h"/>
-        <FILE id="F3rWqo" name="DocumentObserverLambda.hpp" compile="0" resource="0"
-              file="../../Flip/include/flip/DocumentObserverLambda.hpp"/>
-        <FILE id="ZBy5WI" name="DocumentObserverVoid.h" compile="0" resource="0"
-              file="../../Flip/include/flip/DocumentObserverVoid.h"/>
-        <FILE id="pAXPOV" name="DocumentServer.h" compile="0" resource="0"
-              file="../../Flip/include/flip/DocumentServer.h"/>
-        <FILE id="MQNJhW" name="DocumentServer.hpp" compile="0" resource="0"
-              file="../../Flip/include/flip/DocumentServer.hpp"/>
-        <FILE id="obxedl" name="DocumentValidator.h" compile="0" resource="0"
-              file="../../Flip/include/flip/DocumentValidator.h"/>
-        <FILE id="MK87kh" name="DocumentValidator.hpp" compile="0" resource="0"
-              file="../../Flip/include/flip/DocumentValidator.hpp"/>
-        <FILE id="aaCZMo" name="DocumentValidatorVoid.h" compile="0" resource="0"
-              file="../../Flip/include/flip/DocumentValidatorVoid.h"/>
-        <FILE id="CNzQrD" name="Entity.h" compile="0" resource="0" file="../../Flip/include/flip/Entity.h"/>
-        <FILE id="mPxJqZ" name="Entity.hpp" compile="0" resource="0" file="../../Flip/include/flip/Entity.hpp"/>
-        <FILE id="t35Mgc" name="Enum.h" compile="0" resource="0" file="../../Flip/include/flip/Enum.h"/>
-        <FILE id="QYlwAT" name="Enum.hpp" compile="0" resource="0" file="../../Flip/include/flip/Enum.hpp"/>
-        <FILE id="peMtpA" name="EnumClass.h" compile="0" resource="0" file="../../Flip/include/flip/EnumClass.h"/>
-        <FILE id="dSDgpb" name="EnumClass.hpp" compile="0" resource="0" file="../../Flip/include/flip/EnumClass.hpp"/>
-        <FILE id="Ik6Gge" name="flip.gypi" compile="0" resource="1" file="../../Flip/include/flip/flip.gypi"/>
-        <FILE id="OC7HeX" name="Float.h" compile="0" resource="0" file="../../Flip/include/flip/Float.h"/>
-        <FILE id="y13gpa" name="History.h" compile="0" resource="0" file="../../Flip/include/flip/History.h"/>
-        <FILE id="iJYP7Y" name="History.hpp" compile="0" resource="0" file="../../Flip/include/flip/History.hpp"/>
-        <FILE id="lYfFhU" name="HistoryStoreMemory.h" compile="0" resource="0"
-              file="../../Flip/include/flip/HistoryStoreMemory.h"/>
-        <FILE id="NBLAPk" name="Hub.h" compile="0" resource="0" file="../../Flip/include/flip/Hub.h"/>
-        <FILE id="JWtHPC" name="Hub.hpp" compile="0" resource="0" file="../../Flip/include/flip/Hub.hpp"/>
-        <FILE id="tpVgDn" name="Int.h" compile="0" resource="0" file="../../Flip/include/flip/Int.h"/>
-        <FILE id="A0Rhft" name="iterator.h" compile="0" resource="0" file="../../Flip/include/flip/iterator.h"/>
-        <FILE id="x4mfE6" name="Message.h" compile="0" resource="0" file="../../Flip/include/flip/Message.h"/>
-        <FILE id="T5mlZA" name="Message.hpp" compile="0" resource="0" file="../../Flip/include/flip/Message.hpp"/>
-        <FILE id="yNNVKb" name="Mold.h" compile="0" resource="0" file="../../Flip/include/flip/Mold.h"/>
-        <FILE id="mX8f6I" name="Mold.hpp" compile="0" resource="0" file="../../Flip/include/flip/Mold.hpp"/>
-        <FILE id="UqsBil" name="Object.h" compile="0" resource="0" file="../../Flip/include/flip/Object.h"/>
-        <FILE id="R2LmFm" name="Object.hpp" compile="0" resource="0" file="../../Flip/include/flip/Object.hpp"/>
-        <FILE id="nl4ZGP" name="ObjectRef.h" compile="0" resource="0" file="../../Flip/include/flip/ObjectRef.h"/>
-        <FILE id="ER05fD" name="ObjectRef.hpp" compile="0" resource="0" file="../../Flip/include/flip/ObjectRef.hpp"/>
-        <FILE id="QsnjEB" name="Optional.h" compile="0" resource="0" file="../../Flip/include/flip/Optional.h"/>
-        <FILE id="iY1OZn" name="Optional.hpp" compile="0" resource="0" file="../../Flip/include/flip/Optional.hpp"/>
-        <FILE id="W2ApJl" name="PortDirect.h" compile="0" resource="0" file="../../Flip/include/flip/PortDirect.h"/>
-        <FILE id="YHQtbr" name="Ref.h" compile="0" resource="0" file="../../Flip/include/flip/Ref.h"/>
-        <FILE id="PKhhd5" name="Signal.h" compile="0" resource="0" file="../../Flip/include/flip/Signal.h"/>
-        <FILE id="Fio8M7" name="Signal.hpp" compile="0" resource="0" file="../../Flip/include/flip/Signal.hpp"/>
-        <FILE id="tsEF5H" name="SignalConnection.h" compile="0" resource="0"
-              file="../../Flip/include/flip/SignalConnection.h"/>
-        <FILE id="rcDVZX" name="String.h" compile="0" resource="0" file="../../Flip/include/flip/String.h"/>
-        <FILE id="bzszZS" name="Transaction.h" compile="0" resource="0" file="../../Flip/include/flip/Transaction.h"/>
-        <FILE id="Moz5MQ" name="Variant.h" compile="0" resource="0" file="../../Flip/include/flip/Variant.h"/>
-        <FILE id="Ouspdx" name="Variant.hpp" compile="0" resource="0" file="../../Flip/include/flip/Variant.hpp"/>
-        <FILE id="EqyPSO" name="Vector.h" compile="0" resource="0" file="../../Flip/include/flip/Vector.h"/>
-        <FILE id="yRacEy" name="Vector.hpp" compile="0" resource="0" file="../../Flip/include/flip/Vector.hpp"/>
+        <GROUP id="{EAB5FDE8-288D-B49F-328B-D88DE6547CF4}" name="KiwiView"/>
       </GROUP>
-      <GROUP id="{871AC34E-861D-8AA5-BBB1-99620816A067}" name="src">
-        <GROUP id="{76CB12EB-BF9C-51E6-108A-8DEBABA59B43}" name="contrib">
-          <GROUP id="{C57C2C82-FD89-B61D-5B3D-FDC4E10ADCB4}" name="local_tcp">
-            <FILE id="gqAbGF" name="CarrierSocketTcp.cpp" compile="1" resource="0"
-                  file="../../Flip/src/contrib/local_tcp/CarrierSocketTcp.cpp"/>
-            <FILE id="uY0CgT" name="PortSocketTcp.cpp" compile="1" resource="0"
-                  file="../../Flip/src/contrib/local_tcp/PortSocketTcp.cpp"/>
-          </GROUP>
-          <GROUP id="{725F4608-0F38-4B1D-D0A9-BA3B148C2D97}" name="shared">
-            <FILE id="T10o5l" name="Filesystem.cpp" compile="1" resource="0" file="../../Flip/src/contrib/shared/Filesystem.cpp"/>
-            <FILE id="lq2CQ7" name="HttpRequestParser.cpp" compile="1" resource="0"
-                  file="../../Flip/src/contrib/shared/HttpRequestParser.cpp"/>
-          </GROUP>
-          <GROUP id="{E2BDE790-3C86-97DD-AEA5-46562B24EDDA}" name="transport_tcp">
-            <FILE id="z8HWhS" name="CarrierTransportSocketTcp.cpp" compile="1"
-                  resource="0" file="../../Flip/src/contrib/transport_tcp/CarrierTransportSocketTcp.cpp"/>
-            <FILE id="FykUf3" name="PortTransportServerTcp.cpp" compile="1" resource="0"
-                  file="../../Flip/src/contrib/transport_tcp/PortTransportServerTcp.cpp"/>
-            <FILE id="tgy54D" name="PortTransportSocketTcp.cpp" compile="1" resource="0"
-                  file="../../Flip/src/contrib/transport_tcp/PortTransportSocketTcp.cpp"/>
-          </GROUP>
-          <FILE id="OQlxyl" name="DataConsumerFile.cpp" compile="1" resource="0"
-                file="../../Flip/src/contrib/DataConsumerFile.cpp"/>
-          <FILE id="vyo6w6" name="DataProviderFile.cpp" compile="1" resource="0"
-                file="../../Flip/src/contrib/DataProviderFile.cpp"/>
-          <FILE id="AlTZmc" name="Dns.cpp" compile="1" resource="0" file="../../Flip/src/contrib/Dns.cpp"/>
-          <FILE id="R6HZm8" name="HistoryStoreFile.cpp" compile="1" resource="0"
-                file="../../Flip/src/contrib/HistoryStoreFile.cpp"/>
-          <FILE id="kxpd7f" name="MulticastService.cpp" compile="1" resource="0"
-                file="../../Flip/src/contrib/MulticastService.cpp"/>
-          <FILE id="hD7v8B" name="MulticastServiceExplorer.cpp" compile="1" resource="0"
-                file="../../Flip/src/contrib/MulticastServiceExplorer.cpp"/>
-          <FILE id="v23iN5" name="MulticastServiceProvider.cpp" compile="1" resource="0"
-                file="../../Flip/src/contrib/MulticastServiceProvider.cpp"/>
-          <FILE id="qWG0Rx" name="MulticastServiceSocket.cpp" compile="1" resource="0"
-                file="../../Flip/src/contrib/MulticastServiceSocket.cpp"/>
-          <FILE id="kogjz2" name="PacketStreamPinger.cpp" compile="1" resource="0"
-                file="../../Flip/src/contrib/PacketStreamPinger.cpp"/>
-          <FILE id="NgO9nM" name="PacketStreamReceiver.cpp" compile="1" resource="0"
-                file="../../Flip/src/contrib/PacketStreamReceiver.cpp"/>
-          <FILE id="k9F5yK" name="PacketStreamSender.cpp" compile="1" resource="0"
-                file="../../Flip/src/contrib/PacketStreamSender.cpp"/>
-          <FILE id="htUmKK" name="ServerHttp.cpp" compile="1" resource="0" file="../../Flip/src/contrib/ServerHttp.cpp"/>
-          <FILE id="jG2NPJ" name="Socket.cpp" compile="1" resource="0" file="../../Flip/src/contrib/Socket.cpp"/>
-          <FILE id="p9jmse" name="SqlDatabase.cpp" compile="1" resource="0" file="../../Flip/src/contrib/SqlDatabase.cpp"/>
-          <FILE id="xnzkS5" name="sqlite3.c" compile="1" resource="0" file="../../Flip/src/contrib/sqlite3.c"/>
-          <FILE id="PaTfTX" name="SqlStatement.cpp" compile="1" resource="0"
-                file="../../Flip/src/contrib/SqlStatement.cpp"/>
-          <FILE id="fZMQVS" name="Utml.cpp" compile="1" resource="0" file="../../Flip/src/contrib/Utml.cpp"/>
+      <GROUP id="{4E36069F-186B-8CE4-3264-BA41957CB0CD}" name="KiwiEngine">
+        <GROUP id="{19F465CD-4650-5103-BEB4-187B108FDBE8}" name="Objects">
+          <FILE id="Ze0HXq" name="KiwiObjectPlus.hpp" compile="0" resource="0"
+                file="../Modules/KiwiEngine/Objects/KiwiObjectPlus.hpp"/>
+          <FILE id="S6uSPV" name="KiwiObjectPrint.hpp" compile="0" resource="0"
+                file="../Modules/KiwiEngine/Objects/KiwiObjectPrint.hpp"/>
+          <FILE id="mdW09F" name="KiwiObjects.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/Objects/KiwiObjects.hpp"/>
         </GROUP>
-        <GROUP id="{D1FA6741-D063-D85C-EC17-86C7BDD08DA3}" name="detail">
-          <FILE id="HTFByY" name="BackEndIRDiff.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/BackEndIRDiff.cpp"/>
-          <FILE id="Lt2o36" name="BackEndMlCodec.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/BackEndMlCodec.cpp"/>
-          <FILE id="LgNkp2" name="BasicType.cpp" compile="1" resource="0" file="../../Flip/src/detail/BasicType.cpp"/>
-          <FILE id="eNsVP3" name="CarrierBase.cpp" compile="1" resource="0" file="../../Flip/src/detail/CarrierBase.cpp"/>
-          <FILE id="gdBOGu" name="CarrierListener.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/CarrierListener.cpp"/>
-          <FILE id="vzu38R" name="CarrierTransportBase.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/CarrierTransportBase.cpp"/>
-          <FILE id="D4pqXB" name="ClassBase.cpp" compile="1" resource="0" file="../../Flip/src/detail/ClassBase.cpp"/>
-          <FILE id="wgO9F9" name="ClassRegistry.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/ClassRegistry.cpp"/>
-          <FILE id="JHPSpl" name="Codec.cpp" compile="1" resource="0" file="../../Flip/src/detail/Codec.cpp"/>
-          <FILE id="Ml3qyw" name="ConsumerTextOut.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/ConsumerTextOut.cpp"/>
-          <FILE id="I0IKRo" name="DataConsumerBase.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/DataConsumerBase.cpp"/>
-          <FILE id="p9LBXE" name="DataModelBase.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/DataModelBase.cpp"/>
-          <FILE id="cBcyuy" name="DataProviderBase.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/DataProviderBase.cpp"/>
-          <FILE id="tSuqjk" name="Direction.cpp" compile="1" resource="0" file="../../Flip/src/detail/Direction.cpp"/>
-          <FILE id="cO3XiD" name="DocumentBase.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/DocumentBase.cpp"/>
-          <FILE id="w3oaNn" name="EnumClassBase.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/EnumClassBase.cpp"/>
-          <FILE id="SWwEOz" name="fnc.cpp" compile="1" resource="0" file="../../Flip/src/detail/fnc.cpp"/>
-          <FILE id="fPBLan" name="Journal.cpp" compile="1" resource="0" file="../../Flip/src/detail/Journal.cpp"/>
-          <FILE id="KukoLU" name="KeyFloat.cpp" compile="1" resource="0" file="../../Flip/src/detail/KeyFloat.cpp"/>
-          <FILE id="mhzEyL" name="KeyRandom.cpp" compile="1" resource="0" file="../../Flip/src/detail/KeyRandom.cpp"/>
-          <FILE id="Yv0VvJ" name="Opcode.cpp" compile="1" resource="0" file="../../Flip/src/detail/Opcode.cpp"/>
-          <FILE id="LU7CqY" name="PortBase.cpp" compile="1" resource="0" file="../../Flip/src/detail/PortBase.cpp"/>
-          <FILE id="fF31Ey" name="PortFactoryListener.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/PortFactoryListener.cpp"/>
-          <FILE id="gkUsok" name="PortListener.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/PortListener.cpp"/>
-          <FILE id="WwNWCn" name="PortTransportBase.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/PortTransportBase.cpp"/>
-          <FILE id="EDGHJX" name="PullStack.cpp" compile="1" resource="0" file="../../Flip/src/detail/PullStack.cpp"/>
-          <FILE id="cf89o2" name="RandomDevice.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/RandomDevice.cpp"/>
-          <FILE id="XH112P" name="RefAllocator.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/RefAllocator.cpp"/>
-          <FILE id="MdaaKs" name="Representative.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/Representative.cpp"/>
-          <FILE id="QT78Z6" name="SignalBase.cpp" compile="1" resource="0" file="../../Flip/src/detail/SignalBase.cpp"/>
-          <FILE id="kdPINv" name="SignalData.cpp" compile="1" resource="0" file="../../Flip/src/detail/SignalData.cpp"/>
-          <FILE id="FgHCjk" name="specs.cpp" compile="1" resource="0" file="../../Flip/src/detail/specs.cpp"/>
-          <FILE id="BKcdCz" name="StreamBinIn.cpp" compile="1" resource="0" file="../../Flip/src/detail/StreamBinIn.cpp"/>
-          <FILE id="vYTxqh" name="StreamBinOut.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/StreamBinOut.cpp"/>
-          <FILE id="yf3bDU" name="TransactionStack.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/TransactionStack.cpp"/>
-          <FILE id="uzjIKr" name="TxId.cpp" compile="1" resource="0" file="../../Flip/src/detail/TxId.cpp"/>
-          <FILE id="GJX1kY" name="TxIdRange.cpp" compile="1" resource="0" file="../../Flip/src/detail/TxIdRange.cpp"/>
-          <FILE id="itRqWi" name="Type.cpp" compile="1" resource="0" file="../../Flip/src/detail/Type.cpp"/>
-          <FILE id="GEwagw" name="TypeRegistry.cpp" compile="1" resource="0"
-                file="../../Flip/src/detail/TypeRegistry.cpp"/>
-        </GROUP>
-        <FILE id="VjrD0L" name="BackEndBinary.cpp" compile="1" resource="0"
-              file="../../Flip/src/BackEndBinary.cpp"/>
-        <FILE id="N33t5N" name="BackEndIR.cpp" compile="1" resource="0" file="../../Flip/src/BackEndIR.cpp"/>
-        <FILE id="aJ53O6" name="BackEndMl.cpp" compile="1" resource="0" file="../../Flip/src/BackEndMl.cpp"/>
-        <FILE id="LykVKt" name="Blob.cpp" compile="1" resource="0" file="../../Flip/src/Blob.cpp"/>
-        <FILE id="nckgVX" name="Bool.cpp" compile="1" resource="0" file="../../Flip/src/Bool.cpp"/>
-        <FILE id="kDiuHp" name="CarrierDirect.cpp" compile="1" resource="0"
-              file="../../Flip/src/CarrierDirect.cpp"/>
-        <FILE id="KxOf1a" name="DataConsumerMemory.cpp" compile="1" resource="0"
-              file="../../Flip/src/DataConsumerMemory.cpp"/>
-        <FILE id="hMPiKq" name="DataProviderMemory.cpp" compile="1" resource="0"
-              file="../../Flip/src/DataProviderMemory.cpp"/>
-        <FILE id="yrPEni" name="Document.cpp" compile="1" resource="0" file="../../Flip/src/Document.cpp"/>
-        <FILE id="DC8Geq" name="DocumentServer.cpp" compile="1" resource="0"
-              file="../../Flip/src/DocumentServer.cpp"/>
-        <FILE id="tMLn2e" name="Entity.cpp" compile="1" resource="0" file="../../Flip/src/Entity.cpp"/>
-        <FILE id="WFSeXY" name="Float.cpp" compile="1" resource="0" file="../../Flip/src/Float.cpp"/>
-        <FILE id="uWbR7N" name="HistoryStoreMemory.cpp" compile="1" resource="0"
-              file="../../Flip/src/HistoryStoreMemory.cpp"/>
-        <FILE id="msxrpO" name="Hub.cpp" compile="1" resource="0" file="../../Flip/src/Hub.cpp"/>
-        <FILE id="HhU20h" name="Int.cpp" compile="1" resource="0" file="../../Flip/src/Int.cpp"/>
-        <FILE id="N6P9c8" name="Mold.cpp" compile="1" resource="0" file="../../Flip/src/Mold.cpp"/>
-        <FILE id="lf6vjt" name="Object.cpp" compile="1" resource="0" file="../../Flip/src/Object.cpp"/>
-        <FILE id="eNdPKt" name="PortDirect.cpp" compile="1" resource="0" file="../../Flip/src/PortDirect.cpp"/>
-        <FILE id="TOjbrn" name="Ref.cpp" compile="1" resource="0" file="../../Flip/src/Ref.cpp"/>
-        <FILE id="GNkiDV" name="SignalConnection.cpp" compile="1" resource="0"
-              file="../../Flip/src/SignalConnection.cpp"/>
-        <FILE id="b4ewwC" name="src.gypi" compile="0" resource="1" file="../../Flip/src/src.gypi"/>
-        <FILE id="ED2QyR" name="String.cpp" compile="1" resource="0" file="../../Flip/src/String.cpp"/>
-        <FILE id="zPVa96" name="Transaction.cpp" compile="1" resource="0" file="../../Flip/src/Transaction.cpp"/>
+        <FILE id="jL96qu" name="KiwiEngine.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiEngine.hpp"/>
+        <FILE id="nqlKRd" name="KiwiInstance.cpp" compile="1" resource="0"
+              file="../Modules/KiwiEngine/KiwiInstance.cpp"/>
+        <FILE id="nQWL7d" name="KiwiInstance.hpp" compile="0" resource="0"
+              file="../Modules/KiwiEngine/KiwiInstance.hpp"/>
+        <FILE id="v3qHXh" name="KiwiLink.cpp" compile="1" resource="0" file="../Modules/KiwiEngine/KiwiLink.cpp"/>
+        <FILE id="xNca6o" name="KiwiLink.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiLink.hpp"/>
+        <FILE id="m2CfHk" name="KiwiObject.cpp" compile="1" resource="0" file="../Modules/KiwiEngine/KiwiObject.cpp"/>
+        <FILE id="vQkAvN" name="KiwiObject.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiObject.hpp"/>
+        <FILE id="I5TUoZ" name="KiwiPatcher.cpp" compile="1" resource="0" file="../Modules/KiwiEngine/KiwiPatcher.cpp"/>
+        <FILE id="pPUuGj" name="KiwiPatcher.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiPatcher.hpp"/>
       </GROUP>
+      <GROUP id="{376DD321-D631-7853-E7CD-124C62FC3BC4}" name="KiwiModel">
+        <GROUP id="{F56C6760-A887-FA55-9679-441F9458784C}" name="Objects">
+          <FILE id="zGZHD5" name="KiwiObjectPlus.hpp" compile="0" resource="0"
+                file="../Modules/KiwiModel/Objects/KiwiObjectPlus.hpp"/>
+          <FILE id="H8npNm" name="KiwiObjectPrint.hpp" compile="0" resource="0"
+                file="../Modules/KiwiModel/Objects/KiwiObjectPrint.hpp"/>
+          <FILE id="sUorTp" name="KiwiObjects.hpp" compile="0" resource="0" file="../Modules/KiwiModel/Objects/KiwiObjects.hpp"/>
+        </GROUP>
+        <FILE id="j95wIT" name="KiwiLink.cpp" compile="1" resource="0" file="../Modules/KiwiModel/KiwiLink.cpp"/>
+        <FILE id="A6aXHc" name="KiwiLink.hpp" compile="0" resource="0" file="../Modules/KiwiModel/KiwiLink.hpp"/>
+        <FILE id="cr3Yvu" name="KiwiModel.hpp" compile="0" resource="0" file="../Modules/KiwiModel/KiwiModel.hpp"/>
+        <FILE id="kEinH2" name="KiwiObject.cpp" compile="1" resource="0" file="../Modules/KiwiModel/KiwiObject.cpp"/>
+        <FILE id="axstoL" name="KiwiObject.hpp" compile="0" resource="0" file="../Modules/KiwiModel/KiwiObject.hpp"/>
+        <FILE id="IHkOOO" name="KiwiPatcher.cpp" compile="1" resource="0" file="../Modules/KiwiModel/KiwiPatcher.cpp"/>
+        <FILE id="oRYb04" name="KiwiPatcher.hpp" compile="0" resource="0" file="../Modules/KiwiModel/KiwiPatcher.hpp"/>
+      </GROUP>
+      <GROUP id="{CBF4E414-23D0-76EE-C19E-6AB749B32073}" name="KiwiCore">
+        <FILE id="xsKzHU" name="KiwiAtom.hpp" compile="0" resource="0" file="../Modules/KiwiCore/KiwiAtom.hpp"/>
+      </GROUP>
+    </GROUP>
+    <GROUP id="{72FCDC55-1C0F-D5C0-C444-A9EF14BCE12B}" name="Flip">
+      <FILE id="atFmM4" name="Array.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Array.h"/>
+      <FILE id="RGF7tm" name="Array.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Array.hpp"/>
+      <FILE id="Xbw0JN" name="BackEndBinary.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/BackEndBinary.h"/>
+      <FILE id="qawlPp" name="BackEndIR.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/BackEndIR.h"/>
+      <FILE id="lihHhZ" name="BackEndIR.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/BackEndIR.hpp"/>
+      <FILE id="msoPeM" name="BackEndMl.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/BackEndMl.h"/>
+      <FILE id="RNL788" name="Blob.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Blob.h"/>
+      <FILE id="txHAuC" name="Bool.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Bool.h"/>
+      <FILE id="jokQQx" name="CarrierDirect.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/CarrierDirect.h"/>
+      <FILE id="cUFgfj" name="Class.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Class.h"/>
+      <FILE id="t8UQqx" name="Class.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Class.hpp"/>
+      <FILE id="NrlMr4" name="Collection.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Collection.h"/>
+      <FILE id="AIfrwT" name="Collection.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Collection.hpp"/>
+      <FILE id="DVBJqL" name="config.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/config.h"/>
+      <GROUP id="{09E34710-1F41-DCBD-313D-4F4A957C961F}" name="contrib">
+        <GROUP id="{DC9E073C-CDF5-89F3-54F2-4CEC053D9EC2}" name="cloud_store">
+          <FILE id="zShMFe" name="ApiDropbox.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/contrib/cloud_store/ApiDropbox.h"/>
+          <FILE id="jWxzHp" name="ApiDropboxServerEmulation.h" compile="0" resource="0"
+                file="../ThirdParty/flip-public/include/flip/contrib/cloud_store/ApiDropboxServerEmulation.h"/>
+          <FILE id="MsGFyb" name="CloudStore.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/contrib/cloud_store/CloudStore.h"/>
+          <FILE id="JxbqJL" name="CloudStoreDropbox.h" compile="0" resource="0"
+                file="../ThirdParty/flip-public/include/flip/contrib/cloud_store/CloudStoreDropbox.h"/>
+          <FILE id="TtXV4u" name="CloudStoreFilesystem.h" compile="0" resource="0"
+                file="../ThirdParty/flip-public/include/flip/contrib/cloud_store/CloudStoreFilesystem.h"/>
+          <FILE id="oJUCEx" name="CurlEasy.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/contrib/cloud_store/CurlEasy.h"/>
+          <FILE id="rCC7EN" name="CurlEasyPool.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/contrib/cloud_store/CurlEasyPool.h"/>
+          <FILE id="AowIqA" name="CurlEasyQueue.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/contrib/cloud_store/CurlEasyQueue.h"/>
+          <FILE id="bcvY1C" name="CurlMulti.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/contrib/cloud_store/CurlMulti.h"/>
+          <FILE id="skDjPQ" name="TransportCloudStore.h" compile="0" resource="0"
+                file="../ThirdParty/flip-public/include/flip/contrib/cloud_store/TransportCloudStore.h"/>
+        </GROUP>
+        <GROUP id="{BAEF97E5-C668-4113-9F2C-C998BA8756F7}" name="local_tcp">
+          <FILE id="Cn56BO" name="CarrierSocketTcp.h" compile="0" resource="0"
+                file="../ThirdParty/flip-public/include/flip/contrib/local_tcp/CarrierSocketTcp.h"/>
+          <FILE id="uEZQkO" name="PortSocketTcp.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/contrib/local_tcp/PortSocketTcp.h"/>
+        </GROUP>
+        <GROUP id="{5994DACA-3BF2-68DD-56F5-53CD99AADE59}" name="shared">
+          <FILE id="Bp0GkE" name="Filesystem.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/contrib/shared/Filesystem.h"/>
+          <FILE id="vVUdiA" name="HttpRequestParser.h" compile="0" resource="0"
+                file="../ThirdParty/flip-public/include/flip/contrib/shared/HttpRequestParser.h"/>
+        </GROUP>
+        <GROUP id="{9CFE853F-3514-0CD8-AA3C-5C6C13A5590D}" name="transport_tcp">
+          <FILE id="LF40V6" name="CarrierTransportSocketTcp.h" compile="0" resource="0"
+                file="../ThirdParty/flip-public/include/flip/contrib/transport_tcp/CarrierTransportSocketTcp.h"/>
+          <FILE id="pvELzw" name="PortTransportServerTcp.h" compile="0" resource="0"
+                file="../ThirdParty/flip-public/include/flip/contrib/transport_tcp/PortTransportServerTcp.h"/>
+          <FILE id="uXnluj" name="PortTransportSocketTcp.h" compile="0" resource="0"
+                file="../ThirdParty/flip-public/include/flip/contrib/transport_tcp/PortTransportSocketTcp.h"/>
+        </GROUP>
+        <FILE id="AHoXsv" name="DataConsumerFile.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/contrib/DataConsumerFile.h"/>
+        <FILE id="plvSHr" name="DataProviderFile.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/contrib/DataProviderFile.h"/>
+        <FILE id="CnXik2" name="Dns.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/contrib/Dns.h"/>
+        <FILE id="HnxQWY" name="HistoryStoreFile.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/contrib/HistoryStoreFile.h"/>
+        <FILE id="J5FVV3" name="MulticastService.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/contrib/MulticastService.h"/>
+        <FILE id="r2fkDY" name="MulticastServiceExplorer.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/contrib/MulticastServiceExplorer.h"/>
+        <FILE id="BMqEiE" name="MulticastServiceProvider.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/contrib/MulticastServiceProvider.h"/>
+        <FILE id="Z9pgn9" name="MulticastServiceSocket.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/contrib/MulticastServiceSocket.h"/>
+        <FILE id="c83doK" name="PacketStreamPinger.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/contrib/PacketStreamPinger.h"/>
+        <FILE id="InCYvJ" name="PacketStreamReceiver.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/contrib/PacketStreamReceiver.h"/>
+        <FILE id="nCVRJ6" name="PacketStreamSender.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/contrib/PacketStreamSender.h"/>
+        <FILE id="TMD72E" name="ServerHttp.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/contrib/ServerHttp.h"/>
+        <FILE id="Rc2ojW" name="Socket.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/contrib/Socket.h"/>
+        <FILE id="eTAfEA" name="SqlDatabase.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/contrib/SqlDatabase.h"/>
+        <FILE id="FViQIH" name="sqlite3.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/contrib/sqlite3.h"/>
+        <FILE id="uNG3z2" name="sqlite3ext.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/contrib/sqlite3ext.h"/>
+        <FILE id="A5oF3K" name="SqlStatement.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/contrib/SqlStatement.h"/>
+        <FILE id="D9ns89" name="Utml.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/contrib/Utml.h"/>
+      </GROUP>
+      <FILE id="hTzcUZ" name="Controller.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Controller.h"/>
+      <FILE id="L39FbH" name="DataConsumerMemory.h" compile="0" resource="0"
+            file="../ThirdParty/flip-public/include/flip/DataConsumerMemory.h"/>
+      <FILE id="yrtA7r" name="DataModel.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/DataModel.h"/>
+      <FILE id="pSF5TJ" name="DataModel.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/DataModel.hpp"/>
+      <FILE id="SMhYYC" name="DataProviderMemory.h" compile="0" resource="0"
+            file="../ThirdParty/flip-public/include/flip/DataProviderMemory.h"/>
+      <GROUP id="{17D8876C-8695-5185-BA5C-2B0AF27B6392}" name="detail">
+        <FILE id="aLVpty" name="ArrayBase.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/ArrayBase.h"/>
+        <FILE id="vOaQaY" name="ArrayIteratorBase.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/ArrayIteratorBase.h"/>
+        <FILE id="T4KynO" name="ArrayIteratorBase.hpp" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/ArrayIteratorBase.hpp"/>
+        <FILE id="v9Qswx" name="BackEndBase.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/BackEndBase.h"/>
+        <FILE id="zKmpvx" name="BackEndMlCodec.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/BackEndMlCodec.h"/>
+        <FILE id="Bdw6Ef" name="BasicType.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/BasicType.h"/>
+        <FILE id="PGJ3bd" name="CarrierBase.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/CarrierBase.h"/>
+        <FILE id="mh90EV" name="CarrierListener.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/CarrierListener.h"/>
+        <FILE id="pDmvX8" name="CarrierTransportBase.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/CarrierTransportBase.h"/>
+        <FILE id="wEoXkp" name="CarrierTransportBase.hpp" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/CarrierTransportBase.hpp"/>
+        <FILE id="fDmE5s" name="ClassBase.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/ClassBase.h"/>
+        <FILE id="V8NT4d" name="ClassRegistry.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/ClassRegistry.h"/>
+        <FILE id="YQQRKl" name="Codec.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/Codec.h"/>
+        <FILE id="L5I2JT" name="CollectionBase.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/CollectionBase.h"/>
+        <FILE id="GF0EkA" name="CollectionIteratorBase.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/CollectionIteratorBase.h"/>
+        <FILE id="eVHBiU" name="CollectionIteratorBase.hpp" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/CollectionIteratorBase.hpp"/>
+        <FILE id="jBC3UJ" name="ConsumerTextOut.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/ConsumerTextOut.h"/>
+        <FILE id="ZB560M" name="ConsumerTextOut.hpp" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/ConsumerTextOut.hpp"/>
+        <FILE id="pkhZce" name="ContainerIterator.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/ContainerIterator.h"/>
+        <FILE id="OqYlwt" name="ContainerIterator.hpp" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/ContainerIterator.hpp"/>
+        <FILE id="Qbv5y9" name="ContainerType.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/ContainerType.h"/>
+        <FILE id="ZcqemD" name="DataConsumerBase.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/DataConsumerBase.h"/>
+        <FILE id="nxNjeN" name="DataModelBase.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/DataModelBase.h"/>
+        <FILE id="TNax6W" name="DataProviderBase.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/DataProviderBase.h"/>
+        <FILE id="NFXU9L" name="def.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/def.h"/>
+        <FILE id="YtDdVA" name="Default.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/Default.h"/>
+        <FILE id="eMBPbs" name="Direction.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/Direction.h"/>
+        <FILE id="JzvZ75" name="DocumentBase.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/DocumentBase.h"/>
+        <FILE id="JI3Wpw" name="DocumentBase.hpp" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/DocumentBase.hpp"/>
+        <FILE id="W1xKXk" name="DocumentObserverBase.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/DocumentObserverBase.h"/>
+        <FILE id="ydlqK4" name="DocumentValidatorBase.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/DocumentValidatorBase.h"/>
+        <FILE id="bBYYM0" name="ElementState.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/ElementState.h"/>
+        <FILE id="eOGpH8" name="EnumBase.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/EnumBase.h"/>
+        <FILE id="XHvKcc" name="EnumClassBase.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/EnumClassBase.h"/>
+        <FILE id="YuCsl1" name="ExecFlags.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/ExecFlags.h"/>
+        <FILE id="cw1uuh" name="fnc.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/fnc.h"/>
+        <FILE id="ZMUHsl" name="fnc.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/fnc.hpp"/>
+        <FILE id="vEHKp9" name="Journal.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/Journal.h"/>
+        <FILE id="fZrTPm" name="KeyFloat.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/KeyFloat.h"/>
+        <FILE id="iC3ibY" name="KeyRandom.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/KeyRandom.h"/>
+        <FILE id="fZCL6W" name="LockFreeQueue.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/LockFreeQueue.h"/>
+        <FILE id="eN4jR7" name="LockFreeQueue.hpp" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/LockFreeQueue.hpp"/>
+        <FILE id="DJbleZ" name="MessageBase.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/MessageBase.h"/>
+        <FILE id="jaIkOj" name="ObjectRefBase.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/ObjectRefBase.h"/>
+        <FILE id="JTJee6" name="ObjectWrapper.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/ObjectWrapper.h"/>
+        <FILE id="UdGUHq" name="ObjectWrapper.hpp" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/ObjectWrapper.hpp"/>
+        <FILE id="aDwGAi" name="Opcode.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/Opcode.h"/>
+        <FILE id="NEJDH8" name="PortBase.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/PortBase.h"/>
+        <FILE id="ffyDMP" name="PortFactoryListener.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/PortFactoryListener.h"/>
+        <FILE id="L5EpA7" name="PortListener.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/PortListener.h"/>
+        <FILE id="pGRVNj" name="PortTransportBase.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/PortTransportBase.h"/>
+        <FILE id="ZFtEFd" name="PullStack.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/PullStack.h"/>
+        <FILE id="u90H3q" name="RandomDevice.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/RandomDevice.h"/>
+        <FILE id="aTsD5w" name="RandomDevice.hpp" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/RandomDevice.hpp"/>
+        <FILE id="vduUqC" name="RefAllocator.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/RefAllocator.h"/>
+        <FILE id="LpeX4k" name="Representative.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/Representative.h"/>
+        <FILE id="sG55vd" name="Representative.hpp" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/Representative.hpp"/>
+        <FILE id="bEraWX" name="SignalBase.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/SignalBase.h"/>
+        <FILE id="ox4zd5" name="SignalData.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/SignalData.h"/>
+        <FILE id="IPOl9x" name="specs.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/specs.h"/>
+        <FILE id="XLnYLI" name="StreamBinIn.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/StreamBinIn.h"/>
+        <FILE id="RXGGb5" name="StreamBinIn.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/StreamBinIn.hpp"/>
+        <FILE id="wsVep5" name="StreamBinOut.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/StreamBinOut.h"/>
+        <FILE id="wwELyA" name="StreamBinOut.hpp" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/StreamBinOut.hpp"/>
+        <FILE id="mrl52p" name="TransactionStack.h" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/TransactionStack.h"/>
+        <FILE id="qdVFBY" name="TxId.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/TxId.h"/>
+        <FILE id="XkErlu" name="TxIdRange.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/TxIdRange.h"/>
+        <FILE id="p0PVvE" name="Type.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/Type.h"/>
+        <FILE id="hn5FUI" name="Type.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/Type.hpp"/>
+        <FILE id="KCYyJU" name="TypeId.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/TypeId.h"/>
+        <FILE id="tMudms" name="TypeRegistry.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/TypeRegistry.h"/>
+        <FILE id="HMUJq3" name="TypeRegistry.hpp" compile="0" resource="0"
+              file="../ThirdParty/flip-public/include/flip/detail/TypeRegistry.hpp"/>
+        <FILE id="OdukRK" name="TypeTraits.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/TypeTraits.h"/>
+        <FILE id="rb5nHa" name="VMErr.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/detail/VMErr.h"/>
+      </GROUP>
+      <FILE id="dFBGg4" name="Document.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Document.h"/>
+      <FILE id="rk9CTc" name="DocumentObserver.h" compile="0" resource="0"
+            file="../ThirdParty/flip-public/include/flip/DocumentObserver.h"/>
+      <FILE id="HPjUCW" name="DocumentObserver.hpp" compile="0" resource="0"
+            file="../ThirdParty/flip-public/include/flip/DocumentObserver.hpp"/>
+      <FILE id="crjFFh" name="DocumentObserverLambda.h" compile="0" resource="0"
+            file="../ThirdParty/flip-public/include/flip/DocumentObserverLambda.h"/>
+      <FILE id="joK3Z1" name="DocumentObserverLambda.hpp" compile="0" resource="0"
+            file="../ThirdParty/flip-public/include/flip/DocumentObserverLambda.hpp"/>
+      <FILE id="Sbemmu" name="DocumentObserverVoid.h" compile="0" resource="0"
+            file="../ThirdParty/flip-public/include/flip/DocumentObserverVoid.h"/>
+      <FILE id="NPFCCS" name="DocumentServer.h" compile="0" resource="0"
+            file="../ThirdParty/flip-public/include/flip/DocumentServer.h"/>
+      <FILE id="pwSClf" name="DocumentServer.hpp" compile="0" resource="0"
+            file="../ThirdParty/flip-public/include/flip/DocumentServer.hpp"/>
+      <FILE id="UkIaze" name="DocumentValidator.h" compile="0" resource="0"
+            file="../ThirdParty/flip-public/include/flip/DocumentValidator.h"/>
+      <FILE id="x3a60s" name="DocumentValidator.hpp" compile="0" resource="0"
+            file="../ThirdParty/flip-public/include/flip/DocumentValidator.hpp"/>
+      <FILE id="QP4wz5" name="DocumentValidatorVoid.h" compile="0" resource="0"
+            file="../ThirdParty/flip-public/include/flip/DocumentValidatorVoid.h"/>
+      <FILE id="vEegTO" name="Entity.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Entity.h"/>
+      <FILE id="t3VQRL" name="Entity.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Entity.hpp"/>
+      <FILE id="HML9PE" name="Enum.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Enum.h"/>
+      <FILE id="SCjyP1" name="Enum.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Enum.hpp"/>
+      <FILE id="aMAZ5t" name="EnumClass.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/EnumClass.h"/>
+      <FILE id="DJXPcz" name="EnumClass.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/EnumClass.hpp"/>
+      <FILE id="cHO2QZ" name="Float.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Float.h"/>
+      <FILE id="KQLaxz" name="History.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/History.h"/>
+      <FILE id="pmWFc3" name="History.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/History.hpp"/>
+      <FILE id="tmD8R4" name="HistoryStoreMemory.h" compile="0" resource="0"
+            file="../ThirdParty/flip-public/include/flip/HistoryStoreMemory.h"/>
+      <FILE id="coUS7V" name="Hub.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Hub.h"/>
+      <FILE id="pk4Srt" name="Hub.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Hub.hpp"/>
+      <FILE id="vwV8i2" name="Int.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Int.h"/>
+      <FILE id="y8jTbb" name="iterator.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/iterator.h"/>
+      <FILE id="aL2Nim" name="Message.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Message.h"/>
+      <FILE id="eBp4zj" name="Message.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Message.hpp"/>
+      <FILE id="m4LoOa" name="Mold.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Mold.h"/>
+      <FILE id="AY4tQE" name="Mold.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Mold.hpp"/>
+      <FILE id="BWVkxj" name="Object.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Object.h"/>
+      <FILE id="ZlLtJj" name="Object.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Object.hpp"/>
+      <FILE id="OpbwMi" name="ObjectRef.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/ObjectRef.h"/>
+      <FILE id="ockvrO" name="ObjectRef.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/ObjectRef.hpp"/>
+      <FILE id="UfC1Tc" name="Optional.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Optional.h"/>
+      <FILE id="sov5Vm" name="Optional.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Optional.hpp"/>
+      <FILE id="yQsUQn" name="PortDirect.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/PortDirect.h"/>
+      <FILE id="H70Q3Y" name="Ref.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Ref.h"/>
+      <FILE id="wHFRqf" name="Signal.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Signal.h"/>
+      <FILE id="zwwqr4" name="Signal.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Signal.hpp"/>
+      <FILE id="NhUL6C" name="SignalConnection.h" compile="0" resource="0"
+            file="../ThirdParty/flip-public/include/flip/SignalConnection.h"/>
+      <FILE id="NK5t9X" name="String.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/String.h"/>
+      <FILE id="Trap6p" name="Transaction.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Transaction.h"/>
+      <FILE id="WyaroI" name="Variant.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Variant.h"/>
+      <FILE id="f7bPtK" name="Variant.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Variant.hpp"/>
+      <FILE id="eBOCAp" name="Vector.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Vector.h"/>
+      <FILE id="eckOVg" name="Vector.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Vector.hpp"/>
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX" extraDefs="">
+    <XCODE_MAC targetFolder="Builds/MacOSX" extraDefs="" externalLibraries=""
+               extraCompilerFlags="" extraLinkerFlags="../../../ThirdParty/flip-public/bin/flip_macos.a">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.10 SDK" osxArchitecture="default"
-                       isDebug="1" optimisation="1" targetName="Kiwi" headerPath="../../../../Flip/include&#10;../../../Modules"
-                       defines="" cppLanguageStandard="c++11" cppLibType="libc++" customXcodeFlags="USE_HEADERMAP=NO"/>
+                       isDebug="1" optimisation="1" targetName="Kiwi" headerPath="../../../ThirdParty/flip-public/include&#10;../../../Modules"
+                       defines="" cppLanguageStandard="c++11" cppLibType="libc++" customXcodeFlags="USE_HEADERMAP=NO"
+                       libraryPath="../../../ThirdParty/flip-public/bin"/>
         <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="default" osxArchitecture="default"
-                       isDebug="0" optimisation="3" targetName="Kiwi" headerPath="../../../../Flip/include&#10;../../../Modules"
-                       defines="" cppLanguageStandard="c++11" cppLibType="libc++" customXcodeFlags="USE_HEADERMAP=NO"/>
+                       isDebug="0" optimisation="3" targetName="Kiwi" headerPath="../../../ThirdParty/flip-public/include&#10;../../../Modules"
+                       defines="" cppLanguageStandard="c++11" cppLibType="libc++" customXcodeFlags="USE_HEADERMAP=NO"
+                       libraryPath="../../../ThirdParty/flip-public/bin"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../ThirdParty/Juce/modules"/>

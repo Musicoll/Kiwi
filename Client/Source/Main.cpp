@@ -21,8 +21,7 @@
  ==============================================================================
  */
 
-#include "KiwiEngine/KiwiEngine.h"
-#include "KiwiGraphics/KiwiGraphics.h"
+#include <KiwiEngine/KiwiEngine.hpp>
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
@@ -31,9 +30,6 @@ namespace kiwi
     //==============================================================================
     class KiwiApplication  : public JUCEApplication
     {
-    private:
-        std::unique_ptr<Instance> m_instance;
-        
     public:
         //==============================================================================
         KiwiApplication() {}
@@ -43,39 +39,9 @@ namespace kiwi
         bool moreThanOneInstanceAllowed() override       { return true; }
         
         //==============================================================================
-        void initialise (const String& commandLine) override
+        void initialise (String const& commandLine) override
         {
-            m_instance = Instance::create(123456789ULL, "Main");
-            std::cout << "Kiwi instance : " << m_instance->getName()->getName() << '\n';
-            
-            sPatcher patcher = m_instance->createPatcher();
-            
-            // change grid size and commit
-            std::cout << "\n\n------ Change things ------\n  \n";
-            patcher->setGridSize(40, true);
-            
-            std::cout << "\n\n------ Change unlocked_bgcolor & gridsize ------\n\n";
-            patcher->beginTransaction("Change unlocked_bgcolor & gridsize");
-            patcher->setAttributeValue(Tags::unlocked_bgcolor, Atom{0.1, 0.2, 0.3, 1.});
-            patcher->setAttributeValue(Tags::gridsize, Atom(45));
-            patcher->setAttributeValue(Tag::create("attr_bool"), Atom(true));
-            patcher->setAttributeValue(Tag::create("attr_tag"), "zozo");
-            patcher->endTransaction();
-            
-            std::cout << "\n\n------ Change things ------\n\n";
-            patcher->beginTransaction("Change things");
-            patcher->setAttributeValue(Tags::unlocked_bgcolor, Colors::green);
-            patcher->setAttributeValue(Tags::gridsize, 10ll);
-            patcher->setAttributeValue(Tag::create("attr_bool"), Atom(false));
-            patcher->setAttributeValue(Tag::create("attr_tag"), Atom("lolo"));
-            patcher->endTransaction();
-            
-            std::cout << "\n\n------ undo (1) ------\n\n";
-            patcher->undo(true);
-            std::cout << "\n\n------ undo (2) ------\n\n";
-            patcher->undo(true);
-            std::cout << "\n\n------ redo ------\n\n";
-            patcher->redo(true);
+            //m_instance = Instance::create(123456789ULL, "Main");
         }
         
         void shutdown() override
@@ -85,7 +51,7 @@ namespace kiwi
         //==============================================================================
         void systemRequestedQuit() override
         {
-            m_instance.reset();
+            //m_instance.reset();
             
             // This is called when the app is being asked to quit: you can ignore this
             // request and let the app carry on running, or call quit() to allow the app to close.
@@ -98,6 +64,9 @@ namespace kiwi
             // this method is invoked, and the commandLine parameter tells you what
             // the other instance's command-line arguments were.
         }
+        
+    private:
+        //std::unique_ptr<Instance> m_instance;
     };
     
     //==============================================================================
