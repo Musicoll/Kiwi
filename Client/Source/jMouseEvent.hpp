@@ -21,37 +21,31 @@
  ==============================================================================
  */
 
-#ifndef KIWI_JPATCHER_HPP_INCLUDED
-#define KIWI_JPATCHER_HPP_INCLUDED
+#ifndef KIWI_JUCE_MOUSE_EVENT_HPP_INCLUDED
+#define KIWI_JUCE_MOUSE_EVENT_HPP_INCLUDED
 
-#include <KiwiModel/KiwiPatcher.hpp>
-#include <KiwiGui/KiwiView/KiwiView.hpp>
+#include <KiwiGui/KiwiEvents/KiwiMouseEvent.hpp>
 
-#include "jView.hpp"
+#include "../JuceLibraryCode/JuceHeader.h"
 
 namespace kiwi
 {
-    //! @brief The juce Patcher Component.
-    class jPatcher : public jView
+    class jMouseEvent : public gui::MouseEvent
     {
     public:
         
-        jPatcher(model::Patcher& patcher_model);
-        ~jPatcher();
+        jMouseEvent(gui::MouseEvent::Type const& type, juce::MouseEvent const& event) noexcept;
         
-        // juce::Component
-        void paint(juce::Graphics& g) override;
-        void resized() override;
-
-        void mouseDown(juce::MouseEvent const& event) override;
-        void mouseDrag(juce::MouseEvent const& event) override;
-        void mouseUp(juce::MouseEvent const& event) override;
-        void mouseDoubleClick(juce::MouseEvent const& event) override;
+        jMouseEvent(juce::MouseEvent const& event, juce::MouseWheelDetails const& wheel) noexcept;
+        
+        ~jMouseEvent() noexcept;
+        
+        void setMouseUnlimited(bool isLimited, bool visibleUntilLimits = false) const override;
         
     private:
         
-        model::Patcher& m_model;
+        const MouseInputSource m_source;
     };
 }
 
-#endif // KIWI_JPATCHER_HPP_INCLUDED
+#endif // KIWI_JUCE_MOUSE_EVENT_HPP_INCLUDED

@@ -6,6 +6,10 @@
               companyEmail="cicm.mshparisnord@gmail.com">
   <MAINGROUP id="HfN8up" name="Kiwi">
     <GROUP id="{E476D5A0-2E9D-DD18-D007-54A51ACF9459}" name="Application">
+      <FILE id="UnaKnf" name="jMouseEvent.cpp" compile="1" resource="0" file="Source/jMouseEvent.cpp"/>
+      <FILE id="n4Bm9h" name="jMouseEvent.hpp" compile="0" resource="0" file="Source/jMouseEvent.hpp"/>
+      <FILE id="ZMLjNr" name="jView.cpp" compile="1" resource="0" file="Source/jView.cpp"/>
+      <FILE id="YNwlmy" name="jView.hpp" compile="0" resource="0" file="Source/jView.hpp"/>
       <FILE id="KxD69I" name="jPatcher.cpp" compile="1" resource="0" file="Source/jPatcher.cpp"/>
       <FILE id="KQjSU2" name="jPatcher.hpp" compile="0" resource="0" file="Source/jPatcher.hpp"/>
       <FILE id="QMh5qc" name="jWindow.cpp" compile="1" resource="0" file="Source/jWindow.cpp"/>
@@ -16,18 +20,6 @@
       <FILE id="gEGUnW" name="Application.hpp" compile="0" resource="0" file="Source/Application.hpp"/>
     </GROUP>
     <GROUP id="{8FA1C9D1-9F39-6B48-4CD5-95C1B98E14A6}" name="Modules">
-      <GROUP id="{BE538FC5-8082-DC84-062F-90CBBF6F2E7D}" name="KiwiGui">
-        <GROUP id="{979E45D0-E9AF-B23D-DDAA-40022416C173}" name="KiwiEvents"/>
-        <GROUP id="{6420AB87-8BD2-6589-8F31-9943240B6025}" name="KiwiGraphics">
-          <FILE id="uEcTTD" name="KiwiAffineMatrix.hpp" compile="0" resource="0"
-                file="../Modules/KiwiGui/KiwiGraphics/KiwiAffineMatrix.hpp"/>
-          <FILE id="MCN96D" name="KiwiPath.cpp" compile="1" resource="0" file="../Modules/KiwiGui/KiwiGraphics/KiwiPath.cpp"/>
-          <FILE id="aSo2LS" name="KiwiPath.hpp" compile="0" resource="0" file="../Modules/KiwiGui/KiwiGraphics/KiwiPath.hpp"/>
-          <FILE id="O7XNeN" name="KiwiPoint.cpp" compile="1" resource="0" file="../Modules/KiwiGui/KiwiGraphics/KiwiPoint.cpp"/>
-          <FILE id="jUKtFc" name="KiwiPoint.hpp" compile="0" resource="0" file="../Modules/KiwiGui/KiwiGraphics/KiwiPoint.hpp"/>
-        </GROUP>
-        <GROUP id="{EAB5FDE8-288D-B49F-328B-D88DE6547CF4}" name="KiwiView"/>
-      </GROUP>
       <GROUP id="{4E36069F-186B-8CE4-3264-BA41957CB0CD}" name="KiwiEngine">
         <FILE id="jL96qu" name="KiwiEngine.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiEngine.hpp"/>
         <FILE id="eHddVd" name="KiwiDocumentManager.cpp" compile="1" resource="0"
@@ -51,6 +43,30 @@
               file="../Modules/KiwiEngine/KiwiInstance.cpp"/>
         <FILE id="nQWL7d" name="KiwiInstance.hpp" compile="0" resource="0"
               file="../Modules/KiwiEngine/KiwiInstance.hpp"/>
+      </GROUP>
+      <GROUP id="{BE538FC5-8082-DC84-062F-90CBBF6F2E7D}" name="KiwiGui">
+        <GROUP id="{979E45D0-E9AF-B23D-DDAA-40022416C173}" name="KiwiEvents">
+          <FILE id="kANZh9" name="KiwiMouseEvent.cpp" compile="1" resource="0"
+                file="../Modules/KiwiGui/KiwiEvents/KiwiMouseEvent.cpp"/>
+          <FILE id="fp78TR" name="KiwiMouseEvent.hpp" compile="0" resource="0"
+                file="../Modules/KiwiGui/KiwiEvents/KiwiMouseEvent.hpp"/>
+        </GROUP>
+        <GROUP id="{6420AB87-8BD2-6589-8F31-9943240B6025}" name="KiwiGraphics">
+          <FILE id="uEcTTD" name="KiwiAffineMatrix.hpp" compile="0" resource="0"
+                file="../Modules/KiwiGui/KiwiGraphics/KiwiAffineMatrix.hpp"/>
+          <FILE id="MCN96D" name="KiwiPath.cpp" compile="1" resource="0" file="../Modules/KiwiGui/KiwiGraphics/KiwiPath.cpp"/>
+          <FILE id="aSo2LS" name="KiwiPath.hpp" compile="0" resource="0" file="../Modules/KiwiGui/KiwiGraphics/KiwiPath.hpp"/>
+          <FILE id="O7XNeN" name="KiwiPoint.cpp" compile="1" resource="0" file="../Modules/KiwiGui/KiwiGraphics/KiwiPoint.cpp"/>
+          <FILE id="jUKtFc" name="KiwiPoint.hpp" compile="0" resource="0" file="../Modules/KiwiGui/KiwiGraphics/KiwiPoint.hpp"/>
+        </GROUP>
+        <GROUP id="{EAB5FDE8-288D-B49F-328B-D88DE6547CF4}" name="KiwiView">
+          <FILE id="je6NVi" name="KiwiView.cpp" compile="1" resource="0" file="../Modules/KiwiGui/KiwiView/KiwiView.cpp"/>
+          <FILE id="XKItb8" name="KiwiView.hpp" compile="0" resource="0" file="../Modules/KiwiGui/KiwiView/KiwiView.hpp"/>
+          <FILE id="UXDkIc" name="KiwiViewManager.cpp" compile="1" resource="0"
+                file="../Modules/KiwiGui/KiwiView/KiwiViewManager.cpp"/>
+          <FILE id="nciiez" name="KiwiViewManager.hpp" compile="0" resource="0"
+                file="../Modules/KiwiGui/KiwiView/KiwiViewManager.hpp"/>
+        </GROUP>
       </GROUP>
       <GROUP id="{376DD321-D631-7853-E7CD-124C62FC3BC4}" name="KiwiModel">
         <FILE id="cr3Yvu" name="KiwiModel.hpp" compile="0" resource="0" file="../Modules/KiwiModel/KiwiModel.hpp"/>

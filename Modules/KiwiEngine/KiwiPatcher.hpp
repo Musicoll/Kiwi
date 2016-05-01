@@ -28,6 +28,8 @@
 
 #include "flip/DocumentObserver.h"
 
+#include <KiwiGui/KiwiView/KiwiViewManager.hpp>
+
 namespace kiwi
 {
     namespace engine
@@ -38,7 +40,7 @@ namespace kiwi
         
         //! @brief The Patcher manages object and link controllers.
         //! @details The patcher engine observes the Patcher mode for changes.
-        class Patcher : public flip::DocumentObserver<model::Patcher>
+        class Patcher : public gui::ViewManager, public flip::DocumentObserver<model::Patcher>
         {
         public:
             
@@ -84,6 +86,9 @@ namespace kiwi
             // Rebouger et refaire
             //! @brief Send a message to an object
             void sendToObject(Object& object, uint32_t inlet, std::vector<Atom> args);
+            
+            //----------- ViewManager
+            void receive(gui::View& view, gui::MouseEvent const& e) override;
             
         private:
             

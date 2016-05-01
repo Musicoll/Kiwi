@@ -21,23 +21,28 @@
  ==============================================================================
  */
 
-#ifndef KIWI_JPATCHER_HPP_INCLUDED
-#define KIWI_JPATCHER_HPP_INCLUDED
+#ifndef KIWI_JUCE_VIEW_HPP_INCLUDED
+#define KIWI_JUCE_VIEW_HPP_INCLUDED
 
-#include <KiwiModel/KiwiPatcher.hpp>
 #include <KiwiGui/KiwiView/KiwiView.hpp>
 
-#include "jView.hpp"
+#include "../JuceLibraryCode/JuceHeader.h"
 
 namespace kiwi
 {
+    // ================================================================================ //
+    //                                      jVIEW                                       //
+    // ================================================================================ //
+    
     //! @brief The juce Patcher Component.
-    class jPatcher : public jView
+    class jView : public gui::View, public juce::Component
     {
     public:
+        jView();
+        ~jView();
         
-        jPatcher(model::Patcher& patcher_model);
-        ~jPatcher();
+        // gui::View
+        void redraw() override;
         
         // juce::Component
         void paint(juce::Graphics& g) override;
@@ -49,9 +54,7 @@ namespace kiwi
         void mouseDoubleClick(juce::MouseEvent const& event) override;
         
     private:
-        
-        model::Patcher& m_model;
     };
 }
 
-#endif // KIWI_JPATCHER_HPP_INCLUDED
+#endif // KIWI_JUCE_VIEW_HPP_INCLUDED

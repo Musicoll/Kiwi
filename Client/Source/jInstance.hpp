@@ -35,7 +35,7 @@ namespace kiwi
     class jWindow;
     
     //! @brief The main DocumentObserver.
-    //! @details The jInstance dispatchs changes to other DocumentObserver objects
+    //! @details The jInstance dispatch changes to other DocumentObserver objects
     class jInstance : public flip::DocumentObserver<model::Patcher>
     {
     public:
