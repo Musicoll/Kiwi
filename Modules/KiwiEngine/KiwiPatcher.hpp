@@ -26,10 +26,7 @@
 
 #include "KiwiLink.hpp"
 
-#include "flip/Document.h"
 #include "flip/DocumentObserver.h"
-#include "flip/History.h"
-#include "flip/HistoryStoreMemory.h"
 
 namespace kiwi
 {
@@ -84,61 +81,14 @@ namespace kiwi
             //! @brief Returns the objects.
             std::vector<engine::Link const*> getLinks() const;
             
-            //! @brief Begins a new transaction
-            //! @details Each call to this function must be followed by a call to endTransaction.
-            //! @param label The label of the current transaction.
-            //! @see endTransaction
-            void beginTransaction(std::string const& label);
-            
-            //! @brief Ends a transaction
-            //! @details Each call to this function must be preceded by a call to beginTransaction.
-            //! @see beginTransaction
-            void endTransaction();
-            
-            //! @brief Undo the last transaction and optionally commit
-            void undo(const bool commit = false);
-            
-            //! @brief Redo the next transaction and optionally commit
-            void redo(const bool commit = false);
-            
             // Rebouger et refaire
             //! @brief Send a message to an object
             void sendToObject(Object& object, uint32_t inlet, std::vector<Atom> args);
             
-            class Listener
-            {
-            public:
-                Listener(Patcher &patcher);
-                
-                virtual void patcherChanged() = 0;
-                
-                virtual ~Listener();
-            protected:
-                Patcher &m_patcher;
-            };
-            
-            //! @brief Add a listener to the patcher
-            void addListener(Listener *listener);
-            
-            //! @brief Remove a listener from the patcher
-            void removeListener(Listener *listener);
-            
         private:
-            
-            //! @brief Get the Patcher model
-            inline model::Patcher& getModel() { return m_document.root<model::Patcher>(); }
-            
-            //! @brief Get the Patcher model
-            inline model::Patcher const& getModel() const { return m_document.root<model::Patcher>(); }
-            
-            //! @brief Notify the listeners that the patcher has changed
-            void notify();
             
             //! @internal flip::DocumentObserver<model::Patcher>::document_changed
             void document_changed(model::Patcher& patcher) final;
-            
-            //! @internal for debugging purpose.
-            void debug_document(model::Patcher& patcher);
             
             //! @internal Object has just been added to the document.
             void objectHasBeenAdded(model::Object& object);
@@ -160,14 +110,10 @@ namespace kiwi
             
             // -----------------------------
             
-            Instance&                     m_instance;
+            friend class Instance; // for document_changed access
             
-            std::set<Patcher::Listener*>  m_listeners;
-            
-            flip::Document  m_document;
-            flip::History
-            <flip::HistoryStoreMemory>
-                            m_history;
+            Instance&                       m_instance;
+            model::Patcher*                 m_model;
         };
     }
 }

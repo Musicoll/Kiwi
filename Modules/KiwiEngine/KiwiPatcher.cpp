@@ -33,11 +33,7 @@ namespace kiwi
         //                                      PATCHER                                     //
         // ================================================================================ //
         
-        //Patcher::Patcher(sInstance instance, PatcherModel& model) noexcept : m_instance(instance), m_model(model)
-        Patcher::Patcher(Instance& instance) noexcept :
-        m_instance(instance),
-        m_document(model::Model::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
-        m_history(m_document)
+        Patcher::Patcher(Instance& instance) noexcept : m_instance(instance)
         {
             ;
         }
@@ -49,33 +45,33 @@ namespace kiwi
         
         void Patcher::addPlus()
         {
-            getModel().addPlus();
+            m_model->addPlus();
         }
         
         void Patcher::addPrint()
         {
-            getModel().addPrint();
+            m_model->addPrint();
         }
         
         void Patcher::addLink(Object const& from, const uint32_t outlet, Object const& to, const uint32_t inlet)
         {
-            getModel().addLink(from.m_model, outlet, to.m_model, inlet);
+            m_model->addLink(from.m_model, outlet, to.m_model, inlet);
         }
         
         void Patcher::removeObject(Object const& object)
         {
-            getModel().removeObject(object.m_model);
+            m_model->removeObject(object.m_model);
         }
         
         void Patcher::removeLink(Link const& link)
         {
-            getModel().removeLink(link.m_model);
+            m_model->removeLink(link.m_model);
         }
         
         std::vector<engine::Object const*> Patcher::getObjects() const
         {
             std::vector<engine::Object const*> objects;
-            for(auto& obj : getModel().getObjects())
+            for(auto& obj : m_model->getObjects())
             {
                 if(obj.resident())
                 {
@@ -90,7 +86,7 @@ namespace kiwi
         std::vector<engine::Object*> Patcher::getObjects()
         {
             std::vector<engine::Object*> objects;
-            for(auto& obj : getModel().getObjects())
+            for(auto& obj : m_model->getObjects())
             {
                 if(obj.resident())
                 {
@@ -105,7 +101,7 @@ namespace kiwi
         std::vector<engine::Link const*> Patcher::getLinks() const
         {
             std::vector<engine::Link const*> links;
-            for(auto& link : getModel().getLinks())
+            for(auto& link : m_model->getLinks())
             {
                 if(link.resident())
                 {
@@ -123,100 +119,15 @@ namespace kiwi
         }
         
         // ================================================================================ //
-        //                              PATCHER LISTENER                                    //
-        // ================================================================================ //
-        
-        Patcher::Listener::Listener(Patcher &patcher):m_patcher(patcher)
-        {
-            m_patcher.addListener(this);
-            
-        };
-        
-        Patcher::Listener::~Listener()
-        {
-            m_patcher.removeListener(this);
-        }
-        
-        void Patcher::addListener(Patcher::Listener * listener)
-        {
-            m_listeners.insert(listener);
-        }
-        
-        void Patcher::removeListener(Patcher::Listener * listener)
-        {
-            m_listeners.erase(listener);
-        }
-        
-        void Patcher::notify()
-        {
-            for (auto listener : m_listeners)
-            {
-                listener->patcherChanged();
-            }
-        }
-        
-        // ================================================================================ //
-        //                              DOCUMENT TRANSACTIONS                               //
-        // ================================================================================ //
-        
-        void Patcher::beginTransaction(std::string const& label)
-        {
-            m_document.set_label(label);
-            std::cout << "* " << label << '\n';
-        }
-        
-        void Patcher::endTransaction()
-        {
-            auto tx = m_document.commit();
-            m_history.add_undo_step(tx);
-        }
-        
-        void Patcher::undo(const bool commit)
-        {
-            const auto last_undo = m_history.last_undo();
-            
-            if(last_undo != m_history.end())
-            {
-                std::cout << "* " << "Undo \"" << last_undo->label() << "\"\n";
-                m_history.execute_undo();
-                if(commit)
-                {
-                    m_document.commit();
-                }
-            }
-            else
-            {
-                std::cout << "* Undo impossible\n";
-            }
-        }
-        
-        void Patcher::redo(const bool commit)
-        {
-            const auto first_redo = m_history.first_redo();
-            
-            if(first_redo != m_history.end())
-            {
-                std::cout << "* " << "Redo \"" << first_redo->label() << "\"\n";
-                m_history.execute_redo();
-                
-                if(commit)
-                {
-                    m_document.commit();
-                }
-            }
-            else
-            {
-                std::cout << "* Redo impossible\n";
-            }
-        }
-        
-        // ================================================================================ //
         //                                  DOCUMENT OBSERVER                               //
         // ================================================================================ //
         
         void Patcher::document_changed(model::Patcher& patcher)
         {
-            debug_document(patcher);
+            if(patcher.added())
+            {
+                m_model = &patcher;
+            }
             
             if(patcher.changed())
             {
@@ -276,7 +187,10 @@ namespace kiwi
                 }
             }
             
-            notify();
+            if(patcher.removed())
+            {
+                m_model = nullptr;
+            }
         }
 
         void Patcher::objectHasBeenAdded(model::Object& object)
@@ -353,81 +267,6 @@ namespace kiwi
             engine::Object* from = link.getSenderObject().entity().use<engine::Object*>();
             from->removeOutputLink(&link_engine);
             link.entity().erase<Link>();
-        }
-        
-        // ================================================================================ //
-        //                                  PATCHER DEBUG                                   //
-        // ================================================================================ //
-        
-        void Patcher::debug_document(model::Patcher& patcher)
-        {
-            if(!m_instance.isInDebugMode()) return;
-            
-            const auto indent = [](const int level)
-            {
-                if(level >= 1) for(int i = 0; i < level; ++i) std::cout << "  |---";
-            };
-            
-            std::cout << "  Patcher changed :" << '\n';
-            
-            //if(patcher.getObjects().changed())
-            if(true)
-            {
-                const auto objs_change_status_str = (patcher.objectsChanged() ? "changed" : "no change");
-                indent(1);
-                std::cout << "- Objects : (" << objs_change_status_str << ")\n";
-                
-                auto const& objects = patcher.getObjects();
-                
-                for(const auto& obj : objects)
-                {
-                    const auto change_status_str = (obj.changed() ? "changed" : "no change");
-                    indent(2);
-                    std::cout << "- object \"" << obj.getName() << "\" (" << change_status_str << ")\n";
-                    
-                    const auto status_str = (obj.resident() ? "resident" : (obj.added() ? "added" : "removed"));
-                    
-                    indent(3); std::cout << "- status : " << status_str << '\n';
-                    
-                    indent(3); std::cout << "- n°inlet : " << obj.getNumberOfInlets() << '\n';
-                    indent(3); std::cout << "- n°outlet : " << obj.getNumberOfOutlets() << '\n';
-                }
-            }
-            
-            //if(patcher.getLinks().changed())
-            if(true)
-            {
-                const auto links_change_status_str = (patcher.linksChanged() ? "changed" : "no change");
-                indent(1);
-                std::cout << "- Links : (" << links_change_status_str << ")\n";
-                
-                auto const& links = patcher.getLinks();
-                
-                for(const auto& link : links)
-                {
-                    const auto change_status_str = (link.changed() ? "changed" : "no change");
-                    
-                    indent(2);
-                    std::cout << "- link " << "(" << change_status_str << ")\n";
-                    
-                    const auto status_str = (link.resident() ? "resident" : (link.added() ? "added" : "removed"));
-                    
-                    indent(3); std::cout << "- status : " << status_str << '\n';
-                    
-                    auto const& from = link.getSenderObject();
-                    auto const& to = link.getReceiverObject();
-                    
-                    indent(3); std::cout << "- from object : \""
-                    << from.getName() << "\" ("
-                    << link.getSenderIndex() << ")" << '\n';
-                    
-                    indent(3); std::cout << "- to object : \""
-                    << to.getName() << "\" ("
-                    << link.getReceiverIndex() << ")" << '\n';
-                }
-            }
-            
-            std::cout << "- - - - - - - - - - - - - - - - - - -\n";
         }
     }
 }

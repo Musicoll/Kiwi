@@ -34,15 +34,14 @@ namespace kiwi
         //                                      INSTANCE                                    //
         // ================================================================================ //
         
-        class Instance
+        class Instance : public flip::DocumentObserver<model::Patcher>
         {
         public:
             
-            //! @brief Creates and returns an Instance.
+            //! @brief Constructor.
             //! @param user_id The user ID.
             //! @param name The instance name.
-            //! @return A new instance.
-            static std::unique_ptr<Instance> create(uint64_t user_id, std::string const& name);
+            Instance(uint64_t user_id, std::string const& name) noexcept;
             
             //! @brief Destructor.
             ~Instance();
@@ -53,43 +52,13 @@ namespace kiwi
             //! @brief Get the user ID of the Instance.
             inline uint64_t getUserId() const noexcept          { return m_user_id; }
             
-            //! @brief Set debug mode.
-            inline void setDebug(bool active_debug) noexcept    { m_debug = active_debug; }
-            
-            //! @brief Set debug mode.
-            inline bool isInDebugMode() const noexcept          { return m_debug; }
-            
-            //! @brief Creates and adds a new patcher to the Instance.
-            //! @return A reference to the created Patcher.
-            //! @see removePatcher, getPatchers
-            Patcher& createPatcher();
-            
-            //! @brief Removes a patcher from the Instance.
-            //! @param patcher The patcher to remove.
-            //! @see createPatcher, getPatchers
-            void removePatcher(Patcher* patcher);
-            
-            //! @brief Get the patchers of the Instance.
-            //! @return A vector of patchers.
-            //! @see createPatcher, removePatcher
-            std::vector<std::unique_ptr<Patcher>> const& getPatchers();
+            //! @internal flip::DocumentObserver<model::Patcher>::document_changed
+            void document_changed(model::Patcher& patcher) final;
             
         private:
             
-            //! @internal Constructor.
-            Instance(uint64_t user_id, std::string const& name) noexcept;
-            
             const uint64_t          m_user_id;
             const std::string       m_name;
-            
-            std::vector<std::unique_ptr<Patcher>>
-                                    m_patchers;
-            
-            static bool             m_declared_flag;
-            
-            bool                    m_debug;
-            
-            static void declare();
         };
     }
 }

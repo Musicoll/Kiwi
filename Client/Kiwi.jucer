@@ -6,7 +6,10 @@
               companyEmail="cicm.mshparisnord@gmail.com">
   <MAINGROUP id="HfN8up" name="Kiwi">
     <GROUP id="{E476D5A0-2E9D-DD18-D007-54A51ACF9459}" name="Application">
-      <FILE id="wfKKwK" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      <FILE id="Jmu5NJ" name="jInstance.cpp" compile="1" resource="0" file="Source/jInstance.cpp"/>
+      <FILE id="dfUOAd" name="jInstance.hpp" compile="0" resource="0" file="Source/jInstance.hpp"/>
+      <FILE id="Je1Viq" name="Application.cpp" compile="1" resource="0" file="Source/Application.cpp"/>
+      <FILE id="gEGUnW" name="Application.hpp" compile="0" resource="0" file="Source/Application.hpp"/>
     </GROUP>
     <GROUP id="{8FA1C9D1-9F39-6B48-4CD5-95C1B98E14A6}" name="Modules">
       <GROUP id="{BE538FC5-8082-DC84-062F-90CBBF6F2E7D}" name="KiwiGui">
@@ -22,6 +25,15 @@
         <GROUP id="{EAB5FDE8-288D-B49F-328B-D88DE6547CF4}" name="KiwiView"/>
       </GROUP>
       <GROUP id="{4E36069F-186B-8CE4-3264-BA41957CB0CD}" name="KiwiEngine">
+        <FILE id="jL96qu" name="KiwiEngine.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiEngine.hpp"/>
+        <FILE id="eHddVd" name="KiwiDocumentManager.cpp" compile="1" resource="0"
+              file="../Modules/KiwiEngine/KiwiDocumentManager.cpp"/>
+        <FILE id="Nc2HAm" name="KiwiDocumentManager.hpp" compile="0" resource="0"
+              file="../Modules/KiwiEngine/KiwiDocumentManager.hpp"/>
+        <FILE id="m2CfHk" name="KiwiObject.cpp" compile="1" resource="0" file="../Modules/KiwiEngine/KiwiObject.cpp"/>
+        <FILE id="vQkAvN" name="KiwiObject.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiObject.hpp"/>
+        <FILE id="v3qHXh" name="KiwiLink.cpp" compile="1" resource="0" file="../Modules/KiwiEngine/KiwiLink.cpp"/>
+        <FILE id="xNca6o" name="KiwiLink.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiLink.hpp"/>
         <GROUP id="{19F465CD-4650-5103-BEB4-187B108FDBE8}" name="Objects">
           <FILE id="Ze0HXq" name="KiwiObjectPlus.hpp" compile="0" resource="0"
                 file="../Modules/KiwiEngine/Objects/KiwiObjectPlus.hpp"/>
@@ -29,17 +41,12 @@
                 file="../Modules/KiwiEngine/Objects/KiwiObjectPrint.hpp"/>
           <FILE id="mdW09F" name="KiwiObjects.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/Objects/KiwiObjects.hpp"/>
         </GROUP>
-        <FILE id="jL96qu" name="KiwiEngine.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiEngine.hpp"/>
+        <FILE id="I5TUoZ" name="KiwiPatcher.cpp" compile="1" resource="0" file="../Modules/KiwiEngine/KiwiPatcher.cpp"/>
+        <FILE id="pPUuGj" name="KiwiPatcher.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiPatcher.hpp"/>
         <FILE id="nqlKRd" name="KiwiInstance.cpp" compile="1" resource="0"
               file="../Modules/KiwiEngine/KiwiInstance.cpp"/>
         <FILE id="nQWL7d" name="KiwiInstance.hpp" compile="0" resource="0"
               file="../Modules/KiwiEngine/KiwiInstance.hpp"/>
-        <FILE id="v3qHXh" name="KiwiLink.cpp" compile="1" resource="0" file="../Modules/KiwiEngine/KiwiLink.cpp"/>
-        <FILE id="xNca6o" name="KiwiLink.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiLink.hpp"/>
-        <FILE id="m2CfHk" name="KiwiObject.cpp" compile="1" resource="0" file="../Modules/KiwiEngine/KiwiObject.cpp"/>
-        <FILE id="vQkAvN" name="KiwiObject.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiObject.hpp"/>
-        <FILE id="I5TUoZ" name="KiwiPatcher.cpp" compile="1" resource="0" file="../Modules/KiwiEngine/KiwiPatcher.cpp"/>
-        <FILE id="pPUuGj" name="KiwiPatcher.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiPatcher.hpp"/>
       </GROUP>
       <GROUP id="{376DD321-D631-7853-E7CD-124C62FC3BC4}" name="KiwiModel">
         <GROUP id="{F56C6760-A887-FA55-9679-441F9458784C}" name="Objects">
@@ -317,11 +324,11 @@
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.10 SDK" osxArchitecture="default"
                        isDebug="1" optimisation="1" targetName="Kiwi" headerPath="../../../ThirdParty/flip-public/include&#10;../../../Modules"
-                       defines="" cppLanguageStandard="c++11" cppLibType="libc++" customXcodeFlags="USE_HEADERMAP=NO"
+                       defines="" cppLanguageStandard="c++11" cppLibType="libc++" customXcodeFlags="USE_HEADERMAP=NO, GCC_SYMBOLS_PRIVATE_EXTERN=DEFAULT"
                        libraryPath="../../../ThirdParty/flip-public/bin"/>
         <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="default" osxArchitecture="default"
                        isDebug="0" optimisation="3" targetName="Kiwi" headerPath="../../../ThirdParty/flip-public/include&#10;../../../Modules"
-                       defines="" cppLanguageStandard="c++11" cppLibType="libc++" customXcodeFlags="USE_HEADERMAP=NO"
+                       defines="" cppLanguageStandard="c++11" cppLibType="libc++" customXcodeFlags="USE_HEADERMAP=NO, GCC_SYMBOLS_PRIVATE_EXTERN=DEFAULT"
                        libraryPath="../../../ThirdParty/flip-public/bin"/>
       </CONFIGURATIONS>
       <MODULEPATHS>

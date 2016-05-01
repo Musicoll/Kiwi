@@ -24,7 +24,7 @@
 #ifndef KIWI_MODEL_OBJECT_HPP_INCLUDED
 #define KIWI_MODEL_OBJECT_HPP_INCLUDED
 
-#include "../KiwiCore/KiwiAtom.hpp"
+#include <KiwiCore/KiwiAtom.hpp>
 #include <mutex>
 #include <algorithm>
 
