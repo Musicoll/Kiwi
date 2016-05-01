@@ -6,6 +6,10 @@
               companyEmail="cicm.mshparisnord@gmail.com">
   <MAINGROUP id="HfN8up" name="Kiwi">
     <GROUP id="{E476D5A0-2E9D-DD18-D007-54A51ACF9459}" name="Application">
+      <FILE id="KxD69I" name="jPatcher.cpp" compile="1" resource="0" file="Source/jPatcher.cpp"/>
+      <FILE id="KQjSU2" name="jPatcher.hpp" compile="0" resource="0" file="Source/jPatcher.hpp"/>
+      <FILE id="QMh5qc" name="jWindow.cpp" compile="1" resource="0" file="Source/jWindow.cpp"/>
+      <FILE id="dmcYQZ" name="jWindow.hpp" compile="0" resource="0" file="Source/jWindow.hpp"/>
       <FILE id="Jmu5NJ" name="jInstance.cpp" compile="1" resource="0" file="Source/jInstance.cpp"/>
       <FILE id="dfUOAd" name="jInstance.hpp" compile="0" resource="0" file="Source/jInstance.hpp"/>
       <FILE id="Je1Viq" name="Application.cpp" compile="1" resource="0" file="Source/Application.cpp"/>
@@ -49,6 +53,11 @@
               file="../Modules/KiwiEngine/KiwiInstance.hpp"/>
       </GROUP>
       <GROUP id="{376DD321-D631-7853-E7CD-124C62FC3BC4}" name="KiwiModel">
+        <FILE id="cr3Yvu" name="KiwiModel.hpp" compile="0" resource="0" file="../Modules/KiwiModel/KiwiModel.hpp"/>
+        <FILE id="kEinH2" name="KiwiObject.cpp" compile="1" resource="0" file="../Modules/KiwiModel/KiwiObject.cpp"/>
+        <FILE id="axstoL" name="KiwiObject.hpp" compile="0" resource="0" file="../Modules/KiwiModel/KiwiObject.hpp"/>
+        <FILE id="j95wIT" name="KiwiLink.cpp" compile="1" resource="0" file="../Modules/KiwiModel/KiwiLink.cpp"/>
+        <FILE id="A6aXHc" name="KiwiLink.hpp" compile="0" resource="0" file="../Modules/KiwiModel/KiwiLink.hpp"/>
         <GROUP id="{F56C6760-A887-FA55-9679-441F9458784C}" name="Objects">
           <FILE id="zGZHD5" name="KiwiObjectPlus.hpp" compile="0" resource="0"
                 file="../Modules/KiwiModel/Objects/KiwiObjectPlus.hpp"/>
@@ -56,11 +65,6 @@
                 file="../Modules/KiwiModel/Objects/KiwiObjectPrint.hpp"/>
           <FILE id="sUorTp" name="KiwiObjects.hpp" compile="0" resource="0" file="../Modules/KiwiModel/Objects/KiwiObjects.hpp"/>
         </GROUP>
-        <FILE id="j95wIT" name="KiwiLink.cpp" compile="1" resource="0" file="../Modules/KiwiModel/KiwiLink.cpp"/>
-        <FILE id="A6aXHc" name="KiwiLink.hpp" compile="0" resource="0" file="../Modules/KiwiModel/KiwiLink.hpp"/>
-        <FILE id="cr3Yvu" name="KiwiModel.hpp" compile="0" resource="0" file="../Modules/KiwiModel/KiwiModel.hpp"/>
-        <FILE id="kEinH2" name="KiwiObject.cpp" compile="1" resource="0" file="../Modules/KiwiModel/KiwiObject.cpp"/>
-        <FILE id="axstoL" name="KiwiObject.hpp" compile="0" resource="0" file="../Modules/KiwiModel/KiwiObject.hpp"/>
         <FILE id="IHkOOO" name="KiwiPatcher.cpp" compile="1" resource="0" file="../Modules/KiwiModel/KiwiPatcher.cpp"/>
         <FILE id="oRYb04" name="KiwiPatcher.hpp" compile="0" resource="0" file="../Modules/KiwiModel/KiwiPatcher.hpp"/>
       </GROUP>

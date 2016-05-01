@@ -21,9 +21,10 @@
  ==============================================================================
  */
 
-#include "jInstance.hpp"
-
 #include <KiwiEngine/KiwiDocumentManager.hpp>
+
+#include "jInstance.hpp"
+#include "jPatcher.hpp"
 
 namespace kiwi
 {
@@ -35,17 +36,25 @@ namespace kiwi
     jInstance::~jInstance()
     {
         m_documents.clear();
+        m_windows.clear();
     }
     
     void jInstance::newPatcherDocument()
     {
-        auto it = m_documents.emplace(m_documents.end(),
+        auto doc_it = m_documents.emplace(m_documents.end(),
                                       std::make_unique<flip::Document>
                                       (model::Model::use(), *this, m_instance->getUserId(), 'cicm', 'kpat'));
         
-        auto& document = *it->get();
+        auto& document = *doc_it->get();
         document.commit();
         document.push();
+
+        auto window_it = m_windows.emplace(m_windows.end(), std::make_unique<jWindow>());
+        
+        auto& window = *window_it->get();
+        
+        auto& patcher_model = document.root<model::Patcher>();
+        window.setContentOwned(new jPatcher(patcher_model), true);
     }
     
     void jInstance::document_changed(model::Patcher& patcher)

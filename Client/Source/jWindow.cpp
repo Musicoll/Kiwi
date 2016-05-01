@@ -21,39 +21,27 @@
  ==============================================================================
  */
 
-#ifndef KIWI_JINSTANCE_HPP_INCLUDED
-#define KIWI_JINSTANCE_HPP_INCLUDED
-
-#include <KiwiEngine/KiwiInstance.hpp>
-
-#include "flip/Document.h"
-
 #include "jWindow.hpp"
 
 namespace kiwi
 {
-    class jWindow;
-    
-    //! @brief The main DocumentObserver.
-    //! @details The jInstance dispatchs changes to other DocumentObserver objects
-    class jInstance : public flip::DocumentObserver<model::Patcher>
+    jWindow::jWindow() :
+    juce::DocumentWindow("Untitled Patcher", juce::Colours::lightgrey, juce::DocumentWindow::allButtons, true)
     {
-    public:
-        jInstance();
-        ~jInstance();
-        
-        void newPatcherDocument();
-        
-    private:
-        
-        //! @internal flip::DocumentObserver<model::Patcher>::document_changed
-        void document_changed(model::Patcher& patcher) final;
-        
-        std::unique_ptr<engine::Instance>               m_instance;
-        
-        std::vector<std::unique_ptr<flip::Document>>    m_documents;
-        std::vector<std::unique_ptr<jWindow>>           m_windows;
-    };
+        setUsingNativeTitleBar(true);
+        setSize(600, 500);
+        centreWithSize(getWidth(), getHeight());
+        setResizable(true, true);
+        setVisible(true);
+    }
+    
+    jWindow::~jWindow()
+    {
+        ;
+    }
+    
+    void jWindow::closeButtonPressed()
+    {
+        juce::JUCEApplication::quit();
+    }
 }
-
-#endif // KIWI_JINSTANCE_HPP_INCLUDED

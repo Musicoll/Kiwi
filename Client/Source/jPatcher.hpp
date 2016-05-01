@@ -21,39 +21,35 @@
  ==============================================================================
  */
 
-#ifndef KIWI_JINSTANCE_HPP_INCLUDED
-#define KIWI_JINSTANCE_HPP_INCLUDED
+#ifndef KIWI_JPATCHER_HPP_INCLUDED
+#define KIWI_JPATCHER_HPP_INCLUDED
 
-#include <KiwiEngine/KiwiInstance.hpp>
+#include <KiwiModel/KiwiPatcher.hpp>
 
-#include "flip/Document.h"
-
-#include "jWindow.hpp"
+#include "../JuceLibraryCode/JuceHeader.h"
 
 namespace kiwi
 {
-    class jWindow;
-    
-    //! @brief The main DocumentObserver.
-    //! @details The jInstance dispatchs changes to other DocumentObserver objects
-    class jInstance : public flip::DocumentObserver<model::Patcher>
+    //! @brief The juce Patcher Component.
+    class jPatcher : public juce::Component
     {
     public:
-        jInstance();
-        ~jInstance();
+        jPatcher(model::Patcher& patcher_model);
+        ~jPatcher();
         
-        void newPatcherDocument();
+        // juce::Component
+        void paint(juce::Graphics& g) override;
+        void resized() override;
+
+        void mouseDown(juce::MouseEvent const& event) override;
+        void mouseDrag(juce::MouseEvent const& event) override;
+        void mouseUp(juce::MouseEvent const& event) override;
+        void mouseDoubleClick(juce::MouseEvent const& event) override;
         
     private:
         
-        //! @internal flip::DocumentObserver<model::Patcher>::document_changed
-        void document_changed(model::Patcher& patcher) final;
-        
-        std::unique_ptr<engine::Instance>               m_instance;
-        
-        std::vector<std::unique_ptr<flip::Document>>    m_documents;
-        std::vector<std::unique_ptr<jWindow>>           m_windows;
+        model::Patcher& m_model;
     };
 }
 
-#endif // KIWI_JINSTANCE_HPP_INCLUDED
+#endif // KIWI_JPATCHER_HPP_INCLUDED

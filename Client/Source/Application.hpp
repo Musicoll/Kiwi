@@ -21,11 +21,10 @@
  ==============================================================================
  */
 
-#include <KiwiEngine/KiwiEngine.hpp>
+#ifndef KIWI_APPLICATION_HPP_INCLUDED
+#define KIWI_APPLICATION_HPP_INCLUDED
 
 #include "jInstance.hpp"
-
-#include "../JuceLibraryCode/JuceHeader.h"
 
 namespace kiwi
 {
@@ -54,3 +53,5 @@ namespace kiwi
     // This macro generates the main() routine that launches the app.
     START_JUCE_APPLICATION (KiwiApplication)
 }
+
+#endif // KIWI_APPLICATION_HPP_INCLUDED
