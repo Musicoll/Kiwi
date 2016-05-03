@@ -123,25 +123,17 @@ namespace kiwi
         
         void Patcher::addView()
         {
-            m_views.emplace(*this);
+            m_view.reset(*this);
         }
         
-        void Patcher::removeView(View const& view)
+        void Patcher::removeView()
         {
-            auto it = m_views.find_if([&view](View const& patcher_view) {
-                return (&view == &patcher_view);
-            });
-            
-            if(it != m_views.end())
-            {
-                m_views.erase(it);
-            }
+            m_view.reset(flip::None());
         }
         
-        Patcher::View& Patcher::getFirstView()
+        Patcher::View& Patcher::getView()
         {
-            assert(m_views.begin() != m_views.end());
-            return *m_views.begin();
+            return m_view;
         }
         
         flip::Array<model::Object>::const_iterator Patcher::findObject(model::Object const& object) const

@@ -35,8 +35,9 @@ namespace kiwi
     
     jInstance::~jInstance()
     {
-        m_documents.clear();
+        m_patcher_views.clear();
         m_windows.clear();
+        m_documents.clear();
     }
     
     void jInstance::newPatcherDocument()
@@ -63,12 +64,15 @@ namespace kiwi
             return;
         }
         
-        if(patcher.viewChanged())
+        
+        if(patcher.hasView() && patcher.viewChanged())
         {
-            patcherViewChanged(patcher.getFirstView());
+            patcherViewChanged(patcher.getView());
         }
         
+        
         m_instance->document_changed(patcher);
+        
         
         if(patcher.removed())
         {
@@ -83,7 +87,10 @@ namespace kiwi
             auto window_it = m_windows.emplace(m_windows.end(), std::make_unique<jWindow>());
             
             auto& window = *window_it->get();
-            window.setContentOwned(new jPatcher(patcher_view), true);
+            
+            auto pview_it = m_patcher_views.emplace(m_patcher_views.end(), std::make_unique<jPatcher>(patcher_view));
+            
+            window.setContentNonOwned(pview_it->get(), true);
         }
         
         if(patcher_view.removed())

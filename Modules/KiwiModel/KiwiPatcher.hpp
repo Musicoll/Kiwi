@@ -24,6 +24,7 @@
 #ifndef KIWI_MODEL_PATCHER_HPP_INCLUDED
 #define KIWI_MODEL_PATCHER_HPP_INCLUDED
 
+#include "flip/Optional.h"
 #include "Objects/KiwiObjects.hpp"
 
 namespace kiwi
@@ -116,11 +117,13 @@ namespace kiwi
             
             void addView();
             
-            void removeView(View const& view);
+            void removeView();
             
-            View& getFirstView();
+            View& getView();
             
-            bool viewChanged() const noexcept { return m_views.changed(); }
+            bool viewChanged() const noexcept { return m_view.changed(); }
+            
+            bool hasView() const noexcept { return ! m_view.empty(); }
             
         private:
             
@@ -137,8 +140,7 @@ namespace kiwi
             flip::Array<model::Object>   m_objects;
             flip::Array<model::Link>     m_links;
             
-            flip::Collection<View>      m_views;
-            //flip::Collection<Client>     m_clients;
+            flip::Optional<View>         m_view;
         };
         
         // ================================================================================ //
@@ -153,118 +155,23 @@ namespace kiwi
             View(model::Patcher& patcher) : m_patcher(&patcher) {}
             ~View() = default;
             
-        public:
-            
-            struct Object : public flip::Object
-            {
-                Object() = default;
-                Object(model::Object& object) : m_ref(&object) {}
-                flip::ObjectRef<model::Object> m_ref;
-            };
-            
-            struct Link : public flip::Object
-            {
-                Link() = default;
-                Link(model::Link& link) : m_ref(&link) {}
-                flip::ObjectRef<model::Link> m_ref;
-            };
-            
-            // ================================================================================ //
-            //                                   SELECTION                                      //
-            // ================================================================================ //
-            
-            class Selection : public flip::Object
-            {
-            public:
-                
-                //! @brief Default constructor.
-                Selection() = default;
-                
-                //! @brief Destructor.
-                ~Selection()
-                {
-                    m_links.clear();
-                    m_objects.clear();
-                }
-                
-                std::vector<model::Object*> getObjects();
-                std::vector<model::Link*> getLinks();
-                bool isSelected(model::Object const& object);
-                bool isSelected(model::Link const& link);
-                
-            private:
-                flip::Collection<View::Object>  m_objects;
-                flip::Collection<View::Link>    m_links;
-                friend Patcher::View;
-            };
+            model::Patcher& getPatcher() {return *m_patcher;}
             
         public:
-            
-            void unSelectAll()
-            {
-                m_selection.m_links.clear();
-                m_selection.m_objects.clear();
-            }
-            
-            void selectAll()
-            {
-                unSelectAll();
-                
-                for(auto& object : m_patcher.value()->getObjects())
-                {
-                    m_selection.m_objects.emplace(object);
-                }
-                
-                for(auto& link : m_patcher.value()->getLinks())
-                {
-                    m_selection.m_links.emplace(link);
-                }
-            }
             
             template<class TModel>
             static void declare()
             {
                 assert(! TModel::template has<Patcher::View>());
                 
-                TModel::template declare<Patcher::View::Object>()
-                .name("cicm&.kiwi.Patcher.View.Object")
-                .template member<flip::ObjectRef<model::Object>, &View::Object::m_ref> ("ref");
-                
-                TModel::template declare<Patcher::View::Link>()
-                .name("cicm.kiwi.Patcher.View.Link")
-                .template member<flip::ObjectRef<model::Link>, &View::Link::m_ref> ("ref");
-                
-                TModel::template declare<Patcher::View::Selection>()
-                .name("cicm.kiwi.Patcher.View.Selection")
-                .template member<flip::Collection<View::Object>, &Selection::m_objects> ("objects")
-                .template member<flip::Collection<View::Link>, &Selection::m_links> ("links");
-                
                 TModel::template declare<Patcher::View>()
                 .name("cicm.kiwi.Patcher.View")
-                .template member<flip::ObjectRef<Patcher>, &View::m_patcher> ("patcher")
-                .template member<View::Selection, &View::m_selection> ("selection");
+                .template member<flip::ObjectRef<Patcher>, &View::m_patcher> ("patcher");
             }
             
         private:
             
-            flip::ObjectRef<Patcher>    m_patcher;
-            Selection                   m_selection;
-        };
-        
-        // ================================================================================ //
-        //                                 PATCHER CLIENT                                   //
-        // ================================================================================ //
-        
-        class Patcher::Client : public flip::Object
-        {
-        public:
-            Client() = default;
-            ~Client() = default;
-            
-        private:
-            
-            flip::Collection<Patcher::View> m_views;
-            friend Patcher;
+            flip::ObjectRef<Patcher> m_patcher;
         };
         
         // ================================================================================ //
@@ -277,17 +184,12 @@ namespace kiwi
             assert(! TModel::template has<Patcher>());
             
             Patcher::View::declare<TModel>();
-            
-            TModel::template declare<Patcher::Client>()
-            .name("cicm.kiwi.Patcher.Client")
-            .template member<flip::Collection<Patcher::View>, &Patcher::Client::m_views> ("views");
-            
+
             TModel::template declare<Patcher>()
             .name("cicm.kiwi.Patcher")
             .template member<flip::Array<model::Object>, &Patcher::m_objects> ("objects")
             .template member<flip::Array<model::Link>, &Patcher::m_links> ("links")
-            .template member<flip::Collection<Patcher::View>, &Patcher::m_views> ("views");
-            //.template member<flip::Collection<Patcher::Client>, &Patcher::m_clients> ("clients");
+            .template member<flip::Optional<Patcher::View>, &Patcher::m_view> ("view");
         }
     }
 }

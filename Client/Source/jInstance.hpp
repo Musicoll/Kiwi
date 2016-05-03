@@ -29,11 +29,10 @@
 #include "flip/Document.h"
 
 #include "jWindow.hpp"
+#include "jPatcher.hpp"
 
 namespace kiwi
 {
-    class jWindow;
-    
     //! @brief The main DocumentObserver.
     //! @details The jInstance dispatch changes to other DocumentObserver objects
     class jInstance : public flip::DocumentObserver<model::Patcher>
@@ -55,7 +54,7 @@ namespace kiwi
         
         std::vector<std::unique_ptr<flip::Document>>    m_documents;
         std::vector<std::unique_ptr<jWindow>>           m_windows;
-        //std::vector<std::unique_ptr<jPatcher>>           m_ptcher_views;
+        std::vector<std::unique_ptr<jPatcher>>          m_patcher_views;
     };
 }
 
