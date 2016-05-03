@@ -25,14 +25,13 @@
 #define KIWI_JPATCHER_HPP_INCLUDED
 
 #include <KiwiModel/KiwiPatcher.hpp>
-#include <KiwiGui/KiwiView/KiwiView.hpp>
 
-#include "jView.hpp"
+#include "../JuceLibraryCode/JuceHeader.h"
 
 namespace kiwi
 {
     //! @brief The juce Patcher Component.
-    class jPatcher : public jView
+    class jPatcher : public juce::Component
     {
     public:
         

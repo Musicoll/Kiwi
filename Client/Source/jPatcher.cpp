@@ -22,7 +22,6 @@
  */
 
 #include "jPatcher.hpp"
-#include "jMouseEvent.hpp"
 
 namespace kiwi
 {
@@ -66,7 +65,7 @@ namespace kiwi
     
     void jPatcher::mouseDown(juce::MouseEvent const& e)
     {
-        receive(jMouseEvent(gui::MouseEvent::Type::Down, e));
+        ;
     }
     
     void jPatcher::mouseDrag(juce::MouseEvent const& event)
