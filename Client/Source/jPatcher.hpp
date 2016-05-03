@@ -36,8 +36,10 @@ namespace kiwi
     {
     public:
         
-        jPatcher(model::Patcher& patcher_model);
+        jPatcher(model::Patcher::View& patcher_model);
         ~jPatcher();
+        
+        //patcherViewChanged()
         
         // juce::Component
         void paint(juce::Graphics& g) override;
@@ -50,7 +52,7 @@ namespace kiwi
         
     private:
         
-        model::Patcher& m_model;
+        model::Patcher::View& m_model;
     };
 }
 

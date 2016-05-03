@@ -121,6 +121,29 @@ namespace kiwi
             }
         }
         
+        void Patcher::addView()
+        {
+            m_views.emplace(*this);
+        }
+        
+        void Patcher::removeView(View const& view)
+        {
+            auto it = m_views.find_if([&view](View const& patcher_view) {
+                return (&view == &patcher_view);
+            });
+            
+            if(it != m_views.end())
+            {
+                m_views.erase(it);
+            }
+        }
+        
+        Patcher::View& Patcher::getFirstView()
+        {
+            assert(m_views.begin() != m_views.end());
+            return *m_views.begin();
+        }
+        
         flip::Array<model::Object>::const_iterator Patcher::findObject(model::Object const& object) const
         {
             const auto find_it = [&object](model::Object const& object_model)

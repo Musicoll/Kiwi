@@ -26,7 +26,7 @@
 
 namespace kiwi
 {
-    jPatcher::jPatcher(model::Patcher& patcher_model) : m_model(patcher_model)
+    jPatcher::jPatcher(model::Patcher::View& patcher_model) : m_model(patcher_model)
     {
         setSize(600, 400);
     }
@@ -66,8 +66,7 @@ namespace kiwi
     
     void jPatcher::mouseDown(juce::MouseEvent const& e)
     {
-        auto event = jMouseEvent(gui::MouseEvent::Type::Down, e);
-        //receive(jMouseEvent(gui::MouseEvent::Type::Down, e));
+        receive(jMouseEvent(gui::MouseEvent::Type::Down, e));
     }
     
     void jPatcher::mouseDrag(juce::MouseEvent const& event)

@@ -46,15 +46,11 @@ namespace kiwi
                                       (model::Model::use(), *this, m_instance->getUserId(), 'cicm', 'kpat'));
         
         auto& document = *doc_it->get();
+        auto& patcher = document.root<model::Patcher>();
+        patcher.addView();
+        
         document.commit();
         document.push();
-
-        auto window_it = m_windows.emplace(m_windows.end(), std::make_unique<jWindow>());
-        
-        auto& window = *window_it->get();
-        
-        auto& patcher_model = document.root<model::Patcher>();
-        window.setContentOwned(new jPatcher(patcher_model), true);
     }
     
     void jInstance::document_changed(model::Patcher& patcher)
@@ -63,6 +59,13 @@ namespace kiwi
         if(patcher.added())
         {
             patcher.entity().emplace<engine::DocumentManager>(patcher.document());
+            m_instance->document_changed(patcher);
+            return;
+        }
+        
+        if(patcher.viewChanged())
+        {
+            patcherViewChanged(patcher.getFirstView());
         }
         
         m_instance->document_changed(patcher);
@@ -70,6 +73,22 @@ namespace kiwi
         if(patcher.removed())
         {
             patcher.entity().erase<engine::DocumentManager>();
+        }
+    }
+    
+    void jInstance::patcherViewChanged(model::Patcher::View& patcher_view)
+    {
+        if(patcher_view.added())
+        {
+            auto window_it = m_windows.emplace(m_windows.end(), std::make_unique<jWindow>());
+            
+            auto& window = *window_it->get();
+            window.setContentOwned(new jPatcher(patcher_view), true);
+        }
+        
+        if(patcher_view.removed())
+        {
+            // remove Window
         }
     }
 }
