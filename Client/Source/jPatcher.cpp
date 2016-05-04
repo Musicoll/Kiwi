@@ -76,13 +76,13 @@ namespace kiwi
     {
         std::cout << "jPatcher ---> object has been added" << '\n';
         
-        auto& jobj = m_model->entity().emplace<jObject>();
+        auto& jobj = object.entity().emplace<jObject>();
         addAndMakeVisible(jobj);
     }
     
     void jPatcher::objectChanged(model::Object& object)
     {
-        auto& jobject = m_model->entity().use<jObject>();
+        auto& jobject = object.entity().use<jObject>();
         jobject.document_changed(object);
     }
     
@@ -90,10 +90,10 @@ namespace kiwi
     {
         std::cout << "jPatcher ---> object will be removed" << '\n';
         
-        auto& jobj = m_model->entity().use<jObject>();
+        auto& jobj = object.entity().use<jObject>();
         removeChildComponent(&jobj);
         
-        m_model->entity().erase<jObject>();
+        object.entity().erase<jObject>();
     }
     
     void jPatcher::paint(juce::Graphics & g)
