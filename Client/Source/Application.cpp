@@ -28,7 +28,7 @@ namespace kiwi
     void KiwiApplication::initialise(String const& commandLine)
     {
         m_instance = std::make_unique<jInstance>();
-        m_instance->newPatcherDocument();
+        m_instance->newPatcher();
     }
     
     void KiwiApplication::shutdown()

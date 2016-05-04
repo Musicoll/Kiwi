@@ -39,10 +39,7 @@ namespace kiwi
         class Patcher : public flip::Object
         {
         public:
-            
-            class Client;
-            class View;
-            
+                        
             //! @brief Default constructor.
             Patcher();
             
@@ -115,16 +112,6 @@ namespace kiwi
             //! @brief Returns true if a Link has been added, removed or changed.
             inline bool linksChanged() const noexcept   { return m_links.changed(); }
             
-            void addView();
-            
-            void removeView();
-            
-            View& getView();
-            
-            bool viewChanged() const noexcept { return m_view.changed(); }
-            
-            bool hasView() const noexcept { return ! m_view.empty(); }
-            
         private:
             
             bool canConnect(model::Object const& from, const uint32_t outlet,
@@ -139,39 +126,6 @@ namespace kiwi
             //! objects and links are stored in a flip::Array to maintain a graphical z-order.
             flip::Array<model::Object>   m_objects;
             flip::Array<model::Link>     m_links;
-            
-            flip::Optional<View>         m_view;
-        };
-        
-        // ================================================================================ //
-        //                                   PATCHER VIEW                                   //
-        // ================================================================================ //
-        
-        class Patcher::View : public flip::Object
-        {
-        public:
-            
-            View() = default;
-            View(model::Patcher& patcher) : m_patcher(&patcher) {}
-            ~View() = default;
-            
-            model::Patcher& getPatcher() {return *m_patcher;}
-            
-        public:
-            
-            template<class TModel>
-            static void declare()
-            {
-                assert(! TModel::template has<Patcher::View>());
-                
-                TModel::template declare<Patcher::View>()
-                .name("cicm.kiwi.Patcher.View")
-                .template member<flip::ObjectRef<Patcher>, &View::m_patcher> ("patcher");
-            }
-            
-        private:
-            
-            flip::ObjectRef<Patcher> m_patcher;
         };
         
         // ================================================================================ //
@@ -182,14 +136,11 @@ namespace kiwi
         void Patcher::declare()
         {
             assert(! TModel::template has<Patcher>());
-            
-            Patcher::View::declare<TModel>();
 
             TModel::template declare<Patcher>()
             .name("cicm.kiwi.Patcher")
             .template member<flip::Array<model::Object>, &Patcher::m_objects> ("objects")
-            .template member<flip::Array<model::Link>, &Patcher::m_links> ("links")
-            .template member<flip::Optional<Patcher::View>, &Patcher::m_view> ("view");
+            .template member<flip::Array<model::Link>, &Patcher::m_links> ("links");
         }
     }
 }

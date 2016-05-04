@@ -41,20 +41,15 @@ namespace kiwi
         jInstance();
         ~jInstance();
         
-        void newPatcherDocument();
+        void newPatcher();
         
     private:
         
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
-        void document_changed(model::Patcher& patcher) final;
+        void document_changed(model::Patcher& patcher) override final;
         
-        void patcherViewChanged(model::Patcher::View& patcher_view);
-        
-        std::unique_ptr<engine::Instance>               m_instance;
-        
-        std::vector<std::unique_ptr<flip::Document>>    m_documents;
-        std::vector<std::unique_ptr<jWindow>>           m_windows;
-        std::vector<std::unique_ptr<jPatcher>>          m_patcher_views;
+        std::unique_ptr<engine::Instance>   m_instance;
+        std::unique_ptr<flip::Document>     m_document;
     };
 }
 

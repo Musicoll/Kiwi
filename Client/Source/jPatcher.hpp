@@ -26,32 +26,37 @@
 
 #include <KiwiModel/KiwiPatcher.hpp>
 
+#include "flip/DocumentObserver.h"
+
 #include "../JuceLibraryCode/JuceHeader.h"
 
 namespace kiwi
 {
     //! @brief The juce Patcher Component.
-    class jPatcher : public juce::Component
+    class jPatcher : public juce::Component, public flip::DocumentObserver<model::Patcher>
     {
     public:
         
-        jPatcher(model::Patcher::View& patcher_model);
+        jPatcher();
         ~jPatcher();
         
-        //patcherViewChanged()
+        //! @internal flip::DocumentObserver<model::Patcher>::document_changed
+        void document_changed(model::Patcher& patcher) override final;
         
         // juce::Component
         void paint(juce::Graphics& g) override;
-        void resized() override;
-
         void mouseDown(juce::MouseEvent const& event) override;
-        void mouseDrag(juce::MouseEvent const& event) override;
-        void mouseUp(juce::MouseEvent const& event) override;
-        void mouseDoubleClick(juce::MouseEvent const& event) override;
         
     private:
         
-        model::Patcher::View& m_model;
+        void leftClick(juce::MouseEvent const& event);
+        void rightClick(juce::MouseEvent const& event);
+        
+        void objectHasBeenAdded(model::Object& object);
+        void objectChanged(model::Object& /*object*/);
+        void objectWillBeRemoved(model::Object& object);
+        
+        model::Patcher* m_model;
     };
 }
 

@@ -21,11 +21,13 @@
  ==============================================================================
  */
 
+#include <KiwiEngine/KiwiDocumentManager.hpp>
+
 #include "jPatcher.hpp"
 
 namespace kiwi
 {
-    jPatcher::jPatcher(model::Patcher::View& patcher_model) : m_model(patcher_model)
+    jPatcher::jPatcher()
     {
         setSize(600, 400);
     }
@@ -33,6 +35,56 @@ namespace kiwi
     jPatcher::~jPatcher()
     {
         ;
+    }
+    
+    void jPatcher::document_changed(model::Patcher& patcher)
+    {
+        if(patcher.added())
+        {
+            m_model = &patcher;
+        }
+        
+        if(patcher.objectsChanged())
+        {
+            for(auto& object : patcher.getObjects())
+            {
+                if(object.changed())
+                {
+                    if(object.added())
+                    {
+                        objectHasBeenAdded(object);
+                    }
+                    else if(object.removed())
+                    {
+                        objectWillBeRemoved(object);
+                    }
+                    else // resident
+                    {
+                        objectChanged(object);
+                    }
+                }
+            }
+        }
+        
+        if(patcher.removed())
+        {
+            m_model = nullptr;
+        }
+    }
+    
+    void jPatcher::objectHasBeenAdded(model::Object& object)
+    {
+        std::cout << "jPatcher ---> object has been added" << '\n';
+    }
+    
+    void jPatcher::objectChanged(model::Object& /*object*/)
+    {
+        
+    }
+    
+    void jPatcher::objectWillBeRemoved(model::Object& object)
+    {
+        std::cout << "jPatcher ---> object will be removed" << '\n';
     }
     
     void jPatcher::paint(juce::Graphics & g)
@@ -58,28 +110,53 @@ namespace kiwi
         }
     }
     
-    void jPatcher::resized()
+    void jPatcher::mouseDown(juce::MouseEvent const& event)
+    {
+        if(event.mods.isLeftButtonDown())
+        {
+            leftClick(event);
+        }
+        else if(event.mods.isRightButtonDown())
+        {
+            rightClick(event);
+        }
+    }
+    
+    void jPatcher::leftClick(juce::MouseEvent const& event)
     {
         ;
     }
-    
-    void jPatcher::mouseDown(juce::MouseEvent const& e)
+
+    void jPatcher::rightClick(juce::MouseEvent const& event)
     {
-        ;
-    }
-    
-    void jPatcher::mouseDrag(juce::MouseEvent const& event)
-    {
-        ;
-    }
-    
-    void jPatcher::mouseUp(juce::MouseEvent const& event)
-    {
-        ;
-    }
-    
-    void jPatcher::mouseDoubleClick(juce::MouseEvent const& event)
-    {
-        ;
+        assert(m_model != nullptr);
+        
+        auto& patcher = *m_model;
+
+        juce::PopupMenu m;
+        m.addItem(1, "Add Plus (1)");
+        m.addItem(2, "Add Print");
+        m.addSeparator();
+
+        auto r = m.show();
+        
+        switch(r)
+        {
+            case 1:
+            {
+                patcher.addPlus();
+                engine::DocumentManager::commit(patcher, "Add Plus Object");
+                break;
+            }
+                
+            case 2:
+            {
+                patcher.addPrint();
+                engine::DocumentManager::commit(patcher, "Add Print Object");
+                break;
+            }
+                
+            default:break;
+        }
     }
 }

@@ -35,23 +35,15 @@ namespace kiwi
     
     jInstance::~jInstance()
     {
-        m_patcher_views.clear();
-        m_windows.clear();
-        m_documents.clear();
+        m_document.reset();
     }
     
-    void jInstance::newPatcherDocument()
+    void jInstance::newPatcher()
     {
-        auto doc_it = m_documents.emplace(m_documents.end(),
-                                      std::make_unique<flip::Document>
-                                      (model::Model::use(), *this, m_instance->getUserId(), 'cicm', 'kpat'));
+        m_document = std::make_unique<flip::Document> (model::Model::use(), *this, m_instance->getUserId(), 'cicm', 'kpat');
         
-        auto& document = *doc_it->get();
-        auto& patcher = document.root<model::Patcher>();
-        patcher.addView();
-        
-        document.commit();
-        document.push();
+        m_document->commit();
+        m_document->push();
     }
     
     void jInstance::document_changed(model::Patcher& patcher)
@@ -60,42 +52,26 @@ namespace kiwi
         if(patcher.added())
         {
             patcher.entity().emplace<engine::DocumentManager>(patcher.document());
-            m_instance->document_changed(patcher);
-            return;
+            
+            auto& window = patcher.entity().emplace<jWindow>();
+            auto& jpatcher = patcher.entity().emplace<jPatcher>();
+            window.setContentNonOwned(&jpatcher, true);
         }
         
-        
-        if(patcher.hasView() && patcher.viewChanged())
-        {
-            patcherViewChanged(patcher.getView());
-        }
+        // Notify jPatcher
+        auto& jpatcher = patcher.entity().use<jPatcher>();
+        jpatcher.document_changed(patcher);
         
         
+        // Notify Engine
         m_instance->document_changed(patcher);
-        
         
         if(patcher.removed())
         {
+            patcher.entity().erase<jPatcher>();
+            patcher.entity().erase<jWindow>();
+            
             patcher.entity().erase<engine::DocumentManager>();
-        }
-    }
-    
-    void jInstance::patcherViewChanged(model::Patcher::View& patcher_view)
-    {
-        if(patcher_view.added())
-        {
-            auto window_it = m_windows.emplace(m_windows.end(), std::make_unique<jWindow>());
-            
-            auto& window = *window_it->get();
-            
-            auto pview_it = m_patcher_views.emplace(m_patcher_views.end(), std::make_unique<jPatcher>(patcher_view));
-            
-            window.setContentNonOwned(pview_it->get(), true);
-        }
-        
-        if(patcher_view.removed())
-        {
-            // remove Window
         }
     }
 }
