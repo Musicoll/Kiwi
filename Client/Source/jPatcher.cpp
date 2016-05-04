@@ -24,6 +24,7 @@
 #include <KiwiEngine/KiwiDocumentManager.hpp>
 
 #include "jPatcher.hpp"
+#include "jObject.hpp"
 
 namespace kiwi
 {
@@ -54,13 +55,12 @@ namespace kiwi
                     {
                         objectHasBeenAdded(object);
                     }
-                    else if(object.removed())
+                    
+                    objectChanged(object);
+                    
+                    if(object.removed())
                     {
                         objectWillBeRemoved(object);
-                    }
-                    else // resident
-                    {
-                        objectChanged(object);
                     }
                 }
             }
@@ -75,16 +75,25 @@ namespace kiwi
     void jPatcher::objectHasBeenAdded(model::Object& object)
     {
         std::cout << "jPatcher ---> object has been added" << '\n';
+        
+        auto& jobj = m_model->entity().emplace<jObject>();
+        addAndMakeVisible(jobj);
     }
     
-    void jPatcher::objectChanged(model::Object& /*object*/)
+    void jPatcher::objectChanged(model::Object& object)
     {
-        
+        auto& jobject = m_model->entity().use<jObject>();
+        jobject.document_changed(object);
     }
     
     void jPatcher::objectWillBeRemoved(model::Object& object)
     {
         std::cout << "jPatcher ---> object will be removed" << '\n';
+        
+        auto& jobj = m_model->entity().use<jObject>();
+        removeChildComponent(&jobj);
+        
+        m_model->entity().erase<jObject>();
     }
     
     void jPatcher::paint(juce::Graphics & g)
@@ -144,19 +153,21 @@ namespace kiwi
         {
             case 1:
             {
-                patcher.addPlus();
+                auto& obj = patcher.addPlus();
+                obj.setPosition(event.x, event.y);
                 engine::DocumentManager::commit(patcher, "Add Plus Object");
                 break;
             }
                 
             case 2:
             {
-                patcher.addPrint();
+                auto& obj = patcher.addPrint();
+                obj.setPosition(event.getMouseDownX(), event.getMouseDownY());
                 engine::DocumentManager::commit(patcher, "Add Print Object");
                 break;
             }
                 
-            default:break;
+            default: break;
         }
     }
 }

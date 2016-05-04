@@ -73,7 +73,9 @@ namespace kiwi
                 .name("cicm.kiwi.Object")
                 .template member<flip::String, &Object::m_name>("name")
                 .template member<flip::Int, &Object::m_inlets>("inlets")
-                .template member<flip::Int, &Object::m_outlets>("outlets");
+                .template member<flip::Int, &Object::m_outlets>("outlets")
+                .template member<flip::Float, &Object::m_position_x>("pos_x")
+                .template member<flip::Float, &Object::m_position_y>("pos_y");
             }
             
             //! @brief Returns the name of the Object.
@@ -94,10 +96,32 @@ namespace kiwi
                 return static_cast<uint32_t>(m_outlets);
             }
             
+            //! @brief Set the x/y position.
+            void setPosition(double x, double y)
+            {
+                m_position_x = x;
+                m_position_y = y;
+            }
+            
+            //! @brief Returns true if the object's position changed.
+            bool positionChanged() const noexcept
+            {
+                return (m_position_x.changed() || m_position_y.changed());
+            }
+            
+            //! @brief Returns the x position.
+            double getX() const noexcept { return m_position_x; }
+            
+            //! @brief Returns the y position.
+            double getY() const noexcept { return m_position_y; }
+            
         private:
             flip::String    m_name;
             flip::Int       m_inlets;
             flip::Int       m_outlets;
+            
+            flip::Float     m_position_x;
+            flip::Float     m_position_y;
         };
     }
 }

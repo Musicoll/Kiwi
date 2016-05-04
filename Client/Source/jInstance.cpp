@@ -62,9 +62,9 @@ namespace kiwi
         auto& jpatcher = patcher.entity().use<jPatcher>();
         jpatcher.document_changed(patcher);
         
-        
         // Notify Engine
-        m_instance->document_changed(patcher);
+        //m_instance->document_changed(patcher);
+        int uncomment_engine;
         
         if(patcher.removed())
         {

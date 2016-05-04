@@ -80,10 +80,10 @@ namespace kiwi
             flip::Array<model::Link> const& getLinks() const noexcept    { return m_links; }
             
             //! @brief Creates and adds a "plus" object to the Patcher.
-            void addPlus();
+            model::Object& addPlus();
             
             //! @brief Creates and adds a "print" object to the Patcher.
-            void addPrint();
+            model::Object& addPrint();
             
             //! @brief Constructs and add a Link to the Patcher.
             //! @details Constructs a Link with given origin and destination Object
