@@ -47,6 +47,8 @@ namespace kiwi
         
     private:
         
+        void drawInletsOutlets(juce::Graphics & g);
+        
         model::Object* m_model;
     };
 }

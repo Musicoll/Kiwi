@@ -42,6 +42,12 @@ namespace kiwi
     {
         m_document = std::make_unique<flip::Document> (model::Model::use(), *this, m_instance->getUserId(), 'cicm', 'kpat');
         
+        model::Patcher& patcher = m_document->root<model::Patcher>();
+        auto& plus = patcher.addPlus();
+        plus.setPosition(100, 100);
+        auto& print = patcher.addPrint();
+        print.setPosition(100, 200);
+        
         m_document->commit();
         m_document->push();
     }

@@ -58,7 +58,7 @@ namespace kiwi
     
     void jObject::paint(juce::Graphics & g)
     {
-        auto bounds = g.getClipBounds();
+        auto bounds = getLocalBounds();
         
         g.setColour(juce::Colours::white);
         g.fillRect(bounds);
@@ -67,6 +67,52 @@ namespace kiwi
         g.drawRect(bounds);
         
         g.drawFittedText(m_model->getName(), bounds.reduced(5), juce::Justification::centredLeft, 1);
+        
+        drawInletsOutlets(g);
+    }
+    
+    void jObject::drawInletsOutlets(juce::Graphics & g)
+    {
+        const unsigned int io_width = 5;
+        const unsigned int io_height = 3;
+        const juce::Colour io_color(0.3, 0.3, 0.3);
+        const juce::Rectangle<int> bounds = getLocalBounds();
+        
+        const unsigned int ninlets = m_model->getNumberOfInlets();
+        const unsigned int noutlets = m_model->getNumberOfOutlets();
+
+        if(ninlets)
+        {
+            g.setColour(io_color);
+            g.fillRect(bounds.getX(), bounds.getY(), io_width, io_height);
+            
+            if(ninlets > 1)
+            {
+                const double ratio = (bounds.getWidth() - io_width) / (double)(ninlets - 1);
+                for(unsigned int i = 1; i < ninlets; ++i)
+                {
+                    g.fillRect(bounds.getX() + ratio * i, bounds.getY(), io_width, io_height);
+                }
+            }
+        }
+        
+        if(noutlets)
+        {
+            g.setColour(io_color);
+            g.fillRect(bounds.getX(), bounds.getY() + bounds.getHeight() - io_height, io_width, io_height);
+            
+            if(noutlets > 1)
+            {
+                const double ratio = (bounds.getWidth() - io_width) / (double)(noutlets - 1);
+                for(unsigned int i = 1; i < noutlets; --i)
+                {
+                    juce::Rectangle<int> outlet(bounds.getX() + ratio * i,
+                                                bounds.getY() + bounds.getHeight() - io_height,
+                                                io_width, io_height);
+                    g.fillRect(outlet);
+                }
+            }
+        }
     }
     
     void jObject::mouseDown(juce::MouseEvent const& event)
