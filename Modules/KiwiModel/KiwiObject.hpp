@@ -40,6 +40,7 @@
 #include "flip/Collection.h"
 #include "flip/Object.h"
 #include "flip/ObjectRef.h"
+#include "flip/Signal.h"
 
 namespace kiwi
 {
@@ -56,10 +57,13 @@ namespace kiwi
         public:
 
             //! @internal flip Default constructor
-            Object(flip::Default&) {}
+            Object(flip::Default&);
             
             //! @brief Constructor.
             Object(std::string const& name, const uint32_t inlets, const uint32_t outlets);
+            
+            //! @brief Copy constructor (needed for flip::Array)
+            Object(model::Object const&);
             
             //! @brief Destructor.
             virtual ~Object();
@@ -115,7 +119,15 @@ namespace kiwi
             //! @brief Returns the y position.
             double getY() const noexcept { return m_position_y; }
             
+            flip::Signal<>  signalTrigger;
+            
         private:
+            
+            enum SignalType
+            {
+                Trigger
+            };
+            
             flip::String    m_name;
             flip::Int       m_inlets;
             flip::Int       m_outlets;
