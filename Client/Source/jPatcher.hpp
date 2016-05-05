@@ -40,21 +40,35 @@ namespace kiwi
         jPatcher();
         ~jPatcher();
         
-        //! @internal flip::DocumentObserver<model::Patcher>::document_changed
-        void document_changed(model::Patcher& patcher) override final;
-        
         // juce::Component
         void paint(juce::Graphics& g) override;
         void mouseDown(juce::MouseEvent const& event) override;
+        
+        //! @internal flip::DocumentObserver<model::Patcher>::document_changed
+        void document_changed(model::Patcher& patcher) override final;
         
     private:
         
         void leftClick(juce::MouseEvent const& event);
         void rightClick(juce::MouseEvent const& event);
         
+        //! @internal Object has just been added to the document.
         void objectHasBeenAdded(model::Object& object);
-        void objectChanged(model::Object& /*object*/);
+        
+        //! @internal Object is resident and internal value changed.
+        void objectChanged(model::Object& object);
+        
+        //! @internal Object will be removed from the document.
         void objectWillBeRemoved(model::Object& object);
+        
+        //! @internal Link has just been added to the document.
+        void linkHasBeenAdded(model::Link& link);
+        
+        //! @internal Link is resident and internal value changed.
+        void linkChanged(model::Link& link);
+        
+        //! @internal Link will be removed from the document.
+        void linkWillBeRemoved(model::Link& link);
         
         model::Patcher* m_model;
     };

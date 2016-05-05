@@ -46,7 +46,9 @@ namespace kiwi
         auto& plus = patcher.addPlus();
         plus.setPosition(100, 100);
         auto& print = patcher.addPrint();
-        print.setPosition(100, 200);
+        print.setPosition(300, 300);
+        
+        patcher.addLink(plus, 0, print, 0);
         
         m_document->commit();
         m_document->push();
@@ -69,8 +71,7 @@ namespace kiwi
         jpatcher.document_changed(patcher);
         
         // Notify Engine
-        //m_instance->document_changed(patcher);
-        int uncomment_engine;
+        m_instance->document_changed(patcher);
         
         if(patcher.removed())
         {

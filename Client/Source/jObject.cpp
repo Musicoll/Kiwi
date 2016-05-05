@@ -115,6 +115,62 @@ namespace kiwi
         }
     }
     
+    juce::Point<int> jObject::getInletPatcherPosition(const size_t index) const
+    {
+        const unsigned int ninlets = m_model->getNumberOfInlets();
+        
+        juce::Rectangle<int> rect;
+        
+        if(ninlets > 0 && index < ninlets)
+        {
+            const unsigned int io_width = 5;
+            const unsigned int io_height = 3;
+            const juce::Rectangle<int> bounds = getLocalBounds();
+            
+            if(ninlets == 1 && index == 0)
+            {
+                rect.setBounds(bounds.getX(), bounds.getY(), io_width, io_height);
+            }
+            
+            if(ninlets > 1)
+            {
+                const double ratio = (bounds.getWidth() - io_width) / (double)(ninlets - 1);
+                rect.setBounds(bounds.getX() + ratio * index, bounds.getY(), io_width, io_height);
+            }
+        }
+        
+        return getPosition() + rect.getCentre();
+    }
+    
+    juce::Point<int> jObject::getOutletPatcherPosition(const size_t index) const
+    {
+        const unsigned int noutlets = m_model->getNumberOfOutlets();
+        
+        juce::Rectangle<int> rect;
+        
+        if(noutlets > 0 && index < noutlets)
+        {
+            const unsigned int io_width = 5;
+            const unsigned int io_height = 3;
+            const juce::Rectangle<int> bounds = getLocalBounds();
+            
+            if(noutlets == 1 && index == 0)
+            {
+                rect.setBounds(bounds.getX(), bounds.getY() + bounds.getHeight() - io_height, io_width, io_height);
+            }
+            
+            if(noutlets > 1)
+            {
+                const double ratio = (bounds.getWidth() - io_width) / (double)(noutlets - 1);
+                rect.setBounds(bounds.getX() + ratio * index,
+                               bounds.getY() + bounds.getHeight() - io_height,
+                               io_width, io_height);
+            }
+        }
+        
+        return getPosition() + rect.getCentre();
+    }
+    
     void jObject::mouseDown(juce::MouseEvent const& event)
     {
         // signal engine

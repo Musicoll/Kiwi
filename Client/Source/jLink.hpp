@@ -21,39 +21,37 @@
  ==============================================================================
  */
 
-#ifndef KIWI_JOBJECT_HPP_INCLUDED
-#define KIWI_JOBJECT_HPP_INCLUDED
+#ifndef KIWI_JLINK_HPP_INCLUDED
+#define KIWI_JLINK_HPP_INCLUDED
 
-#include <KiwiModel/KiwiObject.hpp>
+#include <KiwiModel/KiwiLink.hpp>
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "jObject.hpp"
 
 namespace kiwi
 {
-    //! @brief The juce object Component.
-    class jObject : public juce::Component
+    //! @brief The juce link Component.
+    class jLink : public juce::Component, juce::ComponentListener
     {
     public:
         
-        jObject();
-        ~jObject();
+        jLink();
+        ~jLink();
         
+        void document_changed(model::Link& link);
         void document_changed(model::Object& object);
         
         // juce::Component
         void paint(juce::Graphics& g) override;
-        void mouseDown(juce::MouseEvent const& event) override;
-        void mouseDrag(juce::MouseEvent const& event) override;
-        
-        juce::Point<int> getInletPatcherPosition(const size_t index) const;
-        juce::Point<int> getOutletPatcherPosition(const size_t index) const;
         
     private:
         
-        void drawInletsOutlets(juce::Graphics & g);
+        void updateBounds();
         
-        model::Object* m_model;
+        model::Link* m_model;
+        
+        juce::Point<int> m_last_inlet_pos, m_last_outlet_pos;
     };
 }
 
-#endif // KIWI_JOBJECT_HPP_INCLUDED
+#endif // KIWI_JLINK_HPP_INCLUDED

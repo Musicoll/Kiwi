@@ -8,6 +8,8 @@
     <GROUP id="{E476D5A0-2E9D-DD18-D007-54A51ACF9459}" name="Application">
       <FILE id="LWHJru" name="jObject.cpp" compile="1" resource="0" file="Source/jObject.cpp"/>
       <FILE id="YYSxJ8" name="jObject.hpp" compile="0" resource="0" file="Source/jObject.hpp"/>
+      <FILE id="KpZNMh" name="jLink.cpp" compile="1" resource="0" file="Source/jLink.cpp"/>
+      <FILE id="MRxCah" name="jLink.hpp" compile="0" resource="0" file="Source/jLink.hpp"/>
       <FILE id="KxD69I" name="jPatcher.cpp" compile="1" resource="0" file="Source/jPatcher.cpp"/>
       <FILE id="KQjSU2" name="jPatcher.hpp" compile="0" resource="0" file="Source/jPatcher.hpp"/>
       <FILE id="QMh5qc" name="jWindow.cpp" compile="1" resource="0" file="Source/jWindow.cpp"/>

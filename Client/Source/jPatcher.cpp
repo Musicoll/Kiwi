@@ -25,6 +25,7 @@
 
 #include "jPatcher.hpp"
 #include "jObject.hpp"
+#include "jLink.hpp"
 
 namespace kiwi
 {
@@ -36,64 +37,6 @@ namespace kiwi
     jPatcher::~jPatcher()
     {
         ;
-    }
-    
-    void jPatcher::document_changed(model::Patcher& patcher)
-    {
-        if(patcher.added())
-        {
-            m_model = &patcher;
-        }
-        
-        if(patcher.objectsChanged())
-        {
-            for(auto& object : patcher.getObjects())
-            {
-                if(object.changed())
-                {
-                    if(object.added())
-                    {
-                        objectHasBeenAdded(object);
-                    }
-                    
-                    objectChanged(object);
-                    
-                    if(object.removed())
-                    {
-                        objectWillBeRemoved(object);
-                    }
-                }
-            }
-        }
-        
-        if(patcher.removed())
-        {
-            m_model = nullptr;
-        }
-    }
-    
-    void jPatcher::objectHasBeenAdded(model::Object& object)
-    {
-        std::cout << "jPatcher ---> object has been added" << '\n';
-        
-        auto& jobj = object.entity().emplace<jObject>();
-        addAndMakeVisible(jobj);
-    }
-    
-    void jPatcher::objectChanged(model::Object& object)
-    {
-        auto& jobject = object.entity().use<jObject>();
-        jobject.document_changed(object);
-    }
-    
-    void jPatcher::objectWillBeRemoved(model::Object& object)
-    {
-        std::cout << "jPatcher ---> object will be removed" << '\n';
-        
-        auto& jobj = object.entity().use<jObject>();
-        removeChildComponent(&jobj);
-        
-        object.entity().erase<jObject>();
     }
     
     void jPatcher::paint(juce::Graphics & g)
@@ -169,5 +112,116 @@ namespace kiwi
                 
             default: break;
         }
+    }
+    
+    void jPatcher::document_changed(model::Patcher& patcher)
+    {
+        if(patcher.added())
+        {
+            m_model = &patcher;
+        }
+        
+        if(patcher.objectsChanged())
+        {
+            for(auto& object : patcher.getObjects())
+            {
+                if(object.changed())
+                {
+                    if(object.added())
+                    {
+                        objectHasBeenAdded(object);
+                    }
+                    
+                    objectChanged(object);
+                    
+                    if(object.removed())
+                    {
+                        objectWillBeRemoved(object);
+                    }
+                }
+            }
+        }
+        
+        if(patcher.linksChanged())
+        {
+            for(auto& link : patcher.getLinks())
+            {
+                if(link.changed())
+                {
+                    if(link.added())
+                    {
+                        linkHasBeenAdded(link);
+                    }
+                    
+                    linkChanged(link);
+                    
+                    if(patcher.objectsChanged())
+                    {
+                        for(auto& object : patcher.getObjects())
+                        {
+                            if(object.changed())
+                            {
+                                auto& jlink = link.entity().use<jLink>();
+                                jlink.document_changed(object);
+                            }
+                        }
+                    }
+                    
+                    if(link.removed())
+                    {
+                        linkWillBeRemoved(link);
+                    }
+                }
+            }
+        }
+        
+        if(patcher.removed())
+        {
+            m_model = nullptr;
+        }
+    }
+    
+    void jPatcher::objectHasBeenAdded(model::Object& object)
+    {
+        std::cout << "jPatcher ---> object has been added" << '\n';
+        
+        auto& jobj = object.entity().emplace<jObject>();
+        addAndMakeVisible(jobj);
+    }
+    
+    void jPatcher::objectChanged(model::Object& object)
+    {
+        auto& jobject = object.entity().use<jObject>();
+        jobject.document_changed(object);
+    }
+    
+    void jPatcher::objectWillBeRemoved(model::Object& object)
+    {
+        std::cout << "jPatcher ---> object will be removed" << '\n';
+        
+        auto& jobj = object.entity().use<jObject>();
+        removeChildComponent(&jobj);
+        
+        object.entity().erase<jObject>();
+    }
+    
+    void jPatcher::linkHasBeenAdded(model::Link& link)
+    {
+        auto& jlink = link.entity().emplace<jLink>();
+        addAndMakeVisible(jlink);
+    }
+    
+    void jPatcher::linkChanged(model::Link& link)
+    {
+        auto& jlink = link.entity().use<jLink>();
+        jlink.document_changed(link);
+    }
+    
+    void jPatcher::linkWillBeRemoved(model::Link& link)
+    {
+        auto& jlink = link.entity().use<jLink>();
+        removeChildComponent(&jlink);
+        
+        link.entity().erase<jLink>();
     }
 }
