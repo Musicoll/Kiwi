@@ -35,7 +35,7 @@ namespace kiwi
         KiwiApplication() = default;
         ~KiwiApplication() = default;
         
-        void initialise (String const& commandLine) override;
+        void initialise(String const& commandLine) override;
         
         void shutdown() override;
         
@@ -48,10 +48,8 @@ namespace kiwi
     private:
         std::unique_ptr<jInstance> m_instance;
     };
-    
-    //==============================================================================
-    // This macro generates the main() routine that launches the app.
-    START_JUCE_APPLICATION (KiwiApplication)
+
+    START_JUCE_APPLICATION(KiwiApplication)
 }
 
 #endif // KIWI_APPLICATION_HPP_INCLUDED

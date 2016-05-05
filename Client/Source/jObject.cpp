@@ -37,7 +37,7 @@ namespace kiwi
         ;
     }
     
-    void jObject::document_changed(model::Object& object)
+    void jObject::objectModelChanged(model::Object& object)
     {
         if(object.added())
         {

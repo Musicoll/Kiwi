@@ -38,14 +38,17 @@ namespace kiwi
         jObject();
         ~jObject();
         
-        void document_changed(model::Object& object);
+        void objectModelChanged(model::Object& object);
         
         // juce::Component
         void paint(juce::Graphics& g) override;
         void mouseDown(juce::MouseEvent const& event) override;
         void mouseDrag(juce::MouseEvent const& event) override;
         
+        //! @brief Returns the inlet position relative to the parent jPatcher component for a given index.
         juce::Point<int> getInletPatcherPosition(const size_t index) const;
+        
+        //! @brief Returns the outlet position relative to the parent jPatcher component for a given index.
         juce::Point<int> getOutletPatcherPosition(const size_t index) const;
         
     private:

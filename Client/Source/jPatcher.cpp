@@ -129,14 +129,14 @@ namespace kiwi
                 {
                     if(object.added())
                     {
-                        objectHasBeenAdded(object);
+                        objectModelAdded(object);
                     }
                     
-                    objectChanged(object);
+                    objectModelChanged(object);
                     
                     if(object.removed())
                     {
-                        objectWillBeRemoved(object);
+                        objectModelRemoved(object);
                     }
                 }
             }
@@ -150,10 +150,10 @@ namespace kiwi
                 {
                     if(link.added())
                     {
-                        linkHasBeenAdded(link);
+                        linkModelAdded(link);
                     }
                     
-                    linkChanged(link);
+                    linkModelChanged(link);
                     
                     if(patcher.objectsChanged())
                     {
@@ -162,14 +162,14 @@ namespace kiwi
                             if(object.changed())
                             {
                                 auto& jlink = link.entity().use<jLink>();
-                                jlink.document_changed(object);
+                                jlink.objectModelChanged(object);
                             }
                         }
                     }
                     
                     if(link.removed())
                     {
-                        linkWillBeRemoved(link);
+                        linkModelRemoved(link);
                     }
                 }
             }
@@ -181,19 +181,19 @@ namespace kiwi
         }
     }
     
-    void jPatcher::objectHasBeenAdded(model::Object& object)
+    void jPatcher::objectModelAdded(model::Object& object)
     {
         auto& jobj = object.entity().emplace<jObject>();
         addAndMakeVisible(jobj);
     }
     
-    void jPatcher::objectChanged(model::Object& object)
+    void jPatcher::objectModelChanged(model::Object& object)
     {
         auto& jobject = object.entity().use<jObject>();
-        jobject.document_changed(object);
+        jobject.objectModelChanged(object);
     }
     
-    void jPatcher::objectWillBeRemoved(model::Object& object)
+    void jPatcher::objectModelRemoved(model::Object& object)
     {
         auto& jobj = object.entity().use<jObject>();
         removeChildComponent(&jobj);
@@ -201,19 +201,19 @@ namespace kiwi
         object.entity().erase<jObject>();
     }
     
-    void jPatcher::linkHasBeenAdded(model::Link& link)
+    void jPatcher::linkModelAdded(model::Link& link)
     {
         auto& jlink = link.entity().emplace<jLink>();
         addAndMakeVisible(jlink);
     }
     
-    void jPatcher::linkChanged(model::Link& link)
+    void jPatcher::linkModelChanged(model::Link& link)
     {
         auto& jlink = link.entity().use<jLink>();
-        jlink.document_changed(link);
+        jlink.linkModelChanged(link);
     }
     
-    void jPatcher::linkWillBeRemoved(model::Link& link)
+    void jPatcher::linkModelRemoved(model::Link& link)
     {
         auto& jlink = link.entity().use<jLink>();
         removeChildComponent(&jlink);

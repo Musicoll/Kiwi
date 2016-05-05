@@ -55,10 +55,7 @@ namespace kiwi
         class Object : public flip::Object
         {
         public:
-
-            //! @internal flip Default constructor
-            Object(flip::Default&);
-            
+ 
             //! @brief Constructor.
             Object(std::string const& name, const uint32_t inlets, const uint32_t outlets);
             
@@ -67,20 +64,6 @@ namespace kiwi
             
             //! @brief Destructor.
             virtual ~Object();
-            
-            //! @internal flip static declare method
-            template<class TModel> static void declare()
-            {
-                if(TModel::template has<model::Object>()) return;
-                
-                TModel::template declare<model::Object>()
-                .name("cicm.kiwi.Object")
-                .template member<flip::String, &Object::m_name>("name")
-                .template member<flip::Int, &Object::m_inlets>("inlets")
-                .template member<flip::Int, &Object::m_outlets>("outlets")
-                .template member<flip::Float, &Object::m_position_x>("pos_x")
-                .template member<flip::Float, &Object::m_position_y>("pos_y");
-            }
             
             //! @brief Returns the name of the Object.
             //! @return The name of the Object.
@@ -119,14 +102,21 @@ namespace kiwi
             //! @brief Returns the y position.
             double getY() const noexcept { return m_position_y; }
             
-            flip::Signal<>  signalTrigger;
+            //! @brief Call signalTrigger() to hmmm.. trigger the signal.
+            flip::Signal<> signalTrigger;
+            
+        public:
+            
+            //! @internal flip Default constructor
+            Object(flip::Default&);
+            
+            //! @internal flip static declare method
+            template<class TModel> static void declare();
             
         private:
             
-            enum SignalType
-            {
-                Trigger
-            };
+            //! @brief Signal types
+            enum SignalType { Trigger };
             
             flip::String    m_name;
             flip::Int       m_inlets;
@@ -135,6 +125,24 @@ namespace kiwi
             flip::Float     m_position_x;
             flip::Float     m_position_y;
         };
+        
+        // ================================================================================ //
+        //                                  OBJECT::declare                                 //
+        // ================================================================================ //
+        
+        template<class TModel>
+        void Object::declare()
+        {
+            if(TModel::template has<model::Object>()) return;
+            
+            TModel::template declare<model::Object>()
+            .name("cicm.kiwi.Object")
+            .template member<flip::String, &Object::m_name>("name")
+            .template member<flip::Int, &Object::m_inlets>("inlets")
+            .template member<flip::Int, &Object::m_outlets>("outlets")
+            .template member<flip::Float, &Object::m_position_x>("pos_x")
+            .template member<flip::Float, &Object::m_position_y>("pos_y");
+        }
     }
 }
 

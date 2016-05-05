@@ -218,9 +218,10 @@ namespace kiwi
             }
         }
 
-        void Patcher::objectChanged(model::Object& /*object*/)
+        void Patcher::objectChanged(model::Object& object_m)
         {
-            
+            auto& object_e = object_m.entity().use<engine::Object>();
+            object_e.modelChanged(object_m);
         }
 
         void Patcher::objectWillBeRemoved(model::Object& object)
@@ -256,9 +257,10 @@ namespace kiwi
             }
         }
         
-        void Patcher::linkChanged(model::Link& /*link*/)
+        void Patcher::linkChanged(model::Link& link_m)
         {
-            ;
+            auto& link_e = link_m.entity().use<engine::Link>();
+            link_e.modelChanged(link_m);
         }
         
         void Patcher::linkWillBeRemoved(model::Link& link)

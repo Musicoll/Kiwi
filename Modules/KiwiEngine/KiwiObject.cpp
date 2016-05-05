@@ -84,6 +84,19 @@ namespace kiwi
             }
         }
         
+        void Object::modelChanged(model::Object& object_m)
+        {
+            if(object_m.added())
+            {
+                ;
+            }
+            
+            if(object_m.added())
+            {
+                ;
+            }
+        }
+        
         void Object::internal_signalTriggerCalled()
         {
             signalTriggerCalled();

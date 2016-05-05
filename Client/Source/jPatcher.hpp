@@ -53,22 +53,22 @@ namespace kiwi
         void rightClick(juce::MouseEvent const& event);
         
         //! @internal Object has just been added to the document.
-        void objectHasBeenAdded(model::Object& object);
+        void objectModelAdded(model::Object& object);
         
         //! @internal Object is resident and internal value changed.
-        void objectChanged(model::Object& object);
+        void objectModelChanged(model::Object& object);
         
         //! @internal Object will be removed from the document.
-        void objectWillBeRemoved(model::Object& object);
+        void objectModelRemoved(model::Object& object);
         
         //! @internal Link has just been added to the document.
-        void linkHasBeenAdded(model::Link& link);
+        void linkModelAdded(model::Link& link);
         
         //! @internal Link is resident and internal value changed.
-        void linkChanged(model::Link& link);
+        void linkModelChanged(model::Link& link);
         
         //! @internal Link will be removed from the document.
-        void linkWillBeRemoved(model::Link& link);
+        void linkModelRemoved(model::Link& link);
         
         model::Patcher* m_model;
     };

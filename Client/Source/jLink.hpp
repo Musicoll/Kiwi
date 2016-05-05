@@ -38,8 +38,8 @@ namespace kiwi
         jLink();
         ~jLink();
         
-        void document_changed(model::Link& link);
-        void document_changed(model::Object& object);
+        void linkModelChanged(model::Link& link);
+        void objectModelChanged(model::Object& object);
         
         // juce::Component
         void paint(juce::Graphics& g) override;

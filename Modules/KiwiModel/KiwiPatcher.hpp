@@ -24,7 +24,6 @@
 #ifndef KIWI_MODEL_PATCHER_HPP_INCLUDED
 #define KIWI_MODEL_PATCHER_HPP_INCLUDED
 
-#include "flip/Optional.h"
 #include "Objects/KiwiObjects.hpp"
 
 namespace kiwi
@@ -35,49 +34,19 @@ namespace kiwi
         //                                      PATCHER                                     //
         // ================================================================================ //
         
-        //! @brief The patcher manages a set of objects, links and attributes
+        //! @brief The Patcher manages a set of Object and Link
         class Patcher : public flip::Object
         {
         public:
+            
+            using object_array_t = flip::Array<model::Object>;
+            using link_array_t = flip::Array<model::Link>;
                         
             //! @brief Default constructor.
             Patcher();
             
             //! @brief Destructor.
             ~Patcher();
-            
-            //! @internal flip static declare method
-            template<class TModel> static void declare();
-            
-            //! @brief Get the first Object.
-            flip::Array<model::Object>::const_iterator getFirstObject() const noexcept
-            {
-                return m_objects.cbegin();
-            }
-            
-            //! @brief Get the last Object.
-            flip::Array<model::Object>::const_iterator getLastObject() const noexcept
-            {
-                return m_objects.cend();
-            }
-            
-            //! @brief Get the first Link.
-            flip::Array<model::Link>::const_iterator getFirstLink() const noexcept
-            {
-                return m_links.cbegin();
-            }
-            
-            //! @brief Get the last Link.
-            flip::Array<model::Link>::const_iterator getLastLink() const noexcept
-            {
-                return m_links.cend();
-            }
-            
-            //! @brief Get the objects.
-            flip::Array<model::Object> const& getObjects() const noexcept  { return m_objects; }
-            
-            //! @brief Get the links.
-            flip::Array<model::Link> const& getLinks() const noexcept    { return m_links; }
             
             //! @brief Creates and adds a "plus" object to the Patcher.
             model::Object& addPlus();
@@ -112,16 +81,51 @@ namespace kiwi
             //! @brief Returns true if a Link has been added, removed or changed.
             inline bool linksChanged() const noexcept   { return m_links.changed(); }
             
+            //! @brief Get the first Object.
+            object_array_t::const_iterator getFirstObject() const noexcept  { return m_objects.cbegin(); }
+            
+            //! @brief Get the first Object.
+            object_array_t::iterator getFirstObject() noexcept              { return m_objects.begin(); }
+            
+            //! @brief Get the last Object.
+            object_array_t::const_iterator getLastObject() const noexcept   { return m_objects.cend(); }
+            
+            //! @brief Get the last Object.
+            object_array_t::iterator getLastObject() noexcept               { return m_objects.end(); }
+            
+            //! @brief Get the first Link.
+            link_array_t::const_iterator getFirstLink() const noexcept      { return m_links.cbegin(); }
+            
+            //! @brief Get the first Link.
+            link_array_t::iterator getFirstLink() noexcept                  { return m_links.begin(); }
+            
+            //! @brief Get the last Link.
+            link_array_t::const_iterator getLastLink() const noexcept       { return m_links.cend(); }
+            
+            //! @brief Get the last Link.
+            link_array_t::iterator getLastLink() noexcept                   { return m_links.end(); }
+            
+            //! @brief Get the objects.
+            flip::Array<model::Object> const& getObjects() const noexcept   { return m_objects; }
+            
+            //! @brief Get the links.
+            flip::Array<model::Link> const& getLinks() const noexcept       { return m_links; }
+            
+            //! @internal flip static declare method
+            template<class TModel> static void declare();
+            
         private:
             
             bool canConnect(model::Object const& from, const uint32_t outlet,
                             model::Object const& to, const uint32_t inlet) const;
+        
+            object_array_t::const_iterator findObject(model::Object const& object) const;
+            object_array_t::iterator findObject(model::Object const& object);
             
-            flip::Array<model::Object>::const_iterator findObject(model::Object const& object) const;
-            flip::Array<model::Object>::iterator findObject(model::Object const& object);
+            link_array_t::const_iterator findLink(model::Link const& object) const;
+            link_array_t::iterator findLink(model::Link const& object);
             
-            flip::Array<model::Link>::const_iterator findLink(model::Link const& object) const;
-            flip::Array<model::Link>::iterator findLink(model::Link const& object);
+        private:
             
             //! objects and links are stored in a flip::Array to maintain a graphical z-order.
             flip::Array<model::Object>   m_objects;

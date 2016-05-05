@@ -26,7 +26,7 @@
 namespace kiwi
 {
     jWindow::jWindow() :
-    juce::DocumentWindow("Untitled Patcher", juce::Colours::lightgrey, juce::DocumentWindow::allButtons, true)
+    juce::DocumentWindow("Untitled", juce::Colours::lightgrey, juce::DocumentWindow::allButtons, true)
     {
         setUsingNativeTitleBar(true);
         setSize(600, 500);

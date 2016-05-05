@@ -45,5 +45,10 @@ namespace kiwi
         {
             ;
         }
+        
+        void Link::modelChanged(model::Link& link_m)
+        {
+            ;
+        }
     }
 }

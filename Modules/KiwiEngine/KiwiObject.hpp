@@ -24,7 +24,6 @@
 #ifndef KIWI_ENGINE_OBJECT_HPP_INCLUDED
 #define KIWI_ENGINE_OBJECT_HPP_INCLUDED
 
-//#include "flip/Signal.h"
 #include "flip/SignalConnection.h"
 
 #include "../KiwiModel/KiwiModel.hpp"
@@ -49,7 +48,7 @@ namespace kiwi
         public:
             
             //! @brief Constructor.
-            Object(model::Object& model) noexcept;
+            Object(model::Object& object_m) noexcept;
             
             //! @brief Destructor.
             virtual ~Object() noexcept;
@@ -76,6 +75,9 @@ namespace kiwi
             virtual void signalTriggerCalled() {};
         
         private:
+            
+            //! @internal Model change notification.
+            void modelChanged(model::Object& object_m);
             
             //! @internal signalTriggerCallback.
             void internal_signalTriggerCalled();

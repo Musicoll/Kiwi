@@ -34,13 +34,14 @@
 namespace kiwi
 {
     //! @brief The main DocumentObserver.
-    //! @details The jInstance dispatch changes to other DocumentObserver objects
+    //! @details The jInstance dispatch changes to all other DocumentObserver objects
     class jInstance : public flip::DocumentObserver<model::Patcher>
     {
     public:
         jInstance();
         ~jInstance();
         
+        //! @brief create a new patcher window.
         void newPatcher();
         
     private:
