@@ -47,7 +47,6 @@ namespace kiwi
         if(object.positionChanged())
         {
             setTopLeftPosition(juce::Point<int>(object.getX(), object.getY()));
-            std::cout << "jObject ---> positionChanged" << '\n';
         }
         
         if(object.removed())

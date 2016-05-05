@@ -49,6 +49,7 @@ namespace kiwi
     void jInstance::populatePatcher(model::Patcher& patcher)
     {
         {
+            // simple print
             auto& plus = patcher.addPlus();
             plus.setPosition(50, 50);
             auto& print = patcher.addPrint();
@@ -57,6 +58,7 @@ namespace kiwi
         }
         
         {
+            // set rhs value
             auto& plus_1 = patcher.addPlus();
             plus_1.setPosition(150, 50);
             
@@ -75,6 +77,7 @@ namespace kiwi
         }
         
         {
+            // basic counter
             auto& plus_1 = patcher.addPlus();
             plus_1.setPosition(350, 100);
             
@@ -94,7 +97,7 @@ namespace kiwi
     
     void jInstance::document_changed(model::Patcher& patcher)
     {
-        std::cout << "jInstance::document_changed" << '\n';
+        //std::cout << "jInstance::document_changed" << '\n';
         if(patcher.added())
         {
             patcher.entity().emplace<engine::DocumentManager>(patcher.document());

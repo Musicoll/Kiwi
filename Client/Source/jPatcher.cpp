@@ -183,8 +183,6 @@ namespace kiwi
     
     void jPatcher::objectHasBeenAdded(model::Object& object)
     {
-        std::cout << "jPatcher ---> object has been added" << '\n';
-        
         auto& jobj = object.entity().emplace<jObject>();
         addAndMakeVisible(jobj);
     }
@@ -197,8 +195,6 @@ namespace kiwi
     
     void jPatcher::objectWillBeRemoved(model::Object& object)
     {
-        std::cout << "jPatcher ---> object will be removed" << '\n';
-        
         auto& jobj = object.entity().use<jObject>();
         removeChildComponent(&jobj);
         
