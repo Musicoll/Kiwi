@@ -43,15 +43,53 @@ namespace kiwi
         m_document = std::make_unique<flip::Document> (model::Model::use(), *this, m_instance->getUserId(), 'cicm', 'kpat');
         
         model::Patcher& patcher = m_document->root<model::Patcher>();
-        auto& plus = patcher.addPlus();
-        plus.setPosition(100, 100);
-        auto& print = patcher.addPrint();
-        print.setPosition(300, 300);
+        populatePatcher(patcher);
+    }
+    
+    void jInstance::populatePatcher(model::Patcher& patcher)
+    {
+        {
+            auto& plus = patcher.addPlus();
+            plus.setPosition(50, 50);
+            auto& print = patcher.addPrint();
+            print.setPosition(50, 100);
+            patcher.addLink(plus, 0, print, 0);
+        }
         
-        patcher.addLink(plus, 0, print, 0);
+        {
+            auto& plus_1 = patcher.addPlus();
+            plus_1.setPosition(150, 50);
+            
+            auto& plus_2 = patcher.addPlus();
+            plus_2.setPosition(220, 50);
+            
+            auto& plus_3 = patcher.addPlus();
+            plus_3.setPosition(150, 100);
+            
+            auto& print = patcher.addPrint();
+            print.setPosition(150, 150);
+            
+            patcher.addLink(plus_1, 0, plus_3, 0);
+            patcher.addLink(plus_2, 0, plus_3, 1);
+            patcher.addLink(plus_3, 0, print, 0);
+        }
         
-        m_document->commit();
-        m_document->push();
+        {
+            auto& plus_1 = patcher.addPlus();
+            plus_1.setPosition(350, 100);
+            
+            auto& plus_2 = patcher.addPlus();
+            plus_2.setPosition(405, 50);
+            
+            auto& print = patcher.addPrint();
+            print.setPosition(350, 150);
+            
+            patcher.addLink(plus_1, 0, plus_2, 0);
+            patcher.addLink(plus_2, 0, plus_1, 1);
+            patcher.addLink(plus_1, 0, print, 0);
+        }
+
+        engine::DocumentManager::commit(patcher, "load initial objects and links");
     }
     
     void jInstance::document_changed(model::Patcher& patcher)

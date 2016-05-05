@@ -48,6 +48,8 @@ namespace kiwi
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
         void document_changed(model::Patcher& patcher) override final;
         
+        void populatePatcher(model::Patcher& patcher);
+        
         std::unique_ptr<engine::Instance>   m_instance;
         std::unique_ptr<flip::Document>     m_document;
     };

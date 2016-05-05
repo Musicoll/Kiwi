@@ -27,7 +27,7 @@ namespace kiwi
 {
     jLink::jLink()
     {
-        //setSize(100, 20);
+        setInterceptsMouseClicks(false, false);
     }
     
     jLink::~jLink()

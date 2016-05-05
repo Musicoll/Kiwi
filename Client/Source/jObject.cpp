@@ -29,7 +29,7 @@ namespace kiwi
 {
     jObject::jObject()
     {
-        setSize(100, 20);
+        setSize(60, 20);
     }
     
     jObject::~jObject()
@@ -174,6 +174,7 @@ namespace kiwi
     void jObject::mouseDown(juce::MouseEvent const& event)
     {
         // signal engine
+        m_model->signalTrigger();
     }
     
     void jObject::mouseDrag(juce::MouseEvent const& event)
