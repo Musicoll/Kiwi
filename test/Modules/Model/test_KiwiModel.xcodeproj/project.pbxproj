@@ -220,7 +220,7 @@
 		2C7F54D41CA0428B00917D46 /* Vector.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Vector.hpp; path = "../../../ThirdParty/flip-public/include/flip/Vector.hpp"; sourceTree = "<group>"; };
 		2C7F54D51CA0432000917D46 /* flip_macos.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = flip_macos.a; path = "../../../ThirdParty/flip-public/bin/flip_macos.a"; sourceTree = "<group>"; };
 		2C85B2BD1CB051770038A291 /* KiwiObjectPrint.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = KiwiObjectPrint.hpp; sourceTree = "<group>"; };
-		2C92CECB1C7DCF3200EDF976 /* KiwiAtom.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; lineEnding = 2; path = KiwiAtom.hpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		2C92CECB1C7DCF3200EDF976 /* KiwiAtom.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; lineEnding = 2; path = KiwiAtom.hpp; sourceTree = "<group>"; };
 		2CBC36DA1CBDAD610080FF4D /* KiwiEngine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiEngine.hpp; sourceTree = "<group>"; };
 		2CBC36DB1CBDAD610080FF4D /* KiwiInstance.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiInstance.cpp; sourceTree = "<group>"; };
 		2CBC36DC1CBDAD610080FF4D /* KiwiInstance.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiInstance.hpp; sourceTree = "<group>"; };

@@ -53,7 +53,7 @@ namespace kiwi
         //! @brief The type of a floating-point number in the Atom class.
         using float_t   = double;
         
-        //! @brief The type of a std::string in the Atom class.
+        //! @brief The type of a string type in the Atom class.
         using string_t  = std::string;
         
         //! @brief Enum of Atom value types
@@ -73,18 +73,18 @@ namespace kiwi
         //! @brief Default constructor.
         //! @details Constructs an Atom of type Null.
         Atom() noexcept :
-            m_type(Type::Null),
-            m_value()
+        m_type(Type::Null),
+        m_value()
         {
             ;
         }
-
+        
         //! @brief Constructs an int_t Atom.
         //! @details The integer value will be 1 or 0 depending on the bool value.
         //! @param value The value.
         Atom(const bool value) noexcept :
-            m_type(Type::Int),
-            m_value(value ? int_t(1) : int_t(0))
+        m_type(Type::Int),
+        m_value(value ? int_t(1) : int_t(0))
         {
             ;
         }
@@ -92,8 +92,8 @@ namespace kiwi
         //! @brief Constructs an int_t Atom.
         //! @param value The value.
         Atom(const int value) noexcept :
-            m_type(Type::Int),
-            m_value(static_cast<int_t>(value))
+        m_type(Type::Int),
+        m_value(static_cast<int_t>(value))
         {
             ;
         }
@@ -101,8 +101,8 @@ namespace kiwi
         //! @brief Constructs an int_t Atom.
         //! @param value The value.
         Atom(const long value) noexcept :
-            m_type(Type::Int),
-            m_value(static_cast<int_t>(value))
+        m_type(Type::Int),
+        m_value(static_cast<int_t>(value))
         {
             ;
         }
@@ -110,8 +110,8 @@ namespace kiwi
         //! @brief Constructs an int_t Atom.
         //! @param value The value.
         Atom(const long long value) noexcept :
-            m_type(Type::Int),
-            m_value(static_cast<int_t>(value))
+        m_type(Type::Int),
+        m_value(static_cast<int_t>(value))
         {
             ;
         }
@@ -120,8 +120,8 @@ namespace kiwi
         //! @details infinty and NaN value both produce a Null Atom type.
         //! @param value The value.
         Atom(const float value) noexcept :
-            m_type(Type::Float),
-            m_value(static_cast<float_t>(value))
+        m_type(Type::Float),
+        m_value(static_cast<float_t>(value))
         {
             ;
         }
@@ -130,8 +130,8 @@ namespace kiwi
         //! @details infinty and NaN value both produce a Null Atom type.
         //! @param value The value.
         Atom(const double value) noexcept :
-            m_type(Type::Float),
-            m_value(static_cast<float_t>(value))
+        m_type(Type::Float),
+        m_value(static_cast<float_t>(value))
         {
             ;
         }
@@ -139,8 +139,8 @@ namespace kiwi
         //! @brief Constructs a string_t Atom.
         //! @param sym The value.
         Atom(string_t const& sym) :
-            m_type(Type::String),
-            m_value(sym)
+        m_type(Type::String),
+        m_value(sym)
         {
             ;
         }
@@ -187,8 +187,8 @@ namespace kiwi
         //! using move semantics, leaving the other as a Null value Atom.
         //! @param other The other Atom value.
         Atom(Atom&& other) :
-            m_type(std::move(other.m_type)),
-            m_value(std::move(other.m_value))
+        m_type(std::move(other.m_type)),
+        m_value(std::move(other.m_value))
         {
             // leave the other as a Null value Atom
             other.m_type = Type::Null;
@@ -343,7 +343,7 @@ namespace kiwi
         static string_t* create_string_pointer(string_t const& v)
         {
             std::allocator<string_t> alloc;
-            auto deleter = [&](string_t * object) { alloc.deallocate(object, 1); };
+            auto deleter = [&alloc](string_t * object) { alloc.deallocate(object, 1); };
             std::unique_ptr<string_t, decltype(deleter)> object(alloc.allocate(1), deleter);
             alloc.construct(object.get(), v);
             return object.release();
@@ -352,7 +352,7 @@ namespace kiwi
         static string_t* create_string_pointer(string_t&& v)
         {
             std::allocator<string_t> alloc;
-            auto deleter = [&](string_t * object) { alloc.deallocate(object, 1); };
+            auto deleter = [&alloc](string_t * object) { alloc.deallocate(object, 1); };
             std::unique_ptr<string_t, decltype(deleter)> object(alloc.allocate(1), deleter);
             alloc.construct(object.get(), std::move(v));
             return object.release();
@@ -393,8 +393,14 @@ namespace kiwi
         atom_value  m_value = {};
     };
     
+    // ================================================================================ //
+    //                                  STRING HELPER                                   //
+    // ================================================================================ //
+    
+    //! @brief std::string helper class
     struct StringHelper
     {
+        //! @brief unescape a string
         static std::string unescape(std::string const& text)
         {
             bool state = false;
@@ -431,8 +437,19 @@ namespace kiwi
         }
     };
     
+    // ================================================================================ //
+    //                                    ATOM HELPER                                   //
+    // ================================================================================ //
+    
+    //! @brief Atom helper class
     struct AtomHelper
     {
+        //! @brief Parse a string into a vector of atoms.
+        //! @details Parse a string into a vector of atoms.
+        //! @param text The string to parse.
+        //! @return The vector of atoms.
+        //! @remark For example, the string : "foo \"bar 42\" 1 2 3.14" will parsed into a vector of 5 atoms.
+        //! The atom types will be determined automatically as 2 #Atom::Type::TAG atoms, 2 #Atom::Type::LONG atoms, and 1 #Atom::Type::DOUBLE atom.
         static std::vector<Atom> parse(std::string const& text)
         {
             std::vector<Atom> atoms;
@@ -442,7 +459,7 @@ namespace kiwi
             while(pos < textlen)
             {
                 std::string word;
-                word.reserve(20); // is it more efficient ?
+                word.reserve(20);
                 bool is_tag      = false;
                 bool is_number   = false;
                 bool is_float    = false;
@@ -457,12 +474,13 @@ namespace kiwi
                     {
                         if(!is_quoted)
                         {
-                            if(word.empty()) // delete useless white spaces
+                            // preserve white space in quoted tags, otherwise skip them
+                            if(word.empty())
                             {
                                 pos++;
                                 continue;
                             }
-                            else // preserve white space in quoted tags, otherwise break word
+                            else
                             {
                                 break;
                             }
@@ -470,13 +488,15 @@ namespace kiwi
                     }
                     else if(c == '\"')
                     {
-                        if(is_quoted) // closing quote
+                        // closing quote
+                        if(is_quoted)
                         {
                             pos++;
                             break;
                         }
                         
-                        if(word.empty()) // begin quote
+                        // opening quote
+                        if(word.empty())
                         {
                             pos++;
                             
@@ -535,6 +555,7 @@ namespace kiwi
             return atoms;
         }
         
+        //! @brief Convert an Atom into a string.
         static std::string toString(Atom const& atom)
         {
             std::string output;
@@ -554,22 +575,23 @@ namespace kiwi
             return output;
         }
         
-        static std::string toString(std::vector<Atom> const& atom_vec)
+        //! @brief Convert a vector of Atom into a string.
+        static std::string toString(std::vector<Atom> const& atoms)
         {
             std::string output;
-            if(!atom_vec.empty())
+            if(!atoms.empty())
             {
-                if(atom_vec.size() == 1)
+                if(atoms.size() == 1)
                 {
-                    output += toString(atom_vec[0]);
+                    output += toString(atoms[0]);
                 }
                 else
                 {
                     output += '[';
-                    for(std::vector<Atom>::size_type i = 0; i < atom_vec.size();)
+                    for(std::vector<Atom>::size_type i = 0; i < atoms.size();)
                     {
-                        output += toString(atom_vec[i]);
-                        if(++i != atom_vec.size())
+                        output += toString(atoms[i]);
+                        if(++i != atoms.size())
                         {
                             output += ", ";
                         }

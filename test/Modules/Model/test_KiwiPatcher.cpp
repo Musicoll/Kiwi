@@ -49,11 +49,10 @@ TEST_CASE("Patcher", "[Patcher]")
     patcher.addLink(*objects[1], 0, *objects[2], 0);
     patcher.endTransaction();
     
-    auto links = patcher.getLinks();
-    REQUIRE(links.size() == 2);
+    REQUIRE(patcher.getLinks().size() == 2);
     
-    //patcher.sendToObject(*objects[0], 1, {10});
-    //patcher.sendToObject(*objects[0], 0, {10});
+    patcher.sendToObject(*objects[0], 1, {10});
+    patcher.sendToObject(*objects[0], 0, {10});
     
     patcher.beginTransaction("remove object plus 2 (and links too)");
     patcher.removeObject(*objects[1]);
@@ -66,19 +65,17 @@ TEST_CASE("Patcher", "[Patcher]")
     REQUIRE(patcher.getObjects().size() == 3);
     REQUIRE(patcher.getLinks().size() == 2);
     
+    objects = patcher.getObjects();
     
-    /*
-    // test stack overflow :
     // Warning object container index changed and is not coherent with model (to be fixed)
     patcher.beginTransaction("add recursive link");
-    patcher.addLink(*objects[2], 0, *objects[0], 0);
+    patcher.addLink(*objects[1], 0, *objects[0], 0);
     patcher.endTransaction();
     
-    REQUIRE(links.size() == 3);
+    REQUIRE(patcher.getLinks().size() == 3);
     
     patcher.sendToObject(*objects[0], 1, {1});
     patcher.sendToObject(*objects[1], 1, {1});
     
     patcher.sendToObject(*objects[0], 0, bang_msg);
-    */
 }

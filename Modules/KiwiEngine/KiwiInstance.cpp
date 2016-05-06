@@ -31,63 +31,31 @@ namespace kiwi
         //                                      INSTANCE                                    //
         // ================================================================================ //
         
-        bool Instance::m_declared_flag = false;
-        
         Instance::Instance(uint64_t user_id, std::string const& name) noexcept :
         m_user_id(user_id),
-        m_name(name),
-        m_debug(false)
+        m_name(name)
         {
             ;
         }
         
         Instance::~Instance()
         {
-            m_patchers.clear();
+            ;
         }
         
-        std::unique_ptr<Instance> Instance::create(uint64_t user_id, std::string const& name)
+        void Instance::document_changed(model::Patcher& patcher)
         {
-            declare();
-            
-            //@todo assert unique instance's name
-            return std::unique_ptr<Instance>(new Instance(user_id, name));
-        }
-        
-        void Instance::declare()
-        {
-            if(m_declared_flag) return;
-            
-            // define current model version :
-            model::Model::init("v0.0.1");
-            
-            m_declared_flag = true;
-        }
-        
-        Patcher& Instance::createPatcher()
-        {
-            auto it = m_patchers.emplace(m_patchers.cend(), std::unique_ptr<Patcher>(new Patcher(*this)));
-            return *it->get();
-        }
-        
-        void Instance::removePatcher(Patcher* patcher)
-        {
-            const auto find_patcher = [patcher](std::unique_ptr<Patcher> const& p) -> bool
+            if(patcher.added())
             {
-                return (patcher == p.get());
-            };
-            
-            const auto it = std::find_if(m_patchers.begin(), m_patchers.end(), find_patcher);
-            
-            if (it != m_patchers.cend())
-            {
-                m_patchers.erase(it);
+                patcher.entity().emplace<Patcher>(*this);
             }
-        }
-        
-        auto Instance::getPatchers() -> std::vector<std::unique_ptr<Patcher>> const&
-        {
-            return m_patchers;
+            
+            patcher.entity().use<Patcher>().document_changed(patcher);
+            
+            if(patcher.removed())
+            {
+                patcher.entity().erase<Patcher>();
+            }
         }
     }
 }

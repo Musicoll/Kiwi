@@ -42,14 +42,14 @@ namespace kiwi
             m_objects.clear();
         }
         
-        void Patcher::addPlus()
+        model::Object& Patcher::addPlus()
         {
-            m_objects.insert(m_objects.end(), std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus()));
+            return *m_objects.insert(m_objects.end(), std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus()));
         }
         
-        void Patcher::addPrint()
+        model::Object& Patcher::addPrint()
         {
-            m_objects.insert(m_objects.end(), std::unique_ptr<model::ObjectPrint>(new model::ObjectPrint()));
+            return *m_objects.insert(m_objects.end(), std::unique_ptr<model::ObjectPrint>(new model::ObjectPrint()));
         }
         
         bool Patcher::canConnect(model::Object const& from, const uint32_t outlet,

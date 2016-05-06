@@ -19,36 +19,41 @@
  To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
  
  ==============================================================================
-*/
+ */
 
-#include "KiwiLink.hpp"
-#include "KiwiObject.hpp"
-#include "KiwiPatcher.hpp"
+#ifndef KIWI_JINSTANCE_HPP_INCLUDED
+#define KIWI_JINSTANCE_HPP_INCLUDED
+
+#include <KiwiEngine/KiwiInstance.hpp>
+
+#include "flip/Document.h"
+
+#include "jWindow.hpp"
+#include "jPatcher.hpp"
 
 namespace kiwi
 {
-    namespace engine
+    //! @brief The main DocumentObserver.
+    //! @details The jInstance dispatch changes to all other DocumentObserver objects
+    class jInstance : public flip::DocumentObserver<model::Patcher>
     {
-        // ================================================================================ //
-        //                                      LINK                                        //
-        // ================================================================================ //
+    public:
+        jInstance();
+        ~jInstance();
         
-        Link::Link(model::Link& model, Object& sender, Object& receiver) :
-        m_model(model),
-        m_sender(sender),
-        m_receiver(receiver)
-        {
-            ;
-        }
+        //! @brief create a new patcher window.
+        void newPatcher();
         
-        Link::~Link()
-        {
-            ;
-        }
+    private:
         
-        void Link::modelChanged(model::Link& link_m)
-        {
-            ;
-        }
-    }
+        //! @internal flip::DocumentObserver<model::Patcher>::document_changed
+        void document_changed(model::Patcher& patcher) override final;
+        
+        void populatePatcher(model::Patcher& patcher);
+        
+        std::unique_ptr<engine::Instance>   m_instance;
+        std::unique_ptr<flip::Document>     m_document;
+    };
 }
+
+#endif // KIWI_JINSTANCE_HPP_INCLUDED

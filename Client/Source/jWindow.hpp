@@ -19,36 +19,26 @@
  To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
  
  ==============================================================================
-*/
+ */
 
-#include "KiwiLink.hpp"
-#include "KiwiObject.hpp"
-#include "KiwiPatcher.hpp"
+#ifndef KIWI_JWINDOW_HPP_INCLUDED
+#define KIWI_JWINDOW_HPP_INCLUDED
+
+#include "../JuceLibraryCode/JuceHeader.h"
 
 namespace kiwi
 {
-    namespace engine
+    //! @brief A juce Window.
+    class jWindow : public juce::DocumentWindow
     {
-        // ================================================================================ //
-        //                                      LINK                                        //
-        // ================================================================================ //
+    public:
+        jWindow();
+        ~jWindow();
         
-        Link::Link(model::Link& model, Object& sender, Object& receiver) :
-        m_model(model),
-        m_sender(sender),
-        m_receiver(receiver)
-        {
-            ;
-        }
+    private:
         
-        Link::~Link()
-        {
-            ;
-        }
-        
-        void Link::modelChanged(model::Link& link_m)
-        {
-            ;
-        }
-    }
+        void closeButtonPressed() override;
+    };
 }
+
+#endif // KIWI_JWINDOW_HPP_INCLUDED

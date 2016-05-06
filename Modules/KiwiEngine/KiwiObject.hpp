@@ -24,7 +24,10 @@
 #ifndef KIWI_ENGINE_OBJECT_HPP_INCLUDED
 #define KIWI_ENGINE_OBJECT_HPP_INCLUDED
 
+#include "flip/SignalConnection.h"
+
 #include "../KiwiModel/KiwiModel.hpp"
+
 #include <utility>
 
 namespace kiwi
@@ -45,7 +48,7 @@ namespace kiwi
         public:
             
             //! @brief Constructor.
-            Object(model::Object& model) noexcept;
+            Object(model::Object& object_m) noexcept;
             
             //! @brief Destructor.
             virtual ~Object() noexcept;
@@ -68,20 +71,34 @@ namespace kiwi
             //! @brief Send a message through a given outlet index.
             void send(const uint32_t index, std::vector<Atom> args);
             
+            //! @brief Called when the signalTrigger method is fired.
+            virtual void signalTriggerCalled() {};
+        
         private:
-            typedef std::set<Link*> Outlet;
             
-            //! @brief Append a new link to an outlet.
+            //! @internal Model change notification.
+            void modelChanged(model::Object& object_m);
+            
+            //! @internal signalTriggerCallback.
+            void internal_signalTriggerCalled();
+            
+            //! @internal Append a new link to an outlet.
             void addOutputLink(Link* link);
             
-            //! @brief Remove a link from an outlet.
+            //! @internal Remove a link from an outlet.
             void removeOutputLink(Link* link);
             
+            friend class engine::Patcher;
+            
+        private:
+            
+            typedef std::set<Link*> Outlet;
+
             model::Object const&    m_model;
             std::vector<Outlet>     m_outlets;
             uint32_t                m_stack_count = 0ul;
             
-            friend class engine::Patcher;
+            flip::SignalConnection  m_signal_cnx;
         };
     }
 }

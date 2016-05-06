@@ -19,36 +19,37 @@
  To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
  
  ==============================================================================
-*/
+ */
 
-#include "KiwiLink.hpp"
-#include "KiwiObject.hpp"
-#include "KiwiPatcher.hpp"
+#ifndef KIWI_APPLICATION_HPP_INCLUDED
+#define KIWI_APPLICATION_HPP_INCLUDED
+
+#include "jInstance.hpp"
 
 namespace kiwi
 {
-    namespace engine
+    //==============================================================================
+    class KiwiApplication  : public JUCEApplication
     {
-        // ================================================================================ //
-        //                                      LINK                                        //
-        // ================================================================================ //
+    public:
+        KiwiApplication() = default;
+        ~KiwiApplication() = default;
         
-        Link::Link(model::Link& model, Object& sender, Object& receiver) :
-        m_model(model),
-        m_sender(sender),
-        m_receiver(receiver)
-        {
-            ;
-        }
+        void initialise(String const& commandLine) override;
         
-        Link::~Link()
-        {
-            ;
-        }
+        void shutdown() override;
         
-        void Link::modelChanged(model::Link& link_m)
-        {
-            ;
-        }
-    }
+        void systemRequestedQuit() override;
+        
+        const String getApplicationName() override       { return ProjectInfo::projectName; }
+        const String getApplicationVersion() override    { return ProjectInfo::versionString; }
+        bool moreThanOneInstanceAllowed() override       { return true; }
+        
+    private:
+        std::unique_ptr<jInstance> m_instance;
+    };
+
+    START_JUCE_APPLICATION(KiwiApplication)
 }
+
+#endif // KIWI_APPLICATION_HPP_INCLUDED

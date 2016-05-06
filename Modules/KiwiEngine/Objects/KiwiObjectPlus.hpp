@@ -38,7 +38,7 @@ namespace kiwi
         {
         public:
 
-            ObjectPlus(model::ObjectPlus& model) : engine::Object(model), m_lhs(0.0), m_rhs(0.0)
+            ObjectPlus(model::ObjectPlus& model) : engine::Object(model), m_lhs(1.0), m_rhs(0.0)
             {
                 ;
             }
@@ -73,9 +73,14 @@ namespace kiwi
                 send(0, {m_rhs + m_lhs});
             }
             
+            void signalTriggerCalled() override
+            {
+                bang();
+            }
+            
         private:
+            double m_lhs = 1.0;
             double m_rhs = 0.0;
-            double m_lhs = 0.0;
         };
     }
 }

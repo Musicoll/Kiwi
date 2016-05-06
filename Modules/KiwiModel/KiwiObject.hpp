@@ -24,7 +24,7 @@
 #ifndef KIWI_MODEL_OBJECT_HPP_INCLUDED
 #define KIWI_MODEL_OBJECT_HPP_INCLUDED
 
-#include "../KiwiCore/KiwiAtom.hpp"
+#include <KiwiCore/KiwiAtom.hpp>
 #include <mutex>
 #include <algorithm>
 
@@ -40,6 +40,7 @@
 #include "flip/Collection.h"
 #include "flip/Object.h"
 #include "flip/ObjectRef.h"
+#include "flip/Signal.h"
 
 namespace kiwi
 {
@@ -54,27 +55,15 @@ namespace kiwi
         class Object : public flip::Object
         {
         public:
-
-            //! @internal flip Default constructor
-            Object(flip::Default&) {}
-            
+ 
             //! @brief Constructor.
             Object(std::string const& name, const uint32_t inlets, const uint32_t outlets);
             
+            //! @brief Copy constructor (needed for flip::Array)
+            Object(model::Object const&);
+            
             //! @brief Destructor.
             virtual ~Object();
-            
-            //! @internal flip static declare method
-            template<class TModel> static void declare()
-            {
-                if(TModel::template has<model::Object>()) return;
-                
-                TModel::template declare<model::Object>()
-                .name("cicm.kiwi.Object")
-                .template member<flip::String, &Object::m_name>("name")
-                .template member<flip::Int, &Object::m_inlets>("inlets")
-                .template member<flip::Int, &Object::m_outlets>("outlets");
-            }
             
             //! @brief Returns the name of the Object.
             //! @return The name of the Object.
@@ -94,11 +83,66 @@ namespace kiwi
                 return static_cast<uint32_t>(m_outlets);
             }
             
+            //! @brief Set the x/y position.
+            void setPosition(double x, double y)
+            {
+                m_position_x = x;
+                m_position_y = y;
+            }
+            
+            //! @brief Returns true if the object's position changed.
+            bool positionChanged() const noexcept
+            {
+                return (m_position_x.changed() || m_position_y.changed());
+            }
+            
+            //! @brief Returns the x position.
+            double getX() const noexcept { return m_position_x; }
+            
+            //! @brief Returns the y position.
+            double getY() const noexcept { return m_position_y; }
+            
+            //! @brief Call signalTrigger() to hmmm.. trigger the signal.
+            flip::Signal<> signalTrigger;
+            
+        public:
+            
+            //! @internal flip Default constructor
+            Object(flip::Default&);
+            
+            //! @internal flip static declare method
+            template<class TModel> static void declare();
+            
         private:
+            
+            //! @brief Signal types
+            enum SignalType { Trigger };
+            
             flip::String    m_name;
             flip::Int       m_inlets;
             flip::Int       m_outlets;
+            
+            flip::Float     m_position_x;
+            flip::Float     m_position_y;
         };
+        
+        // ================================================================================ //
+        //                                  OBJECT::declare                                 //
+        // ================================================================================ //
+        
+        template<class TModel>
+        void Object::declare()
+        {
+            if(TModel::template has<model::Object>()) return;
+            
+            TModel::template declare<model::Object>()
+            .name("cicm.kiwi.Object")
+            .template member<flip::String, &Object::m_name>("name")
+            .template member<flip::Int, &Object::m_inlets>("inlets")
+            .template member<flip::Int, &Object::m_outlets>("outlets")
+            .template member<flip::Float, &Object::m_position_x>("pos_x")
+            .template member<flip::Float, &Object::m_position_y>("pos_y");
+        }
     }
 }
 
