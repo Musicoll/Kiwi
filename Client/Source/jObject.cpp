@@ -27,7 +27,8 @@
 
 namespace kiwi
 {
-    jObject::jObject()
+    jObject::jObject() :
+    m_io_color(0.3, 0.3, 0.3)
     {
         setSize(60, 20);
     }
@@ -39,19 +40,40 @@ namespace kiwi
     
     void jObject::objectModelChanged(model::Object& object)
     {
+        bool need_redraw = false;
+        
         if(object.added())
         {
             m_model = &object;
         }
         
+        if(object.inletsChanged())
+        {
+            m_inlets = object.getNumberOfInlets();
+            need_redraw = true;
+        }
+        
+        if(object.outletsChanged())
+        {
+            m_outlets = object.getNumberOfOutlets();
+            need_redraw = true;
+        }
+        
         if(object.positionChanged())
         {
             setTopLeftPosition(juce::Point<int>(object.getX(), object.getY()));
+            need_redraw = true;
         }
         
         if(object.removed())
         {
             m_model = nullptr;
+            need_redraw = false;
+        }
+        
+        if(need_redraw)
+        {
+            repaint();
         }
     }
     
@@ -72,102 +94,78 @@ namespace kiwi
     
     void jObject::drawInletsOutlets(juce::Graphics & g)
     {
-        const unsigned int io_width = 5;
-        const unsigned int io_height = 3;
-        const juce::Colour io_color(0.3, 0.3, 0.3);
         const juce::Rectangle<int> bounds = getLocalBounds();
         
-        const unsigned int ninlets = m_model->getNumberOfInlets();
-        const unsigned int noutlets = m_model->getNumberOfOutlets();
-
-        if(ninlets)
+        g.setColour(m_io_color);
+        
+        for(unsigned int i = 0; i < m_inlets; ++i)
         {
-            g.setColour(io_color);
-            g.fillRect(bounds.getX(), bounds.getY(), io_width, io_height);
-            
-            if(ninlets > 1)
-            {
-                const double ratio = (bounds.getWidth() - io_width) / (double)(ninlets - 1);
-                for(unsigned int i = 1; i < ninlets; ++i)
-                {
-                    g.fillRect(bounds.getX() + ratio * i, bounds.getY(), io_width, io_height);
-                }
-            }
+            g.fillRect(getInletLocalBounds(i, bounds));
         }
         
-        if(noutlets)
+        for(unsigned int i = 0; i < m_outlets; ++i)
         {
-            g.setColour(io_color);
-            g.fillRect(bounds.getX(), bounds.getY() + bounds.getHeight() - io_height, io_width, io_height);
-            
-            if(noutlets > 1)
-            {
-                const double ratio = (bounds.getWidth() - io_width) / (double)(noutlets - 1);
-                for(unsigned int i = 1; i < noutlets; --i)
-                {
-                    juce::Rectangle<int> outlet(bounds.getX() + ratio * i,
-                                                bounds.getY() + bounds.getHeight() - io_height,
-                                                io_width, io_height);
-                    g.fillRect(outlet);
-                }
-            }
+            g.fillRect(getOutletLocalBounds(i, bounds));
         }
     }
     
     juce::Point<int> jObject::getInletPatcherPosition(const size_t index) const
     {
-        const unsigned int ninlets = m_model->getNumberOfInlets();
-        
-        juce::Rectangle<int> rect;
-        
-        if(ninlets > 0 && index < ninlets)
-        {
-            const unsigned int io_width = 5;
-            const unsigned int io_height = 3;
-            const juce::Rectangle<int> bounds = getLocalBounds();
-            
-            if(ninlets == 1 && index == 0)
-            {
-                rect.setBounds(bounds.getX(), bounds.getY(), io_width, io_height);
-            }
-            
-            if(ninlets > 1)
-            {
-                const double ratio = (bounds.getWidth() - io_width) / (double)(ninlets - 1);
-                rect.setBounds(bounds.getX() + ratio * index, bounds.getY(), io_width, io_height);
-            }
-        }
-        
-        return getPosition() + rect.getCentre();
+        return getPosition() + getInletLocalBounds(index, getLocalBounds()).getCentre();
     }
     
     juce::Point<int> jObject::getOutletPatcherPosition(const size_t index) const
     {
-        const unsigned int noutlets = m_model->getNumberOfOutlets();
-        
+        return getPosition() + getOutletLocalBounds(index, getLocalBounds()).getCentre();
+    }
+    
+    juce::Rectangle<int> jObject::getInletLocalBounds(const size_t index,
+                                                      juce::Rectangle<int> const& object_bounds) const
+    {
         juce::Rectangle<int> rect;
         
-        if(noutlets > 0 && index < noutlets)
+        if(m_inlets > 0 && index < m_inlets)
         {
-            const unsigned int io_width = 5;
-            const unsigned int io_height = 3;
-            const juce::Rectangle<int> bounds = getLocalBounds();
-            
-            if(noutlets == 1 && index == 0)
+            if(m_inlets == 1 && index == 0)
             {
-                rect.setBounds(bounds.getX(), bounds.getY() + bounds.getHeight() - io_height, io_width, io_height);
+                rect.setBounds(object_bounds.getX(), object_bounds.getY(), m_io_width, m_io_height);
             }
             
-            if(noutlets > 1)
+            if(m_inlets > 1)
             {
-                const double ratio = (bounds.getWidth() - io_width) / (double)(noutlets - 1);
-                rect.setBounds(bounds.getX() + ratio * index,
-                               bounds.getY() + bounds.getHeight() - io_height,
-                               io_width, io_height);
+                const double ratio = (object_bounds.getWidth() - m_io_width) / (double)(m_inlets - 1);
+                rect.setBounds(object_bounds.getX() + ratio * index, object_bounds.getY(),
+                               m_io_width, m_io_height);
             }
         }
         
-        return getPosition() + rect.getCentre();
+        return rect;
+    }
+    
+    juce::Rectangle<int> jObject::getOutletLocalBounds(const size_t index,
+                                                       juce::Rectangle<int> const& object_bounds) const
+    {
+        juce::Rectangle<int> rect;
+        
+        if(m_outlets > 0 && index < m_outlets)
+        {
+            if(m_outlets == 1 && index == 0)
+            {
+                rect.setBounds(object_bounds.getX(),
+                               object_bounds.getY() + object_bounds.getHeight() - m_io_height,
+                               m_io_width, m_io_height);
+            }
+            
+            if(m_outlets > 1)
+            {
+                const double ratio = (object_bounds.getWidth() - m_io_width) / (double)(m_outlets - 1);
+                rect.setBounds(object_bounds.getX() + ratio * index,
+                               object_bounds.getY() + object_bounds.getHeight() - m_io_height,
+                               m_io_width, m_io_height);
+            }
+        }
+        
+        return rect;
     }
     
     void jObject::mouseDown(juce::MouseEvent const& event)

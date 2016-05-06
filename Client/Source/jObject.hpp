@@ -55,7 +55,20 @@ namespace kiwi
         
         void drawInletsOutlets(juce::Graphics & g);
         
-        model::Object* m_model;
+        //! @brief Returns the inlet local bounds for a given index.
+        juce::Rectangle<int> getInletLocalBounds(const size_t index,
+                                                 juce::Rectangle<int> const& object_bounds) const;
+        
+        //! @brief Returns the outlet local bounds for a given index.
+        juce::Rectangle<int> getOutletLocalBounds(const size_t index,
+                                                  juce::Rectangle<int> const& object_bounds) const;
+        
+        model::Object*      m_model = nullptr;
+        const unsigned int  m_io_width = 5;
+        const unsigned int  m_io_height = 3;
+        size_t              m_inlets = 0;
+        size_t              m_outlets = 0;
+        const juce::Colour  m_io_color;
     };
 }
 

@@ -76,11 +76,23 @@ namespace kiwi
                 return static_cast<uint32_t>(m_inlets);
             }
             
+            //! @brief Returns true if the inlets changed.
+            bool inletsChanged() const noexcept
+            {
+                return m_inlets.changed();
+            }
+            
             //! @brief Returns the number of outlets.
             //! @return The number of outlets.
             inline uint32_t getNumberOfOutlets() const noexcept
             {
                 return static_cast<uint32_t>(m_outlets);
+            }
+            
+            //! @brief Returns true if the outlets changed.
+            bool outletsChanged() const noexcept
+            {
+                return m_outlets.changed();
             }
             
             //! @brief Set the x/y position.
