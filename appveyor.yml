@@ -16,7 +16,6 @@ build_script:
     - cd Debug
     - dir
     - test_core
-    - test_dsp
 
 #---------------------------------#
 #         notifications           #

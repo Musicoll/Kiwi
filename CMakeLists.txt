@@ -91,29 +91,6 @@ if(${APPLE})
     target_link_libraries(KiwiModel ${PROJECT_SOURCE_DIR}/ThirdParty/flip-public/bin/flip_macos.a)
 endif()
 
-# -> Module DSP
-
-file(GLOB KIWI_DSP_SRC
-     ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp/*.hpp
-     ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp/*.cpp
-)
-add_library(KiwiDsp STATIC ${KIWI_DSP_SRC})
-set_property(TARGET KiwiDsp
-             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
-set_property(TARGET KiwiDsp
-             APPEND PROPERTY COMPILE_DEFINITIONS KIWI_DSP_FLOAT)
-
-# -> Module Graphics
-
-file(GLOB KIWI_GRAPHICS_SRC                                   
-     ${PROJECT_SOURCE_DIR}/Modules/KiwiGraphics/*.hpp
-     ${PROJECT_SOURCE_DIR}/Modules/KiwiGraphics/*.cpp
-)
-add_library(KiwiGraphics STATIC ${KIWI_GRAPHICS_SRC})
-set_property(TARGET KiwiGraphics
-             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
-
-
 #----------------------------------
 # Tests
 #----------------------------------
@@ -128,31 +105,31 @@ set_property(TARGET test_core
              PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
 
 # -> Model Unit Tests (only Mac for now)
-if(${APPLE})
-    file(GLOB TEST_MODEL_SRC
-        ${PROJECT_SOURCE_DIR}/test/Modules/Model/*.cpp)
-    add_executable(test_model ${TEST_MODEL_SRC})
-
-    target_link_libraries(test_model KiwiModel ${PROJECT_SOURCE_DIR}/ThirdParty/flip-public/bin/flip_macos.a)
-    set_property(TARGET test_model
-                 PROPERTY INCLUDE_DIRECTORIES   ${PROJECT_SOURCE_DIR}/Modules
-                                                ${PROJECT_SOURCE_DIR}/ThirdParty/flip-public/include)
-endif()
+# if(${APPLE})
+#     file(GLOB TEST_MODEL_SRC
+#         ${PROJECT_SOURCE_DIR}/test/Modules/Model/*.cpp)
+#     add_executable(test_model ${TEST_MODEL_SRC})
+#
+#     target_link_libraries(test_model KiwiModel ${PROJECT_SOURCE_DIR}/ThirdParty/flip-public/bin/flip_macos.a)
+#     set_property(TARGET test_model
+#                  PROPERTY INCLUDE_DIRECTORIES   ${PROJECT_SOURCE_DIR}/Modules
+#                                                 ${PROJECT_SOURCE_DIR}/ThirdParty/flip-public/include)
+# endif()
 
 # -> Dsp Unit Tests
 
-file(GLOB TEST_DSP_SRC ${PROJECT_SOURCE_DIR}/test/Modules/Dsp/*.cpp)
-add_executable(test_dsp ${TEST_DSP_SRC})
-target_link_libraries(test_dsp KiwiDsp)
-set_property(TARGET test_dsp
-             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
-set_property(TARGET test_dsp
-             APPEND PROPERTY COMPILE_DEFINITIONS KIWI_DSP_FLOAT)
+# file(GLOB TEST_DSP_SRC ${PROJECT_SOURCE_DIR}/test/Modules/Dsp/*.cpp)
+# add_executable(test_dsp ${TEST_DSP_SRC})
+# target_link_libraries(test_dsp KiwiDsp)
+# set_property(TARGET test_dsp
+#              PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
+# set_property(TARGET test_dsp
+#              APPEND PROPERTY COMPILE_DEFINITIONS KIWI_DSP_FLOAT)
 
 # -> Graphics Unit Tests
 
-file(GLOB TEST_GRAPHICS_SRC ${PROJECT_SOURCE_DIR}/test/Modules/Graphics/*.cpp)
-add_executable(test_graphics ${TEST_GRAPHICS_SRC})
-target_link_libraries(test_graphics KiwiGraphics)
-set_property(TARGET test_graphics
-             PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
+# file(GLOB TEST_GRAPHICS_SRC ${PROJECT_SOURCE_DIR}/test/Modules/Graphics/*.cpp)
+# add_executable(test_graphics ${TEST_GRAPHICS_SRC})
+# target_link_libraries(test_graphics KiwiGraphics)
+# set_property(TARGET test_graphics
+#              PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules)
