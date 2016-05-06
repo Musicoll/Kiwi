@@ -29,7 +29,6 @@
 #include <algorithm>
 
 // ---- Flip headers ---- //
-#include "flip/DataModel.h"
 #include "flip/Bool.h"
 #include "flip/Int.h"
 #include "flip/Float.h"

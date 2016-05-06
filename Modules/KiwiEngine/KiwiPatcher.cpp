@@ -55,12 +55,12 @@ namespace kiwi
         
         void Patcher::addLink(Object const& from, const uint32_t outlet, Object const& to, const uint32_t inlet)
         {
-            m_model->addLink(from.m_model, outlet, to.m_model, inlet);
+            m_model->addLink(*from.m_model, outlet, *to.m_model, inlet);
         }
         
         void Patcher::removeObject(Object const& object)
         {
-            m_model->removeObject(object.m_model);
+            m_model->removeObject(*object.m_model);
         }
         
         void Patcher::removeLink(Link const& link)
@@ -155,13 +155,12 @@ namespace kiwi
                             {
                                 objectHasBeenAdded(object);
                             }
-                            else if(object.removed())
+                            
+                            objectChanged(object);
+                            
+                            if(object.removed())
                             {
                                 objectWillBeRemoved(object);
-                            }
-                            else // resident
-                            {
-                                objectChanged(object);
                             }
                         }
                     }
@@ -201,11 +200,18 @@ namespace kiwi
             
             if(name == "plus")
             {
+                //std::vector<Atom> args{42};
+                //model::ObjectFactory::createEngine<engine::Object>(object.getName(), args);
+                
                 object_engine_ptr = &object.entity().emplace<engine::ObjectPlus>(static_cast<model::ObjectPlus&>(object));
             }
             else if(name == "print")
             {
                 object_engine_ptr = &object.entity().emplace<engine::ObjectPrint>(static_cast<model::ObjectPrint&>(object));
+            }
+            else
+            {
+                assert(false && "Bad Object engine name");
             }
             
             if(object_engine_ptr)
@@ -220,7 +226,7 @@ namespace kiwi
 
         void Patcher::objectChanged(model::Object& object_m)
         {
-            auto& object_e = object_m.entity().use<engine::Object>();
+            auto& object_e = *object_m.entity().use<engine::Object*>();
             object_e.modelChanged(object_m);
         }
 

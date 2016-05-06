@@ -38,7 +38,7 @@ namespace kiwi
         {
         public:
 
-            ObjectPrint(model::ObjectPrint& model) : engine::Object(model)
+            ObjectPrint(model::ObjectPrint& model)
             {
                 ;
             }

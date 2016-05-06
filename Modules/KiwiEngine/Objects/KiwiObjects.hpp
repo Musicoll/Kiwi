@@ -24,13 +24,21 @@
 #ifndef KIWI_ENGINE_OBJECTS_HPP_INCLUDED
 #define KIWI_ENGINE_OBJECTS_HPP_INCLUDED
 
+#include <KiwiModel/KiwiObjectFactory.hpp>
+#include "KiwiObjectPlus.hpp"
 #include "KiwiObjectPrint.hpp"
 
 namespace kiwi
 {
     namespace engine
     {
-        ;
+        void registerObjects()
+        {
+            using ObjectFactory = model::ObjectFactory;
+            
+            ObjectFactory::add<model::ObjectPlus, ObjectPlus>("plus");
+            //ObjectFactory::add<model::ObjectPrint, ObjectPrint>("print");
+        }
     }
 }
 

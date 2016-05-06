@@ -44,7 +44,12 @@ namespace kiwi
         
         model::Object& Patcher::addPlus()
         {
-            return *m_objects.insert(m_objects.end(), std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus()));
+            assert(ObjectFactory::has("plus"));
+            
+            std::vector<Atom> args {42};
+            return *m_objects.insert(m_objects.end(), ObjectFactory::create("plus", args));
+            
+            //return *m_objects.insert(m_objects.end(), std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus()));
         }
         
         model::Object& Patcher::addPrint()

@@ -37,8 +37,15 @@ namespace kiwi
         class ObjectPlus : public engine::Object
         {
         public:
+            
+            ObjectPlus(model::ObjectPlus& model) :
+            m_lhs(1.0), m_rhs(0.0)
+            {
+                ;
+            }
 
-            ObjectPlus(model::ObjectPlus& model) : engine::Object(model), m_lhs(1.0), m_rhs(0.0)
+            ObjectPlus(std::vector<Atom> args) :
+            m_lhs(1.0), m_rhs(0.0)
             {
                 ;
             }

@@ -24,6 +24,7 @@
 #ifndef KIWI_MODEL_HPP_INCLUDED
 #define KIWI_MODEL_HPP_INCLUDED
 
+#include "flip/DataModel.h"
 #include "KiwiPatcher.hpp"
 
 namespace kiwi

@@ -48,6 +48,10 @@
         <FILE id="cr3Yvu" name="KiwiModel.hpp" compile="0" resource="0" file="../Modules/KiwiModel/KiwiModel.hpp"/>
         <FILE id="kEinH2" name="KiwiObject.cpp" compile="1" resource="0" file="../Modules/KiwiModel/KiwiObject.cpp"/>
         <FILE id="axstoL" name="KiwiObject.hpp" compile="0" resource="0" file="../Modules/KiwiModel/KiwiObject.hpp"/>
+        <FILE id="jORbNI" name="KiwiObjectFactory.cpp" compile="1" resource="0"
+              file="../Modules/KiwiModel/KiwiObjectFactory.cpp"/>
+        <FILE id="aaibRl" name="KiwiObjectFactory.hpp" compile="0" resource="0"
+              file="../Modules/KiwiModel/KiwiObjectFactory.hpp"/>
         <FILE id="j95wIT" name="KiwiLink.cpp" compile="1" resource="0" file="../Modules/KiwiModel/KiwiLink.cpp"/>
         <FILE id="A6aXHc" name="KiwiLink.hpp" compile="0" resource="0" file="../Modules/KiwiModel/KiwiLink.hpp"/>
         <GROUP id="{F56C6760-A887-FA55-9679-441F9458784C}" name="Objects">

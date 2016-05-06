@@ -33,12 +33,9 @@ namespace kiwi
         //                                      OBJECT                                      //
         // ================================================================================ //
         
-        Object::Object(model::Object& model) noexcept : m_model(model), m_stack_count(0)
+        Object::Object() noexcept : m_stack_count(0)
         {
-            m_outlets.resize(m_model.getNumberOfOutlets());
             
-            // connect signals
-            m_signal_cnx = model.signalTrigger.connect(*this, &Object::internal_signalTriggerCalled);
         }
         
         Object::~Object() noexcept
@@ -88,7 +85,12 @@ namespace kiwi
         {
             if(object_m.added())
             {
-                ;
+                m_model = &object_m;
+                
+                m_outlets.resize(m_model->getNumberOfOutlets());
+                
+                // connect signals
+                m_signal_cnx = m_model->signalTrigger.connect(*this, &Object::internal_signalTriggerCalled);
             }
             
             if(object_m.added())
