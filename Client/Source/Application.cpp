@@ -19,27 +19,29 @@
  To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
  
  ==============================================================================
-*/
+ */
 
-#include "KiwiLink.hpp"
-#include "KiwiObject.hpp"
-#include "KiwiPatcher.hpp"
+#include "Application.hpp"
 
 namespace kiwi
 {
-    namespace model
+    void KiwiApplication::initialise(String const& commandLine)
     {
-        // ================================================================================ //
-        //                                      LINK                                        //
-        // ================================================================================ //
+        m_instance = std::make_unique<jInstance>();
+        m_instance->newPatcher();
+    }
+    
+    void KiwiApplication::shutdown()
+    {
+        ;
+    }
+    
+    void KiwiApplication::systemRequestedQuit()
+    {
+        m_instance.reset();
         
-        Link::Link(model::Object const& from, const uint32_t outlet, model::Object const& to, const uint32_t inlet) :
-        m_sender(from.ref()),
-        m_receiver(to.ref()),
-        m_index_outlet(outlet),
-        m_index_inlet(inlet)
-        {
-            ;
-        }
+        // This is called when the app is being asked to quit: you can ignore this
+        // request and let the app carry on running, or call quit() to allow the app to close.
+        quit();
     }
 }

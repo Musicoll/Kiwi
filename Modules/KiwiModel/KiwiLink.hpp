@@ -34,81 +34,86 @@ namespace kiwi
         //                                      LINK                                        //
         // ================================================================================ //
         
-        //! @brief The Link is used to create a connection between objects.
-        //! @details The Link holds a reference from the origin Object and to the destination Object
-        //! as well as IO indexes.
-        class Link : public Attribute::Manager
+        //! @brief The Link is used to create a connection between two objects.
+        //! @details The Link holds a reference to the sender Object, to the receiver Object
+        //! and inlet and outlet indexes.
+        class Link : public flip::Object
         {
         public:
-            
-            //! @brief default constructor.
-            Link() {}
             
             //! @brief Constructs a Link.
             //! @details Constructs a Link with given origin and destination Object pointers
             //! and IO indexes.
-            //! @param from     The origin Object pointer.
-            //! @param outlet   The origin outlet index.
-            //! @param to       The destination Object pointer.
-            //! @param inlet    The destination inlet index.
-            Link(model::Object* from, const uint8_t outlet, model::Object* to, const uint8_t inlet);
+            //! @param from     The sender Object.
+            //! @param outlet   The sender outlet index.
+            //! @param to       The receiver Object.
+            //! @param inlet    The receiver inlet index.
+            Link(model::Object const& from, const uint32_t outlet, model::Object const& to, const uint32_t inlet);
             
             //! @brief Destructor.
-            virtual ~Link() {}
+            virtual ~Link() = default;
             
-            //! @brief Creates and returns a new Link
-            //! @param from     The origin Object pointer.
-            //! @param outlet   The origin outlet index.
-            //! @param to       The destination Object pointer.
-            //! @param inlet    The destination inlet index.
-            static std::unique_ptr<Link> create(model::Object* from, const uint8_t outlet,
-                                                model::Object* to, const uint8_t inlet);
-            
-            //! @internal flip static declare method
-            template<class TModel>
-            static void declare()
+            //! @brief Get the source Object ID of the link.
+            //! @return The source Object ID of the link.
+            model::Object const& getSenderObject() const noexcept
             {
-                if(TModel::template has<Link>()) return;
-                
-                TModel::template declare<Link>()
-                .name("cicm.kiwi.Link")
-                .template inherit<Attribute::Manager>()
-                .template member<decltype(Link::m_object_from), &Link::m_object_from>("object_from")
-                .template member<decltype(Link::m_object_to),   &Link::m_object_to>("object_to")
-                .template member<decltype(Link::m_index_outlet),&Link::m_index_outlet>("outlet_index")
-                .template member<decltype(Link::m_index_inlet), &Link::m_index_inlet>("inlet_index");
+                return !removed() ? *m_sender.value() : *m_sender.before();
             }
-            
-            //! @brief Returns the patcher that manages the link.
-            //! @return The Patcher reference.
-            inline Patcher& getParentPatcher()                              { return ancestor<Patcher>(); }
-            
-            //! @brief Returns the patcher that manages the link.
-            //! @return The Patcher reference.
-            inline Patcher const& getParentPatcher() const                  { return ancestor<Patcher>(); }
-            
-            //! @brief Get the origin Object of the link.
-            //! @return The origin Object of the link.
-            inline model::Object* getObjectFrom() const noexcept            { return m_object_from; }
             
             //! @brief Get the destination Object of the link.
             //! @return The destination Object of the link.
-            inline model::Object* getObjectTo() const noexcept              { return m_object_to; }
+            model::Object const& getReceiverObject() const noexcept
+            {
+                return !removed() ? *m_receiver.value() : *m_receiver.before();
+            }
             
-            //! @brief Get the origin outlet index of the link.
-            //! @return The origin outlet index of the link.
-            inline flip::Int::internal_type getOutletIndex() const noexcept { return m_index_outlet; }
+            //! @brief Get the actual origin outlet index of the link.
+            //! @return The actual origin outlet index of the link.
+            uint32_t getSenderIndex() const noexcept
+            {
+                int64_t value = !removed() ? m_index_outlet.value() : m_index_outlet.before();
+                return static_cast<uint32_t>(value);
+            }
             
-            //! @brief Get the destination inlet index of the link.
-            //! @return The destination inlet index of the link.
-            inline flip::Int::internal_type getInletIndex() const noexcept  { return m_index_inlet; }
+            //! @brief Get the actual destination inlet index of the link.
+            //! @return The actual destination inlet index of the link.
+            uint32_t getReceiverIndex() const noexcept
+            {
+                int64_t value = !removed() ? m_index_inlet.value() : m_index_inlet.before();
+                return static_cast<uint32_t>(value);
+            }
+            
+        public:
+            
+            //! @internal flip Default constructor
+            Link(flip::Default&) {}
+            
+            //! @internal flip static declare method
+            template<class TModel> static void declare();
             
         private:
-            model::Object::Ref              m_object_from;
-            model::Object::Ref              m_object_to;
+            flip::ObjectRef<model::Object>  m_sender;
+            flip::ObjectRef<model::Object>  m_receiver;
             flip::Int                       m_index_outlet;
             flip::Int                       m_index_inlet;
         };
+        
+        // ================================================================================ //
+        //                                  LINK::declare                                   //
+        // ================================================================================ //
+        
+        template<class TModel>
+        void Link::declare()
+        {
+            if(TModel::template has<Link>()) return;
+            
+            TModel::template declare<Link>()
+            .name("cicm.kiwi.Link")
+            .template member<flip::ObjectRef<model::Object>, &Link::m_sender>("sender_obj")
+            .template member<flip::ObjectRef<model::Object>, &Link::m_receiver>("receiver_obj")
+            .template member<flip::Int, &Link::m_index_outlet>("outlet_index")
+            .template member<flip::Int, &Link::m_index_inlet>("inlet_index");
+        }
     }
 }
 

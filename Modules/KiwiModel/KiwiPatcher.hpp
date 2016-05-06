@@ -24,7 +24,7 @@
 #ifndef KIWI_MODEL_PATCHER_HPP_INCLUDED
 #define KIWI_MODEL_PATCHER_HPP_INCLUDED
 
-#include "KiwiLink.hpp"
+#include "Objects/KiwiObjects.hpp"
 
 namespace kiwi
 {
@@ -34,79 +34,46 @@ namespace kiwi
         //                                      PATCHER                                     //
         // ================================================================================ //
         
-        //! @brief The patcher manages a set of objects, links and attributes
-        class Patcher : public Attribute::Manager
+        //! @brief The Patcher manages a set of Object and Link
+        class Patcher : public flip::Object
         {
         public:
             
+            using object_array_t = flip::Array<model::Object>;
+            using link_array_t = flip::Array<model::Link>;
+                        
             //! @brief Default constructor.
             Patcher();
-            
-            //! @internal flip Default constructor.
-            Patcher(flip::Default&) {}
             
             //! @brief Destructor.
             ~Patcher();
             
-            //! @brief initialize the Patcher model
-            void init();
+            //! @brief Creates and adds a "plus" object to the Patcher.
+            model::Object& addPlus();
             
-            //! @internal flip static declare method
-            template<class TModel>
-            static void declare()
-            {
-                TModel::template declare<Patcher>()
-                .name("cicm.kiwi.Patcher")
-                .template inherit<Attribute::Manager>()
-                .template member<decltype(Patcher::m_objects),   &Patcher::m_objects>   ("objects")
-                .template member<decltype(Patcher::m_links),     &Patcher::m_links>     ("links");
-            }
-            
-            //! Get the objects.
-            /** The function retrieves the objects from the patcher.
-             @return A vector with the objects.
-             */
-            flip::Array<flip::Object>::difference_type getNumberOfObjects() const
-            {
-                std::lock_guard<std::mutex> guard(m_mutex);
-                return std::count_if(m_objects.begin(), m_objects.end(), [](flip::Object const&){return true;});
-            }
-            
-            //! Get the objects.
-            /** The function retrieves the objects from the patcher.
-             @return A vector with the objects.
-             */
-            flip::Array<model::Object> const& getObjects() noexcept
-            {
-                std::lock_guard<std::mutex> guard(m_mutex);
-                return m_objects;
-            }
-            
-            //! Get the objects.
-            /** The function retrieves the objects from the patcher.
-             @return A vector with the objects.
-             */
-            flip::Collection<Link> const& getLinks() noexcept
-            {
-                std::lock_guard<std::mutex> guard(m_mutex);
-                return m_links;
-            }
-            
-            //! @brief Adds an object to the Patcher.
-            model::Object* addObject(std::string const& name, std::string const& text = "");
+            //! @brief Creates and adds a "print" object to the Patcher.
+            model::Object& addPrint();
             
             //! @brief Constructs and add a Link to the Patcher.
-            //! @details Constructs a Link with given origin and destination Object pointers
+            //! @details Constructs a Link with given origin and destination Object
             //! and IO indexes then adds it in the Patcher.
-            //! @param from     The origin Object pointer.
+            //! @param from     The origin Object.
             //! @param outlet   The origin outlet index.
-            //! @param to       The destination Object pointer.
+            //! @param to       The destination Object.
             //! @param inlet    The destination inlet index.
-            Link* addLink(model::Object* from, const uint8_t outlet, model::Object* to, const uint8_t inlet);
+            void addLink(model::Object const& from,
+                         const uint32_t outlet,
+                         model::Object const& to,
+                         const uint32_t inlet);
             
             //! @brief Removes an object from the Patcher.
-            //! @param obj The pointer to the object to remove.
-            void remove(model::Object* obj);
+            //! @details This will also remove all links connected to this object.
+            //! @param object The Object to remove.
+            void removeObject(model::Object const& object);
+            
+            //! @brief Removes a link from the Patcher.
+            //! @param link The Link to remove.
+            void removeLink(model::Link const& link);
             
             //! @brief Returns true if an Object has been added, removed or changed.
             inline bool objectsChanged() const noexcept { return m_objects.changed(); }
@@ -114,13 +81,71 @@ namespace kiwi
             //! @brief Returns true if a Link has been added, removed or changed.
             inline bool linksChanged() const noexcept   { return m_links.changed(); }
             
+            //! @brief Get the first Object.
+            object_array_t::const_iterator getFirstObject() const noexcept  { return m_objects.cbegin(); }
+            
+            //! @brief Get the first Object.
+            object_array_t::iterator getFirstObject() noexcept              { return m_objects.begin(); }
+            
+            //! @brief Get the last Object.
+            object_array_t::const_iterator getLastObject() const noexcept   { return m_objects.cend(); }
+            
+            //! @brief Get the last Object.
+            object_array_t::iterator getLastObject() noexcept               { return m_objects.end(); }
+            
+            //! @brief Get the first Link.
+            link_array_t::const_iterator getFirstLink() const noexcept      { return m_links.cbegin(); }
+            
+            //! @brief Get the first Link.
+            link_array_t::iterator getFirstLink() noexcept                  { return m_links.begin(); }
+            
+            //! @brief Get the last Link.
+            link_array_t::const_iterator getLastLink() const noexcept       { return m_links.cend(); }
+            
+            //! @brief Get the last Link.
+            link_array_t::iterator getLastLink() noexcept                   { return m_links.end(); }
+            
+            //! @brief Get the objects.
+            flip::Array<model::Object> const& getObjects() const noexcept   { return m_objects; }
+            
+            //! @brief Get the links.
+            flip::Array<model::Link> const& getLinks() const noexcept       { return m_links; }
+            
+            //! @internal flip static declare method
+            template<class TModel> static void declare();
+            
         private:
             
-            //! object are stored in a flip::Array to maintain a z-order.
-            flip::Array<model::Object>  m_objects;
-            flip::Collection<Link>      m_links;
-            mutable std::mutex          m_mutex;        // lock-free (grahams) ??
+            bool canConnect(model::Object const& from, const uint32_t outlet,
+                            model::Object const& to, const uint32_t inlet) const;
+        
+            object_array_t::const_iterator findObject(model::Object const& object) const;
+            object_array_t::iterator findObject(model::Object const& object);
+            
+            link_array_t::const_iterator findLink(model::Link const& object) const;
+            link_array_t::iterator findLink(model::Link const& object);
+            
+        private:
+            
+            //! objects and links are stored in a flip::Array to maintain a graphical z-order.
+            flip::Array<model::Object>   m_objects;
+            flip::Array<model::Link>     m_links;
         };
+        
+        // ================================================================================ //
+        //                                  PATCHER::declare                                //
+        // ================================================================================ //
+        
+        template<class TModel>
+        void Patcher::declare()
+        {
+            assert(! TModel::template has<Patcher>());
+
+            TModel::template declare<Patcher>()
+            .name("cicm.kiwi.Patcher")
+            .template member<flip::Array<model::Object>, &Patcher::m_objects> ("objects")
+            .template member<flip::Array<model::Link>, &Patcher::m_links> ("links");
+        }
     }
 }
 

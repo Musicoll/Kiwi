@@ -24,114 +24,125 @@
 #ifndef KIWI_MODEL_OBJECT_HPP_INCLUDED
 #define KIWI_MODEL_OBJECT_HPP_INCLUDED
 
-#include "KiwiAttribute.hpp"
+#include <KiwiCore/KiwiAtom.hpp>
+#include <mutex>
+#include <algorithm>
+
+// ---- Flip headers ---- //
+#include "flip/DataModel.h"
+#include "flip/Bool.h"
+#include "flip/Int.h"
+#include "flip/Float.h"
+#include "flip/Blob.h"
+#include "flip/String.h"
+#include "flip/Enum.h"
+#include "flip/Array.h"
+#include "flip/Collection.h"
+#include "flip/Object.h"
+#include "flip/ObjectRef.h"
+#include "flip/Signal.h"
 
 namespace kiwi
 {
     namespace model
     {
-        class Patcher;
-        
         // ================================================================================ //
         //                                      OBJECT                                      //
         // ================================================================================ //
         
         //! @brief The Object is an abstract base class for kiwi objects.
         //! @details objects can be instantiated in a Patcher.
-        class Object : public Attribute::Manager
+        class Object : public flip::Object
         {
         public:
-            
-            struct initInfos
-            {
-                std::string         name;
-                std::string         text;
-                std::vector<Atom>   args;
-                
-                initInfos(std::string const& object_name, std::string const& object_text) :
-                name(object_name),
-                text(object_text)
-                {
-                    ;
-                }
-            };
-            
-            using Ref = flip::ObjectRef<model::Object>;
-            
-            //! @internal flip Default constructor
-            Object(flip::Default&) {}
-            
+ 
             //! @brief Constructor.
-            Object(std::string const& name, std::string const& text);
+            Object(std::string const& name, const uint32_t inlets, const uint32_t outlets);
+            
+            //! @brief Copy constructor (needed for flip::Array)
+            Object(model::Object const&);
             
             //! @brief Destructor.
-            virtual ~Object() noexcept {}
-            
-            //! @internal flip static declare method
-            template<class TModel>
-            static void declare()
-            {
-                if(TModel::template has<model::Object>()) return;
-                
-                TModel::template declare<model::Object>()
-                .name("cicm.kiwi.Object")
-                .template inherit<Attribute::Manager>()
-                .template member<flip::String, &Object::m_name>("name")
-                .template member<flip::String, &Object::m_text>("text")
-                .template member<flip::Int,    &Object::m_number_of_inlets>("ninlets")
-                .template member<flip::Int,    &Object::m_number_of_outlets>("noutlets");
-            }
-            
-            //! @brief Returns the patcher that manages the object.
-            //! @return The Patcher reference.
-            inline Patcher& getParentPatcher()              { return ancestor<Patcher>(); }
-            
-            //! @brief Returns the patcher that manages the object.
-            //! @return The Patcher reference.
-            inline Patcher const& getParentPatcher() const  { return ancestor<Patcher>(); }
+            virtual ~Object();
             
             //! @brief Returns the name of the Object.
             //! @return The name of the Object.
-            inline std::string getName() const noexcept     { return m_name; }
-            
-            //! @brief Returns the text of the Object.
-            //! @return The text of the Object.
-            inline std::string getText() const noexcept     { return m_text; }
+            inline std::string getName() const     { return m_name; }
             
             //! @brief Returns the number of inlets.
             //! @return The number of inlets.
-            inline flip::Int::internal_type getNumberOfInlets() const noexcept
+            inline uint32_t getNumberOfInlets() const noexcept
             {
-                return m_number_of_inlets;
-            }
-            
-            //! @brief Sets the number of inlets.
-            //! @param value The new number of inlets.
-            void setNumberOfInlets(uint32_t value) noexcept
-            {
-                m_number_of_inlets = reinterpret_cast<flip::Int::internal_type&>(value);
+                return static_cast<uint32_t>(m_inlets);
             }
             
             //! @brief Returns the number of outlets.
             //! @return The number of outlets.
-            inline flip::Int::internal_type getNumberOfOutlets() const noexcept
+            inline uint32_t getNumberOfOutlets() const noexcept
             {
-                return m_number_of_outlets;
+                return static_cast<uint32_t>(m_outlets);
             }
             
-            //! @brief Sets the number of outlets.
-            //! @param value The new number of outlets.
-            void setNumberOfOutlets(uint32_t value) noexcept
+            //! @brief Set the x/y position.
+            void setPosition(double x, double y)
             {
-                m_number_of_outlets = reinterpret_cast<flip::Int::internal_type&>(value);
+                m_position_x = x;
+                m_position_y = y;
             }
+            
+            //! @brief Returns true if the object's position changed.
+            bool positionChanged() const noexcept
+            {
+                return (m_position_x.changed() || m_position_y.changed());
+            }
+            
+            //! @brief Returns the x position.
+            double getX() const noexcept { return m_position_x; }
+            
+            //! @brief Returns the y position.
+            double getY() const noexcept { return m_position_y; }
+            
+            //! @brief Call signalTrigger() to hmmm.. trigger the signal.
+            flip::Signal<> signalTrigger;
+            
+        public:
+            
+            //! @internal flip Default constructor
+            Object(flip::Default&);
+            
+            //! @internal flip static declare method
+            template<class TModel> static void declare();
             
         private:
+            
+            //! @brief Signal types
+            enum SignalType { Trigger };
+            
             flip::String    m_name;
-            flip::String    m_text;
-            flip::Int       m_number_of_inlets;
-            flip::Int       m_number_of_outlets;
+            flip::Int       m_inlets;
+            flip::Int       m_outlets;
+            
+            flip::Float     m_position_x;
+            flip::Float     m_position_y;
         };
+        
+        // ================================================================================ //
+        //                                  OBJECT::declare                                 //
+        // ================================================================================ //
+        
+        template<class TModel>
+        void Object::declare()
+        {
+            if(TModel::template has<model::Object>()) return;
+            
+            TModel::template declare<model::Object>()
+            .name("cicm.kiwi.Object")
+            .template member<flip::String, &Object::m_name>("name")
+            .template member<flip::Int, &Object::m_inlets>("inlets")
+            .template member<flip::Int, &Object::m_outlets>("outlets")
+            .template member<flip::Float, &Object::m_position_x>("pos_x")
+            .template member<flip::Float, &Object::m_position_y>("pos_y");
+        }
     }
 }
 

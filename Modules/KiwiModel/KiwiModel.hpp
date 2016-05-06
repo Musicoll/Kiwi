@@ -24,7 +24,7 @@
 #ifndef KIWI_MODEL_HPP_INCLUDED
 #define KIWI_MODEL_HPP_INCLUDED
 
-#include "Objects/KiwiObjects.hpp"
+#include "KiwiPatcher.hpp"
 
 namespace kiwi
 {
@@ -42,27 +42,12 @@ namespace kiwi
             {
                 Model::version(version);
                 
-                // basic types declaration :
-                FlipRGBA::declare<Model>();
-                FlipPoint::declare<Model>();
-                
-                // attributes declaration :
-                Attribute::declare<Model>();
-                
-                // Attributes types
-                Attribute::Int::declare<Model>();
-                Attribute::Float::declare<Model>();
-                Attribute::String::declare<Model>();
-                Attribute::RGBA::declare<Model>();
-                Attribute::Enum::declare<Model>();
-                
-                Attribute::Manager::declare<Model>();
-                
                 // patcher elements declaration :
                 model::Object::declare<Model>();
                 
                 // Objects
-                model::ObjectPlus::declare<Model>();
+                ObjectPlus::declare<Model>();
+                ObjectPrint::declare<Model>();
                 
                 // Links
                 Link::declare<Model>();
@@ -72,15 +57,6 @@ namespace kiwi
             }
         };
     }
-    
-    using Model = kiwi::model::Model;
-    using FlipRGBA = kiwi::model::FlipRGBA;
-    using FlipPoint = kiwi::model::FlipPoint;
-    using Attribute = kiwi::model::Attribute;
-    using Object = kiwi::model::Object;
-    using Link = kiwi::model::Link;
-    using Patcher = kiwi::model::Patcher;
-
 }
 
 #endif // KIWI_MODEL_HPP_INCLUDED

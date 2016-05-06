@@ -19,27 +19,29 @@
  To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
  
  ==============================================================================
-*/
+ */
 
-#include "KiwiLink.hpp"
-#include "KiwiObject.hpp"
-#include "KiwiPatcher.hpp"
+#include "jWindow.hpp"
 
 namespace kiwi
 {
-    namespace model
+    jWindow::jWindow() :
+    juce::DocumentWindow("Untitled", juce::Colours::lightgrey, juce::DocumentWindow::allButtons, true)
     {
-        // ================================================================================ //
-        //                                      LINK                                        //
-        // ================================================================================ //
-        
-        Link::Link(model::Object const& from, const uint32_t outlet, model::Object const& to, const uint32_t inlet) :
-        m_sender(from.ref()),
-        m_receiver(to.ref()),
-        m_index_outlet(outlet),
-        m_index_inlet(inlet)
-        {
-            ;
-        }
+        setUsingNativeTitleBar(true);
+        setSize(600, 500);
+        centreWithSize(getWidth(), getHeight());
+        setResizable(true, true);
+        setVisible(true);
+    }
+    
+    jWindow::~jWindow()
+    {
+        ;
+    }
+    
+    void jWindow::closeButtonPressed()
+    {
+        juce::JUCEApplication::quit();
     }
 }

@@ -21,25 +21,14 @@
  ==============================================================================
 */
 
-#include "KiwiLink.hpp"
-#include "KiwiObject.hpp"
-#include "KiwiPatcher.hpp"
+#ifndef KIWI_ENGINE_HPP_INCLUDED
+#define KIWI_ENGINE_HPP_INCLUDED
+
+#include "KiwiInstance.hpp"
 
 namespace kiwi
 {
-    namespace model
-    {
-        // ================================================================================ //
-        //                                      LINK                                        //
-        // ================================================================================ //
-        
-        Link::Link(model::Object const& from, const uint32_t outlet, model::Object const& to, const uint32_t inlet) :
-        m_sender(from.ref()),
-        m_receiver(to.ref()),
-        m_index_outlet(outlet),
-        m_index_inlet(inlet)
-        {
-            ;
-        }
-    }
+    
 }
+
+#endif // KIWI_ENGINE_HPP_INCLUDED

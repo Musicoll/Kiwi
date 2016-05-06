@@ -21,25 +21,43 @@
  ==============================================================================
 */
 
-#include "KiwiLink.hpp"
-#include "KiwiObject.hpp"
-#include "KiwiPatcher.hpp"
+#ifndef KIWI_MODEL_OBJECTS_OBJECTPRINT_HPP_INCLUDED
+#define KIWI_MODEL_OBJECTS_OBJECTPRINT_HPP_INCLUDED
+
+#include "KiwiObjectPlus.hpp"
 
 namespace kiwi
 {
     namespace model
     {
         // ================================================================================ //
-        //                                      LINK                                        //
+        //                                    OBJECT PLUS                                   //
         // ================================================================================ //
         
-        Link::Link(model::Object const& from, const uint32_t outlet, model::Object const& to, const uint32_t inlet) :
-        m_sender(from.ref()),
-        m_receiver(to.ref()),
-        m_index_outlet(outlet),
-        m_index_inlet(inlet)
+        class ObjectPrint : public model::Object
         {
-            ;
-        }
+        public:
+            
+            ObjectPrint(flip::Default& d) : model::Object(d) {}
+            
+            ObjectPrint() : model::Object("print", 1, 0)
+            {
+                ;
+            }
+
+            //! @internal flip static declare method
+            template<class TModel>
+            static void declare()
+            {
+                if(TModel::template has<ObjectPrint>()) return;
+                
+                TModel::template declare<ObjectPrint>()
+                .name("cicm.kiwi.ObjectPrint")
+                .template inherit<model::Object>();
+            }
+        };
     }
 }
+
+
+#endif // KIWI_MODEL_OBJECTS_OBJECTPRINT_HPP_INCLUDED

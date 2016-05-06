@@ -24,18 +24,13 @@
 #ifndef KIWI_MODEL_OBJECTS_HPP_INCLUDED
 #define KIWI_MODEL_OBJECTS_HPP_INCLUDED
 
-#include "KiwiObjectPlus.hpp"
+#include "KiwiObjectPrint.hpp"
 
 namespace kiwi
 {
     namespace model
     {
-        void initializeBasicObjects();
-        void initializeBasicObjects()
-        {
-            ObjectFactory::add<ObjectPlus>("plus");
-            ObjectFactory::add<ObjectPlus>("+");
-        }
+        ;
     }
 }
 

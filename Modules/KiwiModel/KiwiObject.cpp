@@ -22,7 +22,6 @@
 */
 
 #include "KiwiObject.hpp"
-#include "KiwiPatcher.hpp"
 
 namespace kiwi
 {
@@ -32,12 +31,36 @@ namespace kiwi
         //                                      OBJECT                                      //
         // ================================================================================ //
         
-        Object::Object(std::string const& name, std::string const& text) :
-        m_name(name),
-        m_text(text)
+        Object::Object(flip::Default&) : signalTrigger(Trigger, *this)
         {
-            addAttr<Attribute::RGBA>("bgcolor",  FlipRGBA{1., 1., 1., 1.});
-            addAttr<Attribute::RGBA>("color",    FlipRGBA{0., 0., 0., 1.});
+            ;
+        }
+        
+        Object::Object(std::string const& name, const uint32_t inlets, const uint32_t outlets) :
+        signalTrigger(Trigger, *this),
+        m_name(name),
+        m_inlets(inlets),
+        m_outlets(outlets),
+        m_position_x(0.),
+        m_position_y(0.)
+        {
+            ;
+        }
+        
+        Object::Object(model::Object const& other) :
+        signalTrigger(Trigger, *this),
+        m_name(other.m_name),
+        m_inlets(other.m_inlets),
+        m_outlets(other.m_outlets),
+        m_position_x(other.m_position_x),
+        m_position_y(other.m_position_y)
+        {
+            
+        }
+        
+        Object::~Object()
+        {
+            ;
         }
     }
 }

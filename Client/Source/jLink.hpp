@@ -19,27 +19,39 @@
  To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
  
  ==============================================================================
-*/
+ */
 
-#include "KiwiLink.hpp"
-#include "KiwiObject.hpp"
-#include "KiwiPatcher.hpp"
+#ifndef KIWI_JLINK_HPP_INCLUDED
+#define KIWI_JLINK_HPP_INCLUDED
+
+#include <KiwiModel/KiwiLink.hpp>
+
+#include "jObject.hpp"
 
 namespace kiwi
 {
-    namespace model
+    //! @brief The juce link Component.
+    class jLink : public juce::Component, juce::ComponentListener
     {
-        // ================================================================================ //
-        //                                      LINK                                        //
-        // ================================================================================ //
+    public:
         
-        Link::Link(model::Object const& from, const uint32_t outlet, model::Object const& to, const uint32_t inlet) :
-        m_sender(from.ref()),
-        m_receiver(to.ref()),
-        m_index_outlet(outlet),
-        m_index_inlet(inlet)
-        {
-            ;
-        }
-    }
+        jLink();
+        ~jLink();
+        
+        void linkModelChanged(model::Link& link);
+        void objectModelChanged(model::Object& object);
+        
+        // juce::Component
+        void paint(juce::Graphics& g) override;
+        
+    private:
+        
+        void updateBounds();
+        
+        model::Link* m_model;
+        
+        juce::Point<int> m_last_inlet_pos, m_last_outlet_pos;
+    };
 }
+
+#endif // KIWI_JLINK_HPP_INCLUDED

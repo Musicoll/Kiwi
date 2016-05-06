@@ -21,145 +21,254 @@
  ==============================================================================
 */
 
-#include "KiwiPatcher.h"
-#include "KiwiInstance.h"
-#include "KiwiFactory.h"
+#include "KiwiPatcher.hpp"
+#include "KiwiInstance.hpp"
+#include "Objects/KiwiObjects.hpp"
 
 namespace kiwi
-{    
-    // ================================================================================ //
-    //                                      PAGE                                        //
-    // ================================================================================ //
-    
-    //Patcher::Patcher(sInstance instance, PatcherModel& model) noexcept : m_instance(instance), m_model(model)
-    Patcher::Patcher(Instance* instance) noexcept : m_instance(instance)
+{
+    namespace engine
     {
-        if(m_instance != nullptr)
-        {
-            // Set up a document
-            m_document = std::make_shared<flip::Document>(Model::use(), *this, m_instance->getUserId(), 'cicm', 'kpat');
-            
-            // Set up an history for this document
-            m_history = std::make_shared<flip::History<flip::HistoryStoreMemory>>(*m_document.get());
-            
-            // Get our document's root model
-            m_model = &m_document->root<PatcherModel>();
-            
-            Dico dico;
-            m_model->init(dico);
-            m_document->commit();
-        }
-    }
-	
-    Patcher::~Patcher()
-    {
-        m_objects.clear();
-        m_links.clear();
-    }
-    
-    std::unique_ptr<Patcher> Patcher::create(Instance* instance)
-    {
-        std::unique_ptr<Patcher> patcher(new Patcher(instance));
-        return patcher;
-    }
-    
-    void Patcher::document_changed(PatcherModel& patcher)
-    {
-        std::cout << "Patcher : document_changed fn" << '\n';
+        // ================================================================================ //
+        //                                      PATCHER                                     //
+        // ================================================================================ //
         
-        //if (patcher.attributeChanged())
-        if (true)
+        Patcher::Patcher(Instance& instance) noexcept : m_instance(instance)
         {
-            std::cout << "\tpatcher attribute changed" << '\n';
-            
-            const Atom sigcolor = patcher.getAttributeValue(Tags::sigcolor);
-            std::cout << "\t\t- sigcolor : " << sigcolor << '\n';
-            
-            const Atom color = patcher.getAttributeValue(Tags::unlocked_bgcolor);
-            std::cout << "\t\t- unlocked_bgcolor : " << color << '\n';
-            
-            int64_t gridsize = patcher.getGridSize();
-            std::cout << "\t\t- gridSize : " << gridsize << '\n';
-            
-            auto val = patcher.getAttributeValue(Tag::create("attr_bool"));
-            std::cout << "\t\t- attr_bool : " << val << '\n';
-            
-            auto tag = patcher.getAttributeValue(Tag::create("attr_tag"));
-            std::cout << "\t\t- attr_tag : " << tag << '\n';
-            
-            auto tagArray = patcher.getAttributeValue(Tag::create("attr_tagArray"));
-            std::cout << "\t\t- attr_tag_array : " << tagArray << '\n';
-            
-            std::cout << "\t\t- atom : " << patcher.m_atom << '\n';
-            std::cout << "\t\t-- is undefined : " << patcher.m_atom.isUndefined() << '\n';
-            std::cout << "\t\t-- is bool : " << patcher.m_atom.isBool() << '\n';
-            std::cout << "\t\t-- is number : " << patcher.m_atom.isNumber() << '\n';
-            std::cout << "\t\t-- is tag : " << patcher.m_atom.isTag() << '\n';
+            ;
         }
-    }
-    
-    void Patcher::createObject(Dico& dico)
-    {
-        if(dico.count(Tags::name))
+        
+        Patcher::~Patcher()
         {
-            sTag objectName = dico[Tags::name];
-            if(Factory::has(objectName))
+            ;
+        }
+        
+        void Patcher::addPlus()
+        {
+            m_model->addPlus();
+        }
+        
+        void Patcher::addPrint()
+        {
+            m_model->addPrint();
+        }
+        
+        void Patcher::addLink(Object const& from, const uint32_t outlet, Object const& to, const uint32_t inlet)
+        {
+            m_model->addLink(from.m_model, outlet, to.m_model, inlet);
+        }
+        
+        void Patcher::removeObject(Object const& object)
+        {
+            m_model->removeObject(object.m_model);
+        }
+        
+        void Patcher::removeLink(Link const& link)
+        {
+            m_model->removeLink(link.m_model);
+        }
+        
+        std::vector<engine::Object const*> Patcher::getObjects() const
+        {
+            std::vector<engine::Object const*> objects;
+            for(auto& obj : m_model->getObjects())
             {
-                //@todo no need to cast here
-                const auto infos = Infos(static_cast<int64_t>(dico[Tags::id]),
-                                         sTag(dico[Tags::name]),
-                                         sTag(dico[Tags::text])->getName(),
-                                         dico, dico[Tags::arguments]);
-                
-                const Object* object = Factory::create(objectName, infos);
-                
-                if(object)
+                if(obj.resident())
                 {
-                    //m_objects.insert(m_objects.end(), *object);
-                    
-                    //m_listeners.call(&Listener::objectCreated, getShared(), object);
-                    //object->loaded();
+                    engine::Object const* object_engine = obj.entity().use<engine::Object*>();
+                    objects.push_back(object_engine);
                 }
             }
-        }
-    }
-    
-    void Patcher::add(Dico const& dico)
-    {
-        Vector objects;
-        const auto it = dico.find(Tags::objects);
-        if(it != dico.end())
-        {
-            objects = it->second;
+            
+            return objects;
         }
         
-        std::lock_guard<std::mutex> guard(m_mutex);
-        
-        for(Dico objdico : objects)
+        std::vector<engine::Object*> Patcher::getObjects()
         {
-            if(!objdico.empty())
+            std::vector<engine::Object*> objects;
+            for(auto& obj : m_model->getObjects())
             {
-                //const ulong r_id = objdico[Tags::id];
-                /*
-                const ulong n_id = m_free_ids.empty() ? getNumberOfObjects() + 1 : m_free_ids[0];
-                if(!m_free_ids.empty())
+                if(obj.resident())
                 {
-                    m_free_ids.erase(m_free_ids.begin());
+                    engine::Object* object_engine = obj.entity().use<engine::Object*>();
+                    objects.push_back(object_engine);
                 }
-                objdico[Tags::id] = (long)n_id;
+            }
+            
+            return objects;
+        }
+        
+        std::vector<engine::Link const*> Patcher::getLinks() const
+        {
+            std::vector<engine::Link const*> links;
+            for(auto& link : m_model->getLinks())
+            {
+                if(link.resident())
+                {
+                    engine::Link const* link_engine = link.entity().get<Link>();
+                    links.push_back(link_engine);
+                }
+            }
+            
+            return links;
+        }
+        
+        void Patcher::sendToObject(Object& object, const uint32_t inlet, std::vector<Atom> args)
+        {
+            object.receive(inlet, args);
+        }
+        
+        // ================================================================================ //
+        //                               DOCUMENT OBSERVER                                  //
+        // ================================================================================ //
+        
+        void Patcher::document_changed(model::Patcher& patcher)
+        {
+            if(patcher.added())
+            {
+                m_model = &patcher;
+            }
+            
+            if(patcher.changed())
+            {
+                const bool link_changed = patcher.linksChanged();
                 
-                createObject(objdico);
-                */
+                // check links before objects
+                if(link_changed)
+                {
+                    for(auto& link : patcher.getLinks())
+                    {
+                        if(link.changed() && link.removed())
+                        {
+                            linkWillBeRemoved(link);
+                        }
+                    }
+                }
+
+                if(patcher.objectsChanged())
+                {
+                    for(auto& object : patcher.getObjects())
+                    {
+                        if(object.changed())
+                        {
+                            if(object.added())
+                            {
+                                objectHasBeenAdded(object);
+                            }
+                            else if(object.removed())
+                            {
+                                objectWillBeRemoved(object);
+                            }
+                            else // resident
+                            {
+                                objectChanged(object);
+                            }
+                        }
+                    }
+                }
+                
+                // check links before objects
+                if(link_changed)
+                {
+                    for(auto& link : patcher.getLinks())
+                    {
+                        if(link.changed())
+                        {
+                            if(link.added())
+                            {
+                                linkHasBeenAdded(link);
+                            }
+                            else if(link.resident())
+                            {
+                                linkChanged(link);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if(patcher.removed())
+            {
+                m_model = nullptr;
             }
         }
-    }
-    
-    void Patcher::remove(sObject object)
-    {
-        ;
+
+        void Patcher::objectHasBeenAdded(model::Object& object)
+        {
+            const auto name = object.getName();
+            
+            engine::Object* object_engine_ptr = nullptr;
+            
+            if(name == "plus")
+            {
+                object_engine_ptr = &object.entity().emplace<engine::ObjectPlus>(static_cast<model::ObjectPlus&>(object));
+            }
+            else if(name == "print")
+            {
+                object_engine_ptr = &object.entity().emplace<engine::ObjectPrint>(static_cast<model::ObjectPrint&>(object));
+            }
+            
+            if(object_engine_ptr)
+            {
+                object.entity().emplace<engine::Object*>(object_engine_ptr);
+            }
+            else
+            {
+                assert(false && "Object engine creation fail");
+            }
+        }
+
+        void Patcher::objectChanged(model::Object& object_m)
+        {
+            auto& object_e = object_m.entity().use<engine::Object>();
+            object_e.modelChanged(object_m);
+        }
+
+        void Patcher::objectWillBeRemoved(model::Object& object)
+        {
+            object.entity().erase<engine::Object*>();
+            
+            const auto name = object.getName();
+            
+            if(name == "plus")
+            {
+                object.entity().erase<engine::ObjectPlus>();
+            }
+            else if(name == "print")
+            {
+                object.entity().erase<engine::ObjectPrint>();
+            }
+            else
+            {
+                assert(false && "Object engine destruction fail");
+                return;
+            }
+        }
+
+        void Patcher::linkHasBeenAdded(model::Link& link)
+        {
+            engine::Object* from = link.getSenderObject().entity().use<engine::Object*>();
+            engine::Object* to = link.getReceiverObject().entity().use<engine::Object*>();
+            
+            if(from && to)
+            {
+                auto& link_engine = link.entity().emplace<Link>(link, *from, *to);
+                from->addOutputLink(&link_engine);
+            }
+        }
+        
+        void Patcher::linkChanged(model::Link& link_m)
+        {
+            auto& link_e = link_m.entity().use<engine::Link>();
+            link_e.modelChanged(link_m);
+        }
+        
+        void Patcher::linkWillBeRemoved(model::Link& link)
+        {
+            auto& link_engine = link.entity().use<Link>();
+            engine::Object* from = link.getSenderObject().entity().use<engine::Object*>();
+            from->removeOutputLink(&link_engine);
+            link.entity().erase<Link>();
+        }
     }
 }
-
-
-
-

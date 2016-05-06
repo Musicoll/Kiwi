@@ -21,43 +21,85 @@
  ==============================================================================
 */
 
-#include "KiwiObject.h"
-#include "KiwiPatcher.h"
-#include "KiwiInstance.h"
+#include "KiwiObject.hpp"
+#include "KiwiPatcher.hpp"
+#include "KiwiInstance.hpp"
 
 namespace kiwi
 {
-    // ================================================================================ //
-    //                                      OBJECT                                      //
-    // ================================================================================ //
-    
-    Object::Object(ObjectModel& model) noexcept : m_model(model)
+    namespace engine
     {
-        /*
-        createFlipAttr(Tags::position,              "Position",                 "Appearance", flip::Array<FlipTag>("", ""));
-        createFlipAttr(Tags::position,              "Position",                 "Appearance", Point(0., 0.));
-        createFlipAttr(Tags::size,                  "Size",                     "Appearance", Size(10., 10.));
-        createFlipAttr(Tags::presentation_position, "Presentation Position",    "Appearance", Point(0., 0.));
-        createFlipAttr(Tags::presentation_size,     "Presentation Size",        "Appearance", Size(10., 10.));
-        */
-        //createFlipAttr(Tags::position, "Position", "Appearance", FlipPoint(0., 0.));
-        //createFlipAttr(Tags::presentation_position, "Presentation Position", "Appearance", FlipPoint(0., 0.));
-        /*
-        createFlipAttr(Tags::hidden,        "Hide on Lock",             "Appearance", flip::Bool(false));
-        createFlipAttr(Tags::presentation,  "Include in presentation",  "Appearance", flip::Bool(false));
-        createFlipAttr(Tags::ignoreclick,   "Ignore Click",             "Behavior",   flip::Bool(false));
-        */
-    }
-    
-    Object::Object(const Object& rhs) noexcept : m_model(rhs.m_model)
-    {
-        //m_attributes = rhs.m_attributes;
-    }
-    
-    Object::~Object() noexcept
-    {
-        ;
+        // ================================================================================ //
+        //                                      OBJECT                                      //
+        // ================================================================================ //
+        
+        Object::Object(model::Object& model) noexcept : m_model(model), m_stack_count(0)
+        {
+            m_outlets.resize(m_model.getNumberOfOutlets());
+            
+            // connect signals
+            m_signal_cnx = model.signalTrigger.connect(*this, &Object::internal_signalTriggerCalled);
+        }
+        
+        Object::~Object() noexcept
+        {
+            m_outlets.clear();
+        }
+        
+        void Object::addOutputLink(Link* link)
+        {
+            const size_t idx = link->getSenderIndex();
+            m_outlets[idx].insert(link);
+        }
+        
+        void Object::removeOutputLink(Link* link)
+        {
+            const size_t idx = link->getSenderIndex();
+            m_outlets[idx].erase(link);
+        }
+        
+        void Object::send(const uint32_t index, std::vector<Atom> args)
+        {
+            const auto idx = static_cast<std::vector<Outlet>::size_type>(index);
+            
+            if(idx < m_outlets.size())
+            {
+                for(auto* link : m_outlets[idx])
+                {
+                    Object& receiver = link->getReceiverObject();
+                    
+                    if(++receiver.m_stack_count < 256)
+                    {
+                        receiver.receive(link->getReceiverIndex(), args);
+                    }
+                    else
+                    {
+                        // commented because of an xcode f*c*i*g indentation bug
+                        std::cout << "object " << getName() << " => Stack overflow !" << '\n';
+                    }
+                    
+                    receiver.m_stack_count--;
+                }
+            
+            }
+        }
+        
+        void Object::modelChanged(model::Object& object_m)
+        {
+            if(object_m.added())
+            {
+                ;
+            }
+            
+            if(object_m.added())
+            {
+                ;
+            }
+        }
+        
+        void Object::internal_signalTriggerCalled()
+        {
+            signalTriggerCalled();
+        }
     }
 }
-
-

@@ -21,40 +21,66 @@
  ==============================================================================
 */
 
-#ifndef KIWI_MODEL_OBJECTS_OBJECTPLUS_HPP_INCLUDED
-#define KIWI_MODEL_OBJECTS_OBJECTPLUS_HPP_INCLUDED
+#ifndef KIWI_ENGINE_OBJECTS_OBJECTPLUS_HPP_INCLUDED
+#define KIWI_ENGINE_OBJECTS_OBJECTPLUS_HPP_INCLUDED
 
 #include "../KiwiLink.hpp"
 
 namespace kiwi
 {
-    namespace model
+    namespace engine
     {
         // ================================================================================ //
         //                                    OBJECT PLUS                                   //
         // ================================================================================ //
         
-        class ObjectPlus : public model::Object
+        class ObjectPlus : public engine::Object
         {
         public:
-            
-            ObjectPlus(flip::Default& d) : model::Object(d) {}
-            
-            ObjectPlus() : model::Object("plus", 2, 1)
+
+            ObjectPlus(model::ObjectPlus& model) : engine::Object(model), m_lhs(1.0), m_rhs(0.0)
             {
                 ;
             }
-
-            //! @internal flip static declare method
-            template<class TModel>
-            static void declare()
+            
+            void receive(uint32_t index, std::vector<Atom> args) override
             {
-                if(TModel::template has<ObjectPlus>()) return;
-                
-                TModel::template declare<ObjectPlus>()
-                .name("cicm.kiwi.ObjectPlus")
-                .template inherit<model::Object>();
+                if(args.size() > 0)
+                {
+                    if(args[0].isNumber())
+                    {
+                        if(index == 0)
+                        {
+                            m_lhs = args[0].getFloat();
+                            bang();
+                        }
+                        else if(index == 1)
+                        {
+                            m_rhs = args[0].getFloat();
+                        }
+                    }
+                    else if(index == 0
+                            && args[0].isString()
+                            && (args[0].getString() == "bang"))
+                    {
+                        bang();
+                    }
+                }
             }
+            
+            void bang()
+            {
+                send(0, {m_rhs + m_lhs});
+            }
+            
+            void signalTriggerCalled() override
+            {
+                bang();
+            }
+            
+        private:
+            double m_lhs = 1.0;
+            double m_rhs = 0.0;
         };
     }
 }
