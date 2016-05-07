@@ -59,8 +59,8 @@ namespace kiwi
             
         private:
             
-            //! @internal Model change notification.
-            void modelChanged(model::Link& link_m);
+            //! @internal Link model has changed.
+            void linkModelChanged(model::Link& link_m);
             
         private:
             

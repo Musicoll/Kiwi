@@ -114,9 +114,9 @@ namespace kiwi
                     {
                         if(link.changed() && link.removed())
                         {
-                            linkChanged(link);
+                            linkModelChanged(link);
                             
-                            linkWillBeRemoved(link);
+                            linkModelRemoved(link);
                         }
                     }
                 }
@@ -129,14 +129,14 @@ namespace kiwi
                         {
                             if(object.added())
                             {
-                                objectHasBeenAdded(object);
+                                objectModelAdded(object);
                             }
                             
-                            objectChanged(object);
+                            objectModelChanged(object);
                             
                             if(object.removed())
                             {
-                                objectWillBeRemoved(object);
+                                objectModelRemoved(object);
                             }
                         }
                     }
@@ -151,12 +151,12 @@ namespace kiwi
                         {
                             if(link.added())
                             {
-                                linkHasBeenAdded(link);
+                                linkModelAdded(link);
                             }
                             
                             if(link.resident())
                             {
-                                linkHasBeenAdded(link);
+                                linkModelChanged(link);
                             }
                         }
                     }
@@ -169,24 +169,24 @@ namespace kiwi
             }
         }
 
-        void Patcher::objectHasBeenAdded(model::Object& object_m)
+        void Patcher::objectModelAdded(model::Object& object_m)
         {
             sObject obj_sptr = ObjectFactory::createEngine<engine::Object>(object_m);
             object_m.entity().emplace<sObject>(obj_sptr);
         }
 
-        void Patcher::objectChanged(model::Object& object_m)
+        void Patcher::objectModelChanged(model::Object& object_m)
         {
             sObject object_e = object_m.entity().use<sObject>();
-            object_e->modelChanged(object_m);
+            object_e->objectModelChanged(object_m);
         }
 
-        void Patcher::objectWillBeRemoved(model::Object& object_m)
+        void Patcher::objectModelRemoved(model::Object& object_m)
         {
             object_m.entity().erase<sObject>();
         }
 
-        void Patcher::linkHasBeenAdded(model::Link& link_m)
+        void Patcher::linkModelAdded(model::Link& link_m)
         {
             auto& sender_entity = link_m.getSenderObject().entity();
             auto& receiver_entity = link_m.getReceiverObject().entity();
@@ -204,13 +204,13 @@ namespace kiwi
             }
         }
         
-        void Patcher::linkChanged(model::Link& link_m)
+        void Patcher::linkModelChanged(model::Link& link_m)
         {
             auto& link_e = link_m.entity().use<engine::Link>();
-            link_e.modelChanged(link_m);
+            link_e.linkModelChanged(link_m);
         }
         
-        void Patcher::linkWillBeRemoved(model::Link& link)
+        void Patcher::linkModelRemoved(model::Link& link)
         {
             auto& sender_entity = link.getSenderObject().entity();
             

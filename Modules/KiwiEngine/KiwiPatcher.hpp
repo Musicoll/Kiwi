@@ -65,25 +65,25 @@ namespace kiwi
         private:
             
             //! @internal flip::DocumentObserver<model::Patcher>::document_changed
-            void document_changed(model::Patcher& patcher) final;
+            void document_changed(model::Patcher& patcher) final override;
             
-            //! @internal Object has just been added to the document.
-            void objectHasBeenAdded(model::Object& object);
+            //! @internal Object model has just been added to the document.
+            void objectModelAdded(model::Object& object);
             
-            //! @internal Object is resident and internal value changed.
-            void objectChanged(model::Object& object);
+            //! @internal Object model has changed.
+            void objectModelChanged(model::Object& object);
             
-            //! @internal Object will be removed from the document.
-            void objectWillBeRemoved(model::Object& object);
+            //! @internal Object model will be removed from the document.
+            void objectModelRemoved(model::Object& object);
             
-            //! @internal Link has just been added to the document.
-            void linkHasBeenAdded(model::Link& link);
+            //! @internal Link model has just been added to the document.
+            void linkModelAdded(model::Link& link);
             
-            //! @internal Link is resident and internal value changed.
-            void linkChanged(model::Link& link);
+            //! @internal Link model has changed.
+            void linkModelChanged(model::Link& link);
             
-            //! @internal Link will be removed from the document.
-            void linkWillBeRemoved(model::Link& link);
+            //! @internal Link model will be removed from the document.
+            void linkModelRemoved(model::Link& link);
             
             // -----------------------------
             

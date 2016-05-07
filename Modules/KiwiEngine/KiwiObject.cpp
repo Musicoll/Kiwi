@@ -81,7 +81,7 @@ namespace kiwi
             }
         }
         
-        void Object::modelChanged(model::Object& object_m)
+        void Object::objectModelChanged(model::Object& object_m)
         {
             if(object_m.added())
             {

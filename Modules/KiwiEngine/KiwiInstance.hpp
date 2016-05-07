@@ -53,7 +53,7 @@ namespace kiwi
             inline uint64_t getUserId() const noexcept          { return m_user_id; }
             
             //! @internal flip::DocumentObserver<model::Patcher>::document_changed
-            void document_changed(model::Patcher& patcher) final;
+            void document_changed(model::Patcher& patcher) final override;
             
         private:
             
