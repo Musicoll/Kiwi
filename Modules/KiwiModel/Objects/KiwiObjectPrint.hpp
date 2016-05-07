@@ -56,7 +56,7 @@ namespace kiwi
                 .name("cicm.kiwi.ObjectPrint")
                 .template inherit<model::Object>();
                 
-                ObjectFactory::add<ObjectPrint>("print");
+                ObjectFactory::registerModel<ObjectPrint>("print");
             }
         };
     }

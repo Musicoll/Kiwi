@@ -65,7 +65,7 @@ namespace kiwi
                 .name("cicm.kiwi.ObjectPlus")
                 .template inherit<model::Object>();
                 
-                ObjectFactory::add<ObjectPlus>("plus");
+                ObjectFactory::registerModel<ObjectPlus>("plus");
             }
         };
     }

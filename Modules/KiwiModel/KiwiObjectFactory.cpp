@@ -60,17 +60,24 @@ namespace kiwi
         return nullptr;
     }
     
-    bool ObjectFactory::has(std::string const& name)
+    bool ObjectFactory::hasModel(std::string const& name)
     {
         std::lock_guard<std::mutex> guard(getMutex());
         const auto& creators = getCreators();
         return (creators.find(name) != creators.end());
     }
     
-    void ObjectFactory::remove(std::string const& name)
+    bool ObjectFactory::hasEngine(std::string const& name)
     {
         std::lock_guard<std::mutex> guard(getMutex());
-        getCreators().erase(name);
+        const auto& creators = getCreators();
+        const auto it = creators.find(name);
+        if(it != creators.end())
+        {
+            return (it->second.engine_ctor_fn != nullptr);
+        }
+        
+        return false;
     }
     
     std::vector<std::string> ObjectFactory::getNames()

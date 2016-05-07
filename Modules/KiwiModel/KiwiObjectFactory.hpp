@@ -48,11 +48,11 @@ namespace kiwi
         //! @param name An alias name of the object or nothing if you want yo use the default object name.
         template <class T,
         typename std::enable_if<std::is_base_of<model::Object, T>::value, model::Object>::type* = nullptr>
-        static void add(std::string name)
+        static void registerModel(std::string name)
         {
             static_assert(!std::is_abstract<T>::value, "The class must not be abstract.");
             
-            static_assert(std::is_constructible<T, std::string, std::vector<Atom>>::value, "The object must support (std::string, std::vector<Atom>) constructor");
+            static_assert(std::is_constructible<T, std::string, std::vector<Atom>>::value, "Bad model object constructor");
             
             if(!name.empty())
             {
@@ -82,7 +82,7 @@ namespace kiwi
         template <class TModel, class TEngine, typename
         std::enable_if<std::is_base_of<engine::Object, TEngine>::value,
         model::Object>::type* = nullptr>
-        static void add(std::string name)
+        static void registerEngine(std::string name)
         {
             static_assert(!std::is_abstract<TEngine>::value, "The class must not be abstract.");
             
@@ -106,7 +106,7 @@ namespace kiwi
                 else
                 {
                     //Console::error("Object model not declared");
-                    assert(false && "The Object model is not declared");
+                    assert(false && "The Object model is not registered");
                 }
             }
         }
@@ -156,11 +156,12 @@ namespace kiwi
         //! @brief Returns true if a given string match a registered Object name.
         //! @param name The name of the object.
         //! @return true if the object has been registered, otherwise false.
-        static bool has(std::string const& name);
+        static bool hasModel(std::string const& name);
         
-        //! @brief Removes an object from the factory.
-        //! @param name The name of the object to be removed.
-        static void remove(std::string const& name);
+        //! @brief Returns true if a given string match a registered Object name.
+        //! @param name The name of the object.
+        //! @return true if the object has been registered, otherwise false.
+        static bool hasEngine(std::string const& name);
         
         //! @brief Returns all the registered Object names.
         //! @return A vector of Object names.
@@ -176,8 +177,8 @@ namespace kiwi
         
         struct CreatorBundle
         {
-            model_ctor_t    model_ctor_fn;
-            engine_ctor_t   engine_ctor_fn;
+            model_ctor_t model_ctor_fn = nullptr;
+            engine_ctor_t engine_ctor_fn = nullptr;
         };
         
         //! @brief Returns the static map of creators.
