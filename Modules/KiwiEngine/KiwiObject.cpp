@@ -93,9 +93,9 @@ namespace kiwi
                 m_signal_cnx = m_model->signalTrigger.connect(*this, &Object::internal_signalTriggerCalled);
             }
             
-            if(object_m.added())
+            if(object_m.removed())
             {
-                ;
+                m_model = nullptr;
             }
         }
         

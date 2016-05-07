@@ -100,6 +100,8 @@ namespace kiwi
             
             flip::SignalConnection  m_signal_cnx;
         };
+        
+        typedef std::shared_ptr<Object> sObject;
     }
 }
 

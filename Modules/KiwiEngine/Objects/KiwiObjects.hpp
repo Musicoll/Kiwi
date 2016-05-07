@@ -33,11 +33,9 @@ namespace kiwi
     namespace engine
     {
         void registerObjects()
-        {
-            using ObjectFactory = model::ObjectFactory;
-            
-            ObjectFactory::add<model::ObjectPlus, ObjectPlus>("plus");
-            //ObjectFactory::add<model::ObjectPrint, ObjectPrint>("print");
+        {               
+            model::ObjectFactory::add<model::ObjectPlus, ObjectPlus>("plus");
+            model::ObjectFactory::add<model::ObjectPrint, ObjectPrint>("print");
         }
     }
 }

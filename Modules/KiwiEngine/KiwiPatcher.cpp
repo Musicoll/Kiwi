@@ -23,7 +23,6 @@
 
 #include "KiwiPatcher.hpp"
 #include "KiwiInstance.hpp"
-#include "Objects/KiwiObjects.hpp"
 
 namespace kiwi
 {
@@ -43,31 +42,6 @@ namespace kiwi
             ;
         }
         
-        void Patcher::addPlus()
-        {
-            m_model->addPlus();
-        }
-        
-        void Patcher::addPrint()
-        {
-            m_model->addPrint();
-        }
-        
-        void Patcher::addLink(Object const& from, const uint32_t outlet, Object const& to, const uint32_t inlet)
-        {
-            m_model->addLink(*from.m_model, outlet, *to.m_model, inlet);
-        }
-        
-        void Patcher::removeObject(Object const& object)
-        {
-            m_model->removeObject(*object.m_model);
-        }
-        
-        void Patcher::removeLink(Link const& link)
-        {
-            m_model->removeLink(link.m_model);
-        }
-        
         std::vector<engine::Object const*> Patcher::getObjects() const
         {
             std::vector<engine::Object const*> objects;
@@ -75,8 +49,8 @@ namespace kiwi
             {
                 if(obj.resident())
                 {
-                    engine::Object const* object_engine = obj.entity().use<engine::Object*>();
-                    objects.push_back(object_engine);
+                    auto object_engine = obj.entity().use<sObject>();
+                    objects.push_back(object_engine.get());
                 }
             }
             
@@ -90,8 +64,8 @@ namespace kiwi
             {
                 if(obj.resident())
                 {
-                    engine::Object* object_engine = obj.entity().use<engine::Object*>();
-                    objects.push_back(object_engine);
+                    auto object_engine = obj.entity().use<sObject>();
+                    objects.push_back(object_engine.get());
                 }
             }
             
@@ -140,6 +114,8 @@ namespace kiwi
                     {
                         if(link.changed() && link.removed())
                         {
+                            linkChanged(link);
+                            
                             linkWillBeRemoved(link);
                         }
                     }
@@ -177,9 +153,10 @@ namespace kiwi
                             {
                                 linkHasBeenAdded(link);
                             }
-                            else if(link.resident())
+                            
+                            if(link.resident())
                             {
-                                linkChanged(link);
+                                linkHasBeenAdded(link);
                             }
                         }
                     }
@@ -192,69 +169,34 @@ namespace kiwi
             }
         }
 
-        void Patcher::objectHasBeenAdded(model::Object& object)
+        void Patcher::objectHasBeenAdded(model::Object& object_m)
         {
-            const auto name = object.getName();
+            std::vector<Atom> args{42};
             
-            engine::Object* object_engine_ptr = nullptr;
-            
-            if(name == "plus")
-            {
-                //std::vector<Atom> args{42};
-                //model::ObjectFactory::createEngine<engine::Object>(object.getName(), args);
-                
-                object_engine_ptr = &object.entity().emplace<engine::ObjectPlus>(static_cast<model::ObjectPlus&>(object));
-            }
-            else if(name == "print")
-            {
-                object_engine_ptr = &object.entity().emplace<engine::ObjectPrint>(static_cast<model::ObjectPrint&>(object));
-            }
-            else
-            {
-                assert(false && "Bad Object engine name");
-            }
-            
-            if(object_engine_ptr)
-            {
-                object.entity().emplace<engine::Object*>(object_engine_ptr);
-            }
-            else
-            {
-                assert(false && "Object engine creation fail");
-            }
+            sObject obj_sptr = object_m.entity().emplace<sObject>(model::ObjectFactory::createEngine<engine::Object>(object_m.getName(), args));
         }
 
         void Patcher::objectChanged(model::Object& object_m)
         {
-            auto& object_e = *object_m.entity().use<engine::Object*>();
-            object_e.modelChanged(object_m);
+            sObject object_e = object_m.entity().use<sObject>();
+            object_e->modelChanged(object_m);
         }
 
         void Patcher::objectWillBeRemoved(model::Object& object)
         {
-            object.entity().erase<engine::Object*>();
-            
-            const auto name = object.getName();
-            
-            if(name == "plus")
-            {
-                object.entity().erase<engine::ObjectPlus>();
-            }
-            else if(name == "print")
-            {
-                object.entity().erase<engine::ObjectPrint>();
-            }
-            else
-            {
-                assert(false && "Object engine destruction fail");
-                return;
-            }
+            object.entity().erase<sObject>();
         }
 
         void Patcher::linkHasBeenAdded(model::Link& link)
         {
-            engine::Object* from = link.getSenderObject().entity().use<engine::Object*>();
-            engine::Object* to = link.getReceiverObject().entity().use<engine::Object*>();
+            auto& sender_entity = link.getSenderObject().entity();
+            auto& receiver_entity = link.getReceiverObject().entity();
+            
+            assert(sender_entity.has<sObject>());
+            assert(receiver_entity.has<sObject>());
+            
+            auto from = sender_entity.use<sObject>();
+            auto to = receiver_entity.use<sObject>();
             
             if(from && to)
             {
@@ -271,9 +213,15 @@ namespace kiwi
         
         void Patcher::linkWillBeRemoved(model::Link& link)
         {
-            auto& link_engine = link.entity().use<Link>();
-            engine::Object* from = link.getSenderObject().entity().use<engine::Object*>();
-            from->removeOutputLink(&link_engine);
+            auto& sender_entity = link.getSenderObject().entity();
+            
+            if(sender_entity.has<sObject>())
+            {
+                auto& link_engine = link.entity().use<Link>();
+                auto from = sender_entity.use<sObject>();
+                from->removeOutputLink(&link_engine);
+            }
+            
             link.entity().erase<Link>();
         }
     }

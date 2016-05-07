@@ -62,11 +62,7 @@ namespace kiwi
                     
                     std::map<std::string, CreatorBundle>& creators = getCreators();
                     
-                    if(creators.find(name) != creators.end())
-                    {
-                        //Console::error("The object " + name->getName() + " already exist !");
-                    }
-                    else
+                    if(creators.find(name) == creators.end())
                     {
                         CreatorBundle creator;
                         
@@ -76,6 +72,10 @@ namespace kiwi
                         };
                         
                         creators[name] = std::move(creator);
+                    }
+                    else
+                    {
+                        //Console::error("The object " + name->getName() + " already exist !");
                     }
                 }
             }
@@ -88,7 +88,7 @@ namespace kiwi
                 static_assert(!std::is_abstract<TEngine>::value, "The class must not be abstract.");
                 
                 static_assert(std::is_constructible<TEngine, std::vector<Atom>>::value, "Bad engine object constructor");
-                
+                                
                 if(!name.empty())
                 {
                     std::lock_guard<std::mutex> guard(getMutex());
@@ -124,7 +124,7 @@ namespace kiwi
             template <class TEngineObject, typename
             std::enable_if<std::is_base_of<engine::Object, TEngineObject>::value,
             engine::Object>::type* = nullptr>
-            static std::unique_ptr<engine::Object> createEngine(std::string const& name,
+            static std::unique_ptr<TEngineObject> createEngine(std::string const& name,
                                                                 std::vector<Atom> const& args)
             {
                 std::lock_guard<std::mutex> guard(getMutex());
@@ -133,10 +133,13 @@ namespace kiwi
                 const auto it = creators.find(name);
                 if(it != creators.end())
                 {
-                    const auto engine_ctor = it->second.engine_ctor_fn;
+                    const auto& engine_ctor = it->second.engine_ctor_fn;
                     
-                    const auto uptr = std::unique_ptr<TEngineObject>(engine_ctor(args));
-                    //return std::unique_ptr<engine::Object>(engine_ctor(args));
+                    if(!engine_ctor)
+                    {
+                        assert(false && "the engine object has not been registered");
+                    }
+                    return std::unique_ptr<TEngineObject>(engine_ctor(args));
                 }
                 
                 return nullptr;

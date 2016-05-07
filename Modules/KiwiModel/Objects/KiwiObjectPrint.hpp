@@ -25,6 +25,7 @@
 #define KIWI_MODEL_OBJECTS_OBJECTPRINT_HPP_INCLUDED
 
 #include "../KiwiObject.hpp"
+#include "../KiwiObjectFactory.hpp"
 
 namespace kiwi
 {
@@ -40,7 +41,8 @@ namespace kiwi
             
             ObjectPrint(flip::Default& d) : model::Object(d) {}
             
-            ObjectPrint() : model::Object("print", 1, 0)
+            ObjectPrint(std::string const& name, std::vector<Atom> args) :
+            model::Object(name, 1, 0)
             {
                 ;
             }
@@ -54,6 +56,8 @@ namespace kiwi
                 TModel::template declare<ObjectPrint>()
                 .name("cicm.kiwi.ObjectPrint")
                 .template inherit<model::Object>();
+                
+                ObjectFactory::add<ObjectPrint>("print");
             }
         };
     }

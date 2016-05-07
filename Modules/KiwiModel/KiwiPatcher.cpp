@@ -42,19 +42,12 @@ namespace kiwi
             m_objects.clear();
         }
         
-        model::Object& Patcher::addPlus()
+        model::Object& Patcher::addObject(std::string const& object_name)
         {
-            assert(ObjectFactory::has("plus"));
+            assert(ObjectFactory::has(object_name));
             
-            std::vector<Atom> args {42};
-            return *m_objects.insert(m_objects.end(), ObjectFactory::create("plus", args));
-            
-            //return *m_objects.insert(m_objects.end(), std::unique_ptr<model::ObjectPlus>(new model::ObjectPlus()));
-        }
-        
-        model::Object& Patcher::addPrint()
-        {
-            return *m_objects.insert(m_objects.end(), std::unique_ptr<model::ObjectPrint>(new model::ObjectPrint()));
+            std::vector<Atom> args;
+            return *m_objects.insert(m_objects.end(), ObjectFactory::create(object_name, args));
         }
         
         bool Patcher::canConnect(model::Object const& from, const uint32_t outlet,

@@ -96,7 +96,7 @@ namespace kiwi
         {
             case 1:
             {
-                auto& obj = patcher.addPlus();
+                auto& obj = patcher.addObject("plus");
                 obj.setPosition(event.x, event.y);
                 engine::DocumentManager::commit(patcher, "Add Plus Object");
                 break;
@@ -104,7 +104,7 @@ namespace kiwi
                 
             case 2:
             {
-                auto& obj = patcher.addPrint();
+                auto& obj = patcher.addObject("print");
                 obj.setPosition(event.getMouseDownX(), event.getMouseDownY());
                 engine::DocumentManager::commit(patcher, "Add Print Object");
                 break;

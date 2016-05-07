@@ -22,6 +22,7 @@
 */
 
 #include "KiwiInstance.hpp"
+#include "Objects/KiwiObjects.hpp"
 
 namespace kiwi
 {
@@ -35,7 +36,8 @@ namespace kiwi
         m_user_id(user_id),
         m_name(name)
         {
-            ;
+            model::Model::init("v0.0.1");
+            registerObjects();
         }
         
         Instance::~Instance()

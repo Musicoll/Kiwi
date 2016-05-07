@@ -30,7 +30,7 @@ namespace kiwi
 {
     jInstance::jInstance() : m_instance(new engine::Instance(123456789ULL, "Main"))
     {
-        model::Model::init("v0.0.1");
+        ;
     }
     
     jInstance::~jInstance()
@@ -50,25 +50,25 @@ namespace kiwi
     {
         {
             // simple print
-            auto& plus = patcher.addPlus();
+            auto& plus = patcher.addObject("plus");
             plus.setPosition(50, 50);
-            auto& print = patcher.addPrint();
+            auto& print = patcher.addObject("print");
             print.setPosition(50, 100);
             patcher.addLink(plus, 0, print, 0);
         }
         
         {
             // set rhs value
-            auto& plus_1 = patcher.addPlus();
+            auto& plus_1 = patcher.addObject("plus");
             plus_1.setPosition(150, 50);
             
-            auto& plus_2 = patcher.addPlus();
+            auto& plus_2 = patcher.addObject("plus");
             plus_2.setPosition(220, 50);
             
-            auto& plus_3 = patcher.addPlus();
+            auto& plus_3 = patcher.addObject("plus");
             plus_3.setPosition(150, 100);
             
-            auto& print = patcher.addPrint();
+            auto& print = patcher.addObject("print");
             print.setPosition(150, 150);
             
             patcher.addLink(plus_1, 0, plus_3, 0);
@@ -78,13 +78,13 @@ namespace kiwi
         
         {
             // basic counter
-            auto& plus_1 = patcher.addPlus();
+            auto& plus_1 = patcher.addObject("plus");
             plus_1.setPosition(350, 100);
             
-            auto& plus_2 = patcher.addPlus();
+            auto& plus_2 = patcher.addObject("plus");
             plus_2.setPosition(405, 50);
             
-            auto& print = patcher.addPrint();
+            auto& print = patcher.addObject("print");
             print.setPosition(350, 150);
             
             patcher.addLink(plus_1, 0, plus_2, 0);
@@ -97,7 +97,6 @@ namespace kiwi
     
     void jInstance::document_changed(model::Patcher& patcher)
     {
-        //std::cout << "jInstance::document_changed" << '\n';
         if(patcher.added())
         {
             patcher.entity().emplace<engine::DocumentManager>(patcher.document());

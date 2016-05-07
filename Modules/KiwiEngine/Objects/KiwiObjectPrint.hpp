@@ -43,6 +43,11 @@ namespace kiwi
                 ;
             }
             
+            ObjectPrint(std::vector<Atom> args)
+            {
+                ;
+            }
+            
             void receive(uint32_t, std::vector<Atom> args) override
             {
                 if(!args.empty())
