@@ -57,6 +57,8 @@ namespace kiwi
             
         private:
             
+            class PatcherModelDeclarator;
+            
             const uint64_t          m_user_id;
             const std::string       m_name;
         };

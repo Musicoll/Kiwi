@@ -24,7 +24,6 @@
 #ifndef KIWI_ENGINE_OBJECTS_HPP_INCLUDED
 #define KIWI_ENGINE_OBJECTS_HPP_INCLUDED
 
-#include <KiwiModel/KiwiObjectFactory.hpp>
 #include "KiwiObjectPlus.hpp"
 #include "KiwiObjectPrint.hpp"
 
@@ -32,11 +31,7 @@ namespace kiwi
 {
     namespace engine
     {
-        void registerObjects()
-        {               
-            ObjectFactory::registerEngine<model::ObjectPlus, ObjectPlus>("plus");
-            ObjectFactory::registerEngine<model::ObjectPrint, ObjectPrint>("print");
-        }
+        ;
     }
 }
 

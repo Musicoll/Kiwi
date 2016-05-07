@@ -71,7 +71,6 @@ namespace kiwi
                     }
                     else
                     {
-                        // commented because of an xcode f*c*i*g indentation bug
                         std::cout << "object " << getName() << " => Stack overflow !" << '\n';
                     }
                     

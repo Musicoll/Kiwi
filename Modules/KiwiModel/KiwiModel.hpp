@@ -32,29 +32,51 @@ namespace kiwi
     namespace model
     {
         //! @brief The Patcher Model class
-        class Model : public flip::DataModel<Model>
+        class PatcherDataModel : public flip::DataModel<PatcherDataModel>
         {
         public:
+            
+            using model_t = PatcherDataModel;
             
             //! @brief Initializes the model.
             //! @details Declares all flip classes.
             //! @param version The model version.
-            static void init(std::string const& version)
+            void init(std::string const& version)
             {
-                Model::version(version);
+                PatcherDataModel::version(version);
                 
                 // patcher elements declaration :
-                model::Object::declare<Model>();
+                model::Object::declare<model_t>();
                 
-                // Objects
-                ObjectPlus::declare<Model>();
-                ObjectPrint::declare<Model>();
+                declareObjects();
+                
+                declareExternalObjects();
                 
                 // Links
-                Link::declare<Model>();
+                Link::declare<model_t>();
                 
                 // Patcher
-                Patcher::declare<Model>();
+                Patcher::declare<model_t>();
+                
+                endOfModelDeclarationHook();
+            }
+            
+        protected:
+            
+            //! @brief Declare external/additionnal kiwi objects here
+            //! @details This method is called when all internal kiwi objects has been declared.
+            virtual void declareExternalObjects() {}
+            
+            //! @brief This method is called at the end of the init function
+            virtual void endOfModelDeclarationHook() {}
+            
+        private:
+            
+            //! @brief Declare all kiwi objects here
+            void declareObjects()
+            {
+                ObjectPlus::declare<model_t>();
+                ObjectPrint::declare<model_t>();
             }
         };
     }

@@ -22,12 +22,35 @@
 */
 
 #include "KiwiInstance.hpp"
+
+#include <KiwiModel/KiwiObjectFactory.hpp>
 #include "Objects/KiwiObjects.hpp"
 
 namespace kiwi
 {
     namespace engine
     {
+        // ================================================================================ //
+        //                           PATCHER MODEL DECLARATOR                               //
+        // ================================================================================ //
+        
+        //! @brief The Patcher Model class declarator
+        class Instance::PatcherModelDeclarator : public model::PatcherDataModel
+        {
+        public:
+            
+            void declareExternalObjects() final override
+            {
+                ;
+            }
+            
+            void endOfModelDeclarationHook() final override
+            {
+                ObjectFactory::registerEngine<model::ObjectPlus, ObjectPlus>("plus");
+                ObjectFactory::registerEngine<model::ObjectPrint, ObjectPrint>("print");
+            }
+        };
+        
         // ================================================================================ //
         //                                      INSTANCE                                    //
         // ================================================================================ //
@@ -36,8 +59,8 @@ namespace kiwi
         m_user_id(user_id),
         m_name(name)
         {
-            model::Model::init("v0.0.1");
-            registerObjects();
+            PatcherModelDeclarator model;
+            model.init("v0.0.1");
         }
         
         Instance::~Instance()

@@ -30,6 +30,7 @@ namespace kiwi
 {
     namespace engine
     {
+        // forward declaration of engine::Object
         class Object;
     }
     

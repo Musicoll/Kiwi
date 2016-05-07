@@ -21,7 +21,6 @@
     </GROUP>
     <GROUP id="{8FA1C9D1-9F39-6B48-4CD5-95C1B98E14A6}" name="Modules">
       <GROUP id="{4E36069F-186B-8CE4-3264-BA41957CB0CD}" name="KiwiEngine">
-        <FILE id="jL96qu" name="KiwiEngine.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiEngine.hpp"/>
         <FILE id="eHddVd" name="KiwiDocumentManager.cpp" compile="1" resource="0"
               file="../Modules/KiwiEngine/KiwiDocumentManager.cpp"/>
         <FILE id="Nc2HAm" name="KiwiDocumentManager.hpp" compile="0" resource="0"
