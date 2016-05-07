@@ -37,17 +37,14 @@ namespace kiwi
         class ObjectPlus : public engine::Object
         {
         public:
-            
-            ObjectPlus(model::ObjectPlus& model) :
-            m_lhs(1.0), m_rhs(0.0)
-            {
-                ;
-            }
 
-            ObjectPlus(std::vector<Atom> args) :
-            m_lhs(1.0), m_rhs(0.0)
+            ObjectPlus(std::vector<Atom> args)
             {
-                ;
+                m_lhs = 0.;
+                if(!args.empty() && args[0].isNumber())
+                {
+                    m_rhs = args[0].getFloat();
+                }
             }
             
             void receive(uint32_t index, std::vector<Atom> args) override
@@ -86,7 +83,7 @@ namespace kiwi
             }
             
         private:
-            double m_lhs = 1.0;
+            double m_lhs = 0.0;
             double m_rhs = 0.0;
         };
     }

@@ -34,8 +34,8 @@ namespace kiwi
     {
         void registerObjects()
         {               
-            model::ObjectFactory::add<model::ObjectPlus, ObjectPlus>("plus");
-            model::ObjectFactory::add<model::ObjectPrint, ObjectPrint>("print");
+            ObjectFactory::add<model::ObjectPlus, ObjectPlus>("plus");
+            ObjectFactory::add<model::ObjectPrint, ObjectPrint>("print");
         }
     }
 }

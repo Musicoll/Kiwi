@@ -50,7 +50,7 @@ namespace kiwi
     {
         {
             // simple print
-            auto& plus = patcher.addObject("plus");
+            auto& plus = patcher.addObject("plus 44");
             plus.setPosition(50, 50);
             auto& print = patcher.addObject("print");
             print.setPosition(50, 100);
@@ -59,10 +59,10 @@ namespace kiwi
         
         {
             // set rhs value
-            auto& plus_1 = patcher.addObject("plus");
+            auto& plus_1 = patcher.addObject("plus 1");
             plus_1.setPosition(150, 50);
             
-            auto& plus_2 = patcher.addObject("plus");
+            auto& plus_2 = patcher.addObject("plus 10");
             plus_2.setPosition(220, 50);
             
             auto& plus_3 = patcher.addObject("plus");
@@ -82,14 +82,23 @@ namespace kiwi
             plus_1.setPosition(350, 100);
             
             auto& plus_2 = patcher.addObject("plus");
-            plus_2.setPosition(405, 50);
+            plus_2.setPosition(405, 70);
             
-            auto& print = patcher.addObject("print");
+            auto& plus_3 = patcher.addObject("plus 10");
+            plus_3.setPosition(300, 20);
+            
+            auto& plus_4 = patcher.addObject("plus -10");
+            plus_4.setPosition(380, 20);
+            
+            auto& print = patcher.addObject("print zozo");
             print.setPosition(350, 150);
             
             patcher.addLink(plus_1, 0, plus_2, 0);
             patcher.addLink(plus_2, 0, plus_1, 1);
             patcher.addLink(plus_1, 0, print, 0);
+            
+            patcher.addLink(plus_3, 0, plus_1, 0);
+            patcher.addLink(plus_4, 0, plus_1, 0);
         }
 
         engine::DocumentManager::commit(patcher, "load initial objects and links");

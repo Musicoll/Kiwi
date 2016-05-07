@@ -41,8 +41,7 @@ namespace kiwi
             
             ObjectPrint(flip::Default& d) : model::Object(d) {}
             
-            ObjectPrint(std::string const& name, std::vector<Atom> args) :
-            model::Object(name, 1, 0)
+            ObjectPrint(std::string const& name, std::vector<Atom> args)
             {
                 ;
             }

@@ -42,12 +42,11 @@ namespace kiwi
             m_objects.clear();
         }
         
-        model::Object& Patcher::addObject(std::string const& object_name)
+        model::Object& Patcher::addObject(std::string const& text)
         {
-            assert(ObjectFactory::has(object_name));
+            //assert(ObjectFactory::has(object_name));
             
-            std::vector<Atom> args;
-            return *m_objects.insert(m_objects.end(), ObjectFactory::create(object_name, args));
+            return *m_objects.insert(m_objects.end(), ObjectFactory::createModel(text));
         }
         
         bool Patcher::canConnect(model::Object const& from, const uint32_t outlet,
@@ -60,7 +59,6 @@ namespace kiwi
             // check destination object
             const auto to_it = findObject(to);
             const bool to_valid = (to_it != m_objects.cend() && to_it->getNumberOfInlets() > inlet);
-            
             
             if(from_valid && to_valid)
             {

@@ -171,9 +171,8 @@ namespace kiwi
 
         void Patcher::objectHasBeenAdded(model::Object& object_m)
         {
-            std::vector<Atom> args{42};
-            
-            sObject obj_sptr = object_m.entity().emplace<sObject>(model::ObjectFactory::createEngine<engine::Object>(object_m.getName(), args));
+            sObject obj_sptr = ObjectFactory::createEngine<engine::Object>(object_m);
+            object_m.entity().emplace<sObject>(obj_sptr);
         }
 
         void Patcher::objectChanged(model::Object& object_m)
@@ -182,15 +181,15 @@ namespace kiwi
             object_e->modelChanged(object_m);
         }
 
-        void Patcher::objectWillBeRemoved(model::Object& object)
+        void Patcher::objectWillBeRemoved(model::Object& object_m)
         {
-            object.entity().erase<sObject>();
+            object_m.entity().erase<sObject>();
         }
 
-        void Patcher::linkHasBeenAdded(model::Link& link)
+        void Patcher::linkHasBeenAdded(model::Link& link_m)
         {
-            auto& sender_entity = link.getSenderObject().entity();
-            auto& receiver_entity = link.getReceiverObject().entity();
+            auto& sender_entity = link_m.getSenderObject().entity();
+            auto& receiver_entity = link_m.getReceiverObject().entity();
             
             assert(sender_entity.has<sObject>());
             assert(receiver_entity.has<sObject>());
@@ -200,8 +199,8 @@ namespace kiwi
             
             if(from && to)
             {
-                auto& link_engine = link.entity().emplace<Link>(link, *from, *to);
-                from->addOutputLink(&link_engine);
+                auto& link_e = link_m.entity().emplace<Link>(link_m, *from, *to);
+                from->addOutputLink(&link_e);
             }
         }
         
