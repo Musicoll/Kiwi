@@ -23,10 +23,29 @@
 
 #include "KiwiInstance.hpp"
 
+#include <KiwiModel/KiwiObjectFactory.hpp>
+#include "Objects/KiwiObjects.hpp"
+
 namespace kiwi
 {
     namespace engine
     {
+        // ================================================================================ //
+        //                           PATCHER MODEL DECLARATOR                               //
+        // ================================================================================ //
+        
+        //! @brief The Patcher Model class declarator
+        class Instance::PatcherModelDeclarator : public model::PatcherDataModel
+        {
+        public:
+            
+            void endOfModelDeclaration() final override
+            {
+                ObjectFactory::registerEngine<ObjectPlus>("plus");
+                ObjectFactory::registerEngine<ObjectPrint>("print");
+            }
+        };
+        
         // ================================================================================ //
         //                                      INSTANCE                                    //
         // ================================================================================ //
@@ -35,12 +54,20 @@ namespace kiwi
         m_user_id(user_id),
         m_name(name)
         {
-            ;
+            PatcherModelDeclarator model;
+            model.init("v0.0.1");
         }
         
         Instance::~Instance()
         {
             ;
+        }
+        
+        std::unique_ptr<flip::Document>
+        Instance::createPatcherDocument(flip::DocumentObserver<model::Patcher>& observer)
+        {
+            return std::make_unique<flip::Document>(PatcherModelDeclarator::use(),
+                                                    observer, getUserId(), 'cicm', 'kpat');
         }
         
         void Instance::document_changed(model::Patcher& patcher)

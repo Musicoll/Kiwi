@@ -25,6 +25,7 @@
 #define KIWI_MODEL_OBJECTS_HPP_INCLUDED
 
 #include "KiwiObjectPrint.hpp"
+#include "KiwiObjectPlus.hpp"
 
 namespace kiwi
 {

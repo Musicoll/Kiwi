@@ -29,7 +29,6 @@
 #include <algorithm>
 
 // ---- Flip headers ---- //
-#include "flip/DataModel.h"
 #include "flip/Bool.h"
 #include "flip/Int.h"
 #include "flip/Float.h"
@@ -44,6 +43,8 @@
 
 namespace kiwi
 {
+    class ObjectFactory;
+    
     namespace model
     {
         // ================================================================================ //
@@ -57,7 +58,7 @@ namespace kiwi
         public:
  
             //! @brief Constructor.
-            Object(std::string const& name, const uint32_t inlets, const uint32_t outlets);
+            Object();
             
             //! @brief Copy constructor (needed for flip::Array)
             Object(model::Object const&);
@@ -68,6 +69,10 @@ namespace kiwi
             //! @brief Returns the name of the Object.
             //! @return The name of the Object.
             inline std::string getName() const     { return m_name; }
+            
+            //! @brief Returns the name of the Object.
+            //! @return The name of the Object.
+            inline std::string getText() const     { return m_text; }
             
             //! @brief Returns the number of inlets.
             //! @return The number of inlets.
@@ -117,6 +122,22 @@ namespace kiwi
             //! @brief Call signalTrigger() to hmmm.. trigger the signal.
             flip::Signal<> signalTrigger;
             
+        protected:
+            
+            //! @brief Set the number of inlets.
+            //! @param inlets The number of inlets.
+            inline void setNumberOfInlets(uint32_t inlets)
+            {
+                m_inlets = static_cast<flip::Int::internal_type>(inlets);
+            }
+            
+            //! @brief Set the number of inlets.
+            //! @param inlets The number of inlets.
+            inline void setNumberOfOutlets(uint32_t outlets)
+            {
+                m_outlets = static_cast<flip::Int::internal_type>(outlets);
+            }
+            
         public:
             
             //! @internal flip Default constructor
@@ -131,11 +152,14 @@ namespace kiwi
             enum SignalType { Trigger };
             
             flip::String    m_name;
+            flip::String    m_text;
             flip::Int       m_inlets;
             flip::Int       m_outlets;
             
             flip::Float     m_position_x;
             flip::Float     m_position_y;
+            
+            friend class kiwi::ObjectFactory;
         };
         
         // ================================================================================ //
@@ -150,6 +174,7 @@ namespace kiwi
             TModel::template declare<model::Object>()
             .name("cicm.kiwi.Object")
             .template member<flip::String, &Object::m_name>("name")
+            .template member<flip::String, &Object::m_text>("text")
             .template member<flip::Int, &Object::m_inlets>("inlets")
             .template member<flip::Int, &Object::m_outlets>("outlets")
             .template member<flip::Float, &Object::m_position_x>("pos_x")

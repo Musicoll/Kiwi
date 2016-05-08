@@ -36,11 +36,11 @@ namespace kiwi
             ;
         }
         
-        Object::Object(std::string const& name, const uint32_t inlets, const uint32_t outlets) :
+        Object::Object() :
         signalTrigger(Trigger, *this),
-        m_name(name),
-        m_inlets(inlets),
-        m_outlets(outlets),
+        m_name("noobj"),
+        m_inlets(1),
+        m_outlets(0),
         m_position_x(0.),
         m_position_y(0.)
         {

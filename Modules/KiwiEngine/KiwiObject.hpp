@@ -26,7 +26,7 @@
 
 #include "flip/SignalConnection.h"
 
-#include "../KiwiModel/KiwiModel.hpp"
+#include <KiwiModel/KiwiModel.hpp>
 
 #include <utility>
 
@@ -48,19 +48,19 @@ namespace kiwi
         public:
             
             //! @brief Constructor.
-            Object(model::Object& object_m) noexcept;
+            Object() noexcept;
             
             //! @brief Destructor.
             virtual ~Object() noexcept;
 
             //! @brief Returns the name of the Object.
-            inline std::string getName() const noexcept         { return m_model.getName(); }
+            inline std::string getName() const noexcept         { return m_model->getName(); }
             
             //! @brief Get the number of inlets of the Object.
-            inline uint32_t getNumberOfInlets() const noexcept  { return m_model.getNumberOfInlets(); }
+            inline uint32_t getNumberOfInlets() const noexcept  { return m_model->getNumberOfInlets(); }
             
             //! @brief Get the number of inlets of the object.
-            inline uint32_t getNumberOfOutlets() const noexcept { return m_model.getNumberOfOutlets(); }
+            inline uint32_t getNumberOfOutlets() const noexcept { return m_model->getNumberOfOutlets(); }
             
             //! @brief The receive method.
             //! @details This method must be overriden by object's subclasses.
@@ -77,7 +77,7 @@ namespace kiwi
         private:
             
             //! @internal Model change notification.
-            void modelChanged(model::Object& object_m);
+            void objectModelChanged(model::Object& object_m);
             
             //! @internal signalTriggerCallback.
             void internal_signalTriggerCalled();
@@ -94,12 +94,14 @@ namespace kiwi
             
             typedef std::set<Link*> Outlet;
 
-            model::Object const&    m_model;
+            model::Object*          m_model;
             std::vector<Outlet>     m_outlets;
             uint32_t                m_stack_count = 0ul;
             
             flip::SignalConnection  m_signal_cnx;
         };
+        
+        typedef std::shared_ptr<Object> sObject;
     }
 }
 

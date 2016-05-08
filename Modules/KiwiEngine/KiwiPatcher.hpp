@@ -24,9 +24,9 @@
 #ifndef KIWI_ENGINE_PATCHER_HPP_INCLUDED
 #define KIWI_ENGINE_PATCHER_HPP_INCLUDED
 
-#include "KiwiLink.hpp"
-
 #include "flip/DocumentObserver.h"
+
+#include "KiwiLink.hpp"
 
 namespace kiwi
 {
@@ -49,29 +49,6 @@ namespace kiwi
             //! @brief Destructor.
             ~Patcher();
             
-            //! @brief Creates and adds a "plus" object to the Patcher.
-            void addPlus();
-            
-            //! @brief Creates and adds a "print" object to the Patcher.
-            void addPrint();
-            
-            //! @brief Constructs and add a Link to the Patcher.
-            //! @details Constructs a Link with given origin and destination Object pointers
-            //! and IO indexes then adds it in the Patcher.
-            //! @param from     The origin Object pointer.
-            //! @param outlet   The origin outlet index.
-            //! @param to       The destination Object pointer.
-            //! @param inlet    The destination inlet index.
-            void addLink(Object const& from, const uint32_t outlet, Object const& to, const uint32_t inlet);
-            
-            //! @brief Removes an Object from the Patcher.
-            //! @param id The ID of the object to be removed.
-            void removeObject(Object const& object);
-            
-            //! @brief Removes an Object from the Patcher.
-            //! @param object The pointer to the object to be removed.
-            void removeLink(Link const& link);
-            
             //! @brief Returns the objects.
             std::vector<engine::Object const*> getObjects() const;
             
@@ -88,25 +65,25 @@ namespace kiwi
         private:
             
             //! @internal flip::DocumentObserver<model::Patcher>::document_changed
-            void document_changed(model::Patcher& patcher) final;
+            void document_changed(model::Patcher& patcher) final override;
             
-            //! @internal Object has just been added to the document.
-            void objectHasBeenAdded(model::Object& object);
+            //! @internal Object model has just been added to the document.
+            void objectModelAdded(model::Object& object);
             
-            //! @internal Object is resident and internal value changed.
-            void objectChanged(model::Object& object);
+            //! @internal Object model has changed.
+            void objectModelChanged(model::Object& object);
             
-            //! @internal Object will be removed from the document.
-            void objectWillBeRemoved(model::Object& object);
+            //! @internal Object model will be removed from the document.
+            void objectModelRemoved(model::Object& object);
             
-            //! @internal Link has just been added to the document.
-            void linkHasBeenAdded(model::Link& link);
+            //! @internal Link model has just been added to the document.
+            void linkModelAdded(model::Link& link);
             
-            //! @internal Link is resident and internal value changed.
-            void linkChanged(model::Link& link);
+            //! @internal Link model has changed.
+            void linkModelChanged(model::Link& link);
             
-            //! @internal Link will be removed from the document.
-            void linkWillBeRemoved(model::Link& link);
+            //! @internal Link model will be removed from the document.
+            void linkModelRemoved(model::Link& link);
             
             // -----------------------------
             

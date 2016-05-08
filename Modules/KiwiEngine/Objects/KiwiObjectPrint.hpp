@@ -37,19 +37,22 @@ namespace kiwi
         class ObjectPrint : public engine::Object
         {
         public:
-
-            ObjectPrint(model::ObjectPrint& model) : engine::Object(model)
+            
+            ObjectPrint(std::vector<Atom> args)
             {
-                ;
+                m_name = !args.empty() ? args[0].getString() : "print";
             }
             
             void receive(uint32_t, std::vector<Atom> args) override
             {
                 if(!args.empty())
                 {
-                    std::cout << "\u2022 " << AtomHelper::toString(args) << '\n';
+                    std::cout << m_name << " \u2022 " << AtomHelper::toString(args) << '\n';
                 }
             }
+            
+        private:
+            std::string m_name;
         };
     }
 }

@@ -87,7 +87,7 @@ namespace kiwi
         g.setColour(juce::Colours::black);
         g.drawRect(bounds);
         
-        g.drawFittedText(m_model->getName(), bounds.reduced(5), juce::Justification::centredLeft, 1);
+        g.drawFittedText(m_model->getText(), bounds.reduced(5), juce::Justification::centredLeft, 1);
         
         drawInletsOutlets(g);
     }

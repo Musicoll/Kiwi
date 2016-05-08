@@ -24,6 +24,7 @@
 #ifndef KIWI_MODEL_PATCHER_HPP_INCLUDED
 #define KIWI_MODEL_PATCHER_HPP_INCLUDED
 
+#include "KiwiLink.hpp"
 #include "Objects/KiwiObjects.hpp"
 
 namespace kiwi
@@ -48,11 +49,11 @@ namespace kiwi
             //! @brief Destructor.
             ~Patcher();
             
-            //! @brief Creates and adds a "plus" object to the Patcher.
-            model::Object& addPlus();
-            
-            //! @brief Creates and adds a "print" object to the Patcher.
-            model::Object& addPrint();
+            //! @brief Adds an Object of a given name to the Patcher.
+            //! @details The Object must be registered with the ObjectFactory::add() method before.
+            //! @param object_name the name with which the Object was registered.
+            //! @return A reference
+            model::Object& addObject(std::string const& object_name);
             
             //! @brief Constructs and add a Link to the Patcher.
             //! @details Constructs a Link with given origin and destination Object
