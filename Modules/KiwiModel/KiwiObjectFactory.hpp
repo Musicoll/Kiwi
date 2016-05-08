@@ -43,31 +43,33 @@ namespace kiwi
     {
     public:
         
-        //! @brief Add an object to the ObjectFactory.
-        //! @details This function adds a new object to the factory. If the name of the object already exists,
-        //! the function doesn't do anything otherwise the object is added to the factory.
-        //! @param name An alias name of the object or nothing if you want yo use the default object name.
-        template <class T,
-        typename std::enable_if<std::is_base_of<model::Object, T>::value, model::Object>::type* = nullptr>
-        static void registerModel(std::string name)
+        //! @brief Register an object model into the ObjectFactory.
+        //! @details This function adds a new object model to the factory.
+        //! If the name of the object already exists, the function do nothing,
+        //! otherwise the object is added to the factory.
+        //! @param name The name of the object.
+        template <class TModel, typename
+        std::enable_if<std::is_base_of<model::Object, TModel>::value,
+        model::Object>::type* = nullptr>
+        static void registerModel(std::string const& name)
         {
-            static_assert(!std::is_abstract<T>::value, "The class must not be abstract.");
+            static_assert(!std::is_abstract<TModel>::value,
+                          "The class must not be abstract.");
             
-            static_assert(std::is_constructible<T, std::string, std::vector<Atom>>::value, "Bad model object constructor");
+            static_assert(std::is_constructible<TModel, std::string, std::vector<Atom>>::value,
+                          "Bad model object constructor");
             
             if(!name.empty())
             {
-                std::lock_guard<std::mutex> guard(getMutex());
-                
-                std::map<std::string, CreatorBundle>& creators = getCreators();
+                auto& creators = getCreators();
                 
                 if(creators.find(name) == creators.end())
                 {
                     CreatorBundle creator;
                     
-                    creator.model_ctor_fn = [name](std::vector<Atom> args) -> T*
+                    creator.model_ctor_fn = [name](std::vector<Atom> args) -> TModel*
                     {
-                        return new T(name, args);
+                        return new TModel(name, args);
                     };
                     
                     creators[name] = std::move(creator);
@@ -80,20 +82,28 @@ namespace kiwi
             }
         }
         
-        template <class TModel, class TEngine, typename
+        //! @brief Register an object engine into the ObjectFactory.
+        //! @details This function adds a new object engine to the factory.
+        //! If the name of the object already exists, the function do nothing,
+        //! otherwise the object is added to the factory.
+        //! @param name The name of the object.
+        template <class TEngine, typename
         std::enable_if<std::is_base_of<engine::Object, TEngine>::value,
-        model::Object>::type* = nullptr>
-        static void registerEngine(std::string name)
+        engine::Object>::type* = nullptr>
+        static void registerEngine(std::string const& name)
         {
-            static_assert(!std::is_abstract<TEngine>::value, "The class must not be abstract.");
+            static_assert(!std::is_abstract<TEngine>::value,
+                          "The class must not be abstract.");
             
-            static_assert(std::is_constructible<TEngine, std::vector<Atom>>::value, "Bad engine object constructor");
+            // The engine Object must be constructible with a vector of Atom
+            static_assert(std::is_constructible<TEngine, std::vector<Atom>>::value,
+                          "Bad engine object constructor");
+            
+            assert(!name.empty());
             
             if(!name.empty())
             {
-                std::lock_guard<std::mutex> guard(getMutex());
-                
-                std::map<std::string, CreatorBundle>& creators = getCreators();
+                auto& creators = getCreators();
                 
                 if(creators.find(name) != creators.end())
                 {
@@ -121,17 +131,15 @@ namespace kiwi
         //! @brief Creates a new engine Object with a given text.
         //! @param text The text of the Object.
         //! @return An object (if the name matches a registered engine Object name).
-        template <class TEngineObject, typename
-        std::enable_if<std::is_base_of<engine::Object, TEngineObject>::value,
+        template <class TEngine, typename
+        std::enable_if<std::is_base_of<engine::Object, TEngine>::value,
         engine::Object>::type* = nullptr>
-        static std::unique_ptr<TEngineObject> createEngine(model::Object const& model)
+        static std::unique_ptr<TEngine> createEngine(model::Object const& model)
         {
             std::vector<Atom> atoms = AtomHelper::parse(model.getText());
             
             if(atoms.size() > 0 && atoms[0].isString())
             {
-                std::lock_guard<std::mutex> guard(getMutex());
-                
                 const std::string name = atoms[0].getString();
                 
                 const auto& creators = getCreators();
@@ -147,20 +155,20 @@ namespace kiwi
                         assert(false && "the engine object has not been registered");
                     }
                     
-                    return std::unique_ptr<TEngineObject>(engine_ctor(args));
+                    return std::unique_ptr<TEngine>(engine_ctor(args));
                 }
             }
         
             return nullptr;
         }
         
-        //! @brief Returns true if a given string match a registered Object name.
-        //! @param name The name of the object.
+        //! @brief Returns true if a given string match a registered Object model name.
+        //! @param name The name of the object model.
         //! @return true if the object has been registered, otherwise false.
         static bool hasModel(std::string const& name);
         
-        //! @brief Returns true if a given string match a registered Object name.
-        //! @param name The name of the object.
+        //! @brief Returns true if a given string match a registered Object engine name.
+        //! @param name The name of the object engine.
         //! @return true if the object has been registered, otherwise false.
         static bool hasEngine(std::string const& name);
         
@@ -182,21 +190,10 @@ namespace kiwi
             engine_ctor_t engine_ctor_fn = nullptr;
         };
         
-        //! @brief Returns the static map of creators.
-        //! @return The static map of creators.
-        static std::map<std::string, CreatorBundle>& getCreators() noexcept
-        {
-            static std::map<std::string, CreatorBundle> static_creators;
-            return static_creators;
-        }
+        using creator_map_t = std::map<std::string, CreatorBundle>;
         
-        //! @brief Returns the static mutex.
-        //! @return The static mutex.
-        static inline std::mutex& getMutex() noexcept
-        {
-            static std::mutex static_mutex;
-            return static_mutex;
-        }
+        //! @internal Returns the static map of creators.
+        static creator_map_t& getCreators();
     };
 }
 

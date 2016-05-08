@@ -40,7 +40,8 @@ namespace kiwi
     
     void jInstance::newPatcher()
     {
-        m_document = std::make_unique<flip::Document>(model::PatcherDataModel::use(), *this, m_instance->getUserId(), 'cicm', 'kpat');
+        m_document.reset();
+        m_document = m_instance->createPatcherDocument(*this);
         
         model::Patcher& patcher = m_document->root<model::Patcher>();
         populatePatcher(patcher);

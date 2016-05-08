@@ -39,15 +39,10 @@ namespace kiwi
         {
         public:
             
-            void declareExternalObjects() final override
+            void endOfModelDeclaration() final override
             {
-                ;
-            }
-            
-            void endOfModelDeclarationHook() final override
-            {
-                ObjectFactory::registerEngine<model::ObjectPlus, ObjectPlus>("plus");
-                ObjectFactory::registerEngine<model::ObjectPrint, ObjectPrint>("print");
+                ObjectFactory::registerEngine<ObjectPlus>("plus");
+                ObjectFactory::registerEngine<ObjectPrint>("print");
             }
         };
         
@@ -66,6 +61,13 @@ namespace kiwi
         Instance::~Instance()
         {
             ;
+        }
+        
+        std::unique_ptr<flip::Document>
+        Instance::createPatcherDocument(flip::DocumentObserver<model::Patcher>& observer)
+        {
+            return std::make_unique<flip::Document>(PatcherModelDeclarator::use(),
+                                                    observer, getUserId(), 'cicm', 'kpat');
         }
         
         void Instance::document_changed(model::Patcher& patcher)

@@ -24,6 +24,8 @@
 #ifndef KIWI_ENGINE_INSTANCE_HPP_INCLUDED
 #define KIWI_ENGINE_INSTANCE_HPP_INCLUDED
 
+#include "flip/Document.h"
+
 #include "KiwiPatcher.hpp"
 
 namespace kiwi
@@ -51,6 +53,10 @@ namespace kiwi
             
             //! @brief Get the user ID of the Instance.
             inline uint64_t getUserId() const noexcept          { return m_user_id; }
+            
+            //! @brief Creates and returns a new document
+            std::unique_ptr<flip::Document>
+            createPatcherDocument(flip::DocumentObserver<model::Patcher>& observer);
             
             //! @internal flip::DocumentObserver<model::Patcher>::document_changed
             void document_changed(model::Patcher& patcher) final override;

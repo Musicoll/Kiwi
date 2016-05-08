@@ -58,7 +58,7 @@ namespace kiwi
                 // Patcher
                 Patcher::declare<model_t>();
                 
-                endOfModelDeclarationHook();
+                endOfModelDeclaration();
             }
             
         protected:
@@ -68,7 +68,7 @@ namespace kiwi
             virtual void declareExternalObjects() {}
             
             //! @brief This method is called at the end of the init function
-            virtual void endOfModelDeclarationHook() {}
+            virtual void endOfModelDeclaration() {}
             
         private:
             

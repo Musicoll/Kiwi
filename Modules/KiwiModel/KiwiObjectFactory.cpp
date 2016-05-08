@@ -35,8 +35,6 @@ namespace kiwi
         
         if(atoms.size() > 0 && atoms[0].isString())
         {
-            std::lock_guard<std::mutex> guard(getMutex());
-            
             const std::string name = atoms[0].getString();
             
             const auto& creators = getCreators();
@@ -56,20 +54,22 @@ namespace kiwi
                 return object_uptr;
             }
         }
+        else
+        {
+            // handle creation fail
+        }
         
         return nullptr;
     }
     
     bool ObjectFactory::hasModel(std::string const& name)
     {
-        std::lock_guard<std::mutex> guard(getMutex());
         const auto& creators = getCreators();
         return (creators.find(name) != creators.end());
     }
     
     bool ObjectFactory::hasEngine(std::string const& name)
     {
-        std::lock_guard<std::mutex> guard(getMutex());
         const auto& creators = getCreators();
         const auto it = creators.find(name);
         if(it != creators.end())
@@ -82,8 +82,6 @@ namespace kiwi
     
     std::vector<std::string> ObjectFactory::getNames()
     {
-        std::lock_guard<std::mutex> guard(getMutex());
-        
         std::vector<std::string> names;
         for(const auto& creator : getCreators())
         {
@@ -91,5 +89,11 @@ namespace kiwi
         }
         
         return names;
+    }
+    
+    auto ObjectFactory::getCreators() -> creator_map_t&
+    {
+        static creator_map_t static_creators;
+        return static_creators;
     }
 }
