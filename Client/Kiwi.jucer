@@ -65,6 +65,8 @@
       </GROUP>
       <GROUP id="{CBF4E414-23D0-76EE-C19E-6AB749B32073}" name="KiwiCore">
         <FILE id="xsKzHU" name="KiwiAtom.hpp" compile="0" resource="0" file="../Modules/KiwiCore/KiwiAtom.hpp"/>
+        <FILE id="hXEkjp" name="KiwiConsole.cpp" compile="1" resource="0" file="../Modules/KiwiCore/KiwiConsole.cpp"/>
+        <FILE id="YOWKg3" name="KiwiConsole.hpp" compile="0" resource="0" file="../Modules/KiwiCore/KiwiConsole.hpp"/>
       </GROUP>
     </GROUP>
     <GROUP id="{72FCDC55-1C0F-D5C0-C444-A9EF14BCE12B}" name="Flip">
