@@ -38,19 +38,19 @@ namespace kiwi
         template<class Arg, class ...Args>
         static void post(Arg&& arg, Args&&... args)
         {
-            output(std::cout, "> ", std::forward<Arg>(arg), std::forward<Args>(args)...);
+            output(std::cout, std::forward<Arg>(arg), std::forward<Args>(args)...);
         }
         
         template<class Arg, class ...Args>
         static void error(Arg&& arg, Args&&... args)
         {
-            output(std::cerr, "- error: ", std::forward<Arg>(arg), std::forward<Args>(args)...);
+            output(std::cerr, std::forward<Arg>(arg), std::forward<Args>(args)...);
         }
         
         template<class Arg, class ...Args>
         static void log(Arg&& arg, Args&&... args)
         {
-            output(std::clog, "- log: ", std::forward<Arg>(arg), std::forward<Args>(args)...);
+            output(std::clog, std::forward<Arg>(arg), std::forward<Args>(args)...);
         }
         
     private:

@@ -24,6 +24,8 @@
 #ifndef KIWI_MODEL_FACTORY_HPP_INCLUDED
 #define KIWI_MODEL_FACTORY_HPP_INCLUDED
 
+#include <KiwiCore/KiwiConsole.hpp>
+
 #include "KiwiObject.hpp"
 
 namespace kiwi
@@ -76,8 +78,7 @@ namespace kiwi
                 }
                 else
                 {
-                    assert(false && "The object already exist");
-                    //Console::error("The object " + name->getName() + " already exist !");
+                    Console::error("The object " + name + " already exist !");
                 }
             }
         }
@@ -116,8 +117,7 @@ namespace kiwi
                 }
                 else
                 {
-                    //Console::error("Object model not declared");
-                    assert(false && "The Object model is not registered");
+                    Console::error("The Object model is not registered");
                 }
             }
         }
