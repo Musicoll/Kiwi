@@ -68,8 +68,10 @@ namespace kiwi
         
         m_listeners.call(&Listener::newConsoleMessage, msg);
         
+    #ifdef DEBUG
         std::lock_guard<std::mutex> guard(m_ostream_mutex);
         output_stream << message << '\n';
+    #endif
     }
     
     void Console::addListener(Listener& listener)
@@ -105,21 +107,14 @@ namespace kiwi
     Console::History::History() :
     m_sort(Console::History::ByIndex)
     {
-        ;
+        Console::addListener(*this);
     }
     
     Console::History::~History()
     {
+        Console::removeListener(*this);
+        
         m_messages.clear();
-    }
-    
-    std::unique_ptr<Console::History> Console::History::create()
-    {
-        auto history = std::unique_ptr<Console::History>(new History());
-        
-        Console::addListener(*history.get());
-        
-        return std::move(history);
     }
     
     void Console::History::newConsoleMessage(Console::Message const& message)

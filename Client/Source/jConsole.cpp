@@ -26,13 +26,13 @@
 
 namespace kiwi
 {
-    //std::unique_ptr<Console::History> jConsole::m_history = Console::History::create();
-    
     // ================================================================================ //
     //                                  CONSOLE COMPONENT                               //
     // ================================================================================ //
     
-    jConsole::jConsole() : m_history(Console::History::create()), m_font(13.f)
+    jConsole::jConsole() :
+    m_history(new Console::History()),
+    m_font(13.f)
     {
         m_history->addListener(*this);
         

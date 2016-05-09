@@ -77,8 +77,7 @@ namespace kiwi
     
     void jPatcher::leftClick(juce::MouseEvent const& event)
     {
-        Console::error("You just clicked the patcher");
-        Console::warning("You just clicked the patcher");
+        ;
     }
 
     void jPatcher::rightClick(juce::MouseEvent const& event)

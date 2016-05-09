@@ -74,7 +74,7 @@ namespace kiwi
         private:
             std::string           m_text;
             Console::MessageType  m_type;
-            flip::Ref             m_ref;
+            flip::Ref             m_ref;    // to be used later (ex : objectPost)
         };
         
         //! @brief Print a post-type message in the console.
@@ -87,10 +87,10 @@ namespace kiwi
         static void postAtoms(std::vector<Atom> const& atoms);
         
         //! @brief Print a warning-type message in the console.
-        static void warning(std:: string const& message);
+        static void warning(std::string const& message);
         
         //! @brief Print an error-type message in the console.
-        static void error(std:: string const& message);
+        static void error(std::string const& message);
         
         class History;
         
@@ -120,7 +120,10 @@ namespace kiwi
         
     private:
         
+        #ifdef DEBUG
         static std::mutex           m_ostream_mutex;
+        #endif
+        
         static Listeners<Listener>  m_listeners;
     };
     
@@ -140,7 +143,7 @@ namespace kiwi
         {
             ByIndex = 0,    ///< Sort messages by Index
             ByType,         ///< Sort message by type
-            ByText          ///< Sort message by type
+            ByText          ///< Sort message by text
         };
         
     public:
@@ -150,9 +153,6 @@ namespace kiwi
         
         //! @brief Destructor.
         ~History();
-        
-        //! @brief Create a new Console History and bind it to the console
-        static std::unique_ptr<Console::History> create();
         
         //! @brief Clear the messages.
         void clear();

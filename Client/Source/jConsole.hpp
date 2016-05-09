@@ -140,8 +140,8 @@ namespace kiwi
     private:
         
         std::unique_ptr<Console::History>    m_history;
-        juce::Font                                  m_font;
-        TableListBox                                m_table;
+        juce::Font                           m_font;
+        TableListBox                         m_table;
     };
 
     // ================================================================================ //
