@@ -37,6 +37,9 @@ namespace kiwi
     //                                  JCONSOLE COMPONENT                              //
     // ================================================================================ //
     
+    //! @brief The juce Console Component
+    //! @details The juce Console Component maintain a Console::History and display Console messages to the user.
+    //! The user can select a message to copy it to the system clipboard, delete a specific message or a range of messages, sort messages, double-click on a row to hilight the corresponding object...
     class jConsole :
     public Console::History::Listener,
     public Component,
@@ -66,65 +69,69 @@ namespace kiwi
         //                              TABLE LIST BOX MODEL                                //
         // ================================================================================ //
         
-        //! Notify that the selection has changed.
-        /** The function notifies that the selection has changed.
-         */
+        //! @brief Called when selected rows changed.
         void selectedRowsChanged(int row) override;
         
-        //! Notify that the delete key has been pressed.
-        /** The function notifies that the delete key has been pressed.
-         */
+        //! @brief Called when the delete key has been pressed.
         void deleteKeyPressed(int lastRowSelected) override;
         
-        //! Retreive the number of rows currently displayed by the console
-        /** The function retreives the number of rows currently displayed by the console
-         */
+        //! @brief Get the number of rows currently displayed by the console
         int getNumRows() override;
         
-        // This is overloaded from TableListBoxModel, and should fill in the background of the whole row
-        void paintRowBackground (Graphics& g, int rowNumber, int width, int height, bool rowIsSelected) override;
+        //! @brief This is overloaded from TableListBoxModel, and should fill in the background of the whole row
+        void paintRowBackground(Graphics& g,
+                                int rowNumber, int width, int height,
+                                bool rowIsSelected) override;
         
-        void paintOverChildren (Graphics &g) override;
+        //! @brief Paint over cells.
+        void paintOverChildren(Graphics &g) override;
         
-        void backgroundClicked (const MouseEvent& mouse) override;
+        //! @brief Called when the console background has been clicked (clear row selection).
+        void backgroundClicked(const MouseEvent& mouse) override;
         
-        // This is overloaded from TableListBoxModel, and must paint any cells that aren't using custom components.
-        void paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected) override;
+        //! @brief This must paint any cells that aren't using custom components.
+        void paintCell(Graphics& g,
+                       int rowNumber, int columnId,
+                       int width, int height,
+                       bool rowIsSelected) override;
         
-        // This is overloaded from TableListBoxModel, and tells us that the user has clicked a table header to change the sort order.
+        //! @brief This is overloaded from TableListBoxModel,
+        //! @details Called when the user has clicked a table header to change the sort order.
         void sortOrderChanged(int newSortColumnId, bool isForwards) override;
         
+        //! @brief Called when a cell is double-clicked,
         void cellDoubleClicked(int rowNumber, int columnId, const MouseEvent& mouse) override;
         
-        // This is overloaded from TableListBoxModel, and must update any custom components that we're using
+        //! @brief This is overloaded from TableListBoxModel
+        //! @details Must update any custom components that we're using
         Component* refreshComponentForCell(int rowNumber,
                                            int columnId,
                                            bool isRowSelected,
                                            Component* existingComponentToUpdate) override;
         
-        // This is overloaded from TableListBoxModel, and should choose the best width for the specified
-        // column.
+        //! @brief This is overloaded from TableListBoxModel.
+        //! @details Should choose and return the best width for the specified column.
         int getColumnAutoSizeWidth(int columnId) override;
         
         // ================================================================================ //
         //                          TABLE HEADER COMPONENT LISTENER                         //
         // ================================================================================ //
         
-        /** This is called when one or more of the table's columns are resized. */
-        void tableColumnsResized (TableHeaderComponent* tableHeader) override;
+        //! @brief This is called when one or more of the table's columns are resized.
+        void tableColumnsResized(TableHeaderComponent* tableHeader) override;
         
-        /** This is called when some of the table's columns are added, removed, hidden,
-         or rearranged.
-         */
-        void tableColumnsChanged (TableHeaderComponent* tableHeader) override {};
+        //! @brief This is called when some of the table's columns are added, removed, hidden, or rearranged.
+        void tableColumnsChanged(TableHeaderComponent* tableHeader) override {};
 	
-        /** This is called when the column by which the table should be sorted is changed. */
-        void tableSortOrderChanged (TableHeaderComponent* tableHeader) override {};
+        //! @brief This is called when the column by which the table should be sorted is changed.
+        void tableSortOrderChanged(TableHeaderComponent* tableHeader) override {};
 
-        void updateRighmostColumnWidth (TableHeaderComponent* header);
+        //! @brief This is called when the rightmost column width need to be updated.
+        void updateRighmostColumnWidth(TableHeaderComponent* header);
         
     private:
         
+        //! @internal Column type
         enum Column
         {
             Id      = 1,
@@ -133,8 +140,10 @@ namespace kiwi
             Message = 4
         };
         
+        //! @internal copy selected rows content.
         void copy();
         
+        //! @internal erase selected rows.
         void erase();
         
     private:
@@ -148,6 +157,7 @@ namespace kiwi
     //                                  CONSOLE WINDOW                                  //
     // ================================================================================ //
     
+    //! @brief The jConsoleWindow is a jWindow that manages and display a jConsole Component.
     class jConsoleWindow : public jWindow
     {
     public:

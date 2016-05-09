@@ -39,10 +39,23 @@ namespace kiwi
         setSize(300, 500);
         
         TableHeaderComponent* header = new TableHeaderComponent();
-        header->addColumn(String("ID"),        Column::Id, 30, 20, 50, TableHeaderComponent::defaultFlags, -1);
-        header->addColumn(String("Type"),      Column::Type, 30, 20, 50, TableHeaderComponent::defaultFlags, -1);
-        header->addColumn(String("Object"),    Column::Object, 60, 20, 10000, TableHeaderComponent::defaultFlags, -1);
-        header->addColumn(String("Message"),   Column::Message, 100, 40, 10000, TableHeaderComponent::defaultFlags, -1);
+        
+        header->addColumn(String("ID"),
+                          Column::Id, 30, 20, 50,
+                          TableHeaderComponent::defaultFlags, -1);
+        
+        header->addColumn(String("Type"),
+                          Column::Type, 30, 20, 50,
+                          TableHeaderComponent::defaultFlags, -1);
+        
+        header->addColumn(String("Object"),
+                          Column::Object, 60, 20, 10000,
+                          TableHeaderComponent::defaultFlags, -1);
+        
+        header->addColumn(String("Message"),
+                          Column::Message, 100, 40, 10000,
+                          TableHeaderComponent::defaultFlags, -1);
+        
         header->setStretchToFitActive(false);
         header->setColumnVisible(1, false);
         header->setColumnVisible(2, false);
@@ -88,12 +101,14 @@ namespace kiwi
     
     void jConsole::erase()
     {
-        SparseSet<int> selection = m_table.getSelectedRows();
+        juce::SparseSet<int> selection = m_table.getSelectedRows();
         std::vector<size_t> select;
+        
         for(size_t i = 0; i < selection.size(); i++)
         {
             select.push_back(selection[i]);
         }
+        
         m_history->erase(select);
         m_table.setVerticalPosition(0);
     }
@@ -208,6 +223,7 @@ namespace kiwi
                              bool rowIsSelected)
     {
         auto msg = m_history->get(rowNumber);
+        
         if(msg)
         {
             g.setColour(Colours::black.brighter(0.4));
@@ -295,6 +311,7 @@ namespace kiwi
                 rightmostColumnId = i;
             }
         }
+        
         rightmostColumnId   = header->getColumnIdOfIndex(header->getNumColumns(true)-1, true);
         rightmostColumnX    = header->getTotalWidth() - header->getColumnWidth(rightmostColumnId);
         

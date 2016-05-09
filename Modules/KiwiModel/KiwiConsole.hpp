@@ -106,7 +106,7 @@ namespace kiwi
         public:
             virtual ~Listener() = default;
             
-            //! Receive the Console messages.
+            //! @brief Receive the Console messages.
             virtual void newConsoleMessage(Console::Message const& message) = 0;
         };
         
