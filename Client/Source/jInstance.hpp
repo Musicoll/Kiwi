@@ -29,6 +29,7 @@
 #include "flip/Document.h"
 
 #include "jWindow.hpp"
+#include "jConsole.hpp"
 #include "jPatcher.hpp"
 
 namespace kiwi
@@ -53,6 +54,8 @@ namespace kiwi
         
         std::unique_ptr<engine::Instance>   m_instance;
         std::unique_ptr<flip::Document>     m_document;
+        
+        std::unique_ptr<jConsoleWindow>     m_console_window;
     };
 }
 

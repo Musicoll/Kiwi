@@ -25,8 +25,8 @@
 
 namespace kiwi
 {
-    jWindow::jWindow() :
-    juce::DocumentWindow("Untitled", juce::Colours::lightgrey, juce::DocumentWindow::allButtons, true)
+    jWindow::jWindow(std::string const& name, juce::Colour color, int requiredButtons, bool addToDesktop) :
+    DocumentWindow(name, color, requiredButtons, addToDesktop)
     {
         setUsingNativeTitleBar(true);
         setSize(600, 500);

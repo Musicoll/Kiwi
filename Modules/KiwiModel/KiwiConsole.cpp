@@ -113,6 +113,15 @@ namespace kiwi
         m_messages.clear();
     }
     
+    std::unique_ptr<Console::History> Console::History::create()
+    {
+        auto history = std::unique_ptr<Console::History>(new History());
+        
+        Console::addListener(*history.get());
+        
+        return std::move(history);
+    }
+    
     void Console::History::newConsoleMessage(Console::Message const& message)
     {
         {

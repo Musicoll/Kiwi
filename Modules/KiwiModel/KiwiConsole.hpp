@@ -111,10 +111,10 @@ namespace kiwi
         };
         
         //! @brief Add an history listener.
-        void addListener(Listener& listener);
+        static void addListener(Listener& listener);
         
         //! @brief Remove an history listener.
-        void removeListener(Listener& listener);
+        static void removeListener(Listener& listener);
         
         Console() = delete;
         
@@ -150,6 +150,9 @@ namespace kiwi
         
         //! @brief Destructor.
         ~History();
+        
+        //! @brief Create a new Console History and bind it to the console
+        static std::unique_ptr<Console::History> create();
         
         //! @brief Clear the messages.
         void clear();
@@ -220,7 +223,7 @@ namespace kiwi
         
         //! @brief The function is called by an hisotry when it has changed.
         //! @param history The console history.
-        virtual void consoleHistoryChanged(History const& history) {}
+        virtual void consoleHistoryChanged(History const& history) = 0;
     };
 }
 

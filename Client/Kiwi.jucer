@@ -14,6 +14,8 @@
       <FILE id="KQjSU2" name="jPatcher.hpp" compile="0" resource="0" file="Source/jPatcher.hpp"/>
       <FILE id="QMh5qc" name="jWindow.cpp" compile="1" resource="0" file="Source/jWindow.cpp"/>
       <FILE id="dmcYQZ" name="jWindow.hpp" compile="0" resource="0" file="Source/jWindow.hpp"/>
+      <FILE id="ZMqKKa" name="jConsole.cpp" compile="1" resource="0" file="Source/jConsole.cpp"/>
+      <FILE id="jpbFUu" name="jConsole.hpp" compile="0" resource="0" file="Source/jConsole.hpp"/>
       <FILE id="Jmu5NJ" name="jInstance.cpp" compile="1" resource="0" file="Source/jInstance.cpp"/>
       <FILE id="dfUOAd" name="jInstance.hpp" compile="0" resource="0" file="Source/jInstance.hpp"/>
       <FILE id="Je1Viq" name="Application.cpp" compile="1" resource="0" file="Source/Application.cpp"/>
