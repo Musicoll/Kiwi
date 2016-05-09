@@ -31,7 +31,7 @@
 namespace kiwi
 {
     //! @brief The juce link Component.
-    class jLink : public juce::Component, juce::ComponentListener
+    class jLink : public juce::Component
     {
     public:
         

@@ -22,6 +22,7 @@
  */
 
 #include <KiwiEngine/KiwiDocumentManager.hpp>
+#include <KiwiModel/KiwiConsole.hpp>
 
 #include "jPatcher.hpp"
 #include "jObject.hpp"

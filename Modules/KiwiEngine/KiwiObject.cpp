@@ -71,7 +71,7 @@ namespace kiwi
                     }
                     else
                     {
-                        std::cout << "object " << getName() << " => Stack overflow !" << '\n';
+                        Console::error("object " + getName() + " => Stack overflow !");
                     }
                     
                     receiver.m_stack_count--;

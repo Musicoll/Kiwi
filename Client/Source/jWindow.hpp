@@ -32,7 +32,11 @@ namespace kiwi
     class jWindow : public juce::DocumentWindow
     {
     public:
-        jWindow();
+        jWindow(std::string const& name = "untitled",
+                juce::Colour color = juce::Colours::lightgrey,
+                int buttons = allButtons,
+                bool addToDesktop = true);
+        
         ~jWindow();
         
     private:

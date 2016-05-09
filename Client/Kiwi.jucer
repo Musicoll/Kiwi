@@ -14,6 +14,8 @@
       <FILE id="KQjSU2" name="jPatcher.hpp" compile="0" resource="0" file="Source/jPatcher.hpp"/>
       <FILE id="QMh5qc" name="jWindow.cpp" compile="1" resource="0" file="Source/jWindow.cpp"/>
       <FILE id="dmcYQZ" name="jWindow.hpp" compile="0" resource="0" file="Source/jWindow.hpp"/>
+      <FILE id="ZMqKKa" name="jConsole.cpp" compile="1" resource="0" file="Source/jConsole.cpp"/>
+      <FILE id="jpbFUu" name="jConsole.hpp" compile="0" resource="0" file="Source/jConsole.hpp"/>
       <FILE id="Jmu5NJ" name="jInstance.cpp" compile="1" resource="0" file="Source/jInstance.cpp"/>
       <FILE id="dfUOAd" name="jInstance.hpp" compile="0" resource="0" file="Source/jInstance.hpp"/>
       <FILE id="Je1Viq" name="Application.cpp" compile="1" resource="0" file="Source/Application.cpp"/>
@@ -62,9 +64,13 @@
         </GROUP>
         <FILE id="IHkOOO" name="KiwiPatcher.cpp" compile="1" resource="0" file="../Modules/KiwiModel/KiwiPatcher.cpp"/>
         <FILE id="oRYb04" name="KiwiPatcher.hpp" compile="0" resource="0" file="../Modules/KiwiModel/KiwiPatcher.hpp"/>
+        <FILE id="bDnugw" name="KiwiConsole.cpp" compile="1" resource="0" file="../Modules/KiwiModel/KiwiConsole.cpp"/>
+        <FILE id="lUTZ0H" name="KiwiConsole.hpp" compile="0" resource="0" file="../Modules/KiwiModel/KiwiConsole.hpp"/>
       </GROUP>
       <GROUP id="{CBF4E414-23D0-76EE-C19E-6AB749B32073}" name="KiwiCore">
         <FILE id="xsKzHU" name="KiwiAtom.hpp" compile="0" resource="0" file="../Modules/KiwiCore/KiwiAtom.hpp"/>
+        <FILE id="QQUBqT" name="KiwiListeners.hpp" compile="0" resource="0"
+              file="../Modules/KiwiCore/KiwiListeners.hpp"/>
       </GROUP>
     </GROUP>
     <GROUP id="{72FCDC55-1C0F-D5C0-C444-A9EF14BCE12B}" name="Flip">

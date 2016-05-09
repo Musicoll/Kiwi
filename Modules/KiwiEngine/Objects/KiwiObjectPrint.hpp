@@ -47,7 +47,7 @@ namespace kiwi
             {
                 if(!args.empty())
                 {
-                    std::cout << m_name << " \u2022 " << AtomHelper::toString(args) << '\n';
+                    Console::post(m_name + " \u2022 " + AtomHelper::toString(args));
                 }
             }
             
