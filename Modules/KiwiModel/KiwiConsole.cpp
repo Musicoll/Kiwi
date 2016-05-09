@@ -227,7 +227,7 @@ namespace kiwi
         return i.m_index < j.m_index;
     }
     
-    bool Console::History::compareContent(MessageHolder const& i, MessageHolder const& j)
+    bool Console::History::compareText(MessageHolder const& i, MessageHolder const& j)
     {
         std::string first = i.m_message.getText();
         std::string second = j.m_message.getText();
@@ -254,8 +254,8 @@ namespace kiwi
             case ByType:
             { std::sort(m_messages.begin(), m_messages.end(), compareType); break; }
                 
-            case ByContent:
-            { std::sort(m_messages.begin(), m_messages.end(), compareContent); break; }
+            case ByText:
+            { std::sort(m_messages.begin(), m_messages.end(), compareText); break; }
         }
     }
     

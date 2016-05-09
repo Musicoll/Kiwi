@@ -138,9 +138,9 @@ namespace kiwi
         //! @brief Sorting method types
         enum Sort
         {
-            ByIndex = 0,
-            ByType,
-            ByContent
+            ByIndex = 0,    ///< Sort messages by Index
+            ByType,         ///< Sort message by type
+            ByText          ///< Sort message by type
         };
         
     public:
@@ -193,7 +193,7 @@ namespace kiwi
         };
         
         static bool compareIndex(MessageHolder const& i, MessageHolder const& j);
-        static bool compareContent(MessageHolder const& i, MessageHolder const& j);
+        static bool compareText(MessageHolder const& i, MessageHolder const& j);
         static bool compareType(MessageHolder const& i, MessageHolder const& j);
         
         //! @internal Receive the messages from the Console and dispatch changes to listeners.
