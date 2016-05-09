@@ -117,6 +117,35 @@ namespace kiwi
             }
         }
         
+        Patcher::User* Patcher::getUser(uint32_t user_id)
+        {
+            const auto has_same_id = [user_id] (User const& user)
+            {
+                return user_id == user.m_user_id;
+            };
+            
+            const auto it = std::find_if(m_users.begin(), m_users.end(), has_same_id);
+            
+            if(it != m_users.end())
+            {
+                return it.operator->();
+            }
+            
+            return nullptr;
+        }
+        
+        Patcher::User& Patcher::getOrCreateUser(uint32_t user_id)
+        {
+            auto* user = getUser(user_id);
+            
+            if(user == nullptr)
+            {
+                return *user;
+            }
+            
+            return *m_users.emplace(user_id);
+        }
+        
         flip::Array<model::Object>::const_iterator Patcher::findObject(model::Object const& object) const
         {
             const auto find_it = [&object](model::Object const& object_model)
@@ -155,6 +184,54 @@ namespace kiwi
             };
             
             return std::find_if(m_links.begin(), m_links.end(), find_it);
+        }
+        
+        // ================================================================================ //
+        //                                   PATCHER VIEW                                   //
+        // ================================================================================ //
+        
+        void Patcher::View::unSelectAll()
+        {
+            m_selection.m_links.clear();
+            m_selection.m_objects.clear();
+        }
+        
+        void Patcher::View::selectAll()
+        {
+            unSelectAll();
+            
+            auto& patcher = getPatcher();
+            
+            for(auto& object : patcher.getObjects())
+            {
+                m_selection.m_objects.emplace(object);
+            }
+            
+            for(auto& link : patcher.getLinks())
+            {
+                m_selection.m_links.emplace(link);
+            }
+        }
+        
+        // ================================================================================ //
+        //                                   PATCHER USER                                   //
+        // ================================================================================ //
+        
+        Patcher::View& Patcher::User::addView()
+        {
+            return *m_views.emplace();
+        }
+        
+        void Patcher::User::removeView(View const& view)
+        {
+            auto it = m_views.find_if([&view](View const& patcher_view) {
+                return (&view == &patcher_view);
+            });
+            
+            if(it != m_views.end())
+            {
+                m_views.erase(it);
+            }
         }
     }
 }

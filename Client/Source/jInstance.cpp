@@ -28,9 +28,11 @@
 
 namespace kiwi
 {
-    jInstance::jInstance() : m_instance(new engine::Instance(123456789ULL, "Main"))
+    jInstance::jInstance() :
+    m_instance(new engine::Instance(123456789ULL, "Main")),
+    m_console_window(new jConsoleWindow())
     {
-        m_console_window = std::unique_ptr<jConsoleWindow>(new jConsoleWindow());
+        ;
     }
     
     jInstance::~jInstance()
