@@ -41,11 +41,21 @@ namespace kiwi
     {
     public:
         
-        using listener_ref_t = ListenerClass&;
-        using listener_ptr_t = ListenerClass*;
+        struct is_valid_listener : std::integral_constant<bool,
+        !std::is_pointer<ListenerClass>::value &&
+        !std::is_reference<ListenerClass>::value
+        > {};
+        
+        using listener_t = typename std::remove_pointer<typename std::remove_reference<ListenerClass>::type>::type;
+        using listener_ref_t = listener_t&;
+        using listener_ptr_t = listener_t*;
         
         //! @brief Creates an empty listener set.
-        Listeners() = default;
+        Listeners()
+        {
+            static_assert(is_valid_listener::value,
+                          "Template parameter must not be a pointer or a reference");
+        }
         
         //! @brief Destructor.
         ~Listeners() noexcept { m_listeners.clear(); }
