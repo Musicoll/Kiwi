@@ -103,7 +103,32 @@ namespace kiwi
             patcher.addLink(plus_3, 0, plus_1, 0);
             patcher.addLink(plus_4, 0, plus_1, 0);
         }
-
+        
+        {
+            // stack overflow
+            auto& plus_1 = patcher.addObject("plus");
+            plus_1.setPosition(550, 100);
+            
+            auto& plus_2 = patcher.addObject("plus");
+            plus_2.setPosition(605, 70);
+            
+            auto& plus_3 = patcher.addObject("plus 10");
+            plus_3.setPosition(500, 20);
+            
+            auto& plus_4 = patcher.addObject("plus -10");
+            plus_4.setPosition(580, 20);
+            
+            auto& print = patcher.addObject("print zozo");
+            print.setPosition(550, 150);
+            
+            patcher.addLink(plus_1, 0, plus_2, 0);
+            patcher.addLink(plus_2, 0, plus_1, 0);
+            patcher.addLink(plus_1, 0, print, 0);
+            
+            patcher.addLink(plus_3, 0, plus_1, 0);
+            patcher.addLink(plus_4, 0, plus_1, 0);
+        }
+        
         engine::DocumentManager::commit(patcher, "load initial objects and links");
     }
     
