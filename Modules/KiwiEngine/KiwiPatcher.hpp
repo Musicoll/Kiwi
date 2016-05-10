@@ -70,22 +70,22 @@ namespace kiwi
             void document_changed(model::Patcher& patcher) final override;
             
             //! @internal Object model has just been added to the document.
-            void objectModelAdded(model::Object& object);
+            void objectAdded(model::Object& object);
             
             //! @internal Object model has changed.
-            void objectModelChanged(model::Object& object);
+            void objectChanged(model::Object& object);
             
             //! @internal Object model will be removed from the document.
-            void objectModelRemoved(model::Object& object);
+            void objectRemoved(model::Object& object);
             
             //! @internal Link model has just been added to the document.
-            void linkModelAdded(model::Link& link);
+            void linkAdded(model::Link& link);
             
             //! @internal Link model has changed.
-            void linkModelChanged(model::Link& link);
+            void linkChanged(model::Link& link);
             
             //! @internal Link model will be removed from the document.
-            void linkModelRemoved(model::Link& link);
+            void linkRemoved(model::Link& link);
             
             // -----------------------------
             

@@ -38,7 +38,7 @@ namespace kiwi
         jObject();
         ~jObject();
         
-        void objectModelChanged(model::Object& object);
+        void objectChanged(model::Object& object);
         
         // juce::Component
         void paint(juce::Graphics& g) override;

@@ -52,25 +52,35 @@ namespace kiwi
         void leftClick(juce::MouseEvent const& event);
         void rightClick(juce::MouseEvent const& event);
         
-        //! @internal Object has just been added to the document.
-        void objectModelAdded(model::Object& object);
+        //! @internal User has just been added to the document.
+        void userAdded(model::Patcher::User& user);
         
-        //! @internal Object is resident and internal value changed.
-        void objectModelChanged(model::Object& object);
+        //! @internal User is resident and internal value changed.
+        void userChanged(model::Patcher::User& user);
         
-        //! @internal Object will be removed from the document.
-        void objectModelRemoved(model::Object& object);
+        //! @internal User will be removed from the document.
+        void userRemoved(model::Patcher::User& user);
         
-        //! @internal Link has just been added to the document.
-        void linkModelAdded(model::Link& link);
+        //! @internal Object model has just been added to the document.
+        void objectAdded(model::Object& object);
         
-        //! @internal Link is resident and internal value changed.
-        void linkModelChanged(model::Link& link);
+        //! @internal Object model is resident and internal value changed.
+        void objectChanged(model::Object& object);
         
-        //! @internal Link will be removed from the document.
-        void linkModelRemoved(model::Link& link);
+        //! @internal Object model will be removed from the document.
+        void objectRemoved(model::Object& object);
+        
+        //! @internal Link model has just been added to the document.
+        void linkAdded(model::Link& link);
+        
+        //! @internal Link model is resident and internal value changed.
+        void linkChanged(model::Link& link);
+        
+        //! @internal Link model will be removed from the document.
+        void linkRemoved(model::Link& link);
         
         model::Patcher* m_model;
+        model::Patcher::User* m_user;
     };
 }
 

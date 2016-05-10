@@ -78,7 +78,7 @@ namespace kiwi
         private:
             
             //! @internal Model change notification.
-            void objectModelChanged(model::Object& object_m);
+            void objectChanged(model::Object& object_m);
             
             //! @internal signalTriggerCallback.
             void internal_signalTriggerCalled();

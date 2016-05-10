@@ -35,7 +35,7 @@ namespace kiwi
         ;
     }
     
-    void jLink::linkModelChanged(model::Link& link)
+    void jLink::linkChanged(model::Link& link)
     {
         if(link.added())
         {
@@ -48,7 +48,7 @@ namespace kiwi
         }
     }
     
-    void jLink::objectModelChanged(model::Object& object)
+    void jLink::objectChanged(model::Object& object)
     {
         if(!object.removed() && object.positionChanged())
         {

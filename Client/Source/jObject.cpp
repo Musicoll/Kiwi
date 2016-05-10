@@ -38,7 +38,7 @@ namespace kiwi
         ;
     }
     
-    void jObject::objectModelChanged(model::Object& object)
+    void jObject::objectChanged(model::Object& object)
     {
         bool need_redraw = false;
         

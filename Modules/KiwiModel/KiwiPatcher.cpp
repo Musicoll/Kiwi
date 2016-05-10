@@ -33,9 +33,9 @@ namespace kiwi
         //                                  PATCHER::declare                                //
         // ================================================================================ //
         
-        void Patcher::View::declare()
+        void Patcher::View::Selection::declare()
         {
-            assert(! PatcherModel::has<Patcher::View>());
+            assert(! PatcherModel::has<Patcher::View::Selection>());
             
             PatcherModel::declare<Patcher::View::Object>()
             .name("cicm&.kiwi.Patcher.View.Object")
@@ -49,6 +49,17 @@ namespace kiwi
             .name("cicm.kiwi.Patcher.View.Selection")
             .member<flip::Collection<View::Object>, &Selection::m_objects>("objects")
             .member<flip::Collection<View::Link>, &Selection::m_links>("links");
+            
+            PatcherModel::declare<Patcher::View>()
+            .name("cicm.kiwi.Patcher.View")
+            .member<View::Selection, &View::m_selection>("selection");
+        }
+        
+        void Patcher::View::declare()
+        {
+            assert(! PatcherModel::has<Patcher::View>());
+            
+            Patcher::View::Selection::declare();
             
             PatcherModel::declare<Patcher::View>()
             .name("cicm.kiwi.Patcher.View")

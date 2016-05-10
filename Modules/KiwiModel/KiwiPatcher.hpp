@@ -204,7 +204,10 @@ namespace kiwi
                 bool isSelected(model::Object const& object);
                 bool isSelected(model::Link const& link);
                 
+                static void declare();
+                
             private:
+                
                 flip::Collection<View::Object>  m_objects;
                 flip::Collection<View::Link>    m_links;
                 friend Patcher::View;
@@ -212,12 +215,16 @@ namespace kiwi
             
         public:
             
+            //! @brief Return the parent Patcher object
             Patcher& getPatcher() { return parent<Patcher>(); }
             
+            //! @brief Unselect all objects and links
             void unSelectAll();
             
+            //! @brief Select all objects and links
             void selectAll();
             
+            //! @brief flip declare method
             static void declare();
             
         private:
@@ -233,10 +240,13 @@ namespace kiwi
         {
         public:
             
-            User() = default;
+            //! @brief flip default Constructor.
+            User(flip::Default&) {};
             
+            //! @brief Constructor.
             User(uint32_t user_id) : m_user_id(user_id) {}
             
+            //! @brief Destructor.
             ~User() = default;
             
             //! @brief Add a new View.

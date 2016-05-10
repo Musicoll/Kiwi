@@ -62,7 +62,7 @@ namespace kiwi
         private:
             
             //! @internal Link model has changed.
-            void linkModelChanged(model::Link& link_m);
+            void linkChanged(model::Link& link_m);
             
         private:
             
