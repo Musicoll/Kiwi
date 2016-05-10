@@ -93,7 +93,7 @@ namespace kiwi
             //! @brief Set the User.
             //! @param user_id The user unique id.
             //! @return The user.
-            User& getOrCreateUser(uint32_t user_id);
+            User& createUserIfNotAlreadyThere(uint32_t user_id);
             
             //! @brief Get a User by id.
             //! @param user_id The user unique id.

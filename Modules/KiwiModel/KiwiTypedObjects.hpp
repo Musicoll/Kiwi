@@ -43,7 +43,7 @@ namespace kiwi
             ObjectPlus(flip::Default& d) : model::Object(d) {}
             
             //! @brief Constructor
-            ObjectPlus(std::string const& name, std::vector<Atom> args);
+            ObjectPlus(std::string const& name, std::vector<Atom> const& args);
             
             //! @internal flip static declare method
             static void declare();
@@ -61,7 +61,7 @@ namespace kiwi
             ObjectPrint(flip::Default& d) : model::Object(d) {}
             
             //! @brief Constructor
-            ObjectPrint(std::string const& name, std::vector<Atom> args);
+            ObjectPrint(std::string const& name, std::vector<Atom> const& args);
             
             //! @internal flip static declare method
             static void declare();

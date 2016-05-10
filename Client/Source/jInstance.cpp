@@ -46,6 +46,7 @@ namespace kiwi
         m_document = m_instance->createPatcherDocument(*this);
         
         model::Patcher& patcher = m_document->root<model::Patcher>();
+        patcher.createUserIfNotAlreadyThere(m_instance->getUserId());
         populatePatcher(patcher);
     }
     

@@ -44,7 +44,7 @@ namespace kiwi
             ObjectFactory::registerModel<ObjectPlus>("plus");
         }
         
-        ObjectPlus::ObjectPlus(std::string const& name, std::vector<Atom> args)
+        ObjectPlus::ObjectPlus(std::string const& name, std::vector<Atom> const& args)
         {
             if(!args.empty() && args[0].isNumber())
             {
@@ -62,7 +62,7 @@ namespace kiwi
         //                                    OBJECT PRINT                                  //
         // ================================================================================ //
         
-        ObjectPrint::ObjectPrint(std::string const& name, std::vector<Atom> args)
+        ObjectPrint::ObjectPrint(std::string const& name, std::vector<Atom> const& args)
         {
             ;
         }

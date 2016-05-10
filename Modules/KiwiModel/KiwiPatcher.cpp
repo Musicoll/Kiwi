@@ -92,7 +92,8 @@ namespace kiwi
         {
             //assert(ObjectFactory::has(object_name));
             
-            return *m_objects.insert(m_objects.end(), ObjectFactory::createModel(text));
+            auto object_uptr = ObjectFactory::createModel(text);
+            return *m_objects.insert(m_objects.end(), std::move(object_uptr));
         }
         
         bool Patcher::canConnect(model::Object const& from, const uint32_t outlet,
@@ -180,7 +181,7 @@ namespace kiwi
             return nullptr;
         }
         
-        Patcher::User& Patcher::getOrCreateUser(uint32_t user_id)
+        Patcher::User& Patcher::createUserIfNotAlreadyThere(uint32_t user_id)
         {
             auto* user = getUser(user_id);
             

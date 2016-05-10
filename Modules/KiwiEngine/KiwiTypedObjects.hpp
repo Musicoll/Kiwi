@@ -38,9 +38,9 @@ namespace kiwi
         {
         public:
             
-            ObjectPlus(std::vector<Atom> args);
+            ObjectPlus(std::vector<Atom> const& args);
             
-            void receive(uint32_t index, std::vector<Atom> args) override;
+            void receive(uint32_t index, std::vector<Atom> const& args) override;
             
             void bang();
             
@@ -59,9 +59,9 @@ namespace kiwi
         {
         public:
             
-            ObjectPrint(std::vector<Atom> args);
+            ObjectPrint(std::vector<Atom> const& args);
             
-            void receive(uint32_t, std::vector<Atom> args) override;
+            void receive(uint32_t, std::vector<Atom> const& args) override;
             
         private:
             std::string m_name;
