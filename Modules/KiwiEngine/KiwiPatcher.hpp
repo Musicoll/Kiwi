@@ -24,6 +24,8 @@
 #ifndef KIWI_ENGINE_PATCHER_HPP_INCLUDED
 #define KIWI_ENGINE_PATCHER_HPP_INCLUDED
 
+#include <KiwiModel/KiwiPatcher.hpp>
+
 #include "flip/DocumentObserver.h"
 
 #include "KiwiLink.hpp"

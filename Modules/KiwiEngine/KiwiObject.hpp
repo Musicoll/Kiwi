@@ -26,7 +26,8 @@
 
 #include "flip/SignalConnection.h"
 
-#include <KiwiModel/KiwiModel.hpp>
+#include <KiwiModel/KiwiConsole.hpp>
+#include <KiwiModel/KiwiObject.hpp>
 
 #include <utility>
 

@@ -23,10 +23,56 @@
 
 #include "KiwiPatcher.hpp"
 
+#include "KiwiPatcherModel.hpp"
+
 namespace kiwi
 {
     namespace model
     {
+        // ================================================================================ //
+        //                                  PATCHER::declare                                //
+        // ================================================================================ //
+        
+        void Patcher::View::declare()
+        {
+            assert(! PatcherModel::has<Patcher::View>());
+            
+            PatcherModel::declare<Patcher::View::Object>()
+            .name("cicm&.kiwi.Patcher.View.Object")
+            .template member<flip::ObjectRef<model::Object>, &View::Object::m_ref>("ref");
+            
+            PatcherModel::declare<Patcher::View::Link>()
+            .name("cicm.kiwi.Patcher.View.Link")
+            .member<flip::ObjectRef<model::Link>, &View::Link::m_ref>("ref");
+            
+            PatcherModel::declare<Patcher::View::Selection>()
+            .name("cicm.kiwi.Patcher.View.Selection")
+            .member<flip::Collection<View::Object>, &Selection::m_objects>("objects")
+            .member<flip::Collection<View::Link>, &Selection::m_links>("links");
+            
+            PatcherModel::declare<Patcher::View>()
+            .name("cicm.kiwi.Patcher.View")
+            .member<View::Selection, &View::m_selection>("selection");
+        }
+        
+        void Patcher::declare()
+        {
+            assert(! PatcherModel::has<Patcher>());
+            
+            Patcher::View::declare();
+            
+            PatcherModel::declare<Patcher::User>()
+            .name("cicm.kiwi.Patcher.User")
+            .member<flip::Int, &Patcher::User::m_user_id>("user_id")
+            .member<flip::Collection<Patcher::View>, &Patcher::User::m_views>("views");
+            
+            PatcherModel::declare<Patcher>()
+            .name("cicm.kiwi.Patcher")
+            .member<flip::Array<model::Object>, &Patcher::m_objects>("objects")
+            .member<flip::Array<model::Link>, &Patcher::m_links>("links")
+            .member<flip::Collection<Patcher::User>, &Patcher::m_users>("users");
+        }
+        
         // ================================================================================ //
         //                                   PATCHER MODEL                                  //
         // ================================================================================ //
@@ -232,6 +278,11 @@ namespace kiwi
             {
                 m_views.erase(it);
             }
+        }
+        
+        uint32_t Patcher::User::getId() const
+        {
+            return m_user_id;
         }
     }
 }

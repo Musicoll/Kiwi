@@ -25,7 +25,7 @@
 #define KIWI_MODEL_PATCHER_HPP_INCLUDED
 
 #include "KiwiLink.hpp"
-#include "Objects/KiwiObjects.hpp"
+#include "KiwiTypedObjects.hpp"
 
 namespace kiwi
 {
@@ -131,7 +131,7 @@ namespace kiwi
             flip::Array<model::Link> const& getLinks() const noexcept       { return m_links; }
             
             //! @internal flip static declare method
-            template<class TModel> static void declare();
+            static void declare();
             
         private:
             
@@ -218,28 +218,7 @@ namespace kiwi
             
             void selectAll();
             
-            template<class TModel>
-            static void declare()
-            {
-                assert(! TModel::template has<Patcher::View>());
-                
-                TModel::template declare<Patcher::View::Object>()
-                .name("cicm&.kiwi.Patcher.View.Object")
-                .template member<flip::ObjectRef<model::Object>, &View::Object::m_ref>("ref");
-                
-                TModel::template declare<Patcher::View::Link>()
-                .name("cicm.kiwi.Patcher.View.Link")
-                .template member<flip::ObjectRef<model::Link>, &View::Link::m_ref>("ref");
-                
-                TModel::template declare<Patcher::View::Selection>()
-                .name("cicm.kiwi.Patcher.View.Selection")
-                .template member<flip::Collection<View::Object>, &Selection::m_objects>("objects")
-                .template member<flip::Collection<View::Link>, &Selection::m_links>("links");
-                
-                TModel::template declare<Patcher::View>()
-                .name("cicm.kiwi.Patcher.View")
-                .template member<View::Selection, &View::m_selection>("selection");
-            }
+            static void declare();
             
         private:
 
@@ -266,6 +245,9 @@ namespace kiwi
             //! @brief Remove a View.
             void removeView(View const& view);
             
+            //! @brief Get the User id
+            uint32_t getId() const;
+            
         private:
             
             flip::Int                       m_user_id;
@@ -273,29 +255,6 @@ namespace kiwi
             
             friend Patcher;
         };
-        
-        // ================================================================================ //
-        //                                  PATCHER::declare                                //
-        // ================================================================================ //
-        
-        template<class TModel>
-        void Patcher::declare()
-        {
-            assert(! TModel::template has<Patcher>());
-            
-            Patcher::View::declare<TModel>();
-            
-            TModel::template declare<Patcher::User>()
-            .name("cicm.kiwi.Patcher.User")
-            .template member<flip::Int, &Patcher::User::m_user_id>("user_id")
-            .template member<flip::Collection<Patcher::View>, &Patcher::User::m_views>("views");
-            
-            TModel::template declare<Patcher>()
-            .name("cicm.kiwi.Patcher")
-            .template member<flip::Array<model::Object>, &Patcher::m_objects>("objects")
-            .template member<flip::Array<model::Link>, &Patcher::m_links>("links")
-            .template member<flip::Collection<Patcher::User>, &Patcher::m_users>("users");
-        }
     }
 }
 

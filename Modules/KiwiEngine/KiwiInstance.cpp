@@ -24,7 +24,8 @@
 #include "KiwiInstance.hpp"
 
 #include <KiwiModel/KiwiObjectFactory.hpp>
-#include "Objects/KiwiObjects.hpp"
+#include <KiwiModel/KiwiPatcherModel.hpp>
+#include "KiwiTypedObjects.hpp"
 
 namespace kiwi
 {
@@ -35,7 +36,7 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief The Patcher Model class declarator
-        class Instance::PatcherModelDeclarator : public model::PatcherDataModel
+        class Instance::PatcherModelDeclarator : public model::PatcherModel
         {
         public:
             

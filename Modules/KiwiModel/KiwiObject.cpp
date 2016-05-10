@@ -23,10 +23,30 @@
 
 #include "KiwiObject.hpp"
 
+#include "KiwiPatcherModel.hpp"
+
 namespace kiwi
 {
     namespace model
     {
+        // ================================================================================ //
+        //                                  OBJECT::declare                                 //
+        // ================================================================================ //
+        
+        void Object::declare()
+        {
+            if(PatcherModel::has<model::Object>()) return;
+            
+            PatcherModel::declare<model::Object>()
+            .name("cicm.kiwi.Object")
+            .member<flip::String, &Object::m_name>("name")
+            .member<flip::String, &Object::m_text>("text")
+            .member<flip::Int, &Object::m_inlets>("inlets")
+            .member<flip::Int, &Object::m_outlets>("outlets")
+            .member<flip::Float, &Object::m_position_x>("pos_x")
+            .member<flip::Float, &Object::m_position_y>("pos_y");
+        }
+        
         // ================================================================================ //
         //                                      OBJECT                                      //
         // ================================================================================ //

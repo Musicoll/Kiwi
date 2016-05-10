@@ -21,11 +21,11 @@
  ==============================================================================
 */
 
-#ifndef KIWI_MODEL_OBJECTS_OBJECTPLUS_HPP_INCLUDED
-#define KIWI_MODEL_OBJECTS_OBJECTPLUS_HPP_INCLUDED
+#ifndef KIWI_MODEL_TYPED_OBJECTS_HPP_INCLUDED
+#define KIWI_MODEL_TYPED_OBJECTS_HPP_INCLUDED
 
-#include "../KiwiObject.hpp"
-#include "../KiwiObjectFactory.hpp"
+#include "KiwiObject.hpp"
+#include "KiwiObjectFactory.hpp"
 
 namespace kiwi
 {
@@ -39,37 +39,35 @@ namespace kiwi
         {
         public:
             
+            //! @brief flip Default Constructor
             ObjectPlus(flip::Default& d) : model::Object(d) {}
             
-            ObjectPlus(std::string const& name, std::vector<Atom> args)
-            {
-                if(!args.empty() && args[0].isNumber())
-                {
-                    setNumberOfInlets(1);
-                }
-                else
-                {
-                    setNumberOfInlets(2);
-                }
-
-                setNumberOfOutlets(1);
-            }
-
+            //! @brief Constructor
+            ObjectPlus(std::string const& name, std::vector<Atom> args);
+            
             //! @internal flip static declare method
-            template<class TModel>
-            static void declare()
-            {
-                if(TModel::template has<ObjectPlus>()) return;
-                
-                TModel::template declare<ObjectPlus>()
-                .name("cicm.kiwi.ObjectPlus")
-                .template inherit<model::Object>();
-                
-                ObjectFactory::registerModel<ObjectPlus>("plus");
-            }
+            static void declare();
+        };
+        
+        // ================================================================================ //
+        //                                    OBJECT PRINT                                  //
+        // ================================================================================ //
+        
+        class ObjectPrint : public model::Object
+        {
+        public:
+            
+            //! @brief flip Default Constructor
+            ObjectPrint(flip::Default& d) : model::Object(d) {}
+            
+            //! @brief Constructor
+            ObjectPrint(std::string const& name, std::vector<Atom> args);
+            
+            //! @internal flip static declare method
+            static void declare();
         };
     }
 }
 
 
-#endif // KIWI_MODEL_OBJECTS_OBJECTPLUS_HPP_INCLUDED
+#endif // KIWI_MODEL_TYPED_OBJECTS_HPP_INCLUDED

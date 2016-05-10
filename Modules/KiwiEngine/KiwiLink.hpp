@@ -24,6 +24,8 @@
 #ifndef KIWI_ENGINE_LINK_HPP_INCLUDED
 #define KIWI_ENGINE_LINK_HPP_INCLUDED
 
+#include <KiwiModel/KiwiLink.hpp>
+
 #include "KiwiObject.hpp"
 
 namespace kiwi
