@@ -21,11 +21,12 @@
  ==============================================================================
 */
 
-#include "KiwiInstance.hpp"
-
 #include <KiwiModel/KiwiObjectFactory.hpp>
 #include <KiwiModel/KiwiPatcherModel.hpp>
 #include "KiwiTypedObjects.hpp"
+
+#include "KiwiInstance.hpp"
+#include "KiwiDocumentManager.hpp"
 
 namespace kiwi
 {
@@ -75,6 +76,8 @@ namespace kiwi
         {
             if(patcher.added())
             {
+                patcher.entity().emplace<DocumentManager>(patcher.document());
+                
                 patcher.entity().emplace<Patcher>(*this);
             }
             
@@ -82,6 +85,8 @@ namespace kiwi
             
             if(patcher.removed())
             {
+                patcher.entity().erase<DocumentManager>();
+                
                 patcher.entity().erase<Patcher>();
             }
         }

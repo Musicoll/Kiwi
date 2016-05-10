@@ -136,8 +136,6 @@ namespace kiwi
     {
         if(patcher.added())
         {
-            patcher.entity().emplace<engine::DocumentManager>(patcher.document());
-            
             auto& window = patcher.entity().emplace<jWindow>();
             auto& jpatcher = patcher.entity().emplace<jPatcher>();
             window.setContentNonOwned(&jpatcher, true);
@@ -154,8 +152,6 @@ namespace kiwi
         {
             patcher.entity().erase<jPatcher>();
             patcher.entity().erase<jWindow>();
-            
-            patcher.entity().erase<engine::DocumentManager>();
         }
     }
 }
