@@ -39,14 +39,14 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief The Patcher manages object and link controllers.
-        //! @details The patcher engine observes the Patcher mode for changes.
+        //! @details The patcher engine observes the Patcher model for changes.
         class Patcher : public flip::DocumentObserver<model::Patcher>
         {
         public:
             
             //! @brief Constructor.
             //! @details use the create method instead.
-            Patcher(Instance& instance) noexcept;
+            Patcher() noexcept;
             
             //! @brief Destructor.
             ~Patcher();
@@ -64,10 +64,10 @@ namespace kiwi
             //! @brief Send a message to an object
             void sendToObject(Object& object, uint32_t inlet, std::vector<Atom> args);
             
-        private:
-            
             //! @internal flip::DocumentObserver<model::Patcher>::document_changed
             void document_changed(model::Patcher& patcher) final override;
+            
+        private: // methods
             
             //! @internal Object model has just been added to the document.
             void objectAdded(model::Object& object);
@@ -86,12 +86,9 @@ namespace kiwi
             
             //! @internal Link model will be removed from the document.
             void linkRemoved(model::Link& link);
+        
+        private: // members
             
-            // -----------------------------
-            
-            friend class Instance; // for document_changed access
-            
-            Instance&                       m_instance;
             model::Patcher*                 m_model;
         };
     }

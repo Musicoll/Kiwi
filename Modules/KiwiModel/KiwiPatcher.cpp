@@ -290,7 +290,7 @@ namespace kiwi
         
         uint32_t Patcher::User::getId() const
         {
-            return m_user_id;
+            return !removed() ? static_cast<uint32_t>(m_user_id) : static_cast<uint32_t>(m_user_id.before());
         }
         
         flip::Collection<Patcher::View> const& Patcher::User::getViews() const noexcept

@@ -32,7 +32,7 @@ namespace kiwi
         //                                      PATCHER                                     //
         // ================================================================================ //
         
-        Patcher::Patcher(Instance& instance) noexcept : m_instance(instance)
+        Patcher::Patcher() noexcept
         {
             ;
         }

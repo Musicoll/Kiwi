@@ -32,8 +32,11 @@
 
 namespace kiwi
 {
+    class jObject;
+    class jLink;
+    
     //! @brief The juce Patcher Component.
-    class jPatcher : public juce::Component, public flip::DocumentObserver<model::Patcher>
+    class jPatcher : public juce::Component
     {
     public:
         
@@ -45,27 +48,27 @@ namespace kiwi
         void mouseDown(juce::MouseEvent const& event) override;
         
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
-        void document_changed(model::Patcher& patcher) override final;
+        void patcherChanged(model::Patcher& patcher, model::Patcher::View& view);
+        
+        //! @brief Returns the jObject corresponding to a given Object model.
+        jObject const* const getjObject(model::Object const& object) const;
+        
+        //! @brief Returns the jLink corresponding to a given Link model.
+        //jLink const* const getjLink(model::Link const& link) const;
+        
+        //! @brief Returns the jLink corresponding to a given Link model.
+        jLink* getjLink(model::Link const& link);
         
     private:
         
         void leftClick(juce::MouseEvent const& event);
         void rightClick(juce::MouseEvent const& event);
         
-        //! @internal User has just been added to the document.
-        void userAdded(model::Patcher::User& user);
-        
-        //! @internal User is resident and internal value changed.
-        void userChanged(model::Patcher::User& user);
-        
-        //! @internal User will be removed from the document.
-        void userRemoved(model::Patcher::User& user);
-        
         //! @internal Object model has just been added to the document.
         void objectAdded(model::Object& object);
         
         //! @internal Object model is resident and internal value changed.
-        void objectChanged(model::Object& object);
+        void objectChanged(model::Patcher::View& view, model::Object& object);
         
         //! @internal Object model will be removed from the document.
         void objectRemoved(model::Object& object);
@@ -79,8 +82,10 @@ namespace kiwi
         //! @internal Link model will be removed from the document.
         void linkRemoved(model::Link& link);
         
-        model::Patcher* m_model;
-        model::Patcher::User* m_user;
+        model::Patcher*                     m_model;
+        
+        std::set<std::unique_ptr<jObject>>  m_objects;
+        std::set<std::unique_ptr<jLink>>    m_links;
     };
 }
 

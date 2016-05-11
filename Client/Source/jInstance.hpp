@@ -28,32 +28,40 @@
 
 #include "flip/Document.h"
 
-#include "jWindow.hpp"
 #include "jConsole.hpp"
-#include "jPatcher.hpp"
+#include "jPatcherManager.hpp"
 
 namespace kiwi
 {
-    //! @brief The main DocumentObserver.
-    //! @details The jInstance dispatch changes to all other DocumentObserver objects
-    class jInstance : public flip::DocumentObserver<model::Patcher>
+    //! @brief The jInstance
+    class jInstance
     {
     public:
+        
+        //! @brief Constructor
         jInstance();
+        
+        //! @brief Destructor
         ~jInstance();
         
         //! @brief create a new patcher window.
         void newPatcher();
         
+        //! @brief Get the user ID of the Instance.
+        uint64_t getUserId() const noexcept;
+        
     private:
         
-        //! @internal flip::DocumentObserver<model::Patcher>::document_changed
-        void document_changed(model::Patcher& patcher) override final;
-        
+        //! @internal temporary method to pre-populate new patchers
         void populatePatcher(model::Patcher& patcher);
         
+    private:
+        
+        const uint64_t m_user_id;
+        
         std::unique_ptr<engine::Instance>   m_instance;
-        std::unique_ptr<flip::Document>     m_document;
+        
+        std::unique_ptr<jPatcherManager>    m_patcher_manager;
         
         std::unique_ptr<jConsoleWindow>     m_console_window;
     };

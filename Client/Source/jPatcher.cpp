@@ -99,7 +99,7 @@ namespace kiwi
             {
                 auto& obj = patcher.addObject("plus");
                 obj.setPosition(event.x, event.y);
-                engine::DocumentManager::commit(patcher, "Add Plus Object");
+                DocumentManager::commit(patcher, "Add Plus Object");
                 break;
             }
                 
@@ -107,7 +107,7 @@ namespace kiwi
             {
                 auto& obj = patcher.addObject("print");
                 obj.setPosition(event.getMouseDownX(), event.getMouseDownY());
-                engine::DocumentManager::commit(patcher, "Add Print Object");
+                DocumentManager::commit(patcher, "Add Print Object");
                 break;
             }
                 
@@ -115,68 +115,63 @@ namespace kiwi
         }
     }
     
-    void jPatcher::document_changed(model::Patcher& patcher)
+    void jPatcher::patcherChanged(model::Patcher& patcher, model::Patcher::View& view)
     {
-        if(patcher.added())
+        if(view.added())
         {
             m_model = &patcher;
         }
         
-        if(patcher.objectsChanged())
+        // send changes to objects
+        for(auto& object : patcher.getObjects())
         {
-            for(auto& object : patcher.getObjects())
+            if(object.changed())
             {
-                if(object.changed())
+                if(object.added())
                 {
-                    if(object.added())
-                    {
-                        objectAdded(object);
-                    }
-                    
-                    objectChanged(object);
-                    
-                    if(object.removed())
-                    {
-                        objectRemoved(object);
-                    }
+                    objectAdded(object);
+                }
+                
+                objectChanged(view, object);
+                
+                if(object.removed())
+                {
+                    objectRemoved(object);
                 }
             }
         }
         
-        if(patcher.linksChanged())
+        for(auto& link : patcher.getLinks())
         {
-            for(auto& link : patcher.getLinks())
+            if(link.added())
             {
-                if(link.changed())
+                linkAdded(link);
+            }
+            
+            linkChanged(link);
+            
+            if(patcher.objectsChanged())
+            {
+                for(auto& object : patcher.getObjects())
                 {
-                    if(link.added())
+                    if(object.changed())
                     {
-                        linkAdded(link);
-                    }
-                    
-                    linkChanged(link);
-                    
-                    if(patcher.objectsChanged())
-                    {
-                        for(auto& object : patcher.getObjects())
+                        auto jlink = getjLink(link);
+                        if(jlink)
                         {
-                            if(object.changed())
-                            {
-                                auto& jlink = link.entity().use<jLink>();
-                                jlink.objectChanged(object);
-                            }
+                            jlink->objectChanged(object);
                         }
                     }
-                    
-                    if(link.removed())
-                    {
-                        linkRemoved(link);
-                    }
                 }
+            }
+            
+            if(link.removed())
+            {
+                linkRemoved(link);
             }
         }
         
-        if(patcher.removed())
+        if(view.removed())
         {
             m_model = nullptr;
         }
@@ -184,41 +179,120 @@ namespace kiwi
     
     void jPatcher::objectAdded(model::Object& object)
     {
-        auto& jobj = object.entity().emplace<jObject>();
-        addAndMakeVisible(jobj);
+        auto result = m_objects.emplace(new jObject(object));
+        if(result.second)
+        {
+            jObject& jobj = *result.first->get();
+            addAndMakeVisible(jobj);
+        }
     }
     
-    void jPatcher::objectChanged(model::Object& object)
+    void jPatcher::objectChanged(model::Patcher::View& view, model::Object& object)
     {
-        auto& jobject = object.entity().use<jObject>();
-        jobject.objectChanged(object);
+        const auto find_jobj = [&object](std::unique_ptr<jObject> const& jobj)
+        {
+            return (&object == &jobj->getModel());
+        };
+        
+        const auto it = std::find_if(m_objects.begin(), m_objects.end(), find_jobj);
+        
+        if(it != m_objects.cend())
+        {
+            jObject& jobject = *it->get();
+            jobject.objectChanged(view, object);
+        }
     }
     
     void jPatcher::objectRemoved(model::Object& object)
     {
-        auto& jobj = object.entity().use<jObject>();
-        removeChildComponent(&jobj);
+        const auto find_jobj = [&object](std::unique_ptr<jObject> const& jobj)
+        {
+            return (&object == &jobj->getModel());
+        };
         
-        object.entity().erase<jObject>();
+        const auto it = std::find_if(m_objects.begin(), m_objects.end(), find_jobj);
+        
+        if(it != m_objects.cend())
+        {
+            removeChildComponent(it->get());
+            m_objects.erase(it);
+        }
     }
     
     void jPatcher::linkAdded(model::Link& link)
     {
-        auto& jlink = link.entity().emplace<jLink>();
-        addAndMakeVisible(jlink);
+        auto result = m_links.emplace(new jLink(*this, link));
+        
+        if(result.second)
+        {
+            jLink& jlink = *result.first->get();
+            addAndMakeVisible(jlink);
+        }
     }
     
     void jPatcher::linkChanged(model::Link& link)
     {
-        auto& jlink = link.entity().use<jLink>();
-        jlink.linkChanged(link);
+        const auto find_jlink = [&link](std::unique_ptr<jLink> const& jlink)
+        {
+            return (&link == &jlink->getModel());
+        };
+        
+        const auto it = std::find_if(m_links.begin(), m_links.end(), find_jlink);
+        
+        if(it != m_links.cend())
+        {
+            jLink& jlink = *it->get();
+            jlink.linkChanged(link);
+        }
     }
     
     void jPatcher::linkRemoved(model::Link& link)
     {
-        auto& jlink = link.entity().use<jLink>();
-        removeChildComponent(&jlink);
+        const auto find_jlink = [&link](std::unique_ptr<jLink> const& jlink)
+        {
+            return (&link == &jlink->getModel());
+        };
         
-        link.entity().erase<jLink>();
+        const auto it = std::find_if(m_links.begin(), m_links.end(), find_jlink);
+        
+        if(it != m_links.cend())
+        {
+            removeChildComponent(it->get());
+            m_links.erase(it);
+        }
+    }
+    
+    jObject const* const jPatcher::getjObject(model::Object const& object) const
+    {
+        const auto find_jobj = [&object](std::unique_ptr<jObject> const& jobj)
+        {
+            return (&object == &jobj->getModel());
+        };
+        
+        const auto it = std::find_if(m_objects.begin(), m_objects.end(), find_jobj);
+        
+        if(it != m_objects.cend())
+        {
+            return it->get();
+        }
+        
+        return nullptr;
+    }
+    
+    jLink* jPatcher::getjLink(model::Link const& link)
+    {
+        const auto find_jlink = [&link](std::unique_ptr<jLink> const& jlink)
+        {
+            return (&link == &jlink->getModel());
+        };
+        
+        const auto it = std::find_if(m_links.begin(), m_links.end(), find_jlink);
+        
+        if(it != m_links.cend())
+        {
+            return it->get();
+        }
+        
+        return nullptr;
     }
 }

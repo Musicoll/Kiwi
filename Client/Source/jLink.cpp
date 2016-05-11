@@ -23,9 +23,13 @@
 
 #include "jLink.hpp"
 
+#include "jPatcher.hpp"
+
 namespace kiwi
 {
-    jLink::jLink()
+    jLink::jLink(jPatcher const& jpatcher, model::Link& link_m) :
+    m_jpatcher(jpatcher),
+    m_model(&link_m)
     {
         setInterceptsMouseClicks(false, false);
     }
@@ -57,15 +61,21 @@ namespace kiwi
             
             if(&object == &sender_object)
             {
-                auto& jobject = sender_object.entity().use<jObject>();
-                m_last_outlet_pos = jobject.getOutletPatcherPosition(m_model->getSenderIndex());
-                updateBounds();
+                auto jobject = m_jpatcher.getjObject(sender_object);
+                if(jobject)
+                {
+                    m_last_outlet_pos = jobject->getOutletPatcherPosition(m_model->getSenderIndex());
+                    updateBounds();
+                }
             }
             else if(&object == &receiver_object)
             {
-                auto& jobject = receiver_object.entity().use<jObject>();
-                m_last_inlet_pos = jobject.getInletPatcherPosition(m_model->getReceiverIndex());
-                updateBounds();
+                auto jobject = m_jpatcher.getjObject(receiver_object);
+                if(jobject)
+                {
+                    m_last_inlet_pos = jobject->getInletPatcherPosition(m_model->getReceiverIndex());
+                    updateBounds();
+                }
             }
         }
     }

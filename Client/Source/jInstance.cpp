@@ -29,7 +29,8 @@
 namespace kiwi
 {
     jInstance::jInstance() :
-    m_instance(new engine::Instance(123456789ULL, "Main")),
+    m_user_id(123456789ULL),
+    m_instance(new engine::Instance(m_user_id)),
     m_console_window(new jConsoleWindow())
     {
         ;
@@ -37,16 +38,25 @@ namespace kiwi
     
     jInstance::~jInstance()
     {
-        m_document.reset();
+        m_console_window.reset();
+        m_patcher_manager.reset();
+    }
+    
+    uint64_t jInstance::getUserId() const noexcept
+    {
+        return m_user_id;
     }
     
     void jInstance::newPatcher()
     {
-        m_document.reset();
-        m_document = m_instance->createPatcherDocument(*this);
+        m_patcher_manager.reset();
+        m_patcher_manager = std::make_unique<jPatcherManager>(*this);
         
-        model::Patcher& patcher = m_document->root<model::Patcher>();
-        patcher.createUserIfNotAlreadyThere(m_instance->getUserId());
+        model::Patcher& patcher = m_patcher_manager->createPatcher();
+        
+        m_patcher_manager->newView();
+        m_patcher_manager->newView();
+        
         populatePatcher(patcher);
     }
     
@@ -130,29 +140,6 @@ namespace kiwi
             patcher.addLink(plus_4, 0, plus_1, 0);
         }
         
-        engine::DocumentManager::commit(patcher, "load initial objects and links");
-    }
-    
-    void jInstance::document_changed(model::Patcher& patcher)
-    {
-        if(patcher.added())
-        {
-            auto& window = patcher.entity().emplace<jWindow>();
-            auto& jpatcher = patcher.entity().emplace<jPatcher>();
-            window.setContentNonOwned(&jpatcher, true);
-        }
-        
-        // Notify jPatcher
-        auto& jpatcher = patcher.entity().use<jPatcher>();
-        jpatcher.document_changed(patcher);
-        
-        // Notify Engine
-        m_instance->document_changed(patcher);
-        
-        if(patcher.removed())
-        {
-            patcher.entity().erase<jPatcher>();
-            patcher.entity().erase<jWindow>();
-        }
+        DocumentManager::commit(patcher, "load initial objects and links");
     }
 }
