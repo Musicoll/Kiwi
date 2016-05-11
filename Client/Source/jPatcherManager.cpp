@@ -43,7 +43,7 @@ namespace kiwi
         m_document.reset();
     }
     
-    model::Patcher& jPatcherManager::createPatcher()
+    model::Patcher& jPatcherManager::init()
     {
         m_document.reset();
         m_document = std::make_unique<flip::Document>(model::PatcherModel::use(), *this,
@@ -70,6 +70,7 @@ namespace kiwi
             if(user)
             {
                 user->addView();
+                
                 DocumentManager::commit(*user);
             }
         }
@@ -111,35 +112,41 @@ namespace kiwi
                 {
                     if(view.added())
                     {
-                        viewAdded(patcher, user, view);
+                        createPatcherWindow(patcher, user, view);
                     }
                     
-                    viewChanged(patcher, user, view);
+                    notifyPatcherView(patcher, user, view);
                     
                     if(view.removed())
                     {
-                        viewRemoved(patcher, user, view);
+                        removePatcherWindow(patcher, user, view);
                     }
                 }
             }
             else
             {
                 // handle external users.
+                
+                Console::post("New user !!");
             }
         }
     }
 
-    void jPatcherManager::viewAdded(model::Patcher& patcher, model::Patcher::User& user, model::Patcher::View& view)
+    void jPatcherManager::createPatcherWindow(model::Patcher& patcher,
+                                              model::Patcher::User& user,
+                                              model::Patcher::View& view)
     {
         if(user.getId() == m_instance.getUserId())
         {
             auto& window = view.entity().emplace<jWindow>();
-            auto& jpatcher = view.entity().emplace<jPatcher>();
+            auto& jpatcher = view.entity().emplace<jPatcher>(patcher, view);
             window.setContentNonOwned(&jpatcher, true);
         }
     }
 
-    void jPatcherManager::viewChanged(model::Patcher& patcher, model::Patcher::User& user, model::Patcher::View& view)
+    void jPatcherManager::notifyPatcherView(model::Patcher& patcher,
+                                            model::Patcher::User& user,
+                                            model::Patcher::View& view)
     {
         if(user.getId() == m_instance.getUserId())
         {
@@ -149,7 +156,9 @@ namespace kiwi
         }
     }
 
-    void jPatcherManager::viewRemoved(model::Patcher& patcher, model::Patcher::User& user, model::Patcher::View& view)
+    void jPatcherManager::removePatcherWindow(model::Patcher& patcher,
+                                              model::Patcher::User& user,
+                                              model::Patcher::View& view)
     {
         if(user.getId() == m_instance.getUserId())
         {

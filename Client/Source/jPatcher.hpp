@@ -40,7 +40,7 @@ namespace kiwi
     {
     public:
         
-        jPatcher();
+        jPatcher(model::Patcher& patcher, model::Patcher::View& view);
         ~jPatcher();
         
         // juce::Component
@@ -51,38 +51,42 @@ namespace kiwi
         void patcherChanged(model::Patcher& patcher, model::Patcher::View& view);
         
         //! @brief Returns the jObject corresponding to a given Object model.
-        jObject const* const getjObject(model::Object const& object) const;
+        jObject* getjObject(model::Object const& object) const;
         
         //! @brief Returns the jLink corresponding to a given Link model.
-        //jLink const* const getjLink(model::Link const& link) const;
-        
-        //! @brief Returns the jLink corresponding to a given Link model.
-        jLink* getjLink(model::Link const& link);
+        jLink* getjLink(model::Link const& link) const;
         
     private:
+        
+        std::set<std::unique_ptr<jObject>>::iterator findjObject(model::Object const& object) const;
+        std::set<std::unique_ptr<jLink>>::iterator findjLink(model::Link const& link) const;
+        
+        //! @brief Load object and links.
+        void loadPatcher();
         
         void leftClick(juce::MouseEvent const& event);
         void rightClick(juce::MouseEvent const& event);
         
         //! @internal Object model has just been added to the document.
-        void objectAdded(model::Object& object);
+        void addjObject(model::Object& object);
         
         //! @internal Object model is resident and internal value changed.
         void objectChanged(model::Patcher::View& view, model::Object& object);
         
         //! @internal Object model will be removed from the document.
-        void objectRemoved(model::Object& object);
+        void removejObject(model::Object& object);
         
         //! @internal Link model has just been added to the document.
-        void linkAdded(model::Link& link);
+        void addjLink(model::Link& link);
         
         //! @internal Link model is resident and internal value changed.
         void linkChanged(model::Link& link);
         
         //! @internal Link model will be removed from the document.
-        void linkRemoved(model::Link& link);
+        void removejLink(model::Link& link);
         
-        model::Patcher*                     m_model;
+        model::Patcher&                     m_patcher_model;
+        model::Patcher::View&               m_view_model;
         
         std::set<std::unique_ptr<jObject>>  m_objects;
         std::set<std::unique_ptr<jLink>>    m_links;

@@ -48,8 +48,9 @@ namespace kiwi
         //! @brief Destructor.
         ~jPatcherManager();
         
-        //! @brief Returns the Patcher model
-        model::Patcher& createPatcher();
+        //! @brief Initialize the patcher manager by creating a new document.
+        //! @return The newly created the Patcher model.
+        model::Patcher& init();
         
         //! @brief Returns the Patcher model
         model::Patcher& getPatcher() const;
@@ -65,14 +66,21 @@ namespace kiwi
         //! @internal Notify and create jPatchers.
         void notifyPatcherViews(model::Patcher& patcher);
         
-        //! @internal View has just been added to the document.
-        void viewAdded(model::Patcher& patcher, model::Patcher::User& user, model::Patcher::View& view);
+        //! @internal React to the fact that a View has just been added to the document.
+        //! @details create a jPatcherWindow.
+        void createPatcherWindow(model::Patcher& patcher,
+                                 model::Patcher::User& user,
+                                 model::Patcher::View& view);
         
         //! @internal View is resident and internal value changed.
-        void viewChanged(model::Patcher& patcher, model::Patcher::User& user, model::Patcher::View& view);
+        void notifyPatcherView(model::Patcher& patcher,
+                               model::Patcher::User& user,
+                               model::Patcher::View& view);
         
         //! @internal Vser will be removed from the document.
-        void viewRemoved(model::Patcher& patcher, model::Patcher::User& user, model::Patcher::View& view);
+        void removePatcherWindow(model::Patcher& patcher,
+                                 model::Patcher::User& user,
+                                 model::Patcher::View& view);
 
     private: // members
         

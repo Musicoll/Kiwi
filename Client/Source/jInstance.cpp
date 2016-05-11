@@ -52,12 +52,15 @@ namespace kiwi
         m_patcher_manager.reset();
         m_patcher_manager = std::make_unique<jPatcherManager>(*this);
         
-        model::Patcher& patcher = m_patcher_manager->createPatcher();
+        model::Patcher& patcher = m_patcher_manager->init();
         
-        m_patcher_manager->newView();
         m_patcher_manager->newView();
         
         populatePatcher(patcher);
+        
+        m_patcher_manager->newView();
+        
+        //populatePatcher(patcher);
     }
     
     void jInstance::populatePatcher(model::Patcher& patcher)

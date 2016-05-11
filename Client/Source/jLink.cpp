@@ -31,6 +31,17 @@ namespace kiwi
     m_jpatcher(jpatcher),
     m_model(&link_m)
     {
+        auto& sender_object = m_model->getSenderObject();
+        auto& receiver_object = m_model->getReceiverObject();
+        
+        auto j_sender_object = m_jpatcher.getjObject(sender_object);
+        m_last_outlet_pos = j_sender_object->getOutletPatcherPosition(m_model->getSenderIndex());
+        
+        auto j_receiver_object = m_jpatcher.getjObject(receiver_object);
+        m_last_inlet_pos = j_receiver_object->getInletPatcherPosition(m_model->getReceiverIndex());
+        
+        updateBounds();
+        
         setInterceptsMouseClicks(false, false);
     }
     
@@ -41,15 +52,7 @@ namespace kiwi
     
     void jLink::linkChanged(model::Link& link)
     {
-        if(link.added())
-        {
-            m_model = &link;
-        }
-        
-        if(link.removed())
-        {
-            m_model = nullptr;
-        }
+        ;
     }
     
     void jLink::objectChanged(model::Object& object)

@@ -32,6 +32,10 @@ namespace kiwi
     m_io_color(0.3, 0.3, 0.3)
     {
         setSize(60, 20);
+        m_inlets = m_model->getNumberOfInlets();
+        m_outlets = m_model->getNumberOfOutlets();
+        
+        setTopLeftPosition(juce::Point<int>(m_model->getX(), m_model->getY()));
     }
     
     jObject::~jObject()
