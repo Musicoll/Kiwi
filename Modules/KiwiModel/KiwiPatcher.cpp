@@ -49,10 +49,6 @@ namespace kiwi
             .name("cicm.kiwi.Patcher.View.Selection")
             .member<flip::Collection<View::Object>, &Selection::m_objects>("objects")
             .member<flip::Collection<View::Link>, &Selection::m_links>("links");
-            
-            PatcherModel::declare<Patcher::View>()
-            .name("cicm.kiwi.Patcher.View")
-            .member<View::Selection, &View::m_selection>("selection");
         }
         
         void Patcher::View::declare()
@@ -198,10 +194,10 @@ namespace kiwi
             
             if(user == nullptr)
             {
-                return *user;
+                return *m_users.emplace(user_id);
             }
             
-            return *m_users.emplace(user_id);
+            return *user;
         }
         
         flip::Array<model::Object>::const_iterator Patcher::findObject(model::Object const& object) const
@@ -295,6 +291,11 @@ namespace kiwi
         uint32_t Patcher::User::getId() const
         {
             return m_user_id;
+        }
+        
+        flip::Collection<Patcher::View> const& Patcher::User::getViews() const noexcept
+        {
+            return m_views;
         }
     }
 }

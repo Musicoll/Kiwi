@@ -130,6 +130,9 @@ namespace kiwi
             //! @brief Get the links.
             flip::Array<model::Link> const& getLinks() const noexcept       { return m_links; }
             
+            //! @brief Get the users.
+            flip::Collection<User> const& getUsers() const noexcept         { return m_users; }
+            
             //! @internal flip static declare method
             static void declare();
             
@@ -241,10 +244,16 @@ namespace kiwi
         public:
             
             //! @brief flip default Constructor.
-            User(flip::Default&) {};
+            User(flip::Default&)
+            {
+                //disable_in_undo();
+            };
             
             //! @brief Constructor.
-            User(uint32_t user_id) : m_user_id(user_id) {}
+            User(uint32_t user_id) : m_user_id(user_id)
+            {
+                //disable_in_undo();
+            }
             
             //! @brief Destructor.
             ~User() = default;
@@ -254,6 +263,9 @@ namespace kiwi
             
             //! @brief Remove a View.
             void removeView(View const& view);
+            
+            //! @brief Get views.
+            flip::Collection<Patcher::View> const& getViews() const noexcept;
             
             //! @brief Get the User id
             uint32_t getId() const;
