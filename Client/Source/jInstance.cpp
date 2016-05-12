@@ -55,9 +55,10 @@ namespace kiwi
         model::Patcher& patcher = m_patcher_manager->init();
         
         m_patcher_manager->newView();
-        m_patcher_manager->newView();
         
         populatePatcher(patcher);
+        
+        m_patcher_manager->newView();
     }
     
     void jInstance::showConsoleWindow()

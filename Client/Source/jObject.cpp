@@ -92,12 +92,8 @@ namespace kiwi
         g.setColour(juce::Colours::black);
         g.drawRect(bounds);
         
-        if(m_model)
-        {
-            g.drawFittedText(m_model->getText(), bounds.reduced(5), juce::Justification::centredLeft, 1);
-            
-            drawInletsOutlets(g);
-        }
+        g.drawFittedText(m_model->getText(), bounds.reduced(5), juce::Justification::centredLeft, 1);
+        drawInletsOutlets(g);
     }
     
     void jObject::drawInletsOutlets(juce::Graphics & g)

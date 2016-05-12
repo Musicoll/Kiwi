@@ -122,6 +122,8 @@ namespace kiwi
         
         std::set<std::unique_ptr<jObject>>  m_objects;
         std::set<std::unique_ptr<jLink>>    m_links;
+        
+        static bool m_command_manager_binded;
     };
 }
 

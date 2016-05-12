@@ -32,11 +32,18 @@
 
 namespace kiwi
 {
+    bool jPatcher::m_command_manager_binded = false;
+    
     jPatcher::jPatcher(model::Patcher& patcher, model::Patcher::View& view) :
     m_patcher_model(patcher),
     m_view_model(view)
     {
-        KiwiApp::bindToCommandManager(this);
+        if(!m_command_manager_binded)
+        {
+            KiwiApp::bindToCommandManager(this);
+            m_command_manager_binded = true;
+        }
+        
         KiwiApp::bindToKeyMapping(this);
         
         setSize(600, 400);
