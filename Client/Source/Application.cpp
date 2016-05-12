@@ -159,7 +159,7 @@ namespace kiwi
         return StringArray(names);
     }
     
-    void KiwiApp::createMenu (PopupMenu& menu, const String& menuName)
+    void KiwiApp::createMenu(PopupMenu& menu, const String& menuName)
     {
         if		(menuName == "File")        createFileMenu		(menu);
         else if (menuName == "Edit")        createEditMenu		(menu);
@@ -173,12 +173,12 @@ namespace kiwi
         else assert(false); // names have changed?
     }
     
-    void KiwiApp::createOpenRecentPageMenu (PopupMenu& menu)
+    void KiwiApp::createOpenRecentPageMenu(PopupMenu& menu)
     {
         
     }
     
-    void KiwiApp::createFileMenu (PopupMenu& menu)
+    void KiwiApp::createFileMenu(PopupMenu& menu)
     {
         menu.addCommandItem(m_command_manager.get(), CommandIDs::newPatcher);
         menu.addSeparator();
@@ -198,7 +198,7 @@ namespace kiwi
 #endif
     }
     
-    void KiwiApp::createEditMenu (PopupMenu& menu)
+    void KiwiApp::createEditMenu(PopupMenu& menu)
     {
         menu.addCommandItem(m_command_manager.get(), StandardApplicationCommandIDs::undo);
         menu.addCommandItem(m_command_manager.get(), StandardApplicationCommandIDs::redo);
@@ -225,18 +225,18 @@ namespace kiwi
         ;
     }
     
-    void KiwiApp::createArrangeMenu (PopupMenu& menu)
+    void KiwiApp::createArrangeMenu(PopupMenu& menu)
     {
         menu.addCommandItem(m_command_manager.get(), CommandIDs::toFront);
         menu.addCommandItem(m_command_manager.get(), CommandIDs::toBack);
     }
     
-    void KiwiApp::createOptionsMenu (PopupMenu& menu)
+    void KiwiApp::createOptionsMenu(PopupMenu& menu)
     {
         ;
     }
     
-    void KiwiApp::createWindowMenu (PopupMenu& menu)
+    void KiwiApp::createWindowMenu(PopupMenu& menu)
     {
         menu.addCommandItem(m_command_manager.get(), CommandIDs::minimizeWindow);
         menu.addCommandItem(m_command_manager.get(), CommandIDs::maximizeWindow);
@@ -245,12 +245,12 @@ namespace kiwi
         menu.addCommandItem(m_command_manager.get(), CommandIDs::showConsoleWindow);
     }
     
-    void KiwiApp::createHelpMenu (PopupMenu& menu)
+    void KiwiApp::createHelpMenu(PopupMenu& menu)
     {
         ;
     }
     
-    void KiwiApp::handleMainMenuCommand (int menuItemID)
+    void KiwiApp::handleMainMenuCommand(int menuItemID)
     {
         ;
     }

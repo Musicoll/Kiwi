@@ -55,12 +55,9 @@ namespace kiwi
         model::Patcher& patcher = m_patcher_manager->init();
         
         m_patcher_manager->newView();
-        
-        populatePatcher(patcher);
-        
         m_patcher_manager->newView();
         
-        //populatePatcher(patcher);
+        populatePatcher(patcher);
     }
     
     void jInstance::showConsoleWindow()
@@ -149,6 +146,6 @@ namespace kiwi
             patcher.addLink(plus_4, 0, plus_1, 0);
         }
         
-        DocumentManager::commit(patcher, "load initial objects and links");
+        DocumentManager::commit(patcher, "pre-populate patcher");
     }
 }

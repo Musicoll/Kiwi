@@ -52,7 +52,7 @@ namespace kiwi
         model::Patcher& patcher = m_document->root<model::Patcher>();
         patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
         
-        DocumentManager::commit(patcher);
+        DocumentManager::commit(patcher, "Add User");
         
         return patcher;
     }
@@ -71,7 +71,7 @@ namespace kiwi
             {
                 user->addView();
                 
-                DocumentManager::commit(*user);
+                DocumentManager::commit(*m_model, "Add view");
             }
         }
     }

@@ -65,7 +65,7 @@ namespace kiwi
         void getCommandInfo(CommandID commandID, ApplicationCommandInfo& result) override;
         bool perform(const InvocationInfo& info) override;
         
-    private:
+    private: // methods
         
         std::set<std::unique_ptr<jObject>>::iterator findjObject(model::Object const& object) const;
         std::set<std::unique_ptr<jLink>>::iterator findjLink(model::Link const& link) const;
@@ -93,6 +93,29 @@ namespace kiwi
         
         //! @internal Link model will be removed from the document.
         void removejLink(model::Link& link);
+        
+        //! @brief Add a new Object to the model at a given position.
+        void createObjectModel(std::string const& text, double pos_x, double pos_y);
+        
+        //! @internal Try to undo last action.
+        void undo();
+        
+        //! @internal Returns true if there is an action to undo.
+        bool canUndo();
+        
+        //! @internal Returns the undo label if there is an action to undo or an empty string.
+        std::string getUndoLabel();
+        
+        //! @internal Try to redo next action.
+        void redo();
+        
+        //! @internal Returns true if there is an action to undo.
+        bool canRedo();
+        
+        //! @internal Returns the redo label if there is an action to redo or an empty string.
+        std::string getRedoLabel();
+
+    private: // members
         
         model::Patcher&                     m_patcher_model;
         model::Patcher::View&               m_view_model;

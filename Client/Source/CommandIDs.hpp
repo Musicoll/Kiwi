@@ -43,8 +43,10 @@ namespace kiwi
         showAboutAppWindow          = 0x202020,        ///< Make visible the "about app" window.
         showAppSettingsWindow       = 0x202030,        ///< Make visible the "application settings" window.
         
-        duplicate                   = 0xf1000a,        ///< Duplicate selected objects and paste them on patcher.
-        pasteReplace                = 0xf1000b,        ///< Replace an objects by the one in the clipboard.
+        undo                        = 0xf1000a,        ///< Undo last action.
+        redo                        = 0xf1000b,        ///< Redo last action.
+        duplicate                   = 0xf1000c,        ///< Duplicate selected objects and paste them on patcher.
+        pasteReplace                = 0xf1000d,        ///< Replace an objects by the one in the clipboard.
         
         toFront                     = 0xf2000a,        ///< Move selected object ahead of all other objects.
         toBack                      = 0xf2000b,        ///< Move selected object behind all other objects.

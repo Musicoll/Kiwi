@@ -67,14 +67,14 @@ namespace kiwi
         return patcher.entity().use<DocumentManager>().m_gesture_flag;
     }
     
-    bool DocumentManager::hasUndo()
+    bool DocumentManager::canUndo()
     {
         return m_history.last_undo() != m_history.end();
     }
     
     std::string DocumentManager::getUndoLabel()
     {
-        assert(hasUndo());
+        assert(canUndo());
         
         return m_history.last_undo()->label();
     }
@@ -84,14 +84,14 @@ namespace kiwi
         m_history.execute_undo();
     }
     
-    bool DocumentManager::hasRedo()
+    bool DocumentManager::canRedo()
     {
         return m_history.first_redo() != m_history.end();
     }
     
     std::string DocumentManager::getRedoLabel()
     {
-        assert(hasRedo());
+        assert(canRedo());
         
         return m_history.first_redo()->label();
     }

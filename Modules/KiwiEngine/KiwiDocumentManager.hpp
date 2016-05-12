@@ -65,7 +65,7 @@ namespace kiwi
         static bool isInCommitGesture(flip::Type& type);
         
         //! @brief Returns true if there is an action to undo.
-        bool hasUndo();
+        bool canUndo();
         
         //! @brief Returns the label of the last undo action.
         std::string getUndoLabel();
@@ -74,12 +74,12 @@ namespace kiwi
         void undo();
         
         //! @brief Returns true if there is an action to redo.
-        bool hasRedo();
+        bool canRedo();
         
         //! @brief Returns the label of the next redo action.
         std::string getRedoLabel();
         
-        //! @brief Redo the next transaction.
+        //! @brief Redo the next action.
         void redo();
         
     private:

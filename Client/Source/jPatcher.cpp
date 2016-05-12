@@ -36,11 +36,11 @@ namespace kiwi
     m_patcher_model(patcher),
     m_view_model(view)
     {
-        setSize(600, 400);
-        loadPatcher();
-        
         KiwiApp::bindToCommandManager(this);
         KiwiApp::bindToKeyMapping(this);
+        
+        setSize(600, 400);
+        loadPatcher();
     }
     
     jPatcher::~jPatcher()
@@ -100,22 +100,8 @@ namespace kiwi
         
         switch(r)
         {
-            case 1:
-            {
-                auto& obj = m_patcher_model.addObject("plus");
-                obj.setPosition(event.x, event.y);
-                DocumentManager::commit(m_patcher_model, "Add Plus Object");
-                break;
-            }
-                
-            case 2:
-            {
-                auto& obj = m_patcher_model.addObject("print");
-                obj.setPosition(event.getMouseDownX(), event.getMouseDownY());
-                DocumentManager::commit(m_patcher_model, "Add Print Object");
-                break;
-            }
-                
+            case 1: { createObjectModel("plus", event.x, event.y); break; }
+            case 2: { createObjectModel("print", event.x, event.y); break; }
             default: break;
         }
     }
@@ -300,6 +286,60 @@ namespace kiwi
     }
     
     // ================================================================================ //
+    //                                  COMMANDS ACTIONS                                //
+    // ================================================================================ //
+    
+    void jPatcher::createObjectModel(std::string const& text, double pos_x, double pos_y)
+    {
+        auto& obj = m_patcher_model.addObject(text);
+        obj.setPosition(pos_x, pos_y);
+        DocumentManager::commit(m_patcher_model, "Insert Object");
+        KiwiApp::commandStatusChanged();
+    }
+    
+    void jPatcher::undo()
+    {
+        auto& doc = m_patcher_model.entity().use<DocumentManager>();
+        if(doc.canUndo())
+        {
+            doc.undo();
+            doc.commit(m_patcher_model);
+        }
+    }
+    
+    bool jPatcher::canUndo()
+    {
+        return m_patcher_model.entity().use<DocumentManager>().canUndo();
+    }
+    
+    std::string jPatcher::getUndoLabel()
+    {
+        auto& doc = m_patcher_model.entity().use<DocumentManager>();
+        return doc.canUndo() ? doc.getUndoLabel() : "";
+    }
+
+    void jPatcher::redo()
+    {
+        auto& doc = m_patcher_model.entity().use<DocumentManager>();
+        if(doc.canRedo())
+        {
+            doc.redo();
+            doc.commit(m_patcher_model);
+        }
+    }
+    
+    bool jPatcher::canRedo()
+    {
+        return m_patcher_model.entity().use<DocumentManager>().canRedo();
+    }
+    
+    std::string jPatcher::getRedoLabel()
+    {
+        auto& doc = m_patcher_model.entity().use<DocumentManager>();
+        return doc.canRedo() ? doc.getRedoLabel() : "";
+    }
+    
+    // ================================================================================ //
     //                              APPLICATION COMMAND TARGET                          //
     // ================================================================================ //
     
@@ -347,15 +387,28 @@ namespace kiwi
                 break;
                 
             case StandardApplicationCommandIDs::undo:
-                result.setInfo(TRANS("Undo"), TRANS("Undo last action"), CommandCategories::general, 0);
+            {
+                juce::String label = TRANS("Undo");
+                const bool hasUndo = canUndo();
+                if(hasUndo) { label += ' ' + getUndoLabel(); }
+                
+                result.setInfo(label, TRANS("Undo last action"), CommandCategories::general, 0);
                 result.addDefaultKeypress('z',  ModifierKeys::commandModifier);
+                result.setActive(hasUndo);
                 break;
-                
+            }
             case StandardApplicationCommandIDs::redo:
-                result.setInfo(TRANS("Redo"), TRANS("Redo action"), CommandCategories::general, 0);
-                result.addDefaultKeypress('z',  ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
-                break;
+            {
+                juce::String label = TRANS("Redo");
+                const bool hasRedo = canRedo();
                 
+                if(hasRedo) { label += ' ' + getRedoLabel(); }
+                
+                result.setInfo(label, TRANS("Redo action"), CommandCategories::general, 0);
+                result.addDefaultKeypress('z',  ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+                result.setActive(canRedo());
+                break;
+            }
             case StandardApplicationCommandIDs::cut:
                 result.setInfo(TRANS("Cut"), TRANS("Cut"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('x', ModifierKeys::commandModifier);
@@ -375,19 +428,26 @@ namespace kiwi
                 break;
                 
             case CommandIDs::pasteReplace:
-                result.setInfo(TRANS("Paste replace"), TRANS("Replace selected objects with the object on the clipboard"), CommandCategories::editing, 0);
+                result.setInfo(TRANS("Paste replace"),
+                               TRANS("Replace selected objects with the object on the clipboard"),
+                               CommandCategories::editing, 0);
+                
                 result.addDefaultKeypress('v', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
                 //result.setActive(isAnyBoxSelected() && SystemClipboard::getTextFromClipboard().isNotEmpty());
                 break;
                 
             case CommandIDs::duplicate:
-                result.setInfo(TRANS("Duplicate"), TRANS("Duplicate the selection"), CommandCategories::editing, 0);
+                result.setInfo(TRANS("Duplicate"), TRANS("Duplicate the selection"),
+                               CommandCategories::editing, 0);
+                
                 result.addDefaultKeypress('d', ModifierKeys::commandModifier);
                 //result.setActive(isAnyBoxSelected());
                 break;
                 
             case StandardApplicationCommandIDs::del:
-                result.setInfo(TRANS("Delete"), TRANS("Delete all selected boxes and links"), CommandCategories::editing, 0);
+                result.setInfo(TRANS("Delete"), TRANS("Delete all selected objects and links"),
+                               CommandCategories::editing, 0);
+                
                 result.addDefaultKeypress(KeyPress::backspaceKey, ModifierKeys::noModifiers);
                 //result.setActive(isAnythingSelected());
                 break;
@@ -424,7 +484,6 @@ namespace kiwi
     
     bool jPatcher::perform(const InvocationInfo& info)
     {
-        Console::post("perform command");
         switch (info.commandID)
         {
             case CommandIDs::save:
@@ -432,51 +491,37 @@ namespace kiwi
                 Console::post("|- try to save page");
                 break;
             }
-            case StandardApplicationCommandIDs::undo:
-            {
-                Console::post("|- Undo");
-                auto& doc = m_patcher_model.entity().use<DocumentManager>();
-                doc.undo();
-                doc.commit(m_patcher_model);
-                break;
-            }
-            case StandardApplicationCommandIDs::redo:
-            {
-                Console::post("|- Redo");
-                auto& doc = m_patcher_model.entity().use<DocumentManager>();
-                doc.redo();
-                doc.commit(m_patcher_model);
-                break;
-            }
+            case StandardApplicationCommandIDs::undo: { undo(); break; }
+            case StandardApplicationCommandIDs::redo: { redo(); break; }
             case StandardApplicationCommandIDs::cut:
             {
-                Console::post("|- cut box");
+                Console::post("|- cut");
                 //copySelectionToClipboard();
                 //deleteSelection();
                 break;
             }
             case StandardApplicationCommandIDs::copy:
             {
-                Console::post("|- copy box");
+                Console::post("|- copy selected objects");
                 //copySelectionToClipboard();
                 break;
             }
             case StandardApplicationCommandIDs::paste:
             {
-                Console::post("|- paste boxes");
+                Console::post("|- paste objects");
                 //const long gridsize = getPage()->getGridSize();
                 //pasteFromClipboard(Gui::Point(gridsize, gridsize));
                 break;
             }
             case CommandIDs::pasteReplace:
             {
-                Console::post("|- paste replace boxes");
+                Console::post("|- paste replace objects");
                 //replaceBoxesFromClipboard();
                 break;
             }
             case CommandIDs::duplicate:
             {
-                Console::post("|- duplicate boxes");
+                Console::post("|- duplicate objects");
                 //copySelectionToClipboard();
                 //const long gridsize = getPage()->getGridSize();
                 //pasteFromClipboard(Gui::Point(gridsize, gridsize));
