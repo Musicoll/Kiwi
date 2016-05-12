@@ -144,7 +144,7 @@ namespace kiwi
             Object(flip::Default&);
             
             //! @internal flip static declare method
-            template<class TModel> static void declare();
+            static void declare();
             
         private:
             
@@ -161,25 +161,6 @@ namespace kiwi
             
             friend class kiwi::ObjectFactory;
         };
-        
-        // ================================================================================ //
-        //                                  OBJECT::declare                                 //
-        // ================================================================================ //
-        
-        template<class TModel>
-        void Object::declare()
-        {
-            if(TModel::template has<model::Object>()) return;
-            
-            TModel::template declare<model::Object>()
-            .name("cicm.kiwi.Object")
-            .template member<flip::String, &Object::m_name>("name")
-            .template member<flip::String, &Object::m_text>("text")
-            .template member<flip::Int, &Object::m_inlets>("inlets")
-            .template member<flip::Int, &Object::m_outlets>("outlets")
-            .template member<flip::Float, &Object::m_position_x>("pos_x")
-            .template member<flip::Float, &Object::m_position_y>("pos_y");
-        }
     }
 }
 

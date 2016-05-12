@@ -28,23 +28,45 @@
 
 namespace kiwi
 {
-    jInstance::jInstance() : m_instance(new engine::Instance(123456789ULL, "Main"))
+    jInstance::jInstance() :
+    m_user_id(123456789ULL),
+    m_instance(new engine::Instance(m_user_id)),
+    m_console_window(new jConsoleWindow())
     {
-        m_console_window = std::unique_ptr<jConsoleWindow>(new jConsoleWindow());
+        ;
     }
     
     jInstance::~jInstance()
     {
-        m_document.reset();
+        m_console_window.reset();
+        m_patcher_manager.reset();
+    }
+    
+    uint64_t jInstance::getUserId() const noexcept
+    {
+        return m_user_id;
     }
     
     void jInstance::newPatcher()
     {
-        m_document.reset();
-        m_document = m_instance->createPatcherDocument(*this);
+        m_patcher_manager.reset();
+        m_patcher_manager = std::make_unique<jPatcherManager>(*this);
         
-        model::Patcher& patcher = m_document->root<model::Patcher>();
+        model::Patcher& patcher = m_patcher_manager->init();
+        
+        m_patcher_manager->newView();
+        
         populatePatcher(patcher);
+        
+        m_patcher_manager->newView();
+        
+        //populatePatcher(patcher);
+    }
+    
+    void jInstance::showConsoleWindow()
+    {
+        m_console_window->setVisible(true);
+        m_console_window->toFront(true);
     }
     
     void jInstance::populatePatcher(model::Patcher& patcher)
@@ -101,34 +123,32 @@ namespace kiwi
             patcher.addLink(plus_3, 0, plus_1, 0);
             patcher.addLink(plus_4, 0, plus_1, 0);
         }
-
-        engine::DocumentManager::commit(patcher, "load initial objects and links");
-    }
-    
-    void jInstance::document_changed(model::Patcher& patcher)
-    {
-        if(patcher.added())
+        
         {
-            patcher.entity().emplace<engine::DocumentManager>(patcher.document());
+            // stack overflow
+            auto& plus_1 = patcher.addObject("plus");
+            plus_1.setPosition(550, 100);
             
-            auto& window = patcher.entity().emplace<jWindow>();
-            auto& jpatcher = patcher.entity().emplace<jPatcher>();
-            window.setContentNonOwned(&jpatcher, true);
+            auto& plus_2 = patcher.addObject("plus");
+            plus_2.setPosition(605, 70);
+            
+            auto& plus_3 = patcher.addObject("plus 10");
+            plus_3.setPosition(500, 20);
+            
+            auto& plus_4 = patcher.addObject("plus -10");
+            plus_4.setPosition(580, 20);
+            
+            auto& print = patcher.addObject("print zozo");
+            print.setPosition(550, 150);
+            
+            patcher.addLink(plus_1, 0, plus_2, 0);
+            patcher.addLink(plus_2, 0, plus_1, 0);
+            patcher.addLink(plus_1, 0, print, 0);
+            
+            patcher.addLink(plus_3, 0, plus_1, 0);
+            patcher.addLink(plus_4, 0, plus_1, 0);
         }
         
-        // Notify jPatcher
-        auto& jpatcher = patcher.entity().use<jPatcher>();
-        jpatcher.document_changed(patcher);
-        
-        // Notify Engine
-        m_instance->document_changed(patcher);
-        
-        if(patcher.removed())
-        {
-            patcher.entity().erase<jPatcher>();
-            patcher.entity().erase<jWindow>();
-            
-            patcher.entity().erase<engine::DocumentManager>();
-        }
+        DocumentManager::commit(patcher, "load initial objects and links");
     }
 }

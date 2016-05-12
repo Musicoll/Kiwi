@@ -21,10 +21,12 @@
  ==============================================================================
 */
 
-#include "KiwiInstance.hpp"
-
 #include <KiwiModel/KiwiObjectFactory.hpp>
-#include "Objects/KiwiObjects.hpp"
+#include <KiwiModel/KiwiPatcherModel.hpp>
+#include "KiwiTypedObjects.hpp"
+
+#include "KiwiInstance.hpp"
+#include "KiwiDocumentManager.hpp"
 
 namespace kiwi
 {
@@ -35,7 +37,7 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief The Patcher Model class declarator
-        class Instance::PatcherModelDeclarator : public model::PatcherDataModel
+        class Instance::PatcherModelDeclarator : public model::PatcherModel
         {
         public:
             
@@ -50,9 +52,8 @@ namespace kiwi
         //                                      INSTANCE                                    //
         // ================================================================================ //
         
-        Instance::Instance(uint64_t user_id, std::string const& name) noexcept :
-        m_user_id(user_id),
-        m_name(name)
+        Instance::Instance(uint64_t user_id) noexcept :
+        m_user_id(user_id)
         {
             PatcherModelDeclarator model;
             model.init("v0.0.1");
@@ -61,28 +62,6 @@ namespace kiwi
         Instance::~Instance()
         {
             ;
-        }
-        
-        std::unique_ptr<flip::Document>
-        Instance::createPatcherDocument(flip::DocumentObserver<model::Patcher>& observer)
-        {
-            return std::make_unique<flip::Document>(PatcherModelDeclarator::use(),
-                                                    observer, getUserId(), 'cicm', 'kpat');
-        }
-        
-        void Instance::document_changed(model::Patcher& patcher)
-        {
-            if(patcher.added())
-            {
-                patcher.entity().emplace<Patcher>(*this);
-            }
-            
-            patcher.entity().use<Patcher>().document_changed(patcher);
-            
-            if(patcher.removed())
-            {
-                patcher.entity().erase<Patcher>();
-            }
         }
     }
 }

@@ -55,7 +55,7 @@ namespace kiwi
             m_outlets[idx].erase(link);
         }
         
-        void Object::send(const uint32_t index, std::vector<Atom> args)
+        void Object::send(const uint32_t index, std::vector<Atom> const& args)
         {
             const auto idx = static_cast<std::vector<Outlet>::size_type>(index);
             
@@ -80,7 +80,7 @@ namespace kiwi
             }
         }
         
-        void Object::objectModelChanged(model::Object& object_m)
+        void Object::objectChanged(model::Object& object_m)
         {
             if(object_m.added())
             {

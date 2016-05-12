@@ -19,21 +19,11 @@
  To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
  
  ==============================================================================
-*/
+ */
 
-#ifndef KIWI_ENGINE_OBJECTS_HPP_INCLUDED
-#define KIWI_ENGINE_OBJECTS_HPP_INCLUDED
+#include "Application.hpp"
 
-#include "KiwiObjectPlus.hpp"
-#include "KiwiObjectPrint.hpp"
+//==============================================================================
+// This macro generates the main() routine that launches the app.
 
-namespace kiwi
-{
-    namespace engine
-    {
-        ;
-    }
-}
-
-
-#endif // KIWI_ENGINE_OBJECTS_HPP_INCLUDED
+START_JUCE_APPLICATION(kiwi::KiwiApp)

@@ -26,7 +26,8 @@
 
 #include "flip/SignalConnection.h"
 
-#include <KiwiModel/KiwiModel.hpp>
+#include <KiwiModel/KiwiConsole.hpp>
+#include <KiwiModel/KiwiObject.hpp>
 
 #include <utility>
 
@@ -64,12 +65,12 @@ namespace kiwi
             
             //! @brief The receive method.
             //! @details This method must be overriden by object's subclasses.
-            virtual void receive(uint32_t index, std::vector<Atom> args) = 0;
+            virtual void receive(uint32_t index, std::vector<Atom> const& args) = 0;
             
         protected:
             
             //! @brief Send a message through a given outlet index.
-            void send(const uint32_t index, std::vector<Atom> args);
+            void send(const uint32_t index, std::vector<Atom> const& args);
             
             //! @brief Called when the signalTrigger method is fired.
             virtual void signalTriggerCalled() {};
@@ -77,7 +78,7 @@ namespace kiwi
         private:
             
             //! @internal Model change notification.
-            void objectModelChanged(model::Object& object_m);
+            void objectChanged(model::Object& object_m);
             
             //! @internal signalTriggerCallback.
             void internal_signalTriggerCalled();

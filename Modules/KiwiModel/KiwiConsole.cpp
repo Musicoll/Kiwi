@@ -25,7 +25,10 @@
 
 namespace kiwi
 {
+    #ifdef DEBUG
     std::mutex                      Console::m_ostream_mutex;
+    #endif
+    
     Listeners<Console::Listener>    Console::m_listeners;
     
     // ================================================================================ //

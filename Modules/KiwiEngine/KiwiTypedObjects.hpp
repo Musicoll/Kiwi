@@ -21,10 +21,10 @@
  ==============================================================================
 */
 
-#ifndef KIWI_ENGINE_OBJECTS_OBJECTPRINT_HPP_INCLUDED
-#define KIWI_ENGINE_OBJECTS_OBJECTPRINT_HPP_INCLUDED
+#ifndef KIWI_ENGINE_TYPED_OBJECTS_HPP_INCLUDED
+#define KIWI_ENGINE_TYPED_OBJECTS_HPP_INCLUDED
 
-#include "KiwiObjectPlus.hpp"
+#include "KiwiObject.hpp"
 
 namespace kiwi
 {
@@ -34,22 +34,34 @@ namespace kiwi
         //                                    OBJECT PLUS                                   //
         // ================================================================================ //
         
+        class ObjectPlus : public engine::Object
+        {
+        public:
+            
+            ObjectPlus(std::vector<Atom> const& args);
+            
+            void receive(uint32_t index, std::vector<Atom> const& args) override;
+            
+            void bang();
+            
+            void signalTriggerCalled() override;
+            
+        private:
+            double m_lhs = 0.0;
+            double m_rhs = 0.0;
+        };
+        
+        // ================================================================================ //
+        //                                    OBJECT PLUS                                   //
+        // ================================================================================ //
+        
         class ObjectPrint : public engine::Object
         {
         public:
             
-            ObjectPrint(std::vector<Atom> args)
-            {
-                m_name = !args.empty() ? args[0].getString() : "print";
-            }
+            ObjectPrint(std::vector<Atom> const& args);
             
-            void receive(uint32_t, std::vector<Atom> args) override
-            {
-                if(!args.empty())
-                {
-                    Console::post(m_name + " \u2022 " + AtomHelper::toString(args));
-                }
-            }
+            void receive(uint32_t, std::vector<Atom> const& args) override;
             
         private:
             std::string m_name;
@@ -58,4 +70,4 @@ namespace kiwi
 }
 
 
-#endif // KIWI_ENGINE_OBJECTS_OBJECTPRINT_HPP_INCLUDED
+#endif // KIWI_ENGINE_TYPED_OBJECTS_HPP_INCLUDED

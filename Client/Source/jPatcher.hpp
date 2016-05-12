@@ -32,12 +32,15 @@
 
 namespace kiwi
 {
+    class jObject;
+    class jLink;
+    
     //! @brief The juce Patcher Component.
-    class jPatcher : public juce::Component, public flip::DocumentObserver<model::Patcher>
+    class jPatcher : public juce::Component, public ApplicationCommandTarget
     {
     public:
         
-        jPatcher();
+        jPatcher(model::Patcher& patcher, model::Patcher::View& view);
         ~jPatcher();
         
         // juce::Component
@@ -45,32 +48,57 @@ namespace kiwi
         void mouseDown(juce::MouseEvent const& event) override;
         
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
-        void document_changed(model::Patcher& patcher) override final;
+        void patcherChanged(model::Patcher& patcher, model::Patcher::View& view);
+        
+        //! @brief Returns the jObject corresponding to a given Object model.
+        jObject* getjObject(model::Object const& object) const;
+        
+        //! @brief Returns the jLink corresponding to a given Link model.
+        jLink* getjLink(model::Link const& link) const;
+        
+        // ================================================================================ //
+        //                              APPLICATION COMMAND TARGET                          //
+        // ================================================================================ //
+        
+        ApplicationCommandTarget* getNextCommandTarget() override;
+        void getAllCommands(Array<CommandID>& commands) override;
+        void getCommandInfo(CommandID commandID, ApplicationCommandInfo& result) override;
+        bool perform(const InvocationInfo& info) override;
         
     private:
+        
+        std::set<std::unique_ptr<jObject>>::iterator findjObject(model::Object const& object) const;
+        std::set<std::unique_ptr<jLink>>::iterator findjLink(model::Link const& link) const;
+        
+        //! @brief Load object and links.
+        void loadPatcher();
         
         void leftClick(juce::MouseEvent const& event);
         void rightClick(juce::MouseEvent const& event);
         
-        //! @internal Object has just been added to the document.
-        void objectModelAdded(model::Object& object);
+        //! @internal Object model has just been added to the document.
+        void addjObject(model::Object& object);
         
-        //! @internal Object is resident and internal value changed.
-        void objectModelChanged(model::Object& object);
+        //! @internal Object model is resident and internal value changed.
+        void objectChanged(model::Patcher::View& view, model::Object& object);
         
-        //! @internal Object will be removed from the document.
-        void objectModelRemoved(model::Object& object);
+        //! @internal Object model will be removed from the document.
+        void removejObject(model::Object& object);
         
-        //! @internal Link has just been added to the document.
-        void linkModelAdded(model::Link& link);
+        //! @internal Link model has just been added to the document.
+        void addjLink(model::Link& link);
         
-        //! @internal Link is resident and internal value changed.
-        void linkModelChanged(model::Link& link);
+        //! @internal Link model is resident and internal value changed.
+        void linkChanged(model::Link& link);
         
-        //! @internal Link will be removed from the document.
-        void linkModelRemoved(model::Link& link);
+        //! @internal Link model will be removed from the document.
+        void removejLink(model::Link& link);
         
-        model::Patcher* m_model;
+        model::Patcher&                     m_patcher_model;
+        model::Patcher::View&               m_view_model;
+        
+        std::set<std::unique_ptr<jObject>>  m_objects;
+        std::set<std::unique_ptr<jLink>>    m_links;
     };
 }
 

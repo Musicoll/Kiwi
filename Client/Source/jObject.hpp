@@ -24,7 +24,7 @@
 #ifndef KIWI_JOBJECT_HPP_INCLUDED
 #define KIWI_JOBJECT_HPP_INCLUDED
 
-#include <KiwiModel/KiwiObject.hpp>
+#include <KiwiModel/KiwiPatcher.hpp>
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
@@ -35,10 +35,10 @@ namespace kiwi
     {
     public:
         
-        jObject();
+        jObject(model::Object& object_m);
         ~jObject();
         
-        void objectModelChanged(model::Object& object);
+        void objectChanged(model::Patcher::View& view, model::Object& object);
         
         // juce::Component
         void paint(juce::Graphics& g) override;
@@ -50,6 +50,9 @@ namespace kiwi
         
         //! @brief Returns the outlet position relative to the parent jPatcher component for a given index.
         juce::Point<int> getOutletPatcherPosition(const size_t index) const;
+        
+        //! Get the Object model
+        model::Object& getModel() const {return *m_model;};
         
     private:
         

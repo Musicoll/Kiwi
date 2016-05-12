@@ -27,10 +27,15 @@
 
 namespace kiwi
 {
-    jObject::jObject() :
+    jObject::jObject(model::Object& object_m) :
+    m_model(&object_m),
     m_io_color(0.3, 0.3, 0.3)
     {
         setSize(60, 20);
+        m_inlets = m_model->getNumberOfInlets();
+        m_outlets = m_model->getNumberOfOutlets();
+        
+        setTopLeftPosition(juce::Point<int>(m_model->getX(), m_model->getY()));
     }
     
     jObject::~jObject()
@@ -38,11 +43,11 @@ namespace kiwi
         ;
     }
     
-    void jObject::objectModelChanged(model::Object& object)
+    void jObject::objectChanged(model::Patcher::View& view, model::Object& object)
     {
         bool need_redraw = false;
         
-        if(object.added())
+        if(view.added())
         {
             m_model = &object;
         }
@@ -65,7 +70,7 @@ namespace kiwi
             need_redraw = true;
         }
         
-        if(object.removed())
+        if(view.removed())
         {
             m_model = nullptr;
             need_redraw = false;
@@ -87,9 +92,12 @@ namespace kiwi
         g.setColour(juce::Colours::black);
         g.drawRect(bounds);
         
-        g.drawFittedText(m_model->getText(), bounds.reduced(5), juce::Justification::centredLeft, 1);
-        
-        drawInletsOutlets(g);
+        if(m_model)
+        {
+            g.drawFittedText(m_model->getText(), bounds.reduced(5), juce::Justification::centredLeft, 1);
+            
+            drawInletsOutlets(g);
+        }
     }
     
     void jObject::drawInletsOutlets(juce::Graphics & g)

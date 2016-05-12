@@ -33,90 +33,80 @@ namespace flip
     class Object;
 }
 
-
-namespace model
-{
-    class Patcher;
-}
-
-
 namespace kiwi
 {
-    namespace engine
+    class DocumentManager
     {
-        class DocumentManager
-        {
-        public:
-            
-            DocumentManager(flip::DocumentBase & document);
-            virtual ~DocumentManager() = default;
-            
-            //! @brief Commit and push.
-            //! @see startCommitGesture, endCommitGesture.
-            static void commit(flip::Type& type, std::string action = std::string());
-            
-            //! @brief Starts a commit gesture.
-            //! @details Each call to this function must be followed by a call to endCommitGesture.
-            //! @see endCommitGesture, commitGesture
-            static void startCommitGesture(flip::Type& type);
-            
-            //! @brief Commit a gesture.
-            //! @param label The label of the current gesture.
-            //! @see startCommitGesture, endCommitGesture.
-            static void commitGesture(flip::Type& type, std::string label);
-            
-            //! @brief Ends a commit gesture.
-            //! @details Each call to this function must be preceded by a call to startCommitGesture.
-            //! @see startCommitGesture.
-            static void endCommitGesture(flip::Type& type);
-            
-            //! @brief Returns true if the document is currently commiting a gesture.
-            static bool isInCommitGesture(flip::Type& type);
-            
-            //! @brief Returns true if there is an action to undo.
-            bool hasUndo();
-            
-            //! @brief Returns the label of the last undo action.
-            std::string getUndoLabel();
-            
-            //! @brief Undo the last action.
-            void undo();
-            
-            //! @brief Returns true if there is an action to redo.
-            bool hasRedo();
-            
-            //! @brief Returns the label of the next redo action.
-            std::string getRedoLabel();
-            
-            //! @brief Redo the next transaction.
-            void redo();
-            
-        private:
-            
-            void commit(std::string action);
-            void startCommitGesture();
-            void commitGesture(std::string action);
-            void endCommitGesture();
+    public:
         
-        private:
-            
-            flip::DocumentBase&                     m_document;
-            flip::History<flip::HistoryStoreMemory> m_history;
-            
-            bool                                    m_gesture_flag = false;
-            size_t                                  m_gesture_cnt = 0;
-            
-        private:
-            
-            DocumentManager() = delete;
-            DocumentManager(const DocumentManager& rhs) = delete;
-            DocumentManager(DocumentManager&& rhs) = delete;
-            DocumentManager& operator =(const DocumentManager& rhs) = delete;
-            DocumentManager& operator =(DocumentManager&& rhs) = delete;
-            bool operator ==(DocumentManager const& rhs) const = delete;
-            bool operator !=(DocumentManager const& rhs) const = delete;
-        };
-    }
+        DocumentManager(flip::DocumentBase & document);
+        virtual ~DocumentManager() = default;
+        
+        //! @brief Commit and push.
+        //! @see startCommitGesture, endCommitGesture.
+        static void commit(flip::Type& type, std::string action = std::string());
+        
+        //! @brief Starts a commit gesture.
+        //! @details Each call to this function must be followed by a call to endCommitGesture.
+        //! @see endCommitGesture, commitGesture
+        static void startCommitGesture(flip::Type& type);
+        
+        //! @brief Commit a gesture.
+        //! @param label The label of the current gesture.
+        //! @see startCommitGesture, endCommitGesture.
+        static void commitGesture(flip::Type& type, std::string label);
+        
+        //! @brief Ends a commit gesture.
+        //! @details Each call to this function must be preceded by a call to startCommitGesture.
+        //! @see startCommitGesture.
+        static void endCommitGesture(flip::Type& type);
+        
+        //! @brief Returns true if the document is currently commiting a gesture.
+        static bool isInCommitGesture(flip::Type& type);
+        
+        //! @brief Returns true if there is an action to undo.
+        bool hasUndo();
+        
+        //! @brief Returns the label of the last undo action.
+        std::string getUndoLabel();
+        
+        //! @brief Undo the last action.
+        void undo();
+        
+        //! @brief Returns true if there is an action to redo.
+        bool hasRedo();
+        
+        //! @brief Returns the label of the next redo action.
+        std::string getRedoLabel();
+        
+        //! @brief Redo the next transaction.
+        void redo();
+        
+    private:
+        
+        void commit(std::string action);
+        void startCommitGesture();
+        void commitGesture(std::string action);
+        void endCommitGesture();
+        
+    private:
+        
+        flip::DocumentBase&                     m_document;
+        flip::History<flip::HistoryStoreMemory> m_history;
+        
+        bool                                    m_gesture_flag = false;
+        size_t                                  m_gesture_cnt = 0;
+        
+    private:
+        
+        DocumentManager() = delete;
+        DocumentManager(const DocumentManager& rhs) = delete;
+        DocumentManager(DocumentManager&& rhs) = delete;
+        DocumentManager& operator =(const DocumentManager& rhs) = delete;
+        DocumentManager& operator =(DocumentManager&& rhs) = delete;
+        bool operator ==(DocumentManager const& rhs) const = delete;
+        bool operator !=(DocumentManager const& rhs) const = delete;
+    };
 }
 
 #endif // KIWI_ENGINE_DOCUMENT_MANAGER_HPP_INCLUDED

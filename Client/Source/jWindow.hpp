@@ -29,7 +29,7 @@
 namespace kiwi
 {
     //! @brief A juce Window.
-    class jWindow : public juce::DocumentWindow
+    class jWindow : public juce::DocumentWindow, public ApplicationCommandTarget
     {
     public:
         jWindow(std::string const& name = "untitled",
@@ -38,6 +38,15 @@ namespace kiwi
                 bool addToDesktop = true);
         
         ~jWindow();
+        
+        // ================================================================================ //
+        //                              APPLICATION COMMAND TARGET                          //
+        // ================================================================================ //
+        
+        ApplicationCommandTarget* getNextCommandTarget() override;
+        void getAllCommands (Array <CommandID>& commands) override;
+        void getCommandInfo (const CommandID commandID, ApplicationCommandInfo& result) override;
+        bool perform (const InvocationInfo& info) override;
         
     private:
         

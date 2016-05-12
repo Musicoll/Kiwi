@@ -89,7 +89,7 @@ namespace kiwi
             Link(flip::Default&) {}
             
             //! @internal flip static declare method
-            template<class TModel> static void declare();
+            static void declare();
             
         private:
             flip::ObjectRef<model::Object>  m_sender;
@@ -97,23 +97,6 @@ namespace kiwi
             flip::Int                       m_index_outlet;
             flip::Int                       m_index_inlet;
         };
-        
-        // ================================================================================ //
-        //                                  LINK::declare                                   //
-        // ================================================================================ //
-        
-        template<class TModel>
-        void Link::declare()
-        {
-            if(TModel::template has<Link>()) return;
-            
-            TModel::template declare<Link>()
-            .name("cicm.kiwi.Link")
-            .template member<flip::ObjectRef<model::Object>, &Link::m_sender>("sender_obj")
-            .template member<flip::ObjectRef<model::Object>, &Link::m_receiver>("receiver_obj")
-            .template member<flip::Int, &Link::m_index_outlet>("outlet_index")
-            .template member<flip::Int, &Link::m_index_inlet>("inlet_index");
-        }
     }
 }
 

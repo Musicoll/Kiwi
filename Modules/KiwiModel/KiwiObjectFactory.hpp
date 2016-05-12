@@ -69,7 +69,7 @@ namespace kiwi
                 {
                     CreatorBundle creator;
                     
-                    creator.model_ctor_fn = [name](std::vector<Atom> args) -> TModel*
+                    creator.model_ctor_fn = [name](std::vector<Atom> const& args) -> TModel*
                     {
                         return new TModel(name, args);
                     };
@@ -110,7 +110,7 @@ namespace kiwi
                 {
                     CreatorBundle& creator = creators[name];
                     
-                    creator.engine_ctor_fn = [](std::vector<Atom> args) -> TEngine*
+                    creator.engine_ctor_fn = [](std::vector<Atom> const& args) -> TEngine*
                     {
                         return new TEngine(args);
                     };

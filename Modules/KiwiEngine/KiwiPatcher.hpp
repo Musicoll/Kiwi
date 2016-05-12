@@ -24,6 +24,8 @@
 #ifndef KIWI_ENGINE_PATCHER_HPP_INCLUDED
 #define KIWI_ENGINE_PATCHER_HPP_INCLUDED
 
+#include <KiwiModel/KiwiPatcher.hpp>
+
 #include "flip/DocumentObserver.h"
 
 #include "KiwiLink.hpp"
@@ -37,14 +39,14 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief The Patcher manages object and link controllers.
-        //! @details The patcher engine observes the Patcher mode for changes.
+        //! @details The patcher engine observes the Patcher model for changes.
         class Patcher : public flip::DocumentObserver<model::Patcher>
         {
         public:
             
             //! @brief Constructor.
             //! @details use the create method instead.
-            Patcher(Instance& instance) noexcept;
+            Patcher() noexcept;
             
             //! @brief Destructor.
             ~Patcher();
@@ -62,34 +64,31 @@ namespace kiwi
             //! @brief Send a message to an object
             void sendToObject(Object& object, uint32_t inlet, std::vector<Atom> args);
             
-        private:
-            
             //! @internal flip::DocumentObserver<model::Patcher>::document_changed
             void document_changed(model::Patcher& patcher) final override;
             
+        private: // methods
+            
             //! @internal Object model has just been added to the document.
-            void objectModelAdded(model::Object& object);
+            void objectAdded(model::Object& object);
             
             //! @internal Object model has changed.
-            void objectModelChanged(model::Object& object);
+            void objectChanged(model::Object& object);
             
             //! @internal Object model will be removed from the document.
-            void objectModelRemoved(model::Object& object);
+            void objectRemoved(model::Object& object);
             
             //! @internal Link model has just been added to the document.
-            void linkModelAdded(model::Link& link);
+            void linkAdded(model::Link& link);
             
             //! @internal Link model has changed.
-            void linkModelChanged(model::Link& link);
+            void linkChanged(model::Link& link);
             
             //! @internal Link model will be removed from the document.
-            void linkModelRemoved(model::Link& link);
+            void linkRemoved(model::Link& link);
+        
+        private: // members
             
-            // -----------------------------
-            
-            friend class Instance; // for document_changed access
-            
-            Instance&                       m_instance;
             model::Patcher*                 m_model;
         };
     }

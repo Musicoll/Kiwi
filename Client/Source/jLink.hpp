@@ -30,16 +30,21 @@
 
 namespace kiwi
 {
+    class jPatcher;
+    
     //! @brief The juce link Component.
     class jLink : public juce::Component
     {
     public:
         
-        jLink();
+        jLink(jPatcher const& jpatcher, model::Link& link_m);
         ~jLink();
         
-        void linkModelChanged(model::Link& link);
-        void objectModelChanged(model::Object& object);
+        //! Get the Link model
+        model::Link& getModel() const {return *m_model;};
+        
+        void linkChanged(model::Link& link);
+        void objectChanged(model::Object& object);
         
         // juce::Component
         void paint(juce::Graphics& g) override;
@@ -48,9 +53,13 @@ namespace kiwi
         
         void updateBounds();
         
-        model::Link* m_model;
+    private: // members
         
-        juce::Point<int> m_last_inlet_pos, m_last_outlet_pos;
+        jPatcher const&     m_jpatcher;
+        model::Link*        m_model;
+        
+        juce::Point<int>    m_last_inlet_pos,
+                            m_last_outlet_pos;
     };
 }
 

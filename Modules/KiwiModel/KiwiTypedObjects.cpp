@@ -21,9 +21,7 @@
  ==============================================================================
 */
 
-#include "KiwiObject.hpp"
-#include "KiwiLink.hpp"
-#include "KiwiPatcher.hpp"
+#include "KiwiTypedObjects.hpp"
 
 #include "KiwiPatcherModel.hpp"
 
@@ -32,32 +30,53 @@ namespace kiwi
     namespace model
     {
         // ================================================================================ //
-        //                                  LINK::declare                                   //
+        //                                    OBJECT PLUS                                   //
         // ================================================================================ //
-        
-        void Link::declare()
+ 
+        void ObjectPlus::declare()
         {
-            if(PatcherModel::has<Link>()) return;
+            if(PatcherModel::has<ObjectPlus>()) return;
             
-            PatcherModel::declare<Link>()
-            .name("cicm.kiwi.Link")
-            .member<flip::ObjectRef<model::Object>, &Link::m_sender>("sender_obj")
-            .member<flip::ObjectRef<model::Object>, &Link::m_receiver>("receiver_obj")
-            .member<flip::Int, &Link::m_index_outlet>("outlet_index")
-            .member<flip::Int, &Link::m_index_inlet>("inlet_index");
+            PatcherModel::declare<ObjectPlus>()
+            .name("cicm.kiwi.ObjectPlus")
+            .inherit<model::Object>();
+            
+            ObjectFactory::registerModel<ObjectPlus>("plus");
+        }
+        
+        ObjectPlus::ObjectPlus(std::string const& name, std::vector<Atom> const& args)
+        {
+            if(!args.empty() && args[0].isNumber())
+            {
+                setNumberOfInlets(1);
+            }
+            else
+            {
+                setNumberOfInlets(2);
+            }
+            
+            setNumberOfOutlets(1);
         }
         
         // ================================================================================ //
-        //                                      LINK                                        //
+        //                                    OBJECT PRINT                                  //
         // ================================================================================ //
         
-        Link::Link(model::Object const& from, const uint32_t outlet, model::Object const& to, const uint32_t inlet) :
-        m_sender(from.ref()),
-        m_receiver(to.ref()),
-        m_index_outlet(outlet),
-        m_index_inlet(inlet)
+        ObjectPrint::ObjectPrint(std::string const& name, std::vector<Atom> const& args)
         {
             ;
+        }
+        
+        //! @internal flip static declare method
+        void ObjectPrint::declare()
+        {
+            if(PatcherModel::has<ObjectPrint>()) return;
+            
+            PatcherModel::declare<ObjectPrint>()
+            .name("cicm.kiwi.ObjectPrint")
+            .inherit<model::Object>();
+            
+            ObjectFactory::registerModel<ObjectPrint>("print");
         }
     }
 }

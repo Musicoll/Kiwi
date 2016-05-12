@@ -24,6 +24,8 @@
 #ifndef KIWI_ENGINE_LINK_HPP_INCLUDED
 #define KIWI_ENGINE_LINK_HPP_INCLUDED
 
+#include <KiwiModel/KiwiLink.hpp>
+
 #include "KiwiObject.hpp"
 
 namespace kiwi
@@ -60,7 +62,7 @@ namespace kiwi
         private:
             
             //! @internal Link model has changed.
-            void linkModelChanged(model::Link& link_m);
+            void linkChanged(model::Link& link_m);
             
         private:
             
