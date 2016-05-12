@@ -227,15 +227,13 @@ namespace kiwi
     
     void KiwiApp::createArrangeMenu (PopupMenu& menu)
     {
-        menu.addCommandItem(m_command_manager.get(), CommandIDs::enableSnapToGrid);
-        menu.addSeparator();
         menu.addCommandItem(m_command_manager.get(), CommandIDs::toFront);
         menu.addCommandItem(m_command_manager.get(), CommandIDs::toBack);
     }
     
     void KiwiApp::createOptionsMenu (PopupMenu& menu)
     {
-        menu.addCommandItem(m_command_manager.get(), CommandIDs::showAudioStatusWindow);
+        ;
     }
     
     void KiwiApp::createWindowMenu (PopupMenu& menu)
@@ -249,7 +247,7 @@ namespace kiwi
     
     void KiwiApp::createHelpMenu (PopupMenu& menu)
     {
-        menu.addCommandItem(m_command_manager.get(), CommandIDs::openObjectHelp);
+        ;
     }
     
     void KiwiApp::handleMainMenuCommand (int menuItemID)
