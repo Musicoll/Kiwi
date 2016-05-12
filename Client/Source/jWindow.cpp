@@ -82,17 +82,16 @@ namespace kiwi
                 break;
             }
             case CommandIDs::minimizeWindow:
-                result.setInfo (TRANS("Minimize"), TRANS("Minimize Window"), CommandCategories::windows, 0);
+                result.setInfo(TRANS("Minimize"), TRANS("Minimize Window"), CommandCategories::windows, 0);
                 result.setActive(getDesktopWindowStyleFlags() & allButtons || getDesktopWindowStyleFlags() & minimiseButton);
                 break;
                 
             case CommandIDs::maximizeWindow:
-                result.setInfo (TRANS("Maximize"), TRANS("Maximize Window"), CommandCategories::windows, 0);
+                result.setInfo(TRANS("Maximize"), TRANS("Maximize Window"), CommandCategories::windows, 0);
                 result.setActive(getDesktopWindowStyleFlags() & allButtons || getDesktopWindowStyleFlags() & maximiseButton);
                 break;
                 
-            default:
-                break;
+            default: break;
         }
     }
     

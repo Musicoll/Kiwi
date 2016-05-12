@@ -218,15 +218,6 @@ namespace kiwi
     void KiwiApp::createViewMenu(PopupMenu& menu)
     {
         menu.addCommandItem(m_command_manager.get(), CommandIDs::editModeSwitch);
-        menu.addSeparator();
-        menu.addCommandItem(m_command_manager.get(), CommandIDs::showPatcherInspector);
-        menu.addSeparator();
-        menu.addCommandItem(m_command_manager.get(), CommandIDs::gridModeSwitch);
-        menu.addSeparator();
-        menu.addCommandItem(m_command_manager.get(), CommandIDs::zoomIn);
-        menu.addCommandItem(m_command_manager.get(), CommandIDs::zoomOut);
-        menu.addCommandItem(m_command_manager.get(), CommandIDs::zoomNormal);
-        menu.addSeparator();
     }
     
     void KiwiApp::createObjectMenu(PopupMenu& menu)
@@ -317,16 +308,12 @@ namespace kiwi
         }
     }
     
-    bool KiwiApp::perform(const InvocationInfo& info)
+    bool KiwiApp::perform(InvocationInfo const& info)
     {
         switch(info.commandID)
         {
             case CommandIDs::newPatcher :           { m_instance->newPatcher(); break; }
-            case CommandIDs::showConsoleWindow :
-            {
-                std::cout << "showConsoleWindow\n";
-                m_instance->showConsoleWindow(); break;
-            }
+            case CommandIDs::showConsoleWindow :    { m_instance->showConsoleWindow(); break; }
             
             default : return JUCEApplication::perform(info);
         }
@@ -339,10 +326,5 @@ namespace kiwi
         m_command_manager.reset(new ApplicationCommandManager());
         
         m_command_manager->registerAllCommandsForTarget(this);
-        
-        {
-            jWindow window;
-            //m_command_manager->registerAllCommandsForTarget(&window);
-        }
     }
 }

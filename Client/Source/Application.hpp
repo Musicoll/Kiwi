@@ -120,7 +120,7 @@ namespace kiwi
         void getCommandInfo(CommandID commandID, ApplicationCommandInfo& result) override;
         
         //! @brief This must actually perform the specified command.
-        bool perform(const InvocationInfo& info) override;
+        bool perform(InvocationInfo const& info) override;
         
     private:
 
