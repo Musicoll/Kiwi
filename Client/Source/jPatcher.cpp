@@ -132,37 +132,32 @@ namespace kiwi
     
     void jPatcher::patcherChanged(model::Patcher& patcher, model::Patcher::View& view)
     {
-        // est-ce que c'est bien ma vue !!!!
-        if(view.added() /*&& istmyview*/)
-        {
-            ;
-        }
+        if(view.added()) {}
         
-        // send changes to objects
+        // create jObject for each newly added objects
         for(auto& object : patcher.getObjects())
         {
-            if(object.added())
-            {
-                addjObject(object);
-            }
-            
-            objectChanged(view, object);
-            
-            if(object.removed())
-            {
-                removejObject(object);
-            }
+            if(object.added()) { addjObject(object); }
         }
         
+        // create jLink for each newly added links
         for(auto& link : patcher.getLinks())
         {
-            if(link.added())
-            {
-                addjLink(link);
-            }
+            if(link.added()) { addjLink(link); }
+        }
+        
+        // send jObject change notification
+        for(auto& object : patcher.getObjects())
+        {
+            if(object.changed()) { objectChanged(view, object); }
+        }
+        
+        // send jLink change notification
+        for(auto& link : patcher.getLinks())
+        {
+            if(link.changed()) { linkChanged(link); }
             
-            linkChanged(link);
-            
+            // send to jLink jObject change notification
             if(patcher.objectsChanged())
             {
                 for(auto& object : patcher.getObjects())
@@ -170,24 +165,26 @@ namespace kiwi
                     if(object.changed())
                     {
                         jLink* jlink = getjLink(link);
-                        if(jlink)
-                        {
-                            jlink->objectChanged(object);
-                        }
+                        
+                        if(jlink) { jlink->objectChanged(object); }
                     }
                 }
             }
-            
-            if(link.removed())
-            {
-                removejLink(link);
-            }
         }
         
-        if(view.removed())
+        // delete jLink for each removed links
+        for(auto& link : patcher.getLinks())
         {
-            ;
+            if(link.removed()) { removejLink(link); }
         }
+        
+        // delete jObject for each removed objects
+        for(auto& object : patcher.getObjects())
+        {
+            if(object.removed()) { removejObject(object); }
+        }
+        
+        if(view.removed()) {}
     }
     
     void jPatcher::addjObject(model::Object& object)
