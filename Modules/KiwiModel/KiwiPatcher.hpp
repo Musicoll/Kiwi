@@ -244,16 +244,10 @@ namespace kiwi
         public:
             
             //! @brief flip default Constructor.
-            User(flip::Default&)
-            {
-                disable_in_undo();
-            };
+            User(flip::Default&) {}
             
             //! @brief Constructor.
-            User(uint32_t user_id) : m_user_id(user_id)
-            {
-                disable_in_undo();
-            }
+            User(uint32_t user_id) : m_user_id(user_id) {}
             
             //! @brief Destructor.
             ~User() = default;

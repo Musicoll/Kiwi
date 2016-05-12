@@ -86,7 +86,8 @@ namespace kiwi
         
         Patcher::Patcher()
         {
-            ;
+            // user changes doesn't need to be stored in an history.
+            m_users.disable_in_undo();
         }
         
         Patcher::~Patcher()
