@@ -50,6 +50,9 @@ namespace kiwi
         //! @brief Get the user ID of the Instance.
         uint64_t getUserId() const noexcept;
         
+        //! Brings the Console to front.
+        void showConsoleWindow();
+        
     private:
         
         //! @internal temporary method to pre-populate new patchers

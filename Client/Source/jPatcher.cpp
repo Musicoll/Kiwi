@@ -27,6 +27,8 @@
 #include "jPatcher.hpp"
 #include "jObject.hpp"
 #include "jLink.hpp"
+#include "Application.hpp"
+#include "CommandIDs.hpp"
 
 namespace kiwi
 {
@@ -36,6 +38,9 @@ namespace kiwi
     {
         setSize(600, 400);
         loadPatcher();
+        
+        KiwiApp::bindToCommandManager(this);
+        KiwiApp::bindToKeyMapping(this);
     }
     
     jPatcher::~jPatcher()
@@ -292,5 +297,219 @@ namespace kiwi
     {
         const auto it = findjLink(link);
         return (it != m_links.cend()) ? it->get() : nullptr;
+    }
+    
+    // ================================================================================ //
+    //                              APPLICATION COMMAND TARGET                          //
+    // ================================================================================ //
+    
+    ApplicationCommandTarget* jPatcher::getNextCommandTarget()
+    {
+        return findFirstTargetParentComponent();
+    }
+    
+    void jPatcher::getAllCommands(Array<CommandID>& commands)
+    {
+        commands.add(CommandIDs::save);
+        commands.add(StandardApplicationCommandIDs::undo);
+        commands.add(StandardApplicationCommandIDs::redo);
+        commands.add(StandardApplicationCommandIDs::cut);
+        commands.add(StandardApplicationCommandIDs::copy);
+        commands.add(StandardApplicationCommandIDs::paste);
+        commands.add(CommandIDs::pasteReplace);
+        commands.add(CommandIDs::duplicate);
+        commands.add(StandardApplicationCommandIDs::del);
+        commands.add(StandardApplicationCommandIDs::selectAll);
+        
+        commands.add(CommandIDs::toFront);
+        commands.add(CommandIDs::toBack);
+        
+        commands.add(CommandIDs::zoomIn);
+        commands.add(CommandIDs::zoomOut);
+        commands.add(CommandIDs::zoomNormal);
+        commands.add(CommandIDs::editModeSwitch);
+        commands.add(CommandIDs::gridModeSwitch);
+        commands.add(CommandIDs::enableSnapToGrid);
+        
+        commands.add(CommandIDs::showPatcherInspector);
+        commands.add(CommandIDs::showObjectInspector);
+        
+        //CommandIDs::openObjectHelp
+    }
+    
+    void jPatcher::getCommandInfo(const CommandID commandID, ApplicationCommandInfo& result)
+    {
+        switch(commandID)
+        {
+            case CommandIDs::save:
+                result.setInfo(TRANS("Save"), TRANS("Save document"), CommandCategories::general, 0);
+                result.addDefaultKeypress('s',  ModifierKeys::commandModifier);
+                break;
+                
+            case StandardApplicationCommandIDs::undo:
+                result.setInfo(TRANS("Undo"), TRANS("Undo last action"), CommandCategories::general, 0);
+                result.addDefaultKeypress('z',  ModifierKeys::commandModifier);
+                break;
+                
+            case StandardApplicationCommandIDs::redo:
+                result.setInfo(TRANS("Redo"), TRANS("Redo action"), CommandCategories::general, 0);
+                result.addDefaultKeypress('z',  ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+                break;
+                
+            case StandardApplicationCommandIDs::cut:
+                result.setInfo(TRANS("Cut"), TRANS("Cut"), CommandCategories::editing, 0);
+                result.addDefaultKeypress('x', ModifierKeys::commandModifier);
+                //result.setActive(isAnyBoxSelected());
+                break;
+                
+            case StandardApplicationCommandIDs::copy:
+                result.setInfo(TRANS("Copy"), TRANS("Copy"), CommandCategories::editing, 0);
+                result.addDefaultKeypress('c', ModifierKeys::commandModifier);
+                //result.setActive(isAnyBoxSelected());
+                break;
+                
+            case StandardApplicationCommandIDs::paste:
+                result.setInfo(TRANS("Paste"), TRANS("Paste"), CommandCategories::editing, 0);
+                result.addDefaultKeypress('v', ModifierKeys::commandModifier);
+                //result.setActive(!getLockStatus() && SystemClipboard::getTextFromClipboard().isNotEmpty());
+                break;
+                
+            case CommandIDs::pasteReplace:
+                result.setInfo(TRANS("Paste replace"), TRANS("Replace selected objects with the object on the clipboard"), CommandCategories::editing, 0);
+                result.addDefaultKeypress('v', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+                //result.setActive(isAnyBoxSelected() && SystemClipboard::getTextFromClipboard().isNotEmpty());
+                break;
+                
+            case CommandIDs::duplicate:
+                result.setInfo(TRANS("Duplicate"), TRANS("Duplicate the selection"), CommandCategories::editing, 0);
+                result.addDefaultKeypress('d', ModifierKeys::commandModifier);
+                //result.setActive(isAnyBoxSelected());
+                break;
+                
+            case StandardApplicationCommandIDs::del:
+                result.setInfo(TRANS("Delete"), TRANS("Delete all selected boxes and links"), CommandCategories::editing, 0);
+                result.addDefaultKeypress(KeyPress::backspaceKey, ModifierKeys::noModifiers);
+                //result.setActive(isAnythingSelected());
+                break;
+                
+            case StandardApplicationCommandIDs::selectAll:
+                result.setInfo(TRANS("Select All"), TRANS("Select all boxes and links"), CommandCategories::editing, 0);
+                result.addDefaultKeypress('a', ModifierKeys::commandModifier);
+                //result.setActive(!getLockStatus());
+                break;
+                
+            case CommandIDs::toFront:
+                result.setInfo(TRANS("Bring to Front"), TRANS("Bring selected boxes to front"), CommandCategories::editing, 0);
+                result.addDefaultKeypress('f', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+                //result.setActive(isAnyBoxSelected());
+                break;
+                
+            case CommandIDs::toBack:
+                result.setInfo(TRANS("Send to Back"), TRANS("Send selected boxes to back"), CommandCategories::editing, 0);
+                result.addDefaultKeypress('b', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+                //result.setActive(isAnyBoxSelected());
+                break;
+                
+            case CommandIDs::editModeSwitch:
+                result.setInfo (TRANS("Edit"), TRANS("Switch between edit and play mode"), CommandCategories::view, 0);
+                result.addDefaultKeypress ('e',  ModifierKeys::commandModifier);
+                //result.setTicked(!getLockStatus());
+                break;
+                
+            default:
+                result.setInfo (TRANS("[unknown command]"), TRANS("dada"), CommandCategories::view, 0);
+                break;
+        }
+    }
+    
+    bool jPatcher::perform(const InvocationInfo& info)
+    {
+        Console::post("perform command");
+        switch (info.commandID)
+        {
+            case CommandIDs::save:
+            {
+                Console::post("|- try to save page");
+                break;
+            }
+            case StandardApplicationCommandIDs::undo:
+            {
+                Console::post("|- Undo");
+                auto& doc = m_patcher_model.entity().use<DocumentManager>();
+                doc.undo();
+                doc.commit(m_patcher_model);
+                break;
+            }
+            case StandardApplicationCommandIDs::redo:
+            {
+                Console::post("|- Redo");
+                auto& doc = m_patcher_model.entity().use<DocumentManager>();
+                doc.redo();
+                doc.commit(m_patcher_model);
+                break;
+            }
+            case StandardApplicationCommandIDs::cut:
+            {
+                Console::post("|- cut box");
+                //copySelectionToClipboard();
+                //deleteSelection();
+                break;
+            }
+            case StandardApplicationCommandIDs::copy:
+            {
+                Console::post("|- copy box");
+                //copySelectionToClipboard();
+                break;
+            }
+            case StandardApplicationCommandIDs::paste:
+            {
+                Console::post("|- paste boxes");
+                //const long gridsize = getPage()->getGridSize();
+                //pasteFromClipboard(Gui::Point(gridsize, gridsize));
+                break;
+            }
+            case CommandIDs::pasteReplace:
+            {
+                Console::post("|- paste replace boxes");
+                //replaceBoxesFromClipboard();
+                break;
+            }
+            case CommandIDs::duplicate:
+            {
+                Console::post("|- duplicate boxes");
+                //copySelectionToClipboard();
+                //const long gridsize = getPage()->getGridSize();
+                //pasteFromClipboard(Gui::Point(gridsize, gridsize));
+                //unselectAllLinks();
+                break;
+            }
+            case StandardApplicationCommandIDs::del:
+            {
+                Console::post("|- delete selection");
+                //deleteSelection();
+                break;
+            }
+            case StandardApplicationCommandIDs::selectAll:
+            {
+                //selectAllBoxes();
+                break;
+            }
+            case CommandIDs::toFront:
+            {
+                break;
+            }
+            case CommandIDs::toBack:
+            {
+                break;
+            }
+            case CommandIDs::editModeSwitch:
+            {
+                //setLockStatus(!getLockStatus());
+                break;
+            }
+            default: return false;
+        }
+        
+        return true;
     }
 }

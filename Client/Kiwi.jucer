@@ -22,8 +22,10 @@
       <FILE id="jpbFUu" name="jConsole.hpp" compile="0" resource="0" file="Source/jConsole.hpp"/>
       <FILE id="Jmu5NJ" name="jInstance.cpp" compile="1" resource="0" file="Source/jInstance.cpp"/>
       <FILE id="dfUOAd" name="jInstance.hpp" compile="0" resource="0" file="Source/jInstance.hpp"/>
+      <FILE id="yC78kD" name="CommandIDs.hpp" compile="0" resource="0" file="Source/CommandIDs.hpp"/>
       <FILE id="Je1Viq" name="Application.cpp" compile="1" resource="0" file="Source/Application.cpp"/>
       <FILE id="gEGUnW" name="Application.hpp" compile="0" resource="0" file="Source/Application.hpp"/>
+      <FILE id="EcI2R7" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
     </GROUP>
     <GROUP id="{8FA1C9D1-9F39-6B48-4CD5-95C1B98E14A6}" name="Modules">
       <GROUP id="{4E36069F-186B-8CE4-3264-BA41957CB0CD}" name="KiwiEngine">

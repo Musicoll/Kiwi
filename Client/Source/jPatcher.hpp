@@ -36,7 +36,7 @@ namespace kiwi
     class jLink;
     
     //! @brief The juce Patcher Component.
-    class jPatcher : public juce::Component
+    class jPatcher : public juce::Component, public ApplicationCommandTarget
     {
     public:
         
@@ -55,6 +55,15 @@ namespace kiwi
         
         //! @brief Returns the jLink corresponding to a given Link model.
         jLink* getjLink(model::Link const& link) const;
+        
+        // ================================================================================ //
+        //                              APPLICATION COMMAND TARGET                          //
+        // ================================================================================ //
+        
+        ApplicationCommandTarget* getNextCommandTarget() override;
+        void getAllCommands(Array<CommandID>& commands) override;
+        void getCommandInfo(CommandID commandID, ApplicationCommandInfo& result) override;
+        bool perform(const InvocationInfo& info) override;
         
     private:
         

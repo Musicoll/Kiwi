@@ -63,6 +63,12 @@ namespace kiwi
         //populatePatcher(patcher);
     }
     
+    void jInstance::showConsoleWindow()
+    {
+        m_console_window->setVisible(true);
+        m_console_window->toFront(true);
+    }
+    
     void jInstance::populatePatcher(model::Patcher& patcher)
     {
         {
