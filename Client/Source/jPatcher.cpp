@@ -24,6 +24,7 @@
 #include <KiwiEngine/KiwiDocumentManager.hpp>
 #include <KiwiModel/KiwiConsole.hpp>
 
+#include "jInstance.hpp"
 #include "jPatcher.hpp"
 #include "jObject.hpp"
 #include "jLink.hpp"
@@ -34,7 +35,8 @@ namespace kiwi
 {
     bool jPatcher::m_command_manager_binded = false;
     
-    jPatcher::jPatcher(model::Patcher& patcher, model::Patcher::View& view) :
+    jPatcher::jPatcher(jInstance& instance, model::Patcher& patcher, model::Patcher::View& view) :
+    m_instance(instance),
     m_patcher_model(patcher),
     m_view_model(view)
     {
@@ -48,6 +50,8 @@ namespace kiwi
         
         setSize(600, 400);
         loadPatcher();
+        
+        setWantsKeyboardFocus(true);
     }
     
     jPatcher::~jPatcher()
@@ -93,13 +97,13 @@ namespace kiwi
     
     void jPatcher::leftClick(juce::MouseEvent const& event)
     {
-        ;
+        unselectAll();
     }
 
     void jPatcher::rightClick(juce::MouseEvent const& event)
     {
         juce::PopupMenu m;
-        m.addItem(1, "Add Plus (1)");
+        m.addItem(1, "Add Plus");
         m.addItem(2, "Add Print");
         m.addSeparator();
 
@@ -111,6 +115,64 @@ namespace kiwi
             case 2: { createObjectModel("print", event.x, event.y); break; }
             default: break;
         }
+    }
+    
+    void jPatcher::moveSelectedObjects(juce::Point<int> const& delta)
+    {
+        if(true /*isAnyBoxSelected()*/)
+        {
+            auto& selection = m_view_model.useSelection();
+            
+            for(auto& object : selection.getObjects())
+            {
+                object->setPosition(object->getX() + delta.x, object->getY() + delta.y);
+            }
+            
+            DocumentManager::commit(m_patcher_model, "Move selected objects");
+        }
+    }
+
+    
+    bool jPatcher::keyPressed(const KeyPress& key)
+    {
+        if(key.isKeyCode(KeyPress::deleteKey) || key.isKeyCode(KeyPress::backspaceKey))
+        {
+            //deleteSelection();
+            return true;
+        }
+        else if(key.isKeyCode(KeyPress::returnKey))
+        {
+            //if a box is selected (only one) and this box is editable => give it textediting focus
+            //selected_box.showTextEditor();
+        }
+        else
+        {
+            const bool snap = key.getModifiers().isShiftDown();
+            const int gridsize = 20;
+            const int amount = snap ? gridsize : 1;
+            
+            if(key.isKeyCode(KeyPress::rightKey))
+            {
+                moveSelectedObjects({amount, 0});
+                return true;
+            }
+            else if(key.isKeyCode(KeyPress::downKey))
+            {
+                moveSelectedObjects({0, amount});
+                return true;
+            }
+            else if(key.isKeyCode(KeyPress::leftKey))
+            {
+                moveSelectedObjects({-amount, 0});
+                return true;
+            }
+            else if(key.isKeyCode(KeyPress::upKey))
+            {
+                moveSelectedObjects({0, -amount});
+                return true;
+            }
+        }
+        return false;
     }
     
     void jPatcher::loadPatcher()
@@ -130,6 +192,8 @@ namespace kiwi
     
     void jPatcher::patcherChanged(model::Patcher& patcher, model::Patcher::View& view)
     {
+        if(! patcher.changed()) return; // abort
+        
         if(view.added()) {}
         
         // create jObject for each newly added objects
@@ -170,6 +234,8 @@ namespace kiwi
             }
         }
         
+        checkSelectionChanges(patcher);
+        
         // delete jLink for each removed links
         for(auto& link : patcher.getLinks())
         {
@@ -183,6 +249,116 @@ namespace kiwi
         }
         
         if(view.removed()) {}
+    }
+    
+    void jPatcher::checkSelectionChanges(model::Patcher& patcher)
+    {
+        if(! patcher.changed()) return; // abort
+        
+        std::set<model::Object*>                        new_local_objects_selection;
+        std::map<model::Object*, std::set<uint64_t>>    new_distant_objects_selection;
+        
+        for(auto& object_m : patcher.getObjects())
+        {
+            if(object_m.removed()) break;
+            
+            std::set<uint64_t> selected_for_users;
+            
+            for(auto& user : patcher.getUsers())
+            {
+                bool selected_for_local_view = false;
+                bool selected_for_other_view = false;
+                
+                const uint64_t user_id = user.getId();
+                const bool is_distant_user = user_id != m_instance.getUserId();
+                
+                for(auto& view : user.getViews())
+                {
+                    const bool is_local_view = ( &m_view_model == &view );
+                    
+                    const bool is_selected = view.useSelection().isSelected(object_m);
+                    
+                    if(is_selected)
+                    {
+                        if(is_distant_user)
+                        {
+                            selected_for_other_view = true;
+                            
+                            // an object is considered selected for a given user
+                            // when it's selected in at least one of its patcher's views.
+                            break;
+                        }
+                        else if(is_local_view)
+                        {
+                            selected_for_local_view = true;
+                        }
+                        else
+                        {
+                            selected_for_other_view = true;
+                        }
+                    }
+                }
+                
+                if(selected_for_local_view)
+                {
+                    new_local_objects_selection.emplace(&object_m);
+                }
+                
+                if(selected_for_other_view)
+                {
+                    selected_for_users.emplace(user_id);
+                }
+            }
+            
+            new_distant_objects_selection.insert({&object_m, selected_for_users});
+        }
+        
+        // check diff between old and new distant selection
+        // and notify objects if their selection state changed
+        for(auto& local_object : m_objects)
+        {
+            const auto local_object_m = &local_object->getModel();
+            
+            // local diff
+            const bool old_local_selected_state = m_local_objects_selection.find(local_object_m) != m_local_objects_selection.end();
+            
+            bool new_local_selected_state = new_local_objects_selection.find(local_object_m) != new_local_objects_selection.end();
+            
+            if(old_local_selected_state != new_local_selected_state)
+            {
+                local_object->localSelectionChanged(new_local_selected_state);
+                selectionChanged();
+            }
+            
+            // distant diff
+            bool distant_selection_changed_for_object = false;
+            for(auto distant_it : new_distant_objects_selection)
+            {
+                model::Object* distant_object_lookup = distant_it.first;
+                
+                if(distant_object_lookup == &local_object->getModel())
+                {
+                    distant_selection_changed_for_object =
+                    m_distant_objects_selection[distant_object_lookup] != distant_it.second;
+                    
+                    // notify object
+                    if(distant_selection_changed_for_object)
+                    {
+                        local_object->distantSelectionChanged(distant_it.second);
+                        selectionChanged();
+                    }
+                }
+            }
+        }
+        
+        // cache new selection state
+        std::swap(m_distant_objects_selection, new_distant_objects_selection);
+        std::swap(m_local_objects_selection, new_local_objects_selection);
+    }
+    
+    void jPatcher::selectionChanged()
+    {
+        KiwiApp::commandStatusChanged();
     }
     
     void jPatcher::addjObject(model::Object& object)
@@ -346,6 +522,18 @@ namespace kiwi
         return doc.canRedo() ? doc.getRedoLabel() : "";
     }
     
+    void jPatcher::selectAllObjects()
+    {
+        m_view_model.selectAll();
+        DocumentManager::commit(m_patcher_model, "Select all objects");
+    }
+    
+    void jPatcher::unselectAll()
+    {
+        m_view_model.unSelectAll();
+        DocumentManager::commit(m_patcher_model, "Unselect all");
+    }
+    
     // ================================================================================ //
     //                              APPLICATION COMMAND TARGET                          //
     // ================================================================================ //
@@ -408,7 +596,6 @@ namespace kiwi
             {
                 juce::String label = TRANS("Redo");
                 const bool hasRedo = canRedo();
-                
                 if(hasRedo) { label += ' ' + getRedoLabel(); }
                 
                 result.setInfo(label, TRANS("Redo action"), CommandCategories::general, 0);
@@ -541,11 +728,7 @@ namespace kiwi
                 //deleteSelection();
                 break;
             }
-            case StandardApplicationCommandIDs::selectAll:
-            {
-                //selectAllBoxes();
-                break;
-            }
+            case StandardApplicationCommandIDs::selectAll: { selectAllObjects(); break; }
             case CommandIDs::toFront:
             {
                 break;

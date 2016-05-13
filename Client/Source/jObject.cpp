@@ -23,24 +23,101 @@
 
 #include <KiwiEngine/KiwiDocumentManager.hpp>
 
+#include "Application.hpp"
 #include "jObject.hpp"
 
 namespace kiwi
 {
     jObject::jObject(model::Object& object_m) :
     m_model(&object_m),
-    m_io_color(0.3, 0.3, 0.3)
+    m_io_color(0.3, 0.3, 0.3),
+    m_selection_width(2),
+    m_is_selected(false)
     {
-        setSize(60, 20);
         m_inlets = m_model->getNumberOfInlets();
         m_outlets = m_model->getNumberOfOutlets();
         
-        setTopLeftPosition(juce::Point<int>(m_model->getX(), m_model->getY()));
+        updateBounds();
     }
     
     jObject::~jObject()
     {
         ;
+    }
+    
+    void jObject::updateBounds()
+    {
+        const juce::Rectangle<int> model_bounds(m_model->getX(), m_model->getY(), 60, 20);
+        
+        const auto new_bounds = model_bounds.expanded(m_selection_width, m_selection_width);
+        
+        m_local_box_bounds = model_bounds.withPosition(model_bounds.getX() - new_bounds.getX(),
+                                                       model_bounds.getY() - new_bounds.getY());
+        
+        setBounds(new_bounds);
+    }
+    
+    void jObject::paint(juce::Graphics & g)
+    {
+        const auto bounds = getLocalBounds();
+        const auto box_bounds = m_local_box_bounds;
+        
+        const juce::Colour selection_color = Colour::fromFloatRGBA(0., 0.5, 0.9, 0.8);
+        
+        /*
+        for(auto user_id : m_distant_selection)
+        {
+            // auto color = getColorForUserId(user_id);
+        }
+        */
+        
+        const bool selected = m_is_selected;
+        const bool other_selected = ! m_distant_selection.empty();
+        const bool other_view_selected = (other_selected &&
+                                          m_distant_selection.find(KiwiApp::userID())
+                                          != m_distant_selection.end());
+        
+        if(selected || other_view_selected)
+        {
+            const juce::Colour color = selected ? selection_color : selection_color.withAlpha(0.3f);
+            g.setColour(color);
+            g.drawRect(bounds.reduced(m_selection_width*0.5), m_selection_width*0.5);
+            
+            g.setColour(juce::Colours::black.darker(0.2));
+            g.drawRect(bounds, 1);
+        }
+
+        g.setColour(juce::Colours::white);
+        g.fillRect(box_bounds);
+        
+        g.setColour(juce::Colours::black);
+        g.drawRect(box_bounds);
+        
+        g.drawFittedText(m_model->getText(), box_bounds.reduced(5), juce::Justification::centredLeft, 1);
+        
+        drawInletsOutlets(g);
+    }
+    
+    void jObject::drawInletsOutlets(juce::Graphics & g)
+    {
+        const juce::Rectangle<int> bounds = m_local_box_bounds;
+        
+        g.setColour(m_io_color);
+        
+        for(unsigned int i = 0; i < m_inlets; ++i)
+        {
+            g.fillRect(getInletLocalBounds(i, bounds));
+        }
+        
+        for(unsigned int i = 0; i < m_outlets; ++i)
+        {
+            g.fillRect(getOutletLocalBounds(i, bounds));
+        }
+    }
+    
+    bool jObject::hitTest(int x, int y)
+    {
+        return m_local_box_bounds.contains(x, y);
     }
     
     void jObject::objectChanged(model::Patcher::View& view, model::Object& object)
@@ -66,7 +143,7 @@ namespace kiwi
         
         if(object.positionChanged())
         {
-            setTopLeftPosition(juce::Point<int>(object.getX(), object.getY()));
+            updateBounds();
             need_redraw = true;
         }
         
@@ -81,46 +158,30 @@ namespace kiwi
             repaint();
         }
     }
-    
-    void jObject::paint(juce::Graphics & g)
+
+    void jObject::localSelectionChanged(bool selected)
     {
-        auto bounds = getLocalBounds();
-        
-        g.setColour(juce::Colours::white);
-        g.fillRect(bounds);
-        
-        g.setColour(juce::Colours::black);
-        g.drawRect(bounds);
-        
-        g.drawFittedText(m_model->getText(), bounds.reduced(5), juce::Justification::centredLeft, 1);
-        drawInletsOutlets(g);
+        if(m_is_selected != selected)
+        {
+            m_is_selected = selected;
+            repaint();
+        }
     }
     
-    void jObject::drawInletsOutlets(juce::Graphics & g)
+    void jObject::distantSelectionChanged(std::set<uint64_t> distant_user_id_selection)
     {
-        const juce::Rectangle<int> bounds = getLocalBounds();
-        
-        g.setColour(m_io_color);
-        
-        for(unsigned int i = 0; i < m_inlets; ++i)
-        {
-            g.fillRect(getInletLocalBounds(i, bounds));
-        }
-        
-        for(unsigned int i = 0; i < m_outlets; ++i)
-        {
-            g.fillRect(getOutletLocalBounds(i, bounds));
-        }
+        m_distant_selection = distant_user_id_selection;
+        repaint();
     }
     
     juce::Point<int> jObject::getInletPatcherPosition(const size_t index) const
     {
-        return getPosition() + getInletLocalBounds(index, getLocalBounds()).getCentre();
+        return getPosition() + getInletLocalBounds(index, m_local_box_bounds).getCentre();
     }
     
     juce::Point<int> jObject::getOutletPatcherPosition(const size_t index) const
     {
-        return getPosition() + getOutletLocalBounds(index, getLocalBounds()).getCentre();
+        return getPosition() + getOutletLocalBounds(index, m_local_box_bounds).getCentre();
     }
     
     juce::Rectangle<int> jObject::getInletLocalBounds(const size_t index,

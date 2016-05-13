@@ -90,16 +90,21 @@ namespace kiwi
         quit();
     }
     
-    KiwiApp* KiwiApp::getApp()
-    {
-        return dynamic_cast<KiwiApp*>(JUCEApplication::getInstance());
-    }
-    
     KiwiApp& KiwiApp::use()
     {
         KiwiApp* const app = getApp();
         assert(app != nullptr);
         return *app;
+    }
+    
+    KiwiApp* KiwiApp::getApp()
+    {
+        return dynamic_cast<KiwiApp*>(JUCEApplication::getInstance());
+    }
+    
+    uint64_t KiwiApp::userID()
+    {
+        return KiwiApp::use().m_instance->getUserId();
     }
     
     void KiwiApp::bindToCommandManager(ApplicationCommandTarget* target)
@@ -129,7 +134,7 @@ namespace kiwi
     
     void KiwiApp::commandStatusChanged()
     {
-        KiwiApp* const app = dynamic_cast<KiwiApp*>(JUCEApplication::getInstance());
+        KiwiApp* const app = KiwiApp::getApp();
         if(app && app->m_command_manager)
         {
             app->m_command_manager->commandStatusChanged();
@@ -138,7 +143,7 @@ namespace kiwi
     
     KeyPressMappingSet* KiwiApp::getKeyMappings()
     {
-        KiwiApp* const app = dynamic_cast<KiwiApp*>(JUCEApplication::getInstance());
+        KiwiApp* const app = KiwiApp::getApp();
         if(app && app->m_command_manager)
         {
             return app->m_command_manager->getKeyMappings();

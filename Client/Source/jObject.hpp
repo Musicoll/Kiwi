@@ -39,6 +39,8 @@ namespace kiwi
         ~jObject();
         
         void objectChanged(model::Patcher::View& view, model::Object& object);
+        void localSelectionChanged(bool selected_for_view);
+        void distantSelectionChanged(std::set<uint64_t> distant_user_id_selection);
         
         // juce::Component
         void paint(juce::Graphics& g) override;
@@ -54,8 +56,12 @@ namespace kiwi
         //! Get the Object model
         model::Object& getModel() const {return *m_model;};
         
+        //! @brief overloaded from Component to exclude border size.
+        bool hitTest(int x, int y) override;
+        
     private:
         
+        void updateBounds();
         void drawInletsOutlets(juce::Graphics & g);
         
         //! @brief Returns the inlet local bounds for a given index.
@@ -66,12 +72,19 @@ namespace kiwi
         juce::Rectangle<int> getOutletLocalBounds(const size_t index,
                                                   juce::Rectangle<int> const& object_bounds) const;
         
-        model::Object*      m_model = nullptr;
-        const unsigned int  m_io_width = 5;
-        const unsigned int  m_io_height = 3;
-        size_t              m_inlets = 0;
-        size_t              m_outlets = 0;
-        const juce::Colour  m_io_color;
+    private: // members
+        
+        model::Object*          m_model = nullptr;
+        const unsigned int      m_io_width = 5;
+        const unsigned int      m_io_height = 3;
+        size_t                  m_inlets = 0;
+        size_t                  m_outlets = 0;
+        const juce::Colour      m_io_color;
+        int                     m_selection_width = 4;
+        juce::Rectangle<int>    m_local_box_bounds;
+        
+        bool                    m_is_selected;
+        std::set<uint64_t>      m_distant_selection;
     };
 }
 

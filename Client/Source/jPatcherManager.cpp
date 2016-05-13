@@ -139,7 +139,7 @@ namespace kiwi
         if(user.getId() == m_instance.getUserId())
         {
             auto& window = view.entity().emplace<jWindow>();
-            auto& jpatcher = view.entity().emplace<jPatcher>(patcher, view);
+            auto& jpatcher = view.entity().emplace<jPatcher>(m_instance, patcher, view);
             window.setContentNonOwned(&jpatcher, true);
         }
     }

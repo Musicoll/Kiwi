@@ -138,6 +138,12 @@ namespace kiwi
             
         private:
             
+            //! @brief Unselect this object for all views of all users.
+            void unselectForAllUsers(model::Object const& object);
+            
+            //! @brief Unselect this link for all views of all users.
+            void unselectForAllUsers(model::Link const& link);
+            
             bool canConnect(model::Object const& from, const uint32_t outlet,
                             model::Object const& to, const uint32_t inlet) const;
             
@@ -172,15 +178,33 @@ namespace kiwi
             
             struct Object : public flip::Object
             {
+            public:
+                
                 Object() = default;
                 Object(model::Object& object) : m_ref(&object) {}
+                
+                model::Object* get() {return m_ref.value();}
+                
+                static void declare();
+                
+            private:
+                
                 flip::ObjectRef<model::Object> m_ref;
             };
             
             struct Link : public flip::Object
             {
+            public:
+                
                 Link() = default;
                 Link(model::Link& link) : m_ref(&link) {}
+                
+                model::Link* get() {return !removed() ? m_ref.value() : m_ref.before();}
+                
+                static void declare();
+                
+            private:
+                
                 flip::ObjectRef<model::Link> m_ref;
             };
             
@@ -202,9 +226,12 @@ namespace kiwi
                     m_objects.clear();
                 }
                 
+                //! @brief Return the Parent View
+                View& useView();
+                
                 std::vector<model::Object*> getObjects();
                 std::vector<model::Link*> getLinks();
-                bool isSelected(model::Object const& object);
+                bool isSelected(model::Object const& object) const;
                 bool isSelected(model::Link const& link);
                 
                 static void declare();
@@ -219,7 +246,13 @@ namespace kiwi
         public:
             
             //! @brief Return the parent Patcher object
-            Patcher& getPatcher() { return parent<Patcher>(); }
+            Patcher& getPatcher() { return ancestor<Patcher>(); }
+            
+            //! @brief Return the selection.
+            Selection& useSelection() { return m_selection; }
+            
+            //! @brief Returns true if selection has changed.
+            bool selectionChanged() const;
             
             //! @brief Unselect all objects and links
             void unSelectAll();

@@ -34,18 +34,20 @@ namespace kiwi
 {
     class jObject;
     class jLink;
+    class jInstance;
     
     //! @brief The juce Patcher Component.
     class jPatcher : public juce::Component, public ApplicationCommandTarget
     {
     public:
         
-        jPatcher(model::Patcher& patcher, model::Patcher::View& view);
+        jPatcher(jInstance& instance, model::Patcher& patcher, model::Patcher::View& view);
         ~jPatcher();
         
         // juce::Component
         void paint(juce::Graphics& g) override;
         void mouseDown(juce::MouseEvent const& event) override;
+        bool keyPressed(const KeyPress& key) override;
         
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
         void patcherChanged(model::Patcher& patcher, model::Patcher::View& view);
@@ -73,8 +75,16 @@ namespace kiwi
         //! @brief Load object and links.
         void loadPatcher();
         
+        //! @internal handle left click
         void leftClick(juce::MouseEvent const& event);
+        
+        //! @internal handle right click
         void rightClick(juce::MouseEvent const& event);
+        
+        void selectionChanged();
+        
+        //! @brief Check the patcher selection changes.
+        void checkSelectionChanges(model::Patcher& patcher);
         
         //! @internal Object model has just been added to the document.
         void addjObject(model::Object& object);
@@ -114,14 +124,30 @@ namespace kiwi
         
         //! @internal Returns the redo label if there is an action to redo or an empty string.
         std::string getRedoLabel();
+        
+        //! @brief Add all objects to the patcher selection.
+        void selectAllObjects();
+        
+        //! @brief Unselect all objects.
+        void unselectAll();
+        
+        //! @brief Move selected boxes by a given ammount of pixels.
+        void moveSelectedObjects(juce::Point<int> const& delta);
 
     private: // members
         
-        model::Patcher&                     m_patcher_model;
-        model::Patcher::View&               m_view_model;
+        jInstance&                                  m_instance;
+        model::Patcher&                             m_patcher_model;
+        model::Patcher::View&                       m_view_model;
         
-        std::set<std::unique_ptr<jObject>>  m_objects;
-        std::set<std::unique_ptr<jLink>>    m_links;
+        std::set<std::unique_ptr<jObject>>          m_objects;
+        std::set<std::unique_ptr<jLink>>            m_links;
+        
+        std::set<model::Object*>                    m_local_objects_selection;
+        std::set<model::Link*>                      m_local_links_selection;
+        
+        std::map<model::Object*, std::set<uint64_t>> m_distant_objects_selection;
+        std::map<model::Link*, std::set<uint64_t>>   m_distant_links_selection;
         
         static bool m_command_manager_binded;
     };

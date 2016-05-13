@@ -33,17 +33,30 @@ namespace kiwi
         //                                  PATCHER::declare                                //
         // ================================================================================ //
         
-        void Patcher::View::Selection::declare()
+        void Patcher::View::Object::declare()
         {
-            assert(! PatcherModel::has<Patcher::View::Selection>());
+            assert(! PatcherModel::has<Patcher::View::Object>());
             
             PatcherModel::declare<Patcher::View::Object>()
             .name("cicm&.kiwi.Patcher.View.Object")
             .template member<flip::ObjectRef<model::Object>, &View::Object::m_ref>("ref");
+        }
+        
+        void Patcher::View::Link::declare()
+        {
+            assert(! PatcherModel::has<Patcher::View::Link>());
             
             PatcherModel::declare<Patcher::View::Link>()
             .name("cicm.kiwi.Patcher.View.Link")
             .member<flip::ObjectRef<model::Link>, &View::Link::m_ref>("ref");
+        }
+        
+        void Patcher::View::Selection::declare()
+        {
+            assert(! PatcherModel::has<Patcher::View::Selection>());
+            
+            Patcher::View::Object::declare();
+            Patcher::View::Link::declare();
             
             PatcherModel::declare<Patcher::View::Selection>()
             .name("cicm.kiwi.Patcher.View.Selection")
@@ -245,6 +258,62 @@ namespace kiwi
         //                                   PATCHER VIEW                                   //
         // ================================================================================ //
         
+        Patcher::View& Patcher::View::Selection::useView()
+        {
+            return parent<Patcher::View>();
+        }
+        
+        std::vector<model::Object*> Patcher::View::Selection::getObjects()
+        {
+            std::vector<model::Object*> objects;
+            for(auto& object : m_objects)
+            {
+                objects.push_back(object.get());
+            }
+            
+            return objects;
+        }
+        
+        std::vector<model::Link*> Patcher::View::Selection::getLinks()
+        {
+            std::vector<model::Link*> links;
+            for(auto& link : m_links)
+            {
+                links.push_back(link.get());
+            }
+            
+            return links;
+        }
+        
+        bool Patcher::View::Selection::isSelected(model::Object const& object) const
+        {
+            for(auto& ref : m_objects)
+            {
+                auto* sel_object = ref.get();
+                
+                if(sel_object != nullptr && sel_object == &object) return true;
+            }
+            
+            return false;
+        }
+        
+        bool Patcher::View::Selection::isSelected(model::Link const& link)
+        {
+            for(auto& ref : m_links)
+            {
+                auto* sel_link = ref.get();
+                
+                if(sel_link != nullptr && sel_link == &link) return true;
+            }
+            
+            return false;
+        }
+        
+        bool Patcher::View::selectionChanged() const
+        {
+            return m_selection.changed();
+        }
+        
         void Patcher::View::unSelectAll()
         {
             m_selection.m_links.clear();
@@ -259,12 +328,18 @@ namespace kiwi
             
             for(auto& object : patcher.getObjects())
             {
-                m_selection.m_objects.emplace(object);
+                if(!object.removed())
+                {
+                    m_selection.m_objects.emplace(object);
+                }
             }
             
             for(auto& link : patcher.getLinks())
             {
-                m_selection.m_links.emplace(link);
+                if(!link.removed())
+                {
+                    m_selection.m_links.emplace(link);
+                }
             }
         }
         
