@@ -80,7 +80,7 @@ namespace kiwi
         size_t                  m_inlets = 0;
         size_t                  m_outlets = 0;
         const juce::Colour      m_io_color;
-        int                     m_selection_width = 4;
+        float                   m_selection_width = 3.;
         juce::Rectangle<int>    m_local_box_bounds;
         
         bool                    m_is_selected;

@@ -121,9 +121,7 @@ namespace kiwi
     {
         if(true /*isAnyBoxSelected()*/)
         {
-            auto& selection = m_view_model.useSelection();
-            
-            for(auto& object : selection.getObjects())
+            for(auto& object : m_view_model.getSelectedObjects())
             {
                 object->setPosition(object->getX() + delta.x, object->getY() + delta.y);
             }
@@ -276,7 +274,7 @@ namespace kiwi
                 {
                     const bool is_local_view = ( &m_view_model == &view );
                     
-                    const bool is_selected = view.useSelection().isSelected(object_m);
+                    const bool is_selected = view.isSelected(object_m);
                     
                     if(is_selected)
                     {
@@ -530,8 +528,23 @@ namespace kiwi
     
     void jPatcher::unselectAll()
     {
-        m_view_model.unSelectAll();
+        m_view_model.unselectAll();
         DocumentManager::commit(m_patcher_model, "Unselect all");
+    }
+    
+    void jPatcher::deleteSelection()
+    {
+        for(model::Link* link : m_view_model.getSelectedLinks())
+        {
+            m_patcher_model.removeLink(*link);
+        }
+        
+        for(model::Object* object : m_view_model.getSelectedObjects())
+        {
+            m_patcher_model.removeObject(*object);
+        }
+        
+        DocumentManager::commit(m_patcher_model, "Delete objects and links");
     }
     
     // ================================================================================ //
@@ -722,13 +735,8 @@ namespace kiwi
                 //unselectAllLinks();
                 break;
             }
-            case StandardApplicationCommandIDs::del:
-            {
-                Console::post("|- delete selection");
-                //deleteSelection();
-                break;
-            }
-            case StandardApplicationCommandIDs::selectAll: { selectAllObjects(); break; }
+            case StandardApplicationCommandIDs::del:        { deleteSelection(); break; }
+            case StandardApplicationCommandIDs::selectAll:  { selectAllObjects(); break; }
             case CommandIDs::toFront:
             {
                 break;

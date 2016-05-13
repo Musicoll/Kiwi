@@ -139,10 +139,10 @@ namespace kiwi
         private:
             
             //! @brief Unselect this object for all views of all users.
-            void unselectForAllUsers(model::Object const& object);
+            void unselectForAllUsers(model::Object& object);
             
             //! @brief Unselect this link for all views of all users.
-            void unselectForAllUsers(model::Link const& link);
+            void unselectForAllUsers(model::Link& link);
             
             bool canConnect(model::Object const& from, const uint32_t outlet,
                             model::Object const& to, const uint32_t inlet) const;
@@ -171,10 +171,59 @@ namespace kiwi
         {
         public:
             
+            //! @brief Constructor.
             View() = default;
-            ~View() = default;
             
-        public:
+            //! @brief Destructor.
+            ~View();
+            
+            //! @brief Return the parent Patcher object
+            Patcher& getPatcher() { return ancestor<Patcher>(); }
+            
+            // ================================================================================ //
+            //                                   SELECTION                                      //
+            // ================================================================================ //
+            
+            //! @brief Return the selected Objects.
+            std::vector<model::Object*> getSelectedObjects();
+            
+            //! @brief Return the selected Links.
+            std::vector<model::Link*> getSelectedLinks();
+            
+            //! @brief Return true if the given Object is selected in this view.
+            bool isSelected(model::Object const& object) const;
+            
+            //! @brief Return true if the given Link is selected in this view.
+            bool isSelected(model::Link const& link) const;
+            
+            //! @brief Returns true if selection has changed.
+            bool selectionChanged() const;
+            
+            //! @brief Select an Object.
+            void selectObject(model::Object& object);
+            
+            //! @brief Select a Link.
+            void selectLink(model::Link& object);
+            
+            //! @brief Unselect an Object.
+            void unselectObject(model::Object& object);
+            
+            //! @brief Unselect a Link.
+            void unselectLink(model::Link& object);
+            
+            //! @brief Unselect all objects and links
+            void unselect();
+            
+            //! @brief Unselect all objects and links
+            void unselectAll();
+            
+            //! @brief Select all objects and links
+            void selectAll();
+            
+            //! @brief flip declare method
+            static void declare();
+            
+        private:
             
             struct Object : public flip::Object
             {
@@ -199,7 +248,7 @@ namespace kiwi
                 Link() = default;
                 Link(model::Link& link) : m_ref(&link) {}
                 
-                model::Link* get() {return !removed() ? m_ref.value() : m_ref.before();}
+                model::Link* get() {return m_ref.value();}
                 
                 static void declare();
                 
@@ -207,65 +256,11 @@ namespace kiwi
                 
                 flip::ObjectRef<model::Link> m_ref;
             };
-            
-            // ================================================================================ //
-            //                                   SELECTION                                      //
-            // ================================================================================ //
-            
-            class Selection : public flip::Object
-            {
-            public:
-                
-                //! @brief Default constructor.
-                Selection() = default;
-                
-                //! @brief Destructor.
-                ~Selection()
-                {
-                    m_links.clear();
-                    m_objects.clear();
-                }
-                
-                //! @brief Return the Parent View
-                View& useView();
-                
-                std::vector<model::Object*> getObjects();
-                std::vector<model::Link*> getLinks();
-                bool isSelected(model::Object const& object) const;
-                bool isSelected(model::Link const& link);
-                
-                static void declare();
-                
-            private:
-                
-                flip::Collection<View::Object>  m_objects;
-                flip::Collection<View::Link>    m_links;
-                friend Patcher::View;
-            };
-            
-        public:
-            
-            //! @brief Return the parent Patcher object
-            Patcher& getPatcher() { return ancestor<Patcher>(); }
-            
-            //! @brief Return the selection.
-            Selection& useSelection() { return m_selection; }
-            
-            //! @brief Returns true if selection has changed.
-            bool selectionChanged() const;
-            
-            //! @brief Unselect all objects and links
-            void unSelectAll();
-            
-            //! @brief Select all objects and links
-            void selectAll();
-            
-            //! @brief flip declare method
-            static void declare();
-            
-        private:
 
-            Selection m_selection;
+        private: // members
+            
+            flip::Collection<View::Object>  m_selected_objects;
+            flip::Collection<View::Link>    m_selected_links;
         };
         
         // ================================================================================ //

@@ -31,7 +31,7 @@ namespace kiwi
     jObject::jObject(model::Object& object_m) :
     m_model(&object_m),
     m_io_color(0.3, 0.3, 0.3),
-    m_selection_width(2),
+    m_selection_width(4.f),
     m_is_selected(false)
     {
         m_inlets = m_model->getNumberOfInlets();
@@ -62,7 +62,7 @@ namespace kiwi
         const auto bounds = getLocalBounds();
         const auto box_bounds = m_local_box_bounds;
         
-        const juce::Colour selection_color = Colour::fromFloatRGBA(0., 0.5, 0.9, 0.8);
+        const juce::Colour selection_color = Colour::fromFloatRGBA(0., 0.5, 1., 0.8);
         
         /*
         for(auto user_id : m_distant_selection)
@@ -80,11 +80,16 @@ namespace kiwi
         if(selected || other_view_selected)
         {
             const juce::Colour color = selected ? selection_color : selection_color.withAlpha(0.3f);
-            g.setColour(color);
-            g.drawRect(bounds.reduced(m_selection_width*0.5), m_selection_width*0.5);
+        
+            g.setColour(selection_color.darker(0.4));
+            g.drawRect(bounds.reduced(m_selection_width*0.5 + 1), 1);
             
-            g.setColour(juce::Colours::black.darker(0.2));
-            g.drawRect(bounds, 1);
+            g.setColour(color);
+            g.drawRoundedRectangle(bounds.reduced(m_selection_width*0.5).toFloat(),
+                                   m_selection_width*0.5, m_selection_width*0.5);
+            
+            g.setColour(selection_color.darker(0.4));
+            g.drawRoundedRectangle(bounds.reduced(1).toFloat(), m_selection_width*0.5, 1);
         }
 
         g.setColour(juce::Colours::white);

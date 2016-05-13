@@ -51,28 +51,17 @@ namespace kiwi
             .member<flip::ObjectRef<model::Link>, &View::Link::m_ref>("ref");
         }
         
-        void Patcher::View::Selection::declare()
-        {
-            assert(! PatcherModel::has<Patcher::View::Selection>());
-            
-            Patcher::View::Object::declare();
-            Patcher::View::Link::declare();
-            
-            PatcherModel::declare<Patcher::View::Selection>()
-            .name("cicm.kiwi.Patcher.View.Selection")
-            .member<flip::Collection<View::Object>, &Selection::m_objects>("objects")
-            .member<flip::Collection<View::Link>, &Selection::m_links>("links");
-        }
-        
         void Patcher::View::declare()
         {
             assert(! PatcherModel::has<Patcher::View>());
             
-            Patcher::View::Selection::declare();
+            Patcher::View::Object::declare();
+            Patcher::View::Link::declare();
             
             PatcherModel::declare<Patcher::View>()
             .name("cicm.kiwi.Patcher.View")
-            .member<View::Selection, &View::m_selection>("selection");
+            .member<flip::Collection<View::Object>, &View::m_selected_objects>("selected_objects")
+            .member<flip::Collection<View::Link>, &View::m_selected_links>("selected_links");
         }
         
         void Patcher::declare()
@@ -161,10 +150,18 @@ namespace kiwi
                 // first remove links connected to this object
                 for(auto link_it = m_links.begin(); link_it != m_links.end();)
                 {
-                    if(link_it->getSenderObject().ref() == object.ref()
-                       || link_it->getReceiverObject().ref() == object.ref())
+                    if(!link_it.removed())
                     {
-                        link_it = m_links.erase(link_it);
+                        if(link_it->getSenderObject().ref() == object.ref()
+                           || link_it->getReceiverObject().ref() == object.ref())
+                        {
+                            unselectForAllUsers(*link_it);
+                            link_it = m_links.erase(link_it);
+                        }
+                        else
+                        {
+                            ++link_it;
+                        }
                     }
                     else
                     {
@@ -172,6 +169,7 @@ namespace kiwi
                     }
                 }
                 
+                unselectForAllUsers(*obj_it);
                 m_objects.erase(obj_it);
             }
         }
@@ -181,6 +179,7 @@ namespace kiwi
             const auto link_it = findLink(link);
             if(link_it != m_links.end())
             {
+                unselectForAllUsers(*link_it);
                 m_links.erase(link_it);
             }
         }
@@ -212,6 +211,28 @@ namespace kiwi
             }
             
             return *user;
+        }
+        
+        void Patcher::unselectForAllUsers(model::Object& object)
+        {
+            for(auto& user : m_users)
+            {
+                for(auto view : user.getViews())
+                {
+                    view.unselectObject(object);
+                }
+            }
+        }
+        
+        void Patcher::unselectForAllUsers(model::Link& link)
+        {
+            for(auto& user : m_users)
+            {
+                for(auto view : user.getViews())
+                {
+                    view.unselectLink(link);
+                }
+            }
         }
         
         flip::Array<model::Object>::const_iterator Patcher::findObject(model::Object const& object) const
@@ -258,15 +279,16 @@ namespace kiwi
         //                                   PATCHER VIEW                                   //
         // ================================================================================ //
         
-        Patcher::View& Patcher::View::Selection::useView()
+        Patcher::View::~View()
         {
-            return parent<Patcher::View>();
+            m_selected_links.clear();
+            m_selected_objects.clear();
         }
         
-        std::vector<model::Object*> Patcher::View::Selection::getObjects()
+        std::vector<model::Object*> Patcher::View::getSelectedObjects()
         {
             std::vector<model::Object*> objects;
-            for(auto& object : m_objects)
+            for(auto& object : m_selected_objects)
             {
                 objects.push_back(object.get());
             }
@@ -274,10 +296,10 @@ namespace kiwi
             return objects;
         }
         
-        std::vector<model::Link*> Patcher::View::Selection::getLinks()
+        std::vector<model::Link*> Patcher::View::getSelectedLinks()
         {
             std::vector<model::Link*> links;
-            for(auto& link : m_links)
+            for(auto& link : m_selected_links)
             {
                 links.push_back(link.get());
             }
@@ -285,25 +307,31 @@ namespace kiwi
             return links;
         }
         
-        bool Patcher::View::Selection::isSelected(model::Object const& object) const
+        bool Patcher::View::isSelected(model::Object const& object) const
         {
-            for(auto& ref : m_objects)
+            for(auto& ref : m_selected_objects)
             {
-                auto* sel_object = ref.get();
-                
-                if(sel_object != nullptr && sel_object == &object) return true;
+                if(!ref.removed())
+                {
+                    auto* sel_object = ref.get();
+                    
+                    if(sel_object != nullptr && sel_object == &object) return true;
+                }
             }
             
             return false;
         }
         
-        bool Patcher::View::Selection::isSelected(model::Link const& link)
+        bool Patcher::View::isSelected(model::Link const& link) const
         {
-            for(auto& ref : m_links)
+            for(auto& ref : m_selected_links)
             {
-                auto* sel_link = ref.get();
-                
-                if(sel_link != nullptr && sel_link == &link) return true;
+                if(!ref.removed())
+                {
+                    auto* sel_link = ref.get();
+                    
+                    if(sel_link != nullptr && sel_link == &link) return true;
+                }
             }
             
             return false;
@@ -311,18 +339,38 @@ namespace kiwi
         
         bool Patcher::View::selectionChanged() const
         {
-            return m_selection.changed();
+            return (m_selected_objects.changed() || m_selected_links.changed());
         }
         
-        void Patcher::View::unSelectAll()
+        void Patcher::View::selectObject(model::Object& object)
         {
-            m_selection.m_links.clear();
-            m_selection.m_objects.clear();
+            
+        }
+        
+        void Patcher::View::selectLink(model::Link& object)
+        {
+            
+        }
+        
+        void Patcher::View::unselectObject(model::Object& object)
+        {
+            ;
+        }
+        
+        void Patcher::View::unselectLink(model::Link& object)
+        {
+            
+        }
+        
+        void Patcher::View::unselectAll()
+        {
+            m_selected_links.clear();
+            m_selected_objects.clear();
         }
         
         void Patcher::View::selectAll()
         {
-            unSelectAll();
+            unselectAll();
             
             auto& patcher = getPatcher();
             
@@ -330,7 +378,7 @@ namespace kiwi
             {
                 if(!object.removed())
                 {
-                    m_selection.m_objects.emplace(object);
+                    m_selected_objects.emplace(object);
                 }
             }
             
@@ -338,7 +386,7 @@ namespace kiwi
             {
                 if(!link.removed())
                 {
-                    m_selection.m_links.emplace(link);
+                    m_selected_links.emplace(link);
                 }
             }
         }

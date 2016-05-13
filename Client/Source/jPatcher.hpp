@@ -131,6 +131,9 @@ namespace kiwi
         //! @brief Unselect all objects.
         void unselectAll();
         
+        //! @brief Unselect all objects.
+        void deleteSelection();
+        
         //! @brief Move selected boxes by a given ammount of pixels.
         void moveSelectedObjects(juce::Point<int> const& delta);
 
