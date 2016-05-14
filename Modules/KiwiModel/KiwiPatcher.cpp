@@ -355,22 +355,62 @@ namespace kiwi
         
         void Patcher::View::selectObject(model::Object& object)
         {
-            
+            if(!isSelected(object))
+            {
+                m_selected_objects.emplace(object);
+            }
         }
         
-        void Patcher::View::selectLink(model::Link& object)
+        void Patcher::View::selectLink(model::Link& link)
         {
-            
+            if(!isSelected(link))
+            {
+                m_selected_links.emplace(link);
+            }
         }
         
         void Patcher::View::unselectObject(model::Object& object)
         {
-            ;
+            const auto find_object = [&object] (View::Object& ref)
+            {
+                if(!ref.removed())
+                {
+                    auto* sel_object = ref.get();
+                    
+                    if(sel_object != nullptr && sel_object == &object) return true;
+                }
+                
+                return false;
+            };
+            
+            auto it = std::find_if(m_selected_objects.begin(), m_selected_objects.end(), find_object);
+            
+            if(it != m_selected_objects.end())
+            {
+                m_selected_objects.erase(it);
+            }
         }
         
-        void Patcher::View::unselectLink(model::Link& object)
+        void Patcher::View::unselectLink(model::Link& link)
         {
+            const auto find_link = [&link] (View::Link& ref)
+            {
+                if(!ref.removed())
+                {
+                    auto* sel_link = ref.get();
+                    
+                    if(sel_link != nullptr && sel_link == &link) return true;
+                }
+                
+                return false;
+            };
             
+            auto it = std::find_if(m_selected_links.begin(), m_selected_links.end(), find_link);
+            
+            if(it != m_selected_links.end())
+            {
+                m_selected_links.erase(it);
+            }
         }
         
         void Patcher::View::unselectAll()
