@@ -49,6 +49,12 @@ namespace kiwi
         // juce::Component
         void paint(juce::Graphics& g) override;
         
+        //! @brief internal kiwi jPatcher Hit-Testing.
+        bool hitTest(juce::Point<int> const& pt, HitTester& result) const;
+        
+        //! @brief internal kiwi jPatcher HitTesting (overlaps a rectangle).
+        bool hitTest(juce::Rectangle<int> const& rect);
+        
     private:
         
         void updateBounds();

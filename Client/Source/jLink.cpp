@@ -34,10 +34,10 @@ namespace kiwi
         auto& sender_object = m_model->getSenderObject();
         auto& receiver_object = m_model->getReceiverObject();
         
-        auto j_sender_object = m_jpatcher.getjObject(sender_object);
+        auto j_sender_object = m_jpatcher.getObject(sender_object);
         m_last_outlet_pos = j_sender_object->getOutletPatcherPosition(m_model->getSenderIndex());
         
-        auto j_receiver_object = m_jpatcher.getjObject(receiver_object);
+        auto j_receiver_object = m_jpatcher.getObject(receiver_object);
         m_last_inlet_pos = j_receiver_object->getInletPatcherPosition(m_model->getReceiverIndex());
         
         updateBounds();
@@ -64,7 +64,7 @@ namespace kiwi
             
             if(&object == &sender_object)
             {
-                auto jobject = m_jpatcher.getjObject(sender_object);
+                auto jobject = m_jpatcher.getObject(sender_object);
                 if(jobject)
                 {
                     m_last_outlet_pos = jobject->getOutletPatcherPosition(m_model->getSenderIndex());
@@ -73,7 +73,7 @@ namespace kiwi
             }
             else if(&object == &receiver_object)
             {
-                auto jobject = m_jpatcher.getjObject(receiver_object);
+                auto jobject = m_jpatcher.getObject(receiver_object);
                 if(jobject)
                 {
                     m_last_inlet_pos = jobject->getInletPatcherPosition(m_model->getReceiverIndex());
@@ -115,5 +115,15 @@ namespace kiwi
         g.fillEllipse(link_start.toFloat());
         g.fillEllipse(link_end.toFloat());
         */
+    }
+    
+    bool jLink::hitTest(juce::Point<int> const& pt, HitTester& hit) const
+    {
+        return false;
+    }
+    
+    bool jLink::hitTest(juce::Rectangle<int> const& rect)
+    {
+        return false;
     }
 }

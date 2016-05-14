@@ -44,22 +44,42 @@ namespace kiwi
         jPatcher(jInstance& instance, model::Patcher& patcher, model::Patcher::View& view);
         ~jPatcher();
         
-        // juce::Component
-        void paint(juce::Graphics& g) override;
-        void mouseDown(juce::MouseEvent const& event) override;
-        bool keyPressed(const KeyPress& key) override;
+        // ================================================================================ //
+        //                                    jPATCHER                                      //
+        // ================================================================================ //
+        
+        using jObjects = std::set<std::unique_ptr<jObject>>;
+        using jLinks = std::set<std::unique_ptr<jLink>>;
         
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
         void patcherChanged(model::Patcher& patcher, model::Patcher::View& view);
         
+        //! @brief Returns the jObjects.
+        jObjects const& getObjects() const;
+        
+        //! @brief Returns the jLinks.
+        jLinks const& getLinks() const;
+        
         //! @brief Returns the jObject corresponding to a given Object model.
-        jObject* getjObject(model::Object const& object) const;
+        jObject* getObject(model::Object const& object) const;
         
         //! @brief Returns the jLink corresponding to a given Link model.
-        jLink* getjLink(model::Link const& link) const;
+        jLink* getLink(model::Link const& link) const;
         
         //! @brief Set the lock status of the patcher view.
         void setLock(bool locked);
+        
+        //! @brief Get the lock status of the patcher view.
+        bool getLockStatus();
+        
+        // ================================================================================ //
+        //                                    COMPONENT                                     //
+        // ================================================================================ //
+        
+        void paint(juce::Graphics& g) override;
+        void mouseDown(juce::MouseEvent const& event) override;
+        void mouseMove(juce::MouseEvent const& event) override;
+        bool keyPressed(const KeyPress& key) override;
         
         // ================================================================================ //
         //                              APPLICATION COMMAND TARGET                          //
@@ -72,9 +92,6 @@ namespace kiwi
         
     private: // methods
         
-        using jObjects = std::set<std::unique_ptr<jObject>>;
-        using jLinks = std::set<std::unique_ptr<jLink>>;
-        
         jObjects::iterator findjObject(model::Object const& object) const;
         jLinks::iterator findjLink(model::Link const& link) const;
         
@@ -86,6 +103,10 @@ namespace kiwi
         
         //! @internal handle right click
         void rightClick(juce::MouseEvent const& event);
+        
+        // ================================================================================ //
+        //                                  MODEL OBSERVER                                  //
+        // ================================================================================ //
         
         //! @brief Notify jPatcher that selection has changed.
         void selectionChanged();
@@ -122,6 +143,10 @@ namespace kiwi
         
         //! @brief Bring all object components in front of link ones.
         void bringsObjectsToFront();
+        
+        // ================================================================================ //
+        //                                     UNDO/REDO                                    //
+        // ================================================================================ //
         
         //! @internal Try to undo last action.
         void undo();

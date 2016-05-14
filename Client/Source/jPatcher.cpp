@@ -26,6 +26,7 @@
 
 #include "jInstance.hpp"
 #include "jPatcher.hpp"
+#include "jPatcherHelper.hpp"
 #include "jObject.hpp"
 #include "jLink.hpp"
 #include "Application.hpp"
@@ -101,8 +102,51 @@ namespace kiwi
         {
             setLock(!m_is_locked);
         }
+        else if(isAnythingSelected())
+        {
+            unselectAll();
+        }
         
-        unselectAll();
+        HitTester hit(*this);
+        hit.test(event.getPosition());
+        
+        if(hit.targetObject())
+        {
+            Console::post("Hit object");
+            if(hit.getZone() == HitTester::Zone::Inside)
+            {
+                Console::post("Zone : inside");
+            }
+            else if(hit.getZone() == HitTester::Zone::Inlet)
+            {
+                Console::post("Zone : inlet");
+            }
+            else if(hit.getZone() == HitTester::Zone::Outlet)
+            {
+                Console::post("Zone : outlet");
+            }
+            else if(hit.getZone() == HitTester::Zone::Border)
+            {
+                Console::post("Zone : border");
+            }
+        }
+        else if(hit.targetLink())
+        {
+            Console::post("Hit link");
+        }
+        else if(hit.targetPatcher())
+        {
+            Console::post("Hit Patcher");
+        }
+        else
+        {
+            Console::post("Hit Nothing");
+        }
+    }
+    
+    void jPatcher::mouseMove(juce::MouseEvent const& event)
+    {
+        ;
     }
 
     void jPatcher::rightClick(juce::MouseEvent const& event)
@@ -155,7 +199,7 @@ namespace kiwi
     {
         if(key.isKeyCode(KeyPress::deleteKey) || key.isKeyCode(KeyPress::backspaceKey))
         {
-            //deleteSelection();
+            deleteSelection();
             return true;
         }
         else if(key.isKeyCode(KeyPress::returnKey))
@@ -210,8 +254,18 @@ namespace kiwi
     
     void jPatcher::setLock(bool locked)
     {
+        if(locked)
+        {
+            m_view_model.unselectAll();
+        }
+        
         m_view_model.setLock(locked);
         DocumentManager::commit(m_patcher_model, "Edit mode switch");
+    }
+    
+    bool jPatcher::getLockStatus()
+    {
+        return m_is_locked;
     }
     
     void jPatcher::patcherChanged(model::Patcher& patcher, model::Patcher::View& view)
@@ -250,7 +304,7 @@ namespace kiwi
                 {
                     if(object.changed())
                     {
-                        jLink* jlink = getjLink(link);
+                        jLink* jlink = getLink(link);
                         
                         if(jlink) { jlink->objectChanged(object); }
                     }
@@ -283,6 +337,11 @@ namespace kiwi
         if(was_locked != m_is_locked)
         {
             m_is_locked ? bringsObjectsToFront() : bringsLinksToFront();
+            
+            for(auto& object : m_objects)
+            {
+                object->lockStatusChanged(m_is_locked);
+            }
             
             repaint();
             KiwiApp::commandStatusChanged();
@@ -405,7 +464,7 @@ namespace kiwi
         
         if(it == m_objects.cend())
         {
-            auto result = m_objects.emplace(new jObject(object));
+            auto result = m_objects.emplace(new jObject(*this, object));
             if(result.second)
             {
                 jObject& jobj = *result.first->get();
@@ -494,13 +553,24 @@ namespace kiwi
         return std::find_if(m_links.begin(), m_links.end(), find_jlink);
     }
     
-    jObject* jPatcher::getjObject(model::Object const& object) const
+    jPatcher::jObjects const& jPatcher::getObjects() const
+    {
+        return m_objects;
+    }
+    
+    //! @brief Returns the jLinks.
+    jPatcher::jLinks const& jPatcher::getLinks() const
+    {
+        return m_links;
+    }
+    
+    jObject* jPatcher::getObject(model::Object const& object) const
     {
         const auto it = findjObject(object);
         return (it != m_objects.cend()) ? it->get() : nullptr;
     }
     
-    jLink* jPatcher::getjLink(model::Link const& link) const
+    jLink* jPatcher::getLink(model::Link const& link) const
     {
         const auto it = findjLink(link);
         return (it != m_links.cend()) ? it->get() : nullptr;
@@ -661,7 +731,7 @@ namespace kiwi
                 
                 result.setInfo(label, TRANS("Undo last action"), CommandCategories::general, 0);
                 result.addDefaultKeypress('z',  ModifierKeys::commandModifier);
-                result.setActive(hasUndo);
+                result.setActive(!m_is_locked && hasUndo);
                 break;
             }
             case StandardApplicationCommandIDs::redo:
@@ -672,7 +742,7 @@ namespace kiwi
                 
                 result.setInfo(label, TRANS("Redo action"), CommandCategories::general, 0);
                 result.addDefaultKeypress('z',  ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
-                result.setActive(canRedo());
+                result.setActive(!m_is_locked && hasRedo);
                 break;
             }
             case StandardApplicationCommandIDs::cut:
@@ -781,7 +851,7 @@ namespace kiwi
             {
                 Console::post("|- paste objects");
                 //const long gridsize = getPage()->getGridSize();
-                //pasteFromClipboard(Gui::Point(gridsize, gridsize));
+                //pasteFromClipboard(juce::Point<int>(gridsize, gridsize));
                 break;
             }
             case CommandIDs::pasteReplace:
@@ -795,7 +865,7 @@ namespace kiwi
                 Console::post("|- duplicate objects");
                 //copySelectionToClipboard();
                 //const long gridsize = getPage()->getGridSize();
-                //pasteFromClipboard(Gui::Point(gridsize, gridsize));
+                //pasteFromClipboard(juce::Point<int>(gridsize, gridsize));
                 //unselectAllLinks();
                 break;
             }

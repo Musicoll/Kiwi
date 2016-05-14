@@ -30,22 +30,29 @@
 
 namespace kiwi
 {
+    class HitTester;
+    class jPatcher;
+    
     //! @brief The juce object Component.
     class jObject : public juce::Component
     {
     public:
         
-        jObject(model::Object& object_m);
+        jObject(jPatcher& patcher_view, model::Object& object_m);
         ~jObject();
         
         void objectChanged(model::Patcher::View& view, model::Object& object);
         void localSelectionChanged(bool selected_for_view);
         void distantSelectionChanged(std::set<uint64_t> distant_user_id_selection);
+        void lockStatusChanged(bool locked);
         
         // juce::Component
         void paint(juce::Graphics& g) override;
         void mouseDown(juce::MouseEvent const& event) override;
         void mouseDrag(juce::MouseEvent const& event) override;
+        
+        //! @brief Returns The box bounds relative to the parent Component
+        juce::Rectangle<int> getBoxBounds() const;
         
         //! @brief Returns the inlet position relative to the parent jPatcher component for a given index.
         juce::Point<int> getInletPatcherPosition(const size_t index) const;
@@ -58,6 +65,12 @@ namespace kiwi
         
         //! @brief overloaded from Component to exclude border size.
         bool hitTest(int x, int y) override;
+        
+        //! @brief internal kiwi jPatcher HitTesting.
+        bool hitTest(juce::Point<int> const& pt, HitTester& result) const;
+        
+        //! @brief internal kiwi jPatcher HitTesting (overlaps a rectangle).
+        bool hitTest(juce::Rectangle<int> const& rect);
         
     private:
         
@@ -74,6 +87,7 @@ namespace kiwi
         
     private: // members
         
+        jPatcher&               m_patcher_view;
         model::Object*          m_model = nullptr;
         const unsigned int      m_io_width = 5;
         const unsigned int      m_io_height = 3;
@@ -83,7 +97,9 @@ namespace kiwi
         float                   m_selection_width = 3.;
         juce::Rectangle<int>    m_local_box_bounds;
         
-        bool                    m_is_selected;
+        bool                    m_is_locked = 0;
+        
+        bool                    m_is_selected = 0;
         std::set<uint64_t>      m_distant_selection;
     };
 }

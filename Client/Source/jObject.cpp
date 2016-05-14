@@ -23,12 +23,15 @@
 
 #include <KiwiEngine/KiwiDocumentManager.hpp>
 
-#include "Application.hpp"
 #include "jObject.hpp"
+#include "Application.hpp"
+#include "jPatcherHelper.hpp"
+#include "jPatcher.hpp"
 
 namespace kiwi
 {
-    jObject::jObject(model::Object& object_m) :
+    jObject::jObject(jPatcher& patcher_view, model::Object& object_m) :
+    m_patcher_view(patcher_view),
     m_model(&object_m),
     m_io_color(0.3, 0.3, 0.3),
     m_selection_width(4.f),
@@ -37,6 +40,7 @@ namespace kiwi
         m_inlets = m_model->getNumberOfInlets();
         m_outlets = m_model->getNumberOfOutlets();
         
+        lockStatusChanged(m_patcher_view.getLockStatus());
         updateBounds();
     }
     
@@ -120,9 +124,110 @@ namespace kiwi
         }
     }
     
+    juce::Rectangle<int> jObject::getBoxBounds() const
+    {
+        return m_local_box_bounds.withPosition(getPosition() + m_local_box_bounds.getPosition());
+    }
+    
     bool jObject::hitTest(int x, int y)
     {
+        bool allowclick;
+        bool allowclick_onchild;
+        getInterceptsMouseClicks(allowclick, allowclick_onchild);
+        
+        if (! allowclick)
+            return false;
+        
         return m_local_box_bounds.contains(x, y);
+    }
+    
+    bool jObject::hitTest(juce::Point<int> const& pt, HitTester& hit) const
+    {
+        const auto box_bounds = m_local_box_bounds;
+        
+        // test body and iolets
+        if(box_bounds.contains(pt))
+        {
+            if(!m_is_selected)
+            {
+                // test inlets
+                if(m_inlets > 0 && pt.getY() > m_io_height)
+                {
+                    for(size_t i = 0; i < m_inlets; ++i)
+                    {
+                        if(getInletLocalBounds(i, box_bounds).contains(pt))
+                        {
+                            hit.m_zone    = HitTester::Inlet;
+                            hit.m_index   = i;
+                            return true;
+                        }
+                    }
+                }
+                
+                // test outlets
+                if(m_outlets > 0 && pt.getY() > box_bounds.getHeight() - m_io_height)
+                {
+                    for(size_t i = 0; i < m_outlets; ++i)
+                    {
+                        if(getOutletLocalBounds(i, box_bounds).contains(pt))
+                        {
+                            hit.m_zone    = HitTester::Outlet;
+                            hit.m_index   = i;
+                            return true;
+                        }
+                    }
+                }
+            }
+            
+            // hit the body of the box
+            hit.m_zone    = HitTester::Inside;
+            hit.m_index   = 0;
+            return true;
+        }
+        else if(m_is_selected) // test borders
+        {
+            const auto resizer_bounds = box_bounds.expanded(m_selection_width, m_selection_width);
+            
+            if(pt.getY() >= resizer_bounds.getY())
+            {
+                hit.m_zone = HitTester::Border;
+                hit.m_border |= HitTester::Top;
+            }
+            
+            if(pt.getX() <= resizer_bounds.getRight())
+            {
+                hit.m_zone = HitTester::Border;
+                hit.m_border |= HitTester::Right;
+            }
+            
+            if(pt.getY() <= resizer_bounds.getBottom())
+            {
+                hit.m_zone = HitTester::Border;
+                hit.m_border |= HitTester::Bottom;
+            }
+            
+            if(pt.getX() >= resizer_bounds.getX())
+            {
+                hit.m_zone = HitTester::Border;
+                hit.m_border |= HitTester::Left;
+            }
+            
+            // remove Border::None flag if we hit a border.
+            if(hit.m_zone == HitTester::Border)
+            {
+                hit.m_border &= ~HitTester::None;
+                return true;
+            }
+        }
+        
+        hit.m_zone    = HitTester::Outside;
+        hit.m_index   = 0;
+        return false;
+    }
+    
+    bool jObject::hitTest(juce::Rectangle<int> const& rect)
+    {
+        return rect.intersects(getBoxBounds());
     }
     
     void jObject::objectChanged(model::Patcher::View& view, model::Object& object)
@@ -236,6 +341,15 @@ namespace kiwi
         }
         
         return rect;
+    }
+    
+    void jObject::lockStatusChanged(bool locked)
+    {
+        m_is_locked = locked;
+        
+        setInterceptsMouseClicks(locked, locked);
+        //setWantsKeyboardFocus(locked);
+        //setMouseClickGrabsKeyboardFocus(locked);
     }
     
     void jObject::mouseDown(juce::MouseEvent const& event)
