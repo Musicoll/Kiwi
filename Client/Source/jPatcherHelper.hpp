@@ -146,10 +146,10 @@ namespace kiwi
         //! If a link has hit, it can only be the four first zones.
         //! It nothing hit, it will be outside.
         //! @return The Zone of the Target that result of the hit-test.
-        long getZone() const noexcept;
+        int getZone() const noexcept;
 		
 		//! @brief Returns the type of border (if a border of an object box has hit).
-        long getBorder() const noexcept;
+        int getBorder() const noexcept;
 		
         //! @brief Returns the index of the Zone of the object box.
         //! @details Get the index of the Zone of the object box.

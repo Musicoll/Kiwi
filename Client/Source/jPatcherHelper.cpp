@@ -181,7 +181,7 @@ namespace kiwi
         return nullptr;
     }
     
-    long HitTester::getZone() const noexcept
+    int HitTester::getZone() const noexcept
     {
         if(m_target == Box)
         {
@@ -199,7 +199,7 @@ namespace kiwi
         return Outside;
     }
     
-    long HitTester::getBorder() const noexcept
+    int HitTester::getBorder() const noexcept
     {
         if(m_target == Box)
         {

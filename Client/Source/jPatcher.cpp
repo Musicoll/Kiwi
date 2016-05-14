@@ -146,7 +146,50 @@ namespace kiwi
     
     void jPatcher::mouseMove(juce::MouseEvent const& event)
     {
-        ;
+        MouseCursor::StandardCursorType mc = MouseCursor::NormalCursor;
+        
+        if(!m_is_locked)
+        {
+            HitTester hit(*this);
+            hit.test(event.getPosition());
+            
+            if(hit.targetObject())
+            {
+                if(hit.getZone() == HitTester::Zone::Border)
+                {   
+                    switch(hit.getBorder())
+                    {
+                        case (HitTester::Border::Top) :
+                        { mc = MouseCursor::TopEdgeResizeCursor; break; }
+                            
+                        case (HitTester::Border::Left):
+                        { mc = MouseCursor::LeftEdgeResizeCursor; break; }
+                            
+                        case (HitTester::Border::Right):
+                        { mc = MouseCursor::RightEdgeResizeCursor; break; }
+                            
+                        case (HitTester::Border::Bottom):
+                        { mc = MouseCursor::BottomEdgeResizeCursor; break; }
+                            
+                        case (HitTester::Border::Top | HitTester::Border::Left):
+                        { mc = MouseCursor::TopLeftCornerResizeCursor; break; }
+                            
+                        case (HitTester::Border::Top | HitTester::Border::Right):
+                        { mc = MouseCursor::TopRightCornerResizeCursor; break;}
+
+                        case (HitTester::Border::Bottom | HitTester::Border::Left):
+                        { mc = MouseCursor::BottomLeftCornerResizeCursor; break; }
+                            
+                        case (HitTester::Border::Bottom | HitTester::Border::Right):
+                        { mc = MouseCursor::BottomRightCornerResizeCursor; break; }
+                            
+                        default: break;
+                    }
+                }
+            }
+        }
+        
+        setMouseCursor(mc);
     }
 
     void jPatcher::rightClick(juce::MouseEvent const& event)

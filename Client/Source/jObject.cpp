@@ -191,34 +191,34 @@ namespace kiwi
         {
             const auto resizer_bounds = box_bounds.expanded(m_selection_width, m_selection_width);
             
-            if(pt.getY() >= resizer_bounds.getY())
+            if(pt.getY() >= resizer_bounds.getY() && pt.getY() <= box_bounds.getY())
             {
                 hit.m_zone = HitTester::Border;
-                hit.m_border |= HitTester::Top;
+                hit.m_border |= HitTester::Border::Top;
             }
             
-            if(pt.getX() <= resizer_bounds.getRight())
+            if(pt.getX() >= box_bounds.getRight() && pt.getX() <= resizer_bounds.getRight())
             {
                 hit.m_zone = HitTester::Border;
-                hit.m_border |= HitTester::Right;
+                hit.m_border |= HitTester::Border::Right;
             }
             
-            if(pt.getY() <= resizer_bounds.getBottom())
+            if(pt.getY() >= box_bounds.getBottom() && pt.getY() <= resizer_bounds.getBottom())
             {
                 hit.m_zone = HitTester::Border;
-                hit.m_border |= HitTester::Bottom;
+                hit.m_border |= HitTester::Border::Bottom;
             }
             
-            if(pt.getX() >= resizer_bounds.getX())
+            if(pt.getX() <= box_bounds.getX() && pt.getX() >= resizer_bounds.getX())
             {
                 hit.m_zone = HitTester::Border;
-                hit.m_border |= HitTester::Left;
+                hit.m_border |= HitTester::Border::Left;
             }
             
             // remove Border::None flag if we hit a border.
             if(hit.m_zone == HitTester::Border)
             {
-                hit.m_border &= ~HitTester::None;
+                hit.m_border &= ~HitTester::Border::None;
                 return true;
             }
         }
