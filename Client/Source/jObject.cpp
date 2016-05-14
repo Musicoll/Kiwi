@@ -104,7 +104,10 @@ namespace kiwi
         
         g.drawFittedText(m_model->getText(), box_bounds.reduced(5), juce::Justification::centredLeft, 1);
         
-        drawInletsOutlets(g);
+        if(!m_is_locked)
+        {
+            drawInletsOutlets(g);
+        }
     }
     
     void jObject::drawInletsOutlets(juce::Graphics & g)
