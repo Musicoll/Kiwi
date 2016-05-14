@@ -100,7 +100,11 @@ namespace kiwi
         g.fillRect(box_bounds);
         
         g.setColour(juce::Colours::black);
-        g.drawRect(box_bounds);
+        
+        if(!selected)
+        {
+            g.drawRect(box_bounds);
+        }
         
         g.drawFittedText(m_model->getText(), box_bounds.reduced(5), juce::Justification::centredLeft, 1);
         
@@ -231,6 +235,11 @@ namespace kiwi
     bool jObject::hitTest(juce::Rectangle<int> const& rect)
     {
         return rect.intersects(getBoxBounds());
+    }
+    
+    bool jObject::isSelected()
+    {
+        return m_is_selected;
     }
     
     void jObject::objectChanged(model::Patcher::View& view, model::Object& object)

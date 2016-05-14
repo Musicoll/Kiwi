@@ -84,21 +84,13 @@ namespace kiwi
         }
     }
     
-    void jPatcher::mouseDown(juce::MouseEvent const& event)
-    {
-        if(event.mods.isLeftButtonDown())
-        {
-            leftClick(event);
-        }
-        else if(event.mods.isRightButtonDown())
-        {
-            rightClick(event);
-        }
-    }
+    // ================================================================================ //
+    //                                   MOUSE DOWN                                     //
+    // ================================================================================ //
     
-    void jPatcher::leftClick(juce::MouseEvent const& event)
+    void jPatcher::mouseDown(juce::MouseEvent const& e)
     {
-        if(event.mods.isCommandDown())
+        if(e.mods.isCommandDown())
         {
             setLock(!m_is_locked);
         }
@@ -107,41 +99,67 @@ namespace kiwi
             unselectAll();
         }
         
-        HitTester hit(*this);
-        hit.test(event.getPosition());
+        m_box_received_downevent    = false;
+        m_copy_on_drag              = false;
+        m_box_dragstatus            = false;
+        m_link_dragstatus           = false;
+        m_mouse_wasclicked          = true;
         
-        if(hit.targetObject())
+        if(!m_is_locked)
         {
-            Console::post("Hit object");
-            if(hit.getZone() == HitTester::Zone::Inside)
+            HitTester hit(*this);
+            hit.test(e.getPosition());
+
+            if(hit.targetObject())
             {
-                Console::post("Zone : inside");
+                jObject* jbox = hit.getObject();
+                if(jbox)
+                {
+                    if(hit.getZone() == HitTester::Zone::Inside)
+                    {
+                        if(e.mods.isAltDown())
+                        {
+                            m_copy_on_drag = true;
+                            m_box_downstatus = selectOnMouseDown(*jbox, true);
+                        }
+                        else if (e.mods.isCommandDown())
+                        {
+                            jbox->mouseDown(e);
+                            m_box_received_downevent = true;
+                        }
+                        else
+                        {
+                            if(e.mods.isPopupMenu())
+                            {
+                                if (!jbox->isSelected())
+                                {
+                                    m_box_downstatus = selectOnMouseDown(*jbox, true);
+                                }
+                                
+                                //showObjectPopupMenu(*box);
+                            }
+                            else
+                            {
+                                m_box_downstatus = selectOnMouseDown(*jbox, !e.mods.isShiftDown());
+                            }
+                        }
+                    }
+                }
             }
-            else if(hit.getZone() == HitTester::Zone::Inlet)
+            else if(hit.targetPatcher())
             {
-                Console::post("Zone : inlet");
-            }
-            else if(hit.getZone() == HitTester::Zone::Outlet)
-            {
-                Console::post("Zone : outlet");
-            }
-            else if(hit.getZone() == HitTester::Zone::Border)
-            {
-                Console::post("Zone : border");
+                if(e.mods.isRightButtonDown())
+                {
+                    showPatcherPopupMenu(e.getPosition());
+                }
+                else
+                {
+                    //m_lasso->begin(e, e.mods.isShiftDown());
+                }
             }
         }
-        else if(hit.targetLink())
-        {
-            Console::post("Hit link");
-        }
-        else if(hit.targetPatcher())
-        {
-            Console::post("Hit Patcher");
-        }
-        else
-        {
-            Console::post("Hit Nothing");
-        }
+        
+        m_last_drag = e.getPosition();
     }
     
     void jPatcher::mouseMove(juce::MouseEvent const& event)
@@ -192,7 +210,7 @@ namespace kiwi
         setMouseCursor(mc);
     }
 
-    void jPatcher::rightClick(juce::MouseEvent const& event)
+    void jPatcher::showPatcherPopupMenu(juce::Point<int> const& position)
     {
         juce::PopupMenu m;
         m.addItem(1, "Add Plus");
@@ -203,8 +221,8 @@ namespace kiwi
         
         switch(r)
         {
-            case 1: { createObjectModel("plus", event.x, event.y); break; }
-            case 2: { createObjectModel("print", event.x, event.y); break; }
+            case 1: { createObjectModel("plus", position.getX(), position.getY()); break; }
+            case 2: { createObjectModel("print", position.getX(), position.getY()); break; }
             default: break;
         }
     }
@@ -221,7 +239,77 @@ namespace kiwi
             DocumentManager::commit(m_patcher_model, "Move selected objects");
         }
     }
-
+    
+    void jPatcher::addToSelectionBasedOnModifiers(jObject& object, bool select_only)
+    {
+        if(select_only)
+        {
+            selectObjectOnly(object);
+        }
+        else if(m_view_model.isSelected(object.getModel()))
+        {
+            unselectObject(object);
+        }
+        else
+        {
+            selectObject(object);
+        }
+    }
+    
+    void jPatcher::addToSelectionBasedOnModifiers(jLink& link, bool select_only)
+    {
+        if(select_only)
+        {
+            selectLinkOnly(link);
+        }
+        else if(m_view_model.isSelected(link.getModel()))
+        {
+            unselectLink(link);
+        }
+        else
+        {
+            selectLink(link);
+        }
+    }
+    
+    bool jPatcher::selectOnMouseDown(jObject& object, bool select_only)
+    {
+        if(m_view_model.isSelected(object.getModel())) return true;
+        
+        addToSelectionBasedOnModifiers(object, select_only);
+        return false;
+    }
+    
+    bool jPatcher::selectOnMouseDown(jLink& link, bool select_only)
+    {
+        if(m_view_model.isSelected(link.getModel()))
+        {
+            return true;
+        }
+        
+        addToSelectionBasedOnModifiers(link, select_only);
+        return false;
+    }
+    
+    void jPatcher::selectOnMouseUp(jObject& object, bool select_only,
+                                   const bool box_was_dragged, const bool result_of_mouse_down_select_method)
+    {
+        if(result_of_mouse_down_select_method && ! box_was_dragged)
+        {
+            addToSelectionBasedOnModifiers(object, select_only);
+        }
+    }
+    
+    
+    void jPatcher::selectOnMouseUp(jLink& link, bool select_only,
+                                   const bool box_was_dragged, const bool result_of_mouse_down_select_method)
+    {
+        if(result_of_mouse_down_select_method && ! box_was_dragged)
+        {
+            addToSelectionBasedOnModifiers(link, select_only);
+        }
+    }
+    
     void jPatcher::bringsLinksToFront()
     {
         for(auto& link_uptr : m_links)
@@ -690,6 +778,44 @@ namespace kiwi
     bool jPatcher::isAnyLinksSelected()
     {
         return !m_local_links_selection.empty();
+    }
+    
+    void jPatcher::selectObject(jObject& object)
+    {
+        m_view_model.selectObject(object.getModel());
+        DocumentManager::commit(m_patcher_model, "select object");
+    }
+    
+    void jPatcher::selectLink(jLink& link)
+    {
+        m_view_model.selectLink(link.getModel());
+        DocumentManager::commit(m_patcher_model, "select link");
+    }
+    
+    void jPatcher::unselectObject(jObject& object)
+    {
+        m_view_model.unselectObject(object.getModel());
+        DocumentManager::commit(m_patcher_model, "unselect object");
+    }
+    
+    void jPatcher::unselectLink(jLink& link)
+    {
+        m_view_model.unselectLink(link.getModel());
+        DocumentManager::commit(m_patcher_model, "unselect link");
+    }
+    
+    void jPatcher::selectObjectOnly(jObject& object)
+    {
+        unselectAll();
+        selectObject(object);
+        DocumentManager::commit(m_patcher_model, "Select object");
+    }
+
+    void jPatcher::selectLinkOnly(jLink& link)
+    {
+        unselectAll();
+        selectLink(link);
+        DocumentManager::commit(m_patcher_model, "Select link");
     }
     
     void jPatcher::selectAllObjects()

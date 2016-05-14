@@ -98,11 +98,8 @@ namespace kiwi
         //! @brief Load object and links.
         void loadPatcher();
         
-        //! @internal handle left click
-        void leftClick(juce::MouseEvent const& event);
-        
         //! @internal handle right click
-        void rightClick(juce::MouseEvent const& event);
+        void showPatcherPopupMenu(juce::Point<int> const& position);
         
         // ================================================================================ //
         //                                  MODEL OBSERVER                                  //
@@ -170,6 +167,22 @@ namespace kiwi
         //                                     SELECTION                                    //
         // ================================================================================ //
         
+        void addToSelectionBasedOnModifiers(jObject& object, bool select_only);
+        
+        void addToSelectionBasedOnModifiers(jLink& link, bool select_only);
+        
+        bool selectOnMouseDown(jObject& object, bool select_only);
+        
+        bool selectOnMouseDown(jLink& link, bool select_only);
+        
+        void selectOnMouseUp(jObject& box, bool select_only,
+                             const bool box_was_dragged,
+                             const bool result_of_mouse_down_select_method);
+        
+        void selectOnMouseUp(jLink& link, bool select_only,
+                             const bool box_was_dragged,
+                             const bool result_of_mouse_down_select_method);
+        
         //! @brief Returns true if any object or link is selected
         bool isAnythingSelected();
         
@@ -178,6 +191,24 @@ namespace kiwi
         
         //! @brief Returns true if there is at least one link selected
         bool isAnyLinksSelected();
+        
+        //! @brief Select an Object.
+        void selectObject(jObject& object);
+        
+        //! @brief Unselect all and select an object.
+        void selectObjectOnly(jObject& object);
+        
+        //! @brief Select a Link.
+        void selectLink(jLink& link);
+        
+        //! @brief Unselect all and select a link.
+        void selectLinkOnly(jLink& link);
+        
+        //! @brief Unselect an Object.
+        void unselectObject(jObject& object);
+        
+        //! @brief Unselect a Link.
+        void unselectLink(jLink& link);
         
         //! @brief Add all objects to the patcher selection.
         void selectAllObjects();
@@ -206,8 +237,20 @@ namespace kiwi
         std::map<model::Object*, std::set<uint64_t>> m_distant_objects_selection;
         std::map<model::Link*, std::set<uint64_t>>   m_distant_links_selection;
         
-        bool                                        m_is_locked;
+        bool m_is_locked;
         
+        // mouse interactions flags
+        juce::Point<int> m_last_drag;
+        bool m_box_received_downevent = false;
+        bool m_copy_on_drag = false;
+        bool m_box_dragstatus = false;
+        bool m_link_dragstatus = false;
+        bool m_mouse_wasclicked = false;
+        bool m_box_downstatus = false;
+        bool m_link_downstatus = false;
+        long m_last_border_downstatus;
+        
+        // here to initialise jPatcher commands only one time.
         static bool m_command_manager_binded;
     };
 }
