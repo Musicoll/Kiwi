@@ -58,6 +58,9 @@ namespace kiwi
         //! @brief Returns the jLink corresponding to a given Link model.
         jLink* getjLink(model::Link const& link) const;
         
+        //! @brief Set the lock status of the patcher view.
+        void setLock(bool locked);
+        
         // ================================================================================ //
         //                              APPLICATION COMMAND TARGET                          //
         // ================================================================================ //
@@ -69,8 +72,11 @@ namespace kiwi
         
     private: // methods
         
-        std::set<std::unique_ptr<jObject>>::iterator findjObject(model::Object const& object) const;
-        std::set<std::unique_ptr<jLink>>::iterator findjLink(model::Link const& link) const;
+        using jObjects = std::set<std::unique_ptr<jObject>>;
+        using jLinks = std::set<std::unique_ptr<jLink>>;
+        
+        jObjects::iterator findjObject(model::Object const& object) const;
+        jLinks::iterator findjLink(model::Link const& link) const;
         
         //! @brief Load object and links.
         void loadPatcher();
@@ -81,7 +87,11 @@ namespace kiwi
         //! @internal handle right click
         void rightClick(juce::MouseEvent const& event);
         
+        //! @brief Notify jPatcher that selection has changed.
         void selectionChanged();
+        
+        //! @brief Check patcher view information changes (lock_status...).
+        void checkViewInfos(model::Patcher::View& view);
         
         //! @brief Check the patcher selection changes.
         void checkSelectionChanges(model::Patcher& patcher);
@@ -107,6 +117,12 @@ namespace kiwi
         //! @brief Add a new Object to the model at a given position.
         void createObjectModel(std::string const& text, double pos_x, double pos_y);
         
+        //! @brief Bring all link components in front of object ones.
+        void bringsLinksToFront();
+        
+        //! @brief Bring all object components in front of link ones.
+        void bringsObjectsToFront();
+        
         //! @internal Try to undo last action.
         void undo();
         
@@ -124,6 +140,19 @@ namespace kiwi
         
         //! @internal Returns the redo label if there is an action to redo or an empty string.
         std::string getRedoLabel();
+        
+        // ================================================================================ //
+        //                                     SELECTION                                    //
+        // ================================================================================ //
+        
+        //! @brief Returns true if any object or link is selected
+        bool isAnythingSelected();
+        
+        //! @brief Returns true if there is at least one object selected
+        bool isAnyObjectSelected();
+        
+        //! @brief Returns true if there is at least one link selected
+        bool isAnyLinksSelected();
         
         //! @brief Add all objects to the patcher selection.
         void selectAllObjects();
@@ -143,14 +172,16 @@ namespace kiwi
         model::Patcher&                             m_patcher_model;
         model::Patcher::View&                       m_view_model;
         
-        std::set<std::unique_ptr<jObject>>          m_objects;
-        std::set<std::unique_ptr<jLink>>            m_links;
+        jObjects                                    m_objects;
+        jLinks                                      m_links;
         
         std::set<model::Object*>                    m_local_objects_selection;
         std::set<model::Link*>                      m_local_links_selection;
         
         std::map<model::Object*, std::set<uint64_t>> m_distant_objects_selection;
         std::map<model::Link*, std::set<uint64_t>>   m_distant_links_selection;
+        
+        bool                                        m_is_locked;
         
         static bool m_command_manager_binded;
     };

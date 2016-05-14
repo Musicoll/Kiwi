@@ -62,7 +62,7 @@ namespace kiwi
     
     void jPatcher::paint(juce::Graphics & g)
     {
-        const bool locked = false;
+        const bool locked = m_is_locked;
         const juce::Colour bgcolor = juce::Colours::lightgrey;
         const int grid_size = 20;
         const juce::Rectangle<int> bounds(g.getClipBounds());
@@ -70,7 +70,7 @@ namespace kiwi
         g.setColour(bgcolor);
         g.fillAll();
         
-        if (!locked)
+        if(!locked)
         {
             g.setColour(bgcolor.contrasting(0.5));
             for(int x = bounds.getX() - (bounds.getX() % grid_size); x < bounds.getRight(); x += grid_size)
@@ -97,6 +97,11 @@ namespace kiwi
     
     void jPatcher::leftClick(juce::MouseEvent const& event)
     {
+        if(event.mods.isCommandDown())
+        {
+            setLock(!m_is_locked);
+        }
+        
         unselectAll();
     }
 
@@ -130,6 +135,21 @@ namespace kiwi
         }
     }
 
+    void jPatcher::bringsLinksToFront()
+    {
+        for(auto& link_uptr : m_links)
+        {
+            link_uptr->toFront(false);
+        }
+    }
+    
+    void jPatcher::bringsObjectsToFront()
+    {
+        for(auto& object_uptr : m_objects)
+        {
+            object_uptr->toFront(false);
+        }
+    }
     
     bool jPatcher::keyPressed(const KeyPress& key)
     {
@@ -188,6 +208,12 @@ namespace kiwi
         }
     }
     
+    void jPatcher::setLock(bool locked)
+    {
+        m_view_model.setLock(locked);
+        DocumentManager::commit(m_patcher_model, "Edit mode switch");
+    }
+    
     void jPatcher::patcherChanged(model::Patcher& patcher, model::Patcher::View& view)
     {
         if(! patcher.changed()) return; // abort
@@ -232,6 +258,7 @@ namespace kiwi
             }
         }
         
+        checkViewInfos(view);
         checkSelectionChanges(patcher);
         
         // delete jLink for each removed links
@@ -247,6 +274,19 @@ namespace kiwi
         }
         
         if(view.removed()) {}
+    }
+    
+    void jPatcher::checkViewInfos(model::Patcher::View& view)
+    {
+        const bool was_locked = m_is_locked;
+        m_is_locked = view.getLock();
+        if(was_locked != m_is_locked)
+        {
+            m_is_locked ? bringsObjectsToFront() : bringsLinksToFront();
+            
+            repaint();
+            KiwiApp::commandStatusChanged();
+        }
     }
     
     void jPatcher::checkSelectionChanges(model::Patcher& patcher)
@@ -520,6 +560,25 @@ namespace kiwi
         return doc.canRedo() ? doc.getRedoLabel() : "";
     }
     
+    // ================================================================================ //
+    //                                     SELECTION                                    //
+    // ================================================================================ //
+    
+    bool jPatcher::isAnythingSelected()
+    {
+        return isAnyObjectSelected() || isAnyLinksSelected();
+    }
+    
+    bool jPatcher::isAnyObjectSelected()
+    {
+        return !m_local_objects_selection.empty();
+    }
+    
+    bool jPatcher::isAnyLinksSelected()
+    {
+        return !m_local_links_selection.empty();
+    }
+    
     void jPatcher::selectAllObjects()
     {
         m_view_model.selectAll();
@@ -619,19 +678,19 @@ namespace kiwi
             case StandardApplicationCommandIDs::cut:
                 result.setInfo(TRANS("Cut"), TRANS("Cut"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('x', ModifierKeys::commandModifier);
-                //result.setActive(isAnyBoxSelected());
+                result.setActive(isAnyObjectSelected());
                 break;
                 
             case StandardApplicationCommandIDs::copy:
                 result.setInfo(TRANS("Copy"), TRANS("Copy"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('c', ModifierKeys::commandModifier);
-                //result.setActive(isAnyBoxSelected());
+                result.setActive(isAnyObjectSelected());
                 break;
                 
             case StandardApplicationCommandIDs::paste:
                 result.setInfo(TRANS("Paste"), TRANS("Paste"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('v', ModifierKeys::commandModifier);
-                //result.setActive(!getLockStatus() && SystemClipboard::getTextFromClipboard().isNotEmpty());
+                //result.setActive(!m_is_locked && SystemClipboard::getTextFromClipboard().isNotEmpty());
                 break;
                 
             case CommandIDs::pasteReplace:
@@ -640,7 +699,7 @@ namespace kiwi
                                CommandCategories::editing, 0);
                 
                 result.addDefaultKeypress('v', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
-                //result.setActive(isAnyBoxSelected() && SystemClipboard::getTextFromClipboard().isNotEmpty());
+                //result.setActive(isAnyObjectSelected() && SystemClipboard::getTextFromClipboard().isNotEmpty());
                 break;
                 
             case CommandIDs::duplicate:
@@ -648,7 +707,7 @@ namespace kiwi
                                CommandCategories::editing, 0);
                 
                 result.addDefaultKeypress('d', ModifierKeys::commandModifier);
-                //result.setActive(isAnyBoxSelected());
+                result.setActive(isAnyObjectSelected());
                 break;
                 
             case StandardApplicationCommandIDs::del:
@@ -656,32 +715,37 @@ namespace kiwi
                                CommandCategories::editing, 0);
                 
                 result.addDefaultKeypress(KeyPress::backspaceKey, ModifierKeys::noModifiers);
-                //result.setActive(isAnythingSelected());
+                result.setActive(isAnythingSelected());
                 break;
                 
             case StandardApplicationCommandIDs::selectAll:
                 result.setInfo(TRANS("Select All"), TRANS("Select all boxes and links"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('a', ModifierKeys::commandModifier);
-                //result.setActive(!getLockStatus());
+                result.setActive(!m_is_locked);
                 break;
                 
             case CommandIDs::toFront:
                 result.setInfo(TRANS("Bring to Front"), TRANS("Bring selected boxes to front"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('f', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
-                //result.setActive(isAnyBoxSelected());
+                result.setActive(isAnyObjectSelected());
                 break;
                 
             case CommandIDs::toBack:
                 result.setInfo(TRANS("Send to Back"), TRANS("Send selected boxes to back"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('b', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
-                //result.setActive(isAnyBoxSelected());
+                result.setActive(isAnyObjectSelected());
                 break;
                 
             case CommandIDs::editModeSwitch:
-                result.setInfo (TRANS("Edit"), TRANS("Switch between edit and play mode"), CommandCategories::view, 0);
+            {
+                result.setInfo(TRANS("Edit"),
+                               TRANS("Switch between edition and play mode"),
+                               CommandCategories::view, 0);
+                
                 result.addDefaultKeypress ('e',  ModifierKeys::commandModifier);
-                //result.setTicked(!getLockStatus());
+                result.setTicked(!m_view_model.getLock());
                 break;
+            }
                 
             default:
                 result.setInfo (TRANS("[unknown command]"), TRANS("dada"), CommandCategories::view, 0);
@@ -737,19 +801,10 @@ namespace kiwi
             }
             case StandardApplicationCommandIDs::del:        { deleteSelection(); break; }
             case StandardApplicationCommandIDs::selectAll:  { selectAllObjects(); break; }
-            case CommandIDs::toFront:
-            {
-                break;
-            }
-            case CommandIDs::toBack:
-            {
-                break;
-            }
-            case CommandIDs::editModeSwitch:
-            {
-                //setLockStatus(!getLockStatus());
-                break;
-            }
+            case CommandIDs::toFront:                       { break; }
+            case CommandIDs::toBack:                        { break; }
+            case CommandIDs::editModeSwitch:                { setLock(!m_is_locked); break; }
+                
             default: return false;
         }
         

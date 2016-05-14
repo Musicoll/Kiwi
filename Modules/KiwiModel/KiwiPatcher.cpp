@@ -61,7 +61,8 @@ namespace kiwi
             PatcherModel::declare<Patcher::View>()
             .name("cicm.kiwi.Patcher.View")
             .member<flip::Collection<View::Object>, &View::m_selected_objects>("selected_objects")
-            .member<flip::Collection<View::Link>, &View::m_selected_links>("selected_links");
+            .member<flip::Collection<View::Link>, &View::m_selected_links>("selected_links")
+            .member<flip::Bool, &View::m_is_locked>("locked");
         }
         
         void Patcher::declare()
@@ -283,6 +284,16 @@ namespace kiwi
         {
             m_selected_links.clear();
             m_selected_objects.clear();
+        }
+        
+        void Patcher::View::setLock(bool locked)
+        {
+            m_is_locked = locked;
+        }
+        
+        bool Patcher::View::getLock()
+        {
+            return m_is_locked;
         }
         
         std::vector<model::Object*> Patcher::View::getSelectedObjects()

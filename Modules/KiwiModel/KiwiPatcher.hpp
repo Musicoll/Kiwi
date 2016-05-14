@@ -180,6 +180,12 @@ namespace kiwi
             //! @brief Return the parent Patcher object
             Patcher& getPatcher() { return ancestor<Patcher>(); }
             
+            //! @brief Set the lock status.
+            void setLock(bool locked);
+            
+            //! @brief Returns true if the view is locked.
+            bool getLock();
+            
             // ================================================================================ //
             //                                   SELECTION                                      //
             // ================================================================================ //
@@ -261,6 +267,8 @@ namespace kiwi
             
             flip::Collection<View::Object>  m_selected_objects;
             flip::Collection<View::Link>    m_selected_links;
+            
+            flip::Bool                      m_is_locked;
         };
         
         // ================================================================================ //
