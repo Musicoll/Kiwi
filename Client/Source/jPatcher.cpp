@@ -40,7 +40,8 @@ namespace kiwi
     m_instance(instance),
     m_patcher_model(patcher),
     m_view_model(view),
-    m_hittester(new HitTester(*this))
+    m_hittester(new HitTester(*this)),
+    m_object_border_down_status(HitTester::Border::None)
     {
         if(!m_command_manager_binded)
         {
@@ -189,7 +190,7 @@ namespace kiwi
                             object_j->mouseDrag(e);
                         }
                     }
-                    else if(m_last_border_downstatus != HitTester::Border::None)
+                    else if(m_object_border_down_status != HitTester::Border::None)
                     {
                         if(m_mouse_has_just_been_clicked)
                         {
@@ -197,52 +198,23 @@ namespace kiwi
                         }
 
                         //resizeSelectedBoxes(e.getOffsetFromDragStart(),
-                          //                  m_last_border_downstatus, e.mods.isShiftDown());
+                          //                  m_object_border_down_status, e.mods.isShiftDown());
                         
                         m_last_drag = e.getPosition();
                         
-                        switch (m_last_border_downstatus)
-                        {
-                            case (HitTester::Border::Top) :
-                            { mc = MouseCursor::TopEdgeResizeCursor; break; }
-                                
-                            case (HitTester::Border::Left):
-                            { mc = MouseCursor::LeftEdgeResizeCursor; break; }
-                                
-                            case (HitTester::Border::Right):
-                            { mc = MouseCursor::RightEdgeResizeCursor; break; }
-                                
-                            case (HitTester::Border::Bottom):
-                            { mc = MouseCursor::BottomEdgeResizeCursor; break; }
-                                
-                            case (HitTester::Border::Top | HitTester::Border::Left):
-                            { mc = MouseCursor::TopLeftCornerResizeCursor; break; }
-                                
-                            case (HitTester::Border::Top | HitTester::Border::Right):
-                            { mc = MouseCursor::TopRightCornerResizeCursor; break;}
-                                
-                            case (HitTester::Border::Bottom | HitTester::Border::Left):
-                            { mc = MouseCursor::BottomLeftCornerResizeCursor; break; }
-                                
-                            case (HitTester::Border::Bottom | HitTester::Border::Right):
-                            { mc = MouseCursor::BottomRightCornerResizeCursor; break; }
-                                
-                            default: break;
-                        }
+                        mc = getMouseCursorForBorder(m_object_border_down_status);
                     }
                     else if(isAnyObjectSelected())
                     {
                         if(m_mouse_has_just_been_clicked)
                         {
                             startMoveOrResizeObjects();
-                            //Console::post("startMoveOrResizeObjects");
                         }
                         
                         const juce::Point<int> pos = e.getPosition();
                         auto delta = pos - m_last_drag;
                         moveSelectedObjects(delta, true, true);
                         m_last_drag = pos;
-                        //Console::post("moveSelectedObjects");
                     }
                 }
             }
@@ -259,7 +231,7 @@ namespace kiwi
     
     void jPatcher::mouseUp(MouseEvent const& e)
     {
-        m_last_border_downstatus = HitTester::Border::None;
+        m_object_border_down_status = HitTester::Border::None;
         
         if(!isLocked())
         {
@@ -299,7 +271,6 @@ namespace kiwi
         if(m_is_in_move_or_resize_gesture)
         {
             endMoveOrResizeObjects();
-            //Console::post("endMoveOrResizeObjects");
         }
         
         m_mouse_has_just_been_clicked = false;
@@ -321,35 +292,8 @@ namespace kiwi
             if(hit.targetObject())
             {
                 if(hit.getZone() == HitTester::Zone::Border)
-                {   
-                    switch(hit.getBorder())
-                    {
-                        case (HitTester::Border::Top) :
-                        { mc = MouseCursor::TopEdgeResizeCursor; break; }
-                            
-                        case (HitTester::Border::Left):
-                        { mc = MouseCursor::LeftEdgeResizeCursor; break; }
-                            
-                        case (HitTester::Border::Right):
-                        { mc = MouseCursor::RightEdgeResizeCursor; break; }
-                            
-                        case (HitTester::Border::Bottom):
-                        { mc = MouseCursor::BottomEdgeResizeCursor; break; }
-                            
-                        case (HitTester::Border::Top | HitTester::Border::Left):
-                        { mc = MouseCursor::TopLeftCornerResizeCursor; break; }
-                            
-                        case (HitTester::Border::Top | HitTester::Border::Right):
-                        { mc = MouseCursor::TopRightCornerResizeCursor; break;}
-
-                        case (HitTester::Border::Bottom | HitTester::Border::Left):
-                        { mc = MouseCursor::BottomLeftCornerResizeCursor; break; }
-                            
-                        case (HitTester::Border::Bottom | HitTester::Border::Right):
-                        { mc = MouseCursor::BottomRightCornerResizeCursor; break; }
-                            
-                        default: break;
-                    }
+                {
+                    mc = getMouseCursorForBorder(hit.getBorder());
                 }
             }
         }
@@ -357,6 +301,42 @@ namespace kiwi
         setMouseCursor(mc);
     }
 
+    juce::MouseCursor::StandardCursorType jPatcher::getMouseCursorForBorder(int border_flag) const
+    {
+        MouseCursor::StandardCursorType mc = MouseCursor::NormalCursor;
+        
+        switch(border_flag)
+        {
+            case (HitTester::Border::Top) :
+            { mc = MouseCursor::TopEdgeResizeCursor; break; }
+                
+            case (HitTester::Border::Left):
+            { mc = MouseCursor::LeftEdgeResizeCursor; break; }
+                
+            case (HitTester::Border::Right):
+            { mc = MouseCursor::RightEdgeResizeCursor; break; }
+                
+            case (HitTester::Border::Bottom):
+            { mc = MouseCursor::BottomEdgeResizeCursor; break; }
+                
+            case (HitTester::Border::Top | HitTester::Border::Left):
+            { mc = MouseCursor::TopLeftCornerResizeCursor; break; }
+                
+            case (HitTester::Border::Top | HitTester::Border::Right):
+            { mc = MouseCursor::TopRightCornerResizeCursor; break;}
+                
+            case (HitTester::Border::Bottom | HitTester::Border::Left):
+            { mc = MouseCursor::BottomLeftCornerResizeCursor; break; }
+                
+            case (HitTester::Border::Bottom | HitTester::Border::Right):
+            { mc = MouseCursor::BottomRightCornerResizeCursor; break; }
+                
+            default: break;
+        }
+        
+        return mc;
+    }
+    
     void jPatcher::showPatcherPopupMenu(juce::Point<int> const& position)
     {
         juce::PopupMenu m;

@@ -144,6 +144,9 @@ namespace kiwi
         //! @brief Bring all object components in front of link ones.
         void bringsObjectsToFront();
         
+        //! Get the appropriate mouse cursor for a given border flag.
+        juce::MouseCursor::StandardCursorType getMouseCursorForBorder(int border_flag) const;
+        
         // ================================================================================ //
         //                                     UNDO/REDO                                    //
         // ================================================================================ //
@@ -263,7 +266,7 @@ namespace kiwi
         bool m_mouse_has_just_been_clicked = false;
         bool m_select_on_mouse_down_status = false;
         bool m_link_downstatus = false;
-        long m_last_border_downstatus;
+        long m_object_border_down_status;
         bool m_is_in_move_or_resize_gesture = false;
         
         // here to initialise jPatcher commands only one time.
