@@ -33,8 +33,8 @@ namespace kiwi
     m_patcher(patcher),
     m_object(nullptr),
     m_link(nullptr),
-    m_target(Nothing),
-    m_zone(Outside),
+    m_target(Target::Nothing),
+    m_zone(Zone::Outside),
     m_border(None),
     m_index(0)
     {
@@ -50,8 +50,8 @@ namespace kiwi
     {
         m_object    = nullptr;
         m_link      = nullptr;
-        m_target    = Nothing;
-        m_zone      = Outside;
+        m_target    = Target::Nothing;
+        m_zone      = Zone::Outside;
 		m_border    = None;
         m_index     = 0;
     }
@@ -68,8 +68,8 @@ namespace kiwi
             
             if(!hit_link)
             {
-                m_target = Patcher;
-                m_zone   = Inside;
+                m_target = Target::Patcher;
+                m_zone   = Zone::Inside;
             }
         }
     }
@@ -89,7 +89,7 @@ namespace kiwi
                     if(box_uptr->hitTest(relative_point, *this))
                     {
                         m_object = box_uptr.get();
-                        m_target = Box;
+                        m_target = Target::Box;
                         return true;
                     }
                 }
@@ -114,7 +114,7 @@ namespace kiwi
                     if(link_uptr->hitTest(relative_point, *this))
                     {
                         m_link = link_uptr.get();
-                        m_target = Link;
+                        m_target = Target::Link;
                         return true;
                     }
                 }
@@ -164,7 +164,7 @@ namespace kiwi
     
     jObject* HitTester::getObject() const noexcept
     {
-        if(m_target == Box)
+        if(m_target == Target::Box)
         {
             return m_object;
         }
@@ -174,34 +174,34 @@ namespace kiwi
     
     jLink* HitTester::getLink() const noexcept
     {
-        if(m_target == Link)
+        if(m_target == Target::Link)
         {
             return m_link;
         }
         return nullptr;
     }
     
-    int HitTester::getZone() const noexcept
+    HitTester::Zone HitTester::getZone() const noexcept
     {
-        if(m_target == Box)
+        if(m_target == Target::Box)
         {
             return m_zone;
         }
-        else if(m_target == Link)
+        else if(m_target == Target::Link)
         {
-            return std::max<long>(Outside, std::min<long>(m_zone, Outlet));
+            return std::max<Zone>(Zone::Outside, std::min<Zone>(m_zone, Zone::Outlet));
         }
-        else if(m_target == Patcher)
+        else if(m_target == Target::Patcher)
         {
-            return std::max<long>(Outside, std::min<long>(m_zone, Inside));
+            return std::max<Zone>(Zone::Outside, std::min<Zone>(m_zone, Zone::Inside));
         }
         
-        return Outside;
+        return Zone::Outside;
     }
     
     int HitTester::getBorder() const noexcept
     {
-        if(m_target == Box)
+        if(m_target == Target::Box)
         {
             return m_border;
         }
@@ -210,7 +210,7 @@ namespace kiwi
     
     size_t HitTester::getIndex() const noexcept
     {
-        if(m_target == Box)
+        if(m_target == Target::Box)
         {
             return m_index;
         }

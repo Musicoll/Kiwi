@@ -67,6 +67,7 @@ namespace kiwi
         const auto box_bounds = m_local_box_bounds;
         
         const juce::Colour selection_color = Colour::fromFloatRGBA(0., 0.5, 1., 0.8);
+        const juce::Colour other_view_selected_color = Colour::fromFloatRGBA(0.8, 0.3, 0.3, 0.3);
         
         /*
         for(auto user_id : m_distant_selection)
@@ -83,16 +84,16 @@ namespace kiwi
         
         if(selected || other_view_selected)
         {
-            const juce::Colour color = selected ? selection_color : selection_color.withAlpha(0.3f);
+            const juce::Colour color = selected ? selection_color : other_view_selected_color;
         
-            g.setColour(selection_color.darker(0.4));
+            g.setColour(color.darker(0.4));
             g.drawRect(bounds.reduced(m_selection_width*0.5 + 1), 1);
             
             g.setColour(color);
             g.drawRoundedRectangle(bounds.reduced(m_selection_width*0.5).toFloat(),
                                    m_selection_width*0.5, m_selection_width*0.5);
             
-            g.setColour(selection_color.darker(0.4));
+            g.setColour(color.darker(0.4));
             g.drawRoundedRectangle(bounds.reduced(1).toFloat(), m_selection_width*0.5, 1);
         }
 
@@ -164,7 +165,7 @@ namespace kiwi
                     {
                         if(getInletLocalBounds(i, box_bounds).contains(pt))
                         {
-                            hit.m_zone    = HitTester::Inlet;
+                            hit.m_zone    = HitTester::Zone::Inlet;
                             hit.m_index   = i;
                             return true;
                         }
@@ -178,7 +179,7 @@ namespace kiwi
                     {
                         if(getOutletLocalBounds(i, box_bounds).contains(pt))
                         {
-                            hit.m_zone    = HitTester::Outlet;
+                            hit.m_zone    = HitTester::Zone::Outlet;
                             hit.m_index   = i;
                             return true;
                         }
@@ -187,7 +188,7 @@ namespace kiwi
             }
             
             // hit the body of the box
-            hit.m_zone    = HitTester::Inside;
+            hit.m_zone    = HitTester::Zone::Inside;
             hit.m_index   = 0;
             return true;
         }
@@ -197,37 +198,37 @@ namespace kiwi
             
             if(pt.getY() >= resizer_bounds.getY() && pt.getY() <= box_bounds.getY())
             {
-                hit.m_zone = HitTester::Border;
+                hit.m_zone = HitTester::Zone::Border;
                 hit.m_border |= HitTester::Border::Top;
             }
             
             if(pt.getX() >= box_bounds.getRight() && pt.getX() <= resizer_bounds.getRight())
             {
-                hit.m_zone = HitTester::Border;
+                hit.m_zone = HitTester::Zone::Border;
                 hit.m_border |= HitTester::Border::Right;
             }
             
             if(pt.getY() >= box_bounds.getBottom() && pt.getY() <= resizer_bounds.getBottom())
             {
-                hit.m_zone = HitTester::Border;
+                hit.m_zone = HitTester::Zone::Border;
                 hit.m_border |= HitTester::Border::Bottom;
             }
             
             if(pt.getX() <= box_bounds.getX() && pt.getX() >= resizer_bounds.getX())
             {
-                hit.m_zone = HitTester::Border;
+                hit.m_zone = HitTester::Zone::Border;
                 hit.m_border |= HitTester::Border::Left;
             }
             
             // remove Border::None flag if we hit a border.
-            if(hit.m_zone == HitTester::Border)
+            if(hit.m_zone == HitTester::Zone::Border)
             {
                 hit.m_border &= ~HitTester::Border::None;
                 return true;
             }
         }
         
-        hit.m_zone    = HitTester::Outside;
+        hit.m_zone    = HitTester::Zone::Outside;
         hit.m_index   = 0;
         return false;
     }

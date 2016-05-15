@@ -261,7 +261,7 @@ namespace kiwi
         bool m_is_dragging = false;
         bool m_is_dragging_links = false;
         bool m_mouse_has_just_been_clicked = false;
-        bool m_box_downstatus = false;
+        bool m_select_on_mouse_down_status = false;
         bool m_link_downstatus = false;
         long m_last_border_downstatus;
         bool m_is_in_move_or_resize_gesture = false;
