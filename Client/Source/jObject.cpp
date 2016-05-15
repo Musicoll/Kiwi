@@ -40,7 +40,7 @@ namespace kiwi
         m_inlets = m_model->getNumberOfInlets();
         m_outlets = m_model->getNumberOfOutlets();
         
-        lockStatusChanged(m_patcher_view.getLockStatus());
+        lockStatusChanged(m_patcher_view.isLocked());
         updateBounds();
     }
     

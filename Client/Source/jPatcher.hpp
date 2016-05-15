@@ -35,6 +35,7 @@ namespace kiwi
     class jObject;
     class jLink;
     class jInstance;
+    class HitTester;
     
     //! @brief The juce Patcher Component.
     class jPatcher : public juce::Component, public ApplicationCommandTarget
@@ -70,7 +71,7 @@ namespace kiwi
         void setLock(bool locked);
         
         //! @brief Get the lock status of the patcher view.
-        bool getLockStatus();
+        bool isLocked();
         
         // ================================================================================ //
         //                                    COMPONENT                                     //
@@ -78,6 +79,7 @@ namespace kiwi
         
         void paint(juce::Graphics& g) override;
         void mouseDown(juce::MouseEvent const& event) override;
+        void mouseUp(MouseEvent const& e) override;
         void mouseMove(juce::MouseEvent const& event) override;
         bool keyPressed(const KeyPress& key) override;
         
@@ -236,6 +238,8 @@ namespace kiwi
         
         std::map<model::Object*, std::set<uint64_t>> m_distant_objects_selection;
         std::map<model::Link*, std::set<uint64_t>>   m_distant_links_selection;
+        
+        std::unique_ptr<HitTester> m_hittester;
         
         bool m_is_locked;
         

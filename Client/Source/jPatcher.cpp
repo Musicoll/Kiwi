@@ -39,7 +39,8 @@ namespace kiwi
     jPatcher::jPatcher(jInstance& instance, model::Patcher& patcher, model::Patcher::View& view) :
     m_instance(instance),
     m_patcher_model(patcher),
-    m_view_model(view)
+    m_view_model(view),
+    m_hittester(new HitTester(*this))
     {
         if(!m_command_manager_binded)
         {
@@ -60,6 +61,10 @@ namespace kiwi
         m_links.clear();
         m_objects.clear();
     }
+    
+    // ================================================================================ //
+    //                                       PAINT                                      //
+    // ================================================================================ //
     
     void jPatcher::paint(juce::Graphics & g)
     {
@@ -90,15 +95,6 @@ namespace kiwi
     
     void jPatcher::mouseDown(juce::MouseEvent const& e)
     {
-        if(e.mods.isCommandDown())
-        {
-            setLock(!m_is_locked);
-        }
-        else if(isAnythingSelected())
-        {
-            unselectAll();
-        }
-        
         m_box_received_downevent    = false;
         m_copy_on_drag              = false;
         m_box_dragstatus            = false;
@@ -107,7 +103,7 @@ namespace kiwi
         
         if(!m_is_locked)
         {
-            HitTester hit(*this);
+            HitTester& hit = *m_hittester.get();
             hit.test(e.getPosition());
 
             if(hit.targetObject())
@@ -152,6 +148,10 @@ namespace kiwi
                 {
                     showPatcherPopupMenu(e.getPosition());
                 }
+                else if(!e.mods.isShiftDown())
+                {
+                    unselectAll();
+                }
                 else
                 {
                     //m_lasso->begin(e, e.mods.isShiftDown());
@@ -161,6 +161,56 @@ namespace kiwi
         
         m_last_drag = e.getPosition();
     }
+    
+    // ================================================================================ //
+    //                                      MOUSE UP                                    //
+    // ================================================================================ //
+    
+    void jPatcher::mouseUp(MouseEvent const& e)
+    {
+        m_last_border_downstatus = HitTester::Border::None;
+        
+        if(!isLocked())
+        {
+            HitTester& hit = *m_hittester.get();
+            
+            if(hit.targetObject() && hit.getZone() == HitTester::Zone::Inside && e.mods.isCommandDown())
+            {
+                jObject* object_j = hit.getObject();
+                if(object_j)
+                {
+                    object_j->mouseUp(e);
+                    return;
+                }
+            }
+            
+            hit.test(e.getPosition());
+            
+            if(hit.targetObject())
+            {
+                jObject* object_j = hit.getObject();
+                if(object_j)
+                {
+                    selectOnMouseUp(*object_j, !e.mods.isShiftDown(), m_box_dragstatus, m_box_downstatus);
+                }
+            }
+            else if(e.mods.isCommandDown())
+            {
+                setLock(true);
+            }
+            
+        }
+        else if(e.mods.isCommandDown())
+        {
+            setLock(false);
+        }
+        
+        m_mouse_wasclicked = false;
+    }
+    
+    // ================================================================================ //
+    //                                     MOUSE MOVE                                   //
+    // ================================================================================ //
     
     void jPatcher::mouseMove(juce::MouseEvent const& event)
     {
@@ -229,7 +279,7 @@ namespace kiwi
     
     void jPatcher::moveSelectedObjects(juce::Point<int> const& delta)
     {
-        if(true /*isAnyBoxSelected()*/)
+        if(isAnyObjectSelected())
         {
             for(auto& object : m_view_model.getSelectedObjects())
             {
@@ -394,7 +444,7 @@ namespace kiwi
         DocumentManager::commit(m_patcher_model, "Edit mode switch");
     }
     
-    bool jPatcher::getLockStatus()
+    bool jPatcher::isLocked()
     {
         return m_is_locked;
     }
@@ -826,8 +876,11 @@ namespace kiwi
     
     void jPatcher::unselectAll()
     {
-        m_view_model.unselectAll();
-        DocumentManager::commit(m_patcher_model, "Unselect all");
+        if(isAnythingSelected())
+        {
+            m_view_model.unselectAll();
+            DocumentManager::commit(m_patcher_model, "Unselect all");
+        }
     }
     
     void jPatcher::deleteSelection()
