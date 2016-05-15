@@ -48,7 +48,7 @@ namespace kiwi
     public:
 
         //! @brief Type of message
-        enum MessageType
+        enum class MessageType
         {
             Empty = 0,
             Post,
