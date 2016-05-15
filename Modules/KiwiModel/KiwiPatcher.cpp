@@ -38,7 +38,7 @@ namespace kiwi
             assert(! PatcherModel::has<Patcher::View::Object>());
             
             PatcherModel::declare<Patcher::View::Object>()
-            .name("cicm&.kiwi.Patcher.View.Object")
+            .name("cicm.kiwi.Patcher.View.Object")
             .template member<flip::ObjectRef<model::Object>, &View::Object::m_ref>("ref");
         }
         
@@ -180,8 +180,11 @@ namespace kiwi
             const auto link_it = findLink(link);
             if(link_it != m_links.end())
             {
-                unselectForAllUsers(*link_it);
-                m_links.erase(link_it);
+                if(!link_it.removed())
+                {
+                    unselectForAllUsers(*link_it);
+                    m_links.erase(link_it);
+                }
             }
         }
         
@@ -216,9 +219,9 @@ namespace kiwi
         
         void Patcher::unselectForAllUsers(model::Object& object)
         {
-            for(auto& user : m_users)
+            for(Patcher::User& user : m_users)
             {
-                for(auto view : user.getViews())
+                for(Patcher::View& view : user.getViews())
                 {
                     view.unselectObject(object);
                 }
@@ -227,9 +230,9 @@ namespace kiwi
         
         void Patcher::unselectForAllUsers(model::Link& link)
         {
-            for(auto& user : m_users)
+            for(Patcher::User& user : m_users)
             {
-                for(auto view : user.getViews())
+                for(Patcher::View& view : user.getViews())
                 {
                     view.unselectLink(link);
                 }
