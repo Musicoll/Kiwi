@@ -79,6 +79,7 @@ namespace kiwi
         
         void paint(juce::Graphics& g) override;
         void mouseDown(juce::MouseEvent const& event) override;
+        void mouseDrag(MouseEvent const& e) override;
         void mouseUp(MouseEvent const& e) override;
         void mouseMove(juce::MouseEvent const& event) override;
         bool keyPressed(const KeyPress& key) override;
@@ -221,8 +222,18 @@ namespace kiwi
         //! @brief Unselect all objects.
         void deleteSelection();
         
-        //! @brief Move selected boxes by a given ammount of pixels.
-        void moveSelectedObjects(juce::Point<int> const& delta);
+        //! @brief Begins a move or resize gesture.
+        void startMoveOrResizeObjects();
+        
+        //! @brief Ends a move or resize gesture.
+        void endMoveOrResizeObjects();
+        
+        //! @brief Move selected objects by a given amount of pixels.
+        //! @param delta The given amount of pixel.
+        //! @param commit Pass false if you don't want to commit.
+        //! @param gesture Pass true to commit a gesture (commit must be true).
+        void moveSelectedObjects(juce::Point<int> const& delta,
+                                 bool commit = true, bool gesture = false);
 
     private: // members
         
@@ -245,14 +256,15 @@ namespace kiwi
         
         // mouse interactions flags
         juce::Point<int> m_last_drag;
-        bool m_box_received_downevent = false;
+        bool m_object_received_down_event = false;
         bool m_copy_on_drag = false;
-        bool m_box_dragstatus = false;
-        bool m_link_dragstatus = false;
-        bool m_mouse_wasclicked = false;
+        bool m_is_dragging = false;
+        bool m_is_dragging_links = false;
+        bool m_mouse_has_just_been_clicked = false;
         bool m_box_downstatus = false;
         bool m_link_downstatus = false;
         long m_last_border_downstatus;
+        bool m_is_in_move_or_resize_gesture = false;
         
         // here to initialise jPatcher commands only one time.
         static bool m_command_manager_binded;

@@ -95,13 +95,14 @@ namespace kiwi
     
     void jPatcher::mouseDown(juce::MouseEvent const& e)
     {
-        m_box_received_downevent    = false;
-        m_copy_on_drag              = false;
-        m_box_dragstatus            = false;
-        m_link_dragstatus           = false;
-        m_mouse_wasclicked          = true;
+        m_mouse_has_just_been_clicked = true;
         
-        if(!m_is_locked)
+        m_object_received_down_event    = false;
+        m_copy_on_drag                  = false;
+        m_is_dragging           = false;
+        m_is_dragging_links             = false;
+        
+        if(!isLocked())
         {
             HitTester& hit = *m_hittester.get();
             hit.test(e.getPosition());
@@ -121,7 +122,7 @@ namespace kiwi
                         else if (e.mods.isCommandDown())
                         {
                             jbox->mouseDown(e);
-                            m_box_received_downevent = true;
+                            m_object_received_down_event = true;
                         }
                         else
                         {
@@ -163,6 +164,92 @@ namespace kiwi
     }
     
     // ================================================================================ //
+    //                                     MOUSE DOWN                                   //
+    // ================================================================================ //
+    
+    void jPatcher::mouseDrag(MouseEvent const& e)
+    {
+        MouseCursor::StandardCursorType mc = MouseCursor::NormalCursor;
+        
+        if(!isLocked())
+        {
+            HitTester& hit = *m_hittester.get();
+            
+            if(hit.targetObject())
+            {
+                jObject* object_j = hit.getObject();
+                if(object_j)
+                {
+                    if(m_object_received_down_event && hit.getZone() == HitTester::Zone::Inside)
+                    {
+                        if(m_object_received_down_event)
+                        {
+                            object_j->mouseDrag(e);
+                        }
+                    }
+                    else if(m_last_border_downstatus != HitTester::Border::None)
+                    {
+                        if(m_mouse_has_just_been_clicked)
+                        {
+                            //startMoveOrResizeObjects();
+                        }
+
+                        //resizeSelectedBoxes(e.getOffsetFromDragStart(),
+                          //                  m_last_border_downstatus, e.mods.isShiftDown());
+                        
+                        m_last_drag = e.getPosition();
+                        
+                        switch (m_last_border_downstatus)
+                        {
+                            case (HitTester::Border::Top) :
+                            { mc = MouseCursor::TopEdgeResizeCursor; break; }
+                                
+                            case (HitTester::Border::Left):
+                            { mc = MouseCursor::LeftEdgeResizeCursor; break; }
+                                
+                            case (HitTester::Border::Right):
+                            { mc = MouseCursor::RightEdgeResizeCursor; break; }
+                                
+                            case (HitTester::Border::Bottom):
+                            { mc = MouseCursor::BottomEdgeResizeCursor; break; }
+                                
+                            case (HitTester::Border::Top | HitTester::Border::Left):
+                            { mc = MouseCursor::TopLeftCornerResizeCursor; break; }
+                                
+                            case (HitTester::Border::Top | HitTester::Border::Right):
+                            { mc = MouseCursor::TopRightCornerResizeCursor; break;}
+                                
+                            case (HitTester::Border::Bottom | HitTester::Border::Left):
+                            { mc = MouseCursor::BottomLeftCornerResizeCursor; break; }
+                                
+                            case (HitTester::Border::Bottom | HitTester::Border::Right):
+                            { mc = MouseCursor::BottomRightCornerResizeCursor; break; }
+                                
+                            default: break;
+                        }
+                    }
+                    else if(isAnyObjectSelected())
+                    {
+                        if(m_mouse_has_just_been_clicked)
+                        {
+                            startMoveOrResizeObjects();
+                        }
+                        
+                        const juce::Point<int> pos = e.getPosition();
+                        auto delta = pos - m_last_drag;
+                        moveSelectedObjects(delta, true, true);
+                        m_last_drag = pos;
+                    }
+                }
+            }
+        }
+        
+        setMouseCursor(mc);
+        m_mouse_has_just_been_clicked = false;
+        m_is_dragging = true;
+    }
+    
+    // ================================================================================ //
     //                                      MOUSE UP                                    //
     // ================================================================================ //
     
@@ -191,7 +278,7 @@ namespace kiwi
                 jObject* object_j = hit.getObject();
                 if(object_j)
                 {
-                    selectOnMouseUp(*object_j, !e.mods.isShiftDown(), m_box_dragstatus, m_box_downstatus);
+                    selectOnMouseUp(*object_j, !e.mods.isShiftDown(), m_is_dragging, m_box_downstatus);
                 }
             }
             else if(e.mods.isCommandDown())
@@ -205,7 +292,12 @@ namespace kiwi
             setLock(false);
         }
         
-        m_mouse_wasclicked = false;
+        if(m_is_in_move_or_resize_gesture)
+        {
+            endMoveOrResizeObjects();
+        }
+        
+        m_mouse_has_just_been_clicked = false;
     }
     
     // ================================================================================ //
@@ -277,7 +369,19 @@ namespace kiwi
         }
     }
     
-    void jPatcher::moveSelectedObjects(juce::Point<int> const& delta)
+    void jPatcher::startMoveOrResizeObjects()
+    {
+        m_is_in_move_or_resize_gesture = true;
+        DocumentManager::startCommitGesture(m_patcher_model);
+    }
+
+    void jPatcher::endMoveOrResizeObjects()
+    {
+        DocumentManager::endCommitGesture(m_patcher_model);
+        m_is_in_move_or_resize_gesture = false;
+    }
+    
+    void jPatcher::moveSelectedObjects(juce::Point<int> const& delta, bool commit, bool commit_gesture)
     {
         if(isAnyObjectSelected())
         {
@@ -286,7 +390,17 @@ namespace kiwi
                 object->setPosition(object->getX() + delta.x, object->getY() + delta.y);
             }
             
-            DocumentManager::commit(m_patcher_model, "Move selected objects");
+            if(commit)
+            {
+                if(commit_gesture)
+                {
+                    DocumentManager::commitGesture(m_patcher_model, "Move selected objects");
+                }
+                else
+                {
+                    DocumentManager::commit(m_patcher_model, "Move selected objects");
+                }
+            }
         }
     }
     
