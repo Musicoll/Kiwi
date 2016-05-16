@@ -36,9 +36,13 @@ namespace kiwi
     class jLink;
     class jInstance;
     class HitTester;
+    class jPatcherViewport;
     
     //! @brief The juce Patcher Component.
-    class jPatcher : public juce::Component, public ApplicationCommandTarget
+    class jPatcher :
+    public juce::Component,
+    public ComponentListener,
+    public ApplicationCommandTarget
     {
     public:
         
@@ -93,16 +97,15 @@ namespace kiwi
         void getCommandInfo(CommandID commandID, ApplicationCommandInfo& result) override;
         bool perform(const InvocationInfo& info) override;
         
+        //! @brief Called when the component's position or size changes.
+        //! @param component    the component that was moved or resized
+        //! @param wasMoved     true if the component's top-left corner has just moved
+        //! @param wasResized   true if the component's width or height has just changed
+        void componentMovedOrResized(Component& component, bool was_moved, bool was_resized) override;
+        
+        jPatcherViewport& getViewport() { return *m_viewport.get(); }
+        
     private: // methods
-        
-        jObjects::iterator findjObject(model::Object const& object) const;
-        jLinks::iterator findjLink(model::Link const& link) const;
-        
-        //! @brief Load object and links.
-        void loadPatcher();
-        
-        //! @internal handle right click
-        void showPatcherPopupMenu(juce::Point<int> const& position);
         
         // ================================================================================ //
         //                                  MODEL OBSERVER                                  //
@@ -137,15 +140,6 @@ namespace kiwi
         
         //! @brief Add a new Object to the model at a given position.
         void createObjectModel(std::string const& text, double pos_x, double pos_y);
-        
-        //! @brief Bring all link components in front of object ones.
-        void bringsLinksToFront();
-        
-        //! @brief Bring all object components in front of link ones.
-        void bringsObjectsToFront();
-        
-        //! Get the appropriate mouse cursor for a given border flag.
-        juce::MouseCursor::StandardCursorType getMouseCursorForBorder(int border_flag) const;
         
         // ================================================================================ //
         //                                     UNDO/REDO                                    //
@@ -231,12 +225,47 @@ namespace kiwi
         //! @brief Ends a move or resize gesture.
         void endMoveOrResizeObjects();
         
+        //! @brief Resize selected objects by a given amount of pixels.
+        //! @param delta        The given amount of pixel.
+        //! @param border_flag  The border flag (see HitTester::Border enum)
+        //! @param preserve_ratio Should preserve box ratio
+        void resizeSelectedObjects(juce::Point<int> const& delta,
+                                   const long border_flag, const bool preserve_ratio);
+        
         //! @brief Move selected objects by a given amount of pixels.
         //! @param delta The given amount of pixel.
         //! @param commit Pass false if you don't want to commit.
         //! @param gesture Pass true to commit a gesture (commit must be true).
         void moveSelectedObjects(juce::Point<int> const& delta,
                                  bool commit = true, bool gesture = false);
+        
+        // ================================================================================ //
+        //                                      MISC                                        //
+        // ================================================================================ //
+        
+        jObjects::iterator findjObject(model::Object const& object) const;
+        jLinks::iterator findjLink(model::Link const& link) const;
+        
+        //! @internal Re-compute objects area.
+        void updateObjectsArea();
+        
+        //! @internal Update patcher size.
+        void updatePatcherSize();
+        
+        //! @internal Load object and links.
+        void loadPatcher();
+        
+        //! @internal handle right click
+        void showPatcherPopupMenu(juce::Point<int> const& position);
+        
+        //! @brief Bring all link components in front of object ones.
+        void bringsLinksToFront();
+        
+        //! @brief Bring all object components in front of link ones.
+        void bringsObjectsToFront();
+        
+        //! Get the appropriate mouse cursor for a given border flag.
+        juce::MouseCursor::StandardCursorType getMouseCursorForBorder(int border_flag) const;
 
     private: // members
         
@@ -253,7 +282,10 @@ namespace kiwi
         std::map<model::Object*, std::set<uint64_t>> m_distant_objects_selection;
         std::map<model::Link*, std::set<uint64_t>>   m_distant_links_selection;
         
-        std::unique_ptr<HitTester> m_hittester;
+        std::unique_ptr<jPatcherViewport>   m_viewport;
+        std::unique_ptr<HitTester>          m_hittester;
+        
+        juce::Rectangle<int>                m_whole_objects_bounds;
         
         bool m_is_locked;
         
@@ -266,8 +298,8 @@ namespace kiwi
         bool m_mouse_has_just_been_clicked = false;
         bool m_select_on_mouse_down_status = false;
         bool m_link_downstatus = false;
-        long m_object_border_down_status;
         bool m_is_in_move_or_resize_gesture = false;
+        long m_object_border_down_status;
         
         // here to initialise jPatcher commands only one time.
         static bool m_command_manager_binded;

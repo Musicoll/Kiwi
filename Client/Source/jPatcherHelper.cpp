@@ -216,4 +216,10 @@ namespace kiwi
         }
         return 0;
     }
+    
+    jPatcherViewport::jPatcherViewport(jPatcher& patcher) :
+    m_patcher(patcher)
+    {
+        
+    }
 }

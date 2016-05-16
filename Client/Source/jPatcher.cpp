@@ -40,6 +40,7 @@ namespace kiwi
     m_instance(instance),
     m_patcher_model(patcher),
     m_view_model(view),
+    m_viewport(new jPatcherViewport(*this)),
     m_hittester(new HitTester(*this)),
     m_object_border_down_status(HitTester::Border::None)
     {
@@ -50,15 +51,21 @@ namespace kiwi
         }
         
         KiwiApp::bindToKeyMapping(this);
+        setWantsKeyboardFocus(true);
+
+        // Patcher Viewport settings
+        m_viewport->addComponentListener(this);
+        m_viewport->setViewedComponent(this, false);
+        m_viewport->setSize(600, 400);
         
         setSize(600, 400);
         loadPatcher();
-        
-        setWantsKeyboardFocus(true);
     }
     
     jPatcher::~jPatcher()
     {
+        m_viewport->removeComponentListener(this);
+        m_viewport.reset();
         m_links.clear();
         m_objects.clear();
     }
@@ -337,6 +344,30 @@ namespace kiwi
         return mc;
     }
     
+    void jPatcher::componentMovedOrResized(Component& component, bool was_moved, bool was_resized)
+    {
+        jObject* jbox = dynamic_cast<jObject*>(&component);
+        if(jbox)
+        {
+            // totally unoptimized !
+            updateObjectsArea();
+            updatePatcherSize();
+            
+            //Console::post("componentMovedOrResized jbox");
+        }
+        else if(was_resized)
+        {
+            auto& viewport = *m_viewport.get();
+            
+            if(&component == &viewport)
+            {
+                //Console::post("viewport is resizing");
+                
+                updatePatcherSize();
+            }
+        }
+    }
+    
     void jPatcher::showPatcherPopupMenu(juce::Point<int> const& position)
     {
         juce::PopupMenu m;
@@ -354,6 +385,10 @@ namespace kiwi
         }
     }
     
+    // ================================================================================ //
+    //                                     SELECTION                                    //
+    // ================================================================================ //
+    
     void jPatcher::startMoveOrResizeObjects()
     {
         m_is_in_move_or_resize_gesture = true;
@@ -364,6 +399,15 @@ namespace kiwi
     {
         DocumentManager::endCommitGesture(m_patcher_model);
         m_is_in_move_or_resize_gesture = false;
+        
+        updateObjectsArea();
+        updatePatcherSize();
+    }
+    
+    void jPatcher::resizeSelectedObjects(juce::Point<int> const& delta,
+                                         const long border_flag, const bool preserve_ratio)
+    {
+        // todo
     }
     
     void jPatcher::moveSelectedObjects(juce::Point<int> const& delta, bool commit, bool commit_gesture)
@@ -547,6 +591,83 @@ namespace kiwi
     {
         return m_is_locked;
     }
+    
+    void jPatcher::updateObjectsArea()
+    {
+        if(!m_objects.empty())
+        {
+            const auto first_object_bounds = (*m_objects.cbegin())->getBoxBounds();
+            juce::Rectangle<int> area(first_object_bounds);
+            
+            for(auto& jbox_uptr : m_objects)
+            {
+                auto jbox_bounds = jbox_uptr->getBoxBounds();
+                
+                if(jbox_bounds.getX() < area.getX())
+                {
+                    area.setX(jbox_bounds.getX());
+                }
+                
+                if(jbox_bounds.getY() < area.getY())
+                {
+                    area.setY(jbox_bounds.getY());
+                }
+                
+                if(jbox_bounds.getBottom() > area.getBottom())
+                {
+                    area.setBottom(jbox_bounds.getBottom());
+                }
+                
+                if(jbox_bounds.getRight() > area.getRight())
+                {
+                    area.setRight(jbox_bounds.getRight());
+                }
+            }
+            
+            std::swap(m_whole_objects_bounds, area);
+        }
+        else
+        {
+            m_whole_objects_bounds.setBounds(0, 0, 0, 0);
+        }
+    }
+    
+    void jPatcher::updatePatcherSize()
+    {
+        //Console::post("updatePatcherSize new object bounds : " + m_whole_objects_bounds.toString().toStdString());
+        
+        auto& viewport = *m_viewport.get();
+        
+        int new_width = getWidth();
+        int new_height = getHeight();
+        
+        if(viewport.getMaximumVisibleWidth() > m_whole_objects_bounds.getRight())
+        {
+            new_width = viewport.getMaximumVisibleWidth();
+        }
+        else
+        {
+            new_width = m_whole_objects_bounds.getRight();
+        }
+        
+        if(viewport.getMaximumVisibleHeight() > m_whole_objects_bounds.getBottom())
+        {
+            new_height = viewport.getMaximumVisibleHeight();
+        }
+        else
+        {
+            new_height = m_whole_objects_bounds.getBottom();
+        }
+        
+        if(new_width != getWidth() || new_height != getHeight())
+        {
+            setSize(new_width, new_height);
+        }
+    }
+    
+    // ================================================================================ //
+    //                                     OBSERVER                                     //
+    // ================================================================================ //
     
     void jPatcher::patcherChanged(model::Patcher& patcher, model::Patcher::View& view)
     {
@@ -745,9 +866,11 @@ namespace kiwi
         if(it == m_objects.cend())
         {
             auto result = m_objects.emplace(new jObject(*this, object));
+            
             if(result.second)
             {
                 jObject& jobj = *result.first->get();
+                jobj.addComponentListener(this);
                 addAndMakeVisible(jobj);
             }
         }
@@ -770,7 +893,9 @@ namespace kiwi
         
         if(it != m_objects.cend())
         {
-            removeChildComponent(it->get());
+            jObject* jobject = it->get();
+            jobject->removeComponentListener(this);
+            removeChildComponent(jobject);
             m_objects.erase(it);
         }
     }

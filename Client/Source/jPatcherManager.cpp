@@ -28,6 +28,7 @@
 #include "jInstance.hpp"
 #include "jPatcherManager.hpp"
 #include "jPatcher.hpp"
+#include "jPatcherHelper.hpp"
 
 namespace kiwi
 {
@@ -140,7 +141,7 @@ namespace kiwi
         {
             auto& window = view.entity().emplace<jWindow>();
             auto& jpatcher = view.entity().emplace<jPatcher>(m_instance, patcher, view);
-            window.setContentNonOwned(&jpatcher, true);
+            window.setContentNonOwned(&jpatcher.getViewport(), true);
         }
     }
 

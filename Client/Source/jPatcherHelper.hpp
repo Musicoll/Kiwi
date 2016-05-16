@@ -168,6 +168,18 @@ namespace kiwi
         int             m_border	= Border::None;
         size_t          m_index = 0;
     };
+    
+    
+    //! @brief The jPatcher Viewport
+    class jPatcherViewport : public juce::Viewport
+    {
+    public:
+        jPatcherViewport(jPatcher& patcher);
+        
+    private:
+        jPatcher& m_patcher;
+    };
+    
 }
 
 #endif // KIWI_JPATCHER_HELPER_HPP_INCLUDED
