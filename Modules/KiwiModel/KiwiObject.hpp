@@ -114,10 +114,16 @@ namespace kiwi
             }
             
             //! @brief Returns the x position.
-            double getX() const noexcept { return m_position_x; }
+            double getX() const noexcept
+            {
+                return !removed() ? m_position_x.value() : m_position_x.before();
+            }
             
             //! @brief Returns the y position.
-            double getY() const noexcept { return m_position_y; }
+            double getY() const noexcept
+            {
+                return !removed() ? m_position_y.value() : m_position_y.before();
+            }
             
             //! @brief Call signalTrigger() to hmmm.. trigger the signal.
             flip::Signal<> signalTrigger;

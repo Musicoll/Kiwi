@@ -61,7 +61,7 @@ namespace kiwi
         setSize(600, 400);
         loadPatcher();
         updateObjectsArea();
-        updatePatcherSize();
+        updatePatcherSize(true);
     }
     
     jPatcher::~jPatcher()
@@ -385,7 +385,7 @@ namespace kiwi
             
             if(&component == &viewport)
             {
-                updatePatcherSize();
+                updatePatcherSize(true);
             }
         }
     }
@@ -429,7 +429,7 @@ namespace kiwi
             jbox_uptr->patcherViewOriginPositionChanged();
         }
         
-        updatePatcherSize();
+        updatePatcherSize(false);
     }
     
     void jPatcher::resizeSelectedObjects(juce::Point<int> const& delta,
@@ -666,46 +666,32 @@ namespace kiwi
         }
     }
     
-    void jPatcher::updatePatcherSize()
+    void jPatcher::updatePatcherSize(bool can_be_reduced)
     {
-        const auto origin = getOriginPosition();
-        
-        //Console::post("updatePatcherSize getOriginPosition : " + getOriginPosition().toString().toStdString());
-
         auto& viewport = *m_viewport.get();
+        
+        const auto origin = getOriginPosition();
         
         int new_width = getWidth();
         int new_height = getHeight();
         
-        if(viewport.getMaximumVisibleWidth() > m_whole_objects_bounds.getRight() + origin.getX())
-        {
-            new_width = viewport.getMaximumVisibleWidth();
-        }
-        else
-        {
-            new_width = m_whole_objects_bounds.getRight() + origin.getX();
-        }
+        const int viewport_width = viewport.getMaximumVisibleWidth();
+        const int viewport_height = viewport.getMaximumVisibleHeight();
         
-        if(viewport.getMaximumVisibleHeight() > m_whole_objects_bounds.getBottom() + origin.getY())
-        {
-            new_height = viewport.getMaximumVisibleHeight();
-        }
-        else
-        {
-            new_height = m_whole_objects_bounds.getBottom() + origin.getY();
-        }
+        const int min_right = m_whole_objects_bounds.getRight() + origin.getX();
+        const int min_bottom = m_whole_objects_bounds.getBottom() + origin.getY();
         
-        if(!isLocked())
+        new_width = (viewport_width > min_right) ? viewport_width : min_right;
+        new_height = (viewport_height > min_bottom) ? viewport_height : min_bottom;
+        
+        // patcher positive area should never be smaller than viewport area
+        new_width = new_width < (viewport_width + origin.getX()) ? (viewport_width + origin.getX()) : new_width;
+        new_height = new_height < (viewport_height + origin.getY()) ? (viewport_height + origin.getY()) : new_height;
+        
+        if(!can_be_reduced)
         {
-            if(new_width <= getWidth())
-            {
-                new_width = getWidth();
-            }
-            
-            if(new_height <= getHeight())
-            {
-                new_height = getHeight();
-            }
+            new_width = (new_width <= getWidth()) ? getWidth() : new_width;
+            new_height = (new_height <= getHeight()) ? getHeight() : new_height;
         }
 
         if(new_width != getWidth() || new_height != getHeight())
@@ -778,6 +764,18 @@ namespace kiwi
             }
         }
         
+        if(!view.removed() && !m_is_in_move_or_resize_gesture)
+        {
+            updateObjectsArea();
+            
+            for(auto& jbox_uptr : m_objects)
+            {
+                jbox_uptr->patcherViewOriginPositionChanged();
+            }
+            
+            updatePatcherSize(isLocked());
+        }
+        
         checkViewInfos(view);
         checkSelectionChanges(patcher);
         
@@ -811,7 +809,7 @@ namespace kiwi
             
             if(m_is_locked)
             {
-                updatePatcherSize();
+                updatePatcherSize(true);
             }
             
             repaint();

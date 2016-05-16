@@ -260,7 +260,7 @@ namespace kiwi
         void updateObjectsArea();
         
         //! @internal Update patcher size.
-        void updatePatcherSize();
+        void updatePatcherSize(bool can_be_reduced);
         
         //! @internal Load object and links.
         void loadPatcher();
