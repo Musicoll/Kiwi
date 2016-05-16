@@ -51,12 +51,16 @@ namespace kiwi
     
     void jObject::updateBounds()
     {
-        const juce::Rectangle<int> model_bounds(m_model->getX(), m_model->getY(), 60, 20);
+        const juce::Point<int> origin = m_patcher_view.getOriginPosition();
         
-        const auto new_bounds = model_bounds.expanded(m_selection_width, m_selection_width);
+        const juce::Rectangle<int> bounds(m_model->getX() + origin.getX(),
+                                          m_model->getY() + origin.getY(),
+                                          60, 20);
         
-        m_local_box_bounds = model_bounds.withPosition(model_bounds.getX() - new_bounds.getX(),
-                                                       model_bounds.getY() - new_bounds.getY());
+        const auto new_bounds = bounds.expanded(m_selection_width, m_selection_width);
+        
+        m_local_box_bounds = bounds.withPosition(bounds.getX() - new_bounds.getX(),
+                                                 bounds.getY() - new_bounds.getY());
         
         setBounds(new_bounds);
     }
@@ -267,7 +271,7 @@ namespace kiwi
         if(object.positionChanged())
         {
             updateBounds();
-            need_redraw = true;
+            need_redraw = false;
         }
         
         if(view.removed())
@@ -363,6 +367,11 @@ namespace kiwi
         setInterceptsMouseClicks(locked, locked);
         //setWantsKeyboardFocus(locked);
         //setMouseClickGrabsKeyboardFocus(locked);
+    }
+    
+    void jObject::patcherViewOriginPositionChanged()
+    {
+        updateBounds();
     }
     
     void jObject::mouseDown(juce::MouseEvent const& event)

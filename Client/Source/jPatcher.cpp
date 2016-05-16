@@ -60,6 +60,8 @@ namespace kiwi
         
         setSize(600, 400);
         loadPatcher();
+        updateObjectsArea();
+        updatePatcherSize();
     }
     
     jPatcher::~jPatcher()
@@ -78,22 +80,53 @@ namespace kiwi
     {
         const bool locked = m_is_locked;
         const juce::Colour bgcolor = juce::Colours::lightgrey;
-        const int grid_size = 20;
-        const juce::Rectangle<int> bounds(g.getClipBounds());
-        
-        g.setColour(bgcolor);
-        g.fillAll();
-        
+
         if(!locked)
         {
-            g.setColour(bgcolor.contrasting(0.5));
-            for(int x = bounds.getX() - (bounds.getX() % grid_size); x < bounds.getRight(); x += grid_size)
+            const int grid_size = 20;
+            
+            const juce::Point<int> origin = getOriginPosition();
+            const juce::Rectangle<int> bounds = getLocalBounds();
+            const juce::Rectangle<int> clip_bounds = g.getClipBounds();
+            const juce::Rectangle<int> origin_bounds = bounds.withPosition(origin);
+            
+            if(!origin.isOrigin())
             {
-                for(int y = bounds.getY() - (bounds.getY() % grid_size) ; y < bounds.getBottom(); y += grid_size)
+                const juce::Colour off_bgcolor = bgcolor.darker(0.2);
+                g.setColour(off_bgcolor);
+                g.fillRect(bounds);
+                
+                // draw origin
+                g.setColour(off_bgcolor.contrasting(0.5));
+                
+                if(origin.getY() != 0)
+                {
+                    g.drawLine(origin.getX(), origin.getY(), bounds.getWidth(), origin.getY());
+                }
+                
+                if(origin.getX() != 0)
+                {
+                    g.drawLine(origin.getX(), origin.getY(), origin.getX(), bounds.getHeight());
+                }
+            }
+            
+            g.setColour(bgcolor);
+            g.fillRect(origin_bounds);
+            
+            g.setColour(bgcolor.contrasting(0.5));
+            
+            for(int x = (origin.getX() % grid_size); x < clip_bounds.getRight(); x += grid_size)
+            {
+                for(int y = (origin.getY() % grid_size); y < clip_bounds.getBottom(); y += grid_size)
                 {
                     g.setPixel(x, y);
                 }
             }
+        }
+        else
+        {
+            g.setColour(bgcolor);
+            g.fillAll();
         }
     }
     
@@ -346,23 +379,12 @@ namespace kiwi
     
     void jPatcher::componentMovedOrResized(Component& component, bool was_moved, bool was_resized)
     {
-        jObject* jbox = dynamic_cast<jObject*>(&component);
-        if(jbox)
-        {
-            // totally unoptimized !
-            updateObjectsArea();
-            updatePatcherSize();
-            
-            //Console::post("componentMovedOrResized jbox");
-        }
-        else if(was_resized)
+        if(was_resized)
         {
             auto& viewport = *m_viewport.get();
             
             if(&component == &viewport)
             {
-                //Console::post("viewport is resizing");
-                
                 updatePatcherSize();
             }
         }
@@ -401,6 +423,12 @@ namespace kiwi
         m_is_in_move_or_resize_gesture = false;
         
         updateObjectsArea();
+        
+        for(auto& jbox_uptr : m_objects)
+        {
+            jbox_uptr->patcherViewOriginPositionChanged();
+        }
+        
         updatePatcherSize();
     }
     
@@ -594,75 +622,112 @@ namespace kiwi
     
     void jPatcher::updateObjectsArea()
     {
-        if(!m_objects.empty())
+        const auto last_origin = getOriginPosition();
+        
+        m_whole_objects_bounds.setBounds(0, 0, 0, 0);
+        
+        juce::Rectangle<int> area;
+        
+        for(auto& object_m : m_patcher_model.getObjects())
         {
-            const auto first_object_bounds = (*m_objects.cbegin())->getBoxBounds();
-            juce::Rectangle<int> area(first_object_bounds);
-            
-            for(auto& jbox_uptr : m_objects)
+            if(!object_m.removed())
             {
-                auto jbox_bounds = jbox_uptr->getBoxBounds();
+                juce::Rectangle<int> object_bounds(object_m.getX(), object_m.getY(), 60, 20);
                 
-                if(jbox_bounds.getX() < area.getX())
+                if(object_bounds.getX() < area.getX())
                 {
-                    area.setX(jbox_bounds.getX());
+                    area.setX(object_bounds.getX());
                 }
                 
-                if(jbox_bounds.getY() < area.getY())
+                if(object_bounds.getY() < area.getY())
                 {
-                    area.setY(jbox_bounds.getY());
+                    area.setY(object_bounds.getY());
                 }
                 
-                if(jbox_bounds.getBottom() > area.getBottom())
+                if(object_bounds.getBottom() > area.getBottom())
                 {
-                    area.setBottom(jbox_bounds.getBottom());
+                    area.setBottom(object_bounds.getBottom());
                 }
                 
-                if(jbox_bounds.getRight() > area.getRight())
+                if(object_bounds.getRight() > area.getRight())
                 {
-                    area.setRight(jbox_bounds.getRight());
+                    area.setRight(object_bounds.getRight());
                 }
             }
-            
-            std::swap(m_whole_objects_bounds, area);
         }
-        else
+        
+        std::swap(m_whole_objects_bounds, area);
+        
+        //Console::post("new object bounds : " + m_whole_objects_bounds.toString().toStdString());
+        
+        if(last_origin != getOriginPosition())
         {
-            m_whole_objects_bounds.setBounds(0, 0, 0, 0);
+            originPositionChanged();
         }
     }
     
     void jPatcher::updatePatcherSize()
     {
-        //Console::post("updatePatcherSize new object bounds : " + m_whole_objects_bounds.toString().toStdString());
+        const auto origin = getOriginPosition();
         
+        //Console::post("updatePatcherSize getOriginPosition : " + getOriginPosition().toString().toStdString());
+
         auto& viewport = *m_viewport.get();
         
         int new_width = getWidth();
         int new_height = getHeight();
         
-        if(viewport.getMaximumVisibleWidth() > m_whole_objects_bounds.getRight())
+        if(viewport.getMaximumVisibleWidth() > m_whole_objects_bounds.getRight() + origin.getX())
         {
             new_width = viewport.getMaximumVisibleWidth();
         }
         else
         {
-            new_width = m_whole_objects_bounds.getRight();
+            new_width = m_whole_objects_bounds.getRight() + origin.getX();
         }
         
-        if(viewport.getMaximumVisibleHeight() > m_whole_objects_bounds.getBottom())
+        if(viewport.getMaximumVisibleHeight() > m_whole_objects_bounds.getBottom() + origin.getY())
         {
             new_height = viewport.getMaximumVisibleHeight();
         }
         else
         {
-            new_height = m_whole_objects_bounds.getBottom();
+            new_height = m_whole_objects_bounds.getBottom() + origin.getY();
         }
         
+        if(!isLocked())
+        {
+            if(new_width <= getWidth())
+            {
+                new_width = getWidth();
+            }
+            
+            if(new_height <= getHeight())
+            {
+                new_height = getHeight();
+            }
+        }
+
         if(new_width != getWidth() || new_height != getHeight())
         {
             setSize(new_width, new_height);
         }
+    }
+    
+    juce::Point<int> jPatcher::getOriginPosition() const
+    {
+        const int x = m_whole_objects_bounds.getX();
+        const int y = m_whole_objects_bounds.getY();
+        
+        return {
+            x < 0 ? -x : 0,
+            y < 0 ? -y : 0
+        };
+    }
+    
+    void jPatcher::originPositionChanged()
+    {
+        repaint();
     }
     
     // ================================================================================ //
@@ -742,6 +807,11 @@ namespace kiwi
             for(auto& object : m_objects)
             {
                 object->lockStatusChanged(m_is_locked);
+            }
+            
+            if(m_is_locked)
+            {
+                updatePatcherSize();
             }
             
             repaint();
@@ -861,7 +931,7 @@ namespace kiwi
     
     void jPatcher::addjObject(model::Object& object)
     {
-        const auto it = findjObject(object);
+        const auto it = findObject(object);
         
         if(it == m_objects.cend())
         {
@@ -870,7 +940,6 @@ namespace kiwi
             if(result.second)
             {
                 jObject& jobj = *result.first->get();
-                jobj.addComponentListener(this);
                 addAndMakeVisible(jobj);
             }
         }
@@ -878,7 +947,7 @@ namespace kiwi
     
     void jPatcher::objectChanged(model::Patcher::View& view, model::Object& object)
     {
-        const auto it = findjObject(object);
+        const auto it = findObject(object);
         
         if(it != m_objects.cend())
         {
@@ -889,12 +958,11 @@ namespace kiwi
     
     void jPatcher::removejObject(model::Object& object)
     {
-        const auto it = findjObject(object);
+        const auto it = findObject(object);
         
         if(it != m_objects.cend())
         {
             jObject* jobject = it->get();
-            jobject->removeComponentListener(this);
             removeChildComponent(jobject);
             m_objects.erase(it);
         }
@@ -902,7 +970,7 @@ namespace kiwi
     
     void jPatcher::addjLink(model::Link& link)
     {
-        const auto it = findjLink(link);
+        const auto it = findLink(link);
         
         if(it == m_links.cend())
         {
@@ -918,7 +986,7 @@ namespace kiwi
     
     void jPatcher::linkChanged(model::Link& link)
     {
-        const auto it = findjLink(link);
+        const auto it = findLink(link);
         
         if(it != m_links.cend())
         {
@@ -929,7 +997,7 @@ namespace kiwi
     
     void jPatcher::removejLink(model::Link& link)
     {
-        const auto it = findjLink(link);
+        const auto it = findLink(link);
         
         if(it != m_links.cend())
         {
@@ -938,7 +1006,7 @@ namespace kiwi
         }
     }
     
-    std::set<std::unique_ptr<jObject>>::iterator jPatcher::findjObject(model::Object const& object) const
+    std::set<std::unique_ptr<jObject>>::iterator jPatcher::findObject(model::Object const& object) const
     {
         const auto find_jobj = [&object](std::unique_ptr<jObject> const& jobj)
         {
@@ -948,7 +1016,7 @@ namespace kiwi
         return std::find_if(m_objects.begin(), m_objects.end(), find_jobj);
     }
     
-    std::set<std::unique_ptr<jLink>>::iterator jPatcher::findjLink(model::Link const& link) const
+    std::set<std::unique_ptr<jLink>>::iterator jPatcher::findLink(model::Link const& link) const
     {
         const auto find_jlink = [&link](std::unique_ptr<jLink> const& jlink)
         {
@@ -971,13 +1039,13 @@ namespace kiwi
     
     jObject* jPatcher::getObject(model::Object const& object) const
     {
-        const auto it = findjObject(object);
+        const auto it = findObject(object);
         return (it != m_objects.cend()) ? it->get() : nullptr;
     }
     
     jLink* jPatcher::getLink(model::Link const& link) const
     {
-        const auto it = findjLink(link);
+        const auto it = findLink(link);
         return (it != m_links.cend()) ? it->get() : nullptr;
     }
     
@@ -995,6 +1063,10 @@ namespace kiwi
             KiwiApp::commandStatusChanged();
         }
     }
+    
+    // ================================================================================ //
+    //                                     UNDO/REDO                                    //
+    // ================================================================================ //
     
     void jPatcher::undo()
     {
@@ -1159,8 +1231,6 @@ namespace kiwi
         
         commands.add(CommandIDs::showPatcherInspector);
         commands.add(CommandIDs::showObjectInspector);
-        
-        //CommandIDs::openObjectHelp
     }
     
     void jPatcher::getCommandInfo(const CommandID commandID, ApplicationCommandInfo& result)

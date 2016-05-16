@@ -103,7 +103,17 @@ namespace kiwi
         //! @param wasResized   true if the component's width or height has just changed
         void componentMovedOrResized(Component& component, bool was_moved, bool was_resized) override;
         
+        //! @brief Returns the Viewport that contains this patcher view.
+        //! @details You must use this method if you want to add this component into an other one.
         jPatcherViewport& getViewport() { return *m_viewport.get(); }
+        
+        //! @brief Returns the position of the patcher origin relative to the component position.
+        juce::Point<int> getOriginPosition() const;
+        
+    protected:
+        
+        //! @brief Called internally when the origin of the patcher view changed.
+        virtual void originPositionChanged();
         
     private: // methods
         
@@ -243,8 +253,8 @@ namespace kiwi
         //                                      MISC                                        //
         // ================================================================================ //
         
-        jObjects::iterator findjObject(model::Object const& object) const;
-        jLinks::iterator findjLink(model::Link const& link) const;
+        jObjects::iterator findObject(model::Object const& object) const;
+        jLinks::iterator findLink(model::Link const& link) const;
         
         //! @internal Re-compute objects area.
         void updateObjectsArea();

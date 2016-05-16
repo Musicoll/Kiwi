@@ -45,6 +45,7 @@ namespace kiwi
         void localSelectionChanged(bool selected_for_view);
         void distantSelectionChanged(std::set<uint64_t> distant_user_id_selection);
         void lockStatusChanged(bool locked);
+        void patcherViewOriginPositionChanged();
         
         // juce::Component
         void paint(juce::Graphics& g) override;

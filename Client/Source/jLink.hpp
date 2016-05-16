@@ -33,7 +33,7 @@ namespace kiwi
     class jPatcher;
     
     //! @brief The juce link Component.
-    class jLink : public juce::Component
+    class jLink : public juce::Component, public ComponentListener
     {
     public:
         
@@ -45,7 +45,7 @@ namespace kiwi
         
         void linkChanged(model::Link& link);
         void objectChanged(model::Object& object);
-        
+                
         // juce::Component
         void paint(juce::Graphics& g) override;
         
@@ -54,6 +54,12 @@ namespace kiwi
         
         //! @brief internal kiwi jPatcher HitTesting (overlaps a rectangle).
         bool hitTest(juce::Rectangle<int> const& rect);
+        
+        //! @brief Called when the component's position or size changes.
+        //! @param component    the component that was moved or resized
+        //! @param wasMoved     true if the component's top-left corner has just moved
+        //! @param wasResized   true if the component's width or height has just changed
+        void componentMovedOrResized(Component& component, bool was_moved, bool was_resized) override;
         
     private:
         

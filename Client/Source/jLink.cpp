@@ -31,23 +31,40 @@ namespace kiwi
     m_jpatcher(jpatcher),
     m_model(&link_m)
     {
-        auto& sender_object = m_model->getSenderObject();
-        auto& receiver_object = m_model->getReceiverObject();
+        auto& sender_object_m = m_model->getSenderObject();
+        auto& receiver_object_m = m_model->getReceiverObject();
         
-        auto j_sender_object = m_jpatcher.getObject(sender_object);
-        m_last_outlet_pos = j_sender_object->getOutletPatcherPosition(m_model->getSenderIndex());
+        jObject* jbox_sender = m_jpatcher.getObject(sender_object_m);
+        jObject* jbox_receiver = m_jpatcher.getObject(receiver_object_m);
         
-        auto j_receiver_object = m_jpatcher.getObject(receiver_object);
-        m_last_inlet_pos = j_receiver_object->getInletPatcherPosition(m_model->getReceiverIndex());
-        
-        updateBounds();
-        
+        if(jbox_sender && jbox_receiver)
+        {
+            m_last_outlet_pos = jbox_sender->getOutletPatcherPosition(m_model->getSenderIndex());
+            m_last_inlet_pos  = jbox_receiver->getInletPatcherPosition(m_model->getReceiverIndex());
+            
+            jbox_sender->addComponentListener(this);
+            jbox_receiver->addComponentListener(this);
+            updateBounds();
+        }
+
         setInterceptsMouseClicks(false, false);
     }
     
     jLink::~jLink()
     {
-        ;
+        auto& sender_object_m = m_model->getSenderObject();
+        jObject* jbox_sender = m_jpatcher.getObject(sender_object_m);
+        if(jbox_sender)
+        {
+            jbox_sender->removeComponentListener(this);
+        }
+        
+        auto& receiver_object_m = m_model->getReceiverObject();
+        jObject* jbox_receiver = m_jpatcher.getObject(receiver_object_m);
+        if(jbox_receiver)
+        {
+            jbox_receiver->removeComponentListener(this);
+        }
     }
     
     void jLink::linkChanged(model::Link& link)
@@ -57,6 +74,7 @@ namespace kiwi
     
     void jLink::objectChanged(model::Object& object)
     {
+        /*
         if(!object.removed() && object.positionChanged())
         {
             auto& sender_object = m_model->getSenderObject();
@@ -81,6 +99,7 @@ namespace kiwi
                 }
             }
         }
+        */
     }
     
     void jLink::updateBounds()
@@ -88,6 +107,24 @@ namespace kiwi
         const juce::Rectangle<int> bounds(m_last_inlet_pos, m_last_outlet_pos);
         
         setBounds(bounds.expanded(10));
+    }
+    
+    void jLink::componentMovedOrResized(Component& component, bool was_moved, bool was_resized)
+    {
+        jObject* jbox = dynamic_cast<jObject*>(&component);
+        if(jbox)
+        {
+            if(&jbox->getModel() == &m_model->getSenderObject())
+            {
+                m_last_outlet_pos = jbox->getOutletPatcherPosition(m_model->getSenderIndex());
+                updateBounds();
+            }
+            else if(&jbox->getModel() == &m_model->getReceiverObject())
+            {
+                m_last_inlet_pos = jbox->getInletPatcherPosition(m_model->getReceiverIndex());
+                updateBounds();
+            }
+        }
     }
     
     void jLink::paint(juce::Graphics & g)
