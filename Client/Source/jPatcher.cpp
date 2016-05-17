@@ -385,7 +385,7 @@ namespace kiwi
             
             if(&component == &viewport)
             {
-                updatePatcherSize(true);
+                updatePatcherSize(true, true);
             }
         }
     }
@@ -666,11 +666,12 @@ namespace kiwi
         }
     }
     
-    void jPatcher::updatePatcherSize(bool can_be_reduced)
+    void jPatcher::updatePatcherSize(bool can_be_reduced, bool is_resizing)
     {
         auto& viewport = *m_viewport.get();
         
-        const auto origin = getOriginPosition();
+        const Point<int> origin = getOriginPosition();
+        const Point<int> view_pos = viewport.getViewPosition();
         
         int new_width = getWidth();
         int new_height = getHeight();
@@ -697,6 +698,11 @@ namespace kiwi
         if(new_width != getWidth() || new_height != getHeight())
         {
             setSize(new_width, new_height);
+        }
+        
+        if(is_resizing)
+        {
+            viewport.setViewPosition(view_pos);
         }
     }
     
@@ -1072,7 +1078,7 @@ namespace kiwi
         if(doc.canUndo())
         {
             doc.undo();
-            doc.commit(m_patcher_model, "undo last action");
+            doc.commit(m_patcher_model);
         }
     }
     
@@ -1093,7 +1099,7 @@ namespace kiwi
         if(doc.canRedo())
         {
             doc.redo();
-            doc.commit(m_patcher_model, "redo last action");
+            doc.commit(m_patcher_model);
         }
     }
     
@@ -1130,45 +1136,45 @@ namespace kiwi
     void jPatcher::selectObject(jObject& object)
     {
         m_view_model.selectObject(object.getModel());
-        DocumentManager::commit(m_patcher_model, "select object");
+        DocumentManager::commit(m_patcher_model);
     }
     
     void jPatcher::selectLink(jLink& link)
     {
         m_view_model.selectLink(link.getModel());
-        DocumentManager::commit(m_patcher_model, "select link");
+        DocumentManager::commit(m_patcher_model);
     }
     
     void jPatcher::unselectObject(jObject& object)
     {
         m_view_model.unselectObject(object.getModel());
-        DocumentManager::commit(m_patcher_model, "unselect object");
+        DocumentManager::commit(m_patcher_model);
     }
     
     void jPatcher::unselectLink(jLink& link)
     {
         m_view_model.unselectLink(link.getModel());
-        DocumentManager::commit(m_patcher_model, "unselect link");
+        DocumentManager::commit(m_patcher_model);
     }
     
     void jPatcher::selectObjectOnly(jObject& object)
     {
         unselectAll();
         selectObject(object);
-        DocumentManager::commit(m_patcher_model, "Select object");
+        DocumentManager::commit(m_patcher_model);
     }
 
     void jPatcher::selectLinkOnly(jLink& link)
     {
         unselectAll();
         selectLink(link);
-        DocumentManager::commit(m_patcher_model, "Select link");
+        DocumentManager::commit(m_patcher_model);
     }
     
     void jPatcher::selectAllObjects()
     {
         m_view_model.selectAll();
-        DocumentManager::commit(m_patcher_model, "Select all objects");
+        DocumentManager::commit(m_patcher_model);
     }
     
     void jPatcher::unselectAll()
@@ -1176,7 +1182,7 @@ namespace kiwi
         if(isAnythingSelected() && !DocumentManager::isInCommitGesture(m_patcher_model))
         {
             m_view_model.unselectAll();
-            DocumentManager::commit(m_patcher_model, "Unselect all");
+            DocumentManager::commit(m_patcher_model);
         }
     }
     
