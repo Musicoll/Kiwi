@@ -48,17 +48,16 @@ namespace kiwi
         //! @brief Destructor.
         ~jPatcherManager();
         
-        //! @brief Initialize the patcher manager by creating a new document.
-        //! @return The newly created the Patcher model.
-        model::Patcher& init();
-        
-        //! @brief Returns the Patcher model
-        model::Patcher& getPatcher() const;
-        
         //! @brief create a new patcher view window.
         void newView();
         
     private:
+        
+        //! @brief Returns the Patcher model
+        model::Patcher& getPatcher();
+        
+        //! @brief Initializes a hardcoded patcher
+        void populatePatcher();
         
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
         void document_changed(model::Patcher& patcher) override final;
@@ -85,8 +84,7 @@ namespace kiwi
     private: // members
         
         jInstance&                          m_instance;
-        std::unique_ptr<flip::Document>     m_document;
-        model::Patcher*                     m_model = nullptr;
+        flip::Document                      m_document;
     };
 }
 

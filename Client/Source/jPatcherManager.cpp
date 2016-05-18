@@ -33,60 +33,127 @@ namespace kiwi
 {
     jPatcherManager::jPatcherManager(jInstance& instance) :
     m_instance(instance),
-    m_document(nullptr)
+    m_document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat')
     {
-        ;
+        model::Patcher & patcher = getPatcher();
+        
+        patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
+        DocumentManager::commit(patcher);
+        
+        populatePatcher();
+        DocumentManager::commit(patcher, "load initial objects and links");
     }
     
     jPatcherManager::~jPatcherManager()
     {
-        m_document.reset();
     }
     
-    model::Patcher& jPatcherManager::init()
+    model::Patcher& jPatcherManager::getPatcher()
     {
-        m_document.reset();
-        m_document = std::make_unique<flip::Document>(model::PatcherModel::use(), *this,
-                                                      m_instance.getUserId(), 'cicm', 'kpat');
-        
-        model::Patcher& patcher = m_document->root<model::Patcher>();
-        patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
-        
-        DocumentManager::commit(patcher);
-        
-        return patcher;
-    }
-    
-    model::Patcher& jPatcherManager::getPatcher() const
-    {
-        return *m_model;
+        return m_document.root<model::Patcher>();
     }
     
     void jPatcherManager::newView()
     {
-        if(m_model)
+        auto* user = getPatcher().getUser(m_instance.getUserId());
+        if(user)
         {
-            auto* user = m_model->getUser(m_instance.getUserId());
-            if(user)
-            {
-                user->addView();
-                
-                DocumentManager::commit(*user);
-            }
+            user->addView();
+            
+            DocumentManager::commit(*user);
+        }
+    }
+    
+    void jPatcherManager::populatePatcher()
+    {
+        model::Patcher & patcher = getPatcher();
+        
+        {
+            // simple print
+            auto& plus = patcher.addObject("plus 44");
+            plus.setPosition(50, 50);
+            auto& print = patcher.addObject("print");
+            print.setPosition(50, 100);
+            patcher.addLink(plus, 0, print, 0);
+        }
+        
+        {
+            // set rhs value
+            auto& plus_1 = patcher.addObject("plus 1");
+            plus_1.setPosition(150, 50);
+            
+            auto& plus_2 = patcher.addObject("plus 10");
+            plus_2.setPosition(220, 50);
+            
+            auto& plus_3 = patcher.addObject("plus");
+            plus_3.setPosition(150, 100);
+            
+            auto& print = patcher.addObject("print");
+            print.setPosition(150, 150);
+            
+            patcher.addLink(plus_1, 0, plus_3, 0);
+            patcher.addLink(plus_2, 0, plus_3, 1);
+            patcher.addLink(plus_3, 0, print, 0);
+        }
+        
+        {
+            // basic counter
+            auto& plus_1 = patcher.addObject("plus");
+            plus_1.setPosition(350, 100);
+            
+            auto& plus_2 = patcher.addObject("plus");
+            plus_2.setPosition(405, 70);
+            
+            auto& plus_3 = patcher.addObject("plus 10");
+            plus_3.setPosition(300, 20);
+            
+            auto& plus_4 = patcher.addObject("plus -10");
+            plus_4.setPosition(380, 20);
+            
+            auto& print = patcher.addObject("print zozo");
+            print.setPosition(350, 150);
+            
+            patcher.addLink(plus_1, 0, plus_2, 0);
+            patcher.addLink(plus_2, 0, plus_1, 1);
+            patcher.addLink(plus_1, 0, print, 0);
+            
+            patcher.addLink(plus_3, 0, plus_1, 0);
+            patcher.addLink(plus_4, 0, plus_1, 0);
+        }
+        
+        {
+            // stack overflow
+            auto& plus_1 = patcher.addObject("plus");
+            plus_1.setPosition(550, 100);
+            
+            auto& plus_2 = patcher.addObject("plus");
+            plus_2.setPosition(605, 70);
+            
+            auto& plus_3 = patcher.addObject("plus 10");
+            plus_3.setPosition(500, 20);
+            
+            auto& plus_4 = patcher.addObject("plus -10");
+            plus_4.setPosition(580, 20);
+            
+            auto& print = patcher.addObject("print zozo");
+            print.setPosition(550, 150);
+            
+            patcher.addLink(plus_1, 0, plus_2, 0);
+            patcher.addLink(plus_2, 0, plus_1, 0);
+            patcher.addLink(plus_1, 0, print, 0);
+            
+            patcher.addLink(plus_3, 0, plus_1, 0);
+            patcher.addLink(plus_4, 0, plus_1, 0);
         }
     }
     
     void jPatcherManager::document_changed(model::Patcher& patcher)
     {
-        if(patcher.added())
+        if (patcher.added())
         {
-            m_model = &patcher;
-            
             patcher.entity().emplace<DocumentManager>(patcher.document());
-            
             patcher.entity().emplace<engine::Patcher>();
         }
-        
         //! engine
         patcher.entity().use<engine::Patcher>().document_changed(patcher);
         
@@ -95,10 +162,7 @@ namespace kiwi
         if(patcher.removed())
         {
             patcher.entity().erase<engine::Patcher>();
-            
             patcher.entity().erase<DocumentManager>();
-            
-            m_model = nullptr;
         }
     }
     
