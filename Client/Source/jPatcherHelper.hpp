@@ -178,6 +178,7 @@ namespace kiwi
         
     private:
         jPatcher& m_patcher;
+        std::unique_ptr<Component> m_patcher_holder;
     };
     
 }

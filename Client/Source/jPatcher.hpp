@@ -256,11 +256,20 @@ namespace kiwi
         jObjects::iterator findObject(model::Object const& object) const;
         jLinks::iterator findLink(model::Link const& link) const;
         
-        //! @internal Re-compute objects area.
-        void updateObjectsArea();
+        //! @internal Returns the current objects area.
+        juce::Rectangle<int> getCurrentObjectsArea();
         
         //! @internal Update patcher size.
-        void updatePatcherSize(bool can_be_reduced, bool is_resizing = false);
+        void updatePatcherArea(bool can_be_reduced, bool is_resizing = false);
+        
+        //! @brief Zoom in Patcher View.
+        void zoomIn();
+        
+        //! @brief Zoom out Patcher View.
+        void zoomOut();
+        
+        //! @brief Reset Patcher View zoom to 100%.
+        void zoomNormal();
         
         //! @internal Load object and links.
         void loadPatcher();
@@ -295,9 +304,10 @@ namespace kiwi
         std::unique_ptr<jPatcherViewport>   m_viewport;
         std::unique_ptr<HitTester>          m_hittester;
         
-        juce::Rectangle<int>                m_whole_objects_bounds;
+        juce::Rectangle<int>                m_objects_area;
         
         bool m_is_locked;
+        float m_zoom_factor;
         
         // mouse interactions flags
         juce::Point<int> m_last_drag;

@@ -218,8 +218,13 @@ namespace kiwi
     }
     
     jPatcherViewport::jPatcherViewport(jPatcher& patcher) :
-    m_patcher(patcher)
+    m_patcher(patcher),
+    m_patcher_holder(new Component())
     {
-        
+        setSize(600, 400);
+        m_patcher.setSize(600, 400);
+        m_patcher_holder->setSize(600, 400);
+        m_patcher_holder->addAndMakeVisible(m_patcher);
+        setViewedComponent(m_patcher_holder.get(), false);
     }
 }
