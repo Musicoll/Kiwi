@@ -174,11 +174,26 @@ namespace kiwi
     class jPatcherViewport : public juce::Viewport
     {
     public:
+        
         jPatcherViewport(jPatcher& patcher);
         
+        void visibleAreaChanged(juce::Rectangle<int> const& new_visible_area) override;
+        
+        void resized() override;
+        
+        juce::Point<int> getLastViewPosition();
+        
     private:
-        jPatcher& m_patcher;
-        std::unique_ptr<Component> m_patcher_holder;
+        
+        jPatcher&               m_patcher;
+        juce::Viewport          m_viewport;
+        Component               m_patcher_holder;
+        juce::Rectangle<int>    m_last_view_area;
+        
+        juce::Point<int>        m_last_view_position;
+        
+        int m_last_width, m_last_height;
+        juce::Rectangle<int>    m_last_bounds;
     };
     
 }

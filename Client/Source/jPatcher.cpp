@@ -53,22 +53,13 @@ namespace kiwi
         
         KiwiApp::bindToKeyMapping(this);
         setWantsKeyboardFocus(true);
-        
-        setSize(600, 400);
 
-        // Patcher Viewport settings
-        m_viewport->addComponentListener(this);
-        //m_viewport->setViewedComponent(this, false);
-        //m_viewport->setSize(600, 400);
-        
-        setSize(600, 400);
         loadPatcher();
         updatePatcherArea(true);
     }
     
     jPatcher::~jPatcher()
     {
-        m_viewport->removeComponentListener(this);
         m_viewport.reset();
         m_links.clear();
         m_objects.clear();
@@ -386,19 +377,6 @@ namespace kiwi
         return mc;
     }
     
-    void jPatcher::componentMovedOrResized(Component& component, bool was_moved, bool was_resized)
-    {
-        if(was_resized)
-        {
-            auto& viewport = *m_viewport.get();
-            
-            if(&component == &viewport)
-            {
-                updatePatcherArea(true, true);
-            }
-        }
-    }
-    
     void jPatcher::showPatcherPopupMenu(juce::Point<int> const& position)
     {
         juce::PopupMenu m;
@@ -632,22 +610,22 @@ namespace kiwi
             {
                 juce::Rectangle<int> object_bounds(object_m.getX(), object_m.getY(), 60, 20);
                 
-                if(object_bounds.getX() < area.getX())
+                if(object_bounds.getX() <= area.getX())
                 {
                     area.setX(object_bounds.getX());
                 }
                 
-                if(object_bounds.getY() < area.getY())
+                if(object_bounds.getY() <= area.getY())
                 {
                     area.setY(object_bounds.getY());
                 }
                 
-                if(object_bounds.getBottom() > area.getBottom())
+                if(object_bounds.getBottom() >= area.getBottom())
                 {
                     area.setBottom(object_bounds.getBottom());
                 }
                 
-                if(object_bounds.getRight() > area.getRight())
+                if(object_bounds.getRight() >= area.getRight())
                 {
                     area.setRight(object_bounds.getRight());
                 }
@@ -657,14 +635,111 @@ namespace kiwi
         return area;
     }
     
+    void jPatcher::viewportResized(juce::Rectangle<int> const& last_bounds,
+                                   juce::Rectangle<int> const& new_bounds)
+    {
+        const int delta_width = new_bounds.getWidth() - last_bounds.getWidth();
+        const int delta_height = new_bounds.getHeight() - last_bounds.getHeight();
+        
+        int new_width = getWidth() + delta_width;
+        int new_height = getHeight() + delta_height;
+        
+        if(m_viewport)
+        {
+            const Rectangle<int> objects_area = getCurrentObjectsArea();
+            const Point<int> view_pos = m_viewport->getViewPosition();
+            
+            if(delta_width != 0)
+            {
+                const int viewport_width = (m_viewport->getMaximumVisibleWidth() / m_zoom_factor) + view_pos.getX();
+                
+                if(delta_width < 0)
+                {
+                    new_width = (viewport_width > objects_area.getWidth()) ? viewport_width : objects_area.getWidth();
+                }
+                else if(delta_width > 0)
+                {
+                    const bool smaller_than_objects_area = (objects_area.getWidth() > viewport_width);
+                    
+                    if(smaller_than_objects_area)
+                    {
+                        const bool will_be_bigger = (objects_area.getWidth() < new_bounds.getWidth() + view_pos.getX());
+                        
+                        if(!will_be_bigger)
+                        {
+                            new_width = objects_area.getWidth();
+                        }
+                        else
+                        {
+                            new_width = last_bounds.getWidth() + delta_width + view_pos.getX();
+                        }
+                        
+                    }
+                }
+            }
+            
+            if(delta_height != 0)
+            {
+                const int viewport_height = (m_viewport->getMaximumVisibleHeight() / m_zoom_factor) + view_pos.getY();
+                
+                if(delta_height < 0)
+                {
+                    new_height = (viewport_height > objects_area.getHeight()) ? viewport_height : objects_area.getHeight();
+                }
+                else if(delta_height > 0)
+                {
+                    const bool smaller_than_objects_area = (objects_area.getHeight() > viewport_height);
+                    
+                    if(smaller_than_objects_area)
+                    {
+                        const bool will_be_bigger = (objects_area.getHeight() < new_bounds.getHeight() + view_pos.getY());
+                        
+                        if(!will_be_bigger)
+                        {
+                            new_height = objects_area.getHeight();
+                        }
+                        else
+                        {
+                            new_height = last_bounds.getHeight() + delta_height + view_pos.getY();
+                        }
+                        
+                    }
+                }
+            }
+            
+            if(m_viewport->getViewPosition().isOrigin())
+            {
+                m_objects_area = objects_area;
+            }
+            
+            Component* parent = getParentComponent();
+            if(parent)
+            {
+                parent->setSize(new_width * m_zoom_factor, new_height * m_zoom_factor);
+                setBounds(0, 0, new_width, new_height);
+            }
+        }
+    }
+    
     void jPatcher::updatePatcherArea(bool can_be_reduced, bool is_resizing)
     {
         const auto last_origin = getOriginPosition();
  
         juce::Rectangle<int> objects_current_area = getCurrentObjectsArea();
-        std::swap(m_objects_area, objects_current_area);
         
-        Console::post("new object bounds : " + m_objects_area.toString().toStdString());
+        m_objects_area.setPosition(objects_current_area.getPosition());
+        
+        if(objects_current_area.getWidth() > m_objects_area.getWidth())
+        {
+            m_objects_area.setWidth(objects_current_area.getWidth());
+        }
+        
+        if(objects_current_area.getHeight() > m_objects_area.getHeight())
+        {
+            m_objects_area.setHeight(objects_current_area.getHeight());
+        }
+        
+        //Console::post("new object bounds : " + m_objects_area.toString().toStdString());
         
         if(last_origin != getOriginPosition())
         {
@@ -680,7 +755,8 @@ namespace kiwi
         auto& viewport = *m_viewport.get();
         
         const Point<int> origin = getOriginPosition();
-        const Point<int> view_pos = viewport.getViewPosition();
+        //const Point<int> view_pos = viewport.getViewPosition();
+        //const Point<int> view_pos = viewport.getLastViewPosition();
         
         const int old_width = getWidth();
         const int old_height = getHeight();
@@ -688,8 +764,8 @@ namespace kiwi
         int new_width = old_width;
         int new_height = old_height;
         
-        const int viewport_width = viewport.getMaximumVisibleWidth();
-        const int viewport_height = viewport.getMaximumVisibleHeight();
+        const int viewport_width = viewport.getMaximumVisibleWidth() / m_zoom_factor;
+        const int viewport_height = viewport.getMaximumVisibleHeight() / m_zoom_factor;
         
         const Rectangle<int> objects_area = m_objects_area.withPosition(origin);
         
@@ -698,12 +774,12 @@ namespace kiwi
         
         //-----
         
-        new_width = (viewport_width >= objects_area.getWidth()) ? viewport_width : objects_area.getWidth();
-        new_height = (viewport_height >= objects_area.getHeight()) ? viewport_height : objects_area.getHeight();
+        new_width = (viewport_width > objects_area.getWidth()) ? viewport_width : objects_area.getWidth();
+        new_height = (viewport_height > objects_area.getHeight()) ? viewport_height : objects_area.getHeight();
    
         // patcher positive area should never be smaller than viewport area
-        new_width = new_width <= (viewport_width + origin_x) ? (viewport_width + origin_x) : new_width;
-        new_height = new_height <= (viewport_height + origin_y) ? (viewport_height + origin_y) : new_height;
+        new_width = new_width < (viewport_width + origin_x) ? (viewport_width + origin_x) : new_width;
+        new_height = new_height < (viewport_height + origin_y) ? (viewport_height + origin_y) : new_height;
         
         //if(!can_be_reduced)
         {
@@ -716,9 +792,9 @@ namespace kiwi
         
         //if(is_resizing)
         {
-            Console::post("viewpos : " + view_pos.toString().toStdString());
-            viewport.setViewPosition(view_pos);
-            Console::post("getViewPosition : " + viewport.getViewPosition().toString().toStdString());
+            //Console::post("viewpos : " + view_pos.toString().toStdString());
+           // viewport.setViewPosition(viewport.getLastViewPosition());
+            //Console::post("getViewPosition : " + viewport.getLastViewPosition().toString().toStdString());
         }
         
     }
@@ -727,6 +803,17 @@ namespace kiwi
     {
         const int x = m_objects_area.getX();
         const int y = m_objects_area.getY();
+        
+        return {
+            x < 0 ? -x : 0,
+            y < 0 ? -y : 0
+        };
+    }
+    
+    juce::Point<int> jPatcher::getOriginPosition(juce::Rectangle<int> const& bounds) const
+    {
+        const int x = bounds.getX();
+        const int y = bounds.getY();
         
         return {
             x < 0 ? -x : 0,
@@ -755,7 +842,8 @@ namespace kiwi
     
     void jPatcher::zoomOut()
     {
-        m_zoom_factor -= 0.25;
+        float new_zoom = m_zoom_factor - 0.25;
+        m_zoom_factor = new_zoom > 0. ? new_zoom : m_zoom_factor;
         setTransform(AffineTransform::scale(m_zoom_factor));
         updatePatcherArea(true, false);
     }
@@ -810,7 +898,7 @@ namespace kiwi
         
         if(!view.removed() && !m_is_in_move_or_resize_gesture)
         {
-            updatePatcherArea(isLocked());
+            //updatePatcherArea(isLocked());
         }
         
         checkViewInfos(view);
@@ -846,6 +934,7 @@ namespace kiwi
             
             if(m_is_locked)
             {
+                m_objects_area = getCurrentObjectsArea();
                 updatePatcherArea(true);
             }
             

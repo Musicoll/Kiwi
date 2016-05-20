@@ -218,13 +218,46 @@ namespace kiwi
     }
     
     jPatcherViewport::jPatcherViewport(jPatcher& patcher) :
-    m_patcher(patcher),
-    m_patcher_holder(new Component())
+    m_patcher(patcher)
     {
         setSize(600, 400);
         m_patcher.setSize(600, 400);
-        m_patcher_holder->setSize(600, 400);
-        m_patcher_holder->addAndMakeVisible(m_patcher);
-        setViewedComponent(m_patcher_holder.get(), false);
+        m_patcher_holder.setSize(600, 400);
+        m_patcher_holder.addAndMakeVisible(m_patcher);
+        setViewedComponent(&m_patcher_holder, false);
+        setScrollBarThickness(12);
+    }
+    
+    void jPatcherViewport::visibleAreaChanged(juce::Rectangle<int> const& new_visible_area)
+    {
+        //Console::post("visibleAreaChanged : " + new_visible_area.toString().toStdString());
+        //m_last_view_area = new_visible_area;
+        //m_patcher.updatePatcherArea(false);
+        
+        bool resized = (new_visible_area.getWidth() != m_last_view_area.getWidth() ||
+                        new_visible_area.getHeight() != m_last_view_area.getHeight());
+        
+        if(resized)
+        {
+            m_last_view_position = new_visible_area.getPosition();
+        }
+        else
+        {
+            m_last_view_area = new_visible_area;
+        }
+    }
+    
+    void jPatcherViewport::resized()
+    {
+        m_patcher.viewportResized(m_last_bounds, getBounds());
+        
+        Viewport::resized();
+           
+        m_last_bounds = getBounds();
+    }
+    
+    juce::Point<int> jPatcherViewport::getLastViewPosition()
+    {
+        return m_last_view_area.getPosition();
     }
 }

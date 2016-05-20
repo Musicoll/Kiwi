@@ -41,7 +41,6 @@ namespace kiwi
     //! @brief The juce Patcher Component.
     class jPatcher :
     public juce::Component,
-    public ComponentListener,
     public ApplicationCommandTarget
     {
     public:
@@ -97,18 +96,14 @@ namespace kiwi
         void getCommandInfo(CommandID commandID, ApplicationCommandInfo& result) override;
         bool perform(const InvocationInfo& info) override;
         
-        //! @brief Called when the component's position or size changes.
-        //! @param component    the component that was moved or resized
-        //! @param wasMoved     true if the component's top-left corner has just moved
-        //! @param wasResized   true if the component's width or height has just changed
-        void componentMovedOrResized(Component& component, bool was_moved, bool was_resized) override;
-        
         //! @brief Returns the Viewport that contains this patcher view.
         //! @details You must use this method if you want to add this component into an other one.
         jPatcherViewport& getViewport() { return *m_viewport.get(); }
         
         //! @brief Returns the position of the patcher origin relative to the component position.
         juce::Point<int> getOriginPosition() const;
+        
+        juce::Point<int> getOriginPosition(juce::Rectangle<int> const& bounds) const;
         
     protected:
         
@@ -253,7 +248,10 @@ namespace kiwi
         //                                      MISC                                        //
         // ================================================================================ //
         
+        //! @internal Find a jObject with a given Object model.
         jObjects::iterator findObject(model::Object const& object) const;
+        
+        //! @internal Find a jLink with a given Link model.
         jLinks::iterator findLink(model::Link const& link) const;
         
         //! @internal Returns the current objects area.
@@ -261,6 +259,10 @@ namespace kiwi
         
         //! @internal Update patcher size.
         void updatePatcherArea(bool can_be_reduced, bool is_resizing = false);
+        
+        //! @internal Hook method called by jPatcherViewport just before resized.
+        void viewportResized(juce::Rectangle<int> const& last_bounds,
+                             juce::Rectangle<int> const& new_bounds);
         
         //! @brief Zoom in Patcher View.
         void zoomIn();
@@ -323,6 +325,8 @@ namespace kiwi
         
         // here to initialise jPatcher commands only one time.
         static bool m_command_manager_binded;
+        
+        friend jPatcherViewport;
     };
 }
 
