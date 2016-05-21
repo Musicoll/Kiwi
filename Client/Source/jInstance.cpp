@@ -29,7 +29,7 @@
 namespace kiwi
 {
     jInstance::jInstance() :
-    m_user_id(123456789ULL),
+    m_user_id(flip::Ref::User::Offline),
     m_instance(new engine::Instance(m_user_id)),
     m_console_window(new jConsoleWindow())
     {
