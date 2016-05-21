@@ -24,6 +24,8 @@
 #ifndef KIWI_JINSTANCE_HPP_INCLUDED
 #define KIWI_JINSTANCE_HPP_INCLUDED
 
+#include <string>
+
 #include <KiwiEngine/KiwiInstance.hpp>
 
 #include "flip/Document.h"
@@ -47,6 +49,9 @@ namespace kiwi
         //! @brief create a new patcher window.
         void newPatcher();
         
+        //! @brief Create a new remote patcher
+        void openRemotePatcher();
+        
         //! @brief Opens the settings
         void openSettings();
         
@@ -57,6 +62,7 @@ namespace kiwi
         void showConsoleWindow();
         
     private:
+        void openRemoteDialogBox(std::string & host, uint16_t & port);
         void setUserId(uint64_t user_id);
         
     private:

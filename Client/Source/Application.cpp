@@ -75,8 +75,6 @@ namespace kiwi
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAppSettingsWindow);
         MenuBarModel::setMacMainMenu(m_menu_model.get(), &macMainMenuPopup, TRANS("Open Recent"));
         #endif
-        
-        m_instance->newPatcher();
     }
     
     void KiwiApp::shutdown()
@@ -184,6 +182,7 @@ namespace kiwi
     void KiwiApp::createFileMenu (PopupMenu& menu)
     {
         menu.addCommandItem(m_command_manager.get(), CommandIDs::newPatcher);
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::openRemotePatcher);
         menu.addSeparator();
         
         menu.addCommandItem(m_command_manager.get(), CommandIDs::openFile);
@@ -267,6 +266,7 @@ namespace kiwi
         const CommandID ids[] =
         {
             CommandIDs::newPatcher,
+            CommandIDs::openRemotePatcher,
             CommandIDs::openFile,
             CommandIDs::showConsoleWindow,
             CommandIDs::showAppSettingsWindow,
@@ -285,6 +285,14 @@ namespace kiwi
                                CommandCategories::general, 0);
                 
                 result.addDefaultKeypress('n', ModifierKeys::commandModifier);
+                break;
+            }
+            case CommandIDs::openRemotePatcher:
+            {
+                result.setInfo(TRANS("Open remote..."), TRANS("open a remote patcher"),
+                               CommandCategories::general, 0);
+                
+                result.addDefaultKeypress('r', ModifierKeys::commandModifier);
                 break;
             }
             case CommandIDs::openFile:
@@ -322,6 +330,7 @@ namespace kiwi
         switch(info.commandID)
         {
             case CommandIDs::newPatcher :               { m_instance->newPatcher(); break; }
+            case CommandIDs::openRemotePatcher :        { m_instance->openRemotePatcher(); break; }
             case CommandIDs::showConsoleWindow :        { m_instance->showConsoleWindow(); break; }
             case CommandIDs::showAppSettingsWindow :    { m_instance->openSettings(); break; }
             
