@@ -44,6 +44,25 @@ namespace kiwi
         DocumentManager::commit(patcher, "load initial objects and links");
     }
     
+    jPatcherManager::jPatcherManager(jInstance & instance, const std::string host, uint16_t port) :
+    m_instance(instance),
+    m_document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat')
+    {
+        model::Patcher & patcher = getPatcher();
+        
+        try
+        {
+            DocumentManager::connect(patcher, host, port);
+        }
+        catch (std::runtime_error &e)
+        {
+            throw e;
+        }
+        
+        patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
+        DocumentManager::commit(patcher);
+    }
+    
     jPatcherManager::~jPatcherManager()
     {
     }

@@ -45,6 +45,9 @@ namespace kiwi
         //! @brief Constructor.
         jPatcherManager(jInstance& instance);
         
+        //! @brief Construct and connect to remote server
+        jPatcherManager(jInstance & instance, const std::string host, uint16_t port);
+        
         //! @brief Destructor.
         ~jPatcherManager();
         
