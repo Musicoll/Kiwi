@@ -55,9 +55,6 @@ namespace kiwi
         
     private:
         
-        //! @internal temporary method to pre-populate new patchers
-        void populatePatcher(model::Patcher& patcher);
-        
     private:
         
         const uint64_t m_user_id;
