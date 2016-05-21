@@ -85,7 +85,7 @@ namespace kiwi
             
             if(!origin.isOrigin())
             {
-                const juce::Colour off_bgcolor = bgcolor.darker(0.2);
+                const juce::Colour off_bgcolor = bgcolor.darker(0.1);
                 g.setColour(off_bgcolor);
                 g.fillRect(bounds);
                 
@@ -106,7 +106,7 @@ namespace kiwi
             g.setColour(bgcolor);
             g.fillRect(origin_bounds);
             
-            g.setColour(bgcolor.contrasting(0.5));
+            g.setColour(bgcolor.contrasting(0.3));
             
             for(int x = (origin.getX() % grid_size); x < clip_bounds.getRight(); x += grid_size)
             {
@@ -651,11 +651,11 @@ namespace kiwi
             
             if(delta_width != 0)
             {
-                const int viewport_width = (m_viewport->getMaximumVisibleWidth() / m_zoom_factor) + view_pos.getX();
+                const int viewport_width = (m_viewport->getMaximumVisibleWidth() + view_pos.getX()) / m_zoom_factor;
                 
                 if(delta_width < 0)
                 {
-                    new_width = (viewport_width > objects_area.getWidth()) ? viewport_width : objects_area.getWidth();
+                    new_width = (viewport_width - delta_width > objects_area.getWidth()) ? viewport_width - delta_width : objects_area.getWidth();
                 }
                 else if(delta_width > 0)
                 {
@@ -663,28 +663,37 @@ namespace kiwi
                     
                     if(smaller_than_objects_area)
                     {
-                        const bool will_be_bigger = (objects_area.getWidth() < new_bounds.getWidth() + view_pos.getX());
+                        //Console::post("smaller_than_objects_area");
+                        
+                        const bool will_be_bigger = (objects_area.getWidth() < (new_bounds.getWidth() + view_pos.getX()) / m_zoom_factor);
                         
                         if(!will_be_bigger)
                         {
+                            //Console::post("will be smaller");
                             new_width = objects_area.getWidth();
                         }
                         else
                         {
-                            new_width = last_bounds.getWidth() + delta_width + view_pos.getX();
+                            //Console::post("will be bigger");
+                            new_width = objects_area.getWidth() + (delta_width * 10);
                         }
+                    }
+                    else
+                    {
+                        new_width = viewport_width + (delta_width * 10);
                         
+                        //Console::post("is bigger");
                     }
                 }
             }
             
             if(delta_height != 0)
             {
-                const int viewport_height = (m_viewport->getMaximumVisibleHeight() / m_zoom_factor) + view_pos.getY();
+                const int viewport_height = (m_viewport->getMaximumVisibleHeight() + view_pos.getY()) / m_zoom_factor;
                 
                 if(delta_height < 0)
                 {
-                    new_height = (viewport_height > objects_area.getHeight()) ? viewport_height : objects_area.getHeight();
+                    new_height = (viewport_height - delta_height > objects_area.getHeight()) ? viewport_height - delta_height : objects_area.getHeight();
                 }
                 else if(delta_height > 0)
                 {
@@ -692,7 +701,7 @@ namespace kiwi
                     
                     if(smaller_than_objects_area)
                     {
-                        const bool will_be_bigger = (objects_area.getHeight() < new_bounds.getHeight() + view_pos.getY());
+                        const bool will_be_bigger = (objects_area.getHeight() < (new_bounds.getHeight() + view_pos.getY()) / m_zoom_factor);
                         
                         if(!will_be_bigger)
                         {
@@ -700,16 +709,16 @@ namespace kiwi
                         }
                         else
                         {
-                            new_height = last_bounds.getHeight() + delta_height + view_pos.getY();
+                            new_height = objects_area.getHeight() + (delta_height * 10);
                         }
+                    }
+                    else
+                    {
+                        new_height = viewport_height + (delta_height * 10);
                         
+                        Console::post("is bigger");
                     }
                 }
-            }
-            
-            if(m_viewport->getViewPosition().isOrigin())
-            {
-                m_objects_area = objects_area;
             }
             
             Component* parent = getParentComponent();
@@ -755,8 +764,6 @@ namespace kiwi
         auto& viewport = *m_viewport.get();
         
         const Point<int> origin = getOriginPosition();
-        //const Point<int> view_pos = viewport.getViewPosition();
-        //const Point<int> view_pos = viewport.getLastViewPosition();
         
         const int old_width = getWidth();
         const int old_height = getHeight();
@@ -781,22 +788,8 @@ namespace kiwi
         new_width = new_width < (viewport_width + origin_x) ? (viewport_width + origin_x) : new_width;
         new_height = new_height < (viewport_height + origin_y) ? (viewport_height + origin_y) : new_height;
         
-        //if(!can_be_reduced)
-        {
-            //new_width = (new_width <= old_width) ? old_width : new_width;
-            //new_height = (new_height <= old_height) ? old_height : new_height;
-        }
-        
         getParentComponent()->setSize(new_width * m_zoom_factor, new_height * m_zoom_factor);
         setBounds(0, 0, new_width, new_height);
-        
-        //if(is_resizing)
-        {
-            //Console::post("viewpos : " + view_pos.toString().toStdString());
-           // viewport.setViewPosition(viewport.getLastViewPosition());
-            //Console::post("getViewPosition : " + viewport.getLastViewPosition().toString().toStdString());
-        }
-        
     }
     
     juce::Point<int> jPatcher::getOriginPosition() const

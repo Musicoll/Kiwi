@@ -161,13 +161,17 @@ namespace kiwi
     private: // members
         
         jPatcher const& m_patcher;
-        jObject*        m_object;
-        jLink*          m_link;
+        jObject*        m_object    = nullptr;
+        jLink*          m_link      = nullptr;
         Target          m_target	= Target::Nothing;
         Zone            m_zone		= Zone::Outside;
         int             m_border	= Border::None;
-        size_t          m_index = 0;
+        size_t          m_index     = 0;
     };
+    
+    // ================================================================================ //
+    //                                  JPATCHER VIEWPORT                               //
+    // ================================================================================ //
     
     
     //! @brief The jPatcher Viewport
@@ -194,6 +198,8 @@ namespace kiwi
         
         int m_last_width, m_last_height;
         juce::Rectangle<int>    m_last_bounds;
+        
+        bool can_hook_resized;
     };
     
 }
