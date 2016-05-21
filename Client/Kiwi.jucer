@@ -74,6 +74,8 @@
         <FILE id="xsKzHU" name="KiwiAtom.hpp" compile="0" resource="0" file="../Modules/KiwiCore/KiwiAtom.hpp"/>
         <FILE id="QQUBqT" name="KiwiListeners.hpp" compile="0" resource="0"
               file="../Modules/KiwiCore/KiwiListeners.hpp"/>
+        <FILE id="CPXLr1" name="KiwiTimer.cpp" compile="1" resource="0" file="../Modules/KiwiCore/KiwiTimer.cpp"/>
+        <FILE id="czXOP9" name="KiwiTimer.hpp" compile="0" resource="0" file="../Modules/KiwiCore/KiwiTimer.hpp"/>
       </GROUP>
     </GROUP>
     <GROUP id="{72FCDC55-1C0F-D5C0-C444-A9EF14BCE12B}" name="Flip">

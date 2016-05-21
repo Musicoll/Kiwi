@@ -21,8 +21,9 @@
  ==============================================================================
  */
 
-#include "Application.hpp"
+#include <KiwiCore/KiwiTimer.hpp>
 
+#include "Application.hpp"
 #include "CommandIDs.hpp"
 
 namespace kiwi
@@ -64,6 +65,8 @@ namespace kiwi
         m_menu_model.reset(new MainMenuModel());
         
         m_instance = std::make_unique<jInstance>();
+        
+        startTimer(20);
         
         #if JUCE_MAC
         PopupMenu macMainMenuPopup;
@@ -324,5 +327,10 @@ namespace kiwi
         m_command_manager.reset(new ApplicationCommandManager());
         
         m_command_manager->registerAllCommandsForTarget(this);
+    }
+    
+    void KiwiApp::timerCallback()
+    {
+        kiwi::Timer::getTimer().tick();
     }
 }
