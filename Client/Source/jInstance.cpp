@@ -47,6 +47,11 @@ namespace kiwi
         return m_user_id;
     }
     
+    void jInstance::setUserId(uint64_t user_id)
+    {
+        m_user_id = user_id;
+    }
+    
     void jInstance::newPatcher()
     {
         m_patcher_manager.reset();
@@ -54,6 +59,59 @@ namespace kiwi
         
         m_patcher_manager->newView();
         m_patcher_manager->newView();
+    }
+    
+    //------------------------------------------------------------
+    // Settings component
+    //------------------------------------------------------------
+    
+    class jSettings final : public juce::Component
+    {
+    public:
+        jSettings(uint64_t client_id);
+        
+        uint64_t getClientId();
+        
+        ~jSettings() = default;
+        
+    private:
+        juce::TextEditor m_client_id;
+        
+    private:
+        jSettings(jSettings const & other) = delete;
+        jSettings(jSettings && other) = delete;
+        jSettings& operator=(jSettings const& other) = delete;
+        jSettings& operator=(jSettings && other) = delete;
+    };
+    
+    jSettings::jSettings(uint64_t client_id)
+    {
+        setSize(300, 100);
+        setVisible(true);
+        
+        addAndMakeVisible(m_client_id);
+        m_client_id.setBoundsRelative((1./5), (5./12), (3./5), (3./12));
+        m_client_id.setText(juce::String(client_id));
+    }
+    
+    uint64_t jSettings::getClientId()
+    {
+        return m_client_id.getText().getFloatValue();
+    }
+    
+    void jInstance::openSettings()
+    {
+        jSettings set_cmp(getUserId());
+        juce::OptionalScopedPointer<Component> settings_component(&set_cmp, false);
+        
+        juce::DialogWindow::LaunchOptions option;
+        option.dialogTitle = juce::String("Settings");
+        option.content = settings_component;
+        option.resizable = false;
+        
+        option.runModal();
+        
+        setUserId(set_cmp.getClientId());
     }
     
     void jInstance::showConsoleWindow()

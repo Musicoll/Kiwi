@@ -47,6 +47,9 @@ namespace kiwi
         //! @brief create a new patcher window.
         void newPatcher();
         
+        //! @brief Opens the settings
+        void openSettings();
+        
         //! @brief Get the user ID of the Instance.
         uint64_t getUserId() const noexcept;
         
@@ -54,10 +57,10 @@ namespace kiwi
         void showConsoleWindow();
         
     private:
+        void setUserId(uint64_t user_id);
         
     private:
-        
-        const uint64_t m_user_id;
+        uint64_t m_user_id;
         
         std::unique_ptr<engine::Instance>   m_instance;
         

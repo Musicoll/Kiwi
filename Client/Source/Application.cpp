@@ -268,7 +268,8 @@ namespace kiwi
         {
             CommandIDs::newPatcher,
             CommandIDs::openFile,
-            CommandIDs::showConsoleWindow
+            CommandIDs::showConsoleWindow,
+            CommandIDs::showAppSettingsWindow,
         };
         
         commands.addArray(ids, numElementsInArray(ids));
@@ -302,6 +303,13 @@ namespace kiwi
                 result.addDefaultKeypress('k', ModifierKeys::commandModifier);
                 break;
             }
+            case CommandIDs::showAppSettingsWindow:
+            {
+                result.setInfo(TRANS("Settings"), TRANS("Show kiwi settings"),
+                               CommandCategories::windows, 0);
+                
+                break;
+            }
             default:
             {
                 JUCEApplication::getCommandInfo(commandID, result); break;
@@ -313,8 +321,9 @@ namespace kiwi
     {
         switch(info.commandID)
         {
-            case CommandIDs::newPatcher :           { m_instance->newPatcher(); break; }
-            case CommandIDs::showConsoleWindow :    { m_instance->showConsoleWindow(); break; }
+            case CommandIDs::newPatcher :               { m_instance->newPatcher(); break; }
+            case CommandIDs::showConsoleWindow :        { m_instance->showConsoleWindow(); break; }
+            case CommandIDs::showAppSettingsWindow :    { m_instance->openSettings(); break; }
             
             default : return JUCEApplication::perform(info);
         }
