@@ -172,7 +172,7 @@ namespace kiwi
         public:
             
             //! @brief Constructor.
-            View() = default;
+            View();
             
             //! @brief Destructor.
             ~View();
@@ -184,7 +184,19 @@ namespace kiwi
             void setLock(bool locked);
             
             //! @brief Returns true if the view is locked.
-            bool getLock();
+            bool getLock() const noexcept;
+            
+            //! @brief Returns true if the lock status changed.
+            bool lockChanged() const noexcept;
+            
+            //! @brief Set zoom factor.
+            void setZoomFactor(double zoom_factor);
+            
+            //! @brief Returns the current zoom factor.
+            double getZoomFactor() const noexcept;
+            
+            //! @brief Returns true if the zoom factor changed.
+            bool zoomFactorChanged() const noexcept;
             
             // ================================================================================ //
             //                                   SELECTION                                      //
@@ -262,6 +274,11 @@ namespace kiwi
                 
                 flip::ObjectRef<model::Link> m_ref;
             };
+            
+        private: // methods
+            
+            //! @internal flip Default constructor.
+            View(flip::Default&) {};
 
         private: // members
             
@@ -269,6 +286,7 @@ namespace kiwi
             flip::Collection<View::Link>    m_selected_links;
             
             flip::Bool                      m_is_locked;
+            flip::Float                     m_zoom_factor;
         };
         
         // ================================================================================ //

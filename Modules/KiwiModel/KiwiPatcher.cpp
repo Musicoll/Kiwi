@@ -62,7 +62,8 @@ namespace kiwi
             .name("cicm.kiwi.Patcher.View")
             .member<flip::Collection<View::Object>, &View::m_selected_objects>("selected_objects")
             .member<flip::Collection<View::Link>, &View::m_selected_links>("selected_links")
-            .member<flip::Bool, &View::m_is_locked>("locked");
+            .member<flip::Bool, &View::m_is_locked>("locked")
+            .member<flip::Float, &View::m_zoom_factor>("zoom_factor");
         }
         
         void Patcher::declare()
@@ -283,6 +284,11 @@ namespace kiwi
         //                                   PATCHER VIEW                                   //
         // ================================================================================ //
         
+        Patcher::View::View() : m_is_locked(false), m_zoom_factor(1.)
+        {
+            ;
+        }
+        
         Patcher::View::~View()
         {
             m_selected_links.clear();
@@ -294,9 +300,30 @@ namespace kiwi
             m_is_locked = locked;
         }
         
-        bool Patcher::View::getLock()
+        bool Patcher::View::getLock() const noexcept
         {
             return m_is_locked;
+        }
+        
+        bool Patcher::View::lockChanged() const noexcept
+        {
+            return m_is_locked.changed();
+        }
+        
+        void Patcher::View::setZoomFactor(double zoom_factor)
+        {
+            const double min_zoom = 0.25;
+            m_zoom_factor = zoom_factor < min_zoom ? min_zoom : zoom_factor;
+        }
+        
+        double Patcher::View::getZoomFactor() const noexcept
+        {
+            return m_zoom_factor;
+        }
+        
+        bool Patcher::View::zoomFactorChanged() const noexcept
+        {
+            return m_zoom_factor.changed();
         }
         
         std::vector<model::Object*> Patcher::View::getSelectedObjects()
