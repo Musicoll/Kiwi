@@ -30,26 +30,38 @@
 
 namespace kiwi
 {
+    //! @brief Clock on the message thread
+    //! @details The timer is a singleton used to call listeners at a regular pace on the message thread.
     class Timer final
     {
     public:
+        //! @brief Returns the unique instance of Timer
         static Timer &getTimer();
         
+        //! @brief Ticks all the listeners registered to the timer.
         void tick();
         
+        //! @brief A timer listener is called on tick at a regular pace
         class Listener
         {
         public:
+            //! @brief The listener callback function
             virtual void tick() = 0;
             
             virtual ~Listener();
             
         protected:
+            //! @brief Lets the listener callback being called
             void startTimer();
+            
+            //! @brief Stops the listener callback from being called
             void stopTimer();
         };
         
+        //! @brief Add a listener to be called
         void addListener(Listener &listener);
+        
+        //! @biref Remove a listener
         void removeListener(Listener &listener);
         
         ~Timer() = default;

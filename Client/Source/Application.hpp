@@ -128,7 +128,7 @@ namespace kiwi
         //! @brief Initialise the command manager
         void initCommandManager();
         
-        //! @brief Called at regular frequency on the main thread
+        //! @brief Called at regular frequency on the message thread
         void timerCallback() final override;
         
     private:
