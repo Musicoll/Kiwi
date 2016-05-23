@@ -42,33 +42,49 @@ namespace flip
 
 namespace kiwi
 {
+    //! @biref Class that encapsulate a TCP socket
     class CarrierSocket
     {
     public:
         CarrierSocket(flip::DocumentBase & document, std::string const& host, uint16_t port);
         
-        void disconnect();
+        // @brief Connects the socket to a remote socket
         void connect(std::string const& host, uint16_t port);
+        //! @brief Stop the socket from processing and disconnect
+        void disconnect();
+        //! @brief Returns true if the socket is connected, false otherwise
         bool isConnected() const;
         
+        //! @brief Starts a thread that continuously process the socket
         void startProcess();
+        //! @biref Process the socket once
         void process();
+        //! @brief Stops the thread that processes the socket
         void stopProcess();
         
-        
+        //! @brief Add a callback to be called once disconnected
         void listenDisconnected(std::function<void ()> func);
+        //! @brief Add a callback to be called on connected
         void listenConnected(std::function<void ()> func);
+        //! @brief Add a callback to be called once first load terminated
         void listenLoaded(std::function<void ()> func);
         
+        //! @brief Stops processing
         ~CarrierSocket();
         
     private:
+        //! @brief Function called on the processing thread
         void runProcess();
         
+        //! @brief Binds the encapsulated socket callbacks
         void bindCallBacks();
+        //! @brief Called when connection transition happen
         void listenStateTransition(flip::CarrierBase::Transition state, flip::CarrierBase::Error error);
+        //! @brief Called during loading process
         void listenTransferBackEnd(size_t cur, size_t total);
+        //! @brief Called when receiving a transaction
         void listenTransferTransaction(size_t cur, size_t total);
+        //! @brief Called when receiving a signal
         void listenTransferSignal(size_t cur, size_t total);
         
     private:
@@ -145,20 +161,30 @@ namespace kiwi
         void tick() override final;
         
     private:
-        
+        //! @brief Commmits and pushes a transaction
         void commit(std::string action);
+        //! @brief Pulls transactions stacked by a socket's process
         void pull();
+        //! @brief Pushes a trasactions stacked by a socket's process
         void push();
         
+        //! @brief Connects the document manager and download the patcher's initial state
         void connect(std::string const host, uint16_t port);
+        //! @brief Returns true if the document manager is connected false otherwise
         bool isConnected();
+        //! @brief Disconnects the document manager from the server
         void disconnect();
         
+        //! @brief Starts a timer callback on the message thread that that pulls
         void startPulling();
+        //! @brief Stops the pulling callback
         void stopPulling();
         
+        //! @brief Called once document manager is connected and starts pulling
         void onConnected();
+        //! @brief Called once document manager is disconnected and stops pulling
         void onDisconnected();
+        //! @brief Called once the initial load happened
         void onLoaded();
         
         void startCommitGesture();

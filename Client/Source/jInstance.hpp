@@ -62,7 +62,10 @@ namespace kiwi
         void showConsoleWindow();
         
     private:
+        //! @brief Open a dialog box used to enter server infos
         void openRemoteDialogBox(std::string & host, uint16_t & port);
+        
+        //! @brief Sets the instance user id
         void setUserId(uint64_t user_id);
         
     private:
