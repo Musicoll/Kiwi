@@ -191,6 +191,9 @@ namespace kiwi
         //! @brief Returns the current patcher area relative to the patcher origin position.
         juce::Rectangle<int> getRelativeViewArea() const noexcept;
         
+        //! @brief Get the view position relative to the patcher origin position.
+        juce::Point<int> getRelativeViewPosition() const noexcept;
+        
         //! @brief Set the new view position relative to the patcher origin position.
         void setRelativeViewPosition(juce::Point<int> position);
         

@@ -236,7 +236,15 @@ namespace kiwi
     
     void jPatcherViewport::visibleAreaChanged(juce::Rectangle<int> const& new_visible_area)
     {
-        ;
+        /*
+        const auto view_area = getViewArea();
+        const auto origin = getOriginPosition();
+        const auto rel_view_pos = (getViewPosition() / m_zoom_factor) - origin;
+        const auto rel_view_width = (view_area.getWidth() / m_zoom_factor);
+        const auto rel_view_height = (view_area.getHeight() / m_zoom_factor);
+        */
+        //Console::post("rel_view_pos : " + rel_view_pos.toString().toStdString());
+        //Console::post("rel_view size : " + juce::Point<int>(rel_view_width, rel_view_height).toString().toStdString());
     }
     
     void jPatcherViewport::resized()
@@ -276,15 +284,25 @@ namespace kiwi
     
     juce::Rectangle<int> jPatcherViewport::getRelativeViewArea() const noexcept
     {
-        const auto view_area = getViewArea();
-        return juce::Rectangle<int>((view_area.getPosition() - getOriginPosition() / m_zoom_factor) ,
-                                    view_area.getBottomRight() / m_zoom_factor);
-        //return view_area.withPosition((view_area.getPosition() - getOriginPosition()) / m_zoom_factor);
+        const auto rel_view_pos = getRelativeViewPosition();
+        
+        return
+        {
+            rel_view_pos.getX(),
+            rel_view_pos.getY(),
+            static_cast<int>(getViewWidth() / m_zoom_factor),
+            static_cast<int>(getViewHeight() / m_zoom_factor)
+        };
+    }
+    
+    juce::Point<int> jPatcherViewport::getRelativeViewPosition() const noexcept
+    {
+        return (getViewPosition() / m_zoom_factor) - getOriginPosition();
     }
     
     void jPatcherViewport::setRelativeViewPosition(juce::Point<int> position)
     {
-        setViewPosition((position + getOriginPosition() * m_zoom_factor) );
+        setViewPosition((position + getOriginPosition()) * m_zoom_factor);
     }
     
     void jPatcherViewport::jumpViewToObject(jObject const& object_j)
@@ -293,16 +311,9 @@ namespace kiwi
         auto object_bounds = object_j.getBoxBounds();
         object_bounds.setPosition(((object_bounds.getPosition() - getOriginPosition())));
         
-        Console::post("view_area : " + view_area.toString().toStdString());
-        Console::post("object_bounds : " + object_bounds.toString().toStdString());
-        
         if(! view_area.contains(object_bounds))
         {
-            Console::post("need moving");
-            
             juce::Point<int> view_pos = view_area.getPosition();
-            Console::post("view_pos : " + view_pos.toString().toStdString());
-            
             juce::Point<int> area_bottom_right = view_area.getBottomRight();
             juce::Point<int> object_bottom_right = object_bounds.getBottomRight();
             
@@ -324,8 +335,7 @@ namespace kiwi
                 view_pos.setY(view_pos.getY() + object_bottom_right.getY() - area_bottom_right.getY());
             }
             
-            Console::post("new view_pos : " + view_pos.toString().toStdString());
-            setRelativeViewPosition(view_pos * m_zoom_factor);
+            setRelativeViewPosition(view_pos);
         }
     }
     
