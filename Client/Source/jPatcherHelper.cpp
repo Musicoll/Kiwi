@@ -223,12 +223,12 @@ namespace kiwi
     
     jPatcherViewport::jPatcherViewport(jPatcher& patcher) :
     m_patcher(patcher),
-    can_hook_resized(false)
+    m_can_hook_resized(false)
     {
         m_patcher.setSize(600, 400);
-        m_patcher_holder.setSize(600, 400);
-        m_patcher_holder.addAndMakeVisible(m_patcher);
-        setViewedComponent(&m_patcher_holder, false);
+        m_magnifier.setSize(600, 400);
+        m_magnifier.addAndMakeVisible(m_patcher);
+        setViewedComponent(&m_magnifier, false);
         setScrollBarThickness(12);
         
         setSize(600, 400);
@@ -236,33 +236,20 @@ namespace kiwi
     
     void jPatcherViewport::visibleAreaChanged(juce::Rectangle<int> const& new_visible_area)
     {
-        //Console::post("visibleAreaChanged : " + new_visible_area.toString().toStdString());
-        //m_last_view_area = new_visible_area;
-        //m_patcher.updatePatcherArea(false);
-        
-        bool resized = (new_visible_area.getWidth() != m_last_view_area.getWidth() ||
-                        new_visible_area.getHeight() != m_last_view_area.getHeight());
-        
-        if(resized)
-        {
-            m_last_view_position = new_visible_area.getPosition();
-        }
-        else
-        {
-            m_last_view_area = new_visible_area;
-        }
+        ;
     }
     
     void jPatcherViewport::resized()
     {
-        if(!can_hook_resized)
+        if(!m_can_hook_resized)
         {
             Viewport::resized();
-            can_hook_resized = true;
+            m_can_hook_resized = true;
+            m_last_bounds = getBounds();
         }
         else
         {
-            m_patcher.viewportResized(m_last_bounds, getBounds());
+            viewportResized(m_last_bounds, getBounds());
             
             Viewport::resized();
             
@@ -270,8 +257,238 @@ namespace kiwi
         }
     }
     
-    juce::Point<int> jPatcherViewport::getLastViewPosition()
+    void jPatcherViewport::setZoomFactor(double zoom_factor)
     {
-        return m_last_view_area.getPosition();
+        if(zoom_factor != m_zoom_factor)
+        {
+            const double min_zoom = 0.25;
+            m_zoom_factor = zoom_factor < min_zoom ? min_zoom : zoom_factor;
+            m_patcher.setTransform(AffineTransform::scale(m_zoom_factor));
+            
+            updatePatcherArea(false);
+        }
+    }
+    
+    double jPatcherViewport::getZoomFactor() const noexcept
+    {
+        return m_zoom_factor;
+    }
+    
+    juce::Rectangle<int> jPatcherViewport::getRelativeViewArea() const noexcept
+    {
+        const auto view_area = getViewArea();
+        return juce::Rectangle<int>((view_area.getPosition() - getOriginPosition() / m_zoom_factor) ,
+                                    view_area.getBottomRight() / m_zoom_factor);
+        //return view_area.withPosition((view_area.getPosition() - getOriginPosition()) / m_zoom_factor);
+    }
+    
+    void jPatcherViewport::setRelativeViewPosition(juce::Point<int> position)
+    {
+        setViewPosition((position + getOriginPosition() * m_zoom_factor) );
+    }
+    
+    void jPatcherViewport::jumpViewToObject(jObject const& object_j)
+    {
+        const auto view_area = getRelativeViewArea();
+        auto object_bounds = object_j.getBoxBounds();
+        object_bounds.setPosition(((object_bounds.getPosition() - getOriginPosition())));
+        
+        Console::post("view_area : " + view_area.toString().toStdString());
+        Console::post("object_bounds : " + object_bounds.toString().toStdString());
+        
+        if(! view_area.contains(object_bounds))
+        {
+            Console::post("need moving");
+            
+            juce::Point<int> view_pos = view_area.getPosition();
+            Console::post("view_pos : " + view_pos.toString().toStdString());
+            
+            juce::Point<int> area_bottom_right = view_area.getBottomRight();
+            juce::Point<int> object_bottom_right = object_bounds.getBottomRight();
+            
+            if(object_bounds.getX() < view_area.getX())
+            {
+                view_pos.setX(object_bounds.getX());
+            }
+            else if(object_bottom_right.getX() > area_bottom_right.getX())
+            {
+                view_pos.setX(view_pos.getX() + object_bottom_right.getX() - area_bottom_right.getX());
+            }
+            
+            if(object_bounds.getY() < view_area.getY())
+            {
+                view_pos.setY(object_bounds.getY());
+            }
+            else if(object_bottom_right.getY() > area_bottom_right.getY())
+            {
+                view_pos.setY(view_pos.getY() + object_bottom_right.getY() - area_bottom_right.getY());
+            }
+            
+            Console::post("new view_pos : " + view_pos.toString().toStdString());
+            setRelativeViewPosition(view_pos * m_zoom_factor);
+        }
+    }
+    
+    void jPatcherViewport::resetObjectsArea()
+    {
+        m_objects_area = m_patcher.getCurrentObjectsArea();
+        updatePatcherArea(true);
+    }
+    
+    juce::Rectangle<int> jPatcherViewport::getObjectsArea() const noexcept
+    {
+        return m_objects_area;
+    }
+    
+    juce::Point<int> jPatcherViewport::getOriginPosition() const noexcept
+    {
+        const int x = m_objects_area.getX();
+        const int y = m_objects_area.getY();
+        
+        return {
+            x < 0 ? -x : 0,
+            y < 0 ? -y : 0
+        };
+    }
+    
+    void jPatcherViewport::viewportResized(juce::Rectangle<int> const& last_bounds,
+                                           juce::Rectangle<int> const& new_bounds)
+    {
+        const int delta_width = new_bounds.getWidth() - last_bounds.getWidth();
+        const int delta_height = new_bounds.getHeight() - last_bounds.getHeight();
+        
+        int new_width = m_patcher.getWidth() + delta_width;
+        int new_height = m_patcher.getHeight() + delta_height;
+        
+        const Rectangle<int> objects_area = m_patcher.getCurrentObjectsArea();
+        const int objects_width = objects_area.getWidth();
+        const int objects_height = objects_area.getHeight();
+        
+        const Point<int> view_pos = getViewPosition();
+        const double zoom = getZoomFactor();
+        
+        if(delta_width != 0)
+        {
+            const int viewport_width = (getMaximumVisibleWidth() + view_pos.getX()) / zoom;
+            
+            if(delta_width < 0)
+            {
+                new_width = (viewport_width - delta_width > objects_width) ? viewport_width - delta_width : objects_width;
+            }
+            else if(delta_width > 0)
+            {
+                const bool smaller_than_objects_area = (objects_width > viewport_width);
+                
+                if(smaller_than_objects_area)
+                {
+                    const bool will_be_bigger = (objects_width < (new_bounds.getWidth() + view_pos.getX()) / zoom);
+                    
+                    if(!will_be_bigger)
+                    {
+                        new_width = objects_width;
+                    }
+                    else
+                    {
+                        new_width = objects_width + (delta_width * 10);
+                    }
+                }
+                else
+                {
+                    new_width = viewport_width + (delta_width * 10);
+                }
+            }
+        }
+        
+        if(delta_height != 0)
+        {
+            const int viewport_height = (getMaximumVisibleHeight() + view_pos.getY()) / zoom;
+            
+            if(delta_height < 0)
+            {
+                new_height = (viewport_height - delta_height > objects_height) ? viewport_height - delta_height : objects_height;
+            }
+            else if(delta_height > 0)
+            {
+                const bool smaller_than_objects_area = (objects_height > viewport_height);
+                
+                if(smaller_than_objects_area)
+                {
+                    const bool will_be_bigger = (objects_height < (new_bounds.getHeight() + view_pos.getY()) / zoom);
+                    
+                    if(!will_be_bigger)
+                    {
+                        new_height = objects_height;
+                    }
+                    else
+                    {
+                        new_height = objects_height + (delta_height * 10);
+                    }
+                }
+                else
+                {
+                    new_height = viewport_height + (delta_height * 10);
+                }
+            }
+        }
+        
+        m_patcher.setSize(new_width, new_height);
+        m_magnifier.setSize(new_width * zoom, new_height * zoom);
+    }
+    
+    void jPatcherViewport::updatePatcherArea(bool keep_view_pos)
+    {
+        const juce::Point<int> view_pos = getViewPosition();
+        const juce::Point<int> last_origin = getOriginPosition();
+        
+        juce::Rectangle<int> objects_current_area = m_patcher.getCurrentObjectsArea();
+        
+        m_objects_area.setLeft(objects_current_area.getX());
+        m_objects_area.setTop(objects_current_area.getY());
+        
+        //if(!keep_view_pos || objects_current_area.getWidth() > m_objects_area.getWidth())
+        if(objects_current_area.getWidth() > m_objects_area.getWidth())
+        {
+            m_objects_area.setWidth(objects_current_area.getWidth());
+        }
+        
+        //if(!keep_view_pos || objects_current_area.getHeight() > m_objects_area.getHeight())
+        if(objects_current_area.getHeight() > m_objects_area.getHeight())
+        {
+            m_objects_area.setHeight(objects_current_area.getHeight());
+        }
+        
+        const juce::Point<int> origin = getOriginPosition();
+        const int origin_x = origin.getX();
+        const int origin_y = origin.getY();
+        
+        if(last_origin != origin)
+        {
+            m_patcher.originPositionChanged();
+        }
+        
+        const auto zoom = getZoomFactor();
+        
+        const int viewport_width = getMaximumVisibleWidth() / zoom;
+        const int viewport_height = getMaximumVisibleHeight() / zoom;
+        
+        const Rectangle<int> objects_area = m_objects_area.withPosition(origin);
+        const int objects_width = objects_area.getWidth();
+        const int objects_height = objects_area.getHeight();
+        
+        int new_width = (viewport_width > objects_width) ? viewport_width : objects_width;
+        int new_height = (viewport_height > objects_height) ? viewport_height : objects_height;
+        
+        // patcher positive area should never be smaller than viewport area
+        new_width = new_width < (viewport_width + origin_x) ? (viewport_width + origin_x) : new_width;
+        new_height = new_height < (viewport_height + origin_y) ? (viewport_height + origin_y) : new_height;
+        
+        m_patcher.setSize(new_width, new_height);
+        m_magnifier.setSize(new_width * zoom, new_height * zoom);
+        
+        if(keep_view_pos)
+        {
+            const juce::Point<int> delta = (view_pos - origin) - (view_pos - last_origin);
+            setViewPosition(view_pos - delta);
+        }
     }
 }

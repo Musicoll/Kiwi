@@ -51,18 +51,21 @@ namespace kiwi
     
     void jObject::updateBounds()
     {
-        const juce::Point<int> origin = m_patcher_view.getOriginPosition();
-        
-        const juce::Rectangle<int> bounds(m_model->getX() + origin.getX(),
-                                          m_model->getY() + origin.getY(),
-                                          60, 20);
-        
-        const auto new_bounds = bounds.expanded(m_selection_width, m_selection_width);
-        
-        m_local_box_bounds = bounds.withPosition(bounds.getX() - new_bounds.getX(),
-                                                 bounds.getY() - new_bounds.getY());
-        
-        setBounds(new_bounds);
+        if(m_model && !m_model->removed())
+        {
+            const juce::Point<int> origin = m_patcher_view.getOriginPosition();
+            
+            const juce::Rectangle<int> bounds(m_model->getX() + origin.getX(),
+                                              m_model->getY() + origin.getY(),
+                                              60, 20);
+            
+            const auto new_bounds = bounds.expanded(m_selection_width, m_selection_width);
+            
+            m_local_box_bounds = bounds.withPosition(bounds.getX() - new_bounds.getX(),
+                                                     bounds.getY() - new_bounds.getY());
+            
+            setBounds(new_bounds);
+        }
     }
     
     void jObject::paint(juce::Graphics & g)

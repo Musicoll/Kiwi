@@ -185,21 +185,49 @@ namespace kiwi
         
         void resized() override;
         
-        juce::Point<int> getLastViewPosition();
+        //! @brief Make the object visible in the viewport area.
+        void jumpViewToObject(jObject const&);
         
-    private:
+        //! @brief Returns the current patcher area relative to the patcher origin position.
+        juce::Rectangle<int> getRelativeViewArea() const noexcept;
         
-        jPatcher&               m_patcher;
-        juce::Viewport          m_viewport;
-        Component               m_patcher_holder;
-        juce::Rectangle<int>    m_last_view_area;
+        //! @brief Set the new view position relative to the patcher origin position.
+        void setRelativeViewPosition(juce::Point<int> position);
         
-        juce::Point<int>        m_last_view_position;
+        //! @brief Set the zoom factor.
+        //! @details The non-zooming factor is 1., 2. means zoom at 200%, -0.5 zoom at 50% and so on.
+        void setZoomFactor(double zoom_factor);
         
-        int m_last_width, m_last_height;
-        juce::Rectangle<int>    m_last_bounds;
+        //! @brief Returns the current zoom factor.
+        double getZoomFactor() const noexcept;
         
-        bool can_hook_resized;
+        //! @brief Returns the position of the patcher origin relative to the component position.
+        juce::Point<int> getOriginPosition() const noexcept;
+        
+        //! @brief Reset the objects area.
+        void resetObjectsArea();
+        
+        //! @brief Returns the current objects area.
+        juce::Rectangle<int> getObjectsArea() const noexcept;
+        
+        //! @brief Update patcher size.
+        void updatePatcherArea(bool keep_same_view_position);
+        
+    private: // members
+        
+        //! @internal Hook method called by jPatcherViewport just before resized.
+        void viewportResized(juce::Rectangle<int> const& last_bounds,
+                             juce::Rectangle<int> const& new_bounds);
+        
+    private: // members
+        
+        jPatcher&                   m_patcher;
+        juce::Viewport              m_viewport;
+        Component                   m_magnifier;
+        juce::Rectangle<int>        m_last_bounds;
+        juce::Rectangle<int>        m_objects_area;
+        double                      m_zoom_factor;
+        bool                        m_can_hook_resized;
     };
     
 }

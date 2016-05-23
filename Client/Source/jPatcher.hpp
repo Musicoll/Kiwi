@@ -76,6 +76,13 @@ namespace kiwi
         //! @brief Get the lock status of the patcher view.
         bool isLocked();
         
+        //! @brief Returns the Viewport that contains this patcher view.
+        //! @details You must use this method if you want to add this component into an other one.
+        jPatcherViewport& getViewport() { return *m_viewport.get(); }
+        
+        //! @brief Returns the position of the patcher origin relative to the component position.
+        juce::Point<int> getOriginPosition() const;
+        
         // ================================================================================ //
         //                                    COMPONENT                                     //
         // ================================================================================ //
@@ -95,15 +102,6 @@ namespace kiwi
         void getAllCommands(Array<CommandID>& commands) override;
         void getCommandInfo(CommandID commandID, ApplicationCommandInfo& result) override;
         bool perform(const InvocationInfo& info) override;
-        
-        //! @brief Returns the Viewport that contains this patcher view.
-        //! @details You must use this method if you want to add this component into an other one.
-        jPatcherViewport& getViewport() { return *m_viewport.get(); }
-        
-        //! @brief Returns the position of the patcher origin relative to the component position.
-        juce::Point<int> getOriginPosition() const;
-        
-        juce::Point<int> getOriginPosition(juce::Rectangle<int> const& bounds) const;
         
     protected:
         
@@ -257,13 +255,6 @@ namespace kiwi
         //! @internal Returns the current objects area.
         juce::Rectangle<int> getCurrentObjectsArea();
         
-        //! @internal Update patcher size.
-        void updatePatcherArea(bool can_be_reduced, bool is_resizing = false);
-        
-        //! @internal Hook method called by jPatcherViewport just before resized.
-        void viewportResized(juce::Rectangle<int> const& last_bounds,
-                             juce::Rectangle<int> const& new_bounds);
-        
         //! @brief Zoom in Patcher View.
         void zoomIn();
         
@@ -306,10 +297,7 @@ namespace kiwi
         std::unique_ptr<jPatcherViewport>   m_viewport;
         std::unique_ptr<HitTester>          m_hittester;
         
-        juce::Rectangle<int>                m_objects_area;
-        
         bool m_is_locked;
-        float m_zoom_factor;
         
         // mouse interactions flags
         juce::Point<int> m_last_drag;
