@@ -48,16 +48,24 @@ namespace kiwi
             ~PatcherManager();
             
         private:
+            //! @brief Launches a thread that continuoustly processes the document's socket
             void launchTransport();
+            //! @brief Functions called by the processing thread to process the socket
             void runTransport();
+            //! @brief Joins the thread processing the socket
             void stopTransport();
             
+            //! @brief Initializes the patcher with a hardcoded structure
             void populatePatcher();
             
+            //! @brief Returns the referenced patcher
             model::Patcher &getPatcher();
             
+            //! @brief Called when a client is connecting to the document
             void on_connecting(flip::PortBase& port);
+            //! @brief Called once a client is connected to the document
             void on_connected(flip::PortBase& port);
+            //! @brief Called once a client is disconnected
             void on_disconnected(flip::PortBase& port);
             
         private:

@@ -37,13 +37,15 @@ namespace kiwi
         public:
             Server() = default;
             
+            //! @brief Loop that retrieves user input to manager server
             void runCommand();
-            void runTransport();
             
             ~Server() = default;
             
         private:
+            //! @brief Open the patcher that has document_id as id
             void openPatcher(uint64_t document_id);
+            //! @brief Close the patcher that has document_id as id
             void closePatcher(uint64_t patcher_id);
             
         private:

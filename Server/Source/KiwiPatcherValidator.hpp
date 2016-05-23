@@ -37,6 +37,7 @@ namespace kiwi
         public:
             PatcherValidator() = default;
             
+            //! @brief Called to validate a new transaction
             void validate (model::Patcher & root) final override;
             
             ~PatcherValidator() = default;
