@@ -256,16 +256,9 @@ namespace kiwi
                         moveSelectedObjects(delta, true, true);
                         m_last_drag = pos;
                         
-                        const auto vp_area = m_viewport->getViewArea();
-                        
-                        //Console::post("getViewArea : " + vp_area.toString().toStdString());
-                        //Console::post("pos : " + pos.toString().toStdString());
-                        
-                        if(! vp_area.contains(pos))
-                        {
-                            //beginDragAutoRepeat(100);
-                            //m_viewport->autoScroll(pos.getX(), pos.getY(), 5, 10);
-                        }
+                        beginDragAutoRepeat(50);
+                        const MouseEvent e2(e.getEventRelativeTo(m_viewport.get()));
+                        m_viewport->autoScroll(e2.x, e2.y, 5, 5);
                     }
                 }
             }
@@ -305,7 +298,6 @@ namespace kiwi
                 jObject* object_j = hit.getObject();
                 if(object_j)
                 {
-                    Console::post("selectOnMouseUp");
                     selectOnMouseUp(*object_j, !e.mods.isShiftDown(), m_is_dragging, m_select_on_mouse_down_status);
                 }
             }

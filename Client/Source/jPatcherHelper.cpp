@@ -236,15 +236,7 @@ namespace kiwi
     
     void jPatcherViewport::visibleAreaChanged(juce::Rectangle<int> const& new_visible_area)
     {
-        /*
-        const auto view_area = getViewArea();
-        const auto origin = getOriginPosition();
-        const auto rel_view_pos = (getViewPosition() / m_zoom_factor) - origin;
-        const auto rel_view_width = (view_area.getWidth() / m_zoom_factor);
-        const auto rel_view_height = (view_area.getHeight() / m_zoom_factor);
-        */
-        //Console::post("rel_view_pos : " + rel_view_pos.toString().toStdString());
-        //Console::post("rel_view size : " + juce::Point<int>(rel_view_width, rel_view_height).toString().toStdString());
+        ;
     }
     
     void jPatcherViewport::resized()
