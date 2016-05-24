@@ -188,7 +188,7 @@ namespace kiwi
             {
                 if(e.mods.isRightButtonDown())
                 {
-                    showPatcherPopupMenu(e.getPosition());
+                    showPatcherPopupMenu(e.getPosition() - m_viewport->getOriginPosition());
                 }
                 else if(!e.mods.isShiftDown())
                 {

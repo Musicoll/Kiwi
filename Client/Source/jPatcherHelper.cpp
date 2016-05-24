@@ -287,9 +287,14 @@ namespace kiwi
         };
     }
     
+    juce::Point<int> jPatcherViewport::getRelativePosition(juce::Point<int> point) const noexcept
+    {
+        return (point / m_zoom_factor) - getOriginPosition();
+    }
+    
     juce::Point<int> jPatcherViewport::getRelativeViewPosition() const noexcept
     {
-        return (getViewPosition() / m_zoom_factor) - getOriginPosition();
+        return getRelativePosition(getViewPosition());
     }
     
     void jPatcherViewport::setRelativeViewPosition(juce::Point<int> position)
