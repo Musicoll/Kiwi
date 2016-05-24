@@ -1005,7 +1005,6 @@ namespace kiwi
         return m_objects;
     }
     
-    //! @brief Returns the jLinks.
     jPatcher::jLinks const& jPatcher::getLinks() const
     {
         return m_links;

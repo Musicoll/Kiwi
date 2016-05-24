@@ -78,8 +78,10 @@ namespace kiwi
     {
         reset();
         
-        for(auto& box_uptr : m_patcher.getObjects())
+        const auto& objects = m_patcher.getObjects();
+        for(auto it = objects.rbegin(); it != objects.rend(); ++it)
         {
+            auto& box_uptr = *it;
             if(box_uptr)
             {
                 const auto box_bounds = box_uptr->getBounds();
@@ -103,8 +105,10 @@ namespace kiwi
     {
         reset();
         
-        for(auto& link_uptr : m_patcher.getLinks())
+        const auto& links = m_patcher.getLinks();
+        for(auto it = links.rbegin(); it != links.rend(); ++it)
         {
+            auto& link_uptr = *it;
             if(link_uptr)
             {
                 const auto link_bounds = link_uptr->getBounds();
