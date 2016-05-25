@@ -265,6 +265,10 @@ namespace kiwi
                                 m_viewport->autoScroll(e2.x, e2.y, 5, 5);
                             }
                         }
+                        else
+                        {
+                            m_viewport->updatePatcherArea(true);
+                        }
                     }
                 }
             }
@@ -416,9 +420,8 @@ namespace kiwi
     void jPatcher::endMoveOrResizeObjects()
     {
         DocumentManager::endCommitGesture(m_patcher_model);
-        
-        m_viewport->updatePatcherArea(true);
         m_is_in_move_or_resize_gesture = false;
+        m_viewport->updatePatcherArea(true);
 
         HitTester& hit = *m_hittester.get();
         
