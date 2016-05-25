@@ -173,16 +173,21 @@ namespace kiwi
     //                                  JPATCHER VIEWPORT                               //
     // ================================================================================ //
     
-    
     //! @brief The jPatcher Viewport
     class jPatcherViewport : public juce::Viewport
     {
     public:
         
+        //! @brief Constructor
         jPatcherViewport(jPatcher& patcher);
         
+        //! @brief Destructor
+        ~jPatcherViewport() = default;
+        
+        //! @brief Called by juce::Viewport when the visible area changed
         void visibleAreaChanged(juce::Rectangle<int> const& new_visible_area) override;
         
+        //! @brief Overriden from juce::Viewport to update patcher area on viewport resize.
         void resized() override;
         
         //! @brief Make the object visible in the viewport area.

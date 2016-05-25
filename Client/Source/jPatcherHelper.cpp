@@ -382,9 +382,19 @@ namespace kiwi
         {
             const int viewport_width = (getMaximumVisibleWidth() + view_pos.getX()) / zoom;
             
+            bool need_resize = false;
+            
             if(delta_width < 0)
             {
-                new_width = (viewport_width - delta_width > objects_width) ? viewport_width - delta_width : objects_width;
+                if(viewport_width - delta_width > objects_width)
+                {
+                    new_width = viewport_width - delta_width;
+                    need_resize = true;
+                }
+                else
+                {
+                    new_width = objects_width;
+                }
             }
             else if(delta_width > 0)
             {
@@ -401,12 +411,20 @@ namespace kiwi
                     else
                     {
                         new_width = objects_width + (delta_width * 10);
+                        need_resize = true;
                     }
                 }
                 else
                 {
                     new_width = viewport_width + (delta_width * 10);
+                    need_resize = true;
                 }
+            }
+            
+            if(need_resize)
+            {
+                m_magnifier.setSize(new_width * zoom, new_height * zoom);
+                new_width = (getMaximumVisibleWidth() + view_pos.getX()) / zoom + 1;
             }
         }
         
@@ -414,9 +432,19 @@ namespace kiwi
         {
             const int viewport_height = (getMaximumVisibleHeight() + view_pos.getY()) / zoom;
             
+            bool need_resize = false;
+            
             if(delta_height < 0)
             {
-                new_height = (viewport_height - delta_height > objects_height) ? viewport_height - delta_height : objects_height;
+                if(viewport_height - delta_height > objects_height)
+                {
+                    new_height = viewport_height - delta_height;
+                    need_resize = true;
+                }
+                else
+                {
+                    new_height = objects_height;
+                }
             }
             else if(delta_height > 0)
             {
@@ -433,12 +461,20 @@ namespace kiwi
                     else
                     {
                         new_height = objects_height + (delta_height * 10);
+                        need_resize = true;
                     }
                 }
                 else
                 {
                     new_height = viewport_height + (delta_height * 10);
+                    need_resize = true;
                 }
+            }
+            
+            if(need_resize)
+            {
+                m_magnifier.setSize(new_width * zoom, new_height * zoom);
+                new_height = (getMaximumVisibleHeight() + view_pos.getY()) / zoom + 1;
             }
         }
         
