@@ -231,7 +231,7 @@ namespace kiwi
         juce::Viewport              m_viewport;
         Component                   m_magnifier;
         juce::Rectangle<int>        m_last_bounds;
-        juce::Rectangle<int>        m_objects_area;
+        juce::Rectangle<int>        m_patching_area;
         double                      m_zoom_factor;
         bool                        m_can_hook_resized;
     };

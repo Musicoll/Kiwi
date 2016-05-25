@@ -342,19 +342,19 @@ namespace kiwi
     
     void jPatcherViewport::resetObjectsArea()
     {
-        m_objects_area = m_patcher.getCurrentObjectsArea();
+        m_patching_area = m_patcher.getCurrentObjectsArea();
         updatePatcherArea(true);
     }
     
     juce::Rectangle<int> jPatcherViewport::getObjectsArea() const noexcept
     {
-        return m_objects_area;
+        return m_patching_area;
     }
     
     juce::Point<int> jPatcherViewport::getOriginPosition() const noexcept
     {
-        const int x = m_objects_area.getX();
-        const int y = m_objects_area.getY();
+        const int x = m_patching_area.getX();
+        const int y = m_patching_area.getY();
         
         return {
             x < 0 ? -x : 0,
@@ -442,6 +442,7 @@ namespace kiwi
             }
         }
         
+        m_patching_area.setSize(new_width, new_height);
         m_patcher.setSize(new_width, new_height);
         m_magnifier.setSize(new_width * zoom, new_height * zoom);
     }
@@ -453,19 +454,17 @@ namespace kiwi
         
         juce::Rectangle<int> objects_current_area = m_patcher.getCurrentObjectsArea();
         
-        m_objects_area.setLeft(objects_current_area.getX());
-        m_objects_area.setTop(objects_current_area.getY());
+        m_patching_area.setLeft(objects_current_area.getX());
+        m_patching_area.setTop(objects_current_area.getY());
         
-        //if(!keep_view_pos || objects_current_area.getWidth() > m_objects_area.getWidth())
-        if(objects_current_area.getWidth() > m_objects_area.getWidth())
+        if(objects_current_area.getWidth() > m_patching_area.getWidth())
         {
-            m_objects_area.setWidth(objects_current_area.getWidth());
+            m_patching_area.setWidth(objects_current_area.getWidth());
         }
-        
-        //if(!keep_view_pos || objects_current_area.getHeight() > m_objects_area.getHeight())
-        if(objects_current_area.getHeight() > m_objects_area.getHeight())
+
+        if(objects_current_area.getHeight() > m_patching_area.getHeight())
         {
-            m_objects_area.setHeight(objects_current_area.getHeight());
+            m_patching_area.setHeight(objects_current_area.getHeight());
         }
         
         const juce::Point<int> origin = getOriginPosition();
@@ -482,7 +481,7 @@ namespace kiwi
         const int viewport_width = getMaximumVisibleWidth() / zoom;
         const int viewport_height = getMaximumVisibleHeight() / zoom;
         
-        const Rectangle<int> objects_area = m_objects_area.withPosition(origin);
+        const Rectangle<int> objects_area = m_patching_area.withPosition(origin);
         const int objects_width = objects_area.getWidth();
         const int objects_height = objects_area.getHeight();
         
