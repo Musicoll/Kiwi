@@ -43,7 +43,7 @@ namespace kiwi
             }
         }
         
-        void ObjectPlus::receive(uint32_t index, std::vector<Atom> const& args)
+        void ObjectPlus::receive(size_t index, std::vector<Atom> const& args)
         {
             if(args.size() > 0)
             {
@@ -87,7 +87,7 @@ namespace kiwi
             m_name = !args.empty() ? args[0].getString() : "print";
         }
         
-        void ObjectPrint::receive(uint32_t, std::vector<Atom> const& args)
+        void ObjectPrint::receive(size_t, std::vector<Atom> const& args)
         {
             if(!args.empty())
             {

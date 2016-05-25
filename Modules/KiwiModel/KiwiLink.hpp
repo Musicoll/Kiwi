@@ -48,7 +48,7 @@ namespace kiwi
             //! @param outlet   The sender outlet index.
             //! @param to       The receiver Object.
             //! @param inlet    The receiver inlet index.
-            Link(model::Object const& from, const uint32_t outlet, model::Object const& to, const uint32_t inlet);
+            Link(model::Object const& from, const size_t outlet, model::Object const& to, const size_t inlet);
             
             //! @brief Destructor.
             virtual ~Link() = default;
@@ -69,18 +69,18 @@ namespace kiwi
             
             //! @brief Get the actual origin outlet index of the link.
             //! @return The actual origin outlet index of the link.
-            uint32_t getSenderIndex() const noexcept
+            size_t getSenderIndex() const noexcept
             {
                 int64_t value = !removed() ? m_index_outlet.value() : m_index_outlet.before();
-                return static_cast<uint32_t>(value);
+                return static_cast<size_t>(value);
             }
             
             //! @brief Get the actual destination inlet index of the link.
             //! @return The actual destination inlet index of the link.
-            uint32_t getReceiverIndex() const noexcept
+            size_t getReceiverIndex() const noexcept
             {
                 int64_t value = !removed() ? m_index_inlet.value() : m_index_inlet.before();
-                return static_cast<uint32_t>(value);
+                return static_cast<size_t>(value);
             }
             
         public:

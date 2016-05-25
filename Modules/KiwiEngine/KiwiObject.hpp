@@ -58,19 +58,19 @@ namespace kiwi
             inline std::string getName() const noexcept         { return m_model->getName(); }
             
             //! @brief Get the number of inlets of the Object.
-            inline uint32_t getNumberOfInlets() const noexcept  { return m_model->getNumberOfInlets(); }
+            inline size_t getNumberOfInlets() const noexcept    { return m_model->getNumberOfInlets(); }
             
             //! @brief Get the number of inlets of the object.
-            inline uint32_t getNumberOfOutlets() const noexcept { return m_model->getNumberOfOutlets(); }
+            inline size_t getNumberOfOutlets() const noexcept   { return m_model->getNumberOfOutlets(); }
             
             //! @brief The receive method.
             //! @details This method must be overriden by object's subclasses.
-            virtual void receive(uint32_t index, std::vector<Atom> const& args) = 0;
+            virtual void receive(size_t index, std::vector<Atom> const& args) = 0;
             
         protected:
             
             //! @brief Send a message through a given outlet index.
-            void send(const uint32_t index, std::vector<Atom> const& args);
+            void send(const size_t index, std::vector<Atom> const& args);
             
             //! @brief Called when the signalTrigger method is fired.
             virtual void signalTriggerCalled() {};
@@ -97,7 +97,7 @@ namespace kiwi
 
             model::Object*          m_model;
             std::vector<Outlet>     m_outlets;
-            uint32_t                m_stack_count = 0ul;
+            size_t                  m_stack_count = 0ul;
             
             flip::SignalConnection  m_signal_cnx;
         };

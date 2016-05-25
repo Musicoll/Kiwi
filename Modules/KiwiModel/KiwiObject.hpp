@@ -76,9 +76,9 @@ namespace kiwi
             
             //! @brief Returns the number of inlets.
             //! @return The number of inlets.
-            inline uint32_t getNumberOfInlets() const noexcept
+            inline size_t getNumberOfInlets() const noexcept
             {
-                return static_cast<uint32_t>(m_inlets);
+                return static_cast<size_t>(m_inlets);
             }
             
             //! @brief Returns true if the inlets changed.
@@ -89,9 +89,9 @@ namespace kiwi
             
             //! @brief Returns the number of outlets.
             //! @return The number of outlets.
-            inline uint32_t getNumberOfOutlets() const noexcept
+            inline size_t getNumberOfOutlets() const noexcept
             {
-                return static_cast<uint32_t>(m_outlets);
+                return static_cast<size_t>(m_outlets);
             }
             
             //! @brief Returns true if the outlets changed.
@@ -132,14 +132,14 @@ namespace kiwi
             
             //! @brief Set the number of inlets.
             //! @param inlets The number of inlets.
-            inline void setNumberOfInlets(uint32_t inlets)
+            inline void setNumberOfInlets(size_t inlets)
             {
                 m_inlets = static_cast<flip::Int::internal_type>(inlets);
             }
             
             //! @brief Set the number of inlets.
             //! @param inlets The number of inlets.
-            inline void setNumberOfOutlets(uint32_t outlets)
+            inline void setNumberOfOutlets(size_t outlets)
             {
                 m_outlets = static_cast<flip::Int::internal_type>(outlets);
             }

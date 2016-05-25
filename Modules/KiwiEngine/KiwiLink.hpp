@@ -54,10 +54,10 @@ namespace kiwi
             inline Object& getReceiverObject() const noexcept   { return m_receiver; }
             
             //! @brief Retrieve the index of the outlet of the link.
-            inline uint32_t getSenderIndex() const noexcept     { return m_model.getSenderIndex(); }
+            inline size_t getSenderIndex() const noexcept     { return m_model.getSenderIndex(); }
             
             //! @brief Retrieve the index of the inlet of the link.
-            inline uint32_t getReceiverIndex() const noexcept   { return m_model.getReceiverIndex(); }
+            inline size_t getReceiverIndex() const noexcept   { return m_model.getReceiverIndex(); }
             
         private:
             

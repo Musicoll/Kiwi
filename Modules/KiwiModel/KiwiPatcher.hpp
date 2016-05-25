@@ -68,9 +68,9 @@ namespace kiwi
             //! @param to       The destination Object.
             //! @param inlet    The destination inlet index.
             void addLink(model::Object const& from,
-                         const uint32_t outlet,
+                         const size_t outlet,
                          model::Object const& to,
-                         const uint32_t inlet);
+                         const size_t inlet);
             
             //! @brief Removes an object from the Patcher.
             //! @details This will also remove all links connected to this object.
@@ -144,8 +144,8 @@ namespace kiwi
             //! @brief Unselect this link for all views of all users.
             void unselectForAllUsers(model::Link& link);
             
-            bool canConnect(model::Object const& from, const uint32_t outlet,
-                            model::Object const& to, const uint32_t inlet) const;
+            bool canConnect(model::Object const& from, const size_t outlet,
+                            model::Object const& to, const size_t inlet) const;
             
             object_array_t::const_iterator findObject(model::Object const& object) const;
             object_array_t::iterator findObject(model::Object const& object);

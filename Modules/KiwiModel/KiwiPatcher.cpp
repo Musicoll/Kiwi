@@ -108,8 +108,8 @@ namespace kiwi
             return *m_objects.insert(m_objects.end(), std::move(object_uptr));
         }
         
-        bool Patcher::canConnect(model::Object const& from, const uint32_t outlet,
-                                 model::Object const& to, const uint32_t inlet) const
+        bool Patcher::canConnect(model::Object const& from, const size_t outlet,
+                                 model::Object const& to, const size_t inlet) const
         {
             // check source object
             const auto from_it = findObject(from);
@@ -126,8 +126,8 @@ namespace kiwi
                 {
                     return (link_model.getSenderObject().ref()      == from.ref() &&
                             link_model.getReceiverObject().ref()    == to.ref() &&
-                            link_model.getSenderIndex()         == outlet &&
-                            link_model.getReceiverIndex()       == inlet);
+                            link_model.getSenderIndex()             == outlet &&
+                            link_model.getReceiverIndex()           == inlet);
                 };
                 
                 return (std::find_if(m_links.begin(), m_links.end(), find_link) == m_links.cend());
@@ -136,7 +136,7 @@ namespace kiwi
             return false;
         }
         
-        void Patcher::addLink(model::Object const& from, const uint32_t outlet, model::Object const& to, const uint32_t inlet)
+        void Patcher::addLink(model::Object const& from, const size_t outlet, model::Object const& to, const size_t inlet)
         {
             if(canConnect(from, outlet, to, inlet))
             {

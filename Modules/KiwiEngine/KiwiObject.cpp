@@ -55,7 +55,7 @@ namespace kiwi
             m_outlets[idx].erase(link);
         }
         
-        void Object::send(const uint32_t index, std::vector<Atom> const& args)
+        void Object::send(const size_t index, std::vector<Atom> const& args)
         {
             const auto idx = static_cast<std::vector<Outlet>::size_type>(index);
             
