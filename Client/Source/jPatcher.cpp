@@ -150,35 +150,35 @@ namespace kiwi
 
             if(hit.targetObject())
             {
-                jObject* jbox = hit.getObject();
-                if(jbox)
+                jObject* object_j = hit.getObject();
+                if(object_j)
                 {
                     if(hit.getZone() == HitTester::Zone::Inside)
                     {
                         if(e.mods.isAltDown())
                         {
                             m_copy_on_drag = true;
-                            m_select_on_mouse_down_status = selectOnMouseDown(*jbox, true);
+                            m_select_on_mouse_down_status = selectOnMouseDown(*object_j, true);
                         }
                         else if (e.mods.isCommandDown())
                         {
-                            jbox->mouseDown(e);
+                            object_j->mouseDown(e.getEventRelativeTo(object_j));
                             m_object_received_down_event = true;
                         }
                         else
                         {
                             if(e.mods.isPopupMenu())
                             {
-                                if (!jbox->isSelected())
+                                if (!object_j->isSelected())
                                 {
-                                    m_select_on_mouse_down_status = selectOnMouseDown(*jbox, true);
+                                    m_select_on_mouse_down_status = selectOnMouseDown(*object_j, true);
                                 }
                                 
                                 //showObjectPopupMenu(*box);
                             }
                             else
                             {
-                                m_select_on_mouse_down_status = selectOnMouseDown(*jbox, !e.mods.isShiftDown());
+                                m_select_on_mouse_down_status = selectOnMouseDown(*object_j, !e.mods.isShiftDown());
                             }
                         }
                     }
@@ -212,8 +212,6 @@ namespace kiwi
     {
         MouseCursor::StandardCursorType mc = MouseCursor::NormalCursor;
         
-        //m_is_dragging = ! m_mouse_has_just_been_clicked;
-        
         if(!isLocked())
         {
             HitTester& hit = *m_hittester.get();
@@ -227,7 +225,7 @@ namespace kiwi
                     {
                         if(m_object_received_down_event)
                         {
-                            object_j->mouseDrag(e);
+                            object_j->mouseDrag(e.getEventRelativeTo(object_j));
                         }
                     }
                     else if(m_object_border_down_status != HitTester::Border::None)
@@ -246,19 +244,27 @@ namespace kiwi
                     }
                     else if(isAnyObjectSelected())
                     {
-                        if(m_mouse_has_just_been_clicked)
+                        if(! m_is_dragging && (e.getMouseDownPosition() != e.getPosition()))
                         {
                             startMoveOrResizeObjects();
+                            m_is_dragging = true;
                         }
                         
-                        const juce::Point<int> pos = e.getPosition();
-                        auto delta = pos - m_last_drag;
-                        moveSelectedObjects(delta, true, true);
-                        m_last_drag = pos;
-                        
-                        beginDragAutoRepeat(50);
-                        const MouseEvent e2(e.getEventRelativeTo(m_viewport.get()));
-                        m_viewport->autoScroll(e2.x, e2.y, 5, 5);
+                        if(m_is_dragging)
+                        {
+                            const juce::Point<int> pos = e.getPosition();
+                            auto delta = pos - m_last_drag;
+                            moveSelectedObjects(delta, true, true);
+                            m_last_drag = pos;
+                            
+                            if(! m_viewport->getRelativeViewArea().contains(pos))
+                            {
+                                // scroll viewport
+                                beginDragAutoRepeat(50);
+                                const MouseEvent e2(e.getEventRelativeTo(m_viewport.get()));
+                                m_viewport->autoScroll(e2.x, e2.y, 5, 5);
+                            }
+                        }
                     }
                 }
             }
@@ -266,7 +272,6 @@ namespace kiwi
         
         setMouseCursor(mc);
         m_mouse_has_just_been_clicked = false;
-        m_is_dragging = true;
     }
     
     // ================================================================================ //
@@ -286,7 +291,7 @@ namespace kiwi
                 jObject* object_j = hit.getObject();
                 if(object_j)
                 {
-                    object_j->mouseUp(e);
+                    object_j->mouseUp(e.getEventRelativeTo(object_j));
                     return;
                 }
             }
@@ -464,7 +469,6 @@ namespace kiwi
         }
         else if(m_view_model.isSelected(object.getModel()))
         {
-            Console::post("isSelected");
             unselectObject(object);
         }
         else
@@ -513,7 +517,6 @@ namespace kiwi
     {
         if(result_of_mouse_down_select_method && ! box_was_dragged)
         {
-            Console::post("result_of_mouse_down_select_method");
             addToSelectionBasedOnModifiers(object, select_only);
         }
     }
