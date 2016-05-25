@@ -82,5 +82,66 @@ namespace kiwi
         {
             ;
         }
+        
+        std::string Object::getName() const
+        {
+            return m_name;
+        }
+        
+        std::string Object::getText() const
+        {
+            return m_text;
+        }
+        
+        size_t Object::getNumberOfInlets() const noexcept
+        {
+            return static_cast<size_t>(m_inlets);
+        }
+        
+        bool Object::inletsChanged() const noexcept
+        {
+            return m_inlets.changed();
+        }
+        
+        size_t Object::getNumberOfOutlets() const noexcept
+        {
+            return static_cast<size_t>(m_outlets);
+        }
+        
+        bool Object::outletsChanged() const noexcept
+        {
+            return m_outlets.changed();
+        }
+        
+        void Object::setPosition(double x, double y)
+        {
+            m_position_x = x;
+            m_position_y = y;
+        }
+        
+        bool Object::positionChanged() const noexcept
+        {
+            return (m_position_x.changed() || m_position_y.changed());
+        }
+        
+        double Object::getX() const noexcept
+        {
+            return !removed() ? m_position_x.value() : m_position_x.before();
+        }
+        
+        double Object::getY() const noexcept
+        {
+            return !removed() ? m_position_y.value() : m_position_y.before();
+        }
+        
+        void Object::setNumberOfInlets(size_t inlets)
+        {
+            m_inlets = static_cast<flip::Int::internal_type>(inlets);
+        }
+        
+        void Object::setNumberOfOutlets(size_t outlets)
+        {
+            m_outlets = static_cast<flip::Int::internal_type>(outlets);
+        }
     }
 }

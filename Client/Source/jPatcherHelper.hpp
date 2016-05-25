@@ -40,6 +40,8 @@ namespace kiwi
         friend class jLink;
         friend class jObject;
     public:
+        
+        //! @brief The target type
         enum class Target : int
 		{
 			Nothing = 0,
@@ -48,6 +50,7 @@ namespace kiwi
 			Link	= 3
 		};
 		
+        //! @brief The Zone
         enum class Zone : int
         {
             Outside     = 1<<0,
@@ -57,6 +60,7 @@ namespace kiwi
             Border      = 1<<4
         };
 		
+        //! @brief The Border type
         enum Border
 		{
 			None	= 1<<0,

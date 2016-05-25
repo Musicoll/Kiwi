@@ -66,16 +66,22 @@ namespace kiwi
             .member<flip::Float, &View::m_zoom_factor>("zoom_factor");
         }
         
-        void Patcher::declare()
+        void Patcher::User::declare()
         {
-            assert(! PatcherModel::has<Patcher>());
-            
-            Patcher::View::declare();
+            assert(! PatcherModel::has<Patcher::User>());
             
             PatcherModel::declare<Patcher::User>()
             .name("cicm.kiwi.Patcher.User")
             .member<flip::Int, &Patcher::User::m_user_id>("user_id")
             .member<flip::Collection<Patcher::View>, &Patcher::User::m_views>("views");
+        }
+        
+        void Patcher::declare()
+        {
+            assert(! PatcherModel::has<Patcher>());
+            
+            Patcher::View::declare();
+            Patcher::User::declare();
             
             PatcherModel::declare<Patcher>()
             .name("cicm.kiwi.Patcher")
@@ -189,6 +195,21 @@ namespace kiwi
             }
         }
         
+        bool Patcher::objectsChanged() const noexcept
+        {
+            return m_objects.changed();
+        }
+        
+        bool Patcher::linksChanged() const noexcept
+        {
+            return m_links.changed();
+        }
+        
+        bool Patcher::usersChanged() const noexcept
+        {
+            return m_users.changed();
+        }
+        
         Patcher::User* Patcher::getUser(uint32_t user_id)
         {
             const auto has_same_id = [user_id] (User const& user)
@@ -293,6 +314,11 @@ namespace kiwi
         {
             m_selected_links.clear();
             m_selected_objects.clear();
+        }
+        
+        Patcher& Patcher::View::getPatcher()
+        {
+            return ancestor<Patcher>();
         }
         
         void Patcher::View::setLock(bool locked)
@@ -475,6 +501,11 @@ namespace kiwi
         // ================================================================================ //
         //                                   PATCHER USER                                   //
         // ================================================================================ //
+        
+        Patcher::User::User(uint32_t user_id) : m_user_id(user_id)
+        {
+            
+        }
         
         Patcher::View& Patcher::User::addView()
         {

@@ -55,34 +55,19 @@ namespace kiwi
             
             //! @brief Get the source Object ID of the link.
             //! @return The source Object ID of the link.
-            model::Object const& getSenderObject() const noexcept
-            {
-                return !removed() ? *m_sender.value() : *m_sender.before();
-            }
+            model::Object const& getSenderObject() const noexcept;
             
             //! @brief Get the destination Object of the link.
             //! @return The destination Object of the link.
-            model::Object const& getReceiverObject() const noexcept
-            {
-                return !removed() ? *m_receiver.value() : *m_receiver.before();
-            }
+            model::Object const& getReceiverObject() const noexcept;
             
             //! @brief Get the actual origin outlet index of the link.
             //! @return The actual origin outlet index of the link.
-            size_t getSenderIndex() const noexcept
-            {
-                int64_t value = !removed() ? m_index_outlet.value() : m_index_outlet.before();
-                return static_cast<size_t>(value);
-            }
+            size_t getSenderIndex() const noexcept;
             
             //! @brief Get the actual destination inlet index of the link.
             //! @return The actual destination inlet index of the link.
-            size_t getReceiverIndex() const noexcept
-            {
-                int64_t value = !removed() ? m_index_inlet.value() : m_index_inlet.before();
-                return static_cast<size_t>(value);
-            }
-            
+            size_t getReceiverIndex() const noexcept;
         public:
             
             //! @internal flip Default constructor

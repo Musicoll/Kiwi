@@ -82,13 +82,13 @@ namespace kiwi
             void removeLink(model::Link const& link);
             
             //! @brief Returns true if an Object has been added, removed or changed.
-            inline bool objectsChanged() const noexcept { return m_objects.changed(); }
+            bool objectsChanged() const noexcept;
             
             //! @brief Returns true if a Link has been added, removed or changed.
-            inline bool linksChanged() const noexcept   { return m_links.changed(); }
+            bool linksChanged() const noexcept;
             
             //! @brief Returns true if a User has been added, removed or changed.
-            inline bool usersChanged() const noexcept { return m_users.changed(); }
+            bool usersChanged() const noexcept;
             
             //! @brief Set the User.
             //! @param user_id The user unique id.
@@ -178,7 +178,7 @@ namespace kiwi
             ~View();
             
             //! @brief Return the parent Patcher object
-            Patcher& getPatcher() { return ancestor<Patcher>(); }
+            Patcher& getPatcher();
             
             //! @brief Set the lock status.
             void setLock(bool locked);
@@ -301,7 +301,7 @@ namespace kiwi
             User(flip::Default&) {}
             
             //! @brief Constructor.
-            User(uint32_t user_id) : m_user_id(user_id) {}
+            User(uint32_t user_id);
             
             //! @brief Destructor.
             ~User() = default;
@@ -317,6 +317,9 @@ namespace kiwi
             
             //! @brief Get the User id
             uint32_t getId() const;
+            
+            //! @brief flip declare method
+            static void declare();
             
         private:
             

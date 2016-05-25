@@ -68,62 +68,37 @@ namespace kiwi
             
             //! @brief Returns the name of the Object.
             //! @return The name of the Object.
-            inline std::string getName() const     { return m_name; }
+            std::string getName() const;
             
             //! @brief Returns the name of the Object.
             //! @return The name of the Object.
-            inline std::string getText() const     { return m_text; }
+            std::string getText() const;
             
             //! @brief Returns the number of inlets.
             //! @return The number of inlets.
-            inline size_t getNumberOfInlets() const noexcept
-            {
-                return static_cast<size_t>(m_inlets);
-            }
+            size_t getNumberOfInlets() const noexcept;
             
             //! @brief Returns true if the inlets changed.
-            bool inletsChanged() const noexcept
-            {
-                return m_inlets.changed();
-            }
+            bool inletsChanged() const noexcept;
             
             //! @brief Returns the number of outlets.
             //! @return The number of outlets.
-            inline size_t getNumberOfOutlets() const noexcept
-            {
-                return static_cast<size_t>(m_outlets);
-            }
+            size_t getNumberOfOutlets() const noexcept;
             
             //! @brief Returns true if the outlets changed.
-            bool outletsChanged() const noexcept
-            {
-                return m_outlets.changed();
-            }
+            bool outletsChanged() const noexcept;
             
             //! @brief Set the x/y position.
-            void setPosition(double x, double y)
-            {
-                m_position_x = x;
-                m_position_y = y;
-            }
+            void setPosition(double x, double y);
             
             //! @brief Returns true if the object's position changed.
-            bool positionChanged() const noexcept
-            {
-                return (m_position_x.changed() || m_position_y.changed());
-            }
+            bool positionChanged() const noexcept;
             
             //! @brief Returns the x position.
-            double getX() const noexcept
-            {
-                return !removed() ? m_position_x.value() : m_position_x.before();
-            }
+            double getX() const noexcept;
             
             //! @brief Returns the y position.
-            double getY() const noexcept
-            {
-                return !removed() ? m_position_y.value() : m_position_y.before();
-            }
+            double getY() const noexcept;
             
             //! @brief Call signalTrigger() to hmmm.. trigger the signal.
             flip::Signal<> signalTrigger;
@@ -132,17 +107,11 @@ namespace kiwi
             
             //! @brief Set the number of inlets.
             //! @param inlets The number of inlets.
-            inline void setNumberOfInlets(size_t inlets)
-            {
-                m_inlets = static_cast<flip::Int::internal_type>(inlets);
-            }
+            void setNumberOfInlets(size_t inlets);
             
             //! @brief Set the number of inlets.
             //! @param inlets The number of inlets.
-            inline void setNumberOfOutlets(size_t outlets)
-            {
-                m_outlets = static_cast<flip::Int::internal_type>(outlets);
-            }
+            void setNumberOfOutlets(size_t outlets);
             
         public:
             
