@@ -473,8 +473,8 @@ namespace kiwi
             
             if(need_resize)
             {
-                m_magnifier.setSize(new_width * zoom, new_height * zoom);
-                new_height = (getMaximumVisibleHeight() + view_pos.getY()) / zoom + 1;
+                //m_magnifier.setSize(new_width * zoom, new_height * zoom);
+                //new_height = (getMaximumVisibleHeight() + view_pos.getY()) / zoom + 1;
             }
         }
         
