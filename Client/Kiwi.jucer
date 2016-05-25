@@ -331,8 +331,8 @@
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX" extraDefs="" externalLibraries=""
-               extraCompilerFlags="" extraLinkerFlags="../../../ThirdParty/flip-public/bin/flip_macos.a">
+    <XCODE_MAC targetFolder="Builds/MacOSX" extraDefs="flip_NOTHING=flip_NOTHING_FATAL"
+               externalLibraries="" extraCompilerFlags="" extraLinkerFlags="../../../ThirdParty/flip-public/bin/flip_macos.a">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.10 SDK" osxArchitecture="default"
                        isDebug="1" optimisation="1" targetName="Kiwi" headerPath="../../../ThirdParty/flip-public/include&#10;../../../Modules"
