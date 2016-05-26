@@ -22,8 +22,8 @@
  */
 
 #include "jLink.hpp"
-
 #include "jPatcher.hpp"
+#include "Application.hpp"
 
 namespace kiwi
 {
@@ -74,32 +74,22 @@ namespace kiwi
     
     void jLink::objectChanged(model::Object& object)
     {
-        /*
-        if(!object.removed() && object.positionChanged())
+        ;
+    }
+    
+    void jLink::localSelectionChanged(bool selected)
+    {
+        if(m_is_selected != selected)
         {
-            auto& sender_object = m_model->getSenderObject();
-            auto& receiver_object = m_model->getReceiverObject();
-            
-            if(&object == &sender_object)
-            {
-                auto jobject = m_jpatcher.getObject(sender_object);
-                if(jobject)
-                {
-                    m_last_outlet_pos = jobject->getOutletPatcherPosition(m_model->getSenderIndex());
-                    updateBounds();
-                }
-            }
-            else if(&object == &receiver_object)
-            {
-                auto jobject = m_jpatcher.getObject(receiver_object);
-                if(jobject)
-                {
-                    m_last_inlet_pos = jobject->getInletPatcherPosition(m_model->getReceiverIndex());
-                    updateBounds();
-                }
-            }
+            m_is_selected = selected;
+            repaint();
         }
-        */
+    }
+    
+    void jLink::distantSelectionChanged(std::set<uint64_t> distant_user_id_selection)
+    {
+        m_distant_selection = distant_user_id_selection;
+        repaint();
     }
     
     void jLink::updateBounds()
@@ -135,6 +125,10 @@ namespace kiwi
         g.drawRect(bounds);
         */
         
+        const juce::Colour link_color = Colour::fromFloatRGBA(0.4, 0.4, 0.4, 1.);
+        const juce::Colour selection_color = Colour::fromFloatRGBA(0., 0.5, 1., 0.8);
+        const juce::Colour other_view_selected_color = Colour::fromFloatRGBA(0.8, 0.3, 0.3, 0.3);
+        
         // draw link
         const juce::Point<int> edge_pt_width(3, 3);
         const juce::Point<int> comp_pos = getPosition();
@@ -142,7 +136,21 @@ namespace kiwi
         const juce::Point<int> local_inlet_pos(m_last_inlet_pos - comp_pos);
         const juce::Point<int> local_outlet_pos(m_last_outlet_pos - comp_pos);
         
-        g.setColour(juce::Colours::black);
+        const bool selected = m_is_selected;
+        const bool other_selected = ! m_distant_selection.empty();
+        const bool other_view_selected = (other_selected &&
+                                          m_distant_selection.find(KiwiApp::userID())
+                                          != m_distant_selection.end());
+        
+        if(selected || other_view_selected)
+        {
+            const juce::Colour color = selected ? selection_color : other_view_selected_color;
+            
+            g.setColour(color);
+            g.drawLine(local_inlet_pos.x, local_inlet_pos.y, local_outlet_pos.x, local_outlet_pos.y, 3.f);
+        }
+        
+        g.setColour(link_color);
         g.drawLine(local_inlet_pos.x, local_inlet_pos.y, local_outlet_pos.x, local_outlet_pos.y, 1.f);
         
         /* // draw edge points

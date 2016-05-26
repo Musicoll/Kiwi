@@ -120,8 +120,11 @@ namespace kiwi
         //! @brief Check patcher view information changes (lock_status...).
         void checkViewInfos(model::Patcher::View& view);
         
-        //! @brief Check the patcher selection changes.
-        void checkSelectionChanges(model::Patcher& patcher);
+        //! @brief Check the patcher objects selection changes.
+        void checkObjectsSelectionChanges(model::Patcher& patcher);
+        
+        //! @brief Check the patcher objects selection changes.
+        void checkLinksSelectionChanges(model::Patcher& patcher);
         
         //! @internal Object model has just been added to the document.
         void addjObject(model::Object& object);

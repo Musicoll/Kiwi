@@ -37,14 +37,19 @@ namespace kiwi
     {
     public:
         
+        //! @brief Constructor
         jLink(jPatcher const& jpatcher, model::Link& link_m);
+        
+        //! @brief Destructor
         ~jLink();
         
-        //! Get the Link model
+        //! @brief Get the Link model
         model::Link& getModel() const {return *m_model;};
         
         void linkChanged(model::Link& link);
         void objectChanged(model::Object& object);
+        void localSelectionChanged(bool selected_for_view);
+        void distantSelectionChanged(std::set<uint64_t> distant_user_id_selection);
                 
         // juce::Component
         void paint(juce::Graphics& g) override;
@@ -72,6 +77,9 @@ namespace kiwi
         
         juce::Point<int>    m_last_inlet_pos,
                             m_last_outlet_pos;
+        
+        bool                m_is_selected = 0;
+        std::set<uint64_t>  m_distant_selection;
     };
 }
 

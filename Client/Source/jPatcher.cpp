@@ -749,8 +749,12 @@ namespace kiwi
             m_viewport->updatePatcherArea(true);
         }
         
-        checkViewInfos(view);
-        checkSelectionChanges(patcher);
+        if(!view.removed() && &view == &m_view_model)
+        {
+            checkViewInfos(view);
+            checkObjectsSelectionChanges(patcher);
+            checkLinksSelectionChanges(patcher);
+        }
         
         // delete jLink for each removed links
         for(auto& link : patcher.getLinks())
@@ -799,7 +803,7 @@ namespace kiwi
         }
     }
     
-    void jPatcher::checkSelectionChanges(model::Patcher& patcher)
+    void jPatcher::checkObjectsSelectionChanges(model::Patcher& patcher)
     {
         if(! patcher.changed()) return; // abort
         
@@ -902,6 +906,111 @@ namespace kiwi
         // cache new selection state
         std::swap(m_distant_objects_selection, new_distant_objects_selection);
         std::swap(m_local_objects_selection, new_local_objects_selection);
+    }
+    
+    void jPatcher::checkLinksSelectionChanges(model::Patcher& patcher)
+    {
+        if(! patcher.changed()) return; // abort
+        
+        std::set<flip::Ref>                     new_local_links_selection;
+        std::map<flip::Ref, std::set<uint64_t>> new_distant_links_selection;
+        
+        for(auto& link_m : patcher.getLinks())
+        {
+            if(link_m.removed()) break;
+            
+            std::set<uint64_t> selected_for_users;
+            
+            for(auto& user : patcher.getUsers())
+            {
+                bool selected_for_local_view = false;
+                bool selected_for_other_view = false;
+                
+                const uint64_t user_id = user.getId();
+                const bool is_distant_user = user_id != m_instance.getUserId();
+                
+                for(auto& view : user.getViews())
+                {
+                    const bool is_local_view = ( &m_view_model == &view );
+                    
+                    const bool is_selected = view.isSelected(link_m);
+                    
+                    if(is_selected)
+                    {
+                        if(is_distant_user)
+                        {
+                            selected_for_other_view = true;
+                            
+                            // a link is considered selected for a given user
+                            // when it's selected in at least one of its patcher's views.
+                            break;
+                        }
+                        else if(is_local_view)
+                        {
+                            selected_for_local_view = true;
+                        }
+                        else
+                        {
+                            selected_for_other_view = true;
+                        }
+                    }
+                }
+                
+                if(selected_for_local_view)
+                {
+                    new_local_links_selection.emplace(link_m.ref());
+                }
+                
+                if(selected_for_other_view)
+                {
+                    selected_for_users.emplace(user_id);
+                }
+            }
+            
+            new_distant_links_selection.insert({link_m.ref(), selected_for_users});
+        }
+        
+        // check diff between old and new distant selection
+        // and notify links if their selection state changed
+        for(auto& local_link_uptr : m_links)
+        {
+            model::Link const& local_link_m = local_link_uptr->getModel();
+            
+            // local diff
+            const bool old_local_selected_state = m_local_links_selection.find(local_link_m.ref()) != m_local_links_selection.end();
+            
+            bool new_local_selected_state = new_local_links_selection.find(local_link_m.ref()) != new_local_links_selection.end();
+            
+            if(old_local_selected_state != new_local_selected_state)
+            {
+                local_link_uptr->localSelectionChanged(new_local_selected_state);
+                selectionChanged();
+            }
+            
+            // distant diff
+            bool distant_selection_changed_for_link = false;
+            for(auto distant_it : new_distant_links_selection)
+            {
+                flip::Ref const& distant_link_lookup_ref = distant_it.first;
+                
+                if(distant_link_lookup_ref == local_link_uptr->getModel().ref())
+                {
+                    distant_selection_changed_for_link =
+                    m_distant_links_selection[distant_link_lookup_ref] != distant_it.second;
+                    
+                    // notify link
+                    if(distant_selection_changed_for_link)
+                    {
+                        local_link_uptr->distantSelectionChanged(distant_it.second);
+                        selectionChanged();
+                    }
+                }
+            }
+        }
+        
+        // cache new selection state
+        std::swap(m_distant_links_selection, new_distant_links_selection);
+        std::swap(m_local_links_selection, new_local_links_selection);
     }
     
     void jPatcher::selectionChanged()
