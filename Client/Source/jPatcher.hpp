@@ -288,14 +288,14 @@ namespace kiwi
         jObjects                                    m_objects;
         jLinks                                      m_links;
         
-        std::set<model::Object*>                    m_local_objects_selection;
-        std::set<model::Link*>                      m_local_links_selection;
+        std::set<flip::Ref>                         m_local_objects_selection;
+        std::set<flip::Ref>                         m_local_links_selection;
         
-        std::map<model::Object*, std::set<uint64_t>> m_distant_objects_selection;
-        std::map<model::Link*, std::set<uint64_t>>   m_distant_links_selection;
+        std::map<flip::Ref, std::set<uint64_t>>     m_distant_objects_selection;
+        std::map<flip::Ref, std::set<uint64_t>>     m_distant_links_selection;
         
-        std::unique_ptr<jPatcherViewport>   m_viewport;
-        std::unique_ptr<HitTester>          m_hittester;
+        std::unique_ptr<jPatcherViewport>           m_viewport;
+        std::unique_ptr<HitTester>                  m_hittester;
         
         bool m_is_locked;
         

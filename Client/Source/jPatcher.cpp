@@ -803,8 +803,8 @@ namespace kiwi
     {
         if(! patcher.changed()) return; // abort
         
-        std::set<model::Object*>                        new_local_objects_selection;
-        std::map<model::Object*, std::set<uint64_t>>    new_distant_objects_selection;
+        std::set<flip::Ref>                     new_local_objects_selection;
+        std::map<flip::Ref, std::set<uint64_t>> new_distant_objects_selection;
         
         for(auto& object_m : patcher.getObjects())
         {
@@ -849,7 +849,7 @@ namespace kiwi
                 
                 if(selected_for_local_view)
                 {
-                    new_local_objects_selection.emplace(&object_m);
+                    new_local_objects_selection.emplace(object_m.ref());
                 }
                 
                 if(selected_for_other_view)
@@ -858,23 +858,23 @@ namespace kiwi
                 }
             }
             
-            new_distant_objects_selection.insert({&object_m, selected_for_users});
+            new_distant_objects_selection.insert({object_m.ref(), selected_for_users});
         }
         
         // check diff between old and new distant selection
         // and notify objects if their selection state changed
-        for(auto& local_object : m_objects)
+        for(auto& local_object_uptr : m_objects)
         {
-            const auto local_object_m = &local_object->getModel();
+            model::Object const& local_object_m = local_object_uptr->getModel();
             
             // local diff
-            const bool old_local_selected_state = m_local_objects_selection.find(local_object_m) != m_local_objects_selection.end();
+            const bool old_local_selected_state = m_local_objects_selection.find(local_object_m.ref()) != m_local_objects_selection.end();
             
-            bool new_local_selected_state = new_local_objects_selection.find(local_object_m) != new_local_objects_selection.end();
+            bool new_local_selected_state = new_local_objects_selection.find(local_object_m.ref()) != new_local_objects_selection.end();
             
             if(old_local_selected_state != new_local_selected_state)
             {
-                local_object->localSelectionChanged(new_local_selected_state);
+                local_object_uptr->localSelectionChanged(new_local_selected_state);
                 selectionChanged();
             }
             
@@ -882,17 +882,17 @@ namespace kiwi
             bool distant_selection_changed_for_object = false;
             for(auto distant_it : new_distant_objects_selection)
             {
-                model::Object* distant_object_lookup = distant_it.first;
+                flip::Ref const& distant_object_lookup_ref = distant_it.first;
                 
-                if(distant_object_lookup == &local_object->getModel())
+                if(distant_object_lookup_ref == local_object_uptr->getModel().ref())
                 {
                     distant_selection_changed_for_object =
-                    m_distant_objects_selection[distant_object_lookup] != distant_it.second;
+                    m_distant_objects_selection[distant_object_lookup_ref] != distant_it.second;
                     
                     // notify object
                     if(distant_selection_changed_for_object)
                     {
-                        local_object->distantSelectionChanged(distant_it.second);
+                        local_object_uptr->distantSelectionChanged(distant_it.second);
                         selectionChanged();
                     }
                 }
@@ -1154,7 +1154,7 @@ namespace kiwi
     
     void jPatcher::unselectAll()
     {
-        if(isAnythingSelected() && !DocumentManager::isInCommitGesture(m_patcher_model))
+        if(!DocumentManager::isInCommitGesture(m_patcher_model))
         {
             m_view_model.unselectAll();
             DocumentManager::commit(m_patcher_model);
@@ -1165,15 +1165,17 @@ namespace kiwi
     {
         for(model::Link* link : m_view_model.getSelectedLinks())
         {
-            m_patcher_model.removeLink(*link);
+            m_patcher_model.removeLink(*link, &m_view_model);
         }
         
         for(model::Object* object : m_view_model.getSelectedObjects())
         {
-            m_patcher_model.removeObject(*object);
+            m_patcher_model.removeObject(*object, &m_view_model);
         }
         
         DocumentManager::commit(m_patcher_model, "Delete objects and links");
+        
+        m_viewport->updatePatcherArea(false);
     }
     
     // ================================================================================ //

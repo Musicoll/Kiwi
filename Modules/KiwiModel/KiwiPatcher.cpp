@@ -150,10 +150,10 @@ namespace kiwi
             }
         }
         
-        void Patcher::removeObject(model::Object const& object)
+        void Patcher::removeObject(model::Object const& object, Patcher::View* view)
         {
-            auto obj_it = findObject(object);
-            if(obj_it != m_objects.end())
+            auto object_it = findObject(object);
+            if(object_it != m_objects.end())
             {
                 // first remove links connected to this object
                 for(auto link_it = m_links.begin(); link_it != m_links.end();)
@@ -163,7 +163,11 @@ namespace kiwi
                         if(link_it->getSenderObject().ref() == object.ref()
                            || link_it->getReceiverObject().ref() == object.ref())
                         {
-                            unselectForAllUsers(*link_it);
+                            if(view != nullptr)
+                            {
+                                view->unselectLink(*link_it);
+                            }
+                            
                             link_it = m_links.erase(link_it);
                         }
                         else
@@ -177,19 +181,27 @@ namespace kiwi
                     }
                 }
                 
-                unselectForAllUsers(*obj_it);
-                m_objects.erase(obj_it);
+                if(view != nullptr)
+                {
+                    view->unselectObject(*object_it);
+                }
+                
+                m_objects.erase(object_it);
             }
         }
         
-        void Patcher::removeLink(model::Link const& link)
+        void Patcher::removeLink(model::Link const& link, Patcher::View* view)
         {
             const auto link_it = findLink(link);
             if(link_it != m_links.end())
             {
                 if(!link_it.removed())
                 {
-                    unselectForAllUsers(*link_it);
+                    if(view != nullptr)
+                    {
+                        view->unselectLink(*link_it);
+                    }
+                    
                     m_links.erase(link_it);
                 }
             }

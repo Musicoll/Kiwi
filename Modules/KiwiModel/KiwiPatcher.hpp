@@ -75,11 +75,11 @@ namespace kiwi
             //! @brief Removes an object from the Patcher.
             //! @details This will also remove all links connected to this object.
             //! @param object The Object to remove.
-            void removeObject(model::Object const& object);
+            void removeObject(model::Object const& object, Patcher::View* view = nullptr);
             
             //! @brief Removes a link from the Patcher.
             //! @param link The Link to remove.
-            void removeLink(model::Link const& link);
+            void removeLink(model::Link const& link, Patcher::View* view = nullptr);
             
             //! @brief Returns true if an Object has been added, removed or changed.
             bool objectsChanged() const noexcept;
@@ -228,9 +228,6 @@ namespace kiwi
             
             //! @brief Unselect a Link.
             void unselectLink(model::Link& object);
-            
-            //! @brief Unselect all objects and links
-            void unselect();
             
             //! @brief Unselect all objects and links
             void unselectAll();
