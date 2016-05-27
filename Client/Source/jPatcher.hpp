@@ -34,6 +34,7 @@ namespace kiwi
 {
     class jObject;
     class jLink;
+    class jLinkCreator;
     class jInstance;
     class HitTester;
     class jPatcherViewport;
@@ -258,6 +259,9 @@ namespace kiwi
         //! @internal Returns the current objects area.
         juce::Rectangle<int> getCurrentObjectsArea();
         
+        //! @internal get the nearest valid iolet of the link creator.
+        std::pair<jObject*, size_t> getLinkCreatorNearestEndingIolet();
+        
         //! @brief Zoom in Patcher View.
         void zoomIn();
         
@@ -299,6 +303,7 @@ namespace kiwi
         
         std::unique_ptr<jPatcherViewport>           m_viewport;
         std::unique_ptr<HitTester>                  m_hittester;
+        std::unique_ptr<jLinkCreator>               m_link_creator;
         
         bool m_is_locked;
         

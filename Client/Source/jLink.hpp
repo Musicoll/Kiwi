@@ -31,6 +31,11 @@
 namespace kiwi
 {
     class jPatcher;
+    class jLink;
+    
+    // ================================================================================ //
+    //                                      JLINK                                       //
+    // ================================================================================ //
     
     //! @brief The juce link Component.
     class jLink : public juce::Component, public ComponentListener
@@ -82,6 +87,56 @@ namespace kiwi
         
         bool                m_is_selected = 0;
         std::set<uint64_t>  m_distant_selection;
+    };
+    
+    // ================================================================================ //
+    //                                   JLINK CREATOR                                  //
+    // ================================================================================ //
+    
+    //! @brief The jLink creator helper.
+    class jLinkCreator : public juce::Component
+    {
+    public:
+        
+        //! @brief Constructor
+        jLinkCreator(jObject& binded_object,
+                     const size_t index,
+                     bool is_sender,
+                     juce::Point<int> dragged_pos);
+        
+        //! @brief Destructor
+        ~jLinkCreator() = default;
+        
+        //! @brief Get the binded object
+        jObject& getBindedObject() const {return m_binded_object;};
+        
+        //! @brief Get the portlet index
+        size_t getIndex() const {return m_index;};
+        
+        //! @brief Returns true if the link is binded to an outlet.
+        size_t isSender() const {return m_is_sender;};
+        
+        //! @brief Set end position of the link
+        void setEndPosition(juce::Point<int> const& pos);
+        
+        //! @brief Get The end position of the link
+        juce::Point<int> getEndPosition() const noexcept;
+        
+        // juce::Component
+        void paint(juce::Graphics& g) override;
+        
+    private:
+        
+        void updateBounds();
+        
+    private: // members
+        
+        jObject&            m_binded_object;
+        const size_t        m_index;
+        const bool          m_is_sender;
+        juce::Point<int>    m_outlet_pos;
+        juce::Point<int>    m_inlet_pos;
+        juce::Path          m_path;
     };
 }
 

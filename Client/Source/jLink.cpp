@@ -103,8 +103,8 @@ namespace kiwi
         const juce::Point<int> local_inlet_pos(m_last_inlet_pos - comp_pos);
         const juce::Point<int> local_outlet_pos(m_last_outlet_pos - comp_pos);
         
-        const Point<float> start_point = local_outlet_pos.toFloat();
-        const Point<float> end_point = local_inlet_pos.toFloat();
+        const Point<float> start_point = local_outlet_pos.translated(0.f, 2.f).toFloat();
+        const Point<float> end_point = local_inlet_pos.translated(0.f, -1.f).toFloat();
         
         const float max_shift = std::min(link_bounds.getWidth(), link_bounds.getHeight());
         const float shift = (max_shift < 10) ? max_shift * 0.2 : (max_shift * 0.5);
@@ -200,5 +200,74 @@ namespace kiwi
                 || m_path.intersectsLine({rect.getTopRight().toFloat(), rect.getBottomRight().toFloat()})
                 || m_path.intersectsLine({rect.getBottomLeft().toFloat(), rect.getBottomRight().toFloat()})
                 || m_path.intersectsLine({rect.getPosition().toFloat(), rect.getBottomLeft().toFloat()}));
+    }
+    
+    // ================================================================================ //
+    //                                   JLINK CREATOR                                  //
+    // ================================================================================ //
+    
+    jLinkCreator::jLinkCreator(jObject& binded_object,
+                               const size_t index,
+                               bool is_sender,
+                               juce::Point<int> dragged_pos) :
+    m_binded_object(binded_object),
+    m_index(index),
+    m_is_sender(is_sender)
+    {
+        m_outlet_pos = m_is_sender ? m_binded_object.getOutletPatcherPosition(m_index) : dragged_pos;
+        m_inlet_pos = m_is_sender ? dragged_pos : m_binded_object.getInletPatcherPosition(m_index);
+        updateBounds();
+    }
+    
+    void jLinkCreator::setEndPosition(juce::Point<int> const& pos)
+    {
+        if(m_is_sender)
+        {
+            m_inlet_pos = pos;
+        }
+        else
+        {
+            m_outlet_pos = pos;
+        }
+        
+        updateBounds();
+    }
+    
+    juce::Point<int> jLinkCreator::getEndPosition() const noexcept
+    {
+        return m_is_sender ? m_inlet_pos : m_outlet_pos;
+    }
+    
+    void jLinkCreator::paint(juce::Graphics & g)
+    {
+        const juce::Colour link_color = Colour::fromFloatRGBA(0.2, 0.2, 0.2, 1.);
+        g.setColour(link_color);
+        g.strokePath(m_path, juce::PathStrokeType(1.5f));
+    }
+    
+    void jLinkCreator::updateBounds()
+    {
+        const juce::Rectangle<int> link_bounds(m_outlet_pos, m_inlet_pos);
+        const juce::Rectangle<int> new_bounds = link_bounds.expanded(20);
+        
+        const juce::Point<int> comp_pos = new_bounds.getPosition();
+        
+        const juce::Point<int> local_inlet_pos(m_inlet_pos - comp_pos);
+        const juce::Point<int> local_outlet_pos(m_outlet_pos - comp_pos);
+        
+        const Point<float> start_point = local_outlet_pos.translated(0.f, 2.f).toFloat();
+        const Point<float> end_point = local_inlet_pos.translated(0.f, -1.f).toFloat();
+        
+        const float max_shift = std::min(link_bounds.getWidth(), link_bounds.getHeight());
+        const float shift = (max_shift < 10) ? max_shift * 0.2 : (max_shift * 0.5);
+        
+        const Point<float> ctrl_pt1 { start_point.x, static_cast<float>(start_point.y + shift) };
+        const Point<float> ctrl_pt2 { end_point.x, static_cast<float>(end_point.y - shift) };
+        
+        m_path.clear();
+        m_path.startNewSubPath(start_point.x, start_point.y);
+        m_path.cubicTo(ctrl_pt1, ctrl_pt2, end_point);
+        
+        setBounds(new_bounds);
     }
 }

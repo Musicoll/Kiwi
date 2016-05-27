@@ -182,6 +182,14 @@ namespace kiwi
                             }
                         }
                     }
+                    else if(hit.getZone() == HitTester::Zone::Outlet || hit.getZone() == HitTester::Zone::Inlet)
+                    {
+                        const size_t index = hit.getIndex();
+                        const bool is_sender = hit.getZone() == HitTester::Zone::Outlet;
+                        
+                        m_link_creator.reset(new jLinkCreator(*object_j, index, is_sender, e.getPosition()));
+                        addAndMakeVisible(*m_link_creator);
+                    }
                 }
             }
             else if(hit.targetLink())
@@ -246,6 +254,11 @@ namespace kiwi
                             object_j->mouseDrag(e.getEventRelativeTo(object_j));
                         }
                     }
+                    else if((hit.getZone() == HitTester::Zone::Outlet
+                            || hit.getZone() == HitTester::Zone::Inlet) && m_link_creator)
+                    {
+                        m_link_creator->setEndPosition(e.getPosition());
+                    }
                     else if(m_object_border_down_status != HitTester::Border::None)
                     {
                         if(m_mouse_has_just_been_clicked)
@@ -306,6 +319,34 @@ namespace kiwi
         
         if(!isLocked())
         {
+            if(m_link_creator)
+            {
+                auto end_pair = getLinkCreatorNearestEndingIolet();
+                if(end_pair.first != nullptr)
+                {
+                    const bool sender = m_link_creator->isSender();
+                    
+                    model::Object const& binded_object = m_link_creator->getBindedObject().getModel();
+                    model::Object const& ending_object = end_pair.first->getModel();
+                    
+                    model::Object const& from = sender ? binded_object : ending_object;
+                    model::Object const& to = sender ? ending_object : binded_object;
+                    
+                    const size_t outlet = sender ? m_link_creator->getIndex() : end_pair.second;
+                    const size_t inlet = sender ? end_pair.second : m_link_creator->getIndex();
+                    
+                    model::Link* link = m_patcher_model.addLink(from, outlet, to, inlet);
+                    if(link != nullptr)
+                    {
+                        m_view_model.selectLink(*link);
+                        DocumentManager::commit(m_patcher_model, "Add link");
+                    }
+                }
+
+                removeChildComponent(m_link_creator.get());
+                m_link_creator.reset();
+            }
+            
             HitTester& hit = *m_hittester.get();
             
             if(hit.targetObject() && hit.getZone() == HitTester::Zone::Inside && e.mods.isCommandDown())
@@ -373,6 +414,11 @@ namespace kiwi
                 if(hit.getZone() == HitTester::Zone::Border)
                 {
                     mc = getMouseCursorForBorder(hit.getBorder());
+                }
+                else if(hit.getZone() == HitTester::Zone::Outlet
+                        || hit.getZone() == HitTester::Zone::Inlet)
+                {
+                    mc = MouseCursor::PointingHandCursor;
                 }
             }
         }
@@ -647,6 +693,61 @@ namespace kiwi
     bool jPatcher::isLocked()
     {
         return m_is_locked;
+    }
+    
+    std::pair<jObject*, size_t> jPatcher::getLinkCreatorNearestEndingIolet()
+    {
+        jObject* result_object = nullptr;
+        size_t result_index = 0;
+        
+        if(m_link_creator)
+        {
+            const jObject& binded_object = m_link_creator->getBindedObject();
+            const juce::Point<int> end_pos = m_link_creator->getEndPosition();
+            
+            const int max_distance = 20;
+            int min_distance = max_distance;
+            
+            for(auto& object_j_uptr : m_objects)
+            {
+                if(object_j_uptr.get() != &binded_object)
+                {
+                    model::Object const& object_m = object_j_uptr->getModel();
+                    
+                    const bool sender = m_link_creator->isSender();
+                    
+                    const size_t io_size = sender ? object_m.getNumberOfInlets() : object_m.getNumberOfOutlets();
+                    
+                    for(size_t i = 0; i < io_size; ++i)
+                    {
+                        const juce::Point<int> io_pos = sender ? object_j_uptr->getInletPatcherPosition(i) : object_j_uptr->getOutletPatcherPosition(i);
+                        
+                        const int distance = end_pos.getDistanceFrom(io_pos);
+                        
+                        if(min_distance > distance)
+                        {
+                            model::Object const& binded_object_m = binded_object.getModel();
+                            model::Object const& ending_object_m = object_m;
+                            
+                            model::Object const& from = sender ? binded_object_m : ending_object_m;
+                            model::Object const& to = sender ? ending_object_m : binded_object_m;
+                            
+                            const size_t outlet = sender ? m_link_creator->getIndex() : i;
+                            const size_t inlet = sender ? i : m_link_creator->getIndex();
+                            
+                            if(m_patcher_model.canConnect(from, outlet, to, inlet))
+                            {
+                                min_distance = distance;
+                                result_object = object_j_uptr.get();
+                                result_index = i;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        return std::make_pair(result_object, result_index);
     }
     
     juce::Rectangle<int> jPatcher::getCurrentObjectsArea()
