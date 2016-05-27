@@ -45,6 +45,9 @@ namespace kiwi
         //! @brief Constructor.
         jPatcherManager(jInstance& instance);
         
+        //! @brief Constructs and load patcher from file
+        jPatcherManager(jInstance& instance, File const& file);
+        
         //! @brief Destructor.
         ~jPatcherManager();
         
@@ -52,13 +55,12 @@ namespace kiwi
         //! @return The newly created the Patcher model.
         model::Patcher& init();
         
-        //! @brief Returns the Patcher model
-        model::Patcher& getPatcher() const;
-        
         //! @brief create a new patcher view window.
         void newView();
         
     private:
+        //! @brief Returns the Patcher model
+        model::Patcher& getPatcher();
         
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
         void document_changed(model::Patcher& patcher) override final;

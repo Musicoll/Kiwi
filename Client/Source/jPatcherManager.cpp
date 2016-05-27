@@ -38,6 +38,18 @@ namespace kiwi
         ;
     }
     
+    jPatcherManager::jPatcherManager(jInstance& instance, File const& file):
+    m_instance(instance),
+    m_document(new flip::Document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'))
+    {
+        
+        model::Patcher& patcher = getPatcher();
+        DocumentManager::load(patcher, file);
+        
+        patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
+        DocumentManager::commit(patcher);
+    }
+    
     jPatcherManager::~jPatcherManager()
     {
         m_document.reset();
@@ -57,9 +69,9 @@ namespace kiwi
         return patcher;
     }
     
-    model::Patcher& jPatcherManager::getPatcher() const
+    model::Patcher& jPatcherManager::getPatcher()
     {
-        return *m_model;
+        return m_document->root<model::Patcher>();
     }
     
     void jPatcherManager::newView()

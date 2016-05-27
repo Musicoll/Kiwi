@@ -23,10 +23,12 @@
 
 #include <KiwiEngine/KiwiDocumentManager.hpp>
 #include <KiwiModel/KiwiConsole.hpp>
+#include <KiwiCore/KiwiFile.hpp>
 
 #include "jPatcher.hpp"
 #include "jObject.hpp"
 #include "jLink.hpp"
+#include "jFileBrowser.hpp"
 #include "Application.hpp"
 #include "CommandIDs.hpp"
 
@@ -299,6 +301,21 @@ namespace kiwi
         return (it != m_links.cend()) ? it->get() : nullptr;
     }
     
+    void jPatcher::openSaveDialog(File & save_file) const
+    {
+        jFileBrowser file_browser(jFileBrowser::Mode::save);
+        juce::OptionalScopedPointer<Component> file_browser_cmp(&file_browser, false);
+        
+        juce::DialogWindow::LaunchOptions option;
+        option.dialogTitle = juce::String("Save File");
+        option.content = file_browser_cmp;
+        option.resizable = true;
+        
+        option.runModal();
+        
+        save_file = file_browser.getSelectedFile();
+    }
+    
     // ================================================================================ //
     //                              APPLICATION COMMAND TARGET                          //
     // ================================================================================ //
@@ -429,7 +446,18 @@ namespace kiwi
         {
             case CommandIDs::save:
             {
-                Console::post("|- try to save page");
+                File const& current_save_file = DocumentManager::getSelectedFile(m_patcher_model);
+                
+                if (current_save_file.exist())
+                {
+                    DocumentManager::save(m_patcher_model, current_save_file);
+                }
+                else
+                {
+                    File save_file;
+                    openSaveDialog(save_file);
+                    DocumentManager::save(m_patcher_model, save_file);
+                }
                 break;
             }
             case StandardApplicationCommandIDs::undo:

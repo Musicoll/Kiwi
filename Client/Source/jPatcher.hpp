@@ -25,6 +25,7 @@
 #define KIWI_JPATCHER_HPP_INCLUDED
 
 #include <KiwiModel/KiwiPatcher.hpp>
+#include <KiwiCore/KiwiFile.hpp>
 
 #include "flip/DocumentObserver.h"
 
@@ -69,6 +70,9 @@ namespace kiwi
         
         std::set<std::unique_ptr<jObject>>::iterator findjObject(model::Object const& object) const;
         std::set<std::unique_ptr<jLink>>::iterator findjLink(model::Link const& link) const;
+        
+        //! @brief Open a dialog box to save a file.
+        void openSaveDialog(File& save_file) const;
         
         //! @brief Load object and links.
         void loadPatcher();

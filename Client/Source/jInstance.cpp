@@ -22,9 +22,11 @@
  */
 
 #include <KiwiEngine/KiwiDocumentManager.hpp>
+#include <KiwiCore/KiwiFile.hpp>
 
 #include "jInstance.hpp"
 #include "jPatcher.hpp"
+#include "jFileBrowser.hpp"
 
 namespace kiwi
 {
@@ -61,6 +63,31 @@ namespace kiwi
         m_patcher_manager->newView();
         
         //populatePatcher(patcher);
+    }
+    
+    void jInstance::openFileDialog(File & open_file) const
+    {
+        jFileBrowser file_browser(jFileBrowser::Mode::open);
+        juce::OptionalScopedPointer<Component> file_browser_cmp(&file_browser, false);
+        
+        juce::DialogWindow::LaunchOptions option;
+        option.dialogTitle = juce::String("Open File");
+        option.content = file_browser_cmp;
+        option.resizable = true;
+        
+        option.runModal();
+        
+        open_file = file_browser.getSelectedFile();
+    }
+    
+    void jInstance::openPatcher()
+    {
+        File open_file;
+        
+        openFileDialog(open_file);
+        
+        m_patcher_manager.reset(new jPatcherManager(*this, open_file));
+        m_patcher_manager->newView();
     }
     
     void jInstance::showConsoleWindow()
