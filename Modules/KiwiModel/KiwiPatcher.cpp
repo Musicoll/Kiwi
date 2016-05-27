@@ -142,12 +142,17 @@ namespace kiwi
             return false;
         }
         
-        void Patcher::addLink(model::Object const& from, const size_t outlet, model::Object const& to, const size_t inlet)
+        model::Link* Patcher::addLink(model::Object const& from, const size_t outlet, model::Object const& to, const size_t inlet)
         {
             if(canConnect(from, outlet, to, inlet))
             {
-                m_links.insert(m_links.end(), std::unique_ptr<model::Link>(new model::Link(from, outlet, to, inlet)));
+                const auto it = m_links.insert(m_links.end(),
+                                               std::unique_ptr<model::Link>(new model::Link(from, outlet, to, inlet)));
+                
+                return it.operator->();
             }
+            
+            return nullptr;
         }
         
         void Patcher::removeObject(model::Object const& object, Patcher::View* view)
