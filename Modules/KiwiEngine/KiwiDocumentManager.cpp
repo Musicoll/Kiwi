@@ -21,6 +21,11 @@
  ==============================================================================
  */
 
+#include <flip/BackEndIR.h>
+#include <flip/BackEndBinary.h>
+#include <flip/contrib/DataConsumerFile.h>
+#include <flip/contrib/DataProviderFile.h>
+
 #include "KiwiDocumentManager.hpp"
 
 #include <KiwiModel/KiwiPatcher.hpp>
@@ -32,7 +37,8 @@ namespace kiwi
 {
     DocumentManager::DocumentManager(flip::DocumentBase& document) :
     m_document(document),
-    m_history(document)
+    m_history(document),
+    m_file_handler(m_document)
     {
         ;
     }
@@ -65,6 +71,24 @@ namespace kiwi
     {
         auto & patcher = type.ancestor<model::Patcher>();
         return patcher.entity().use<DocumentManager>().m_gesture_flag;
+    }
+    
+    void DocumentManager::save(flip::Type& type, File const& file)
+    {
+        model::Patcher& patcher = type.ancestor<model::Patcher>();
+        patcher.entity().use<DocumentManager>().save(file);
+    }
+    
+    void DocumentManager::load(flip::Type& type, File const& file)
+    {
+        model::Patcher& patcher = type.ancestor<model::Patcher>();
+        patcher.entity().use<DocumentManager>().load(file);
+    }
+    
+    File const& DocumentManager::getSelectedFile(flip::Type& type)
+    {
+        model::Patcher& patcher = type.ancestor<model::Patcher>();
+        return patcher.entity().use<DocumentManager>().getSelectedFile();
     }
     
     bool DocumentManager::hasUndo()
@@ -161,5 +185,77 @@ namespace kiwi
         m_gesture_flag = false;
         
         m_document.push();
+    }
+    
+    void DocumentManager::save(File const& file)
+    {
+        m_file_handler.save(file);
+    }
+    
+    void DocumentManager::load(File const& file)
+    {
+        m_file_handler.load(file);
+    }
+    
+    File const& DocumentManager::getSelectedFile() const
+    {
+        return m_file_handler.getFile();
+    }
+    
+    //=============================================================================
+    // FileHandler
+    //=============================================================================
+    
+    FileHandler::FileHandler(flip::DocumentBase & document):
+    m_document(document),
+    m_file()
+    {
+    }
+    
+    File const& FileHandler::getFile() const
+    {
+        return m_file;
+    }
+    
+    void FileHandler::setFile(File const& file)
+    {
+        m_file = file;
+    }
+    
+    void FileHandler::load(File const& file)
+    {
+        if (file.isKiwiFile())
+        {
+            setFile(file);
+            load();
+        }
+    }
+    
+    void FileHandler::load()
+    {
+        flip::DataProviderFile provider(m_file.getAbsolutePath().c_str());
+        flip::BackEndIR back_end;
+        
+        back_end.register_backend<flip::BackEndBinary>();
+        back_end.read(provider);
+        
+        m_document.read(back_end);
+    }
+    
+    void FileHandler::save(File const& file)
+    {
+        if (file.isKiwiFile())
+        {
+            setFile(file);
+            save();
+        }
+    }
+    
+    void FileHandler::save()
+    {
+        flip::DataConsumerFile consumer(m_file.getAbsolutePath().c_str());
+        
+        flip::BackEndIR back_end =  m_document.write();
+        back_end.write<flip::BackEndBinary>(consumer);
     }
 }
