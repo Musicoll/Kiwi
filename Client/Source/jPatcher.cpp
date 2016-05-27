@@ -184,6 +184,24 @@ namespace kiwi
                     }
                 }
             }
+            else if(hit.targetLink())
+            {
+                jLink* link_j = hit.getLink();
+                if(link_j)
+                {
+                    if(hit.getZone() == HitTester::Zone::Inside)
+                    {
+                        if(e.mods.isPopupMenu())
+                        {
+                            //showLinkPopupMenu(*link_j);
+                        }
+                        else
+                        {
+                            m_select_on_mouse_down_status = selectOnMouseDown(*link_j, !e.mods.isShiftDown());
+                        }
+                    }
+                }
+            }
             else if(hit.targetPatcher())
             {
                 if(e.mods.isRightButtonDown())
@@ -308,6 +326,14 @@ namespace kiwi
                 if(object_j)
                 {
                     selectOnMouseUp(*object_j, !e.mods.isShiftDown(), m_is_dragging, m_select_on_mouse_down_status);
+                }
+            }
+            else if(hit.targetLink())
+            {
+                jLink* link_j = hit.getLink();
+                if(link_j)
+                {
+                    selectOnMouseUp(*link_j, !e.mods.isShiftDown(), m_is_dragging, m_select_on_mouse_down_status);
                 }
             }
             else if(e.mods.isCommandDown())
@@ -1029,7 +1055,12 @@ namespace kiwi
             if(result.second)
             {
                 jObject& jobj = *result.first->get();
-                addAndMakeVisible(jobj);
+                
+                jobj.setAlpha(0.);
+                addChildComponent(jobj);
+                
+                ComponentAnimator& animator = Desktop::getInstance().getAnimator();
+                animator.animateComponent(&jobj, jobj.getBounds(), 1., 200., true, 0.8, 1.);
             }
         }
     }
@@ -1052,6 +1083,10 @@ namespace kiwi
         if(it != m_objects.cend())
         {
             jObject* jobject = it->get();
+            
+            ComponentAnimator& animator = Desktop::getInstance().getAnimator();
+            animator.animateComponent(jobject, jobject->getBounds(), 0., 200., true, 0.8, 1.);
+            
             removeChildComponent(jobject);
             m_objects.erase(it);
         }

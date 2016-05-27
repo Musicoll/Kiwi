@@ -24,6 +24,7 @@
 #include "jLink.hpp"
 #include "jPatcher.hpp"
 #include "Application.hpp"
+#include "jPatcherHelper.hpp"
 
 namespace kiwi
 {
@@ -94,9 +95,28 @@ namespace kiwi
     
     void jLink::updateBounds()
     {
-        const juce::Rectangle<int> bounds(m_last_inlet_pos, m_last_outlet_pos);
+        const juce::Rectangle<int> link_bounds(m_last_inlet_pos, m_last_outlet_pos);
+        const juce::Rectangle<int> new_bounds = link_bounds.expanded(20);
         
-        setBounds(bounds.expanded(10));
+        const juce::Point<int> comp_pos = new_bounds.getPosition();
+        
+        const juce::Point<int> local_inlet_pos(m_last_inlet_pos - comp_pos);
+        const juce::Point<int> local_outlet_pos(m_last_outlet_pos - comp_pos);
+        
+        const Point<float> start_point = local_outlet_pos.toFloat();
+        const Point<float> end_point = local_inlet_pos.toFloat();
+        
+        const float max_shift = std::min(link_bounds.getWidth(), link_bounds.getHeight());
+        const float shift = (max_shift < 10) ? max_shift * 0.2 : (max_shift * 0.5);
+        
+        const Point<float> ctrl_pt1 { start_point.x, static_cast<float>(start_point.y + shift) };
+        const Point<float> ctrl_pt2 { end_point.x, static_cast<float>(end_point.y - shift) };
+        
+        m_path.clear();
+        m_path.startNewSubPath(start_point.x, start_point.y);
+        m_path.cubicTo(ctrl_pt1, ctrl_pt2, end_point);
+        
+        setBounds(new_bounds);
     }
     
     void jLink::componentMovedOrResized(Component& component, bool was_moved, bool was_resized)
@@ -125,16 +145,9 @@ namespace kiwi
         g.drawRect(bounds);
         */
         
-        const juce::Colour link_color = Colour::fromFloatRGBA(0.4, 0.4, 0.4, 1.);
+        const juce::Colour link_color = Colour::fromFloatRGBA(0.2, 0.2, 0.2, 1.);
         const juce::Colour selection_color = Colour::fromFloatRGBA(0., 0.5, 1., 0.8);
         const juce::Colour other_view_selected_color = Colour::fromFloatRGBA(0.8, 0.3, 0.3, 0.3);
-        
-        // draw link
-        const juce::Point<int> edge_pt_width(3, 3);
-        const juce::Point<int> comp_pos = getPosition();
-        
-        const juce::Point<int> local_inlet_pos(m_last_inlet_pos - comp_pos);
-        const juce::Point<int> local_outlet_pos(m_last_outlet_pos - comp_pos);
         
         const bool selected = m_is_selected;
         const bool other_selected = ! m_distant_selection.empty();
@@ -147,13 +160,14 @@ namespace kiwi
             const juce::Colour color = selected ? selection_color : other_view_selected_color;
             
             g.setColour(color);
-            g.drawLine(local_inlet_pos.x, local_inlet_pos.y, local_outlet_pos.x, local_outlet_pos.y, 3.f);
+            g.strokePath(m_path, juce::PathStrokeType(3.5f));
         }
         
         g.setColour(link_color);
-        g.drawLine(local_inlet_pos.x, local_inlet_pos.y, local_outlet_pos.x, local_outlet_pos.y, 1.f);
+        g.strokePath(m_path, juce::PathStrokeType(1.5f));
         
         /* // draw edge points
+        const juce::Point<int> edge_pt_width(3, 3);
         const juce::Rectangle<int> link_start(local_inlet_pos - edge_pt_width, local_inlet_pos + edge_pt_width);
         const juce::Rectangle<int> link_end(local_outlet_pos - edge_pt_width, local_outlet_pos + edge_pt_width);
         g.setColour(juce::Colours::red);
@@ -164,11 +178,27 @@ namespace kiwi
     
     bool jLink::hitTest(juce::Point<int> const& pt, HitTester& hit) const
     {
+        const float max_distance = 3.f;
+        juce::Point<float> point_on_line;
+                
+        const float distance_from_start = m_path.getNearestPoint(pt.toFloat(), point_on_line);
+        const juce::Point<float> point_on_path = m_path.getPointAlongPath(distance_from_start);
+        const float distance = point_on_path.getDistanceFrom(pt.toFloat());
+        
+        if(distance <= max_distance)
+        {
+            return true;
+        }
+        
         return false;
     }
     
     bool jLink::hitTest(juce::Rectangle<int> const& rect)
     {
-        return false;
+        return (rect.contains(m_last_outlet_pos) || rect.contains(m_last_outlet_pos)
+                || m_path.intersectsLine({rect.getPosition().toFloat(), rect.getTopRight().toFloat()})
+                || m_path.intersectsLine({rect.getTopRight().toFloat(), rect.getBottomRight().toFloat()})
+                || m_path.intersectsLine({rect.getBottomLeft().toFloat(), rect.getBottomRight().toFloat()})
+                || m_path.intersectsLine({rect.getPosition().toFloat(), rect.getBottomLeft().toFloat()}));
     }
 }

@@ -117,8 +117,10 @@ namespace kiwi
                     const auto relative_point = point - link_bounds.getPosition();
                     if(link_uptr->hitTest(relative_point, *this))
                     {
+                        m_zone = HitTester::Zone::Inside;
                         m_link = link_uptr.get();
                         m_target = Target::Link;
+                        m_index = 0;
                         return true;
                     }
                 }

@@ -78,6 +78,8 @@ namespace kiwi
         juce::Point<int>    m_last_inlet_pos,
                             m_last_outlet_pos;
         
+        juce::Path          m_path;
+        
         bool                m_is_selected = 0;
         std::set<uint64_t>  m_distant_selection;
     };
