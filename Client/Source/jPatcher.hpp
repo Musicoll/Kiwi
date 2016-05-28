@@ -38,6 +38,7 @@ namespace kiwi
     class jInstance;
     class HitTester;
     class jPatcherViewport;
+    class IoletHighlighter;
     
     //! @brief The juce Patcher Component.
     class jPatcher :
@@ -304,6 +305,7 @@ namespace kiwi
         std::unique_ptr<jPatcherViewport>           m_viewport;
         std::unique_ptr<HitTester>                  m_hittester;
         std::unique_ptr<jLinkCreator>               m_link_creator;
+        std::unique_ptr<IoletHighlighter>           m_io_highlighter;
         
         bool m_is_locked;
         

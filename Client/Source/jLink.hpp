@@ -111,10 +111,10 @@ namespace kiwi
         jObject& getBindedObject() const {return m_binded_object;};
         
         //! @brief Get the portlet index
-        size_t getIndex() const {return m_index;};
+        size_t getBindedIndex() const {return m_index;};
         
         //! @brief Returns true if the link is binded to an outlet.
-        size_t isSender() const {return m_is_sender;};
+        size_t isBindedToSender() const {return m_is_sender;};
         
         //! @brief Set end position of the link
         void setEndPosition(juce::Point<int> const& pos);

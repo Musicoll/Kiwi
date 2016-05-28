@@ -42,6 +42,7 @@ namespace kiwi
     m_view_model(view),
     m_viewport(new jPatcherViewport(*this)),
     m_hittester(new HitTester(*this)),
+    m_io_highlighter(new IoletHighlighter()),
     m_object_border_down_status(HitTester::Border::None)
     {
         if(!m_command_manager_binded)
@@ -52,6 +53,8 @@ namespace kiwi
         
         KiwiApp::bindToKeyMapping(this);
         setWantsKeyboardFocus(true);
+        
+        addChildComponent(m_io_highlighter.get());
 
         loadPatcher();
         m_viewport->updatePatcherArea(true);
@@ -59,6 +62,8 @@ namespace kiwi
     
     jPatcher::~jPatcher()
     {
+        removeChildComponent(m_io_highlighter.get());
+        m_io_highlighter.reset();
         m_viewport.reset();
         m_links.clear();
         m_objects.clear();
@@ -240,6 +245,32 @@ namespace kiwi
         
         if(!isLocked())
         {
+            if(m_link_creator)
+            {
+                auto end_pair = getLinkCreatorNearestEndingIolet();
+                if(end_pair.first != nullptr)
+                {
+                    const bool sender = m_link_creator->isBindedToSender();
+                    
+                    jObject* object_j = end_pair.first;
+                    if(object_j != nullptr)
+                    {
+                        if(sender)
+                        {
+                            m_io_highlighter->highlightInlet(*object_j, end_pair.second);
+                        }
+                        else
+                        {
+                            m_io_highlighter->highlightOutlet(*object_j, end_pair.second);
+                        }
+                    }
+                }
+                else
+                {
+                    m_io_highlighter->hide();
+                }
+            }
+            
             HitTester& hit = *m_hittester.get();
             
             if(hit.targetObject())
@@ -321,10 +352,12 @@ namespace kiwi
         {
             if(m_link_creator)
             {
+                m_io_highlighter->hide();
+                
                 auto end_pair = getLinkCreatorNearestEndingIolet();
                 if(end_pair.first != nullptr)
                 {
-                    const bool sender = m_link_creator->isSender();
+                    const bool sender = m_link_creator->isBindedToSender();
                     
                     model::Object const& binded_object = m_link_creator->getBindedObject().getModel();
                     model::Object const& ending_object = end_pair.first->getModel();
@@ -332,8 +365,8 @@ namespace kiwi
                     model::Object const& from = sender ? binded_object : ending_object;
                     model::Object const& to = sender ? ending_object : binded_object;
                     
-                    const size_t outlet = sender ? m_link_creator->getIndex() : end_pair.second;
-                    const size_t inlet = sender ? end_pair.second : m_link_creator->getIndex();
+                    const size_t outlet = sender ? m_link_creator->getBindedIndex() : end_pair.second;
+                    const size_t inlet = sender ? end_pair.second : m_link_creator->getBindedIndex();
                     
                     model::Link* link = m_patcher_model.addLink(from, outlet, to, inlet);
                     if(link != nullptr)
@@ -404,6 +437,8 @@ namespace kiwi
     {
         MouseCursor::StandardCursorType mc = MouseCursor::NormalCursor;
         
+        m_io_highlighter->hide();
+        
         if(!m_is_locked)
         {
             HitTester hit(*this);
@@ -418,6 +453,15 @@ namespace kiwi
                 else if(hit.getZone() == HitTester::Zone::Outlet
                         || hit.getZone() == HitTester::Zone::Inlet)
                 {
+                    if(hit.getZone() == HitTester::Zone::Inlet)
+                    {
+                        m_io_highlighter->highlightInlet(*hit.getObject(), hit.getIndex());
+                    }
+                    else
+                    {
+                        m_io_highlighter->highlightOutlet(*hit.getObject(), hit.getIndex());
+                    }
+                    
                     mc = MouseCursor::PointingHandCursor;
                 }
             }
@@ -705,7 +749,7 @@ namespace kiwi
             const jObject& binded_object = m_link_creator->getBindedObject();
             const juce::Point<int> end_pos = m_link_creator->getEndPosition();
             
-            const int max_distance = 20;
+            const int max_distance = 30;
             int min_distance = max_distance;
             
             for(auto& object_j_uptr : m_objects)
@@ -714,7 +758,7 @@ namespace kiwi
                 {
                     model::Object const& object_m = object_j_uptr->getModel();
                     
-                    const bool sender = m_link_creator->isSender();
+                    const bool sender = m_link_creator->isBindedToSender();
                     
                     const size_t io_size = sender ? object_m.getNumberOfInlets() : object_m.getNumberOfOutlets();
                     
@@ -732,8 +776,8 @@ namespace kiwi
                             model::Object const& from = sender ? binded_object_m : ending_object_m;
                             model::Object const& to = sender ? ending_object_m : binded_object_m;
                             
-                            const size_t outlet = sender ? m_link_creator->getIndex() : i;
-                            const size_t inlet = sender ? i : m_link_creator->getIndex();
+                            const size_t outlet = sender ? m_link_creator->getBindedIndex() : i;
+                            const size_t inlet = sender ? i : m_link_creator->getBindedIndex();
                             
                             if(m_patcher_model.canConnect(from, outlet, to, inlet))
                             {

@@ -245,6 +245,38 @@ namespace kiwi
         bool                        m_can_hook_resized;
     };
     
+    // ================================================================================ //
+    //                                   IOLET HILIGHTER                                //
+    // ================================================================================ //
+    
+    class IoletHighlighter : public juce::Component
+    {
+    public:
+        
+        //! @brief Constructor.
+        IoletHighlighter();
+        
+        //! @brief Destructor.
+        ~IoletHighlighter() = default;
+        
+        //! @brief The paint method.
+        void paint(juce::Graphics& g) override;
+        
+        //! @brief Stop highlighting.
+        void hide();
+        
+        //! @brief Highlight inlet
+        void highlightInlet(jObject const& object, const size_t index);
+        
+        //! @brief Highlight outlet
+        void highlightOutlet(jObject const& object, const size_t index);
+        
+    private: // members
+        
+        bool            m_is_inlet;
+        std::string     m_text;
+    };
+    
 }
 
 #endif // KIWI_JPATCHER_HELPER_HPP_INCLUDED

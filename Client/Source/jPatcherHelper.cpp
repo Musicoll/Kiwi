@@ -358,10 +358,7 @@ namespace kiwi
         const int x = m_patching_area.getX();
         const int y = m_patching_area.getY();
         
-        return {
-            x < 0 ? -x : 0,
-            y < 0 ? -y : 0
-        };
+        return juce::Point<int>( x < 0 ? -x : 0, y < 0 ? -y : 0 );
     }
     
     void jPatcherViewport::viewportResized(juce::Rectangle<int> const& last_bounds,
@@ -547,5 +544,59 @@ namespace kiwi
             const juce::Point<int> delta = (view_pos - origin) - (view_pos - last_origin);
             setViewPosition(view_pos - delta);
         }
+    }
+    
+    // ================================================================================ //
+    //                                   IOLET HILIGHTER                                //
+    // ================================================================================ //
+    
+    IoletHighlighter::IoletHighlighter()
+    {
+        setInterceptsMouseClicks(false, false);
+        setAlwaysOnTop(true);
+        
+        setVisible(false);
+        setBounds(0, 0, 1, 1);
+    }
+    
+    void IoletHighlighter::hide()
+    {
+        setVisible(false);
+    }
+    
+    void IoletHighlighter::paint(juce::Graphics& g)
+    {
+        const juce::Colour bgcolor = m_is_inlet ? juce::Colour(0xFF17BEBB) : juce::Colour(0xFFCD5334);
+        const juce::Colour bd_color(0xFF2E282A);
+        
+        const juce::Rectangle<float> bounds = getLocalBounds().reduced(1).toFloat();
+        
+        g.setColour(bgcolor);
+        g.fillRect(bounds);
+        
+        g.setColour(bd_color);
+        g.drawRect(bounds);
+    }
+    
+    void IoletHighlighter::highlightInlet(jObject const& object, const size_t index)
+    {
+        const juce::Point<int> io_center = object.getInletPatcherPosition(index);
+        juce::Rectangle<int> new_bounds = juce::Rectangle<int>(io_center, io_center).expanded(5);
+        
+        m_is_inlet = true;
+        
+        setBounds(new_bounds);
+        setVisible(true);
+    }
+    
+    void IoletHighlighter::highlightOutlet(jObject const& object, const size_t index)
+    {
+        const juce::Point<int> io_center = object.getOutletPatcherPosition(index);
+        juce::Rectangle<int> new_bounds = juce::Rectangle<int>(io_center, io_center).expanded(5);
+        
+        m_is_inlet = false;
+        
+        setBounds(new_bounds);
+        setVisible(true);
     }
 }
