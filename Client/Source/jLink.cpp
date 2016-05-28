@@ -68,6 +68,11 @@ namespace kiwi
         }
     }
     
+    bool jLink::isSelected() const noexcept
+    {
+        return m_is_selected;
+    }
+    
     void jLink::linkChanged(model::Link& link)
     {
         ;
@@ -146,8 +151,8 @@ namespace kiwi
         */
         
         const juce::Colour link_color = Colour::fromFloatRGBA(0.2, 0.2, 0.2, 1.);
-        const juce::Colour selection_color = Colour::fromFloatRGBA(0., 0.5, 1., 0.8);
-        const juce::Colour other_view_selected_color = Colour::fromFloatRGBA(0.8, 0.3, 0.3, 0.3);
+        const juce::Colour selection_color = Colour::fromFloatRGBA(0., 0.5, 1., 1.);
+        const juce::Colour other_view_selected_color = Colour::fromFloatRGBA(0.8, 0.3, 0.3, 1.);
         
         const bool selected = m_is_selected;
         const bool other_selected = ! m_distant_selection.empty();
@@ -155,16 +160,18 @@ namespace kiwi
                                           m_distant_selection.find(KiwiApp::userID())
                                           != m_distant_selection.end());
         
+        g.setColour(link_color);
+        g.strokePath(m_path, juce::PathStrokeType(2.f));
+        
+        juce::Colour inner_color = link_color.contrasting(0.4);
+        
         if(selected || other_view_selected)
         {
-            const juce::Colour color = selected ? selection_color : other_view_selected_color;
-            
-            g.setColour(color);
-            g.strokePath(m_path, juce::PathStrokeType(3.5f));
+            inner_color = selected ? selection_color : other_view_selected_color;
         }
         
-        g.setColour(link_color);
-        g.strokePath(m_path, juce::PathStrokeType(1.5f));
+        g.setColour(inner_color);
+        g.strokePath(m_path, juce::PathStrokeType(1.f));
         
         /* // draw edge points
         const juce::Point<int> edge_pt_width(3, 3);
@@ -193,13 +200,16 @@ namespace kiwi
         return false;
     }
     
-    bool jLink::hitTest(juce::Rectangle<int> const& rect)
+    bool jLink::hitTest(juce::Rectangle<float> const& rect)
     {
-        return (rect.contains(m_last_outlet_pos) || rect.contains(m_last_outlet_pos)
-                || m_path.intersectsLine({rect.getPosition().toFloat(), rect.getTopRight().toFloat()})
-                || m_path.intersectsLine({rect.getTopRight().toFloat(), rect.getBottomRight().toFloat()})
-                || m_path.intersectsLine({rect.getBottomLeft().toFloat(), rect.getBottomRight().toFloat()})
-                || m_path.intersectsLine({rect.getPosition().toFloat(), rect.getBottomLeft().toFloat()}));
+        juce::Path p = m_path;
+        p.applyTransform(juce::AffineTransform::translation(getPosition()));
+        
+        return (rect.contains(m_last_outlet_pos.toFloat()) || rect.contains(m_last_inlet_pos.toFloat())
+                || p.intersectsLine({rect.getPosition(), rect.getTopRight()})
+                || p.intersectsLine({rect.getTopRight(), rect.getBottomRight()})
+                || p.intersectsLine({rect.getBottomLeft(), rect.getBottomRight()})
+                || p.intersectsLine({rect.getPosition(), rect.getBottomLeft()}));
     }
     
     // ================================================================================ //

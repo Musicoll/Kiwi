@@ -277,6 +277,52 @@ namespace kiwi
         std::string     m_text;
     };
     
+    // ================================================================================ //
+    //										JLASSO                                      //
+    // ================================================================================ //
+    
+    class jLasso : public Component
+    {
+    public:
+        
+        //! @brief Contructor.
+        jLasso(jPatcher& patcher);
+        
+        //! @grief Destructor.
+        ~jLasso();
+        
+        //! @brief The paint method.
+        void paint(Graphics& g) override;
+        
+        //! @brief Begins the selection of the links and the boxes.
+        //! @param point The starting point.
+        //! @param preserve_selection The lasso should preserve the current selection.
+        void begin(juce::Point<int> const& point, const bool preserve_selection);
+        
+        //! @brief Perform the selection of the links and the boxes.
+        //! @param point The draging point.
+        //! @param objects The lasso should add objects to the selection.
+        //! @param links The lasso should add links to the selection.
+        //! @param preserve The lasso should preserve the last selection.
+        void perform(juce::Point<int> const& point, bool objects, bool links, const bool preserve);
+        
+        //! @brief Ends the selection of the links and the boxes.
+        void end();
+
+        //! Retrieve Returns true if the Lasso is performing the selection.
+        bool isPerforming() const noexcept;
+        
+    private: // members
+        
+        jPatcher&           m_patcher;
+        
+        std::set<flip::Ref> m_objects;
+        std::set<flip::Ref> m_links;
+        
+        juce::Point<int>    m_start;
+        bool				m_dragging;
+    };
+    
 }
 
 #endif // KIWI_JPATCHER_HELPER_HPP_INCLUDED

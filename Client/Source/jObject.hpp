@@ -73,7 +73,7 @@ namespace kiwi
         //! @brief internal kiwi jPatcher HitTesting (overlaps a rectangle).
         bool hitTest(juce::Rectangle<int> const& rect);
         
-        //! Returns true if the box is selected.
+        //! Returns true if the object is selected.
         bool isSelected();
         
     private:

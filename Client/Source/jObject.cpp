@@ -242,7 +242,8 @@ namespace kiwi
     
     bool jObject::hitTest(juce::Rectangle<int> const& rect)
     {
-        return rect.intersects(getBoxBounds());
+        const juce::Rectangle<int> bounds = getBoxBounds();
+        return rect.intersects(bounds) || rect.contains(bounds) || bounds.contains(rect);
     }
     
     bool jObject::isSelected()

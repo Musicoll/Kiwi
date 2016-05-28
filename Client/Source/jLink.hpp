@@ -51,6 +51,9 @@ namespace kiwi
         //! @brief Get the Link model
         model::Link& getModel() const {return *m_model;};
         
+        //! Returns true if the link is selected.
+        bool isSelected() const noexcept;
+        
         void linkChanged(model::Link& link);
         void objectChanged(model::Object& object);
         void localSelectionChanged(bool selected_for_view);
@@ -63,7 +66,7 @@ namespace kiwi
         bool hitTest(juce::Point<int> const& pt, HitTester& result) const;
         
         //! @brief internal kiwi jPatcher HitTesting (overlaps a rectangle).
-        bool hitTest(juce::Rectangle<int> const& rect);
+        bool hitTest(juce::Rectangle<float> const& rect);
         
         //! @brief Called when the component's position or size changes.
         //! @param component    the component that was moved or resized

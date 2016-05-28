@@ -39,6 +39,7 @@ namespace kiwi
     class HitTester;
     class jPatcherViewport;
     class IoletHighlighter;
+    class jLasso;
     
     //! @brief The juce Patcher Component.
     class jPatcher :
@@ -175,6 +176,12 @@ namespace kiwi
         //                                     SELECTION                                    //
         // ================================================================================ //
         
+        //! @brief Returns the selected objects.
+        std::set<flip::Ref> getSelectedObjects() const;
+        
+        //! @brief Returns the selected links.
+        std::set<flip::Ref> getSelectedLinks() const;
+        
         void addToSelectionBasedOnModifiers(jObject& object, bool select_only);
         
         void addToSelectionBasedOnModifiers(jLink& link, bool select_only);
@@ -203,11 +210,17 @@ namespace kiwi
         //! @brief Select an Object.
         void selectObject(jObject& object);
         
+        //! @brief Select multiple objects
+        void selectObjects(std::vector<jObject*> const& objects);
+        
         //! @brief Unselect all and select an object.
         void selectObjectOnly(jObject& object);
         
         //! @brief Select a Link.
         void selectLink(jLink& link);
+        
+        //! @brief Select multiple links
+        void selectLinks(std::vector<jLink*> const& links);
         
         //! @brief Unselect all and select a link.
         void selectLinkOnly(jLink& link);
@@ -306,6 +319,7 @@ namespace kiwi
         std::unique_ptr<HitTester>                  m_hittester;
         std::unique_ptr<jLinkCreator>               m_link_creator;
         std::unique_ptr<IoletHighlighter>           m_io_highlighter;
+        std::unique_ptr<jLasso>                     m_lasso;
         
         bool m_is_locked;
         
@@ -325,6 +339,7 @@ namespace kiwi
         static bool m_command_manager_binded;
         
         friend jPatcherViewport;
+        friend jLasso;
     };
 }
 

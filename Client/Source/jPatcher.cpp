@@ -43,6 +43,7 @@ namespace kiwi
     m_viewport(new jPatcherViewport(*this)),
     m_hittester(new HitTester(*this)),
     m_io_highlighter(new IoletHighlighter()),
+    m_lasso(new jLasso(*this)),
     m_object_border_down_status(HitTester::Border::None)
     {
         if(!m_command_manager_binded)
@@ -55,6 +56,7 @@ namespace kiwi
         setWantsKeyboardFocus(true);
         
         addChildComponent(m_io_highlighter.get());
+        addChildComponent(m_lasso.get());
 
         loadPatcher();
         m_viewport->updatePatcherArea(true);
@@ -63,7 +65,9 @@ namespace kiwi
     jPatcher::~jPatcher()
     {
         removeChildComponent(m_io_highlighter.get());
+        removeChildComponent(m_lasso.get());
         m_io_highlighter.reset();
+        m_lasso.reset();
         m_viewport.reset();
         m_links.clear();
         m_objects.clear();
@@ -76,7 +80,6 @@ namespace kiwi
     void jPatcher::paint(juce::Graphics & g)
     {
         const bool locked = m_is_locked;
-        //const juce::Colour bgcolor = juce::Colours::lightgrey;
         const juce::Colour bgcolor = juce::Colour::fromFloatRGBA(0.8, 0.8, 0.8, 1.);
 
         if(!locked)
@@ -221,13 +224,9 @@ namespace kiwi
                 {
                     showPatcherPopupMenu(e.getPosition() - m_viewport->getOriginPosition());
                 }
-                else if(!e.mods.isShiftDown())
-                {
-                    unselectAll();
-                }
                 else
                 {
-                    //m_lasso->begin(e, e.mods.isShiftDown());
+                    m_lasso->begin(e.getPosition(), e.mods.isShiftDown());
                 }
             }
         }
@@ -245,6 +244,11 @@ namespace kiwi
         
         if(!isLocked())
         {
+            if(m_lasso->isPerforming())
+            {
+                m_lasso->perform(e.getPosition(), true, e.mods.isAltDown(), e.mods.isShiftDown());
+            }
+    
             if(m_link_creator)
             {
                 auto end_pair = getLinkCreatorNearestEndingIolet();
@@ -350,6 +354,11 @@ namespace kiwi
         
         if(!isLocked())
         {
+            if(m_lasso->isPerforming())
+            {
+                m_lasso->end();
+            }
+   
             if(m_link_creator)
             {
                 m_io_highlighter->hide();
@@ -578,6 +587,16 @@ namespace kiwi
                 }
             }
         }
+    }
+    
+    std::set<flip::Ref> jPatcher::getSelectedObjects() const
+    {
+        return m_local_objects_selection;
+    }
+    
+    std::set<flip::Ref> jPatcher::getSelectedLinks() const
+    {
+        return m_local_links_selection;
     }
     
     void jPatcher::addToSelectionBasedOnModifiers(jObject& object, bool select_only)
@@ -1403,10 +1422,48 @@ namespace kiwi
         DocumentManager::commit(m_patcher_model);
     }
     
+    void jPatcher::selectObjects(std::vector<jObject*> const& objects)
+    {
+        bool should_commit = false;
+        
+        for(jObject* object : objects)
+        {
+            if(object != nullptr)
+            {
+                m_view_model.selectObject(object->getModel());
+                should_commit = true;
+            }
+        }
+        
+        if(should_commit)
+        {
+            DocumentManager::commit(m_patcher_model);
+        }
+    }
+    
     void jPatcher::selectLink(jLink& link)
     {
         m_view_model.selectLink(link.getModel());
         DocumentManager::commit(m_patcher_model);
+    }
+    
+    void jPatcher::selectLinks(std::vector<jLink*> const& links)
+    {
+        bool should_commit = false;
+        
+        for(jLink* link : links)
+        {
+            if(link != nullptr)
+            {
+                m_view_model.selectLink(link->getModel());
+                should_commit = true;
+            }
+        }
+        
+        if(should_commit)
+        {
+            DocumentManager::commit(m_patcher_model);
+        }
     }
     
     void jPatcher::unselectObject(jObject& object)
