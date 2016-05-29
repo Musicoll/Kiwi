@@ -142,12 +142,19 @@ namespace kiwi
             return false;
         }
         
+        model::Object& Patcher::addObject(flip::Mold const& mold)
+        {
+            //const auto it = m_objects.emplace<model::ObjectPrint>(m_objects.end(), mold);
+            const auto it = m_objects.emplace<model::ObjectPrint>(m_objects.end(), mold);
+            return *it;
+        }
+        
         model::Link* Patcher::addLink(model::Object const& from, const size_t outlet, model::Object const& to, const size_t inlet)
         {
             if(canConnect(from, outlet, to, inlet))
             {
-                const auto it = m_links.insert(m_links.end(),
-                                               std::unique_ptr<model::Link>(new model::Link(from, outlet, to, inlet)));
+                const auto link_uptr = std::unique_ptr<model::Link>(new model::Link(from, outlet, to, inlet));
+                const auto it = m_links.insert(m_links.end(), std::move(link_uptr));
                 
                 return it.operator->();
             }

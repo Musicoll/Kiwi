@@ -260,6 +260,12 @@ namespace kiwi
         void moveSelectedObjects(juce::Point<int> const& delta,
                                  bool commit = true, bool gesture = false);
         
+        //! @brief Add selected objects and links to clipboard.
+        void copySelectionToClipboard();
+        
+        //! @brief Try to paste clipboard content.
+        void pasteFromClipboard(juce::Point<int> const& delta);
+        
         // ================================================================================ //
         //                                      MISC                                        //
         // ================================================================================ //
@@ -321,7 +327,9 @@ namespace kiwi
         std::unique_ptr<IoletHighlighter>           m_io_highlighter;
         std::unique_ptr<jLasso>                     m_lasso;
         
-        bool m_is_locked;
+        bool                    m_is_locked;
+        
+        std::vector<uint8_t>    m_clipboard_data;
         
         // mouse interactions flags
         juce::Point<int> m_last_drag;

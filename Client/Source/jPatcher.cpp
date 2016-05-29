@@ -21,8 +21,11 @@
  ==============================================================================
  */
 
+#include "flip/Mold.h"
+
 #include <KiwiEngine/KiwiDocumentManager.hpp>
 #include <KiwiModel/KiwiConsole.hpp>
+#include <KiwiModel/KiwiPatcherModel.hpp>
 
 #include "jInstance.hpp"
 #include "jPatcher.hpp"
@@ -597,6 +600,88 @@ namespace kiwi
     std::set<flip::Ref> jPatcher::getSelectedLinks() const
     {
         return m_local_links_selection;
+    }
+    
+    void jPatcher::copySelectionToClipboard()
+    {
+        auto& document = m_patcher_model.entity().use<DocumentManager>();
+        
+        m_clipboard_data.clear();
+        flip::StreamBinOut sbo(m_clipboard_data);
+        
+        sbo << m_patcher_model.ref();
+        //sbo << m_view_model.ref();
+        
+        flip::Mold mold(model::PatcherModel::use(), sbo);
+        
+        for(auto& object_ref : getSelectedObjects())
+        {
+            model::Object const* object_ptr = document.get<model::Object>(object_ref);
+            if(object_ptr)
+            {
+                model::Object const& object = *object_ptr;
+                mold.make(object, false);
+                mold.cure();
+            }
+        }
+        
+        /*
+        for(auto& link_ref : getSelectedLinks())
+        {
+            model::Link* link_ptr = document.get<model::Link>(link_ref);
+            if(link_ptr)
+            {
+                model::Link const& link = *link_ptr;
+                mold.make(link, true);
+            }
+        }
+        */
+        
+        KiwiApp::commandStatusChanged();
+        
+        /*
+        std::string text(data.begin(), data.end());
+        
+        if(!text.empty())
+        {
+            Console::post("copy : " + text);
+            juce::String str = CharPointer_UTF8(text.c_str());
+            Console::post("copy str : " + str.toStdString());
+            
+            juce::SystemClipboard::copyTextToClipboard(str);
+            KiwiApp::commandStatusChanged();
+        }
+        */
+    }
+    
+    void jPatcher::pasteFromClipboard(juce::Point<int> const& delta)
+    {
+        //const std::string text = SystemClipboard::getTextFromClipboard().toStdString();
+        
+        //Console::post("paste : " + text);
+        
+        if(!m_clipboard_data.empty())
+        {
+            std::vector<uint8_t> data(m_clipboard_data.begin(), m_clipboard_data.end());
+            flip::StreamBinIn sbi(data);
+            
+            unselectAll();
+            
+            flip::Ref patcher_model_ref;
+            sbi >> patcher_model_ref;
+            
+            // run until we reach the end of the stream
+            while(!sbi.is_eos())
+            {
+                flip::Mold mold(model::PatcherModel::use(), sbi);
+                
+                model::Object& object = m_patcher_model.addObject(mold);
+                object.setPosition(object.getX() + delta.x, object.getY() + delta.y);
+                m_view_model.selectObject(object);                
+            }
+            
+            DocumentManager::commit(m_patcher_model, "paste objects");
+        }
     }
     
     void jPatcher::addToSelectionBasedOnModifiers(jObject& object, bool select_only)
@@ -1700,24 +1785,12 @@ namespace kiwi
             case StandardApplicationCommandIDs::redo: { redo(); break; }
             case StandardApplicationCommandIDs::cut:
             {
-                Console::post("|- cut");
-                //copySelectionToClipboard();
-                //deleteSelection();
+                copySelectionToClipboard();
+                deleteSelection();
                 break;
             }
-            case StandardApplicationCommandIDs::copy:
-            {
-                Console::post("|- copy selected objects");
-                //copySelectionToClipboard();
-                break;
-            }
-            case StandardApplicationCommandIDs::paste:
-            {
-                Console::post("|- paste objects");
-                //const long gridsize = getPage()->getGridSize();
-                //pasteFromClipboard(juce::Point<int>(gridsize, gridsize));
-                break;
-            }
+            case StandardApplicationCommandIDs::copy:  { copySelectionToClipboard(); break; }
+            case StandardApplicationCommandIDs::paste: { pasteFromClipboard({10 , 10}); break; }
             case CommandIDs::pasteReplace:
             {
                 Console::post("|- paste replace objects");
@@ -1726,11 +1799,8 @@ namespace kiwi
             }
             case CommandIDs::duplicate:
             {
-                Console::post("|- duplicate objects");
-                //copySelectionToClipboard();
-                //const long gridsize = getPage()->getGridSize();
-                //pasteFromClipboard(juce::Point<int>(gridsize, gridsize));
-                //unselectAllLinks();
+                copySelectionToClipboard();
+                pasteFromClipboard({10 , 10});
                 break;
             }
             case StandardApplicationCommandIDs::del:        { deleteSelection(); break; }
