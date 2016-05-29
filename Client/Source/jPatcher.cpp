@@ -850,8 +850,10 @@ namespace kiwi
         {
             if(! object_m.removed())
             {
-                // hard-coded size to be changed..
-                juce::Rectangle<int> object_bounds(object_m.getX(), object_m.getY(), 60, 20);
+                juce::Rectangle<int> object_bounds(object_m.getX(),
+                                                   object_m.getY(),
+                                                   object_m.getWidth(),
+                                                   object_m.getHeight());
                 
                 if(object_bounds.getX() <= area.getX())
                 {

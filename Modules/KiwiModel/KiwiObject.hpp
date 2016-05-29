@@ -94,11 +94,23 @@ namespace kiwi
             //! @brief Returns true if the object's position changed.
             bool positionChanged() const noexcept;
             
+            //! @brief Returns true if the object's size changed.
+            bool sizeChanged() const noexcept;
+            
+            //! @brief Returns true if the position or the size of the object changed.
+            bool boundsChanged() const noexcept;
+            
             //! @brief Returns the x position.
             double getX() const noexcept;
             
             //! @brief Returns the y position.
             double getY() const noexcept;
+            
+            //! @brief Returns the object's width.
+            double getWidth() const noexcept;
+            
+            //! @brief Returns the object's height.
+            double getHeight() const noexcept;
             
             //! @brief Call signalTrigger() to hmmm.. trigger the signal.
             flip::Signal<> signalTrigger;
@@ -133,6 +145,8 @@ namespace kiwi
             
             flip::Float     m_position_x;
             flip::Float     m_position_y;
+            flip::Float     m_width;
+            flip::Float     m_height;
             
             friend class kiwi::ObjectFactory;
         };

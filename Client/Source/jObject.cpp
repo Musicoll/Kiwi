@@ -57,7 +57,8 @@ namespace kiwi
             
             const juce::Rectangle<int> bounds(m_model->getX() + origin.getX(),
                                               m_model->getY() + origin.getY(),
-                                              60, 20);
+                                              m_model->getWidth(),
+                                              m_model->getHeight());
             
             const auto new_bounds = bounds.expanded(m_selection_width, m_selection_width);
             
@@ -416,9 +417,12 @@ namespace kiwi
         
         m_editor->setColour(juce::TextEditor::highlightColourId, Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
         m_editor->setColour(juce::TextEditor::focusedOutlineColourId, Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
+
+        m_editor->setReturnKeyStartsNewLine(false);
+        m_editor->setMultiLine(true, false);
+        
         m_editor->setText(text);
         m_editor->setCaretPosition(text.length());
-        m_editor->setMultiLine(true, false);
         
         m_editor->addListener(this);
         
@@ -445,12 +449,9 @@ namespace kiwi
     
     void jObjectBox::textEditorReturnKeyPressed(juce::TextEditor& e)
     {
-        std::string text = e.getText().toStdString();
-        //e.clear();
-        //e.setVisible(false);
+        Console::post("textEditorReturnKeyPressed");
         
-        const juce::Rectangle<int> box_bounds = getBoxBounds();
-        //m_patcher_view.createObjectModel(text, box_bounds.getX(), box_bounds.getY());
+        m_patcher_view.grabKeyboardFocus();
     }
     
     void jObjectBox::textEditorEscapeKeyPressed(juce::TextEditor& e)
@@ -467,6 +468,13 @@ namespace kiwi
     {
         const bool locked = m_is_locked;
         setInterceptsMouseClicks(locked, locked);
+        
+        std::string text = e.getText().toStdString();
+        //e.clear();
+        //e.setVisible(false);
+        
+        const juce::Rectangle<int> box_bounds = getBoxBounds();
+        //m_patcher_view.createObjectModel(text, box_bounds.getX(), box_bounds.getY());
         
         m_editor->removeListener(this);
         removeChildComponent(m_editor.get());
