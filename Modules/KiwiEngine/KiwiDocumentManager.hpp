@@ -82,6 +82,12 @@ namespace kiwi
         //! @brief Redo the next action.
         void redo();
         
+        //! @brief Returns the object's pointer or nullptr if not found in document.
+        template<class T> T* get(flip::Ref const& ref)
+        {
+            return m_document.object_ptr<T>(ref);
+        }
+        
     private:
         
         void commit(std::string action);

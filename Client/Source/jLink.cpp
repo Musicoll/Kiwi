@@ -144,12 +144,6 @@ namespace kiwi
     
     void jLink::paint(juce::Graphics & g)
     {
-        /* // draw link bounds
-        const auto bounds = getLocalBounds();
-        g.setColour(juce::Colours::black);
-        g.drawRect(bounds);
-        */
-        
         const juce::Colour link_color = Colour::fromFloatRGBA(0.2, 0.2, 0.2, 1.);
         const juce::Colour selection_color = Colour::fromFloatRGBA(0., 0.5, 1., 1.);
         const juce::Colour other_view_selected_color = Colour::fromFloatRGBA(0.8, 0.3, 0.3, 1.);
@@ -172,15 +166,6 @@ namespace kiwi
         
         g.setColour(inner_color);
         g.strokePath(m_path, juce::PathStrokeType(1.f));
-        
-        /* // draw edge points
-        const juce::Point<int> edge_pt_width(3, 3);
-        const juce::Rectangle<int> link_start(local_inlet_pos - edge_pt_width, local_inlet_pos + edge_pt_width);
-        const juce::Rectangle<int> link_end(local_outlet_pos - edge_pt_width, local_outlet_pos + edge_pt_width);
-        g.setColour(juce::Colours::red);
-        g.fillEllipse(link_start.toFloat());
-        g.fillEllipse(link_end.toFloat());
-        */
     }
     
     bool jLink::hitTest(juce::Point<int> const& pt, HitTester& hit) const
