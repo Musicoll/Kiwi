@@ -705,8 +705,25 @@ namespace kiwi
         }
         else if(key.isKeyCode(KeyPress::returnKey))
         {
-            //if a box is selected (only one) and this box is editable => give it textediting focus
-            //selected_box.showTextEditor();
+            if(m_local_objects_selection.size() == 1)
+            {
+                auto& doc = m_patcher_model.entity().use<DocumentManager>();
+                
+                model::Object* object_m = doc.get<model::Object>(*m_local_objects_selection.begin());
+                if(object_m)
+                {
+                    const auto it = findObject(*object_m);
+                    if(it != m_objects.cend())
+                    {
+                        jObjectBox* box = dynamic_cast<jObjectBox*>(it->get());
+                        if(box)
+                        {
+                            box->grabKeyboardFocus();
+                            return true;
+                        }
+                    }
+                }
+            }
         }
         else
         {
@@ -735,6 +752,7 @@ namespace kiwi
                 return true;
             }
         }
+        
         return false;
     }
     
