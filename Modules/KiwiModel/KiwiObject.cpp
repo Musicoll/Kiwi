@@ -150,6 +150,16 @@ namespace kiwi
             return !removed() ? m_position_y.value() : m_position_y.before();
         }
         
+        void Object::setWidth(double new_width)
+        {
+            m_width = std::max(0., new_width);
+        }
+        
+        void Object::setHeight(double new_height)
+        {
+            m_height = std::max(0., new_height);
+        }
+        
         double Object::getWidth() const noexcept
         {
             return !removed() ? m_width.value() : m_width.before();

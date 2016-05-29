@@ -132,6 +132,9 @@ namespace kiwi
         //! @brief Give focus to the text editor.
         void grabKeyboardFocus();
         
+        //! @brief Remove the text editor and give focus back to the jPatcher.
+        void removeTextEditor();
+        
         //! @brief Called when this component has just gained the keyboard focus.
         void focusGained(FocusChangeType cause) override;
         

@@ -60,7 +60,7 @@ namespace kiwi
                                               m_model->getWidth(),
                                               m_model->getHeight());
             
-            const auto new_bounds = bounds.expanded(m_selection_width, m_selection_width);
+            const auto new_bounds = bounds.expanded(m_selection_width);
             
             m_local_box_bounds = bounds.withPosition(bounds.getX() - new_bounds.getX(),
                                                      bounds.getY() - new_bounds.getY());
@@ -397,18 +397,17 @@ namespace kiwi
     jObjectBox::jObjectBox(jPatcher& patcher_view, model::Object& object_m) : jObject(patcher_view, object_m)
     {
         setWantsKeyboardFocus(true);
-        //setMouseClickGrabsKeyboardFocus(true);
+        setMouseClickGrabsKeyboardFocus(true);
     }
 
     jObjectBox::~jObjectBox()
     {
-        
+        removeTextEditor();
     }
     
     void jObjectBox::grabKeyboardFocus()
     {
         setInterceptsMouseClicks(true, true);
-        //setWantsKeyboardFocus(true);
         
         m_editor.reset(new juce::TextEditor());
         m_editor->setBounds(m_local_box_bounds.expanded(2));
@@ -425,11 +424,22 @@ namespace kiwi
         m_editor->setCaretPosition(text.length());
         
         m_editor->addListener(this);
-        
         addAndMakeVisible(m_editor.get());
         
         m_editor->setSelectAllWhenFocused(true);
         m_editor->grabKeyboardFocus();
+    }
+    
+    void jObjectBox::removeTextEditor()
+    {
+        if(m_editor)
+        {
+            m_editor->removeListener(this);
+            removeChildComponent(m_editor.get());
+            m_editor.reset();
+            
+            m_patcher_view.grabKeyboardFocus();
+        }
     }
     
     void jObjectBox::focusGained(FocusChangeType cause)
@@ -444,24 +454,21 @@ namespace kiwi
     
     void jObjectBox::textEditorTextChanged(juce::TextEditor& e)
     {
-        Console::post("textEditorTextChanged");
+        //Console::post("textEditorTextChanged");
     }
     
     void jObjectBox::textEditorReturnKeyPressed(juce::TextEditor& e)
     {
-        Console::post("textEditorReturnKeyPressed");
+        //Console::post("textEditorReturnKeyPressed");
         
         m_patcher_view.grabKeyboardFocus();
     }
     
     void jObjectBox::textEditorEscapeKeyPressed(juce::TextEditor& e)
     {
-        Console::post("textEditorEscapeKeyPressed");
-        /*
-        box->setVisible(true);
-        m_box_edited.reset();
-        e.setVisible(false);
-        */
+        //Console::post("textEditorEscapeKeyPressed");
+        
+        removeTextEditor();
     }
     
     void jObjectBox::textEditorFocusLost(juce::TextEditor& e)
@@ -469,15 +476,10 @@ namespace kiwi
         const bool locked = m_is_locked;
         setInterceptsMouseClicks(locked, locked);
         
-        std::string text = e.getText().toStdString();
-        //e.clear();
-        //e.setVisible(false);
+        std::string new_text = e.getText().toStdString();
         
-        const juce::Rectangle<int> box_bounds = getBoxBounds();
-        //m_patcher_view.createObjectModel(text, box_bounds.getX(), box_bounds.getY());
+        removeTextEditor();
         
-        m_editor->removeListener(this);
-        removeChildComponent(m_editor.get());
-        m_editor.reset();
+        m_patcher_view.boxHasBeenEdited(*this, new_text);
     }
 }

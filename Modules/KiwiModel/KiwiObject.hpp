@@ -106,6 +106,12 @@ namespace kiwi
             //! @brief Returns the y position.
             double getY() const noexcept;
             
+            //! @brief Set the width of the object.
+            void setWidth(double new_width);
+            
+            //! @brief Set the height of the object.
+            void setHeight(double new_height);
+            
             //! @brief Returns the object's width.
             double getWidth() const noexcept;
             

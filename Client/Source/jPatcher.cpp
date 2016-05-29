@@ -1251,11 +1251,12 @@ namespace kiwi
             {
                 jObject& jobj = *result.first->get();
                 
-                jobj.setAlpha(0.);
-                addChildComponent(jobj);
+                //jobj.setAlpha(0.);
+                //addChildComponent(jobj);
+                addAndMakeVisible(jobj);
                 
-                ComponentAnimator& animator = Desktop::getInstance().getAnimator();
-                animator.animateComponent(&jobj, jobj.getBounds(), 1., 200., true, 0.8, 1.);
+                //ComponentAnimator& animator = Desktop::getInstance().getAnimator();
+                //animator.animateComponent(&jobj, jobj.getBounds(), 1., 200., true, 0.8, 1.);
             }
         }
     }
@@ -1279,8 +1280,8 @@ namespace kiwi
         {
             jObject* jobject = it->get();
             
-            ComponentAnimator& animator = Desktop::getInstance().getAnimator();
-            animator.animateComponent(jobject, jobject->getBounds(), 0., 200., true, 0.8, 1.);
+            //ComponentAnimator& animator = Desktop::getInstance().getAnimator();
+            //animator.animateComponent(jobject, jobject->getBounds(), 0., 200., true, 0.8, 1.);
             
             removeChildComponent(jobject);
             m_objects.erase(it);
@@ -1371,12 +1372,75 @@ namespace kiwi
     //                                  COMMANDS ACTIONS                                //
     // ================================================================================ //
     
+    void jPatcher::boxHasBeenEdited(jObjectBox& box, std::string const& new_object_text)
+    {
+        model::Object& old_object_m = box.getModel();
+        const std::string old_object_text = old_object_m.getText();
+        
+        if(old_object_text != new_object_text)
+        {
+            model::Object& new_object_m = m_patcher_model.addObject(new_object_text);
+
+            std::string new_object_text = new_object_m.getText();
+            juce::Font font;
+            int text_width = font.getStringWidth(new_object_text);
+            
+            juce::Rectangle<int> box_bounds = box.getBoxBounds();
+            new_object_m.setPosition(box_bounds.getX(), box_bounds.getY());
+            
+            new_object_m.setWidth(text_width + 12);
+            new_object_m.setHeight(box_bounds.getHeight());
+            
+            // re-link object
+            const size_t new_inlets = new_object_m.getNumberOfInlets();
+            const size_t new_outlets = new_object_m.getNumberOfOutlets();
+            
+            for(model::Link& link : m_patcher_model.getLinks())
+            {
+                if(!link.removed())
+                {
+                    const model::Object& from = link.getSenderObject();
+                    const size_t outlet = link.getSenderIndex();
+                    const model::Object& to = link.getReceiverObject();
+                    const size_t inlet = link.getReceiverIndex();
+                    
+                    if(&link.getSenderObject() == &old_object_m
+                       && link.getSenderIndex() <= new_outlets)
+                    {
+                        m_patcher_model.addLink(new_object_m, outlet, to, inlet);
+                    }
+                    
+                    if(&link.getReceiverObject() == &old_object_m
+                       && link.getReceiverIndex() <= new_inlets)
+                    {
+                        m_patcher_model.addLink(from, outlet, new_object_m, inlet);
+                    }
+                }
+            }
+            
+            m_patcher_model.removeObject(old_object_m);
+            
+            m_view_model.unselectAll();
+            m_view_model.selectObject(new_object_m);
+            
+            DocumentManager::commit(m_patcher_model, "Edit Object");
+            KiwiApp::commandStatusChanged();
+        }
+    }
+    
     void jPatcher::createObjectModel(std::string const& text, double pos_x, double pos_y)
     {
         if(! DocumentManager::isInCommitGesture(m_patcher_model))
         {
             auto& obj = m_patcher_model.addObject(text);
             obj.setPosition(pos_x, pos_y);
+            
+            std::string text = obj.getText();
+            juce::Font font;
+            int text_width = font.getStringWidth(text);
+            
+            obj.setWidth(text_width + 12);
+            
             DocumentManager::commit(m_patcher_model, "Insert Object");
             KiwiApp::commandStatusChanged();
         }

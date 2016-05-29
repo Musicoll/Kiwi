@@ -33,6 +33,7 @@
 namespace kiwi
 {
     class jObject;
+    class jObjectBox;
     class jLink;
     class jLinkCreator;
     class jInstance;
@@ -85,6 +86,9 @@ namespace kiwi
         
         //! @brief Returns the position of the patcher origin relative to the component position.
         juce::Point<int> getOriginPosition() const;
+        
+        //! @brief called by jObjectBox when hmmm.. the text has been edited.
+        void boxHasBeenEdited(jObjectBox& box, std::string const& new_text);
         
         // ================================================================================ //
         //                                    COMPONENT                                     //
