@@ -391,13 +391,24 @@ namespace kiwi
             
             HitTester& hit = *m_hittester.get();
             
-            if(hit.targetObject() && hit.getZone() == HitTester::Zone::Inside && e.mods.isCommandDown())
+            if(hit.targetObject() && hit.getZone() == HitTester::Zone::Inside)
             {
                 jObject* object_j = hit.getObject();
                 if(object_j)
                 {
-                    object_j->mouseUp(e.getEventRelativeTo(object_j));
-                    return;
+                    if(e.mods.isCommandDown())
+                    {
+                        object_j->mouseUp(e.getEventRelativeTo(object_j));
+                        return;
+                    }
+                    else if(m_select_on_mouse_down_status && !m_is_in_move_or_resize_gesture)
+                    {
+                        jObjectBox* box = dynamic_cast<jObjectBox*>(object_j);
+                        if(box)
+                        {
+                            box->grabKeyboardFocus();
+                        }
+                    }
                 }
             }
             
@@ -1214,7 +1225,7 @@ namespace kiwi
         
         if(it == m_objects.cend())
         {
-            auto result = m_objects.emplace(new jObject(*this, object));
+            auto result = m_objects.emplace(new jObjectBox(*this, object));
             
             if(result.second)
             {
