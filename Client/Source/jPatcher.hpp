@@ -25,6 +25,7 @@
 #define KIWI_JPATCHER_HPP_INCLUDED
 
 #include <KiwiModel/KiwiPatcher.hpp>
+#include <KiwiCore/KiwiFile.hpp>
 
 #include "flip/DocumentObserver.h"
 
@@ -119,6 +120,12 @@ namespace kiwi
         
         //! @brief Notify jPatcher that selection has changed.
         void selectionChanged();
+        
+        //! @brief Open a dialog box to save a file.
+        void savePatcher() const;
+        
+        //! @brief Load object and links.
+        void loadPatcher();
         
         //! @brief Check patcher view information changes (lock_status...).
         void checkViewInfos(model::Patcher::View& view);
@@ -284,9 +291,6 @@ namespace kiwi
         
         //! @brief Reset Patcher View zoom to 100%.
         void zoomNormal();
-        
-        //! @internal Load object and links.
-        void loadPatcher();
         
         //! @internal handle right click
         void showPatcherPopupMenu(juce::Point<int> const& position);

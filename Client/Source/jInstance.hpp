@@ -25,6 +25,7 @@
 #define KIWI_JINSTANCE_HPP_INCLUDED
 
 #include <KiwiEngine/KiwiInstance.hpp>
+#include <KiwiCore/KiwiFile.hpp>
 
 #include "flip/Document.h"
 
@@ -47,6 +48,9 @@ namespace kiwi
         //! @brief create a new patcher window.
         void newPatcher();
         
+        //! @brief Open a patcher from file
+        void openPatcher();
+        
         //! @brief Get the user ID of the Instance.
         uint64_t getUserId() const noexcept;
         
@@ -54,7 +58,6 @@ namespace kiwi
         void showConsoleWindow();
         
     private:
-        
         //! @internal temporary method to pre-populate new patchers
         void populatePatcher(model::Patcher& patcher);
         

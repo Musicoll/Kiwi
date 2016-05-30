@@ -72,8 +72,6 @@ namespace kiwi
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAppSettingsWindow);
         MenuBarModel::setMacMainMenu(m_menu_model.get(), &macMainMenuPopup, TRANS("Open Recent"));
         #endif
-        
-        m_instance->newPatcher();
     }
     
     void KiwiApp::shutdown()
@@ -274,7 +272,7 @@ namespace kiwi
         {
             CommandIDs::newPatcher,
             CommandIDs::openFile,
-            CommandIDs::showConsoleWindow
+            CommandIDs::showConsoleWindow,
         };
         
         commands.addArray(ids, numElementsInArray(ids));
@@ -320,6 +318,7 @@ namespace kiwi
         switch(info.commandID)
         {
             case CommandIDs::newPatcher :           { m_instance->newPatcher(); break; }
+            case CommandIDs::openFile :             { m_instance->openPatcher(); break; }
             case CommandIDs::showConsoleWindow :    { m_instance->showConsoleWindow(); break; }
             
             default : return JUCEApplication::perform(info);

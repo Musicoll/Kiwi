@@ -76,6 +76,8 @@
       </GROUP>
       <GROUP id="{CBF4E414-23D0-76EE-C19E-6AB749B32073}" name="KiwiCore">
         <FILE id="xsKzHU" name="KiwiAtom.hpp" compile="0" resource="0" file="../Modules/KiwiCore/KiwiAtom.hpp"/>
+        <FILE id="HDVtN5" name="KiwiFile.cpp" compile="1" resource="0" file="../Modules/KiwiCore/KiwiFile.cpp"/>
+        <FILE id="W0UzEX" name="KiwiFile.hpp" compile="0" resource="0" file="../Modules/KiwiCore/KiwiFile.hpp"/>
         <FILE id="QQUBqT" name="KiwiListeners.hpp" compile="0" resource="0"
               file="../Modules/KiwiCore/KiwiListeners.hpp"/>
       </GROUP>

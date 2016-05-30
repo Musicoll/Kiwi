@@ -273,7 +273,7 @@ namespace kiwi
                 flip::ObjectRef<model::Link> m_ref;
             };
             
-        private: // methods
+        public: // methods
             
             //! @internal flip Default constructor.
             View(flip::Default&) {};

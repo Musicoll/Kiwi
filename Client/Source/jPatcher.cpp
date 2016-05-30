@@ -23,6 +23,7 @@
 
 #include <KiwiEngine/KiwiDocumentManager.hpp>
 #include <KiwiModel/KiwiConsole.hpp>
+#include <KiwiCore/KiwiFile.hpp>
 
 #include "jInstance.hpp"
 #include "jPatcher.hpp"
@@ -1687,13 +1688,35 @@ namespace kiwi
         }
     }
     
+    void jPatcher::savePatcher() const
+    {
+        File const& current_save_file = DocumentManager::getSelectedFile(m_patcher_model);
+        
+        if (current_save_file.exist())
+        {
+            DocumentManager::save(m_patcher_model, current_save_file);
+        }
+        else
+        {
+            juce::FileChooser saveFileChooser("Save file",
+                                              juce::File::getSpecialLocation (juce::File::userHomeDirectory),
+                                              "*.kiwi");
+            
+            if (saveFileChooser.browseForFileToSave(true))
+            {
+                File save_file (saveFileChooser.getResult().getFullPathName().toStdString());
+                DocumentManager::save(m_patcher_model, save_file);
+            }
+        }
+    }
+    
     bool jPatcher::perform(const InvocationInfo& info)
     {
         switch (info.commandID)
         {
             case CommandIDs::save:
             {
-                Console::post("|- try to save page");
+                savePatcher();
                 break;
             }
             case StandardApplicationCommandIDs::undo: { undo(); break; }

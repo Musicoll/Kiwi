@@ -27,6 +27,8 @@
 #include "flip/History.h"
 #include "flip/HistoryStoreMemory.h"
 
+#include <KiwiCore/KiwiFile.hpp>
+
 namespace flip
 {
     class DocumentBase;
@@ -35,6 +37,40 @@ namespace flip
 
 namespace kiwi
 {
+    //! @brief Class that enable saving and loading the document from a kiwi file
+    class FileHandler final
+    {
+    public:
+        //! @brief Constructs the FileHandler referencing document and pointing to a non-existing file.
+        FileHandler(flip::DocumentBase & document);
+        
+        //! @biref Loads the document from file and sets the pointed file.
+        void load(File const& file);
+        
+        //! @brief Saves the document from file and sets the pointed file.
+        void save(File const& file);
+        
+        //! @brief Get the pointed file.
+        File const& getFile() const;
+        
+        ~FileHandler() = default;
+        
+    private:
+        void setFile(File const& file);
+        void load();
+        void save();
+        
+    private:
+        flip::DocumentBase& m_document;
+        File m_file;
+        
+    private:
+        FileHandler(File const& other) = delete;
+        FileHandler(File && other) = delete;
+        FileHandler& operator=(File const& other) = delete;
+        FileHandler& operator=(File && other) = delete;
+    };
+                
     class DocumentManager
     {
     public:
@@ -60,6 +96,18 @@ namespace kiwi
         //! @details Each call to this function must be preceded by a call to startCommitGesture.
         //! @see startCommitGesture.
         static void endCommitGesture(flip::Type& type);
+        
+        //! @brief Saves the patch into the designated file
+        //! @details Doesn't save if not kiwi file. Sets the currently pointed file.
+        static void save(flip::Type& type, File const& file);
+        
+        //! @brief Loads the patch from the designated file
+        //! @details Doesn't load if not kiwi file. Sets the currently pointed file.
+        static void load(flip::Type& type, File const& file);
+        
+        //! @brief Returns the file that is currently pointed to by the DocumentManager.
+        //! @details If neither save or load was called return a non existing file (file.exist() == false).
+        static  File const& getSelectedFile(flip::Type& type);
         
         //! @brief Returns true if the document is currently commiting a gesture.
         static bool isInCommitGesture(flip::Type& type);
@@ -89,16 +137,19 @@ namespace kiwi
         }
         
     private:
-        
         void commit(std::string action);
         void startCommitGesture();
         void commitGesture(std::string action);
         void endCommitGesture();
+        void save(File const& file);
+        void load(File const& file);
+        File const& getSelectedFile() const;
         
     private:
         
         flip::DocumentBase&                     m_document;
         flip::History<flip::HistoryStoreMemory> m_history;
+        FileHandler                             m_file_handler;
         
         bool                                    m_gesture_flag = false;
         size_t                                  m_gesture_cnt = 0;

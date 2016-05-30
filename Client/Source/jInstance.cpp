@@ -22,6 +22,7 @@
  */
 
 #include <KiwiEngine/KiwiDocumentManager.hpp>
+#include <KiwiCore/KiwiFile.hpp>
 
 #include "jInstance.hpp"
 #include "jPatcher.hpp"
@@ -59,6 +60,21 @@ namespace kiwi
         populatePatcher(patcher);
         
         m_patcher_manager->newView();
+    }
+    
+    void jInstance::openPatcher()
+    {
+        juce::FileChooser openFileChooser("Open file",
+                                          juce::File::getSpecialLocation (juce::File::userHomeDirectory),
+                                          "*.kiwi");
+        
+        if (openFileChooser.browseForFileToOpen())
+        {
+            File open_file (openFileChooser.getResult().getFullPathName().toStdString());
+            
+            m_patcher_manager.reset(new jPatcherManager(*this, open_file));
+            //m_patcher_manager->newView();
+        }
     }
     
     void jInstance::showConsoleWindow()
