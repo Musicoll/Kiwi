@@ -35,7 +35,8 @@ namespace kiwi
     m_model(&object_m),
     m_io_color(0.3, 0.3, 0.3),
     m_selection_width(4.f),
-    m_is_selected(false)
+    m_is_selected(false),
+    m_is_editing(false)
     {
         m_inlets = m_model->getNumberOfInlets();
         m_outlets = m_model->getNumberOfOutlets();
@@ -115,7 +116,12 @@ namespace kiwi
             g.drawRect(box_bounds);
         }
         
-        g.drawFittedText(m_model->getText(), box_bounds.reduced(5), juce::Justification::centredLeft, 1, 1.);
+        if(!m_is_editing)
+        {
+            g.drawFittedText(m_model->getText(),
+                             box_bounds.reduced(5),
+                             juce::Justification::centredLeft, 1, 1.);
+        }
         
         if(!m_is_locked)
         {
@@ -410,13 +416,16 @@ namespace kiwi
         setInterceptsMouseClicks(true, true);
         
         m_editor.reset(new juce::TextEditor());
-        m_editor->setBounds(m_local_box_bounds.expanded(2));
+        m_editor->setBounds(m_local_box_bounds.expanded(m_selection_width*0.5));
         
         std::string text = m_model->getText();
         
         m_editor->setColour(juce::TextEditor::highlightColourId, Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
         m_editor->setColour(juce::TextEditor::focusedOutlineColourId, Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
+        m_editor->setColour(juce::TextEditor::backgroundColourId, Colours::transparentWhite);
 
+        m_editor->setScrollbarsShown(false);
+        m_editor->setScrollToShowCursor(true);
         m_editor->setReturnKeyStartsNewLine(false);
         m_editor->setMultiLine(true, false);
         
@@ -428,6 +437,8 @@ namespace kiwi
         
         m_editor->setSelectAllWhenFocused(true);
         m_editor->grabKeyboardFocus();
+        
+        m_is_editing = true;
     }
     
     void jObjectBox::removeTextEditor()
@@ -439,6 +450,7 @@ namespace kiwi
             m_editor.reset();
             
             m_patcher_view.grabKeyboardFocus();
+            m_is_editing = false;
         }
     }
     
@@ -452,9 +464,32 @@ namespace kiwi
         //Console::post("focusLost");
     }
     
+    void jObjectBox::resized()
+    {
+        if(m_editor)
+        {
+            auto ed_borders = m_editor->getBorder();
+            m_editor->setBounds(m_local_box_bounds.expanded(m_selection_width*0.5));
+        }
+    }
+    
     void jObjectBox::textEditorTextChanged(juce::TextEditor& e)
     {
-        //Console::post("textEditorTextChanged");
+        const juce::String new_text = e.getText();
+        const juce::Font font;
+        const int text_width = font.getStringWidth(new_text);
+        
+        //auto ed_borders = e.getBorder();
+        
+        const int ed_width = e.getWidth();
+        
+        // box grows only up
+        if(ed_width < text_width + 16)
+        {
+            const int new_width = text_width + 24;
+            m_local_box_bounds.setWidth(new_width-8);
+            setSize(new_width, getHeight());
+        }
     }
     
     void jObjectBox::textEditorReturnKeyPressed(juce::TextEditor& e)

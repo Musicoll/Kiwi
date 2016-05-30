@@ -53,6 +53,11 @@ namespace kiwi
                 
                 return object_uptr;
             }
+            else
+            {
+                Console::error("Object " + name + " not found");
+                assert(false && "fix that !");
+            }
         }
         else
         {

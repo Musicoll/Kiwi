@@ -110,6 +110,7 @@ namespace kiwi
         
         bool                    m_is_selected = 0;
         std::set<uint64_t>      m_distant_selection;
+        bool                    m_is_editing;
         
         friend jObjectBox;
     };
@@ -140,6 +141,9 @@ namespace kiwi
         
         //! @brief Called when this component has just lost the keyboard focus.
         void focusLost(FocusChangeType cause) override;
+        
+        //! @brief called when the object is resized.
+        void resized() override;
         
         void textEditorTextChanged(juce::TextEditor&) override;
         void textEditorReturnKeyPressed(juce::TextEditor&) override;

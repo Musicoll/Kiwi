@@ -1400,20 +1400,32 @@ namespace kiwi
                 if(!link.removed())
                 {
                     const model::Object& from = link.getSenderObject();
-                    const size_t outlet = link.getSenderIndex();
+                    const size_t outlet_index = link.getSenderIndex();
                     const model::Object& to = link.getReceiverObject();
-                    const size_t inlet = link.getReceiverIndex();
+                    const size_t inlet_index = link.getReceiverIndex();
                     
-                    if(&link.getSenderObject() == &old_object_m
-                       && link.getSenderIndex() <= new_outlets)
+                    if(&from == &old_object_m)
                     {
-                        m_patcher_model.addLink(new_object_m, outlet, to, inlet);
+                        if(outlet_index < new_outlets)
+                        {
+                            m_patcher_model.addLink(new_object_m, outlet_index, to, inlet_index);
+                        }
+                        else
+                        {
+                            Console::error("Link removed (outlet out of range)");
+                        }
                     }
                     
-                    if(&link.getReceiverObject() == &old_object_m
-                       && link.getReceiverIndex() <= new_inlets)
+                    if(&to == &old_object_m)
                     {
-                        m_patcher_model.addLink(from, outlet, new_object_m, inlet);
+                        if(inlet_index < new_inlets)
+                        {
+                            m_patcher_model.addLink(from, outlet_index, new_object_m, inlet_index);
+                        }
+                        else
+                        {
+                            Console::error("Link removed (inlet out of range)");
+                        }
                     }
                 }
             }
