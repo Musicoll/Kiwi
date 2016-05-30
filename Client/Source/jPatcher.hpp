@@ -72,7 +72,7 @@ namespace kiwi
         std::set<std::unique_ptr<jLink>>::iterator findjLink(model::Link const& link) const;
         
         //! @brief Open a dialog box to save a file.
-        void openSaveDialog(File& save_file) const;
+        void savePatcher() const;
         
         //! @brief Load object and links.
         void loadPatcher();

@@ -58,9 +58,6 @@ namespace kiwi
         void showConsoleWindow();
         
     private:
-        //! @internal open a dialog box to open a file
-        void openFileDialog(File& open_file) const;
-        
         //! @internal temporary method to pre-populate new patchers
         void populatePatcher(model::Patcher& patcher);
         

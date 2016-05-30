@@ -75,7 +75,7 @@ namespace kiwi
     
     bool File::isKiwiFile() const
     {
-        return getExtension() == "kiwi";
+        return getExtension() == "kiwi"; // CHeck if exists.
     }
     
     std::string File::getAbsolutePath() const

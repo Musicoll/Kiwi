@@ -28,7 +28,6 @@
 #include "jPatcher.hpp"
 #include "jObject.hpp"
 #include "jLink.hpp"
-#include "jFileBrowser.hpp"
 #include "Application.hpp"
 #include "CommandIDs.hpp"
 
@@ -301,21 +300,6 @@ namespace kiwi
         return (it != m_links.cend()) ? it->get() : nullptr;
     }
     
-    void jPatcher::openSaveDialog(File & save_file) const
-    {
-        jFileBrowser file_browser(jFileBrowser::Mode::save);
-        juce::OptionalScopedPointer<Component> file_browser_cmp(&file_browser, false);
-        
-        juce::DialogWindow::LaunchOptions option;
-        option.dialogTitle = juce::String("Save File");
-        option.content = file_browser_cmp;
-        option.resizable = true;
-        
-        option.runModal();
-        
-        save_file = file_browser.getSelectedFile();
-    }
-    
     // ================================================================================ //
     //                              APPLICATION COMMAND TARGET                          //
     // ================================================================================ //
@@ -439,6 +423,28 @@ namespace kiwi
         }
     }
     
+    void jPatcher::savePatcher() const
+    {
+        File const& current_save_file = DocumentManager::getSelectedFile(m_patcher_model);
+        
+        if (current_save_file.exist())
+        {
+            DocumentManager::save(m_patcher_model, current_save_file);
+        }
+        else
+        {
+            juce::FileChooser saveFileChooser("Save file",
+                                              juce::File::getSpecialLocation (juce::File::userHomeDirectory),
+                                              "*.kiwi");
+            
+            if (saveFileChooser.browseForFileToSave(true))
+            {
+                File save_file (saveFileChooser.getResult().getFullPathName().toStdString());
+                DocumentManager::save(m_patcher_model, save_file);
+            }
+        }
+    }
+    
     bool jPatcher::perform(const InvocationInfo& info)
     {
         Console::post("perform command");
@@ -446,18 +452,7 @@ namespace kiwi
         {
             case CommandIDs::save:
             {
-                File const& current_save_file = DocumentManager::getSelectedFile(m_patcher_model);
-                
-                if (current_save_file.exist())
-                {
-                    DocumentManager::save(m_patcher_model, current_save_file);
-                }
-                else
-                {
-                    File save_file;
-                    openSaveDialog(save_file);
-                    DocumentManager::save(m_patcher_model, save_file);
-                }
+                savePatcher();
                 break;
             }
             case StandardApplicationCommandIDs::undo:
