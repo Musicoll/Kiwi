@@ -153,7 +153,7 @@ namespace kiwi
         {
             if(canConnect(from, outlet, to, inlet))
             {
-                const auto link_uptr = std::unique_ptr<model::Link>(new model::Link(from, outlet, to, inlet));
+                auto link_uptr = std::unique_ptr<model::Link>(new model::Link(from, outlet, to, inlet));
                 const auto it = m_links.insert(m_links.end(), std::move(link_uptr));
                 
                 return it.operator->();
