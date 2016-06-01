@@ -82,6 +82,9 @@
               file="../Modules/KiwiCore/KiwiListeners.hpp"/>
       </GROUP>
     </GROUP>
+    <GROUP id="{48484045-029E-6FC8-B937-EB70114D9875}" name="Ressources">
+      <FILE id="ryVSWY" name="kiwi-logo.png" compile="0" resource="1" file="Ressources/kiwi-logo.png"/>
+    </GROUP>
     <GROUP id="{72FCDC55-1C0F-D5C0-C444-A9EF14BCE12B}" name="Flip">
       <FILE id="irtxw5" name="Array.h" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Array.h"/>
       <FILE id="QohXcn" name="Array.hpp" compile="0" resource="0" file="../ThirdParty/flip-public/include/flip/Array.hpp"/>
@@ -335,7 +338,7 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" extraDefs="flip_NOTHING=flip_NOTHING_FATAL"
                externalLibraries="" extraCompilerFlags="" extraLinkerFlags="../../../ThirdParty/flip-public/bin/flip_macos.a"
-               documentExtensions="kiwi">
+               documentExtensions="kiwi" smallIcon="ryVSWY" bigIcon="ryVSWY">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.10 SDK" osxArchitecture="default"
                        isDebug="1" optimisation="1" targetName="Kiwi" headerPath="../../../ThirdParty/flip-public/include&#10;../../../Modules"
