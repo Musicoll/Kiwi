@@ -579,23 +579,23 @@ namespace kiwi
     
     void jPatcher::moveSelectedObjects(juce::Point<int> const& delta, bool commit, bool commit_gesture)
     {
-        if(isAnyObjectSelected())
+        for(auto* object : m_view_model.getSelectedObjects())
         {
-            for(auto& object : m_view_model.getSelectedObjects())
+            if(object && !object->removed())
             {
                 object->setPosition(object->getX() + delta.x, object->getY() + delta.y);
             }
-            
-            if(commit)
+        }
+        
+        if(commit)
+        {
+            if(commit_gesture)
             {
-                if(commit_gesture)
-                {
-                    DocumentManager::commitGesture(m_patcher_model, "Move selected objects");
-                }
-                else
-                {
-                    DocumentManager::commit(m_patcher_model, "Move selected objects");
-                }
+                DocumentManager::commitGesture(m_patcher_model, "Move selected objects");
+            }
+            else
+            {
+                DocumentManager::commit(m_patcher_model, "Move selected objects");
             }
         }
     }
@@ -939,10 +939,20 @@ namespace kiwi
             if(link.added()) { addjLink(link); }
         }
         
+        bool objects_bounds_changed = false;
+        
         // send jObject change notification
         for(auto& object : patcher.getObjects())
         {
-            if(object.changed()) { objectChanged(view, object); }
+            if(object.changed())
+            {
+                if(object.boundsChanged())
+                {
+                    objects_bounds_changed = true;
+                }
+                
+                objectChanged(view, object);
+            }
         }
         
         // send jLink change notification
@@ -965,7 +975,7 @@ namespace kiwi
             }
         }
         
-        if(!view.removed() && !m_is_in_move_or_resize_gesture)
+        if(objects_bounds_changed && !view.removed() && !m_is_in_move_or_resize_gesture)
         {
             m_viewport->updatePatcherArea(true);
         }
@@ -994,7 +1004,7 @@ namespace kiwi
     
     void jPatcher::checkViewInfos(model::Patcher::View& view)
     {
-        if(&view == &m_view_model)
+        if(&view == &m_view_model && !view.removed())
         {
             const bool was_locked = m_is_locked;
             m_is_locked = view.getLock();
@@ -1430,12 +1440,12 @@ namespace kiwi
                 }
             }
             
+            m_view_model.unselectObject(old_object_m);
             m_patcher_model.removeObject(old_object_m);
-            
-            m_view_model.unselectAll();
-            m_view_model.selectObject(new_object_m);
-            
             DocumentManager::commit(m_patcher_model, "Edit Object");
+            
+            m_view_model.selectObject(new_object_m);
+            DocumentManager::commit(m_patcher_model);
             KiwiApp::commandStatusChanged();
         }
     }

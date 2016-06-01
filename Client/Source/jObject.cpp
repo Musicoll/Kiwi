@@ -262,11 +262,6 @@ namespace kiwi
     {
         bool need_redraw = false;
         
-        if(view.added())
-        {
-            m_model = &object;
-        }
-        
         if(object.inletsChanged())
         {
             m_inlets = object.getNumberOfInlets();
@@ -279,7 +274,7 @@ namespace kiwi
             need_redraw = true;
         }
         
-        if(object.positionChanged())
+        if(object.boundsChanged())
         {
             updateBounds();
             need_redraw = false;
