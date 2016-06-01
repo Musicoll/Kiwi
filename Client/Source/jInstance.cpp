@@ -50,16 +50,12 @@ namespace kiwi
     
     void jInstance::newPatcher()
     {
-        m_patcher_manager.reset();
-        m_patcher_manager = std::make_unique<jPatcherManager>(*this);
+        m_patcher_manager.reset(new jPatcherManager(*this));
         
         model::Patcher& patcher = m_patcher_manager->init();
         
         m_patcher_manager->newView();
-        
-        populatePatcher(patcher);
-        
-        m_patcher_manager->newView();
+        DocumentManager::commit(patcher, "pre-populate patcher");
     }
     
     void jInstance::openFile(kiwi::File const& file)
