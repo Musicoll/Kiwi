@@ -42,6 +42,8 @@ namespace kiwi
         
         void initialise(String const& commandLine) override;
         
+        void anotherInstanceStarted(String const& command_line) override;
+        
         void shutdown() override;
         
         void systemRequestedQuit() override;

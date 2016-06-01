@@ -74,6 +74,14 @@ namespace kiwi
         #endif
     }
     
+    void KiwiApp::anotherInstanceStarted(String const& command_line)
+    {
+        if(m_instance)
+        {
+            m_instance->openFile(kiwi::File(command_line.unquoted().toStdString()));
+        }
+    }
+    
     void KiwiApp::shutdown()
     {
         #if JUCE_MAC

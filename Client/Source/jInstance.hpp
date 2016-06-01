@@ -48,6 +48,9 @@ namespace kiwi
         //! @brief create a new patcher window.
         void newPatcher();
         
+        //! @brief Open a File.
+        void openFile(kiwi::File const& file);
+        
         //! @brief Open a patcher from file
         void openPatcher();
         

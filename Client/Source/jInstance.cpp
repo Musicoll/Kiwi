@@ -62,6 +62,18 @@ namespace kiwi
         m_patcher_manager->newView();
     }
     
+    void jInstance::openFile(kiwi::File const& file)
+    {
+        if(file.isKiwiFile())
+        {
+            m_patcher_manager.reset(new jPatcherManager(*this, file));
+        }
+        else
+        {
+            Console::error("can't open file");
+        }
+    }
+    
     void jInstance::openPatcher()
     {
         juce::FileChooser openFileChooser("Open file",
@@ -73,7 +85,6 @@ namespace kiwi
             File open_file (openFileChooser.getResult().getFullPathName().toStdString());
             
             m_patcher_manager.reset(new jPatcherManager(*this, open_file));
-            //m_patcher_manager->newView();
         }
     }
     
