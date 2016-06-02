@@ -80,10 +80,9 @@ namespace kiwi
     
     void jPatcher::paint(juce::Graphics & g)
     {
-        const bool locked = m_is_locked;
         const juce::Colour bgcolor = juce::Colour::fromFloatRGBA(0.8, 0.8, 0.8, 1.);
 
-        if(!locked)
+        if(!isLocked())
         {
             const int grid_size = 20;
             
@@ -392,13 +391,24 @@ namespace kiwi
             
             HitTester& hit = *m_hittester.get();
             
-            if(hit.targetObject() && hit.getZone() == HitTester::Zone::Inside && e.mods.isCommandDown())
+            if(hit.targetObject() && hit.getZone() == HitTester::Zone::Inside)
             {
                 jObject* object_j = hit.getObject();
                 if(object_j)
                 {
-                    object_j->mouseUp(e.getEventRelativeTo(object_j));
-                    return;
+                    if(e.mods.isCommandDown())
+                    {
+                        object_j->mouseUp(e.getEventRelativeTo(object_j));
+                        return;
+                    }
+                    else if(m_select_on_mouse_down_status && !m_is_in_move_or_resize_gesture)
+                    {
+                        jObjectBox* box = dynamic_cast<jObjectBox*>(object_j);
+                        if(box)
+                        {
+                            box->grabKeyboardFocus();
+                        }
+                    }
                 }
             }
             
@@ -449,7 +459,7 @@ namespace kiwi
         
         m_io_highlighter->hide();
         
-        if(!m_is_locked)
+        if(!isLocked())
         {
             HitTester hit(*this);
             hit.test(event.getPosition());
@@ -479,7 +489,29 @@ namespace kiwi
         
         setMouseCursor(mc);
     }
-
+    
+    void jPatcher::mouseDoubleClick(const MouseEvent& e)
+    {
+        if(!isLocked())
+        {
+            HitTester hit(*this);
+            hit.test(e.getPosition());
+            
+            if(e.mods.isCommandDown() && hit.targetObject())
+            {
+                jObject* object_j = hit.getObject();
+                if(object_j)
+                {
+                    object_j->mouseDoubleClick(e.getEventRelativeTo(object_j));
+                }
+            }
+            else if(hit.targetPatcher())
+            {
+                createNewBoxModel(true);
+            }
+        }
+    }
+    
     juce::MouseCursor::StandardCursorType jPatcher::getMouseCursorForBorder(int border_flag) const
     {
         MouseCursor::StandardCursorType mc = MouseCursor::NormalCursor;
@@ -569,23 +601,23 @@ namespace kiwi
     
     void jPatcher::moveSelectedObjects(juce::Point<int> const& delta, bool commit, bool commit_gesture)
     {
-        if(isAnyObjectSelected())
+        for(auto* object : m_view_model.getSelectedObjects())
         {
-            for(auto& object : m_view_model.getSelectedObjects())
+            if(object && !object->removed())
             {
                 object->setPosition(object->getX() + delta.x, object->getY() + delta.y);
             }
-            
-            if(commit)
+        }
+        
+        if(commit)
+        {
+            if(commit_gesture)
             {
-                if(commit_gesture)
-                {
-                    DocumentManager::commitGesture(m_patcher_model, "Move selected objects");
-                }
-                else
-                {
-                    DocumentManager::commit(m_patcher_model, "Move selected objects");
-                }
+                DocumentManager::commitGesture(m_patcher_model, "Move selected objects");
+            }
+            else
+            {
+                DocumentManager::commit(m_patcher_model, "Move selected objects");
             }
         }
     }
@@ -695,8 +727,25 @@ namespace kiwi
         }
         else if(key.isKeyCode(KeyPress::returnKey))
         {
-            //if a box is selected (only one) and this box is editable => give it textediting focus
-            //selected_box.showTextEditor();
+            if(m_local_objects_selection.size() == 1)
+            {
+                auto& doc = m_patcher_model.entity().use<DocumentManager>();
+                
+                model::Object* object_m = doc.get<model::Object>(*m_local_objects_selection.begin());
+                if(object_m)
+                {
+                    const auto it = findObject(*object_m);
+                    if(it != m_objects.cend())
+                    {
+                        jObjectBox* box = dynamic_cast<jObjectBox*>(it->get());
+                        if(box)
+                        {
+                            box->grabKeyboardFocus();
+                            return true;
+                        }
+                    }
+                }
+            }
         }
         else
         {
@@ -725,6 +774,7 @@ namespace kiwi
                 return true;
             }
         }
+        
         return false;
     }
     
@@ -822,8 +872,10 @@ namespace kiwi
         {
             if(! object_m.removed())
             {
-                // hard-coded size to be changed..
-                juce::Rectangle<int> object_bounds(object_m.getX(), object_m.getY(), 60, 20);
+                juce::Rectangle<int> object_bounds(object_m.getX(),
+                                                   object_m.getY(),
+                                                   object_m.getWidth(),
+                                                   object_m.getHeight());
                 
                 if(object_bounds.getX() <= area.getX())
                 {
@@ -909,10 +961,20 @@ namespace kiwi
             if(link.added()) { addjLink(link); }
         }
         
+        bool objects_bounds_changed = false;
+        
         // send jObject change notification
         for(auto& object : patcher.getObjects())
         {
-            if(object.changed()) { objectChanged(view, object); }
+            if(object.changed())
+            {
+                if(object.boundsChanged())
+                {
+                    objects_bounds_changed = true;
+                }
+                
+                objectChanged(view, object);
+            }
         }
         
         // send jLink change notification
@@ -935,7 +997,7 @@ namespace kiwi
             }
         }
         
-        if(!view.removed() && !m_is_in_move_or_resize_gesture)
+        if(objects_bounds_changed && !view.removed() && !m_is_in_move_or_resize_gesture)
         {
             m_viewport->updatePatcherArea(true);
         }
@@ -964,7 +1026,7 @@ namespace kiwi
     
     void jPatcher::checkViewInfos(model::Patcher::View& view)
     {
-        if(&view == &m_view_model)
+        if(&view == &m_view_model && !view.removed())
         {
             const bool was_locked = m_is_locked;
             m_is_locked = view.getLock();
@@ -1215,17 +1277,18 @@ namespace kiwi
         
         if(it == m_objects.cend())
         {
-            auto result = m_objects.emplace(new jObject(*this, object));
+            auto result = m_objects.emplace(new jObjectBox(*this, object));
             
             if(result.second)
             {
                 jObject& jobj = *result.first->get();
                 
-                jobj.setAlpha(0.);
-                addChildComponent(jobj);
+                //jobj.setAlpha(0.);
+                //addChildComponent(jobj);
+                addAndMakeVisible(jobj);
                 
-                ComponentAnimator& animator = Desktop::getInstance().getAnimator();
-                animator.animateComponent(&jobj, jobj.getBounds(), 1., 200., true, 0.8, 1.);
+                //ComponentAnimator& animator = Desktop::getInstance().getAnimator();
+                //animator.animateComponent(&jobj, jobj.getBounds(), 1., 200., true, 0.8, 1.);
             }
         }
     }
@@ -1249,8 +1312,8 @@ namespace kiwi
         {
             jObject* jobject = it->get();
             
-            ComponentAnimator& animator = Desktop::getInstance().getAnimator();
-            animator.animateComponent(jobject, jobject->getBounds(), 0., 200., true, 0.8, 1.);
+            //ComponentAnimator& animator = Desktop::getInstance().getAnimator();
+            //animator.animateComponent(jobject, jobject->getBounds(), 0., 200., true, 0.8, 1.);
             
             removeChildComponent(jobject);
             m_objects.erase(it);
@@ -1341,14 +1404,141 @@ namespace kiwi
     //                                  COMMANDS ACTIONS                                //
     // ================================================================================ //
     
+    void jPatcher::boxHasBeenEdited(jObjectBox& box, std::string new_object_text)
+    {
+        model::Object& old_object_m = box.getModel();
+        const std::string old_object_text = old_object_m.getText();
+        
+        if(new_object_text.empty())
+        {
+           new_object_text = "newbox";
+        }
+        
+        if(old_object_text != new_object_text)
+        {
+            model::Object& new_object_m = m_patcher_model.addObject(new_object_text);
+
+            const std::string new_object_name = new_object_m.getName();
+            const std::string new_object_text = new_object_m.getText();
+            juce::Font font;
+            int text_width = font.getStringWidth(new_object_text);
+            
+            juce::Rectangle<int> box_bounds = box.getBoxBounds();
+            new_object_m.setPosition(box_bounds.getX(), box_bounds.getY());
+            
+            new_object_m.setWidth(text_width + 12);
+            new_object_m.setHeight(box_bounds.getHeight());
+            
+            // handle error box case
+            if(new_object_name == "errorbox")
+            {
+                model::ErrorBox& error_box = dynamic_cast<model::ErrorBox&>(new_object_m);
+                error_box.setNumberOfInlets(old_object_m.getNumberOfInlets());
+                error_box.setNumberOfOutlets(old_object_m.getNumberOfOutlets());
+            }
+            
+            // re-link object
+            const size_t new_inlets = new_object_m.getNumberOfInlets();
+            const size_t new_outlets = new_object_m.getNumberOfOutlets();
+            
+            for(model::Link& link : m_patcher_model.getLinks())
+            {
+                if(!link.removed())
+                {
+                    const model::Object& from = link.getSenderObject();
+                    const size_t outlet_index = link.getSenderIndex();
+                    const model::Object& to = link.getReceiverObject();
+                    const size_t inlet_index = link.getReceiverIndex();
+                    
+                    if(&from == &old_object_m)
+                    {
+                        if(outlet_index < new_outlets)
+                        {
+                            m_patcher_model.addLink(new_object_m, outlet_index, to, inlet_index);
+                        }
+                        else
+                        {
+                            Console::error("Link removed (outlet out of range)");
+                        }
+                    }
+                    
+                    if(&to == &old_object_m)
+                    {
+                        if(inlet_index < new_inlets)
+                        {
+                            m_patcher_model.addLink(from, outlet_index, new_object_m, inlet_index);
+                        }
+                        else
+                        {
+                            Console::error("Link removed (inlet out of range)");
+                        }
+                    }
+                }
+            }
+            
+            m_view_model.unselectObject(old_object_m);
+            m_patcher_model.removeObject(old_object_m);
+            DocumentManager::commit(m_patcher_model, "Edit Object");
+            
+            m_view_model.selectObject(new_object_m);
+            DocumentManager::commit(m_patcher_model);
+            KiwiApp::commandStatusChanged();
+        }
+    }
+    
     void jPatcher::createObjectModel(std::string const& text, double pos_x, double pos_y)
     {
         if(! DocumentManager::isInCommitGesture(m_patcher_model))
         {
             auto& obj = m_patcher_model.addObject(text);
             obj.setPosition(pos_x, pos_y);
+            
+            std::string text = obj.getText();
+            juce::Font font;
+            int text_width = font.getStringWidth(text);
+            
+            obj.setWidth(text_width + 12);
+            
+            m_view_model.selectObject(obj);
+            
             DocumentManager::commit(m_patcher_model, "Insert Object");
             KiwiApp::commandStatusChanged();
+        }
+    }
+    
+    void jPatcher::createNewBoxModel(bool give_focus)
+    {
+        if(! DocumentManager::isInCommitGesture(m_patcher_model))
+        {
+            const juce::Point<int> pos = getMouseXYRelative() - getOriginPosition();
+            
+            auto& obj = m_patcher_model.addObject("newbox");
+            obj.setPosition(pos.x, pos.y);
+            obj.setWidth(80);
+            
+            m_view_model.unselectAll();
+            m_view_model.selectObject(obj);
+            
+            DocumentManager::commit(m_patcher_model, "Insert New Empty Box");
+            
+            if(give_focus && m_local_objects_selection.size() == 1)
+            {
+                auto& doc = m_patcher_model.entity().use<DocumentManager>();
+                
+                model::Object* object_m = doc.get<model::Object>(*m_local_objects_selection.begin());
+                if(object_m)
+                {
+                    const auto it = findObject(*object_m);
+                    if(it != m_objects.cend())
+                    {
+                        jObjectBox* box = dynamic_cast<jObjectBox*>(it->get());
+                        if(box)
+                        {
+                            box->grabKeyboardFocus();
+                        }
+                    }
+                }
+            }
         }
     }
     
@@ -1547,6 +1737,8 @@ namespace kiwi
         commands.add(StandardApplicationCommandIDs::del);
         commands.add(StandardApplicationCommandIDs::selectAll);
         
+        commands.add(CommandIDs::newBox);
+        
         commands.add(CommandIDs::toFront);
         commands.add(CommandIDs::toBack);
         
@@ -1578,7 +1770,7 @@ namespace kiwi
                 
                 result.setInfo(label, TRANS("Undo last action"), CommandCategories::general, 0);
                 result.addDefaultKeypress('z',  ModifierKeys::commandModifier);
-                result.setActive(!m_is_locked && hasUndo);
+                result.setActive(!isLocked() && hasUndo);
                 break;
             }
             case StandardApplicationCommandIDs::redo:
@@ -1589,7 +1781,7 @@ namespace kiwi
                 
                 result.setInfo(label, TRANS("Redo action"), CommandCategories::general, 0);
                 result.addDefaultKeypress('z',  ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
-                result.setActive(!m_is_locked && hasRedo);
+                result.setActive(!isLocked() && hasRedo);
                 break;
             }
             case StandardApplicationCommandIDs::cut:
@@ -1624,7 +1816,7 @@ namespace kiwi
                                CommandCategories::editing, 0);
                 
                 result.addDefaultKeypress('d', ModifierKeys::commandModifier);
-                result.setActive(isAnyObjectSelected());
+                result.setActive(!isLocked() && isAnyObjectSelected());
                 break;
                 
             case StandardApplicationCommandIDs::del:
@@ -1632,13 +1824,19 @@ namespace kiwi
                                CommandCategories::editing, 0);
                 
                 result.addDefaultKeypress(KeyPress::backspaceKey, ModifierKeys::noModifiers);
-                result.setActive(isAnythingSelected());
+                result.setActive(!isLocked() && isAnythingSelected());
                 break;
                 
             case StandardApplicationCommandIDs::selectAll:
                 result.setInfo(TRANS("Select All"), TRANS("Select all boxes and links"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('a', ModifierKeys::commandModifier);
-                result.setActive(!m_is_locked);
+                result.setActive(!isLocked());
+                break;
+                
+            case CommandIDs::newBox:
+                result.setInfo(TRANS("New Object Box"), TRANS("Add a new object box"), CommandCategories::editing, 0);
+                result.addDefaultKeypress('n', ModifierKeys::noModifiers);
+                result.setActive(!isLocked());
                 break;
                 
             case CommandIDs::toFront:
@@ -1758,6 +1956,9 @@ namespace kiwi
             }
             case StandardApplicationCommandIDs::del:        { deleteSelection(); break; }
             case StandardApplicationCommandIDs::selectAll:  { selectAllObjects(); break; }
+            
+            case CommandIDs::newBox:                        { createNewBoxModel(true); break; }
+                
             case CommandIDs::toFront:                       { break; }
             case CommandIDs::toBack:                        { break; }
             case CommandIDs::zoomIn:                        { zoomIn(); break; }

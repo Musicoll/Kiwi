@@ -30,6 +30,58 @@ namespace kiwi
     namespace model
     {
         // ================================================================================ //
+        //                                       NEWBOX                                     //
+        // ================================================================================ //
+        
+        void NewBox::declare()
+        {
+            if(PatcherModel::has<NewBox>()) return;
+            
+            PatcherModel::declare<NewBox>()
+            .name("cicm.kiwi.NewBox")
+            .inherit<model::Object>();
+            
+            ObjectFactory::registerModel<NewBox>("newbox");
+        }
+        
+        NewBox::NewBox(std::string const& name, std::vector<Atom> const& args)
+        {
+            setNumberOfInlets(0);
+            setNumberOfOutlets(0);
+        }
+        
+        // ================================================================================ //
+        //                                      ERRORBOX                                    //
+        // ================================================================================ //
+        
+        void ErrorBox::declare()
+        {
+            if(PatcherModel::has<ErrorBox>()) return;
+            
+            PatcherModel::declare<ErrorBox>()
+            .name("cicm.kiwi.ErrorBox")
+            .inherit<model::Object>();
+            
+            ObjectFactory::registerModel<ErrorBox>("errorbox");
+        }
+        
+        ErrorBox::ErrorBox(std::string const& name, std::vector<Atom> const& args)
+        {
+            setNumberOfInlets(0);
+            setNumberOfOutlets(0);
+        }
+        
+        void ErrorBox::setNumberOfInlets(size_t inlets)
+        {
+            model::Object::setNumberOfInlets(inlets);
+        }
+        
+        void ErrorBox::setNumberOfOutlets(size_t outlets)
+        {
+            model::Object::setNumberOfOutlets(outlets);
+        }
+        
+        // ================================================================================ //
         //                                    OBJECT PLUS                                   //
         // ================================================================================ //
  

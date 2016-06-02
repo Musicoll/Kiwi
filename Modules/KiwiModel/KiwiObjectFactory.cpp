@@ -22,6 +22,7 @@
 */
 
 #include "KiwiObjectFactory.hpp"
+#include "KiwiTypedObjects.hpp"
 
 namespace kiwi
 {
@@ -47,6 +48,21 @@ namespace kiwi
                 auto object_uptr = std::unique_ptr<model::Object>(model_ctor(args));
                 
                 object_uptr->m_name = name;
+                
+                // parse text again to clean input text
+                object_uptr->m_text = AtomHelper::toString(atoms);
+                
+                return object_uptr;
+            }
+            else
+            {
+                Console::error("Object \"" + name + "\" not found");
+                
+                std::vector<Atom> args {atoms.begin() + 1, atoms.end()};
+                
+                auto object_uptr = std::unique_ptr<model::Object>(new model::ErrorBox("errorbox", args));
+                
+                object_uptr->m_name = "errorbox";
                 
                 // parse text again to clean input text
                 object_uptr->m_text = AtomHelper::toString(atoms);

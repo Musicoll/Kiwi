@@ -32,6 +32,11 @@ namespace kiwi
 {
     class HitTester;
     class jPatcher;
+    class jObjectBox;
+    
+    // ================================================================================ //
+    //                                      JOBJECT                                     //
+    // ================================================================================ //
     
     //! @brief The juce object Component.
     class jObject : public juce::Component
@@ -105,6 +110,50 @@ namespace kiwi
         
         bool                    m_is_selected = 0;
         std::set<uint64_t>      m_distant_selection;
+        bool                    m_is_editing;
+        bool                    m_is_errorbox;
+        
+        friend jObjectBox;
+    };
+    
+    // ================================================================================ //
+    //                                   JOBJECT BOX                                    //
+    // ================================================================================ //
+    
+    //! @brief The jObjectBox let the user change the text of the box
+    class jObjectBox : public jObject, public juce::TextEditor::Listener
+    {
+    public:
+        
+        //! @brief Constructor.
+        jObjectBox(jPatcher& patcher_view, model::Object& object_m);
+        
+        //! @brief Destructor.
+        ~jObjectBox();
+        
+        //! @brief Give focus to the text editor.
+        void grabKeyboardFocus();
+        
+        //! @brief Remove the text editor and give focus back to the jPatcher.
+        void removeTextEditor();
+        
+        //! @brief Called when this component has just gained the keyboard focus.
+        void focusGained(FocusChangeType cause) override;
+        
+        //! @brief Called when this component has just lost the keyboard focus.
+        void focusLost(FocusChangeType cause) override;
+        
+        //! @brief called when the object is resized.
+        void resized() override;
+        
+        void textEditorTextChanged(juce::TextEditor&) override;
+        void textEditorReturnKeyPressed(juce::TextEditor&) override;
+        void textEditorEscapeKeyPressed(juce::TextEditor&) override;
+        void textEditorFocusLost(juce::TextEditor&) override;
+        
+    private: // members
+        
+        std::unique_ptr<juce::TextEditor> m_editor;
     };
 }
 

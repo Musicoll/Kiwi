@@ -35,10 +35,14 @@ namespace kiwi
     m_model(&object_m),
     m_io_color(0.3, 0.3, 0.3),
     m_selection_width(4.f),
-    m_is_selected(false)
+    m_is_selected(false),
+    m_is_editing(false),
+    m_is_errorbox(false)
     {
         m_inlets = m_model->getNumberOfInlets();
         m_outlets = m_model->getNumberOfOutlets();
+        
+        m_is_errorbox = (dynamic_cast<model::ErrorBox*>(m_model) != nullptr);
         
         lockStatusChanged(m_patcher_view.isLocked());
         updateBounds();
@@ -57,9 +61,10 @@ namespace kiwi
             
             const juce::Rectangle<int> bounds(m_model->getX() + origin.getX(),
                                               m_model->getY() + origin.getY(),
-                                              60, 20);
+                                              m_model->getWidth(),
+                                              m_model->getHeight());
             
-            const auto new_bounds = bounds.expanded(m_selection_width, m_selection_width);
+            const auto new_bounds = bounds.expanded(m_selection_width);
             
             m_local_box_bounds = bounds.withPosition(bounds.getX() - new_bounds.getX(),
                                                      bounds.getY() - new_bounds.getY());
@@ -75,6 +80,8 @@ namespace kiwi
         
         const juce::Colour selection_color = Colour::fromFloatRGBA(0., 0.5, 1., 0.8);
         const juce::Colour other_view_selected_color = Colour::fromFloatRGBA(0.8, 0.3, 0.3, 0.3);
+        
+        const juce::Colour errorbox_overlay_color = Colour::fromFloatRGBA(0.6, 0.1, 0.1, 0.4);
         
         /*
         for(auto user_id : m_distant_selection)
@@ -107,14 +114,36 @@ namespace kiwi
         g.setColour(juce::Colours::white);
         g.fillRect(box_bounds);
         
-        g.setColour(juce::Colours::black);
-        
         if(!selected)
         {
-            g.drawRect(box_bounds);
+            g.setColour(juce::Colours::black);
+            //g.drawRect(box_bounds);
+            
+            g.drawRect(box_bounds.reduced(0), 3);
         }
         
-        g.drawFittedText(m_model->getText(), box_bounds.reduced(5), juce::Justification::centredLeft, 1);
+        if(!m_is_editing)
+        {
+            g.setColour(juce::Colours::black);
+            
+            const std::string object_name = m_model->getName();
+            if(object_name == "newbox")
+            {
+                ;
+            }
+            else
+            {
+                g.drawFittedText(m_model->getText(),
+                                 box_bounds.reduced(5),
+                                 juce::Justification::centredLeft, 1, 1.);
+            }
+        }
+        
+        if(m_is_errorbox)
+        {
+            g.setColour(errorbox_overlay_color);
+            g.fillRect(box_bounds);
+        }
         
         if(!m_is_locked)
         {
@@ -255,11 +284,6 @@ namespace kiwi
     {
         bool need_redraw = false;
         
-        if(view.added())
-        {
-            m_model = &object;
-        }
-        
         if(object.inletsChanged())
         {
             m_inlets = object.getNumberOfInlets();
@@ -272,7 +296,7 @@ namespace kiwi
             need_redraw = true;
         }
         
-        if(object.positionChanged())
+        if(object.boundsChanged())
         {
             updateBounds();
             need_redraw = false;
@@ -387,5 +411,128 @@ namespace kiwi
     void jObject::mouseDrag(juce::MouseEvent const& event)
     {
         ;
+    }
+    
+    // ================================================================================ //
+    //                                   JOBJECT BOX                                    //
+    // ================================================================================ //
+    
+    jObjectBox::jObjectBox(jPatcher& patcher_view, model::Object& object_m) : jObject(patcher_view, object_m)
+    {
+        setWantsKeyboardFocus(true);
+        setMouseClickGrabsKeyboardFocus(true);
+    }
+
+    jObjectBox::~jObjectBox()
+    {
+        removeTextEditor();
+    }
+    
+    void jObjectBox::grabKeyboardFocus()
+    {
+        setInterceptsMouseClicks(true, true);
+        
+        m_editor.reset(new juce::TextEditor());
+        m_editor->setBounds(m_local_box_bounds.expanded(m_selection_width*0.5));
+        
+        const std::string object_name = m_model->getName();
+        const std::string text = object_name == "newbox" ? "" : m_model->getText();
+        
+        m_editor->setColour(juce::TextEditor::highlightColourId, Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
+        m_editor->setColour(juce::TextEditor::focusedOutlineColourId, Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
+        m_editor->setColour(juce::TextEditor::backgroundColourId, Colours::transparentWhite);
+
+        m_editor->setScrollbarsShown(false);
+        m_editor->setScrollToShowCursor(true);
+        m_editor->setReturnKeyStartsNewLine(false);
+        m_editor->setMultiLine(true, false);
+        
+        m_editor->setText(text);
+        m_editor->setCaretPosition(text.length());
+        
+        m_editor->addListener(this);
+        addAndMakeVisible(m_editor.get());
+        
+        m_editor->setSelectAllWhenFocused(true);
+        m_editor->grabKeyboardFocus();
+        
+        m_is_editing = true;
+    }
+    
+    void jObjectBox::removeTextEditor()
+    {
+        if(m_editor)
+        {
+            m_editor->removeListener(this);
+            removeChildComponent(m_editor.get());
+            m_editor.reset();
+            
+            m_patcher_view.grabKeyboardFocus();
+            m_is_editing = false;
+        }
+    }
+    
+    void jObjectBox::focusGained(FocusChangeType cause)
+    {
+        //Console::post("focusGained");
+    }
+    
+    void jObjectBox::focusLost(FocusChangeType cause)
+    {
+        //Console::post("focusLost");
+    }
+    
+    void jObjectBox::resized()
+    {
+        if(m_editor)
+        {
+            auto ed_borders = m_editor->getBorder();
+            m_editor->setBounds(m_local_box_bounds.expanded(m_selection_width*0.5));
+        }
+    }
+    
+    void jObjectBox::textEditorTextChanged(juce::TextEditor& e)
+    {
+        const juce::String new_text = e.getText();
+        const juce::Font font;
+        const int text_width = font.getStringWidth(new_text);
+        
+        //auto ed_borders = e.getBorder();
+        
+        const int ed_width = e.getWidth();
+        
+        // box grows only up
+        if(ed_width < text_width + 16)
+        {
+            const int new_width = text_width + 24;
+            m_local_box_bounds.setWidth(new_width-8);
+            setSize(new_width, getHeight());
+        }
+    }
+    
+    void jObjectBox::textEditorReturnKeyPressed(juce::TextEditor& e)
+    {
+        //Console::post("textEditorReturnKeyPressed");
+        
+        m_patcher_view.grabKeyboardFocus();
+    }
+    
+    void jObjectBox::textEditorEscapeKeyPressed(juce::TextEditor& e)
+    {
+        //Console::post("textEditorEscapeKeyPressed");
+        
+        removeTextEditor();
+    }
+    
+    void jObjectBox::textEditorFocusLost(juce::TextEditor& e)
+    {
+        const bool locked = m_is_locked;
+        setInterceptsMouseClicks(locked, locked);
+        
+        std::string new_text = e.getText().toStdString();
+        
+        removeTextEditor();
+        
+        m_patcher_view.boxHasBeenEdited(*this, new_text);
     }
 }
