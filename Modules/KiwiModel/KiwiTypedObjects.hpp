@@ -44,6 +44,32 @@ namespace kiwi
             
             //! @brief Constructor
             NewBox(std::string const& name, std::vector<Atom> const& args);
+
+            //! @internal flip static declare method
+            static void declare();
+        };
+        
+        // ================================================================================ //
+        //                                      ERRORBOX                                    //
+        // ================================================================================ //
+        
+        class ErrorBox : public model::Object
+        {
+        public:
+            
+            //! @brief flip Default Constructor
+            ErrorBox(flip::Default& d) : model::Object(d) {}
+            
+            //! @brief Constructor
+            ErrorBox(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @brief Set the number of inlets.
+            //! @param inlets The number of inlets.
+            void setNumberOfInlets(size_t inlets);
+            
+            //! @brief Set the number of inlets.
+            //! @param inlets The number of inlets.
+            void setNumberOfOutlets(size_t outlets);
             
             //! @internal flip static declare method
             static void declare();

@@ -36,10 +36,13 @@ namespace kiwi
     m_io_color(0.3, 0.3, 0.3),
     m_selection_width(4.f),
     m_is_selected(false),
-    m_is_editing(false)
+    m_is_editing(false),
+    m_is_errorbox(false)
     {
         m_inlets = m_model->getNumberOfInlets();
         m_outlets = m_model->getNumberOfOutlets();
+        
+        m_is_errorbox = (dynamic_cast<model::ErrorBox*>(m_model) != nullptr);
         
         lockStatusChanged(m_patcher_view.isLocked());
         updateBounds();
@@ -78,6 +81,8 @@ namespace kiwi
         const juce::Colour selection_color = Colour::fromFloatRGBA(0., 0.5, 1., 0.8);
         const juce::Colour other_view_selected_color = Colour::fromFloatRGBA(0.8, 0.3, 0.3, 0.3);
         
+        const juce::Colour errorbox_overlay_color = Colour::fromFloatRGBA(0.6, 0.1, 0.1, 0.4);
+        
         /*
         for(auto user_id : m_distant_selection)
         {
@@ -109,15 +114,18 @@ namespace kiwi
         g.setColour(juce::Colours::white);
         g.fillRect(box_bounds);
         
-        g.setColour(juce::Colours::black);
-        
         if(!selected)
         {
-            g.drawRect(box_bounds);
+            g.setColour(juce::Colours::black);
+            //g.drawRect(box_bounds);
+            
+            g.drawRect(box_bounds.reduced(0), 3);
         }
         
         if(!m_is_editing)
         {
+            g.setColour(juce::Colours::black);
+            
             const std::string object_name = m_model->getName();
             if(object_name == "newbox")
             {
@@ -129,6 +137,12 @@ namespace kiwi
                                  box_bounds.reduced(5),
                                  juce::Justification::centredLeft, 1, 1.);
             }
+        }
+        
+        if(m_is_errorbox)
+        {
+            g.setColour(errorbox_overlay_color);
+            g.fillRect(box_bounds);
         }
         
         if(!m_is_locked)

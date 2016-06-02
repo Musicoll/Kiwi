@@ -136,14 +136,15 @@ namespace kiwi
         engine::Object>::type* = nullptr>
         static std::unique_ptr<TEngine> createEngine(model::Object const& model)
         {
+            const std::string object_name = model.getName();
             std::vector<Atom> atoms = AtomHelper::parse(model.getText());
             
-            if(atoms.size() > 0 && atoms[0].isString())
+            if(atoms.size() > 0)
             {
-                const std::string name = atoms[0].getString();
+                //const std::string name = atoms[0].getString();
                 
                 const auto& creators = getCreators();
-                const auto it = creators.find(name);
+                const auto it = creators.find(object_name);
                 if(it != creators.end())
                 {
                     std::vector<Atom> args {atoms.begin() + 1, atoms.end()};

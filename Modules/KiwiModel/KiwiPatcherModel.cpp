@@ -53,6 +53,7 @@ namespace kiwi
         void PatcherModel::declareObjects()
         {
             NewBox::declare();
+            ErrorBox::declare();
             ObjectPlus::declare();
             ObjectPrint::declare();
         }

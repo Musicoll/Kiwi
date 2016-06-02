@@ -34,13 +34,26 @@ namespace kiwi
         //                                       NEWBOX                                     //
         // ================================================================================ //
         
-        
         NewBox::NewBox(std::vector<Atom> const& args)
         {
             ;
         }
         
         void NewBox::receive(size_t index, std::vector<Atom> const& args)
+        {
+            ;
+        }
+        
+        // ================================================================================ //
+        //                                      ERRORBOX                                    //
+        // ================================================================================ //
+        
+        ErrorBox::ErrorBox(std::vector<Atom> const& args)
+        {
+            ;
+        }
+        
+        void ErrorBox::receive(size_t index, std::vector<Atom> const& args)
         {
             ;
         }

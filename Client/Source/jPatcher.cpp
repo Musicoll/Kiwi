@@ -79,10 +79,9 @@ namespace kiwi
     
     void jPatcher::paint(juce::Graphics & g)
     {
-        const bool locked = isLocked();
         const juce::Colour bgcolor = juce::Colour::fromFloatRGBA(0.8, 0.8, 0.8, 1.);
 
-        if(!locked)
+        if(!isLocked())
         {
             const int grid_size = 20;
             
@@ -1418,7 +1417,8 @@ namespace kiwi
         {
             model::Object& new_object_m = m_patcher_model.addObject(new_object_text);
 
-            std::string new_object_text = new_object_m.getText();
+            const std::string new_object_name = new_object_m.getName();
+            const std::string new_object_text = new_object_m.getText();
             juce::Font font;
             int text_width = font.getStringWidth(new_object_text);
             
@@ -1427,6 +1427,14 @@ namespace kiwi
             
             new_object_m.setWidth(text_width + 12);
             new_object_m.setHeight(box_bounds.getHeight());
+            
+            // handle error box case
+            if(new_object_name == "errorbox")
+            {
+                model::ErrorBox& error_box = dynamic_cast<model::ErrorBox&>(new_object_m);
+                error_box.setNumberOfInlets(old_object_m.getNumberOfInlets());
+                error_box.setNumberOfOutlets(old_object_m.getNumberOfOutlets());
+            }
             
             // re-link object
             const size_t new_inlets = new_object_m.getNumberOfInlets();

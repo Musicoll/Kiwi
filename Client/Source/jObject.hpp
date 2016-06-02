@@ -111,6 +111,7 @@ namespace kiwi
         bool                    m_is_selected = 0;
         std::set<uint64_t>      m_distant_selection;
         bool                    m_is_editing;
+        bool                    m_is_errorbox;
         
         friend jObjectBox;
     };
