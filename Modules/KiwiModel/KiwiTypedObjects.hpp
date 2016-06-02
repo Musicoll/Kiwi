@@ -32,6 +32,24 @@ namespace kiwi
     namespace model
     {
         // ================================================================================ //
+        //                                       NEWBOX                                     //
+        // ================================================================================ //
+        
+        class NewBox : public model::Object
+        {
+        public:
+            
+            //! @brief flip Default Constructor
+            NewBox(flip::Default& d) : model::Object(d) {}
+            
+            //! @brief Constructor
+            NewBox(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @internal flip static declare method
+            static void declare();
+        };
+        
+        // ================================================================================ //
         //                                    OBJECT PLUS                                   //
         // ================================================================================ //
         

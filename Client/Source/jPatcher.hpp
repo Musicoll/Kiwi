@@ -88,7 +88,7 @@ namespace kiwi
         juce::Point<int> getOriginPosition() const;
         
         //! @brief called by jObjectBox when hmmm.. the text has been edited.
-        void boxHasBeenEdited(jObjectBox& box, std::string const& new_text);
+        void boxHasBeenEdited(jObjectBox& box, std::string new_text);
         
         // ================================================================================ //
         //                                    COMPONENT                                     //
@@ -99,6 +99,7 @@ namespace kiwi
         void mouseDrag(MouseEvent const& e) override;
         void mouseUp(MouseEvent const& e) override;
         void mouseMove(juce::MouseEvent const& event) override;
+        void mouseDoubleClick(const MouseEvent& event) override;
         bool keyPressed(const KeyPress& key) override;
         
         // ================================================================================ //
@@ -153,6 +154,9 @@ namespace kiwi
         
         //! @brief Add a new Object to the model at a given position.
         void createObjectModel(std::string const& text, double pos_x, double pos_y);
+        
+        //! @brief Add a newbox Object at current mouse position and give it focus.
+        void createNewBoxModel(bool give_focus);
         
         // ================================================================================ //
         //                                     UNDO/REDO                                    //

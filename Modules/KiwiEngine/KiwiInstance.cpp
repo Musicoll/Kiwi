@@ -43,6 +43,7 @@ namespace kiwi
             
             void endOfModelDeclaration() final override
             {
+                ObjectFactory::registerEngine<NewBox>("newbox");
                 ObjectFactory::registerEngine<ObjectPlus>("plus");
                 ObjectFactory::registerEngine<ObjectPrint>("print");
             }

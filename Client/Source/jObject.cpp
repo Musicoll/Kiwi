@@ -118,9 +118,17 @@ namespace kiwi
         
         if(!m_is_editing)
         {
-            g.drawFittedText(m_model->getText(),
-                             box_bounds.reduced(5),
-                             juce::Justification::centredLeft, 1, 1.);
+            const std::string object_name = m_model->getName();
+            if(object_name == "newbox")
+            {
+                ;
+            }
+            else
+            {
+                g.drawFittedText(m_model->getText(),
+                                 box_bounds.reduced(5),
+                                 juce::Justification::centredLeft, 1, 1.);
+            }
         }
         
         if(!m_is_locked)
@@ -413,7 +421,8 @@ namespace kiwi
         m_editor.reset(new juce::TextEditor());
         m_editor->setBounds(m_local_box_bounds.expanded(m_selection_width*0.5));
         
-        std::string text = m_model->getText();
+        const std::string object_name = m_model->getName();
+        const std::string text = object_name == "newbox" ? "" : m_model->getText();
         
         m_editor->setColour(juce::TextEditor::highlightColourId, Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
         m_editor->setColour(juce::TextEditor::focusedOutlineColourId, Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));

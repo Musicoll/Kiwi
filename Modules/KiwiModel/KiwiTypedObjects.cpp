@@ -30,6 +30,27 @@ namespace kiwi
     namespace model
     {
         // ================================================================================ //
+        //                                       NEWBOX                                     //
+        // ================================================================================ //
+        
+        void NewBox::declare()
+        {
+            if(PatcherModel::has<NewBox>()) return;
+            
+            PatcherModel::declare<NewBox>()
+            .name("cicm.kiwi.NewBox")
+            .inherit<model::Object>();
+            
+            ObjectFactory::registerModel<NewBox>("newbox");
+        }
+        
+        NewBox::NewBox(std::string const& name, std::vector<Atom> const& args)
+        {
+            setNumberOfInlets(0);
+            setNumberOfOutlets(0);
+        }
+        
+        // ================================================================================ //
         //                                    OBJECT PLUS                                   //
         // ================================================================================ //
  

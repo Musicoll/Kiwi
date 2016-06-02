@@ -79,7 +79,7 @@ namespace kiwi
     
     void jPatcher::paint(juce::Graphics & g)
     {
-        const bool locked = m_is_locked;
+        const bool locked = isLocked();
         const juce::Colour bgcolor = juce::Colour::fromFloatRGBA(0.8, 0.8, 0.8, 1.);
 
         if(!locked)
@@ -459,7 +459,7 @@ namespace kiwi
         
         m_io_highlighter->hide();
         
-        if(!m_is_locked)
+        if(!isLocked())
         {
             HitTester hit(*this);
             hit.test(event.getPosition());
@@ -489,7 +489,29 @@ namespace kiwi
         
         setMouseCursor(mc);
     }
-
+    
+    void jPatcher::mouseDoubleClick(const MouseEvent& e)
+    {
+        if(!isLocked())
+        {
+            HitTester hit(*this);
+            hit.test(e.getPosition());
+            
+            if(e.mods.isCommandDown() && hit.targetObject())
+            {
+                jObject* object_j = hit.getObject();
+                if(object_j)
+                {
+                    object_j->mouseDoubleClick(e.getEventRelativeTo(object_j));
+                }
+            }
+            else if(hit.targetPatcher())
+            {
+                createNewBoxModel(true);
+            }
+        }
+    }
+    
     juce::MouseCursor::StandardCursorType jPatcher::getMouseCursorForBorder(int border_flag) const
     {
         MouseCursor::StandardCursorType mc = MouseCursor::NormalCursor;
@@ -1382,10 +1404,15 @@ namespace kiwi
     //                                  COMMANDS ACTIONS                                //
     // ================================================================================ //
     
-    void jPatcher::boxHasBeenEdited(jObjectBox& box, std::string const& new_object_text)
+    void jPatcher::boxHasBeenEdited(jObjectBox& box, std::string new_object_text)
     {
         model::Object& old_object_m = box.getModel();
         const std::string old_object_text = old_object_m.getText();
+        
+        if(new_object_text.empty())
+        {
+           new_object_text = "newbox";
+        }
         
         if(old_object_text != new_object_text)
         {
@@ -1463,8 +1490,46 @@ namespace kiwi
             
             obj.setWidth(text_width + 12);
             
+            m_view_model.selectObject(obj);
+            
             DocumentManager::commit(m_patcher_model, "Insert Object");
             KiwiApp::commandStatusChanged();
+        }
+    }
+    
+    void jPatcher::createNewBoxModel(bool give_focus)
+    {
+        if(! DocumentManager::isInCommitGesture(m_patcher_model))
+        {
+            const juce::Point<int> pos = getMouseXYRelative() - getOriginPosition();
+            
+            auto& obj = m_patcher_model.addObject("newbox");
+            obj.setPosition(pos.x, pos.y);
+            obj.setWidth(80);
+            
+            m_view_model.unselectAll();
+            m_view_model.selectObject(obj);
+            
+            DocumentManager::commit(m_patcher_model, "Insert New Empty Box");
+            
+            if(give_focus && m_local_objects_selection.size() == 1)
+            {
+                auto& doc = m_patcher_model.entity().use<DocumentManager>();
+                
+                model::Object* object_m = doc.get<model::Object>(*m_local_objects_selection.begin());
+                if(object_m)
+                {
+                    const auto it = findObject(*object_m);
+                    if(it != m_objects.cend())
+                    {
+                        jObjectBox* box = dynamic_cast<jObjectBox*>(it->get());
+                        if(box)
+                        {
+                            box->grabKeyboardFocus();
+                        }
+                    }
+                }
+            }
         }
     }
     
@@ -1663,6 +1728,8 @@ namespace kiwi
         commands.add(StandardApplicationCommandIDs::del);
         commands.add(StandardApplicationCommandIDs::selectAll);
         
+        commands.add(CommandIDs::newBox);
+        
         commands.add(CommandIDs::toFront);
         commands.add(CommandIDs::toBack);
         
@@ -1694,7 +1761,7 @@ namespace kiwi
                 
                 result.setInfo(label, TRANS("Undo last action"), CommandCategories::general, 0);
                 result.addDefaultKeypress('z',  ModifierKeys::commandModifier);
-                result.setActive(!m_is_locked && hasUndo);
+                result.setActive(!isLocked() && hasUndo);
                 break;
             }
             case StandardApplicationCommandIDs::redo:
@@ -1705,7 +1772,7 @@ namespace kiwi
                 
                 result.setInfo(label, TRANS("Redo action"), CommandCategories::general, 0);
                 result.addDefaultKeypress('z',  ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
-                result.setActive(!m_is_locked && hasRedo);
+                result.setActive(!isLocked() && hasRedo);
                 break;
             }
             case StandardApplicationCommandIDs::cut:
@@ -1740,7 +1807,7 @@ namespace kiwi
                                CommandCategories::editing, 0);
                 
                 result.addDefaultKeypress('d', ModifierKeys::commandModifier);
-                result.setActive(isAnyObjectSelected());
+                result.setActive(!isLocked() && isAnyObjectSelected());
                 break;
                 
             case StandardApplicationCommandIDs::del:
@@ -1748,13 +1815,19 @@ namespace kiwi
                                CommandCategories::editing, 0);
                 
                 result.addDefaultKeypress(KeyPress::backspaceKey, ModifierKeys::noModifiers);
-                result.setActive(isAnythingSelected());
+                result.setActive(!isLocked() && isAnythingSelected());
                 break;
                 
             case StandardApplicationCommandIDs::selectAll:
                 result.setInfo(TRANS("Select All"), TRANS("Select all boxes and links"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('a', ModifierKeys::commandModifier);
-                result.setActive(!m_is_locked);
+                result.setActive(!isLocked());
+                break;
+                
+            case CommandIDs::newBox:
+                result.setInfo(TRANS("New Object Box"), TRANS("Add a new object box"), CommandCategories::editing, 0);
+                result.addDefaultKeypress('n', ModifierKeys::noModifiers);
+                result.setActive(!isLocked());
                 break;
                 
             case CommandIDs::toFront:
@@ -1852,6 +1925,9 @@ namespace kiwi
             }
             case StandardApplicationCommandIDs::del:        { deleteSelection(); break; }
             case StandardApplicationCommandIDs::selectAll:  { selectAllObjects(); break; }
+            
+            case CommandIDs::newBox:                        { createNewBoxModel(true); break; }
+                
             case CommandIDs::toFront:                       { break; }
             case CommandIDs::toBack:                        { break; }
             case CommandIDs::zoomIn:                        { zoomIn(); break; }
