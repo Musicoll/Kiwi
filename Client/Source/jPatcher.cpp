@@ -606,78 +606,104 @@ namespace kiwi
     {
         auto& document = m_patcher_model.entity().use<DocumentManager>();
         
-        m_clipboard_data.clear();
-        flip::StreamBinOut sbo(m_clipboard_data);
-        
-        sbo << m_patcher_model.ref();
-        //sbo << m_view_model.ref();
-        
-        flip::Mold mold(model::PatcherModel::use(), sbo);
+        auto& clipboard = m_instance.getPatcherClipboardData();
+        clipboard.clear();
+        flip::StreamBinOut sbo(clipboard);
         
         for(auto& object_ref : getSelectedObjects())
         {
             model::Object const* object_ptr = document.get<model::Object>(object_ref);
             if(object_ptr)
             {
+                flip::Mold mold(model::PatcherModel::use(), sbo);
                 model::Object const& object = *object_ptr;
-                mold.make(object, false);
+                mold.make(object);
                 mold.cure();
+
+                // store object ref to find links boundaries
+                sbo << object_ptr->ref();
             }
         }
         
-        /*
-        for(auto& link_ref : getSelectedLinks())
+        for(model::Link& link : m_patcher_model.getLinks())
         {
-            model::Link* link_ptr = document.get<model::Link>(link_ref);
-            if(link_ptr)
+            if(!link.removed())
             {
-                model::Link const& link = *link_ptr;
-                mold.make(link, true);
+                flip::Ref const& sender_ref = link.getSenderObject().ref();
+                flip::Ref const& receiver_ref = link.getReceiverObject().ref();
+                
+                bool sender_selected = m_local_objects_selection.find(sender_ref) != m_local_objects_selection.end();
+                
+                bool receiver_selected = m_local_objects_selection.find(receiver_ref) != m_local_objects_selection.end();
+                
+                if(sender_selected && receiver_selected)
+                {
+                    flip::Mold mold(model::PatcherModel::use(), sbo);
+                    mold.make(link);
+                    mold.cure();
+                    
+                    // store object ref to find links boundaries
+                    sbo << sender_ref;
+                    sbo << receiver_ref;
+                }
             }
         }
-        */
         
         KiwiApp::commandStatusChanged();
-        
-        /*
-        std::string text(data.begin(), data.end());
-        
-        if(!text.empty())
-        {
-            Console::post("copy : " + text);
-            juce::String str = CharPointer_UTF8(text.c_str());
-            Console::post("copy str : " + str.toStdString());
-            
-            juce::SystemClipboard::copyTextToClipboard(str);
-            KiwiApp::commandStatusChanged();
-        }
-        */
     }
     
     void jPatcher::pasteFromClipboard(juce::Point<int> const& delta)
     {
-        //const std::string text = SystemClipboard::getTextFromClipboard().toStdString();
-        
-        //Console::post("paste : " + text);
-        
-        if(!m_clipboard_data.empty())
+        auto& clipboard = m_instance.getPatcherClipboardData();
+        if(!clipboard.empty())
         {
-            std::vector<uint8_t> data(m_clipboard_data.begin(), m_clipboard_data.end());
+            std::vector<uint8_t> data(clipboard.begin(), clipboard.end());
             flip::StreamBinIn sbi(data);
             
             unselectAll();
             
-            flip::Ref patcher_model_ref;
-            sbi >> patcher_model_ref;
+            std::map<flip::Ref, model::Object const*> molded_objects;
             
             // run until we reach the end of the stream
             while(!sbi.is_eos())
             {
                 flip::Mold mold(model::PatcherModel::use(), sbi);
                 
-                model::Object& object = m_patcher_model.addObject(mold);
-                object.setPosition(object.getX() + delta.x, object.getY() + delta.y);
-                m_view_model.selectObject(object);                
+                if(mold.has<model::Object>())
+                {
+                    flip::Ref old_object_ref;
+                    sbi >> old_object_ref;
+                    
+                    model::Object& new_object = m_patcher_model.addObject(mold);
+                    new_object.setPosition(new_object.getX() + delta.x, new_object.getY() + delta.y);
+                    m_view_model.selectObject(new_object);
+                    
+                    molded_objects.insert({old_object_ref, &new_object});
+                }
+                else if(mold.has<model::Link>())
+                {
+                    model::Link link = mold.cast<model::Link>();
+                    
+                    flip::Ref old_sender_ref;
+                    sbi >> old_sender_ref;
+                    
+                    flip::Ref old_receiver_ref;
+                    sbi >> old_receiver_ref;
+                    
+                    const auto from_it = molded_objects.find(old_sender_ref);
+                    const auto to_it = molded_objects.find(old_receiver_ref);
+                    
+                    model::Object const* from = (from_it != molded_objects.cend()) ? from_it->second : nullptr;
+                    model::Object const* to = (to_it != molded_objects.cend()) ? to_it->second : nullptr;
+                    
+                    const size_t outlet = link.getSenderIndex();
+                    const size_t inlet = link.getReceiverIndex();
+                    
+                    if(from && to)
+                    {
+                        m_patcher_model.addLink(*from, outlet, *to, inlet);
+                    }
+                }
             }
             
             DocumentManager::commit(m_patcher_model, "paste objects");

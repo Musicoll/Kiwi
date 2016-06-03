@@ -144,8 +144,7 @@ namespace kiwi
         
         model::Object& Patcher::addObject(flip::Mold const& mold)
         {
-            //const auto it = m_objects.emplace<model::ObjectPrint>(m_objects.end(), mold);
-            const auto it = m_objects.emplace<model::ObjectPrint>(m_objects.end(), mold);
+            const auto it = m_objects.emplace(m_objects.end(), mold);
             return *it;
         }
         

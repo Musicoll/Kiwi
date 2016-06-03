@@ -67,6 +67,11 @@ namespace kiwi
         m_console_window->toFront(true);
     }
     
+    std::vector<uint8_t>& jInstance::getPatcherClipboardData()
+    {
+        return m_patcher_clipboard;
+    }
+    
     void jInstance::populatePatcher(model::Patcher& patcher)
     {
         {

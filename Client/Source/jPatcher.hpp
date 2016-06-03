@@ -328,9 +328,7 @@ namespace kiwi
         std::unique_ptr<jLasso>                     m_lasso;
         
         bool                    m_is_locked;
-        
-        std::vector<uint8_t>    m_clipboard_data;
-        
+                
         // mouse interactions flags
         juce::Point<int> m_last_drag;
         bool m_object_received_down_event = false;
