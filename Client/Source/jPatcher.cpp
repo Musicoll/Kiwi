@@ -315,6 +315,12 @@ namespace kiwi
                     {
                         if(! m_is_dragging && (e.getMouseDownPosition() != e.getPosition()))
                         {
+                            if(m_copy_on_drag)
+                            {
+                                copySelectionToClipboard();
+                                pasteFromClipboard({0, 0});
+                            }
+                            
                             startMoveOrResizeObjects();
                             m_is_dragging = true;
                         }
