@@ -63,6 +63,11 @@ namespace kiwi
             //! @brief create an Object from a flip::Mold.
             model::Object& addObject(flip::Mold const& mold);
             
+            //! @brief Replace Object
+            model::Object& replaceObjectWith(model::Object& object_to_replace,
+                                             flip::Mold const& mold,
+                                             Patcher::View& view);
+            
             //! @brief Constructs and add a Link to the Patcher.
             //! @details Constructs a Link with given origin and destination Object
             //! and IO indexes then adds it in the Patcher.

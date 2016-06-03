@@ -177,10 +177,10 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief Returns the selected objects.
-        std::set<flip::Ref> getSelectedObjects() const;
+        std::set<flip::Ref> const& getSelectedObjects() const;
         
         //! @brief Returns the selected links.
-        std::set<flip::Ref> getSelectedLinks() const;
+        std::set<flip::Ref> const& getSelectedLinks() const;
         
         void addToSelectionBasedOnModifiers(jObject& object, bool select_only);
         
@@ -265,6 +265,15 @@ namespace kiwi
         
         //! @brief Try to paste clipboard content.
         void pasteFromClipboard(juce::Point<int> const& delta);
+        
+        //! @brief Duplicate selected objects.
+        void duplicateSelection();
+        
+        //! @brief Copy selected objects then delete selection.
+        void cut();
+        
+        //! @brief Try to replace selected object by the object copied into clipboard.
+        void pasteReplace();
         
         // ================================================================================ //
         //                                      MISC                                        //
