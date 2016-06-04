@@ -192,10 +192,10 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief Returns the selected objects.
-        std::set<flip::Ref> getSelectedObjects() const;
+        std::set<flip::Ref> const& getSelectedObjects() const;
         
         //! @brief Returns the selected links.
-        std::set<flip::Ref> getSelectedLinks() const;
+        std::set<flip::Ref> const& getSelectedLinks() const;
         
         void addToSelectionBasedOnModifiers(jObject& object, bool select_only);
         
@@ -275,6 +275,21 @@ namespace kiwi
         void moveSelectedObjects(juce::Point<int> const& delta,
                                  bool commit = true, bool gesture = false);
         
+        //! @brief Add selected objects and links to clipboard.
+        void copySelectionToClipboard();
+        
+        //! @brief Try to paste clipboard content.
+        void pasteFromClipboard(juce::Point<int> const& delta);
+        
+        //! @brief Duplicate selected objects.
+        void duplicateSelection();
+        
+        //! @brief Copy selected objects then delete selection.
+        void cut();
+        
+        //! @brief Try to replace selected object by the object copied into clipboard.
+        void pasteReplace();
+        
         // ================================================================================ //
         //                                      MISC                                        //
         // ================================================================================ //
@@ -333,8 +348,8 @@ namespace kiwi
         std::unique_ptr<IoletHighlighter>           m_io_highlighter;
         std::unique_ptr<jLasso>                     m_lasso;
         
-        bool m_is_locked;
-        
+        bool                    m_is_locked;
+                
         // mouse interactions flags
         juce::Point<int> m_last_drag;
         bool m_object_received_down_event = false;

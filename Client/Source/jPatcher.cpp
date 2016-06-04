@@ -21,9 +21,12 @@
  ==============================================================================
  */
 
+#include "flip/Mold.h"
+
 #include <KiwiEngine/KiwiDocumentManager.hpp>
 #include <KiwiModel/KiwiConsole.hpp>
 #include <KiwiCore/KiwiFile.hpp>
+#include <KiwiModel/KiwiPatcherModel.hpp>
 
 #include "jInstance.hpp"
 #include "jPatcher.hpp"
@@ -312,6 +315,12 @@ namespace kiwi
                     {
                         if(! m_is_dragging && (e.getMouseDownPosition() != e.getPosition()))
                         {
+                            if(m_copy_on_drag)
+                            {
+                                copySelectionToClipboard();
+                                pasteFromClipboard({0, 0});
+                            }
+                            
                             startMoveOrResizeObjects();
                             m_is_dragging = true;
                         }
@@ -622,14 +631,183 @@ namespace kiwi
         }
     }
     
-    std::set<flip::Ref> jPatcher::getSelectedObjects() const
+    std::set<flip::Ref> const& jPatcher::getSelectedObjects() const
     {
         return m_local_objects_selection;
     }
     
-    std::set<flip::Ref> jPatcher::getSelectedLinks() const
+    std::set<flip::Ref> const& jPatcher::getSelectedLinks() const
     {
         return m_local_links_selection;
+    }
+    
+    void jPatcher::copySelectionToClipboard()
+    {
+        auto& document = m_patcher_model.entity().use<DocumentManager>();
+        
+        auto& clipboard = m_instance.getPatcherClipboardData();
+        clipboard.clear();
+        flip::StreamBinOut sbo(clipboard);
+        
+        std::set<flip::Ref> const& selected_objects = getSelectedObjects();
+        
+        sbo << static_cast<uint32_t>(selected_objects.size());
+        
+        for(flip::Ref const& object_ref : selected_objects)
+        {
+            model::Object const* object_ptr = document.get<model::Object>(object_ref);
+            if(object_ptr)
+            {
+                flip::Mold mold(model::PatcherModel::use(), sbo);
+                model::Object const& object = *object_ptr;
+                mold.make(object);
+                mold.cure();
+
+                // store object ref to find links boundaries
+                sbo << object_ptr->ref();
+            }
+        }
+        
+        for(model::Link& link : m_patcher_model.getLinks())
+        {
+            if(!link.removed())
+            {
+                flip::Ref const& sender_ref = link.getSenderObject().ref();
+                flip::Ref const& receiver_ref = link.getReceiverObject().ref();
+                
+                bool sender_selected = m_local_objects_selection.find(sender_ref) != m_local_objects_selection.end();
+                
+                bool receiver_selected = m_local_objects_selection.find(receiver_ref) != m_local_objects_selection.end();
+                
+                if(sender_selected && receiver_selected)
+                {
+                    flip::Mold mold(model::PatcherModel::use(), sbo);
+                    mold.make(link);
+                    mold.cure();
+                    
+                    // store object ref to find links boundaries
+                    sbo << sender_ref;
+                    sbo << receiver_ref;
+                }
+            }
+        }
+        
+        KiwiApp::commandStatusChanged();
+    }
+    
+    void jPatcher::pasteFromClipboard(juce::Point<int> const& delta)
+    {
+        auto& clipboard = m_instance.getPatcherClipboardData();
+        if(!clipboard.empty())
+        {
+            std::vector<uint8_t> data(clipboard.begin(), clipboard.end());
+            flip::StreamBinIn sbi(data);
+            
+            unselectAll();
+            
+            std::map<flip::Ref, model::Object const*> molded_objects;
+            
+            uint32_t number_of_objects;
+            sbi >> number_of_objects;
+            
+            // run until we reach the end of the stream
+            while(!sbi.is_eos())
+            {
+                flip::Mold mold(model::PatcherModel::use(), sbi);
+                
+                if(mold.has<model::Object>())
+                {
+                    flip::Ref old_object_ref;
+                    sbi >> old_object_ref;
+                    
+                    model::Object& new_object = m_patcher_model.addObject(mold);
+                    new_object.setPosition(new_object.getX() + delta.x, new_object.getY() + delta.y);
+                    m_view_model.selectObject(new_object);
+                    
+                    molded_objects.insert({old_object_ref, &new_object});
+                }
+                else if(mold.has<model::Link>())
+                {
+                    model::Link link = mold.cast<model::Link>();
+                    
+                    flip::Ref old_sender_ref;
+                    sbi >> old_sender_ref;
+                    
+                    flip::Ref old_receiver_ref;
+                    sbi >> old_receiver_ref;
+                    
+                    const auto from_it = molded_objects.find(old_sender_ref);
+                    const auto to_it = molded_objects.find(old_receiver_ref);
+                    
+                    model::Object const* from = (from_it != molded_objects.cend()) ? from_it->second : nullptr;
+                    model::Object const* to = (to_it != molded_objects.cend()) ? to_it->second : nullptr;
+                    
+                    const size_t outlet = link.getSenderIndex();
+                    const size_t inlet = link.getReceiverIndex();
+                    
+                    if(from && to)
+                    {
+                        m_patcher_model.addLink(*from, outlet, *to, inlet);
+                    }
+                }
+            }
+            
+            DocumentManager::commit(m_patcher_model, "paste objects");
+        }
+    }
+    
+    void jPatcher::duplicateSelection()
+    {
+        copySelectionToClipboard();
+        pasteFromClipboard({10, 10});
+    }
+    
+    void jPatcher::cut()
+    {
+        copySelectionToClipboard();
+        deleteSelection();
+    }
+    
+    void jPatcher::pasteReplace()
+    {
+        if(isAnyObjectSelected())
+        {
+            auto& clipboard = m_instance.getPatcherClipboardData();
+            if(!clipboard.empty())
+            {
+                std::vector<uint8_t> data(clipboard.begin(), clipboard.end());
+                flip::StreamBinIn sbi(data);
+                
+                uint32_t number_of_objects_in_clipboard;
+                sbi >> number_of_objects_in_clipboard;
+                
+                std::set<flip::Ref> const& selected_objects = getSelectedObjects();
+                
+                if(number_of_objects_in_clipboard == 1)
+                {
+                    flip::Mold mold(model::PatcherModel::use(), sbi);
+                    
+                    if(mold.has<model::Object>())
+                    {
+                        auto& document = m_patcher_model.entity().use<DocumentManager>();
+                        
+                        flip::Ref old_object_ref;
+                        sbi >> old_object_ref;
+                        
+                        for(auto const& obj_ref : selected_objects)
+                        {
+                            model::Object* selected_object = document.get<model::Object>(obj_ref);
+                            if(selected_object != nullptr && !selected_object->removed())
+                            {
+                                m_patcher_model.replaceObjectWith(*selected_object, mold, m_view_model);
+                            }
+                        }
+                        
+                        DocumentManager::commit(m_patcher_model, "paste-replace objects");
+                    }
+                }
+            }
+        }
     }
     
     void jPatcher::addToSelectionBasedOnModifiers(jObject& object, bool select_only)
@@ -1715,6 +1893,28 @@ namespace kiwi
         m_viewport->updatePatcherArea(false);
     }
     
+    void jPatcher::savePatcher() const
+    {
+        File const& current_save_file = DocumentManager::getSelectedFile(m_patcher_model);
+        
+        if (current_save_file.exist())
+        {
+            DocumentManager::save(m_patcher_model, current_save_file);
+        }
+        else
+        {
+            juce::FileChooser saveFileChooser("Save file",
+                                              juce::File::getSpecialLocation (juce::File::userHomeDirectory),
+                                              "*.kiwi");
+            
+            if (saveFileChooser.browseForFileToSave(true))
+            {
+                File save_file (saveFileChooser.getResult().getFullPathName().toStdString());
+                DocumentManager::save(m_patcher_model, save_file);
+            }
+        }
+    }
+    
     // ================================================================================ //
     //                              APPLICATION COMMAND TARGET                          //
     // ================================================================================ //
@@ -1807,7 +2007,7 @@ namespace kiwi
                                TRANS("Replace selected objects with the object on the clipboard"),
                                CommandCategories::editing, 0);
                 
-                result.addDefaultKeypress('v', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+                result.addDefaultKeypress('v', ModifierKeys::commandModifier | ModifierKeys::altModifier);
                 //result.setActive(isAnyObjectSelected() && SystemClipboard::getTextFromClipboard().isNotEmpty());
                 break;
                 
@@ -1886,74 +2086,20 @@ namespace kiwi
         }
     }
     
-    void jPatcher::savePatcher() const
-    {
-        File const& current_save_file = DocumentManager::getSelectedFile(m_patcher_model);
-        
-        if (current_save_file.exist())
-        {
-            DocumentManager::save(m_patcher_model, current_save_file);
-        }
-        else
-        {
-            juce::FileChooser saveFileChooser("Save file",
-                                              juce::File::getSpecialLocation (juce::File::userHomeDirectory),
-                                              "*.kiwi");
-            
-            if (saveFileChooser.browseForFileToSave(true))
-            {
-                File save_file (saveFileChooser.getResult().getFullPathName().toStdString());
-                DocumentManager::save(m_patcher_model, save_file);
-            }
-        }
-    }
-    
     bool jPatcher::perform(const InvocationInfo& info)
     {
         switch (info.commandID)
         {
-            case CommandIDs::save:
-            {
-                savePatcher();
-                break;
-            }
-            case StandardApplicationCommandIDs::undo: { undo(); break; }
-            case StandardApplicationCommandIDs::redo: { redo(); break; }
-            case StandardApplicationCommandIDs::cut:
-            {
-                Console::post("|- cut");
-                //copySelectionToClipboard();
-                //deleteSelection();
-                break;
-            }
-            case StandardApplicationCommandIDs::copy:
-            {
-                Console::post("|- copy selected objects");
-                //copySelectionToClipboard();
-                break;
-            }
-            case StandardApplicationCommandIDs::paste:
-            {
-                Console::post("|- paste objects");
-                //const long gridsize = getPage()->getGridSize();
-                //pasteFromClipboard(juce::Point<int>(gridsize, gridsize));
-                break;
-            }
-            case CommandIDs::pasteReplace:
-            {
-                Console::post("|- paste replace objects");
-                //replaceBoxesFromClipboard();
-                break;
-            }
-            case CommandIDs::duplicate:
-            {
-                Console::post("|- duplicate objects");
-                //copySelectionToClipboard();
-                //const long gridsize = getPage()->getGridSize();
-                //pasteFromClipboard(juce::Point<int>(gridsize, gridsize));
-                //unselectAllLinks();
-                break;
-            }
+            case CommandIDs::save:                          { savePatcher(); break; }
+                
+            case StandardApplicationCommandIDs::undo:       { undo(); break; }
+            case StandardApplicationCommandIDs::redo:       { redo(); break; }
+                
+            case StandardApplicationCommandIDs::cut:        { cut(); break; }
+            case StandardApplicationCommandIDs::copy:       { copySelectionToClipboard(); break; }
+            case StandardApplicationCommandIDs::paste:      { pasteFromClipboard({10 , 10}); break; }
+            case CommandIDs::pasteReplace:                  { pasteReplace(); break; }
+            case CommandIDs::duplicate:                     { duplicateSelection(); break; }
             case StandardApplicationCommandIDs::del:        { deleteSelection(); break; }
             case StandardApplicationCommandIDs::selectAll:  { selectAllObjects(); break; }
             

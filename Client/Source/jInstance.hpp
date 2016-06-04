@@ -57,8 +57,11 @@ namespace kiwi
         //! @brief Get the user ID of the Instance.
         uint64_t getUserId() const noexcept;
         
-        //! Brings the Console to front.
+        //! @brief Brings the Console to front.
         void showConsoleWindow();
+        
+        //! @brief Get Patcher clipboard data.
+        std::vector<uint8_t>& getPatcherClipboardData();
         
     private:
         //! @internal temporary method to pre-populate new patchers
@@ -69,10 +72,9 @@ namespace kiwi
         const uint64_t m_user_id;
         
         std::unique_ptr<engine::Instance>   m_instance;
-        
         std::unique_ptr<jPatcherManager>    m_patcher_manager;
-        
         std::unique_ptr<jConsoleWindow>     m_console_window;
+        std::vector<uint8_t>                m_patcher_clipboard;
     };
 }
 

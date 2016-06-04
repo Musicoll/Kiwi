@@ -117,9 +117,7 @@ namespace kiwi
         if(!selected)
         {
             g.setColour(juce::Colours::black);
-            //g.drawRect(box_bounds);
-            
-            g.drawRect(box_bounds.reduced(0), 3);
+            g.drawRect(box_bounds);
         }
         
         if(!m_is_editing)
