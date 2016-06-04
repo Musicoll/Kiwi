@@ -555,6 +555,23 @@ namespace kiwi
             return atoms;
         }
         
+        static std::string trimDecimal(std::string& text)
+        {
+            std::string::size_type pos = text.find('.');
+            
+            if(pos != std::string::npos)
+            {
+                std::string::size_type size = text.size();
+                while(size > pos && text[size - 1] == '0')
+                {
+                    text.pop_back();
+                    size--;
+                }
+            }
+            
+            return text;
+        }
+        
         //! @brief Convert an Atom into a string.
         static std::string toString(Atom const& atom)
         {
@@ -565,7 +582,8 @@ namespace kiwi
             }
             else if(atom.isFloat())
             {
-                output += std::to_string(atom.getFloat());
+                std::string str = std::to_string(atom.getFloat());
+                output += trimDecimal(str);
             }
             else if(atom.isString())
             {
