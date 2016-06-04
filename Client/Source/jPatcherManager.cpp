@@ -154,6 +154,7 @@ namespace kiwi
             auto& window = view.entity().emplace<jWindow>();
             auto& jpatcher = view.entity().emplace<jPatcher>(m_instance, patcher, view);
             window.setContentNonOwned(&jpatcher.getViewport(), true);
+            jpatcher.grabKeyboardFocus();
         }
     }
 

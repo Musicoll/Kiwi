@@ -111,40 +111,34 @@ namespace kiwi
             //assert(ObjectFactory::has(object_name));
             
             auto object_uptr = ObjectFactory::createModel(text);
-            return *m_objects.insert(m_objects.end(), std::move(object_uptr));
-        }
-        
-        bool Patcher::canConnect(model::Object const& from, const size_t outlet,
-                                 model::Object const& to, const size_t inlet) const
-        {
-            // check source object
-            const auto from_it = findObject(from);
-            const bool from_valid = (from_it != m_objects.cend() && from_it->getNumberOfOutlets() > outlet);
+            const auto it = m_objects.insert(m_objects.end(), std::move(object_uptr));
             
-            // check destination object
-            const auto to_it = findObject(to);
-            const bool to_valid = (to_it != m_objects.cend() && to_it->getNumberOfInlets() > inlet);
-            
-            if(from_valid && to_valid)
+            if(it->getName() == "errorbox")
             {
-                // Check if link does not exists.
-                const auto find_link = [&from, &outlet, &to, &inlet](model::Link const& link_model)
-                {
-                    return (link_model.getSenderObject().ref()      == from.ref() &&
-                            link_model.getReceiverObject().ref()    == to.ref() &&
-                            link_model.getSenderIndex()             == outlet &&
-                            link_model.getReceiverIndex()           == inlet);
-                };
+                model::ErrorBox* error_box = dynamic_cast<model::ErrorBox*>(it.operator->());
                 
-                return (std::find_if(m_links.begin(), m_links.end(), find_link) == m_links.cend());
+                if(error_box != nullptr)
+                {
+                    Console::post("error_box");
+                }
             }
             
-            return false;
+            return *it;
         }
         
         model::Object& Patcher::addObject(flip::Mold const& mold)
         {
             const auto it = m_objects.emplace(m_objects.end(), mold);
+            
+            if(it->getName() == "errorbox")
+            {
+                model::ErrorBox* error_box = dynamic_cast<model::ErrorBox*>(it.operator->());
+                
+                if(error_box != nullptr)
+                {
+                    Console::post("error_box");
+                }
+            }
             return *it;
         }
         
@@ -153,6 +147,24 @@ namespace kiwi
                                                   Patcher::View& view)
         {
             model::Object& new_object = addObject(mold);
+            
+            /*
+            // handle error box case
+            if(new_object.getName() == "errorbox")
+            {
+                model::ErrorBox& error_box = reinterpret_cast<model::ErrorBox&>(new_object);
+                error_box.setNumberOfInlets(object_to_replace.getNumberOfInlets());
+                error_box.setNumberOfOutlets(object_to_replace.getNumberOfOutlets());
+            }
+            
+            
+            if(new_object.getName() == "plus")
+            {
+                model::ObjectPlus* plus_box = static_cast<model::ObjectPlus*>(&new_object);
+                Console::post("plus_box : " + std::string(plus_box ? "OK !" : "nullptr"));
+                
+            }
+            */
             
             new_object.setPosition(object_to_replace.getX(), object_to_replace.getY());
             
@@ -214,6 +226,34 @@ namespace kiwi
             }
             
             return nullptr;
+        }
+        
+        bool Patcher::canConnect(model::Object const& from, const size_t outlet,
+                                 model::Object const& to, const size_t inlet) const
+        {
+            // check source object
+            const auto from_it = findObject(from);
+            const bool from_valid = (from_it != m_objects.cend() && from_it->getNumberOfOutlets() > outlet);
+            
+            // check destination object
+            const auto to_it = findObject(to);
+            const bool to_valid = (to_it != m_objects.cend() && to_it->getNumberOfInlets() > inlet);
+            
+            if(from_valid && to_valid)
+            {
+                // Check if link does not exists.
+                const auto find_link = [&from, &outlet, &to, &inlet](model::Link const& link_model)
+                {
+                    return (link_model.getSenderObject().ref()      == from.ref() &&
+                            link_model.getReceiverObject().ref()    == to.ref() &&
+                            link_model.getSenderIndex()             == outlet &&
+                            link_model.getReceiverIndex()           == inlet);
+                };
+                
+                return (std::find_if(m_links.begin(), m_links.end(), find_link) == m_links.cend());
+            }
+            
+            return false;
         }
         
         void Patcher::removeObject(model::Object const& object, Patcher::View* view)

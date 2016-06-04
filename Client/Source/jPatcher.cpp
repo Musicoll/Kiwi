@@ -48,6 +48,7 @@ namespace kiwi
     m_hittester(new HitTester(*this)),
     m_io_highlighter(new IoletHighlighter()),
     m_lasso(new jLasso(*this)),
+    m_grid_size(20),
     m_object_border_down_status(HitTester::Border::None)
     {
         if(!m_command_manager_binded)
@@ -87,7 +88,7 @@ namespace kiwi
 
         if(!isLocked())
         {
-            const int grid_size = 20;
+            const int grid_size = m_grid_size;
             
             const juce::Point<int> origin = getOriginPosition();
             const juce::Rectangle<int> bounds = getLocalBounds();
@@ -180,7 +181,7 @@ namespace kiwi
                         {
                             if(e.mods.isPopupMenu())
                             {
-                                if (!object_j->isSelected())
+                                if (!isSelected(*object_j))
                                 {
                                     m_select_on_mouse_down_status = selectOnMouseDown(*object_j, true);
                                 }
@@ -759,7 +760,7 @@ namespace kiwi
     void jPatcher::duplicateSelection()
     {
         copySelectionToClipboard();
-        pasteFromClipboard({10, 10});
+        pasteFromClipboard({m_grid_size, m_grid_size});
     }
     
     void jPatcher::cut()
@@ -810,13 +811,23 @@ namespace kiwi
         }
     }
     
+    bool jPatcher::isSelected(jObject const& object) const
+    {
+        return m_view_model.isSelected(object.getModel());
+    }
+    
+    bool jPatcher::isSelected(jLink const& link) const
+    {
+        return m_view_model.isSelected(link.getModel());
+    }
+    
     void jPatcher::addToSelectionBasedOnModifiers(jObject& object, bool select_only)
     {
         if(select_only)
         {
             selectObjectOnly(object);
         }
-        else if(m_view_model.isSelected(object.getModel()))
+        else if(isSelected(object))
         {
             unselectObject(object);
         }
@@ -832,7 +843,7 @@ namespace kiwi
         {
             selectLinkOnly(link);
         }
-        else if(m_view_model.isSelected(link.getModel()))
+        else if(isSelected(link))
         {
             unselectLink(link);
         }
@@ -844,7 +855,10 @@ namespace kiwi
     
     bool jPatcher::selectOnMouseDown(jObject& object, bool select_only)
     {
-        if(m_view_model.isSelected(object.getModel())) return true;
+        if(isSelected(object))
+        {
+            return true;
+        }
         
         addToSelectionBasedOnModifiers(object, select_only);
         return false;
@@ -852,7 +866,7 @@ namespace kiwi
     
     bool jPatcher::selectOnMouseDown(jLink& link, bool select_only)
     {
-        if(m_view_model.isSelected(link.getModel()))
+        if(isSelected(link))
         {
             return true;
         }
@@ -928,8 +942,7 @@ namespace kiwi
         else
         {
             const bool snap = key.getModifiers().isShiftDown();
-            const int gridsize = 20;
-            const int amount = snap ? gridsize : 1;
+            const int amount = snap ? m_grid_size : 1;
             
             if(key.isKeyCode(KeyPress::rightKey))
             {
@@ -1490,8 +1503,8 @@ namespace kiwi
         {
             jObject* jobject = it->get();
             
-            //ComponentAnimator& animator = Desktop::getInstance().getAnimator();
-            //animator.animateComponent(jobject, jobject->getBounds(), 0., 200., true, 0.8, 1.);
+            ComponentAnimator& animator = Desktop::getInstance().getAnimator();
+            animator.animateComponent(jobject, jobject->getBounds(), 0., 200., true, 0.8, 1.);
             
             removeChildComponent(jobject);
             m_objects.erase(it);
@@ -1601,8 +1614,9 @@ namespace kiwi
             juce::Font font;
             int text_width = font.getStringWidth(new_object_text);
             
+            const juce::Point<int> origin = getOriginPosition();
             juce::Rectangle<int> box_bounds = box.getBoxBounds();
-            new_object_m.setPosition(box_bounds.getX(), box_bounds.getY());
+            new_object_m.setPosition(box_bounds.getX() - origin.x, box_bounds.getY() - origin.y);
             
             new_object_m.setWidth(text_width + 12);
             new_object_m.setHeight(box_bounds.getHeight());
@@ -1688,21 +1702,40 @@ namespace kiwi
     {
         if(! DocumentManager::isInCommitGesture(m_patcher_model))
         {
-            const juce::Point<int> pos = getMouseXYRelative() - getOriginPosition();
+            bool linked_newbox = m_local_objects_selection.size() == 1;
             
-            auto& obj = m_patcher_model.addObject("newbox");
-            obj.setPosition(pos.x, pos.y);
-            obj.setWidth(80);
+            auto& new_object = m_patcher_model.addObject("newbox");
+            
+            juce::Point<int> pos = getMouseXYRelative() - getOriginPosition();
+            
+            auto& doc = m_patcher_model.entity().use<DocumentManager>();
+            
+            if(linked_newbox)
+            {
+                model::Object* obj = doc.get<model::Object>(*m_local_objects_selection.begin());
+                
+                if(obj)
+                {
+                    pos.setX(obj->getX());
+                    pos.setY(obj->getY() + obj->getHeight() + m_grid_size);
+                    
+                    if(obj->getNumberOfInlets() >= 1)
+                    {
+                        m_patcher_model.addLink(*obj, 0, new_object, 0);
+                    }
+                }
+            }
+            
+            new_object.setPosition(pos.x, pos.y);
+            new_object.setWidth(80);
             
             m_view_model.unselectAll();
-            m_view_model.selectObject(obj);
+            m_view_model.selectObject(new_object);
             
             DocumentManager::commit(m_patcher_model, "Insert New Empty Box");
             
             if(give_focus && m_local_objects_selection.size() == 1)
             {
-                auto& doc = m_patcher_model.entity().use<DocumentManager>();
-                
                 model::Object* object_m = doc.get<model::Object>(*m_local_objects_selection.begin());
                 if(object_m)
                 {
@@ -2097,7 +2130,9 @@ namespace kiwi
                 
             case StandardApplicationCommandIDs::cut:        { cut(); break; }
             case StandardApplicationCommandIDs::copy:       { copySelectionToClipboard(); break; }
-            case StandardApplicationCommandIDs::paste:      { pasteFromClipboard({10 , 10}); break; }
+            case StandardApplicationCommandIDs::paste:
+            { pasteFromClipboard({m_grid_size , m_grid_size}); break; }
+                
             case CommandIDs::pasteReplace:                  { pasteReplace(); break; }
             case CommandIDs::duplicate:                     { duplicateSelection(); break; }
             case StandardApplicationCommandIDs::del:        { deleteSelection(); break; }

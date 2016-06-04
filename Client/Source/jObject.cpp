@@ -35,7 +35,7 @@ namespace kiwi
     m_model(&object_m),
     m_io_color(0.3, 0.3, 0.3),
     m_selection_width(4.f),
-    m_is_selected(false),
+    m_is_selected(m_patcher_view.isSelected(*this)),
     m_is_editing(false),
     m_is_errorbox(false)
     {
@@ -43,6 +43,7 @@ namespace kiwi
         m_outlets = m_model->getNumberOfOutlets();
         
         m_is_errorbox = (dynamic_cast<model::ErrorBox*>(m_model) != nullptr);
+        //m_is_errorbox = (m_model->getName() == "errorbox");
         
         lockStatusChanged(m_patcher_view.isLocked());
         updateBounds();
@@ -173,11 +174,11 @@ namespace kiwi
     
     bool jObject::hitTest(int x, int y)
     {
-        bool allowclick;
-        bool allowclick_onchild;
-        getInterceptsMouseClicks(allowclick, allowclick_onchild);
+        bool allow_click;
+        bool allow_click_onchild;
+        getInterceptsMouseClicks(allow_click, allow_click_onchild);
         
-        if (! allowclick)
+        if (! allow_click)
             return false;
         
         return m_local_box_bounds.contains(x, y);

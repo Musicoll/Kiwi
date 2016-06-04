@@ -81,6 +81,12 @@ namespace kiwi
         //! @brief Get the lock status of the patcher view.
         bool isLocked();
         
+        //! @brief Returns true if the object is selected.
+        bool isSelected(jObject const& object) const;
+        
+        //! @brief Returns true if the link is selected.
+        bool isSelected(jLink const& link) const;
+        
         //! @brief Returns the Viewport that contains this patcher view.
         //! @details You must use this method if you want to add this component into an other one.
         jPatcherViewport& getViewport() { return *m_viewport.get(); }
@@ -348,7 +354,8 @@ namespace kiwi
         std::unique_ptr<IoletHighlighter>           m_io_highlighter;
         std::unique_ptr<jLasso>                     m_lasso;
         
-        bool                    m_is_locked;
+        bool    m_is_locked;
+        int     m_grid_size;
                 
         // mouse interactions flags
         juce::Point<int> m_last_drag;
