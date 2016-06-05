@@ -34,7 +34,7 @@ namespace kiwi
     {
         std::vector<Atom> atoms = AtomHelper::parse(text);
         
-        if(atoms.size() > 0 && atoms[0].isString())
+        if(atoms.size() > 0)
         {
             const std::string name = atoms[0].getString();
             
@@ -72,9 +72,14 @@ namespace kiwi
         }
         else
         {
-            // handle creation fail
+            auto object_uptr = std::unique_ptr<model::Object>(new model::NewBox("newbox", {}));
+            object_uptr->m_name = "newbox";
+            object_uptr->m_text = "";
+            
+            return object_uptr;
         }
         
+        assert(true && "typed object creation fail"); // sould never appear
         return nullptr;
     }
     
