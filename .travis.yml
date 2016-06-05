@@ -30,9 +30,9 @@ matrix:
       compiler: clang
       addons:
         apt:
-          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.6']
-          packages: ['clang-3.6']
-      env: COMPILER=clang++-3.6
+          #sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.6']
+          packages: ['clang-3.6', 'libc++-dev']
+      env: COMPILER=clang++-3.6 CONFIGURATION=Debug
 
     - os: osx
       compiler: gcc
