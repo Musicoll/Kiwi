@@ -321,8 +321,14 @@ namespace kiwi
         //! @brief Reset Patcher View zoom to 100%.
         void zoomNormal();
         
-        //! @internal handle right click
+        //! @internal Show Patcher contextual Popup menu
         void showPatcherPopupMenu(juce::Point<int> const& position);
+        
+        //! @internal Show Object contextual Popup menu
+        void showObjectPopupMenu(jObject const& object, juce::Point<int> const& position);
+        
+        //! @internal Show Link contextual Popup menu
+        void showLinkPopupMenu(jLink const& link, juce::Point<int> const& position);
         
         //! @brief Bring all link components in front of object ones.
         void bringsLinksToFront();

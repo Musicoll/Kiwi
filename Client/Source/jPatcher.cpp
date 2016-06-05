@@ -186,7 +186,9 @@ namespace kiwi
                                     m_select_on_mouse_down_status = selectOnMouseDown(*object_j, true);
                                 }
                                 
-                                //showObjectPopupMenu(*box);
+                                const auto pos = e.getPosition() - m_viewport->getOriginPosition();
+                                showObjectPopupMenu(*object_j, pos);
+                                                    
                             }
                             else
                             {
@@ -213,7 +215,13 @@ namespace kiwi
                     {
                         if(e.mods.isPopupMenu())
                         {
-                            //showLinkPopupMenu(*link_j);
+                            if (!isSelected(*link_j))
+                            {
+                                m_select_on_mouse_down_status = selectOnMouseDown(*link_j, true);
+                            }
+  
+                            const auto pos = e.getPosition() - m_viewport->getOriginPosition();
+                            showLinkPopupMenu(*link_j, pos);
                         }
                         else
                         {
@@ -235,11 +243,16 @@ namespace kiwi
             }
         }
         
+        else if(e.mods.isRightButtonDown())
+        {
+            showPatcherPopupMenu(e.getPosition() - m_viewport->getOriginPosition());
+        }
+        
         m_last_drag = e.getPosition();
     }
     
     // ================================================================================ //
-    //                                     MOUSE DOWN                                   //
+    //                                     MOUSE DRAG                                   //
     // ================================================================================ //
     
     void jPatcher::mouseDrag(MouseEvent const& e)
@@ -562,17 +575,58 @@ namespace kiwi
     void jPatcher::showPatcherPopupMenu(juce::Point<int> const& position)
     {
         juce::PopupMenu m;
-        m.addItem(1, "Add Plus");
-        m.addItem(2, "Add Print");
-        m.addSeparator();
-
-        auto r = m.show();
+        auto* cm = &KiwiApp::getCommandManager();
         
-        switch(r)
+        m.addCommandItem(cm, CommandIDs::editModeSwitch);
+        m.addSeparator();
+        
+        if(!isLocked())
         {
-            case 1: { createObjectModel("plus", position.getX(), position.getY()); break; }
-            case 2: { createObjectModel("print", position.getX(), position.getY()); break; }
-            default: break;
+            m.addCommandItem(cm, StandardApplicationCommandIDs::paste);
+            m.addSeparator();
+            
+            m.addCommandItem(cm, StandardApplicationCommandIDs::selectAll);
+            m.addSeparator();
+        }
+
+        m.show();
+    }
+    
+    void jPatcher::showObjectPopupMenu(jObject const& object, juce::Point<int> const& position)
+    {
+        if(!isLocked())
+        {
+            juce::PopupMenu m;
+            auto* cm = &KiwiApp::getCommandManager();
+            
+            m.addCommandItem(cm, StandardApplicationCommandIDs::cut);
+            m.addCommandItem(cm, StandardApplicationCommandIDs::copy);
+            m.addCommandItem(cm, StandardApplicationCommandIDs::paste);
+            m.addSeparator();
+            
+            m.addCommandItem(cm, CommandIDs::pasteReplace);
+            m.addCommandItem(cm, StandardApplicationCommandIDs::del);
+            m.addSeparator();
+            
+            m.addCommandItem(cm, CommandIDs::toFront);
+            m.addCommandItem(cm, CommandIDs::toBack);
+            m.addSeparator();
+            
+            m.show();
+        }
+    }
+    
+    void jPatcher::showLinkPopupMenu(jLink const& link, juce::Point<int> const& position)
+    {
+        if(!isLocked())
+        {
+            juce::PopupMenu m;
+            auto* cm = &KiwiApp::getCommandManager();
+            
+            m.addCommandItem(cm, StandardApplicationCommandIDs::del);
+            m.addSeparator();
+            
+            m.show();
         }
     }
     
