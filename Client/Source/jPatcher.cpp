@@ -367,6 +367,7 @@ namespace kiwi
             if(m_lasso->isPerforming())
             {
                 m_lasso->end();
+                return;
             }
    
             if(m_link_creator)
