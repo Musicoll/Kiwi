@@ -309,6 +309,9 @@ namespace kiwi
         //! @internal Returns the current objects area.
         juce::Rectangle<int> getCurrentObjectsArea();
         
+        //! @internal Returns the current selection bounds.
+        juce::Rectangle<int> getSelectionBounds();
+        
         //! @internal get the nearest valid iolet of the link creator.
         std::pair<jObject*, size_t> getLinkCreatorNearestEndingIolet();
         

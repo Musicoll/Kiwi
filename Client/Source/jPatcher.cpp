@@ -1148,6 +1148,53 @@ namespace kiwi
         return area;
     }
     
+    juce::Rectangle<int> jPatcher::getSelectionBounds()
+    {
+        juce::Rectangle<int> area;
+        
+        int counter = 0;
+        for(auto* object_m : m_view_model.getSelectedObjects())
+        {
+            counter++;
+            if(object_m && !object_m->removed())
+            {
+                juce::Rectangle<int> object_bounds(object_m->getX(),
+                                                   object_m->getY(),
+                                                   object_m->getWidth(),
+                                                   object_m->getHeight());
+                
+                if(counter == 1)
+                {
+                    area = object_bounds;
+                }
+                else
+                {
+                    if(object_bounds.getX() < area.getX())
+                    {
+                        area.setLeft(object_bounds.getX());
+                    }
+                    
+                    if(object_bounds.getY() < area.getY())
+                    {
+                        area.setTop(object_bounds.getY());
+                    }
+                    
+                    if(object_bounds.getBottom() > area.getBottom())
+                    {
+                        area.setBottom(object_bounds.getBottom());
+                    }
+                    
+                    if(object_bounds.getRight() > area.getRight())
+                    {
+                        area.setRight(object_bounds.getRight());
+                    }
+                }
+            }
+        }
+        
+        return area;
+    }
+    
     juce::Point<int> jPatcher::getOriginPosition() const
     {
         return m_viewport->getOriginPosition();
@@ -1167,12 +1214,22 @@ namespace kiwi
     {
         m_view_model.setZoomFactor(m_view_model.getZoomFactor() + 0.25);
         DocumentManager::commit(m_patcher_model);
+        
+        if(isAnyObjectSelected())
+        {
+            m_viewport->bringBoundsToCentre(getSelectionBounds());
+        }
     }
     
     void jPatcher::zoomNormal()
     {
         m_view_model.setZoomFactor(1.);
         DocumentManager::commit(m_patcher_model);
+        
+        if(isAnyObjectSelected())
+        {
+            m_viewport->bringBoundsToCentre(getSelectionBounds());
+        }
     }
     
     void jPatcher::zoomOut()
@@ -1182,6 +1239,11 @@ namespace kiwi
         {
             m_view_model.setZoomFactor(zoom - 0.25);
             DocumentManager::commit(m_patcher_model);
+            
+            if(isAnyObjectSelected())
+            {
+                m_viewport->bringBoundsToCentre(getSelectionBounds());
+            }
         }
     }
     

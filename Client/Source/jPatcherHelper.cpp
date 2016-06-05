@@ -342,6 +342,20 @@ namespace kiwi
         }
     }
     
+    void jPatcherViewport::bringBoundsToCentre(juce::Rectangle<int> bounds)
+    {
+        const juce::Rectangle<int> view_area = getRelativeViewArea();
+        const juce::Point<int> center = bounds.getCentre();
+        
+        const juce::Point<int> new_view_pos
+        {
+            static_cast<int>(center.getX() - view_area.getWidth()*0.5),
+            static_cast<int>(center.getY() - view_area.getHeight()*0.5)
+        };
+        
+        setRelativeViewPosition(new_view_pos);
+    }
+    
     void jPatcherViewport::resetObjectsArea()
     {
         m_patching_area = m_patcher.getCurrentObjectsArea();

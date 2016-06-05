@@ -98,7 +98,7 @@ namespace kiwi
         
         jPatcher&               m_patcher_view;
         model::Object*          m_model = nullptr;
-        const unsigned int      m_io_width = 5;
+        const unsigned int      m_io_width = 6;
         const unsigned int      m_io_height = 3;
         size_t                  m_inlets = 0;
         size_t                  m_outlets = 0;

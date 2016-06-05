@@ -146,6 +146,7 @@ namespace kiwi
         
         if(!m_is_locked)
         {
+            g.setColour(selected ? m_io_color.brighter(0.6) : m_io_color);
             drawInletsOutlets(g);
         }
     }
@@ -153,8 +154,6 @@ namespace kiwi
     void jObject::drawInletsOutlets(juce::Graphics & g)
     {
         const juce::Rectangle<int> bounds = m_local_box_bounds;
-        
-        g.setColour(m_io_color);
         
         for(unsigned int i = 0; i < m_inlets; ++i)
         {
