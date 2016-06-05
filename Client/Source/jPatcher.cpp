@@ -1587,7 +1587,7 @@ namespace kiwi
         
         if(it == m_objects.cend())
         {
-            const auto it = m_objects.begin() + zorder;
+            const auto it = (zorder > 0) ? m_objects.begin() + zorder : m_objects.end();
             auto new_object_it = m_objects.emplace(it, new jObjectBox(*this, object));
             
             jObject& jobj = *new_object_it->get();
@@ -2074,6 +2074,9 @@ namespace kiwi
     void jPatcher::getAllCommands(Array<CommandID>& commands)
     {
         commands.add(CommandIDs::save);
+        
+        commands.add(CommandIDs::newPatcherView);
+        
         commands.add(StandardApplicationCommandIDs::undo);
         commands.add(StandardApplicationCommandIDs::redo);
         commands.add(StandardApplicationCommandIDs::cut);
@@ -2105,10 +2108,17 @@ namespace kiwi
         switch(commandID)
         {
             case CommandIDs::save:
+            {
                 result.setInfo(TRANS("Save"), TRANS("Save document"), CommandCategories::general, 0);
                 result.addDefaultKeypress('s',  ModifierKeys::commandModifier);
                 break;
-                
+            }
+            case CommandIDs::newPatcherView:
+            {
+                result.setInfo(TRANS("New View"), TRANS("New Patcher View"), CommandCategories::view, 0);
+                result.addDefaultKeypress('n',  ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+                break;
+            }
             case StandardApplicationCommandIDs::undo:
             {
                 juce::String label = TRANS("Undo");
@@ -2238,6 +2248,19 @@ namespace kiwi
         switch (info.commandID)
         {
             case CommandIDs::save:                          { savePatcher(); break; }
+                
+            case CommandIDs::newPatcherView:
+            {
+                auto* user = m_patcher_model.getUser(m_instance.getUserId());
+                if(user)
+                {
+                    user->addView();
+                    
+                    DocumentManager::commit(m_patcher_model, "Add view");
+                }
+                
+                break;
+            }
                 
             case StandardApplicationCommandIDs::undo:       { undo(); break; }
             case StandardApplicationCommandIDs::redo:       { redo(); break; }

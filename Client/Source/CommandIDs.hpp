@@ -29,6 +29,7 @@ namespace kiwi
     enum CommandIDs
     {
         newPatcher                  = 0x200010,        ///< Create a new blank patcher window.
+        newPatcherView              = 0x200020,        ///< Create a new patcher view.
         openFile                    = 0x200030,        ///< Open a file in a new window.
         closePatcher                = 0x200051,        ///< Close the current patcher.
         save                        = 0x200060,        ///< Save the current patcher document.

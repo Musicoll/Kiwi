@@ -228,6 +228,8 @@ namespace kiwi
     
     void KiwiApp::createViewMenu(PopupMenu& menu)
     {
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::newPatcherView);
+        menu.addSeparator();
         menu.addCommandItem(m_command_manager.get(), CommandIDs::editModeSwitch);
         menu.addSeparator();
         menu.addCommandItem(m_command_manager.get(), CommandIDs::zoomIn);
