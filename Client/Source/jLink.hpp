@@ -43,7 +43,7 @@ namespace kiwi
     public:
         
         //! @brief Constructor
-        jLink(jPatcher const& jpatcher, model::Link& link_m);
+        jLink(jPatcher& jpatcher, model::Link& link_m);
         
         //! @brief Destructor
         ~jLink();
@@ -80,7 +80,7 @@ namespace kiwi
         
     private: // members
         
-        jPatcher const&     m_jpatcher;
+        jPatcher&           m_jpatcher;
         model::Link*        m_model;
         
         juce::Point<int>    m_last_inlet_pos,

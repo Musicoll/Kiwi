@@ -28,7 +28,7 @@
 
 namespace kiwi
 {
-    jLink::jLink(jPatcher const& jpatcher, model::Link& link_m) :
+    jLink::jLink(jPatcher& jpatcher, model::Link& link_m) :
     m_jpatcher(jpatcher),
     m_model(&link_m)
     {

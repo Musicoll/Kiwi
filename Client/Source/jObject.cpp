@@ -485,7 +485,7 @@ namespace kiwi
     {
         if(m_editor)
         {
-            auto ed_borders = m_editor->getBorder();
+            //auto ed_borders = m_editor->getBorder();
             m_editor->setBounds(m_local_box_bounds.expanded(m_selection_width*0.5));
         }
     }
@@ -493,7 +493,7 @@ namespace kiwi
     void jObjectBox::textEditorTextChanged(juce::TextEditor& e)
     {
         const juce::String new_text = e.getText();
-        const juce::Font font;
+        const juce::Font font = e.getFont();
         const int text_width = font.getStringWidth(new_text);
         
         //auto ed_borders = e.getBorder();

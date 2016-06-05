@@ -1142,9 +1142,11 @@ namespace kiwi
         if(view.added()) {}
         
         // create jObject for each newly added objects
+        int object_zorder = -1;
         for(auto& object : patcher.getObjects())
         {
-            if(object.added()) { addjObject(object); }
+            object_zorder++;
+            if(object.added()) { addjObject(object, object_zorder); }
         }
         
         // create jLink for each newly added links
@@ -1463,25 +1465,23 @@ namespace kiwi
         KiwiApp::commandStatusChanged();
     }
     
-    void jPatcher::addjObject(model::Object& object)
+    void jPatcher::addjObject(model::Object& object, int zorder)
     {
         const auto it = findObject(object);
         
         if(it == m_objects.cend())
         {
-            auto result = m_objects.emplace(new jObjectBox(*this, object));
+            const auto it = m_objects.begin() + zorder;
+            auto new_object_it = m_objects.emplace(it, new jObjectBox(*this, object));
             
-            if(result.second)
-            {
-                jObject& jobj = *result.first->get();
-                
-                //jobj.setAlpha(0.);
-                //addChildComponent(jobj);
-                addAndMakeVisible(jobj);
-                
-                //ComponentAnimator& animator = Desktop::getInstance().getAnimator();
-                //animator.animateComponent(&jobj, jobj.getBounds(), 1., 200., true, 0.8, 1.);
-            }
+            jObject& jobj = *new_object_it->get();
+            
+            //jobj.setAlpha(0.);
+            //addChildComponent(jobj);
+            addAndMakeVisible(jobj, zorder);
+            
+            //ComponentAnimator& animator = Desktop::getInstance().getAnimator();
+            //animator.animateComponent(&jobj, jobj.getBounds(), 1., 200., true, 0.8, 1.);
         }
     }
     
@@ -1518,13 +1518,10 @@ namespace kiwi
         
         if(it == m_links.cend())
         {
-            auto result = m_links.emplace(new jLink(*this, link));
+            auto result = m_links.emplace(m_links.end(), new jLink(*this, link));
             
-            if(result.second)
-            {
-                jLink& jlink = *result.first->get();
-                addAndMakeVisible(jlink);
-            }
+            jLink& jlink = *result->get();
+            addAndMakeVisible(jlink);
         }
     }
     
@@ -1550,7 +1547,7 @@ namespace kiwi
         }
     }
     
-    std::set<std::unique_ptr<jObject>>::iterator jPatcher::findObject(model::Object const& object) const
+    jPatcher::jObjects::iterator jPatcher::findObject(model::Object const& object)
     {
         const auto find_jobj = [&object](std::unique_ptr<jObject> const& jobj)
         {
@@ -1560,7 +1557,7 @@ namespace kiwi
         return std::find_if(m_objects.begin(), m_objects.end(), find_jobj);
     }
     
-    std::set<std::unique_ptr<jLink>>::iterator jPatcher::findLink(model::Link const& link) const
+    jPatcher::jLinks::iterator jPatcher::findLink(model::Link const& link)
     {
         const auto find_jlink = [&link](std::unique_ptr<jLink> const& jlink)
         {
@@ -1580,13 +1577,13 @@ namespace kiwi
         return m_links;
     }
     
-    jObject* jPatcher::getObject(model::Object const& object) const
+    jObject* jPatcher::getObject(model::Object const& object)
     {
         const auto it = findObject(object);
         return (it != m_objects.cend()) ? it->get() : nullptr;
     }
     
-    jLink* jPatcher::getLink(model::Link const& link) const
+    jLink* jPatcher::getLink(model::Link const& link)
     {
         const auto it = findLink(link);
         return (it != m_links.cend()) ? it->get() : nullptr;
@@ -2146,7 +2143,7 @@ namespace kiwi
             case CommandIDs::zoomIn:                        { zoomIn(); break; }
             case CommandIDs::zoomOut:                       { zoomOut(); break; }
             case CommandIDs::zoomNormal:                    { zoomNormal(); break; }
-            case CommandIDs::editModeSwitch:                { setLock(!m_is_locked); break; }
+            case CommandIDs::editModeSwitch:                { setLock(!isLocked()); break; }
                 
             default: return false;
         }

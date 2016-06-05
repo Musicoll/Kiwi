@@ -57,8 +57,8 @@ namespace kiwi
         //                                    jPATCHER                                      //
         // ================================================================================ //
         
-        using jObjects = std::set<std::unique_ptr<jObject>>;
-        using jLinks = std::set<std::unique_ptr<jLink>>;
+        using jObjects = std::vector<std::unique_ptr<jObject>>;
+        using jLinks = std::vector<std::unique_ptr<jLink>>;
         
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
         void patcherChanged(model::Patcher& patcher, model::Patcher::View& view);
@@ -70,10 +70,10 @@ namespace kiwi
         jLinks const& getLinks() const;
         
         //! @brief Returns the jObject corresponding to a given Object model.
-        jObject* getObject(model::Object const& object) const;
+        jObject* getObject(model::Object const& object);
         
         //! @brief Returns the jLink corresponding to a given Link model.
-        jLink* getLink(model::Link const& link) const;
+        jLink* getLink(model::Link const& link);
         
         //! @brief Set the lock status of the patcher view.
         void setLock(bool locked);
@@ -148,7 +148,7 @@ namespace kiwi
         void checkLinksSelectionChanges(model::Patcher& patcher);
         
         //! @internal Object model has just been added to the document.
-        void addjObject(model::Object& object);
+        void addjObject(model::Object& object, int zorder = -1);
         
         //! @internal Object model is resident and internal value changed.
         void objectChanged(model::Patcher::View& view, model::Object& object);
@@ -301,10 +301,10 @@ namespace kiwi
         // ================================================================================ //
         
         //! @internal Find a jObject with a given Object model.
-        jObjects::iterator findObject(model::Object const& object) const;
+        jObjects::iterator findObject(model::Object const& object);
         
         //! @internal Find a jLink with a given Link model.
-        jLinks::iterator findLink(model::Link const& link) const;
+        jLinks::iterator findLink(model::Link const& link);
         
         //! @internal Returns the current objects area.
         juce::Rectangle<int> getCurrentObjectsArea();

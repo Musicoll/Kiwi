@@ -47,7 +47,7 @@ namespace kiwi
         NewBox::NewBox(std::string const& name, std::vector<Atom> const& args)
         {
             setNumberOfInlets(1);
-            setNumberOfOutlets(1);
+            setNumberOfOutlets(0);
         }
         
         // ================================================================================ //

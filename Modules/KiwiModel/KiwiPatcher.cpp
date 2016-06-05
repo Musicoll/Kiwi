@@ -113,6 +113,7 @@ namespace kiwi
             auto object_uptr = ObjectFactory::createModel(text);
             const auto it = m_objects.insert(m_objects.end(), std::move(object_uptr));
             
+            /*
             if(it->getName() == "errorbox")
             {
                 model::ErrorBox* error_box = dynamic_cast<model::ErrorBox*>(it.operator->());
@@ -122,6 +123,7 @@ namespace kiwi
                     Console::post("error_box");
                 }
             }
+            */
             
             return *it;
         }
@@ -130,6 +132,7 @@ namespace kiwi
         {
             const auto it = m_objects.emplace(m_objects.end(), mold);
             
+            /*
             if(it->getName() == "errorbox")
             {
                 model::ErrorBox* error_box = dynamic_cast<model::ErrorBox*>(it.operator->());
@@ -139,6 +142,8 @@ namespace kiwi
                     Console::post("error_box");
                 }
             }
+            */
+            
             return *it;
         }
         
@@ -152,7 +157,7 @@ namespace kiwi
             // handle error box case
             if(new_object.getName() == "errorbox")
             {
-                model::ErrorBox& error_box = reinterpret_cast<model::ErrorBox&>(new_object);
+                model::ErrorBox& error_box = dynamic_cast<model::ErrorBox&>(new_object);
                 error_box.setNumberOfInlets(object_to_replace.getNumberOfInlets());
                 error_box.setNumberOfOutlets(object_to_replace.getNumberOfOutlets());
             }
@@ -160,7 +165,7 @@ namespace kiwi
             
             if(new_object.getName() == "plus")
             {
-                model::ObjectPlus* plus_box = static_cast<model::ObjectPlus*>(&new_object);
+                model::ObjectPlus* plus_box = dynamic_cast<model::ObjectPlus*>(&new_object);
                 Console::post("plus_box : " + std::string(plus_box ? "OK !" : "nullptr"));
                 
             }
