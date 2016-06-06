@@ -316,7 +316,7 @@ namespace kiwi
             View& addView();
             
             //! @brief Remove a View.
-            void removeView(View const& view);
+            flip::Collection<Patcher::View>::iterator removeView(View const& view);
             
             //! @brief Get views.
             flip::Collection<Patcher::View> const& getViews() const noexcept;

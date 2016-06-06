@@ -54,6 +54,27 @@ namespace kiwi
     }
     
     // ================================================================================ //
+    //                               ASYNC QUIT RETRIER                                 //
+    // ================================================================================ //
+    
+    class KiwiApp::AsyncQuitRetrier : private Timer
+    {
+    public:
+        AsyncQuitRetrier() { startTimer (500); }
+        
+        void timerCallback()
+        {
+            stopTimer();
+            delete this;
+            
+            if (JUCEApplicationBase* app = JUCEApplicationBase::getInstance())
+                app->systemRequestedQuit();
+        }
+        
+        JUCE_DECLARE_NON_COPYABLE (AsyncQuitRetrier)
+    };
+    
+    // ================================================================================ //
     //                                      APPLICATION                                 //
     // ================================================================================ //
     
@@ -72,6 +93,8 @@ namespace kiwi
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAppSettingsWindow);
         MenuBarModel::setMacMainMenu(m_menu_model.get(), &macMainMenuPopup, TRANS("Open Recent"));
         #endif
+        
+        LookAndFeel::getDefaultLookAndFeel().setUsingNativeAlertWindows(true);
     }
     
     void KiwiApp::anotherInstanceStarted(String const& command_line)
@@ -91,9 +114,19 @@ namespace kiwi
     
     void KiwiApp::systemRequestedQuit()
     {
-        m_instance.reset();
-        
-        quit();
+        if(ModalComponentManager::getInstance()->cancelAllModalComponents())
+        {
+            new AsyncQuitRetrier();
+        }
+        else
+        {
+            if(m_instance->closeAllWindows())
+            {
+                m_instance.reset();
+                
+                quit();
+            }
+        }
     }
     
     KiwiApp& KiwiApp::use()

@@ -33,6 +33,7 @@
 
 namespace kiwi
 {
+    class jPatcherManager;
     class jObject;
     class jObjectBox;
     class jLink;
@@ -43,6 +44,10 @@ namespace kiwi
     class IoletHighlighter;
     class jLasso;
     
+    // ================================================================================ //
+    //                                    jPATCHER                                      //
+    // ================================================================================ //
+    
     //! @brief The juce Patcher Component.
     class jPatcher :
     public juce::Component,
@@ -50,18 +55,21 @@ namespace kiwi
     {
     public:
         
-        jPatcher(jInstance& instance, model::Patcher& patcher, model::Patcher::View& view);
-        ~jPatcher();
+        jPatcher(jPatcherManager& manager,
+                 jInstance& instance,
+                 model::Patcher& patcher,
+                 model::Patcher::View& view);
         
-        // ================================================================================ //
-        //                                    jPATCHER                                      //
-        // ================================================================================ //
+        ~jPatcher();
         
         using jObjects = std::vector<std::unique_ptr<jObject>>;
         using jLinks = std::vector<std::unique_ptr<jLink>>;
         
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
         void patcherChanged(model::Patcher& patcher, model::Patcher::View& view);
+        
+        //! @brief Returns the patcher view model.
+        model::Patcher::View& getPatcherViewModel();
         
         //! @brief Returns the jObjects.
         jObjects const& getObjects() const;
@@ -131,9 +139,6 @@ namespace kiwi
         
         //! @brief Notify jPatcher that selection has changed.
         void selectionChanged();
-        
-        //! @brief Open a dialog box to save a file.
-        void savePatcher() const;
         
         //! @brief Load object and links.
         void loadPatcher();
@@ -344,6 +349,7 @@ namespace kiwi
 
     private: // members
         
+        jPatcherManager&                            m_manager;
         jInstance&                                  m_instance;
         model::Patcher&                             m_patcher_model;
         model::Patcher::View&                       m_view_model;

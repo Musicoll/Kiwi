@@ -54,6 +54,10 @@ namespace kiwi
         //! @brief Open a patcher from file
         void openPatcher();
         
+        //! @brief Attempt to close all document, after asking user to save them if needed.
+        //! @return True if all document have been closed, false if the user cancel the action.
+        bool closeAllWindows();
+        
         //! @brief Get the user ID of the Instance.
         uint64_t getUserId() const noexcept;
         

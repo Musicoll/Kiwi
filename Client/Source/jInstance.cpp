@@ -84,6 +84,21 @@ namespace kiwi
         }
     }
     
+    bool jInstance::closeAllWindows()
+    {
+        bool success = true;
+        
+        if(m_patcher_manager)
+        {
+            if(!m_patcher_manager->askAllWindowsToClose())
+            {
+                success = false;
+            }
+        }
+        
+        return success;
+    }
+    
     void jInstance::showConsoleWindow()
     {
         m_console_window->setVisible(true);

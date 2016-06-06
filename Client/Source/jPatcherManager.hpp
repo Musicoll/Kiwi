@@ -36,6 +36,12 @@ namespace kiwi
 {
     class jInstance;
     
+    class jPatcherWindow;
+    
+    // ================================================================================ //
+    //                                  JPATCHER MANAGER                                //
+    // ================================================================================ //
+    
     //! @brief The main DocumentObserver.
     //! @details The jInstance dispatch changes to all other DocumentObserver objects
     class jPatcherManager : public flip::DocumentObserver<model::Patcher>
@@ -57,6 +63,20 @@ namespace kiwi
         
         //! @brief create a new patcher view window.
         void newView();
+        
+        //! @brief Force all windows to close without asking user to save document.
+        void forceCloseAllWindows();
+        
+        //! @brief Attempt to close all document windows, after asking user to save them if needed.
+        //! @return True if all document have been closed, false if the user cancel the action.
+        bool askAllWindowsToClose();
+        
+        //! @brief Close the window that contains a given jpatcher.
+        //! @details if it's the last patcher view, it will ask the user the save the document before closing
+        bool closePatcherViewWindow(jPatcher& jpatcher);
+        
+        //! @brief Save the document.
+        bool saveDocument();
         
     private:
         
@@ -84,12 +104,17 @@ namespace kiwi
         void removePatcherWindow(model::Patcher& patcher,
                                  model::Patcher::User& user,
                                  model::Patcher::View& view);
+        
+        //! @internal Save document if needed and if user agrees.
+        FileBasedDocument::SaveResult saveIfNeededAndUserAgrees();
 
     private: // members
         
         jInstance&                          m_instance;
         std::unique_ptr<flip::Document>     m_document;
         model::Patcher*                     m_model = nullptr;
+        
+        bool                                m_need_saving_flag;
     };
 }
 

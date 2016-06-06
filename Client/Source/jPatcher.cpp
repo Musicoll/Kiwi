@@ -40,7 +40,11 @@ namespace kiwi
 {
     bool jPatcher::m_command_manager_binded = false;
     
-    jPatcher::jPatcher(jInstance& instance, model::Patcher& patcher, model::Patcher::View& view) :
+    jPatcher::jPatcher(jPatcherManager& manager,
+                       jInstance& instance,
+                       model::Patcher& patcher,
+                       model::Patcher::View& view) :
+    m_manager(manager),
     m_instance(instance),
     m_patcher_model(patcher),
     m_view_model(view),
@@ -1683,6 +1687,11 @@ namespace kiwi
         return std::find_if(m_links.begin(), m_links.end(), find_jlink);
     }
     
+    model::Patcher::View& jPatcher::getPatcherViewModel()
+    {
+        return m_view_model;
+    }
+    
     jPatcher::jObjects const& jPatcher::getObjects() const
     {
         return m_objects;
@@ -2040,28 +2049,6 @@ namespace kiwi
         m_viewport->updatePatcherArea(false);
     }
     
-    void jPatcher::savePatcher() const
-    {
-        File const& current_save_file = DocumentManager::getSelectedFile(m_patcher_model);
-        
-        if (current_save_file.exist())
-        {
-            DocumentManager::save(m_patcher_model, current_save_file);
-        }
-        else
-        {
-            juce::FileChooser saveFileChooser("Save file",
-                                              juce::File::getSpecialLocation (juce::File::userHomeDirectory),
-                                              "*.kiwi");
-            
-            if (saveFileChooser.browseForFileToSave(true))
-            {
-                File save_file (saveFileChooser.getResult().getFullPathName().toStdString());
-                DocumentManager::save(m_patcher_model, save_file);
-            }
-        }
-    }
-    
     // ================================================================================ //
     //                              APPLICATION COMMAND TARGET                          //
     // ================================================================================ //
@@ -2229,7 +2216,7 @@ namespace kiwi
             case CommandIDs::editModeSwitch:
             {
                 result.setInfo(TRANS("Edit"),
-                               TRANS("Switch between edition and play mode"),
+                               TRANS("Switch between edit and perform mode"),
                                CommandCategories::view, 0);
                 
                 result.addDefaultKeypress ('e',  ModifierKeys::commandModifier);
@@ -2247,20 +2234,9 @@ namespace kiwi
     {
         switch (info.commandID)
         {
-            case CommandIDs::save:                          { savePatcher(); break; }
+            case CommandIDs::save:                          { m_manager.saveDocument(); break; }
                 
-            case CommandIDs::newPatcherView:
-            {
-                auto* user = m_patcher_model.getUser(m_instance.getUserId());
-                if(user)
-                {
-                    user->addView();
-                    
-                    DocumentManager::commit(m_patcher_model, "Add view");
-                }
-                
-                break;
-            }
+            case CommandIDs::newPatcherView:                { m_manager.newView(); break; }
                 
             case StandardApplicationCommandIDs::undo:       { undo(); break; }
             case StandardApplicationCommandIDs::redo:       { redo(); break; }

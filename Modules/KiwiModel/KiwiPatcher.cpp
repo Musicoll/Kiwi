@@ -635,7 +635,7 @@ namespace kiwi
             return *m_views.emplace();
         }
         
-        void Patcher::User::removeView(View const& view)
+        flip::Collection<Patcher::View>::iterator Patcher::User::removeView(View const& view)
         {
             auto it = m_views.find_if([&view](View const& patcher_view) {
                 return (&view == &patcher_view);
@@ -643,8 +643,10 @@ namespace kiwi
             
             if(it != m_views.end())
             {
-                m_views.erase(it);
+                return m_views.erase(it);
             }
+            
+            return m_views.end();
         }
         
         uint32_t Patcher::User::getId() const

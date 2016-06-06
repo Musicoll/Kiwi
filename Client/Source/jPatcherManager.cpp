@@ -32,9 +32,34 @@
 
 namespace kiwi
 {
+    class jPatcherWindow : public jWindow
+    {
+    public:
+        jPatcherWindow(jPatcherManager& manager, jPatcher& jpatcher) : jWindow(),
+        m_manager(manager),
+        m_jpatcher(jpatcher)
+        {
+            
+        }
+        
+        void closeButtonPressed() override
+        {
+            m_manager.closePatcherViewWindow(m_jpatcher);
+        }
+        
+    private:
+        jPatcherManager& m_manager;
+        jPatcher& m_jpatcher;
+    };
+    
+    // ================================================================================ //
+    //                                  JPATCHER MANAGER                                //
+    // ================================================================================ //
+    
     jPatcherManager::jPatcherManager(jInstance& instance) :
     m_instance(instance),
-    m_document(nullptr)
+    m_document(nullptr),
+    m_need_saving_flag(false)
     {
         ;
     }
@@ -89,6 +114,147 @@ namespace kiwi
         }
     }
     
+    bool jPatcherManager::saveDocument()
+    {
+        File const& current_save_file = DocumentManager::getSelectedFile(*m_model);
+        
+        if (current_save_file.exist())
+        {
+            DocumentManager::save(*m_model, current_save_file);
+            m_need_saving_flag = false;
+            return true;
+        }
+        else
+        {
+            juce::FileChooser saveFileChooser("Save file",
+                                              juce::File::getSpecialLocation (juce::File::userHomeDirectory),
+                                              "*.kiwi");
+            
+            if(saveFileChooser.browseForFileToSave(true))
+            {
+                File save_file (saveFileChooser.getResult().getFullPathName().toStdString());
+                DocumentManager::save(*m_model, save_file);
+                m_need_saving_flag = false;
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    FileBasedDocument::SaveResult jPatcherManager::saveIfNeededAndUserAgrees()
+    {
+        if (! m_need_saving_flag)
+        {
+            return FileBasedDocument::savedOk;
+        }
+        
+        const std::string document_name = "Untitled";
+        
+        const int r = AlertWindow::showYesNoCancelBox(AlertWindow::QuestionIcon,
+                                                      TRANS("Closing document..."),
+                                                      TRANS("Do you want to save the changes to \"")
+                                                      + document_name + "\"?",
+                                                      TRANS("Save"),
+                                                      TRANS("Discard changes"),
+                                                      TRANS("Cancel"));
+        
+        // save changes
+        if(r == 1)
+        {
+            return (saveDocument()) ? FileBasedDocument::savedOk : FileBasedDocument::failedToWriteToFile;
+        }
+        
+        // discard changes
+        if(r == 2)
+        {
+            return FileBasedDocument::savedOk;
+        }
+        
+        return FileBasedDocument::userCancelledSave;
+    }
+    
+    void jPatcherManager::forceCloseAllWindows()
+    {
+        auto& user = *m_model->getUser(m_instance.getUserId());
+        auto& views = user.getViews();
+        
+        bool view_has_been_removed = false;
+        
+        for(auto it = views.begin(); it != views.end();)
+        {
+            model::Patcher::View& view = *it;
+            it = user.removeView(view);
+        }
+        
+        if(view_has_been_removed)
+        {
+            DocumentManager::commit(*m_model);
+        }
+    }
+    
+    bool jPatcherManager::askAllWindowsToClose()
+    {
+        auto& user = *m_model->getUser(m_instance.getUserId());
+        
+        auto& views = user.getViews();
+        
+        size_t number_of_views = std::count_if(views.begin(), views.end(), [](model::Patcher::View& view){
+            return !view.removed();
+        });
+        
+        bool success = true;
+        
+        for(auto it = views.begin(); it != views.end();)
+        {
+            model::Patcher::View& view = *it;
+            bool need_saving = m_need_saving_flag && (number_of_views <= 1);
+            
+            if(!need_saving || (need_saving && saveIfNeededAndUserAgrees() == FileBasedDocument::savedOk))
+            {
+                it = user.removeView(view);
+                DocumentManager::commit(*m_model);
+            }
+            else
+            {
+                return false;
+            }
+            
+            number_of_views--;
+        }
+        
+        return success;
+    }
+    
+    bool jPatcherManager::closePatcherViewWindow(jPatcher& patcher_j)
+    {
+        auto& user = *m_model->getUser(m_instance.getUserId());
+        auto& patcher_view_m = patcher_j.getPatcherViewModel();
+        
+        auto& views = user.getViews();
+        
+        size_t number_of_views = std::count_if(views.begin(), views.end(), [](model::Patcher::View& view){
+            return !view.removed();
+        });
+        
+        bool need_saving = m_need_saving_flag && (number_of_views <= 1);
+        
+        for(auto& view : views)
+        {
+            if(&view == &patcher_view_m)
+            {
+                if(!need_saving || saveIfNeededAndUserAgrees() == FileBasedDocument::savedOk)
+                {
+                    user.removeView(patcher_view_m);
+                    DocumentManager::commit(*m_model);
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
     void jPatcherManager::document_changed(model::Patcher& patcher)
     {
         if(patcher.added())
@@ -112,6 +278,11 @@ namespace kiwi
             patcher.entity().erase<DocumentManager>();
             
             m_model = nullptr;
+        }
+        
+        if(patcher.changed())
+        {
+            m_need_saving_flag = true;
         }
     }
     
@@ -151,8 +322,9 @@ namespace kiwi
     {
         if(user.getId() == m_instance.getUserId())
         {
-            auto& window = view.entity().emplace<jWindow>();
-            auto& jpatcher = view.entity().emplace<jPatcher>(m_instance, patcher, view);
+            auto& jpatcher = view.entity().emplace<jPatcher>(*this, m_instance, patcher, view);
+            
+            auto& window = view.entity().emplace<jPatcherWindow>(*this, jpatcher);
             window.setContentNonOwned(&jpatcher.getViewport(), true);
             jpatcher.grabKeyboardFocus();
         }
@@ -177,7 +349,7 @@ namespace kiwi
         if(user.getId() == m_instance.getUserId())
         {
             view.entity().erase<jPatcher>();
-            view.entity().erase<jWindow>();
+            view.entity().erase<jPatcherWindow>();
         }
     }
 }

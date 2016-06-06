@@ -76,6 +76,8 @@ namespace kiwi
             void menuItemSelected(int menuItemID, int topLevelMenuIndex);
         };
         
+        class AsyncQuitRetrier;
+        
         //! @brief Called by MainMenuModel to get the menu names
         StringArray getMenuNames();
         
