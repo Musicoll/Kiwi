@@ -32,25 +32,17 @@
 
 namespace kiwi
 {
-    class jPatcherWindow : public jWindow
+    jPatcherWindow::jPatcherWindow(jPatcherManager& manager, jPatcher& jpatcher) : jWindow(),
+    m_manager(manager),
+    m_jpatcher(jpatcher)
     {
-    public:
-        jPatcherWindow(jPatcherManager& manager, jPatcher& jpatcher) : jWindow(),
-        m_manager(manager),
-        m_jpatcher(jpatcher)
-        {
-            
-        }
-        
-        void closeButtonPressed() override
-        {
-            m_manager.closePatcherViewWindow(m_jpatcher);
-        }
-        
-    private:
-        jPatcherManager& m_manager;
-        jPatcher& m_jpatcher;
-    };
+        ;
+    }
+    
+    void jPatcherWindow::closeButtonPressed()
+    {
+        m_manager.closePatcherViewWindow(m_jpatcher);
+    }
     
     // ================================================================================ //
     //                                  JPATCHER MANAGER                                //
@@ -68,12 +60,17 @@ namespace kiwi
     m_instance(instance),
     m_document(new flip::Document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'))
     {
-        
         model::Patcher& patcher = getPatcher();
         DocumentManager::load(patcher, file);
         
-        patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
         DocumentManager::commit(patcher);
+        m_need_saving_flag = false;
+        
+        patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
+        
+        patcher.setName(file.getName());
+        
+        DocumentManager::commit(patcher, "Add User");
     }
     
     jPatcherManager::~jPatcherManager()
@@ -90,7 +87,7 @@ namespace kiwi
         model::Patcher& patcher = m_document->root<model::Patcher>();
         patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
         
-        DocumentManager::commit(patcher, "Add User");
+        DocumentManager::commit(patcher);
         
         return patcher;
     }
@@ -102,25 +99,35 @@ namespace kiwi
     
     void jPatcherManager::newView()
     {
-        if(m_model)
+        auto& patcher = getPatcher();
+        auto* user = patcher.getUser(m_instance.getUserId());
+        if(user)
         {
-            auto* user = m_model->getUser(m_instance.getUserId());
-            if(user)
-            {
-                user->addView();
-                
-                DocumentManager::commit(*m_model, "Add view");
-            }
+            user->addView();
+            
+            DocumentManager::commit(patcher);
         }
+    }
+    
+    size_t jPatcherManager::getNumberOfView()
+    {
+        auto& patcher = getPatcher();
+        auto& user = *patcher.getUser(m_instance.getUserId());
+        auto& views = user.getViews();
+        
+        return std::count_if(views.begin(), views.end(), [](model::Patcher::View& view){
+            return !view.removed();
+        });
     }
     
     bool jPatcherManager::saveDocument()
     {
-        File const& current_save_file = DocumentManager::getSelectedFile(*m_model);
+        auto& patcher = getPatcher();
+        File const& current_save_file = DocumentManager::getSelectedFile(patcher);
         
         if (current_save_file.exist())
         {
-            DocumentManager::save(*m_model, current_save_file);
+            DocumentManager::save(patcher, current_save_file);
             m_need_saving_flag = false;
             return true;
         }
@@ -133,8 +140,11 @@ namespace kiwi
             if(saveFileChooser.browseForFileToSave(true))
             {
                 File save_file (saveFileChooser.getResult().getFullPathName().toStdString());
-                DocumentManager::save(*m_model, save_file);
+                DocumentManager::save(patcher, save_file);
                 m_need_saving_flag = false;
+                
+                patcher.setName(save_file.getName());
+                DocumentManager::commit(patcher);
                 return true;
             }
         }
@@ -149,7 +159,9 @@ namespace kiwi
             return FileBasedDocument::savedOk;
         }
         
-        const std::string document_name = "Untitled";
+        auto& patcher = getPatcher();
+        
+        const std::string document_name = patcher.getName();
         
         const int r = AlertWindow::showYesNoCancelBox(AlertWindow::QuestionIcon,
                                                       TRANS("Closing document..."),
@@ -176,7 +188,8 @@ namespace kiwi
     
     void jPatcherManager::forceCloseAllWindows()
     {
-        auto& user = *m_model->getUser(m_instance.getUserId());
+        auto& patcher = getPatcher();
+        auto& user = *patcher.getUser(m_instance.getUserId());
         auto& views = user.getViews();
         
         bool view_has_been_removed = false;
@@ -189,14 +202,14 @@ namespace kiwi
         
         if(view_has_been_removed)
         {
-            DocumentManager::commit(*m_model);
+            DocumentManager::commit(patcher);
         }
     }
     
     bool jPatcherManager::askAllWindowsToClose()
     {
-        auto& user = *m_model->getUser(m_instance.getUserId());
-        
+        auto& patcher = getPatcher();
+        auto& user = *patcher.getUser(m_instance.getUserId());
         auto& views = user.getViews();
         
         size_t number_of_views = std::count_if(views.begin(), views.end(), [](model::Patcher::View& view){
@@ -213,7 +226,7 @@ namespace kiwi
             if(!need_saving || (need_saving && saveIfNeededAndUserAgrees() == FileBasedDocument::savedOk))
             {
                 it = user.removeView(view);
-                DocumentManager::commit(*m_model);
+                DocumentManager::commit(patcher);
             }
             else
             {
@@ -228,7 +241,8 @@ namespace kiwi
     
     bool jPatcherManager::closePatcherViewWindow(jPatcher& patcher_j)
     {
-        auto& user = *m_model->getUser(m_instance.getUserId());
+        auto& patcher = getPatcher();
+        auto& user = *patcher.getUser(m_instance.getUserId());
         auto& patcher_view_m = patcher_j.getPatcherViewModel();
         
         auto& views = user.getViews();
@@ -246,7 +260,7 @@ namespace kiwi
                 if(!need_saving || saveIfNeededAndUserAgrees() == FileBasedDocument::savedOk)
                 {
                     user.removeView(patcher_view_m);
-                    DocumentManager::commit(*m_model);
+                    DocumentManager::commit(patcher);
                     return true;
                 }
             }
@@ -259,8 +273,6 @@ namespace kiwi
     {
         if(patcher.added())
         {
-            m_model = &patcher;
-            
             patcher.entity().emplace<DocumentManager>(patcher.document());
             
             patcher.entity().emplace<engine::Patcher>();
@@ -276,11 +288,9 @@ namespace kiwi
             patcher.entity().erase<engine::Patcher>();
             
             patcher.entity().erase<DocumentManager>();
-            
-            m_model = nullptr;
         }
         
-        if(patcher.changed())
+        if(patcher.resident() && (patcher.objectsChanged() || patcher.linksChanged()))
         {
             m_need_saving_flag = true;
         }
@@ -326,6 +336,7 @@ namespace kiwi
             
             auto& window = view.entity().emplace<jPatcherWindow>(*this, jpatcher);
             window.setContentNonOwned(&jpatcher.getViewport(), true);
+            jpatcher.updateWindowTitle();
             jpatcher.grabKeyboardFocus();
         }
     }

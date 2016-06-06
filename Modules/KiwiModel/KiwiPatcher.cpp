@@ -87,7 +87,8 @@ namespace kiwi
             .name("cicm.kiwi.Patcher")
             .member<flip::Array<model::Object>, &Patcher::m_objects>("objects")
             .member<flip::Array<model::Link>, &Patcher::m_links>("links")
-            .member<flip::Collection<Patcher::User>, &Patcher::m_users>("users");
+            .member<flip::Collection<Patcher::User>, &Patcher::m_users>("users")
+            .member<flip::String, &Patcher::m_patcher_name>("patcher_name");
         }
         
         // ================================================================================ //
@@ -130,6 +131,7 @@ namespace kiwi
         
         model::Object& Patcher::addObject(flip::Mold const& mold)
         {
+            //const auto it = m_objects.emplace<model::ObjectPlus>(m_objects.end(), mold);
             const auto it = m_objects.emplace(m_objects.end(), mold);
             
             /*
@@ -333,6 +335,21 @@ namespace kiwi
             return m_users.changed();
         }
         
+        bool Patcher::nameChanged() const noexcept
+        {
+            return m_patcher_name.changed();
+        }
+        
+        std::string Patcher::getName() const
+        {
+            return !m_patcher_name.removed() ? static_cast<std::string>(m_patcher_name) : "Untitled";
+        }
+        
+        void Patcher::setName(std::string const& new_name)
+        {
+            m_patcher_name = new_name;
+        }
+        
         Patcher::User* Patcher::getUser(uint32_t user_id)
         {
             const auto has_same_id = [user_id] (User const& user)
@@ -342,7 +359,7 @@ namespace kiwi
             
             const auto it = std::find_if(m_users.begin(), m_users.end(), has_same_id);
             
-            if(it != m_users.end())
+            if(it != m_users.end() && !it->removed())
             {
                 return it.operator->();
             }

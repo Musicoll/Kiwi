@@ -54,6 +54,8 @@ namespace kiwi
         
         model::Patcher& patcher = m_patcher_manager->init();
         
+        patcher.setName("Untitled");
+        
         m_patcher_manager->newView();
         DocumentManager::commit(patcher, "pre-populate patcher");
     }
@@ -63,6 +65,10 @@ namespace kiwi
         if(file.isKiwiFile())
         {
             m_patcher_manager.reset(new jPatcherManager(*this, file));
+            if(m_patcher_manager->getNumberOfView() == 0)
+            {
+                m_patcher_manager->newView();
+            }
         }
         else
         {
@@ -80,7 +86,7 @@ namespace kiwi
         {
             File open_file (openFileChooser.getResult().getFullPathName().toStdString());
             
-            m_patcher_manager.reset(new jPatcherManager(*this, open_file));
+            openFile(open_file);
         }
     }
     

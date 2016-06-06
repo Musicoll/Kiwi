@@ -720,6 +720,10 @@ namespace kiwi
             {
                 flip::Mold mold(model::PatcherModel::use(), sbo);
                 model::Object const& object = *object_ptr;
+                
+                //model::ObjectPlus const& obj = dynamic_cast<model::ObjectPlus const&>(object);
+                //Console::post("obj mold: " + std::string(obj ? "OK" : "fail"));
+                
                 mold.make(object);
                 mold.cure();
 
@@ -775,7 +779,7 @@ namespace kiwi
             {
                 flip::Mold mold(model::PatcherModel::use(), sbi);
                 
-                if(mold.has<model::Object>())
+                if(mold.has<model::Object>() || mold.has<model::ObjectPlus>())
                 {
                     flip::Ref old_object_ref;
                     sbi >> old_object_ref;
@@ -1054,7 +1058,7 @@ namespace kiwi
         DocumentManager::commit(m_patcher_model, "Edit mode switch");
     }
     
-    bool jPatcher::isLocked()
+    bool jPatcher::isLocked() const
     {
         return m_is_locked;
     }
@@ -1316,6 +1320,11 @@ namespace kiwi
             m_viewport->updatePatcherArea(true);
         }
         
+        if(!view.removed() && patcher.nameChanged())
+        {
+            updateWindowTitle();
+        }
+        
         if(!view.removed() && &view == &m_view_model)
         {
             checkViewInfos(view);
@@ -1338,6 +1347,19 @@ namespace kiwi
         if(view.removed()) {}
     }
     
+    void jPatcher::updateWindowTitle() const
+    {
+        jPatcherWindow* window = findParentComponentOfClass<jPatcherWindow>();
+        if(window)
+        {
+            std::string patcher_name = m_patcher_model.getName();
+            
+            std::string new_name = patcher_name + (isLocked() ? "" : " (edit) ");
+            
+            window->setName(new_name);
+        }
+    }
+    
     void jPatcher::checkViewInfos(model::Patcher::View& view)
     {
         if(&view == &m_view_model && !view.removed())
@@ -1357,6 +1379,8 @@ namespace kiwi
                 {
                     m_viewport->resetObjectsArea();
                 }
+                
+                updateWindowTitle();
                 
                 repaint();
                 KiwiApp::commandStatusChanged();

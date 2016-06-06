@@ -102,6 +102,15 @@ namespace kiwi
             //! @brief Returns true if a User has been added, removed or changed.
             bool usersChanged() const noexcept;
             
+            //! @brief Returns true if the Patcher name changed.
+            bool nameChanged() const noexcept;
+            
+            //! @brief Returns the Patcher name.
+            std::string getName() const;
+            
+            //! @brief Returns the Patcher name.
+            void setName(std::string const& new_name);
+            
             //! @brief Set the User.
             //! @param user_id The user unique id.
             //! @return The user.
@@ -169,6 +178,8 @@ namespace kiwi
             flip::Array<model::Link>    m_links;
             
             flip::Collection<User>      m_users;
+            
+            flip::String                m_patcher_name;
         };
         
         

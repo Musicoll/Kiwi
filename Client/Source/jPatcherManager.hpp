@@ -36,7 +36,20 @@ namespace kiwi
 {
     class jInstance;
     
-    class jPatcherWindow;
+    // ================================================================================ //
+    //                                  JPATCHER WINDOW                                 //
+    // ================================================================================ //
+    
+    class jPatcherWindow : public jWindow
+    {
+    public:
+        jPatcherWindow(jPatcherManager& manager, jPatcher& jpatcher);
+        void closeButtonPressed() override;
+        
+    private:
+        jPatcherManager& m_manager;
+        jPatcher& m_jpatcher;
+    };
     
     // ================================================================================ //
     //                                  JPATCHER MANAGER                                //
@@ -60,6 +73,9 @@ namespace kiwi
         //! @brief Initialize the patcher manager by creating a new document.
         //! @return The newly created the Patcher model.
         model::Patcher& init();
+        
+        //! @brief Returns the number of patcher views.
+        size_t getNumberOfView();
         
         //! @brief create a new patcher view window.
         void newView();
@@ -112,8 +128,6 @@ namespace kiwi
         
         jInstance&                          m_instance;
         std::unique_ptr<flip::Document>     m_document;
-        model::Patcher*                     m_model = nullptr;
-        
         bool                                m_need_saving_flag;
     };
 }

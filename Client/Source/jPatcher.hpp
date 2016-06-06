@@ -87,7 +87,7 @@ namespace kiwi
         void setLock(bool locked);
         
         //! @brief Get the lock status of the patcher view.
-        bool isLocked();
+        bool isLocked() const;
         
         //! @brief Returns true if the object is selected.
         bool isSelected(jObject const& object) const;
@@ -104,6 +104,9 @@ namespace kiwi
         
         //! @brief called by jObjectBox when hmmm.. the text has been edited.
         void boxHasBeenEdited(jObjectBox& box, std::string new_text);
+        
+        //! @internal Update the patcher window title.
+        void updateWindowTitle() const;
         
         // ================================================================================ //
         //                                    COMPONENT                                     //
