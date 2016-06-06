@@ -1345,6 +1345,11 @@ namespace kiwi
         }
         
         if(view.removed()) {}
+        
+        if(patcher.resident() && (patcher.objectsChanged() || patcher.linksChanged()))
+        {
+            updateWindowTitle();
+        }
     }
     
     void jPatcher::updateWindowTitle() const
@@ -1352,10 +1357,23 @@ namespace kiwi
         jPatcherWindow* window = findParentComponentOfClass<jPatcherWindow>();
         if(window)
         {
-            std::string patcher_name = m_patcher_model.getName();
+            juce::String title = m_patcher_model.getName();
+            const bool edited = m_manager.needsSaving();
             
-            std::string new_name = patcher_name + (isLocked() ? "" : " (edit) ");
+            kiwi::File kiwi_file = DocumentManager::getSelectedFile(m_patcher_model);
             
+            juce::File file(kiwi_file.getAbsolutePath());
+            
+            if(ComponentPeer* peer = window->getPeer())
+            {
+                if (!peer->setDocumentEditedStatus(edited))
+                    if (edited)
+                        title << "*";
+                
+                peer->setRepresentedFile(file);
+            }
+            
+            std::string new_name = title.toStdString() + (isLocked() ? "" : " (edit) ");
             window->setName(new_name);
         }
     }

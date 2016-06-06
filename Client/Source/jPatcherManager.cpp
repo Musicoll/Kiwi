@@ -125,6 +125,11 @@ namespace kiwi
         });
     }
     
+    bool jPatcherManager::needsSaving() const
+    {
+        return m_need_saving_flag;
+    }
+    
     bool jPatcherManager::saveDocument()
     {
         auto& patcher = getPatcher();

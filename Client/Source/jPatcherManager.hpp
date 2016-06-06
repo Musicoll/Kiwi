@@ -94,6 +94,9 @@ namespace kiwi
         //! @brief Save the document.
         bool saveDocument();
         
+        //! @brief Returns true if the patcher needs to be saved.
+        bool needsSaving() const;
+        
     private:
         
         //! @brief Returns the Patcher model
