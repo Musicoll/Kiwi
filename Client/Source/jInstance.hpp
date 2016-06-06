@@ -68,17 +68,26 @@ namespace kiwi
         std::vector<uint8_t>& getPatcherClipboardData();
         
     private:
+        
         //! @internal temporary method to pre-populate new patchers
         void populatePatcher(model::Patcher& patcher);
+        
+        //! @brief Returns the next untitled number based on current documents
+        size_t getNextUntitledNumberAndIncrement();
         
     private:
         
         const uint64_t m_user_id;
         
         std::unique_ptr<engine::Instance>   m_instance;
-        std::unique_ptr<jPatcherManager>    m_patcher_manager;
+        
+        std::vector<std::unique_ptr<jPatcherManager>>
+                                            m_patcher_managers;
+        
         std::unique_ptr<jConsoleWindow>     m_console_window;
         std::vector<uint8_t>                m_patcher_clipboard;
+        
+        static size_t                       m_untitled_patcher_index;
     };
 }
 

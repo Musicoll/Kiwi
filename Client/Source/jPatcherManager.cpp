@@ -97,6 +97,11 @@ namespace kiwi
         return m_document->root<model::Patcher>();
     }
     
+    model::Patcher const& jPatcherManager::getPatcher() const
+    {
+        return m_document->root<model::Patcher>();
+    }
+    
     void jPatcherManager::newView()
     {
         auto& patcher = getPatcher();

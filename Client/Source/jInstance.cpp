@@ -29,6 +29,8 @@
 
 namespace kiwi
 {
+    size_t jInstance::m_untitled_patcher_index(0);
+    
     jInstance::jInstance() :
     m_user_id(flip::Ref::User::Offline),
     m_instance(new engine::Instance(m_user_id)),
@@ -40,7 +42,7 @@ namespace kiwi
     jInstance::~jInstance()
     {
         m_console_window.reset();
-        m_patcher_manager.reset();
+        m_patcher_managers.clear();
     }
     
     uint64_t jInstance::getUserId() const noexcept
@@ -50,13 +52,22 @@ namespace kiwi
     
     void jInstance::newPatcher()
     {
-        m_patcher_manager.reset(new jPatcherManager(*this));
+        auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), new jPatcherManager(*this));
         
-        model::Patcher& patcher = m_patcher_manager->init();
+        jPatcherManager& manager = *(manager_it->get());
+        model::Patcher& patcher = manager.init();
         
-        patcher.setName("Untitled");
+        const size_t next_untitled = getNextUntitledNumberAndIncrement();
+        std::string patcher_name = "Untitled";
         
-        m_patcher_manager->newView();
+        if(next_untitled > 0)
+        {
+            patcher_name += " " + std::to_string(next_untitled);
+        }
+        
+        patcher.setName(patcher_name);
+        
+        manager.newView();
         DocumentManager::commit(patcher, "pre-populate patcher");
     }
     
@@ -64,10 +75,11 @@ namespace kiwi
     {
         if(file.isKiwiFile())
         {
-            m_patcher_manager.reset(new jPatcherManager(*this, file));
-            if(m_patcher_manager->getNumberOfView() == 0)
+            auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), new jPatcherManager(*this, file));
+            jPatcherManager& manager = *(manager_it->get());
+            if(manager.getNumberOfView() == 0)
             {
-                m_patcher_manager->newView();
+                manager.newView();
             }
         }
         else
@@ -94,11 +106,15 @@ namespace kiwi
     {
         bool success = true;
         
-        if(m_patcher_manager)
+        if(!m_patcher_managers.empty())
         {
-            if(!m_patcher_manager->askAllWindowsToClose())
+            for(auto& manager_uptr : m_patcher_managers)
             {
-                success = false;
+                if(!manager_uptr->askAllWindowsToClose())
+                {
+                    success = false;
+                    break;
+                }
             }
         }
         
@@ -114,6 +130,11 @@ namespace kiwi
     std::vector<uint8_t>& jInstance::getPatcherClipboardData()
     {
         return m_patcher_clipboard;
+    }
+    
+    size_t jInstance::getNextUntitledNumberAndIncrement()
+    {
+        return m_untitled_patcher_index++;
     }
     
     void jInstance::populatePatcher(model::Patcher& patcher)

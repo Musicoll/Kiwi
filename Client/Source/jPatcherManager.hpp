@@ -99,6 +99,9 @@ namespace kiwi
         //! @brief Returns the Patcher model
         model::Patcher& getPatcher();
         
+        //! @brief Returns the Patcher model
+        model::Patcher const& getPatcher() const;
+        
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
         void document_changed(model::Patcher& patcher) override final;
         
