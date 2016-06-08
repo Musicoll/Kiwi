@@ -1,51 +1,53 @@
 language: cpp
 dist: trusty
 sudo: required
-
-# No Email notification
 notifications:
   email: false
-
 git:
   submodules: true
   depth: 5
   on:
-    branch: ['dev-dsp', 'dev-core', 'dev-graphics', 'dev-model']
-
+    branch:
+    - dev-dsp
+    - dev-core
+    - dev-graphics
+    - dev-model
 matrix:
   include:
-    - os: linux
-      compiler: gcc
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-4.9', 'python-pip', 'python-yaml']
-      before_script:
-        - chmod +x .travis/script.sh
-        - chmod +x .travis/after_success.sh
-        - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
-      env: COMPILER=g++-4.9
-
-    - os: linux
-      compiler: clang
-      addons:
-        apt:
-          #sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.6']
-          packages: ['clang-3.6', 'libc++-dev']
-      env: COMPILER=clang++-3.6 CONFIGURATION=Debug
-
-    - os: osx
-      compiler: gcc
-      env: COMPILER=g++-4.9
-
-    - os: osx
-      compiler: clang++
-      env: COMPILER=clang++
-
+  - os: linux
+    compiler: gcc
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - g++-4.9
+        - python-pip
+        - python-yaml
+    before_script:
+    - chmod +x .travis/script.sh
+    - chmod +x .travis/after_success.sh
+    - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
+    env: COMPILER=g++-4.9
+  - os: linux
+    compiler: clang
+    addons:
+      apt:
+        packages:
+        - clang-3.6
+        - libc++-dev
+    env: COMPILER=clang++-3.6 CONFIGURATION=Debug
+  - os: osx
+    compiler: gcc
+    env: COMPILER=g++-4.9
+  - os: osx
+    compiler: clang++
+    env: COMPILER=clang++
 before_script:
-  - chmod +x .travis/script.sh
-  - chmod +x .travis/after_success.sh
-
+- chmod +x .travis/script.sh
+- chmod +x .travis/after_success.sh
 script: .travis/script.sh
-
 after_success: .travis/after_success.sh
+before_install:
+- openssl aes-256-cbc -K $encrypted_5a43ff9033eb_key -iv $encrypted_5a43ff9033eb_iv
+  -in travisci_rsa.enc -out travisci_rsa -d
