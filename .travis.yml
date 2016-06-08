@@ -21,6 +21,20 @@ matrix:
     before_install:
     - openssl aes-256-cbc -K $encrypted_5a43ff9033eb_key -iv $encrypted_5a43ff9033eb_iv
       -in travisci_rsa.enc -out travisci_rsa -d
+    after_success:
+        - sudo apt-get install --yes doxygen graphviz
+        - rm -rf html
+        - mkdir -p html
+        - git clone -b gh-pages git@github.com:Musicoll/Kiwi.git --single-branch html
+        - cd html
+        - git rm -rf .
+        - cd ../
+        - doxygen Doxyfile
+        - cd ../html
+        - git add .
+        - git commit -m "Automated documentation build for changeset git rev-parse --verify HEAD."
+        - git push origin gh-pages
+        - cd ../
     env: COMPILER=g++-4.9
 
   - os: linux
@@ -41,4 +55,4 @@ matrix:
     env: COMPILER=clang++
 
 script:
-  
+  - ls
