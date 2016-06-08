@@ -28,18 +28,29 @@
 
 namespace kiwi
 {
+    // ================================================================================ //
+    //                                       FILE                                       //
+    // ================================================================================ //
+    
     //! @brief Class used to represent a file and its absolute path.
-    class File final
+    class FilePath final
     {
     public:
+        
         //! @brief Initializes a file with a null absolute path.
-        File();
+        FilePath();
+        
         //! @brief Initializes a file with absolute_path
-        explicit File(std::string const& absolute_path);
+        explicit FilePath(std::string const& absolute_path);
+        
         //! @brief Copies a file.
-        File(File const& other);
+        FilePath(FilePath const& other);
+        
         //! @brief Move constructor of file.
-        File(File && other);
+        FilePath(FilePath && other);
+        
+        //! @brief Destructor.
+        ~FilePath() = default;
         
         //! @brief Returns the path of the file without name and extension.
         std::string getPath() const;
@@ -53,16 +64,15 @@ namespace kiwi
         //! @brief Returns the extension of the file.
         std::string getExtension() const;
         
-        //! @brief Checks if the absolute_path point to an existing file.
+        //! @brief Returns true if the current path points to an existing file.
         bool exist() const;
+        
         //! @brief Checks if the file represents a document
         bool isKiwiFile() const;
         
-        bool operator==(File const& other) const;
-        File &operator=(File const& other);
-        File &operator=(File && other);
-        
-        ~File() = default;
+        bool operator==(FilePath const& other) const;
+        FilePath &operator=(FilePath const& other);
+        FilePath &operator=(FilePath && other);
         
     private:
         std::string m_absolute_path;

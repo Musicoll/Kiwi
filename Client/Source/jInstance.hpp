@@ -34,6 +34,10 @@
 
 namespace kiwi
 {
+    // ================================================================================ //
+    //                                     jINSTANCE                                    //
+    // ================================================================================ //
+
     //! @brief The jInstance
     class jInstance
     {
@@ -49,7 +53,7 @@ namespace kiwi
         void newPatcher();
         
         //! @brief Open a File.
-        void openFile(kiwi::File const& file);
+        void openFile(kiwi::FilePath const& file);
         
         //! @brief Open a patcher from file
         void openPatcher();
@@ -69,20 +73,18 @@ namespace kiwi
         
     private:
         
-        //! @internal temporary method to pre-populate new patchers
-        void populatePatcher(model::Patcher& patcher);
-        
         //! @brief Returns the next untitled number based on current documents
         size_t getNextUntitledNumberAndIncrement();
         
     private:
         
+        using jPatcherManagers = std::vector<std::unique_ptr<jPatcherManager>>;
+        
         const uint64_t m_user_id;
         
         std::unique_ptr<engine::Instance>   m_instance;
         
-        std::vector<std::unique_ptr<jPatcherManager>>
-                                            m_patcher_managers;
+        jPatcherManagers                    m_patcher_managers;
         
         std::unique_ptr<jConsoleWindow>     m_console_window;
         std::vector<uint8_t>                m_patcher_clipboard;

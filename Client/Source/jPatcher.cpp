@@ -78,6 +78,12 @@ namespace kiwi
         m_io_highlighter.reset();
         m_lasso.reset();
         m_viewport.reset();
+        
+        m_local_objects_selection.clear();
+        m_local_links_selection.clear();
+        m_distant_objects_selection.clear();
+        m_distant_links_selection.clear();
+        
         m_links.clear();
         m_objects.clear();
     }
@@ -131,13 +137,6 @@ namespace kiwi
                     g.setPixel(x, y);
                 }
             }
-            
-            /*
-            const juce::Rectangle<int> objects_area = m_viewport->getObjectsArea().withPosition(0, 0);
-            
-            g.setColour(juce::Colours::black);
-            g.drawRect(objects_area, 1);
-            */
         }
         else
         {
@@ -246,7 +245,6 @@ namespace kiwi
                 }
             }
         }
-        
         else if(e.mods.isRightButtonDown())
         {
             showPatcherPopupMenu(e.getPosition() - m_viewport->getOriginPosition());
@@ -1360,7 +1358,7 @@ namespace kiwi
             juce::String title = m_patcher_model.getName();
             const bool edited = m_manager.needsSaving();
             
-            kiwi::File kiwi_file = DocumentManager::getSelectedFile(m_patcher_model);
+            kiwi::FilePath kiwi_file = DocumentManager::getSelectedFile(m_patcher_model);
             
             juce::File file(kiwi_file.getAbsolutePath());
             

@@ -26,6 +26,10 @@
 
 namespace kiwi
 {
+    // ================================================================================ //
+    //                                     COMMAND IDs                                  //
+    // ================================================================================ //
+    
     enum CommandIDs
     {
         newPatcher                  = 0x200010,        ///< Create a new blank patcher window.
@@ -74,6 +78,10 @@ namespace kiwi
         showObjectInspector         = 0xf20500,        ///< Shows the selected objects properties inspector.
         openObjectHelp              = 0xf20510         ///< Open selected object help patcher.
     };
+    
+    // ================================================================================ //
+    //                                 COMMAND CATEGORIES                               //
+    // ================================================================================ //
     
     namespace CommandCategories
     {

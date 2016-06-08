@@ -29,6 +29,10 @@
 
 namespace kiwi
 {
+    // ================================================================================ //
+    //                                     jINSTANCE                                    //
+    // ================================================================================ //
+
     size_t jInstance::m_untitled_patcher_index(0);
     
     jInstance::jInstance() :
@@ -71,7 +75,7 @@ namespace kiwi
         DocumentManager::commit(patcher, "pre-populate patcher");
     }
     
-    void jInstance::openFile(kiwi::File const& file)
+    void jInstance::openFile(kiwi::FilePath const& file)
     {
         if(file.isKiwiFile())
         {
@@ -96,7 +100,7 @@ namespace kiwi
         
         if (openFileChooser.browseForFileToOpen())
         {
-            File open_file (openFileChooser.getResult().getFullPathName().toStdString());
+            kiwi::FilePath open_file(openFileChooser.getResult().getFullPathName().toStdString());
             
             openFile(open_file);
         }
@@ -135,88 +139,5 @@ namespace kiwi
     size_t jInstance::getNextUntitledNumberAndIncrement()
     {
         return m_untitled_patcher_index++;
-    }
-    
-    void jInstance::populatePatcher(model::Patcher& patcher)
-    {
-        {
-            // simple print
-            auto& plus = patcher.addObject("plus 44");
-            plus.setPosition(50, 50);
-            auto& print = patcher.addObject("print");
-            print.setPosition(50, 100);
-            patcher.addLink(plus, 0, print, 0);
-        }
-        
-        {
-            // set rhs value
-            auto& plus_1 = patcher.addObject("plus 1");
-            plus_1.setPosition(150, 50);
-            
-            auto& plus_2 = patcher.addObject("plus 10");
-            plus_2.setPosition(220, 50);
-            
-            auto& plus_3 = patcher.addObject("plus");
-            plus_3.setPosition(150, 100);
-            
-            auto& print = patcher.addObject("print");
-            print.setPosition(150, 150);
-            
-            patcher.addLink(plus_1, 0, plus_3, 0);
-            patcher.addLink(plus_2, 0, plus_3, 1);
-            patcher.addLink(plus_3, 0, print, 0);
-        }
-        
-        {
-            // basic counter
-            auto& plus_1 = patcher.addObject("plus");
-            plus_1.setPosition(350, 100);
-            
-            auto& plus_2 = patcher.addObject("plus");
-            plus_2.setPosition(405, 70);
-            
-            auto& plus_3 = patcher.addObject("plus 10");
-            plus_3.setPosition(300, 20);
-            
-            auto& plus_4 = patcher.addObject("plus -10");
-            plus_4.setPosition(380, 20);
-            
-            auto& print = patcher.addObject("print zozo");
-            print.setPosition(350, 150);
-            
-            patcher.addLink(plus_1, 0, plus_2, 0);
-            patcher.addLink(plus_2, 0, plus_1, 1);
-            patcher.addLink(plus_1, 0, print, 0);
-            
-            patcher.addLink(plus_3, 0, plus_1, 0);
-            patcher.addLink(plus_4, 0, plus_1, 0);
-        }
-        
-        {
-            // stack overflow
-            auto& plus_1 = patcher.addObject("plus");
-            plus_1.setPosition(550, 100);
-            
-            auto& plus_2 = patcher.addObject("plus");
-            plus_2.setPosition(605, 70);
-            
-            auto& plus_3 = patcher.addObject("plus 10");
-            plus_3.setPosition(500, 20);
-            
-            auto& plus_4 = patcher.addObject("plus -10");
-            plus_4.setPosition(580, 20);
-            
-            auto& print = patcher.addObject("print zozo");
-            print.setPosition(550, 150);
-            
-            patcher.addLink(plus_1, 0, plus_2, 0);
-            patcher.addLink(plus_2, 0, plus_1, 0);
-            patcher.addLink(plus_1, 0, print, 0);
-            
-            patcher.addLink(plus_3, 0, plus_1, 0);
-            patcher.addLink(plus_4, 0, plus_1, 0);
-        }
-        
-        DocumentManager::commit(patcher, "pre-populate patcher");
     }
 }

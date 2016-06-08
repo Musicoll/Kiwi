@@ -65,7 +65,7 @@ namespace kiwi
         jPatcherManager(jInstance& instance);
         
         //! @brief Constructs and load patcher from file
-        jPatcherManager(jInstance& instance, File const& file);
+        jPatcherManager(jInstance& instance, kiwi::FilePath const& file);
         
         //! @brief Destructor.
         ~jPatcherManager();

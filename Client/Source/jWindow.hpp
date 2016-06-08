@@ -28,6 +28,10 @@
 
 namespace kiwi
 {
+    // ================================================================================ //
+    //                                      JWINDOW                                     //
+    // ================================================================================ //
+
     //! @brief A juce Window.
     class jWindow : public juce::DocumentWindow, public ApplicationCommandTarget
     {

@@ -31,23 +31,23 @@ namespace kiwi
     //                                      FILE                                        //
     // ================================================================================ //
     
-    File::File():m_absolute_path()
+    FilePath::FilePath() : m_absolute_path()
     {
     }
     
-    File::File(File const& other):m_absolute_path(other.m_absolute_path)
+    FilePath::FilePath(FilePath const& other) : m_absolute_path(other.m_absolute_path)
     {
     }
     
-    File::File(std::string const& absolute_path):m_absolute_path(absolute_path)
+    FilePath::FilePath(std::string const& absolute_path) : m_absolute_path(absolute_path)
     {
     }
     
-    File::File(File && other):m_absolute_path(std::move(other.m_absolute_path))
+    FilePath::FilePath(FilePath && other):m_absolute_path(std::move(other.m_absolute_path))
     {
     }
     
-    File& File::operator=(File const& other)
+    FilePath& FilePath::operator=(FilePath const& other)
     {
         if (&other != this)
         {
@@ -57,7 +57,7 @@ namespace kiwi
         return *this;
     }
     
-    File& File::operator=(File && other)
+    FilePath& FilePath::operator=(FilePath && other)
     {
         if (&other != this)
         {
@@ -67,23 +67,23 @@ namespace kiwi
         return *this;
     }
     
-    bool File::exist() const
+    bool FilePath::exist() const
     {
         std::ifstream f(m_absolute_path);
         return f.good();
     }
     
-    bool File::isKiwiFile() const
+    bool FilePath::isKiwiFile() const
     {
         return getExtension() == "kiwi"; // CHeck if exists.
     }
     
-    std::string File::getAbsolutePath() const
+    std::string FilePath::getAbsolutePath() const
     {
         return m_absolute_path;
     }
     
-    std::string File::getPath() const
+    std::string FilePath::getPath() const
     {
         std::string path;
         std::size_t found = m_absolute_path.find_last_of("/\\");
@@ -96,7 +96,7 @@ namespace kiwi
         return path;
     }
     
-    std::string File::getName() const
+    std::string FilePath::getName() const
     {
         std::string file_name;
         std::size_t found = m_absolute_path.find_last_of("/\\");
@@ -109,7 +109,7 @@ namespace kiwi
         return file_name;
     }
     
-    std::string File::getExtension() const
+    std::string FilePath::getExtension() const
     {
         std::string extension;
         std::size_t found = m_absolute_path.find_last_of(".");
@@ -122,7 +122,7 @@ namespace kiwi
         return extension;
     }
     
-    bool File::operator==(File const& other) const
+    bool FilePath::operator==(FilePath const& other) const
     {
         return m_absolute_path == other.m_absolute_path;
     }

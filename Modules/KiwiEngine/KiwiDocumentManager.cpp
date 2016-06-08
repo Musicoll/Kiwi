@@ -35,6 +35,10 @@
 
 namespace kiwi
 {
+    // ================================================================================ //
+    //                                   DOCUMENT MANAGER                               //
+    // ================================================================================ //
+    
     DocumentManager::DocumentManager(flip::DocumentBase& document) :
     m_document(document),
     m_history(document),
@@ -73,19 +77,19 @@ namespace kiwi
         return patcher.entity().use<DocumentManager>().m_gesture_flag;
     }
     
-    void DocumentManager::save(flip::Type& type, File const& file)
+    void DocumentManager::save(flip::Type& type, FilePath const& file)
     {
         model::Patcher& patcher = type.ancestor<model::Patcher>();
         patcher.entity().use<DocumentManager>().save(file);
     }
     
-    void DocumentManager::load(flip::Type& type, File const& file)
+    void DocumentManager::load(flip::Type& type, FilePath const& file)
     {
         model::Patcher& patcher = type.ancestor<model::Patcher>();
         patcher.entity().use<DocumentManager>().load(file);
     }
     
-    File const& DocumentManager::getSelectedFile(flip::Type& type)
+    FilePath const& DocumentManager::getSelectedFile(flip::Type& type)
     {
         model::Patcher& patcher = type.ancestor<model::Patcher>();
         return patcher.entity().use<DocumentManager>().getSelectedFile();
@@ -105,6 +109,8 @@ namespace kiwi
     
     void DocumentManager::undo()
     {
+        assert(canUndo());
+        
         m_history.execute_undo();
     }
     
@@ -122,6 +128,8 @@ namespace kiwi
     
     void DocumentManager::redo()
     {
+        assert(canRedo());
+        
         m_history.execute_redo();
     }
     
@@ -187,24 +195,24 @@ namespace kiwi
         m_document.push();
     }
     
-    void DocumentManager::save(File const& file)
+    void DocumentManager::save(FilePath const& file)
     {
         m_file_handler.save(file);
     }
     
-    void DocumentManager::load(File const& file)
+    void DocumentManager::load(FilePath const& file)
     {
         m_file_handler.load(file);
     }
     
-    File const& DocumentManager::getSelectedFile() const
+    FilePath const& DocumentManager::getSelectedFile() const
     {
         return m_file_handler.getFile();
     }
     
-    //=============================================================================
-    // FileHandler
-    //=============================================================================
+    // ================================================================================ //
+    //                                    FILE HANDLER                                  //
+    // ================================================================================ //
     
     FileHandler::FileHandler(flip::DocumentBase & document):
     m_document(document),
@@ -212,17 +220,17 @@ namespace kiwi
     {
     }
     
-    File const& FileHandler::getFile() const
+    FilePath const& FileHandler::getFile() const
     {
         return m_file;
     }
     
-    void FileHandler::setFile(File const& file)
+    void FileHandler::setFile(FilePath const& file)
     {
         m_file = file;
     }
     
-    void FileHandler::load(File const& file)
+    void FileHandler::load(FilePath const& file)
     {
         if (file.isKiwiFile())
         {
@@ -242,7 +250,7 @@ namespace kiwi
         m_document.read(back_end);
     }
     
-    void FileHandler::save(File const& file)
+    void FileHandler::save(FilePath const& file)
     {
         if (file.isKiwiFile())
         {

@@ -32,6 +32,10 @@
 
 namespace kiwi
 {
+    // ================================================================================ //
+    //                                  JPATCHER WINDOW                                 //
+    // ================================================================================ //
+
     jPatcherWindow::jPatcherWindow(jPatcherManager& manager, jPatcher& jpatcher) : jWindow(),
     m_manager(manager),
     m_jpatcher(jpatcher)
@@ -56,7 +60,7 @@ namespace kiwi
         ;
     }
     
-    jPatcherManager::jPatcherManager(jInstance& instance, File const& file):
+    jPatcherManager::jPatcherManager(jInstance& instance, kiwi::FilePath const& file):
     m_instance(instance),
     m_document(new flip::Document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'))
     {
@@ -133,7 +137,7 @@ namespace kiwi
     bool jPatcherManager::saveDocument()
     {
         auto& patcher = getPatcher();
-        File const& current_save_file = DocumentManager::getSelectedFile(patcher);
+        kiwi::FilePath const& current_save_file = DocumentManager::getSelectedFile(patcher);
         
         if (current_save_file.exist())
         {
@@ -149,7 +153,7 @@ namespace kiwi
             
             if(saveFileChooser.browseForFileToSave(true))
             {
-                File save_file (saveFileChooser.getResult().getFullPathName().toStdString());
+                kiwi::FilePath save_file (saveFileChooser.getResult().getFullPathName().toStdString());
                 DocumentManager::save(patcher, save_file);
                 m_need_saving_flag = false;
                 

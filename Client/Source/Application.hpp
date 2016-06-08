@@ -37,6 +37,11 @@ namespace kiwi
     class KiwiApp : public JUCEApplication
     {
     public:
+        
+        // ================================================================================ //
+        //                                  JUCEApplication                                 //
+        // ================================================================================ //
+
         KiwiApp() = default;
         ~KiwiApp() = default;
         
@@ -76,8 +81,6 @@ namespace kiwi
             void menuItemSelected(int menuItemID, int topLevelMenuIndex);
         };
         
-        class AsyncQuitRetrier;
-        
         //! @brief Called by MainMenuModel to get the menu names
         StringArray getMenuNames();
         
@@ -85,15 +88,15 @@ namespace kiwi
         void createMenu (PopupMenu& menu, const String& menuName);
         
         //! @brief Called by createMenu to create each menu
-        void createOpenRecentPageMenu	(PopupMenu& menu);
-        void createFileMenu				(PopupMenu& menu);
-        void createEditMenu				(PopupMenu& menu);
-        void createViewMenu				(PopupMenu& menu);
-        void createObjectMenu			(PopupMenu& menu);
-        void createArrangeMenu			(PopupMenu& menu);
-        void createOptionsMenu			(PopupMenu& menu);
-        void createWindowMenu			(PopupMenu& menu);
-        void createHelpMenu				(PopupMenu& menu);
+        void createOpenRecentPatchersMenu(PopupMenu& menu);
+        void createFileMenu(PopupMenu& menu);
+        void createEditMenu(PopupMenu& menu);
+        void createViewMenu(PopupMenu& menu);
+        void createObjectMenu(PopupMenu& menu);
+        void createArrangeMenu(PopupMenu& menu);
+        void createOptionsMenu(PopupMenu& menu);
+        void createWindowMenu(PopupMenu& menu);
+        void createHelpMenu(PopupMenu& menu);
         
         //! @brief Called by MainMenuModel to handle the main menu command
         void handleMainMenuCommand (int menuItemID);
@@ -129,12 +132,15 @@ namespace kiwi
         //! @brief This must actually perform the specified command.
         bool perform(InvocationInfo const& info) override;
         
-    private:
+    private: // methods
+        
+        //! @internal Utility to quit the app asynchronously.
+        class AsyncQuitRetrier;
 
         //! @brief Initialise the command manager
         void initCommandManager();
         
-    private:
+    private: // members
         
         std::unique_ptr<jInstance>                  m_instance;
         std::unique_ptr<ApplicationCommandManager>	m_command_manager;

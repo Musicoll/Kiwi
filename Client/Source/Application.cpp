@@ -101,7 +101,7 @@ namespace kiwi
     {
         if(m_instance)
         {
-            m_instance->openFile(kiwi::File(command_line.unquoted().toStdString()));
+            m_instance->openFile(kiwi::FilePath(command_line.unquoted().toStdString()));
         }
     }
     
@@ -191,7 +191,9 @@ namespace kiwi
         return nullptr;
     }
     
-    //==============================================================================
+    // ================================================================================ //
+    //                                  APPLICATION MENU                                //
+    // ================================================================================ //
     
     StringArray KiwiApp::getMenuNames()
     {
@@ -217,7 +219,7 @@ namespace kiwi
         else assert(false); // names have changed?
     }
     
-    void KiwiApp::createOpenRecentPageMenu(PopupMenu& menu)
+    void KiwiApp::createOpenRecentPatchersMenu(PopupMenu& menu)
     {
         
     }
@@ -228,7 +230,7 @@ namespace kiwi
         menu.addSeparator();
         
         menu.addCommandItem(m_command_manager.get(), CommandIDs::openFile);
-        createOpenRecentPageMenu (menu);
+        createOpenRecentPatchersMenu(menu);
         menu.addCommandItem(m_command_manager.get(), CommandIDs::closeWindow);
         menu.addSeparator();
         
@@ -236,10 +238,10 @@ namespace kiwi
         menu.addCommandItem(m_command_manager.get(), CommandIDs::saveAs);
         menu.addSeparator();
         
-#if ! JUCE_MAC
+        #if ! JUCE_MAC
         menu.addSeparator();
         menu.addCommandItem(m_command_manager.get(), StandardApplicationCommandIDs::quit);
-#endif
+        #endif
     }
     
     void KiwiApp::createEditMenu(PopupMenu& menu)
