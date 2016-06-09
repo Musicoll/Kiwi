@@ -28,9 +28,6 @@ xcuserdata/
 *.xcuserdata
 *.xcuserdatad
 
-# Juce
-JuceLibraryCode/
-
 # CMake
 CMakeFiles/
 CMakeCache.txt
