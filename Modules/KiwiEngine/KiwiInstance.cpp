@@ -65,5 +65,10 @@ namespace kiwi
         {
             ;
         }
+        
+        uint64_t Instance::getUserId() const noexcept
+        {
+            return m_user_id;
+        }
     }
 }

@@ -101,7 +101,7 @@ namespace kiwi
         return false;
     }
     
-    std::vector<std::string> ObjectFactory::getNames()
+    std::vector<std::string> ObjectFactory::getRegisteredObjectNames()
     {
         std::vector<std::string> names;
         for(const auto& creator : getCreators())

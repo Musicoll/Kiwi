@@ -46,6 +46,26 @@ namespace kiwi
             ;
         }
         
+        Object& Link::getSenderObject() const noexcept
+        {
+            return m_sender;
+        }
+        
+        Object& Link::getReceiverObject() const noexcept
+        {
+            return m_receiver;
+        }
+        
+        size_t Link::getSenderIndex() const noexcept
+        {
+            return m_model.getSenderIndex();
+        }
+        
+        size_t Link::getReceiverIndex() const noexcept
+        {
+            return m_model.getReceiverIndex();
+        }
+        
         void Link::linkChanged(model::Link& link_m)
         {
             ;

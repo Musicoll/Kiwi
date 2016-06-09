@@ -43,6 +43,21 @@ namespace kiwi
             m_outlets.clear();
         }
         
+        std::string Object::getName() const noexcept
+        {
+            return m_model->getName();
+        }
+        
+        size_t Object::getNumberOfInlets() const noexcept
+        {
+            return m_model->getNumberOfInlets();
+        }
+        
+        size_t Object::getNumberOfOutlets() const noexcept
+        {
+            return m_model->getNumberOfOutlets();
+        }
+        
         void Object::addOutputLink(Link* link)
         {
             const size_t idx = link->getSenderIndex();

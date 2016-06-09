@@ -37,7 +37,7 @@ namespace kiwi
     }
     
     // ================================================================================ //
-    //                                      FACTORY                                     //
+    //                                   OBJECT FACTORY                                 //
     // ================================================================================ //
     
     //! @brief The Object's factory
@@ -175,7 +175,7 @@ namespace kiwi
         
         //! @brief Returns all the registered Object names.
         //! @return A vector of Object names.
-        static std::vector<std::string> getNames();
+        static std::vector<std::string> getRegisteredObjectNames();
         
     private:
         

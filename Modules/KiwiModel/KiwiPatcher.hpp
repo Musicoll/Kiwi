@@ -263,32 +263,22 @@ namespace kiwi
             struct Object : public flip::Object
             {
             public:
-                
                 Object() = default;
                 Object(model::Object& object) : m_ref(&object) {}
-                
                 model::Object* get() {return m_ref.value();}
-                
                 static void declare();
-                
             private:
-                
                 flip::ObjectRef<model::Object> m_ref;
             };
             
             struct Link : public flip::Object
             {
             public:
-                
                 Link() = default;
                 Link(model::Link& link) : m_ref(&link) {}
-                
                 model::Link* get() {return m_ref.value();}
-                
                 static void declare();
-                
             private:
-                
                 flip::ObjectRef<model::Link> m_ref;
             };
             
