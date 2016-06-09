@@ -1,11 +1,15 @@
 language: cpp
 dist: trusty
 sudo: required
+
 notifications:
   email: false
+
 git:
   submodules: true
   depth: 3
+
+
 matrix:
   include:
   - os: linux
@@ -15,13 +19,17 @@ matrix:
         sources:
         - ubuntu-toolchain-r-test
         packages:
-        - ['python-pip', 'python-yaml']
         - g++-4.9
     before_install:
-    - openssl aes-256-cbc -K $encrypted_5a43ff9033eb_key -iv $encrypted_5a43ff9033eb_iv
-      -in config/travisci_rsa.enc -out config/travisci_rsa -d
+    - openssl aes-256-cbc
+      -K $encrypted_5a43ff9033eb_key
+      -iv $encrypted_5a43ff9033eb_iv
+      -in config/travisci_rsa.enc
+      -out config/travisci_rsa
+      -d
     - chmod 0600 config/travisci_rsa
     - cp config/travisci_rsa ~/.ssh/id_rsa
+
     after_success:
     - sudo apt-get install --yes doxygen graphviz
     - rm -rf html
@@ -37,6 +45,7 @@ matrix:
     - git push origin gh-pages
     - cd ../
     env: COMPILER=g++-4.9
+
   - os: linux
     compiler: clang
     addons:
@@ -45,12 +54,15 @@ matrix:
         - clang-3.6
         - libc++-dev
     env: COMPILER=clang++-3.6 CONFIGURATION=Debug
+
   - os: osx
     compiler: gcc
     env: COMPILER=g++-4.9
+
   - os: osx
     compiler: clang++
     env: COMPILER=clang++
+    
 script:
 - ls
 deploy:
