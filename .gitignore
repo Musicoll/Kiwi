@@ -22,17 +22,12 @@
 
 # XCode & Mac
 .DS_Store
-
 xcuserdata/
-xcshareddata/
 *.build/
-*.gcda
-*.mode1V3
+
 *.pbxuser
-*.app
 *.xcuserdata
 *.xcuserdatad
-DerivedData/
 
 # Juce
 JuceLibraryCode/
