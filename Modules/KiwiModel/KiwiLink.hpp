@@ -48,41 +48,26 @@ namespace kiwi
             //! @param outlet   The sender outlet index.
             //! @param to       The receiver Object.
             //! @param inlet    The receiver inlet index.
-            Link(model::Object const& from, const uint32_t outlet, model::Object const& to, const uint32_t inlet);
+            Link(model::Object const& from, const size_t outlet, model::Object const& to, const size_t inlet);
             
             //! @brief Destructor.
             virtual ~Link() = default;
             
             //! @brief Get the source Object ID of the link.
             //! @return The source Object ID of the link.
-            model::Object const& getSenderObject() const noexcept
-            {
-                return !removed() ? *m_sender.value() : *m_sender.before();
-            }
+            model::Object const& getSenderObject() const noexcept;
             
             //! @brief Get the destination Object of the link.
             //! @return The destination Object of the link.
-            model::Object const& getReceiverObject() const noexcept
-            {
-                return !removed() ? *m_receiver.value() : *m_receiver.before();
-            }
+            model::Object const& getReceiverObject() const noexcept;
             
             //! @brief Get the actual origin outlet index of the link.
             //! @return The actual origin outlet index of the link.
-            uint32_t getSenderIndex() const noexcept
-            {
-                int64_t value = !removed() ? m_index_outlet.value() : m_index_outlet.before();
-                return static_cast<uint32_t>(value);
-            }
+            size_t getSenderIndex() const noexcept;
             
             //! @brief Get the actual destination inlet index of the link.
             //! @return The actual destination inlet index of the link.
-            uint32_t getReceiverIndex() const noexcept
-            {
-                int64_t value = !removed() ? m_index_inlet.value() : m_index_inlet.before();
-                return static_cast<uint32_t>(value);
-            }
-            
+            size_t getReceiverIndex() const noexcept;
         public:
             
             //! @internal flip Default constructor

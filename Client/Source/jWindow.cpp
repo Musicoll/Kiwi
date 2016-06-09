@@ -27,6 +27,10 @@
 
 namespace kiwi
 {
+    // ================================================================================ //
+    //                                      JWINDOW                                     //
+    // ================================================================================ //
+    
     jWindow::jWindow(std::string const& name, juce::Colour color, int requiredButtons, bool addToDesktop) :
     DocumentWindow(name, color, requiredButtons, addToDesktop)
     {

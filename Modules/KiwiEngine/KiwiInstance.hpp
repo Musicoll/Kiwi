@@ -48,7 +48,7 @@ namespace kiwi
             ~Instance();
             
             //! @brief Get the user ID of the Instance.
-            inline uint64_t getUserId() const noexcept          { return m_user_id; }
+            uint64_t getUserId() const noexcept;
             
         private:
             

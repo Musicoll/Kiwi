@@ -22,6 +22,7 @@
 */
 
 #include "KiwiObjectFactory.hpp"
+#include "KiwiTypedObjects.hpp"
 
 namespace kiwi
 {
@@ -33,7 +34,7 @@ namespace kiwi
     {
         std::vector<Atom> atoms = AtomHelper::parse(text);
         
-        if(atoms.size() > 0 && atoms[0].isString())
+        if(atoms.size() > 0)
         {
             const std::string name = atoms[0].getString();
             
@@ -53,12 +54,32 @@ namespace kiwi
                 
                 return object_uptr;
             }
+            else
+            {
+                Console::error("Object \"" + name + "\" not found");
+                
+                std::vector<Atom> args {atoms.begin() + 1, atoms.end()};
+                
+                auto object_uptr = std::unique_ptr<model::Object>(new model::ErrorBox("errorbox", args));
+                
+                object_uptr->m_name = "errorbox";
+                
+                // parse text again to clean input text
+                object_uptr->m_text = AtomHelper::toString(atoms);
+                
+                return object_uptr;
+            }
         }
         else
         {
-            // handle creation fail
+            auto object_uptr = std::unique_ptr<model::Object>(new model::NewBox("newbox", {}));
+            object_uptr->m_name = "newbox";
+            object_uptr->m_text = "";
+            
+            return object_uptr;
         }
         
+        assert(true && "typed object creation fail"); // sould never appear
         return nullptr;
     }
     
@@ -80,7 +101,7 @@ namespace kiwi
         return false;
     }
     
-    std::vector<std::string> ObjectFactory::getNames()
+    std::vector<std::string> ObjectFactory::getRegisteredObjectNames()
     {
         std::vector<std::string> names;
         for(const auto& creator : getCreators())

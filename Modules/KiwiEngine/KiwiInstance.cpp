@@ -43,6 +43,8 @@ namespace kiwi
             
             void endOfModelDeclaration() final override
             {
+                ObjectFactory::registerEngine<NewBox>("newbox");
+                ObjectFactory::registerEngine<NewBox>("errorbox");
                 ObjectFactory::registerEngine<ObjectPlus>("plus");
                 ObjectFactory::registerEngine<ObjectPrint>("print");
             }
@@ -62,6 +64,11 @@ namespace kiwi
         Instance::~Instance()
         {
             ;
+        }
+        
+        uint64_t Instance::getUserId() const noexcept
+        {
+            return m_user_id;
         }
     }
 }

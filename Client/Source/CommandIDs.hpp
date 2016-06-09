@@ -26,9 +26,14 @@
 
 namespace kiwi
 {
+    // ================================================================================ //
+    //                                     COMMAND IDs                                  //
+    // ================================================================================ //
+    
     enum CommandIDs
     {
         newPatcher                  = 0x200010,        ///< Create a new blank patcher window.
+        newPatcherView              = 0x200020,        ///< Create a new patcher view.
         openFile                    = 0x200030,        ///< Open a file in a new window.
         closePatcher                = 0x200051,        ///< Close the current patcher.
         save                        = 0x200060,        ///< Save the current patcher document.
@@ -43,8 +48,10 @@ namespace kiwi
         showAboutAppWindow          = 0x202020,        ///< Make visible the "about app" window.
         showAppSettingsWindow       = 0x202030,        ///< Make visible the "application settings" window.
         
-        duplicate                   = 0xf1000a,        ///< Duplicate selected objects and paste them on patcher.
-        pasteReplace                = 0xf1000b,        ///< Replace an objects by the one in the clipboard.
+        undo                        = 0xf1000a,        ///< Undo last action.
+        redo                        = 0xf1000b,        ///< Redo last action.
+        duplicate                   = 0xf1000c,        ///< Duplicate selected objects and paste them on patcher.
+        pasteReplace                = 0xf1000d,        ///< Replace an objects by the one in the clipboard.
         
         toFront                     = 0xf2000a,        ///< Move selected object ahead of all other objects.
         toBack                      = 0xf2000b,        ///< Move selected object behind all other objects.
@@ -71,6 +78,10 @@ namespace kiwi
         showObjectInspector         = 0xf20500,        ///< Shows the selected objects properties inspector.
         openObjectHelp              = 0xf20510         ///< Open selected object help patcher.
     };
+    
+    // ================================================================================ //
+    //                                 COMMAND CATEGORIES                               //
+    // ================================================================================ //
     
     namespace CommandCategories
     {
