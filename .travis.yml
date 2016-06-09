@@ -16,10 +16,16 @@ matrix:
     compiler: gcc
     addons:
       apt:
-        sources:
-        - ubuntu-toolchain-r-test
         packages:
         - g++-4.9
+    env: COMPILER=g++-4.9
+    script:
+    - ls
+
+  - os: osx
+    compiler: clang++
+    env: COMPILER=clang++
+
     before_install:
     - openssl aes-256-cbc
       -K $encrypted_5a43ff9033eb_key
@@ -29,6 +35,10 @@ matrix:
       -d
     - chmod 0600 config/travisci_rsa
     - cp config/travisci_rsa ~/.ssh/id_rsa
+
+    script:
+    - cd Client/Builds/MacOSX
+    - xcodebuild -project Kiwi.xcodeproj
 
     after_success:
     - sudo apt-get install --yes doxygen graphviz
@@ -45,33 +55,6 @@ matrix:
     - git commit -m "Automated documentation build."
     - git push origin gh-pages
     - cd ../
-    env: COMPILER=g++-4.9
-    script:
-    - ls
-
-  - os: linux
-    compiler: clang
-    addons:
-      apt:
-        packages:
-        - clang-3.6
-        - libc++-dev
-    env: COMPILER=clang++-3.6 CONFIGURATION=Debug
-    script:
-    - ls
-
-  - os: osx
-    compiler: gcc
-    env: COMPILER=g++-4.9
-    script:
-    - ls
-
-  - os: osx
-    compiler: clang++
-    env: COMPILER=clang++
-    script:
-    - cd Client/Builds/MacOSX
-    - xcodebuild -project Kiwi.xcodeproj
 
 deploy:
   provider: releases
