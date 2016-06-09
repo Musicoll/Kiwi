@@ -59,9 +59,6 @@ namespace kiwi
         //! @brief Returns the Patcher model
         model::Patcher& getPatcher();
         
-        //! @brief Initializes a hardcoded patcher
-        void populatePatcher();
-        
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
         void document_changed(model::Patcher& patcher) override final;
         
