@@ -11,6 +11,18 @@ git:
 
 
 matrix:
+  - os: linux
+    compiler: gcc
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - g++-4.9
+    script:
+    - ls
+    env: COMPILER=g++-4.9
+
   - os: osx
     compiler: clang++
     env: COMPILER=clang++
