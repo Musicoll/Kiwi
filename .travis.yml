@@ -46,6 +46,8 @@ matrix:
     - git push origin gh-pages
     - cd ../
     env: COMPILER=g++-4.9
+    script:
+    - ls
 
   - os: linux
     compiler: clang
@@ -55,17 +57,21 @@ matrix:
         - clang-3.6
         - libc++-dev
     env: COMPILER=clang++-3.6 CONFIGURATION=Debug
+    script:
+    - ls
 
   - os: osx
     compiler: gcc
     env: COMPILER=g++-4.9
+    script:
+    - ls
 
   - os: osx
     compiler: clang++
     env: COMPILER=clang++
-
-script:
-- ls
+    script:
+    - cd Client/Builds/MacOSX
+    - xcodebuild -project Kiwi.xcodeproj
 
 deploy:
   provider: releases

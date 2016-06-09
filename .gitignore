@@ -24,7 +24,6 @@
 .DS_Store
 xcuserdata/
 *.build/
-
 *.pbxuser
 *.xcuserdata
 *.xcuserdatad
