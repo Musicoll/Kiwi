@@ -415,18 +415,18 @@ namespace kiwi
     //                                   JOBJECT BOX                                    //
     // ================================================================================ //
     
-    jObjectBox::jObjectBox(jPatcher& patcher_view, model::Object& object_m) : jObject(patcher_view, object_m)
+    jClassicBox::jClassicBox(jPatcher& patcher_view, model::Object& object_m) : jObject(patcher_view, object_m)
     {
         setWantsKeyboardFocus(true);
         setMouseClickGrabsKeyboardFocus(true);
     }
 
-    jObjectBox::~jObjectBox()
+    jClassicBox::~jClassicBox()
     {
         removeTextEditor();
     }
     
-    void jObjectBox::grabKeyboardFocus()
+    void jClassicBox::grabKeyboardFocus()
     {
         setInterceptsMouseClicks(true, true);
         
@@ -457,7 +457,7 @@ namespace kiwi
         m_is_editing = true;
     }
     
-    void jObjectBox::removeTextEditor()
+    void jClassicBox::removeTextEditor()
     {
         if(m_editor)
         {
@@ -470,17 +470,17 @@ namespace kiwi
         }
     }
     
-    void jObjectBox::focusGained(FocusChangeType cause)
+    void jClassicBox::focusGained(FocusChangeType cause)
     {
         //Console::post("focusGained");
     }
     
-    void jObjectBox::focusLost(FocusChangeType cause)
+    void jClassicBox::focusLost(FocusChangeType cause)
     {
         //Console::post("focusLost");
     }
     
-    void jObjectBox::resized()
+    void jClassicBox::resized()
     {
         if(m_editor)
         {
@@ -489,7 +489,7 @@ namespace kiwi
         }
     }
     
-    void jObjectBox::textEditorTextChanged(juce::TextEditor& e)
+    void jClassicBox::textEditorTextChanged(juce::TextEditor& e)
     {
         const juce::String new_text = e.getText();
         const juce::Font font = e.getFont();
@@ -508,21 +508,21 @@ namespace kiwi
         }
     }
     
-    void jObjectBox::textEditorReturnKeyPressed(juce::TextEditor& e)
+    void jClassicBox::textEditorReturnKeyPressed(juce::TextEditor& e)
     {
         //Console::post("textEditorReturnKeyPressed");
         
         m_patcher_view.grabKeyboardFocus();
     }
     
-    void jObjectBox::textEditorEscapeKeyPressed(juce::TextEditor& e)
+    void jClassicBox::textEditorEscapeKeyPressed(juce::TextEditor& e)
     {
         //Console::post("textEditorEscapeKeyPressed");
         
         removeTextEditor();
     }
     
-    void jObjectBox::textEditorFocusLost(juce::TextEditor& e)
+    void jClassicBox::textEditorFocusLost(juce::TextEditor& e)
     {
         const bool locked = m_is_locked;
         setInterceptsMouseClicks(locked, locked);

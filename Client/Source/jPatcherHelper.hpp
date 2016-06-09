@@ -199,7 +199,7 @@ namespace kiwi
         void jumpViewToObject(jObject const&);
         
         //! @brief Attempts to brings the center of the given bounds to the center of the viewport view area
-        void bringBoundsToCentre(juce::Rectangle<int> bounds);
+        void bringRectToCentre(juce::Rectangle<int> bounds);
         
         //! @brief Transforms a given point into a point relative to the patcher origin position.
         juce::Point<int> getRelativePosition(juce::Point<int> point) const noexcept;

@@ -32,7 +32,7 @@ namespace kiwi
 {
     class HitTester;
     class jPatcher;
-    class jObjectBox;
+    class jClassicBox;
     
     // ================================================================================ //
     //                                      JOBJECT                                     //
@@ -113,23 +113,23 @@ namespace kiwi
         bool                    m_is_editing;
         bool                    m_is_errorbox;
         
-        friend jObjectBox;
+        friend jClassicBox;
     };
     
     // ================================================================================ //
     //                                   JOBJECT BOX                                    //
     // ================================================================================ //
     
-    //! @brief The jObjectBox let the user change the text of the box
-    class jObjectBox : public jObject, public juce::TextEditor::Listener
+    //! @brief The jClassicBox let the user change the text of the box
+    class jClassicBox : public jObject, public juce::TextEditor::Listener
     {
     public:
         
         //! @brief Constructor.
-        jObjectBox(jPatcher& patcher_view, model::Object& object_m);
+        jClassicBox(jPatcher& patcher_view, model::Object& object_m);
         
         //! @brief Destructor.
-        ~jObjectBox();
+        ~jClassicBox();
         
         //! @brief Give focus to the text editor.
         void grabKeyboardFocus();

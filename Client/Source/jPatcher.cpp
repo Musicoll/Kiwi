@@ -429,7 +429,7 @@ namespace kiwi
                     }
                     else if(m_select_on_mouse_down_status && !m_is_in_move_or_resize_gesture)
                     {
-                        jObjectBox* box = dynamic_cast<jObjectBox*>(object_j);
+                        jClassicBox* box = dynamic_cast<jClassicBox*>(object_j);
                         if(box)
                         {
                             box->grabKeyboardFocus();
@@ -990,7 +990,7 @@ namespace kiwi
                     const auto it = findObject(*object_m);
                     if(it != m_objects.cend())
                     {
-                        jObjectBox* box = dynamic_cast<jObjectBox*>(it->get());
+                        jClassicBox* box = dynamic_cast<jClassicBox*>(it->get());
                         if(box)
                         {
                             box->grabKeyboardFocus();
@@ -1223,7 +1223,7 @@ namespace kiwi
         
         if(isAnyObjectSelected())
         {
-            m_viewport->bringBoundsToCentre(getSelectionBounds());
+            m_viewport->bringRectToCentre(getSelectionBounds());
         }
     }
     
@@ -1234,7 +1234,7 @@ namespace kiwi
         
         if(isAnyObjectSelected())
         {
-            m_viewport->bringBoundsToCentre(getSelectionBounds());
+            m_viewport->bringRectToCentre(getSelectionBounds());
         }
     }
     
@@ -1248,7 +1248,7 @@ namespace kiwi
             
             if(isAnyObjectSelected())
             {
-                m_viewport->bringBoundsToCentre(getSelectionBounds());
+                m_viewport->bringRectToCentre(getSelectionBounds());
             }
         }
     }
@@ -1632,7 +1632,7 @@ namespace kiwi
         if(it == m_objects.cend())
         {
             const auto it = (zorder > 0) ? m_objects.begin() + zorder : m_objects.end();
-            auto new_object_it = m_objects.emplace(it, new jObjectBox(*this, object));
+            auto new_object_it = m_objects.emplace(it, new jClassicBox(*this, object));
             
             jObject& jobj = *new_object_it->get();
             
@@ -1758,7 +1758,7 @@ namespace kiwi
     //                                  COMMANDS ACTIONS                                //
     // ================================================================================ //
     
-    void jPatcher::boxHasBeenEdited(jObjectBox& box, std::string new_object_text)
+    void jPatcher::boxHasBeenEdited(jClassicBox& box, std::string new_object_text)
     {
         model::Object& old_object_m = box.getModel();
         const std::string old_object_text = old_object_m.getText();
@@ -1905,7 +1905,7 @@ namespace kiwi
                     const auto it = findObject(*object_m);
                     if(it != m_objects.cend())
                     {
-                        jObjectBox* box = dynamic_cast<jObjectBox*>(it->get());
+                        jClassicBox* box = dynamic_cast<jClassicBox*>(it->get());
                         if(box)
                         {
                             box->grabKeyboardFocus();
@@ -2172,21 +2172,24 @@ namespace kiwi
             {
                 result.setInfo(TRANS("Cut"), TRANS("Cut"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('x', ModifierKeys::commandModifier);
-                result.setActive(isAnyObjectSelected());
+                result.setActive(!isLocked()
+                                 && isAnyObjectSelected());
                 break;
             }
             case StandardApplicationCommandIDs::copy:
             {
                 result.setInfo(TRANS("Copy"), TRANS("Copy"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('c', ModifierKeys::commandModifier);
-                result.setActive(isAnyObjectSelected());
+                result.setActive(!isLocked()
+                                 && isAnyObjectSelected());
                 break;
             }
             case StandardApplicationCommandIDs::paste:
             {
                 result.setInfo(TRANS("Paste"), TRANS("Paste"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('v', ModifierKeys::commandModifier);
-                result.setActive(!m_is_locked && SystemClipboard::getTextFromClipboard().isNotEmpty());
+                result.setActive(!isLocked()
+                                 && SystemClipboard::getTextFromClipboard().isNotEmpty());
                 break;
             }
             case CommandIDs::pasteReplace:
@@ -2196,7 +2199,9 @@ namespace kiwi
                                CommandCategories::editing, 0);
                 
                 result.addDefaultKeypress('v', ModifierKeys::commandModifier | ModifierKeys::altModifier);
-                //result.setActive(isAnyObjectSelected() && SystemClipboard::getTextFromClipboard().isNotEmpty());
+                result.setActive(!isLocked()
+                                 && isAnyObjectSelected()
+                                 && SystemClipboard::getTextFromClipboard().isNotEmpty());
                 break;
             }
             case CommandIDs::duplicate:
@@ -2275,7 +2280,7 @@ namespace kiwi
             }
             default:
             {
-                result.setInfo (TRANS("[unknown command]"), TRANS("dada"), CommandCategories::view, 0);
+                result.setInfo (TRANS("[unknown command]"), TRANS("[unknown command]"), CommandCategories::view, 0);
                 break;
             }
         }
@@ -2286,7 +2291,6 @@ namespace kiwi
         switch (info.commandID)
         {
             case CommandIDs::save:                          { m_manager.saveDocument(); break; }
-                
             case CommandIDs::newPatcherView:                { m_manager.newView(); break; }
                 
             case StandardApplicationCommandIDs::undo:       { undo(); break; }

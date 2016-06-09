@@ -342,7 +342,7 @@ namespace kiwi
         }
     }
     
-    void jPatcherViewport::bringBoundsToCentre(juce::Rectangle<int> bounds)
+    void jPatcherViewport::bringRectToCentre(juce::Rectangle<int> bounds)
     {
         const juce::Rectangle<int> view_area = getRelativeViewArea();
         const juce::Point<int> center = bounds.getCentre();
