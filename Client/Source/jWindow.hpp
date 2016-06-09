@@ -37,7 +37,7 @@ namespace kiwi
                 int buttons = allButtons,
                 bool addToDesktop = true);
         
-        ~jWindow();
+        virtual ~jWindow();
         
         // ================================================================================ //
         //                              APPLICATION COMMAND TARGET                          //
@@ -48,7 +48,7 @@ namespace kiwi
         void getCommandInfo (const CommandID commandID, ApplicationCommandInfo& result) override;
         bool perform (const InvocationInfo& info) override;
         
-    private:
+    protected:
         
         void closeButtonPressed() override;
     };

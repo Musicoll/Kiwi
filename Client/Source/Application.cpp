@@ -54,6 +54,27 @@ namespace kiwi
     }
     
     // ================================================================================ //
+    //                               ASYNC QUIT RETRIER                                 //
+    // ================================================================================ //
+    
+    class KiwiApp::AsyncQuitRetrier : private Timer
+    {
+    public:
+        AsyncQuitRetrier() { startTimer (500); }
+        
+        void timerCallback()
+        {
+            stopTimer();
+            delete this;
+            
+            if (JUCEApplicationBase* app = JUCEApplicationBase::getInstance())
+                app->systemRequestedQuit();
+        }
+        
+        JUCE_DECLARE_NON_COPYABLE (AsyncQuitRetrier)
+    };
+    
+    // ================================================================================ //
     //                                      APPLICATION                                 //
     // ================================================================================ //
     
@@ -73,7 +94,15 @@ namespace kiwi
         MenuBarModel::setMacMainMenu(m_menu_model.get(), &macMainMenuPopup, TRANS("Open Recent"));
         #endif
         
-        m_instance->newPatcher();
+        LookAndFeel::getDefaultLookAndFeel().setUsingNativeAlertWindows(true);
+    }
+    
+    void KiwiApp::anotherInstanceStarted(String const& command_line)
+    {
+        if(m_instance)
+        {
+            m_instance->openFile(kiwi::File(command_line.unquoted().toStdString()));
+        }
     }
     
     void KiwiApp::shutdown()
@@ -85,14 +114,19 @@ namespace kiwi
     
     void KiwiApp::systemRequestedQuit()
     {
-        m_instance.reset();
-        
-        quit();
-    }
-    
-    KiwiApp* KiwiApp::getApp()
-    {
-        return dynamic_cast<KiwiApp*>(JUCEApplication::getInstance());
+        if(ModalComponentManager::getInstance()->cancelAllModalComponents())
+        {
+            new AsyncQuitRetrier();
+        }
+        else
+        {
+            if(m_instance->closeAllWindows())
+            {
+                m_instance.reset();
+                
+                quit();
+            }
+        }
     }
     
     KiwiApp& KiwiApp::use()
@@ -100,6 +134,16 @@ namespace kiwi
         KiwiApp* const app = getApp();
         assert(app != nullptr);
         return *app;
+    }
+    
+    KiwiApp* KiwiApp::getApp()
+    {
+        return dynamic_cast<KiwiApp*>(JUCEApplication::getInstance());
+    }
+    
+    uint64_t KiwiApp::userID()
+    {
+        return KiwiApp::use().m_instance->getUserId();
     }
     
     void KiwiApp::bindToCommandManager(ApplicationCommandTarget* target)
@@ -129,7 +173,7 @@ namespace kiwi
     
     void KiwiApp::commandStatusChanged()
     {
-        KiwiApp* const app = dynamic_cast<KiwiApp*>(JUCEApplication::getInstance());
+        KiwiApp* const app = KiwiApp::getApp();
         if(app && app->m_command_manager)
         {
             app->m_command_manager->commandStatusChanged();
@@ -138,7 +182,7 @@ namespace kiwi
     
     KeyPressMappingSet* KiwiApp::getKeyMappings()
     {
-        KiwiApp* const app = dynamic_cast<KiwiApp*>(JUCEApplication::getInstance());
+        KiwiApp* const app = KiwiApp::getApp();
         if(app && app->m_command_manager)
         {
             return app->m_command_manager->getKeyMappings();
@@ -159,7 +203,7 @@ namespace kiwi
         return StringArray(names);
     }
     
-    void KiwiApp::createMenu (PopupMenu& menu, const String& menuName)
+    void KiwiApp::createMenu(PopupMenu& menu, const String& menuName)
     {
         if		(menuName == "File")        createFileMenu		(menu);
         else if (menuName == "Edit")        createEditMenu		(menu);
@@ -173,12 +217,12 @@ namespace kiwi
         else assert(false); // names have changed?
     }
     
-    void KiwiApp::createOpenRecentPageMenu (PopupMenu& menu)
+    void KiwiApp::createOpenRecentPageMenu(PopupMenu& menu)
     {
         
     }
     
-    void KiwiApp::createFileMenu (PopupMenu& menu)
+    void KiwiApp::createFileMenu(PopupMenu& menu)
     {
         menu.addCommandItem(m_command_manager.get(), CommandIDs::newPatcher);
         menu.addSeparator();
@@ -198,7 +242,7 @@ namespace kiwi
 #endif
     }
     
-    void KiwiApp::createEditMenu (PopupMenu& menu)
+    void KiwiApp::createEditMenu(PopupMenu& menu)
     {
         menu.addCommandItem(m_command_manager.get(), StandardApplicationCommandIDs::undo);
         menu.addCommandItem(m_command_manager.get(), StandardApplicationCommandIDs::redo);
@@ -217,7 +261,13 @@ namespace kiwi
     
     void KiwiApp::createViewMenu(PopupMenu& menu)
     {
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::newPatcherView);
+        menu.addSeparator();
         menu.addCommandItem(m_command_manager.get(), CommandIDs::editModeSwitch);
+        menu.addSeparator();
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::zoomIn);
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::zoomOut);
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::zoomNormal);
     }
     
     void KiwiApp::createObjectMenu(PopupMenu& menu)
@@ -225,18 +275,18 @@ namespace kiwi
         ;
     }
     
-    void KiwiApp::createArrangeMenu (PopupMenu& menu)
+    void KiwiApp::createArrangeMenu(PopupMenu& menu)
     {
         menu.addCommandItem(m_command_manager.get(), CommandIDs::toFront);
         menu.addCommandItem(m_command_manager.get(), CommandIDs::toBack);
     }
     
-    void KiwiApp::createOptionsMenu (PopupMenu& menu)
+    void KiwiApp::createOptionsMenu(PopupMenu& menu)
     {
         ;
     }
     
-    void KiwiApp::createWindowMenu (PopupMenu& menu)
+    void KiwiApp::createWindowMenu(PopupMenu& menu)
     {
         menu.addCommandItem(m_command_manager.get(), CommandIDs::minimizeWindow);
         menu.addCommandItem(m_command_manager.get(), CommandIDs::maximizeWindow);
@@ -245,12 +295,12 @@ namespace kiwi
         menu.addCommandItem(m_command_manager.get(), CommandIDs::showConsoleWindow);
     }
     
-    void KiwiApp::createHelpMenu (PopupMenu& menu)
+    void KiwiApp::createHelpMenu(PopupMenu& menu)
     {
         ;
     }
     
-    void KiwiApp::handleMainMenuCommand (int menuItemID)
+    void KiwiApp::handleMainMenuCommand(int menuItemID)
     {
         ;
     }
@@ -265,7 +315,7 @@ namespace kiwi
         {
             CommandIDs::newPatcher,
             CommandIDs::openFile,
-            CommandIDs::showConsoleWindow
+            CommandIDs::showConsoleWindow,
         };
         
         commands.addArray(ids, numElementsInArray(ids));
@@ -311,6 +361,7 @@ namespace kiwi
         switch(info.commandID)
         {
             case CommandIDs::newPatcher :           { m_instance->newPatcher(); break; }
+            case CommandIDs::openFile :             { m_instance->openPatcher(); break; }
             case CommandIDs::showConsoleWindow :    { m_instance->showConsoleWindow(); break; }
             
             default : return JUCEApplication::perform(info);

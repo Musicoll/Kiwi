@@ -62,7 +62,7 @@ namespace kiwi
             
             // Rebouger et refaire
             //! @brief Send a message to an object
-            void sendToObject(Object& object, uint32_t inlet, std::vector<Atom> args);
+            void sendToObject(Object& object, size_t inlet, std::vector<Atom> args);
             
             //! @internal flip::DocumentObserver<model::Patcher>::document_changed
             void document_changed(model::Patcher& patcher) final override;

@@ -60,6 +60,14 @@ namespace kiwi
             //! @return A reference
             model::Object& addObject(std::string const& text);
             
+            //! @brief create an Object from a flip::Mold.
+            model::Object& addObject(flip::Mold const& mold);
+            
+            //! @brief Replace Object
+            model::Object& replaceObjectWith(model::Object& object_to_replace,
+                                             flip::Mold const& mold,
+                                             Patcher::View& view);
+            
             //! @brief Constructs and add a Link to the Patcher.
             //! @details Constructs a Link with given origin and destination Object
             //! and IO indexes then adds it in the Patcher.
@@ -67,28 +75,41 @@ namespace kiwi
             //! @param outlet   The origin outlet index.
             //! @param to       The destination Object.
             //! @param inlet    The destination inlet index.
-            void addLink(model::Object const& from,
-                         const uint32_t outlet,
-                         model::Object const& to,
-                         const uint32_t inlet);
+            model::Link* addLink(model::Object const& from,
+                                 const size_t outlet,
+                                 model::Object const& to,
+                                 const size_t inlet);
+            
+            //! @brief Returns true if the link can be created.
+            bool canConnect(model::Object const& from, const size_t outlet,
+                            model::Object const& to, const size_t inlet) const;
             
             //! @brief Removes an object from the Patcher.
             //! @details This will also remove all links connected to this object.
             //! @param object The Object to remove.
-            void removeObject(model::Object const& object);
+            void removeObject(model::Object const& object, Patcher::View* view = nullptr);
             
             //! @brief Removes a link from the Patcher.
             //! @param link The Link to remove.
-            void removeLink(model::Link const& link);
+            void removeLink(model::Link const& link, Patcher::View* view = nullptr);
             
             //! @brief Returns true if an Object has been added, removed or changed.
-            inline bool objectsChanged() const noexcept { return m_objects.changed(); }
+            bool objectsChanged() const noexcept;
             
             //! @brief Returns true if a Link has been added, removed or changed.
-            inline bool linksChanged() const noexcept   { return m_links.changed(); }
+            bool linksChanged() const noexcept;
             
             //! @brief Returns true if a User has been added, removed or changed.
-            inline bool usersChanged() const noexcept { return m_users.changed(); }
+            bool usersChanged() const noexcept;
+            
+            //! @brief Returns true if the Patcher name changed.
+            bool nameChanged() const noexcept;
+            
+            //! @brief Returns the Patcher name.
+            std::string getName() const;
+            
+            //! @brief Returns the Patcher name.
+            void setName(std::string const& new_name);
             
             //! @brief Set the User.
             //! @param user_id The user unique id.
@@ -138,8 +159,11 @@ namespace kiwi
             
         private:
             
-            bool canConnect(model::Object const& from, const uint32_t outlet,
-                            model::Object const& to, const uint32_t inlet) const;
+            //! @brief Unselect this object for all views of all users.
+            void unselectForAllUsers(model::Object& object);
+            
+            //! @brief Unselect this link for all views of all users.
+            void unselectForAllUsers(model::Link& link);
             
             object_array_t::const_iterator findObject(model::Object const& object) const;
             object_array_t::iterator findObject(model::Object const& object);
@@ -154,6 +178,8 @@ namespace kiwi
             flip::Array<model::Link>    m_links;
             
             flip::Collection<User>      m_users;
+            
+            flip::String                m_patcher_name;
         };
         
         
@@ -165,64 +191,66 @@ namespace kiwi
         {
         public:
             
-            View() = default;
-            ~View() = default;
+            //! @brief Constructor.
+            View();
             
-        public:
+            //! @brief Destructor.
+            ~View();
             
-            struct Object : public flip::Object
-            {
-                Object() = default;
-                Object(model::Object& object) : m_ref(&object) {}
-                flip::ObjectRef<model::Object> m_ref;
-            };
+            //! @brief Return the parent Patcher object
+            Patcher& getPatcher();
             
-            struct Link : public flip::Object
-            {
-                Link() = default;
-                Link(model::Link& link) : m_ref(&link) {}
-                flip::ObjectRef<model::Link> m_ref;
-            };
+            //! @brief Set the lock status.
+            void setLock(bool locked);
+            
+            //! @brief Returns true if the view is locked.
+            bool getLock() const noexcept;
+            
+            //! @brief Returns true if the lock status changed.
+            bool lockChanged() const noexcept;
+            
+            //! @brief Set zoom factor.
+            void setZoomFactor(double zoom_factor);
+            
+            //! @brief Returns the current zoom factor.
+            double getZoomFactor() const noexcept;
+            
+            //! @brief Returns true if the zoom factor changed.
+            bool zoomFactorChanged() const noexcept;
             
             // ================================================================================ //
             //                                   SELECTION                                      //
             // ================================================================================ //
             
-            class Selection : public flip::Object
-            {
-            public:
-                
-                //! @brief Default constructor.
-                Selection() = default;
-                
-                //! @brief Destructor.
-                ~Selection()
-                {
-                    m_links.clear();
-                    m_objects.clear();
-                }
-                
-                std::vector<model::Object*> getObjects();
-                std::vector<model::Link*> getLinks();
-                bool isSelected(model::Object const& object);
-                bool isSelected(model::Link const& link);
-                
-                static void declare();
-                
-            private:
-                
-                flip::Collection<View::Object>  m_objects;
-                flip::Collection<View::Link>    m_links;
-                friend Patcher::View;
-            };
+            //! @brief Return the selected Objects.
+            std::vector<model::Object*> getSelectedObjects();
             
-        public:
+            //! @brief Return the selected Links.
+            std::vector<model::Link*> getSelectedLinks();
             
-            //! @brief Return the parent Patcher object
-            Patcher& getPatcher() { return parent<Patcher>(); }
+            //! @brief Return true if the given Object is selected in this view.
+            bool isSelected(model::Object const& object) const;
+            
+            //! @brief Return true if the given Link is selected in this view.
+            bool isSelected(model::Link const& link) const;
+            
+            //! @brief Returns true if selection has changed.
+            bool selectionChanged() const;
+            
+            //! @brief Select an Object.
+            void selectObject(model::Object& object);
+            
+            //! @brief Select a Link.
+            void selectLink(model::Link& object);
+            
+            //! @brief Unselect an Object.
+            void unselectObject(model::Object& object);
+            
+            //! @brief Unselect a Link.
+            void unselectLink(model::Link& object);
             
             //! @brief Unselect all objects and links
-            void unSelectAll();
+            void unselectAll();
             
             //! @brief Select all objects and links
             void selectAll();
@@ -231,8 +259,51 @@ namespace kiwi
             static void declare();
             
         private:
+            
+            struct Object : public flip::Object
+            {
+            public:
+                
+                Object() = default;
+                Object(model::Object& object) : m_ref(&object) {}
+                
+                model::Object* get() {return m_ref.value();}
+                
+                static void declare();
+                
+            private:
+                
+                flip::ObjectRef<model::Object> m_ref;
+            };
+            
+            struct Link : public flip::Object
+            {
+            public:
+                
+                Link() = default;
+                Link(model::Link& link) : m_ref(&link) {}
+                
+                model::Link* get() {return m_ref.value();}
+                
+                static void declare();
+                
+            private:
+                
+                flip::ObjectRef<model::Link> m_ref;
+            };
+            
+        public: // methods
+            
+            //! @internal flip Default constructor.
+            View(flip::Default&) {};
 
-            Selection m_selection;
+        private: // members
+            
+            flip::Collection<View::Object>  m_selected_objects;
+            flip::Collection<View::Link>    m_selected_links;
+            
+            flip::Bool                      m_is_locked;
+            flip::Float                     m_zoom_factor;
         };
         
         // ================================================================================ //
@@ -244,16 +315,10 @@ namespace kiwi
         public:
             
             //! @brief flip default Constructor.
-            User(flip::Default&)
-            {
-                disable_in_undo();
-            };
+            User(flip::Default&) {}
             
             //! @brief Constructor.
-            User(uint32_t user_id) : m_user_id(user_id)
-            {
-                disable_in_undo();
-            }
+            User(uint32_t user_id);
             
             //! @brief Destructor.
             ~User() = default;
@@ -262,13 +327,16 @@ namespace kiwi
             View& addView();
             
             //! @brief Remove a View.
-            void removeView(View const& view);
+            flip::Collection<Patcher::View>::iterator removeView(View const& view);
             
             //! @brief Get views.
             flip::Collection<Patcher::View> const& getViews() const noexcept;
             
             //! @brief Get the User id
             uint32_t getId() const;
+            
+            //! @brief flip declare method
+            static void declare();
             
         private:
             

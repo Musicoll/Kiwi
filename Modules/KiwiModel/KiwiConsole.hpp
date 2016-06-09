@@ -48,7 +48,7 @@ namespace kiwi
     public:
 
         //! @brief Type of message
-        enum MessageType
+        enum class MessageType
         {
             Empty = 0,
             Post,
@@ -214,7 +214,7 @@ namespace kiwi
     //                                  INSTANCE LISTENER                               //
     // ================================================================================ //
     
-    //! The Console History Listener is a is a virtual class you can inherit from to receive console history change notifications.
+    //! @brief The Console History Listener is a is a virtual class you can inherit from to receive console history change notifications.
     class Console::History::Listener
     {
     public:

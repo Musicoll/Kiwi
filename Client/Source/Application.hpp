@@ -42,6 +42,8 @@ namespace kiwi
         
         void initialise(String const& commandLine) override;
         
+        void anotherInstanceStarted(String const& command_line) override;
+        
         void shutdown() override;
         
         void systemRequestedQuit() override;
@@ -52,13 +54,18 @@ namespace kiwi
         
         //==============================================================================
         
-        //! @brief Retrieve the current running Application instance.
+        //! @brief Get the current running Application instance.
         static KiwiApp& use();
         
-        //! @brief Retrieve the current running Application instance.
+        //! @brief Get the current running Application instance.
         static KiwiApp* getApp();
         
-        //==============================================================================
+        //! @brief Get the user id associated to this running Application instance.
+        static uint64_t userID();
+        
+        // ================================================================================ //
+        //                                  APPLICATION MENU                                //
+        // ================================================================================ //
         
         //! @brief The Kiwi Application menu model class
         struct MainMenuModel : public MenuBarModel
@@ -68,6 +75,8 @@ namespace kiwi
             PopupMenu getMenuForIndex(int topLevelMenuIndex, const String& menuName);
             void menuItemSelected(int menuItemID, int topLevelMenuIndex);
         };
+        
+        class AsyncQuitRetrier;
         
         //! @brief Called by MainMenuModel to get the menu names
         StringArray getMenuNames();
@@ -89,7 +98,9 @@ namespace kiwi
         //! @brief Called by MainMenuModel to handle the main menu command
         void handleMainMenuCommand (int menuItemID);
         
-        //==============================================================================
+        // ================================================================================ //
+        //                                APPLICATION COMMAND                               //
+        // ================================================================================ //
         
         //! @brief Bind a command target to the command manager.
         //! @details The function binds a command target to the command manager,
@@ -108,10 +119,6 @@ namespace kiwi
         
         //! @brief Get the command manager key mapping.
         static KeyPressMappingSet* getKeyMappings();
-        
-        // ================================================================================ //
-        //                              APPLICATION COMMAND TARGET                          //
-        // ================================================================================ //
         
         //! @brief This must return a complete list of commands that this target can handle.
         void getAllCommands(Array <CommandID>& commands) override;

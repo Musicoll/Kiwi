@@ -51,13 +51,35 @@ namespace kiwi
         //                                      LINK                                        //
         // ================================================================================ //
         
-        Link::Link(model::Object const& from, const uint32_t outlet, model::Object const& to, const uint32_t inlet) :
+        Link::Link(model::Object const& from, const size_t outlet, model::Object const& to, const size_t inlet) :
         m_sender(from.ref()),
         m_receiver(to.ref()),
         m_index_outlet(outlet),
         m_index_inlet(inlet)
         {
             ;
+        }
+        
+        model::Object const& Link::getSenderObject() const noexcept
+        {
+            return !removed() ? *m_sender.value() : *m_sender.before();
+        }
+        
+        model::Object const& Link::getReceiverObject() const noexcept
+        {
+            return !removed() ? *m_receiver.value() : *m_receiver.before();
+        }
+        
+        size_t Link::getSenderIndex() const noexcept
+        {
+            int64_t value = !removed() ? m_index_outlet.value() : m_index_outlet.before();
+            return static_cast<size_t>(value);
+        }
+
+        size_t Link::getReceiverIndex() const noexcept
+        {
+            int64_t value = !removed() ? m_index_inlet.value() : m_index_inlet.before();
+            return static_cast<size_t>(value);
         }
     }
 }

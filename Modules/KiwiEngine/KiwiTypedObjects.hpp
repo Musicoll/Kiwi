@@ -31,6 +31,30 @@ namespace kiwi
     namespace engine
     {
         // ================================================================================ //
+        //                                       NEWBOX                                     //
+        // ================================================================================ //
+        
+        class NewBox : public engine::Object
+        {
+        public:
+            NewBox(std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const& args) override;
+        };
+        
+        // ================================================================================ //
+        //                                      ERRORBOX                                    //
+        // ================================================================================ //
+        
+        class ErrorBox : public engine::Object
+        {
+        public:
+            ErrorBox(std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const& args) override;
+        };
+        
+        // ================================================================================ //
         //                                    OBJECT PLUS                                   //
         // ================================================================================ //
         
@@ -40,7 +64,7 @@ namespace kiwi
             
             ObjectPlus(std::vector<Atom> const& args);
             
-            void receive(uint32_t index, std::vector<Atom> const& args) override;
+            void receive(size_t index, std::vector<Atom> const& args) override;
             
             void bang();
             
@@ -61,7 +85,7 @@ namespace kiwi
             
             ObjectPrint(std::vector<Atom> const& args);
             
-            void receive(uint32_t, std::vector<Atom> const& args) override;
+            void receive(size_t, std::vector<Atom> const& args) override;
             
         private:
             std::string m_name;

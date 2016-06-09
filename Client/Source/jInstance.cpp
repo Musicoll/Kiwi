@@ -22,14 +22,17 @@
  */
 
 #include <KiwiEngine/KiwiDocumentManager.hpp>
+#include <KiwiCore/KiwiFile.hpp>
 
 #include "jInstance.hpp"
 #include "jPatcher.hpp"
 
 namespace kiwi
 {
+    size_t jInstance::m_untitled_patcher_index(0);
+    
     jInstance::jInstance() :
-    m_user_id(123456789ULL),
+    m_user_id(flip::Ref::User::Offline),
     m_instance(new engine::Instance(m_user_id)),
     m_console_window(new jConsoleWindow())
     {
@@ -39,7 +42,7 @@ namespace kiwi
     jInstance::~jInstance()
     {
         m_console_window.reset();
-        m_patcher_manager.reset();
+        m_patcher_managers.clear();
     }
     
     uint64_t jInstance::getUserId() const noexcept
@@ -49,24 +52,89 @@ namespace kiwi
     
     void jInstance::newPatcher()
     {
-        m_patcher_manager.reset();
-        m_patcher_manager = std::make_unique<jPatcherManager>(*this);
+        auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), new jPatcherManager(*this));
         
-        model::Patcher& patcher = m_patcher_manager->init();
+        jPatcherManager& manager = *(manager_it->get());
+        model::Patcher& patcher = manager.init();
         
-        m_patcher_manager->newView();
+        const size_t next_untitled = getNextUntitledNumberAndIncrement();
+        std::string patcher_name = "Untitled";
         
-        populatePatcher(patcher);
+        if(next_untitled > 0)
+        {
+            patcher_name += " " + std::to_string(next_untitled);
+        }
         
-        m_patcher_manager->newView();
+        patcher.setName(patcher_name);
         
-        //populatePatcher(patcher);
+        manager.newView();
+        DocumentManager::commit(patcher, "pre-populate patcher");
+    }
+    
+    void jInstance::openFile(kiwi::File const& file)
+    {
+        if(file.isKiwiFile())
+        {
+            auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), new jPatcherManager(*this, file));
+            jPatcherManager& manager = *(manager_it->get());
+            if(manager.getNumberOfView() == 0)
+            {
+                manager.newView();
+            }
+        }
+        else
+        {
+            Console::error("can't open file");
+        }
+    }
+    
+    void jInstance::openPatcher()
+    {
+        juce::FileChooser openFileChooser("Open file",
+                                          juce::File::getSpecialLocation (juce::File::userHomeDirectory),
+                                          "*.kiwi");
+        
+        if (openFileChooser.browseForFileToOpen())
+        {
+            File open_file (openFileChooser.getResult().getFullPathName().toStdString());
+            
+            openFile(open_file);
+        }
+    }
+    
+    bool jInstance::closeAllWindows()
+    {
+        bool success = true;
+        
+        if(!m_patcher_managers.empty())
+        {
+            for(auto& manager_uptr : m_patcher_managers)
+            {
+                if(!manager_uptr->askAllWindowsToClose())
+                {
+                    success = false;
+                    break;
+                }
+            }
+        }
+        
+        return success;
     }
     
     void jInstance::showConsoleWindow()
     {
         m_console_window->setVisible(true);
         m_console_window->toFront(true);
+    }
+    
+    std::vector<uint8_t>& jInstance::getPatcherClipboardData()
+    {
+        return m_patcher_clipboard;
+    }
+    
+    size_t jInstance::getNextUntitledNumberAndIncrement()
+    {
+        return m_untitled_patcher_index++;
     }
     
     void jInstance::populatePatcher(model::Patcher& patcher)
@@ -149,6 +217,6 @@ namespace kiwi
             patcher.addLink(plus_4, 0, plus_1, 0);
         }
         
-        DocumentManager::commit(patcher, "load initial objects and links");
+        DocumentManager::commit(patcher, "pre-populate patcher");
     }
 }

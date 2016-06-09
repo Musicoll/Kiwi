@@ -36,6 +36,25 @@ namespace kiwi
 {
     class jInstance;
     
+    // ================================================================================ //
+    //                                  JPATCHER WINDOW                                 //
+    // ================================================================================ //
+    
+    class jPatcherWindow : public jWindow
+    {
+    public:
+        jPatcherWindow(jPatcherManager& manager, jPatcher& jpatcher);
+        void closeButtonPressed() override;
+        
+    private:
+        jPatcherManager& m_manager;
+        jPatcher& m_jpatcher;
+    };
+    
+    // ================================================================================ //
+    //                                  JPATCHER MANAGER                                //
+    // ================================================================================ //
+    
     //! @brief The main DocumentObserver.
     //! @details The jInstance dispatch changes to all other DocumentObserver objects
     class jPatcherManager : public flip::DocumentObserver<model::Patcher>
@@ -45,6 +64,9 @@ namespace kiwi
         //! @brief Constructor.
         jPatcherManager(jInstance& instance);
         
+        //! @brief Constructs and load patcher from file
+        jPatcherManager(jInstance& instance, File const& file);
+        
         //! @brief Destructor.
         ~jPatcherManager();
         
@@ -52,13 +74,36 @@ namespace kiwi
         //! @return The newly created the Patcher model.
         model::Patcher& init();
         
-        //! @brief Returns the Patcher model
-        model::Patcher& getPatcher() const;
+        //! @brief Returns the number of patcher views.
+        size_t getNumberOfView();
         
         //! @brief create a new patcher view window.
         void newView();
         
+        //! @brief Force all windows to close without asking user to save document.
+        void forceCloseAllWindows();
+        
+        //! @brief Attempt to close all document windows, after asking user to save them if needed.
+        //! @return True if all document have been closed, false if the user cancel the action.
+        bool askAllWindowsToClose();
+        
+        //! @brief Close the window that contains a given jpatcher.
+        //! @details if it's the last patcher view, it will ask the user the save the document before closing
+        bool closePatcherViewWindow(jPatcher& jpatcher);
+        
+        //! @brief Save the document.
+        bool saveDocument();
+        
+        //! @brief Returns true if the patcher needs to be saved.
+        bool needsSaving() const;
+        
     private:
+        
+        //! @brief Returns the Patcher model
+        model::Patcher& getPatcher();
+        
+        //! @brief Returns the Patcher model
+        model::Patcher const& getPatcher() const;
         
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
         void document_changed(model::Patcher& patcher) override final;
@@ -81,12 +126,15 @@ namespace kiwi
         void removePatcherWindow(model::Patcher& patcher,
                                  model::Patcher::User& user,
                                  model::Patcher::View& view);
+        
+        //! @internal Save document if needed and if user agrees.
+        FileBasedDocument::SaveResult saveIfNeededAndUserAgrees();
 
     private: // members
         
         jInstance&                          m_instance;
         std::unique_ptr<flip::Document>     m_document;
-        model::Patcher*                     m_model = nullptr;
+        bool                                m_need_saving_flag;
     };
 }
 
