@@ -34,11 +34,31 @@ namespace kiwi
     class jLink;
     
     // ================================================================================ //
+    //                                   JLINK BASE                                     //
+    // ================================================================================ //
+    
+    //! @brief The jLink base class.
+    class jLinkBase : public juce::Component
+    {
+    public:
+        jLinkBase() = default;
+        virtual ~jLinkBase() = default;
+        
+    protected:
+        void updateBounds();
+        
+    protected: // members
+        juce::Point<int>    m_last_outlet_pos;
+        juce::Point<int>    m_last_inlet_pos;
+        juce::Path          m_path;
+    };
+    
+    // ================================================================================ //
     //                                      JLINK                                       //
     // ================================================================================ //
     
     //! @brief The juce link Component.
-    class jLink : public juce::Component, public ComponentListener
+    class jLink : public jLinkBase, public ComponentListener
     {
     public:
         
@@ -74,20 +94,10 @@ namespace kiwi
         //! @param wasResized   true if the component's width or height has just changed
         void componentMovedOrResized(Component& component, bool was_moved, bool was_resized) override;
         
-    private:
-        
-        void updateBounds();
-        
     private: // members
         
         jPatcher&           m_jpatcher;
         model::Link*        m_model;
-        
-        juce::Point<int>    m_last_inlet_pos,
-                            m_last_outlet_pos;
-        
-        juce::Path          m_path;
-        
         bool                m_is_selected = 0;
         std::set<uint64_t>  m_distant_selection;
     };
@@ -97,7 +107,7 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The jLink creator helper.
-    class jLinkCreator : public juce::Component
+    class jLinkCreator : public jLinkBase
     {
     public:
         
@@ -128,18 +138,11 @@ namespace kiwi
         // juce::Component
         void paint(juce::Graphics& g) override;
         
-    private:
-        
-        void updateBounds();
-        
     private: // members
         
         jObject&            m_binded_object;
         const size_t        m_index;
         const bool          m_is_sender;
-        juce::Point<int>    m_outlet_pos;
-        juce::Point<int>    m_inlet_pos;
-        juce::Path          m_path;
     };
 }
 

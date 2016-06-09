@@ -37,8 +37,6 @@ namespace kiwi
     //! @brief The HitTester class...
     class HitTester
     {
-        friend class jLink;
-        friend class jObject;
     public:
         
         //! @brief The target type
@@ -123,16 +121,16 @@ namespace kiwi
         inline Target getTarget() const noexcept            { return m_target; }
         
         //! @brief Returns true if nothing has been hit by the test, otherwise returns false.
-        inline bool targetNothing() const noexcept          { return m_target == Target::Nothing; }
+        inline bool nothingTouched() const noexcept          { return m_target == Target::Nothing; }
         
         //! @brief Returns true if the test hit the patcher, otherwise return false.
-        inline bool targetPatcher() const noexcept          { return m_target == Target::Patcher; }
+        inline bool patcherTouched() const noexcept          { return m_target == Target::Patcher; }
         
         //! @brief Returns true if the test hit an object, otherwise return false.
-        inline bool targetObject() const noexcept           { return m_target == Target::Box; }
+        inline bool objectTouched() const noexcept           { return m_target == Target::Box; }
         
         //! @brief Returns true if the test hit a link, otherwise return false.
-        inline bool targetLink() const noexcept             { return m_target == Target::Link; }
+        inline bool linkTouched() const noexcept             { return m_target == Target::Link; }
         
         //! @brief Get the patcher.
         jPatcher const& getPatcher() const noexcept;
@@ -171,6 +169,9 @@ namespace kiwi
         Zone            m_zone		= Zone::Outside;
         int             m_border	= Border::None;
         size_t          m_index     = 0;
+        
+        friend class jLink;
+        friend class jObject;
     };
     
     // ================================================================================ //

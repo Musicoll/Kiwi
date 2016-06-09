@@ -163,7 +163,7 @@ namespace kiwi
             HitTester& hit = *m_hittester.get();
             hit.test(e.getPosition());
 
-            if(hit.targetObject())
+            if(hit.objectTouched())
             {
                 jObject* object_j = hit.getObject();
                 if(object_j)
@@ -209,7 +209,7 @@ namespace kiwi
                     }
                 }
             }
-            else if(hit.targetLink())
+            else if(hit.linkTouched())
             {
                 jLink* link_j = hit.getLink();
                 if(link_j)
@@ -233,7 +233,7 @@ namespace kiwi
                     }
                 }
             }
-            else if(hit.targetPatcher())
+            else if(hit.patcherTouched())
             {
                 if(e.mods.isRightButtonDown())
                 {
@@ -296,7 +296,7 @@ namespace kiwi
             
             HitTester& hit = *m_hittester.get();
             
-            if(hit.targetObject())
+            if(hit.objectTouched())
             {
                 jObject* object_j = hit.getObject();
                 if(object_j)
@@ -417,7 +417,7 @@ namespace kiwi
             
             HitTester& hit = *m_hittester.get();
             
-            if(hit.targetObject() && hit.getZone() == HitTester::Zone::Inside)
+            if(hit.objectTouched() && hit.getZone() == HitTester::Zone::Inside)
             {
                 jObject* object_j = hit.getObject();
                 if(object_j)
@@ -440,7 +440,7 @@ namespace kiwi
             
             hit.test(e.getPosition());
             
-            if(hit.targetObject())
+            if(hit.objectTouched())
             {
                 jObject* object_j = hit.getObject();
                 if(object_j)
@@ -448,7 +448,7 @@ namespace kiwi
                     selectOnMouseUp(*object_j, !e.mods.isShiftDown(), m_is_dragging, m_select_on_mouse_down_status);
                 }
             }
-            else if(hit.targetLink())
+            else if(hit.linkTouched())
             {
                 jLink* link_j = hit.getLink();
                 if(link_j)
@@ -490,7 +490,7 @@ namespace kiwi
             HitTester hit(*this);
             hit.test(event.getPosition());
             
-            if(hit.targetObject())
+            if(hit.objectTouched())
             {
                 if(hit.getZone() == HitTester::Zone::Border)
                 {
@@ -523,7 +523,7 @@ namespace kiwi
             HitTester hit(*this);
             hit.test(e.getPosition());
             
-            if(e.mods.isCommandDown() && hit.targetObject())
+            if(e.mods.isCommandDown() && hit.objectTouched())
             {
                 jObject* object_j = hit.getObject();
                 if(object_j)
@@ -531,7 +531,7 @@ namespace kiwi
                     object_j->mouseDoubleClick(e.getEventRelativeTo(object_j));
                 }
             }
-            else if(hit.targetPatcher())
+            else if(hit.patcherTouched())
             {
                 createNewBoxModel(true);
             }
@@ -650,7 +650,7 @@ namespace kiwi
 
         HitTester& hit = *m_hittester.get();
         
-        if(hit.targetObject())
+        if(hit.objectTouched())
         {
             jObject* object_j = hit.getObject();
             if(object_j)
@@ -1071,7 +1071,7 @@ namespace kiwi
             const jObject& binded_object = m_link_creator->getBindedObject();
             const juce::Point<int> end_pos = m_link_creator->getEndPosition();
             
-            const int max_distance = 30;
+            const int max_distance = 50;
             int min_distance = max_distance;
             
             for(auto& object_j_uptr : m_objects)
@@ -2169,24 +2169,28 @@ namespace kiwi
                 break;
             }
             case StandardApplicationCommandIDs::cut:
+            {
                 result.setInfo(TRANS("Cut"), TRANS("Cut"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('x', ModifierKeys::commandModifier);
                 result.setActive(isAnyObjectSelected());
                 break;
-                
+            }
             case StandardApplicationCommandIDs::copy:
+            {
                 result.setInfo(TRANS("Copy"), TRANS("Copy"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('c', ModifierKeys::commandModifier);
                 result.setActive(isAnyObjectSelected());
                 break;
-                
+            }
             case StandardApplicationCommandIDs::paste:
+            {
                 result.setInfo(TRANS("Paste"), TRANS("Paste"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('v', ModifierKeys::commandModifier);
-                //result.setActive(!m_is_locked && SystemClipboard::getTextFromClipboard().isNotEmpty());
+                result.setActive(!m_is_locked && SystemClipboard::getTextFromClipboard().isNotEmpty());
                 break;
-                
+            }
             case CommandIDs::pasteReplace:
+            {
                 result.setInfo(TRANS("Paste replace"),
                                TRANS("Replace selected objects with the object on the clipboard"),
                                CommandCategories::editing, 0);
@@ -2194,47 +2198,53 @@ namespace kiwi
                 result.addDefaultKeypress('v', ModifierKeys::commandModifier | ModifierKeys::altModifier);
                 //result.setActive(isAnyObjectSelected() && SystemClipboard::getTextFromClipboard().isNotEmpty());
                 break;
-                
+            }
             case CommandIDs::duplicate:
+            {
                 result.setInfo(TRANS("Duplicate"), TRANS("Duplicate the selection"),
                                CommandCategories::editing, 0);
                 
                 result.addDefaultKeypress('d', ModifierKeys::commandModifier);
                 result.setActive(!isLocked() && isAnyObjectSelected());
                 break;
-                
+            }
             case StandardApplicationCommandIDs::del:
+            {
                 result.setInfo(TRANS("Delete"), TRANS("Delete all selected objects and links"),
                                CommandCategories::editing, 0);
                 
                 result.addDefaultKeypress(KeyPress::backspaceKey, ModifierKeys::noModifiers);
                 result.setActive(!isLocked() && isAnythingSelected());
                 break;
-                
+            }
             case StandardApplicationCommandIDs::selectAll:
+            {
                 result.setInfo(TRANS("Select All"), TRANS("Select all boxes and links"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('a', ModifierKeys::commandModifier);
                 result.setActive(!isLocked());
                 break;
-                
+            }
             case CommandIDs::newBox:
+            {
                 result.setInfo(TRANS("New Object Box"), TRANS("Add a new object box"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('n', ModifierKeys::noModifiers);
                 result.setActive(!isLocked());
                 break;
-                
+            }
             case CommandIDs::toFront:
+            {
                 result.setInfo(TRANS("Bring to Front"), TRANS("Bring selected boxes to front"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('f', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
                 result.setActive(isAnyObjectSelected());
                 break;
-                
+            }
             case CommandIDs::toBack:
+            {
                 result.setInfo(TRANS("Send to Back"), TRANS("Send selected boxes to back"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('b', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
                 result.setActive(isAnyObjectSelected());
                 break;
-                
+            }
             case CommandIDs::zoomIn:
             {
                 result.setInfo(TRANS("Zoom in"), TRANS("Zoom in"), CommandCategories::view, 0);
@@ -2263,10 +2273,11 @@ namespace kiwi
                 result.setTicked(!m_view_model.getLock());
                 break;
             }
-                
             default:
+            {
                 result.setInfo (TRANS("[unknown command]"), TRANS("dada"), CommandCategories::view, 0);
                 break;
+            }
         }
     }
     

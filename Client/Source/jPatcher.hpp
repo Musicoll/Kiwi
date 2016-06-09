@@ -129,12 +129,10 @@ namespace kiwi
         void getCommandInfo(CommandID commandID, ApplicationCommandInfo& result) override;
         bool perform(const InvocationInfo& info) override;
         
-    protected:
+    private: // methods
         
         //! @brief Called internally when the origin of the patcher view changed.
-        virtual void originPositionChanged();
-        
-    private: // methods
+        void originPositionChanged();
         
         // ================================================================================ //
         //                                  MODEL OBSERVER                                  //
