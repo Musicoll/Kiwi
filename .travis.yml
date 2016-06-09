@@ -39,7 +39,8 @@ matrix:
     - git rm -rf .
     - cd ../
     - doxygen Doxyfile
-    - cd ../html
+    - cd html
+    - ls
     - git add .
     - git commit -m "Automated documentation build."
     - git push origin gh-pages
@@ -62,7 +63,7 @@ matrix:
   - os: osx
     compiler: clang++
     env: COMPILER=clang++
-    
+
 script:
 - ls
 deploy:
