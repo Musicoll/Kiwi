@@ -2,50 +2,77 @@ language: cpp
 dist: trusty
 sudo: required
 
-# No Email notification
 notifications:
   email: false
 
 git:
   submodules: true
-  depth: 5
-  on:
-    branch: ['dev-dsp', 'dev-core', 'dev-graphics', 'dev-model']
+  depth: 3
+
 
 matrix:
   include:
-    - os: linux
-      compiler: gcc
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-4.9', 'python-pip', 'python-yaml']
-      before_script:
-        - chmod +x .travis/script.sh
-        - chmod +x .travis/after_success.sh
-        - pip install --user git+git://github.com/eddyxu/cpp-coveralls.git
-      env: COMPILER=g++-4.9
+  - os: linux
+    compiler: gcc
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - g++-4.9
+    before_install:
+    - openssl aes-256-cbc
+      -K $encrypted_5a43ff9033eb_key
+      -iv $encrypted_5a43ff9033eb_iv
+      -in config/travisci_rsa.enc
+      -out config/travisci_rsa
+      -d
+    - chmod 0600 config/travisci_rsa
+    - cp config/travisci_rsa ~/.ssh/id_rsa
 
-    - os: linux
-      compiler: clang
-      addons:
-        apt:
-          #sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.6']
-          packages: ['clang-3.6', 'libc++-dev']
-      env: COMPILER=clang++-3.6 CONFIGURATION=Debug
+    after_success:
+    - sudo apt-get install --yes doxygen graphviz
+    - rm -rf html
+    - mkdir -p html
+    - git clone -b gh-pages git@github.com:Musicoll/Kiwi.git --single-branch html
+    - cd html
+    - git rm -rf .
+    - cd ../
+    - doxygen Doxyfile
+    - cd html
+    - ls
+    - git add .
+    - git commit -m "Automated documentation build."
+    - git push origin gh-pages
+    - cd ../
+    env: COMPILER=g++-4.9
 
-    - os: osx
-      compiler: gcc
-      env: COMPILER=g++-4.9
+  - os: linux
+    compiler: clang
+    addons:
+      apt:
+        packages:
+        - clang-3.6
+        - libc++-dev
+    env: COMPILER=clang++-3.6 CONFIGURATION=Debug
 
-    - os: osx
-      compiler: clang++
-      env: COMPILER=clang++
+  - os: osx
+    compiler: gcc
+    env: COMPILER=g++-4.9
 
-before_script:
-  - chmod +x .travis/script.sh
-  - chmod +x .travis/after_success.sh
+  - os: osx
+    compiler: clang++
+    env: COMPILER=clang++
 
-script: .travis/script.sh
-
-after_success: .travis/after_success.sh
+script:
+- ls
+deploy:
+  provider: releases
+  api_key:
+    secure: atcBDMdJNzUGiUYSqQu/URg8mfvRk9b78tvj1eHKCeDXSTP0Y1UvI5YpmTx8SkUXp23QH4sgp0tKTFB98FbRojR4IL2NW+KZDG1o5BxZ4HYJ4hdCXXXhzeujcn2AjQzRJ9f8uodX/7Pfa19jGlovj1Tl9ZJ9jIfyyvcxlJXkTN9+CDlkkcpLNU64c4B+CclS8aLPbIKqvLmIy3fphzzkJoKN5rnE4EvKrIkJBPEib1WIY8K7W8boCwghsGBs04MwRZwidKIjPSPgbYpmGPspfKpu0W8mKMirdGEVt4rzpm+Dl9wMa/5Qsyc6afYfS4p3PZOfBio0mtVrPz4+4VXy/Ad+FDNnvxUy9776D0pSv2iBrdHhqs6n1vG0uT4uhbGtvwJR3BBbo6+TmEKakRgp+uRhYEvGy/EO0OkcKrOVLsrZ/akj8O+KOSROrz2VYfxmDTxtUi8K51vW3pJhcGsEsN1FkcJfef/pvxGLK5i0qEZWoyCyA4YMPNDWFFiuBadPTujIGJ/iDmwouzalV9F0vKOIFvP9IuZ1FHLOyEzhyoBS3l1NNpQUz+HNgupTVYSREH1qPXUHg3B5BdFpEJpOjU/P8gwG4npcNxX/5XvigFFiTeEN+eV4xcBVLcg+SsumeswIqi5Tvm+mzYyqz3wj628ddWxgGiPFSfySI4tz6lg=
+  file:
+  skip_cleanup: true
+  on:
+    repo: Musicoll/Kiwi
+    branch: dev/doc
+    tags: true
