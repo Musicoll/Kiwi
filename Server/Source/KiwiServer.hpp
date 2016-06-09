@@ -32,26 +32,34 @@ namespace kiwi
 {
     namespace server
     {
+        //! @brief The Server class.
         class Server
         {
         public:
+            
+            //! @brief Constructor.
             Server() = default;
             
-            //! @brief Loop that retrieves user input to manager server
-            void runCommand();
-            
+            //! @brief Destructor.
             ~Server() = default;
             
-        private:
-            //! @brief Open the patcher that has document_id as id
+            //! @brief Loop that retrieves user input to manager server.
+            void runCommand();
+            
+        private: // methods
+            
+            //! @brief Open the patcher that has document_id as id.
             void openPatcher(uint64_t document_id);
-            //! @brief Close the patcher that has document_id as id
+            
+            //! @brief Close the patcher that has document_id as id.
             void closePatcher(uint64_t patcher_id);
             
-        private:
+        private: // members
+            
             std::map<uint64_t, PatcherManager>        m_patchers;
             
-        private:
+        private: // deleted methods
+            
             Server(Server const& other) = delete;
             Server(Server &&other) = delete;
             Server &operator=(Server const& other) = delete;

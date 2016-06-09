@@ -40,42 +40,50 @@ namespace kiwi
 {
     namespace server
     {
+        //! @brief The server Patcher manager.
         class PatcherManager
         {
         public:
+            
+            //! @brief Constructor.
             PatcherManager(uint64_t document_id);
             
+            //! @brief Destructor.
             ~PatcherManager();
             
-        private:
-            //! @brief Launches a thread that continuoustly processes the document's socket
+        private: // methods
+            
+            //! @brief Launches a thread that continuoustly processes the document's socket.
             void launchTransport();
-            //! @brief Functions called by the processing thread to process the socket
+            
+            //! @brief Functions called by the processing thread to process the socket.
             void runTransport();
-            //! @brief Joins the thread processing the socket
+            
+            //! @brief Joins the thread processing the socket.
             void stopTransport();
             
-            //! @brief Initializes the patcher with a hardcoded structure
-            void populatePatcher();
+            //! @brief Returns the Patcher model.
+            model::Patcher& getPatcher();
             
-            //! @brief Returns the referenced patcher
-            model::Patcher &getPatcher();
-            
-            //! @brief Called when a client is connecting to the document
+            //! @brief Called when a client is connecting to the document.
             void on_connecting(flip::PortBase& port);
-            //! @brief Called once a client is connected to the document
+            
+            //! @brief Called once a client is connected to the document.
             void on_connected(flip::PortBase& port);
-            //! @brief Called once a client is disconnected
+            
+            //! @brief Called once a client is disconnected.
             void on_disconnected(flip::PortBase& port);
             
-        private:
+        private: // members
+            
             PatcherValidator                m_validator;
             flip::DocumentServer            m_document;
             flip::PortTransportServerTcp    m_transport;
             std::thread                     m_transport_loop;
             std::atomic_bool                m_transport_running;
             
-        private:
+        private: // deleted methods
+            
             PatcherManager(PatcherManager const& other) = delete;
             PatcherManager(PatcherManager && other) = delete;
             PatcherManager &operator=(PatcherManager const& other) = delete;

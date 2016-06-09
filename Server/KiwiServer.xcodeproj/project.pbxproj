@@ -711,6 +711,7 @@
 		0F2CF7591CE487D8003A9222 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/build/$(CONFIGURATION)";
 				HEADER_SEARCH_PATHS = (
 					"${KIWI_DIR}/ThirdParty/flip-public/include",
 					"${KIWI_DIR}/Modules",
@@ -724,6 +725,7 @@
 		0F2CF75A1CE487D8003A9222 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/build/$(CONFIGURATION)";
 				HEADER_SEARCH_PATHS = (
 					"${KIWI_DIR}/ThirdParty/flip-public/include",
 					"${KIWI_DIR}/Modules",
