@@ -7,7 +7,8 @@ git clone -b gh-pages git@github.com:Musicoll/Kiwi.git --single-branch html
 
 # rm all the files through git to prevent stale files.
 cd html
-git rm -rf .
+ls
+git rm -rf
 cd ..
 
 # Generate the HTML documentation.
