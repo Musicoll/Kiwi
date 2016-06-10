@@ -10,6 +10,7 @@ git:
   depth: 3
 
 matrix:
+  include:
   - os: linux
     compiler: gcc
     addons:
