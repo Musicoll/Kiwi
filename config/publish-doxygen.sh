@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
 # Get a clean version of the HTML documentation repo.
 rm -rf html
@@ -8,14 +8,16 @@ git clone -b gh-pages git@github.com:Musicoll/Kiwi.git --single-branch html
 # rm all the files through git to prevent stale files.
 cd html
 git rm -rf .
-cd -
+cd ..
 
 # Generate the HTML documentation.
 doxygen Doxyfile
+ls
 
 # Create and commit the documentation repo.
 cd html
+ls
 git add .
 git commit -m "Automated documentation build."
 git push origin gh-pages
-cd -
+cd ..
