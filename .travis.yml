@@ -40,6 +40,16 @@ matrix:
     - xcodebuild -project Kiwi.xcodeproj
     after_success:
     - ./config/publish-doxygen
+    - cd Client
+    - ls
+    - cd Builds
+    - ls
+    - cd MacOSX
+    - ls
+    - cd build
+    - ls
+    - cd Debug
+    - ls
     deploy:
       provider: releases
       api_key:
