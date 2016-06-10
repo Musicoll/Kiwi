@@ -1,6 +1,5 @@
 #!/bin/bash -e
 
-echo "Publish documentation..."
 # Get doxygen
 sudo apt-get install --yes doxygen graphviz
 
@@ -27,4 +26,3 @@ git add .
 git commit -m "Automated documentation build."
 git push origin gh-pages
 cd -
-echo "Ok."
