@@ -1,7 +1,15 @@
 #!/bin/bash
 
 # Get a clean version of the HTML documentation repo.
+echo "list files..."
 ls
+echo "end"
+cd config
+
+echo "list files..."
+ls
+echo "end"
+
 rm -rf html
 mkdir -p html
 git clone -b gh-pages git@github.com:Musicoll/Kiwi.git --single-branch html
