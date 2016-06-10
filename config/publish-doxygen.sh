@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # Get a clean version of the HTML documentation repo.
+ls
+cd config
 rm -rf html
 mkdir -p html
 git clone -b gh-pages git@github.com:Musicoll/Kiwi.git --single-branch html
@@ -18,4 +20,5 @@ cd html
 git add .
 git commit -m "Automated documentation build."
 git push origin gh-pages
+cd -
 cd -
