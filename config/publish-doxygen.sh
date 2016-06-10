@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Get a clean version of the HTML documentation repo.
-ls
 cd config
 rm -rf html
 mkdir -p html
@@ -17,6 +16,7 @@ doxygen Doxyfile
 
 # Create and commit the documentation repo.
 cd html
+ls
 git add .
 git commit -m "Automated documentation build."
 git push origin gh-pages
