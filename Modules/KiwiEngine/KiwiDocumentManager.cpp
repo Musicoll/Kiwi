@@ -26,13 +26,15 @@
 #include <mutex>
 #include <condition_variable>
 
-#include "KiwiDocumentManager.hpp"
-
 #include <KiwiModel/KiwiPatcher.hpp>
+
+#include "KiwiDocumentManager.hpp"
+#include "KiwiInstance.hpp"
 
 namespace kiwi
 {
-    DocumentManager::DocumentManager(flip::DocumentBase& document) :
+    DocumentManager::DocumentManager(flip::DocumentBase& document, engine::Instance const& instance) :
+    m_instance(instance),
     m_document(document),
     m_history(document),
     m_socket(m_document, "", 0),
@@ -44,6 +46,8 @@ namespace kiwi
                                               this));
         m_socket.listenLoaded(std::bind(&DocumentManager::onLoaded,
                                         this));
+        
+        m_timer = m_instance.createTimer(std::bind(&DocumentManager::tick, this));
     }
     
     DocumentManager::~DocumentManager()
@@ -164,7 +168,7 @@ namespace kiwi
         m_socket.connect(host, port);
         
         std::chrono::steady_clock::time_point init_time = std::chrono::steady_clock::now();
-        std::chrono::duration<int> time_out(1);
+        std::chrono::duration<int> time_out(2);
         
         while(!m_socket.isConnected() && std::chrono::steady_clock::now() - init_time < time_out)
         {
@@ -201,7 +205,10 @@ namespace kiwi
     
     void DocumentManager::startPulling()
     {
-        startTimer();
+        if(m_timer)
+        {
+            m_timer->start(20);
+        }
     }
     
     void DocumentManager::tick()
@@ -211,7 +218,10 @@ namespace kiwi
     
     void DocumentManager::stopPulling()
     {
-        stopTimer();
+        if(m_timer)
+        {
+            m_timer->stop();
+        }
     }
     
     void DocumentManager::onConnected()

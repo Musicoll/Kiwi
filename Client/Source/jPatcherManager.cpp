@@ -84,7 +84,7 @@ namespace kiwi
     {
         if (patcher.added())
         {
-            patcher.entity().emplace<DocumentManager>(patcher.document());
+            patcher.entity().emplace<DocumentManager>(patcher.document(), m_instance.getEngineInstance());
             patcher.entity().emplace<engine::Patcher>();
         }
         //! engine

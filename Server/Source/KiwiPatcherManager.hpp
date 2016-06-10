@@ -53,7 +53,7 @@ namespace kiwi
             
         private: // methods
             
-            //! @brief Launches a thread that continuoustly processes the document's socket.
+            //! @brief Launches a thread that continuously processes the document's socket.
             void launchTransport();
             
             //! @brief Functions called by the processing thread to process the socket.

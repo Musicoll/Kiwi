@@ -61,6 +61,12 @@ namespace kiwi
         //! Brings the Console to front.
         void showConsoleWindow();
         
+        //! @brief Returns the engine::Instance
+        engine::Instance& getEngineInstance();
+        
+        //! @brief Returns the engine::Instance
+        engine::Instance const& getEngineInstance() const;
+        
     private:
         //! @brief Open a dialog box used to enter server infos
         void openRemoteDialogBox(std::string & host, uint16_t & port);

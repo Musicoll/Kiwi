@@ -25,12 +25,13 @@
 
 #include "jInstance.hpp"
 #include "jPatcher.hpp"
+#include "jGuiDevice.hpp"
 
 namespace kiwi
 {
     jInstance::jInstance() :
     m_user_id(123456789ULL),
-    m_instance(new engine::Instance(m_user_id)),
+    m_instance(new engine::Instance(m_user_id, std::make_unique<jGuiDevice>())),
     m_console_window(new jConsoleWindow())
     {
         ;
@@ -50,6 +51,16 @@ namespace kiwi
     void jInstance::setUserId(uint64_t user_id)
     {
         m_user_id = user_id;
+    }
+    
+    engine::Instance& jInstance::getEngineInstance()
+    {
+        return *m_instance;
+    }
+    
+    engine::Instance const& jInstance::getEngineInstance() const
+    {
+        return *m_instance;
     }
     
     void jInstance::newPatcher()

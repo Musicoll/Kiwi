@@ -34,8 +34,7 @@ namespace kiwi
     //                                  KiWi APPLICATION                                //
     // ================================================================================ //
     
-    class KiwiApp : public JUCEApplication,
-                    public juce::Timer
+    class KiwiApp : public JUCEApplication
     {
     public:
         KiwiApp() = default;
@@ -127,9 +126,6 @@ namespace kiwi
 
         //! @brief Initialise the command manager
         void initCommandManager();
-        
-        //! @brief Called at regular frequency on the message thread
-        void timerCallback() final override;
         
     private:
         

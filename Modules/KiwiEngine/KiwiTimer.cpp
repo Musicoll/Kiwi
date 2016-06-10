@@ -19,60 +19,60 @@
  To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
  
  ==============================================================================
-*/
+ */
 
-#include <KiwiModel/KiwiObjectFactory.hpp>
-#include <KiwiModel/KiwiPatcherModel.hpp>
-#include "KiwiTypedObjects.hpp"
-
-#include "KiwiInstance.hpp"
-#include "KiwiDocumentManager.hpp"
+#include "KiwiTimer.hpp"
 
 namespace kiwi
 {
     namespace engine
     {
         // ================================================================================ //
-        //                           PATCHER MODEL DECLARATOR                               //
+        //                                     TIMER IMPL                                   //
         // ================================================================================ //
         
-        //! @brief The Patcher Model class declarator
-        class Instance::PatcherModelDeclarator : public model::PatcherModel
-        {
-        public:
-            
-            void endOfModelDeclaration() final override
-            {
-                ObjectFactory::registerEngine<ObjectPlus>("plus");
-                ObjectFactory::registerEngine<ObjectPrint>("print");
-            }
-        };
-        
-        // ================================================================================ //
-        //                                      INSTANCE                                    //
-        // ================================================================================ //
-        
-        Instance::Instance(uint64_t user_id, std::unique_ptr<GuiDevice> gui_device) :
-        m_user_id(user_id),
-        m_gui_device(std::move(gui_device))
-        {
-            PatcherModelDeclarator model;
-            model.init("v0.0.2");
-        }
-        
-        Instance::~Instance()
+        Timer::Impl::Impl(std::function<void()> callback) : m_callback(callback)
         {
             ;
         }
         
-        std::unique_ptr<Timer> Instance::createTimer(std::function<void()> callback) const
+        void Timer::Impl::tick()
         {
-            if(m_gui_device)
+            if(m_callback)
             {
-                return std::unique_ptr<Timer>(new Timer(m_gui_device->createTimer(callback)));
+                m_callback();
             }
-            
-            return nullptr;
+        }
+        
+        // ================================================================================ //
+        //                                       TIMER                                      //
+        // ================================================================================ //
+        
+        Timer::Timer(std::unique_ptr<Timer::Impl> implementation) :
+        m_timer_impl(std::move(implementation))
+        {
+            ;
+        }
+        
+        Timer::~Timer()
+        {
+            stop();
+        }
+        
+        void Timer::start(int interval)
+        {
+            if(m_timer_impl)
+            {
+                m_timer_impl->impl_start(interval);
+            }
+        }
+        
+        void Timer::stop()
+        {
+            if(m_timer_impl)
+            {
+                m_timer_impl->impl_stop();
+            }
         }
     }
 }

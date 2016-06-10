@@ -95,10 +95,12 @@ namespace kiwi
                                                              this,
                                                              std::placeholders::_1,
                                                              std::placeholders::_2));
+        
         m_transport_socket.listen_transfer_transaction(std::bind(&CarrierSocket::listenTransferTransaction,
                                                                  this,
                                                                  std::placeholders::_1,
                                                                  std::placeholders::_2));
+        
         m_transport_socket.listen_transfer_signal(std::bind(&CarrierSocket::listenTransferSignal,
                                                             this,
                                                             std::placeholders::_1,

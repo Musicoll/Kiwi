@@ -27,17 +27,21 @@
 #include "flip/History.h"
 #include "flip/HistoryStoreMemory.h"
 
-#include <KiwiCore/KiwiTimer.hpp>
-
 #include "KiwiCarrierSocket.hpp"
+#include "KiwiTimer.hpp"
 
 namespace kiwi
 {
-    class DocumentManager final : public Timer::Listener
+    namespace engine
+    {
+        class Instance;
+    }
+    
+    class DocumentManager final
     {
     public:
         
-        DocumentManager(flip::DocumentBase & document);
+        DocumentManager(flip::DocumentBase & document, engine::Instance const& instance);
         
         ~DocumentManager();
         
@@ -88,7 +92,7 @@ namespace kiwi
         void redo();
         
         //! @brief Called at a regular frequency to pull document
-        void tick() override final;
+        void tick();
         
     private:
         
@@ -131,6 +135,7 @@ namespace kiwi
         
     private:
         
+        engine::Instance const&                 m_instance;
         flip::DocumentBase&                     m_document;
         flip::History<flip::HistoryStoreMemory> m_history;
         CarrierSocket                           m_socket;
@@ -138,6 +143,8 @@ namespace kiwi
         bool                                    m_gesture_flag = false;
         size_t                                  m_gesture_cnt = 0;
         std::atomic_bool                        m_loaded;
+        
+        std::unique_ptr<engine::Timer>          m_timer;
         
     private:
         
