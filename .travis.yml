@@ -29,6 +29,7 @@ matrix:
     script:
     - xcodebuild -project Client/Builds/MacOSX/Kiwi.xcodeproj
     after_success:
+    - openssl aes-256-cbc -K $encrypted_5a43ff9033eb_key -iv $encrypted_5a43ff9033eb_iv -in travisci_rsa.enc -out travisci_rsa -d
     - ./config/publish-doxygen.sh
     - ./config/prepare-release.sh
     deploy:
