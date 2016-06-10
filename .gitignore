@@ -22,11 +22,13 @@
 
 # XCode & Mac
 .DS_Store
+DerivedData/
 xcuserdata/
 *.build/
 *.pbxuser
 *.xcuserdata
 *.xcuserdatad
+*.xcscmblueprint
 
 # CMake
 CMakeFiles/
