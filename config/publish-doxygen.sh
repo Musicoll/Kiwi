@@ -1,8 +1,5 @@
 #!/bin/bash -e
 
-# Get doxygen
-sudo apt-get install --yes doxygen graphviz
-
 # Move key
 chmod 0600 travisci_rsa
 cp travisci_rsa ~/.ssh/id_rsa

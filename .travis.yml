@@ -28,8 +28,10 @@ matrix:
     env: COMPILER=clang++
     script:
     - xcodebuild -project Client/Builds/MacOSX/Kiwi.xcodeproj
+    
     after_success:
     - openssl aes-256-cbc -K $encrypted_5a43ff9033eb_key -iv $encrypted_5a43ff9033eb_iv -in config/travisci_rsa.enc -out config/travisci_rsa -d
+    - sudo apt-get install --yes doxygen graphviz
     - ./config/publish-doxygen.sh
 
     before_deploy:
