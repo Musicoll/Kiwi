@@ -39,7 +39,9 @@ matrix:
     - cd Client/Builds/MacOSX
     - xcodebuild -project Kiwi.xcodeproj
     after_success:
+    -  chmod u+x config/publish-doxygen.sh
     - ./config/publish-doxygen.sh
+    -  chmod u+x config/prepare-release.sh
     - ./config/prepare-release.sh
     deploy:
       provider: releases
