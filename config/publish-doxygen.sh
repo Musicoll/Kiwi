@@ -4,6 +4,11 @@ echo "Publish documentation..."
 # Get doxygen
 sudo apt-get install --yes doxygen graphviz
 
+# Generate key
+openssl aes-256-cbc -K $encrypted_5a43ff9033eb_key -iv $encrypted_5a43ff9033eb_iv -in travisci_rsa.enc -out travisci_rsa -d
+chmod 0600 travisci_rsa
+cp travisci_rsa ~/.ssh/id_rsa
+
 # Get a clean version of the HTML documentation repo.
 rm -rf html
 mkdir -p html

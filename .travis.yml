@@ -26,15 +26,6 @@ matrix:
   - os: osx
     compiler: clang++
     env: COMPILER=clang++
-    before_install:
-    - openssl aes-256-cbc
-      -K $encrypted_5a43ff9033eb_key
-      -iv $encrypted_5a43ff9033eb_iv
-      -in config/travisci_rsa.enc
-      -out config/travisci_rsa
-      -d
-    - chmod 0600 config/travisci_rsa
-    - cp config/travisci_rsa ~/.ssh/id_rsa
     script:
     - cd Client/Builds/MacOSX
     - xcodebuild -project Kiwi.xcodeproj
