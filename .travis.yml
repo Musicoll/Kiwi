@@ -27,13 +27,12 @@ matrix:
     compiler: clang++
     env: COMPILER=clang++
     script:
-    - cd Client/Builds/MacOSX
-    - xcodebuild -project Kiwi.xcodeproj
+    - xcodebuild -project Client/Builds/MacOSX/Kiwi.xcodeproj
     after_success:
-    -  chmod u+x config/publish-doxygen
-    - ./config/publish-doxygen
-    -  chmod u+x config/prepare-release
-    - ./config/prepare-release
+    -  chmod u+x config/publish-doxygen.sh
+    - ./config/publish-doxygen.sh
+    -  chmod u+x config/prepare-release.sh
+    - ./config/prepare-release.sh
     deploy:
       provider: releases
       api_key:
