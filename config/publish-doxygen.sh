@@ -1,9 +1,5 @@
 #!/bin/bash -e
 
-# Move key
-chmod 0600 travisci_rsa
-cp travisci_rsa ~/.ssh/id_rsa
-
 # Get a clean version of the HTML documentation repo.
 rm -rf html
 mkdir -p html
