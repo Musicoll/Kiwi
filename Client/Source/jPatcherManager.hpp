@@ -66,9 +66,18 @@ namespace kiwi
         
         //! @brief Constructs and load patcher from file
         jPatcherManager(jInstance& instance, kiwi::FilePath const& file);
+
+        //! @brief Construct and connect to remote server
+        jPatcherManager(jInstance & instance, const std::string host, uint16_t port);
         
         //! @brief Destructor.
         ~jPatcherManager();
+        
+        //! @brief Returns the Patcher model
+        model::Patcher& getPatcher();
+        
+        //! @brief Returns the Patcher model
+        model::Patcher const& getPatcher() const;
         
         //! @brief Initialize the patcher manager by creating a new document.
         //! @return The newly created the Patcher model.
@@ -99,12 +108,6 @@ namespace kiwi
         
     private:
         
-        //! @brief Returns the Patcher model
-        model::Patcher& getPatcher();
-        
-        //! @brief Returns the Patcher model
-        model::Patcher const& getPatcher() const;
-        
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
         void document_changed(model::Patcher& patcher) override final;
         
@@ -132,9 +135,9 @@ namespace kiwi
 
     private: // members
         
-        jInstance&                          m_instance;
-        std::unique_ptr<flip::Document>     m_document;
-        bool                                m_need_saving_flag;
+        jInstance&      m_instance;
+        flip::Document  m_document;
+        bool            m_need_saving_flag;
     };
 }
 

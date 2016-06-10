@@ -54,15 +54,19 @@ namespace kiwi
     
     jPatcherManager::jPatcherManager(jInstance& instance) :
     m_instance(instance),
-    m_document(nullptr),
-    m_need_saving_flag(false)
+    m_document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat')
     {
-        ;
+        model::Patcher & patcher = getPatcher();
+        
+        patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
+        DocumentManager::commit(patcher);
+        
+        m_need_saving_flag = false;
     }
     
     jPatcherManager::jPatcherManager(jInstance& instance, kiwi::FilePath const& file):
     m_instance(instance),
-    m_document(new flip::Document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'))
+    m_document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat')
     {
         model::Patcher& patcher = getPatcher();
         DocumentManager::load(patcher, file);
@@ -79,31 +83,36 @@ namespace kiwi
     
     jPatcherManager::~jPatcherManager()
     {
-        m_document.reset();
+        ;
     }
     
-    model::Patcher& jPatcherManager::init()
+    jPatcherManager::jPatcherManager(jInstance & instance, const std::string host, uint16_t port) :
+    m_instance(instance),
+    m_document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat')
     {
-        m_document.reset();
-        m_document = std::make_unique<flip::Document>(model::PatcherModel::use(), *this,
-                                                      m_instance.getUserId(), 'cicm', 'kpat');
+        model::Patcher & patcher = getPatcher();
         
-        model::Patcher& patcher = m_document->root<model::Patcher>();
+        try
+        {
+            DocumentManager::connect(patcher, host, port);
+        }
+        catch (std::runtime_error &e)
+        {
+            throw e;
+        }
+        
         patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
-        
         DocumentManager::commit(patcher);
-        
-        return patcher;
     }
     
     model::Patcher& jPatcherManager::getPatcher()
     {
-        return m_document->root<model::Patcher>();
+        return m_document.root<model::Patcher>();
     }
     
     model::Patcher const& jPatcherManager::getPatcher() const
     {
-        return m_document->root<model::Patcher>();
+        return m_document.root<model::Patcher>();
     }
     
     void jPatcherManager::newView()
@@ -285,13 +294,11 @@ namespace kiwi
     
     void jPatcherManager::document_changed(model::Patcher& patcher)
     {
-        if(patcher.added())
+        if (patcher.added())
         {
-            patcher.entity().emplace<DocumentManager>(patcher.document());
-            
+            patcher.entity().emplace<DocumentManager>(patcher.document(), m_instance.getEngineInstance());
             patcher.entity().emplace<engine::Patcher>();
         }
-        
         //! engine
         patcher.entity().use<engine::Patcher>().document_changed(patcher);
         
@@ -300,7 +307,6 @@ namespace kiwi
         if(patcher.removed())
         {
             patcher.entity().erase<engine::Patcher>();
-            
             patcher.entity().erase<DocumentManager>();
         }
         

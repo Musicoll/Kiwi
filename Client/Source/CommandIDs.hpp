@@ -35,6 +35,7 @@ namespace kiwi
         newPatcher                  = 0x200010,        ///< Create a new blank patcher window.
         newPatcherView              = 0x200020,        ///< Create a new patcher view.
         openFile                    = 0x200030,        ///< Open a file in a new window.
+        openRemotePatcher           = 0x200040,        ///< Open a remote patcher.
         closePatcher                = 0x200051,        ///< Close the current patcher.
         save                        = 0x200060,        ///< Save the current patcher document.
         saveAs                      = 0x200061,        ///< Save the current patcher document as.

@@ -6,6 +6,8 @@
               companyEmail="cicm.mshparisnord@gmail.com">
   <MAINGROUP id="HfN8up" name="Kiwi">
     <GROUP id="{E476D5A0-2E9D-DD18-D007-54A51ACF9459}" name="Application">
+      <FILE id="Avxc5l" name="jGuiDevice.cpp" compile="1" resource="0" file="Source/jGuiDevice.cpp"/>
+      <FILE id="sYnkXN" name="jGuiDevice.hpp" compile="0" resource="0" file="Source/jGuiDevice.hpp"/>
       <FILE id="LWHJru" name="jObject.cpp" compile="1" resource="0" file="Source/jObject.cpp"/>
       <FILE id="YYSxJ8" name="jObject.hpp" compile="0" resource="0" file="Source/jObject.hpp"/>
       <FILE id="KpZNMh" name="jLink.cpp" compile="1" resource="0" file="Source/jLink.cpp"/>
@@ -33,6 +35,12 @@
     </GROUP>
     <GROUP id="{8FA1C9D1-9F39-6B48-4CD5-95C1B98E14A6}" name="Modules">
       <GROUP id="{4E36069F-186B-8CE4-3264-BA41957CB0CD}" name="KiwiEngine">
+        <FILE id="LqV6wP" name="KiwiTimer.cpp" compile="1" resource="0" file="../Modules/KiwiEngine/KiwiTimer.cpp"/>
+        <FILE id="zslA80" name="KiwiTimer.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiTimer.hpp"/>
+        <FILE id="ggJZdV" name="KiwiCarrierSocket.cpp" compile="1" resource="0"
+              file="../Modules/KiwiEngine/KiwiCarrierSocket.cpp"/>
+        <FILE id="t1TRYH" name="KiwiCarrierSocket.hpp" compile="0" resource="0"
+              file="../Modules/KiwiEngine/KiwiCarrierSocket.hpp"/>
         <FILE id="eHddVd" name="KiwiDocumentManager.cpp" compile="1" resource="0"
               file="../Modules/KiwiEngine/KiwiDocumentManager.cpp"/>
         <FILE id="Nc2HAm" name="KiwiDocumentManager.hpp" compile="0" resource="0"
@@ -47,6 +55,10 @@
               file="../Modules/KiwiEngine/KiwiTypedObjects.hpp"/>
         <FILE id="I5TUoZ" name="KiwiPatcher.cpp" compile="1" resource="0" file="../Modules/KiwiEngine/KiwiPatcher.cpp"/>
         <FILE id="pPUuGj" name="KiwiPatcher.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiPatcher.hpp"/>
+        <FILE id="xlGx5g" name="KiwiGuiDevice.cpp" compile="1" resource="0"
+              file="../Modules/KiwiEngine/KiwiGuiDevice.cpp"/>
+        <FILE id="LPEo4K" name="KiwiGuiDevice.hpp" compile="0" resource="0"
+              file="../Modules/KiwiEngine/KiwiGuiDevice.hpp"/>
         <FILE id="nqlKRd" name="KiwiInstance.cpp" compile="1" resource="0"
               file="../Modules/KiwiEngine/KiwiInstance.cpp"/>
         <FILE id="nQWL7d" name="KiwiInstance.hpp" compile="0" resource="0"

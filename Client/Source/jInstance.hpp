@@ -24,6 +24,8 @@
 #ifndef KIWI_JINSTANCE_HPP_INCLUDED
 #define KIWI_JINSTANCE_HPP_INCLUDED
 
+#include <string>
+
 #include <KiwiEngine/KiwiInstance.hpp>
 #include <KiwiCore/KiwiFile.hpp>
 
@@ -49,8 +51,17 @@ namespace kiwi
         //! @brief Destructor
         ~jInstance();
         
+        //! @brief Get the user ID of the Instance.
+        uint64_t getUserId() const noexcept;
+        
         //! @brief create a new patcher window.
         void newPatcher();
+        
+        //! @brief Returns the engine::Instance
+        engine::Instance& getEngineInstance();
+        
+        //! @brief Returns the engine::Instance
+        engine::Instance const& getEngineInstance() const;
         
         //! @brief Open a File.
         void openFile(kiwi::FilePath const& file);
@@ -62,8 +73,11 @@ namespace kiwi
         //! @return True if all document have been closed, false if the user cancel the action.
         bool closeAllWindows();
         
-        //! @brief Get the user ID of the Instance.
-        uint64_t getUserId() const noexcept;
+        //! @brief Create a new remote patcher
+        void openRemotePatcher();
+        
+        //! @brief Opens the settings
+        void openSettings();
         
         //! @brief Brings the Console to front.
         void showConsoleWindow();
@@ -76,11 +90,15 @@ namespace kiwi
         //! @brief Returns the next untitled number based on current documents
         size_t getNextUntitledNumberAndIncrement();
         
-    private:
+        //! @brief Open a dialog box used to enter server infos
+        void openRemoteDialogBox(std::string & host, uint16_t & port);
+        
+        //! @brief Sets the instance user id
+        void setUserId(uint64_t user_id);
         
         using jPatcherManagers = std::vector<std::unique_ptr<jPatcherManager>>;
         
-        const uint64_t m_user_id;
+        uint64_t m_user_id;
         
         std::unique_ptr<engine::Instance>   m_instance;
         
