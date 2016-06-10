@@ -30,10 +30,10 @@ matrix:
     - cd Client/Builds/MacOSX
     - xcodebuild -project Kiwi.xcodeproj
     after_success:
-    -  chmod u+x config/publish-doxygen.sh
-    - ./config/publish-doxygen.sh
-    -  chmod u+x config/prepare-release.sh
-    - ./config/prepare-release.sh
+    -  chmod u+x config/publish-doxygen
+    - ./config/publish-doxygen
+    -  chmod u+x config/prepare-release
+    - ./config/prepare-release
     deploy:
       provider: releases
       api_key:
