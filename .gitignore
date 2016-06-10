@@ -36,4 +36,3 @@ Makefile
 
 # Project specific
 build/
-config/html/
