@@ -9,7 +9,6 @@ git:
   submodules: true
   depth: 3
 
-
 matrix:
   - os: linux
     compiler: gcc
