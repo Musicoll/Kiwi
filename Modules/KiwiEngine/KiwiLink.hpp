@@ -24,6 +24,8 @@
 #ifndef KIWI_ENGINE_LINK_HPP_INCLUDED
 #define KIWI_ENGINE_LINK_HPP_INCLUDED
 
+#include <KiwiModel/KiwiLink.hpp>
+
 #include "KiwiObject.hpp"
 
 namespace kiwi
@@ -34,10 +36,10 @@ namespace kiwi
         //                                      LINK                                        //
         // ================================================================================ //
         
-        //! @brief The link represents a connection between two objects.
+        //! @brief The link represents a connection between two kiwi objects.
         class Link
         {
-        public:
+        public: // methods
             
             //! @brief Constructor.
             Link(model::Link& model, Object& sender_object, Object& receiver_object);
@@ -46,29 +48,34 @@ namespace kiwi
             ~Link();
             
             //! @brief Get the object that send messages.
-            inline Object& getSenderObject() const noexcept     { return m_sender; }
+            Object& getSenderObject() const noexcept;
             
             //! @brief Get the object that receive messages.
-            inline Object& getReceiverObject() const noexcept   { return m_receiver; }
+            Object& getReceiverObject() const noexcept;
             
             //! @brief Retrieve the index of the outlet of the link.
-            inline uint32_t getSenderIndex() const noexcept     { return m_model.getSenderIndex(); }
+            size_t getSenderIndex() const noexcept;
             
             //! @brief Retrieve the index of the inlet of the link.
-            inline uint32_t getReceiverIndex() const noexcept   { return m_model.getReceiverIndex(); }
+            size_t getReceiverIndex() const noexcept;
             
-        private:
+        private: // methods
             
-            //! @internal Model change notification.
-            void modelChanged(model::Link& link_m);
+            //! @internal Link model has changed.
+            void linkChanged(model::Link& link_m);
             
-        private:
+        private: // members
             
             model::Link const&  m_model;
             Object&             m_sender;
             Object&             m_receiver;
             
             friend class Patcher;
+            
+        private: // deleted methods
+            
+            Link(Link const&) = delete;
+            Link& operator=(Link const&) = delete;
         };
     }
 }

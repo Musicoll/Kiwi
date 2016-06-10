@@ -25,34 +25,71 @@
 #define KIWI_JINSTANCE_HPP_INCLUDED
 
 #include <KiwiEngine/KiwiInstance.hpp>
+#include <KiwiCore/KiwiFile.hpp>
 
 #include "flip/Document.h"
 
-#include "jWindow.hpp"
-#include "jPatcher.hpp"
+#include "jConsole.hpp"
+#include "jPatcherManager.hpp"
 
 namespace kiwi
 {
-    //! @brief The main DocumentObserver.
-    //! @details The jInstance dispatch changes to all other DocumentObserver objects
-    class jInstance : public flip::DocumentObserver<model::Patcher>
+    // ================================================================================ //
+    //                                     jINSTANCE                                    //
+    // ================================================================================ //
+
+    //! @brief The jInstance
+    class jInstance
     {
     public:
+        
+        //! @brief Constructor
         jInstance();
+        
+        //! @brief Destructor
         ~jInstance();
         
         //! @brief create a new patcher window.
         void newPatcher();
         
+        //! @brief Open a File.
+        void openFile(kiwi::FilePath const& file);
+        
+        //! @brief Open a patcher from file
+        void openPatcher();
+        
+        //! @brief Attempt to close all document, after asking user to save them if needed.
+        //! @return True if all document have been closed, false if the user cancel the action.
+        bool closeAllWindows();
+        
+        //! @brief Get the user ID of the Instance.
+        uint64_t getUserId() const noexcept;
+        
+        //! @brief Brings the Console to front.
+        void showConsoleWindow();
+        
+        //! @brief Get Patcher clipboard data.
+        std::vector<uint8_t>& getPatcherClipboardData();
+        
     private:
         
-        //! @internal flip::DocumentObserver<model::Patcher>::document_changed
-        void document_changed(model::Patcher& patcher) override final;
+        //! @brief Returns the next untitled number based on current documents
+        size_t getNextUntitledNumberAndIncrement();
         
-        void populatePatcher(model::Patcher& patcher);
+    private:
+        
+        using jPatcherManagers = std::vector<std::unique_ptr<jPatcherManager>>;
+        
+        const uint64_t m_user_id;
         
         std::unique_ptr<engine::Instance>   m_instance;
-        std::unique_ptr<flip::Document>     m_document;
+        
+        jPatcherManagers                    m_patcher_managers;
+        
+        std::unique_ptr<jConsoleWindow>     m_console_window;
+        std::vector<uint8_t>                m_patcher_clipboard;
+        
+        static size_t                       m_untitled_patcher_index;
     };
 }
 

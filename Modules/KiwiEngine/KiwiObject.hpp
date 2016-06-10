@@ -26,7 +26,8 @@
 
 #include "flip/SignalConnection.h"
 
-#include "../KiwiModel/KiwiModel.hpp"
+#include <KiwiModel/KiwiConsole.hpp>
+#include <KiwiModel/KiwiObject.hpp>
 
 #include <utility>
 
@@ -45,39 +46,39 @@ namespace kiwi
         //! @brief The model::Object engine.
         class Object
         {
-        public:
+        public: // methods
             
             //! @brief Constructor.
-            Object(model::Object& object_m) noexcept;
+            Object() noexcept;
             
             //! @brief Destructor.
             virtual ~Object() noexcept;
 
             //! @brief Returns the name of the Object.
-            inline std::string getName() const noexcept         { return m_model.getName(); }
+            std::string getName() const noexcept;
             
             //! @brief Get the number of inlets of the Object.
-            inline uint32_t getNumberOfInlets() const noexcept  { return m_model.getNumberOfInlets(); }
+            size_t getNumberOfInlets() const noexcept;
             
             //! @brief Get the number of inlets of the object.
-            inline uint32_t getNumberOfOutlets() const noexcept { return m_model.getNumberOfOutlets(); }
+            size_t getNumberOfOutlets() const noexcept;
             
             //! @brief The receive method.
             //! @details This method must be overriden by object's subclasses.
-            virtual void receive(uint32_t index, std::vector<Atom> args) = 0;
+            virtual void receive(size_t index, std::vector<Atom> const& args) = 0;
             
-        protected:
+        protected: // methods
             
             //! @brief Send a message through a given outlet index.
-            void send(const uint32_t index, std::vector<Atom> args);
+            void send(const size_t index, std::vector<Atom> const& args);
             
             //! @brief Called when the signalTrigger method is fired.
             virtual void signalTriggerCalled() {};
         
-        private:
+        private: // methods
             
             //! @internal Model change notification.
-            void modelChanged(model::Object& object_m);
+            void objectChanged(model::Object& object_m);
             
             //! @internal signalTriggerCallback.
             void internal_signalTriggerCalled();
@@ -90,16 +91,18 @@ namespace kiwi
             
             friend class engine::Patcher;
             
-        private:
+        private: // members
             
             typedef std::set<Link*> Outlet;
 
-            model::Object const&    m_model;
+            model::Object*          m_model;
             std::vector<Outlet>     m_outlets;
-            uint32_t                m_stack_count = 0ul;
+            size_t                  m_stack_count = 0ul;
             
             flip::SignalConnection  m_signal_cnx;
         };
+        
+        typedef std::shared_ptr<Object> sObject;
     }
 }
 

@@ -21,21 +21,12 @@
 *.app
 
 # XCode & Mac
-xcuserdata/
-xcshareddata/
-*.build/
-*.gcda
 .DS_Store
-*.mode1V3
+xcuserdata/
+*.build/
 *.pbxuser
-*.app
 *.xcuserdata
 *.xcuserdatad
-MacOSX/
-DerivedData/
-
-# Juce
-JuceLibraryCode/
 
 # CMake
 CMakeFiles/
@@ -45,3 +36,4 @@ Makefile
 
 # Project specific
 build/
+config/html/

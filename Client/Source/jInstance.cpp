@@ -22,104 +22,122 @@
  */
 
 #include <KiwiEngine/KiwiDocumentManager.hpp>
+#include <KiwiCore/KiwiFile.hpp>
 
 #include "jInstance.hpp"
 #include "jPatcher.hpp"
 
 namespace kiwi
 {
-    jInstance::jInstance() : m_instance(new engine::Instance(123456789ULL, "Main"))
+    // ================================================================================ //
+    //                                     jINSTANCE                                    //
+    // ================================================================================ //
+
+    size_t jInstance::m_untitled_patcher_index(0);
+    
+    jInstance::jInstance() :
+    m_user_id(flip::Ref::User::Offline),
+    m_instance(new engine::Instance(m_user_id)),
+    m_console_window(new jConsoleWindow())
     {
-        model::Model::init("v0.0.1");
+        ;
     }
     
     jInstance::~jInstance()
     {
-        m_document.reset();
+        m_console_window.reset();
+        m_patcher_managers.clear();
+    }
+    
+    uint64_t jInstance::getUserId() const noexcept
+    {
+        return m_user_id;
     }
     
     void jInstance::newPatcher()
     {
-        m_document = std::make_unique<flip::Document> (model::Model::use(), *this, m_instance->getUserId(), 'cicm', 'kpat');
+        auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), new jPatcherManager(*this));
         
-        model::Patcher& patcher = m_document->root<model::Patcher>();
-        populatePatcher(patcher);
+        jPatcherManager& manager = *(manager_it->get());
+        model::Patcher& patcher = manager.init();
+        
+        const size_t next_untitled = getNextUntitledNumberAndIncrement();
+        std::string patcher_name = "Untitled";
+        
+        if(next_untitled > 0)
+        {
+            patcher_name += " " + std::to_string(next_untitled);
+        }
+        
+        patcher.setName(patcher_name);
+        
+        manager.newView();
+        DocumentManager::commit(patcher, "pre-populate patcher");
     }
     
-    void jInstance::populatePatcher(model::Patcher& patcher)
+    void jInstance::openFile(kiwi::FilePath const& file)
     {
+        if(file.isKiwiFile())
         {
-            // simple print
-            auto& plus = patcher.addPlus();
-            plus.setPosition(50, 50);
-            auto& print = patcher.addPrint();
-            print.setPosition(50, 100);
-            patcher.addLink(plus, 0, print, 0);
+            auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), new jPatcherManager(*this, file));
+            jPatcherManager& manager = *(manager_it->get());
+            if(manager.getNumberOfView() == 0)
+            {
+                manager.newView();
+            }
         }
-        
+        else
         {
-            // set rhs value
-            auto& plus_1 = patcher.addPlus();
-            plus_1.setPosition(150, 50);
-            
-            auto& plus_2 = patcher.addPlus();
-            plus_2.setPosition(220, 50);
-            
-            auto& plus_3 = patcher.addPlus();
-            plus_3.setPosition(150, 100);
-            
-            auto& print = patcher.addPrint();
-            print.setPosition(150, 150);
-            
-            patcher.addLink(plus_1, 0, plus_3, 0);
-            patcher.addLink(plus_2, 0, plus_3, 1);
-            patcher.addLink(plus_3, 0, print, 0);
+            Console::error("can't open file");
         }
-        
-        {
-            // basic counter
-            auto& plus_1 = patcher.addPlus();
-            plus_1.setPosition(350, 100);
-            
-            auto& plus_2 = patcher.addPlus();
-            plus_2.setPosition(405, 50);
-            
-            auto& print = patcher.addPrint();
-            print.setPosition(350, 150);
-            
-            patcher.addLink(plus_1, 0, plus_2, 0);
-            patcher.addLink(plus_2, 0, plus_1, 1);
-            patcher.addLink(plus_1, 0, print, 0);
-        }
-
-        engine::DocumentManager::commit(patcher, "load initial objects and links");
     }
     
-    void jInstance::document_changed(model::Patcher& patcher)
+    void jInstance::openPatcher()
     {
-        //std::cout << "jInstance::document_changed" << '\n';
-        if(patcher.added())
+        juce::FileChooser openFileChooser("Open file",
+                                          juce::File::getSpecialLocation (juce::File::userHomeDirectory),
+                                          "*.kiwi");
+        
+        if (openFileChooser.browseForFileToOpen())
         {
-            patcher.entity().emplace<engine::DocumentManager>(patcher.document());
+            kiwi::FilePath open_file(openFileChooser.getResult().getFullPathName().toStdString());
             
-            auto& window = patcher.entity().emplace<jWindow>();
-            auto& jpatcher = patcher.entity().emplace<jPatcher>();
-            window.setContentNonOwned(&jpatcher, true);
+            openFile(open_file);
+        }
+    }
+    
+    bool jInstance::closeAllWindows()
+    {
+        bool success = true;
+        
+        if(!m_patcher_managers.empty())
+        {
+            for(auto& manager_uptr : m_patcher_managers)
+            {
+                if(!manager_uptr->askAllWindowsToClose())
+                {
+                    success = false;
+                    break;
+                }
+            }
         }
         
-        // Notify jPatcher
-        auto& jpatcher = patcher.entity().use<jPatcher>();
-        jpatcher.document_changed(patcher);
-        
-        // Notify Engine
-        m_instance->document_changed(patcher);
-        
-        if(patcher.removed())
-        {
-            patcher.entity().erase<jPatcher>();
-            patcher.entity().erase<jWindow>();
-            
-            patcher.entity().erase<engine::DocumentManager>();
-        }
+        return success;
+    }
+    
+    void jInstance::showConsoleWindow()
+    {
+        m_console_window->setVisible(true);
+        m_console_window->toFront(true);
+    }
+    
+    std::vector<uint8_t>& jInstance::getPatcherClipboardData()
+    {
+        return m_patcher_clipboard;
+    }
+    
+    size_t jInstance::getNextUntitledNumberAndIncrement()
+    {
+        return m_untitled_patcher_index++;
     }
 }

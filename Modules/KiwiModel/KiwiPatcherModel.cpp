@@ -19,20 +19,43 @@
  To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
  
  ==============================================================================
-*/
+ */
 
-#ifndef KIWI_MODEL_OBJECTS_HPP_INCLUDED
-#define KIWI_MODEL_OBJECTS_HPP_INCLUDED
+#include "flip/DataModel.h"
 
-#include "KiwiObjectPrint.hpp"
+#include "KiwiPatcherModel.hpp"
+#include "KiwiPatcher.hpp"
 
 namespace kiwi
 {
     namespace model
     {
-        ;
+        void PatcherModel::init(std::string const& version)
+        {
+            PatcherModel::version(version);
+            
+            // patcher elements declaration :
+            model::Object::declare();
+            
+            declareObjects();
+            
+            declareExternalObjects();
+            
+            // Links
+            Link::declare();
+            
+            // Patcher
+            Patcher::declare();
+            
+            endOfModelDeclaration();
+        }
+        
+        void PatcherModel::declareObjects()
+        {
+            NewBox::declare();
+            ErrorBox::declare();
+            ObjectPlus::declare();
+            ObjectPrint::declare();
+        }
     }
 }
-
-
-#endif // KIWI_MODEL_OBJECTS_HPP_INCLUDED

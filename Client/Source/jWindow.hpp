@@ -28,14 +28,31 @@
 
 namespace kiwi
 {
+    // ================================================================================ //
+    //                                      JWINDOW                                     //
+    // ================================================================================ //
+
     //! @brief A juce Window.
-    class jWindow : public juce::DocumentWindow
+    class jWindow : public juce::DocumentWindow, public ApplicationCommandTarget
     {
     public:
-        jWindow();
-        ~jWindow();
+        jWindow(std::string const& name = "untitled",
+                juce::Colour color = juce::Colours::lightgrey,
+                int buttons = allButtons,
+                bool addToDesktop = true);
         
-    private:
+        virtual ~jWindow();
+        
+        // ================================================================================ //
+        //                              APPLICATION COMMAND TARGET                          //
+        // ================================================================================ //
+        
+        ApplicationCommandTarget* getNextCommandTarget() override;
+        void getAllCommands (Array <CommandID>& commands) override;
+        void getCommandInfo (const CommandID commandID, ApplicationCommandInfo& result) override;
+        bool perform (const InvocationInfo& info) override;
+        
+    protected:
         
         void closeButtonPressed() override;
     };

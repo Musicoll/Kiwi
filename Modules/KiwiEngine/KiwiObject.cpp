@@ -33,17 +33,29 @@ namespace kiwi
         //                                      OBJECT                                      //
         // ================================================================================ //
         
-        Object::Object(model::Object& model) noexcept : m_model(model), m_stack_count(0)
+        Object::Object() noexcept : m_stack_count(0)
         {
-            m_outlets.resize(m_model.getNumberOfOutlets());
             
-            // connect signals
-            m_signal_cnx = model.signalTrigger.connect(*this, &Object::internal_signalTriggerCalled);
         }
         
         Object::~Object() noexcept
         {
             m_outlets.clear();
+        }
+        
+        std::string Object::getName() const noexcept
+        {
+            return m_model->getName();
+        }
+        
+        size_t Object::getNumberOfInlets() const noexcept
+        {
+            return m_model->getNumberOfInlets();
+        }
+        
+        size_t Object::getNumberOfOutlets() const noexcept
+        {
+            return m_model->getNumberOfOutlets();
         }
         
         void Object::addOutputLink(Link* link)
@@ -58,7 +70,7 @@ namespace kiwi
             m_outlets[idx].erase(link);
         }
         
-        void Object::send(const uint32_t index, std::vector<Atom> args)
+        void Object::send(const size_t index, std::vector<Atom> const& args)
         {
             const auto idx = static_cast<std::vector<Outlet>::size_type>(index);
             
@@ -74,8 +86,7 @@ namespace kiwi
                     }
                     else
                     {
-                        // commented because of an xcode f*c*i*g indentation bug
-                        std::cout << "object " << getName() << " => Stack overflow !" << '\n';
+                        Console::error("object " + getName() + " => Stack overflow !");
                     }
                     
                     receiver.m_stack_count--;
@@ -84,16 +95,21 @@ namespace kiwi
             }
         }
         
-        void Object::modelChanged(model::Object& object_m)
+        void Object::objectChanged(model::Object& object_m)
         {
             if(object_m.added())
             {
-                ;
+                m_model = &object_m;
+                
+                m_outlets.resize(m_model->getNumberOfOutlets());
+                
+                // connect signals
+                m_signal_cnx = m_model->signalTrigger.connect(*this, &Object::internal_signalTriggerCalled);
             }
             
-            if(object_m.added())
+            if(object_m.removed())
             {
-                ;
+                m_model = nullptr;
             }
         }
         

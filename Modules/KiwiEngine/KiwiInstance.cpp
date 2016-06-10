@@ -21,21 +21,44 @@
  ==============================================================================
 */
 
+#include <KiwiModel/KiwiObjectFactory.hpp>
+#include <KiwiModel/KiwiPatcherModel.hpp>
+#include "KiwiTypedObjects.hpp"
+
 #include "KiwiInstance.hpp"
+#include "KiwiDocumentManager.hpp"
 
 namespace kiwi
 {
     namespace engine
     {
         // ================================================================================ //
+        //                           PATCHER MODEL DECLARATOR                               //
+        // ================================================================================ //
+        
+        //! @brief The Patcher Model class declarator
+        class Instance::PatcherModelDeclarator : public model::PatcherModel
+        {
+        public:
+            
+            void endOfModelDeclaration() final override
+            {
+                ObjectFactory::registerEngine<NewBox>("newbox");
+                ObjectFactory::registerEngine<NewBox>("errorbox");
+                ObjectFactory::registerEngine<ObjectPlus>("plus");
+                ObjectFactory::registerEngine<ObjectPrint>("print");
+            }
+        };
+        
+        // ================================================================================ //
         //                                      INSTANCE                                    //
         // ================================================================================ //
         
-        Instance::Instance(uint64_t user_id, std::string const& name) noexcept :
-        m_user_id(user_id),
-        m_name(name)
+        Instance::Instance(uint64_t user_id) noexcept :
+        m_user_id(user_id)
         {
-            ;
+            PatcherModelDeclarator model;
+            model.init("v0.0.1");
         }
         
         Instance::~Instance()
@@ -43,19 +66,9 @@ namespace kiwi
             ;
         }
         
-        void Instance::document_changed(model::Patcher& patcher)
+        uint64_t Instance::getUserId() const noexcept
         {
-            if(patcher.added())
-            {
-                patcher.entity().emplace<Patcher>(*this);
-            }
-            
-            patcher.entity().use<Patcher>().document_changed(patcher);
-            
-            if(patcher.removed())
-            {
-                patcher.entity().erase<Patcher>();
-            }
+            return m_user_id;
         }
     }
 }

@@ -24,37 +24,37 @@
 #ifndef KIWI_MODEL_HPP_INCLUDED
 #define KIWI_MODEL_HPP_INCLUDED
 
-#include "KiwiPatcher.hpp"
+#include "flip/DataModel.h"
 
 namespace kiwi
 {
     namespace model
     {
         //! @brief The Patcher Model class
-        class Model : public flip::DataModel<Model>
+        class PatcherModel : public flip::DataModel<PatcherModel>
         {
         public:
+            
+            using model_t = PatcherModel;
             
             //! @brief Initializes the model.
             //! @details Declares all flip classes.
             //! @param version The model version.
-            static void init(std::string const& version)
-            {
-                Model::version(version);
-                
-                // patcher elements declaration :
-                model::Object::declare<Model>();
-                
-                // Objects
-                ObjectPlus::declare<Model>();
-                ObjectPrint::declare<Model>();
-                
-                // Links
-                Link::declare<Model>();
-                
-                // Patcher
-                Patcher::declare<Model>();
-            }
+            void init(std::string const& version);
+            
+        protected:
+            
+            //! @brief Declare external/additionnal kiwi objects here
+            //! @details This method is called when all internal kiwi objects has been declared.
+            virtual void declareExternalObjects() {}
+            
+            //! @brief This method is called at the end of the init function
+            virtual void endOfModelDeclaration() {}
+            
+        private:
+            
+            //! @brief Declare all kiwi objects here
+            void declareObjects();
         };
     }
 }

@@ -29,7 +29,6 @@
 #include <algorithm>
 
 // ---- Flip headers ---- //
-#include "flip/DataModel.h"
 #include "flip/Bool.h"
 #include "flip/Int.h"
 #include "flip/Float.h"
@@ -44,6 +43,8 @@
 
 namespace kiwi
 {
+    class ObjectFactory;
+    
     namespace model
     {
         // ================================================================================ //
@@ -57,7 +58,7 @@ namespace kiwi
         public:
  
             //! @brief Constructor.
-            Object(std::string const& name, const uint32_t inlets, const uint32_t outlets);
+            Object();
             
             //! @brief Copy constructor (needed for flip::Array)
             Object(model::Object const&);
@@ -67,55 +68,68 @@ namespace kiwi
             
             //! @brief Returns the name of the Object.
             //! @return The name of the Object.
-            inline std::string getName() const     { return m_name; }
+            std::string getName() const;
+            
+            //! @brief Returns the name of the Object.
+            //! @return The name of the Object.
+            std::string getText() const;
             
             //! @brief Returns the number of inlets.
             //! @return The number of inlets.
-            inline uint32_t getNumberOfInlets() const noexcept
-            {
-                return static_cast<uint32_t>(m_inlets);
-            }
+            size_t getNumberOfInlets() const noexcept;
             
             //! @brief Returns true if the inlets changed.
-            bool inletsChanged() const noexcept
-            {
-                return m_inlets.changed();
-            }
+            bool inletsChanged() const noexcept;
             
             //! @brief Returns the number of outlets.
             //! @return The number of outlets.
-            inline uint32_t getNumberOfOutlets() const noexcept
-            {
-                return static_cast<uint32_t>(m_outlets);
-            }
+            size_t getNumberOfOutlets() const noexcept;
             
             //! @brief Returns true if the outlets changed.
-            bool outletsChanged() const noexcept
-            {
-                return m_outlets.changed();
-            }
+            bool outletsChanged() const noexcept;
             
             //! @brief Set the x/y position.
-            void setPosition(double x, double y)
-            {
-                m_position_x = x;
-                m_position_y = y;
-            }
+            void setPosition(double x, double y);
             
             //! @brief Returns true if the object's position changed.
-            bool positionChanged() const noexcept
-            {
-                return (m_position_x.changed() || m_position_y.changed());
-            }
+            bool positionChanged() const noexcept;
+            
+            //! @brief Returns true if the object's size changed.
+            bool sizeChanged() const noexcept;
+            
+            //! @brief Returns true if the position or the size of the object changed.
+            bool boundsChanged() const noexcept;
             
             //! @brief Returns the x position.
-            double getX() const noexcept { return m_position_x; }
+            double getX() const noexcept;
             
             //! @brief Returns the y position.
-            double getY() const noexcept { return m_position_y; }
+            double getY() const noexcept;
+            
+            //! @brief Set the width of the object.
+            void setWidth(double new_width);
+            
+            //! @brief Set the height of the object.
+            void setHeight(double new_height);
+            
+            //! @brief Returns the object's width.
+            double getWidth() const noexcept;
+            
+            //! @brief Returns the object's height.
+            double getHeight() const noexcept;
             
             //! @brief Call signalTrigger() to hmmm.. trigger the signal.
             flip::Signal<> signalTrigger;
+            
+        protected:
+            
+            //! @brief Set the number of inlets.
+            //! @param inlets The number of inlets.
+            void setNumberOfInlets(size_t inlets);
+            
+            //! @brief Set the number of inlets.
+            //! @param inlets The number of inlets.
+            void setNumberOfOutlets(size_t outlets);
             
         public:
             
@@ -123,7 +137,7 @@ namespace kiwi
             Object(flip::Default&);
             
             //! @internal flip static declare method
-            template<class TModel> static void declare();
+            static void declare();
             
         private:
             
@@ -131,30 +145,17 @@ namespace kiwi
             enum SignalType { Trigger };
             
             flip::String    m_name;
+            flip::String    m_text;
             flip::Int       m_inlets;
             flip::Int       m_outlets;
             
             flip::Float     m_position_x;
             flip::Float     m_position_y;
-        };
-        
-        // ================================================================================ //
-        //                                  OBJECT::declare                                 //
-        // ================================================================================ //
-        
-        template<class TModel>
-        void Object::declare()
-        {
-            if(TModel::template has<model::Object>()) return;
+            flip::Float     m_width;
+            flip::Float     m_height;
             
-            TModel::template declare<model::Object>()
-            .name("cicm.kiwi.Object")
-            .template member<flip::String, &Object::m_name>("name")
-            .template member<flip::Int, &Object::m_inlets>("inlets")
-            .template member<flip::Int, &Object::m_outlets>("outlets")
-            .template member<flip::Float, &Object::m_position_x>("pos_x")
-            .template member<flip::Float, &Object::m_position_y>("pos_y");
-        }
+            friend class kiwi::ObjectFactory;
+        };
     }
 }
 

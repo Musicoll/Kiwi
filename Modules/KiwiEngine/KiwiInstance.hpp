@@ -24,6 +24,8 @@
 #ifndef KIWI_ENGINE_INSTANCE_HPP_INCLUDED
 #define KIWI_ENGINE_INSTANCE_HPP_INCLUDED
 
+#include "flip/Document.h"
+
 #include "KiwiPatcher.hpp"
 
 namespace kiwi
@@ -34,31 +36,25 @@ namespace kiwi
         //                                      INSTANCE                                    //
         // ================================================================================ //
         
-        class Instance : public flip::DocumentObserver<model::Patcher>
+        class Instance
         {
         public:
             
             //! @brief Constructor.
             //! @param user_id The user ID.
-            //! @param name The instance name.
-            Instance(uint64_t user_id, std::string const& name) noexcept;
+            Instance(uint64_t user_id) noexcept;
             
             //! @brief Destructor.
             ~Instance();
             
-            //! @brief Get the name of the Instance.
-            inline std::string getName() const                  { return m_name; }
-            
             //! @brief Get the user ID of the Instance.
-            inline uint64_t getUserId() const noexcept          { return m_user_id; }
-            
-            //! @internal flip::DocumentObserver<model::Patcher>::document_changed
-            void document_changed(model::Patcher& patcher) final;
+            uint64_t getUserId() const noexcept;
             
         private:
             
+            class PatcherModelDeclarator;
+            
             const uint64_t          m_user_id;
-            const std::string       m_name;
         };
     }
 }
