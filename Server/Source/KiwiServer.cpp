@@ -30,6 +30,15 @@ namespace kiwi
 {
     namespace server
     {
+        // ================================================================================ //
+        //                                      SERVER                                      //
+        // ================================================================================ //
+        
+        Server::~Server()
+        {
+            m_patchers.clear();
+        }
+        
         void Server::openPatcher(uint64_t patcher_id)
         {
             m_patchers.emplace(std::piecewise_construct,

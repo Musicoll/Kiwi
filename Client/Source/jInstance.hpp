@@ -32,6 +32,7 @@
 #include "flip/Document.h"
 
 #include "jConsole.hpp"
+#include "DocumentExplorer.hpp"
 #include "jPatcherManager.hpp"
 
 namespace kiwi
@@ -85,7 +86,7 @@ namespace kiwi
         //! @brief Get Patcher clipboard data.
         std::vector<uint8_t>& getPatcherClipboardData();
         
-    private:
+    private: // methods
         
         //! @brief Returns the next untitled number based on current documents
         size_t getNextUntitledNumberAndIncrement();
@@ -96,18 +97,24 @@ namespace kiwi
         //! @brief Sets the instance user id
         void setUserId(uint64_t user_id);
         
+    private: // members
+        
         using jPatcherManagers = std::vector<std::unique_ptr<jPatcherManager>>;
         
         uint64_t m_user_id;
         
-        std::unique_ptr<engine::Instance>   m_instance;
+        std::unique_ptr<engine::Instance>           m_instance;
         
-        jPatcherManagers                    m_patcher_managers;
+        jPatcherManagers                            m_patcher_managers;
         
-        std::unique_ptr<jConsoleWindow>     m_console_window;
-        std::vector<uint8_t>                m_patcher_clipboard;
+        std::unique_ptr<jConsoleWindow>             m_console_window;
         
-        static size_t                       m_untitled_patcher_index;
+        std::unique_ptr<DocumentExplorer>           m_document_explorer;
+        std::unique_ptr<DocumentExplorerWindow>     m_document_explorer_window;
+        
+        std::vector<uint8_t>                        m_patcher_clipboard;
+        
+        static size_t                               m_untitled_patcher_index;
     };
 }
 

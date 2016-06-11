@@ -25,6 +25,7 @@
 		687C5188C517F83CA6025EEA = {isa = PBXBuildFile; fileRef = C69FB84AADA6F1699BECF488; };
 		11F8C3F82A8F2DAE107D1BD4 = {isa = PBXBuildFile; fileRef = 0AD6304F93D3D5C7427A33B5; };
 		E6737C0327C45D08FEC1CE33 = {isa = PBXBuildFile; fileRef = 18191A65CE9D2310A573C7C8; };
+		AE895F1655A76316AFEA8E3B = {isa = PBXBuildFile; fileRef = 104C0080A4F8DCFD9C1AFA68; };
 		6CB5FEBC0D7B3805614DB636 = {isa = PBXBuildFile; fileRef = B6CA4538740E71FA9FA5813D; };
 		3D04E784962426156465D726 = {isa = PBXBuildFile; fileRef = 2D444B00A6FDDF6AEF13863A; };
 		0BE0F4019C32CCD761194A95 = {isa = PBXBuildFile; fileRef = 10FEBD36F337E40F79733692; };
@@ -130,6 +131,7 @@
 		1026308402A87DE1DEF90320 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "juce_ResizableWindow.cpp"; path = "../../../ThirdParty/Juce/modules/juce_gui_basics/windows/juce_ResizableWindow.cpp"; sourceTree = "SOURCE_ROOT"; };
 		102E6D89F1A4A6D1EE68796F = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PacketStreamReceiver.h; path = "../../../ThirdParty/flip-public/include/flip/contrib/PacketStreamReceiver.h"; sourceTree = "SOURCE_ROOT"; };
 		10397608EEBCC6F16CDBC8E6 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "juce_ApplicationCommandManager.cpp"; path = "../../../ThirdParty/Juce/modules/juce_gui_basics/commands/juce_ApplicationCommandManager.cpp"; sourceTree = "SOURCE_ROOT"; };
+		104C0080A4F8DCFD9C1AFA68 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = DocumentExplorer.cpp; path = ../../Source/DocumentExplorer.cpp; sourceTree = "SOURCE_ROOT"; };
 		1071D18FE3EF4BE4A7995D39 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = "juce_gui_basics.mm"; path = "../../JuceLibraryCode/juce_gui_basics.mm"; sourceTree = "SOURCE_ROOT"; };
 		107272321F5833E3283A4DBE = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SqlDatabase.h; path = "../../../ThirdParty/flip-public/include/flip/contrib/SqlDatabase.h"; sourceTree = "SOURCE_ROOT"; };
 		1074AF7FF27B9890BF978929 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "juce_ImagePreviewComponent.h"; path = "../../../ThirdParty/Juce/modules/juce_gui_basics/filebrowser/juce_ImagePreviewComponent.h"; sourceTree = "SOURCE_ROOT"; };
@@ -908,6 +910,7 @@
 		9EAAD338B1B3BBC9F8D3F4C8 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "juce_FloatVectorOperations.h"; path = "../../../ThirdParty/Juce/modules/juce_audio_basics/buffers/juce_FloatVectorOperations.h"; sourceTree = "SOURCE_ROOT"; };
 		9EE18EA7A393AC7EC002A170 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "juce_FloatVectorOperations.cpp"; path = "../../../ThirdParty/Juce/modules/juce_audio_basics/buffers/juce_FloatVectorOperations.cpp"; sourceTree = "SOURCE_ROOT"; };
 		9F2E53B9306AAC963E63A8F3 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Journal.h; path = "../../../ThirdParty/flip-public/include/flip/detail/Journal.h"; sourceTree = "SOURCE_ROOT"; };
+		9F4C6429BC9FF482642E247D = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DocumentExplorer.hpp; path = ../../Source/DocumentExplorer.hpp; sourceTree = "SOURCE_ROOT"; };
 		9FBFDD167C03CBCBA8B05304 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "juce_AudioAppComponent.cpp"; path = "../../../ThirdParty/Juce/modules/juce_audio_utils/gui/juce_AudioAppComponent.cpp"; sourceTree = "SOURCE_ROOT"; };
 		9FF74B5D15E550FD688678AB = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "juce_MidiFile.cpp"; path = "../../../ThirdParty/Juce/modules/juce_audio_basics/midi/juce_MidiFile.cpp"; sourceTree = "SOURCE_ROOT"; };
 		9FFBB0E77E7233C077C4F93C = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "juce_win32_HiddenMessageWindow.h"; path = "../../../ThirdParty/Juce/modules/juce_events/native/juce_win32_HiddenMessageWindow.h"; sourceTree = "SOURCE_ROOT"; };
@@ -1442,6 +1445,8 @@
 					A1F0EE9282B26CBBC95E0AF7,
 					18191A65CE9D2310A573C7C8,
 					FE43484CC827E6E072D277B3,
+					104C0080A4F8DCFD9C1AFA68,
+					9F4C6429BC9FF482642E247D,
 					B6CA4538740E71FA9FA5813D,
 					65B4DFC0A9BBD366FBED5090,
 					2D444B00A6FDDF6AEF13863A,
@@ -3172,6 +3177,7 @@
 					687C5188C517F83CA6025EEA,
 					11F8C3F82A8F2DAE107D1BD4,
 					E6737C0327C45D08FEC1CE33,
+					AE895F1655A76316AFEA8E3B,
 					6CB5FEBC0D7B3805614DB636,
 					3D04E784962426156465D726,
 					0BE0F4019C32CCD761194A95,

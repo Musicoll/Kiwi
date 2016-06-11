@@ -21,6 +21,8 @@
  ==============================================================================
  */
 
+#include "flip/contrib/MulticastServiceProvider.h"
+
 #include "KiwiPatcherManager.hpp"
 
 #include <KiwiModel/KiwiPatcherModel.hpp>
@@ -29,6 +31,10 @@ namespace kiwi
 {
     namespace server
     {
+        // ================================================================================ //
+        //                                  PATCHER MANAGER                                 //
+        // ================================================================================ //
+        
         PatcherManager::PatcherManager(uint64_t document_id) :
         m_validator(),
         m_document(model::PatcherModel::use(),
@@ -48,12 +54,12 @@ namespace kiwi
                        (std::bind(&PatcherManager::on_disconnected, this, std::placeholders::_1));
             
             m_document.commit();
-            m_document.push();
+            m_document.push(); // needed ?
             
             launchTransport();
         }
         
-        model::Patcher &PatcherManager::getPatcher()
+        model::Patcher& PatcherManager::getPatcher()
         {
             return m_document.root<model::Patcher>();
         }
@@ -69,10 +75,21 @@ namespace kiwi
         
         void PatcherManager::runTransport()
         {
+            model::Patcher& patcher = getPatcher();
+            
+            std::map<std::string, std::string> metadata;
+            
+            std::string name = patcher.getName();
+            metadata["name"] = !name.empty() ? name : "Untitled";
+            
+            flip::MulticastServiceProvider provider(9090, m_document, metadata);
+            
             while(m_transport_running.load())
             {
                 m_transport.process();
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                provider.process();
+                
+                std::this_thread::sleep_for(std::chrono::milliseconds(20));
             }
         }
         

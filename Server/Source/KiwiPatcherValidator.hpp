@@ -32,6 +32,10 @@ namespace kiwi
 {
     namespace server
     {
+        // ================================================================================ //
+        //                                 PATCHER VALIDATOR                                //
+        // ================================================================================ //
+        
         class PatcherValidator final: public flip::DocumentValidator<model::Patcher>
         {
         public:

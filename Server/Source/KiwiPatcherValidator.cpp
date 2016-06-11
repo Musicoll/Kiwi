@@ -27,6 +27,10 @@ namespace kiwi
 {
     namespace server
     {
+        // ================================================================================ //
+        //                                 PATCHER VALIDATOR                                //
+        // ================================================================================ //
+        
         void PatcherValidator::validate(model::Patcher & root)
         {
             

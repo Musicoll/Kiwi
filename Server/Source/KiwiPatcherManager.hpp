@@ -40,6 +40,10 @@ namespace kiwi
 {
     namespace server
     {
+        // ================================================================================ //
+        //                                  PATCHER MANAGER                                 //
+        // ================================================================================ //
+        
         //! @brief The server Patcher manager.
         class PatcherManager
         {

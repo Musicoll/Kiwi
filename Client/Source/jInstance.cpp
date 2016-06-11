@@ -40,7 +40,9 @@ namespace kiwi
     //m_user_id(flip::Ref::User::Offline),
     m_user_id(123456789ULL),
     m_instance(new engine::Instance(m_user_id, std::make_unique<jGuiDevice>())),
-    m_console_window(new jConsoleWindow())
+    m_console_window(new jConsoleWindow()),
+    m_document_explorer(new DocumentExplorer()),
+    m_document_explorer_window(new DocumentExplorerWindow(*m_document_explorer))
     {
         ;
     }

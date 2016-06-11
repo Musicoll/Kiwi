@@ -22,7 +22,6 @@
  */
 
 #include "jConsole.hpp"
-//#include "Application.h"
 
 namespace kiwi
 {

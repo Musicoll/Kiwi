@@ -32,6 +32,10 @@ namespace kiwi
 {
     namespace server
     {
+        // ================================================================================ //
+        //                                      SERVER                                      //
+        // ================================================================================ //
+        
         //! @brief The Server class.
         class Server
         {
@@ -41,7 +45,7 @@ namespace kiwi
             Server() = default;
             
             //! @brief Destructor.
-            ~Server() = default;
+            ~Server();
             
             //! @brief Loop that retrieves user input to manager server.
             void runCommand();
