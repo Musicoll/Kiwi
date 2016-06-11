@@ -147,6 +147,7 @@ namespace kiwi
         const juce::Colour link_color = Colour::fromFloatRGBA(0.2, 0.2, 0.2, 1.);
         const juce::Colour selection_color = Colour::fromFloatRGBA(0., 0.5, 1., 1.);
         const juce::Colour other_view_selected_color = Colour::fromFloatRGBA(0.8, 0.3, 0.3, 1.);
+        const juce::Colour distant_selected_color(0xAAFF9B71);
         
         const bool selected = m_is_selected;
         const bool other_selected = ! m_distant_selection.empty();
@@ -154,14 +155,17 @@ namespace kiwi
                                           m_distant_selection.find(KiwiApp::userID())
                                           != m_distant_selection.end());
         
+        const bool distant_selected = ((other_selected && (other_view_selected && m_distant_selection.size() > 1))
+                                       || (other_selected && !other_view_selected));
+        
         g.setColour(link_color);
         g.strokePath(m_path, juce::PathStrokeType(2.f));
         
         juce::Colour inner_color = link_color.contrasting(0.4);
         
-        if(selected || other_view_selected)
+        if(selected || other_view_selected || distant_selected)
         {
-            inner_color = selected ? selection_color : other_view_selected_color;
+            inner_color = selected ? selection_color : other_view_selected ? other_view_selected_color : distant_selected_color;
         }
         
         g.setColour(inner_color);

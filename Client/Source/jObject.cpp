@@ -81,15 +81,9 @@ namespace kiwi
         
         const juce::Colour selection_color = Colour::fromFloatRGBA(0., 0.5, 1., 0.8);
         const juce::Colour other_view_selected_color = Colour::fromFloatRGBA(0.8, 0.3, 0.3, 0.3);
+        const juce::Colour distant_selected_color(0xAAFF9B71);
         
         const juce::Colour errorbox_overlay_color = Colour::fromFloatRGBA(0.6, 0.1, 0.1, 0.4);
-        
-        /*
-        for(auto user_id : m_distant_selection)
-        {
-            // auto color = getColorForUserId(user_id);
-        }
-        */
         
         const bool selected = m_is_selected;
         const bool other_selected = ! m_distant_selection.empty();
@@ -97,9 +91,12 @@ namespace kiwi
                                           m_distant_selection.find(KiwiApp::userID())
                                           != m_distant_selection.end());
         
-        if(selected || other_view_selected)
+        const bool distant_selected = ((other_selected && (other_view_selected && m_distant_selection.size() > 1))
+                                       || (other_selected && !other_view_selected));
+        
+        if(selected || other_view_selected || distant_selected)
         {
-            const juce::Colour color = selected ? selection_color : other_view_selected_color;
+            const juce::Colour color = selected ? selection_color : other_view_selected ? other_view_selected_color : distant_selected_color;
         
             g.setColour(color.darker(0.4));
             g.drawRect(bounds.reduced(m_selection_width*0.5 + 1), 1);
