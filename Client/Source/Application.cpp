@@ -295,6 +295,9 @@ namespace kiwi
         menu.addSeparator();
         
         menu.addCommandItem(m_command_manager.get(), CommandIDs::showConsoleWindow);
+        menu.addSeparator();
+        
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::showDocumentExplorerWindow);
     }
     
     void KiwiApp::createHelpMenu(PopupMenu& menu)
@@ -319,7 +322,8 @@ namespace kiwi
             CommandIDs::openRemotePatcher,
             CommandIDs::openFile,
             CommandIDs::showConsoleWindow,
-            CommandIDs::showAppSettingsWindow
+            CommandIDs::showAppSettingsWindow,
+            CommandIDs::showDocumentExplorerWindow
         };
         
         commands.addArray(ids, numElementsInArray(ids));
@@ -368,6 +372,13 @@ namespace kiwi
                 
                 break;
             }
+            case CommandIDs::showDocumentExplorerWindow:
+            {
+                result.setInfo(TRANS("Show Document Explorer panel"), TRANS("Show Document Explorer panel"),
+                               CommandCategories::windows, 0);
+                
+                break;
+            }
             default:
             {
                 JUCEApplication::getCommandInfo(commandID, result); break;
@@ -379,11 +390,12 @@ namespace kiwi
     {
         switch(info.commandID)
         {
-            case CommandIDs::newPatcher :               { m_instance->newPatcher(); break; }
-            case CommandIDs::openFile :                 { m_instance->openPatcher(); break; }
-            case CommandIDs::showConsoleWindow :        { m_instance->showConsoleWindow(); break; }
-            case CommandIDs::openRemotePatcher :        { m_instance->openRemotePatcher(); break; }
-            case CommandIDs::showAppSettingsWindow :    { m_instance->openSettings(); break; }
+            case CommandIDs::newPatcher :                   { m_instance->newPatcher(); break; }
+            case CommandIDs::openFile :                     { m_instance->openPatcher(); break; }
+            case CommandIDs::showConsoleWindow :            { m_instance->showConsoleWindow(); break; }
+            case CommandIDs::openRemotePatcher :            { m_instance->openRemotePatcher(); break; }
+            case CommandIDs::showAppSettingsWindow :        { m_instance->openSettings(); break; }
+            case CommandIDs::showDocumentExplorerWindow :   { m_instance->showDocumentExplorerWindow(); break; }
             
             default : return JUCEApplication::perform(info);
         }

@@ -77,11 +77,17 @@ namespace kiwi
         //! @brief Create a new remote patcher
         void openRemotePatcher();
         
+        //! @brief Attempt to create a new patcher with given host and port parameters.
+        void openRemotePatcher(std::string& host, uint16_t& port);
+        
         //! @brief Opens the settings
         void openSettings();
         
         //! @brief Brings the Console to front.
         void showConsoleWindow();
+        
+        //! @brief Brings the Console to front.
+        void showDocumentExplorerWindow();
         
         //! @brief Get Patcher clipboard data.
         std::vector<uint8_t>& getPatcherClipboardData();
@@ -92,7 +98,7 @@ namespace kiwi
         size_t getNextUntitledNumberAndIncrement();
         
         //! @brief Open a dialog box used to enter server infos
-        void openRemoteDialogBox(std::string & host, uint16_t & port);
+        void openRemoteDialogBox(std::string& host, uint16_t& port);
         
         //! @brief Sets the instance user id
         void setUserId(uint64_t user_id);

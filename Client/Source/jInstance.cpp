@@ -42,7 +42,7 @@ namespace kiwi
     m_instance(new engine::Instance(m_user_id, std::make_unique<jGuiDevice>())),
     m_console_window(new jConsoleWindow()),
     m_document_explorer(new DocumentExplorer()),
-    m_document_explorer_window(new DocumentExplorerWindow(*m_document_explorer))
+    m_document_explorer_window(new DocumentExplorerWindow(*m_document_explorer, *this))
     {
         ;
     }
@@ -90,8 +90,12 @@ namespace kiwi
         
         patcher.setName(patcher_name);
         
-        manager.newView();
-        DocumentManager::commit(patcher, "pre-populate patcher");
+        if(manager.getNumberOfView() == 0)
+        {
+            manager.newView();
+        }
+        
+        DocumentManager::commit(patcher);
     }
     
     void jInstance::openFile(kiwi::FilePath const& file)
@@ -144,13 +148,8 @@ namespace kiwi
         return success;
     }
     
-    void jInstance::openRemotePatcher()
+    void jInstance::openRemotePatcher(std::string& host, uint16_t& port)
     {
-        std::string host("");
-        uint16_t port(0);
-        
-        openRemoteDialogBox(host, port);
-        
         std::unique_ptr<jPatcherManager> manager_uptr = nullptr;
         
         try
@@ -166,8 +165,21 @@ namespace kiwi
         {
             auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), std::move(manager_uptr));
             jPatcherManager& manager = *(manager_it->get());
-            manager.newView();
+            if(manager.getNumberOfView() == 0)
+            {
+                manager.newView();
+            }
         }
+    }
+    
+    void jInstance::openRemotePatcher()
+    {
+        std::string host("");
+        uint16_t port(0);
+        
+        openRemoteDialogBox(host, port);
+        
+        openRemotePatcher(host, port);
     }
     
     // ================================================================================ //
@@ -290,6 +302,12 @@ namespace kiwi
     {
         m_console_window->setVisible(true);
         m_console_window->toFront(true);
+    }
+    
+    void jInstance::showDocumentExplorerWindow()
+    {
+        m_document_explorer_window->setVisible(true);
+        m_document_explorer_window->toFront(true);
     }
     
     std::vector<uint8_t>& jInstance::getPatcherClipboardData()

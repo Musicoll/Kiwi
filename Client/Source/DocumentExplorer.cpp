@@ -24,6 +24,7 @@
 #include <KiwiModel/KiwiConsole.hpp>
 
 #include "DocumentExplorer.hpp"
+#include "jInstance.hpp"
 
 namespace kiwi
 {
@@ -64,8 +65,6 @@ namespace kiwi
     
     void DocumentExplorer::process()
     {
-        //flip::MulticastServiceExplorer explorer;
-        
         m_explorer.process();
         
         bool changed = false;
@@ -132,7 +131,71 @@ namespace kiwi
     //                               DOCUMENT EXPLORER PANEL                            //
     // ================================================================================ //
     
-    DocumentExplorer::Panel::Panel(DocumentExplorer& explorer) :
+    DocumentExplorer::Panel::SessionItemButton::SessionItemButton(flip::MulticastServiceExplorer::Session && session) :
+    juce::Button(""),
+    m_session(session)
+    {
+        auto const& metadata = session.metadata;
+        const auto it = metadata.find("name");
+        const std::string name = (it != metadata.end()) ? it->second : "Name error";
+        setButtonText(getMetadata("name"));
+    }
+    
+    void DocumentExplorer::Panel::SessionItemButton::paintButton(Graphics& g, bool isMouseOverButton, bool isButtonDown)
+    {
+        const auto bounds = getLocalBounds();
+        
+        const juce::Colour bgcolor = isMouseOverButton ? juce::Colour(0xFFE0CA3C) : juce::Colour(0xFF5A54C4);
+        g.setColour(bgcolor);
+        
+        g.fillRoundedRectangle(bounds.reduced(1).toFloat(), 5);
+        
+        g.setColour(bgcolor.darker(0.8));
+        g.drawRoundedRectangle(bounds.reduced(1).toFloat(), 5, 1);
+        
+        const juce::Colour text_color = isMouseOverButton ? juce::Colour(0xFF000000) : juce::Colour(0xFFFFFFFF);
+        g.setColour(text_color);
+        g.drawFittedText(getButtonText(), bounds, juce::Justification::centred, 2);
+    }
+    
+    std::string DocumentExplorer::Panel::SessionItemButton::getMetadata(std::string const& key) const
+    {
+        assert(!key.empty());
+        
+        auto const& metadata = m_session.metadata;
+        const auto it = metadata.find(key);
+        return (it != metadata.end()) ? it->second : "";
+    }
+    
+    uint16_t DocumentExplorer::Panel::SessionItemButton::getPort() const
+    {
+        return m_session.port;
+    }
+    
+    uint32_t DocumentExplorer::Panel::SessionItemButton::getIp() const
+    {
+        return m_session.ip;
+    }
+    
+    std::string DocumentExplorer::Panel::SessionItemButton::getHost() const
+    {
+        const uint32 ip_address = getIp();
+        char host[16];
+        
+        if(ip_address)
+        {
+            snprintf(host, sizeof host, "%u.%u.%u.%u",
+                     (ip_address & 0xff000000) >> 24,
+                     (ip_address & 0x00ff0000) >> 16,
+                     (ip_address & 0x0000ff00) >> 8,
+                     (ip_address & 0x000000ff));
+        }
+        
+        return host;
+    }
+    
+    DocumentExplorer::Panel::Panel(DocumentExplorer& explorer, jInstance& instance) :
+    m_instance(instance),
     m_explorer(explorer)
     {
         m_explorer.addListener(*this);
@@ -145,29 +208,75 @@ namespace kiwi
     
     void DocumentExplorer::Panel::resized()
     {
+        const auto bounds = getLocalBounds();
         
+        const int padding = 10;
+        const int button_width = bounds.getWidth() - padding * 2;
+        const int button_height = 30;
+        juce::Point<int> last_top_left_pos(0, 0);
+        
+        for(auto& button_uptr : m_buttons)
+        {
+            juce::Rectangle<int> new_bounds
+            {
+                last_top_left_pos.x + padding,
+                last_top_left_pos.y + padding,
+                button_width, button_height
+            };
+            
+            button_uptr->setBounds(new_bounds);
+            
+            last_top_left_pos = new_bounds.getBottomLeft();
+        }
     }
     
     void DocumentExplorer::Panel::paint(Graphics& g)
     {
-        g.setColour(juce::Colours::lightgrey);
+        g.setColour(juce::Colour(0xFF3F3B4E));
         g.fillAll();
+    }
+    
+    void DocumentExplorer::Panel::buttonClicked(Button* button)
+    {        
+        const auto* session_item = dynamic_cast<SessionItemButton*>(button);
+        if(session_item)
+        {
+            uint16_t port = session_item->getPort();
+            std::string host = session_item->getHost();
+            m_instance.openRemotePatcher(host, port);
+        }
     }
     
     void DocumentExplorer::Panel::documentListChanged()
     {
+        // refresh all buttons
+        for(auto& button_uptr : m_buttons)
+        {
+            button_uptr->removeListener(this);
+        }
+        
+        removeAllChildren();
+        m_buttons.clear();
+        
+        const auto bounds = getLocalBounds();
+        
+        int counter = 0;
         for(auto && session : m_explorer.getSessionList())
         {
             auto const& metadata = session.metadata;
             
-            for(auto& meta : metadata)
-            {
-                Console::post("meta[\"" + meta.first + "\"] : " + meta.second);
-            }
+            const auto it = metadata.find("name");
+            const std::string name = (it != metadata.end()) ? it->second : "Name error";
             
-            Console::post("session.ip : " + std::to_string(session.ip));
-            Console::post("session.port : " + std::to_string(session.port));
-            Console::post("session.version : " + session.version);
+            auto button_it = m_buttons.emplace(m_buttons.end(), std::make_unique<SessionItemButton>(std::move(session)));
+            
+            SessionItemButton& button = *button_it->get();
+            button.addListener(this);
+            
+            button.setBounds(10, 10, bounds.getWidth() - 20, 30);
+            addAndMakeVisible(button);
+            
+            counter++;
         }
     }
     
@@ -175,16 +284,17 @@ namespace kiwi
     //                               DOCUMENT EXPLORER WINDOW                           //
     // ================================================================================ //
     
-    DocumentExplorerWindow::DocumentExplorerWindow(DocumentExplorer& explorer) :
+    DocumentExplorerWindow::DocumentExplorerWindow(DocumentExplorer& explorer, jInstance& instance) :
     jWindow("Document explorer panel",
             Colours::white,
             minimiseButton | closeButton, true)
     {
-        setContentOwned(new DocumentExplorer::Panel(explorer), false);
+        setContentOwned(new DocumentExplorer::Panel(explorer, instance), false);
         setResizable(true, false);
         setResizeLimits(50, 50, 32000, 32000);
-        setTopLeftPosition(0, 0);
-        setSize(300, 440);
+        setTopLeftPosition(0, 500);
+        setSize(250, 300);
+        
         setVisible(true);
     }
     

@@ -53,6 +53,8 @@ namespace kiwi
             m_document.listen_disconnected
                        (std::bind(&PatcherManager::on_disconnected, this, std::placeholders::_1));
             
+            getPatcher().setName("Join this document !!");
+            
             m_document.commit();
             m_document.push(); // needed ?
             
@@ -80,7 +82,7 @@ namespace kiwi
             std::map<std::string, std::string> metadata;
             
             std::string name = patcher.getName();
-            metadata["name"] = !name.empty() ? name : "Untitled";
+            metadata["name"] = !name.empty() ? name : "Unnamed document";
             
             flip::MulticastServiceProvider provider(9090, m_document, metadata);
             

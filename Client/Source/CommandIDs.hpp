@@ -48,6 +48,7 @@ namespace kiwi
         showAudioStatusWindow       = 0x202010,        ///< Make visible the "audio status" window.
         showAboutAppWindow          = 0x202020,        ///< Make visible the "about app" window.
         showAppSettingsWindow       = 0x202030,        ///< Make visible the "application settings" window.
+        showDocumentExplorerWindow  = 0x202040,        ///< Make visible the "lan document explorer" window.
         
         undo                        = 0xf1000a,        ///< Undo last action.
         redo                        = 0xf1000b,        ///< Redo last action.

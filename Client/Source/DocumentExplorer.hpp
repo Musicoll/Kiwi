@@ -32,6 +32,7 @@
 
 namespace kiwi
 {
+    class jInstance;
     
     // ================================================================================ //
     //                                  DOCUMENT EXPLORER                               //
@@ -90,7 +91,7 @@ namespace kiwi
         //! @brief Destructor.
         virtual ~Listener() = default;
         
-        //! @brief Called when
+        //! @brief Called when the document list changed.
         virtual void documentListChanged() = 0;
     };
     
@@ -99,13 +100,14 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief Listen to document explorer changes.
-    class DocumentExplorer::Panel : public DocumentExplorer::Listener,
-                                    public juce::Component
+    class DocumentExplorer::Panel : public juce::Component,
+                                    public DocumentExplorer::Listener,
+                                    public juce::Button::Listener
     {
     public:
         
         //! @brief Constructor.
-        Panel(DocumentExplorer& explorer);
+        Panel(DocumentExplorer& explorer, jInstance& instance);
         
         //! @brief Destructor.
         ~Panel();
@@ -113,13 +115,41 @@ namespace kiwi
         void resized() override;
         void paint(Graphics& g) override;
         
-        //! @brief Called when
+        //! @brief Called when a juce::Button is clicked.
+        void buttonClicked(Button* button) override;
+        
+        //! @brief Called when the document list changed.
         void documentListChanged() override;
+        
+    private: // classses
+        
+        class SessionItemButton : public juce::Button
+        {
+        public:
+            SessionItemButton(flip::MulticastServiceExplorer::Session && session);
+            void paintButton(Graphics& g, bool isMouseOverButton, bool isButtonDown) override;
+            
+            //! @brief Returns the metadata associated to the given key.
+            std::string getMetadata(std::string const& key) const;
+            
+            //! @brief Returns the session port.
+            uint16_t getPort() const;
+            
+            //! @brief Returns the session ip.
+            uint32_t getIp() const;
+            
+            //! @brief Returns the session host.
+            std::string getHost() const;
+            
+        private:
+            const flip::MulticastServiceExplorer::Session   m_session;
+        };
         
     private: // members
         
-        DocumentExplorer&           m_explorer;
-        std::vector<juce::Button>   m_documents;
+        jInstance&                                      m_instance;
+        DocumentExplorer&                               m_explorer;
+        std::vector<std::unique_ptr<SessionItemButton>> m_buttons;
     };
 
     // ================================================================================ //
@@ -130,7 +160,7 @@ namespace kiwi
     class DocumentExplorerWindow : public jWindow
     {
     public:
-        DocumentExplorerWindow(DocumentExplorer& explorer);
+        DocumentExplorerWindow(DocumentExplorer& explorer, jInstance& instance);
         ~DocumentExplorerWindow();
         
         void closeButtonPressed() override;
