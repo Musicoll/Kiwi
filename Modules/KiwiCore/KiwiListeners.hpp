@@ -27,6 +27,7 @@
 #include <memory>
 #include <set>
 #include <vector>
+#include <mutex>
 
 namespace kiwi
 {
@@ -66,14 +67,9 @@ namespace kiwi
         //! @return True if success, otherwise false.
         bool add(listener_ref_t listener) noexcept
         {
-            if(&listener)
-            {
-                std::lock_guard<std::mutex> guard(m_mutex);
-                bool insert_success = m_listeners.insert(&listener).second;
-                return insert_success;
-            }
-            
-            return false;
+            std::lock_guard<std::mutex> guard(m_mutex);
+            bool insert_success = m_listeners.insert(&listener).second;
+            return insert_success;
         }
         
         //! @brief Remove a listener.
@@ -82,14 +78,9 @@ namespace kiwi
         //! @return True if success, false otherwise.
         bool remove(listener_ref_t listener) noexcept
         {
-            if(&listener)
-            {
-                std::lock_guard<std::mutex> guard(m_mutex);
-                bool erase_success = m_listeners.erase(&listener);
-                return erase_success;
-            }
-            
-            return false;
+            std::lock_guard<std::mutex> guard(m_mutex);
+            bool erase_success = m_listeners.erase(&listener);
+            return erase_success;
         }
         
         //! @brief Returns the number of listeners.

@@ -29,6 +29,9 @@
 
 #include <KiwiCore/KiwiFile.hpp>
 
+#include "KiwiCarrierSocket.hpp"
+#include "KiwiTimer.hpp"
+
 namespace flip
 {
     class DocumentBase;
@@ -37,6 +40,11 @@ namespace flip
 
 namespace kiwi
 {
+    namespace engine
+    {
+        class Instance;
+    }
+    
     // ================================================================================ //
     //                                    FILE HANDLER                                  //
     // ================================================================================ //
@@ -49,6 +57,7 @@ namespace kiwi
         //! @brief Constructs the FileHandler referencing document and pointing to a non-existing file.
         FileHandler(flip::DocumentBase & document);
         
+        //! @brief Destructor.
         ~FileHandler() = default;
         
         //! @biref Loads the document from file and sets the pointed file.
@@ -79,20 +88,25 @@ namespace kiwi
     // ================================================================================ //
     //                                   DOCUMENT MANAGER                               //
     // ================================================================================ //
-                
-    class DocumentManager
+    
+    class DocumentManager final
     {
     public:
         
-        //! @brief Constructor.
-        DocumentManager(flip::DocumentBase & document);
+        DocumentManager(flip::DocumentBase & document, engine::Instance const& instance);
         
         //! @brief Destructor.
-        virtual ~DocumentManager() = default;
+        ~DocumentManager();
         
         //! @brief Commit and push.
         //! @see startCommitGesture, endCommitGesture.
         static void commit(flip::Type& type, std::string action = std::string());
+        
+        //! @brief  Connect the DocumentManager to a remote server
+        static void connect(flip::Type& type, const std::string host, uint16_t port);
+        
+        //! @brief Pull changes from remote server
+        static void pull(flip::Type& type);
         
         //! @brief Starts a commit gesture.
         //! @details Each call to this function must be followed by a call to endCommitGesture.
@@ -149,7 +163,43 @@ namespace kiwi
         }
         
     private:
+        
+        //! @brief Commmits and pushes a transaction
         void commit(std::string action);
+        
+        //! @brief Pulls transactions stacked by a socket's process
+        void pull();
+        
+        //! @brief Pushes a trasactions stacked by a socket's process
+        void push();
+        
+        //! @brief Connects the document manager and download the patcher's initial state
+        void connect(std::string const host, uint16_t port);
+        
+        //! @brief Returns true if the document manager is connected false otherwise
+        bool isConnected();
+        
+        //! @brief Disconnects the document manager from the server
+        void disconnect();
+        
+        //! @brief Starts a timer callback on the message thread that that pulls
+        void startPulling();
+        
+        //! @brief Stops the pulling callback
+        void stopPulling();
+        
+        //! @brief Called once document manager is connected and starts pulling
+        void onConnected();
+        
+        //! @brief Called once document manager is disconnected and stops pulling
+        void onDisconnected();
+        
+        //! @brief Called once the initial load happened
+        void onLoaded();
+        
+        //! @brief Called at a regular frequency to pull document
+        void tick();
+        
         void startCommitGesture();
         void commitGesture(std::string action);
         void endCommitGesture();
@@ -159,12 +209,16 @@ namespace kiwi
         
     private:
         
+        engine::Instance const&                 m_instance;
         flip::DocumentBase&                     m_document;
         flip::History<flip::HistoryStoreMemory> m_history;
+        CarrierSocket                           m_socket;
+        std::unique_ptr<engine::Timer>          m_timer;
         FileHandler                             m_file_handler;
         
         bool                                    m_gesture_flag = false;
         size_t                                  m_gesture_cnt = 0;
+        std::atomic_bool                        m_loaded;
         
     private:
         

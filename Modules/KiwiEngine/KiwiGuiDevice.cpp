@@ -21,50 +21,19 @@
  ==============================================================================
 */
 
-#ifndef KIWI_ENGINE_INSTANCE_HPP_INCLUDED
-#define KIWI_ENGINE_INSTANCE_HPP_INCLUDED
-
-#include "flip/Document.h"
-
 #include "KiwiGuiDevice.hpp"
-#include "KiwiPatcher.hpp"
 
 namespace kiwi
 {
     namespace engine
     {
         // ================================================================================ //
-        //                                      INSTANCE                                    //
+        //                                     GUI DEVICE                                   //
         // ================================================================================ //
         
-        class Instance
+        std::unique_ptr<engine::Timer::Impl> GuiDevice::createTimer(std::function<void()>)
         {
-        public:
-            
-            //! @brief Constructor.
-            //! @param user_id The user ID.
-            Instance(uint64_t user_id, std::unique_ptr<GuiDevice> gui_device);
-            
-            //! @brief Destructor.
-            ~Instance();
-            
-            //! @brief Get the user ID of the Instance.
-            uint64_t getUserId() const noexcept;
-            
-            //! @brief Create and returns a Timer.
-            //! @param callback The timer callback method. 
-            std::unique_ptr<Timer> createTimer(std::function<void()> callback) const;
-            
-        private:
-            
-            class PatcherModelDeclarator;
-            
-            const uint64_t              m_user_id;
-            
-            std::unique_ptr<GuiDevice>  m_gui_device;
-        };
+            return nullptr;
+        }
     }
 }
-
-
-#endif // KIWI_ENGINE_INSTANCE_HPP_INCLUDED

@@ -22,7 +22,6 @@
  */
 
 #include "Application.hpp"
-
 #include "CommandIDs.hpp"
 
 namespace kiwi
@@ -227,6 +226,7 @@ namespace kiwi
     void KiwiApp::createFileMenu(PopupMenu& menu)
     {
         menu.addCommandItem(m_command_manager.get(), CommandIDs::newPatcher);
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::openRemotePatcher);
         menu.addSeparator();
         
         menu.addCommandItem(m_command_manager.get(), CommandIDs::openFile);
@@ -316,8 +316,10 @@ namespace kiwi
         const CommandID ids[] =
         {
             CommandIDs::newPatcher,
+            CommandIDs::openRemotePatcher,
             CommandIDs::openFile,
             CommandIDs::showConsoleWindow,
+            CommandIDs::showAppSettingsWindow
         };
         
         commands.addArray(ids, numElementsInArray(ids));
@@ -333,6 +335,14 @@ namespace kiwi
                                CommandCategories::general, 0);
                 
                 result.addDefaultKeypress('n', ModifierKeys::commandModifier);
+                break;
+            }
+            case CommandIDs::openRemotePatcher:
+            {
+                result.setInfo(TRANS("Open remote..."), TRANS("open a remote patcher"),
+                               CommandCategories::general, 0);
+                
+                result.addDefaultKeypress('r', ModifierKeys::commandModifier);
                 break;
             }
             case CommandIDs::openFile:
@@ -351,6 +361,13 @@ namespace kiwi
                 result.addDefaultKeypress('k', ModifierKeys::commandModifier);
                 break;
             }
+            case CommandIDs::showAppSettingsWindow:
+            {
+                result.setInfo(TRANS("Settings"), TRANS("Show kiwi settings"),
+                               CommandCategories::windows, 0);
+                
+                break;
+            }
             default:
             {
                 JUCEApplication::getCommandInfo(commandID, result); break;
@@ -362,9 +379,11 @@ namespace kiwi
     {
         switch(info.commandID)
         {
-            case CommandIDs::newPatcher :           { m_instance->newPatcher(); break; }
-            case CommandIDs::openFile :             { m_instance->openPatcher(); break; }
-            case CommandIDs::showConsoleWindow :    { m_instance->showConsoleWindow(); break; }
+            case CommandIDs::newPatcher :               { m_instance->newPatcher(); break; }
+            case CommandIDs::openFile :                 { m_instance->openPatcher(); break; }
+            case CommandIDs::showConsoleWindow :        { m_instance->showConsoleWindow(); break; }
+            case CommandIDs::openRemotePatcher :        { m_instance->openRemotePatcher(); break; }
+            case CommandIDs::showAppSettingsWindow :    { m_instance->openSettings(); break; }
             
             default : return JUCEApplication::perform(info);
         }

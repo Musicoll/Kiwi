@@ -21,50 +21,34 @@
  ==============================================================================
 */
 
-#ifndef KIWI_ENGINE_INSTANCE_HPP_INCLUDED
-#define KIWI_ENGINE_INSTANCE_HPP_INCLUDED
+#ifndef KIWI_ENGINE_GUI_DEVICE_HPP_INCLUDED
+#define KIWI_ENGINE_GUI_DEVICE_HPP_INCLUDED
 
-#include "flip/Document.h"
-
-#include "KiwiGuiDevice.hpp"
-#include "KiwiPatcher.hpp"
+#include "KiwiTimer.hpp"
 
 namespace kiwi
 {
     namespace engine
     {
         // ================================================================================ //
-        //                                      INSTANCE                                    //
+        //                                     GUI DEVICE                                   //
         // ================================================================================ //
-        
-        class Instance
+ 
+        //! @brief The gui device.
+        class GuiDevice
         {
         public:
             
             //! @brief Constructor.
-            //! @param user_id The user ID.
-            Instance(uint64_t user_id, std::unique_ptr<GuiDevice> gui_device);
+            GuiDevice() = default;
             
             //! @brief Destructor.
-            ~Instance();
+            virtual ~GuiDevice() = default;
             
-            //! @brief Get the user ID of the Instance.
-            uint64_t getUserId() const noexcept;
-            
-            //! @brief Create and returns a Timer.
-            //! @param callback The timer callback method. 
-            std::unique_ptr<Timer> createTimer(std::function<void()> callback) const;
-            
-        private:
-            
-            class PatcherModelDeclarator;
-            
-            const uint64_t              m_user_id;
-            
-            std::unique_ptr<GuiDevice>  m_gui_device;
+            //! @brief Creates and returns a timer implementation.
+            virtual std::unique_ptr<engine::Timer::Impl> createTimer(std::function<void()> callback);
         };
     }
 }
 
-
-#endif // KIWI_ENGINE_INSTANCE_HPP_INCLUDED
+#endif // KIWI_ENGINE_GUI_DEVICE_HPP_INCLUDED
