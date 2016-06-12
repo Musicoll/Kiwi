@@ -263,11 +263,6 @@ namespace kiwi
         int counter = 0;
         for(auto && session : m_explorer.getSessionList())
         {
-            auto const& metadata = session.metadata;
-            
-            const auto it = metadata.find("name");
-            const std::string name = (it != metadata.end()) ? it->second : "Name error";
-            
             auto button_it = m_buttons.emplace(m_buttons.end(), std::make_unique<SessionItemButton>(std::move(session)));
             
             SessionItemButton& button = *button_it->get();
@@ -285,9 +280,7 @@ namespace kiwi
     // ================================================================================ //
     
     DocumentExplorerWindow::DocumentExplorerWindow(DocumentExplorer& explorer, jInstance& instance) :
-    jWindow("Document explorer panel",
-            Colours::white,
-            minimiseButton | closeButton, true)
+    jWindow("Document explorer panel", Colours::white, minimiseButton | closeButton, true)
     {
         setContentOwned(new DocumentExplorer::Panel(explorer, instance), false);
         setResizable(true, false);

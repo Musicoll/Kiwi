@@ -39,11 +39,10 @@ namespace kiwi
             m_patchers.clear();
         }
         
-        void Server::openPatcher(uint64_t patcher_id)
+        void Server::openPatcher(uint64_t document_id, uint64_t session_id, uint16_t port, std::string const& title)
         {
-            m_patchers.emplace(std::piecewise_construct,
-                               std::forward_as_tuple(patcher_id),
-                               std::forward_as_tuple(patcher_id));
+            m_patchers.emplace(document_id,
+                               std::make_unique<PatcherManager>(session_id, port, title));
         }
         
         void Server::closePatcher(uint64_t patcher_id)
@@ -64,7 +63,9 @@ namespace kiwi
                 
                 if (command == "open")
                 {
-                    openPatcher(10);
+                    openPatcher(10, 12345, 9090, "Join this document !!");
+                    openPatcher(20, 12345, 9091, "Document 2 !!");
+                    
                     std::cout << "> ";
                     std::cout << "patcher 10 opened and running" << std::endl;
                     
@@ -72,6 +73,7 @@ namespace kiwi
                 else if(command == "close")
                 {
                     closePatcher(10);
+                    closePatcher(20);
                     std::cout << "> ";
                     std::cout << "patcher 10 closed" << std::endl;
                     run_cmd = false;

@@ -35,12 +35,13 @@ namespace kiwi
         //                                  PATCHER MANAGER                                 //
         // ================================================================================ //
         
-        PatcherManager::PatcherManager(uint64_t document_id) :
+        PatcherManager::PatcherManager(uint64_t session_id, uint16_t port, std::string const& title) :
         m_validator(),
         m_document(model::PatcherModel::use(),
                    m_validator,
-                   document_id),
-        m_transport(m_document, 9090),
+                   session_id),
+        m_port(port),
+        m_transport(m_document, m_port),
         m_transport_loop(),
         m_transport_running(false)
         {
@@ -53,7 +54,7 @@ namespace kiwi
             m_document.listen_disconnected
                        (std::bind(&PatcherManager::on_disconnected, this, std::placeholders::_1));
             
-            getPatcher().setName("Join this document !!");
+            getPatcher().setName(title);
             
             m_document.commit();
             m_document.push(); // needed ?
@@ -84,7 +85,7 @@ namespace kiwi
             std::string name = patcher.getName();
             metadata["name"] = !name.empty() ? name : "Unnamed document";
             
-            flip::MulticastServiceProvider provider(9090, m_document, metadata);
+            flip::MulticastServiceProvider provider(m_port, m_document, metadata);
             
             while(m_transport_running.load())
             {

@@ -50,7 +50,7 @@ namespace kiwi
         public:
             
             //! @brief Constructor.
-            PatcherManager(uint64_t document_id);
+            PatcherManager(uint64_t session_id, uint16_t port, std::string const& title);
             
             //! @brief Destructor.
             ~PatcherManager();
@@ -82,6 +82,7 @@ namespace kiwi
             
             PatcherValidator                m_validator;
             flip::DocumentServer            m_document;
+            uint16_t                        m_port;
             flip::PortTransportServerTcp    m_transport;
             std::thread                     m_transport_loop;
             std::atomic_bool                m_transport_running;
