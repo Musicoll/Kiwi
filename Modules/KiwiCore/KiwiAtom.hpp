@@ -542,7 +542,21 @@ namespace kiwi
                         }
                         else
                         {
-                            atoms.emplace_back(std::stol(word.c_str()));
+                            long value = 0;
+                            try
+                            {
+                                std::stol(word.c_str());
+                            }
+                            catch(std::out_of_range const& err)
+                            {
+                                // print error here
+                            }
+                            catch(std::invalid_argument const& err)
+                            {
+                                // print error here
+                            }
+                            
+                            atoms.emplace_back(value);
                         }
                     }
                     else
