@@ -64,7 +64,7 @@ namespace kiwi
                 if (command == "open")
                 {
                     openPatcher(10, 12345, 9090, "Join this document !!");
-                    openPatcher(20, 12345, 9091, "Document 2 !!");
+                    //openPatcher(20, 12345, 9091, "Document 2 !!");
                     
                     std::cout << "> ";
                     std::cout << "patcher 10 opened and running" << std::endl;
@@ -73,7 +73,7 @@ namespace kiwi
                 else if(command == "close")
                 {
                     closePatcher(10);
-                    closePatcher(20);
+                    //closePatcher(20);
                     std::cout << "> ";
                     std::cout << "patcher 10 closed" << std::endl;
                     run_cmd = false;

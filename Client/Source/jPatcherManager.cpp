@@ -341,7 +341,7 @@ namespace kiwi
             {
                 // handle external users.
                 
-                Console::post("New user !!");
+                //Console::post("New user !!");
             }
         }
     }
