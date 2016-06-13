@@ -545,7 +545,7 @@ namespace kiwi
                             long value = 0;
                             try
                             {
-                                std::stol(word.c_str());
+                                value = std::stol(word.c_str());
                             }
                             catch(std::out_of_range const& err)
                             {
