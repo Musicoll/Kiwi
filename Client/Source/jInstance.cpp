@@ -129,6 +129,31 @@ namespace kiwi
         }
     }
     
+    bool jInstance::closeWindow(jWindow& window)
+    {
+        bool success = true;
+        
+        jPatcherWindow* pwin = dynamic_cast<jPatcherWindow*>(&window);
+        if(pwin && !m_patcher_managers.empty())
+        {
+            jPatcherManager& manager = pwin->getManager();
+            
+            const auto manager_it = getPatcherManager(manager);
+            if(manager_it != m_patcher_managers.end())
+            {
+                jPatcher& jpatcher = pwin->getjPatcher();
+                
+                success = manager.closePatcherViewWindow(jpatcher);
+                if(success && manager.getNumberOfView() == 0)
+                {
+                    m_patcher_managers.erase(manager_it);
+                }
+            }
+        }
+        
+        return success;
+    }
+    
     bool jInstance::closeAllWindows()
     {
         bool success = true;
@@ -296,6 +321,16 @@ namespace kiwi
         option.runModal();
         
         setUserId(set_cmp.getClientId());
+    }
+    
+    jInstance::jPatcherManagers::const_iterator jInstance::getPatcherManager(jPatcherManager const& manager) const
+    {
+        const auto find_it = [&manager](std::unique_ptr<jPatcherManager> const& manager_uptr)
+        {
+            return &manager == manager_uptr.get();
+        };
+        
+        return std::find_if(m_patcher_managers.begin(), m_patcher_managers.end(), find_it);
     }
     
     void jInstance::showConsoleWindow()

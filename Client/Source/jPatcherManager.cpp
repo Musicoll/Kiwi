@@ -25,6 +25,7 @@
 #include <KiwiEngine/KiwiDocumentManager.hpp>
 #include <KiwiEngine/KiwiPatcher.hpp>
 
+#include "Application.hpp"
 #include "jInstance.hpp"
 #include "jPatcherManager.hpp"
 #include "jPatcher.hpp"
@@ -45,7 +46,17 @@ namespace kiwi
     
     void jPatcherWindow::closeButtonPressed()
     {
-        m_manager.closePatcherViewWindow(m_jpatcher);
+        KiwiApp::use().closeWindow(*this);
+    }
+    
+    jPatcherManager& jPatcherWindow::getManager() const
+    {
+        return m_manager;
+    }
+    
+    jPatcher& jPatcherWindow::getjPatcher() const
+    {
+        return m_jpatcher;
     }
     
     // ================================================================================ //

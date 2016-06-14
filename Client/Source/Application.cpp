@@ -145,6 +145,16 @@ namespace kiwi
         return KiwiApp::use().m_instance->getUserId();
     }
     
+    bool KiwiApp::closeWindow(jWindow& window)
+    {
+        if(m_instance)
+        {
+            return m_instance->closeWindow(window);
+        }
+        
+        return false;
+    }
+    
     void KiwiApp::bindToCommandManager(ApplicationCommandTarget* target)
     {
         KiwiApp& app = KiwiApp::use();

@@ -46,6 +46,12 @@ namespace kiwi
         jPatcherWindow(jPatcherManager& manager, jPatcher& jpatcher);
         void closeButtonPressed() override;
         
+        //! @brief returns the patcher manager.
+        jPatcherManager& getManager() const;
+        
+        //! @brief returns the jPatcher.
+        jPatcher& getjPatcher() const;
+        
     private:
         jPatcherManager& m_manager;
         jPatcher& m_jpatcher;

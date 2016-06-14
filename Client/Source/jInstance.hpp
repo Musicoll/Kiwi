@@ -70,6 +70,9 @@ namespace kiwi
         //! @brief Open a patcher from file
         void openPatcher();
         
+        //! @brief Attempt to close the given window asking user to save file if needed.
+        bool closeWindow(jWindow& window);
+        
         //! @brief Attempt to close all document, after asking user to save them if needed.
         //! @return True if all document have been closed, false if the user cancel the action.
         bool closeAllWindows();
@@ -94,6 +97,11 @@ namespace kiwi
         
     private: // methods
         
+        using jPatcherManagers = std::vector<std::unique_ptr<jPatcherManager>>;
+        
+        //! @internal get the given patcher manager iterator.
+        jPatcherManagers::const_iterator getPatcherManager(jPatcherManager const& manager) const;
+        
         //! @brief Returns the next untitled number based on current documents
         size_t getNextUntitledNumberAndIncrement();
         
@@ -104,8 +112,6 @@ namespace kiwi
         void setUserId(uint64_t user_id);
         
     private: // members
-        
-        using jPatcherManagers = std::vector<std::unique_ptr<jPatcherManager>>;
         
         uint64_t m_user_id;
         

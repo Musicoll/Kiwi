@@ -68,6 +68,11 @@ namespace kiwi
         //! @brief Get the user id associated to this running Application instance.
         static uint64_t userID();
         
+        //==============================================================================
+        
+        //! @brief Attempt to close the given window asking user to save file if needed.
+        bool closeWindow(jWindow& window);
+        
         // ================================================================================ //
         //                                  APPLICATION MENU                                //
         // ================================================================================ //
@@ -124,7 +129,7 @@ namespace kiwi
         static KeyPressMappingSet* getKeyMappings();
         
         //! @brief This must return a complete list of commands that this target can handle.
-        void getAllCommands(Array <CommandID>& commands) override;
+        void getAllCommands(Array<CommandID>& commands) override;
         
         //! @brief This must provide details about one of the commands that this target can perform.
         void getCommandInfo(CommandID commandID, ApplicationCommandInfo& result) override;
