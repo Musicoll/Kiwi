@@ -144,6 +144,7 @@ namespace kiwi
         jInstance&      m_instance;
         flip::Document  m_document;
         bool            m_need_saving_flag;
+        bool            m_is_remote;
     };
 }
 
