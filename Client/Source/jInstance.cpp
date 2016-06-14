@@ -42,7 +42,8 @@ namespace kiwi
     m_instance(new engine::Instance(m_user_id, std::make_unique<jGuiDevice>())),
     m_console_window(new jConsoleWindow()),
     m_document_explorer(new DocumentExplorer()),
-    m_document_explorer_window(new DocumentExplorerWindow(*m_document_explorer, *this))
+    m_document_explorer_window(new DocumentExplorerWindow(*m_document_explorer, *this)),
+    m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
     {
         ;
     }
@@ -98,7 +99,7 @@ namespace kiwi
         DocumentManager::commit(patcher);
     }
     
-    void jInstance::openFile(kiwi::FilePath const& file)
+    bool jInstance::openFile(kiwi::FilePath const& file)
     {
         if(file.isKiwiFile())
         {
@@ -108,24 +109,33 @@ namespace kiwi
             {
                 manager.newView();
             }
+            
+            return true;
         }
         else
         {
             Console::error("can't open file");
         }
+        
+        return false;
     }
     
-    void jInstance::openPatcher()
+    void jInstance::askUserToOpenPatcherDocument()
     {
-        juce::FileChooser openFileChooser("Open file",
-                                          juce::File::getSpecialLocation (juce::File::userHomeDirectory),
-                                          "*.kiwi");
+        juce::FileChooser file_chooser("Open file", m_last_opened_file, "*.kiwi");
         
-        if (openFileChooser.browseForFileToOpen())
+        if(file_chooser.browseForFileToOpen())
         {
-            kiwi::FilePath open_file(openFileChooser.getResult().getFullPathName().toStdString());
+            juce::File selected_file = file_chooser.getResult();
+            kiwi::FilePath open_file_path(selected_file.getFullPathName().toStdString());
             
-            openFile(open_file);
+            const bool success = openFile(open_file_path);
+            
+            if(success)
+            {
+                selected_file.setAsCurrentWorkingDirectory();
+                m_last_opened_file = selected_file;
+            }
         }
     }
     

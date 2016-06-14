@@ -351,7 +351,7 @@ namespace kiwi
             }
             case CommandIDs::openFile:
             {
-                result.setInfo(TRANS("Open..."), TRANS("Open a File"),
+                result.setInfo(TRANS("Open..."), TRANS("Open a Patcher File"),
                                CommandCategories::general, 0);
                 
                 result.addDefaultKeypress('o', ModifierKeys::commandModifier);
@@ -391,7 +391,7 @@ namespace kiwi
         switch(info.commandID)
         {
             case CommandIDs::newPatcher :                   { m_instance->newPatcher(); break; }
-            case CommandIDs::openFile :                     { m_instance->openPatcher(); break; }
+            case CommandIDs::openFile :                     { m_instance->askUserToOpenPatcherDocument(); break; }
             case CommandIDs::showConsoleWindow :            { m_instance->showConsoleWindow(); break; }
             case CommandIDs::showAppSettingsWindow :        { m_instance->openSettings(); break; }
             case CommandIDs::showDocumentExplorerWindow :   { m_instance->showDocumentExplorerWindow(); break; }

@@ -65,10 +65,10 @@ namespace kiwi
         engine::Instance const& getEngineInstance() const;
         
         //! @brief Open a File.
-        void openFile(kiwi::FilePath const& file);
+        bool openFile(kiwi::FilePath const& file);
         
         //! @brief Open a patcher from file
-        void openPatcher();
+        void askUserToOpenPatcherDocument();
         
         //! @brief Attempt to close the given window asking user to save file if needed.
         bool closeWindow(jWindow& window);
@@ -121,6 +121,7 @@ namespace kiwi
         std::vector<uint8_t>                        m_patcher_clipboard;
         
         static size_t                               m_untitled_patcher_index;
+        juce::File                                  m_last_opened_file;
     };
 }
 
