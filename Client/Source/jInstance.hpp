@@ -77,9 +77,6 @@ namespace kiwi
         //! @return True if all document have been closed, false if the user cancel the action.
         bool closeAllWindows();
         
-        //! @brief Create a new remote patcher
-        void openRemotePatcher();
-        
         //! @brief Attempt to create a new patcher with given host and port parameters.
         void openRemotePatcher(std::string& host, uint16_t& port);
         
@@ -104,9 +101,6 @@ namespace kiwi
         
         //! @brief Returns the next untitled number based on current documents
         size_t getNextUntitledNumberAndIncrement();
-        
-        //! @brief Open a dialog box used to enter server infos
-        void openRemoteDialogBox(std::string& host, uint16_t& port);
         
         //! @brief Sets the instance user id
         void setUserId(uint64_t user_id);
