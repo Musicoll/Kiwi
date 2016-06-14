@@ -285,15 +285,24 @@ namespace kiwi
         setContentOwned(new DocumentExplorer::Panel(explorer, instance), false);
         setResizable(true, false);
         setResizeLimits(50, 50, 32000, 32000);
-        setTopLeftPosition(0, 500);
-        setSize(250, 300);
         
-        setVisible(true);
+        const String windowState(getGlobalProperties().getValue("document_explorer_window"));
+        
+        if(windowState.isNotEmpty())
+        {
+            restoreWindowStateFromString(windowState);
+        }
+        else
+        {
+            setTopLeftPosition(10, 10);
+            setSize(300, 440);
+            setVisible(true);
+        }
     }
     
     DocumentExplorerWindow::~DocumentExplorerWindow()
     {
-        ;
+        getGlobalProperties().setValue("document_explorer_window", getWindowStateAsString());
     }
     
     void DocumentExplorerWindow::closeButtonPressed()

@@ -34,6 +34,7 @@
 #include "jConsole.hpp"
 #include "DocumentExplorer.hpp"
 #include "jPatcherManager.hpp"
+#include "StoredSettings.hpp"
 
 namespace kiwi
 {

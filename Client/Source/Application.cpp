@@ -67,10 +67,12 @@ namespace kiwi
             delete this;
             
             if (JUCEApplicationBase* app = JUCEApplicationBase::getInstance())
+            {
                 app->systemRequestedQuit();
+            }
         }
         
-        JUCE_DECLARE_NON_COPYABLE (AsyncQuitRetrier)
+        JUCE_DECLARE_NON_COPYABLE(AsyncQuitRetrier)
     };
     
     // ================================================================================ //
@@ -79,6 +81,8 @@ namespace kiwi
     
     void KiwiApp::initialise(String const& commandLine)
     {
+        m_settings = std::make_unique<StoredSettings>();
+        
         initCommandManager();
         
         m_menu_model.reset(new MainMenuModel());
@@ -109,6 +113,8 @@ namespace kiwi
         #if JUCE_MAC
         MenuBarModel::setMacMainMenu(nullptr);
         #endif
+        
+        m_settings.reset();
     }
     
     void KiwiApp::systemRequestedQuit()
@@ -143,6 +149,11 @@ namespace kiwi
     uint64_t KiwiApp::userID()
     {
         return KiwiApp::use().m_instance->getUserId();
+    }
+    
+    StoredSettings& KiwiApp::useSettings()
+    {
+        return *KiwiApp::use().m_settings;
     }
     
     bool KiwiApp::closeWindow(jWindow& window)

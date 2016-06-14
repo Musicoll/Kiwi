@@ -22,6 +22,7 @@
  */
 
 #include "jConsole.hpp"
+#include "StoredSettings.hpp"
 
 namespace kiwi
 {
@@ -331,14 +332,24 @@ namespace kiwi
         setContentOwned(new jConsole(), false);
         setResizable(true, false);
         setResizeLimits(50, 50, 32000, 32000);
-        setTopLeftPosition(0, 0);
-        setSize(300, 440);
-        setVisible(true);
+        
+        const String windowState(getGlobalProperties().getValue("console_window"));
+        
+        if(windowState.isNotEmpty())
+        {
+            restoreWindowStateFromString(windowState);
+        }
+        else
+        {
+            setTopLeftPosition(0, 0);
+            setSize(300, 440);
+            setVisible(true);
+        }
     }
     
     jConsoleWindow::~jConsoleWindow()
     {
-        ;
+        getGlobalProperties().setValue("console_window", getWindowStateAsString());
     }
     
     void jConsoleWindow::closeButtonPressed()

@@ -33,6 +33,10 @@
       <FILE id="Jmu5NJ" name="jInstance.cpp" compile="1" resource="0" file="Source/jInstance.cpp"/>
       <FILE id="dfUOAd" name="jInstance.hpp" compile="0" resource="0" file="Source/jInstance.hpp"/>
       <FILE id="yC78kD" name="CommandIDs.hpp" compile="0" resource="0" file="Source/CommandIDs.hpp"/>
+      <FILE id="dQYnOl" name="StoredSettings.cpp" compile="1" resource="0"
+            file="Source/StoredSettings.cpp"/>
+      <FILE id="HZmZHb" name="StoredSettings.hpp" compile="0" resource="0"
+            file="Source/StoredSettings.hpp"/>
       <FILE id="Je1Viq" name="Application.cpp" compile="1" resource="0" file="Source/Application.cpp"/>
       <FILE id="gEGUnW" name="Application.hpp" compile="0" resource="0" file="Source/Application.hpp"/>
       <FILE id="EcI2R7" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
