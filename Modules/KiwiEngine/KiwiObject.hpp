@@ -29,8 +29,6 @@
 #include <KiwiModel/KiwiConsole.hpp>
 #include <KiwiModel/KiwiObject.hpp>
 
-#include <utility>
-
 namespace kiwi
 {
     namespace engine
@@ -43,7 +41,7 @@ namespace kiwi
         //                                      OBJECT                                      //
         // ================================================================================ //
         
-        //! @brief The model::Object engine.
+        //! @brief The object reacts and interacts with other objects by sending and receiving messages via its inlets and outlets.
         class Object
         {
         public: // methods
@@ -57,19 +55,22 @@ namespace kiwi
             //! @brief Returns the name of the Object.
             std::string getName() const noexcept;
             
-            //! @brief Get the number of inlets of the Object.
+            //! @brief Returns the number of inlets of the Object.
             size_t getNumberOfInlets() const noexcept;
             
-            //! @brief Get the number of inlets of the object.
+            //! @brief Returns the number of inlets of the Object.
             size_t getNumberOfOutlets() const noexcept;
             
-            //! @brief The receive method.
+            //! @brief Receives a set of arguments via an inlet.
             //! @details This method must be overriden by object's subclasses.
+            //! @todo see if the method must be noexcept.
             virtual void receive(size_t index, std::vector<Atom> const& args) = 0;
             
         protected: // methods
             
-            //! @brief Send a message through a given outlet index.
+            //! @brief Sends a vector of Atom via an outlet.
+            //! @todo Improve the stack overflow system.
+            //! @todo see if the method must be noexcept.
             void send(const size_t index, std::vector<Atom> const& args);
             
             //! @brief Called when the signalTrigger method is fired.
@@ -77,17 +78,17 @@ namespace kiwi
         
         private: // methods
             
-            //! @internal Model change notification.
-            void objectChanged(model::Object& object_m);
-            
-            //! @internal signalTriggerCallback.
-            void internal_signalTriggerCalled();
-            
             //! @internal Append a new link to an outlet.
             void addOutputLink(Link* link);
             
             //! @internal Remove a link from an outlet.
             void removeOutputLink(Link* link);
+            
+            //! @internal Model change notification.
+            void objectChanged(model::Object& object_m);
+            
+            //! @internal signalTriggerCallback.
+            void internal_signalTriggerCalled();
             
             friend class engine::Patcher;
             

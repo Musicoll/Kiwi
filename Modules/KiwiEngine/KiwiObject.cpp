@@ -22,8 +22,7 @@
 */
 
 #include "KiwiObject.hpp"
-#include "KiwiPatcher.hpp"
-#include "KiwiInstance.hpp"
+#include "KiwiLink.hpp"
 
 namespace kiwi
 {
@@ -35,7 +34,7 @@ namespace kiwi
         
         Object::Object() noexcept : m_stack_count(0)
         {
-            
+            ;
         }
         
         Object::~Object() noexcept
