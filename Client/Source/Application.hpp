@@ -27,6 +27,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 
 #include "jInstance.hpp"
+#include "StoredSettings.hpp"
 
 namespace kiwi
 {
@@ -59,14 +60,22 @@ namespace kiwi
         
         //==============================================================================
         
-        //! @brief Get the current running Application instance.
+        //! @brief Get the current running application instance.
         static KiwiApp& use();
         
-        //! @brief Get the current running Application instance.
+        //! @brief Get the current running application instance.
         static KiwiApp* getApp();
         
-        //! @brief Get the user id associated to this running Application instance.
+        //! @brief Get the user id associated to this running application instance.
         static uint64_t userID();
+        
+        //! @brief Returns the application stored settings.
+        static StoredSettings& useSettings();
+        
+        //==============================================================================
+        
+        //! @brief Attempt to close the given window asking user to save file if needed.
+        bool closeWindow(jWindow& window);
         
         // ================================================================================ //
         //                                  APPLICATION MENU                                //
@@ -124,7 +133,7 @@ namespace kiwi
         static KeyPressMappingSet* getKeyMappings();
         
         //! @brief This must return a complete list of commands that this target can handle.
-        void getAllCommands(Array <CommandID>& commands) override;
+        void getAllCommands(Array<CommandID>& commands) override;
         
         //! @brief This must provide details about one of the commands that this target can perform.
         void getCommandInfo(CommandID commandID, ApplicationCommandInfo& result) override;
@@ -145,6 +154,8 @@ namespace kiwi
         std::unique_ptr<jInstance>                  m_instance;
         std::unique_ptr<ApplicationCommandManager>	m_command_manager;
         std::unique_ptr<MainMenuModel>				m_menu_model;
+        
+        std::unique_ptr<StoredSettings>             m_settings;
     };
 }
 

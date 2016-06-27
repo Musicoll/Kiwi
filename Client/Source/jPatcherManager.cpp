@@ -25,6 +25,7 @@
 #include <KiwiEngine/KiwiDocumentManager.hpp>
 #include <KiwiEngine/KiwiPatcher.hpp>
 
+#include "Application.hpp"
 #include "jInstance.hpp"
 #include "jPatcherManager.hpp"
 #include "jPatcher.hpp"
@@ -45,7 +46,17 @@ namespace kiwi
     
     void jPatcherWindow::closeButtonPressed()
     {
-        m_manager.closePatcherViewWindow(m_jpatcher);
+        KiwiApp::use().closeWindow(*this);
+    }
+    
+    jPatcherManager& jPatcherWindow::getManager() const
+    {
+        return m_manager;
+    }
+    
+    jPatcher& jPatcherWindow::getjPatcher() const
+    {
+        return m_jpatcher;
     }
     
     // ================================================================================ //
@@ -54,7 +65,8 @@ namespace kiwi
     
     jPatcherManager::jPatcherManager(jInstance& instance) :
     m_instance(instance),
-    m_document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat')
+    m_document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
+    m_is_remote(false)
     {
         model::Patcher & patcher = getPatcher();
         
@@ -66,7 +78,8 @@ namespace kiwi
     
     jPatcherManager::jPatcherManager(jInstance& instance, kiwi::FilePath const& file):
     m_instance(instance),
-    m_document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat')
+    m_document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
+    m_is_remote(false)
     {
         model::Patcher& patcher = getPatcher();
         DocumentManager::load(patcher, file);
@@ -81,14 +94,10 @@ namespace kiwi
         DocumentManager::commit(patcher, "Add User");
     }
     
-    jPatcherManager::~jPatcherManager()
-    {
-        ;
-    }
-    
     jPatcherManager::jPatcherManager(jInstance & instance, const std::string host, uint16_t port) :
     m_instance(instance),
-    m_document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat')
+    m_document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
+    m_is_remote(true)
     {
         model::Patcher & patcher = getPatcher();
         
@@ -103,6 +112,11 @@ namespace kiwi
         
         patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
         DocumentManager::commit(patcher);
+    }
+    
+    jPatcherManager::~jPatcherManager()
+    {
+        ;
     }
     
     model::Patcher& jPatcherManager::getPatcher()
@@ -140,7 +154,7 @@ namespace kiwi
     
     bool jPatcherManager::needsSaving() const
     {
-        return m_need_saving_flag;
+        return (!m_is_remote) && m_need_saving_flag;
     }
     
     bool jPatcherManager::saveDocument()
@@ -177,7 +191,7 @@ namespace kiwi
     
     FileBasedDocument::SaveResult jPatcherManager::saveIfNeededAndUserAgrees()
     {
-        if (! m_need_saving_flag)
+        if (! needsSaving())
         {
             return FileBasedDocument::savedOk;
         }
@@ -341,7 +355,7 @@ namespace kiwi
             {
                 // handle external users.
                 
-                Console::post("New user !!");
+                //Console::post("New user !!");
             }
         }
     }

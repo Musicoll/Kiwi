@@ -62,7 +62,7 @@ endif()
 
 # -> ThirdParty
 
-#find_library(Flip NAMES flip_macos HINTS ${PROJECT_SOURCE_DIR}/ThirdParty/flip-public/bin)
+#find_library(Flip NAMES flip HINTS ${PROJECT_SOURCE_DIR}/ThirdParty/flip-public/lib)
 
 # -> Module Core
 
@@ -88,7 +88,7 @@ if(${APPLE})
                  PROPERTY INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Modules
                                               ${PROJECT_SOURCE_DIR}/ThirdParty/flip-public/include)
 
-    target_link_libraries(KiwiModel ${PROJECT_SOURCE_DIR}/ThirdParty/flip-public/bin/flip_macos.a)
+    target_link_libraries(KiwiModel ${PROJECT_SOURCE_DIR}/ThirdParty/flip-public/lib/macos/libflip.a)
 endif()
 
 #----------------------------------
@@ -110,7 +110,7 @@ set_property(TARGET test_core
 #         ${PROJECT_SOURCE_DIR}/test/Modules/Model/*.cpp)
 #     add_executable(test_model ${TEST_MODEL_SRC})
 #
-#     target_link_libraries(test_model KiwiModel ${PROJECT_SOURCE_DIR}/ThirdParty/flip-public/bin/flip_macos.a)
+#     target_link_libraries(test_model KiwiModel ${PROJECT_SOURCE_DIR}/ThirdParty/flip-public/lib/macos/libflip.a)
 #     set_property(TARGET test_model
 #                  PROPERTY INCLUDE_DIRECTORIES   ${PROJECT_SOURCE_DIR}/Modules
 #                                                 ${PROJECT_SOURCE_DIR}/ThirdParty/flip-public/include)

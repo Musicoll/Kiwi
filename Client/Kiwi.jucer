@@ -20,6 +20,10 @@
       <FILE id="KQjSU2" name="jPatcher.hpp" compile="0" resource="0" file="Source/jPatcher.hpp"/>
       <FILE id="QMh5qc" name="jWindow.cpp" compile="1" resource="0" file="Source/jWindow.cpp"/>
       <FILE id="dmcYQZ" name="jWindow.hpp" compile="0" resource="0" file="Source/jWindow.hpp"/>
+      <FILE id="DHSN5e" name="DocumentExplorer.cpp" compile="1" resource="0"
+            file="Source/DocumentExplorer.cpp"/>
+      <FILE id="SzKgac" name="DocumentExplorer.hpp" compile="0" resource="0"
+            file="Source/DocumentExplorer.hpp"/>
       <FILE id="oCQegP" name="jPatcherManager.cpp" compile="1" resource="0"
             file="Source/jPatcherManager.cpp"/>
       <FILE id="UPcwrk" name="jPatcherManager.hpp" compile="0" resource="0"
@@ -29,6 +33,10 @@
       <FILE id="Jmu5NJ" name="jInstance.cpp" compile="1" resource="0" file="Source/jInstance.cpp"/>
       <FILE id="dfUOAd" name="jInstance.hpp" compile="0" resource="0" file="Source/jInstance.hpp"/>
       <FILE id="yC78kD" name="CommandIDs.hpp" compile="0" resource="0" file="Source/CommandIDs.hpp"/>
+      <FILE id="dQYnOl" name="StoredSettings.cpp" compile="1" resource="0"
+            file="Source/StoredSettings.cpp"/>
+      <FILE id="HZmZHb" name="StoredSettings.hpp" compile="0" resource="0"
+            file="Source/StoredSettings.hpp"/>
       <FILE id="Je1Viq" name="Application.cpp" compile="1" resource="0" file="Source/Application.cpp"/>
       <FILE id="gEGUnW" name="Application.hpp" compile="0" resource="0" file="Source/Application.hpp"/>
       <FILE id="EcI2R7" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
@@ -349,17 +357,17 @@
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" extraDefs="flip_NOTHING=flip_NOTHING_FATAL"
-               externalLibraries="" extraCompilerFlags="" extraLinkerFlags="../../../ThirdParty/flip-public/bin/flip_macos.a"
+               externalLibraries="" extraCompilerFlags="" extraLinkerFlags="../../../ThirdParty/flip-public/lib/macos/libflip.a"
                documentExtensions="kiwi" smallIcon="ryVSWY" bigIcon="ryVSWY">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.10 SDK" osxArchitecture="default"
                        isDebug="1" optimisation="1" targetName="Kiwi" headerPath="../../../ThirdParty/flip-public/include&#10;../../../Modules"
                        defines="" cppLanguageStandard="c++11" cppLibType="libc++" customXcodeFlags="USE_HEADERMAP=NO, GCC_SYMBOLS_PRIVATE_EXTERN=DEFAULT"
-                       libraryPath="../../../ThirdParty/flip-public/bin"/>
+                       libraryPath=""/>
         <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="default" osxArchitecture="default"
                        isDebug="0" optimisation="3" targetName="Kiwi" headerPath="../../../ThirdParty/flip-public/include&#10;../../../Modules"
                        defines="" cppLanguageStandard="c++11" cppLibType="libc++" customXcodeFlags="USE_HEADERMAP=NO, GCC_SYMBOLS_PRIVATE_EXTERN=DEFAULT"
-                       libraryPath="../../../ThirdParty/flip-public/bin"/>
+                       libraryPath=""/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../ThirdParty/Juce/modules"/>

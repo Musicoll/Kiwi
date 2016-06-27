@@ -32,7 +32,9 @@
 #include "flip/Document.h"
 
 #include "jConsole.hpp"
+#include "DocumentExplorer.hpp"
 #include "jPatcherManager.hpp"
+#include "StoredSettings.hpp"
 
 namespace kiwi
 {
@@ -64,17 +66,20 @@ namespace kiwi
         engine::Instance const& getEngineInstance() const;
         
         //! @brief Open a File.
-        void openFile(kiwi::FilePath const& file);
+        bool openFile(kiwi::FilePath const& file);
         
         //! @brief Open a patcher from file
-        void openPatcher();
+        void askUserToOpenPatcherDocument();
+        
+        //! @brief Attempt to close the given window asking user to save file if needed.
+        bool closeWindow(jWindow& window);
         
         //! @brief Attempt to close all document, after asking user to save them if needed.
         //! @return True if all document have been closed, false if the user cancel the action.
         bool closeAllWindows();
         
-        //! @brief Create a new remote patcher
-        void openRemotePatcher();
+        //! @brief Attempt to create a new patcher with given host and port parameters.
+        void openRemotePatcher(std::string& host, uint16_t& port);
         
         //! @brief Opens the settings
         void openSettings();
@@ -82,32 +87,42 @@ namespace kiwi
         //! @brief Brings the Console to front.
         void showConsoleWindow();
         
+        //! @brief Brings the Console to front.
+        void showDocumentExplorerWindow();
+        
         //! @brief Get Patcher clipboard data.
         std::vector<uint8_t>& getPatcherClipboardData();
         
-    private:
+    private: // methods
+        
+        using jPatcherManagers = std::vector<std::unique_ptr<jPatcherManager>>;
+        
+        //! @internal get the given patcher manager iterator.
+        jPatcherManagers::const_iterator getPatcherManager(jPatcherManager const& manager) const;
         
         //! @brief Returns the next untitled number based on current documents
         size_t getNextUntitledNumberAndIncrement();
         
-        //! @brief Open a dialog box used to enter server infos
-        void openRemoteDialogBox(std::string & host, uint16_t & port);
-        
         //! @brief Sets the instance user id
         void setUserId(uint64_t user_id);
         
-        using jPatcherManagers = std::vector<std::unique_ptr<jPatcherManager>>;
+    private: // members
         
         uint64_t m_user_id;
         
-        std::unique_ptr<engine::Instance>   m_instance;
+        std::unique_ptr<engine::Instance>           m_instance;
         
-        jPatcherManagers                    m_patcher_managers;
+        jPatcherManagers                            m_patcher_managers;
         
-        std::unique_ptr<jConsoleWindow>     m_console_window;
-        std::vector<uint8_t>                m_patcher_clipboard;
+        std::unique_ptr<jConsoleWindow>             m_console_window;
         
-        static size_t                       m_untitled_patcher_index;
+        std::unique_ptr<DocumentExplorer>           m_document_explorer;
+        std::unique_ptr<DocumentExplorerWindow>     m_document_explorer_window;
+        
+        std::vector<uint8_t>                        m_patcher_clipboard;
+        
+        static size_t                               m_untitled_patcher_index;
+        juce::File                                  m_last_opened_file;
     };
 }
 

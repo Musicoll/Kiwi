@@ -716,8 +716,8 @@
 					"${KIWI_DIR}/ThirdParty/flip-public/include",
 					"${KIWI_DIR}/Modules",
 				);
-				LIBRARY_SEARCH_PATHS = "${KIWI_DIR}/ThirdParty/flip-public/bin";
-				OTHER_LDFLAGS = "${KIWI_DIR}/ThirdParty/flip-public/bin/flip_macos.a";
+				LIBRARY_SEARCH_PATHS = "${KIWI_DIR}/ThirdParty/flip-public/lib/**";
+				OTHER_LDFLAGS = "${KIWI_DIR}/ThirdParty/flip-public/lib/macos/libflip.a";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -730,8 +730,8 @@
 					"${KIWI_DIR}/ThirdParty/flip-public/include",
 					"${KIWI_DIR}/Modules",
 				);
-				LIBRARY_SEARCH_PATHS = "${KIWI_DIR}/ThirdParty/flip-public/bin";
-				OTHER_LDFLAGS = "${KIWI_DIR}/ThirdParty/flip-public/bin/flip_macos.a";
+				LIBRARY_SEARCH_PATHS = "${KIWI_DIR}/ThirdParty/flip-public/lib/**";
+				OTHER_LDFLAGS = "${KIWI_DIR}/ThirdParty/flip-public/lib/macos/libflip.a";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

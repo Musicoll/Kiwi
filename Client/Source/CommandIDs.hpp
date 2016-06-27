@@ -35,7 +35,6 @@ namespace kiwi
         newPatcher                  = 0x200010,        ///< Create a new blank patcher window.
         newPatcherView              = 0x200020,        ///< Create a new patcher view.
         openFile                    = 0x200030,        ///< Open a file in a new window.
-        openRemotePatcher           = 0x200040,        ///< Open a remote patcher.
         closePatcher                = 0x200051,        ///< Close the current patcher.
         save                        = 0x200060,        ///< Save the current patcher document.
         saveAs                      = 0x200061,        ///< Save the current patcher document as.
@@ -48,6 +47,7 @@ namespace kiwi
         showAudioStatusWindow       = 0x202010,        ///< Make visible the "audio status" window.
         showAboutAppWindow          = 0x202020,        ///< Make visible the "about app" window.
         showAppSettingsWindow       = 0x202030,        ///< Make visible the "application settings" window.
+        showDocumentExplorerWindow  = 0x202040,        ///< Make visible the "lan document explorer" window.
         
         undo                        = 0xf1000a,        ///< Undo last action.
         redo                        = 0xf1000b,        ///< Redo last action.

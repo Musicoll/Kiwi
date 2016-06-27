@@ -40,7 +40,10 @@ namespace kiwi
     //m_user_id(flip::Ref::User::Offline),
     m_user_id(123456789ULL),
     m_instance(new engine::Instance(m_user_id, std::make_unique<jGuiDevice>())),
-    m_console_window(new jConsoleWindow())
+    m_console_window(new jConsoleWindow()),
+    m_document_explorer(new DocumentExplorer()),
+    m_document_explorer_window(new DocumentExplorerWindow(*m_document_explorer, *this)),
+    m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
     {
         ;
     }
@@ -88,11 +91,15 @@ namespace kiwi
         
         patcher.setName(patcher_name);
         
-        manager.newView();
-        DocumentManager::commit(patcher, "pre-populate patcher");
+        if(manager.getNumberOfView() == 0)
+        {
+            manager.newView();
+        }
+        
+        DocumentManager::commit(patcher);
     }
     
-    void jInstance::openFile(kiwi::FilePath const& file)
+    bool jInstance::openFile(kiwi::FilePath const& file)
     {
         if(file.isKiwiFile())
         {
@@ -102,25 +109,59 @@ namespace kiwi
             {
                 manager.newView();
             }
+            
+            return true;
         }
         else
         {
             Console::error("can't open file");
         }
+        
+        return false;
     }
     
-    void jInstance::openPatcher()
+    void jInstance::askUserToOpenPatcherDocument()
     {
-        juce::FileChooser openFileChooser("Open file",
-                                          juce::File::getSpecialLocation (juce::File::userHomeDirectory),
-                                          "*.kiwi");
+        juce::FileChooser file_chooser("Open file", m_last_opened_file, "*.kiwi");
         
-        if (openFileChooser.browseForFileToOpen())
+        if(file_chooser.browseForFileToOpen())
         {
-            kiwi::FilePath open_file(openFileChooser.getResult().getFullPathName().toStdString());
+            juce::File selected_file = file_chooser.getResult();
+            kiwi::FilePath open_file_path(selected_file.getFullPathName().toStdString());
             
-            openFile(open_file);
+            const bool success = openFile(open_file_path);
+            
+            if(success)
+            {
+                selected_file.setAsCurrentWorkingDirectory();
+                m_last_opened_file = selected_file;
+            }
         }
+    }
+    
+    bool jInstance::closeWindow(jWindow& window)
+    {
+        bool success = true;
+        
+        jPatcherWindow* pwin = dynamic_cast<jPatcherWindow*>(&window);
+        if(pwin && !m_patcher_managers.empty())
+        {
+            jPatcherManager& manager = pwin->getManager();
+            
+            const auto manager_it = getPatcherManager(manager);
+            if(manager_it != m_patcher_managers.end())
+            {
+                jPatcher& jpatcher = pwin->getjPatcher();
+                
+                success = manager.closePatcherViewWindow(jpatcher);
+                if(success && manager.getNumberOfView() == 0)
+                {
+                    m_patcher_managers.erase(manager_it);
+                }
+            }
+        }
+        
+        return success;
     }
     
     bool jInstance::closeAllWindows()
@@ -142,13 +183,8 @@ namespace kiwi
         return success;
     }
     
-    void jInstance::openRemotePatcher()
+    void jInstance::openRemotePatcher(std::string& host, uint16_t& port)
     {
-        std::string host("");
-        uint16_t port(0);
-        
-        openRemoteDialogBox(host, port);
-        
         std::unique_ptr<jPatcherManager> manager_uptr = nullptr;
         
         try
@@ -164,71 +200,11 @@ namespace kiwi
         {
             auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), std::move(manager_uptr));
             jPatcherManager& manager = *(manager_it->get());
-            manager.newView();
+            if(manager.getNumberOfView() == 0)
+            {
+                manager.newView();
+            }
         }
-    }
-    
-    // ================================================================================ //
-    //                                   Remote Settings                                //
-    // ================================================================================ //
-    
-    class jRemoteSettings final : public juce::Component
-    {
-    public:
-        jRemoteSettings();
-        
-        std::string getHost();
-        uint16_t getPort();
-        
-        ~jRemoteSettings() = default;
-        
-    private:
-        juce::TextEditor m_hostEditor;
-        juce::TextEditor m_portEditor;
-        
-    private:
-        jRemoteSettings(jRemoteSettings const& other) = delete;
-        jRemoteSettings& operator=(jRemoteSettings const& other) = delete;
-        jRemoteSettings(jRemoteSettings && other) = delete;
-        jRemoteSettings& operator=(jRemoteSettings && other) = delete;
-    };
-    
-    jRemoteSettings::jRemoteSettings()
-    {
-        setSize(300, 100);
-        setVisible(true);
-        
-        addAndMakeVisible(m_hostEditor);
-        addAndMakeVisible(m_portEditor);
-        
-        m_hostEditor.setBoundsRelative((1./5), (3./12), (3./5), (3./12));
-        m_portEditor.setBoundsRelative((1./5), (7./12), (3./5), (3./12));
-    }
-    
-    std::string jRemoteSettings::getHost()
-    {
-        return m_hostEditor.getText().toStdString();
-    }
-    
-    uint16_t jRemoteSettings::getPort()
-    {
-        return m_portEditor.getText().getFloatValue();
-    }
-    
-    void jInstance::openRemoteDialogBox(std::string & host, uint16_t & port)
-    {
-        jRemoteSettings remote_set_cmp;
-        juce::OptionalScopedPointer<Component> remote_component(&remote_set_cmp, false);
-        
-        juce::DialogWindow::LaunchOptions option;
-        option.dialogTitle = juce::String("Remote settings");
-        option.content = remote_component;
-        option.resizable = false;
-        
-        option.runModal();
-        
-        host = remote_set_cmp.getHost();
-        port = remote_set_cmp.getPort();
     }
     
     // ================================================================================ //
@@ -238,14 +214,25 @@ namespace kiwi
     class jSettings final : public juce::Component
     {
     public:
-        jSettings(uint64_t client_id);
-        
-        uint64_t getClientId();
-        
+        jSettings(uint64_t user_id)
+        {
+            setSize(300, 100);
+            setVisible(true);
+            
+            addAndMakeVisible(m_user_id);
+            m_user_id.setBoundsRelative((1./5), (5./12), (3./5), (3./12));
+            m_user_id.setText(juce::String(user_id));
+        }
+      
         ~jSettings() = default;
         
+        uint64_t getUserId() const
+        {
+            return m_user_id.getText().getFloatValue();
+        }
+        
     private:
-        juce::TextEditor m_client_id;
+        juce::TextEditor m_user_id;
         
     private:
         jSettings(jSettings const & other) = delete;
@@ -253,21 +240,6 @@ namespace kiwi
         jSettings& operator=(jSettings const& other) = delete;
         jSettings& operator=(jSettings && other) = delete;
     };
-    
-    jSettings::jSettings(uint64_t client_id)
-    {
-        setSize(300, 100);
-        setVisible(true);
-        
-        addAndMakeVisible(m_client_id);
-        m_client_id.setBoundsRelative((1./5), (5./12), (3./5), (3./12));
-        m_client_id.setText(juce::String(client_id));
-    }
-    
-    uint64_t jSettings::getClientId()
-    {
-        return m_client_id.getText().getFloatValue();
-    }
     
     void jInstance::openSettings()
     {
@@ -281,13 +253,29 @@ namespace kiwi
         
         option.runModal();
         
-        setUserId(set_cmp.getClientId());
+        setUserId(set_cmp.getUserId());
+    }
+    
+    jInstance::jPatcherManagers::const_iterator jInstance::getPatcherManager(jPatcherManager const& manager) const
+    {
+        const auto find_it = [&manager](std::unique_ptr<jPatcherManager> const& manager_uptr)
+        {
+            return &manager == manager_uptr.get();
+        };
+        
+        return std::find_if(m_patcher_managers.begin(), m_patcher_managers.end(), find_it);
     }
     
     void jInstance::showConsoleWindow()
     {
         m_console_window->setVisible(true);
         m_console_window->toFront(true);
+    }
+    
+    void jInstance::showDocumentExplorerWindow()
+    {
+        m_document_explorer_window->setVisible(true);
+        m_document_explorer_window->toFront(true);
     }
     
     std::vector<uint8_t>& jInstance::getPatcherClipboardData()

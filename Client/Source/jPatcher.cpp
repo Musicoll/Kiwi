@@ -1339,7 +1339,22 @@ namespace kiwi
         // delete jObject for each removed objects
         for(auto& object : patcher.getObjects())
         {
-            if(object.removed()) { removejObject(object); }
+            if(object.removed())
+            {
+                // remove link_creator if binded object has been removed.
+                if(m_link_creator)
+                {
+                    model::Object const& binded_object = m_link_creator->getBindedObject().getModel();
+                    if(&binded_object == &object)
+                    {
+                        removeChildComponent(m_link_creator.get());
+                        m_link_creator.reset();
+                        m_io_highlighter->hide();
+                    }
+                }
+                
+                removejObject(object);
+            }
         }
         
         if(view.removed()) {}

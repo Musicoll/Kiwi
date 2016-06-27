@@ -21,6 +21,8 @@
  ==============================================================================
  */
 
+#include "flip/contrib/MulticastServiceProvider.h"
+
 #include "KiwiPatcherManager.hpp"
 
 #include <KiwiModel/KiwiPatcherModel.hpp>
@@ -29,12 +31,17 @@ namespace kiwi
 {
     namespace server
     {
-        PatcherManager::PatcherManager(uint64_t document_id) :
+        // ================================================================================ //
+        //                                  PATCHER MANAGER                                 //
+        // ================================================================================ //
+        
+        PatcherManager::PatcherManager(uint64_t session_id, uint16_t port, std::string const& title) :
         m_validator(),
         m_document(model::PatcherModel::use(),
                    m_validator,
-                   document_id),
-        m_transport(m_document, 9090),
+                   session_id),
+        m_port(port),
+        m_transport(m_document, m_port),
         m_transport_loop(),
         m_transport_running(false)
         {
@@ -47,13 +54,15 @@ namespace kiwi
             m_document.listen_disconnected
                        (std::bind(&PatcherManager::on_disconnected, this, std::placeholders::_1));
             
+            getPatcher().setName(title);
+            
             m_document.commit();
-            m_document.push();
+            m_document.push(); // needed ?
             
             launchTransport();
         }
         
-        model::Patcher &PatcherManager::getPatcher()
+        model::Patcher& PatcherManager::getPatcher()
         {
             return m_document.root<model::Patcher>();
         }
@@ -69,10 +78,21 @@ namespace kiwi
         
         void PatcherManager::runTransport()
         {
+            model::Patcher& patcher = getPatcher();
+            
+            std::map<std::string, std::string> metadata;
+            
+            std::string name = patcher.getName();
+            metadata["name"] = !name.empty() ? name : "Unnamed document";
+            
+            flip::MulticastServiceProvider provider(m_port, m_document, metadata);
+            
             while(m_transport_running.load())
             {
                 m_transport.process();
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                provider.process();
+                
+                std::this_thread::sleep_for(std::chrono::milliseconds(20));
             }
         }
         
