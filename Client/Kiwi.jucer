@@ -360,12 +360,13 @@
                externalLibraries="" extraCompilerFlags="" extraLinkerFlags="../../../ThirdParty/flip-public/lib/macos/libflip.a"
                documentExtensions="kiwi" smallIcon="ryVSWY" bigIcon="ryVSWY">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.10 SDK" osxArchitecture="default"
+        <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.11 SDK" osxArchitecture="default"
                        isDebug="1" optimisation="1" targetName="Kiwi" headerPath="../../../ThirdParty/flip-public/include&#10;../../../Modules"
                        defines="" cppLanguageStandard="c++11" cppLibType="libc++" customXcodeFlags="USE_HEADERMAP=NO, GCC_SYMBOLS_PRIVATE_EXTERN=DEFAULT"
                        libraryPath=""/>
-        <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="default" osxArchitecture="default"
-                       isDebug="0" optimisation="3" targetName="Kiwi" headerPath="../../../ThirdParty/flip-public/include&#10;../../../Modules"
+        <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="10.11 SDK"
+                       osxArchitecture="default" isDebug="0" optimisation="3" targetName="Kiwi"
+                       headerPath="../../../ThirdParty/flip-public/include&#10;../../../Modules"
                        defines="" cppLanguageStandard="c++11" cppLibType="libc++" customXcodeFlags="USE_HEADERMAP=NO, GCC_SYMBOLS_PRIVATE_EXTERN=DEFAULT"
                        libraryPath=""/>
       </CONFIGURATIONS>
