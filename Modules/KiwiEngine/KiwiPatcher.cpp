@@ -199,15 +199,14 @@ namespace kiwi
             
             if(from && to)
             {
-                auto& link_e = link_m.entity().emplace<Link>(link_m, *from, *to);
+                auto& link_e = link_m.entity().emplace<engine::Link>(link_m, *from, *to);
                 from->addOutputLink(&link_e);
             }
         }
         
         void Patcher::linkChanged(model::Link& link_m)
         {
-            auto& link_e = link_m.entity().use<engine::Link>();
-            link_e.linkChanged(link_m);
+            ;
         }
         
         void Patcher::linkRemoved(model::Link& link)
@@ -216,7 +215,7 @@ namespace kiwi
             
             if(sender_entity.has<sObject>())
             {
-                auto& link_engine = link.entity().use<Link>();
+                auto& link_engine = link.entity().use<engine::Link>();
                 auto from = sender_entity.use<sObject>();
                 from->removeOutputLink(&link_engine);
             }

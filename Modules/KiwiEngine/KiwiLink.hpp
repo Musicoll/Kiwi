@@ -36,7 +36,7 @@ namespace kiwi
         //                                      LINK                                        //
         // ================================================================================ //
         
-        //! @brief The link represents a connection between two kiwi objects.
+        //! @brief The link represents the connection between the outlet of an object to the inlet of another.
         class Link
         {
         public: // methods
@@ -48,10 +48,16 @@ namespace kiwi
             ~Link();
             
             //! @brief Get the object that send messages.
-            Object& getSenderObject() const noexcept;
+            Object& getSenderObject() noexcept;
+            
+            //! @brief Get the object that send messages.
+            Object const& getSenderObject() const noexcept;
             
             //! @brief Get the object that receive messages.
-            Object& getReceiverObject() const noexcept;
+            Object& getReceiverObject() noexcept;
+            
+            //! @brief Get the object that receive messages.
+            Object const& getReceiverObject() const noexcept;
             
             //! @brief Retrieve the index of the outlet of the link.
             size_t getSenderIndex() const noexcept;
@@ -59,23 +65,18 @@ namespace kiwi
             //! @brief Retrieve the index of the inlet of the link.
             size_t getReceiverIndex() const noexcept;
             
-        private: // methods
-            
-            //! @internal Link model has changed.
-            void linkChanged(model::Link& link_m);
-            
         private: // members
             
             model::Link const&  m_model;
             Object&             m_sender;
             Object&             m_receiver;
             
-            friend class Patcher;
-            
         private: // deleted methods
             
             Link(Link const&) = delete;
+            Link(Link&&) = delete;
             Link& operator=(Link const&) = delete;
+            Link& operator=(Link&&) = delete;
         };
     }
 }

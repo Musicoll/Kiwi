@@ -22,8 +22,6 @@
 */
 
 #include "KiwiLink.hpp"
-#include "KiwiObject.hpp"
-#include "KiwiPatcher.hpp"
 
 namespace kiwi
 {
@@ -46,12 +44,22 @@ namespace kiwi
             ;
         }
         
-        Object& Link::getSenderObject() const noexcept
+        Object& Link::getSenderObject() noexcept
         {
             return m_sender;
         }
         
-        Object& Link::getReceiverObject() const noexcept
+        Object const& Link::getSenderObject() const noexcept
+        {
+            return m_sender;
+        }
+        
+        Object& Link::getReceiverObject() noexcept
+        {
+            return m_receiver;
+        }
+ 
+        Object const& Link::getReceiverObject() const noexcept
         {
             return m_receiver;
         }
@@ -64,11 +72,6 @@ namespace kiwi
         size_t Link::getReceiverIndex() const noexcept
         {
             return m_model.getReceiverIndex();
-        }
-        
-        void Link::linkChanged(model::Link& link_m)
-        {
-            ;
         }
     }
 }
