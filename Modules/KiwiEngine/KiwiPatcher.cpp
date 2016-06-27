@@ -22,7 +22,6 @@
 */
 
 #include "KiwiPatcher.hpp"
-#include "KiwiInstance.hpp"
 
 namespace kiwi
 {
@@ -85,11 +84,6 @@ namespace kiwi
             }
             
             return links;
-        }
-        
-        void Patcher::sendToObject(Object& object, const size_t inlet, std::vector<Atom> args)
-        {
-            object.receive(inlet, args);
         }
         
         // ================================================================================ //
