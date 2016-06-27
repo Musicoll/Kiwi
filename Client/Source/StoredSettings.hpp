@@ -25,7 +25,6 @@
 #define KIWI_STORED_SETTINGS_HPP_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
-//#include "../Application/jucer_AppearanceSettings.h"
 
 namespace kiwi
 {

@@ -101,6 +101,13 @@ namespace kiwi
             size_t                  m_stack_count = 0ul;
             
             flip::SignalConnection  m_signal_cnx;
+            
+        private: // deleted methods
+            
+            Object(Object const&) = delete;
+            Object(Object&&) = delete;
+            Object& operator=(Object const&) = delete;
+            Object& operator=(Object&&) = delete;
         };
         
         typedef std::shared_ptr<Object> sObject;

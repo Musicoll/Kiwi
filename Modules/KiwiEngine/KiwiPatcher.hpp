@@ -85,6 +85,13 @@ namespace kiwi
         private: // members
             
             model::Patcher* m_model;
+            
+        private: // deleted methods
+            
+            Patcher(Patcher const&) = delete;
+            Patcher(Patcher&&) = delete;
+            Patcher& operator=(Patcher const&) = delete;
+            Patcher& operator=(Patcher&&) = delete;
         };
     }
 }

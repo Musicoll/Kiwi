@@ -23,7 +23,6 @@
 
 #include "StoredSettings.hpp"
 #include "Application.hpp"
-//#include "../Application/jucer_GlobalPreferences.h"
 
 namespace kiwi
 {
