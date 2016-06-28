@@ -24,10 +24,8 @@
 #ifndef KIWI_ENGINE_FACTORY_HPP_INCLUDED
 #define KIWI_ENGINE_FACTORY_HPP_INCLUDED
 
+#include "KiwiEngineDef.hpp"
 #include <KiwiModel/KiwiConsole.hpp>
-#include <KiwiModel/KiwiModelFactory.hpp>
-
-#include "KiwiObject.hpp"
 
 namespace kiwi
 {
@@ -47,16 +45,14 @@ namespace kiwi
             //! If the name of the object already exists, the function do nothing,
             //! otherwise the object is added to the factory.
             //! @param name The name of the object.
-            template <class TEngine, typename
-            std::enable_if<std::is_base_of<engine::Object, TEngine>::value,
-            engine::Object>::type* = nullptr>
+            template <class TEngine, typename std::enable_if<std::is_base_of<Object, TEngine>::value, Object>::type* = nullptr>
             static void add(std::string const& name)
             {
                 static_assert(!std::is_abstract<TEngine>::value,
                               "The class must not be abstract.");
                 
                 // The engine Object must be constructible with a vector of Atom
-                static_assert(std::is_constructible<TEngine, std::vector<Atom>>::value,
+                static_assert(std::is_constructible<TEngine, model::Object const&, std::vector<Atom>>::value,
                               "Bad engine object constructor");
                 
                 assert(!name.empty());
@@ -65,7 +61,7 @@ namespace kiwi
                 {
                     auto& creators = getCreators();
                     
-                    if(! model::Factory::has(name))
+                    if(!modelHasObject(name))
                     {
                         Console::error("The model::Object " + name + " conterpart does not exist");
                         return;
@@ -73,9 +69,9 @@ namespace kiwi
                     
                     if(creators.find(name) == creators.end())
                     {
-                        creators[name] = [](std::vector<Atom> const& args) -> TEngine*
+                        creators[name] = [](model::Object const& model, std::vector<Atom> const& args) -> TEngine*
                         {
-                            return new TEngine(args);
+                            return new TEngine(model, args);
                         };
                     }
                     else
@@ -88,7 +84,7 @@ namespace kiwi
             //! @brief Creates a new engine Object with a given text.
             //! @param model The model::Object.
             //! @return An object (if the name matches a registered engine Object name).
-            static std::unique_ptr<engine::Object> create(model::Object const& model);
+            static std::unique_ptr<Object> create(model::Object const& model);
             
             //! @brief Returns true if a given string match a registered Object engine name.
             //! @param name The name of the object engine.
@@ -101,10 +97,12 @@ namespace kiwi
             
         private:
             
+            static bool modelHasObject(std::string const& name);
+            
             Factory() = delete;
             ~Factory() = delete;
             
-            using ctor_fn_t = std::function<engine::Object*(std::vector<Atom>)>;
+            using ctor_fn_t = std::function<Object*(model::Object const& model, std::vector<Atom>)>;
             using creator_map_t = std::map<std::string, ctor_fn_t>;
             
             //! @internal Returns the static map of creators.

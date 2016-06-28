@@ -24,41 +24,34 @@
 #ifndef KIWI_ENGINE_OBJECT_HPP_INCLUDED
 #define KIWI_ENGINE_OBJECT_HPP_INCLUDED
 
-#include "flip/SignalConnection.h"
-
-#include <KiwiModel/KiwiConsole.hpp>
-#include <KiwiModel/KiwiObject.hpp>
+#include "KiwiEngineDef.hpp"
 
 namespace kiwi
 {
     namespace engine
     {
-        class Patcher;
-        class Instance;
-        class Link;
-        
         // ================================================================================ //
         //                                      OBJECT                                      //
         // ================================================================================ //
         
-        //! @brief The object reacts and interacts with other objects by sending and receiving messages via its inlets and outlets.
+        //! @brief The Object reacts and interacts with other ones by sending and receiving messages via its inlets and outlets.
         class Object
         {
         public: // methods
             
             //! @brief Constructor.
-            Object() noexcept;
+            Object(model::Object const& model) noexcept;
             
             //! @brief Destructor.
             virtual ~Object() noexcept;
 
-            //! @brief Returns the name of the Object.
+            //! @brief Gets the name of the Object.
             std::string getName() const noexcept;
             
-            //! @brief Returns the number of inlets of the Object.
+            //! @brief Gets the number of inlets of the Object.
             size_t getNumberOfInlets() const noexcept;
             
-            //! @brief Returns the number of inlets of the Object.
+            //! @brief Gets the number of inlets of the Object.
             size_t getNumberOfOutlets() const noexcept;
             
             //! @brief Receives a set of arguments via an inlet.
@@ -66,41 +59,26 @@ namespace kiwi
             //! @todo see if the method must be noexcept.
             virtual void receive(size_t index, std::vector<Atom> const& args) = 0;
             
+            //! @internal Appends a new Link to an outlet.
+            void addOutputLink(Link const* link);
+            
+            //! @internal Removes a Link from an outlet.
+            void removeOutputLink(Link const* link);
+            
         protected: // methods
             
             //! @brief Sends a vector of Atom via an outlet.
             //! @todo Improve the stack overflow system.
-            //! @todo see if the method must be noexcept.
+            //! @todo See if the method must be noexcept.
             void send(const size_t index, std::vector<Atom> const& args);
-            
-            //! @brief Called when the signalTrigger method is fired.
-            virtual void signalTriggerCalled() {};
-        
-        private: // methods
-            
-            //! @internal Append a new link to an outlet.
-            void addOutputLink(Link* link);
-            
-            //! @internal Remove a link from an outlet.
-            void removeOutputLink(Link* link);
-            
-            //! @internal Model change notification.
-            void objectChanged(model::Object& object_m);
-            
-            //! @internal signalTriggerCallback.
-            void internal_signalTriggerCalled();
-            
-            friend class engine::Patcher;
             
         private: // members
             
-            typedef std::set<Link*> Outlet;
+            typedef std::set<Link const*> Outlet;
 
-            model::Object*          m_model;
+            model::Object const&    m_model;
             std::vector<Outlet>     m_outlets;
             size_t                  m_stack_count = 0ul;
-            
-            flip::SignalConnection  m_signal_cnx;
             
         private: // deleted methods
             

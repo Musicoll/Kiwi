@@ -21,6 +21,8 @@
  ==============================================================================
 */
 
+#include <KiwiModel/KiwiModelFactory.hpp>
+
 #include "KiwiEngineFactory.hpp"
 #include "KiwiTypedObjects.hpp"
 
@@ -32,7 +34,7 @@ namespace kiwi
         //                                      FACTORY                                     //
         // ================================================================================ //
         
-        std::unique_ptr<engine::Object> Factory::create(model::Object const& model)
+        std::unique_ptr<Object> Factory::create(model::Object const& model)
         {
             const std::string object_name = model.getName();
             std::vector<Atom> atoms = AtomHelper::parse(model.getText());
@@ -54,7 +56,7 @@ namespace kiwi
                         assert(false && "the engine object has not been registered");
                     }
                     
-                    return std::unique_ptr<engine::Object>(engine_ctor(args));
+                    return std::unique_ptr<Object>(engine_ctor(model, args));
                 }
             }
             
@@ -88,6 +90,11 @@ namespace kiwi
         {
             static creator_map_t static_creators;
             return static_creators;
+        }
+        
+        bool Factory::modelHasObject(std::string const& name)
+        {
+            return model::Factory::has(name);
         }
     }
 }

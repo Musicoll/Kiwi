@@ -24,52 +24,42 @@
 #ifndef KIWI_ENGINE_LINK_HPP_INCLUDED
 #define KIWI_ENGINE_LINK_HPP_INCLUDED
 
-#include <KiwiModel/KiwiLink.hpp>
-
-#include "KiwiObject.hpp"
+#include "KiwiEngineDef.hpp"
 
 namespace kiwi
-{
+{    
     namespace engine
     {
         // ================================================================================ //
         //                                      LINK                                        //
         // ================================================================================ //
         
-        //! @brief The link represents the connection between the outlet of an object to the inlet of another.
+        //! @brief The Link represents the connection between the outlet of an Object to the inlet of another.
         class Link
         {
         public: // methods
             
             //! @brief Constructor.
-            Link(model::Link& model, Object& sender_object, Object& receiver_object);
+            Link(model::Link const& model);
             
             //! @brief Destructor.
             ~Link();
             
-            //! @brief Get the object that send messages.
-            Object& getSenderObject() noexcept;
+            //! @brief Gets the Object that sends messages.
+            Object* getSenderObject() const noexcept;
             
-            //! @brief Get the object that send messages.
-            Object const& getSenderObject() const noexcept;
+            //! @brief Gets the Object that receives messages.
+            Object* getReceiverObject() const noexcept;
             
-            //! @brief Get the object that receive messages.
-            Object& getReceiverObject() noexcept;
-            
-            //! @brief Get the object that receive messages.
-            Object const& getReceiverObject() const noexcept;
-            
-            //! @brief Retrieve the index of the outlet of the link.
+            //! @brief Gets the index of the outlet of the Link.
             size_t getSenderIndex() const noexcept;
             
-            //! @brief Retrieve the index of the inlet of the link.
+            //! @brief Gets the index of the inlet of the Link.
             size_t getReceiverIndex() const noexcept;
             
         private: // members
             
             model::Link const&  m_model;
-            Object&             m_sender;
-            Object&             m_receiver;
             
         private: // deleted methods
             

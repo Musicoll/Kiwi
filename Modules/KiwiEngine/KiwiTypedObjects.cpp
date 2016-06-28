@@ -25,6 +25,7 @@
 #define KIWI_ENGINE_OBJECTS_HPP_INCLUDED
 
 #include "KiwiTypedObjects.hpp"
+#include "../KiwiModel/KiwiConsole.hpp"
 
 namespace kiwi
 {
@@ -34,7 +35,7 @@ namespace kiwi
         //                                       NEWBOX                                     //
         // ================================================================================ //
         
-        NewBox::NewBox(std::vector<Atom> const& args)
+        NewBox::NewBox(model::Object const& model, std::vector<Atom> const& args) : Object(model)
         {
             ;
         }
@@ -48,7 +49,7 @@ namespace kiwi
         //                                      ERRORBOX                                    //
         // ================================================================================ //
         
-        ErrorBox::ErrorBox(std::vector<Atom> const& args)
+        ErrorBox::ErrorBox(model::Object const& model, std::vector<Atom> const& args) : Object(model)
         {
             ;
         }
@@ -62,7 +63,7 @@ namespace kiwi
         //                                    OBJECT PLUS                                   //
         // ================================================================================ //
         
-        ObjectPlus::ObjectPlus(std::vector<Atom> const& args)
+        ObjectPlus::ObjectPlus(model::Object const& model, std::vector<Atom> const& args) : Object(model)
         {
             m_lhs = 0.;
             if(!args.empty() && args[0].isNumber())
@@ -101,16 +102,11 @@ namespace kiwi
             send(0, {m_rhs + m_lhs});
         }
         
-        void ObjectPlus::signalTriggerCalled()
-        {
-            bang();
-        }
-        
         // ================================================================================ //
         //                                    OBJECT PRINT                                  //
         // ================================================================================ //
         
-        ObjectPrint::ObjectPrint(std::vector<Atom> const& args)
+        ObjectPrint::ObjectPrint(model::Object const& model, std::vector<Atom> const& args) : Object(model)
         {
             m_name = !args.empty() ? args[0].getString() : "print";
         }

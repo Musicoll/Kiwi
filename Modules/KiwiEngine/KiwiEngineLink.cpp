@@ -21,7 +21,11 @@
  ==============================================================================
 */
 
-#include "KiwiLink.hpp"
+#include "KiwiEngineLink.hpp"
+#include "KiwiEngineObject.hpp"
+
+#include <KiwiModel/KiwiLink.hpp>
+#include <KiwiModel/KiwiObject.hpp>
 
 namespace kiwi
 {
@@ -31,10 +35,8 @@ namespace kiwi
         //                                      LINK                                        //
         // ================================================================================ //
         
-        Link::Link(model::Link& model, Object& sender, Object& receiver) :
-        m_model(model),
-        m_sender(sender),
-        m_receiver(receiver)
+        Link::Link(model::Link const& model) :
+        m_model(model)
         {
             ;
         }
@@ -44,24 +46,14 @@ namespace kiwi
             ;
         }
         
-        Object& Link::getSenderObject() noexcept
+        Object* Link::getSenderObject() const noexcept
         {
-            return m_sender;
-        }
-        
-        Object const& Link::getSenderObject() const noexcept
-        {
-            return m_sender;
-        }
-        
-        Object& Link::getReceiverObject() noexcept
-        {
-            return m_receiver;
+            return m_model.getSenderObject().entity().use<std::shared_ptr<engine::Object>>().get();
         }
  
-        Object const& Link::getReceiverObject() const noexcept
+        Object* Link::getReceiverObject() const noexcept
         {
-            return m_receiver;
+            return m_model.getReceiverObject().entity().use<std::shared_ptr<engine::Object>>().get();
         }
         
         size_t Link::getSenderIndex() const noexcept

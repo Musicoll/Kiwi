@@ -53,20 +53,28 @@
               file="../Modules/KiwiEngine/KiwiDocumentManager.cpp"/>
         <FILE id="Nc2HAm" name="KiwiDocumentManager.hpp" compile="0" resource="0"
               file="../Modules/KiwiEngine/KiwiDocumentManager.hpp"/>
-        <FILE id="m2CfHk" name="KiwiObject.cpp" compile="1" resource="0" file="../Modules/KiwiEngine/KiwiObject.cpp"/>
-        <FILE id="vQkAvN" name="KiwiObject.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiObject.hpp"/>
-        <FILE id="v3qHXh" name="KiwiLink.cpp" compile="1" resource="0" file="../Modules/KiwiEngine/KiwiLink.cpp"/>
-        <FILE id="xNca6o" name="KiwiLink.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiLink.hpp"/>
         <FILE id="iNDjma" name="KiwiTypedObjects.cpp" compile="1" resource="0"
               file="../Modules/KiwiEngine/KiwiTypedObjects.cpp"/>
         <FILE id="i9g05d" name="KiwiTypedObjects.hpp" compile="0" resource="0"
               file="../Modules/KiwiEngine/KiwiTypedObjects.hpp"/>
+        <FILE id="Scvn6j" name="KiwiEngineDef.hpp" compile="0" resource="0"
+              file="../Modules/KiwiEngine/KiwiEngineDef.hpp"/>
+        <FILE id="S7ajZC" name="KiwiEngineLink.cpp" compile="1" resource="0"
+              file="../Modules/KiwiEngine/KiwiEngineLink.cpp"/>
+        <FILE id="sw6b3w" name="KiwiEngineLink.hpp" compile="0" resource="0"
+              file="../Modules/KiwiEngine/KiwiEngineLink.hpp"/>
+        <FILE id="jRiVi8" name="KiwiEngineObject.cpp" compile="1" resource="0"
+              file="../Modules/KiwiEngine/KiwiEngineObject.cpp"/>
+        <FILE id="Ro5E3R" name="KiwiEngineObject.hpp" compile="0" resource="0"
+              file="../Modules/KiwiEngine/KiwiEngineObject.hpp"/>
+        <FILE id="lc5o8x" name="KiwiEnginePatcher.cpp" compile="1" resource="0"
+              file="../Modules/KiwiEngine/KiwiEnginePatcher.cpp"/>
+        <FILE id="KhIEnz" name="KiwiEnginePatcher.hpp" compile="0" resource="0"
+              file="../Modules/KiwiEngine/KiwiEnginePatcher.hpp"/>
         <FILE id="KCNSwo" name="KiwiEngineFactory.cpp" compile="1" resource="0"
               file="../Modules/KiwiEngine/KiwiEngineFactory.cpp"/>
         <FILE id="vMsruG" name="KiwiEngineFactory.hpp" compile="0" resource="0"
               file="../Modules/KiwiEngine/KiwiEngineFactory.hpp"/>
-        <FILE id="I5TUoZ" name="KiwiPatcher.cpp" compile="1" resource="0" file="../Modules/KiwiEngine/KiwiPatcher.cpp"/>
-        <FILE id="pPUuGj" name="KiwiPatcher.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiPatcher.hpp"/>
         <FILE id="xlGx5g" name="KiwiGuiDevice.cpp" compile="1" resource="0"
               file="../Modules/KiwiEngine/KiwiGuiDevice.cpp"/>
         <FILE id="LPEo4K" name="KiwiGuiDevice.hpp" compile="0" resource="0"

@@ -24,43 +24,38 @@
 #ifndef KIWI_ENGINE_PATCHER_HPP_INCLUDED
 #define KIWI_ENGINE_PATCHER_HPP_INCLUDED
 
-#include <KiwiModel/KiwiPatcher.hpp>
-
-#include "flip/DocumentObserver.h"
-
-#include "KiwiLink.hpp"
+#include "KiwiEngineDef.hpp"
 
 namespace kiwi
-{
+{    
     namespace engine
     {
         // ================================================================================ //
         //                                      PATCHER                                     //
         // ================================================================================ //
         
-        //! @brief The Patcher manages a set of objects and links.
-        //! @details The patcher engine observes the Patcher model for changes.
-        class Patcher : public flip::DocumentObserver<model::Patcher>
+        //! @brief The Patcher manages a set of Object and Link.
+        class Patcher
         {
         public:
             
             //! @brief Constructor.
-            Patcher() noexcept;
+            Patcher(model::Patcher const& model) noexcept;
             
             //! @brief Destructor.
             ~Patcher();
             
             //! @brief Returns the objects.
-            std::vector<engine::Object const*> getObjects() const;
+            std::vector<Object const*> getObjects() const;
             
             //! @brief Returns the objects.
-            std::vector<engine::Object*> getObjects();
+            std::vector<Object*> getObjects();
             
             //! @brief Returns the links.
             std::vector<engine::Link const*> getLinks() const;
             
-            //! @internal flip::DocumentObserver<model::Patcher>::document_changed
-            void document_changed(model::Patcher& patcher) final override;
+            //! @internal The model changed.
+            void modelChanged();
             
         private: // methods
             
@@ -84,7 +79,7 @@ namespace kiwi
         
         private: // members
             
-            model::Patcher* m_model;
+            model::Patcher const& m_model;
             
         private: // deleted methods
             
