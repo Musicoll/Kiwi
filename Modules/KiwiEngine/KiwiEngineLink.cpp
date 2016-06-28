@@ -34,7 +34,7 @@ namespace kiwi
         //                                      LINK                                        //
         // ================================================================================ //
         
-        Link::Link(model::Link& model) :
+        Link::Link(model::Link const& model) :
         m_model(model)
         {
             ;

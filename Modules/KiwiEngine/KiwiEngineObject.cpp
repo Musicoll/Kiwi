@@ -21,8 +21,11 @@
  ==============================================================================
 */
 
-#include "KiwiObject.hpp"
+#include "KiwiEngineObject.hpp"
 #include "KiwiLink.hpp"
+
+#include <KiwiModel/KiwiConsole.hpp>
+#include <KiwiModel/KiwiObject.hpp>
 
 namespace kiwi
 {

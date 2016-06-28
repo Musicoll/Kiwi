@@ -41,7 +41,7 @@ namespace kiwi
         //                                      LINK                                        //
         // ================================================================================ //
         
-        //! @brief The link represents the connection between the outlet of an object to the inlet of another.
+        //! @brief The Link represents the connection between the outlet of an Object to the inlet of another.
         class Link
         {
         public: // methods

@@ -28,8 +28,6 @@
 
 #include "flip/DocumentObserver.h"
 
-#include "KiwiLink.hpp"
-
 namespace kiwi
 {
     namespace engine

@@ -24,11 +24,23 @@
 #ifndef KIWI_ENGINE_OBJECT_HPP_INCLUDED
 #define KIWI_ENGINE_OBJECT_HPP_INCLUDED
 
-#include <KiwiModel/KiwiConsole.hpp>
-#include <KiwiModel/KiwiObject.hpp>
+#include <cassert>
+#include <iostream>
+#include <sstream>
+#include <cstring>
+
+#include <memory>
+#include <vector>
+#include <set>
+
 
 namespace kiwi
 {
+    namespace model
+    {
+        class Object;
+    }
+    
     namespace engine
     {
         class Link;
@@ -37,7 +49,7 @@ namespace kiwi
         //                                      OBJECT                                      //
         // ================================================================================ //
         
-        //! @brief The object reacts and interacts with other objects by sending and receiving messages via its inlets and outlets.
+        //! @brief The Object reacts and interacts with other ones by sending and receiving messages via its inlets and outlets.
         class Object
         {
         public: // methods
@@ -48,16 +60,16 @@ namespace kiwi
             //! @brief Destructor.
             virtual ~Object() noexcept;
 
-            //! @brief Returns the name of the Object.
+            //! @brief Return the name of the Object.
             std::string getName() const noexcept;
             
-            //! @brief Returns the number of inlets of the Object.
+            //! @brief Return the number of inlets of the Object.
             size_t getNumberOfInlets() const noexcept;
             
-            //! @brief Returns the number of inlets of the Object.
+            //! @brief Return the number of inlets of the Object.
             size_t getNumberOfOutlets() const noexcept;
             
-            //! @brief Receives a set of arguments via an inlet.
+            //! @brief Receive a set of arguments via an inlet.
             //! @details This method must be overriden by object's subclasses.
             //! @todo see if the method must be noexcept.
             virtual void receive(size_t index, std::vector<Atom> const& args) = 0;
@@ -70,9 +82,9 @@ namespace kiwi
             
         protected: // methods
             
-            //! @brief Sends a vector of Atom via an outlet.
+            //! @brief Send a vector of Atom via an outlet.
             //! @todo Improve the stack overflow system.
-            //! @todo see if the method must be noexcept.
+            //! @todo See if the method must be noexcept.
             void send(const size_t index, std::vector<Atom> const& args);
             
         private: // members
