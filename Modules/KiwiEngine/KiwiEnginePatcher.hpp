@@ -24,22 +24,12 @@
 #ifndef KIWI_ENGINE_PATCHER_HPP_INCLUDED
 #define KIWI_ENGINE_PATCHER_HPP_INCLUDED
 
-#include "flip/DocumentObserver.h"
+#include "KiwiEngineDef.hpp"
 
 namespace kiwi
-{
-    namespace model
-    {
-        class Patcher;
-        class Object;
-        class Link;
-    }
-    
+{    
     namespace engine
     {
-        class Object;
-        class Link;
-        
         // ================================================================================ //
         //                                      PATCHER                                     //
         // ================================================================================ //
@@ -56,15 +46,15 @@ namespace kiwi
             ~Patcher();
             
             //! @brief Returns the objects.
-            std::vector<engine::Object const*> getObjects() const;
+            std::vector<Object const*> getObjects() const;
             
             //! @brief Returns the objects.
-            std::vector<engine::Object*> getObjects();
+            std::vector<Object*> getObjects();
             
             //! @brief Returns the links.
             std::vector<engine::Link const*> getLinks() const;
             
-            //! @brief The model changed.
+            //! @internal The model changed.
             void modelChanged();
             
         private: // methods

@@ -24,24 +24,12 @@
 #ifndef KIWI_ENGINE_OBJECT_HPP_INCLUDED
 #define KIWI_ENGINE_OBJECT_HPP_INCLUDED
 
-#include <cstddef>
-#include <memory>
-#include <vector>
-#include <set>
-
-#include "../KiwiCore/KiwiAtom.hpp"
+#include "KiwiEngineDef.hpp"
 
 namespace kiwi
 {
-    namespace model
-    {
-        class Object;
-    }
-    
     namespace engine
     {
-        class Link;
-        
         // ================================================================================ //
         //                                      OBJECT                                      //
         // ================================================================================ //
@@ -57,29 +45,29 @@ namespace kiwi
             //! @brief Destructor.
             virtual ~Object() noexcept;
 
-            //! @brief Return the name of the Object.
+            //! @brief Gets the name of the Object.
             std::string getName() const noexcept;
             
-            //! @brief Return the number of inlets of the Object.
+            //! @brief Gets the number of inlets of the Object.
             size_t getNumberOfInlets() const noexcept;
             
-            //! @brief Return the number of inlets of the Object.
+            //! @brief Gets the number of inlets of the Object.
             size_t getNumberOfOutlets() const noexcept;
             
-            //! @brief Receive a set of arguments via an inlet.
+            //! @brief Receives a set of arguments via an inlet.
             //! @details This method must be overriden by object's subclasses.
             //! @todo see if the method must be noexcept.
             virtual void receive(size_t index, std::vector<Atom> const& args) = 0;
             
-            //! @internal Append a new Link to an outlet.
+            //! @internal Appends a new Link to an outlet.
             void addOutputLink(Link const* link);
             
-            //! @internal Remove a Link from an outlet.
+            //! @internal Removes a Link from an outlet.
             void removeOutputLink(Link const* link);
             
         protected: // methods
             
-            //! @brief Send a vector of Atom via an outlet.
+            //! @brief Sends a vector of Atom via an outlet.
             //! @todo Improve the stack overflow system.
             //! @todo See if the method must be noexcept.
             void send(const size_t index, std::vector<Atom> const& args);

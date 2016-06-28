@@ -22,6 +22,7 @@
 */
 
 #include "KiwiEngineLink.hpp"
+#include "KiwiEngineObject.hpp"
 
 #include <KiwiModel/KiwiLink.hpp>
 #include <KiwiModel/KiwiObject.hpp>

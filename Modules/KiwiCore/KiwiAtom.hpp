@@ -24,7 +24,7 @@
 #ifndef KIWI_CORE_ATOM_HPP_INCLUDED
 #define KIWI_CORE_ATOM_HPP_INCLUDED
 
-#include <assert.h>
+#include <cassert>
 #include <iostream>
 #include <sstream>
 #include <cstring>

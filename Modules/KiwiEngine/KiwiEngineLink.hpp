@@ -24,20 +24,12 @@
 #ifndef KIWI_ENGINE_LINK_HPP_INCLUDED
 #define KIWI_ENGINE_LINK_HPP_INCLUDED
 
-#include <memory>
-#include <cstddef>
+#include "KiwiEngineDef.hpp"
 
 namespace kiwi
-{
-    namespace model
-    {
-        class Link;
-    }
-    
+{    
     namespace engine
     {
-        class Object;
-        
         // ================================================================================ //
         //                                      LINK                                        //
         // ================================================================================ //
@@ -53,16 +45,16 @@ namespace kiwi
             //! @brief Destructor.
             ~Link();
             
-            //! @brief Get the Object that sends messages.
+            //! @brief Gets the Object that sends messages.
             Object* getSenderObject() const noexcept;
             
-            //! @brief Get the Object that receives messages.
+            //! @brief Gets the Object that receives messages.
             Object* getReceiverObject() const noexcept;
             
-            //! @brief Retrieve the index of the outlet of the Link.
+            //! @brief Gets the index of the outlet of the Link.
             size_t getSenderIndex() const noexcept;
             
-            //! @brief Retrieve the index of the inlet of the Link.
+            //! @brief Gets the index of the inlet of the Link.
             size_t getReceiverIndex() const noexcept;
             
         private: // members
