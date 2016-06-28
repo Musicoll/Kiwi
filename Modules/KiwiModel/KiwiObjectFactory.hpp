@@ -96,10 +96,6 @@ namespace kiwi
             static_assert(!std::is_abstract<TEngine>::value,
                           "The class must not be abstract.");
             
-            // The engine Object must be constructible with a vector of Atom
-            static_assert(std::is_constructible<TEngine, std::vector<Atom>>::value,
-                          "Bad engine object constructor");
-            
             assert(!name.empty());
             
             if(!name.empty())
@@ -110,9 +106,9 @@ namespace kiwi
                 {
                     CreatorBundle& creator = creators[name];
                     
-                    creator.engine_ctor_fn = [](std::vector<Atom> const& args) -> TEngine*
+                    creator.engine_ctor_fn = [](model::Object const& model, std::vector<Atom> const& args) -> TEngine*
                     {
-                        return new TEngine(args);
+                        return new TEngine(model, args);
                     };
                 }
                 else
@@ -156,7 +152,7 @@ namespace kiwi
                         assert(false && "the engine object has not been registered");
                     }
                     
-                    return std::unique_ptr<TEngine>(engine_ctor(args));
+                    return std::unique_ptr<TEngine>(engine_ctor(model, args));
                 }
             }
         
@@ -183,7 +179,7 @@ namespace kiwi
         ~ObjectFactory() = delete;
         
         using model_ctor_t = std::function<model::Object*(std::vector<Atom>)>;
-        using engine_ctor_t = std::function<engine::Object*(std::vector<Atom>)>;
+        using engine_ctor_t = std::function<engine::Object*(model::Object const&, std::vector<Atom>)>;
         
         struct CreatorBundle
         {

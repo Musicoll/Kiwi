@@ -21,7 +21,10 @@
  ==============================================================================
 */
 
-#include "KiwiPatcher.hpp"
+#include "KiwiEnginePatcher.hpp"
+#include "KiwiEngineObject.hpp"
+#include "KiwiEngineLink.hpp"
+#include <KiwiModel/KiwiPatcher.hpp>
 
 namespace kiwi
 {
@@ -31,7 +34,8 @@ namespace kiwi
         //                                      PATCHER                                     //
         // ================================================================================ //
         
-        Patcher::Patcher() noexcept
+        Patcher::Patcher(model::Patcher const& model) noexcept :
+        m_model(model)
         {
             ;
         }
@@ -44,11 +48,11 @@ namespace kiwi
         std::vector<engine::Object const*> Patcher::getObjects() const
         {
             std::vector<engine::Object const*> objects;
-            for(auto& obj : m_model->getObjects())
+            for(auto& obj : m_model.getObjects())
             {
                 if(obj.resident())
                 {
-                    auto object_engine = obj.entity().use<sObject>();
+                    auto object_engine = obj.entity().use<std::shared_ptr<engine::Object>>();
                     objects.push_back(object_engine.get());
                 }
             }
@@ -59,11 +63,11 @@ namespace kiwi
         std::vector<engine::Object*> Patcher::getObjects()
         {
             std::vector<engine::Object*> objects;
-            for(auto& obj : m_model->getObjects())
+            for(auto& obj : m_model.getObjects())
             {
                 if(obj.resident())
                 {
-                    auto object_engine = obj.entity().use<sObject>();
+                    auto object_engine = obj.entity().use<std::shared_ptr<engine::Object>>();
                     objects.push_back(object_engine.get());
                 }
             }
@@ -74,7 +78,7 @@ namespace kiwi
         std::vector<engine::Link const*> Patcher::getLinks() const
         {
             std::vector<engine::Link const*> links;
-            for(auto& link : m_model->getLinks())
+            for(auto& link : m_model.getLinks())
             {
                 if(link.resident())
                 {
@@ -92,11 +96,6 @@ namespace kiwi
         
         void Patcher::document_changed(model::Patcher& patcher)
         {
-            if(patcher.added())
-            {
-                m_model = &patcher;
-            }
-            
             if(patcher.changed())
             {
                 const bool link_changed = patcher.linksChanged();
@@ -156,28 +155,21 @@ namespace kiwi
                     }
                 }
             }
-            
-            if(patcher.removed())
-            {
-                m_model = nullptr;
-            }
         }
 
         void Patcher::objectAdded(model::Object& object_m)
         {
-            sObject obj_sptr = ObjectFactory::createEngine<engine::Object>(object_m);
-            object_m.entity().emplace<sObject>(obj_sptr);
+            std::shared_ptr<engine::Object> obj_sptr = ObjectFactory::createEngine<engine::Object>(object_m);
+            object_m.entity().emplace<std::shared_ptr<engine::Object>>(obj_sptr);
         }
 
         void Patcher::objectChanged(model::Object& object_m)
         {
-            sObject object_e = object_m.entity().use<sObject>();
-            object_e->objectChanged(object_m);
         }
 
         void Patcher::objectRemoved(model::Object& object_m)
         {
-            object_m.entity().erase<sObject>();
+            object_m.entity().erase<std::shared_ptr<engine::Object>>();
         }
 
         void Patcher::linkAdded(model::Link& link_m)
@@ -185,15 +177,15 @@ namespace kiwi
             auto& sender_entity = link_m.getSenderObject().entity();
             auto& receiver_entity = link_m.getReceiverObject().entity();
             
-            assert(sender_entity.has<sObject>());
-            assert(receiver_entity.has<sObject>());
+            assert(sender_entity.has<std::shared_ptr<engine::Object>>());
+            assert(receiver_entity.has<std::shared_ptr<engine::Object>>());
             
-            auto from = sender_entity.use<sObject>();
-            auto to = receiver_entity.use<sObject>();
+            auto from = sender_entity.use<std::shared_ptr<engine::Object>>();
+            auto to = receiver_entity.use<std::shared_ptr<engine::Object>>();
             
             if(from && to)
             {
-                auto& link_e = link_m.entity().emplace<engine::Link>(link_m, *from, *to);
+                auto& link_e = link_m.entity().emplace<engine::Link>(link_m);
                 from->addOutputLink(&link_e);
             }
         }
@@ -207,10 +199,10 @@ namespace kiwi
         {
             auto& sender_entity = link.getSenderObject().entity();
             
-            if(sender_entity.has<sObject>())
+            if(sender_entity.has<std::shared_ptr<engine::Object>>())
             {
                 auto& link_engine = link.entity().use<engine::Link>();
-                auto from = sender_entity.use<sObject>();
+                auto from = sender_entity.use<std::shared_ptr<engine::Object>>();
                 from->removeOutputLink(&link_engine);
             }
             

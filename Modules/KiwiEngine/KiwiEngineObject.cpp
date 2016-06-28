@@ -35,9 +35,9 @@ namespace kiwi
         //                                      OBJECT                                      //
         // ================================================================================ //
         
-        Object::Object(model::Object const& object) noexcept :
-        m_model(object),
-        m_outlets(object.getNumberOfOutlets()),
+        Object::Object(model::Object const& model) noexcept :
+        m_model(model),
+        m_outlets(model.getNumberOfOutlets()),
         m_stack_count(0ul)
         {
             ;

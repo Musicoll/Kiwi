@@ -24,14 +24,22 @@
 #ifndef KIWI_ENGINE_PATCHER_HPP_INCLUDED
 #define KIWI_ENGINE_PATCHER_HPP_INCLUDED
 
-#include <KiwiModel/KiwiPatcher.hpp>
-
 #include "flip/DocumentObserver.h"
 
 namespace kiwi
 {
+    namespace model
+    {
+        class Patcher;
+        class Object;
+        class Link;
+    }
+    
     namespace engine
     {
+        class Object;
+        class Link;
+        
         // ================================================================================ //
         //                                      PATCHER                                     //
         // ================================================================================ //
@@ -42,7 +50,7 @@ namespace kiwi
         public:
             
             //! @brief Constructor.
-            Patcher(model::Patcher const& patcher) noexcept;
+            Patcher(model::Patcher const& model) noexcept;
             
             //! @brief Destructor.
             ~Patcher();

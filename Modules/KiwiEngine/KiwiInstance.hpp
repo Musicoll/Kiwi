@@ -27,7 +27,7 @@
 #include "flip/Document.h"
 
 #include "KiwiGuiDevice.hpp"
-#include "KiwiPatcher.hpp"
+#include "KiwiEnginePatcher.hpp"
 
 namespace kiwi
 {

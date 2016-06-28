@@ -52,7 +52,7 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            Object(model::Object const& object) noexcept;
+            Object(model::Object const& model) noexcept;
             
             //! @brief Destructor.
             virtual ~Object() noexcept;
