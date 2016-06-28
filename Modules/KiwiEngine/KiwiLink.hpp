@@ -24,14 +24,19 @@
 #ifndef KIWI_ENGINE_LINK_HPP_INCLUDED
 #define KIWI_ENGINE_LINK_HPP_INCLUDED
 
-#include <KiwiModel/KiwiLink.hpp>
-
 #include "KiwiObject.hpp"
 
 namespace kiwi
 {
+    namespace model
+    {
+        class Link;
+    }
+    
     namespace engine
     {
+        class Object;
+        
         // ================================================================================ //
         //                                      LINK                                        //
         // ================================================================================ //
@@ -42,22 +47,22 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            Link(model::Link& model, Object& sender_object, Object& receiver_object);
+            Link(model::Link const& model);
             
             //! @brief Destructor.
             ~Link();
             
             //! @brief Get the object that send messages.
-            Object& getSenderObject() noexcept;
+            std::shared_ptr<Object> getSenderObject() noexcept;
             
             //! @brief Get the object that send messages.
-            Object const& getSenderObject() const noexcept;
+            std::shared_ptr<const Object> getSenderObject() const noexcept;
             
             //! @brief Get the object that receive messages.
-            Object& getReceiverObject() noexcept;
+            std::shared_ptr<Object> getReceiverObject() noexcept;
             
             //! @brief Get the object that receive messages.
-            Object const& getReceiverObject() const noexcept;
+            std::shared_ptr<const Object> getReceiverObject() const noexcept;
             
             //! @brief Retrieve the index of the outlet of the link.
             size_t getSenderIndex() const noexcept;
@@ -68,8 +73,6 @@ namespace kiwi
         private: // members
             
             model::Link const&  m_model;
-            Object&             m_sender;
-            Object&             m_receiver;
             
         private: // deleted methods
             

@@ -24,8 +24,6 @@
 #ifndef KIWI_ENGINE_OBJECT_HPP_INCLUDED
 #define KIWI_ENGINE_OBJECT_HPP_INCLUDED
 
-#include "flip/SignalConnection.h"
-
 #include <KiwiModel/KiwiConsole.hpp>
 #include <KiwiModel/KiwiObject.hpp>
 
@@ -33,8 +31,6 @@ namespace kiwi
 {
     namespace engine
     {
-        class Patcher;
-        class Instance;
         class Link;
         
         // ================================================================================ //
@@ -47,7 +43,7 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            Object() noexcept;
+            Object(model::Object const& object) noexcept;
             
             //! @brief Destructor.
             virtual ~Object() noexcept;
@@ -66,6 +62,12 @@ namespace kiwi
             //! @todo see if the method must be noexcept.
             virtual void receive(size_t index, std::vector<Atom> const& args) = 0;
             
+            //! @internal Append a new link to an outlet.
+            void addOutputLink(Link* link);
+            
+            //! @internal Remove a link from an outlet.
+            void removeOutputLink(Link* link);
+            
         protected: // methods
             
             //! @brief Sends a vector of Atom via an outlet.
@@ -73,34 +75,13 @@ namespace kiwi
             //! @todo see if the method must be noexcept.
             void send(const size_t index, std::vector<Atom> const& args);
             
-            //! @brief Called when the signalTrigger method is fired.
-            virtual void signalTriggerCalled() {};
-        
-        private: // methods
-            
-            //! @internal Append a new link to an outlet.
-            void addOutputLink(Link* link);
-            
-            //! @internal Remove a link from an outlet.
-            void removeOutputLink(Link* link);
-            
-            //! @internal Model change notification.
-            void objectChanged(model::Object& object_m);
-            
-            //! @internal signalTriggerCallback.
-            void internal_signalTriggerCalled();
-            
-            friend class engine::Patcher;
-            
         private: // members
             
             typedef std::set<Link*> Outlet;
 
-            model::Object*          m_model;
+            model::Object const&    m_model;
             std::vector<Outlet>     m_outlets;
             size_t                  m_stack_count = 0ul;
-            
-            flip::SignalConnection  m_signal_cnx;
             
         private: // deleted methods
             

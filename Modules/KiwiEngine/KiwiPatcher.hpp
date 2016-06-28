@@ -45,7 +45,7 @@ namespace kiwi
         public:
             
             //! @brief Constructor.
-            Patcher() noexcept;
+            Patcher(model::Patcher& patcher) noexcept;
             
             //! @brief Destructor.
             ~Patcher();
@@ -84,7 +84,7 @@ namespace kiwi
         
         private: // members
             
-            model::Patcher* m_model;
+            model::Patcher const& m_model;
             
         private: // deleted methods
             
