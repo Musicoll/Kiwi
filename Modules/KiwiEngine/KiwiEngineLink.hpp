@@ -24,7 +24,8 @@
 #ifndef KIWI_ENGINE_LINK_HPP_INCLUDED
 #define KIWI_ENGINE_LINK_HPP_INCLUDED
 
-#include "KiwiObject.hpp"
+#include <memory>
+#include <cstddef>
 
 namespace kiwi
 {
@@ -52,22 +53,16 @@ namespace kiwi
             //! @brief Destructor.
             ~Link();
             
-            //! @brief Get the object that send messages.
-            std::shared_ptr<Object> getSenderObject() noexcept;
+            //! @brief Get the Object that sends messages.
+            std::shared_ptr<Object> getSenderObject() const noexcept;
             
-            //! @brief Get the object that send messages.
-            std::shared_ptr<const Object> getSenderObject() const noexcept;
+            //! @brief Get the Object that receives messages.
+            std::shared_ptr<Object> getReceiverObject() const noexcept;
             
-            //! @brief Get the object that receive messages.
-            std::shared_ptr<Object> getReceiverObject() noexcept;
-            
-            //! @brief Get the object that receive messages.
-            std::shared_ptr<const Object> getReceiverObject() const noexcept;
-            
-            //! @brief Retrieve the index of the outlet of the link.
+            //! @brief Retrieve the index of the outlet of the Link.
             size_t getSenderIndex() const noexcept;
             
-            //! @brief Retrieve the index of the inlet of the link.
+            //! @brief Retrieve the index of the inlet of the Link.
             size_t getReceiverIndex() const noexcept;
             
         private: // members

@@ -22,7 +22,7 @@
 */
 
 #include "KiwiEngineObject.hpp"
-#include "KiwiLink.hpp"
+#include "KiwiEngineLink.hpp"
 
 #include <KiwiModel/KiwiConsole.hpp>
 #include <KiwiModel/KiwiObject.hpp>
@@ -63,16 +63,14 @@ namespace kiwi
             return m_model.getNumberOfOutlets();
         }
         
-        void Object::addOutputLink(Link* link)
+        void Object::addOutputLink(Link const* link)
         {
-            const size_t idx = link->getSenderIndex();
-            m_outlets[idx].insert(link);
+            m_outlets[link->getSenderIndex()].insert(link);
         }
         
-        void Object::removeOutputLink(Link* link)
+        void Object::removeOutputLink(Link const* link)
         {
-            const size_t idx = link->getSenderIndex();
-            m_outlets[idx].erase(link);
+            m_outlets[link->getSenderIndex()].erase(link);
         }
         
         void Object::send(const size_t index, std::vector<Atom> const& args)
@@ -81,7 +79,7 @@ namespace kiwi
             
             if(idx < m_outlets.size())
             {
-                for(auto* link : m_outlets[idx])
+                for(auto const* link : m_outlets[idx])
                 {
                     std::shared_ptr<Object> receiver = link->getReceiverObject();
                     

@@ -24,15 +24,12 @@
 #ifndef KIWI_ENGINE_OBJECT_HPP_INCLUDED
 #define KIWI_ENGINE_OBJECT_HPP_INCLUDED
 
-#include <cassert>
-#include <iostream>
-#include <sstream>
-#include <cstring>
-
+#include <cstddef>
 #include <memory>
 #include <vector>
 #include <set>
 
+#include "../KiwiCore/KiwiAtom.hpp"
 
 namespace kiwi
 {
@@ -74,11 +71,11 @@ namespace kiwi
             //! @todo see if the method must be noexcept.
             virtual void receive(size_t index, std::vector<Atom> const& args) = 0;
             
-            //! @internal Append a new link to an outlet.
-            void addOutputLink(Link* link);
+            //! @internal Append a new Link to an outlet.
+            void addOutputLink(Link const* link);
             
-            //! @internal Remove a link from an outlet.
-            void removeOutputLink(Link* link);
+            //! @internal Remove a Link from an outlet.
+            void removeOutputLink(Link const* link);
             
         protected: // methods
             
@@ -89,7 +86,7 @@ namespace kiwi
             
         private: // members
             
-            typedef std::set<Link*> Outlet;
+            typedef std::set<Link const*> Outlet;
 
             model::Object const&    m_model;
             std::vector<Outlet>     m_outlets;

@@ -36,14 +36,13 @@ namespace kiwi
         //                                      PATCHER                                     //
         // ================================================================================ //
         
-        //! @brief The Patcher manages a set of objects and links.
-        //! @details The patcher engine observes the Patcher model for changes.
+        //! @brief The Patcher manages a set of Object and Link.
         class Patcher : public flip::DocumentObserver<model::Patcher>
         {
         public:
             
             //! @brief Constructor.
-            Patcher(model::Patcher& patcher) noexcept;
+            Patcher(model::Patcher const& patcher) noexcept;
             
             //! @brief Destructor.
             ~Patcher();
