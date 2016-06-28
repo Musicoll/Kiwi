@@ -43,10 +43,10 @@
 
 namespace kiwi
 {
-    class ObjectFactory;
-    
     namespace model
     {
+        class Factory;
+        
         // ================================================================================ //
         //                                      OBJECT                                      //
         // ================================================================================ //
@@ -154,7 +154,7 @@ namespace kiwi
             flip::Float     m_width;
             flip::Float     m_height;
             
-            friend class kiwi::ObjectFactory;
+            friend class Factory;
         };
     }
 }

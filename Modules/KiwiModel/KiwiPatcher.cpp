@@ -109,9 +109,7 @@ namespace kiwi
         
         model::Object& Patcher::addObject(std::string const& text)
         {
-            //assert(ObjectFactory::has(object_name));
-            
-            auto object_uptr = ObjectFactory::createModel(text);
+            auto object_uptr = Factory::create(text);
             const auto it = m_objects.insert(m_objects.end(), std::move(object_uptr));
             
             /*

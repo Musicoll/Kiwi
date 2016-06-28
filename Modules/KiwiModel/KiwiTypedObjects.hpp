@@ -25,7 +25,7 @@
 #define KIWI_MODEL_TYPED_OBJECTS_HPP_INCLUDED
 
 #include "KiwiObject.hpp"
-#include "KiwiObjectFactory.hpp"
+#include "KiwiModelFactory.hpp"
 
 namespace kiwi
 {

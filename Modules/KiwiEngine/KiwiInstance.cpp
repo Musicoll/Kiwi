@@ -21,10 +21,10 @@
  ==============================================================================
 */
 
-#include <KiwiModel/KiwiObjectFactory.hpp>
 #include <KiwiModel/KiwiPatcherModel.hpp>
-#include "KiwiTypedObjects.hpp"
 
+#include "KiwiEngineFactory.hpp"
+#include "KiwiTypedObjects.hpp"
 #include "KiwiInstance.hpp"
 #include "KiwiDocumentManager.hpp"
 
@@ -43,10 +43,10 @@ namespace kiwi
             
             void endOfModelDeclaration() final override
             {
-                ObjectFactory::registerEngine<NewBox>("newbox");
-                ObjectFactory::registerEngine<NewBox>("errorbox");
-                ObjectFactory::registerEngine<ObjectPlus>("plus");
-                ObjectFactory::registerEngine<ObjectPrint>("print");
+                engine::Factory::add<NewBox>("newbox");
+                engine::Factory::add<NewBox>("errorbox");
+                engine::Factory::add<ObjectPlus>("plus");
+                engine::Factory::add<ObjectPrint>("print");
             }
         };
         

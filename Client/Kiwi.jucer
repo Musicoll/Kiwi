@@ -61,6 +61,10 @@
               file="../Modules/KiwiEngine/KiwiTypedObjects.cpp"/>
         <FILE id="i9g05d" name="KiwiTypedObjects.hpp" compile="0" resource="0"
               file="../Modules/KiwiEngine/KiwiTypedObjects.hpp"/>
+        <FILE id="KCNSwo" name="KiwiEngineFactory.cpp" compile="1" resource="0"
+              file="../Modules/KiwiEngine/KiwiEngineFactory.cpp"/>
+        <FILE id="vMsruG" name="KiwiEngineFactory.hpp" compile="0" resource="0"
+              file="../Modules/KiwiEngine/KiwiEngineFactory.hpp"/>
         <FILE id="I5TUoZ" name="KiwiPatcher.cpp" compile="1" resource="0" file="../Modules/KiwiEngine/KiwiPatcher.cpp"/>
         <FILE id="pPUuGj" name="KiwiPatcher.hpp" compile="0" resource="0" file="../Modules/KiwiEngine/KiwiPatcher.hpp"/>
         <FILE id="xlGx5g" name="KiwiGuiDevice.cpp" compile="1" resource="0"
@@ -79,10 +83,10 @@
               file="../Modules/KiwiModel/KiwiPatcherModel.hpp"/>
         <FILE id="kEinH2" name="KiwiObject.cpp" compile="1" resource="0" file="../Modules/KiwiModel/KiwiObject.cpp"/>
         <FILE id="axstoL" name="KiwiObject.hpp" compile="0" resource="0" file="../Modules/KiwiModel/KiwiObject.hpp"/>
-        <FILE id="jORbNI" name="KiwiObjectFactory.cpp" compile="1" resource="0"
-              file="../Modules/KiwiModel/KiwiObjectFactory.cpp"/>
-        <FILE id="aaibRl" name="KiwiObjectFactory.hpp" compile="0" resource="0"
-              file="../Modules/KiwiModel/KiwiObjectFactory.hpp"/>
+        <FILE id="jORbNI" name="KiwiModelFactory.cpp" compile="1" resource="0"
+              file="../Modules/KiwiModel/KiwiModelFactory.cpp"/>
+        <FILE id="aaibRl" name="KiwiModelFactory.hpp" compile="0" resource="0"
+              file="../Modules/KiwiModel/KiwiModelFactory.hpp"/>
         <FILE id="j95wIT" name="KiwiLink.cpp" compile="1" resource="0" file="../Modules/KiwiModel/KiwiLink.cpp"/>
         <FILE id="A6aXHc" name="KiwiLink.hpp" compile="0" resource="0" file="../Modules/KiwiModel/KiwiLink.hpp"/>
         <FILE id="tRsTMA" name="KiwiTypedObjects.cpp" compile="1" resource="0"

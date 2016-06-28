@@ -22,6 +22,7 @@
 */
 
 #include "KiwiPatcher.hpp"
+#include "KiwiEngineFactory.hpp"
 
 namespace kiwi
 {
@@ -165,7 +166,7 @@ namespace kiwi
 
         void Patcher::objectAdded(model::Object& object_m)
         {
-            sObject obj_sptr = ObjectFactory::createEngine<engine::Object>(object_m);
+            sObject obj_sptr = engine::Factory::create(object_m);
             object_m.entity().emplace<sObject>(obj_sptr);
         }
 

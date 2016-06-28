@@ -41,7 +41,7 @@ namespace kiwi
             .name("cicm.kiwi.NewBox")
             .inherit<model::Object>();
             
-            ObjectFactory::registerModel<NewBox>("newbox");
+            Factory::add<NewBox>("newbox");
         }
         
         NewBox::NewBox(std::string const& name, std::vector<Atom> const& args)
@@ -62,7 +62,7 @@ namespace kiwi
             .name("cicm.kiwi.ErrorBox")
             .inherit<model::Object>();
             
-            ObjectFactory::registerModel<ErrorBox>("errorbox");
+            Factory::add<ErrorBox>("errorbox");
         }
         
         ErrorBox::ErrorBox(std::string const& name, std::vector<Atom> const& args)
@@ -93,7 +93,7 @@ namespace kiwi
             .name("cicm.kiwi.ObjectPlus")
             .inherit<model::Object>();
             
-            ObjectFactory::registerModel<ObjectPlus>("plus");
+            Factory::add<ObjectPlus>("plus");
         }
         
         ObjectPlus::ObjectPlus(std::string const& name, std::vector<Atom> const& args)
@@ -128,7 +128,7 @@ namespace kiwi
             .name("cicm.kiwi.ObjectPrint")
             .inherit<model::Object>();
             
-            ObjectFactory::registerModel<ObjectPrint>("print");
+            Factory::add<ObjectPrint>("print");
         }
     }
 }
