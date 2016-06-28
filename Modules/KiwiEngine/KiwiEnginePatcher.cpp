@@ -90,47 +90,35 @@ namespace kiwi
             return links;
         }
         
-        // ================================================================================ //
-        //                               DOCUMENT OBSERVER                                  //
-        // ================================================================================ //
-        
-        void Patcher::document_changed(model::Patcher& patcher)
+        void Patcher::modelChanged()
         {
-            if(patcher.changed())
+            if(m_model.changed())
             {
-                const bool link_changed = patcher.linksChanged();
+                const bool link_changed = m_model.linksChanged();
                 
                 // check links before objects
                 if(link_changed)
                 {
-                    for(auto& link : patcher.getLinks())
+                    for(auto& link : m_model.getLinks())
                     {
-                        if(link.changed() && link.removed())
+                        if(link.removed())
                         {
-                            linkChanged(link);
-                            
                             linkRemoved(link);
                         }
                     }
                 }
 
-                if(patcher.objectsChanged())
+                if(m_model.objectsChanged())
                 {
-                    for(auto& object : patcher.getObjects())
+                    for(auto& object : m_model.getObjects())
                     {
-                        if(object.changed())
+                        if(object.added())
                         {
-                            if(object.added())
-                            {
-                                objectAdded(object);
-                            }
-                            
-                            objectChanged(object);
-                            
-                            if(object.removed())
-                            {
-                                objectRemoved(object);
-                            }
+                            objectAdded(object);
+                        }
+                        else if(object.removed())
+                        {
+                            objectRemoved(object);
                         }
                     }
                 }
@@ -138,19 +126,11 @@ namespace kiwi
                 // check links before objects
                 if(link_changed)
                 {
-                    for(auto& link : patcher.getLinks())
+                    for(auto& link : m_model.getLinks())
                     {
-                        if(link.changed())
+                        if(link.added())
                         {
-                            if(link.added())
-                            {
-                                linkAdded(link);
-                            }
-                            
-                            if(link.resident())
-                            {
-                                linkChanged(link);
-                            }
+                            linkAdded(link);
                         }
                     }
                 }
@@ -161,10 +141,6 @@ namespace kiwi
         {
             std::shared_ptr<engine::Object> obj_sptr = ObjectFactory::createEngine<engine::Object>(object_m);
             object_m.entity().emplace<std::shared_ptr<engine::Object>>(obj_sptr);
-        }
-
-        void Patcher::objectChanged(model::Object& object_m)
-        {
         }
 
         void Patcher::objectRemoved(model::Object& object_m)
@@ -188,11 +164,6 @@ namespace kiwi
                 auto& link_e = link_m.entity().emplace<engine::Link>(link_m);
                 from->addOutputLink(&link_e);
             }
-        }
-        
-        void Patcher::linkChanged(model::Link& link_m)
-        {
-            ;
         }
         
         void Patcher::linkRemoved(model::Link& link)

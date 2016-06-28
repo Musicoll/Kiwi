@@ -81,8 +81,7 @@ namespace kiwi
             {
                 for(auto const* link : m_outlets[idx])
                 {
-                    std::shared_ptr<Object> receiver = link->getReceiverObject();
-                    
+                    Object* receiver = link->getReceiverObject();
                     if(++(receiver->m_stack_count) < 256)
                     {
                         receiver->receive(link->getReceiverIndex(), args);

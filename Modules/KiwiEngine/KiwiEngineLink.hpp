@@ -54,10 +54,10 @@ namespace kiwi
             ~Link();
             
             //! @brief Get the Object that sends messages.
-            std::shared_ptr<Object> getSenderObject() const noexcept;
+            Object* getSenderObject() const noexcept;
             
             //! @brief Get the Object that receives messages.
-            std::shared_ptr<Object> getReceiverObject() const noexcept;
+            Object* getReceiverObject() const noexcept;
             
             //! @brief Retrieve the index of the outlet of the Link.
             size_t getSenderIndex() const noexcept;

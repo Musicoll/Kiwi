@@ -45,7 +45,7 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief The Patcher manages a set of Object and Link.
-        class Patcher : public flip::DocumentObserver<model::Patcher>
+        class Patcher
         {
         public:
             
@@ -64,8 +64,8 @@ namespace kiwi
             //! @brief Returns the links.
             std::vector<engine::Link const*> getLinks() const;
             
-            //! @internal flip::DocumentObserver<model::Patcher>::document_changed
-            void document_changed(model::Patcher& patcher) final override;
+            //! @brief The model changed.
+            void modelChanged();
             
         private: // methods
             
