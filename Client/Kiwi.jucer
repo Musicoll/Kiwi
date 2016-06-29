@@ -89,6 +89,14 @@
               file="../Modules/KiwiModel/KiwiModelFactory.cpp"/>
         <FILE id="LeA2gZ" name="KiwiModelFactory.hpp" compile="0" resource="0"
               file="../Modules/KiwiModel/KiwiModelFactory.hpp"/>
+        <FILE id="mADSs8" name="KiwiModelPatcherView.cpp" compile="1" resource="0"
+              file="../Modules/KiwiModel/KiwiModelPatcherView.cpp"/>
+        <FILE id="fJAYMr" name="KiwiModelPatcherView.hpp" compile="0" resource="0"
+              file="../Modules/KiwiModel/KiwiModelPatcherView.hpp"/>
+        <FILE id="wvzxif" name="KiwiModelPatcherUser.cpp" compile="1" resource="0"
+              file="../Modules/KiwiModel/KiwiModelPatcherUser.cpp"/>
+        <FILE id="YbfFvT" name="KiwiModelPatcherUser.hpp" compile="0" resource="0"
+              file="../Modules/KiwiModel/KiwiModelPatcherUser.hpp"/>
         <FILE id="q9UoIZ" name="KiwiModelPatcher.cpp" compile="1" resource="0"
               file="../Modules/KiwiModel/KiwiModelPatcher.cpp"/>
         <FILE id="BOdeeM" name="KiwiModelPatcher.hpp" compile="0" resource="0"

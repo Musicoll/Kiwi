@@ -21,6 +21,8 @@
  ==============================================================================
  */
 
+#include <KiwiModel/KiwiModelPatcherView.hpp>
+
 #include "KiwiDocumentManager.hpp"
 #include "jObject.hpp"
 #include "Application.hpp"

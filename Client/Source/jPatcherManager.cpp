@@ -22,6 +22,7 @@
  */
 
 #include <KiwiModel/KiwiModelDataModel.hpp>
+#include <KiwiModel/KiwiModelPatcherUser.hpp>
 #include <KiwiEngine/KiwiEnginePatcher.hpp>
 
 #include "Application.hpp"
