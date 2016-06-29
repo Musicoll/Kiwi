@@ -365,6 +365,21 @@ namespace kiwi
             return nullptr;
         }
         
+        flip::Array<model::Object> const& Patcher::getObjects() const noexcept
+        {
+            return m_objects;
+        }
+        
+        flip::Array<model::Link> const& Patcher::getLinks() const noexcept
+        {
+            return m_links;
+        }
+        
+        flip::Collection<Patcher::User> const& Patcher::getUsers() const noexcept
+        {
+            return m_users;
+        }
+        
         Patcher::User& Patcher::createUserIfNotAlreadyThere(uint32_t user_id)
         {
             auto* user = getUser(user_id);

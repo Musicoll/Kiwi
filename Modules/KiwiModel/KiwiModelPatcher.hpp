@@ -122,13 +122,13 @@ namespace kiwi
             User* getUser(uint32_t user_id);
             
             //! @brief Get the objects.
-            flip::Array<model::Object> const& getObjects() const noexcept   { return m_objects; }
+            flip::Array<model::Object> const& getObjects() const noexcept;
             
             //! @brief Get the links.
-            flip::Array<model::Link> const& getLinks() const noexcept       { return m_links; }
+            flip::Array<model::Link> const& getLinks() const noexcept;
             
             //! @brief Get the users.
-            flip::Collection<User> const& getUsers() const noexcept         { return m_users; }
+            flip::Collection<User> const& getUsers() const noexcept;
             
             //! @internal flip static declare method
             static void declare();
