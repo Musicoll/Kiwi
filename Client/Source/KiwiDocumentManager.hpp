@@ -21,30 +21,20 @@
  ==============================================================================
  */
 
-#ifndef KIWI_ENGINE_DOCUMENT_MANAGER_HPP_INCLUDED
-#define KIWI_ENGINE_DOCUMENT_MANAGER_HPP_INCLUDED
+#ifndef KIWI_DOCUMENT_MANAGER_HPP_INCLUDED
+#define KIWI_DOCUMENT_MANAGER_HPP_INCLUDED
+
+#include <KiwiCore/KiwiFile.hpp>
 
 #include "flip/History.h"
 #include "flip/HistoryStoreMemory.h"
 
-#include <KiwiCore/KiwiFile.hpp>
+#include "../JuceLibraryCode/JuceHeader.h"
 
 #include "KiwiCarrierSocket.hpp"
-#include "KiwiTimer.hpp"
-
-namespace flip
-{
-    class DocumentBase;
-    class Object;
-}
 
 namespace kiwi
 {
-    namespace engine
-    {
-        class Instance;
-    }
-    
     // ================================================================================ //
     //                                    FILE HANDLER                                  //
     // ================================================================================ //
@@ -89,11 +79,11 @@ namespace kiwi
     //                                   DOCUMENT MANAGER                               //
     // ================================================================================ //
     
-    class DocumentManager final
+    class DocumentManager : public juce::Timer
     {
     public:
         
-        DocumentManager(flip::DocumentBase & document, engine::Instance const& instance);
+        DocumentManager(flip::DocumentBase & document);
         
         //! @brief Destructor.
         ~DocumentManager();
@@ -198,7 +188,7 @@ namespace kiwi
         void onLoaded();
         
         //! @brief Called at a regular frequency to pull document
-        void tick();
+        void timerCallback() override;
         
         void startCommitGesture();
         void commitGesture(std::string action);
@@ -209,11 +199,9 @@ namespace kiwi
         
     private:
         
-        engine::Instance const&                 m_instance;
         flip::DocumentBase&                     m_document;
         flip::History<flip::HistoryStoreMemory> m_history;
         CarrierSocket                           m_socket;
-        std::unique_ptr<engine::Timer>          m_timer;
         FileHandler                             m_file_handler;
         
         bool                                    m_gesture_flag = false;
@@ -232,4 +220,4 @@ namespace kiwi
     };
 }
 
-#endif // KIWI_ENGINE_DOCUMENT_MANAGER_HPP_INCLUDED
+#endif // KIWI_DOCUMENT_MANAGER_HPP_INCLUDED

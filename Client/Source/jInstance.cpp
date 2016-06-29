@@ -21,12 +21,11 @@
  ==============================================================================
  */
 
-#include <KiwiEngine/KiwiDocumentManager.hpp>
 #include <KiwiCore/KiwiFile.hpp>
 
 #include "jInstance.hpp"
+#include "KiwiDocumentManager.hpp"
 #include "jPatcher.hpp"
-#include "jGuiDevice.hpp"
 
 namespace kiwi
 {
@@ -39,7 +38,7 @@ namespace kiwi
     jInstance::jInstance() :
     //m_user_id(flip::Ref::User::Offline),
     m_user_id(123456789ULL),
-    m_instance(new engine::Instance(m_user_id, std::make_unique<jGuiDevice>())),
+    m_instance(new engine::Instance(m_user_id)),
     m_console_window(new jConsoleWindow()),
     m_document_explorer(new DocumentExplorer()),
     m_document_explorer_window(new DocumentExplorerWindow(*m_document_explorer, *this)),

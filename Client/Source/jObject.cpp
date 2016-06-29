@@ -21,8 +21,7 @@
  ==============================================================================
  */
 
-#include <KiwiEngine/KiwiDocumentManager.hpp>
-
+#include "KiwiDocumentManager.hpp"
 #include "jObject.hpp"
 #include "Application.hpp"
 #include "jPatcherHelper.hpp"

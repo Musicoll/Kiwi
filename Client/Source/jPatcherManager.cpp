@@ -22,11 +22,11 @@
  */
 
 #include <KiwiModel/KiwiPatcherModel.hpp>
-#include <KiwiEngine/KiwiDocumentManager.hpp>
 #include <KiwiEngine/KiwiEnginePatcher.hpp>
 
 #include "Application.hpp"
 #include "jInstance.hpp"
+#include "KiwiDocumentManager.hpp"
 #include "jPatcherManager.hpp"
 #include "jPatcher.hpp"
 #include "jPatcherHelper.hpp"
@@ -310,7 +310,7 @@ namespace kiwi
     {
         if(patcher.added())
         {
-            patcher.entity().emplace<DocumentManager>(patcher.document(), m_instance.getEngineInstance());
+            patcher.entity().emplace<DocumentManager>(patcher.document());
             patcher.entity().emplace<engine::Patcher>(patcher);
         }
         

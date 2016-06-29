@@ -29,12 +29,6 @@
 #include <KiwiModel/KiwiPatcher.hpp>
 
 #include "KiwiDocumentManager.hpp"
-#include "KiwiDocumentManager.hpp"
-#include "KiwiInstance.hpp"
-
-//#include <cassert>
-//#include <mutex>
-//#include <condition_variable>
 
 namespace kiwi
 {
@@ -42,8 +36,7 @@ namespace kiwi
     //                                   DOCUMENT MANAGER                               //
     // ================================================================================ //
     
-    DocumentManager::DocumentManager(flip::DocumentBase& document, engine::Instance const& instance) :
-    m_instance(instance),
+    DocumentManager::DocumentManager(flip::DocumentBase& document) :
     m_document(document),
     m_history(document),
     m_socket(m_document, "", 0),
@@ -53,8 +46,6 @@ namespace kiwi
         m_socket.listenConnected(std::bind(&DocumentManager::onConnected, this));
         m_socket.listenDisconnected(std::bind(&DocumentManager::onDisconnected, this));
         m_socket.listenLoaded(std::bind(&DocumentManager::onLoaded, this));
-        
-        m_timer = m_instance.createTimer(std::bind(&DocumentManager::tick, this));
     }
     
     DocumentManager::~DocumentManager()
@@ -234,23 +225,17 @@ namespace kiwi
     
     void DocumentManager::startPulling()
     {
-        if(m_timer)
-        {
-            m_timer->start(20);
-        }
+        startTimer(20);
     }
     
-    void DocumentManager::tick()
+    void DocumentManager::timerCallback()
     {
         pull();
     }
     
     void DocumentManager::stopPulling()
     {
-        if(m_timer)
-        {
-            m_timer->stop();
-        }
+        stopTimer();
     }
     
     void DocumentManager::onConnected()

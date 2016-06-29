@@ -30,12 +30,6 @@
 
 #include "flip/contrib/transport_tcp/CarrierTransportSocketTcp.h"
 
-namespace flip
-{
-    class DocumentBase;
-    class Object;
-}
-
 namespace kiwi
 {
     // ================================================================================ //
@@ -46,6 +40,8 @@ namespace kiwi
     class CarrierSocket
     {
     public:
+        
+        //! @brief Constructor
         CarrierSocket(flip::DocumentBase& document, std::string const& host, uint16_t port);
         
         // @brief Connects the socket to a remote socket
@@ -79,6 +75,7 @@ namespace kiwi
         ~CarrierSocket();
         
     private:
+        
         //! @brief Function called on the processing thread
         void runProcess();
         
@@ -98,6 +95,7 @@ namespace kiwi
         void listenTransferSignal(size_t cur, size_t total);
         
     private:
+        
         flip::CarrierTransportSocketTcp m_transport_socket;
         std::thread                     m_transport_loop;
         std::atomic_bool                m_transport_running;

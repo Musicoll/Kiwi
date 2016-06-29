@@ -21,13 +21,13 @@
  ==============================================================================
  */
 
-#include "flip/Mold.h"
-
-#include <KiwiEngine/KiwiDocumentManager.hpp>
 #include <KiwiModel/KiwiConsole.hpp>
 #include <KiwiCore/KiwiFile.hpp>
 #include <KiwiModel/KiwiPatcherModel.hpp>
 
+#include "flip/Mold.h"
+
+#include "KiwiDocumentManager.hpp"
 #include "jInstance.hpp"
 #include "jPatcher.hpp"
 #include "jPatcherHelper.hpp"

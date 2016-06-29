@@ -19,60 +19,55 @@
  To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
  
  ==============================================================================
- */
+*/
 
-#include "KiwiTimer.hpp"
+#include <KiwiModel/KiwiPatcherModel.hpp>
+
+#include "KiwiEngineFactory.hpp"
+#include "KiwiTypedObjects.hpp"
+#include "KiwiEngineInstance.hpp"
 
 namespace kiwi
 {
     namespace engine
     {
         // ================================================================================ //
-        //                                     TIMER IMPL                                   //
+        //                           PATCHER MODEL DECLARATOR                               //
         // ================================================================================ //
         
-        Timer::Impl::Impl(std::function<void()> callback) : m_callback(callback)
+        //! @brief The Patcher Model class declarator
+        class Instance::PatcherModelDeclarator : public model::PatcherModel
+        {
+        public:
+            
+            void endOfModelDeclaration() final override
+            {
+                engine::Factory::add<NewBox>("newbox");
+                engine::Factory::add<NewBox>("errorbox");
+                engine::Factory::add<ObjectPlus>("plus");
+                engine::Factory::add<ObjectPrint>("print");
+            }
+        };
+        
+        // ================================================================================ //
+        //                                      INSTANCE                                    //
+        // ================================================================================ //
+        
+        Instance::Instance(uint64_t user_id) :
+        m_user_id(user_id)
+        {
+            PatcherModelDeclarator model;
+            model.init("v0.0.2");
+        }
+        
+        Instance::~Instance()
         {
             ;
         }
         
-        void Timer::Impl::tick()
+        uint64_t Instance::getUserId() const noexcept
         {
-            if(m_callback)
-            {
-                m_callback();
-            }
-        }
-        
-        // ================================================================================ //
-        //                                       TIMER                                      //
-        // ================================================================================ //
-        
-        Timer::Timer(std::unique_ptr<Timer::Impl> implementation) :
-        m_timer_impl(std::move(implementation))
-        {
-            ;
-        }
-        
-        Timer::~Timer()
-        {
-            stop();
-        }
-        
-        void Timer::start(int interval)
-        {
-            if(m_timer_impl)
-            {
-                m_timer_impl->impl_start(interval);
-            }
-        }
-        
-        void Timer::stop()
-        {
-            if(m_timer_impl)
-            {
-                m_timer_impl->impl_stop();
-            }
+            return m_user_id;
         }
     }
 }
