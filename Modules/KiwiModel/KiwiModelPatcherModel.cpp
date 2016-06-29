@@ -23,8 +23,8 @@
 
 #include "flip/DataModel.h"
 
-#include "KiwiPatcherModel.hpp"
-#include "KiwiPatcher.hpp"
+#include "KiwiModelPatcherModel.hpp"
+#include "KiwiModelPatcher.hpp"
 
 namespace kiwi
 {

@@ -24,8 +24,8 @@
 #include "KiwiEngineObject.hpp"
 #include "KiwiEngineLink.hpp"
 
-#include <KiwiCore/KiwiConsole.hpp>
-#include <KiwiModel/KiwiObject.hpp>
+#include <KiwiCore/KiwiCoreConsole.hpp>
+#include <KiwiModel/KiwiModelObject.hpp>
 
 namespace kiwi
 {

@@ -21,9 +21,9 @@
  ==============================================================================
 */
 
-#include "KiwiObject.hpp"
+#include "KiwiModelObject.hpp"
 
-#include "KiwiPatcherModel.hpp"
+#include "KiwiModelPatcherModel.hpp"
 
 namespace kiwi
 {

@@ -25,7 +25,7 @@
 #define KIWI_ENGINE_FACTORY_HPP_INCLUDED
 
 #include "KiwiEngineDef.hpp"
-#include <KiwiCore/KiwiConsole.hpp>
+#include <KiwiCore/KiwiCoreConsole.hpp>
 
 namespace kiwi
 {

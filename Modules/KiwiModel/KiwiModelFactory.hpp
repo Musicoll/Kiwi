@@ -24,9 +24,9 @@
 #ifndef KIWI_MODEL_FACTORY_HPP_INCLUDED
 #define KIWI_MODEL_FACTORY_HPP_INCLUDED
 
-#include <KiwiCore/KiwiConsole.hpp>
+#include <KiwiCore/KiwiCoreConsole.hpp>
 
-#include "KiwiObject.hpp"
+#include "KiwiModelObject.hpp"
 
 namespace kiwi
 {

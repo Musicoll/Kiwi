@@ -21,9 +21,9 @@
  ==============================================================================
  */
 
-#include <KiwiCore/KiwiConsole.hpp>
-#include <KiwiCore/KiwiFile.hpp>
-#include <KiwiModel/KiwiPatcherModel.hpp>
+#include <KiwiCore/KiwiCoreConsole.hpp>
+#include <KiwiCore/KiwiCoreFilePath.hpp>
+#include <KiwiModel/KiwiModelPatcherModel.hpp>
 
 #include "flip/Mold.h"
 

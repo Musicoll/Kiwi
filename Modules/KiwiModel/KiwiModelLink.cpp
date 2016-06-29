@@ -21,11 +21,11 @@
  ==============================================================================
 */
 
-#include "KiwiObject.hpp"
-#include "KiwiLink.hpp"
-#include "KiwiPatcher.hpp"
+#include "KiwiModelObject.hpp"
+#include "KiwiModelLink.hpp"
+#include "KiwiModelPatcher.hpp"
 
-#include "KiwiPatcherModel.hpp"
+#include "KiwiModelPatcherModel.hpp"
 
 namespace kiwi
 {

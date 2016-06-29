@@ -26,7 +26,7 @@
 #include <flip/contrib/DataConsumerFile.h>
 #include <flip/contrib/DataProviderFile.h>
 
-#include <KiwiModel/KiwiPatcher.hpp>
+#include <KiwiModel/KiwiModelPatcher.hpp>
 
 #include "KiwiDocumentManager.hpp"
 

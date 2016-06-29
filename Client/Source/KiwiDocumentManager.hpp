@@ -24,7 +24,7 @@
 #ifndef KIWI_DOCUMENT_MANAGER_HPP_INCLUDED
 #define KIWI_DOCUMENT_MANAGER_HPP_INCLUDED
 
-#include <KiwiCore/KiwiFile.hpp>
+#include <KiwiCore/KiwiCoreFilePath.hpp>
 
 #include "flip/History.h"
 #include "flip/HistoryStoreMemory.h"

@@ -26,7 +26,7 @@
 
 #include <flip/DocumentValidator.h>
 
-#include <KiwiModel/KiwiPatcher.hpp>
+#include <KiwiModel/KiwiModelPatcher.hpp>
 
 namespace kiwi
 {

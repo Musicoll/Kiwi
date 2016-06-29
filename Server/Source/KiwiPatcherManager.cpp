@@ -25,7 +25,7 @@
 
 #include "KiwiPatcherManager.hpp"
 
-#include <KiwiModel/KiwiPatcherModel.hpp>
+#include <KiwiModel/KiwiModelPatcherModel.hpp>
 
 namespace kiwi
 {

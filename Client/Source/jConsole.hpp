@@ -24,7 +24,7 @@
 #ifndef KIWI_JCONSOLE_HPP_INCLUDED
 #define KIWI_JCONSOLE_HPP_INCLUDED
 
-#include <KiwiCore/KiwiConsole.hpp>
+#include <KiwiCore/KiwiCoreConsole.hpp>
 
 #include "../JuceLibraryCode/JuceHeader.h"
 

@@ -21,7 +21,7 @@
  ==============================================================================
 */
 
-#include <KiwiModel/KiwiPatcherModel.hpp>
+#include <KiwiModel/KiwiModelPatcherModel.hpp>
 
 #include "KiwiEngineFactory.hpp"
 #include "KiwiTypedObjects.hpp"

@@ -24,8 +24,8 @@
 #ifndef KIWI_JPATCHER_HPP_INCLUDED
 #define KIWI_JPATCHER_HPP_INCLUDED
 
-#include <KiwiModel/KiwiPatcher.hpp>
-#include <KiwiCore/KiwiFile.hpp>
+#include <KiwiModel/KiwiModelPatcher.hpp>
+#include <KiwiCore/KiwiCoreFilePath.hpp>
 
 #include "flip/DocumentObserver.h"
 

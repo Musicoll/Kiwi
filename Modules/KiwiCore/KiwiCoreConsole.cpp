@@ -21,7 +21,7 @@
  ==============================================================================
  */
 
-#include "KiwiConsole.hpp"
+#include "KiwiCoreConsole.hpp"
 
 namespace kiwi
 {

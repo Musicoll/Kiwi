@@ -26,7 +26,7 @@
 
 #include "flip/contrib/MulticastServiceExplorer.h"
 
-#include <KiwiCore/KiwiListeners.hpp>
+#include <KiwiCore/KiwiCoreListeners.hpp>
 
 #include "jWindow.hpp"
 

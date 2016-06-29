@@ -24,7 +24,7 @@
 #ifndef KIWI_JOBJECT_HPP_INCLUDED
 #define KIWI_JOBJECT_HPP_INCLUDED
 
-#include <KiwiModel/KiwiPatcher.hpp>
+#include <KiwiModel/KiwiModelPatcher.hpp>
 
 #include "../JuceLibraryCode/JuceHeader.h"
 

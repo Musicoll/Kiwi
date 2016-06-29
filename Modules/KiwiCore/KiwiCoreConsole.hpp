@@ -21,8 +21,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_CONSOLE_HPP_INCLUDED
-#define KIWI_CONSOLE_HPP_INCLUDED
+#ifndef KIWI_CORE_CONSOLE_HPP_INCLUDED
+#define KIWI_CORE_CONSOLE_HPP_INCLUDED
 
 #include <iostream>
 #include <sstream>
@@ -31,8 +31,8 @@
 #include <set>
 #include <algorithm>
 
-#include <KiwiCore/KiwiAtom.hpp>
-#include <KiwiCore/KiwiListeners.hpp>
+#include <KiwiCore/KiwiCoreAtom.hpp>
+#include <KiwiCore/KiwiCoreListeners.hpp>
 
 namespace kiwi
 {
@@ -222,4 +222,4 @@ namespace kiwi
     };
 }
 
-#endif // KIWI_CONSOLE_HPP_INCLUDED
+#endif // KIWI_CORE_CONSOLE_HPP_INCLUDED

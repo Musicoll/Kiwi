@@ -24,7 +24,7 @@
 #ifndef KIWI_JLINK_HPP_INCLUDED
 #define KIWI_JLINK_HPP_INCLUDED
 
-#include <KiwiModel/KiwiLink.hpp>
+#include <KiwiModel/KiwiModelLink.hpp>
 
 #include "jObject.hpp"
 

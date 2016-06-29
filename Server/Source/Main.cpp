@@ -22,7 +22,7 @@
  */
 
 #include "KiwiServer.hpp"
-#include <KiwiModel/KiwiPatcherModel.hpp>
+#include <KiwiModel/KiwiModelPatcherModel.hpp>
 
 int main(int argc, const char * argv[])
 {

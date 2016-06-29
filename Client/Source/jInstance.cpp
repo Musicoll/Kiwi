@@ -21,7 +21,7 @@
  ==============================================================================
  */
 
-#include <KiwiCore/KiwiFile.hpp>
+#include <KiwiCore/KiwiCoreFilePath.hpp>
 
 #include "jInstance.hpp"
 #include "KiwiDocumentManager.hpp"

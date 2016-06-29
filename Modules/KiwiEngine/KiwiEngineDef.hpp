@@ -29,7 +29,7 @@
 #include <set>
 #include <map>
 
-#include <KiwiCore/KiwiAtom.hpp>
+#include <KiwiCore/KiwiCoreAtom.hpp>
 
 namespace kiwi
 {

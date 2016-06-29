@@ -21,7 +21,7 @@
  ==============================================================================
  */
 
-#include <KiwiCore/KiwiConsole.hpp>
+#include <KiwiCore/KiwiCoreConsole.hpp>
 
 #include "DocumentExplorer.hpp"
 #include "jInstance.hpp"

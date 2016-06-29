@@ -23,7 +23,7 @@
 
 #include <fstream>
 
-#include "KiwiFile.hpp"
+#include "KiwiCoreFilePath.hpp"
 
 namespace kiwi
 {
