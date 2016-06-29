@@ -23,7 +23,7 @@
 
 #include "KiwiModelObject.hpp"
 
-#include "KiwiModelPatcherModel.hpp"
+#include "KiwiModelDataModel.hpp"
 
 namespace kiwi
 {
@@ -35,9 +35,9 @@ namespace kiwi
         
         void Object::declare()
         {
-            if(PatcherModel::has<model::Object>()) return;
+            if(DataModel::has<model::Object>()) return;
             
-            PatcherModel::declare<model::Object>()
+            DataModel::declare<model::Object>()
             .name("cicm.kiwi.Object")
             .member<flip::String, &Object::m_name>("name")
             .member<flip::String, &Object::m_text>("text")

@@ -25,7 +25,7 @@
 #include "KiwiModelLink.hpp"
 #include "KiwiModelPatcher.hpp"
 
-#include "KiwiModelPatcherModel.hpp"
+#include "KiwiModelDataModel.hpp"
 
 namespace kiwi
 {
@@ -37,9 +37,9 @@ namespace kiwi
         
         void Link::declare()
         {
-            if(PatcherModel::has<Link>()) return;
+            if(DataModel::has<Link>()) return;
             
-            PatcherModel::declare<Link>()
+            DataModel::declare<Link>()
             .name("cicm.kiwi.Link")
             .member<flip::ObjectRef<model::Object>, &Link::m_sender>("sender_obj")
             .member<flip::ObjectRef<model::Object>, &Link::m_receiver>("receiver_obj")

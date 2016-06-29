@@ -93,10 +93,10 @@
               file="../Modules/KiwiModel/KiwiModelPatcher.cpp"/>
         <FILE id="BOdeeM" name="KiwiModelPatcher.hpp" compile="0" resource="0"
               file="../Modules/KiwiModel/KiwiModelPatcher.hpp"/>
-        <FILE id="GMSNX3" name="KiwiModelPatcherModel.cpp" compile="1" resource="0"
-              file="../Modules/KiwiModel/KiwiModelPatcherModel.cpp"/>
-        <FILE id="LZQxXm" name="KiwiModelPatcherModel.hpp" compile="0" resource="0"
-              file="../Modules/KiwiModel/KiwiModelPatcherModel.hpp"/>
+        <FILE id="GMSNX3" name="KiwiModelDataModel.cpp" compile="1" resource="0"
+              file="../Modules/KiwiModel/KiwiModelDataModel.cpp"/>
+        <FILE id="LZQxXm" name="KiwiModelDataModel.hpp" compile="0" resource="0"
+              file="../Modules/KiwiModel/KiwiModelDataModel.hpp"/>
         <FILE id="hKlzl3" name="KiwiTypedObjects.cpp" compile="1" resource="0"
               file="../Modules/KiwiModel/KiwiTypedObjects.cpp"/>
         <FILE id="McA2uh" name="KiwiTypedObjects.hpp" compile="0" resource="0"

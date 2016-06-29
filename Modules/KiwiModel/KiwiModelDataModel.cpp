@@ -19,44 +19,43 @@
  To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
  
  ==============================================================================
-*/
-
-#ifndef KIWI_MODEL_HPP_INCLUDED
-#define KIWI_MODEL_HPP_INCLUDED
+ */
 
 #include "flip/DataModel.h"
+
+#include "KiwiModelDataModel.hpp"
+#include "KiwiModelPatcher.hpp"
 
 namespace kiwi
 {
     namespace model
     {
-        //! @brief The Patcher Model class
-        class PatcherModel : public flip::DataModel<PatcherModel>
+        void DataModel::init(std::string const& version)
         {
-        public:
+            DataModel::version(version);
             
-            using model_t = PatcherModel;
+            // patcher elements declaration :
+            model::Object::declare();
             
-            //! @brief Initializes the model.
-            //! @details Declares all flip classes.
-            //! @param version The model version.
-            void init(std::string const& version);
+            declareObjects();
             
-        protected:
+            declareExternalObjects();
             
-            //! @brief Declare external/additionnal kiwi objects here
-            //! @details This method is called when all internal kiwi objects has been declared.
-            virtual void declareExternalObjects() {}
+            // Links
+            Link::declare();
             
-            //! @brief This method is called at the end of the init function
-            virtual void endOfModelDeclaration() {}
+            // Patcher
+            Patcher::declare();
             
-        private:
-            
-            //! @brief Declare all kiwi objects here
-            void declareObjects();
-        };
+            endOfModelDeclaration();
+        }
+        
+        void DataModel::declareObjects()
+        {
+            NewBox::declare();
+            ErrorBox::declare();
+            ObjectPlus::declare();
+            ObjectPrint::declare();
+        }
     }
 }
-
-#endif // KIWI_MODEL_HPP_INCLUDED

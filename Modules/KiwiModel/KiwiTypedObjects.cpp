@@ -23,7 +23,7 @@
 
 #include "KiwiTypedObjects.hpp"
 
-#include "KiwiModelPatcherModel.hpp"
+#include "KiwiModelDataModel.hpp"
 
 namespace kiwi
 {
@@ -35,9 +35,9 @@ namespace kiwi
         
         void NewBox::declare()
         {
-            if(PatcherModel::has<NewBox>()) return;
+            if(DataModel::has<NewBox>()) return;
             
-            PatcherModel::declare<NewBox>()
+            DataModel::declare<NewBox>()
             .name("cicm.kiwi.NewBox")
             .inherit<model::Object>();
             
@@ -56,9 +56,9 @@ namespace kiwi
         
         void ErrorBox::declare()
         {
-            if(PatcherModel::has<ErrorBox>()) return;
+            if(DataModel::has<ErrorBox>()) return;
             
-            PatcherModel::declare<ErrorBox>()
+            DataModel::declare<ErrorBox>()
             .name("cicm.kiwi.ErrorBox")
             .inherit<model::Object>();
             
@@ -87,9 +87,9 @@ namespace kiwi
  
         void ObjectPlus::declare()
         {
-            if(PatcherModel::has<ObjectPlus>()) return;
+            if(DataModel::has<ObjectPlus>()) return;
             
-            PatcherModel::declare<ObjectPlus>()
+            DataModel::declare<ObjectPlus>()
             .name("cicm.kiwi.ObjectPlus")
             .inherit<model::Object>();
             
@@ -122,9 +122,9 @@ namespace kiwi
         //! @internal flip static declare method
         void ObjectPrint::declare()
         {
-            if(PatcherModel::has<ObjectPrint>()) return;
+            if(DataModel::has<ObjectPrint>()) return;
             
-            PatcherModel::declare<ObjectPrint>()
+            DataModel::declare<ObjectPrint>()
             .name("cicm.kiwi.ObjectPrint")
             .inherit<model::Object>();
             

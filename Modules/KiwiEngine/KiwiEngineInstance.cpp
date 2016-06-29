@@ -21,7 +21,7 @@
  ==============================================================================
 */
 
-#include <KiwiModel/KiwiModelPatcherModel.hpp>
+#include <KiwiModel/KiwiModelDataModel.hpp>
 
 #include "KiwiEngineFactory.hpp"
 #include "KiwiTypedObjects.hpp"
@@ -36,7 +36,7 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief The Patcher Model class declarator
-        class Instance::PatcherModelDeclarator : public model::PatcherModel
+        class Instance::DataModelDeclarator : public model::DataModel
         {
         public:
             
@@ -56,7 +56,7 @@ namespace kiwi
         Instance::Instance(uint64_t user_id) :
         m_user_id(user_id)
         {
-            PatcherModelDeclarator model;
+            DataModelDeclarator model;
             model.init("v0.0.2");
         }
         

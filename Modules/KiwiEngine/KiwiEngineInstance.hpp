@@ -52,7 +52,7 @@ namespace kiwi
             
         private:
             
-            class PatcherModelDeclarator;
+            class DataModelDeclarator;
             
             const uint64_t              m_user_id;
         };

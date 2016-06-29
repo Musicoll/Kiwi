@@ -21,7 +21,7 @@
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiModelPatcherModel.hpp>
+#include <KiwiModel/KiwiModelDataModel.hpp>
 #include <KiwiEngine/KiwiEnginePatcher.hpp>
 
 #include "Application.hpp"
@@ -65,7 +65,7 @@ namespace kiwi
     
     jPatcherManager::jPatcherManager(jInstance& instance) :
     m_instance(instance),
-    m_document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
+    m_document(model::DataModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
     m_is_remote(false)
     {
         model::Patcher & patcher = getPatcher();
@@ -78,7 +78,7 @@ namespace kiwi
     
     jPatcherManager::jPatcherManager(jInstance& instance, kiwi::FilePath const& file):
     m_instance(instance),
-    m_document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
+    m_document(model::DataModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
     m_is_remote(false)
     {
         model::Patcher& patcher = getPatcher();
@@ -96,7 +96,7 @@ namespace kiwi
     
     jPatcherManager::jPatcherManager(jInstance & instance, const std::string host, uint16_t port) :
     m_instance(instance),
-    m_document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
+    m_document(model::DataModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
     m_is_remote(true)
     {
         model::Patcher & patcher = getPatcher();

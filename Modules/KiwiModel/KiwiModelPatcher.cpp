@@ -23,7 +23,7 @@
 
 #include "KiwiModelPatcher.hpp"
 
-#include "KiwiModelPatcherModel.hpp"
+#include "KiwiModelDataModel.hpp"
 
 namespace kiwi
 {
@@ -35,30 +35,30 @@ namespace kiwi
         
         void Patcher::View::Object::declare()
         {
-            assert(! PatcherModel::has<Patcher::View::Object>());
+            assert(! DataModel::has<Patcher::View::Object>());
             
-            PatcherModel::declare<Patcher::View::Object>()
+            DataModel::declare<Patcher::View::Object>()
             .name("cicm.kiwi.Patcher.View.Object")
             .template member<flip::ObjectRef<model::Object>, &View::Object::m_ref>("ref");
         }
         
         void Patcher::View::Link::declare()
         {
-            assert(! PatcherModel::has<Patcher::View::Link>());
+            assert(! DataModel::has<Patcher::View::Link>());
             
-            PatcherModel::declare<Patcher::View::Link>()
+            DataModel::declare<Patcher::View::Link>()
             .name("cicm.kiwi.Patcher.View.Link")
             .member<flip::ObjectRef<model::Link>, &View::Link::m_ref>("ref");
         }
         
         void Patcher::View::declare()
         {
-            assert(! PatcherModel::has<Patcher::View>());
+            assert(! DataModel::has<Patcher::View>());
             
             Patcher::View::Object::declare();
             Patcher::View::Link::declare();
             
-            PatcherModel::declare<Patcher::View>()
+            DataModel::declare<Patcher::View>()
             .name("cicm.kiwi.Patcher.View")
             .member<flip::Collection<View::Object>, &View::m_selected_objects>("selected_objects")
             .member<flip::Collection<View::Link>, &View::m_selected_links>("selected_links")
@@ -68,9 +68,9 @@ namespace kiwi
         
         void Patcher::User::declare()
         {
-            assert(! PatcherModel::has<Patcher::User>());
+            assert(! DataModel::has<Patcher::User>());
             
-            PatcherModel::declare<Patcher::User>()
+            DataModel::declare<Patcher::User>()
             .name("cicm.kiwi.Patcher.User")
             .member<flip::Int, &Patcher::User::m_user_id>("user_id")
             .member<flip::Collection<Patcher::View>, &Patcher::User::m_views>("views");
@@ -78,12 +78,12 @@ namespace kiwi
         
         void Patcher::declare()
         {
-            assert(! PatcherModel::has<Patcher>());
+            assert(! DataModel::has<Patcher>());
             
             Patcher::View::declare();
             Patcher::User::declare();
             
-            PatcherModel::declare<Patcher>()
+            DataModel::declare<Patcher>()
             .name("cicm.kiwi.Patcher")
             .member<flip::Array<model::Object>, &Patcher::m_objects>("objects")
             .member<flip::Array<model::Link>, &Patcher::m_links>("links")

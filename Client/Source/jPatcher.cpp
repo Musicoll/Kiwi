@@ -23,7 +23,7 @@
 
 #include <KiwiCore/KiwiCoreConsole.hpp>
 #include <KiwiCore/KiwiCoreFilePath.hpp>
-#include <KiwiModel/KiwiModelPatcherModel.hpp>
+#include <KiwiModel/KiwiModelDataModel.hpp>
 
 #include "flip/Mold.h"
 
@@ -716,7 +716,7 @@ namespace kiwi
             model::Object const* object_ptr = document.get<model::Object>(object_ref);
             if(object_ptr)
             {
-                flip::Mold mold(model::PatcherModel::use(), sbo);
+                flip::Mold mold(model::DataModel::use(), sbo);
                 model::Object const& object = *object_ptr;
                 
                 //model::ObjectPlus const& obj = dynamic_cast<model::ObjectPlus const&>(object);
@@ -743,7 +743,7 @@ namespace kiwi
                 
                 if(sender_selected && receiver_selected)
                 {
-                    flip::Mold mold(model::PatcherModel::use(), sbo);
+                    flip::Mold mold(model::DataModel::use(), sbo);
                     mold.make(link);
                     mold.cure();
                     
@@ -775,7 +775,7 @@ namespace kiwi
             // run until we reach the end of the stream
             while(!sbi.is_eos())
             {
-                flip::Mold mold(model::PatcherModel::use(), sbi);
+                flip::Mold mold(model::DataModel::use(), sbi);
                 
                 if(mold.has<model::Object>() || mold.has<model::ObjectPlus>())
                 {
@@ -847,7 +847,7 @@ namespace kiwi
                 
                 if(number_of_objects_in_clipboard == 1)
                 {
-                    flip::Mold mold(model::PatcherModel::use(), sbi);
+                    flip::Mold mold(model::DataModel::use(), sbi);
                     
                     if(mold.has<model::Object>())
                     {

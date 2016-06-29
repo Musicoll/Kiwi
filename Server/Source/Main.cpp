@@ -22,11 +22,11 @@
  */
 
 #include "KiwiServer.hpp"
-#include <KiwiModel/KiwiModelPatcherModel.hpp>
+#include <KiwiModel/KiwiModelDataModel.hpp>
 
 int main(int argc, const char * argv[])
 {
-    kiwi::model::PatcherModel kiwi_model;
+    kiwi::model::DataModel kiwi_model;
     kiwi_model.init("v0.0.2");
     
     kiwi::server::Server server;
