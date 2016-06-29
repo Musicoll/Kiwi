@@ -36,14 +36,14 @@ namespace kiwi
         //                                   OBJECT FACTORY                                 //
         // ================================================================================ //
         
-        //! @brief The model::Object factory
+        //! @brief The model Object's factory
         class Factory
         {
         public:
             
-            //! @brief Register an object model into the Factory.
+            //! @brief Adds an object model into the Factory.
             //! @details This function adds a new object model to the factory.
-            //! If the name of the object already exists, the function do nothing,
+            //! If the name of the object already exists, the function does nothing,
             //! otherwise the object is added to the factory.
             //! @param name The name of the object.
             template <class TModel, typename
@@ -77,16 +77,16 @@ namespace kiwi
             
             //! @brief Creates a new Object with a text.
             //! @param text The text of the Object.
-            //! @example "plus 42" or "print zozo", or just "plus".
+            //! @example "plus 42", or just "plus".
             //! @return An object (if the name matches a registered Object name).
             static std::unique_ptr<model::Object> create(std::string const& text);
             
             //! @brief Returns true if a given string match a registered Object model name.
-            //! @param name The name of the object model.
-            //! @return true if the object has been registered, otherwise false.
+            //! @param name The name of the object model to find.
+            //! @return true if the object has been added, otherwise false.
             static bool has(std::string const& name);
             
-            //! @brief Returns the names of the object that has been added to the Factory.
+            //! @brief Gets the names of the objects that has been added to the Factory.
             //! @return A vector of Object names.
             static std::vector<std::string> getNames();
             

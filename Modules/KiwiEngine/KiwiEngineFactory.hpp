@@ -35,23 +35,25 @@ namespace kiwi
         //                                   OBJECT FACTORY                                 //
         // ================================================================================ //
         
-        //! @brief The Object's factory
+        //! @brief The engine Object's factory
         class Factory
         {
         public:
             
-            //! @brief Register an object engine into the Factory.
+            //! @brief Adds an object engine into the Factory.
             //! @details This function adds a new object engine to the factory.
-            //! If the name of the object already exists, the function do nothing,
+            //! If the name of the object already exists, the function does nothing,
             //! otherwise the object is added to the factory.
             //! @param name The name of the object.
-            template <class TEngine, typename std::enable_if<std::is_base_of<Object, TEngine>::value, Object>::type* = nullptr>
+            template <class TEngine,
+            typename std::enable_if<std::is_base_of<Object, TEngine>::value,
+            Object>::type* = nullptr>
             static void add(std::string const& name)
             {
                 static_assert(!std::is_abstract<TEngine>::value,
                               "The class must not be abstract.");
                 
-                // The engine Object must be constructible with a vector of Atom
+                // The engine Object must be constructible with a model and vector of Atom
                 static_assert(std::is_constructible<TEngine, model::Object const&, std::vector<Atom>>::value,
                               "Bad engine object constructor");
                 
@@ -63,7 +65,7 @@ namespace kiwi
                     
                     if(!modelHasObject(name))
                     {
-                        Console::error("The model::Object " + name + " conterpart does not exist");
+                        Console::error("The model::Object " + name + " counterpart does not exist");
                         return;
                     }
                     
@@ -81,17 +83,17 @@ namespace kiwi
                 }
             }
             
-            //! @brief Creates a new engine Object with a given text.
+            //! @brief Creates a new engine Object.
             //! @param model The model::Object.
-            //! @return An object (if the name matches a registered engine Object name).
+            //! @return An engine object.
             static std::unique_ptr<Object> create(model::Object const& model);
             
-            //! @brief Returns true if a given string match a registered Object engine name.
-            //! @param name The name of the object engine.
-            //! @return true if the object has been registered, otherwise false.
+            //! @brief Returns true if a given string match a registered Object name.
+            //! @param name The name of the object engine to find.
+            //! @return true if the object has been added, otherwise false.
             static bool has(std::string const& name);
             
-            //! @brief Returns the names of the object that has been added to the Factory.
+            //! @brief Gets the names of the objects that has been added to the Factory.
             //! @return A vector of Object names.
             static std::vector<std::string> getNames();
             
