@@ -32,37 +32,27 @@ namespace kiwi
     namespace engine
     {
         // ================================================================================ //
-        //                           PATCHER MODEL DECLARATOR                               //
-        // ================================================================================ //
-        
-        //! @brief The Patcher Model class declarator
-        class Instance::DataModelDeclarator : public model::DataModel
-        {
-        public:
-            
-            void endOfModelDeclaration() final override
-            {
-                engine::Factory::add<NewBox>("newbox");
-                engine::Factory::add<NewBox>("errorbox");
-                engine::Factory::add<ObjectPlus>("plus");
-                engine::Factory::add<ObjectPrint>("print");
-            }
-        };
-        
-        // ================================================================================ //
         //                                      INSTANCE                                    //
         // ================================================================================ //
         
         Instance::Instance(uint64_t user_id) :
         m_user_id(user_id)
         {
-            DataModelDeclarator model;
-            model.init("v0.0.2");
+            model::DataModel::init();
+            addObjectsToFactory();
         }
         
         Instance::~Instance()
         {
             ;
+        }
+        
+        void Instance::addObjectsToFactory()
+        {
+            engine::Factory::add<NewBox>("newbox");
+            engine::Factory::add<ErrorBox>("errorbox");
+            engine::Factory::add<ObjectPlus>("plus");
+            engine::Factory::add<ObjectPrint>("print");
         }
         
         uint64_t Instance::getUserId() const noexcept

@@ -36,6 +36,7 @@ namespace kiwi
         //                                      INSTANCE                                    //
         // ================================================================================ //
         
+        //! @brief The engine::Instance
         class Instance
         {
         public:
@@ -50,11 +51,13 @@ namespace kiwi
             //! @brief Get the user ID of the Instance.
             uint64_t getUserId() const noexcept;
             
+        private: // methods
+            
+            void addObjectsToFactory();
+            
         private:
             
-            class DataModelDeclarator;
-            
-            const uint64_t              m_user_id;
+            const uint64_t m_user_id;
         };
     }
 }

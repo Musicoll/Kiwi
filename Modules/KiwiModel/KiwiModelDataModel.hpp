@@ -37,22 +37,12 @@ namespace kiwi
             
             //! @brief Initializes the model.
             //! @details Declares all flip classes.
-            //! @param version The model version.
-            void init(std::string const& version);
-            
-        protected:
-            
-            //! @brief Declare external/additionnal kiwi objects here
-            //! @details This method is called when all internal kiwi objects has been declared.
-            virtual void declareExternalObjects() {}
-            
-            //! @brief This method is called at the end of the init function
-            virtual void endOfModelDeclaration() {}
+            static void init();
             
         private:
             
             //! @brief Declare all kiwi objects here
-            void declareObjects();
+            static void declareObjects();
         };
     }
 }

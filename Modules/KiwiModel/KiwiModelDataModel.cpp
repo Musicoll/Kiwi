@@ -30,24 +30,21 @@ namespace kiwi
 {
     namespace model
     {
-        void DataModel::init(std::string const& version)
+        void DataModel::init()
         {
-            DataModel::version(version);
+            // @todo => version in Macro
+            DataModel::version("v0.0.2");
             
             // patcher elements declaration :
             model::Object::declare();
             
             declareObjects();
             
-            declareExternalObjects();
-            
             // Links
             Link::declare();
             
             // Patcher
             Patcher::declare();
-            
-            endOfModelDeclaration();
         }
         
         void DataModel::declareObjects()
