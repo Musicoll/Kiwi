@@ -25,7 +25,7 @@
 #define KIWI_MODEL_PATCHER_HPP_INCLUDED
 
 #include "KiwiModelLink.hpp"
-#include "KiwiTypedObjects.hpp"
+#include "KiwiModelObjects.hpp"
 
 namespace kiwi
 {

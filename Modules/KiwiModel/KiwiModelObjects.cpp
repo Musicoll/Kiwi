@@ -21,7 +21,7 @@
  ==============================================================================
 */
 
-#include "KiwiTypedObjects.hpp"
+#include "KiwiModelObjects.hpp"
 
 #include "KiwiModelDataModel.hpp"
 

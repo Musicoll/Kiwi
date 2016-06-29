@@ -24,7 +24,7 @@
 #include <KiwiModel/KiwiModelFactory.hpp>
 
 #include "KiwiEngineFactory.hpp"
-#include "KiwiTypedObjects.hpp"
+#include "KiwiEngineObjects.hpp"
 
 namespace kiwi
 {

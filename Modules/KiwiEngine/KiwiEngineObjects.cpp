@@ -26,7 +26,7 @@
 
 #include <KiwiCore/KiwiCoreConsole.hpp>
 
-#include "KiwiTypedObjects.hpp"
+#include "KiwiEngineObjects.hpp"
 
 namespace kiwi
 {

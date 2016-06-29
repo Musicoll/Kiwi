@@ -22,7 +22,7 @@
 */
 
 #include "KiwiModelFactory.hpp"
-#include "KiwiTypedObjects.hpp"
+#include "KiwiModelObjects.hpp"
 
 namespace kiwi
 {
