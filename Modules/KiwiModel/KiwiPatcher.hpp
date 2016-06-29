@@ -121,30 +121,6 @@ namespace kiwi
             //! @return The User pointer if found or nullptr.
             User* getUser(uint32_t user_id);
             
-            //! @brief Get the first Object.
-            object_array_t::const_iterator getFirstObject() const noexcept  { return m_objects.cbegin(); }
-            
-            //! @brief Get the first Object.
-            object_array_t::iterator getFirstObject() noexcept              { return m_objects.begin(); }
-            
-            //! @brief Get the last Object.
-            object_array_t::const_iterator getLastObject() const noexcept   { return m_objects.cend(); }
-            
-            //! @brief Get the last Object.
-            object_array_t::iterator getLastObject() noexcept               { return m_objects.end(); }
-            
-            //! @brief Get the first Link.
-            link_array_t::const_iterator getFirstLink() const noexcept      { return m_links.cbegin(); }
-            
-            //! @brief Get the first Link.
-            link_array_t::iterator getFirstLink() noexcept                  { return m_links.begin(); }
-            
-            //! @brief Get the last Link.
-            link_array_t::const_iterator getLastLink() const noexcept       { return m_links.cend(); }
-            
-            //! @brief Get the last Link.
-            link_array_t::iterator getLastLink() noexcept                   { return m_links.end(); }
-            
             //! @brief Get the objects.
             flip::Array<model::Object> const& getObjects() const noexcept   { return m_objects; }
             
