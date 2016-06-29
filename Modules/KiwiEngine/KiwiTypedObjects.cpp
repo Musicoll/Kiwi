@@ -25,7 +25,7 @@
 #define KIWI_ENGINE_OBJECTS_HPP_INCLUDED
 
 #include "KiwiTypedObjects.hpp"
-#include "../KiwiModel/KiwiConsole.hpp"
+#include "../KiwiCore/KiwiConsole.hpp"
 
 namespace kiwi
 {

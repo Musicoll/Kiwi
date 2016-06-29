@@ -21,7 +21,7 @@
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiConsole.hpp>
+#include <KiwiCore/KiwiConsole.hpp>
 #include <KiwiCore/KiwiFile.hpp>
 #include <KiwiModel/KiwiPatcherModel.hpp>
 

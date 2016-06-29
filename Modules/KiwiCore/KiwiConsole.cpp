@@ -37,37 +37,36 @@ namespace kiwi
     
     void Console::post(std:: string const& message)
     {
-        output(MessageType::Post, flip::Ref::null, std::cout, message);
+        output(MessageType::Post, std::cout, message);
     }
     
     //! @brief Converts an Atom into string and print it in the console.
     void Console::postAtom(Atom const& atom)
     {
-        output(MessageType::Post, flip::Ref::null, std::cout, AtomHelper::toString(atom));
+        output(MessageType::Post, std::cout, AtomHelper::toString(atom));
     }
     
     //! @brief Converts a vector of Atom into string and print it in the console.
     void Console::postAtoms(std::vector<Atom> const& atoms)
     {
-        output(MessageType::Post, flip::Ref::null, std::cout, AtomHelper::toString(atoms));
+        output(MessageType::Post, std::cout, AtomHelper::toString(atoms));
     }
     
     //! @brief Print a warning-type message in the console.
     void Console::warning(std:: string const& message)
     {
-        output(MessageType::Warning, flip::Ref::null, std::cout, message);
+        output(MessageType::Warning, std::cout, message);
     }
     
     //! @brief Print an error-type message in the console.
     void Console::error(std:: string const& message)
     {
-        output(MessageType::Error, flip::Ref::null, std::cerr, message);
+        output(MessageType::Error, std::cerr, message);
     }
     
-    void Console::output(MessageType type, flip::Ref ref,
-                         std::ostream& output_stream, std::string const& message)
+    void Console::output(MessageType type, std::ostream& output_stream, std::string const& message)
     {
-        Message msg { message, type, ref };
+        Message msg { message, type };
         
         m_listeners.call(&Listener::newConsoleMessage, msg);
         
@@ -87,18 +86,16 @@ namespace kiwi
         m_listeners.remove(listener);
     }
     
-    Console::Message::Message(std::string text, Console::MessageType type, flip::Ref ref) :
+    Console::Message::Message(std::string text, Console::MessageType type) :
     m_text(text),
-    m_type(type),
-    m_ref(ref)
+    m_type(type)
     {
         ;
     }
     
     Console::Message::Message(Message const& other) :
     m_text(other.m_text),
-    m_type(other.m_type),
-    m_ref(other.m_ref)
+    m_type(other.m_type)
     {
         ;
     }

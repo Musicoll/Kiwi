@@ -11,13 +11,14 @@
 		0F8856DE1CE5D87E00AC1EB4 /* KiwiPatcherManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F8856DC1CE5D87E00AC1EB4 /* KiwiPatcherManager.cpp */; };
 		0FA36AEE1CE50C99008CB057 /* KiwiPatcherValidator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FA36AED1CE50C99008CB057 /* KiwiPatcherValidator.cpp */; };
 		0FEF02D41CE4D87D0090D863 /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FEF02D31CE4D87D0090D863 /* Main.cpp */; };
-		0FEFFF7E1CE4D1F80090D863 /* KiwiConsole.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FEFFF6A1CE4D1F80090D863 /* KiwiConsole.cpp */; };
 		0FEFFF7F1CE4D1F80090D863 /* KiwiLink.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FEFFF6C1CE4D1F80090D863 /* KiwiLink.cpp */; };
 		0FEFFF801CE4D1F80090D863 /* KiwiObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FEFFF6E1CE4D1F80090D863 /* KiwiObject.cpp */; };
 		0FEFFF821CE4D1F80090D863 /* KiwiPatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FEFFF721CE4D1F80090D863 /* KiwiPatcher.cpp */; };
 		0FEFFF831CE4D1F80090D863 /* KiwiPatcherModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FEFFF741CE4D1F80090D863 /* KiwiPatcherModel.cpp */; };
 		0FEFFF841CE4D1F80090D863 /* KiwiTypedObjects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0FEFFF761CE4D1F80090D863 /* KiwiTypedObjects.cpp */; };
 		61DBBF131D23DA0300C89E4F /* KiwiModelFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61DBBF111D23DA0300C89E4F /* KiwiModelFactory.cpp */; };
+		61DBBF181D23FB3D00C89E4F /* KiwiConsole.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61DBBF141D23FB3D00C89E4F /* KiwiConsole.cpp */; };
+		61DBBF191D23FB3D00C89E4F /* KiwiFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61DBBF161D23FB3D00C89E4F /* KiwiFile.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -218,8 +219,6 @@
 		0FEF02D31CE4D87D0090D863 /* Main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Main.cpp; sourceTree = "<group>"; };
 		0FEFFF5A1CE4D1F80090D863 /* KiwiAtom.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiAtom.hpp; sourceTree = "<group>"; };
 		0FEFFF5B1CE4D1F80090D863 /* KiwiListeners.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiListeners.hpp; sourceTree = "<group>"; };
-		0FEFFF6A1CE4D1F80090D863 /* KiwiConsole.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiConsole.cpp; sourceTree = "<group>"; };
-		0FEFFF6B1CE4D1F80090D863 /* KiwiConsole.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiConsole.hpp; sourceTree = "<group>"; };
 		0FEFFF6C1CE4D1F80090D863 /* KiwiLink.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiLink.cpp; sourceTree = "<group>"; };
 		0FEFFF6D1CE4D1F80090D863 /* KiwiLink.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiLink.hpp; sourceTree = "<group>"; };
 		0FEFFF6E1CE4D1F80090D863 /* KiwiObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiObject.cpp; sourceTree = "<group>"; };
@@ -232,6 +231,10 @@
 		0FEFFF771CE4D1F80090D863 /* KiwiTypedObjects.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiTypedObjects.hpp; sourceTree = "<group>"; };
 		61DBBF111D23DA0300C89E4F /* KiwiModelFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiModelFactory.cpp; sourceTree = "<group>"; };
 		61DBBF121D23DA0300C89E4F /* KiwiModelFactory.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiModelFactory.hpp; sourceTree = "<group>"; };
+		61DBBF141D23FB3D00C89E4F /* KiwiConsole.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiConsole.cpp; sourceTree = "<group>"; };
+		61DBBF151D23FB3D00C89E4F /* KiwiConsole.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiConsole.hpp; sourceTree = "<group>"; };
+		61DBBF161D23FB3D00C89E4F /* KiwiFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KiwiFile.cpp; sourceTree = "<group>"; };
+		61DBBF171D23FB3D00C89E4F /* KiwiFile.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KiwiFile.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -515,6 +518,10 @@
 			children = (
 				0FEFFF5A1CE4D1F80090D863 /* KiwiAtom.hpp */,
 				0FEFFF5B1CE4D1F80090D863 /* KiwiListeners.hpp */,
+				61DBBF141D23FB3D00C89E4F /* KiwiConsole.cpp */,
+				61DBBF151D23FB3D00C89E4F /* KiwiConsole.hpp */,
+				61DBBF161D23FB3D00C89E4F /* KiwiFile.cpp */,
+				61DBBF171D23FB3D00C89E4F /* KiwiFile.hpp */,
 			);
 			path = KiwiCore;
 			sourceTree = "<group>";
@@ -522,8 +529,6 @@
 		0FEFFF691CE4D1F80090D863 /* KiwiModel */ = {
 			isa = PBXGroup;
 			children = (
-				0FEFFF6A1CE4D1F80090D863 /* KiwiConsole.cpp */,
-				0FEFFF6B1CE4D1F80090D863 /* KiwiConsole.hpp */,
 				0FEFFF6C1CE4D1F80090D863 /* KiwiLink.cpp */,
 				0FEFFF6D1CE4D1F80090D863 /* KiwiLink.hpp */,
 				0FEFFF6E1CE4D1F80090D863 /* KiwiObject.cpp */,
@@ -597,13 +602,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				0FEF02D41CE4D87D0090D863 /* Main.cpp in Sources */,
+				61DBBF191D23FB3D00C89E4F /* KiwiFile.cpp in Sources */,
 				0FEFFF831CE4D1F80090D863 /* KiwiPatcherModel.cpp in Sources */,
 				0F8856DE1CE5D87E00AC1EB4 /* KiwiPatcherManager.cpp in Sources */,
 				0FEFFF841CE4D1F80090D863 /* KiwiTypedObjects.cpp in Sources */,
 				61DBBF131D23DA0300C89E4F /* KiwiModelFactory.cpp in Sources */,
 				0F2CF7601CE4898B003A9222 /* KiwiServer.cpp in Sources */,
-				0FEFFF7E1CE4D1F80090D863 /* KiwiConsole.cpp in Sources */,
 				0FEFFF801CE4D1F80090D863 /* KiwiObject.cpp in Sources */,
+				61DBBF181D23FB3D00C89E4F /* KiwiConsole.cpp in Sources */,
 				0FEFFF7F1CE4D1F80090D863 /* KiwiLink.cpp in Sources */,
 				0FA36AEE1CE50C99008CB057 /* KiwiPatcherValidator.cpp in Sources */,
 				0FEFFF821CE4D1F80090D863 /* KiwiPatcher.cpp in Sources */,

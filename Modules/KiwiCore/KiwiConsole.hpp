@@ -31,8 +31,6 @@
 #include <set>
 #include <algorithm>
 
-#include "flip/Ref.h"
-
 #include <KiwiCore/KiwiAtom.hpp>
 #include <KiwiCore/KiwiListeners.hpp>
 
@@ -64,17 +62,15 @@ namespace kiwi
         {
         public:
             
-            Message(std::string content, Console::MessageType type, flip::Ref ref);
+            Message(std::string content, Console::MessageType type);
             Message(Message const& other);
             
             std::string const& getText() const      { return m_text; };
             Console::MessageType getType() const    { return m_type; };
-            flip::Ref getRef() const                { return m_ref; };
             
         private:
             std::string           m_text;
             Console::MessageType  m_type;
-            flip::Ref             m_ref;    // to be used later (ex : objectPost)
         };
         
         //! @brief Print a post-type message in the console.
@@ -97,8 +93,7 @@ namespace kiwi
     private:
         
         //! @internal send message to listeners and append it to the ostream parameter value.
-        static void output(MessageType type, flip::Ref ref,
-                           std::ostream& output_stream, std::string const& message);
+        static void output(MessageType type, std::ostream& output_stream, std::string const& message);
         
         //! @brief You can inherit from this class to receive console changes.
         class Listener
