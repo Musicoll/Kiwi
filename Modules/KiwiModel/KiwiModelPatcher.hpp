@@ -36,7 +36,7 @@ namespace kiwi
         //! @brief The Patcher manages a set of Object and Link
         class Patcher : public flip::Object
         {
-        public:
+        public: // methods
             
             class User;
             class View;
@@ -55,7 +55,7 @@ namespace kiwi
             //! to find a registered name object as first atom.
             //! the last atoms are passed to the created object as arguments.
             //! @param text A string composed by the name of the object optionnally followed by a space and a list of argument values (ex : "plus 42")
-            //! @return A reference
+            //! @return An Object.
             model::Object& addObject(std::string const& text);
             
             //! @brief create an Object from a flip::Mold.
@@ -106,7 +106,7 @@ namespace kiwi
             //! @brief Returns the Patcher name.
             std::string getName() const;
             
-            //! @brief Returns the Patcher name.
+            //! @brief Sets the Patcher name.
             void setName(std::string const& new_name);
             
             //! @brief Set the User.
@@ -119,25 +119,21 @@ namespace kiwi
             //! @return The User pointer if found or nullptr.
             User* getUser(uint32_t user_id);
             
-            //! @brief Get the objects.
+            //! @brief Gets the objects.
             flip::Array<model::Object> const& getObjects() const noexcept;
             
-            //! @brief Get the links.
+            //! @brief Gets the links.
             flip::Array<model::Link> const& getLinks() const noexcept;
             
-            //! @brief Get the users.
+            //! @brief Gets the users.
             flip::Collection<User> const& getUsers() const noexcept;
+        
+        public: // internal methods
             
             //! @internal flip static declare method
             static void declare();
             
-        private:
-            
-            //! @brief Unselect this object for all views of all users.
-            void unselectForAllUsers(model::Object& object);
-            
-            //! @brief Unselect this link for all views of all users.
-            void unselectForAllUsers(model::Link& link);
+        private: // methods
             
             object_array_t::const_iterator findObject(model::Object const& object) const;
             object_array_t::iterator findObject(model::Object const& object);
@@ -145,7 +141,7 @@ namespace kiwi
             link_array_t::const_iterator findLink(model::Link const& object) const;
             link_array_t::iterator findLink(model::Link const& object);
             
-        private:
+        private: // members
             
             //! objects and links are stored in a flip::Array to maintain a graphical z-order.
             flip::Array<model::Object>  m_objects;

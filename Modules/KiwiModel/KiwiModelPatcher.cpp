@@ -347,28 +347,6 @@ namespace kiwi
             return *user;
         }
         
-        void Patcher::unselectForAllUsers(model::Object& object)
-        {
-            for(Patcher::User& user : m_users)
-            {
-                for(Patcher::View& view : user.getViews())
-                {
-                    view.unselectObject(object);
-                }
-            }
-        }
-        
-        void Patcher::unselectForAllUsers(model::Link& link)
-        {
-            for(Patcher::User& user : m_users)
-            {
-                for(Patcher::View& view : user.getViews())
-                {
-                    view.unselectLink(link);
-                }
-            }
-        }
-        
         flip::Array<model::Object>::const_iterator Patcher::findObject(model::Object const& object) const
         {
             const auto find_it = [&object](model::Object const& object_model)
