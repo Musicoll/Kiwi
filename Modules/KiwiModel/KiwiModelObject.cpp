@@ -79,7 +79,7 @@ namespace kiwi
         m_width(other.m_width),
         m_height(other.m_height)
         {
-            
+            ;
         }
         
         Object::~Object()

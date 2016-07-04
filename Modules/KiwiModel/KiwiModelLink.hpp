@@ -37,7 +37,7 @@ namespace kiwi
         //! and inlet and outlet indexes.
         class Link : public flip::Object
         {
-        public:
+        public: // methods
             
             //! @brief Constructs a Link.
             //! @details Constructs a Link with given origin and destination Object pointers
@@ -51,22 +51,19 @@ namespace kiwi
             //! @brief Destructor.
             virtual ~Link() = default;
             
-            //! @brief Get the source Object ID of the link.
-            //! @return The source Object ID of the link.
+            //! @brief Gets the Object that sends messages.
             model::Object const& getSenderObject() const noexcept;
             
-            //! @brief Get the destination Object of the link.
-            //! @return The destination Object of the link.
+            //! @brief Gets the Object that receives messages.
             model::Object const& getReceiverObject() const noexcept;
             
-            //! @brief Get the actual origin outlet index of the link.
-            //! @return The actual origin outlet index of the link.
+            //! @brief Returns the sender outlet index.
             size_t getSenderIndex() const noexcept;
             
-            //! @brief Get the actual destination inlet index of the link.
-            //! @return The actual destination inlet index of the link.
+            //! @brief Returns the receiver inlet index.
             size_t getReceiverIndex() const noexcept;
-        public:
+            
+        public: // internal methods
             
             //! @internal flip Default constructor
             Link(flip::Default&) {}
@@ -74,7 +71,8 @@ namespace kiwi
             //! @internal flip static declare method
             static void declare();
             
-        private:
+        private: // members
+            
             flip::ObjectRef<model::Object>  m_sender;
             flip::ObjectRef<model::Object>  m_receiver;
             flip::Int                       m_index_outlet;

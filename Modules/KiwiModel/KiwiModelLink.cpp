@@ -19,11 +19,11 @@
  ==============================================================================
  */
 
+#include "KiwiModelDataModel.hpp"
+
 #include "KiwiModelObject.hpp"
 #include "KiwiModelLink.hpp"
 #include "KiwiModelPatcher.hpp"
-
-#include "KiwiModelDataModel.hpp"
 
 namespace kiwi
 {

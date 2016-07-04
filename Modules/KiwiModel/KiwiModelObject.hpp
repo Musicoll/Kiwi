@@ -30,9 +30,7 @@
 #include "flip/Bool.h"
 #include "flip/Int.h"
 #include "flip/Float.h"
-#include "flip/Blob.h"
 #include "flip/String.h"
-#include "flip/Enum.h"
 #include "flip/Array.h"
 #include "flip/Collection.h"
 #include "flip/Object.h"
@@ -49,11 +47,11 @@ namespace kiwi
         //                                      OBJECT                                      //
         // ================================================================================ //
         
-        //! @brief The Object is an abstract base class for kiwi objects.
+        //! @brief The Object is a base class for kiwi objects.
         //! @details objects can be instantiated in a Patcher.
         class Object : public flip::Object
         {
-        public:
+        public: // methods
  
             //! @brief Constructor.
             Object();
@@ -65,28 +63,24 @@ namespace kiwi
             virtual ~Object();
             
             //! @brief Returns the name of the Object.
-            //! @return The name of the Object.
             std::string getName() const;
             
-            //! @brief Returns the name of the Object.
-            //! @return The name of the Object.
+            //! @brief Returns the text of the Object.
             std::string getText() const;
             
             //! @brief Returns the number of inlets.
-            //! @return The number of inlets.
             size_t getNumberOfInlets() const noexcept;
             
             //! @brief Returns true if the inlets changed.
             bool inletsChanged() const noexcept;
             
             //! @brief Returns the number of outlets.
-            //! @return The number of outlets.
             size_t getNumberOfOutlets() const noexcept;
             
             //! @brief Returns true if the outlets changed.
             bool outletsChanged() const noexcept;
             
-            //! @brief Set the x/y position.
+            //! @brief Sets the x/y graphical position of the object.
             void setPosition(double x, double y);
             
             //! @brief Returns true if the object's position changed.
@@ -104,10 +98,10 @@ namespace kiwi
             //! @brief Returns the y position.
             double getY() const noexcept;
             
-            //! @brief Set the width of the object.
+            //! @brief Sets the width of the object.
             void setWidth(double new_width);
             
-            //! @brief Set the height of the object.
+            //! @brief Sets the height of the object.
             void setHeight(double new_height);
             
             //! @brief Returns the object's width.
@@ -119,17 +113,15 @@ namespace kiwi
             //! @brief Call signalTrigger() to hmmm.. trigger the signal.
             flip::Signal<> signalTrigger;
             
-        protected:
+        protected: // methods
             
-            //! @brief Set the number of inlets.
-            //! @param inlets The number of inlets.
+            //! @brief Sets the number of inlets.
             void setNumberOfInlets(size_t inlets);
             
-            //! @brief Set the number of inlets.
-            //! @param inlets The number of inlets.
+            //! @brief Sets the number of inlets.
             void setNumberOfOutlets(size_t outlets);
             
-        public:
+        public: // internal methods
             
             //! @internal flip Default constructor
             Object(flip::Default&);
@@ -137,7 +129,7 @@ namespace kiwi
             //! @internal flip static declare method
             static void declare();
             
-        private:
+        private: // members
             
             //! @brief Signal types
             enum SignalType { Trigger };
