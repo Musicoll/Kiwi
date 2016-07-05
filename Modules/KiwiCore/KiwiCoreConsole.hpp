@@ -29,8 +29,8 @@
 #include <set>
 #include <algorithm>
 
-#include <KiwiCore/KiwiCoreAtom.hpp>
-#include <KiwiCore/KiwiCoreListeners.hpp>
+#include "KiwiCoreAtom.hpp"
+#include "KiwiCoreListeners.hpp"
 
 namespace kiwi
 {

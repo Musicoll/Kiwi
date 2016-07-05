@@ -32,7 +32,7 @@ namespace kiwi
         //                                      FACTORY                                     //
         // ================================================================================ //
         
-        std::unique_ptr<Object> Factory::create(model::Object const& model)
+        std::unique_ptr<Object> Factory::create(Patcher& patcher, model::Object const& model)
         {
             const std::string object_name = model.getName();
             std::vector<Atom> atoms = AtomHelper::parse(model.getText());
@@ -54,7 +54,7 @@ namespace kiwi
                         assert(false && "the engine object has not been registered");
                     }
                     
-                    return std::unique_ptr<Object>(engine_ctor(model, args));
+                    return std::unique_ptr<Object>(engine_ctor(model, patcher, args));
                 }
             }
             

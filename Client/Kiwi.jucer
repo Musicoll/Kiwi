@@ -55,6 +55,10 @@
               file="../Modules/KiwiEngine/KiwiEngineObjects.hpp"/>
         <FILE id="Scvn6j" name="KiwiEngineDef.hpp" compile="0" resource="0"
               file="../Modules/KiwiEngine/KiwiEngineDef.hpp"/>
+        <FILE id="fbMUGq" name="KiwiEngineBeacon.cpp" compile="1" resource="0"
+              file="../Modules/KiwiEngine/KiwiEngineBeacon.cpp"/>
+        <FILE id="bzq4V9" name="KiwiEngineBeacon.hpp" compile="0" resource="0"
+              file="../Modules/KiwiEngine/KiwiEngineBeacon.hpp"/>
         <FILE id="S7ajZC" name="KiwiEngineLink.cpp" compile="1" resource="0"
               file="../Modules/KiwiEngine/KiwiEngineLink.cpp"/>
         <FILE id="sw6b3w" name="KiwiEngineLink.hpp" compile="0" resource="0"

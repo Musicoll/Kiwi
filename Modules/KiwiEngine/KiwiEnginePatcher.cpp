@@ -35,7 +35,8 @@ namespace kiwi
         // ================================================================================ //
         
         Patcher::Patcher(model::Patcher const& model) noexcept :
-        m_model(model)
+        m_model(model),
+        m_so_links(1)
         {
             ;
         }
@@ -90,6 +91,28 @@ namespace kiwi
             return links;
         }
         
+        
+        void Patcher::addStackOverflow(Link const* link)
+        {
+            m_so_links[m_so_links.size() - 1].push(link);
+        }
+        
+        void Patcher::endStackOverflow()
+        {
+            m_so_links.push_back(SoLinks());
+        }
+        
+        std::vector<std::queue<Link const*>> Patcher::getStackOverflow() const
+        {
+            return m_so_links;
+        }
+        
+        void Patcher::clearStackOverflow()
+        {
+            m_so_links.clear();
+            m_so_links.push_back(SoLinks());
+        }
+        
         void Patcher::modelChanged()
         {
             if(m_model.changed())
@@ -139,7 +162,7 @@ namespace kiwi
 
         void Patcher::objectAdded(model::Object& object_m)
         {
-            std::shared_ptr<Object> obj_sptr = Factory::create(object_m);
+            std::shared_ptr<Object> obj_sptr = Factory::create(*this, object_m);
             object_m.entity().emplace<std::shared_ptr<Object>>(obj_sptr);
         }
 
