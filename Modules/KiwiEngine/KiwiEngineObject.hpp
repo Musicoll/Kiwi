@@ -38,7 +38,7 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            Object(model::Object const& model) noexcept;
+            Object(model::Object const& model, Patcher& patcher) noexcept;
             
             //! @brief Destructor.
             virtual ~Object() noexcept;
@@ -75,6 +75,7 @@ namespace kiwi
             typedef std::set<Link const*> Outlet;
 
             model::Object const&    m_model;
+            Patcher&                m_patcher;
             std::vector<Outlet>     m_outlets;
             size_t                  m_stack_count = 0ul;
             

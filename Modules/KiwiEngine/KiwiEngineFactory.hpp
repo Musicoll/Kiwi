@@ -52,7 +52,7 @@ namespace kiwi
                               "The class must not be abstract.");
                 
                 // The engine Object must be constructible with a model and vector of Atom
-                static_assert(std::is_constructible<TEngine, model::Object const&, std::vector<Atom>>::value,
+                static_assert(std::is_constructible<TEngine, model::Object const&, Patcher&, std::vector<Atom>>::value,
                               "Bad engine object constructor");
                 
                 assert(!name.empty());
@@ -69,9 +69,9 @@ namespace kiwi
                     
                     if(creators.find(name) == creators.end())
                     {
-                        creators[name] = [](model::Object const& model, std::vector<Atom> const& args) -> TEngine*
+                        creators[name] = [](model::Object const& model, Patcher& patcher, std::vector<Atom> const& args) -> TEngine*
                         {
-                            return new TEngine(model, args);
+                            return new TEngine(model, patcher, args);
                         };
                     }
                     else
@@ -84,7 +84,7 @@ namespace kiwi
             //! @brief Creates a new engine Object.
             //! @param model The model::Object.
             //! @return An engine object.
-            static std::unique_ptr<Object> create(model::Object const& model);
+            static std::unique_ptr<Object> create(Patcher& patcher, model::Object const& model);
             
             //! @brief Returns true if a given string match a registered Object name.
             //! @param name The name of the object engine to find.
@@ -102,7 +102,7 @@ namespace kiwi
             Factory() = delete;
             ~Factory() = delete;
             
-            using ctor_fn_t = std::function<Object*(model::Object const& model, std::vector<Atom>)>;
+            using ctor_fn_t = std::function<Object*(model::Object const& model, Patcher& patcher, std::vector<Atom>)>;
             using creator_map_t = std::map<std::string, ctor_fn_t>;
             
             //! @internal Returns the static map of creators.

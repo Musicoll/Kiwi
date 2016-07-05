@@ -34,7 +34,7 @@ namespace kiwi
         //                                       NEWBOX                                     //
         // ================================================================================ //
         
-        NewBox::NewBox(model::Object const& model, std::vector<Atom> const& args) : Object(model)
+        NewBox::NewBox(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args) : Object(model, patcher)
         {
             ;
         }
@@ -48,7 +48,7 @@ namespace kiwi
         //                                      ERRORBOX                                    //
         // ================================================================================ //
         
-        ErrorBox::ErrorBox(model::Object const& model, std::vector<Atom> const& args) : Object(model)
+        ErrorBox::ErrorBox(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args) : Object(model, patcher)
         {
             ;
         }
@@ -62,7 +62,7 @@ namespace kiwi
         //                                    OBJECT PLUS                                   //
         // ================================================================================ //
         
-        ObjectPlus::ObjectPlus(model::Object const& model, std::vector<Atom> const& args) : Object(model)
+        ObjectPlus::ObjectPlus(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args) : Object(model, patcher)
         {
             m_lhs = 0.;
             if(!args.empty() && args[0].isNumber())
@@ -105,7 +105,7 @@ namespace kiwi
         //                                    OBJECT PRINT                                  //
         // ================================================================================ //
         
-        ObjectPrint::ObjectPrint(model::Object const& model, std::vector<Atom> const& args) : Object(model)
+        ObjectPrint::ObjectPrint(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args) : Object(model, patcher)
         {
             m_name = !args.empty() ? args[0].getString() : "print";
         }

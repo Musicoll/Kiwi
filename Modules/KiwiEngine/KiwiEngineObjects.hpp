@@ -35,7 +35,7 @@ namespace kiwi
         class NewBox : public engine::Object
         {
         public:
-            NewBox(model::Object const& model, std::vector<Atom> const& args);
+            NewBox(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
             void receive(size_t index, std::vector<Atom> const& args) override;
         };
@@ -47,7 +47,7 @@ namespace kiwi
         class ErrorBox : public engine::Object
         {
         public:
-            ErrorBox(model::Object const& model, std::vector<Atom> const& args);
+            ErrorBox(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
             void receive(size_t index, std::vector<Atom> const& args) override;
         };
@@ -60,7 +60,7 @@ namespace kiwi
         {
         public:
             
-            ObjectPlus(model::Object const& model, std::vector<Atom> const& args);
+            ObjectPlus(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
             void receive(size_t index, std::vector<Atom> const& args) override;
             
@@ -79,7 +79,7 @@ namespace kiwi
         {
         public:
             
-            ObjectPrint(model::Object const& model, std::vector<Atom> const& args);
+            ObjectPrint(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
             void receive(size_t, std::vector<Atom> const& args) override;
             

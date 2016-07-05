@@ -50,10 +50,24 @@ namespace kiwi
             std::vector<Object*> getObjects();
             
             //! @brief Returns the links.
-            std::vector<engine::Link const*> getLinks() const;
+            std::vector<Link const*> getLinks() const;
             
             //! @internal The model changed.
             void modelChanged();
+            
+            //! @brief Adds a link to the current stack overflow list (or create a new list if there is no).
+            //! @internal Only the Object should use this method.
+            void addStackOverflow(Link const* link);
+            
+            //! @brief Ends a list of stack overflow.
+            //! @internal Only the Object should use this method.
+            void endStackOverflow();
+            
+            //! @brief Gets the lists of stack overflow.
+            std::vector<std::queue<Link const*>> getStackOverflow() const;
+            
+            //! @brief Clears the lists of stack overflow.
+            void clearStackOverflow();
             
         private: // methods
             
@@ -77,7 +91,10 @@ namespace kiwi
         
         private: // members
             
-            model::Patcher const& m_model;
+            typedef std::queue<Link const*> SoLinks;
+            
+            model::Patcher const&   m_model;
+            std::vector<SoLinks>    m_so_links;
             
         private: // deleted methods
             
