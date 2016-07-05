@@ -21,6 +21,7 @@
 
 #include "flip/DataModel.h"
 
+#include "KiwiModelDef.hpp"
 #include "KiwiModelDataModel.hpp"
 #include "KiwiModelPatcher.hpp"
 
@@ -30,8 +31,13 @@ namespace kiwi
     {
         void DataModel::init()
         {
-            // @todo => version in Macro
-            DataModel::version("v0.0.2");
+            const std::string model_version = KIWI_MODEL_VERSION_STRING;
+            
+            #ifdef DEBUG
+            std::cout << "- kiwi model version : " << model_version << '\n';
+            #endif
+            
+            DataModel::version(model_version);
             
             // patcher elements declaration :
             model::Object::declare();

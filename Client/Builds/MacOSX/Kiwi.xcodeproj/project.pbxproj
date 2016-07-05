@@ -476,6 +476,7 @@
 		4D9A91BF48728655FDC24786 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "juce_Base64.h"; path = "../../../ThirdParty/Juce/modules/juce_core/text/juce_Base64.h"; sourceTree = "SOURCE_ROOT"; };
 		4DAD45B0D57A0142E1FC2EB4 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "lookup_data.h"; path = "../../../ThirdParty/Juce/modules/juce_audio_formats/codecs/oggvorbis/libvorbis-1.3.2/lib/lookup_data.h"; sourceTree = "SOURCE_ROOT"; };
 		4DC830256DDCEF55A94DBF82 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "juce_LookAndFeel_V3.cpp"; path = "../../../ThirdParty/Juce/modules/juce_gui_basics/lookandfeel/juce_LookAndFeel_V3.cpp"; sourceTree = "SOURCE_ROOT"; };
+		4DCCA4BE878E510C1AB0EB49 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KiwiModelDef.hpp; path = ../../../Modules/KiwiModel/KiwiModelDef.hpp; sourceTree = "SOURCE_ROOT"; };
 		4E39203FF94BC4EB7D1224F0 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "juce_ScopedLock.h"; path = "../../../ThirdParty/Juce/modules/juce_core/threads/juce_ScopedLock.h"; sourceTree = "SOURCE_ROOT"; };
 		4E9FA9BD694C284F271091F9 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "juce_PropertySet.cpp"; path = "../../../ThirdParty/Juce/modules/juce_core/containers/juce_PropertySet.cpp"; sourceTree = "SOURCE_ROOT"; };
 		4EA17B37EE3CA65759D3D07B = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = "juce_mac_Files.mm"; path = "../../../ThirdParty/Juce/modules/juce_core/native/juce_mac_Files.mm"; sourceTree = "SOURCE_ROOT"; };
@@ -1492,6 +1493,7 @@
 					18C9C351FD7BB4819C632058,
 					DD93413D819E6E9B41094EF5,
 					F34BB4BB2E65E78AB8AF8E20,
+					4DCCA4BE878E510C1AB0EB49,
 					813CF3A32EAACCDC8842F509,
 					02D17CC54564B56CB7DFFE29,
 					217F24DB90959ED83942008D,
