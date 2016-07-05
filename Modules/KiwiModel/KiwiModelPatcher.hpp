@@ -61,7 +61,7 @@ namespace kiwi
             //! @brief create an Object from a flip::Mold.
             model::Object& addObject(flip::Mold const& mold);
             
-            //! @brief Replace Object
+            //! @brief Replace an Object with another using a flip::Mold
             model::Object& replaceObjectWith(model::Object& object_to_replace,
                                              flip::Mold const& mold,
                                              Patcher::View& view);
@@ -69,18 +69,15 @@ namespace kiwi
             //! @brief Constructs and add a Link to the Patcher.
             //! @details Constructs a Link with given origin and destination Object
             //! and IO indexes then adds it in the Patcher.
-            //! @param from     The origin Object.
-            //! @param outlet   The origin outlet index.
-            //! @param to       The destination Object.
-            //! @param inlet    The destination inlet index.
+            //! @param from     The Object that sends messages.
+            //! @param outlet   The sending outlet index.
+            //! @param to       The Object that receives messages.
+            //! @param inlet    The receiving inlet index.
+            //! @return A link or nullptr if the link can't be created
             model::Link* addLink(model::Object const& from,
                                  const size_t outlet,
                                  model::Object const& to,
                                  const size_t inlet);
-            
-            //! @brief Returns true if the link can be created.
-            bool canConnect(model::Object const& from, const size_t outlet,
-                            model::Object const& to, const size_t inlet) const;
             
             //! @brief Removes an object from the Patcher.
             //! @details This will also remove all links connected to this object.
@@ -140,6 +137,10 @@ namespace kiwi
             
             link_array_t::const_iterator findLink(model::Link const& object) const;
             link_array_t::iterator findLink(model::Link const& object);
+            
+            //! @internal Returns true if the link can be created.
+            bool canConnect(model::Object const& from, const size_t outlet,
+                            model::Object const& to, const size_t inlet) const;
             
         private: // members
             
