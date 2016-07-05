@@ -31,7 +31,7 @@ namespace kiwi
     // ================================================================================ //
 
     //! @brief A juce Window.
-    class jWindow : public juce::DocumentWindow, public ApplicationCommandTarget
+    class jWindow : public juce::DocumentWindow, public juce::ApplicationCommandTarget
     {
     public:
         jWindow(std::string const& name = "untitled",
@@ -46,8 +46,8 @@ namespace kiwi
         // ================================================================================ //
         
         ApplicationCommandTarget* getNextCommandTarget() override;
-        void getAllCommands (Array <CommandID>& commands) override;
-        void getCommandInfo (const CommandID commandID, ApplicationCommandInfo& result) override;
+        void getAllCommands (juce::Array<juce::CommandID>& commands) override;
+        void getCommandInfo (const juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
         bool perform (const InvocationInfo& info) override;
         
     protected:

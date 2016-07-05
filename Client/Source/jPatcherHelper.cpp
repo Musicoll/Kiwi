@@ -267,7 +267,7 @@ namespace kiwi
         {
             const double min_zoom = 0.25;
             m_zoom_factor = zoom_factor < min_zoom ? min_zoom : zoom_factor;
-            m_patcher.setTransform(AffineTransform::scale(m_zoom_factor));
+            m_patcher.setTransform(juce::AffineTransform::scale(m_zoom_factor));
             
             updatePatcherArea(false);
         }
@@ -382,11 +382,11 @@ namespace kiwi
         int new_width = m_patcher.getWidth() + delta_width;
         int new_height = m_patcher.getHeight() + delta_height;
         
-        const Rectangle<int> objects_area = m_patcher.getCurrentObjectsArea();
+        const juce::Rectangle<int> objects_area = m_patcher.getCurrentObjectsArea();
         const int objects_width = objects_area.getWidth();
         const int objects_height = objects_area.getHeight();
         
-        const Point<int> view_pos = getViewPosition();
+        const juce::Point<int> view_pos = getViewPosition();
         const double zoom = getZoomFactor();
         
         if(delta_width != 0)
@@ -527,7 +527,7 @@ namespace kiwi
             m_patcher.originPositionChanged();
         }
         
-        const Rectangle<int> objects_area = m_patching_area.withPosition(origin);
+        const juce::Rectangle<int> objects_area = m_patching_area.withPosition(origin);
         const int objects_width = objects_area.getWidth();
         const int objects_height = objects_area.getHeight();
         
@@ -634,7 +634,7 @@ namespace kiwi
         return m_dragging;
     }
     
-    void jLasso::paint(Graphics& g)
+    void jLasso::paint(juce::Graphics& g)
     {
         const juce::Rectangle<int> bounds = getLocalBounds();
         const juce::Colour color = juce::Colour::fromFloatRGBA(0.96, 0.96, 0.96, 1.);

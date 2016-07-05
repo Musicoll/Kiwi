@@ -188,18 +188,18 @@ namespace kiwi
         return false;
     }
     
-    FileBasedDocument::SaveResult jPatcherManager::saveIfNeededAndUserAgrees()
+    juce::FileBasedDocument::SaveResult jPatcherManager::saveIfNeededAndUserAgrees()
     {
         if (! needsSaving())
         {
-            return FileBasedDocument::savedOk;
+            return juce::FileBasedDocument::savedOk;
         }
         
         auto& patcher = getPatcher();
         
         const std::string document_name = patcher.getName();
         
-        const int r = AlertWindow::showYesNoCancelBox(AlertWindow::QuestionIcon,
+        const int r = juce::AlertWindow::showYesNoCancelBox(juce::AlertWindow::QuestionIcon,
                                                       TRANS("Closing document..."),
                                                       TRANS("Do you want to save the changes to \"")
                                                       + document_name + "\"?",
@@ -210,16 +210,16 @@ namespace kiwi
         // save changes
         if(r == 1)
         {
-            return (saveDocument()) ? FileBasedDocument::savedOk : FileBasedDocument::failedToWriteToFile;
+            return (saveDocument()) ? juce::FileBasedDocument::savedOk : juce::FileBasedDocument::failedToWriteToFile;
         }
         
         // discard changes
         if(r == 2)
         {
-            return FileBasedDocument::savedOk;
+            return juce::FileBasedDocument::savedOk;
         }
         
-        return FileBasedDocument::userCancelledSave;
+        return juce::FileBasedDocument::userCancelledSave;
     }
     
     void jPatcherManager::forceCloseAllWindows()
@@ -259,7 +259,7 @@ namespace kiwi
             model::Patcher::View& view = *it;
             bool need_saving = m_need_saving_flag && (number_of_views <= 1);
             
-            if(!need_saving || (need_saving && saveIfNeededAndUserAgrees() == FileBasedDocument::savedOk))
+            if(!need_saving || (need_saving && saveIfNeededAndUserAgrees() == juce::FileBasedDocument::savedOk))
             {
                 it = user.removeView(view);
                 DocumentManager::commit(patcher);
@@ -293,7 +293,7 @@ namespace kiwi
         {
             if(&view == &patcher_view_m)
             {
-                if(!need_saving || saveIfNeededAndUserAgrees() == FileBasedDocument::savedOk)
+                if(!need_saving || saveIfNeededAndUserAgrees() == juce::FileBasedDocument::savedOk)
                 {
                     user.removeView(patcher_view_m);
                     DocumentManager::commit(patcher);

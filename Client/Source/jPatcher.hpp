@@ -47,17 +47,17 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The juce Patcher Component.
-    class jPatcher :
-    public juce::Component,
-    public ApplicationCommandTarget
+    class jPatcher : public juce::Component, public juce::ApplicationCommandTarget
     {
     public:
         
+        //! @brief Constructor
         jPatcher(jPatcherManager& manager,
                  jInstance& instance,
                  model::Patcher& patcher,
                  model::Patcher::View& view);
         
+        //! @brief Destructor
         ~jPatcher();
         
         using jObjects = std::vector<std::unique_ptr<jObject>>;
@@ -112,19 +112,19 @@ namespace kiwi
         
         void paint(juce::Graphics& g) override;
         void mouseDown(juce::MouseEvent const& event) override;
-        void mouseDrag(MouseEvent const& e) override;
-        void mouseUp(MouseEvent const& e) override;
+        void mouseDrag(juce::MouseEvent const& e) override;
+        void mouseUp(juce::MouseEvent const& e) override;
         void mouseMove(juce::MouseEvent const& event) override;
-        void mouseDoubleClick(const MouseEvent& event) override;
-        bool keyPressed(const KeyPress& key) override;
+        void mouseDoubleClick(const juce::MouseEvent& event) override;
+        bool keyPressed(const juce::KeyPress& key) override;
         
         // ================================================================================ //
         //                              APPLICATION COMMAND TARGET                          //
         // ================================================================================ //
         
-        ApplicationCommandTarget* getNextCommandTarget() override;
-        void getAllCommands(Array<CommandID>& commands) override;
-        void getCommandInfo(CommandID commandID, ApplicationCommandInfo& result) override;
+        juce::ApplicationCommandTarget* getNextCommandTarget() override;
+        void getAllCommands(juce::Array<juce::CommandID>& commands) override;
+        void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
         bool perform(const InvocationInfo& info) override;
         
     private: // methods

@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="HQvakn" name="Kiwi" projectType="guiapp" version="0.0.1"
               bundleIdentifier="com.cicm.Kiwi" includeBinaryInAppConfig="1"
-              jucerVersion="4.2.1" companyName="CICM" companyWebsite="cicm.mshparisnord.org"
+              jucerVersion="4.2.3" companyName="CICM" companyWebsite="cicm.mshparisnord.org"
               companyEmail="cicm.mshparisnord@gmail.com">
   <MAINGROUP id="HfN8up" name="Kiwi">
     <GROUP id="{E476D5A0-2E9D-DD18-D007-54A51ACF9459}" name="Application">
@@ -381,7 +381,7 @@
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX" extraDefs="flip_NOTHING=flip_NOTHING_FATAL"
+    <XCODE_MAC targetFolder="Builds/MacOSX" extraDefs="flip_NOTHING=flip_NOTHING_FATAL&#10;DONT_SET_USING_JUCE_NAMESPACE"
                externalLibraries="" extraCompilerFlags="" extraLinkerFlags="../../../ThirdParty/flip-public/lib/macos/libflip.a"
                documentExtensions="kiwi" smallIcon="ryVSWY" bigIcon="ryVSWY">
       <CONFIGURATIONS>

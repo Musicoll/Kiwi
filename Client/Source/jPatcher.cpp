@@ -256,9 +256,9 @@ namespace kiwi
     //                                     MOUSE DRAG                                   //
     // ================================================================================ //
     
-    void jPatcher::mouseDrag(MouseEvent const& e)
+    void jPatcher::mouseDrag(juce::MouseEvent const& e)
     {
-        MouseCursor::StandardCursorType mc = MouseCursor::NormalCursor;
+        juce::MouseCursor::StandardCursorType mc = juce::MouseCursor::NormalCursor;
         
         if(!isLocked())
         {
@@ -351,7 +351,7 @@ namespace kiwi
                             {
                                 // scroll viewport
                                 beginDragAutoRepeat(50);
-                                const MouseEvent e2(e.getEventRelativeTo(m_viewport.get()));
+                                const juce::MouseEvent e2(e.getEventRelativeTo(m_viewport.get()));
                                 m_viewport->autoScroll(e2.x, e2.y, 5, 5);
                             }
                         }
@@ -372,7 +372,7 @@ namespace kiwi
     //                                      MOUSE UP                                    //
     // ================================================================================ //
     
-    void jPatcher::mouseUp(MouseEvent const& e)
+    void jPatcher::mouseUp(juce::MouseEvent const& e)
     {
         m_object_border_down_status = HitTester::Border::None;
         
@@ -480,7 +480,7 @@ namespace kiwi
     
     void jPatcher::mouseMove(juce::MouseEvent const& event)
     {
-        MouseCursor::StandardCursorType mc = MouseCursor::NormalCursor;
+        juce::MouseCursor::StandardCursorType mc = juce::MouseCursor::NormalCursor;
         
         m_io_highlighter->hide();
         
@@ -507,7 +507,7 @@ namespace kiwi
                         m_io_highlighter->highlightOutlet(*hit.getObject(), hit.getIndex());
                     }
                     
-                    mc = MouseCursor::PointingHandCursor;
+                    mc = juce::MouseCursor::PointingHandCursor;
                 }
             }
         }
@@ -515,7 +515,7 @@ namespace kiwi
         setMouseCursor(mc);
     }
     
-    void jPatcher::mouseDoubleClick(const MouseEvent& e)
+    void jPatcher::mouseDoubleClick(const juce::MouseEvent& e)
     {
         if(!isLocked())
         {
@@ -539,33 +539,33 @@ namespace kiwi
     
     juce::MouseCursor::StandardCursorType jPatcher::getMouseCursorForBorder(int border_flag) const
     {
-        MouseCursor::StandardCursorType mc = MouseCursor::NormalCursor;
+        juce::MouseCursor::StandardCursorType mc = juce::MouseCursor::NormalCursor;
         
         switch(border_flag)
         {
             case (HitTester::Border::Top) :
-            { mc = MouseCursor::TopEdgeResizeCursor; break; }
+            { mc = juce::MouseCursor::TopEdgeResizeCursor; break; }
                 
             case (HitTester::Border::Left):
-            { mc = MouseCursor::LeftEdgeResizeCursor; break; }
+            { mc = juce::MouseCursor::LeftEdgeResizeCursor; break; }
                 
             case (HitTester::Border::Right):
-            { mc = MouseCursor::RightEdgeResizeCursor; break; }
+            { mc = juce::MouseCursor::RightEdgeResizeCursor; break; }
                 
             case (HitTester::Border::Bottom):
-            { mc = MouseCursor::BottomEdgeResizeCursor; break; }
+            { mc = juce::MouseCursor::BottomEdgeResizeCursor; break; }
                 
             case (HitTester::Border::Top | HitTester::Border::Left):
-            { mc = MouseCursor::TopLeftCornerResizeCursor; break; }
+            { mc = juce::MouseCursor::TopLeftCornerResizeCursor; break; }
                 
             case (HitTester::Border::Top | HitTester::Border::Right):
-            { mc = MouseCursor::TopRightCornerResizeCursor; break;}
+            { mc = juce::MouseCursor::TopRightCornerResizeCursor; break;}
                 
             case (HitTester::Border::Bottom | HitTester::Border::Left):
-            { mc = MouseCursor::BottomLeftCornerResizeCursor; break; }
+            { mc = juce::MouseCursor::BottomLeftCornerResizeCursor; break; }
                 
             case (HitTester::Border::Bottom | HitTester::Border::Right):
-            { mc = MouseCursor::BottomRightCornerResizeCursor; break; }
+            { mc = juce::MouseCursor::BottomRightCornerResizeCursor; break; }
                 
             default: break;
         }
@@ -583,10 +583,10 @@ namespace kiwi
         
         if(!isLocked())
         {
-            m.addCommandItem(cm, StandardApplicationCommandIDs::paste);
+            m.addCommandItem(cm, juce::StandardApplicationCommandIDs::paste);
             m.addSeparator();
             
-            m.addCommandItem(cm, StandardApplicationCommandIDs::selectAll);
+            m.addCommandItem(cm, juce::StandardApplicationCommandIDs::selectAll);
             m.addSeparator();
         }
 
@@ -600,13 +600,13 @@ namespace kiwi
             juce::PopupMenu m;
             auto* cm = &KiwiApp::getCommandManager();
             
-            m.addCommandItem(cm, StandardApplicationCommandIDs::cut);
-            m.addCommandItem(cm, StandardApplicationCommandIDs::copy);
-            m.addCommandItem(cm, StandardApplicationCommandIDs::paste);
+            m.addCommandItem(cm, juce::StandardApplicationCommandIDs::cut);
+            m.addCommandItem(cm, juce::StandardApplicationCommandIDs::copy);
+            m.addCommandItem(cm, juce::StandardApplicationCommandIDs::paste);
             m.addSeparator();
             
             m.addCommandItem(cm, CommandIDs::pasteReplace);
-            m.addCommandItem(cm, StandardApplicationCommandIDs::del);
+            m.addCommandItem(cm, juce::StandardApplicationCommandIDs::del);
             m.addSeparator();
             
             m.addCommandItem(cm, CommandIDs::toFront);
@@ -624,7 +624,7 @@ namespace kiwi
             juce::PopupMenu m;
             auto* cm = &KiwiApp::getCommandManager();
             
-            m.addCommandItem(cm, StandardApplicationCommandIDs::del);
+            m.addCommandItem(cm, juce::StandardApplicationCommandIDs::del);
             m.addSeparator();
             
             m.show();
@@ -970,14 +970,14 @@ namespace kiwi
         }
     }
     
-    bool jPatcher::keyPressed(const KeyPress& key)
+    bool jPatcher::keyPressed(const juce::KeyPress& key)
     {
-        if(key.isKeyCode(KeyPress::deleteKey) || key.isKeyCode(KeyPress::backspaceKey))
+        if(key.isKeyCode(juce::KeyPress::deleteKey) || key.isKeyCode(juce::KeyPress::backspaceKey))
         {
             deleteSelection();
             return true;
         }
-        else if(key.isKeyCode(KeyPress::returnKey))
+        else if(key.isKeyCode(juce::KeyPress::returnKey))
         {
             if(m_local_objects_selection.size() == 1)
             {
@@ -1004,22 +1004,22 @@ namespace kiwi
             const bool snap = key.getModifiers().isShiftDown();
             const int amount = snap ? m_grid_size : 1;
             
-            if(key.isKeyCode(KeyPress::rightKey))
+            if(key.isKeyCode(juce::KeyPress::rightKey))
             {
                 moveSelectedObjects({amount, 0});
                 return true;
             }
-            else if(key.isKeyCode(KeyPress::downKey))
+            else if(key.isKeyCode(juce::KeyPress::downKey))
             {
                 moveSelectedObjects({0, amount});
                 return true;
             }
-            else if(key.isKeyCode(KeyPress::leftKey))
+            else if(key.isKeyCode(juce::KeyPress::leftKey))
             {
                 moveSelectedObjects({-amount, 0});
                 return true;
             }
-            else if(key.isKeyCode(KeyPress::upKey))
+            else if(key.isKeyCode(juce::KeyPress::upKey))
             {
                 moveSelectedObjects({0, -amount});
                 return true;
@@ -1399,7 +1399,7 @@ namespace kiwi
             
             juce::File file(kiwi_file.getAbsolutePath());
             
-            if(ComponentPeer* peer = window->getPeer())
+            if(juce::ComponentPeer* peer = window->getPeer())
             {
                 if (!peer->setDocumentEditedStatus(edited))
                     if (edited)
@@ -1677,7 +1677,7 @@ namespace kiwi
             //addChildComponent(jobj);
             addAndMakeVisible(jobj, zorder);
             
-            //ComponentAnimator& animator = Desktop::getInstance().getAnimator();
+            //juce::ComponentAnimator& animator = juce::Desktop::getInstance().getAnimator();
             //animator.animateComponent(&jobj, jobj.getBounds(), 1., 200., true, 0.8, 1.);
         }
     }
@@ -1701,7 +1701,7 @@ namespace kiwi
         {
             jObject* jobject = it->get();
             
-            ComponentAnimator& animator = Desktop::getInstance().getAnimator();
+            juce::ComponentAnimator& animator = juce::Desktop::getInstance().getAnimator();
             animator.animateComponent(jobject, jobject->getBounds(), 0., 200., true, 0.8, 1.);
             
             removeChildComponent(jobject);
@@ -2130,26 +2130,26 @@ namespace kiwi
     //                              APPLICATION COMMAND TARGET                          //
     // ================================================================================ //
     
-    ApplicationCommandTarget* jPatcher::getNextCommandTarget()
+    juce::ApplicationCommandTarget* jPatcher::getNextCommandTarget()
     {
         return findFirstTargetParentComponent();
     }
     
-    void jPatcher::getAllCommands(Array<CommandID>& commands)
+    void jPatcher::getAllCommands(juce::Array<juce::CommandID>& commands)
     {
         commands.add(CommandIDs::save);
         
         commands.add(CommandIDs::newPatcherView);
         
-        commands.add(StandardApplicationCommandIDs::undo);
-        commands.add(StandardApplicationCommandIDs::redo);
-        commands.add(StandardApplicationCommandIDs::cut);
-        commands.add(StandardApplicationCommandIDs::copy);
-        commands.add(StandardApplicationCommandIDs::paste);
+        commands.add(juce::StandardApplicationCommandIDs::undo);
+        commands.add(juce::StandardApplicationCommandIDs::redo);
+        commands.add(juce::StandardApplicationCommandIDs::cut);
+        commands.add(juce::StandardApplicationCommandIDs::copy);
+        commands.add(juce::StandardApplicationCommandIDs::paste);
         commands.add(CommandIDs::pasteReplace);
         commands.add(CommandIDs::duplicate);
-        commands.add(StandardApplicationCommandIDs::del);
-        commands.add(StandardApplicationCommandIDs::selectAll);
+        commands.add(juce::StandardApplicationCommandIDs::del);
+        commands.add(juce::StandardApplicationCommandIDs::selectAll);
         
         commands.add(CommandIDs::newBox);
         
@@ -2167,66 +2167,66 @@ namespace kiwi
         commands.add(CommandIDs::showObjectInspector);
     }
     
-    void jPatcher::getCommandInfo(const CommandID commandID, ApplicationCommandInfo& result)
+    void jPatcher::getCommandInfo(const juce::CommandID commandID, juce::ApplicationCommandInfo& result)
     {
         switch(commandID)
         {
             case CommandIDs::save:
             {
                 result.setInfo(TRANS("Save"), TRANS("Save document"), CommandCategories::general, 0);
-                result.addDefaultKeypress('s',  ModifierKeys::commandModifier);
+                result.addDefaultKeypress('s', juce::ModifierKeys::commandModifier);
                 break;
             }
             case CommandIDs::newPatcherView:
             {
                 result.setInfo(TRANS("New View"), TRANS("New Patcher View"), CommandCategories::view, 0);
-                result.addDefaultKeypress('n',  ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+                result.addDefaultKeypress('n', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
                 break;
             }
-            case StandardApplicationCommandIDs::undo:
+            case juce::StandardApplicationCommandIDs::undo:
             {
                 juce::String label = TRANS("Undo");
                 const bool hasUndo = canUndo();
                 if(hasUndo) { label += ' ' + getUndoLabel(); }
                 
                 result.setInfo(label, TRANS("Undo last action"), CommandCategories::general, 0);
-                result.addDefaultKeypress('z',  ModifierKeys::commandModifier);
+                result.addDefaultKeypress('z',  juce::ModifierKeys::commandModifier);
                 result.setActive(!isLocked() && hasUndo);
                 break;
             }
-            case StandardApplicationCommandIDs::redo:
+            case juce::StandardApplicationCommandIDs::redo:
             {
                 juce::String label = TRANS("Redo");
                 const bool hasRedo = canRedo();
                 if(hasRedo) { label += ' ' + getRedoLabel(); }
                 
                 result.setInfo(label, TRANS("Redo action"), CommandCategories::general, 0);
-                result.addDefaultKeypress('z',  ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+                result.addDefaultKeypress('z', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
                 result.setActive(!isLocked() && hasRedo);
                 break;
             }
-            case StandardApplicationCommandIDs::cut:
+            case juce::StandardApplicationCommandIDs::cut:
             {
                 result.setInfo(TRANS("Cut"), TRANS("Cut"), CommandCategories::editing, 0);
-                result.addDefaultKeypress('x', ModifierKeys::commandModifier);
+                result.addDefaultKeypress('x', juce::ModifierKeys::commandModifier);
                 result.setActive(!isLocked()
                                  && isAnyObjectSelected());
                 break;
             }
-            case StandardApplicationCommandIDs::copy:
+            case juce::StandardApplicationCommandIDs::copy:
             {
                 result.setInfo(TRANS("Copy"), TRANS("Copy"), CommandCategories::editing, 0);
-                result.addDefaultKeypress('c', ModifierKeys::commandModifier);
+                result.addDefaultKeypress('c', juce::ModifierKeys::commandModifier);
                 result.setActive(!isLocked()
                                  && isAnyObjectSelected());
                 break;
             }
-            case StandardApplicationCommandIDs::paste:
+            case juce::StandardApplicationCommandIDs::paste:
             {
                 result.setInfo(TRANS("Paste"), TRANS("Paste"), CommandCategories::editing, 0);
-                result.addDefaultKeypress('v', ModifierKeys::commandModifier);
+                result.addDefaultKeypress('v', juce::ModifierKeys::commandModifier);
                 result.setActive(!isLocked()
-                                 && SystemClipboard::getTextFromClipboard().isNotEmpty());
+                                 && juce::SystemClipboard::getTextFromClipboard().isNotEmpty());
                 break;
             }
             case CommandIDs::pasteReplace:
@@ -2235,10 +2235,10 @@ namespace kiwi
                                TRANS("Replace selected objects with the object on the clipboard"),
                                CommandCategories::editing, 0);
                 
-                result.addDefaultKeypress('v', ModifierKeys::commandModifier | ModifierKeys::altModifier);
+                result.addDefaultKeypress('v', juce::ModifierKeys::commandModifier | juce::ModifierKeys::altModifier);
                 result.setActive(!isLocked()
                                  && isAnyObjectSelected()
-                                 && SystemClipboard::getTextFromClipboard().isNotEmpty());
+                                 && juce::SystemClipboard::getTextFromClipboard().isNotEmpty());
                 break;
             }
             case CommandIDs::duplicate:
@@ -2246,63 +2246,63 @@ namespace kiwi
                 result.setInfo(TRANS("Duplicate"), TRANS("Duplicate the selection"),
                                CommandCategories::editing, 0);
                 
-                result.addDefaultKeypress('d', ModifierKeys::commandModifier);
+                result.addDefaultKeypress('d', juce::ModifierKeys::commandModifier);
                 result.setActive(!isLocked() && isAnyObjectSelected());
                 break;
             }
-            case StandardApplicationCommandIDs::del:
+            case juce::StandardApplicationCommandIDs::del:
             {
                 result.setInfo(TRANS("Delete"), TRANS("Delete all selected objects and links"),
                                CommandCategories::editing, 0);
                 
-                result.addDefaultKeypress(KeyPress::backspaceKey, ModifierKeys::noModifiers);
+                result.addDefaultKeypress(juce::KeyPress::backspaceKey, juce::ModifierKeys::noModifiers);
                 result.setActive(!isLocked() && isAnythingSelected());
                 break;
             }
-            case StandardApplicationCommandIDs::selectAll:
+            case juce::StandardApplicationCommandIDs::selectAll:
             {
                 result.setInfo(TRANS("Select All"), TRANS("Select all boxes and links"), CommandCategories::editing, 0);
-                result.addDefaultKeypress('a', ModifierKeys::commandModifier);
+                result.addDefaultKeypress('a', juce::ModifierKeys::commandModifier);
                 result.setActive(!isLocked());
                 break;
             }
             case CommandIDs::newBox:
             {
                 result.setInfo(TRANS("New Object Box"), TRANS("Add a new object box"), CommandCategories::editing, 0);
-                result.addDefaultKeypress('n', ModifierKeys::noModifiers);
+                result.addDefaultKeypress('n', juce::ModifierKeys::noModifiers);
                 result.setActive(!isLocked());
                 break;
             }
             case CommandIDs::toFront:
             {
                 result.setInfo(TRANS("Bring to Front"), TRANS("Bring selected boxes to front"), CommandCategories::editing, 0);
-                result.addDefaultKeypress('f', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+                result.addDefaultKeypress('f', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
                 result.setActive(isAnyObjectSelected());
                 break;
             }
             case CommandIDs::toBack:
             {
                 result.setInfo(TRANS("Send to Back"), TRANS("Send selected boxes to back"), CommandCategories::editing, 0);
-                result.addDefaultKeypress('b', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+                result.addDefaultKeypress('b', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
                 result.setActive(isAnyObjectSelected());
                 break;
             }
             case CommandIDs::zoomIn:
             {
                 result.setInfo(TRANS("Zoom in"), TRANS("Zoom in"), CommandCategories::view, 0);
-                result.addDefaultKeypress('=', ModifierKeys::commandModifier);
+                result.addDefaultKeypress('=', juce::ModifierKeys::commandModifier);
                 break;
             }
             case CommandIDs::zoomOut:
             {
                 result.setInfo(TRANS("Zoom out"), TRANS("Zoom out"), CommandCategories::view, 0);
-                result.addDefaultKeypress('-', ModifierKeys::commandModifier);
+                result.addDefaultKeypress('-', juce::ModifierKeys::commandModifier);
                 break;
             }
             case CommandIDs::zoomNormal:
             {
                 result.setInfo(TRANS("Zoom at 100%"), TRANS("Zoom reset"), CommandCategories::view, 0);
-                result.addDefaultKeypress('1', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+                result.addDefaultKeypress('1', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
                 break;
             }
             case CommandIDs::editModeSwitch:
@@ -2311,7 +2311,7 @@ namespace kiwi
                                TRANS("Switch between edit and perform mode"),
                                CommandCategories::view, 0);
                 
-                result.addDefaultKeypress ('e',  ModifierKeys::commandModifier);
+                result.addDefaultKeypress ('e', juce::ModifierKeys::commandModifier);
                 result.setTicked(!m_view_model.getLock());
                 break;
             }
@@ -2327,30 +2327,30 @@ namespace kiwi
     {
         switch (info.commandID)
         {
-            case CommandIDs::save:                          { m_manager.saveDocument(); break; }
-            case CommandIDs::newPatcherView:                { m_manager.newView(); break; }
+            case CommandIDs::save:                              { m_manager.saveDocument(); break; }
+            case CommandIDs::newPatcherView:                    { m_manager.newView(); break; }
                 
-            case StandardApplicationCommandIDs::undo:       { undo(); break; }
-            case StandardApplicationCommandIDs::redo:       { redo(); break; }
+            case juce::StandardApplicationCommandIDs::undo:     { undo(); break; }
+            case juce::StandardApplicationCommandIDs::redo:     { redo(); break; }
                 
-            case StandardApplicationCommandIDs::cut:        { cut(); break; }
-            case StandardApplicationCommandIDs::copy:       { copySelectionToClipboard(); break; }
-            case StandardApplicationCommandIDs::paste:
+            case juce::StandardApplicationCommandIDs::cut:      { cut(); break; }
+            case juce::StandardApplicationCommandIDs::copy:     { copySelectionToClipboard(); break; }
+            case juce::StandardApplicationCommandIDs::paste:
             { pasteFromClipboard({m_grid_size , m_grid_size}); break; }
                 
-            case CommandIDs::pasteReplace:                  { pasteReplace(); break; }
-            case CommandIDs::duplicate:                     { duplicateSelection(); break; }
-            case StandardApplicationCommandIDs::del:        { deleteSelection(); break; }
-            case StandardApplicationCommandIDs::selectAll:  { selectAllObjects(); break; }
+            case CommandIDs::pasteReplace:                      { pasteReplace(); break; }
+            case CommandIDs::duplicate:                         { duplicateSelection(); break; }
+            case juce::StandardApplicationCommandIDs::del:      { deleteSelection(); break; }
+            case juce::StandardApplicationCommandIDs::selectAll:{ selectAllObjects(); break; }
             
-            case CommandIDs::newBox:                        { createNewBoxModel(true); break; }
+            case CommandIDs::newBox:                            { createNewBoxModel(true); break; }
                 
-            case CommandIDs::toFront:                       { break; }
-            case CommandIDs::toBack:                        { break; }
-            case CommandIDs::zoomIn:                        { zoomIn(); break; }
-            case CommandIDs::zoomOut:                       { zoomOut(); break; }
-            case CommandIDs::zoomNormal:                    { zoomNormal(); break; }
-            case CommandIDs::editModeSwitch:                { setLock(!isLocked()); break; }
+            case CommandIDs::toFront:                           { break; }
+            case CommandIDs::toBack:                            { break; }
+            case CommandIDs::zoomIn:                            { zoomIn(); break; }
+            case CommandIDs::zoomOut:                           { zoomOut(); break; }
+            case CommandIDs::zoomNormal:                        { zoomNormal(); break; }
+            case CommandIDs::editModeSwitch:                    { setLock(!isLocked()); break; }
                 
             default: return false;
         }

@@ -56,7 +56,7 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The juce link Component.
-    class jLink : public jLinkBase, public ComponentListener
+    class jLink : public jLinkBase, public juce::ComponentListener
     {
     public:
         

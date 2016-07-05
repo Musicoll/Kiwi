@@ -135,7 +135,7 @@ namespace kiwi
                                  model::Patcher::View& view);
         
         //! @internal Save document if needed and if user agrees.
-        FileBasedDocument::SaveResult saveIfNeededAndUserAgrees();
+        juce::FileBasedDocument::SaveResult saveIfNeededAndUserAgrees();
 
     private: // members
         

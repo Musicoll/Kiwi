@@ -78,11 +78,11 @@ namespace kiwi
         const auto bounds = getLocalBounds();
         const auto box_bounds = m_local_box_bounds;
         
-        const juce::Colour selection_color = Colour::fromFloatRGBA(0., 0.5, 1., 0.8);
-        const juce::Colour other_view_selected_color = Colour::fromFloatRGBA(0.8, 0.3, 0.3, 0.3);
+        const juce::Colour selection_color = juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.8);
+        const juce::Colour other_view_selected_color = juce::Colour::fromFloatRGBA(0.8, 0.3, 0.3, 0.3);
         const juce::Colour distant_selected_color(0xAAFF9B71);
         
-        const juce::Colour errorbox_overlay_color = Colour::fromFloatRGBA(0.6, 0.1, 0.1, 0.4);
+        const juce::Colour errorbox_overlay_color = juce::Colour::fromFloatRGBA(0.6, 0.1, 0.1, 0.4);
         
         const bool selected = m_is_selected;
         const bool other_selected = ! m_distant_selection.empty();
@@ -432,9 +432,9 @@ namespace kiwi
         const std::string object_name = m_model->getName();
         const std::string text = object_name == "newbox" ? "" : m_model->getText();
         
-        m_editor->setColour(juce::TextEditor::highlightColourId, Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
-        m_editor->setColour(juce::TextEditor::focusedOutlineColourId, Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
-        m_editor->setColour(juce::TextEditor::backgroundColourId, Colours::transparentWhite);
+        m_editor->setColour(juce::TextEditor::highlightColourId, juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
+        m_editor->setColour(juce::TextEditor::focusedOutlineColourId, juce::Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
+        m_editor->setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentWhite);
 
         m_editor->setScrollbarsShown(false);
         m_editor->setScrollToShowCursor(true);

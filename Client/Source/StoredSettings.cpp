@@ -34,7 +34,7 @@ namespace kiwi
         return getAppSettings().getGlobalProperties();
     }
     
-    static PropertiesFile::Options getPropertyFileOptionsFor(const String& filename)
+    static juce::PropertiesFile::Options getPropertyFileOptionsFor(const juce::String& filename)
     {
         juce::PropertiesFile::Options options;
         options.applicationName     = filename;
@@ -50,7 +50,7 @@ namespace kiwi
         return options;
     }
     
-    static std::unique_ptr<juce::PropertiesFile> createPropsFile(const String& filename)
+    static std::unique_ptr<juce::PropertiesFile> createPropsFile(const juce::String& filename)
     {
         return std::make_unique<juce::PropertiesFile>(getPropertyFileOptionsFor(filename));
     }
@@ -71,7 +71,7 @@ namespace kiwi
         flush();
     }
     
-    PropertiesFile& StoredSettings::getGlobalProperties()
+    juce::PropertiesFile& StoredSettings::getGlobalProperties()
     {
         return *m_property_files[0];
     }
@@ -106,7 +106,7 @@ namespace kiwi
     
     void StoredSettings::changed()
     {
-        ScopedPointer<XmlElement> data(m_defaults.createXml());
+        juce::ScopedPointer<juce::XmlElement> data(m_defaults.createXml());
         m_property_files[0]->setValue("KIWI_APP_DEFAULT_SETTINGS", data);
     }
 }

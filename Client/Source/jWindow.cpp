@@ -60,26 +60,26 @@ namespace kiwi
     //                              APPLICATION COMMAND TARGET                          //
     // ================================================================================ //
     
-    ApplicationCommandTarget* jWindow::getNextCommandTarget()
+    juce::ApplicationCommandTarget* jWindow::getNextCommandTarget()
     {
         return findFirstTargetParentComponent();
     }
     
-    void jWindow::getAllCommands(Array<CommandID>& commands)
+    void jWindow::getAllCommands(juce::Array<juce::CommandID>& commands)
     {
         commands.add(CommandIDs::closeWindow);
         commands.add(CommandIDs::minimizeWindow);
         commands.add(CommandIDs::maximizeWindow);
     }
     
-    void jWindow::getCommandInfo(const CommandID commandID, ApplicationCommandInfo& result)
+    void jWindow::getCommandInfo(const juce::CommandID commandID, juce::ApplicationCommandInfo& result)
     {
         switch (commandID)
         {
             case CommandIDs::closeWindow:
             {
                 result.setInfo(TRANS("Close"), TRANS("Close Window"), CommandCategories::windows, 0);
-                result.addDefaultKeypress('w', ModifierKeys::commandModifier);
+                result.addDefaultKeypress('w', juce::ModifierKeys::commandModifier);
                 result.setActive(getDesktopWindowStyleFlags() & allButtons || getDesktopWindowStyleFlags() & closeButton);
                 break;
             }

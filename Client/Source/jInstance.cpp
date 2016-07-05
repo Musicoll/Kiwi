@@ -241,7 +241,7 @@ namespace kiwi
     void jInstance::openSettings()
     {
         jSettings set_cmp(getUserId());
-        juce::OptionalScopedPointer<Component> settings_component(&set_cmp, false);
+        juce::OptionalScopedPointer<juce::Component> settings_component(&set_cmp, false);
         
         juce::DialogWindow::LaunchOptions option;
         option.dialogTitle = juce::String("Settings");

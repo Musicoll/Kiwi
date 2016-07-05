@@ -36,23 +36,23 @@ namespace kiwi
         
         setSize(300, 500);
         
-        TableHeaderComponent* header = new TableHeaderComponent();
+        juce::TableHeaderComponent* header = new juce::TableHeaderComponent();
         
-        header->addColumn(String("ID"),
+        header->addColumn(juce::String("ID"),
                           Column::Id, 30, 20, 50,
-                          TableHeaderComponent::defaultFlags, -1);
+                          juce::TableHeaderComponent::defaultFlags, -1);
         
-        header->addColumn(String("Type"),
+        header->addColumn(juce::String("Type"),
                           Column::Type, 30, 20, 50,
-                          TableHeaderComponent::defaultFlags, -1);
+                          juce::TableHeaderComponent::defaultFlags, -1);
         
-        header->addColumn(String("Object"),
+        header->addColumn(juce::String("Object"),
                           Column::Object, 60, 20, 10000,
-                          TableHeaderComponent::defaultFlags, -1);
+                          juce::TableHeaderComponent::defaultFlags, -1);
         
-        header->addColumn(String("Message"),
+        header->addColumn(juce::String("Message"),
                           Column::Message, 100, 40, 10000,
-                          TableHeaderComponent::defaultFlags, -1);
+                          juce::TableHeaderComponent::defaultFlags, -1);
         
         header->setStretchToFitActive(false);
         header->setColumnVisible(1, false);
@@ -64,7 +64,7 @@ namespace kiwi
         m_table.setMouseMoveSelectsRows(false);
         m_table.setHeaderHeight(m_font.getHeight() + 15);
         m_table.setRowHeight(m_font.getHeight() + 5);
-        m_table.setColour(ListBox::ColourIds::backgroundColourId, Colours::transparentWhite);
+        m_table.setColour(juce::ListBox::ColourIds::backgroundColourId, juce::Colours::transparentWhite);
         m_table.getViewport()->setScrollBarsShown(true, false, true, false);
         m_table.getViewport()->setScrollBarThickness(10);
         m_table.setModel(this);
@@ -83,8 +83,8 @@ namespace kiwi
     
     void jConsole::copy()
     {
-        String text;
-        SparseSet<int> selection = m_table.getSelectedRows();
+        juce::String text;
+        juce::SparseSet<int> selection = m_table.getSelectedRows();
         for(size_t i = 0; i < selection.size(); i++)
         {
             auto msg = m_history->get(selection[i]);
@@ -94,7 +94,7 @@ namespace kiwi
             }
         }
         
-        SystemClipboard::copyTextToClipboard(text);
+        juce::SystemClipboard::copyTextToClipboard(text);
     }
     
     void jConsole::erase()
@@ -130,11 +130,11 @@ namespace kiwi
         updateRighmostColumnWidth(&m_table.getHeader());
     }
     
-    void jConsole::paint(Graphics& g)
+    void jConsole::paint(juce::Graphics& g)
     {
         int width   = m_table.getVisibleContentWidth();
         int rowheight = m_table.getRowHeight();
-        g.setColour(Colours::black.withAlpha(0.15f));
+        g.setColour(juce::Colours::black.withAlpha(0.15f));
         for(int i = m_table.getHeaderHeight() - 1; i < getHeight(); i+= rowheight)
         {
              g.drawHorizontalLine(i, 0, width);
@@ -155,7 +155,7 @@ namespace kiwi
         erase();
     }
     
-    void jConsole::backgroundClicked(const MouseEvent& mouse)
+    void jConsole::backgroundClicked(const juce::MouseEvent& mouse)
     {
         m_table.deselectAllRows();
     }
@@ -165,7 +165,7 @@ namespace kiwi
         return m_history->size();
     }
     
-    void jConsole::paintRowBackground(Graphics& g,
+    void jConsole::paintRowBackground(juce::Graphics& g,
                                       int rowNumber, int width, int height, bool selected)
     {
         auto msg = m_history->get(rowNumber);
@@ -173,31 +173,31 @@ namespace kiwi
         {
             if(selected)
             {
-                g.fillAll(Colours::lightsteelblue);
+                g.fillAll(juce::Colours::lightsteelblue);
             }
             else if(msg->getType() == Console::MessageType::Error)
             {
-                g.fillAll(Colours::lightpink);
+                g.fillAll(juce::Colours::lightpink);
             }
             else if(msg->getType() == Console::MessageType::Warning)
             {
-                g.fillAll(Colours::lightgoldenrodyellow);
+                g.fillAll(juce::Colours::lightgoldenrodyellow);
             }
             else
             {
-                g.fillAll(Colour(0xfffefefe));
+                g.fillAll(juce::Colour(0xfffefefe));
             }
         }
         else
         {
-            g.fillAll(Colour(0xfffefefe));
+            g.fillAll(juce::Colour(0xfffefefe));
         }
     
-        g.setColour(Colours::black.withAlpha(0.15f));
+        g.setColour(juce::Colours::black.withAlpha(0.15f));
         g.drawLine(0, height, width, height);
     }
     
-    void jConsole::paintOverChildren(Graphics &g)
+    void jConsole::paintOverChildren(juce::Graphics &g)
     {
         int numColumns = m_table.getHeader().getNumColumns(true);
         float left = 0, width = 0;
@@ -208,7 +208,7 @@ namespace kiwi
             
             if(m_table.getVisibleContentWidth() >= width + left)
             {
-                g.setColour(Colours::black.withAlpha(0.15f));
+                g.setColour(juce::Colours::black.withAlpha(0.15f));
                 g.drawLine(left + width, m_table.getHeaderHeight(), left + width, getHeight());
             }
             
@@ -216,7 +216,7 @@ namespace kiwi
         }
     }
     
-    void jConsole::paintCell(Graphics& g,
+    void jConsole::paintCell(juce::Graphics& g,
                              int rowNumber, int columnId, int width, int height,
                              bool rowIsSelected)
     {
@@ -224,7 +224,7 @@ namespace kiwi
         
         if(msg)
         {
-            g.setColour(Colours::black.brighter(0.4));
+            g.setColour(juce::Colours::black.brighter(0.4));
             g.setFont(m_font);
             
             switch (columnId)
@@ -238,7 +238,7 @@ namespace kiwi
                 case Column::Message:
                 {
                     g.drawText(msg->getText(), 2, 0, width - 4, height,
-                               Justification::centredLeft, true);
+                               juce::Justification::centredLeft, true);
                     break;
                 }
                     
@@ -253,13 +253,12 @@ namespace kiwi
         m_table.updateContent();
     }
     
-    void jConsole::cellDoubleClicked(int rowNumber, int columnId, const MouseEvent& mouse)
+    void jConsole::cellDoubleClicked(int rowNumber, int columnId, const juce::MouseEvent& mouse)
     {
         // TODO : hilight (if possible) object corresponding to the dblclicked row
     }
     
-    Component* jConsole::refreshComponentForCell(int, int, bool,
-                                                 Component* existingComponentToUpdate)
+    juce::Component* jConsole::refreshComponentForCell(int, int, bool, Component* existingComponentToUpdate)
     {
         // Just return 0, as we'll be painting these columns directly.
         jassert(existingComponentToUpdate == 0);
@@ -289,7 +288,7 @@ namespace kiwi
         return widest + 8;
     }
     
-    void jConsole::tableColumnsResized(TableHeaderComponent* tableHeader)
+    void jConsole::tableColumnsResized(juce::TableHeaderComponent* tableHeader)
     {
         if(tableHeader == &m_table.getHeader())
         {
@@ -297,7 +296,7 @@ namespace kiwi
         }
     }
     
-    void jConsole::updateRighmostColumnWidth(TableHeaderComponent* header)
+    void jConsole::updateRighmostColumnWidth(juce::TableHeaderComponent* header)
     {
         int rightmostColumnId   = 0;
         int rightmostColumnX    = 0;
@@ -323,15 +322,14 @@ namespace kiwi
     //                                  CONSOLE WINDOW                                  //
     // ================================================================================ //
     
-    jConsoleWindow::jConsoleWindow() : jWindow("Kiwi Console",
-                                             Colours::white,
-                                             minimiseButton | closeButton, true)
+    jConsoleWindow::jConsoleWindow() : jWindow("Kiwi Console", juce::Colours::white,
+                                               minimiseButton | closeButton, true)
     {
         setContentOwned(new jConsole(), false);
         setResizable(true, false);
         setResizeLimits(50, 50, 32000, 32000);
         
-        const String windowState(getGlobalProperties().getValue("console_window"));
+        const juce::String windowState(getGlobalProperties().getValue("console_window"));
         
         if(windowState.isNotEmpty())
         {

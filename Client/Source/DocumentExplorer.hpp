@@ -111,10 +111,10 @@ namespace kiwi
         ~Panel();
         
         void resized() override;
-        void paint(Graphics& g) override;
+        void paint(juce::Graphics& g) override;
         
         //! @brief Called when a juce::Button is clicked.
-        void buttonClicked(Button* button) override;
+        void buttonClicked(juce::Button* button) override;
         
         //! @brief Called when the document list changed.
         void documentListChanged() override;
@@ -125,7 +125,7 @@ namespace kiwi
         {
         public:
             SessionItemButton(flip::MulticastServiceExplorer::Session && session);
-            void paintButton(Graphics& g, bool isMouseOverButton, bool isButtonDown) override;
+            void paintButton(juce::Graphics& g, bool isMouseOverButton, bool isButtonDown) override;
             
             //! @brief Returns the metadata associated to the given key.
             std::string getMetadata(std::string const& key) const;

@@ -42,7 +42,7 @@ namespace kiwi
         ~StoredSettings();
         
         //! @brief Returns the global properties file.
-        PropertiesFile& getGlobalProperties();
+        juce::PropertiesFile& getGlobalProperties();
         
         //! @brief Flush settings.
         void flush();
@@ -51,17 +51,17 @@ namespace kiwi
         void reload();
         
     private:
-        std::vector<std::unique_ptr<PropertiesFile>> m_property_files;
-        ValueTree                                    m_defaults;
+        std::vector<std::unique_ptr<juce::PropertiesFile>> m_property_files;
+        juce::ValueTree                                    m_defaults;
         
         void changed();
         void updateGlobalPreferences();
 
-        void valueTreePropertyChanged(ValueTree&, const Identifier&) override  { changed(); }
-        void valueTreeChildAdded(ValueTree&, ValueTree&) override              { changed(); }
-        void valueTreeChildRemoved(ValueTree&, ValueTree&, int) override       { changed(); }
-        void valueTreeChildOrderChanged(ValueTree&, int, int) override         { changed(); }
-        void valueTreeParentChanged(ValueTree&) override                       { changed(); }
+        void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier&) override     { changed(); }
+        void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override           { changed(); }
+        void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override    { changed(); }
+        void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override            { changed(); }
+        void valueTreeParentChanged(juce::ValueTree&) override                          { changed(); }
         
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StoredSettings)
     };

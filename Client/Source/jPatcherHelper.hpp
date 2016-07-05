@@ -283,7 +283,7 @@ namespace kiwi
     //										JLASSO                                      //
     // ================================================================================ //
     
-    class jLasso : public Component
+    class jLasso : public juce::Component
     {
     public:
         
@@ -294,7 +294,7 @@ namespace kiwi
         ~jLasso();
         
         //! @brief The paint method.
-        void paint(Graphics& g) override;
+        void paint(juce::Graphics& g) override;
         
         //! @brief Begins the selection of the links and the boxes.
         //! @param point The starting point.
