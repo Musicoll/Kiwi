@@ -1060,6 +1060,28 @@ namespace kiwi
         return m_is_locked;
     }
     
+    bool jPatcher::canConnect(model::Object const& from, const size_t outlet,
+                              model::Object const& to, const size_t inlet) const
+    {
+        if((from.getNumberOfOutlets() > outlet) && (to.getNumberOfInlets() > inlet))
+        {
+            // Check if link does not exists.
+            const auto find_link = [&from, &outlet, &to, &inlet](std::unique_ptr<jLink> const& jlink_uptr)
+            {
+                model::Link& link_m = jlink_uptr->getModel();
+                
+                return (link_m.getSenderObject().ref()      == from.ref() &&
+                        link_m.getReceiverObject().ref()    == to.ref() &&
+                        link_m.getSenderIndex()             == outlet &&
+                        link_m.getReceiverIndex()           == inlet);
+            };
+            
+            return (std::find_if(m_links.begin(), m_links.end(), find_link) == m_links.cend());
+        }
+        
+        return false;
+    }
+    
     std::pair<jObject*, size_t> jPatcher::getLinkCreatorNearestEndingIolet()
     {
         jObject* result_object = nullptr;
@@ -1100,7 +1122,8 @@ namespace kiwi
                             const size_t outlet = sender ? m_link_creator->getBindedIndex() : i;
                             const size_t inlet = sender ? i : m_link_creator->getBindedIndex();
                             
-                            if(m_patcher_model.canConnect(from, outlet, to, inlet))
+                            //if(m_patcher_model.canConnect(from, outlet, to, inlet))
+                            if(canConnect(from, outlet, to, inlet))
                             {
                                 min_distance = distance;
                                 result_object = object_j_uptr.get();

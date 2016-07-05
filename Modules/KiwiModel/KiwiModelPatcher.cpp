@@ -175,7 +175,8 @@ namespace kiwi
             return new_object;
         }
         
-        model::Link* Patcher::addLink(model::Object const& from, const size_t outlet, model::Object const& to, const size_t inlet)
+        model::Link* Patcher::addLink(model::Object const& from, const size_t outlet,
+                                      model::Object const& to, const size_t inlet)
         {
             if(canConnect(from, outlet, to, inlet))
             {

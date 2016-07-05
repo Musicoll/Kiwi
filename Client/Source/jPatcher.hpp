@@ -310,6 +310,10 @@ namespace kiwi
         //! @internal Find a jLink with a given Link model.
         jLinks::iterator findLink(model::Link const& link);
         
+        //! @internal Returns true if a link can be created between two objects.
+        bool canConnect(model::Object const& from, const size_t outlet,
+                        model::Object const& to, const size_t inlet) const;
+        
         //! @internal Returns the current objects area.
         juce::Rectangle<int> getCurrentObjectsArea();
         
