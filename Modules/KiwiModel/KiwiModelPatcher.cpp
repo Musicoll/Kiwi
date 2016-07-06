@@ -23,8 +23,6 @@
 #include "KiwiModelPatcher.hpp"
 #include "KiwiModelPatcherUser.hpp"
 
-#include <KiwiCore/KiwiCoreConsole.hpp>
-
 namespace kiwi
 {
     namespace model
@@ -66,28 +64,12 @@ namespace kiwi
         
         model::Object& Patcher::addObject(std::string const& name, std::vector<Atom> const& args)
         {
-            const auto it = m_objects.insert(m_objects.end(), Factory::create(name, args));
-            return *it;
+            return *m_objects.insert(m_objects.end(), Factory::create(name, args));
         }
         
         model::Object& Patcher::addObject(flip::Mold const& mold)
         {
-            //const auto it = m_objects.emplace<model::ObjectPlus>(m_objects.end(), mold);
-            const auto it = m_objects.emplace(m_objects.end(), mold);
-            
-            /*
-            if(it->getName() == "errorbox")
-            {
-                model::ErrorBox* error_box = dynamic_cast<model::ErrorBox*>(it.operator->());
-                
-                if(error_box != nullptr)
-                {
-                    Console::post("error_box");
-                }
-            }
-            */
-            
-            return *it;
+            return *m_objects.emplace(m_objects.end(), mold);
         }
         
         model::Object& Patcher::replaceObjectWith(model::Object& object_to_replace,
@@ -95,24 +77,6 @@ namespace kiwi
                                                   Patcher::View& view)
         {
             model::Object& new_object = addObject(mold);
-            
-            /*
-            // handle error box case
-            if(new_object.getName() == "errorbox")
-            {
-                model::ErrorBox& error_box = dynamic_cast<model::ErrorBox&>(new_object);
-                error_box.setNumberOfInlets(object_to_replace.getNumberOfInlets());
-                error_box.setNumberOfOutlets(object_to_replace.getNumberOfOutlets());
-            }
-            
-            
-            if(new_object.getName() == "plus")
-            {
-                model::ObjectPlus* plus_box = dynamic_cast<model::ObjectPlus*>(&new_object);
-                Console::post("plus_box : " + std::string(plus_box ? "OK !" : "nullptr"));
-                
-            }
-            */
             
             new_object.setPosition(object_to_replace.getX(), object_to_replace.getY());
             
@@ -135,10 +99,6 @@ namespace kiwi
                         {
                             addLink(new_object, outlet_index, to, inlet_index);
                         }
-                        else
-                        {
-                            Console::error("Link removed (outlet out of range)");
-                        }
                     }
                     
                     if(&to == &object_to_replace)
@@ -146,10 +106,6 @@ namespace kiwi
                         if(inlet_index < new_inlets)
                         {
                             addLink(from, outlet_index, new_object, inlet_index);
-                        }
-                        else
-                        {
-                            Console::error("Link removed (inlet out of range)");
                         }
                     }
                 }

@@ -860,7 +860,14 @@ namespace kiwi
                             model::Object* selected_object = document.get<model::Object>(obj_ref);
                             if(selected_object != nullptr && !selected_object->removed())
                             {
-                                m_patcher_model.replaceObjectWith(*selected_object, mold, m_view_model);
+                                try
+                                {
+                                    m_patcher_model.replaceObjectWith(*selected_object, mold, m_view_model);
+                                }
+                                catch(...)
+                                {
+                                    int here_post_message_to_console;
+                                }
                             }
                         }
                         
