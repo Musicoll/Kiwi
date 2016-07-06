@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_CORE_FILEPATH_HPP_INCLUDED
-#define KIWI_CORE_FILEPATH_HPP_INCLUDED
+#ifndef KIWI_FILEPATH_HPP_INCLUDED
+#define KIWI_FILEPATH_HPP_INCLUDED
 
 #include <string>
 
@@ -77,4 +77,4 @@ namespace kiwi
     };
 }
 
-#endif // KIWI_CORE_FILEPATH_HPP_INCLUDED
+#endif // KIWI_FILEPATH_HPP_INCLUDED

@@ -22,6 +22,10 @@
             file="Source/KiwiCarrierSocket.cpp"/>
       <FILE id="fYrL64" name="KiwiCarrierSocket.hpp" compile="0" resource="0"
             file="Source/KiwiCarrierSocket.hpp"/>
+      <FILE id="hHfaEF" name="KiwiFilePath.cpp" compile="1" resource="0"
+            file="Source/KiwiFilePath.cpp"/>
+      <FILE id="cYp1q8" name="KiwiFilePath.hpp" compile="0" resource="0"
+            file="Source/KiwiFilePath.hpp"/>
       <FILE id="mEvXwg" name="KiwiDocumentManager.cpp" compile="1" resource="0"
             file="Source/KiwiDocumentManager.cpp"/>
       <FILE id="kWPSit" name="KiwiDocumentManager.hpp" compile="0" resource="0"
@@ -123,10 +127,6 @@
               file="../Modules/KiwiCore/KiwiCoreConsole.cpp"/>
         <FILE id="gDjelN" name="KiwiCoreConsole.hpp" compile="0" resource="0"
               file="../Modules/KiwiCore/KiwiCoreConsole.hpp"/>
-        <FILE id="kpv7eb" name="KiwiCoreFilePath.cpp" compile="1" resource="0"
-              file="../Modules/KiwiCore/KiwiCoreFilePath.cpp"/>
-        <FILE id="HjAPJb" name="KiwiCoreFilePath.hpp" compile="0" resource="0"
-              file="../Modules/KiwiCore/KiwiCoreFilePath.hpp"/>
         <FILE id="ZhyXK0" name="KiwiCoreListeners.hpp" compile="0" resource="0"
               file="../Modules/KiwiCore/KiwiCoreListeners.hpp"/>
       </GROUP>

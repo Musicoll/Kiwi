@@ -23,11 +23,12 @@
 #define KIWI_JPATCHER_HPP_INCLUDED
 
 #include <KiwiModel/KiwiModelPatcher.hpp>
-#include <KiwiCore/KiwiCoreFilePath.hpp>
 
 #include "flip/DocumentObserver.h"
 
 #include "../JuceLibraryCode/JuceHeader.h"
+
+#include "KiwiFilePath.hpp"
 
 namespace kiwi
 {
