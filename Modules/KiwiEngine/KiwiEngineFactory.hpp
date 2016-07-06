@@ -23,7 +23,6 @@
 #define KIWI_ENGINE_FACTORY_HPP_INCLUDED
 
 #include "KiwiEngineDef.hpp"
-#include <KiwiCore/KiwiCoreConsole.hpp>
 
 namespace kiwi
 {
@@ -49,36 +48,19 @@ namespace kiwi
             static void add(std::string const& name)
             {
                 static_assert(!std::is_abstract<TEngine>::value,
-                              "The class must not be abstract.");
-                
-                // The engine Object must be constructible with a model and vector of Atom
+                              "The engine object must not be abstract.");
+            
                 static_assert(std::is_constructible<TEngine, model::Object const&, Patcher&, std::vector<Atom>>::value,
-                              "Bad engine object constructor");
+                              "The engine object must have a valid constructor.");
                 
                 assert(!name.empty());
-                
-                if(!name.empty())
+                assert(modelHasObject(name) && "The model counterpart does not exist");
+                auto& creators = getCreators();
+                assert(creators.count(name) == 0 && "The object already exists");
+                creators[name] = [](model::Object const& model, Patcher& patcher, std::vector<Atom> const& args) -> TEngine*
                 {
-                    auto& creators = getCreators();
-                    
-                    if(!modelHasObject(name))
-                    {
-                        Console::error("The model::Object " + name + " counterpart does not exist");
-                        return;
-                    }
-                    
-                    if(creators.find(name) == creators.end())
-                    {
-                        creators[name] = [](model::Object const& model, Patcher& patcher, std::vector<Atom> const& args) -> TEngine*
-                        {
-                            return new TEngine(model, patcher, args);
-                        };
-                    }
-                    else
-                    {
-                        Console::error("The Object " + name + " already exists");
-                    }
-                }
+                    return new TEngine(model, patcher, args);
+                };
             }
             
             //! @brief Creates a new engine Object.
