@@ -34,9 +34,8 @@ namespace kiwi
     size_t jInstance::m_untitled_patcher_index(0);
     
     jInstance::jInstance() :
-    //m_user_id(flip::Ref::User::Offline),
-    m_user_id(123456789ULL),
-    m_instance(new engine::Instance(m_user_id)),
+    m_user_id(flip::Ref::User::Offline),
+    m_instance(new engine::Instance()),
     m_console_window(new jConsoleWindow()),
     m_document_explorer(new DocumentExplorer()),
     m_document_explorer_window(new DocumentExplorerWindow(*m_document_explorer, *this)),
