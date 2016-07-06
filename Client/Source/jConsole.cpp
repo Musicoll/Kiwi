@@ -29,7 +29,7 @@ namespace kiwi
     // ================================================================================ //
     
     jConsole::jConsole() :
-    m_history(new Console::History()),
+    m_history(new ConsoleHistory()),
     m_font(13.f)
     {
         m_history->addListener(*this);
@@ -88,9 +88,9 @@ namespace kiwi
         for(size_t i = 0; i < selection.size(); i++)
         {
             auto msg = m_history->get(selection[i]);
-            if(msg && !msg->getText().empty())
+            if(msg && !msg->text.empty())
             {
-                text += msg->getText() + "\n";
+                text += msg->text + "\n";
             }
         }
         
@@ -115,7 +115,7 @@ namespace kiwi
     //                                  HISTORY LISTENER                                //
     // ================================================================================ //
     
-    void jConsole::consoleHistoryChanged(Console::History const&)
+    void jConsole::consoleHistoryChanged(ConsoleHistory const&)
     {
         m_table.updateContent();
     }
@@ -175,11 +175,11 @@ namespace kiwi
             {
                 g.fillAll(juce::Colours::lightsteelblue);
             }
-            else if(msg->getType() == Console::MessageType::Error)
+            else if(msg->type == engine::Console::Message::Type::Error)
             {
                 g.fillAll(juce::Colours::lightpink);
             }
-            else if(msg->getType() == Console::MessageType::Warning)
+            else if(msg->type == engine::Console::Message::Type::Warning)
             {
                 g.fillAll(juce::Colours::lightgoldenrodyellow);
             }
@@ -237,7 +237,7 @@ namespace kiwi
                     
                 case Column::Message:
                 {
-                    g.drawText(msg->getText(), 2, 0, width - 4, height,
+                    g.drawText(msg->text, 2, 0, width - 4, height,
                                juce::Justification::centredLeft, true);
                     break;
                 }
@@ -249,7 +249,7 @@ namespace kiwi
     
     void jConsole::sortOrderChanged(int newSortColumnId, bool isForwards)
     {
-        m_history->sort(static_cast<Console::History::Sort>(newSortColumnId));
+        m_history->sort(static_cast<ConsoleHistory::Sort>(newSortColumnId));
         m_table.updateContent();
     }
     
@@ -281,7 +281,7 @@ namespace kiwi
             
             if(msg)
             {
-                widest = std::max(widest, m_font.getStringWidth(msg->getText()));
+                widest = std::max(widest, m_font.getStringWidth(msg->text));
             }
         }
         

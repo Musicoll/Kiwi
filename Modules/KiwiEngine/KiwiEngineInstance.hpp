@@ -24,6 +24,7 @@
 
 #include "flip/Document.h"
 
+#include "KiwiEngineConsole.hpp"
 #include "KiwiEnginePatcher.hpp"
 
 namespace kiwi
@@ -46,10 +47,23 @@ namespace kiwi
             //! @brief Destructor.
             ~Instance();
             
+            //! @brief post a message in the Console.
+            void post(Console::Message const& message);
+            
+            //! @brief Adds a console listener.
+            void addConsoleListener(Console::Listener& listener);
+            
+            //! @brief Removes a console listener.
+            void removeConsoleListener(Console::Listener& listener);
+            
         private: // methods
             
             //! @internal Adds the engine objects to the engine::Factory
             void addObjectsToFactory();
+            
+        private: // members
+            
+            Console m_console;
         };
     }
 }

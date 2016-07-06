@@ -59,7 +59,7 @@ namespace kiwi
         m_user_id = user_id;
     }
     
-    engine::Instance& jInstance::getEngineInstance()
+    engine::Instance& jInstance::useEngineInstance()
     {
         return *m_instance;
     }
@@ -109,7 +109,7 @@ namespace kiwi
         }
         else
         {
-            Console::error("can't open file");
+            //Console::error("can't open file");
         }
         
         return false;
@@ -188,7 +188,7 @@ namespace kiwi
         }
         catch(std::runtime_error &e)
         {
-            Console::error(e.what());
+            //Console::error(e.what());
         }
         
         if(manager_uptr)

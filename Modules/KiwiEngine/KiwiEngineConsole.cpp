@@ -19,49 +19,30 @@
  ==============================================================================
  */
 
-#include "KiwiEngineFactory.hpp"
-#include "KiwiEngineObjects.hpp"
-#include "KiwiEngineInstance.hpp"
+#include "KiwiEngineConsole.hpp"
 
 namespace kiwi
 {
     namespace engine
     {
+        
         // ================================================================================ //
-        //                                      INSTANCE                                    //
+        //                                      CONSOLE                                     //
         // ================================================================================ //
         
-        Instance::Instance()
+        void Console::post(Message const& mess)
         {
-            addObjectsToFactory();
+            m_listeners.call(&Listener::newConsoleMessage, mess);
         }
         
-        Instance::~Instance()
+        void Console::addListener(Listener& listener)
         {
-            ;
+            m_listeners.add(listener);
         }
         
-        void Instance::post(Console::Message const& message)
+        void Console::removeListener(Listener& listener)
         {
-            m_console.post(message);
-        }
-
-        void Instance::addConsoleListener(Console::Listener& listener)
-        {
-            m_console.addListener(listener);
-        }
-
-        void Instance::removeConsoleListener(Console::Listener& listener)
-        {
-            m_console.removeListener(listener);
-        }
-        
-        void Instance::addObjectsToFactory()
-        {
-            engine::Factory::add<NewBox>("newbox");
-            engine::Factory::add<ErrorBox>("errorbox");
-            engine::Factory::add<ObjectPlus>("plus");
-            engine::Factory::add<ObjectPrint>("print");
+            m_listeners.remove(listener);
         }
     }
 }

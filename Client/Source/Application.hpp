@@ -64,6 +64,9 @@ namespace kiwi
         //! @brief Get the current running application instance.
         static KiwiApp* getApp();
         
+        //! @brief Get the current running engine instance.
+        static engine::Instance& useEngineInstance();
+        
         //! @brief Get the user id associated to this running application instance.
         static uint64_t userID();
         

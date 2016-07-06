@@ -22,8 +22,7 @@
 #ifndef KIWI_ENGINE_OBJECTS_HPP_INCLUDED
 #define KIWI_ENGINE_OBJECTS_HPP_INCLUDED
 
-#include <KiwiCore/KiwiCoreConsole.hpp>
-
+#include "KiwiEngineConsole.hpp"
 #include "KiwiEngineObjects.hpp"
 
 namespace kiwi
@@ -112,7 +111,7 @@ namespace kiwi
         {
             if(!args.empty())
             {
-                Console::post(m_name + " \u2022 " + AtomHelper::toString(args));
+                //Console::post(m_name + " \u2022 " + AtomHelper::toString(args));
             }
         }
     }

@@ -146,6 +146,11 @@ namespace kiwi
         return dynamic_cast<KiwiApp*>(JUCEApplication::getInstance());
     }
     
+    engine::Instance& KiwiApp::useEngineInstance()
+    {
+        return KiwiApp::use().m_instance->useEngineInstance();
+    }
+    
     uint64_t KiwiApp::userID()
     {
         return KiwiApp::use().m_instance->getUserId();

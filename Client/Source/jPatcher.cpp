@@ -19,7 +19,6 @@
  ==============================================================================
  */
 
-#include <KiwiCore/KiwiCoreConsole.hpp>
 #include <KiwiModel/KiwiModelDataModel.hpp>
 #include <KiwiModel/KiwiModelPatcherUser.hpp>
 
@@ -1877,7 +1876,7 @@ namespace kiwi
                         }
                         else
                         {
-                            Console::error("Link removed (outlet out of range)");
+                            //KiwiApp::error("Link removed (outlet out of range)");
                         }
                     }
                     
@@ -1889,7 +1888,7 @@ namespace kiwi
                         }
                         else
                         {
-                            Console::error("Link removed (inlet out of range)");
+                            //KiwiApp::error("Link removed (inlet out of range)");
                         }
                     }
                 }

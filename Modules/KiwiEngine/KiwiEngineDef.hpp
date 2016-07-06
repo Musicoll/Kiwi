@@ -29,7 +29,7 @@
 #include <queue>
 #include <exception>
 
-#include <KiwiCore/KiwiCoreAtom.hpp>
+#include <KiwiModel/KiwiModelAtom.hpp>
 
 namespace kiwi
 {

@@ -24,7 +24,7 @@
 
 #include "flip/contrib/MulticastServiceExplorer.h"
 
-#include <KiwiCore/KiwiCoreListeners.hpp>
+#include <KiwiEngine/KiwiEngineListeners.hpp>
 
 #include "jWindow.hpp"
 
@@ -74,7 +74,7 @@ namespace kiwi
         
         flip::MulticastServiceExplorer  m_explorer;
         SessionList                     m_sessions;
-        kiwi::Listeners<Listener>       m_listeners;
+        engine::Listeners<Listener>     m_listeners;
     };
     
     // ================================================================================ //

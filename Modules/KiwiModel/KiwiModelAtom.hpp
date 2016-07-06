@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_CORE_ATOM_HPP_INCLUDED
-#define KIWI_CORE_ATOM_HPP_INCLUDED
+#ifndef KIWI_MODEL_ATOM_HPP_INCLUDED
+#define KIWI_MODEL_ATOM_HPP_INCLUDED
 
 #include <cassert>
 #include <iostream>
@@ -654,4 +654,4 @@ namespace kiwi
     };
 }
 
-#endif // KIWI_CORE_ATOM_HPP_INCLUDED
+#endif // KIWI_MODEL_ATOM_HPP_INCLUDED
