@@ -23,6 +23,8 @@
 #include "KiwiModelPatcher.hpp"
 #include "KiwiModelPatcherUser.hpp"
 
+#include <KiwiCore/KiwiCoreConsole.hpp>
+
 namespace kiwi
 {
     namespace model

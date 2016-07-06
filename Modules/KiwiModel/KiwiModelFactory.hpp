@@ -22,8 +22,6 @@
 #ifndef KIWI_MODEL_FACTORY_HPP_INCLUDED
 #define KIWI_MODEL_FACTORY_HPP_INCLUDED
 
-#include <KiwiCore/KiwiCoreConsole.hpp>
-
 #include "KiwiModelObject.hpp"
 
 namespace kiwi
@@ -58,18 +56,12 @@ namespace kiwi
                 if(!name.empty())
                 {
                     auto& creators = getCreators();
+                    assert(creators.count(name) == 0 && "Object model already in the factory.");
+                    creators[name] = [name](std::vector<Atom> const& args) -> TModel*
+                    {
+                        return new TModel(name, args);
+                    };
                     
-                    if(creators.find(name) == creators.end())
-                    {
-                        creators[name] = [name](std::vector<Atom> const& args) -> TModel*
-                        {
-                            return new TModel(name, args);
-                        };
-                    }
-                    else
-                    {
-                        Console::error("The object " + name + " already exist !");
-                    }
                 }
             }
             
