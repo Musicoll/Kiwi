@@ -109,7 +109,7 @@ namespace kiwi
         }
         else
         {
-            Console::error("can't open file");
+            //Console::error("can't open file");
         }
         
         return false;
@@ -188,7 +188,7 @@ namespace kiwi
         }
         catch(std::runtime_error &e)
         {
-            Console::error(e.what());
+            //Console::error(e.what());
         }
         
         if(manager_uptr)

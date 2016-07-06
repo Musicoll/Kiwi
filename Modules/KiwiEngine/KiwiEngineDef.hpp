@@ -28,7 +28,7 @@
 #include <map>
 #include <queue>
 
-#include <KiwiCore/KiwiCoreAtom.hpp>
+#include <KiwiModel/KiwiModelAtom.hpp>
 
 namespace kiwi
 {

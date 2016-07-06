@@ -19,103 +19,27 @@
  ==============================================================================
  */
 
-#include "KiwiCoreConsole.hpp"
+#include "KiwiConsoleHistory.hpp"
 
 namespace kiwi
 {
-    #ifdef DEBUG
-    std::mutex                      Console::m_ostream_mutex;
-    #endif
-    
-    Listeners<Console::Listener>    Console::m_listeners;
-    
-    // ================================================================================ //
-    //                                      CONSOLE                                     //
-    // ================================================================================ //
-    
-    void Console::post(std:: string const& message)
-    {
-        output(MessageType::Post, std::cout, message);
-    }
-    
-    //! @brief Converts an Atom into string and print it in the console.
-    void Console::postAtom(Atom const& atom)
-    {
-        output(MessageType::Post, std::cout, AtomHelper::toString(atom));
-    }
-    
-    //! @brief Converts a vector of Atom into string and print it in the console.
-    void Console::postAtoms(std::vector<Atom> const& atoms)
-    {
-        output(MessageType::Post, std::cout, AtomHelper::toString(atoms));
-    }
-    
-    //! @brief Print a warning-type message in the console.
-    void Console::warning(std:: string const& message)
-    {
-        output(MessageType::Warning, std::cout, message);
-    }
-    
-    //! @brief Print an error-type message in the console.
-    void Console::error(std:: string const& message)
-    {
-        output(MessageType::Error, std::cerr, message);
-    }
-    
-    void Console::output(MessageType type, std::ostream& output_stream, std::string const& message)
-    {
-        Message msg { message, type };
-        
-        m_listeners.call(&Listener::newConsoleMessage, msg);
-        
-    #ifdef DEBUG
-        std::lock_guard<std::mutex> guard(m_ostream_mutex);
-        output_stream << message << '\n';
-    #endif
-    }
-    
-    void Console::addListener(Listener& listener)
-    {
-        m_listeners.add(listener);
-    }
-    
-    void Console::removeListener(Listener& listener)
-    {
-        m_listeners.remove(listener);
-    }
-    
-    Console::Message::Message(std::string text, Console::MessageType type) :
-    m_text(text),
-    m_type(type)
-    {
-        ;
-    }
-    
-    Console::Message::Message(Message const& other) :
-    m_text(other.m_text),
-    m_type(other.m_type)
-    {
-        ;
-    }
-    
     // ================================================================================ //
     //                                  CONSOLE HISTORY                                 //
     // ================================================================================ //
     
-    Console::History::History() :
-    m_sort(Console::History::ByIndex)
+    ConsoleHistory::ConsoleHistory() : m_sort(ConsoleHistory::ByIndex)
     {
-        Console::addListener(*this);
+        //engine::Console::addListener(*this);
     }
     
-    Console::History::~History()
+    ConsoleHistory::~ConsoleHistory()
     {
-        Console::removeListener(*this);
+        //engine::Console::removeListener(*this);
         
         m_messages.clear();
     }
     
-    void Console::History::newConsoleMessage(Console::Message const& message)
+    void ConsoleHistory::newConsoleMessage(engine::Console::Message const& message)
     {
         {
             std::lock_guard<std::mutex> guard(m_message_mutex);
@@ -126,7 +50,7 @@ namespace kiwi
         m_listeners.call(&Listener::consoleHistoryChanged, *this);
     }
     
-    void Console::History::clear()
+    void ConsoleHistory::clear()
     {
         {
             std::lock_guard<std::mutex> guard(m_message_mutex);
@@ -136,12 +60,12 @@ namespace kiwi
         m_listeners.call(&Listener::consoleHistoryChanged, *this);
     }
     
-    size_t Console::History::size()
+    size_t ConsoleHistory::size()
     {
         return m_messages.size();
     }
     
-    Console::Message const* Console::History::get(size_t index)
+    engine::Console::Message const* ConsoleHistory::get(size_t index)
     {
         std::lock_guard<std::mutex> guard(m_message_mutex);
         if(index < m_messages.size())
@@ -154,7 +78,7 @@ namespace kiwi
         }
     }
     
-    void Console::History::erase(size_t index)
+    void ConsoleHistory::erase(size_t index)
     {
         if(index < m_messages.size())
         {
@@ -175,7 +99,7 @@ namespace kiwi
         }
     }
     
-    void Console::History::erase(size_t begin, size_t last)
+    void ConsoleHistory::erase(size_t begin, size_t last)
     {
         if(begin < last && last < m_messages.size())
         {
@@ -195,7 +119,7 @@ namespace kiwi
         }
     }
     
-    void Console::History::erase(std::vector<size_t>& indices)
+    void ConsoleHistory::erase(std::vector<size_t>& indices)
     {
         size_t max = m_messages.size();
         std::sort(indices.begin(), indices.end());
@@ -224,28 +148,28 @@ namespace kiwi
         m_listeners.call(&Listener::consoleHistoryChanged, *this);
     }
     
-    bool Console::History::compareIndex(MessageHolder const& i, MessageHolder const& j)
+    bool ConsoleHistory::compareIndex(MessageHolder const& i, MessageHolder const& j)
     {
         return i.m_index < j.m_index;
     }
     
-    bool Console::History::compareText(MessageHolder const& i, MessageHolder const& j)
+    bool ConsoleHistory::compareText(MessageHolder const& i, MessageHolder const& j)
     {
-        std::string first = i.m_message.getText();
-        std::string second = j.m_message.getText();
+        std::string first = i.m_message.text;
+        std::string second = j.m_message.text;
         
         return first.compare(second);
     }
     
-    bool Console::History::compareType(MessageHolder const& i, MessageHolder const& j)
+    bool ConsoleHistory::compareType(MessageHolder const& i, MessageHolder const& j)
     {
-        Console::MessageType first = i.m_message.getType();
-        Console::MessageType second = j.m_message.getType();
-
+        engine::Console::Message::Type first = i.m_message.type;
+        engine::Console::Message::Type second = j.m_message.type;
+        
         return first < second;
     }
     
-    void Console::History::sort(Sort type)
+    void ConsoleHistory::sort(Sort type)
     {
         m_sort = type;
         switch(m_sort)
@@ -261,13 +185,12 @@ namespace kiwi
         }
     }
     
-    void Console::History::addListener(History::Listener& listener)
+    void ConsoleHistory::addListener(ConsoleHistory::Listener& listener)
     {
         m_listeners.add(listener);
     }
     
-    
-    void Console::History::removeListener(History::Listener& listener)
+    void ConsoleHistory::removeListener(ConsoleHistory::Listener& listener)
     {
         m_listeners.remove(listener);
     }

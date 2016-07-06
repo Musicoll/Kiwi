@@ -22,24 +22,22 @@
 #ifndef KIWI_JCONSOLE_HPP_INCLUDED
 #define KIWI_JCONSOLE_HPP_INCLUDED
 
-#include <KiwiCore/KiwiCoreConsole.hpp>
-
 #include "../JuceLibraryCode/JuceHeader.h"
 
 #include "jWindow.hpp"
+#include "KiwiConsoleHistory.hpp"
 
 namespace kiwi
 {
-    
     // ================================================================================ //
     //                                  JCONSOLE COMPONENT                              //
     // ================================================================================ //
     
     //! @brief The juce Console Component
-    //! @details The juce Console Component maintain a Console::History and display Console messages to the user.
+    //! @details The juce Console Component maintain a ConsoleHistory and display Console messages to the user.
     //! The user can select a message to copy it to the system clipboard, delete a specific message or a range of messages, sort messages, double-click on a row to hilight the corresponding object...
     class jConsole :
-    public Console::History::Listener,
+    public ConsoleHistory::Listener,
     public juce::Component,
     public juce::TableListBoxModel,
     public juce::TableHeaderComponent::Listener
@@ -54,7 +52,7 @@ namespace kiwi
         
         //! @brief The function is called by an hisotry when it has changed.
         //! @param history The console history.
-        void consoleHistoryChanged(Console::History const& history) final override;
+        void consoleHistoryChanged(ConsoleHistory const& history) final override;
         
         // ================================================================================ //
         //                                      COMPONENT                                   //
@@ -146,7 +144,7 @@ namespace kiwi
         
     private:
         
-        std::unique_ptr<Console::History>    m_history;
+        std::unique_ptr<ConsoleHistory>    m_history;
         juce::Font                           m_font;
         juce::TableListBox                   m_table;
     };
