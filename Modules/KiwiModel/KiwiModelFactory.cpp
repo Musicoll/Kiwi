@@ -30,57 +30,22 @@ namespace kiwi
         //                                      FACTORY                                     //
         // ================================================================================ //
         
-        std::unique_ptr<model::Object> Factory::create(std::string const& text)
+        std::unique_ptr<model::Object> Factory::create(std::string const& name, std::vector<Atom> const& args)
         {
-            std::vector<Atom> atoms = AtomHelper::parse(text);
-            
-            if(atoms.size() > 0)
+            const auto& creators = getCreators();
+            const auto it = creators.find(name);
+            if(it != creators.end())
             {
-                const std::string name = atoms[0].getString();
-                
-                const auto& creators = getCreators();
-                const auto it = creators.find(name);
-                if(it != creators.end())
-                {
-                    std::vector<Atom> args {atoms.begin() + 1, atoms.end()};
-                    
-                    const ctor_fn_t& model_ctor = it->second;
-                    auto object_uptr = std::unique_ptr<model::Object>(model_ctor(args));
-                    
-                    object_uptr->m_name = name;
-                    
-                    // parse text again to clean input text
-                    object_uptr->m_text = AtomHelper::toString(atoms);
-                    
-                    return object_uptr;
-                }
-                else
-                {
-                    Console::error("Object \"" + name + "\" not found");
-                    
-                    std::vector<Atom> args {atoms.begin() + 1, atoms.end()};
-                    
-                    auto object_uptr = std::unique_ptr<model::Object>(new model::ErrorBox("errorbox", args));
-                    
-                    object_uptr->m_name = "errorbox";
-                    
-                    // parse text again to clean input text
-                    object_uptr->m_text = AtomHelper::toString(atoms);
-                    
-                    return object_uptr;
-                }
+                const ctor_fn_t& model_ctor = it->second;
+                auto object_uptr = std::unique_ptr<model::Object>(model_ctor(args));
+                object_uptr->m_name = name;
+                object_uptr->m_text = args.empty() ? name : name + " " + AtomHelper::toString(args);
+                return object_uptr;
             }
             else
             {
-                auto object_uptr = std::unique_ptr<model::Object>(new model::NewBox("newbox", {}));
-                object_uptr->m_name = "newbox";
-                object_uptr->m_text = "";
-                
-                return object_uptr;
+                throw std::runtime_error("Factory can't create object");
             }
-            
-            assert(true && "typed object creation fail"); // should never appear
-            return nullptr;
         }
         
         bool Factory::has(std::string const& name)

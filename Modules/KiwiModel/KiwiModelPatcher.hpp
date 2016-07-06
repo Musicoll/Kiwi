@@ -56,7 +56,7 @@ namespace kiwi
             //! the last atoms are passed to the created object as arguments.
             //! @param text A string composed by the name of the object optionnally followed by a space and a list of argument values (ex : "plus 42")
             //! @return An Object.
-            model::Object& addObject(std::string const& text);
+            model::Object& addObject(std::string const& name, std::vector<Atom> const& args);
             
             //! @brief create an Object from a flip::Mold.
             model::Object& addObject(flip::Mold const& mold);

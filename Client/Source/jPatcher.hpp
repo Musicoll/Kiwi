@@ -100,6 +100,8 @@ namespace kiwi
         //! @brief Returns the position of the patcher origin relative to the component position.
         juce::Point<int> getOriginPosition() const;
         
+        model::Object& createObjectModel(std::string const& text);
+        
         //! @brief called by jClassicBox when hmmm.. the text has been edited.
         void boxHasBeenEdited(jClassicBox& box, std::string new_text);
         

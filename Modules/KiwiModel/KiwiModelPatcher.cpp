@@ -62,23 +62,9 @@ namespace kiwi
             m_objects.clear();
         }
         
-        model::Object& Patcher::addObject(std::string const& text)
+        model::Object& Patcher::addObject(std::string const& name, std::vector<Atom> const& args)
         {
-            auto object_uptr = Factory::create(text);
-            const auto it = m_objects.insert(m_objects.end(), std::move(object_uptr));
-            
-            /*
-            if(it->getName() == "errorbox")
-            {
-                model::ErrorBox* error_box = dynamic_cast<model::ErrorBox*>(it.operator->());
-                
-                if(error_box != nullptr)
-                {
-                    Console::post("error_box");
-                }
-            }
-            */
-            
+            const auto it = m_objects.insert(m_objects.end(), Factory::create(name, args));
             return *it;
         }
         
