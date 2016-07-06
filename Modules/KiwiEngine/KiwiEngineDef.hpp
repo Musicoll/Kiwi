@@ -27,6 +27,7 @@
 #include <set>
 #include <map>
 #include <queue>
+#include <exception>
 
 #include <KiwiModel/KiwiModelAtom.hpp>
 
