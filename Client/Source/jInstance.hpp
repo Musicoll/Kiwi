@@ -58,7 +58,7 @@ namespace kiwi
         void newPatcher();
         
         //! @brief Returns the engine::Instance
-        engine::Instance& getEngineInstance();
+        engine::Instance& useEngineInstance();
         
         //! @brief Returns the engine::Instance
         engine::Instance const& getEngineInstance() const;

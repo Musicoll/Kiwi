@@ -19,6 +19,7 @@
  ==============================================================================
  */
 
+#include "Application.hpp"
 #include "KiwiConsoleHistory.hpp"
 
 namespace kiwi
@@ -29,13 +30,13 @@ namespace kiwi
     
     ConsoleHistory::ConsoleHistory() : m_sort(ConsoleHistory::ByIndex)
     {
-        //engine::Console::addListener(*this);
+        int todo;
+        //KiwiApp::useEngineInstance().addConsoleListener(*this);
     }
     
     ConsoleHistory::~ConsoleHistory()
     {
-        //engine::Console::removeListener(*this);
-        
+        //KiwiApp::useEngineInstance().removeConsoleListener(*this);
         m_messages.clear();
     }
     

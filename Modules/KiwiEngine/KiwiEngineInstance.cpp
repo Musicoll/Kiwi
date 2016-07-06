@@ -48,12 +48,12 @@ namespace kiwi
 
         void Instance::addConsoleListener(Console::Listener& listener)
         {
-            m_console.addListener();
+            m_console.addListener(listener);
         }
 
         void Instance::removeConsoleListener(Console::Listener& listener)
         {
-            m_console.removeListener();
+            m_console.removeListener(listener);
         }
         
         void Instance::addObjectsToFactory()

@@ -23,7 +23,6 @@
 #include "KiwiEngineLink.hpp"
 #include "KiwiEnginePatcher.hpp"
 
-#include <KiwiCore/KiwiCoreConsole.hpp>
 #include <KiwiModel/KiwiModelObject.hpp>
 
 namespace kiwi

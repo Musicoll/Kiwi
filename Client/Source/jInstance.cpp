@@ -59,7 +59,7 @@ namespace kiwi
         m_user_id = user_id;
     }
     
-    engine::Instance& jInstance::getEngineInstance()
+    engine::Instance& jInstance::useEngineInstance()
     {
         return *m_instance;
     }
