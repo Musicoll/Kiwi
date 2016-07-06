@@ -25,10 +25,10 @@
 #include <string>
 
 #include <KiwiEngine/KiwiEngineInstance.hpp>
-#include <KiwiCore/KiwiCoreFilePath.hpp>
 
 #include "flip/Document.h"
 
+#include "KiwiFilePath.hpp"
 #include "jConsole.hpp"
 #include "DocumentExplorer.hpp"
 #include "jPatcherManager.hpp"

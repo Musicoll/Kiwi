@@ -20,7 +20,6 @@
  */
 
 #include <KiwiCore/KiwiCoreConsole.hpp>
-#include <KiwiCore/KiwiCoreFilePath.hpp>
 #include <KiwiModel/KiwiModelDataModel.hpp>
 #include <KiwiModel/KiwiModelPatcherUser.hpp>
 
