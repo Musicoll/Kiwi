@@ -90,7 +90,7 @@ namespace kiwi
                     }
                     else if(++(receiver.m_stack_count) == KIWI_ENGINE_STACKOVERFLOW_MAX)
                     {
-                        m_patcher.addStackOverflow(link);
+                        m_patcher.addStackOverflow(*link);
                         receiver.receive(link->getReceiverIndex(), args);
                     }
                     else

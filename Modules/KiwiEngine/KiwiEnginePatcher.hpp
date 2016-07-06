@@ -57,7 +57,7 @@ namespace kiwi
             
             //! @brief Adds a link to the current stack overflow list (or create a new list if there is no).
             //! @internal Only the Object should use this method.
-            void addStackOverflow(Link const* link);
+            void addStackOverflow(Link const& link);
             
             //! @brief Ends a list of stack overflow.
             //! @internal Only the Object should use this method.

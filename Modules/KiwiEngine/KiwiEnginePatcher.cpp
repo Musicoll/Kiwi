@@ -92,9 +92,9 @@ namespace kiwi
         }
         
         
-        void Patcher::addStackOverflow(Link const* link)
+        void Patcher::addStackOverflow(Link const& link)
         {
-            m_so_links[m_so_links.size() - 1].push(link);
+            m_so_links[m_so_links.size() - 1].push(&link);
         }
         
         void Patcher::endStackOverflow()
