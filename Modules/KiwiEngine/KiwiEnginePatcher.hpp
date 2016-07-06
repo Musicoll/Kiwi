@@ -57,7 +57,7 @@ namespace kiwi
             
             //! @brief Adds a link to the current stack overflow list (or create a new list if there is no).
             //! @internal Only the Object should use this method.
-            void addStackOverflow(Link const* link);
+            void addStackOverflow(Link const& link);
             
             //! @brief Ends a list of stack overflow.
             //! @internal Only the Object should use this method.
@@ -91,7 +91,7 @@ namespace kiwi
         
         private: // members
             
-            typedef std::queue<Link const*> SoLinks;
+            using SoLinks = std::queue<Link const*>;
             
             model::Patcher const&   m_model;
             std::vector<SoLinks>    m_so_links;

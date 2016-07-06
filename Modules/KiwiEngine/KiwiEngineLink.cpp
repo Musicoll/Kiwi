@@ -44,22 +44,22 @@ namespace kiwi
             ;
         }
         
-        Object* Link::getSenderObject() const noexcept
+        Object& Link::getSenderObject() const
         {
-            return m_model.getSenderObject().entity().use<std::shared_ptr<engine::Object>>().get();
+            return *m_model.getSenderObject().entity().use<std::shared_ptr<engine::Object>>().get();
         }
  
-        Object* Link::getReceiverObject() const noexcept
+        Object& Link::getReceiverObject() const
         {
-            return m_model.getReceiverObject().entity().use<std::shared_ptr<engine::Object>>().get();
+            return *m_model.getReceiverObject().entity().use<std::shared_ptr<engine::Object>>().get();
         }
         
-        size_t Link::getSenderIndex() const noexcept
+        size_t Link::getSenderIndex() const
         {
             return m_model.getSenderIndex();
         }
         
-        size_t Link::getReceiverIndex() const noexcept
+        size_t Link::getReceiverIndex() const
         {
             return m_model.getReceiverIndex();
         }

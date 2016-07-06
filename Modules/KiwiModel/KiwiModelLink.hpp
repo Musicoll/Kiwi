@@ -52,16 +52,16 @@ namespace kiwi
             virtual ~Link() = default;
             
             //! @brief Gets the Object that sends messages.
-            model::Object const& getSenderObject() const noexcept;
+            model::Object const& getSenderObject() const;
             
             //! @brief Gets the Object that receives messages.
-            model::Object const& getReceiverObject() const noexcept;
+            model::Object const& getReceiverObject() const;
             
             //! @brief Returns the sender outlet index.
-            size_t getSenderIndex() const noexcept;
+            size_t getSenderIndex() const;
             
             //! @brief Returns the receiver inlet index.
-            size_t getReceiverIndex() const noexcept;
+            size_t getReceiverIndex() const;
             
         public: // internal methods
             

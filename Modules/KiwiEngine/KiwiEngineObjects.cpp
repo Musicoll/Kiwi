@@ -72,7 +72,7 @@ namespace kiwi
         
         void ObjectPlus::receive(size_t index, std::vector<Atom> const& args)
         {
-            if(args.size() > 0)
+            if(!args.empty())
             {
                 if(args[0].isNumber())
                 {
@@ -86,9 +86,7 @@ namespace kiwi
                         m_rhs = args[0].getFloat();
                     }
                 }
-                else if(index == 0
-                        && args[0].isString()
-                        && (args[0].getString() == "bang"))
+                else if(index == 0 && args[0].getString() == "bang")
                 {
                     bang();
                 }

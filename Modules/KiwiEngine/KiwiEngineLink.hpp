@@ -44,16 +44,16 @@ namespace kiwi
             ~Link();
             
             //! @brief Gets the Object that sends messages.
-            Object* getSenderObject() const noexcept;
+            Object& getSenderObject() const;
             
             //! @brief Gets the Object that receives messages.
-            Object* getReceiverObject() const noexcept;
+            Object& getReceiverObject() const;
             
             //! @brief Gets the index of the outlet of the Link.
-            size_t getSenderIndex() const noexcept;
+            size_t getSenderIndex() const;
             
             //! @brief Gets the index of the inlet of the Link.
-            size_t getReceiverIndex() const noexcept;
+            size_t getReceiverIndex() const;
             
         private: // members
             

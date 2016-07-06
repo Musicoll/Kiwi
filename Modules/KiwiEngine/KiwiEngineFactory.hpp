@@ -50,7 +50,7 @@ namespace kiwi
                 static_assert(!std::is_abstract<TEngine>::value,
                               "The engine object must not be abstract.");
             
-                static_assert(std::is_constructible<TEngine, model::Object const&, Patcher&, std::vector<Atom>>::value,
+                static_assert(std::is_constructible<TEngine, model::Object const&, Patcher&, std::vector<Atom> const&>::value,
                               "The engine object must have a valid constructor.");
                 
                 assert(!name.empty());
@@ -84,7 +84,7 @@ namespace kiwi
             Factory() = delete;
             ~Factory() = delete;
             
-            using ctor_fn_t = std::function<Object*(model::Object const& model, Patcher& patcher, std::vector<Atom>)>;
+            using ctor_fn_t = std::function<Object*(model::Object const& model, Patcher& patcher, std::vector<Atom> const&)>;
             using creator_map_t = std::map<std::string, ctor_fn_t>;
             
             //! @internal Returns the static map of creators.
