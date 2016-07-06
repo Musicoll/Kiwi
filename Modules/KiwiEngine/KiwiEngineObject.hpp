@@ -72,7 +72,7 @@ namespace kiwi
             
         private: // members
             
-            typedef std::set<Link const*> Outlet;
+            using  Outlet = std::set<Link const*>;
 
             model::Object const&    m_model;
             Patcher&                m_patcher;

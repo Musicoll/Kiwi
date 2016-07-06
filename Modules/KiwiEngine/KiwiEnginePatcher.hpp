@@ -91,7 +91,7 @@ namespace kiwi
         
         private: // members
             
-            typedef std::queue<Link const*> SoLinks;
+            using SoLinks = std::queue<Link const*>;
             
             model::Patcher const&   m_model;
             std::vector<SoLinks>    m_so_links;
