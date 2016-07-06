@@ -120,13 +120,15 @@ namespace kiwi
         if(!m_is_editing)
         {
             g.setColour(juce::Colours::black);
-            
-            const std::string object_name = m_model->getName();
-            if(object_name == "newbox")
+
+            std::string object_name = m_model->getName();
+            if(object_name == "errorbox")
             {
-                ;
+                g.drawFittedText(m_model->getText().c_str()+9,
+                                 box_bounds.reduced(5),
+                                 juce::Justification::centredLeft, 1, 1.);
             }
-            else
+            else if(object_name != "newbox")
             {
                 g.drawFittedText(m_model->getText(),
                                  box_bounds.reduced(5),
@@ -429,8 +431,15 @@ namespace kiwi
         m_editor.reset(new juce::TextEditor());
         m_editor->setBounds(m_local_box_bounds.expanded(m_selection_width*0.5));
         
-        const std::string object_name = m_model->getName();
-        const std::string text = object_name == "newbox" ? "" : m_model->getText();
+        std::string text = m_model->getText();
+        if(text.compare(0, 8, "errorbox") == 0)
+        {
+            text.erase(text.begin(), text.begin()+9);
+        }
+        else if(text == "newbox")
+        {
+            text.clear();
+        }
         
         m_editor->setColour(juce::TextEditor::highlightColourId, juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
         m_editor->setColour(juce::TextEditor::focusedOutlineColourId, juce::Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));

@@ -1794,6 +1794,27 @@ namespace kiwi
     //                                  COMMANDS ACTIONS                                //
     // ================================================================================ //
     
+    model::Object& jPatcher::createObjectModel(std::string const& text)
+    {
+        int to_clean;
+        std::vector<Atom> atoms = AtomHelper::parse(text);
+        const std::string name = atoms[0].getString();
+        if(model::Factory::has(name))
+        {
+            model::Object* model;
+            try
+            {
+                model = &m_patcher_model.addObject(name, std::vector<Atom>(atoms.begin()+1, atoms.end()));
+            }
+            catch(...)
+            {
+                return m_patcher_model.addObject("errorbox", std::vector<Atom>(atoms.begin()+1, atoms.end()));
+            }
+            return *model;
+        }
+        return m_patcher_model.addObject("errorbox", std::vector<Atom>(atoms.begin(), atoms.end()));
+    }
+    
     void jPatcher::boxHasBeenEdited(jClassicBox& box, std::string new_object_text)
     {
         model::Object& old_object_m = box.getModel();
@@ -1806,7 +1827,7 @@ namespace kiwi
         
         if(old_object_text != new_object_text)
         {
-            model::Object& new_object_m = m_patcher_model.addObject(new_object_text);
+            model::Object& new_object_m = createObjectModel(new_object_text);
 
             const std::string new_object_name = new_object_m.getName();
             const std::string new_object_text = new_object_m.getText();
@@ -1881,7 +1902,7 @@ namespace kiwi
     {
         if(! DocumentManager::isInCommitGesture(m_patcher_model))
         {
-            auto& obj = m_patcher_model.addObject(text);
+            auto& obj = createObjectModel(text);
             obj.setPosition(pos_x, pos_y);
             
             std::string text = obj.getText();
@@ -1903,7 +1924,7 @@ namespace kiwi
         {
             bool linked_newbox = m_local_objects_selection.size() == 1;
             
-            auto& new_object = m_patcher_model.addObject("newbox");
+            auto& new_object = createObjectModel("newbox");
             
             juce::Point<int> pos = getMouseXYRelative() - getOriginPosition();
             

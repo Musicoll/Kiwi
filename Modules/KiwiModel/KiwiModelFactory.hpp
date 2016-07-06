@@ -77,7 +77,7 @@ namespace kiwi
             //! @param text The text of the Object.
             //! @example "plus 42", or just "plus".
             //! @return An object (if the name matches a registered Object name).
-            static std::unique_ptr<model::Object> create(std::string const& text);
+            static std::unique_ptr<model::Object> create(std::string const& name, std::vector<Atom> const& args);
             
             //! @brief Returns true if a given string match a registered Object model name.
             //! @param name The name of the object model to find.
