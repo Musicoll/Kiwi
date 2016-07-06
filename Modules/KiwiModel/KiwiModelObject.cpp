@@ -97,7 +97,7 @@ namespace kiwi
             return m_text;
         }
         
-        size_t Object::getNumberOfInlets() const noexcept
+        size_t Object::getNumberOfInlets() const
         {
             return static_cast<size_t>(m_inlets);
         }
@@ -107,7 +107,7 @@ namespace kiwi
             return m_inlets.changed();
         }
         
-        size_t Object::getNumberOfOutlets() const noexcept
+        size_t Object::getNumberOfOutlets() const
         {
             return static_cast<size_t>(m_outlets);
         }

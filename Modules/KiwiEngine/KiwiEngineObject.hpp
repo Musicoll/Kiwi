@@ -44,7 +44,7 @@ namespace kiwi
             virtual ~Object() noexcept;
 
             //! @brief Gets the name of the Object.
-            std::string getName() const noexcept;
+            std::string getName() const;
             
             //! @brief Gets the number of inlets of the Object.
             size_t getNumberOfInlets() const noexcept;
@@ -58,10 +58,10 @@ namespace kiwi
             virtual void receive(size_t index, std::vector<Atom> const& args) = 0;
             
             //! @internal Appends a new Link to an outlet.
-            void addOutputLink(Link const* link);
+            void addOutputLink(Link const& link);
             
             //! @internal Removes a Link from an outlet.
-            void removeOutputLink(Link const* link);
+            void removeOutputLink(Link const& link);
             
         protected: // methods
             

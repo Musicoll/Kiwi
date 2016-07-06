@@ -48,7 +48,7 @@ namespace kiwi
             m_outlets.clear();
         }
         
-        std::string Object::getName() const noexcept
+        std::string Object::getName() const
         {
             return m_model.getName();
         }
@@ -63,14 +63,14 @@ namespace kiwi
             return m_model.getNumberOfOutlets();
         }
         
-        void Object::addOutputLink(Link const* link)
+        void Object::addOutputLink(Link const& link)
         {
-            m_outlets[link->getSenderIndex()].insert(link);
+            m_outlets[link.getSenderIndex()].insert(&link);
         }
         
-        void Object::removeOutputLink(Link const* link)
+        void Object::removeOutputLink(Link const& link)
         {
-            m_outlets[link->getSenderIndex()].erase(link);
+            m_outlets[link.getSenderIndex()].erase(&link);
         }
         
 #define KIWI_ENGINE_STACKOVERFLOW_MAX 256
@@ -83,21 +83,21 @@ namespace kiwi
             {
                 for(auto const* link : m_outlets[idx])
                 {
-                    Object* receiver = link->getReceiverObject();
-                    if(++(receiver->m_stack_count) < KIWI_ENGINE_STACKOVERFLOW_MAX)
+                    Object& receiver = link->getReceiverObject();
+                    if(++(receiver.m_stack_count) < KIWI_ENGINE_STACKOVERFLOW_MAX)
                     {
-                        receiver->receive(link->getReceiverIndex(), args);
+                        receiver.receive(link->getReceiverIndex(), args);
                     }
-                    else if(++(receiver->m_stack_count) == KIWI_ENGINE_STACKOVERFLOW_MAX)
+                    else if(++(receiver.m_stack_count) == KIWI_ENGINE_STACKOVERFLOW_MAX)
                     {
                         m_patcher.addStackOverflow(link);
-                        receiver->receive(link->getReceiverIndex(), args);
+                        receiver.receive(link->getReceiverIndex(), args);
                     }
                     else
                     {
                         m_patcher.endStackOverflow();
                     }
-                    --(receiver->m_stack_count);
+                    --(receiver.m_stack_count);
                 }
             
             }

@@ -185,7 +185,7 @@ namespace kiwi
             if(from && to)
             {
                 auto& link_e = link_m.entity().emplace<Link>(link_m);
-                from->addOutputLink(&link_e);
+                from->addOutputLink(link_e);
             }
         }
         
@@ -197,7 +197,7 @@ namespace kiwi
             {
                 auto& link_engine = link.entity().use<Link>();
                 auto from = sender_entity.use<std::shared_ptr<Object>>();
-                from->removeOutputLink(&link_engine);
+                from->removeOutputLink(link_engine);
             }
             
             link.entity().erase<Link>();

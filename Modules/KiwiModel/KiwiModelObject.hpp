@@ -70,13 +70,13 @@ namespace kiwi
             std::string getText() const;
             
             //! @brief Returns the number of inlets.
-            size_t getNumberOfInlets() const noexcept;
+            size_t getNumberOfInlets() const;
             
             //! @brief Returns true if the inlets changed.
             bool inletsChanged() const noexcept;
             
             //! @brief Returns the number of outlets.
-            size_t getNumberOfOutlets() const noexcept;
+            size_t getNumberOfOutlets() const;
             
             //! @brief Returns true if the outlets changed.
             bool outletsChanged() const noexcept;
