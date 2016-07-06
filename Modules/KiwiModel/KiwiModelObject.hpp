@@ -25,6 +25,7 @@
 #include <KiwiCore/KiwiCoreAtom.hpp>
 #include <mutex>
 #include <algorithm>
+#include <exception>
 
 // ---- Flip headers ---- //
 #include "flip/Bool.h"
