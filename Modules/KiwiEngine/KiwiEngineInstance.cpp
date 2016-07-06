@@ -19,8 +19,6 @@
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiModelDataModel.hpp>
-
 #include "KiwiEngineFactory.hpp"
 #include "KiwiEngineObjects.hpp"
 #include "KiwiEngineInstance.hpp"
@@ -33,10 +31,8 @@ namespace kiwi
         //                                      INSTANCE                                    //
         // ================================================================================ //
         
-        Instance::Instance(uint64_t user_id) :
-        m_user_id(user_id)
+        Instance::Instance()
         {
-            model::DataModel::init();
             addObjectsToFactory();
         }
         
@@ -51,11 +47,6 @@ namespace kiwi
             engine::Factory::add<ErrorBox>("errorbox");
             engine::Factory::add<ObjectPlus>("plus");
             engine::Factory::add<ObjectPrint>("print");
-        }
-        
-        uint64_t Instance::getUserId() const noexcept
-        {
-            return m_user_id;
         }
     }
 }

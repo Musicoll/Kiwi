@@ -41,6 +41,8 @@ namespace kiwi
             
             //! @brief Declare all kiwi objects here
             static void declareObjects();
+            
+            static bool initialised;
         };
     }
 }

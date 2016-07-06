@@ -19,6 +19,8 @@
  ==============================================================================
  */
 
+#include <KiwiModel/KiwiModelDataModel.hpp>
+
 #include "Application.hpp"
 #include "CommandIDs.hpp"
 
@@ -79,10 +81,10 @@ namespace kiwi
     
     void KiwiApp::initialise(juce::String const& commandLine)
     {
+        model::DataModel::init();
+        
         m_settings = std::make_unique<StoredSettings>();
-        
         initCommandManager();
-        
         m_menu_model.reset(new MainMenuModel());
         
         m_instance = std::make_unique<jInstance>();

@@ -29,8 +29,13 @@ namespace kiwi
 {
     namespace model
     {
+        bool DataModel::initialised = false;
+        
         void DataModel::init()
         {
+            assert(!initialised);
+            if(initialised) return; // abort
+                
             const std::string model_version = KIWI_MODEL_VERSION_STRING;
             
             #ifdef DEBUG
@@ -49,6 +54,8 @@ namespace kiwi
             
             // Patcher
             Patcher::declare();
+            
+            initialised = true;
         }
         
         void DataModel::declareObjects()

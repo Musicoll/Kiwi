@@ -34,28 +34,22 @@ namespace kiwi
         //                                      INSTANCE                                    //
         // ================================================================================ //
         
-        //! @brief The engine::Instance
+        //! @brief The Instance adds the engine objects to the engine::Factory
+        //! @details The patcher document model must be initialised before creating the Instance
         class Instance
         {
-        public:
+        public: // methods
             
-            //! @brief Constructor.
-            //! @param user_id The user ID.
-            Instance(uint64_t user_id);
+            //! @brief Constructs an Instance and adds the engine objects to the engine::Factory.
+            Instance();
             
             //! @brief Destructor.
             ~Instance();
             
-            //! @brief Get the user ID of the Instance.
-            uint64_t getUserId() const noexcept;
-            
         private: // methods
             
+            //! @internal Adds the engine objects to the engine::Factory
             void addObjectsToFactory();
-            
-        private:
-            
-            const uint64_t m_user_id;
         };
     }
 }
