@@ -52,12 +52,12 @@ namespace kiwi
             return m_model.getName();
         }
         
-        size_t Object::getNumberOfInlets() const noexcept
+        size_t Object::getNumberOfInlets() const
         {
             return m_model.getNumberOfInlets();
         }
         
-        size_t Object::getNumberOfOutlets() const noexcept
+        size_t Object::getNumberOfOutlets() const
         {
             return m_model.getNumberOfOutlets();
         }

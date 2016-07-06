@@ -47,10 +47,10 @@ namespace kiwi
             std::string getName() const;
             
             //! @brief Gets the number of inlets of the Object.
-            size_t getNumberOfInlets() const noexcept;
+            size_t getNumberOfInlets() const;
             
-            //! @brief Gets the number of inlets of the Object.
-            size_t getNumberOfOutlets() const noexcept;
+            //! @brief Gets the number of outlets of the Object.
+            size_t getNumberOfOutlets() const;
             
             //! @brief Receives a set of arguments via an inlet.
             //! @details This method must be overriden by object's subclasses.
