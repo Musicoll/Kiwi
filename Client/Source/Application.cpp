@@ -161,6 +161,30 @@ namespace kiwi
         return *KiwiApp::use().m_settings;
     }
     
+    // ================================================================================ //
+    //                                      CONSOLE                                     //
+    // ================================================================================ //
+    
+    void KiwiApp::log(std::string const& text)
+    {
+        useEngineInstance().log(text);
+    }
+    
+    void KiwiApp::post(std::string const& text)
+    {
+        useEngineInstance().post(text);
+    }
+    
+    void KiwiApp::warning(std::string const& text)
+    {
+        useEngineInstance().warning(text);
+    }
+    
+    void KiwiApp::error(std::string const& text)
+    {
+        useEngineInstance().error(text);
+    }
+    
     bool KiwiApp::closeWindow(jWindow& window)
     {
         if(m_instance)

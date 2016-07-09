@@ -73,6 +73,22 @@ namespace kiwi
         //! @brief Returns the application stored settings.
         static StoredSettings& useSettings();
         
+        // ================================================================================ //
+        //                                      CONSOLE                                     //
+        // ================================================================================ //
+        
+        //! @brief post a log message in the Console.
+        static void log(std::string const& text);
+        
+        //! @brief post a message in the Console.
+        static void post(std::string const& text);
+        
+        //! @brief post a warning message in the Console.
+        static void warning(std::string const& text);
+        
+        //! @brief post an error message in the Console.
+        static void error(std::string const& text);
+        
         //==============================================================================
         
         //! @brief Attempt to close the given window asking user to save file if needed.
