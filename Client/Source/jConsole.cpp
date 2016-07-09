@@ -20,6 +20,7 @@
  */
 
 #include "jConsole.hpp"
+#include "Application.hpp"
 #include "StoredSettings.hpp"
 
 namespace kiwi
@@ -28,11 +29,13 @@ namespace kiwi
     //                                  CONSOLE COMPONENT                               //
     // ================================================================================ //
     
-    jConsole::jConsole() :
-    m_history(new ConsoleHistory()),
+    jConsole::jConsole(sConsoleHistory history) :
+    m_history(history),
     m_font(13.f)
     {
-        m_history->addListener(*this);
+        assert(history);
+
+        history->addListener(*this);
         
         setSize(300, 500);
         
@@ -74,7 +77,16 @@ namespace kiwi
     
     jConsole::~jConsole()
     {
-        m_history->removeListener(*this);
+        sConsoleHistory history = getHistory();
+        if(history)
+        {
+            history->removeListener(*this);
+        }
+    }
+    
+    sConsoleHistory jConsole::getHistory()
+    {
+        return m_history.lock();
     }
     
     // ================================================================================ //
@@ -83,32 +95,41 @@ namespace kiwi
     
     void jConsole::copy()
     {
-        juce::String text;
-        juce::SparseSet<int> selection = m_table.getSelectedRows();
-        for(size_t i = 0; i < selection.size(); i++)
+        sConsoleHistory history = getHistory();
+        if(history)
         {
-            auto msg = m_history->get(selection[i]);
-            if(msg && !msg->text.empty())
+            juce::String text;
+            juce::SparseSet<int> selection = m_table.getSelectedRows();
+            
+            for(size_t i = 0; i < selection.size(); i++)
             {
-                text += msg->text + "\n";
+                auto msg = history->get(selection[i]);
+                if(msg && !msg->text.empty())
+                {
+                    text += msg->text + "\n";
+                }
             }
+            
+            juce::SystemClipboard::copyTextToClipboard(text);
         }
-        
-        juce::SystemClipboard::copyTextToClipboard(text);
     }
     
     void jConsole::erase()
     {
-        juce::SparseSet<int> selection = m_table.getSelectedRows();
-        std::vector<size_t> select;
-        
-        for(size_t i = 0; i < selection.size(); i++)
+        sConsoleHistory history = getHistory();
+        if(history)
         {
-            select.push_back(selection[i]);
+            juce::SparseSet<int> selection = m_table.getSelectedRows();
+            std::vector<size_t> select;
+            
+            for(size_t i = 0; i < selection.size(); i++)
+            {
+                select.push_back(selection[i]);
+            }
+            
+            history->erase(select);
+            m_table.setVerticalPosition(0);
         }
-        
-        m_history->erase(select);
-        m_table.setVerticalPosition(0);
     }
     
     // ================================================================================ //
@@ -147,7 +168,7 @@ namespace kiwi
     
     void jConsole::selectedRowsChanged(int row)
     {
-        //Application::commandStatusChanged();
+        KiwiApp::commandStatusChanged();
     }
     
     void jConsole::deleteKeyPressed(int lastRowSelected)
@@ -162,13 +183,16 @@ namespace kiwi
     
     int jConsole::getNumRows()
     {
-        return m_history->size();
+        sConsoleHistory history = getHistory();
+        return history ? history->size() : 0;
     }
     
-    void jConsole::paintRowBackground(juce::Graphics& g,
-                                      int rowNumber, int width, int height, bool selected)
+    void jConsole::paintRowBackground(juce::Graphics& g, int rowNumber, int width, int height, bool selected)
     {
-        auto msg = m_history->get(rowNumber);
+        sConsoleHistory history = getHistory();
+        if(!history) return; //abort
+        
+        auto msg = history->get(rowNumber);
         if(msg)
         {
             if(selected)
@@ -220,7 +244,10 @@ namespace kiwi
                              int rowNumber, int columnId, int width, int height,
                              bool rowIsSelected)
     {
-        auto msg = m_history->get(rowNumber);
+        sConsoleHistory history = getHistory();
+        if(!history) return; //abort
+        
+        auto msg = history->get(rowNumber);
         
         if(msg)
         {
@@ -249,7 +276,10 @@ namespace kiwi
     
     void jConsole::sortOrderChanged(int newSortColumnId, bool isForwards)
     {
-        m_history->sort(static_cast<ConsoleHistory::Sort>(newSortColumnId));
+        sConsoleHistory history = getHistory();
+        if(!history) return; //abort
+        
+        history->sort(static_cast<ConsoleHistory::Sort>(newSortColumnId));
         m_table.updateContent();
     }
     
@@ -274,14 +304,17 @@ namespace kiwi
         
         int widest = 32;
         
-        // find the widest bit of text in this column..
-        for(int i = getNumRows(); --i >= 0;)
+        sConsoleHistory history = getHistory();
+        if(history)
         {
-            auto msg = m_history->get(i);
-            
-            if(msg)
+            // find the widest bit of text in this column..
+            for(int i = getNumRows(); --i >= 0;)
             {
-                widest = std::max(widest, m_font.getStringWidth(msg->text));
+                const auto msg = history->get(i);
+                if(msg)
+                {
+                    widest = std::max(widest, m_font.getStringWidth(msg->text));
+                }
             }
         }
         
@@ -322,10 +355,10 @@ namespace kiwi
     //                                  CONSOLE WINDOW                                  //
     // ================================================================================ //
     
-    jConsoleWindow::jConsoleWindow() : jWindow("Kiwi Console", juce::Colours::white,
-                                               minimiseButton | closeButton, true)
+    jConsoleWindow::jConsoleWindow(sConsoleHistory history) :
+    jWindow("Kiwi Console", juce::Colours::white, minimiseButton | closeButton, true)
     {
-        setContentOwned(new jConsole(), false);
+        setContentOwned(new jConsole(history), false);
         setResizable(true, false);
         setResizeLimits(50, 50, 32000, 32000);
         

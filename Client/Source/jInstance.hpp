@@ -112,6 +112,7 @@ namespace kiwi
         
         jPatcherManagers                            m_patcher_managers;
         
+        sConsoleHistory                             m_console_history;
         std::unique_ptr<jConsoleWindow>             m_console_window;
         
         std::unique_ptr<DocumentExplorer>           m_document_explorer;

@@ -45,10 +45,13 @@ namespace kiwi
     public:
         
         //! @brief Constructor
-        jConsole();
+        jConsole(sConsoleHistory history);
         
         //! @brief Destructor
         ~jConsole();
+        
+        //! @brief Gets the ConsoleHistory.
+        sConsoleHistory getHistory();
         
         //! @brief The function is called by an hisotry when it has changed.
         //! @param history The console history.
@@ -144,9 +147,9 @@ namespace kiwi
         
     private:
         
-        std::unique_ptr<ConsoleHistory>    m_history;
-        juce::Font                           m_font;
-        juce::TableListBox                   m_table;
+        wConsoleHistory     m_history;
+        juce::Font          m_font;
+        juce::TableListBox  m_table;
     };
 
     // ================================================================================ //
@@ -157,7 +160,7 @@ namespace kiwi
     class jConsoleWindow : public jWindow
     {
     public:
-        jConsoleWindow();
+        jConsoleWindow(sConsoleHistory history);
         ~jConsoleWindow();
         
         void closeButtonPressed() override;

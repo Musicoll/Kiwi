@@ -28,15 +28,16 @@ namespace kiwi
     //                                  CONSOLE HISTORY                                 //
     // ================================================================================ //
     
-    ConsoleHistory::ConsoleHistory() : m_sort(ConsoleHistory::ByIndex)
+    ConsoleHistory::ConsoleHistory(engine::Instance& instance) :
+    m_instance(instance),
+    m_sort(ConsoleHistory::ByIndex)
     {
-        int todo;
-        //KiwiApp::useEngineInstance().addConsoleListener(*this);
+        m_instance.addConsoleListener(*this);
     }
     
     ConsoleHistory::~ConsoleHistory()
     {
-        //KiwiApp::useEngineInstance().removeConsoleListener(*this);
+        m_instance.removeConsoleListener(*this);
         m_messages.clear();
     }
     

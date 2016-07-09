@@ -22,7 +22,7 @@
 #ifndef KIWI_CONSOLE_HISTORY_HPP_INCLUDED
 #define KIWI_CONSOLE_HISTORY_HPP_INCLUDED
 
-#include <KiwiEngine/KiwiEngineConsole.hpp>
+#include <KiwiEngine/KiwiEngineInstance.hpp>
 
 namespace kiwi
 {
@@ -48,7 +48,7 @@ namespace kiwi
     public:
         
         //! @brief Constructor.
-        ConsoleHistory();
+        ConsoleHistory(engine::Instance& instance);
         
         //! @brief Destructor.
         ~ConsoleHistory();
@@ -103,6 +103,7 @@ namespace kiwi
         
     private:
         
+        engine::Instance&           m_instance;
         std::mutex                  m_message_mutex;
         std::vector<MessageHolder>  m_messages;
         Sort                        m_sort;
@@ -124,6 +125,9 @@ namespace kiwi
         //! @param history The console history.
         virtual void consoleHistoryChanged(ConsoleHistory const& history) = 0;
     };
+    
+    typedef std::shared_ptr<ConsoleHistory> sConsoleHistory;
+    typedef std::weak_ptr<ConsoleHistory> wConsoleHistory;
 }
 
 #endif // KIWI_CONSOLE_HISTORY_HPP_INCLUDED
