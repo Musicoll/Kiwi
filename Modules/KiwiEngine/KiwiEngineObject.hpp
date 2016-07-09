@@ -65,6 +65,22 @@ namespace kiwi
             
         protected: // methods
             
+            // ================================================================================ //
+            //                                      CONSOLE                                     //
+            // ================================================================================ //
+            
+            //! @brief post a log message in the Console.
+            void log(std::string const& text) const;
+            
+            //! @brief post a message in the Console.
+            void post(std::string const& text) const;
+            
+            //! @brief post a warning message in the Console.
+            void warning(std::string const& text) const;
+            
+            //! @brief post an error message in the Console.
+            void error(std::string const& text) const;
+            
             //! @brief Sends a vector of Atom via an outlet.
             //! @todo Improve the stack overflow system.
             //! @todo See if the method must be noexcept.

@@ -23,6 +23,7 @@
 #include "KiwiEngineObject.hpp"
 #include "KiwiEngineLink.hpp"
 #include "KiwiEngineFactory.hpp"
+#include "KiwiEngineInstance.hpp"
 
 #include <KiwiModel/KiwiModelPatcher.hpp>
 
@@ -34,8 +35,9 @@ namespace kiwi
         //                                      PATCHER                                     //
         // ================================================================================ //
         
-        Patcher::Patcher(model::Patcher const& model) noexcept :
+        Patcher::Patcher(model::Patcher const& model, Instance& instance) noexcept :
         m_model(model),
+        m_instance(instance),
         m_so_links(1)
         {
             ;
@@ -112,6 +114,34 @@ namespace kiwi
             m_so_links.clear();
             m_so_links.push_back(SoLinks());
         }
+        
+        // ================================================================================ //
+        //                                      CONSOLE                                     //
+        // ================================================================================ //
+        
+        void Patcher::log(std::string const& text) const
+        {
+            m_instance.log(text);
+        }
+        
+        void Patcher::post(std::string const& text) const
+        {
+            m_instance.post(text);
+        }
+        
+        void Patcher::warning(std::string const& text) const
+        {
+            m_instance.warning(text);
+        }
+        
+        void Patcher::error(std::string const& text) const
+        {
+            m_instance.error(text);
+        }
+        
+        // ================================================================================ //
+        //                                    MODEL CHANGED                                 //
+        // ================================================================================ //
         
         void Patcher::modelChanged()
         {

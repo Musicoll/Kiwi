@@ -310,7 +310,7 @@ namespace kiwi
         if(patcher.added())
         {
             patcher.entity().emplace<DocumentManager>(patcher.document());
-            patcher.entity().emplace<engine::Patcher>(patcher);
+            patcher.entity().emplace<engine::Patcher>(patcher, m_instance.useEngineInstance());
         }
         
         patcher.entity().use<engine::Patcher>().modelChanged();

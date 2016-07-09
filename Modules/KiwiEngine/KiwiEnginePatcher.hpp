@@ -38,7 +38,7 @@ namespace kiwi
         public:
             
             //! @brief Constructor.
-            Patcher(model::Patcher const& model) noexcept;
+            Patcher(model::Patcher const& model, Instance& instance) noexcept;
             
             //! @brief Destructor.
             ~Patcher();
@@ -69,6 +69,22 @@ namespace kiwi
             //! @brief Clears the lists of stack overflow.
             void clearStackOverflow();
             
+            // ================================================================================ //
+            //                                      CONSOLE                                     //
+            // ================================================================================ //
+            
+            //! @brief post a log message in the Console.
+            void log(std::string const& text) const;
+            
+            //! @brief post a message in the Console.
+            void post(std::string const& text) const;
+            
+            //! @brief post a warning message in the Console.
+            void warning(std::string const& text) const;
+            
+            //! @brief post an error message in the Console.
+            void error(std::string const& text) const;
+            
         private: // methods
             
             //! @internal Object model has just been added to the document.
@@ -94,6 +110,9 @@ namespace kiwi
             using SoLinks = std::queue<Link const*>;
             
             model::Patcher const&   m_model;
+            
+            Instance&               m_instance;
+            
             std::vector<SoLinks>    m_so_links;
             
         private: // deleted methods

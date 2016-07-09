@@ -33,7 +33,8 @@ namespace kiwi
         //                                       NEWBOX                                     //
         // ================================================================================ //
         
-        NewBox::NewBox(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args) : Object(model, patcher)
+        NewBox::NewBox(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        : Object(model, patcher)
         {
             ;
         }
@@ -47,7 +48,8 @@ namespace kiwi
         //                                      ERRORBOX                                    //
         // ================================================================================ //
         
-        ErrorBox::ErrorBox(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args) : Object(model, patcher)
+        ErrorBox::ErrorBox(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        : Object(model, patcher)
         {
             ;
         }
@@ -61,7 +63,8 @@ namespace kiwi
         //                                    OBJECT PLUS                                   //
         // ================================================================================ //
         
-        ObjectPlus::ObjectPlus(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args) : Object(model, patcher)
+        ObjectPlus::ObjectPlus(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        : Object(model, patcher)
         {
             m_lhs = 0.;
             if(!args.empty() && args[0].isNumber())
@@ -102,7 +105,8 @@ namespace kiwi
         //                                    OBJECT PRINT                                  //
         // ================================================================================ //
         
-        ObjectPrint::ObjectPrint(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args) : Object(model, patcher)
+        ObjectPrint::ObjectPrint(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        : Object(model, patcher)
         {
             m_name = !args.empty() ? args[0].getString() : "print";
         }
@@ -111,7 +115,7 @@ namespace kiwi
         {
             if(!args.empty())
             {
-                //Console::post(m_name + " \u2022 " + AtomHelper::toString(args));
+                post(m_name + " \u2022 " + AtomHelper::toString(args));
             }
         }
     }

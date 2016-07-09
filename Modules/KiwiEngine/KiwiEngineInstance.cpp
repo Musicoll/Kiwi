@@ -41,6 +41,10 @@ namespace kiwi
             ;
         }
         
+        // ================================================================================ //
+        //                                      CONSOLE                                     //
+        // ================================================================================ //
+        
         void Instance::log(std::string const& text) const
         {
             m_console.post({text, Console::Message::Type::Log});

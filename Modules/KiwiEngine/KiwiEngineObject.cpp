@@ -72,6 +72,30 @@ namespace kiwi
             m_outlets[link.getSenderIndex()].erase(&link);
         }
         
+        // ================================================================================ //
+        //                                      CONSOLE                                     //
+        // ================================================================================ //
+        
+        void Object::log(std::string const& text) const
+        {
+            m_patcher.log(text);
+        }
+        
+        void Object::post(std::string const& text) const
+        {
+            m_patcher.post(text);
+        }
+        
+        void Object::warning(std::string const& text) const
+        {
+            m_patcher.warning(text);
+        }
+        
+        void Object::error(std::string const& text) const
+        {
+            m_patcher.error(text);
+        }
+        
 #define KIWI_ENGINE_STACKOVERFLOW_MAX 256
         
         void Object::send(const size_t index, std::vector<Atom> const& args)

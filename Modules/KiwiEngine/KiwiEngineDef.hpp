@@ -45,6 +45,7 @@ namespace kiwi
         class Link;
         class Object;
         class Patcher;
+        class Instance;
     }
 }
 
