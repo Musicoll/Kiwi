@@ -238,13 +238,13 @@ namespace kiwi
     
     void DocumentManager::onConnected()
     {
-        //Console::post("Connected"); -> To check issue with multiThreading
+        //KiwiApp::post("Connected"); -> To check issue with multiThreading
         startPulling();
     }
     
     void DocumentManager::onDisconnected()
     {
-        //Console::post("Disconnected"); -> To check Issue with multiThreading
+        //KiwiApp::post("Disconnected"); -> To check Issue with multiThreading
         stopPulling();
     }
     

@@ -717,7 +717,7 @@ namespace kiwi
                 model::Object const& object = *object_ptr;
                 
                 //model::ObjectPlus const& obj = dynamic_cast<model::ObjectPlus const&>(object);
-                //Console::post("obj mold: " + std::string(obj ? "OK" : "fail"));
+                //KiwiApp::log("obj mold: " + std::string(obj ? "OK" : "fail"));
                 
                 mold.make(object);
                 mold.cure();
@@ -864,7 +864,7 @@ namespace kiwi
                                 }
                                 catch(...)
                                 {
-                                    int here_post_message_to_console;
+                                    KiwiApp::error("replace object failed");
                                 }
                             }
                         }
@@ -1876,7 +1876,7 @@ namespace kiwi
                         }
                         else
                         {
-                            //KiwiApp::error("Link removed (outlet out of range)");
+                            KiwiApp::error("Link removed (outlet out of range)");
                         }
                     }
                     
@@ -1888,7 +1888,7 @@ namespace kiwi
                         }
                         else
                         {
-                            //KiwiApp::error("Link removed (inlet out of range)");
+                            KiwiApp::error("Link removed (inlet out of range)");
                         }
                     }
                 }

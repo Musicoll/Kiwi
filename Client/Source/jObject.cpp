@@ -477,12 +477,12 @@ namespace kiwi
     
     void jClassicBox::focusGained(FocusChangeType cause)
     {
-        //Console::post("focusGained");
+        //KiwiApp::post("focusGained");
     }
     
     void jClassicBox::focusLost(FocusChangeType cause)
     {
-        //Console::post("focusLost");
+        //KiwiApp::post("focusLost");
     }
     
     void jClassicBox::resized()
@@ -515,14 +515,14 @@ namespace kiwi
     
     void jClassicBox::textEditorReturnKeyPressed(juce::TextEditor& e)
     {
-        //Console::post("textEditorReturnKeyPressed");
+        //KiwiApp::post("textEditorReturnKeyPressed");
         
         m_patcher_view.grabKeyboardFocus();
     }
     
     void jClassicBox::textEditorEscapeKeyPressed(juce::TextEditor& e)
     {
-        //Console::post("textEditorEscapeKeyPressed");
+        //KiwiApp::post("textEditorEscapeKeyPressed");
         
         removeTextEditor();
     }
