@@ -47,8 +47,21 @@ namespace kiwi
             //! @brief Destructor.
             ~Instance();
             
+            // ================================================================================ //
+            //                                      CONSOLE                                     //
+            // ================================================================================ //
+            
+            //! @brief post a log message in the Console.
+            void log(std::string const& text) const;
+            
             //! @brief post a message in the Console.
-            void post(Console::Message const& message);
+            void post(std::string const& text) const;
+            
+            //! @brief post a warning message in the Console.
+            void warning(std::string const& text) const;
+            
+            //! @brief post an error message in the Console.
+            void error(std::string const& text) const;
             
             //! @brief Adds a console listener.
             void addConsoleListener(Console::Listener& listener);

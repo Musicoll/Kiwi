@@ -69,7 +69,7 @@ namespace kiwi
                 Type        type;
             };
             //! @brief Print a post-type message in the console.
-            void post(Message const& mess);
+            void post(Message const& mess) const;
             
             //! @brief You can inherit from this class to receive console changes.
             class Listener

@@ -30,7 +30,7 @@ namespace kiwi
         //                                      CONSOLE                                     //
         // ================================================================================ //
         
-        void Console::post(Message const& mess)
+        void Console::post(Message const& mess) const
         {
             m_listeners.call(&Listener::newConsoleMessage, mess);
         }

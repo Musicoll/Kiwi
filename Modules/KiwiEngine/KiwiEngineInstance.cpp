@@ -41,9 +41,24 @@ namespace kiwi
             ;
         }
         
-        void Instance::post(Console::Message const& message)
+        void Instance::log(std::string const& text) const
         {
-            m_console.post(message);
+            m_console.post({text, Console::Message::Type::Log});
+        }
+        
+        void Instance::post(std::string const& text) const
+        {
+            m_console.post({text, Console::Message::Type::Normal});
+        }
+        
+        void Instance::warning(std::string const& text) const
+        {
+            m_console.post({text, Console::Message::Type::Warning});
+        }
+        
+        void Instance::error(std::string const& text) const
+        {
+            m_console.post({text, Console::Message::Type::Error});
         }
 
         void Instance::addConsoleListener(Console::Listener& listener)
