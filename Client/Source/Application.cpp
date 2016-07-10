@@ -347,6 +347,7 @@ namespace kiwi
         menu.addSeparator();
         
         menu.addCommandItem(m_command_manager.get(), CommandIDs::showDocumentExplorerWindow);
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::showBeaconDispatcherWindow);
     }
     
     void KiwiApp::createHelpMenu(juce::PopupMenu& menu)
@@ -371,7 +372,8 @@ namespace kiwi
             CommandIDs::openFile,
             CommandIDs::showConsoleWindow,
             CommandIDs::showAppSettingsWindow,
-            CommandIDs::showDocumentExplorerWindow
+            CommandIDs::showDocumentExplorerWindow,
+            CommandIDs::showBeaconDispatcherWindow
         };
         
         commands.addArray(ids, juce::numElementsInArray(ids));
@@ -419,6 +421,13 @@ namespace kiwi
                 
                 break;
             }
+            case CommandIDs::showBeaconDispatcherWindow:
+            {
+                result.setInfo(TRANS("Show Beacon dispatcher window"), TRANS("Show Beacon dispatcher window"),
+                               CommandCategories::windows, 0);
+                
+                break;
+            }
             default:
             {
                 JUCEApplication::getCommandInfo(commandID, result); break;
@@ -435,6 +444,7 @@ namespace kiwi
             case CommandIDs::showConsoleWindow :            { m_instance->showConsoleWindow(); break; }
             case CommandIDs::showAppSettingsWindow :        { m_instance->openSettings(); break; }
             case CommandIDs::showDocumentExplorerWindow :   { m_instance->showDocumentExplorerWindow(); break; }
+            case CommandIDs::showBeaconDispatcherWindow :   { m_instance->showBeaconDispatcherWindow(); break; }
             
             default : return JUCEApplication::perform(info);
         }

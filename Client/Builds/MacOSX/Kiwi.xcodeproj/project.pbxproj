@@ -28,6 +28,7 @@
 		13625A97FD7007362CEC4F3F = {isa = PBXBuildFile; fileRef = 0C789477AC2E720E4ECCB2DE; };
 		1DB110AD548601AF3644B121 = {isa = PBXBuildFile; fileRef = 02B3719D74EA94CA818EA16C; };
 		AE895F1655A76316AFEA8E3B = {isa = PBXBuildFile; fileRef = 104C0080A4F8DCFD9C1AFA68; };
+		19517F5E0B1B3233FFFF154D = {isa = PBXBuildFile; fileRef = 3FAF6C7CE032CE14DB454D76; };
 		6CB5FEBC0D7B3805614DB636 = {isa = PBXBuildFile; fileRef = B6CA4538740E71FA9FA5813D; };
 		91CD1DDEC76B4DCD2227EFF4 = {isa = PBXBuildFile; fileRef = 905D176492ECDE820EEEACE1; };
 		3D04E784962426156465D726 = {isa = PBXBuildFile; fileRef = 2D444B00A6FDDF6AEF13863A; };
@@ -392,6 +393,7 @@
 		3F4713F94E368D0BA6E4D80D = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "juce_MenuBarModel.h"; path = "../../../ThirdParty/Juce/modules/juce_gui_basics/menus/juce_MenuBarModel.h"; sourceTree = "SOURCE_ROOT"; };
 		3F8D5DDE07FB5126BB820270 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "juce_MidiBuffer.h"; path = "../../../ThirdParty/Juce/modules/juce_audio_basics/midi/juce_MidiBuffer.h"; sourceTree = "SOURCE_ROOT"; };
 		3F8FB136DF90C430E1E81751 = {isa = PBXFileReference; lastKnownFileType = text.txt; name = "Flac Licence.txt"; path = "../../../ThirdParty/Juce/modules/juce_audio_formats/codecs/flac/Flac Licence.txt"; sourceTree = "SOURCE_ROOT"; };
+		3FAF6C7CE032CE14DB454D76 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = BeaconDispatcher.cpp; path = ../../Source/BeaconDispatcher.cpp; sourceTree = "SOURCE_ROOT"; };
 		4001C2817A5653009F0F32AB = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = jquant2.c; path = "../../../ThirdParty/Juce/modules/juce_graphics/image_formats/jpglib/jquant2.c"; sourceTree = "SOURCE_ROOT"; };
 		4026A45D4F82DC8525B62057 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "lpc_flac.c"; path = "../../../ThirdParty/Juce/modules/juce_audio_formats/codecs/flac/libFLAC/lpc_flac.c"; sourceTree = "SOURCE_ROOT"; };
 		40323E4C86BC9138CADADC88 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "juce_android_OpenSL.cpp"; path = "../../../ThirdParty/Juce/modules/juce_audio_devices/native/juce_android_OpenSL.cpp"; sourceTree = "SOURCE_ROOT"; };
@@ -973,6 +975,7 @@
 		A7CE708D1C5DA389C90C1B95 = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		A7DEB4C968A398F190C223A9 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PortListener.h; path = "../../../ThirdParty/flip-public/include/flip/detail/PortListener.h"; sourceTree = "SOURCE_ROOT"; };
 		A7F9AC4C991D5DD534E5F8A9 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "juce_KeyMappingEditorComponent.h"; path = "../../../ThirdParty/Juce/modules/juce_gui_extra/misc/juce_KeyMappingEditorComponent.h"; sourceTree = "SOURCE_ROOT"; };
+		A80369608A64608F04A96C1A = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BeaconDispatcher.hpp; path = ../../Source/BeaconDispatcher.hpp; sourceTree = "SOURCE_ROOT"; };
 		A82281EB04B6FF06246FED4B = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "juce_AudioFormat.h"; path = "../../../ThirdParty/Juce/modules/juce_audio_formats/format/juce_AudioFormat.h"; sourceTree = "SOURCE_ROOT"; };
 		A836B2266238274E083B9926 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "juce_MidiBuffer.cpp"; path = "../../../ThirdParty/Juce/modules/juce_audio_basics/midi/juce_MidiBuffer.cpp"; sourceTree = "SOURCE_ROOT"; };
 		A83B9B9DB89B20EEDEC14646 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "juce_Random.h"; path = "../../../ThirdParty/Juce/modules/juce_core/maths/juce_Random.h"; sourceTree = "SOURCE_ROOT"; };
@@ -1462,6 +1465,8 @@
 					8A557D88E3D2B0EF76FD5399,
 					104C0080A4F8DCFD9C1AFA68,
 					9F4C6429BC9FF482642E247D,
+					3FAF6C7CE032CE14DB454D76,
+					A80369608A64608F04A96C1A,
 					B6CA4538740E71FA9FA5813D,
 					65B4DFC0A9BBD366FBED5090,
 					905D176492ECDE820EEEACE1,
@@ -3198,6 +3203,7 @@
 					13625A97FD7007362CEC4F3F,
 					1DB110AD548601AF3644B121,
 					AE895F1655A76316AFEA8E3B,
+					19517F5E0B1B3233FFFF154D,
 					6CB5FEBC0D7B3805614DB636,
 					91CD1DDEC76B4DCD2227EFF4,
 					3D04E784962426156465D726,

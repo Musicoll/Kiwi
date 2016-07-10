@@ -39,6 +39,7 @@ namespace kiwi
     m_console_window(new jConsoleWindow(m_console_history)),
     m_document_explorer(new DocumentExplorer()),
     m_document_explorer_window(new DocumentExplorerWindow(*m_document_explorer, *this)),
+    m_beacon_dispatcher_window(new BeaconDispatcherWindow(*m_instance)),
     m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
     {
         ;
@@ -272,6 +273,12 @@ namespace kiwi
     {
         m_document_explorer_window->setVisible(true);
         m_document_explorer_window->toFront(true);
+    }
+    
+    void jInstance::showBeaconDispatcherWindow()
+    {
+        m_beacon_dispatcher_window->setVisible(true);
+        m_beacon_dispatcher_window->toFront(true);
     }
     
     std::vector<uint8_t>& jInstance::getPatcherClipboardData()

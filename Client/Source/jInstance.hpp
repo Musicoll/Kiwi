@@ -33,6 +33,7 @@
 #include "DocumentExplorer.hpp"
 #include "jPatcherManager.hpp"
 #include "StoredSettings.hpp"
+#include "BeaconDispatcher.hpp"
 
 namespace kiwi
 {
@@ -85,8 +86,11 @@ namespace kiwi
         //! @brief Brings the Console to front.
         void showConsoleWindow();
         
-        //! @brief Brings the Console to front.
+        //! @brief Brings the DocumentExplorerWindow to front.
         void showDocumentExplorerWindow();
+        
+        //! @brief Brings the BeaconDispatcherWindow to front.
+        void showBeaconDispatcherWindow();
         
         //! @brief Get Patcher clipboard data.
         std::vector<uint8_t>& getPatcherClipboardData();
@@ -117,6 +121,8 @@ namespace kiwi
         
         std::unique_ptr<DocumentExplorer>           m_document_explorer;
         std::unique_ptr<DocumentExplorerWindow>     m_document_explorer_window;
+        
+        std::unique_ptr<BeaconDispatcherWindow>     m_beacon_dispatcher_window;
         
         std::vector<uint8_t>                        m_patcher_clipboard;
         
