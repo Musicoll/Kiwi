@@ -96,6 +96,15 @@ namespace kiwi
             m_patcher.error(text);
         }
         
+        // ================================================================================ //
+        //                                      BEACON                                      //
+        // ================================================================================ //
+        
+        Beacon& Object::getBeacon(std::string const& name) const
+        {
+            return m_patcher.getBeacon(name);
+        }
+        
 #define KIWI_ENGINE_STACKOVERFLOW_MAX 256
         
         void Object::send(const size_t index, std::vector<Atom> const& args)

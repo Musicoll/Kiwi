@@ -23,6 +23,7 @@
 #define KIWI_ENGINE_TYPED_OBJECTS_HPP_INCLUDED
 
 #include "KiwiEngineObject.hpp"
+#include "KiwiEngineBeacon.hpp"
 
 namespace kiwi
 {
@@ -85,6 +86,21 @@ namespace kiwi
             
         private:
             std::string m_name;
+        };
+        
+        // ================================================================================ //
+        //                                  OBJECT RECEIVE                                  //
+        // ================================================================================ //
+        
+        class ObjectReceive : public engine::Object, public Beacon::Castaway
+        {
+        public:
+            
+            ObjectReceive(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void receive(size_t, std::vector<Atom> const& args) override;
+            
+            void receive(std::vector<Atom> const& args) override;
         };
     }
 }

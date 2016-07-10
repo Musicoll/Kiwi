@@ -77,7 +77,7 @@ namespace kiwi
             public:
                 Factory();
                 ~Factory();
-                Beacon& get(std::string const& name);
+                Beacon& getBeacon(std::string const& name);
             private:
                 std::map<std::string, std::unique_ptr<Beacon>> m_beacons;
             };

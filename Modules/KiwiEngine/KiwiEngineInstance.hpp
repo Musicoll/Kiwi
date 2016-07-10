@@ -26,6 +26,7 @@
 
 #include "KiwiEngineConsole.hpp"
 #include "KiwiEnginePatcher.hpp"
+#include "KiwiEngineBeacon.hpp"
 
 namespace kiwi
 {
@@ -37,7 +38,7 @@ namespace kiwi
         
         //! @brief The Instance adds the engine objects to the engine::Factory
         //! @details The patcher document model must be initialised before creating the Instance
-        class Instance
+        class Instance : public Beacon::Factory
         {
         public: // methods
             

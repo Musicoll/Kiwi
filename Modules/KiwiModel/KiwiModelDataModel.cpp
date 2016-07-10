@@ -64,6 +64,7 @@ namespace kiwi
             ErrorBox::declare();
             ObjectPlus::declare();
             ObjectPrint::declare();
+            ObjectReceive::declare();
         }
     }
 }

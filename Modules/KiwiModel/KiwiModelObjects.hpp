@@ -108,6 +108,24 @@ namespace kiwi
             //! @internal flip static declare method
             static void declare();
         };
+        
+        // ================================================================================ //
+        //                                  OBJECT RECEIVE                                  //
+        // ================================================================================ //
+        
+        class ObjectReceive : public model::Object
+        {
+        public:
+            
+            //! @brief flip Default Constructor
+            ObjectReceive(flip::Default& d) : model::Object(d) {}
+            
+            //! @brief Constructor
+            ObjectReceive(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @internal flip static declare method
+            static void declare();
+        };
     }
 }
 

@@ -23,6 +23,7 @@
 #define KIWI_ENGINE_PATCHER_HPP_INCLUDED
 
 #include "KiwiEngineDef.hpp"
+#include "KiwiEngineBeacon.hpp"
 
 namespace kiwi
 {    
@@ -84,6 +85,13 @@ namespace kiwi
             
             //! @brief post an error message in the Console.
             void error(std::string const& text) const;
+            
+            // ================================================================================ //
+            //                                      BEACON                                      //
+            // ================================================================================ //
+            
+            //! @brief Gets or creates a Beacon with a given name.
+            Beacon& getBeacon(std::string const& name) const;
             
         private: // methods
             

@@ -117,7 +117,6 @@ namespace kiwi
             ;
         }
         
-        //! @internal flip static declare method
         void ObjectPrint::declare()
         {
             if(DataModel::has<ObjectPrint>()) return;
@@ -127,6 +126,27 @@ namespace kiwi
             .inherit<model::Object>();
             
             Factory::add<ObjectPrint>("print");
+        }
+        
+        // ================================================================================ //
+        //                                  OBJECT RECEIVE                                  //
+        // ================================================================================ //
+        
+        ObjectReceive::ObjectReceive(std::string const& name, std::vector<Atom> const& args)
+        {
+            setNumberOfInlets(0);
+            setNumberOfOutlets(1);
+        }
+        
+        void ObjectReceive::declare()
+        {
+            if(DataModel::has<ObjectReceive>()) return;
+            
+            DataModel::declare<ObjectReceive>()
+            .name("cicm.kiwi.ObjectReceive")
+            .inherit<model::Object>();
+            
+            Factory::add<ObjectReceive>("receive");
         }
     }
 }

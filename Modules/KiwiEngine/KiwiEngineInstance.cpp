@@ -81,6 +81,7 @@ namespace kiwi
             engine::Factory::add<ErrorBox>("errorbox");
             engine::Factory::add<ObjectPlus>("plus");
             engine::Factory::add<ObjectPrint>("print");
+            engine::Factory::add<ObjectReceive>("receive");
         }
     }
 }

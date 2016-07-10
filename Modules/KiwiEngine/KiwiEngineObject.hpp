@@ -81,6 +81,17 @@ namespace kiwi
             //! @brief post an error message in the Console.
             void error(std::string const& text) const;
             
+            // ================================================================================ //
+            //                                      BEACON                                      //
+            // ================================================================================ //
+            
+            //! @brief Gets or creates a Beacon with a given name.
+            Beacon& getBeacon(std::string const& name) const;
+            
+            // ================================================================================ //
+            //                                       SEND                                       //
+            // ================================================================================ //
+            
             //! @brief Sends a vector of Atom via an outlet.
             //! @todo Improve the stack overflow system.
             //! @todo See if the method must be noexcept.

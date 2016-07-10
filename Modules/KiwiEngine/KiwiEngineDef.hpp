@@ -42,6 +42,7 @@ namespace kiwi
     
     namespace engine
     {
+        class Beacon;
         class Link;
         class Object;
         class Patcher;

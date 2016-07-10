@@ -118,6 +118,35 @@ namespace kiwi
                 post(m_name + " \u2022 " + AtomHelper::toString(args));
             }
         }
+        
+        // ================================================================================ //
+        //                                  OBJECT RECEIVE                                  //
+        // ================================================================================ //
+        
+        ObjectReceive::ObjectReceive(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        : Object(model, patcher)
+        {
+            const std::string name = !args.empty() ? args[0].getString() : "print";
+            
+            if(!name.empty())
+            {
+                Beacon& beacon = getBeacon(name);
+                beacon.bind(*this);
+            }
+        }
+        
+        void ObjectReceive::receive(size_t, std::vector<Atom> const& args)
+        {
+            
+        }
+        
+        void ObjectReceive::receive(std::vector<Atom> const& args)
+        {
+            if(!args.empty())
+            {
+                send(0, args);
+            }
+        }
     }
 }
 
