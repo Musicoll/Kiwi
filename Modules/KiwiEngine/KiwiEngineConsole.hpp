@@ -22,13 +22,6 @@
 #ifndef KIWI_ENGINE_CONSOLE_HPP_INCLUDED
 #define KIWI_ENGINE_CONSOLE_HPP_INCLUDED
 
-#include <iostream>
-#include <sstream>
-#include <mutex>
-#include <string>
-#include <set>
-#include <algorithm>
-
 #include <KiwiModel/KiwiModelAtom.hpp>
 #include "KiwiEngineListeners.hpp"
 
@@ -43,7 +36,7 @@ namespace kiwi
         //! @brief The console is an interface that let you print messages.
         class Console
         {
-        public:
+        public: // methods
             
             //! @brief Constructor
             Console() = default;
@@ -68,8 +61,13 @@ namespace kiwi
                 std::string text;
                 Type        type;
             };
+            
             //! @brief Print a post-type message in the console.
             void post(Message const& mess) const;
+            
+            // ================================================================================ //
+            //                                 CONSOLE LISTENER                                 //
+            // ================================================================================ //
             
             //! @brief You can inherit from this class to receive console changes.
             class Listener
@@ -81,13 +79,13 @@ namespace kiwi
                 virtual void newConsoleMessage(Console::Message const& message) = 0;
             };
             
-            //! @brief Add an history listener.
+            //! @brief Adds a Console listener.
             void addListener(Listener& listener);
             
-            //! @brief Remove an history listener.
+            //! @brief Removes a Console listener.
             void removeListener(Listener& listener);
             
-        private:
+        private: // members
             
             Listeners<Listener>  m_listeners;
         };

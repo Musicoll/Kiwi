@@ -19,7 +19,6 @@
  ==============================================================================
  */
 
-
 #include "KiwiEngineBeacon.hpp"
 
 namespace kiwi
@@ -35,11 +34,6 @@ namespace kiwi
             ;
         }
         
-        Beacon::~Beacon()
-        {
-            
-        }
-        
         void Beacon::bind(Castaway& castaway)
         {
             m_castaways.insert(&castaway);
@@ -52,7 +46,7 @@ namespace kiwi
         
         void Beacon::dispatch(std::vector<Atom> const& args)
         {
-            for(auto castaway : m_castaways)
+            for(auto* castaway : m_castaways)
             {
                 castaway->receive(args);
             }
@@ -62,16 +56,6 @@ namespace kiwi
         //                                  BEACON FACTORY                                  //
         // ================================================================================ //
         
-        Beacon::Factory::Factory()
-        {
-            ;
-        }
-        
-        Beacon::Factory::~Factory()
-        {
-            ;
-        }
-        
         Beacon& Beacon::Factory::getBeacon(std::string const& name)
         {
             auto it = m_beacons.find(name);
@@ -79,6 +63,7 @@ namespace kiwi
             {
                 return *it->second.get();
             }
+            
             Beacon* beacon = new Beacon(name);
             if(beacon)
             {
@@ -88,12 +73,3 @@ namespace kiwi
         }
     };
 };
-
-
-
-
-
-
-
-
-

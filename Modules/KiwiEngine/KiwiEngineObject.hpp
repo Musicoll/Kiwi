@@ -99,7 +99,7 @@ namespace kiwi
             
         private: // members
             
-            using  Outlet = std::set<Link const*>;
+            using Outlet = std::set<Link const*>;
 
             model::Object const&    m_model;
             Patcher&                m_patcher;
