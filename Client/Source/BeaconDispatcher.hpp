@@ -33,7 +33,9 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief Explore service running on the Local Area Network.
-    class BeaconDispatcher : public juce::Component, public juce::Button::Listener
+    class BeaconDispatcher :
+    public juce::Component,
+    public juce::Button::Listener
     {
     public:
         
@@ -43,17 +45,24 @@ namespace kiwi
         //! @brief Destructor.
         ~BeaconDispatcher() = default;
         
+        //! @brief Called when resized.
         void resized() override;
         
         //! @brief Called when the button is clicked.
         void buttonClicked(juce::Button*) override;
+    
+    private: // methods
         
-    private:
+        //! @brief dispatch message to castaways
+        void send(std::string const& name, std::vector<Atom> const& args) const;
+        
+    private: // members
+        
         engine::Instance& m_instance;
         
         std::unique_ptr<juce::TextEditor>   m_beacon_name_editor;
         std::unique_ptr<juce::TextEditor>   m_message_editor;
-        std::unique_ptr<juce::Button>       m_send_button;
+        std::unique_ptr<juce::TextButton>   m_send_button;
     };
     
     // ================================================================================ //
