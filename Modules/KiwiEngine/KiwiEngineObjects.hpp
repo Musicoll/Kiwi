@@ -98,12 +98,16 @@ namespace kiwi
             
             ObjectReceive(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
+            ~ObjectReceive();
+            
             void receive(size_t, std::vector<Atom> const& args) override;
             
             void receive(std::vector<Atom> const& args) override;
+            
+        private:
+            std::string m_name;
         };
     }
 }
-
 
 #endif // KIWI_ENGINE_TYPED_OBJECTS_HPP_INCLUDED

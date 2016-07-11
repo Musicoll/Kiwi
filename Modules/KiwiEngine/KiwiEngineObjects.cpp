@@ -126,12 +126,21 @@ namespace kiwi
         ObjectReceive::ObjectReceive(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
         : Object(model, patcher)
         {
-            const std::string name = !args.empty() ? args[0].getString() : "print";
+            m_name = !args.empty() ? args[0].getString() : "";
             
-            if(!name.empty())
+            if(!m_name.empty())
             {
-                Beacon& beacon = getBeacon(name);
+                Beacon& beacon = getBeacon(m_name);
                 beacon.bind(*this);
+            }
+        }
+        
+        ObjectReceive::~ObjectReceive()
+        {
+            if(!m_name.empty())
+            {
+                Beacon& beacon = getBeacon(m_name);
+                beacon.unbind(*this);
             }
         }
         
