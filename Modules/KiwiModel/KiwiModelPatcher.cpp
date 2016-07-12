@@ -72,53 +72,6 @@ namespace kiwi
             return *m_objects.emplace(m_objects.end(), mold);
         }
         
-        model::Object& Patcher::replaceObjectWith(model::Object& object_to_replace,
-                                                  flip::Mold const& mold,
-                                                  Patcher::View& view)
-        {
-            model::Object& new_object = addObject(mold);
-            
-            new_object.setPosition(object_to_replace.getX(), object_to_replace.getY());
-            
-            // re-link object
-            const size_t new_inlets = new_object.getNumberOfInlets();
-            const size_t new_outlets = new_object.getNumberOfOutlets();
-            
-            for(model::Link& link : m_links)
-            {
-                if(!link.removed())
-                {
-                    const model::Object& from = link.getSenderObject();
-                    const size_t outlet_index = link.getSenderIndex();
-                    const model::Object& to = link.getReceiverObject();
-                    const size_t inlet_index = link.getReceiverIndex();
-                    
-                    if(&from == &object_to_replace)
-                    {
-                        if(outlet_index < new_outlets)
-                        {
-                            addLink(new_object, outlet_index, to, inlet_index);
-                        }
-                    }
-                    
-                    if(&to == &object_to_replace)
-                    {
-                        if(inlet_index < new_inlets)
-                        {
-                            addLink(from, outlet_index, new_object, inlet_index);
-                        }
-                    }
-                }
-            }
-            
-            view.unselectObject(object_to_replace);
-            removeObject(object_to_replace);
-            
-            view.selectObject(new_object);
-            
-            return new_object;
-        }
-        
         model::Link* Patcher::addLink(model::Object const& from, const size_t outlet,
                                       model::Object const& to, const size_t inlet)
         {

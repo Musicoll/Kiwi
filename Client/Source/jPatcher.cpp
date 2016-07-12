@@ -849,6 +849,52 @@ namespace kiwi
         deleteSelection();
     }
     
+    model::Object& jPatcher::replaceObjectWith(model::Object& object_to_replace,
+                                              flip::Mold const& mold)
+    {
+        model::Object& new_object = m_patcher_model.addObject(mold);
+        
+        new_object.setPosition(object_to_replace.getX(), object_to_replace.getY());
+        
+        // re-link object
+        const size_t new_inlets = new_object.getNumberOfInlets();
+        const size_t new_outlets = new_object.getNumberOfOutlets();
+        
+        for(model::Link& link : m_patcher_model.getLinks())
+        {
+            if(!link.removed())
+            {
+                const model::Object& from = link.getSenderObject();
+                const size_t outlet_index = link.getSenderIndex();
+                const model::Object& to = link.getReceiverObject();
+                const size_t inlet_index = link.getReceiverIndex();
+                
+                if(&from == &object_to_replace)
+                {
+                    if(outlet_index < new_outlets)
+                    {
+                        m_patcher_model.addLink(new_object, outlet_index, to, inlet_index);
+                    }
+                }
+                
+                if(&to == &object_to_replace)
+                {
+                    if(inlet_index < new_inlets)
+                    {
+                        m_patcher_model.addLink(from, outlet_index, new_object, inlet_index);
+                    }
+                }
+            }
+        }
+        
+        m_view_model.unselectObject(object_to_replace);
+        m_patcher_model.removeObject(object_to_replace);
+        
+        m_view_model.selectObject(new_object);
+        
+        return new_object;
+    }
+    
     void jPatcher::pasteReplace()
     {
         if(isAnyObjectSelected())
@@ -882,7 +928,7 @@ namespace kiwi
                             {
                                 try
                                 {
-                                    m_patcher_model.replaceObjectWith(*selected_object, mold, m_view_model);
+                                    replaceObjectWith(*selected_object, mold);
                                 }
                                 catch(...)
                                 {
