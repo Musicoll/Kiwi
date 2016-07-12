@@ -2,28 +2,25 @@
  ==============================================================================
  
  This file is part of the KIWI library.
- Copyright(c) 2014 Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of either:
- a) the GPL v2(or any later version)
- b) the Affero GPL v3
- 
- Details of these licenses can be found at: www.gnu.org/licenses
+ Permission is granted to use this software under the terms of the GPL v2
+ (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  
  ------------------------------------------------------------------------------
  
- To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
+ Contact : cicm.mshparisnord@gmail.com
  
  ==============================================================================
  */
 
 #include "StoredSettings.hpp"
 #include "Application.hpp"
-//#include "../Application/jucer_GlobalPreferences.h"
 
 namespace kiwi
 {
@@ -37,7 +34,7 @@ namespace kiwi
         return getAppSettings().getGlobalProperties();
     }
     
-    static PropertiesFile::Options getPropertyFileOptionsFor(const String& filename)
+    static juce::PropertiesFile::Options getPropertyFileOptionsFor(const juce::String& filename)
     {
         juce::PropertiesFile::Options options;
         options.applicationName     = filename;
@@ -53,7 +50,7 @@ namespace kiwi
         return options;
     }
     
-    static std::unique_ptr<juce::PropertiesFile> createPropsFile(const String& filename)
+    static std::unique_ptr<juce::PropertiesFile> createPropsFile(const juce::String& filename)
     {
         return std::make_unique<juce::PropertiesFile>(getPropertyFileOptionsFor(filename));
     }
@@ -74,7 +71,7 @@ namespace kiwi
         flush();
     }
     
-    PropertiesFile& StoredSettings::getGlobalProperties()
+    juce::PropertiesFile& StoredSettings::getGlobalProperties()
     {
         return *m_property_files[0];
     }
@@ -109,7 +106,7 @@ namespace kiwi
     
     void StoredSettings::changed()
     {
-        ScopedPointer<XmlElement> data(m_defaults.createXml());
+        juce::ScopedPointer<juce::XmlElement> data(m_defaults.createXml());
         m_property_files[0]->setValue("KIWI_APP_DEFAULT_SETTINGS", data);
     }
 }

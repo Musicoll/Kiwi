@@ -25,7 +25,7 @@
 
 #include "KiwiPatcherManager.hpp"
 
-#include <KiwiModel/KiwiPatcherModel.hpp>
+#include <KiwiModel/KiwiModelDataModel.hpp>
 
 namespace kiwi
 {
@@ -37,7 +37,7 @@ namespace kiwi
         
         PatcherManager::PatcherManager(uint64_t session_id, uint16_t port, std::string const& title) :
         m_validator(),
-        m_document(model::PatcherModel::use(),
+        m_document(model::DataModel::use(),
                    m_validator,
                    session_id),
         m_port(port),

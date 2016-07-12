@@ -2,21 +2,19 @@
  ==============================================================================
  
  This file is part of the KIWI library.
- Copyright (c) 2014 Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of either:
- a) the GPL v2 (or any later version)
- b) the Affero GPL v3
- 
- Details of these licenses can be found at: www.gnu.org/licenses
+ Permission is granted to use this software under the terms of the GPL v2
+ (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  
  ------------------------------------------------------------------------------
  
- To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
+ Contact : cicm.mshparisnord@gmail.com
  
  ==============================================================================
  */
@@ -26,15 +24,16 @@
 
 #include <string>
 
-#include <KiwiEngine/KiwiInstance.hpp>
-#include <KiwiCore/KiwiFile.hpp>
+#include <KiwiEngine/KiwiEngineInstance.hpp>
 
 #include "flip/Document.h"
 
+#include "KiwiFilePath.hpp"
 #include "jConsole.hpp"
 #include "DocumentExplorer.hpp"
 #include "jPatcherManager.hpp"
 #include "StoredSettings.hpp"
+#include "BeaconDispatcher.hpp"
 
 namespace kiwi
 {
@@ -60,7 +59,7 @@ namespace kiwi
         void newPatcher();
         
         //! @brief Returns the engine::Instance
-        engine::Instance& getEngineInstance();
+        engine::Instance& useEngineInstance();
         
         //! @brief Returns the engine::Instance
         engine::Instance const& getEngineInstance() const;
@@ -87,8 +86,11 @@ namespace kiwi
         //! @brief Brings the Console to front.
         void showConsoleWindow();
         
-        //! @brief Brings the Console to front.
+        //! @brief Brings the DocumentExplorerWindow to front.
         void showDocumentExplorerWindow();
+        
+        //! @brief Brings the BeaconDispatcherWindow to front.
+        void showBeaconDispatcherWindow();
         
         //! @brief Get Patcher clipboard data.
         std::vector<uint8_t>& getPatcherClipboardData();
@@ -114,10 +116,13 @@ namespace kiwi
         
         jPatcherManagers                            m_patcher_managers;
         
+        sConsoleHistory                             m_console_history;
         std::unique_ptr<jConsoleWindow>             m_console_window;
         
         std::unique_ptr<DocumentExplorer>           m_document_explorer;
         std::unique_ptr<DocumentExplorerWindow>     m_document_explorer_window;
+        
+        std::unique_ptr<BeaconDispatcherWindow>     m_beacon_dispatcher_window;
         
         std::vector<uint8_t>                        m_patcher_clipboard;
         

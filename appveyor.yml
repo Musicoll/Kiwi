@@ -10,12 +10,6 @@ os: Visual Studio 2015
 
 build_script:
     - mkdir build
-    - cd build
-    - cmake .. -G "Visual Studio 14 2015"
-    - cmake --build .
-    - cd Debug
-    - dir
-    - test_core
 
 #---------------------------------#
 #         notifications           #

@@ -29,7 +29,7 @@
 
 #include "KiwiPatcherValidator.hpp"
 
-#include <KiwiModel/KiwiPatcher.hpp>
+#include <KiwiModel/KiwiModelPatcher.hpp>
 
 #include <flip/DocumentServer.h>
 #include <flip/contrib/transport_tcp/PortTransportServerTcp.h>

@@ -2,26 +2,24 @@
  ==============================================================================
  
  This file is part of the KIWI library.
- Copyright(c) 2014 Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of either:
- a) the GPL v2(or any later version)
- b) the Affero GPL v3
- 
- Details of these licenses can be found at: www.gnu.org/licenses
+ Permission is granted to use this software under the terms of the GPL v2
+ (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  
  ------------------------------------------------------------------------------
  
- To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
+ Contact : cicm.mshparisnord@gmail.com
  
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiConsole.hpp>
+#include <KiwiEngine/KiwiEngineConsole.hpp>
 
 #include "DocumentExplorer.hpp"
 #include "jInstance.hpp"
@@ -141,7 +139,7 @@ namespace kiwi
         setButtonText(getMetadata("name"));
     }
     
-    void DocumentExplorer::Panel::SessionItemButton::paintButton(Graphics& g, bool isMouseOverButton, bool isButtonDown)
+    void DocumentExplorer::Panel::SessionItemButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool isButtonDown)
     {
         const auto bounds = getLocalBounds();
         
@@ -179,7 +177,7 @@ namespace kiwi
     
     std::string DocumentExplorer::Panel::SessionItemButton::getHost() const
     {
-        const uint32 ip_address = getIp();
+        const uint32_t ip_address = getIp();
         char host[16];
         
         if(ip_address)
@@ -230,13 +228,13 @@ namespace kiwi
         }
     }
     
-    void DocumentExplorer::Panel::paint(Graphics& g)
+    void DocumentExplorer::Panel::paint(juce::Graphics& g)
     {
         g.setColour(juce::Colour(0xFF3F3B4E));
         g.fillAll();
     }
     
-    void DocumentExplorer::Panel::buttonClicked(Button* button)
+    void DocumentExplorer::Panel::buttonClicked(juce::Button* button)
     {        
         const auto* session_item = dynamic_cast<SessionItemButton*>(button);
         if(session_item)
@@ -280,13 +278,13 @@ namespace kiwi
     // ================================================================================ //
     
     DocumentExplorerWindow::DocumentExplorerWindow(DocumentExplorer& explorer, jInstance& instance) :
-    jWindow("Document explorer panel", Colours::white, minimiseButton | closeButton, true)
+    jWindow("Document explorer panel", juce::Colours::white, minimiseButton | closeButton, true)
     {
         setContentOwned(new DocumentExplorer::Panel(explorer, instance), false);
         setResizable(true, false);
         setResizeLimits(50, 50, 32000, 32000);
         
-        const String windowState(getGlobalProperties().getValue("document_explorer_window"));
+        const juce::String windowState(getGlobalProperties().getValue("document_explorer_window"));
         
         if(windowState.isNotEmpty())
         {

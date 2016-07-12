@@ -2,27 +2,26 @@
  ==============================================================================
  
  This file is part of the KIWI library.
- Copyright (c) 2014 Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of either:
- a) the GPL v2 (or any later version)
- b) the Affero GPL v3
- 
- Details of these licenses can be found at: www.gnu.org/licenses
+ Permission is granted to use this software under the terms of the GPL v2
+ (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  
  ------------------------------------------------------------------------------
  
- To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
+ Contact : cicm.mshparisnord@gmail.com
  
  ==============================================================================
  */
 
-#include <KiwiEngine/KiwiDocumentManager.hpp>
+#include <KiwiModel/KiwiModelPatcherView.hpp>
 
+#include "KiwiDocumentManager.hpp"
 #include "jObject.hpp"
 #include "Application.hpp"
 #include "jPatcherHelper.hpp"
@@ -79,11 +78,11 @@ namespace kiwi
         const auto bounds = getLocalBounds();
         const auto box_bounds = m_local_box_bounds;
         
-        const juce::Colour selection_color = Colour::fromFloatRGBA(0., 0.5, 1., 0.8);
-        const juce::Colour other_view_selected_color = Colour::fromFloatRGBA(0.8, 0.3, 0.3, 0.3);
+        const juce::Colour selection_color = juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.8);
+        const juce::Colour other_view_selected_color = juce::Colour::fromFloatRGBA(0.8, 0.3, 0.3, 0.3);
         const juce::Colour distant_selected_color(0xAAFF9B71);
         
-        const juce::Colour errorbox_overlay_color = Colour::fromFloatRGBA(0.6, 0.1, 0.1, 0.4);
+        const juce::Colour errorbox_overlay_color = juce::Colour::fromFloatRGBA(0.6, 0.1, 0.1, 0.4);
         
         const bool selected = m_is_selected;
         const bool other_selected = ! m_distant_selection.empty();
@@ -121,13 +120,15 @@ namespace kiwi
         if(!m_is_editing)
         {
             g.setColour(juce::Colours::black);
-            
-            const std::string object_name = m_model->getName();
-            if(object_name == "newbox")
+
+            std::string object_name = m_model->getName();
+            if(object_name == "errorbox")
             {
-                ;
+                g.drawFittedText(m_model->getText().c_str()+9,
+                                 box_bounds.reduced(5),
+                                 juce::Justification::centredLeft, 1, 1.);
             }
-            else
+            else if(object_name != "newbox")
             {
                 g.drawFittedText(m_model->getText(),
                                  box_bounds.reduced(5),
@@ -399,8 +400,7 @@ namespace kiwi
     
     void jObject::mouseDown(juce::MouseEvent const& event)
     {
-        // signal engine
-        m_model->signalTrigger();
+        ;
     }
     
     void jObject::mouseDrag(juce::MouseEvent const& event)
@@ -430,12 +430,19 @@ namespace kiwi
         m_editor.reset(new juce::TextEditor());
         m_editor->setBounds(m_local_box_bounds.expanded(m_selection_width*0.5));
         
-        const std::string object_name = m_model->getName();
-        const std::string text = object_name == "newbox" ? "" : m_model->getText();
+        std::string text = m_model->getText();
+        if(text.compare(0, 8, "errorbox") == 0)
+        {
+            text.erase(text.begin(), text.begin()+9);
+        }
+        else if(text == "newbox")
+        {
+            text.clear();
+        }
         
-        m_editor->setColour(juce::TextEditor::highlightColourId, Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
-        m_editor->setColour(juce::TextEditor::focusedOutlineColourId, Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
-        m_editor->setColour(juce::TextEditor::backgroundColourId, Colours::transparentWhite);
+        m_editor->setColour(juce::TextEditor::highlightColourId, juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
+        m_editor->setColour(juce::TextEditor::focusedOutlineColourId, juce::Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
+        m_editor->setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentWhite);
 
         m_editor->setScrollbarsShown(false);
         m_editor->setScrollToShowCursor(true);
@@ -469,12 +476,12 @@ namespace kiwi
     
     void jClassicBox::focusGained(FocusChangeType cause)
     {
-        //Console::post("focusGained");
+        //KiwiApp::post("focusGained");
     }
     
     void jClassicBox::focusLost(FocusChangeType cause)
     {
-        //Console::post("focusLost");
+        //KiwiApp::post("focusLost");
     }
     
     void jClassicBox::resized()
@@ -507,14 +514,14 @@ namespace kiwi
     
     void jClassicBox::textEditorReturnKeyPressed(juce::TextEditor& e)
     {
-        //Console::post("textEditorReturnKeyPressed");
+        //KiwiApp::post("textEditorReturnKeyPressed");
         
         m_patcher_view.grabKeyboardFocus();
     }
     
     void jClassicBox::textEditorEscapeKeyPressed(juce::TextEditor& e)
     {
-        //Console::post("textEditorEscapeKeyPressed");
+        //KiwiApp::post("textEditorEscapeKeyPressed");
         
         removeTextEditor();
     }

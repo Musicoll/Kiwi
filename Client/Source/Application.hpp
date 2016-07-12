@@ -2,21 +2,19 @@
  ==============================================================================
  
  This file is part of the KIWI library.
- Copyright (c) 2014 Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of either:
- a) the GPL v2 (or any later version)
- b) the Affero GPL v3
- 
- Details of these licenses can be found at: www.gnu.org/licenses
+ Permission is granted to use this software under the terms of the GPL v2
+ (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  
  ------------------------------------------------------------------------------
  
- To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
+ Contact : cicm.mshparisnord@gmail.com
  
  ==============================================================================
  */
@@ -35,7 +33,7 @@ namespace kiwi
     //                                  KiWi APPLICATION                                //
     // ================================================================================ //
     
-    class KiwiApp : public JUCEApplication
+    class KiwiApp : public juce::JUCEApplication
     {
     public:
         
@@ -46,17 +44,17 @@ namespace kiwi
         KiwiApp() = default;
         ~KiwiApp() = default;
         
-        void initialise(String const& commandLine) override;
+        void initialise(juce::String const& commandLine) override;
         
-        void anotherInstanceStarted(String const& command_line) override;
+        void anotherInstanceStarted(juce::String const& command_line) override;
         
         void shutdown() override;
         
         void systemRequestedQuit() override;
         
-        const String getApplicationName() override       { return ProjectInfo::projectName; }
-        const String getApplicationVersion() override    { return ProjectInfo::versionString; }
-        bool moreThanOneInstanceAllowed() override       { return true; }
+        const juce::String getApplicationName() override        { return ProjectInfo::projectName; }
+        const juce::String getApplicationVersion() override     { return ProjectInfo::versionString; }
+        bool moreThanOneInstanceAllowed() override              { return true; }
         
         //==============================================================================
         
@@ -66,11 +64,30 @@ namespace kiwi
         //! @brief Get the current running application instance.
         static KiwiApp* getApp();
         
+        //! @brief Get the current running engine instance.
+        static engine::Instance& useEngineInstance();
+        
         //! @brief Get the user id associated to this running application instance.
         static uint64_t userID();
         
         //! @brief Returns the application stored settings.
         static StoredSettings& useSettings();
+        
+        // ================================================================================ //
+        //                                      CONSOLE                                     //
+        // ================================================================================ //
+        
+        //! @brief post a log message in the Console.
+        static void log(std::string const& text);
+        
+        //! @brief post a message in the Console.
+        static void post(std::string const& text);
+        
+        //! @brief post a warning message in the Console.
+        static void warning(std::string const& text);
+        
+        //! @brief post an error message in the Console.
+        static void error(std::string const& text);
         
         //==============================================================================
         
@@ -82,33 +99,33 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief The Kiwi Application menu model class
-        struct MainMenuModel : public MenuBarModel
+        struct MainMenuModel : public juce::MenuBarModel
         {
             MainMenuModel();
-            StringArray getMenuBarNames();
-            PopupMenu getMenuForIndex(int topLevelMenuIndex, const String& menuName);
+            juce::StringArray getMenuBarNames();
+            juce::PopupMenu getMenuForIndex(int topLevelMenuIndex, const juce::String& menuName);
             void menuItemSelected(int menuItemID, int topLevelMenuIndex);
         };
         
         //! @brief Called by MainMenuModel to get the menu names
-        StringArray getMenuNames();
+        juce::StringArray getMenuNames();
         
         //! @brief Called by MainMenuModel to create menus
-        void createMenu (PopupMenu& menu, const String& menuName);
+        void createMenu (juce::PopupMenu& menu, const juce::String& menuName);
         
         //! @brief Called by createMenu to create each menu
-        void createOpenRecentPatchersMenu(PopupMenu& menu);
-        void createFileMenu(PopupMenu& menu);
-        void createEditMenu(PopupMenu& menu);
-        void createViewMenu(PopupMenu& menu);
-        void createObjectMenu(PopupMenu& menu);
-        void createArrangeMenu(PopupMenu& menu);
-        void createOptionsMenu(PopupMenu& menu);
-        void createWindowMenu(PopupMenu& menu);
-        void createHelpMenu(PopupMenu& menu);
+        void createOpenRecentPatchersMenu(juce::PopupMenu& menu);
+        void createFileMenu(juce::PopupMenu& menu);
+        void createEditMenu(juce::PopupMenu& menu);
+        void createViewMenu(juce::PopupMenu& menu);
+        void createObjectMenu(juce::PopupMenu& menu);
+        void createArrangeMenu(juce::PopupMenu& menu);
+        void createOptionsMenu(juce::PopupMenu& menu);
+        void createWindowMenu(juce::PopupMenu& menu);
+        void createHelpMenu(juce::PopupMenu& menu);
         
         //! @brief Called by MainMenuModel to handle the main menu command
-        void handleMainMenuCommand (int menuItemID);
+        void handleMainMenuCommand(int menuItemID);
         
         // ================================================================================ //
         //                                APPLICATION COMMAND                               //
@@ -121,22 +138,22 @@ namespace kiwi
         static void bindToCommandManager(ApplicationCommandTarget* target);
         
         //! @brief Bind a component to the key mapping set.
-        static void bindToKeyMapping(Component* target);
+        static void bindToKeyMapping(juce::Component* target);
         
         //! @brief Get the global ApplicationCommandManager
-        static ApplicationCommandManager& getCommandManager();
+        static juce::ApplicationCommandManager& getCommandManager();
         
         //! @brief Notify command manager that a command status changed
         static void commandStatusChanged();
         
         //! @brief Get the command manager key mapping.
-        static KeyPressMappingSet* getKeyMappings();
+        static juce::KeyPressMappingSet* getKeyMappings();
         
         //! @brief This must return a complete list of commands that this target can handle.
-        void getAllCommands(Array<CommandID>& commands) override;
+        void getAllCommands(juce::Array<juce::CommandID>& commands) override;
         
         //! @brief This must provide details about one of the commands that this target can perform.
-        void getCommandInfo(CommandID commandID, ApplicationCommandInfo& result) override;
+        void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
         
         //! @brief This must actually perform the specified command.
         bool perform(InvocationInfo const& info) override;
@@ -151,11 +168,11 @@ namespace kiwi
         
     private: // members
         
-        std::unique_ptr<jInstance>                  m_instance;
-        std::unique_ptr<ApplicationCommandManager>	m_command_manager;
-        std::unique_ptr<MainMenuModel>				m_menu_model;
+        std::unique_ptr<jInstance>                          m_instance;
+        std::unique_ptr<juce::ApplicationCommandManager>	m_command_manager;
+        std::unique_ptr<MainMenuModel>                      m_menu_model;
         
-        std::unique_ptr<StoredSettings>             m_settings;
+        std::unique_ptr<StoredSettings>                     m_settings;
     };
 }
 

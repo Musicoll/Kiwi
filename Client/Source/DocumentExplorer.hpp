@@ -2,21 +2,19 @@
  ==============================================================================
  
  This file is part of the KIWI library.
- Copyright (c) 2014 Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of either:
- a) the GPL v2 (or any later version)
- b) the Affero GPL v3
- 
- Details of these licenses can be found at: www.gnu.org/licenses
+ Permission is granted to use this software under the terms of the GPL v2
+ (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  
  ------------------------------------------------------------------------------
  
- To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
+ Contact : cicm.mshparisnord@gmail.com
  
  ==============================================================================
  */
@@ -26,7 +24,7 @@
 
 #include "flip/contrib/MulticastServiceExplorer.h"
 
-#include <KiwiCore/KiwiListeners.hpp>
+#include <KiwiEngine/KiwiEngineListeners.hpp>
 
 #include "jWindow.hpp"
 
@@ -76,7 +74,7 @@ namespace kiwi
         
         flip::MulticastServiceExplorer  m_explorer;
         SessionList                     m_sessions;
-        kiwi::Listeners<Listener>       m_listeners;
+        engine::Listeners<Listener>     m_listeners;
     };
     
     // ================================================================================ //
@@ -113,10 +111,10 @@ namespace kiwi
         ~Panel();
         
         void resized() override;
-        void paint(Graphics& g) override;
+        void paint(juce::Graphics& g) override;
         
         //! @brief Called when a juce::Button is clicked.
-        void buttonClicked(Button* button) override;
+        void buttonClicked(juce::Button* button) override;
         
         //! @brief Called when the document list changed.
         void documentListChanged() override;
@@ -127,7 +125,7 @@ namespace kiwi
         {
         public:
             SessionItemButton(flip::MulticastServiceExplorer::Session && session);
-            void paintButton(Graphics& g, bool isMouseOverButton, bool isButtonDown) override;
+            void paintButton(juce::Graphics& g, bool isMouseOverButton, bool isButtonDown) override;
             
             //! @brief Returns the metadata associated to the given key.
             std::string getMetadata(std::string const& key) const;

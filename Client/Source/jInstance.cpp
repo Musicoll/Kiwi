@@ -2,31 +2,27 @@
  ==============================================================================
  
  This file is part of the KIWI library.
- Copyright (c) 2014 Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of either:
- a) the GPL v2 (or any later version)
- b) the Affero GPL v3
- 
- Details of these licenses can be found at: www.gnu.org/licenses
+ Permission is granted to use this software under the terms of the GPL v2
+ (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  
  ------------------------------------------------------------------------------
  
- To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
+ Contact : cicm.mshparisnord@gmail.com
  
  ==============================================================================
  */
 
-#include <KiwiEngine/KiwiDocumentManager.hpp>
-#include <KiwiCore/KiwiFile.hpp>
 
 #include "jInstance.hpp"
+#include "KiwiDocumentManager.hpp"
 #include "jPatcher.hpp"
-#include "jGuiDevice.hpp"
 
 namespace kiwi
 {
@@ -37,12 +33,13 @@ namespace kiwi
     size_t jInstance::m_untitled_patcher_index(0);
     
     jInstance::jInstance() :
-    //m_user_id(flip::Ref::User::Offline),
-    m_user_id(123456789ULL),
-    m_instance(new engine::Instance(m_user_id, std::make_unique<jGuiDevice>())),
-    m_console_window(new jConsoleWindow()),
+    m_user_id(flip::Ref::User::Offline),
+    m_instance(new engine::Instance()),
+    m_console_history(std::make_shared<ConsoleHistory>(*m_instance)),
+    m_console_window(new jConsoleWindow(m_console_history)),
     m_document_explorer(new DocumentExplorer()),
     m_document_explorer_window(new DocumentExplorerWindow(*m_document_explorer, *this)),
+    m_beacon_dispatcher_window(new BeaconDispatcherWindow(*m_instance)),
     m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
     {
         ;
@@ -64,7 +61,7 @@ namespace kiwi
         m_user_id = user_id;
     }
     
-    engine::Instance& jInstance::getEngineInstance()
+    engine::Instance& jInstance::useEngineInstance()
     {
         return *m_instance;
     }
@@ -114,7 +111,7 @@ namespace kiwi
         }
         else
         {
-            Console::error("can't open file");
+            //Console::error("can't open file");
         }
         
         return false;
@@ -193,7 +190,7 @@ namespace kiwi
         }
         catch(std::runtime_error &e)
         {
-            Console::error(e.what());
+            //Console::error(e.what());
         }
         
         if(manager_uptr)
@@ -244,7 +241,7 @@ namespace kiwi
     void jInstance::openSettings()
     {
         jSettings set_cmp(getUserId());
-        juce::OptionalScopedPointer<Component> settings_component(&set_cmp, false);
+        juce::OptionalScopedPointer<juce::Component> settings_component(&set_cmp, false);
         
         juce::DialogWindow::LaunchOptions option;
         option.dialogTitle = juce::String("Settings");
@@ -276,6 +273,12 @@ namespace kiwi
     {
         m_document_explorer_window->setVisible(true);
         m_document_explorer_window->toFront(true);
+    }
+    
+    void jInstance::showBeaconDispatcherWindow()
+    {
+        m_beacon_dispatcher_window->setVisible(true);
+        m_beacon_dispatcher_window->toFront(true);
     }
     
     std::vector<uint8_t>& jInstance::getPatcherClipboardData()

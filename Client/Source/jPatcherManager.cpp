@@ -2,31 +2,30 @@
  ==============================================================================
  
  This file is part of the KIWI library.
- Copyright (c) 2014 Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of either:
- a) the GPL v2 (or any later version)
- b) the Affero GPL v3
- 
- Details of these licenses can be found at: www.gnu.org/licenses
+ Permission is granted to use this software under the terms of the GPL v2
+ (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  
  ------------------------------------------------------------------------------
  
- To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
+ Contact : cicm.mshparisnord@gmail.com
  
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiPatcherModel.hpp>
-#include <KiwiEngine/KiwiDocumentManager.hpp>
-#include <KiwiEngine/KiwiPatcher.hpp>
+#include <KiwiModel/KiwiModelDataModel.hpp>
+#include <KiwiModel/KiwiModelPatcherUser.hpp>
+#include <KiwiEngine/KiwiEnginePatcher.hpp>
 
 #include "Application.hpp"
 #include "jInstance.hpp"
+#include "KiwiDocumentManager.hpp"
 #include "jPatcherManager.hpp"
 #include "jPatcher.hpp"
 #include "jPatcherHelper.hpp"
@@ -65,7 +64,7 @@ namespace kiwi
     
     jPatcherManager::jPatcherManager(jInstance& instance) :
     m_instance(instance),
-    m_document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
+    m_document(model::DataModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
     m_is_remote(false)
     {
         model::Patcher & patcher = getPatcher();
@@ -78,7 +77,7 @@ namespace kiwi
     
     jPatcherManager::jPatcherManager(jInstance& instance, kiwi::FilePath const& file):
     m_instance(instance),
-    m_document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
+    m_document(model::DataModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
     m_is_remote(false)
     {
         model::Patcher& patcher = getPatcher();
@@ -96,7 +95,7 @@ namespace kiwi
     
     jPatcherManager::jPatcherManager(jInstance & instance, const std::string host, uint16_t port) :
     m_instance(instance),
-    m_document(model::PatcherModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
+    m_document(model::DataModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
     m_is_remote(true)
     {
         model::Patcher & patcher = getPatcher();
@@ -189,18 +188,18 @@ namespace kiwi
         return false;
     }
     
-    FileBasedDocument::SaveResult jPatcherManager::saveIfNeededAndUserAgrees()
+    juce::FileBasedDocument::SaveResult jPatcherManager::saveIfNeededAndUserAgrees()
     {
         if (! needsSaving())
         {
-            return FileBasedDocument::savedOk;
+            return juce::FileBasedDocument::savedOk;
         }
         
         auto& patcher = getPatcher();
         
         const std::string document_name = patcher.getName();
         
-        const int r = AlertWindow::showYesNoCancelBox(AlertWindow::QuestionIcon,
+        const int r = juce::AlertWindow::showYesNoCancelBox(juce::AlertWindow::QuestionIcon,
                                                       TRANS("Closing document..."),
                                                       TRANS("Do you want to save the changes to \"")
                                                       + document_name + "\"?",
@@ -211,16 +210,16 @@ namespace kiwi
         // save changes
         if(r == 1)
         {
-            return (saveDocument()) ? FileBasedDocument::savedOk : FileBasedDocument::failedToWriteToFile;
+            return (saveDocument()) ? juce::FileBasedDocument::savedOk : juce::FileBasedDocument::failedToWriteToFile;
         }
         
         // discard changes
         if(r == 2)
         {
-            return FileBasedDocument::savedOk;
+            return juce::FileBasedDocument::savedOk;
         }
         
-        return FileBasedDocument::userCancelledSave;
+        return juce::FileBasedDocument::userCancelledSave;
     }
     
     void jPatcherManager::forceCloseAllWindows()
@@ -260,7 +259,7 @@ namespace kiwi
             model::Patcher::View& view = *it;
             bool need_saving = m_need_saving_flag && (number_of_views <= 1);
             
-            if(!need_saving || (need_saving && saveIfNeededAndUserAgrees() == FileBasedDocument::savedOk))
+            if(!need_saving || (need_saving && saveIfNeededAndUserAgrees() == juce::FileBasedDocument::savedOk))
             {
                 it = user.removeView(view);
                 DocumentManager::commit(patcher);
@@ -294,7 +293,7 @@ namespace kiwi
         {
             if(&view == &patcher_view_m)
             {
-                if(!need_saving || saveIfNeededAndUserAgrees() == FileBasedDocument::savedOk)
+                if(!need_saving || saveIfNeededAndUserAgrees() == juce::FileBasedDocument::savedOk)
                 {
                     user.removeView(patcher_view_m);
                     DocumentManager::commit(patcher);
@@ -308,13 +307,13 @@ namespace kiwi
     
     void jPatcherManager::document_changed(model::Patcher& patcher)
     {
-        if (patcher.added())
+        if(patcher.added())
         {
-            patcher.entity().emplace<DocumentManager>(patcher.document(), m_instance.getEngineInstance());
-            patcher.entity().emplace<engine::Patcher>();
+            patcher.entity().emplace<DocumentManager>(patcher.document());
+            patcher.entity().emplace<engine::Patcher>(patcher, m_instance.useEngineInstance());
         }
-        //! engine
-        patcher.entity().use<engine::Patcher>().document_changed(patcher);
+        
+        patcher.entity().use<engine::Patcher>().modelChanged();
         
         notifyPatcherViews(patcher);
         
@@ -355,7 +354,7 @@ namespace kiwi
             {
                 // handle external users.
                 
-                //Console::post("New user !!");
+                //KiwiApp::post("New user !!");
             }
         }
     }

@@ -2,21 +2,19 @@
  ==============================================================================
  
  This file is part of the KIWI library.
- Copyright (c) 2014 Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of either:
- a) the GPL v2 (or any later version)
- b) the Affero GPL v3
- 
- Details of these licenses can be found at: www.gnu.org/licenses
+ Permission is granted to use this software under the terms of the GPL v2
+ (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  
  ------------------------------------------------------------------------------
  
- To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
+ Contact : cicm.mshparisnord@gmail.com
  
  ==============================================================================
  */
@@ -38,14 +36,14 @@ namespace kiwi
         const juce::Point<int> local_inlet_pos(m_last_inlet_pos - comp_pos);
         const juce::Point<int> local_outlet_pos(m_last_outlet_pos - comp_pos);
         
-        const Point<float> start_point = local_outlet_pos.translated(0.f, 2.f).toFloat();
-        const Point<float> end_point = local_inlet_pos.translated(0.f, -1.f).toFloat();
+        const juce::Point<float> start_point = local_outlet_pos.translated(0.f, 2.f).toFloat();
+        const juce::Point<float> end_point = local_inlet_pos.translated(0.f, -1.f).toFloat();
         
         const float max_shift = std::min(link_bounds.getWidth(), link_bounds.getHeight());
         const float shift = (max_shift < 10) ? max_shift * 0.2 : (max_shift * 0.5);
         
-        const Point<float> ctrl_pt1 { start_point.x, static_cast<float>(start_point.y + shift) };
-        const Point<float> ctrl_pt2 { end_point.x, static_cast<float>(end_point.y - shift) };
+        const juce::Point<float> ctrl_pt1 { start_point.x, static_cast<float>(start_point.y + shift) };
+        const juce::Point<float> ctrl_pt2 { end_point.x, static_cast<float>(end_point.y - shift) };
         
         m_path.clear();
         m_path.startNewSubPath(start_point.x, start_point.y);
@@ -144,9 +142,9 @@ namespace kiwi
     
     void jLink::paint(juce::Graphics & g)
     {
-        const juce::Colour link_color = Colour::fromFloatRGBA(0.2, 0.2, 0.2, 1.);
-        const juce::Colour selection_color = Colour::fromFloatRGBA(0., 0.5, 1., 1.);
-        const juce::Colour other_view_selected_color = Colour::fromFloatRGBA(0.8, 0.3, 0.3, 1.);
+        const juce::Colour link_color = juce::Colour::fromFloatRGBA(0.2, 0.2, 0.2, 1.);
+        const juce::Colour selection_color = juce::Colour::fromFloatRGBA(0., 0.5, 1., 1.);
+        const juce::Colour other_view_selected_color = juce::Colour::fromFloatRGBA(0.8, 0.3, 0.3, 1.);
         const juce::Colour distant_selected_color(0xAAFF9B71);
         
         const bool selected = m_is_selected;
@@ -239,7 +237,7 @@ namespace kiwi
     
     void jLinkCreator::paint(juce::Graphics & g)
     {
-        const juce::Colour link_color = Colour::fromFloatRGBA(0.2, 0.2, 0.2, 1.);
+        const juce::Colour link_color = juce::Colour::fromFloatRGBA(0.2, 0.2, 0.2, 1.);
         g.setColour(link_color);
         g.strokePath(m_path, juce::PathStrokeType(1.5f));
     }

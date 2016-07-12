@@ -2,21 +2,19 @@
  ==============================================================================
  
  This file is part of the KIWI library.
- Copyright (c) 2014 Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of either:
- a) the GPL v2 (or any later version)
- b) the Affero GPL v3
- 
- Details of these licenses can be found at: www.gnu.org/licenses
+ Permission is granted to use this software under the terms of the GPL v2
+ (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  
  ------------------------------------------------------------------------------
  
- To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
+ Contact : cicm.mshparisnord@gmail.com
  
  ==============================================================================
  */
@@ -62,26 +60,26 @@ namespace kiwi
     //                              APPLICATION COMMAND TARGET                          //
     // ================================================================================ //
     
-    ApplicationCommandTarget* jWindow::getNextCommandTarget()
+    juce::ApplicationCommandTarget* jWindow::getNextCommandTarget()
     {
         return findFirstTargetParentComponent();
     }
     
-    void jWindow::getAllCommands(Array<CommandID>& commands)
+    void jWindow::getAllCommands(juce::Array<juce::CommandID>& commands)
     {
         commands.add(CommandIDs::closeWindow);
         commands.add(CommandIDs::minimizeWindow);
         commands.add(CommandIDs::maximizeWindow);
     }
     
-    void jWindow::getCommandInfo(const CommandID commandID, ApplicationCommandInfo& result)
+    void jWindow::getCommandInfo(const juce::CommandID commandID, juce::ApplicationCommandInfo& result)
     {
         switch (commandID)
         {
             case CommandIDs::closeWindow:
             {
                 result.setInfo(TRANS("Close"), TRANS("Close Window"), CommandCategories::windows, 0);
-                result.addDefaultKeypress('w', ModifierKeys::commandModifier);
+                result.addDefaultKeypress('w', juce::ModifierKeys::commandModifier);
                 result.setActive(getDesktopWindowStyleFlags() & allButtons || getDesktopWindowStyleFlags() & closeButton);
                 break;
             }

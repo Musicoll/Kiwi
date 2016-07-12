@@ -2,21 +2,19 @@
  ==============================================================================
  
  This file is part of the KIWI library.
- Copyright (c) 2014 Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of either:
- a) the GPL v2 (or any later version)
- b) the Affero GPL v3
- 
- Details of these licenses can be found at: www.gnu.org/licenses
+ Permission is granted to use this software under the terms of the GPL v2
+ (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  
  ------------------------------------------------------------------------------
  
- To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
+ Contact : cicm.mshparisnord@gmail.com
  
  ==============================================================================
  */
@@ -24,12 +22,13 @@
 #ifndef KIWI_JPATCHER_HPP_INCLUDED
 #define KIWI_JPATCHER_HPP_INCLUDED
 
-#include <KiwiModel/KiwiPatcher.hpp>
-#include <KiwiCore/KiwiFile.hpp>
+#include <KiwiModel/KiwiModelPatcher.hpp>
 
 #include "flip/DocumentObserver.h"
 
 #include "../JuceLibraryCode/JuceHeader.h"
+
+#include "KiwiFilePath.hpp"
 
 namespace kiwi
 {
@@ -49,17 +48,17 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The juce Patcher Component.
-    class jPatcher :
-    public juce::Component,
-    public ApplicationCommandTarget
+    class jPatcher : public juce::Component, public juce::ApplicationCommandTarget
     {
     public:
         
+        //! @brief Constructor
         jPatcher(jPatcherManager& manager,
                  jInstance& instance,
                  model::Patcher& patcher,
                  model::Patcher::View& view);
         
+        //! @brief Destructor
         ~jPatcher();
         
         using jObjects = std::vector<std::unique_ptr<jObject>>;
@@ -102,6 +101,8 @@ namespace kiwi
         //! @brief Returns the position of the patcher origin relative to the component position.
         juce::Point<int> getOriginPosition() const;
         
+        model::Object& createObjectModel(std::string const& text);
+        
         //! @brief called by jClassicBox when hmmm.. the text has been edited.
         void boxHasBeenEdited(jClassicBox& box, std::string new_text);
         
@@ -114,19 +115,19 @@ namespace kiwi
         
         void paint(juce::Graphics& g) override;
         void mouseDown(juce::MouseEvent const& event) override;
-        void mouseDrag(MouseEvent const& e) override;
-        void mouseUp(MouseEvent const& e) override;
+        void mouseDrag(juce::MouseEvent const& e) override;
+        void mouseUp(juce::MouseEvent const& e) override;
         void mouseMove(juce::MouseEvent const& event) override;
-        void mouseDoubleClick(const MouseEvent& event) override;
-        bool keyPressed(const KeyPress& key) override;
+        void mouseDoubleClick(const juce::MouseEvent& event) override;
+        bool keyPressed(const juce::KeyPress& key) override;
         
         // ================================================================================ //
         //                              APPLICATION COMMAND TARGET                          //
         // ================================================================================ //
         
-        ApplicationCommandTarget* getNextCommandTarget() override;
-        void getAllCommands(Array<CommandID>& commands) override;
-        void getCommandInfo(CommandID commandID, ApplicationCommandInfo& result) override;
+        juce::ApplicationCommandTarget* getNextCommandTarget() override;
+        void getAllCommands(juce::Array<juce::CommandID>& commands) override;
+        void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
         bool perform(const InvocationInfo& info) override;
         
     private: // methods
@@ -302,6 +303,8 @@ namespace kiwi
         //! @brief Try to replace selected object by the object copied into clipboard.
         void pasteReplace();
         
+        model::Object& replaceObjectWith(model::Object& object_to_replace, flip::Mold const& mold);
+        
         // ================================================================================ //
         //                                      MISC                                        //
         // ================================================================================ //
@@ -311,6 +314,10 @@ namespace kiwi
         
         //! @internal Find a jLink with a given Link model.
         jLinks::iterator findLink(model::Link const& link);
+        
+        //! @internal Returns true if a link can be created between two objects.
+        bool canConnect(model::Object const& from, const size_t outlet,
+                        model::Object const& to, const size_t inlet) const;
         
         //! @internal Returns the current objects area.
         juce::Rectangle<int> getCurrentObjectsArea();
