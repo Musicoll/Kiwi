@@ -35,7 +35,7 @@ namespace kiwi
         //! @brief The model Object's factory
         class Factory
         {
-        public:
+        public: // methods
             
             //! @brief Adds an object model into the Factory.
             //! @details This function adds a new object model to the factory.
@@ -69,7 +69,8 @@ namespace kiwi
             //! @param text The text of the Object.
             //! @example "plus 42", or just "plus".
             //! @return An object (if the name matches a registered Object name).
-            static std::unique_ptr<model::Object> create(std::string const& name, std::vector<Atom> const& args);
+            static std::unique_ptr<model::Object> create(std::string const& name,
+                                                         std::vector<Atom> const& args);
             
             //! @brief Returns true if a given string match a registered Object model name.
             //! @param name The name of the object model to find.
@@ -80,17 +81,19 @@ namespace kiwi
             //! @return A vector of Object names.
             static std::vector<std::string> getNames();
             
-        private:
-            
-            Factory() = delete;
-            ~Factory() = delete;
+        private: // methods
             
             using ctor_fn_t = std::function<model::Object*(std::vector<Atom>)>;
             using creator_map_t = std::map<std::string, ctor_fn_t>;
             
             //! @internal Returns the static map of creators.
             static creator_map_t& getCreators();
-        };        
+            
+        private: // deleted methods
+            
+            Factory() = delete;
+            ~Factory() = delete;
+        };
     }
 }
 

@@ -259,5 +259,33 @@ namespace kiwi
                 }
             }
         }
+        
+        // ================================================================================ //
+        //                                PATCHER VIEW OBJECT                               //
+        // ================================================================================ //
+        
+        Patcher::View::Object::Object(model::Object& object) : m_ref(&object)
+        {
+            ;
+        }
+        
+        model::Object* Patcher::View::Object::get() const
+        {
+            return m_ref.value();
+        }
+        
+        // ================================================================================ //
+        //                                 PATCHER VIEW LINK                                //
+        // ================================================================================ //
+        
+        Patcher::View::Link::Link(model::Link& link) : m_ref(&link)
+        {
+            ;
+        }
+        
+        model::Link* Patcher::View::Link::get() const
+        {
+            return m_ref.value();
+        }
     }
 }

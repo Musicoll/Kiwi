@@ -39,7 +39,7 @@ namespace kiwi
     //! @details The Atom can hold an integer, a float or a string.
     class Atom
     {
-    public:
+    public: // methods
         
         // ================================================================================ //
         //                                      Types                                       //
@@ -331,7 +331,7 @@ namespace kiwi
             return string_t();
         }
         
-    private:
+    private: // methods
         
         // ================================================================================ //
         //                                      VALUE                                       //
@@ -384,6 +384,8 @@ namespace kiwi
             atom_value(string_t&& v) : string_v(create_string_pointer(std::move(v))) {}
         };
         
+    private: // methods
+        
         //! @internal Atom Type (Null by default)
         Type        m_type = Type::Null;
         
@@ -395,7 +397,7 @@ namespace kiwi
     //                                  STRING HELPER                                   //
     // ================================================================================ //
     
-    //! @brief std::string helper class
+    //! @brief An std::string helper class.
     struct StringHelper
     {
         //! @brief unescape a string
@@ -439,7 +441,7 @@ namespace kiwi
     //                                    ATOM HELPER                                   //
     // ================================================================================ //
     
-    //! @brief Atom helper class
+    //! @brief An Atom helper class.
     struct AtomHelper
     {
         //! @brief Parse a string into a vector of atoms.

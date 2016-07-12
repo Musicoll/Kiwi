@@ -32,14 +32,13 @@ namespace kiwi
         //                                 PATCHER USER                                   //
         // ================================================================================ //
         
+        //! @brief Represents and stores informations about a user of a patcher document.
         class Patcher::User : public flip::Object
         {
-        public:
-            
-            //! @brief flip default Constructor.
-            User(flip::Default&) {}
+        public: // methods
             
             //! @brief Constructor.
+            //! @user_id The unique user id.
             User(uint32_t user_id);
             
             //! @brief Destructor.
@@ -57,10 +56,15 @@ namespace kiwi
             //! @brief Get the User id
             uint32_t getId() const;
             
+        public: // internal methods
+            
+            //! @brief flip default Constructor.
+            User(flip::Default&) {}
+            
             //! @brief flip declare method
             static void declare();
             
-        private:
+        private: // members
             
             flip::Int                       m_user_id;
             flip::Collection<Patcher::View> m_views;

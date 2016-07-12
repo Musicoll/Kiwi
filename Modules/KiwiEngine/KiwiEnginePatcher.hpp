@@ -36,7 +36,7 @@ namespace kiwi
         //! @brief The Patcher manages a set of Object and Link.
         class Patcher
         {
-        public:
+        public: // methods
             
             //! @brief Constructor.
             Patcher(model::Patcher const& model, Instance& instance) noexcept;

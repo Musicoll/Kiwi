@@ -96,7 +96,7 @@ namespace kiwi
             
             //! @internal Constructor.
             Beacon(std::string const& name);
-            friend class Factory;
+            friend class Beacon::Factory;
             
         private: // members
             

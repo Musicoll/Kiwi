@@ -41,9 +41,6 @@ namespace kiwi
             class User;
             class View;
             
-            using object_array_t = flip::Array<model::Object>;
-            using link_array_t = flip::Array<model::Link>;
-            
             //! @brief Default constructor.
             Patcher();
             
@@ -131,6 +128,9 @@ namespace kiwi
             static void declare();
             
         private: // methods
+            
+            using object_array_t = flip::Array<model::Object>;
+            using link_array_t = flip::Array<model::Link>;
             
             object_array_t::const_iterator findObject(model::Object const& object) const;
             object_array_t::iterator findObject(model::Object const& object);

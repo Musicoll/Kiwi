@@ -39,11 +39,6 @@ namespace kiwi
             ;
         }
         
-        Link::~Link()
-        {
-            ;
-        }
-        
         Object& Link::getSenderObject() const
         {
             return *m_model.getSenderObject().entity().use<std::shared_ptr<engine::Object>>().get();

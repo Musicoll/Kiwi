@@ -41,7 +41,7 @@ namespace kiwi
             Link(model::Link const& model);
             
             //! @brief Destructor.
-            ~Link();
+            ~Link() = default;
             
             //! @brief Gets the Object that sends messages.
             Object& getSenderObject() const;
@@ -57,7 +57,7 @@ namespace kiwi
             
         private: // members
             
-            model::Link const&  m_model;
+            model::Link const& m_model;
             
         private: // deleted methods
             

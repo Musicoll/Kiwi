@@ -28,19 +28,21 @@ namespace kiwi
 {
     namespace model
     {
-        //! @brief The Patcher Model class
+        //! @brief The Patcher data model.
         class DataModel : public flip::DataModel<DataModel>
         {
-        public:
+        public: // methods
             
             //! @brief Initializes the model.
             //! @details Declares all flip classes.
             static void init();
             
-        private:
+        private: // methods
             
-            //! @brief Declare all kiwi objects here
+            //! @brief Declare all kiwi objects.
             static void declareObjects();
+            
+        public: // members
             
             static bool initialised;
         };

@@ -35,7 +35,7 @@ namespace kiwi
         //! @brief The engine Object's factory
         class Factory
         {
-        public:
+        public: // methods
             
             //! @brief Adds an object engine into the Factory.
             //! @details This function adds a new object engine to the factory.
@@ -50,14 +50,19 @@ namespace kiwi
                 static_assert(!std::is_abstract<TEngine>::value,
                               "The engine object must not be abstract.");
             
-                static_assert(std::is_constructible<TEngine, model::Object const&, Patcher&, std::vector<Atom> const&>::value,
+                static_assert(std::is_constructible<TEngine,
+                              model::Object const&, Patcher&, std::vector<Atom> const&>::value,
                               "The engine object must have a valid constructor.");
                 
                 assert(!name.empty());
                 assert(modelHasObject(name) && "The model counterpart does not exist");
+                
                 auto& creators = getCreators();
                 assert(creators.count(name) == 0 && "The object already exists");
-                creators[name] = [](model::Object const& model, Patcher& patcher, std::vector<Atom> const& args) -> TEngine*
+                
+                creators[name] = [](model::Object const& model,
+                                    Patcher& patcher,
+                                    std::vector<Atom> const& args) -> TEngine*
                 {
                     return new TEngine(model, patcher, args);
                 };
@@ -77,18 +82,23 @@ namespace kiwi
             //! @return A vector of Object names.
             static std::vector<std::string> getNames();
             
-        private:
+        private: // methods
             
             static bool modelHasObject(std::string const& name);
             
-            Factory() = delete;
-            ~Factory() = delete;
+            using ctor_fn_t = std::function<Object*(model::Object const& model,
+                                                    Patcher& patcher,
+                                                    std::vector<Atom> const&)>;
             
-            using ctor_fn_t = std::function<Object*(model::Object const& model, Patcher& patcher, std::vector<Atom> const&)>;
             using creator_map_t = std::map<std::string, ctor_fn_t>;
-            
+        
             //! @internal Returns the static map of creators.
             static creator_map_t& getCreators();
+            
+        private: // deleted methods
+            
+            Factory() = delete;
+            ~Factory() = delete;
         };
     }
 }

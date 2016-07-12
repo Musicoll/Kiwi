@@ -38,6 +38,7 @@ namespace kiwi
         
         //! @brief The Instance adds the engine objects to the engine::Factory
         //! @details The patcher document model must be initialised before creating the Instance
+        //! The Instance is also the entry point to retrieve beacons and output messages to the console.
         class Instance : public Beacon::Factory
         {
         public: // methods
@@ -78,6 +79,13 @@ namespace kiwi
         private: // members
             
             Console m_console;
+            
+        private: // deleted methods
+            
+            Instance(Instance const&) = delete;
+            Instance(Instance&&) = delete;
+            Instance& operator=(Instance const&) = delete;
+            Instance& operator=(Instance&&) = delete;
         };
     }
 }
