@@ -77,6 +77,13 @@ namespace kiwi
             flip::ObjectRef<model::Object>  m_receiver;
             flip::Int                       m_index_outlet;
             flip::Int                       m_index_inlet;
+            
+        private: // deleted methods
+            
+            Link(Link const&) = delete;
+            Link(Link&&) = delete;
+            Link& operator=(Link const&) = delete;
+            Link& operator=(Link&&) = delete;
         };
     }
 }

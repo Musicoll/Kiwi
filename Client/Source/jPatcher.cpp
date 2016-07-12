@@ -716,9 +716,6 @@ namespace kiwi
                 flip::Mold mold(model::DataModel::use(), sbo);
                 model::Object const& object = *object_ptr;
                 
-                //model::ObjectPlus const& obj = dynamic_cast<model::ObjectPlus const&>(object);
-                //KiwiApp::log("obj mold: " + std::string(obj ? "OK" : "fail"));
-                
                 mold.make(object);
                 mold.cure();
 
@@ -726,6 +723,8 @@ namespace kiwi
                 sbo << object_ptr->ref();
             }
         }
+        
+        uint32_t number_of_links = 0;
         
         for(model::Link& link : m_patcher_model.getLinks())
         {
@@ -740,13 +739,34 @@ namespace kiwi
                 
                 if(sender_selected && receiver_selected)
                 {
-                    flip::Mold mold(model::DataModel::use(), sbo);
-                    mold.make(link);
-                    mold.cure();
+                    number_of_links++;
+                }
+            }
+        }
+        
+        // Store the number of links
+        sbo << number_of_links;
+        
+        for(model::Link& link : m_patcher_model.getLinks())
+        {
+            if(!link.removed())
+            {
+                flip::Ref const& sender_ref = link.getSenderObject().ref();
+                flip::Ref const& receiver_ref = link.getReceiverObject().ref();
+                
+                bool sender_selected = m_local_objects_selection.find(sender_ref) != m_local_objects_selection.end();
+                
+                bool receiver_selected = m_local_objects_selection.find(receiver_ref) != m_local_objects_selection.end();
+                
+                if(sender_selected && receiver_selected)
+                {
+                    uint32_t sender_index = static_cast<uint32_t>(link.getSenderIndex());
+                    uint32_t receiver_index = static_cast<uint32_t>(link.getReceiverIndex());
                     
-                    // store object ref to find links boundaries
                     sbo << sender_ref;
                     sbo << receiver_ref;
+                    sbo << sender_index;
+                    sbo << receiver_index;
                 }
             }
         }
@@ -766,11 +786,11 @@ namespace kiwi
             
             std::map<flip::Ref, model::Object const*> molded_objects;
             
+            // paste objects:
             uint32_t number_of_objects;
             sbi >> number_of_objects;
             
-            // run until we reach the end of the stream
-            while(!sbi.is_eos())
+            for(uint32_t i = 0; i < number_of_objects; i++)
             {
                 flip::Mold mold(model::DataModel::use(), sbi);
                 
@@ -785,29 +805,31 @@ namespace kiwi
                     
                     molded_objects.insert({old_object_ref, &new_object});
                 }
-                else if(mold.has<model::Link>())
+            }
+            
+            // paste links:
+            uint32_t number_of_links;
+            sbi >> number_of_links;
+            
+            for(uint32_t i = 0; i < number_of_links; i++)
+            {
+                flip::Ref old_sender_ref, old_receiver_ref;
+                sbi >> old_sender_ref;
+                sbi >> old_receiver_ref;
+                
+                uint32_t outlet, inlet;
+                sbi >> outlet;
+                sbi >> inlet;
+                
+                const auto from_it = molded_objects.find(old_sender_ref);
+                const auto to_it = molded_objects.find(old_receiver_ref);
+                
+                model::Object const* from = (from_it != molded_objects.cend()) ? from_it->second : nullptr;
+                model::Object const* to = (to_it != molded_objects.cend()) ? to_it->second : nullptr;
+                
+                if(from && to)
                 {
-                    model::Link link = mold.cast<model::Link>();
-                    
-                    flip::Ref old_sender_ref;
-                    sbi >> old_sender_ref;
-                    
-                    flip::Ref old_receiver_ref;
-                    sbi >> old_receiver_ref;
-                    
-                    const auto from_it = molded_objects.find(old_sender_ref);
-                    const auto to_it = molded_objects.find(old_receiver_ref);
-                    
-                    model::Object const* from = (from_it != molded_objects.cend()) ? from_it->second : nullptr;
-                    model::Object const* to = (to_it != molded_objects.cend()) ? to_it->second : nullptr;
-                    
-                    const size_t outlet = link.getSenderIndex();
-                    const size_t inlet = link.getReceiverIndex();
-                    
-                    if(from && to)
-                    {
-                        m_patcher_model.addLink(*from, outlet, *to, inlet);
-                    }
+                    m_patcher_model.addLink(*from, outlet, *to, inlet);
                 }
             }
             
