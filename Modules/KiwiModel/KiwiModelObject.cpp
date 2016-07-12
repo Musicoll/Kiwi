@@ -68,23 +68,6 @@ namespace kiwi
             ;
         }
         
-        Object::Object(model::Object const& other) :
-        m_name(other.m_name),
-        m_inlets(other.m_inlets),
-        m_outlets(other.m_outlets),
-        m_position_x(other.m_position_x),
-        m_position_y(other.m_position_y),
-        m_width(other.m_width),
-        m_height(other.m_height)
-        {
-            ;
-        }
-        
-        Object::~Object()
-        {
-            ;
-        }
-        
         std::string Object::getName() const
         {
             return m_name;

@@ -151,6 +151,13 @@ namespace kiwi
             flip::Collection<User>      m_users;
             
             flip::String                m_patcher_name;
+            
+        private: // deleted methods
+            
+            Patcher(Patcher const&) = delete;
+            Patcher(Patcher&&) = delete;
+            Patcher& operator=(Patcher const&) = delete;
+            Patcher& operator=(Patcher&&) = delete;
         };
     }
 }

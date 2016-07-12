@@ -774,7 +774,7 @@ namespace kiwi
             {
                 flip::Mold mold(model::DataModel::use(), sbi);
                 
-                if(mold.has<model::Object>() || mold.has<model::ObjectPlus>())
+                if(mold.has<model::Object>())
                 {
                     flip::Ref old_object_ref;
                     sbi >> old_object_ref;

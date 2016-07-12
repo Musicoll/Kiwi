@@ -56,11 +56,8 @@ namespace kiwi
             //! @brief Constructor.
             Object();
             
-            //! @brief Copy constructor (needed for flip::Array)
-            Object(model::Object const&);
-            
             //! @brief Destructor.
-            virtual ~Object();
+            virtual ~Object() = default;
             
             //! @brief Returns the name of the Object.
             std::string getName() const;
@@ -139,6 +136,13 @@ namespace kiwi
             flip::Float     m_height;
             
             friend class Factory;
+        
+        private: // deleted methods
+            
+            Object(Object const&) = delete;
+            Object(model::Object&&) = delete;
+            model::Object& operator=(model::Object const&) = delete;
+            model::Object& operator=(model::Object&&) = delete;
         };
     }
 }
