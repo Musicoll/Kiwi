@@ -36,7 +36,6 @@
 #include "flip/Collection.h"
 #include "flip/Object.h"
 #include "flip/ObjectRef.h"
-#include "flip/Signal.h"
 
 namespace kiwi
 {
@@ -111,9 +110,6 @@ namespace kiwi
             //! @brief Returns the object's height.
             double getHeight() const noexcept;
             
-            //! @brief Call signalTrigger() to hmmm.. trigger the signal.
-            flip::Signal<> signalTrigger;
-            
         protected: // methods
             
             //! @brief Sets the number of inlets.
@@ -131,9 +127,6 @@ namespace kiwi
             static void declare();
             
         private: // members
-            
-            //! @brief Signal types
-            enum SignalType { Trigger };
             
             flip::String    m_name;
             flip::String    m_text;

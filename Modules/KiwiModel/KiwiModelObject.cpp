@@ -51,13 +51,12 @@ namespace kiwi
         //                                      OBJECT                                      //
         // ================================================================================ //
         
-        Object::Object(flip::Default&) : signalTrigger(Trigger, *this)
+        Object::Object(flip::Default&)
         {
             ;
         }
         
         Object::Object() :
-        signalTrigger(Trigger, *this),
         m_name("noobj"),
         m_inlets(1),
         m_outlets(0),
@@ -70,7 +69,6 @@ namespace kiwi
         }
         
         Object::Object(model::Object const& other) :
-        signalTrigger(Trigger, *this),
         m_name(other.m_name),
         m_inlets(other.m_inlets),
         m_outlets(other.m_outlets),

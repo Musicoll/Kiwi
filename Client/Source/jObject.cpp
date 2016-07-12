@@ -400,8 +400,7 @@ namespace kiwi
     
     void jObject::mouseDown(juce::MouseEvent const& event)
     {
-        // signal engine
-        m_model->signalTrigger();
+        ;
     }
     
     void jObject::mouseDrag(juce::MouseEvent const& event)
