@@ -278,7 +278,7 @@ namespace kiwi
     // ================================================================================ //
     
     DocumentExplorerWindow::DocumentExplorerWindow(DocumentExplorer& explorer, Instance& instance) :
-    jWindow("Document explorer panel", juce::Colours::white, minimiseButton | closeButton, true)
+    Window("Document explorer panel", juce::Colours::white, minimiseButton | closeButton, true)
     {
         setContentOwned(new DocumentExplorer::Panel(explorer, instance), false);
         setResizable(true, false);

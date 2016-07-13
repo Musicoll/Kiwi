@@ -137,7 +137,7 @@ namespace kiwi
         }
     }
     
-    bool Instance::closeWindow(jWindow& window)
+    bool Instance::closeWindow(Window& window)
     {
         bool success = true;
         

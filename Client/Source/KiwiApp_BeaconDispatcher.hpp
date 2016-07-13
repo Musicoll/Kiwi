@@ -24,7 +24,7 @@
 
 #include <KiwiEngine/KiwiEngineInstance.hpp>
 
-#include "jWindow.hpp"
+#include "KiwiApp_Window.hpp"
 
 namespace kiwi
 {
@@ -69,7 +69,7 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The BeaconDispatcherWindow
-    class BeaconDispatcherWindow : public jWindow
+    class BeaconDispatcherWindow : public Window
     {
     public:
         BeaconDispatcherWindow(engine::Instance& instance);

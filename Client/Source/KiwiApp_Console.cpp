@@ -356,7 +356,7 @@ namespace kiwi
     // ================================================================================ //
     
     ConsoleWindow::ConsoleWindow(sConsoleHistory history) :
-    jWindow("Kiwi Console", juce::Colours::white, minimiseButton | closeButton, true)
+    Window("Kiwi Console", juce::Colours::white, minimiseButton | closeButton, true)
     {
         setContentOwned(new Console(history), false);
         setResizable(true, false);

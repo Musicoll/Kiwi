@@ -36,7 +36,7 @@ namespace kiwi
     //                                  JPATCHER WINDOW                                 //
     // ================================================================================ //
 
-    jPatcherWindow::jPatcherWindow(PatcherManager& manager, jPatcher& jpatcher) : jWindow(),
+    jPatcherWindow::jPatcherWindow(PatcherManager& manager, jPatcher& jpatcher) : Window(),
     m_manager(manager),
     m_jpatcher(jpatcher)
     {

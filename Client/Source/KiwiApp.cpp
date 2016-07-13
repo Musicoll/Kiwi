@@ -204,7 +204,7 @@ namespace kiwi
         useEngineInstance().error(text);
     }
     
-    bool KiwiApp::closeWindow(jWindow& window)
+    bool KiwiApp::closeWindow(Window& window)
     {
         if(m_instance)
         {

@@ -27,7 +27,7 @@
 #include <KiwiModel/KiwiModelPatcher.hpp>
 #include <KiwiEngine/KiwiEngineInstance.hpp>
 
-#include "jWindow.hpp"
+#include "KiwiApp_Window.hpp"
 #include "jPatcher.hpp"
 
 namespace kiwi
@@ -38,7 +38,7 @@ namespace kiwi
     //                                  JPATCHER WINDOW                                 //
     // ================================================================================ //
     
-    class jPatcherWindow : public jWindow
+    class jPatcherWindow : public Window
     {
     public:
         jPatcherWindow(PatcherManager& manager, jPatcher& jpatcher);

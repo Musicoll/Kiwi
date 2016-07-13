@@ -19,17 +19,17 @@
  ==============================================================================
  */
 
-#include "jWindow.hpp"
-#include "KiwiApp_CommandIDs.hpp"
 #include "KiwiApp.hpp"
+#include "KiwiApp_Window.hpp"
+#include "KiwiApp_CommandIDs.hpp"
 
 namespace kiwi
 {
     // ================================================================================ //
-    //                                      JWINDOW                                     //
+    //                                      WINDOW                                      //
     // ================================================================================ //
     
-    jWindow::jWindow(std::string const& name, juce::Colour color, int requiredButtons, bool addToDesktop) :
+    Window::Window(std::string const& name, juce::Colour color, int requiredButtons, bool addToDesktop) :
     DocumentWindow(name, color, requiredButtons, addToDesktop)
     {
         #if ! JUCE_MAC
@@ -46,12 +46,12 @@ namespace kiwi
         setVisible(true);
     }
     
-    jWindow::~jWindow()
+    Window::~Window()
     {
         ;
     }
     
-    void jWindow::closeButtonPressed()
+    void Window::closeButtonPressed()
     {
         juce::JUCEApplication::quit();
     }
@@ -60,19 +60,19 @@ namespace kiwi
     //                              APPLICATION COMMAND TARGET                          //
     // ================================================================================ //
     
-    juce::ApplicationCommandTarget* jWindow::getNextCommandTarget()
+    juce::ApplicationCommandTarget* Window::getNextCommandTarget()
     {
         return findFirstTargetParentComponent();
     }
     
-    void jWindow::getAllCommands(juce::Array<juce::CommandID>& commands)
+    void Window::getAllCommands(juce::Array<juce::CommandID>& commands)
     {
         commands.add(CommandIDs::closeWindow);
         commands.add(CommandIDs::minimizeWindow);
         commands.add(CommandIDs::maximizeWindow);
     }
     
-    void jWindow::getCommandInfo(const juce::CommandID commandID, juce::ApplicationCommandInfo& result)
+    void Window::getCommandInfo(const juce::CommandID commandID, juce::ApplicationCommandInfo& result)
     {
         switch (commandID)
         {
@@ -97,7 +97,7 @@ namespace kiwi
         }
     }
     
-    bool jWindow::perform(const InvocationInfo& info)
+    bool Window::perform(const InvocationInfo& info)
     {
         switch (info.commandID)
         {

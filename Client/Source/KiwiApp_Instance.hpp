@@ -70,7 +70,7 @@ namespace kiwi
         void askUserToOpenPatcherDocument();
         
         //! @brief Attempt to close the given window asking user to save file if needed.
-        bool closeWindow(jWindow& window);
+        bool closeWindow(Window& window);
         
         //! @brief Attempt to close all document, after asking user to save them if needed.
         //! @return True if all document have been closed, false if the user cancel the action.

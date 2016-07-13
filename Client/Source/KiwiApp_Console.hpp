@@ -24,7 +24,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-#include "jWindow.hpp"
+#include "KiwiApp_Window.hpp"
 #include "KiwiApp_ConsoleHistory.hpp"
 
 namespace kiwi
@@ -156,8 +156,8 @@ namespace kiwi
     //                                  CONSOLE WINDOW                                  //
     // ================================================================================ //
     
-    //! @brief The ConsoleWindow is a jWindow that manages and display a Console Component.
-    class ConsoleWindow : public jWindow
+    //! @brief The ConsoleWindow is a Window that manages and display a Console Component.
+    class ConsoleWindow : public Window
     {
     public:
         ConsoleWindow(sConsoleHistory history);

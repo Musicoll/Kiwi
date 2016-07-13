@@ -26,7 +26,7 @@
 
 #include <KiwiEngine/KiwiEngineListeners.hpp>
 
-#include "jWindow.hpp"
+#include "KiwiApp_Window.hpp"
 
 namespace kiwi
 {
@@ -154,8 +154,8 @@ namespace kiwi
     //                               DOCUMENT EXPLORER WINDOW                           //
     // ================================================================================ //
     
-    //! @brief The ConsoleWindow is a jWindow that manages and display a Console Component.
-    class DocumentExplorerWindow : public jWindow
+    //! @brief The ConsoleWindow is a Window that manages and display a Console Component.
+    class DocumentExplorerWindow : public Window
     {
     public:
         DocumentExplorerWindow(DocumentExplorer& explorer, Instance& instance);

@@ -19,27 +19,27 @@
  ==============================================================================
  */
 
-#ifndef KIWI_JWINDOW_HPP_INCLUDED
-#define KIWI_JWINDOW_HPP_INCLUDED
+#ifndef KIWI_APP_WINDOW_HPP_INCLUDED
+#define KIWI_APP_WINDOW_HPP_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
 namespace kiwi
 {
     // ================================================================================ //
-    //                                      JWINDOW                                     //
+    //                                      WINDOW                                      //
     // ================================================================================ //
 
     //! @brief A juce Window.
-    class jWindow : public juce::DocumentWindow, public juce::ApplicationCommandTarget
+    class Window : public juce::DocumentWindow, public juce::ApplicationCommandTarget
     {
     public:
-        jWindow(std::string const& name = "untitled",
+        Window(std::string const& name = "untitled",
                 juce::Colour color = juce::Colours::lightgrey,
                 int buttons = allButtons,
                 bool addToDesktop = true);
         
-        virtual ~jWindow();
+        virtual ~Window();
         
         // ================================================================================ //
         //                              APPLICATION COMMAND TARGET                          //
@@ -56,4 +56,4 @@ namespace kiwi
     };
 }
 
-#endif // KIWI_JWINDOW_HPP_INCLUDED
+#endif // KIWI_APP_WINDOW_HPP_INCLUDED

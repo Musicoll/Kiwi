@@ -104,7 +104,7 @@ namespace kiwi
     // ================================================================================ //
     
     BeaconDispatcherWindow::BeaconDispatcherWindow(engine::Instance& instance) :
-    jWindow("Beacon dispatcher", juce::Colours::white, minimiseButton | closeButton, true)
+    Window("Beacon dispatcher", juce::Colours::white, minimiseButton | closeButton, true)
     {
         setContentOwned(new BeaconDispatcher(instance), false);
         setResizable(false, false);
