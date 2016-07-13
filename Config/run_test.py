@@ -60,13 +60,15 @@ if (args.configuration == "Release"):
 elif(args.configuration == "Debug"):
     config_path = os.path.join(config_path, "Debug")
     
+platform_path = ""
+    
 if platform.system() == "Windows":
     if (args.platform == "x64"):
-        config_path = os.path.join(config_path, "x64")
-    elif(args.configuration == "Win32"):
-        config_path = os.path.join(config_path, "Win32")
+        platform_path = os.path.join(config_path, "x64")
+    elif(args.platform == "Win32"):
+        platform_path = os.path.join(config_path, "Win32")
 
-test_dir = os.path.join(project_dir, "Build", config_path, "KiwiBuild", "Test", config_path)
+test_dir = os.path.join(project_dir, "Build", platform_path, "KiwiBuild", "Test", config_path)
 
 for test in test_list:
 	subprocess.check_call(os.path.join(test_dir, test), shell= True);
