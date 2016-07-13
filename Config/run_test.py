@@ -11,7 +11,7 @@ import distutils
 
 project_dir = os.path.abspath(".");
 
-test_list = ["test_core"]
+test_list = ["test_atom"]
 
 #==============================================================================
 #Name : parse_args
