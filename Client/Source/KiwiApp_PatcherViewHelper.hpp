@@ -19,10 +19,10 @@
  ==============================================================================
  */
 
-#ifndef KIWI_JPATCHER_HELPER_HPP_INCLUDED
-#define KIWI_JPATCHER_HELPER_HPP_INCLUDED
+#ifndef KIWI_APP_PATCHERVIEW_HELPER_HPP_INCLUDED
+#define KIWI_APP_PATCHERVIEW_HELPER_HPP_INCLUDED
 
-#include "jPatcher.hpp"
+#include "KiwiApp_PatcherView.hpp"
 #include "jObject.hpp"
 #include "jLink.hpp"
 
@@ -67,7 +67,7 @@ namespace kiwi
 		};
         
         //! @brief Contructor.
-        HitTester(jPatcher const& patcher);
+        HitTester(PatcherView const& patcher);
         
         //! @brief Destructor.
         ~HitTester();
@@ -131,7 +131,7 @@ namespace kiwi
         inline bool linkTouched() const noexcept             { return m_target == Target::Link; }
         
         //! @brief Get the patcher.
-        jPatcher const& getPatcher() const noexcept;
+        PatcherView const& getPatcher() const noexcept;
         
         //! @brief Get the object box that has been touched by the last hit-test.
         jObject* getObject() const noexcept;
@@ -160,7 +160,7 @@ namespace kiwi
         
     private: // members
         
-        jPatcher const& m_patcher;
+        PatcherView const& m_patcher;
         jObject*        m_object    = nullptr;
         jLink*          m_link      = nullptr;
         Target          m_target	= Target::Nothing;
@@ -173,19 +173,19 @@ namespace kiwi
     };
     
     // ================================================================================ //
-    //                                  JPATCHER VIEWPORT                               //
+    //                                  PATCHER VIEWPORT                                //
     // ================================================================================ //
     
-    //! @brief The jPatcher Viewport
-    class jPatcherViewport : public juce::Viewport
+    //! @brief The PatcherView Viewport
+    class PatcherViewport : public juce::Viewport
     {
     public:
         
         //! @brief Constructor
-        jPatcherViewport(jPatcher& patcher);
+        PatcherViewport(PatcherView& patcher);
         
         //! @brief Destructor
-        ~jPatcherViewport() = default;
+        ~PatcherViewport() = default;
         
         //! @brief Called by juce::Viewport when the visible area changed
         void visibleAreaChanged(juce::Rectangle<int> const& new_visible_area) override;
@@ -232,13 +232,13 @@ namespace kiwi
         
     private: // members
         
-        //! @internal Hook method called by jPatcherViewport just before resized.
+        //! @internal Hook method called by PatcherViewport just before resized.
         void viewportResized(juce::Rectangle<int> const& last_bounds,
                              juce::Rectangle<int> const& new_bounds);
         
     private: // members
         
-        jPatcher&                   m_patcher;
+        PatcherView&                   m_patcher;
         juce::Viewport              m_viewport;
         Component                   m_magnifier;
         juce::Rectangle<int>        m_last_bounds;
@@ -283,15 +283,15 @@ namespace kiwi
     //										JLASSO                                      //
     // ================================================================================ //
     
-    class jLasso : public juce::Component
+    class Lasso : public juce::Component
     {
     public:
         
         //! @brief Contructor.
-        jLasso(jPatcher& patcher);
+        Lasso(PatcherView& patcher);
         
         //! @grief Destructor.
-        ~jLasso();
+        ~Lasso();
         
         //! @brief The paint method.
         void paint(juce::Graphics& g) override;
@@ -316,7 +316,7 @@ namespace kiwi
         
     private: // members
         
-        jPatcher&           m_patcher;
+        PatcherView&        m_patcher;
         
         std::set<flip::Ref> m_objects;
         std::set<flip::Ref> m_links;
@@ -327,4 +327,4 @@ namespace kiwi
     
 }
 
-#endif // KIWI_JPATCHER_HELPER_HPP_INCLUDED
+#endif // KIWI_APP_PATCHERVIEW_HELPER_HPP_INCLUDED

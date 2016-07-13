@@ -24,12 +24,12 @@
 #include "KiwiApp_DocumentManager.hpp"
 #include "jObject.hpp"
 #include "KiwiApp.hpp"
-#include "jPatcherHelper.hpp"
-#include "jPatcher.hpp"
+#include "KiwiApp_PatcherViewHelper.hpp"
+#include "KiwiApp_PatcherView.hpp"
 
 namespace kiwi
 {
-    jObject::jObject(jPatcher& patcher_view, model::Object& object_m) :
+    jObject::jObject(PatcherView& patcher_view, model::Object& object_m) :
     m_patcher_view(patcher_view),
     m_model(&object_m),
     m_io_color(0.3, 0.3, 0.3),
@@ -412,7 +412,7 @@ namespace kiwi
     //                                   JOBJECT BOX                                    //
     // ================================================================================ //
     
-    jClassicBox::jClassicBox(jPatcher& patcher_view, model::Object& object_m) : jObject(patcher_view, object_m)
+    jClassicBox::jClassicBox(PatcherView& patcher_view, model::Object& object_m) : jObject(patcher_view, object_m)
     {
         setWantsKeyboardFocus(true);
         setMouseClickGrabsKeyboardFocus(true);

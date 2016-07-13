@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_JPATCHER_HPP_INCLUDED
-#define KIWI_JPATCHER_HPP_INCLUDED
+#ifndef KIWI_APP_PATCHERVIEW_HPP_INCLUDED
+#define KIWI_APP_PATCHERVIEW_HPP_INCLUDED
 
 #include <KiwiModel/KiwiModelPatcher.hpp>
 
@@ -37,27 +37,27 @@ namespace kiwi
     class jLinkCreator;
     class Instance;
     class HitTester;
-    class jPatcherViewport;
+    class PatcherViewport;
     class IoletHighlighter;
-    class jLasso;
+    class Lasso;
     
     // ================================================================================ //
-    //                                    jPATCHER                                      //
+    //                                    PATCHER VIEW                                  //
     // ================================================================================ //
     
     //! @brief The juce Patcher Component.
-    class jPatcher : public juce::Component, public juce::ApplicationCommandTarget
+    class PatcherView : public juce::Component, public juce::ApplicationCommandTarget
     {
     public:
         
         //! @brief Constructor
-        jPatcher(PatcherManager& manager,
-                 Instance& instance,
-                 model::Patcher& patcher,
-                 model::Patcher::View& view);
+        PatcherView(PatcherManager& manager,
+                    Instance& instance,
+                    model::Patcher& patcher,
+                    model::Patcher::View& view);
         
         //! @brief Destructor
-        ~jPatcher();
+        ~PatcherView();
         
         using jObjects = std::vector<std::unique_ptr<jObject>>;
         using jLinks = std::vector<std::unique_ptr<jLink>>;
@@ -94,7 +94,7 @@ namespace kiwi
         
         //! @brief Returns the Viewport that contains this patcher view.
         //! @details You must use this method if you want to add this component into an other one.
-        jPatcherViewport& getViewport() { return *m_viewport.get(); }
+        PatcherViewport& getViewport() { return *m_viewport.get(); }
         
         //! @brief Returns the position of the patcher origin relative to the component position.
         juce::Point<int> getOriginPosition() const;
@@ -137,7 +137,7 @@ namespace kiwi
         //                                  MODEL OBSERVER                                  //
         // ================================================================================ //
         
-        //! @brief Notify jPatcher that selection has changed.
+        //! @brief Notify PatcherView that selection has changed.
         void selectionChanged();
         
         //! @brief Load object and links.
@@ -355,7 +355,7 @@ namespace kiwi
 
     private: // members
         
-        PatcherManager&                            m_manager;
+        PatcherManager&                             m_manager;
         Instance&                                   m_instance;
         model::Patcher&                             m_patcher_model;
         model::Patcher::View&                       m_view_model;
@@ -369,11 +369,11 @@ namespace kiwi
         std::map<flip::Ref, std::set<uint64_t>>     m_distant_objects_selection;
         std::map<flip::Ref, std::set<uint64_t>>     m_distant_links_selection;
         
-        std::unique_ptr<jPatcherViewport>           m_viewport;
+        std::unique_ptr<PatcherViewport>            m_viewport;
         std::unique_ptr<HitTester>                  m_hittester;
         std::unique_ptr<jLinkCreator>               m_link_creator;
         std::unique_ptr<IoletHighlighter>           m_io_highlighter;
-        std::unique_ptr<jLasso>                     m_lasso;
+        std::unique_ptr<Lasso>                      m_lasso;
         
         bool    m_is_locked;
         int     m_grid_size;
@@ -390,12 +390,12 @@ namespace kiwi
         bool m_is_in_move_or_resize_gesture = false;
         long m_object_border_down_status;
         
-        // here to initialise jPatcher commands only one time.
+        // here to initialise PatcherView commands only one time.
         static bool m_command_manager_binded;
         
-        friend jPatcherViewport;
-        friend jLasso;
+        friend PatcherViewport;
+        friend Lasso;
     };
 }
 
-#endif // KIWI_JPATCHER_HPP_INCLUDED
+#endif // KIWI_APP_PATCHERVIEW_HPP_INCLUDED

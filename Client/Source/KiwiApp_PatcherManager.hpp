@@ -28,35 +28,35 @@
 #include <KiwiEngine/KiwiEngineInstance.hpp>
 
 #include "KiwiApp_Window.hpp"
-#include "jPatcher.hpp"
+#include "KiwiApp_PatcherView.hpp"
 
 namespace kiwi
 {
     class Instance;
     
     // ================================================================================ //
-    //                                  JPATCHER WINDOW                                 //
+    //                                PATCHER VIEW WINDOW                               //
     // ================================================================================ //
     
-    class jPatcherWindow : public Window
+    class PatcherViewWindow : public Window
     {
     public:
-        jPatcherWindow(PatcherManager& manager, jPatcher& jpatcher);
+        PatcherViewWindow(PatcherManager& manager, PatcherView& patcherview);
         void closeButtonPressed() override;
         
         //! @brief returns the patcher manager.
         PatcherManager& getManager() const;
         
-        //! @brief returns the jPatcher.
-        jPatcher& getjPatcher() const;
+        //! @brief returns the PatcherView.
+        PatcherView& getPatcherView() const;
         
     private:
         PatcherManager& m_manager;
-        jPatcher& m_jpatcher;
+        PatcherView& m_patcherview;
     };
     
     // ================================================================================ //
-    //                                  JPATCHER MANAGER                                //
+    //                                  PATCHER MANAGER                                 //
     // ================================================================================ //
     
     //! @brief The main DocumentObserver.
@@ -100,9 +100,9 @@ namespace kiwi
         //! @return True if all document have been closed, false if the user cancel the action.
         bool askAllWindowsToClose();
         
-        //! @brief Close the window that contains a given jpatcher.
+        //! @brief Close the window that contains a given patcherview.
         //! @details if it's the last patcher view, it will ask the user the save the document before closing
-        bool closePatcherViewWindow(jPatcher& jpatcher);
+        bool closePatcherViewWindow(PatcherView& patcherview);
         
         //! @brief Save the document.
         bool saveDocument();
@@ -115,11 +115,11 @@ namespace kiwi
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
         void document_changed(model::Patcher& patcher) override final;
         
-        //! @internal Notify and create jPatchers.
+        //! @internal Notify and create PatcherViews.
         void notifyPatcherViews(model::Patcher& patcher);
         
         //! @internal React to the fact that a View has just been added to the document.
-        //! @details create a jPatcherWindow.
+        //! @details create a PatcherViewWindow.
         void createPatcherWindow(model::Patcher& patcher,
                                  model::Patcher::User& user,
                                  model::Patcher::View& view);

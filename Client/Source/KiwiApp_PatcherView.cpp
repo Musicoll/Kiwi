@@ -26,8 +26,8 @@
 
 #include "KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_Instance.hpp"
-#include "jPatcher.hpp"
-#include "jPatcherHelper.hpp"
+#include "KiwiApp_PatcherView.hpp"
+#include "KiwiApp_PatcherViewHelper.hpp"
 #include "jObject.hpp"
 #include "jLink.hpp"
 #include "KiwiApp.hpp"
@@ -35,9 +35,13 @@
 
 namespace kiwi
 {
-    bool jPatcher::m_command_manager_binded = false;
+    // ================================================================================ //
+    //                                    PATCHER VIEW                                  //
+    // ================================================================================ //
+
+    bool PatcherView::m_command_manager_binded = false;
     
-    jPatcher::jPatcher(PatcherManager& manager,
+    PatcherView::PatcherView(PatcherManager& manager,
                        Instance& instance,
                        model::Patcher& patcher,
                        model::Patcher::View& view) :
@@ -45,10 +49,10 @@ namespace kiwi
     m_instance(instance),
     m_patcher_model(patcher),
     m_view_model(view),
-    m_viewport(new jPatcherViewport(*this)),
+    m_viewport(new PatcherViewport(*this)),
     m_hittester(new HitTester(*this)),
     m_io_highlighter(new IoletHighlighter()),
-    m_lasso(new jLasso(*this)),
+    m_lasso(new Lasso(*this)),
     m_grid_size(20),
     m_object_border_down_status(HitTester::Border::None)
     {
@@ -68,7 +72,7 @@ namespace kiwi
         m_viewport->updatePatcherArea(true);
     }
     
-    jPatcher::~jPatcher()
+    PatcherView::~PatcherView()
     {
         removeChildComponent(m_io_highlighter.get());
         removeChildComponent(m_lasso.get());
@@ -89,7 +93,7 @@ namespace kiwi
     //                                       PAINT                                      //
     // ================================================================================ //
     
-    void jPatcher::paint(juce::Graphics & g)
+    void PatcherView::paint(juce::Graphics & g)
     {
         const juce::Colour bgcolor = juce::Colour::fromFloatRGBA(0.8, 0.8, 0.8, 1.);
 
@@ -146,7 +150,7 @@ namespace kiwi
     //                                   MOUSE DOWN                                     //
     // ================================================================================ //
     
-    void jPatcher::mouseDown(juce::MouseEvent const& e)
+    void PatcherView::mouseDown(juce::MouseEvent const& e)
     {
         m_mouse_has_just_been_clicked   = true;
         
@@ -254,7 +258,7 @@ namespace kiwi
     //                                     MOUSE DRAG                                   //
     // ================================================================================ //
     
-    void jPatcher::mouseDrag(juce::MouseEvent const& e)
+    void PatcherView::mouseDrag(juce::MouseEvent const& e)
     {
         juce::MouseCursor::StandardCursorType mc = juce::MouseCursor::NormalCursor;
         
@@ -370,7 +374,7 @@ namespace kiwi
     //                                      MOUSE UP                                    //
     // ================================================================================ //
     
-    void jPatcher::mouseUp(juce::MouseEvent const& e)
+    void PatcherView::mouseUp(juce::MouseEvent const& e)
     {
         m_object_border_down_status = HitTester::Border::None;
         
@@ -476,7 +480,7 @@ namespace kiwi
     //                                     MOUSE MOVE                                   //
     // ================================================================================ //
     
-    void jPatcher::mouseMove(juce::MouseEvent const& event)
+    void PatcherView::mouseMove(juce::MouseEvent const& event)
     {
         juce::MouseCursor::StandardCursorType mc = juce::MouseCursor::NormalCursor;
         
@@ -513,7 +517,7 @@ namespace kiwi
         setMouseCursor(mc);
     }
     
-    void jPatcher::mouseDoubleClick(const juce::MouseEvent& e)
+    void PatcherView::mouseDoubleClick(const juce::MouseEvent& e)
     {
         if(!isLocked())
         {
@@ -535,7 +539,7 @@ namespace kiwi
         }
     }
     
-    juce::MouseCursor::StandardCursorType jPatcher::getMouseCursorForBorder(int border_flag) const
+    juce::MouseCursor::StandardCursorType PatcherView::getMouseCursorForBorder(int border_flag) const
     {
         juce::MouseCursor::StandardCursorType mc = juce::MouseCursor::NormalCursor;
         
@@ -571,7 +575,7 @@ namespace kiwi
         return mc;
     }
     
-    void jPatcher::showPatcherPopupMenu(juce::Point<int> const& position)
+    void PatcherView::showPatcherPopupMenu(juce::Point<int> const& position)
     {
         juce::PopupMenu m;
         auto* cm = &KiwiApp::getCommandManager();
@@ -591,7 +595,7 @@ namespace kiwi
         m.show();
     }
     
-    void jPatcher::showObjectPopupMenu(jObject const& object, juce::Point<int> const& position)
+    void PatcherView::showObjectPopupMenu(jObject const& object, juce::Point<int> const& position)
     {
         if(!isLocked())
         {
@@ -615,7 +619,7 @@ namespace kiwi
         }
     }
     
-    void jPatcher::showLinkPopupMenu(jLink const& link, juce::Point<int> const& position)
+    void PatcherView::showLinkPopupMenu(jLink const& link, juce::Point<int> const& position)
     {
         if(!isLocked())
         {
@@ -633,13 +637,13 @@ namespace kiwi
     //                                     SELECTION                                    //
     // ================================================================================ //
     
-    void jPatcher::startMoveOrResizeObjects()
+    void PatcherView::startMoveOrResizeObjects()
     {
         m_is_in_move_or_resize_gesture = true;
         DocumentManager::startCommitGesture(m_patcher_model);
     }
 
-    void jPatcher::endMoveOrResizeObjects()
+    void PatcherView::endMoveOrResizeObjects()
     {
         DocumentManager::endCommitGesture(m_patcher_model);
         m_is_in_move_or_resize_gesture = false;
@@ -657,13 +661,13 @@ namespace kiwi
         }
     }
     
-    void jPatcher::resizeSelectedObjects(juce::Point<int> const& delta,
+    void PatcherView::resizeSelectedObjects(juce::Point<int> const& delta,
                                          const long border_flag, const bool preserve_ratio)
     {
         // todo
     }
     
-    void jPatcher::moveSelectedObjects(juce::Point<int> const& delta, bool commit, bool commit_gesture)
+    void PatcherView::moveSelectedObjects(juce::Point<int> const& delta, bool commit, bool commit_gesture)
     {
         for(auto* object : m_view_model.getSelectedObjects())
         {
@@ -686,17 +690,17 @@ namespace kiwi
         }
     }
     
-    std::set<flip::Ref> const& jPatcher::getSelectedObjects() const
+    std::set<flip::Ref> const& PatcherView::getSelectedObjects() const
     {
         return m_local_objects_selection;
     }
     
-    std::set<flip::Ref> const& jPatcher::getSelectedLinks() const
+    std::set<flip::Ref> const& PatcherView::getSelectedLinks() const
     {
         return m_local_links_selection;
     }
     
-    void jPatcher::copySelectionToClipboard()
+    void PatcherView::copySelectionToClipboard()
     {
         auto& document = m_patcher_model.entity().use<DocumentManager>();
         
@@ -774,7 +778,7 @@ namespace kiwi
         KiwiApp::commandStatusChanged();
     }
     
-    void jPatcher::pasteFromClipboard(juce::Point<int> const& delta)
+    void PatcherView::pasteFromClipboard(juce::Point<int> const& delta)
     {
         auto& clipboard = m_instance.getPatcherClipboardData();
         if(!clipboard.empty())
@@ -837,19 +841,19 @@ namespace kiwi
         }
     }
     
-    void jPatcher::duplicateSelection()
+    void PatcherView::duplicateSelection()
     {
         copySelectionToClipboard();
         pasteFromClipboard({m_grid_size, m_grid_size});
     }
     
-    void jPatcher::cut()
+    void PatcherView::cut()
     {
         copySelectionToClipboard();
         deleteSelection();
     }
     
-    model::Object& jPatcher::replaceObjectWith(model::Object& object_to_replace,
+    model::Object& PatcherView::replaceObjectWith(model::Object& object_to_replace,
                                               flip::Mold const& mold)
     {
         model::Object& new_object = m_patcher_model.addObject(mold);
@@ -895,7 +899,7 @@ namespace kiwi
         return new_object;
     }
     
-    void jPatcher::pasteReplace()
+    void PatcherView::pasteReplace()
     {
         if(isAnyObjectSelected())
         {
@@ -944,17 +948,17 @@ namespace kiwi
         }
     }
     
-    bool jPatcher::isSelected(jObject const& object) const
+    bool PatcherView::isSelected(jObject const& object) const
     {
         return m_view_model.isSelected(object.getModel());
     }
     
-    bool jPatcher::isSelected(jLink const& link) const
+    bool PatcherView::isSelected(jLink const& link) const
     {
         return m_view_model.isSelected(link.getModel());
     }
     
-    void jPatcher::addToSelectionBasedOnModifiers(jObject& object, bool select_only)
+    void PatcherView::addToSelectionBasedOnModifiers(jObject& object, bool select_only)
     {
         if(select_only)
         {
@@ -970,7 +974,7 @@ namespace kiwi
         }
     }
     
-    void jPatcher::addToSelectionBasedOnModifiers(jLink& link, bool select_only)
+    void PatcherView::addToSelectionBasedOnModifiers(jLink& link, bool select_only)
     {
         if(select_only)
         {
@@ -986,7 +990,7 @@ namespace kiwi
         }
     }
     
-    bool jPatcher::selectOnMouseDown(jObject& object, bool select_only)
+    bool PatcherView::selectOnMouseDown(jObject& object, bool select_only)
     {
         if(isSelected(object))
         {
@@ -997,7 +1001,7 @@ namespace kiwi
         return false;
     }
     
-    bool jPatcher::selectOnMouseDown(jLink& link, bool select_only)
+    bool PatcherView::selectOnMouseDown(jLink& link, bool select_only)
     {
         if(isSelected(link))
         {
@@ -1008,7 +1012,7 @@ namespace kiwi
         return false;
     }
     
-    void jPatcher::selectOnMouseUp(jObject& object, bool select_only,
+    void PatcherView::selectOnMouseUp(jObject& object, bool select_only,
                                    const bool box_was_dragged, const bool result_of_mouse_down_select_method)
     {
         if(result_of_mouse_down_select_method && ! box_was_dragged)
@@ -1018,7 +1022,7 @@ namespace kiwi
     }
     
     
-    void jPatcher::selectOnMouseUp(jLink& link, bool select_only,
+    void PatcherView::selectOnMouseUp(jLink& link, bool select_only,
                                    const bool box_was_dragged, const bool result_of_mouse_down_select_method)
     {
         if(result_of_mouse_down_select_method && ! box_was_dragged)
@@ -1027,7 +1031,7 @@ namespace kiwi
         }
     }
     
-    void jPatcher::bringsLinksToFront()
+    void PatcherView::bringsLinksToFront()
     {
         for(auto& link_uptr : m_links)
         {
@@ -1035,7 +1039,7 @@ namespace kiwi
         }
     }
     
-    void jPatcher::bringsObjectsToFront()
+    void PatcherView::bringsObjectsToFront()
     {
         for(auto& object_uptr : m_objects)
         {
@@ -1043,7 +1047,7 @@ namespace kiwi
         }
     }
     
-    bool jPatcher::keyPressed(const juce::KeyPress& key)
+    bool PatcherView::keyPressed(const juce::KeyPress& key)
     {
         if(key.isKeyCode(juce::KeyPress::deleteKey) || key.isKeyCode(juce::KeyPress::backspaceKey))
         {
@@ -1102,7 +1106,7 @@ namespace kiwi
         return false;
     }
     
-    void jPatcher::loadPatcher()
+    void PatcherView::loadPatcher()
     {
         // create resident objects
         for(auto& object : m_patcher_model.getObjects())
@@ -1117,7 +1121,7 @@ namespace kiwi
         }
     }
     
-    void jPatcher::setLock(bool locked)
+    void PatcherView::setLock(bool locked)
     {
         if(locked)
         {
@@ -1128,12 +1132,12 @@ namespace kiwi
         DocumentManager::commit(m_patcher_model, "Edit mode switch");
     }
     
-    bool jPatcher::isLocked() const
+    bool PatcherView::isLocked() const
     {
         return m_is_locked;
     }
     
-    bool jPatcher::canConnect(model::Object const& from, const size_t outlet,
+    bool PatcherView::canConnect(model::Object const& from, const size_t outlet,
                               model::Object const& to, const size_t inlet) const
     {
         if((from.getNumberOfOutlets() > outlet) && (to.getNumberOfInlets() > inlet))
@@ -1155,7 +1159,7 @@ namespace kiwi
         return false;
     }
     
-    std::pair<jObject*, size_t> jPatcher::getLinkCreatorNearestEndingIolet()
+    std::pair<jObject*, size_t> PatcherView::getLinkCreatorNearestEndingIolet()
     {
         jObject* result_object = nullptr;
         size_t result_index = 0;
@@ -1211,7 +1215,7 @@ namespace kiwi
         return std::make_pair(result_object, result_index);
     }
     
-    juce::Rectangle<int> jPatcher::getCurrentObjectsArea()
+    juce::Rectangle<int> PatcherView::getCurrentObjectsArea()
     {
         juce::Rectangle<int> area;
         
@@ -1249,7 +1253,7 @@ namespace kiwi
         return area;
     }
     
-    juce::Rectangle<int> jPatcher::getSelectionBounds()
+    juce::Rectangle<int> PatcherView::getSelectionBounds()
     {
         juce::Rectangle<int> area;
         
@@ -1296,12 +1300,12 @@ namespace kiwi
         return area;
     }
     
-    juce::Point<int> jPatcher::getOriginPosition() const
+    juce::Point<int> PatcherView::getOriginPosition() const
     {
         return m_viewport->getOriginPosition();
     }
     
-    void jPatcher::originPositionChanged()
+    void PatcherView::originPositionChanged()
     {
         for(auto& jbox_uptr : m_objects)
         {
@@ -1311,7 +1315,7 @@ namespace kiwi
         repaint();
     }
     
-    void jPatcher::zoomIn()
+    void PatcherView::zoomIn()
     {
         m_view_model.setZoomFactor(m_view_model.getZoomFactor() + 0.25);
         DocumentManager::commit(m_patcher_model);
@@ -1322,7 +1326,7 @@ namespace kiwi
         }
     }
     
-    void jPatcher::zoomNormal()
+    void PatcherView::zoomNormal()
     {
         m_view_model.setZoomFactor(1.);
         DocumentManager::commit(m_patcher_model);
@@ -1333,7 +1337,7 @@ namespace kiwi
         }
     }
     
-    void jPatcher::zoomOut()
+    void PatcherView::zoomOut()
     {
         const double zoom = m_view_model.getZoomFactor();
         if(zoom > 0.25)
@@ -1352,7 +1356,7 @@ namespace kiwi
     //                                     OBSERVER                                     //
     // ================================================================================ //
     
-    void jPatcher::patcherChanged(model::Patcher& patcher, model::Patcher::View& view)
+    void PatcherView::patcherChanged(model::Patcher& patcher, model::Patcher::View& view)
     {
         if(! patcher.changed()) return; // abort
         
@@ -1460,9 +1464,9 @@ namespace kiwi
         }
     }
     
-    void jPatcher::updateWindowTitle() const
+    void PatcherView::updateWindowTitle() const
     {
-        jPatcherWindow* window = findParentComponentOfClass<jPatcherWindow>();
+        PatcherViewWindow* window = findParentComponentOfClass<PatcherViewWindow>();
         if(window)
         {
             juce::String title = m_patcher_model.getName();
@@ -1484,7 +1488,7 @@ namespace kiwi
         }
     }
     
-    void jPatcher::checkViewInfos(model::Patcher::View& view)
+    void PatcherView::checkViewInfos(model::Patcher::View& view)
     {
         if(&view == &m_view_model && !view.removed())
         {
@@ -1518,7 +1522,7 @@ namespace kiwi
         }
     }
     
-    void jPatcher::checkObjectsSelectionChanges(model::Patcher& patcher)
+    void PatcherView::checkObjectsSelectionChanges(model::Patcher& patcher)
     {
         if(! patcher.changed()) return; // abort
         
@@ -1623,7 +1627,7 @@ namespace kiwi
         std::swap(m_local_objects_selection, new_local_objects_selection);
     }
     
-    void jPatcher::checkLinksSelectionChanges(model::Patcher& patcher)
+    void PatcherView::checkLinksSelectionChanges(model::Patcher& patcher)
     {
         if(! patcher.changed()) return; // abort
         
@@ -1728,12 +1732,12 @@ namespace kiwi
         std::swap(m_local_links_selection, new_local_links_selection);
     }
     
-    void jPatcher::selectionChanged()
+    void PatcherView::selectionChanged()
     {
         KiwiApp::commandStatusChanged();
     }
     
-    void jPatcher::addjObject(model::Object& object, int zorder)
+    void PatcherView::addjObject(model::Object& object, int zorder)
     {
         const auto it = findObject(object);
         
@@ -1753,7 +1757,7 @@ namespace kiwi
         }
     }
     
-    void jPatcher::objectChanged(model::Patcher::View& view, model::Object& object)
+    void PatcherView::objectChanged(model::Patcher::View& view, model::Object& object)
     {
         const auto it = findObject(object);
         
@@ -1764,7 +1768,7 @@ namespace kiwi
         }
     }
     
-    void jPatcher::removejObject(model::Object& object)
+    void PatcherView::removejObject(model::Object& object)
     {
         const auto it = findObject(object);
         
@@ -1780,7 +1784,7 @@ namespace kiwi
         }
     }
     
-    void jPatcher::addjLink(model::Link& link)
+    void PatcherView::addjLink(model::Link& link)
     {
         const auto it = findLink(link);
         
@@ -1793,7 +1797,7 @@ namespace kiwi
         }
     }
     
-    void jPatcher::linkChanged(model::Link& link)
+    void PatcherView::linkChanged(model::Link& link)
     {
         const auto it = findLink(link);
         
@@ -1804,7 +1808,7 @@ namespace kiwi
         }
     }
     
-    void jPatcher::removejLink(model::Link& link)
+    void PatcherView::removejLink(model::Link& link)
     {
         const auto it = findLink(link);
         
@@ -1815,7 +1819,7 @@ namespace kiwi
         }
     }
     
-    jPatcher::jObjects::iterator jPatcher::findObject(model::Object const& object)
+    PatcherView::jObjects::iterator PatcherView::findObject(model::Object const& object)
     {
         const auto find_jobj = [&object](std::unique_ptr<jObject> const& jobj)
         {
@@ -1825,7 +1829,7 @@ namespace kiwi
         return std::find_if(m_objects.begin(), m_objects.end(), find_jobj);
     }
     
-    jPatcher::jLinks::iterator jPatcher::findLink(model::Link const& link)
+    PatcherView::jLinks::iterator PatcherView::findLink(model::Link const& link)
     {
         const auto find_jlink = [&link](std::unique_ptr<jLink> const& jlink)
         {
@@ -1835,28 +1839,28 @@ namespace kiwi
         return std::find_if(m_links.begin(), m_links.end(), find_jlink);
     }
     
-    model::Patcher::View& jPatcher::getPatcherViewModel()
+    model::Patcher::View& PatcherView::getPatcherViewModel()
     {
         return m_view_model;
     }
     
-    jPatcher::jObjects const& jPatcher::getObjects() const
+    PatcherView::jObjects const& PatcherView::getObjects() const
     {
         return m_objects;
     }
     
-    jPatcher::jLinks const& jPatcher::getLinks() const
+    PatcherView::jLinks const& PatcherView::getLinks() const
     {
         return m_links;
     }
     
-    jObject* jPatcher::getObject(model::Object const& object)
+    jObject* PatcherView::getObject(model::Object const& object)
     {
         const auto it = findObject(object);
         return (it != m_objects.cend()) ? it->get() : nullptr;
     }
     
-    jLink* jPatcher::getLink(model::Link const& link)
+    jLink* PatcherView::getLink(model::Link const& link)
     {
         const auto it = findLink(link);
         return (it != m_links.cend()) ? it->get() : nullptr;
@@ -1866,7 +1870,7 @@ namespace kiwi
     //                                  COMMANDS ACTIONS                                //
     // ================================================================================ //
     
-    model::Object& jPatcher::createObjectModel(std::string const& text)
+    model::Object& PatcherView::createObjectModel(std::string const& text)
     {
         int to_clean;
         std::vector<Atom> atoms = AtomHelper::parse(text);
@@ -1887,7 +1891,7 @@ namespace kiwi
         return m_patcher_model.addObject("errorbox", std::vector<Atom>(atoms.begin(), atoms.end()));
     }
     
-    void jPatcher::boxHasBeenEdited(jClassicBox& box, std::string new_object_text)
+    void PatcherView::boxHasBeenEdited(jClassicBox& box, std::string new_object_text)
     {
         model::Object& old_object_m = box.getModel();
         const std::string old_object_text = old_object_m.getText();
@@ -1970,7 +1974,7 @@ namespace kiwi
         }
     }
     
-    void jPatcher::createObjectModel(std::string const& text, double pos_x, double pos_y)
+    void PatcherView::createObjectModel(std::string const& text, double pos_x, double pos_y)
     {
         if(! DocumentManager::isInCommitGesture(m_patcher_model))
         {
@@ -1990,7 +1994,7 @@ namespace kiwi
         }
     }
     
-    void jPatcher::createNewBoxModel(bool give_focus)
+    void PatcherView::createNewBoxModel(bool give_focus)
     {
         if(! DocumentManager::isInCommitGesture(m_patcher_model))
         {
@@ -2049,7 +2053,7 @@ namespace kiwi
     //                                     UNDO/REDO                                    //
     // ================================================================================ //
     
-    void jPatcher::undo()
+    void PatcherView::undo()
     {
         auto& doc = m_patcher_model.entity().use<DocumentManager>();
         if(doc.canUndo())
@@ -2059,18 +2063,18 @@ namespace kiwi
         }
     }
     
-    bool jPatcher::canUndo()
+    bool PatcherView::canUndo()
     {
         return m_patcher_model.entity().use<DocumentManager>().canUndo();
     }
     
-    std::string jPatcher::getUndoLabel()
+    std::string PatcherView::getUndoLabel()
     {
         auto& doc = m_patcher_model.entity().use<DocumentManager>();
         return doc.canUndo() ? doc.getUndoLabel() : "";
     }
 
-    void jPatcher::redo()
+    void PatcherView::redo()
     {
         auto& doc = m_patcher_model.entity().use<DocumentManager>();
         if(doc.canRedo())
@@ -2080,12 +2084,12 @@ namespace kiwi
         }
     }
     
-    bool jPatcher::canRedo()
+    bool PatcherView::canRedo()
     {
         return m_patcher_model.entity().use<DocumentManager>().canRedo();
     }
     
-    std::string jPatcher::getRedoLabel()
+    std::string PatcherView::getRedoLabel()
     {
         auto& doc = m_patcher_model.entity().use<DocumentManager>();
         return doc.canRedo() ? doc.getRedoLabel() : "";
@@ -2095,28 +2099,28 @@ namespace kiwi
     //                                     SELECTION                                    //
     // ================================================================================ //
     
-    bool jPatcher::isAnythingSelected()
+    bool PatcherView::isAnythingSelected()
     {
         return isAnyObjectSelected() || isAnyLinksSelected();
     }
     
-    bool jPatcher::isAnyObjectSelected()
+    bool PatcherView::isAnyObjectSelected()
     {
         return !m_local_objects_selection.empty();
     }
     
-    bool jPatcher::isAnyLinksSelected()
+    bool PatcherView::isAnyLinksSelected()
     {
         return !m_local_links_selection.empty();
     }
     
-    void jPatcher::selectObject(jObject& object)
+    void PatcherView::selectObject(jObject& object)
     {
         m_view_model.selectObject(object.getModel());
         DocumentManager::commit(m_patcher_model);
     }
     
-    void jPatcher::selectObjects(std::vector<jObject*> const& objects)
+    void PatcherView::selectObjects(std::vector<jObject*> const& objects)
     {
         bool should_commit = false;
         
@@ -2135,13 +2139,13 @@ namespace kiwi
         }
     }
     
-    void jPatcher::selectLink(jLink& link)
+    void PatcherView::selectLink(jLink& link)
     {
         m_view_model.selectLink(link.getModel());
         DocumentManager::commit(m_patcher_model);
     }
     
-    void jPatcher::selectLinks(std::vector<jLink*> const& links)
+    void PatcherView::selectLinks(std::vector<jLink*> const& links)
     {
         bool should_commit = false;
         
@@ -2160,39 +2164,39 @@ namespace kiwi
         }
     }
     
-    void jPatcher::unselectObject(jObject& object)
+    void PatcherView::unselectObject(jObject& object)
     {
         m_view_model.unselectObject(object.getModel());
         DocumentManager::commit(m_patcher_model);
     }
     
-    void jPatcher::unselectLink(jLink& link)
+    void PatcherView::unselectLink(jLink& link)
     {
         m_view_model.unselectLink(link.getModel());
         DocumentManager::commit(m_patcher_model);
     }
     
-    void jPatcher::selectObjectOnly(jObject& object)
+    void PatcherView::selectObjectOnly(jObject& object)
     {
         unselectAll();
         selectObject(object);
         DocumentManager::commit(m_patcher_model);
     }
 
-    void jPatcher::selectLinkOnly(jLink& link)
+    void PatcherView::selectLinkOnly(jLink& link)
     {
         unselectAll();
         selectLink(link);
         DocumentManager::commit(m_patcher_model);
     }
     
-    void jPatcher::selectAllObjects()
+    void PatcherView::selectAllObjects()
     {
         m_view_model.selectAll();
         DocumentManager::commit(m_patcher_model);
     }
     
-    void jPatcher::unselectAll()
+    void PatcherView::unselectAll()
     {
         if(!DocumentManager::isInCommitGesture(m_patcher_model))
         {
@@ -2201,7 +2205,7 @@ namespace kiwi
         }
     }
     
-    void jPatcher::deleteSelection()
+    void PatcherView::deleteSelection()
     {
         for(model::Link* link : m_view_model.getSelectedLinks())
         {
@@ -2222,12 +2226,12 @@ namespace kiwi
     //                              APPLICATION COMMAND TARGET                          //
     // ================================================================================ //
     
-    juce::ApplicationCommandTarget* jPatcher::getNextCommandTarget()
+    juce::ApplicationCommandTarget* PatcherView::getNextCommandTarget()
     {
         return findFirstTargetParentComponent();
     }
     
-    void jPatcher::getAllCommands(juce::Array<juce::CommandID>& commands)
+    void PatcherView::getAllCommands(juce::Array<juce::CommandID>& commands)
     {
         commands.add(CommandIDs::save);
         
@@ -2259,7 +2263,7 @@ namespace kiwi
         commands.add(CommandIDs::showObjectInspector);
     }
     
-    void jPatcher::getCommandInfo(const juce::CommandID commandID, juce::ApplicationCommandInfo& result)
+    void PatcherView::getCommandInfo(const juce::CommandID commandID, juce::ApplicationCommandInfo& result)
     {
         switch(commandID)
         {
@@ -2415,7 +2419,7 @@ namespace kiwi
         }
     }
     
-    bool jPatcher::perform(const InvocationInfo& info)
+    bool PatcherView::perform(const InvocationInfo& info)
     {
         switch (info.commandID)
         {

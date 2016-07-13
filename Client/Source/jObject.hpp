@@ -29,7 +29,7 @@
 namespace kiwi
 {
     class HitTester;
-    class jPatcher;
+    class PatcherView;
     class jClassicBox;
     
     // ================================================================================ //
@@ -41,7 +41,7 @@ namespace kiwi
     {
     public:
         
-        jObject(jPatcher& patcher_view, model::Object& object_m);
+        jObject(PatcherView& patcher_view, model::Object& object_m);
         ~jObject();
         
         void objectChanged(model::Patcher::View& view, model::Object& object);
@@ -58,10 +58,10 @@ namespace kiwi
         //! @brief Returns The box bounds relative to the parent Component
         juce::Rectangle<int> getBoxBounds() const;
         
-        //! @brief Returns the inlet position relative to the parent jPatcher component for a given index.
+        //! @brief Returns the inlet position relative to the parent PatcherView component for a given index.
         juce::Point<int> getInletPatcherPosition(const size_t index) const;
         
-        //! @brief Returns the outlet position relative to the parent jPatcher component for a given index.
+        //! @brief Returns the outlet position relative to the parent PatcherView component for a given index.
         juce::Point<int> getOutletPatcherPosition(const size_t index) const;
         
         //! Get the Object model
@@ -70,10 +70,10 @@ namespace kiwi
         //! @brief overloaded from Component to exclude border size.
         bool hitTest(int x, int y) override;
         
-        //! @brief internal kiwi jPatcher HitTesting.
+        //! @brief internal kiwi PatcherView HitTesting.
         bool hitTest(juce::Point<int> const& pt, HitTester& result) const;
         
-        //! @brief internal kiwi jPatcher HitTesting (overlaps a rectangle).
+        //! @brief internal kiwi PatcherView HitTesting (overlaps a rectangle).
         bool hitTest(juce::Rectangle<int> const& rect);
         
         //! Returns true if the object is selected.
@@ -94,7 +94,7 @@ namespace kiwi
         
     private: // members
         
-        jPatcher&               m_patcher_view;
+        PatcherView&               m_patcher_view;
         model::Object*          m_model = nullptr;
         const unsigned int      m_io_width = 6;
         const unsigned int      m_io_height = 3;
@@ -124,7 +124,7 @@ namespace kiwi
     public:
         
         //! @brief Constructor.
-        jClassicBox(jPatcher& patcher_view, model::Object& object_m);
+        jClassicBox(PatcherView& patcher_view, model::Object& object_m);
         
         //! @brief Destructor.
         ~jClassicBox();
@@ -132,7 +132,7 @@ namespace kiwi
         //! @brief Give focus to the text editor.
         void grabKeyboardFocus();
         
-        //! @brief Remove the text editor and give focus back to the jPatcher.
+        //! @brief Remove the text editor and give focus back to the PatcherView.
         void removeTextEditor();
         
         //! @brief Called when this component has just gained the keyboard focus.

@@ -20,9 +20,9 @@
  */
 
 #include "jLink.hpp"
-#include "jPatcher.hpp"
+#include "KiwiApp_PatcherView.hpp"
 #include "KiwiApp.hpp"
-#include "jPatcherHelper.hpp"
+#include "KiwiApp_PatcherViewHelper.hpp"
 
 namespace kiwi
 {
@@ -52,15 +52,15 @@ namespace kiwi
         setBounds(new_bounds);
     }
     
-    jLink::jLink(jPatcher& jpatcher, model::Link& link_m) :
-    m_jpatcher(jpatcher),
+    jLink::jLink(PatcherView& patcherview, model::Link& link_m) :
+    m_patcherview(patcherview),
     m_model(&link_m)
     {
         auto& sender_object_m = m_model->getSenderObject();
         auto& receiver_object_m = m_model->getReceiverObject();
         
-        jObject* jbox_sender = m_jpatcher.getObject(sender_object_m);
-        jObject* jbox_receiver = m_jpatcher.getObject(receiver_object_m);
+        jObject* jbox_sender = m_patcherview.getObject(sender_object_m);
+        jObject* jbox_receiver = m_patcherview.getObject(receiver_object_m);
         
         if(jbox_sender && jbox_receiver)
         {
@@ -78,14 +78,14 @@ namespace kiwi
     jLink::~jLink()
     {
         auto& sender_object_m = m_model->getSenderObject();
-        jObject* jbox_sender = m_jpatcher.getObject(sender_object_m);
+        jObject* jbox_sender = m_patcherview.getObject(sender_object_m);
         if(jbox_sender)
         {
             jbox_sender->removeComponentListener(this);
         }
         
         auto& receiver_object_m = m_model->getReceiverObject();
-        jObject* jbox_receiver = m_jpatcher.getObject(receiver_object_m);
+        jObject* jbox_receiver = m_patcherview.getObject(receiver_object_m);
         if(jbox_receiver)
         {
             jbox_receiver->removeComponentListener(this);

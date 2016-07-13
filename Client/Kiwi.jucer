@@ -10,12 +10,14 @@
       <FILE id="YYSxJ8" name="jObject.hpp" compile="0" resource="0" file="Source/jObject.hpp"/>
       <FILE id="KpZNMh" name="jLink.cpp" compile="1" resource="0" file="Source/jLink.cpp"/>
       <FILE id="MRxCah" name="jLink.hpp" compile="0" resource="0" file="Source/jLink.hpp"/>
-      <FILE id="mMQjEq" name="jPatcherHelper.cpp" compile="1" resource="0"
-            file="Source/jPatcherHelper.cpp"/>
-      <FILE id="unJYSB" name="jPatcherHelper.hpp" compile="0" resource="0"
-            file="Source/jPatcherHelper.hpp"/>
-      <FILE id="KxD69I" name="jPatcher.cpp" compile="1" resource="0" file="Source/jPatcher.cpp"/>
-      <FILE id="KQjSU2" name="jPatcher.hpp" compile="0" resource="0" file="Source/jPatcher.hpp"/>
+      <FILE id="mMQjEq" name="KiwiApp_PatcherViewHelper.cpp" compile="1"
+            resource="0" file="Source/KiwiApp_PatcherViewHelper.cpp"/>
+      <FILE id="unJYSB" name="KiwiApp_PatcherViewHelper.hpp" compile="0"
+            resource="0" file="Source/KiwiApp_PatcherViewHelper.hpp"/>
+      <FILE id="KxD69I" name="KiwiApp_PatcherView.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_PatcherView.cpp"/>
+      <FILE id="KQjSU2" name="KiwiApp_PatcherView.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_PatcherView.hpp"/>
       <FILE id="QMh5qc" name="KiwiApp_Window.cpp" compile="1" resource="0"
             file="Source/KiwiApp_Window.cpp"/>
       <FILE id="dmcYQZ" name="KiwiApp_Window.hpp" compile="0" resource="0"

@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include "jPatcherHelper.hpp"
+#include "KiwiApp_PatcherViewHelper.hpp"
 
 namespace kiwi
 {
@@ -27,7 +27,7 @@ namespace kiwi
     //                                    HITTESTER                                     //
     // ================================================================================ //
     
-    HitTester::HitTester(jPatcher const& patcher) :
+    HitTester::HitTester(PatcherView const& patcher) :
     m_patcher(patcher),
     m_object(nullptr),
     m_link(nullptr),
@@ -161,7 +161,7 @@ namespace kiwi
         }
     }
     
-    jPatcher const& HitTester::getPatcher() const noexcept
+    PatcherView const& HitTester::getPatcher() const noexcept
     {
         return m_patcher;
     }
@@ -222,10 +222,10 @@ namespace kiwi
     }
     
     // ================================================================================ //
-    //                                  JPATCHER VIEWPORT                               //
+    //                                  PATCHER VIEWPORT                                //
     // ================================================================================ //
     
-    jPatcherViewport::jPatcherViewport(jPatcher& patcher) :
+    PatcherViewport::PatcherViewport(PatcherView& patcher) :
     m_patcher(patcher),
     m_can_hook_resized(false)
     {
@@ -238,12 +238,12 @@ namespace kiwi
         setSize(600, 400);
     }
     
-    void jPatcherViewport::visibleAreaChanged(juce::Rectangle<int> const& new_visible_area)
+    void PatcherViewport::visibleAreaChanged(juce::Rectangle<int> const& new_visible_area)
     {
         ;
     }
     
-    void jPatcherViewport::resized()
+    void PatcherViewport::resized()
     {
         if(!m_can_hook_resized)
         {
@@ -261,7 +261,7 @@ namespace kiwi
         }
     }
     
-    void jPatcherViewport::setZoomFactor(double zoom_factor)
+    void PatcherViewport::setZoomFactor(double zoom_factor)
     {
         if(zoom_factor != m_zoom_factor)
         {
@@ -273,12 +273,12 @@ namespace kiwi
         }
     }
     
-    double jPatcherViewport::getZoomFactor() const noexcept
+    double PatcherViewport::getZoomFactor() const noexcept
     {
         return m_zoom_factor;
     }
     
-    juce::Rectangle<int> jPatcherViewport::getRelativeViewArea() const noexcept
+    juce::Rectangle<int> PatcherViewport::getRelativeViewArea() const noexcept
     {
         const auto rel_view_pos = getRelativeViewPosition();
         
@@ -291,22 +291,22 @@ namespace kiwi
         };
     }
     
-    juce::Point<int> jPatcherViewport::getRelativePosition(juce::Point<int> point) const noexcept
+    juce::Point<int> PatcherViewport::getRelativePosition(juce::Point<int> point) const noexcept
     {
         return (point / m_zoom_factor) - getOriginPosition();
     }
     
-    juce::Point<int> jPatcherViewport::getRelativeViewPosition() const noexcept
+    juce::Point<int> PatcherViewport::getRelativeViewPosition() const noexcept
     {
         return getRelativePosition(getViewPosition());
     }
     
-    void jPatcherViewport::setRelativeViewPosition(juce::Point<int> position)
+    void PatcherViewport::setRelativeViewPosition(juce::Point<int> position)
     {
         setViewPosition((position + getOriginPosition()) * m_zoom_factor);
     }
     
-    void jPatcherViewport::jumpViewToObject(jObject const& object_j)
+    void PatcherViewport::jumpViewToObject(jObject const& object_j)
     {
         const auto view_area = getRelativeViewArea();
         auto object_bounds = object_j.getBoxBounds();
@@ -340,7 +340,7 @@ namespace kiwi
         }
     }
     
-    void jPatcherViewport::bringRectToCentre(juce::Rectangle<int> bounds)
+    void PatcherViewport::bringRectToCentre(juce::Rectangle<int> bounds)
     {
         const juce::Rectangle<int> view_area = getRelativeViewArea();
         const juce::Point<int> center = bounds.getCentre();
@@ -354,18 +354,18 @@ namespace kiwi
         setRelativeViewPosition(new_view_pos);
     }
     
-    void jPatcherViewport::resetObjectsArea()
+    void PatcherViewport::resetObjectsArea()
     {
         m_patching_area = m_patcher.getCurrentObjectsArea();
         updatePatcherArea(true);
     }
     
-    juce::Rectangle<int> jPatcherViewport::getObjectsArea() const noexcept
+    juce::Rectangle<int> PatcherViewport::getObjectsArea() const noexcept
     {
         return m_patching_area;
     }
     
-    juce::Point<int> jPatcherViewport::getOriginPosition() const noexcept
+    juce::Point<int> PatcherViewport::getOriginPosition() const noexcept
     {
         const int x = m_patching_area.getX();
         const int y = m_patching_area.getY();
@@ -373,7 +373,7 @@ namespace kiwi
         return juce::Point<int>( x < 0 ? -x : 0, y < 0 ? -y : 0 );
     }
     
-    void jPatcherViewport::viewportResized(juce::Rectangle<int> const& last_bounds,
+    void PatcherViewport::viewportResized(juce::Rectangle<int> const& last_bounds,
                                            juce::Rectangle<int> const& new_bounds)
     {
         const int delta_width = new_bounds.getWidth() - last_bounds.getWidth();
@@ -494,7 +494,7 @@ namespace kiwi
         m_magnifier.setSize(new_width * zoom, new_height * zoom);
     }
     
-    void jPatcherViewport::updatePatcherArea(bool keep_view_pos)
+    void PatcherViewport::updatePatcherArea(bool keep_view_pos)
     {
         const juce::Point<int> view_pos = getViewPosition();
         const juce::Point<int> last_origin = getOriginPosition();
@@ -615,7 +615,7 @@ namespace kiwi
     // ================================================================================ //
     //										JLASSO                                      //
     // ================================================================================ //
-    jLasso::jLasso(jPatcher& patcher) : m_patcher(patcher), m_dragging(false)
+    Lasso::Lasso(PatcherView& patcher) : m_patcher(patcher), m_dragging(false)
     {
         setInterceptsMouseClicks(false, false);
         setWantsKeyboardFocus(false);
@@ -624,17 +624,17 @@ namespace kiwi
         setBounds(0, 0, 1, 1);
     }
     
-    jLasso::~jLasso()
+    Lasso::~Lasso()
     {
         
     }
     
-    bool jLasso::isPerforming() const noexcept
+    bool Lasso::isPerforming() const noexcept
     {
         return m_dragging;
     }
     
-    void jLasso::paint(juce::Graphics& g)
+    void Lasso::paint(juce::Graphics& g)
     {
         const juce::Rectangle<int> bounds = getLocalBounds();
         const juce::Colour color = juce::Colour::fromFloatRGBA(0.96, 0.96, 0.96, 1.);
@@ -645,7 +645,7 @@ namespace kiwi
         g.drawRect(bounds, 1.);
     }
     
-    void jLasso::begin(juce::Point<int> const& point, const bool preserve_selection)
+    void Lasso::begin(juce::Point<int> const& point, const bool preserve_selection)
     {
         assert(!m_dragging);
         
@@ -663,7 +663,7 @@ namespace kiwi
         m_dragging = true;
     }
 
-    void jLasso::perform(juce::Point<int> const& point,
+    void Lasso::perform(juce::Point<int> const& point,
                          bool include_objects, bool include_links, const bool preserve)
     {
         bool selection_changed = false;
@@ -689,7 +689,7 @@ namespace kiwi
         {
             if(include_objects)
             {
-                jPatcher::jObjects const& objects = m_patcher.getObjects();
+                PatcherView::jObjects const& objects = m_patcher.getObjects();
                 
                 HitTester hit(m_patcher);
                 std::vector<jObject*> lasso_objects;
@@ -722,7 +722,7 @@ namespace kiwi
             
             if(include_links)
             {
-                jPatcher::jLinks const& links = m_patcher.getLinks();
+                PatcherView::jLinks const& links = m_patcher.getLinks();
                 
                 HitTester hit(m_patcher);
                 std::vector<jLink*> lasso_links;
@@ -779,7 +779,7 @@ namespace kiwi
         }
     }
 
-    void jLasso::end()
+    void Lasso::end()
     {
         m_dragging = false;
         setVisible(false);

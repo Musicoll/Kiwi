@@ -28,7 +28,7 @@
 
 namespace kiwi
 {
-    class jPatcher;
+    class PatcherView;
     class jLink;
     
     // ================================================================================ //
@@ -61,7 +61,7 @@ namespace kiwi
     public:
         
         //! @brief Constructor
-        jLink(jPatcher& jpatcher, model::Link& link_m);
+        jLink(PatcherView& patcherview, model::Link& link_m);
         
         //! @brief Destructor
         ~jLink();
@@ -80,10 +80,10 @@ namespace kiwi
         // juce::Component
         void paint(juce::Graphics& g) override;
         
-        //! @brief internal kiwi jPatcher Hit-Testing.
+        //! @brief internal kiwi PatcherView Hit-Testing.
         bool hitTest(juce::Point<int> const& pt, HitTester& result) const;
         
-        //! @brief internal kiwi jPatcher HitTesting (overlaps a rectangle).
+        //! @brief internal kiwi PatcherView HitTesting (overlaps a rectangle).
         bool hitTest(juce::Rectangle<float> const& rect);
         
         //! @brief Called when the component's position or size changes.
@@ -94,7 +94,7 @@ namespace kiwi
         
     private: // members
         
-        jPatcher&           m_jpatcher;
+        PatcherView&           m_patcherview;
         model::Link*        m_model;
         bool                m_is_selected = 0;
         std::set<uint64_t>  m_distant_selection;

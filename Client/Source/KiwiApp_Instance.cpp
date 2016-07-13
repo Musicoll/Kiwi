@@ -23,7 +23,7 @@
 #include "KiwiApp.hpp"
 #include "KiwiApp_Instance.hpp"
 #include "KiwiApp_DocumentManager.hpp"
-#include "jPatcher.hpp"
+#include "KiwiApp_PatcherView.hpp"
 
 namespace kiwi
 {
@@ -141,7 +141,7 @@ namespace kiwi
     {
         bool success = true;
         
-        jPatcherWindow* pwin = dynamic_cast<jPatcherWindow*>(&window);
+        PatcherViewWindow* pwin = dynamic_cast<PatcherViewWindow*>(&window);
         if(pwin && !m_patcher_managers.empty())
         {
             PatcherManager& manager = pwin->getManager();
@@ -149,9 +149,9 @@ namespace kiwi
             const auto manager_it = getPatcherManager(manager);
             if(manager_it != m_patcher_managers.end())
             {
-                jPatcher& jpatcher = pwin->getjPatcher();
+                PatcherView& patcherview = pwin->getPatcherView();
                 
-                success = manager.closePatcherViewWindow(jpatcher);
+                success = manager.closePatcherViewWindow(patcherview);
                 if(success && manager.getNumberOfView() == 0)
                 {
                     m_patcher_managers.erase(manager_it);

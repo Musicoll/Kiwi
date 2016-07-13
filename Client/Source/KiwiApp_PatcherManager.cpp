@@ -27,39 +27,39 @@
 #include "KiwiApp_Instance.hpp"
 #include "KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_PatcherManager.hpp"
-#include "jPatcher.hpp"
-#include "jPatcherHelper.hpp"
+#include "KiwiApp_PatcherView.hpp"
+#include "KiwiApp_PatcherViewHelper.hpp"
 
 namespace kiwi
 {
     // ================================================================================ //
-    //                                  JPATCHER WINDOW                                 //
+    //                                PATCHER VIEW WINDOW                               //
     // ================================================================================ //
 
-    jPatcherWindow::jPatcherWindow(PatcherManager& manager, jPatcher& jpatcher) : Window(),
+    PatcherViewWindow::PatcherViewWindow(PatcherManager& manager, PatcherView& patcherview) : Window(),
     m_manager(manager),
-    m_jpatcher(jpatcher)
+    m_patcherview(patcherview)
     {
         ;
     }
     
-    void jPatcherWindow::closeButtonPressed()
+    void PatcherViewWindow::closeButtonPressed()
     {
         KiwiApp::use().closeWindow(*this);
     }
     
-    PatcherManager& jPatcherWindow::getManager() const
+    PatcherManager& PatcherViewWindow::getManager() const
     {
         return m_manager;
     }
     
-    jPatcher& jPatcherWindow::getjPatcher() const
+    PatcherView& PatcherViewWindow::getPatcherView() const
     {
-        return m_jpatcher;
+        return m_patcherview;
     }
     
     // ================================================================================ //
-    //                                  JPATCHER MANAGER                                //
+    //                                  PATCHER MANAGER                                 //
     // ================================================================================ //
     
     PatcherManager::PatcherManager(Instance& instance) :
@@ -275,7 +275,7 @@ namespace kiwi
         return success;
     }
     
-    bool PatcherManager::closePatcherViewWindow(jPatcher& patcher_j)
+    bool PatcherManager::closePatcherViewWindow(PatcherView& patcher_j)
     {
         auto& patcher = getPatcher();
         auto& user = *patcher.getUser(m_instance.getUserId());
@@ -365,12 +365,12 @@ namespace kiwi
     {
         if(user.getId() == m_instance.getUserId())
         {
-            auto& jpatcher = view.entity().emplace<jPatcher>(*this, m_instance, patcher, view);
+            auto& patcherview = view.entity().emplace<PatcherView>(*this, m_instance, patcher, view);
             
-            auto& window = view.entity().emplace<jPatcherWindow>(*this, jpatcher);
-            window.setContentNonOwned(&jpatcher.getViewport(), true);
-            jpatcher.updateWindowTitle();
-            jpatcher.grabKeyboardFocus();
+            auto& window = view.entity().emplace<PatcherViewWindow>(*this, patcherview);
+            window.setContentNonOwned(&patcherview.getViewport(), true);
+            patcherview.updateWindowTitle();
+            patcherview.grabKeyboardFocus();
         }
     }
 
@@ -380,9 +380,9 @@ namespace kiwi
     {
         if(user.getId() == m_instance.getUserId())
         {
-            // Notify jPatcher
-            auto& jpatcher = view.entity().use<jPatcher>();
-            jpatcher.patcherChanged(patcher, view);
+            // Notify PatcherView
+            auto& patcherview = view.entity().use<PatcherView>();
+            patcherview.patcherChanged(patcher, view);
         }
     }
 
@@ -392,8 +392,8 @@ namespace kiwi
     {
         if(user.getId() == m_instance.getUserId())
         {
-            view.entity().erase<jPatcher>();
-            view.entity().erase<jPatcherWindow>();
+            view.entity().erase<PatcherView>();
+            view.entity().erase<PatcherViewWindow>();
         }
     }
 }
