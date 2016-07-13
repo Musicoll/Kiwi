@@ -33,7 +33,7 @@ namespace kiwi
     //! @brief Settings storage class utility.
     class StoredSettings : public juce::ValueTree::Listener
     {
-    public:
+    public: // methods
         
         //! @brief Constructor.
         StoredSettings();
@@ -50,9 +50,7 @@ namespace kiwi
         //! @brief Reload settings.
         void reload();
         
-    private:
-        std::vector<std::unique_ptr<juce::PropertiesFile>> m_property_files;
-        juce::ValueTree                                    m_defaults;
+    private: // methods
         
         void changed();
         void updateGlobalPreferences();
@@ -62,6 +60,13 @@ namespace kiwi
         void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override        { changed(); }
         void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override                { changed(); }
         void valueTreeParentChanged(juce::ValueTree&) override                              { changed(); }
+        
+    private: // members
+        
+        std::vector<std::unique_ptr<juce::PropertiesFile>> m_property_files;
+        juce::ValueTree                                    m_defaults;
+        
+    private: // deleted methods
         
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StoredSettings)
     };

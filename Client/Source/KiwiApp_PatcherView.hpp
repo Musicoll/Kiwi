@@ -99,6 +99,7 @@ namespace kiwi
         //! @brief Returns the position of the patcher origin relative to the component position.
         juce::Point<int> getOriginPosition() const;
         
+        //! @brief Create an object model. 
         model::Object& createObjectModel(std::string const& text);
         
         //! @brief called by ClassicBox when hmmm.. the text has been edited.
@@ -339,10 +340,10 @@ namespace kiwi
         void showPatcherPopupMenu(juce::Point<int> const& position);
         
         //! @internal Show Object contextual Popup menu
-        void showObjectPopupMenu(ObjectView const& object, juce::Point<int> const& position);
+        void showObjectPopupMenu(ObjectView const& object_view, juce::Point<int> const& position);
         
         //! @internal Show Link contextual Popup menu
-        void showLinkPopupMenu(LinkView const& link, juce::Point<int> const& position);
+        void showLinkPopupMenu(LinkView const& link_view, juce::Point<int> const& position);
         
         //! @brief Bring all link components in front of object ones.
         void bringsLinksToFront();
@@ -360,8 +361,8 @@ namespace kiwi
         model::Patcher&                             m_patcher_model;
         model::Patcher::View&                       m_view_model;
         
-        ObjectViews                                    m_objects;
-        LinkViews                                      m_links;
+        ObjectViews                                 m_objects;
+        LinkViews                                   m_links;
         
         std::set<flip::Ref>                         m_local_objects_selection;
         std::set<flip::Ref>                         m_local_links_selection;
@@ -371,7 +372,7 @@ namespace kiwi
         
         std::unique_ptr<PatcherViewport>            m_viewport;
         std::unique_ptr<HitTester>                  m_hittester;
-        std::unique_ptr<LinkViewCreator>               m_link_creator;
+        std::unique_ptr<LinkViewCreator>            m_link_creator;
         std::unique_ptr<IoletHighlighter>           m_io_highlighter;
         std::unique_ptr<Lasso>                      m_lasso;
         

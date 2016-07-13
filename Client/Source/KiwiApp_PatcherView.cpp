@@ -25,13 +25,11 @@
 #include "flip/Mold.h"
 
 #include "KiwiApp.hpp"
+#include "KiwiApp_CommandIDs.hpp"
 #include "KiwiApp_DocumentManager.hpp"
-#include "KiwiApp_Instance.hpp"
-#include "KiwiApp_PatcherView.hpp"
 #include "KiwiApp_PatcherViewHelper.hpp"
 #include "KiwiApp_ObjectView.hpp"
 #include "KiwiApp_LinkView.hpp"
-#include "KiwiApp_CommandIDs.hpp"
 
 namespace kiwi
 {
