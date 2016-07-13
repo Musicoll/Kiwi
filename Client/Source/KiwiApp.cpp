@@ -104,7 +104,7 @@ namespace kiwi
     {
         if(m_instance)
         {
-            m_instance->openFile(kiwi::FilePath(command_line.unquoted().toStdString()));
+            m_instance->openFile(juce::File(command_line.unquoted()));
         }
     }
     

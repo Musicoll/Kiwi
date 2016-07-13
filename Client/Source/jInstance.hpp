@@ -28,7 +28,6 @@
 
 #include "flip/Document.h"
 
-#include "KiwiFilePath.hpp"
 #include "jConsole.hpp"
 #include "DocumentExplorer.hpp"
 #include "jPatcherManager.hpp"
@@ -65,7 +64,7 @@ namespace kiwi
         engine::Instance const& getEngineInstance() const;
         
         //! @brief Open a File.
-        bool openFile(kiwi::FilePath const& file);
+        bool openFile(juce::File const& file);
         
         //! @brief Open a patcher from file
         void askUserToOpenPatcherDocument();

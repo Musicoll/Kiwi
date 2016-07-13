@@ -28,8 +28,6 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-#include "KiwiFilePath.hpp"
-
 namespace kiwi
 {
     class jPatcherManager;

@@ -27,7 +27,6 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-#include "KiwiFilePath.hpp"
 #include "KiwiCarrierSocket.hpp"
 
 namespace kiwi
@@ -39,7 +38,7 @@ namespace kiwi
     //! @brief Class that enable saving and loading the document from a kiwi file
     class FileHandler final
     {
-    public:
+    public: // methods
         
         //! @brief Constructs the FileHandler referencing document and pointing to a non-existing file.
         FileHandler(flip::DocumentBase & document);
@@ -48,28 +47,32 @@ namespace kiwi
         ~FileHandler() = default;
         
         //! @biref Loads the document from file and sets the pointed file.
-        void load(FilePath const& file);
+        void load(juce::File const& file);
         
         //! @brief Saves the document from file and sets the pointed file.
-        void save(FilePath const& file);
+        void save(juce::File const& file);
         
         //! @brief Get the pointed file.
-        FilePath const& getFile() const;
+        juce::File const& getFile() const;
         
-    private:
-        void setFile(FilePath const& file);
+    private: // internal methods
+        
+        void setFile(juce::File const& file);
         void load();
         void save();
+        bool hasValidExtension(juce::File const& file);
         
-    private:
+    private: // members
+        
         flip::DocumentBase& m_document;
-        FilePath m_file;
+        juce::File          m_file;
         
-    private:
-        FileHandler(FilePath const& other) = delete;
-        FileHandler(FilePath && other) = delete;
-        FileHandler& operator=(FilePath const& other) = delete;
-        FileHandler& operator=(FilePath && other) = delete;
+    private: // deleted methods
+        
+        FileHandler(FileHandler const& other) = delete;
+        FileHandler(FileHandler && other) = delete;
+        FileHandler& operator=(FileHandler const& other) = delete;
+        FileHandler& operator=(FileHandler && other) = delete;
     };
     
     // ================================================================================ //
@@ -115,15 +118,15 @@ namespace kiwi
         
         //! @brief Saves the patch into the designated file
         //! @details Doesn't save if not kiwi file. Sets the currently pointed file.
-        static void save(flip::Type& type, FilePath const& file);
+        static void save(flip::Type& type, juce::File const& file);
         
         //! @brief Loads the patch from the designated file
         //! @details Doesn't load if not kiwi file. Sets the currently pointed file.
-        static void load(flip::Type& type, FilePath const& file);
+        static void load(flip::Type& type, juce::File const& file);
         
         //! @brief Returns the file that is currently pointed to by the DocumentManager.
         //! @details If neither save or load was called return a non existing file (file.exist() == false).
-        static FilePath const& getSelectedFile(flip::Type& type);
+        static juce::File const& getSelectedFile(flip::Type& type);
         
         //! @brief Returns true if there is an action to undo.
         bool canUndo();
@@ -190,9 +193,9 @@ namespace kiwi
         void startCommitGesture();
         void commitGesture(std::string action);
         void endCommitGesture();
-        void save(FilePath const& file);
-        void load(FilePath const& file);
-        FilePath const& getSelectedFile() const;
+        void save(juce::File const& file);
+        void load(juce::File const& file);
+        juce::File const& getSelectedFile() const;
         
     private:
         

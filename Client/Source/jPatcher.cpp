@@ -1468,9 +1468,7 @@ namespace kiwi
             juce::String title = m_patcher_model.getName();
             const bool edited = m_manager.needsSaving();
             
-            kiwi::FilePath kiwi_file = DocumentManager::getSelectedFile(m_patcher_model);
-            
-            juce::File file(kiwi_file.getAbsolutePath());
+            juce::File kiwi_file = DocumentManager::getSelectedFile(m_patcher_model);
             
             if(juce::ComponentPeer* peer = window->getPeer())
             {
@@ -1478,7 +1476,7 @@ namespace kiwi
                     if (edited)
                         title << "*";
                 
-                peer->setRepresentedFile(file);
+                peer->setRepresentedFile(kiwi_file);
             }
             
             std::string new_name = title.toStdString() + (isLocked() ? "" : " (edit) ");

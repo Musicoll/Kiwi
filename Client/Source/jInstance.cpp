@@ -97,11 +97,13 @@ namespace kiwi
         DocumentManager::commit(patcher);
     }
     
-    bool jInstance::openFile(kiwi::FilePath const& file)
+    bool jInstance::openFile(juce::File const& file)
     {
-        if(file.isKiwiFile())
+        if(file.hasFileExtension("kiwi"))
         {
-            auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), new jPatcherManager(*this, file));
+            auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(),
+                                                         new jPatcherManager(*this, file));
+            
             jPatcherManager& manager = *(manager_it->get());
             if(manager.getNumberOfView() == 0)
             {
@@ -112,7 +114,7 @@ namespace kiwi
         }
         else
         {
-            KiwiApp::error("can't open file");
+            KiwiApp::error("can't open file (bad file extension)");
         }
         
         return false;
@@ -125,9 +127,7 @@ namespace kiwi
         if(file_chooser.browseForFileToOpen())
         {
             juce::File selected_file = file_chooser.getResult();
-            kiwi::FilePath open_file_path(selected_file.getFullPathName().toStdString());
-            
-            const bool success = openFile(open_file_path);
+            const bool success = openFile(selected_file);
             
             if(success)
             {

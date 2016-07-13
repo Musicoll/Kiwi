@@ -22,10 +22,6 @@
             file="Source/KiwiCarrierSocket.cpp"/>
       <FILE id="fYrL64" name="KiwiCarrierSocket.hpp" compile="0" resource="0"
             file="Source/KiwiCarrierSocket.hpp"/>
-      <FILE id="hHfaEF" name="KiwiFilePath.cpp" compile="1" resource="0"
-            file="Source/KiwiFilePath.cpp"/>
-      <FILE id="cYp1q8" name="KiwiFilePath.hpp" compile="0" resource="0"
-            file="Source/KiwiFilePath.hpp"/>
       <FILE id="mEvXwg" name="KiwiDocumentManager.cpp" compile="1" resource="0"
             file="Source/KiwiDocumentManager.cpp"/>
       <FILE id="kWPSit" name="KiwiDocumentManager.hpp" compile="0" resource="0"

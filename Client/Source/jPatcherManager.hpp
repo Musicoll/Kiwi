@@ -69,7 +69,7 @@ namespace kiwi
         jPatcherManager(jInstance& instance);
         
         //! @brief Constructs and load patcher from file
-        jPatcherManager(jInstance& instance, kiwi::FilePath const& file);
+        jPatcherManager(jInstance& instance, juce::File const& file);
 
         //! @brief Construct and connect to remote server
         jPatcherManager(jInstance & instance, const std::string host, uint16_t port);

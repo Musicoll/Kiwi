@@ -93,19 +93,19 @@ namespace kiwi
         return patcher.entity().use<DocumentManager>().m_gesture_flag;
     }
     
-    void DocumentManager::save(flip::Type& type, FilePath const& file)
+    void DocumentManager::save(flip::Type& type, juce::File const& file)
     {
         model::Patcher& patcher = type.ancestor<model::Patcher>();
         patcher.entity().use<DocumentManager>().save(file);
     }
     
-    void DocumentManager::load(flip::Type& type, FilePath const& file)
+    void DocumentManager::load(flip::Type& type, juce::File const& file)
     {
         model::Patcher& patcher = type.ancestor<model::Patcher>();
         patcher.entity().use<DocumentManager>().load(file);
     }
     
-    FilePath const& DocumentManager::getSelectedFile(flip::Type& type)
+    juce::File const& DocumentManager::getSelectedFile(flip::Type& type)
     {
         model::Patcher& patcher = type.ancestor<model::Patcher>();
         return patcher.entity().use<DocumentManager>().getSelectedFile();
@@ -295,17 +295,17 @@ namespace kiwi
         m_document.push();
     }
     
-    void DocumentManager::save(FilePath const& file)
+    void DocumentManager::save(juce::File const& file)
     {
         m_file_handler.save(file);
     }
     
-    void DocumentManager::load(FilePath const& file)
+    void DocumentManager::load(juce::File const& file)
     {
         m_file_handler.load(file);
     }
     
-    FilePath const& DocumentManager::getSelectedFile() const
+    juce::File const& DocumentManager::getSelectedFile() const
     {
         return m_file_handler.getFile();
     }
@@ -320,19 +320,24 @@ namespace kiwi
     {
     }
     
-    FilePath const& FileHandler::getFile() const
+    juce::File const& FileHandler::getFile() const
     {
         return m_file;
     }
     
-    void FileHandler::setFile(FilePath const& file)
+    void FileHandler::setFile(juce::File const& file)
     {
         m_file = file;
     }
     
-    void FileHandler::load(FilePath const& file)
+    bool FileHandler::hasValidExtension(juce::File const& file)
     {
-        if (file.isKiwiFile())
+        return file.hasFileExtension("kiwi");
+    }
+    
+    void FileHandler::load(juce::File const& file)
+    {
+        if (hasValidExtension(file))
         {
             setFile(file);
             load();
@@ -341,7 +346,7 @@ namespace kiwi
     
     void FileHandler::load()
     {
-        flip::DataProviderFile provider(m_file.getAbsolutePath().c_str());
+        flip::DataProviderFile provider(m_file.getFullPathName().toStdString().c_str());
         flip::BackEndIR back_end;
         
         back_end.register_backend<flip::BackEndBinary>();
@@ -350,9 +355,9 @@ namespace kiwi
         m_document.read(back_end);
     }
     
-    void FileHandler::save(FilePath const& file)
+    void FileHandler::save(juce::File const& file)
     {
-        if (file.isKiwiFile())
+        if (hasValidExtension(file))
         {
             setFile(file);
             save();
@@ -361,7 +366,7 @@ namespace kiwi
     
     void FileHandler::save()
     {
-        flip::DataConsumerFile consumer(m_file.getAbsolutePath().c_str());
+        flip::DataConsumerFile consumer(m_file.getFullPathName().toStdString().c_str());
         
         flip::BackEndIR back_end =  m_document.write();
         back_end.write<flip::BackEndBinary>(consumer);

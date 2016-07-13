@@ -75,7 +75,7 @@ namespace kiwi
         m_need_saving_flag = false;
     }
     
-    jPatcherManager::jPatcherManager(jInstance& instance, kiwi::FilePath const& file):
+    jPatcherManager::jPatcherManager(jInstance& instance, juce::File const& file):
     m_instance(instance),
     m_document(model::DataModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
     m_is_remote(false)
@@ -88,7 +88,7 @@ namespace kiwi
         
         patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
         
-        patcher.setName(file.getName());
+        patcher.setName(file.getFileNameWithoutExtension().toStdString());
         
         DocumentManager::commit(patcher, "Add User");
     }
@@ -159,9 +159,9 @@ namespace kiwi
     bool jPatcherManager::saveDocument()
     {
         auto& patcher = getPatcher();
-        kiwi::FilePath const& current_save_file = DocumentManager::getSelectedFile(patcher);
+        juce::File const& current_save_file = DocumentManager::getSelectedFile(patcher);
         
-        if (current_save_file.exist())
+        if (current_save_file.existsAsFile())
         {
             DocumentManager::save(patcher, current_save_file);
             m_need_saving_flag = false;
@@ -175,11 +175,11 @@ namespace kiwi
             
             if(saveFileChooser.browseForFileToSave(true))
             {
-                kiwi::FilePath save_file (saveFileChooser.getResult().getFullPathName().toStdString());
+                juce::File save_file(saveFileChooser.getResult().getFullPathName());
                 DocumentManager::save(patcher, save_file);
                 m_need_saving_flag = false;
                 
-                patcher.setName(save_file.getName());
+                patcher.setName(save_file.getFileNameWithoutExtension().toStdString());
                 DocumentManager::commit(patcher);
                 return true;
             }
