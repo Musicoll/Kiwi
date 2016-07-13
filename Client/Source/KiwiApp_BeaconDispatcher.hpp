@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_BEACON_DISPATCHER_HPP_INCLUDED
-#define KIWI_BEACON_DISPATCHER_HPP_INCLUDED
+#ifndef KIWI_APP_BEACON_DISPATCHER_HPP_INCLUDED
+#define KIWI_APP_BEACON_DISPATCHER_HPP_INCLUDED
 
 #include <KiwiEngine/KiwiEngineInstance.hpp>
 
@@ -80,4 +80,4 @@ namespace kiwi
 }
 
 
-#endif // KIWI_BEACON_DISPATCHER_HPP_INCLUDED
+#endif // KIWI_APP_BEACON_DISPATCHER_HPP_INCLUDED

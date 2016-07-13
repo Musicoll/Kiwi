@@ -22,7 +22,7 @@
 #include <cassert>
 #include <mutex>
 
-#include "KiwiCarrierSocket.hpp"
+#include "KiwiApp_CarrierSocket.hpp"
 
 #include <KiwiModel/KiwiModelPatcher.hpp>
 

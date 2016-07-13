@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_DOCUMENT_EXPLORER_HPP_INCLUDED
-#define KIWI_DOCUMENT_EXPLORER_HPP_INCLUDED
+#ifndef KIWI_APP_DOCUMENT_EXPLORER_HPP_INCLUDED
+#define KIWI_APP_DOCUMENT_EXPLORER_HPP_INCLUDED
 
 #include "flip/contrib/MulticastServiceExplorer.h"
 
@@ -166,4 +166,4 @@ namespace kiwi
 }
 
 
-#endif // KIWI_DOCUMENT_EXPLORER_HPP_INCLUDED
+#endif // KIWI_APP_DOCUMENT_EXPLORER_HPP_INCLUDED

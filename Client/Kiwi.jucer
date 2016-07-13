@@ -18,22 +18,22 @@
       <FILE id="KQjSU2" name="jPatcher.hpp" compile="0" resource="0" file="Source/jPatcher.hpp"/>
       <FILE id="QMh5qc" name="jWindow.cpp" compile="1" resource="0" file="Source/jWindow.cpp"/>
       <FILE id="dmcYQZ" name="jWindow.hpp" compile="0" resource="0" file="Source/jWindow.hpp"/>
-      <FILE id="RRhAev" name="KiwiCarrierSocket.cpp" compile="1" resource="0"
-            file="Source/KiwiCarrierSocket.cpp"/>
-      <FILE id="fYrL64" name="KiwiCarrierSocket.hpp" compile="0" resource="0"
-            file="Source/KiwiCarrierSocket.hpp"/>
-      <FILE id="mEvXwg" name="KiwiDocumentManager.cpp" compile="1" resource="0"
-            file="Source/KiwiDocumentManager.cpp"/>
-      <FILE id="kWPSit" name="KiwiDocumentManager.hpp" compile="0" resource="0"
-            file="Source/KiwiDocumentManager.hpp"/>
-      <FILE id="DHSN5e" name="DocumentExplorer.cpp" compile="1" resource="0"
-            file="Source/DocumentExplorer.cpp"/>
-      <FILE id="SzKgac" name="DocumentExplorer.hpp" compile="0" resource="0"
-            file="Source/DocumentExplorer.hpp"/>
-      <FILE id="EOqi96" name="BeaconDispatcher.cpp" compile="1" resource="0"
-            file="Source/BeaconDispatcher.cpp"/>
-      <FILE id="WtjygW" name="BeaconDispatcher.hpp" compile="0" resource="0"
-            file="Source/BeaconDispatcher.hpp"/>
+      <FILE id="RRhAev" name="KiwiApp_CarrierSocket.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_CarrierSocket.cpp"/>
+      <FILE id="fYrL64" name="KiwiApp_CarrierSocket.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_CarrierSocket.hpp"/>
+      <FILE id="mEvXwg" name="KiwiApp_DocumentManager.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_DocumentManager.cpp"/>
+      <FILE id="kWPSit" name="KiwiApp_DocumentManager.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_DocumentManager.hpp"/>
+      <FILE id="DHSN5e" name="KiwiApp_DocumentExplorer.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_DocumentExplorer.cpp"/>
+      <FILE id="SzKgac" name="KiwiApp_DocumentExplorer.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_DocumentExplorer.hpp"/>
+      <FILE id="EOqi96" name="KiwiApp_BeaconDispatcher.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_BeaconDispatcher.cpp"/>
+      <FILE id="WtjygW" name="KiwiApp_BeaconDispatcher.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_BeaconDispatcher.hpp"/>
       <FILE id="oCQegP" name="KiwiApp_PatcherManager.cpp" compile="1" resource="0"
             file="Source/KiwiApp_PatcherManager.cpp"/>
       <FILE id="UPcwrk" name="KiwiApp_PatcherManager.hpp" compile="0" resource="0"

@@ -22,7 +22,7 @@
 
 #include "KiwiApp.hpp"
 #include "KiwiApp_Instance.hpp"
-#include "KiwiDocumentManager.hpp"
+#include "KiwiApp_DocumentManager.hpp"
 #include "jPatcher.hpp"
 
 namespace kiwi

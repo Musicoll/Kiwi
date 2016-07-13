@@ -29,10 +29,10 @@
 #include "flip/Document.h"
 
 #include "KiwiApp_Console.hpp"
-#include "DocumentExplorer.hpp"
+#include "KiwiApp_DocumentExplorer.hpp"
 #include "KiwiApp_PatcherManager.hpp"
 #include "KiwiApp_StoredSettings.hpp"
-#include "BeaconDispatcher.hpp"
+#include "KiwiApp_BeaconDispatcher.hpp"
 
 namespace kiwi
 {

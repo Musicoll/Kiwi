@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include "BeaconDispatcher.hpp"
+#include "KiwiApp_BeaconDispatcher.hpp"
 #include "KiwiApp_StoredSettings.hpp"
 
 namespace kiwi

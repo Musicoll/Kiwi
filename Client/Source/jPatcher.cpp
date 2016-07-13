@@ -24,7 +24,7 @@
 
 #include "flip/Mold.h"
 
-#include "KiwiDocumentManager.hpp"
+#include "KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_Instance.hpp"
 #include "jPatcher.hpp"
 #include "jPatcherHelper.hpp"

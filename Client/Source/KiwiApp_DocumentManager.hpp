@@ -19,15 +19,15 @@
  ==============================================================================
  */
 
-#ifndef KIWI_DOCUMENT_MANAGER_HPP_INCLUDED
-#define KIWI_DOCUMENT_MANAGER_HPP_INCLUDED
+#ifndef KIWI_APP_DOCUMENT_MANAGER_HPP_INCLUDED
+#define KIWI_APP_DOCUMENT_MANAGER_HPP_INCLUDED
 
 #include "flip/History.h"
 #include "flip/HistoryStoreMemory.h"
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-#include "KiwiCarrierSocket.hpp"
+#include "KiwiApp_CarrierSocket.hpp"
 
 namespace kiwi
 {
@@ -220,4 +220,4 @@ namespace kiwi
     };
 }
 
-#endif // KIWI_DOCUMENT_MANAGER_HPP_INCLUDED
+#endif // KIWI_APP_DOCUMENT_MANAGER_HPP_INCLUDED

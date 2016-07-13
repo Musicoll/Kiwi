@@ -21,7 +21,7 @@
 
 #include <KiwiEngine/KiwiEngineConsole.hpp>
 
-#include "DocumentExplorer.hpp"
+#include "KiwiApp_DocumentExplorer.hpp"
 #include "KiwiApp_Instance.hpp"
 
 namespace kiwi

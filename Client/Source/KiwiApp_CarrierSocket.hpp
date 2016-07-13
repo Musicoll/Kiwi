@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_ENGINE_CARRIER_SOCKET_HPP_INCLUDED
-#define KIWI_ENGINE_CARRIER_SOCKET_HPP_INCLUDED
+#ifndef KIWI_APP_CARRIER_SOCKET_HPP_INCLUDED
+#define KIWI_APP_CARRIER_SOCKET_HPP_INCLUDED
 
 #include <thread>
 #include <functional>
@@ -110,4 +110,4 @@ namespace kiwi
     };
 }
 
-#endif // KIWI_ENGINE_CARRIER_SOCKET_HPP_INCLUDED
+#endif // KIWI_APP_CARRIER_SOCKET_HPP_INCLUDED
