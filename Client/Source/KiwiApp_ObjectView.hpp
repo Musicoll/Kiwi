@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_JOBJECT_HPP_INCLUDED
-#define KIWI_JOBJECT_HPP_INCLUDED
+#ifndef KIWI_APP_OBJECTVIEW_HPP_INCLUDED
+#define KIWI_APP_OBJECTVIEW_HPP_INCLUDED
 
 #include <KiwiModel/KiwiModelPatcher.hpp>
 
@@ -30,19 +30,19 @@ namespace kiwi
 {
     class HitTester;
     class PatcherView;
-    class jClassicBox;
+    class ClassicBox;
     
     // ================================================================================ //
-    //                                      JOBJECT                                     //
+    //                                     OBJECT VIEW                                  //
     // ================================================================================ //
     
     //! @brief The juce object Component.
-    class jObject : public juce::Component
+    class ObjectView : public juce::Component
     {
     public:
         
-        jObject(PatcherView& patcher_view, model::Object& object_m);
-        ~jObject();
+        ObjectView(PatcherView& patcher_view, model::Object& object_m);
+        ~ObjectView();
         
         void objectChanged(model::Patcher::View& view, model::Object& object);
         void localSelectionChanged(bool selected_for_view);
@@ -111,23 +111,23 @@ namespace kiwi
         bool                    m_is_editing;
         bool                    m_is_errorbox;
         
-        friend jClassicBox;
+        friend ClassicBox;
     };
     
     // ================================================================================ //
-    //                                   JOBJECT BOX                                    //
+    //                                   CLASSIC BOX                                    //
     // ================================================================================ //
     
-    //! @brief The jClassicBox let the user change the text of the box
-    class jClassicBox : public jObject, public juce::TextEditor::Listener
+    //! @brief The ClassicBox let the user change the text of the box
+    class ClassicBox : public ObjectView, public juce::TextEditor::Listener
     {
     public:
         
         //! @brief Constructor.
-        jClassicBox(PatcherView& patcher_view, model::Object& object_m);
+        ClassicBox(PatcherView& patcher_view, model::Object& object_m);
         
         //! @brief Destructor.
-        ~jClassicBox();
+        ~ClassicBox();
         
         //! @brief Give focus to the text editor.
         void grabKeyboardFocus();
@@ -155,4 +155,4 @@ namespace kiwi
     };
 }
 
-#endif // KIWI_JOBJECT_HPP_INCLUDED
+#endif // KIWI_APP_OBJECTVIEW_HPP_INCLUDED

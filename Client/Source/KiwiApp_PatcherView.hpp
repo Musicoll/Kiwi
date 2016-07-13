@@ -31,8 +31,8 @@
 namespace kiwi
 {
     class PatcherManager;
-    class jObject;
-    class jClassicBox;
+    class ObjectView;
+    class ClassicBox;
     class LinkView;
     class LinkViewCreator;
     class Instance;
@@ -59,7 +59,7 @@ namespace kiwi
         //! @brief Destructor
         ~PatcherView();
         
-        using jObjects = std::vector<std::unique_ptr<jObject>>;
+        using ObjectViews = std::vector<std::unique_ptr<ObjectView>>;
         using LinkViews = std::vector<std::unique_ptr<LinkView>>;
         
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
@@ -68,14 +68,14 @@ namespace kiwi
         //! @brief Returns the patcher view model.
         model::Patcher::View& getPatcherViewModel();
         
-        //! @brief Returns the jObjects.
-        jObjects const& getObjects() const;
+        //! @brief Returns the ObjectViews.
+        ObjectViews const& getObjects() const;
         
         //! @brief Returns the LinkViews.
         LinkViews const& getLinks() const;
         
-        //! @brief Returns the jObject corresponding to a given Object model.
-        jObject* getObject(model::Object const& object);
+        //! @brief Returns the ObjectView corresponding to a given Object model.
+        ObjectView* getObject(model::Object const& object);
         
         //! @brief Returns the LinkView corresponding to a given Link model.
         LinkView* getLink(model::Link const& link);
@@ -87,7 +87,7 @@ namespace kiwi
         bool isLocked() const;
         
         //! @brief Returns true if the object is selected.
-        bool isSelected(jObject const& object) const;
+        bool isSelected(ObjectView const& object) const;
         
         //! @brief Returns true if the link is selected.
         bool isSelected(LinkView const& link) const;
@@ -101,8 +101,8 @@ namespace kiwi
         
         model::Object& createObjectModel(std::string const& text);
         
-        //! @brief called by jClassicBox when hmmm.. the text has been edited.
-        void boxHasBeenEdited(jClassicBox& box, std::string new_text);
+        //! @brief called by ClassicBox when hmmm.. the text has been edited.
+        void boxHasBeenEdited(ClassicBox& box, std::string new_text);
         
         //! @internal Update the patcher window title.
         void updateWindowTitle() const;
@@ -153,13 +153,13 @@ namespace kiwi
         void checkLinksSelectionChanges(model::Patcher& patcher);
         
         //! @internal Object model has just been added to the document.
-        void addjObject(model::Object& object, int zorder = -1);
+        void addObjectView(model::Object& object, int zorder = -1);
         
         //! @internal Object model is resident and internal value changed.
         void objectChanged(model::Patcher::View& view, model::Object& object);
         
         //! @internal Object model will be removed from the document.
-        void removejObject(model::Object& object);
+        void removeObjectView(model::Object& object);
         
         //! @internal Link model has just been added to the document.
         void addLinkView(model::Link& link);
@@ -208,15 +208,15 @@ namespace kiwi
         //! @brief Returns the selected links.
         std::set<flip::Ref> const& getSelectedLinks() const;
         
-        void addToSelectionBasedOnModifiers(jObject& object, bool select_only);
+        void addToSelectionBasedOnModifiers(ObjectView& object, bool select_only);
         
         void addToSelectionBasedOnModifiers(LinkView& link, bool select_only);
         
-        bool selectOnMouseDown(jObject& object, bool select_only);
+        bool selectOnMouseDown(ObjectView& object, bool select_only);
         
         bool selectOnMouseDown(LinkView& link, bool select_only);
         
-        void selectOnMouseUp(jObject& box, bool select_only,
+        void selectOnMouseUp(ObjectView& box, bool select_only,
                              const bool box_was_dragged,
                              const bool result_of_mouse_down_select_method);
         
@@ -234,13 +234,13 @@ namespace kiwi
         bool isAnyLinksSelected();
         
         //! @brief Select an Object.
-        void selectObject(jObject& object);
+        void selectObject(ObjectView& object);
         
         //! @brief Select multiple objects
-        void selectObjects(std::vector<jObject*> const& objects);
+        void selectObjects(std::vector<ObjectView*> const& objects);
         
         //! @brief Unselect all and select an object.
-        void selectObjectOnly(jObject& object);
+        void selectObjectOnly(ObjectView& object);
         
         //! @brief Select a Link.
         void selectLink(LinkView& link);
@@ -252,7 +252,7 @@ namespace kiwi
         void selectLinkOnly(LinkView& link);
         
         //! @brief Unselect an Object.
-        void unselectObject(jObject& object);
+        void unselectObject(ObjectView& object);
         
         //! @brief Unselect a Link.
         void unselectLink(LinkView& link);
@@ -307,8 +307,8 @@ namespace kiwi
         //                                      MISC                                        //
         // ================================================================================ //
         
-        //! @internal Find a jObject with a given Object model.
-        jObjects::iterator findObject(model::Object const& object);
+        //! @internal Find a ObjectView with a given Object model.
+        ObjectViews::iterator findObject(model::Object const& object);
         
         //! @internal Find a LinkView with a given Link model.
         LinkViews::iterator findLink(model::Link const& link);
@@ -324,7 +324,7 @@ namespace kiwi
         juce::Rectangle<int> getSelectionBounds();
         
         //! @internal get the nearest valid iolet of the link creator.
-        std::pair<jObject*, size_t> getLinkCreatorNearestEndingIolet();
+        std::pair<ObjectView*, size_t> getLinkCreatorNearestEndingIolet();
         
         //! @brief Zoom in Patcher View.
         void zoomIn();
@@ -339,7 +339,7 @@ namespace kiwi
         void showPatcherPopupMenu(juce::Point<int> const& position);
         
         //! @internal Show Object contextual Popup menu
-        void showObjectPopupMenu(jObject const& object, juce::Point<int> const& position);
+        void showObjectPopupMenu(ObjectView const& object, juce::Point<int> const& position);
         
         //! @internal Show Link contextual Popup menu
         void showLinkPopupMenu(LinkView const& link, juce::Point<int> const& position);
@@ -360,7 +360,7 @@ namespace kiwi
         model::Patcher&                             m_patcher_model;
         model::Patcher::View&                       m_view_model;
         
-        jObjects                                    m_objects;
+        ObjectViews                                    m_objects;
         LinkViews                                      m_links;
         
         std::set<flip::Ref>                         m_local_objects_selection;

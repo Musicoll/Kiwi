@@ -22,14 +22,14 @@
 #include <KiwiModel/KiwiModelPatcherView.hpp>
 
 #include "KiwiApp_DocumentManager.hpp"
-#include "jObject.hpp"
+#include "KiwiApp_ObjectView.hpp"
 #include "KiwiApp.hpp"
 #include "KiwiApp_PatcherViewHelper.hpp"
 #include "KiwiApp_PatcherView.hpp"
 
 namespace kiwi
 {
-    jObject::jObject(PatcherView& patcher_view, model::Object& object_m) :
+    ObjectView::ObjectView(PatcherView& patcher_view, model::Object& object_m) :
     m_patcher_view(patcher_view),
     m_model(&object_m),
     m_io_color(0.3, 0.3, 0.3),
@@ -48,12 +48,12 @@ namespace kiwi
         updateBounds();
     }
     
-    jObject::~jObject()
+    ObjectView::~ObjectView()
     {
         ;
     }
     
-    void jObject::updateBounds()
+    void ObjectView::updateBounds()
     {
         if(m_model && !m_model->removed())
         {
@@ -73,7 +73,7 @@ namespace kiwi
         }
     }
     
-    void jObject::paint(juce::Graphics & g)
+    void ObjectView::paint(juce::Graphics & g)
     {
         const auto bounds = getLocalBounds();
         const auto box_bounds = m_local_box_bounds;
@@ -149,7 +149,7 @@ namespace kiwi
         }
     }
     
-    void jObject::drawInletsOutlets(juce::Graphics & g)
+    void ObjectView::drawInletsOutlets(juce::Graphics & g)
     {
         const juce::Rectangle<int> bounds = m_local_box_bounds;
         
@@ -164,12 +164,12 @@ namespace kiwi
         }
     }
     
-    juce::Rectangle<int> jObject::getBoxBounds() const
+    juce::Rectangle<int> ObjectView::getBoxBounds() const
     {
         return m_local_box_bounds.withPosition(getPosition() + m_local_box_bounds.getPosition());
     }
     
-    bool jObject::hitTest(int x, int y)
+    bool ObjectView::hitTest(int x, int y)
     {
         bool allow_click;
         bool allow_click_onchild;
@@ -181,7 +181,7 @@ namespace kiwi
         return m_local_box_bounds.contains(x, y);
     }
     
-    bool jObject::hitTest(juce::Point<int> const& pt, HitTester& hit) const
+    bool ObjectView::hitTest(juce::Point<int> const& pt, HitTester& hit) const
     {
         const auto box_bounds = m_local_box_bounds;
         
@@ -265,18 +265,18 @@ namespace kiwi
         return false;
     }
     
-    bool jObject::hitTest(juce::Rectangle<int> const& rect)
+    bool ObjectView::hitTest(juce::Rectangle<int> const& rect)
     {
         const juce::Rectangle<int> bounds = getBoxBounds();
         return rect.intersects(bounds) || rect.contains(bounds) || bounds.contains(rect);
     }
     
-    bool jObject::isSelected()
+    bool ObjectView::isSelected()
     {
         return m_is_selected;
     }
     
-    void jObject::objectChanged(model::Patcher::View& view, model::Object& object)
+    void ObjectView::objectChanged(model::Patcher::View& view, model::Object& object)
     {
         bool need_redraw = false;
         
@@ -310,7 +310,7 @@ namespace kiwi
         }
     }
 
-    void jObject::localSelectionChanged(bool selected)
+    void ObjectView::localSelectionChanged(bool selected)
     {
         if(m_is_selected != selected)
         {
@@ -319,23 +319,23 @@ namespace kiwi
         }
     }
     
-    void jObject::distantSelectionChanged(std::set<uint64_t> distant_user_id_selection)
+    void ObjectView::distantSelectionChanged(std::set<uint64_t> distant_user_id_selection)
     {
         m_distant_selection = distant_user_id_selection;
         repaint();
     }
     
-    juce::Point<int> jObject::getInletPatcherPosition(const size_t index) const
+    juce::Point<int> ObjectView::getInletPatcherPosition(const size_t index) const
     {
         return getPosition() + getInletLocalBounds(index, m_local_box_bounds).getCentre();
     }
     
-    juce::Point<int> jObject::getOutletPatcherPosition(const size_t index) const
+    juce::Point<int> ObjectView::getOutletPatcherPosition(const size_t index) const
     {
         return getPosition() + getOutletLocalBounds(index, m_local_box_bounds).getCentre();
     }
     
-    juce::Rectangle<int> jObject::getInletLocalBounds(const size_t index,
+    juce::Rectangle<int> ObjectView::getInletLocalBounds(const size_t index,
                                                       juce::Rectangle<int> const& object_bounds) const
     {
         juce::Rectangle<int> rect;
@@ -358,7 +358,7 @@ namespace kiwi
         return rect;
     }
     
-    juce::Rectangle<int> jObject::getOutletLocalBounds(const size_t index,
+    juce::Rectangle<int> ObjectView::getOutletLocalBounds(const size_t index,
                                                        juce::Rectangle<int> const& object_bounds) const
     {
         juce::Rectangle<int> rect;
@@ -384,7 +384,7 @@ namespace kiwi
         return rect;
     }
     
-    void jObject::lockStatusChanged(bool locked)
+    void ObjectView::lockStatusChanged(bool locked)
     {
         m_is_locked = locked;
         
@@ -393,37 +393,37 @@ namespace kiwi
         //setMouseClickGrabsKeyboardFocus(locked);
     }
     
-    void jObject::patcherViewOriginPositionChanged()
+    void ObjectView::patcherViewOriginPositionChanged()
     {
         updateBounds();
     }
     
-    void jObject::mouseDown(juce::MouseEvent const& event)
+    void ObjectView::mouseDown(juce::MouseEvent const& event)
     {
         ;
     }
     
-    void jObject::mouseDrag(juce::MouseEvent const& event)
+    void ObjectView::mouseDrag(juce::MouseEvent const& event)
     {
         ;
     }
     
     // ================================================================================ //
-    //                                   JOBJECT BOX                                    //
+    //                                   CLASSIC BOX                                    //
     // ================================================================================ //
     
-    jClassicBox::jClassicBox(PatcherView& patcher_view, model::Object& object_m) : jObject(patcher_view, object_m)
+    ClassicBox::ClassicBox(PatcherView& patcher_view, model::Object& object_m) : ObjectView(patcher_view, object_m)
     {
         setWantsKeyboardFocus(true);
         setMouseClickGrabsKeyboardFocus(true);
     }
 
-    jClassicBox::~jClassicBox()
+    ClassicBox::~ClassicBox()
     {
         removeTextEditor();
     }
     
-    void jClassicBox::grabKeyboardFocus()
+    void ClassicBox::grabKeyboardFocus()
     {
         setInterceptsMouseClicks(true, true);
         
@@ -461,7 +461,7 @@ namespace kiwi
         m_is_editing = true;
     }
     
-    void jClassicBox::removeTextEditor()
+    void ClassicBox::removeTextEditor()
     {
         if(m_editor)
         {
@@ -474,17 +474,17 @@ namespace kiwi
         }
     }
     
-    void jClassicBox::focusGained(FocusChangeType cause)
+    void ClassicBox::focusGained(FocusChangeType cause)
     {
         //KiwiApp::post("focusGained");
     }
     
-    void jClassicBox::focusLost(FocusChangeType cause)
+    void ClassicBox::focusLost(FocusChangeType cause)
     {
         //KiwiApp::post("focusLost");
     }
     
-    void jClassicBox::resized()
+    void ClassicBox::resized()
     {
         if(m_editor)
         {
@@ -493,7 +493,7 @@ namespace kiwi
         }
     }
     
-    void jClassicBox::textEditorTextChanged(juce::TextEditor& e)
+    void ClassicBox::textEditorTextChanged(juce::TextEditor& e)
     {
         const juce::String new_text = e.getText();
         const juce::Font font = e.getFont();
@@ -512,21 +512,21 @@ namespace kiwi
         }
     }
     
-    void jClassicBox::textEditorReturnKeyPressed(juce::TextEditor& e)
+    void ClassicBox::textEditorReturnKeyPressed(juce::TextEditor& e)
     {
         //KiwiApp::post("textEditorReturnKeyPressed");
         
         m_patcher_view.grabKeyboardFocus();
     }
     
-    void jClassicBox::textEditorEscapeKeyPressed(juce::TextEditor& e)
+    void ClassicBox::textEditorEscapeKeyPressed(juce::TextEditor& e)
     {
         //KiwiApp::post("textEditorEscapeKeyPressed");
         
         removeTextEditor();
     }
     
-    void jClassicBox::textEditorFocusLost(juce::TextEditor& e)
+    void ClassicBox::textEditorFocusLost(juce::TextEditor& e)
     {
         const bool locked = m_is_locked;
         setInterceptsMouseClicks(locked, locked);

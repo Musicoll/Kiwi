@@ -24,7 +24,7 @@
 
 #include <KiwiModel/KiwiModelLink.hpp>
 
-#include "jObject.hpp"
+#include "KiwiApp_ObjectView.hpp"
 
 namespace kiwi
 {
@@ -110,7 +110,7 @@ namespace kiwi
     public:
         
         //! @brief Constructor
-        LinkViewCreator(jObject& binded_object,
+        LinkViewCreator(ObjectView& binded_object,
                      const size_t index,
                      bool is_sender,
                      juce::Point<int> dragged_pos);
@@ -119,7 +119,7 @@ namespace kiwi
         ~LinkViewCreator() = default;
         
         //! @brief Get the binded object
-        jObject& getBindedObject() const {return m_binded_object;};
+        ObjectView& getBindedObject() const {return m_binded_object;};
         
         //! @brief Get the portlet index
         size_t getBindedIndex() const {return m_index;};
@@ -138,7 +138,7 @@ namespace kiwi
         
     private: // members
         
-        jObject&            m_binded_object;
+        ObjectView&            m_binded_object;
         const size_t        m_index;
         const bool          m_is_sender;
     };

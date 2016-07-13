@@ -129,13 +129,13 @@ namespace kiwi
     }
     
     void HitTester::test(juce::Rectangle<int> const& rect,
-                         std::vector<jObject*>& objects, std::vector<LinkView*>& links)
+                         std::vector<ObjectView*>& objects, std::vector<LinkView*>& links)
     {
         testObjects(rect, objects);
         testLinks(rect, links);
     }
     
-    void HitTester::testObjects(juce::Rectangle<int> const& rect, std::vector<jObject*>& objects)
+    void HitTester::testObjects(juce::Rectangle<int> const& rect, std::vector<ObjectView*>& objects)
     {
         objects.clear();
         
@@ -166,7 +166,7 @@ namespace kiwi
         return m_patcher;
     }
     
-    jObject* HitTester::getObject() const noexcept
+    ObjectView* HitTester::getObject() const noexcept
     {
         if(m_target == Target::Box)
         {
@@ -306,10 +306,10 @@ namespace kiwi
         setViewPosition((position + getOriginPosition()) * m_zoom_factor);
     }
     
-    void PatcherViewport::jumpViewToObject(jObject const& object_j)
+    void PatcherViewport::jumpViewToObject(ObjectView const& object_view)
     {
         const auto view_area = getRelativeViewArea();
-        auto object_bounds = object_j.getBoxBounds();
+        auto object_bounds = object_view.getBoxBounds();
         object_bounds.setPosition(((object_bounds.getPosition() - getOriginPosition())));
         
         if(! view_area.contains(object_bounds))
@@ -590,7 +590,7 @@ namespace kiwi
         g.drawRect(bounds);
     }
     
-    void IoletHighlighter::highlightInlet(jObject const& object, const size_t index)
+    void IoletHighlighter::highlightInlet(ObjectView const& object, const size_t index)
     {
         const juce::Point<int> io_center = object.getInletPatcherPosition(index);
         juce::Rectangle<int> new_bounds = juce::Rectangle<int>(io_center, io_center).expanded(5);
@@ -601,7 +601,7 @@ namespace kiwi
         setVisible(true);
     }
     
-    void IoletHighlighter::highlightOutlet(jObject const& object, const size_t index)
+    void IoletHighlighter::highlightOutlet(ObjectView const& object, const size_t index)
     {
         const juce::Point<int> io_center = object.getOutletPatcherPosition(index);
         juce::Rectangle<int> new_bounds = juce::Rectangle<int>(io_center, io_center).expanded(5);
@@ -689,17 +689,17 @@ namespace kiwi
         {
             if(include_objects)
             {
-                PatcherView::jObjects const& objects = m_patcher.getObjects();
+                PatcherView::ObjectViews const& objects = m_patcher.getObjects();
                 
                 HitTester hit(m_patcher);
-                std::vector<jObject*> lasso_objects;
+                std::vector<ObjectView*> lasso_objects;
                 hit.testObjects(bounds, lasso_objects);
                 
-                for(auto& object_j_uptr : objects)
+                for(auto& object_view_uptr : objects)
                 {
-                    if(object_j_uptr)
+                    if(object_view_uptr)
                     {
-                        jObject& object = *object_j_uptr.get();
+                        ObjectView& object = *object_view_uptr.get();
                         
                         const bool is_selected = object.isSelected();
                         const bool was_selected = m_objects.find(object.getModel().ref()) != m_objects.end();
@@ -765,7 +765,7 @@ namespace kiwi
             
             if(include_objects)
             {
-                std::vector<jObject*> objects;
+                std::vector<ObjectView*> objects;
                 hit.testObjects(bounds, objects);
                 m_patcher.selectObjects(objects);
             }

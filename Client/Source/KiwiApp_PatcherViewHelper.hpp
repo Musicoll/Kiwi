@@ -23,7 +23,7 @@
 #define KIWI_APP_PATCHERVIEW_HELPER_HPP_INCLUDED
 
 #include "KiwiApp_PatcherView.hpp"
-#include "jObject.hpp"
+#include "KiwiApp_ObjectView.hpp"
 #include "KiwiApp_LinkView.hpp"
 
 namespace kiwi
@@ -100,14 +100,14 @@ namespace kiwi
         //! @param objects The vector of objects that will be filled.
         //! @param links The vector of links that will be filled.
         void test(juce::Rectangle<int> const& rect,
-                  std::vector<jObject*>& objects,
+                  std::vector<ObjectView*>& objects,
                   std::vector<LinkView*>& links);
         
         //! @brief Test a rectangle.
         //! @details Try to find the objects that overlaps the given rectangle.
         //! @param rect The rectangle.
         //! @param objects The vector of objects that will be filled.
-        void testObjects(juce::Rectangle<int> const& rect, std::vector<jObject*>& objects);
+        void testObjects(juce::Rectangle<int> const& rect, std::vector<ObjectView*>& objects);
         
         //! @brief Test a rectangle.
         //! @details Try to find the links that overlaps the given rectangle.
@@ -134,7 +134,7 @@ namespace kiwi
         PatcherView const& getPatcher() const noexcept;
         
         //! @brief Get the object box that has been touched by the last hit-test.
-        jObject* getObject() const noexcept;
+        ObjectView* getObject() const noexcept;
         
         //! @brief Get the link that has been touched by the last hit-test.
         LinkView* getLink() const noexcept;
@@ -161,7 +161,7 @@ namespace kiwi
     private: // members
         
         PatcherView const& m_patcher;
-        jObject*        m_object    = nullptr;
+        ObjectView*        m_object    = nullptr;
         LinkView*          m_link      = nullptr;
         Target          m_target	= Target::Nothing;
         Zone            m_zone		= Zone::Outside;
@@ -169,7 +169,7 @@ namespace kiwi
         size_t          m_index     = 0;
         
         friend class LinkView;
-        friend class jObject;
+        friend class ObjectView;
     };
     
     // ================================================================================ //
@@ -194,7 +194,7 @@ namespace kiwi
         void resized() override;
         
         //! @brief Make the object visible in the viewport area.
-        void jumpViewToObject(jObject const&);
+        void jumpViewToObject(ObjectView const&);
         
         //! @brief Attempts to brings the center of the given bounds to the center of the viewport view area
         void bringRectToCentre(juce::Rectangle<int> bounds);
@@ -268,10 +268,10 @@ namespace kiwi
         void hide();
         
         //! @brief Highlight inlet
-        void highlightInlet(jObject const& object, const size_t index);
+        void highlightInlet(ObjectView const& object, const size_t index);
         
         //! @brief Highlight outlet
-        void highlightOutlet(jObject const& object, const size_t index);
+        void highlightOutlet(ObjectView const& object, const size_t index);
         
     private: // members
         
