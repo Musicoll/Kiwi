@@ -30,7 +30,7 @@
 
 namespace kiwi
 {
-    class jInstance;
+    class Instance;
     
     // ================================================================================ //
     //                                  DOCUMENT EXPLORER                               //
@@ -105,7 +105,7 @@ namespace kiwi
     public:
         
         //! @brief Constructor.
-        Panel(DocumentExplorer& explorer, jInstance& instance);
+        Panel(DocumentExplorer& explorer, Instance& instance);
         
         //! @brief Destructor.
         ~Panel();
@@ -145,7 +145,7 @@ namespace kiwi
         
     private: // members
         
-        jInstance&                                      m_instance;
+        Instance&                                       m_instance;
         DocumentExplorer&                               m_explorer;
         std::vector<std::unique_ptr<SessionItemButton>> m_buttons;
     };
@@ -158,7 +158,7 @@ namespace kiwi
     class DocumentExplorerWindow : public jWindow
     {
     public:
-        DocumentExplorerWindow(DocumentExplorer& explorer, jInstance& instance);
+        DocumentExplorerWindow(DocumentExplorer& explorer, Instance& instance);
         ~DocumentExplorerWindow();
         
         void closeButtonPressed() override;

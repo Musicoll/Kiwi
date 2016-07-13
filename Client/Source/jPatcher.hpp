@@ -35,7 +35,7 @@ namespace kiwi
     class jClassicBox;
     class jLink;
     class jLinkCreator;
-    class jInstance;
+    class Instance;
     class HitTester;
     class jPatcherViewport;
     class IoletHighlighter;
@@ -52,7 +52,7 @@ namespace kiwi
         
         //! @brief Constructor
         jPatcher(jPatcherManager& manager,
-                 jInstance& instance,
+                 Instance& instance,
                  model::Patcher& patcher,
                  model::Patcher::View& view);
         
@@ -356,7 +356,7 @@ namespace kiwi
     private: // members
         
         jPatcherManager&                            m_manager;
-        jInstance&                                  m_instance;
+        Instance&                                   m_instance;
         model::Patcher&                             m_patcher_model;
         model::Patcher::View&                       m_view_model;
         

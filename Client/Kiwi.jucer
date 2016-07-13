@@ -44,8 +44,10 @@
             file="Source/KiwiConsoleHistory.hpp"/>
       <FILE id="ZMqKKa" name="jConsole.cpp" compile="1" resource="0" file="Source/jConsole.cpp"/>
       <FILE id="jpbFUu" name="jConsole.hpp" compile="0" resource="0" file="Source/jConsole.hpp"/>
-      <FILE id="Jmu5NJ" name="jInstance.cpp" compile="1" resource="0" file="Source/jInstance.cpp"/>
-      <FILE id="dfUOAd" name="jInstance.hpp" compile="0" resource="0" file="Source/jInstance.hpp"/>
+      <FILE id="Jmu5NJ" name="KiwiApp_Instance.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_Instance.cpp"/>
+      <FILE id="dfUOAd" name="KiwiApp_Instance.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_Instance.hpp"/>
       <FILE id="yC78kD" name="KiwiApp_CommandIDs.hpp" compile="0" resource="0"
             file="Source/KiwiApp_CommandIDs.hpp"/>
       <FILE id="dQYnOl" name="KiwiApp_StoredSettings.cpp" compile="1" resource="0"

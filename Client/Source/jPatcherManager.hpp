@@ -32,7 +32,7 @@
 
 namespace kiwi
 {
-    class jInstance;
+    class Instance;
     
     // ================================================================================ //
     //                                  JPATCHER WINDOW                                 //
@@ -60,19 +60,19 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The main DocumentObserver.
-    //! @details The jInstance dispatch changes to all other DocumentObserver objects
+    //! @details The Instance dispatch changes to all other DocumentObserver objects
     class jPatcherManager : public flip::DocumentObserver<model::Patcher>
     {
     public:
         
         //! @brief Constructor.
-        jPatcherManager(jInstance& instance);
+        jPatcherManager(Instance& instance);
         
         //! @brief Constructs and load patcher from file
-        jPatcherManager(jInstance& instance, juce::File const& file);
+        jPatcherManager(Instance& instance, juce::File const& file);
 
         //! @brief Construct and connect to remote server
-        jPatcherManager(jInstance & instance, const std::string host, uint16_t port);
+        jPatcherManager(Instance & instance, const std::string host, uint16_t port);
         
         //! @brief Destructor.
         ~jPatcherManager();
@@ -139,7 +139,7 @@ namespace kiwi
 
     private: // members
         
-        jInstance&      m_instance;
+        Instance&       m_instance;
         flip::Document  m_document;
         bool            m_need_saving_flag;
         bool            m_is_remote;

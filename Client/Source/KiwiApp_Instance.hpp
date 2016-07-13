@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_JINSTANCE_HPP_INCLUDED
-#define KIWI_JINSTANCE_HPP_INCLUDED
+#ifndef KIWI_APP_INSTANCE_HPP_INCLUDED
+#define KIWI_APP_INSTANCE_HPP_INCLUDED
 
 #include <string>
 
@@ -37,19 +37,19 @@
 namespace kiwi
 {
     // ================================================================================ //
-    //                                     jINSTANCE                                    //
+    //                                      INSTANCE                                    //
     // ================================================================================ //
 
-    //! @brief The jInstance
-    class jInstance
+    //! @brief The Application Instance
+    class Instance
     {
     public:
         
         //! @brief Constructor
-        jInstance();
+        Instance();
         
         //! @brief Destructor
-        ~jInstance();
+        ~Instance();
         
         //! @brief Get the user ID of the Instance.
         uint64_t getUserId() const noexcept;
@@ -130,4 +130,4 @@ namespace kiwi
     };
 }
 
-#endif // KIWI_JINSTANCE_HPP_INCLUDED
+#endif // KIWI_APP_INSTANCE_HPP_INCLUDED

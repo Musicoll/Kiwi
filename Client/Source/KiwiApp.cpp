@@ -87,7 +87,7 @@ namespace kiwi
         initCommandManager();
         m_menu_model.reset(new MainMenuModel());
         
-        m_instance = std::make_unique<jInstance>();
+        m_instance = std::make_unique<Instance>();
         
         #if JUCE_MAC
         juce::PopupMenu macMainMenuPopup;

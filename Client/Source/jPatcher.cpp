@@ -25,7 +25,7 @@
 #include "flip/Mold.h"
 
 #include "KiwiDocumentManager.hpp"
-#include "jInstance.hpp"
+#include "KiwiApp_Instance.hpp"
 #include "jPatcher.hpp"
 #include "jPatcherHelper.hpp"
 #include "jObject.hpp"
@@ -38,7 +38,7 @@ namespace kiwi
     bool jPatcher::m_command_manager_binded = false;
     
     jPatcher::jPatcher(jPatcherManager& manager,
-                       jInstance& instance,
+                       Instance& instance,
                        model::Patcher& patcher,
                        model::Patcher::View& view) :
     m_manager(manager),

@@ -21,19 +21,19 @@
 
 
 #include "KiwiApp.hpp"
-#include "jInstance.hpp"
+#include "KiwiApp_Instance.hpp"
 #include "KiwiDocumentManager.hpp"
 #include "jPatcher.hpp"
 
 namespace kiwi
 {
     // ================================================================================ //
-    //                                     jINSTANCE                                    //
+    //                                      INSTANCE                                    //
     // ================================================================================ //
 
-    size_t jInstance::m_untitled_patcher_index(0);
+    size_t Instance::m_untitled_patcher_index(0);
     
-    jInstance::jInstance() :
+    Instance::Instance() :
     m_user_id(flip::Ref::User::Offline),
     m_instance(new engine::Instance()),
     m_console_history(std::make_shared<ConsoleHistory>(*m_instance)),
@@ -46,33 +46,33 @@ namespace kiwi
         ;
     }
     
-    jInstance::~jInstance()
+    Instance::~Instance()
     {
         m_console_window.reset();
         m_patcher_managers.clear();
     }
     
-    uint64_t jInstance::getUserId() const noexcept
+    uint64_t Instance::getUserId() const noexcept
     {
         return m_user_id;
     }
     
-    void jInstance::setUserId(uint64_t user_id)
+    void Instance::setUserId(uint64_t user_id)
     {
         m_user_id = user_id;
     }
     
-    engine::Instance& jInstance::useEngineInstance()
+    engine::Instance& Instance::useEngineInstance()
     {
         return *m_instance;
     }
     
-    engine::Instance const& jInstance::getEngineInstance() const
+    engine::Instance const& Instance::getEngineInstance() const
     {
         return *m_instance;
     }
     
-    void jInstance::newPatcher()
+    void Instance::newPatcher()
     {
         auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), new jPatcherManager(*this));
         
@@ -97,7 +97,7 @@ namespace kiwi
         DocumentManager::commit(patcher);
     }
     
-    bool jInstance::openFile(juce::File const& file)
+    bool Instance::openFile(juce::File const& file)
     {
         if(file.hasFileExtension("kiwi"))
         {
@@ -120,7 +120,7 @@ namespace kiwi
         return false;
     }
     
-    void jInstance::askUserToOpenPatcherDocument()
+    void Instance::askUserToOpenPatcherDocument()
     {
         juce::FileChooser file_chooser("Open file", m_last_opened_file, "*.kiwi");
         
@@ -137,7 +137,7 @@ namespace kiwi
         }
     }
     
-    bool jInstance::closeWindow(jWindow& window)
+    bool Instance::closeWindow(jWindow& window)
     {
         bool success = true;
         
@@ -162,7 +162,7 @@ namespace kiwi
         return success;
     }
     
-    bool jInstance::closeAllWindows()
+    bool Instance::closeAllWindows()
     {
         bool success = true;
         
@@ -181,7 +181,7 @@ namespace kiwi
         return success;
     }
     
-    void jInstance::openRemotePatcher(std::string& host, uint16_t& port)
+    void Instance::openRemotePatcher(std::string& host, uint16_t& port)
     {
         std::unique_ptr<jPatcherManager> manager_uptr = nullptr;
         
@@ -240,7 +240,7 @@ namespace kiwi
         jSettings& operator=(jSettings && other) = delete;
     };
     
-    void jInstance::openSettings()
+    void Instance::openSettings()
     {
         jSettings set_cmp(getUserId());
         juce::OptionalScopedPointer<juce::Component> settings_component(&set_cmp, false);
@@ -255,7 +255,7 @@ namespace kiwi
         setUserId(set_cmp.getUserId());
     }
     
-    jInstance::jPatcherManagers::const_iterator jInstance::getPatcherManager(jPatcherManager const& manager) const
+    Instance::jPatcherManagers::const_iterator Instance::getPatcherManager(jPatcherManager const& manager) const
     {
         const auto find_it = [&manager](std::unique_ptr<jPatcherManager> const& manager_uptr)
         {
@@ -265,30 +265,30 @@ namespace kiwi
         return std::find_if(m_patcher_managers.begin(), m_patcher_managers.end(), find_it);
     }
     
-    void jInstance::showConsoleWindow()
+    void Instance::showConsoleWindow()
     {
         m_console_window->setVisible(true);
         m_console_window->toFront(true);
     }
     
-    void jInstance::showDocumentExplorerWindow()
+    void Instance::showDocumentExplorerWindow()
     {
         m_document_explorer_window->setVisible(true);
         m_document_explorer_window->toFront(true);
     }
     
-    void jInstance::showBeaconDispatcherWindow()
+    void Instance::showBeaconDispatcherWindow()
     {
         m_beacon_dispatcher_window->setVisible(true);
         m_beacon_dispatcher_window->toFront(true);
     }
     
-    std::vector<uint8_t>& jInstance::getPatcherClipboardData()
+    std::vector<uint8_t>& Instance::getPatcherClipboardData()
     {
         return m_patcher_clipboard;
     }
     
-    size_t jInstance::getNextUntitledNumberAndIncrement()
+    size_t Instance::getNextUntitledNumberAndIncrement()
     {
         return m_untitled_patcher_index++;
     }

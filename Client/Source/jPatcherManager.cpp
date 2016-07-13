@@ -24,7 +24,7 @@
 #include <KiwiEngine/KiwiEnginePatcher.hpp>
 
 #include "KiwiApp.hpp"
-#include "jInstance.hpp"
+#include "KiwiApp_Instance.hpp"
 #include "KiwiDocumentManager.hpp"
 #include "jPatcherManager.hpp"
 #include "jPatcher.hpp"
@@ -62,7 +62,7 @@ namespace kiwi
     //                                  JPATCHER MANAGER                                //
     // ================================================================================ //
     
-    jPatcherManager::jPatcherManager(jInstance& instance) :
+    jPatcherManager::jPatcherManager(Instance& instance) :
     m_instance(instance),
     m_document(model::DataModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
     m_is_remote(false)
@@ -75,7 +75,7 @@ namespace kiwi
         m_need_saving_flag = false;
     }
     
-    jPatcherManager::jPatcherManager(jInstance& instance, juce::File const& file):
+    jPatcherManager::jPatcherManager(Instance& instance, juce::File const& file):
     m_instance(instance),
     m_document(model::DataModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
     m_is_remote(false)
@@ -93,7 +93,7 @@ namespace kiwi
         DocumentManager::commit(patcher, "Add User");
     }
     
-    jPatcherManager::jPatcherManager(jInstance & instance, const std::string host, uint16_t port) :
+    jPatcherManager::jPatcherManager(Instance & instance, const std::string host, uint16_t port) :
     m_instance(instance),
     m_document(model::DataModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
     m_is_remote(true)

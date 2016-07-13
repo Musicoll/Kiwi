@@ -24,7 +24,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-#include "jInstance.hpp"
+#include "KiwiApp_Instance.hpp"
 #include "KiwiApp_StoredSettings.hpp"
 
 namespace kiwi
@@ -179,7 +179,7 @@ namespace kiwi
         
     private: // members
         
-        std::unique_ptr<jInstance>                          m_instance;
+        std::unique_ptr<Instance>                           m_instance;
         std::unique_ptr<juce::ApplicationCommandManager>	m_command_manager;
         std::unique_ptr<MainMenuModel>                      m_menu_model;
         

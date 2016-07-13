@@ -58,8 +58,7 @@ namespace kiwi
         
     private: // members
         
-        engine::Instance& m_instance;
-        
+        engine::Instance&                   m_instance;
         std::unique_ptr<juce::TextEditor>   m_beacon_name_editor;
         std::unique_ptr<juce::TextEditor>   m_message_editor;
         std::unique_ptr<juce::TextButton>   m_send_button;

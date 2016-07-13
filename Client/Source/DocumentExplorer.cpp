@@ -22,7 +22,7 @@
 #include <KiwiEngine/KiwiEngineConsole.hpp>
 
 #include "DocumentExplorer.hpp"
-#include "jInstance.hpp"
+#include "KiwiApp_Instance.hpp"
 
 namespace kiwi
 {
@@ -192,7 +192,7 @@ namespace kiwi
         return host;
     }
     
-    DocumentExplorer::Panel::Panel(DocumentExplorer& explorer, jInstance& instance) :
+    DocumentExplorer::Panel::Panel(DocumentExplorer& explorer, Instance& instance) :
     m_instance(instance),
     m_explorer(explorer)
     {
@@ -277,7 +277,7 @@ namespace kiwi
     //                               DOCUMENT EXPLORER WINDOW                           //
     // ================================================================================ //
     
-    DocumentExplorerWindow::DocumentExplorerWindow(DocumentExplorer& explorer, jInstance& instance) :
+    DocumentExplorerWindow::DocumentExplorerWindow(DocumentExplorer& explorer, Instance& instance) :
     jWindow("Document explorer panel", juce::Colours::white, minimiseButton | closeButton, true)
     {
         setContentOwned(new DocumentExplorer::Panel(explorer, instance), false);
