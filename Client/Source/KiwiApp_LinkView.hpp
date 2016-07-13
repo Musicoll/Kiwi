@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_JLINK_HPP_INCLUDED
-#define KIWI_JLINK_HPP_INCLUDED
+#ifndef KIWI_APP_LINKVIEW_HPP_INCLUDED
+#define KIWI_APP_LINKVIEW_HPP_INCLUDED
 
 #include <KiwiModel/KiwiModelLink.hpp>
 
@@ -29,18 +29,18 @@
 namespace kiwi
 {
     class PatcherView;
-    class jLink;
+    class LinkView;
     
     // ================================================================================ //
-    //                                   JLINK BASE                                     //
+    //                                   LINK VIEW BASE                                 //
     // ================================================================================ //
     
-    //! @brief The jLink base class.
-    class jLinkBase : public juce::Component
+    //! @brief The LinkView base class.
+    class LinkViewBase : public juce::Component
     {
     public:
-        jLinkBase() = default;
-        virtual ~jLinkBase() = default;
+        LinkViewBase() = default;
+        virtual ~LinkViewBase() = default;
         
     protected:
         void updateBounds();
@@ -52,19 +52,19 @@ namespace kiwi
     };
     
     // ================================================================================ //
-    //                                      JLINK                                       //
+    //                                     LINK VIEW                                    //
     // ================================================================================ //
     
     //! @brief The juce link Component.
-    class jLink : public jLinkBase, public juce::ComponentListener
+    class LinkView : public LinkViewBase, public juce::ComponentListener
     {
     public:
         
         //! @brief Constructor
-        jLink(PatcherView& patcherview, model::Link& link_m);
+        LinkView(PatcherView& patcherview, model::Link& link_m);
         
         //! @brief Destructor
-        ~jLink();
+        ~LinkView();
         
         //! @brief Get the Link model
         model::Link& getModel() const {return *m_model;};
@@ -94,29 +94,29 @@ namespace kiwi
         
     private: // members
         
-        PatcherView&           m_patcherview;
+        PatcherView&        m_patcherview;
         model::Link*        m_model;
         bool                m_is_selected = 0;
         std::set<uint64_t>  m_distant_selection;
     };
     
     // ================================================================================ //
-    //                                   JLINK CREATOR                                  //
+    //                                 LINK VIEW CREATOR                                //
     // ================================================================================ //
     
-    //! @brief The jLink creator helper.
-    class jLinkCreator : public jLinkBase
+    //! @brief The LinkView creator helper.
+    class LinkViewCreator : public LinkViewBase
     {
     public:
         
         //! @brief Constructor
-        jLinkCreator(jObject& binded_object,
+        LinkViewCreator(jObject& binded_object,
                      const size_t index,
                      bool is_sender,
                      juce::Point<int> dragged_pos);
         
         //! @brief Destructor
-        ~jLinkCreator() = default;
+        ~LinkViewCreator() = default;
         
         //! @brief Get the binded object
         jObject& getBindedObject() const {return m_binded_object;};
@@ -144,4 +144,4 @@ namespace kiwi
     };
 }
 
-#endif // KIWI_JLINK_HPP_INCLUDED
+#endif // KIWI_APP_LINKVIEW_HPP_INCLUDED

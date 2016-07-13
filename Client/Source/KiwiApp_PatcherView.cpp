@@ -29,7 +29,7 @@
 #include "KiwiApp_PatcherView.hpp"
 #include "KiwiApp_PatcherViewHelper.hpp"
 #include "jObject.hpp"
-#include "jLink.hpp"
+#include "KiwiApp_LinkView.hpp"
 #include "KiwiApp.hpp"
 #include "KiwiApp_CommandIDs.hpp"
 
@@ -205,31 +205,31 @@ namespace kiwi
                         const size_t index = hit.getIndex();
                         const bool is_sender = hit.getZone() == HitTester::Zone::Outlet;
                         
-                        m_link_creator.reset(new jLinkCreator(*object_j, index, is_sender, e.getPosition()));
+                        m_link_creator.reset(new LinkViewCreator(*object_j, index, is_sender, e.getPosition()));
                         addAndMakeVisible(*m_link_creator);
                     }
                 }
             }
             else if(hit.linkTouched())
             {
-                jLink* link_j = hit.getLink();
-                if(link_j)
+                LinkView* link_view = hit.getLink();
+                if(link_view)
                 {
                     if(hit.getZone() == HitTester::Zone::Inside)
                     {
                         if(e.mods.isPopupMenu())
                         {
-                            if (!isSelected(*link_j))
+                            if (!isSelected(*link_view))
                             {
-                                m_select_on_mouse_down_status = selectOnMouseDown(*link_j, true);
+                                m_select_on_mouse_down_status = selectOnMouseDown(*link_view, true);
                             }
   
                             const auto pos = e.getPosition() - m_viewport->getOriginPosition();
-                            showLinkPopupMenu(*link_j, pos);
+                            showLinkPopupMenu(*link_view, pos);
                         }
                         else
                         {
-                            m_select_on_mouse_down_status = selectOnMouseDown(*link_j, !e.mods.isShiftDown());
+                            m_select_on_mouse_down_status = selectOnMouseDown(*link_view, !e.mods.isShiftDown());
                         }
                     }
                 }
@@ -451,10 +451,10 @@ namespace kiwi
             }
             else if(hit.linkTouched())
             {
-                jLink* link_j = hit.getLink();
-                if(link_j)
+                LinkView* link_view = hit.getLink();
+                if(link_view)
                 {
-                    selectOnMouseUp(*link_j, !e.mods.isShiftDown(), m_is_dragging, m_select_on_mouse_down_status);
+                    selectOnMouseUp(*link_view, !e.mods.isShiftDown(), m_is_dragging, m_select_on_mouse_down_status);
                 }
             }
             else if(e.mods.isCommandDown())
@@ -619,7 +619,7 @@ namespace kiwi
         }
     }
     
-    void PatcherView::showLinkPopupMenu(jLink const& link, juce::Point<int> const& position)
+    void PatcherView::showLinkPopupMenu(LinkView const& link, juce::Point<int> const& position)
     {
         if(!isLocked())
         {
@@ -953,7 +953,7 @@ namespace kiwi
         return m_view_model.isSelected(object.getModel());
     }
     
-    bool PatcherView::isSelected(jLink const& link) const
+    bool PatcherView::isSelected(LinkView const& link) const
     {
         return m_view_model.isSelected(link.getModel());
     }
@@ -974,7 +974,7 @@ namespace kiwi
         }
     }
     
-    void PatcherView::addToSelectionBasedOnModifiers(jLink& link, bool select_only)
+    void PatcherView::addToSelectionBasedOnModifiers(LinkView& link, bool select_only)
     {
         if(select_only)
         {
@@ -1001,7 +1001,7 @@ namespace kiwi
         return false;
     }
     
-    bool PatcherView::selectOnMouseDown(jLink& link, bool select_only)
+    bool PatcherView::selectOnMouseDown(LinkView& link, bool select_only)
     {
         if(isSelected(link))
         {
@@ -1022,7 +1022,7 @@ namespace kiwi
     }
     
     
-    void PatcherView::selectOnMouseUp(jLink& link, bool select_only,
+    void PatcherView::selectOnMouseUp(LinkView& link, bool select_only,
                                    const bool box_was_dragged, const bool result_of_mouse_down_select_method)
     {
         if(result_of_mouse_down_select_method && ! box_was_dragged)
@@ -1117,7 +1117,7 @@ namespace kiwi
         // create resident links
         for(auto& link : m_patcher_model.getLinks())
         {
-            if(link.resident()) { addjLink(link); }
+            if(link.resident()) { addLinkView(link); }
         }
     }
     
@@ -1143,9 +1143,9 @@ namespace kiwi
         if((from.getNumberOfOutlets() > outlet) && (to.getNumberOfInlets() > inlet))
         {
             // Check if link does not exists.
-            const auto find_link = [&from, &outlet, &to, &inlet](std::unique_ptr<jLink> const& jlink_uptr)
+            const auto find_link = [&from, &outlet, &to, &inlet](std::unique_ptr<LinkView> const& link_view_uptr)
             {
-                model::Link& link_m = jlink_uptr->getModel();
+                model::Link& link_m = link_view_uptr->getModel();
                 
                 return (link_m.getSenderObject().ref()      == from.ref() &&
                         link_m.getReceiverObject().ref()    == to.ref() &&
@@ -1370,10 +1370,10 @@ namespace kiwi
             if(object.added()) { addjObject(object, object_zorder); }
         }
         
-        // create jLink for each newly added links
+        // create LinkView for each newly added links
         for(auto& link : patcher.getLinks())
         {
-            if(link.added()) { addjLink(link); }
+            if(link.added()) { addLinkView(link); }
         }
         
         bool objects_bounds_changed = false;
@@ -1392,21 +1392,21 @@ namespace kiwi
             }
         }
         
-        // send jLink change notification
+        // send LinkView change notification
         for(auto& link : patcher.getLinks())
         {
             if(link.changed()) { linkChanged(link); }
             
-            // send to jLink jObject change notification
+            // send to LinkView jObject change notification
             if(patcher.objectsChanged())
             {
                 for(auto& object : patcher.getObjects())
                 {
                     if(object.changed())
                     {
-                        jLink* jlink = getLink(link);
+                        LinkView* link_view = getLink(link);
                         
-                        if(jlink) { jlink->objectChanged(object); }
+                        if(link_view) { link_view->objectChanged(object); }
                     }
                 }
             }
@@ -1429,10 +1429,10 @@ namespace kiwi
             checkLinksSelectionChanges(patcher);
         }
         
-        // delete jLink for each removed links
+        // delete LinkView for each removed links
         for(auto& link : patcher.getLinks())
         {
-            if(link.removed()) { removejLink(link); }
+            if(link.removed()) { removeLinkView(link); }
         }
         
         // delete jObject for each removed objects
@@ -1784,16 +1784,16 @@ namespace kiwi
         }
     }
     
-    void PatcherView::addjLink(model::Link& link)
+    void PatcherView::addLinkView(model::Link& link)
     {
         const auto it = findLink(link);
         
         if(it == m_links.cend())
         {
-            auto result = m_links.emplace(m_links.end(), new jLink(*this, link));
+            auto result = m_links.emplace(m_links.end(), new LinkView(*this, link));
             
-            jLink& jlink = *result->get();
-            addAndMakeVisible(jlink);
+            LinkView& link_view = *result->get();
+            addAndMakeVisible(link_view);
         }
     }
     
@@ -1803,12 +1803,12 @@ namespace kiwi
         
         if(it != m_links.cend())
         {
-            jLink& jlink = *it->get();
-            jlink.linkChanged(link);
+            LinkView& link_view = *it->get();
+            link_view.linkChanged(link);
         }
     }
     
-    void PatcherView::removejLink(model::Link& link)
+    void PatcherView::removeLinkView(model::Link& link)
     {
         const auto it = findLink(link);
         
@@ -1829,14 +1829,14 @@ namespace kiwi
         return std::find_if(m_objects.begin(), m_objects.end(), find_jobj);
     }
     
-    PatcherView::jLinks::iterator PatcherView::findLink(model::Link const& link)
+    PatcherView::LinkViews::iterator PatcherView::findLink(model::Link const& link)
     {
-        const auto find_jlink = [&link](std::unique_ptr<jLink> const& jlink)
+        const auto find_link_view = [&link](std::unique_ptr<LinkView> const& link_view)
         {
-            return (&link == &jlink->getModel());
+            return (&link == &link_view->getModel());
         };
         
-        return std::find_if(m_links.begin(), m_links.end(), find_jlink);
+        return std::find_if(m_links.begin(), m_links.end(), find_link_view);
     }
     
     model::Patcher::View& PatcherView::getPatcherViewModel()
@@ -1849,7 +1849,7 @@ namespace kiwi
         return m_objects;
     }
     
-    PatcherView::jLinks const& PatcherView::getLinks() const
+    PatcherView::LinkViews const& PatcherView::getLinks() const
     {
         return m_links;
     }
@@ -1860,7 +1860,7 @@ namespace kiwi
         return (it != m_objects.cend()) ? it->get() : nullptr;
     }
     
-    jLink* PatcherView::getLink(model::Link const& link)
+    LinkView* PatcherView::getLink(model::Link const& link)
     {
         const auto it = findLink(link);
         return (it != m_links.cend()) ? it->get() : nullptr;
@@ -2139,17 +2139,17 @@ namespace kiwi
         }
     }
     
-    void PatcherView::selectLink(jLink& link)
+    void PatcherView::selectLink(LinkView& link)
     {
         m_view_model.selectLink(link.getModel());
         DocumentManager::commit(m_patcher_model);
     }
     
-    void PatcherView::selectLinks(std::vector<jLink*> const& links)
+    void PatcherView::selectLinks(std::vector<LinkView*> const& links)
     {
         bool should_commit = false;
         
-        for(jLink* link : links)
+        for(LinkView* link : links)
         {
             if(link != nullptr)
             {
@@ -2170,7 +2170,7 @@ namespace kiwi
         DocumentManager::commit(m_patcher_model);
     }
     
-    void PatcherView::unselectLink(jLink& link)
+    void PatcherView::unselectLink(LinkView& link)
     {
         m_view_model.unselectLink(link.getModel());
         DocumentManager::commit(m_patcher_model);
@@ -2183,7 +2183,7 @@ namespace kiwi
         DocumentManager::commit(m_patcher_model);
     }
 
-    void PatcherView::selectLinkOnly(jLink& link)
+    void PatcherView::selectLinkOnly(LinkView& link)
     {
         unselectAll();
         selectLink(link);

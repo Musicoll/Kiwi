@@ -8,8 +8,10 @@
     <GROUP id="{E476D5A0-2E9D-DD18-D007-54A51ACF9459}" name="Application">
       <FILE id="LWHJru" name="jObject.cpp" compile="1" resource="0" file="Source/jObject.cpp"/>
       <FILE id="YYSxJ8" name="jObject.hpp" compile="0" resource="0" file="Source/jObject.hpp"/>
-      <FILE id="KpZNMh" name="jLink.cpp" compile="1" resource="0" file="Source/jLink.cpp"/>
-      <FILE id="MRxCah" name="jLink.hpp" compile="0" resource="0" file="Source/jLink.hpp"/>
+      <FILE id="KpZNMh" name="KiwiApp_LinkView.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_LinkView.cpp"/>
+      <FILE id="MRxCah" name="KiwiApp_LinkView.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_LinkView.hpp"/>
       <FILE id="mMQjEq" name="KiwiApp_PatcherViewHelper.cpp" compile="1"
             resource="0" file="Source/KiwiApp_PatcherViewHelper.cpp"/>
       <FILE id="unJYSB" name="KiwiApp_PatcherViewHelper.hpp" compile="0"

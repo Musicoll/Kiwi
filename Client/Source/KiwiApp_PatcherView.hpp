@@ -33,8 +33,8 @@ namespace kiwi
     class PatcherManager;
     class jObject;
     class jClassicBox;
-    class jLink;
-    class jLinkCreator;
+    class LinkView;
+    class LinkViewCreator;
     class Instance;
     class HitTester;
     class PatcherViewport;
@@ -60,7 +60,7 @@ namespace kiwi
         ~PatcherView();
         
         using jObjects = std::vector<std::unique_ptr<jObject>>;
-        using jLinks = std::vector<std::unique_ptr<jLink>>;
+        using LinkViews = std::vector<std::unique_ptr<LinkView>>;
         
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
         void patcherChanged(model::Patcher& patcher, model::Patcher::View& view);
@@ -71,14 +71,14 @@ namespace kiwi
         //! @brief Returns the jObjects.
         jObjects const& getObjects() const;
         
-        //! @brief Returns the jLinks.
-        jLinks const& getLinks() const;
+        //! @brief Returns the LinkViews.
+        LinkViews const& getLinks() const;
         
         //! @brief Returns the jObject corresponding to a given Object model.
         jObject* getObject(model::Object const& object);
         
-        //! @brief Returns the jLink corresponding to a given Link model.
-        jLink* getLink(model::Link const& link);
+        //! @brief Returns the LinkView corresponding to a given Link model.
+        LinkView* getLink(model::Link const& link);
         
         //! @brief Set the lock status of the patcher view.
         void setLock(bool locked);
@@ -90,7 +90,7 @@ namespace kiwi
         bool isSelected(jObject const& object) const;
         
         //! @brief Returns true if the link is selected.
-        bool isSelected(jLink const& link) const;
+        bool isSelected(LinkView const& link) const;
         
         //! @brief Returns the Viewport that contains this patcher view.
         //! @details You must use this method if you want to add this component into an other one.
@@ -162,13 +162,13 @@ namespace kiwi
         void removejObject(model::Object& object);
         
         //! @internal Link model has just been added to the document.
-        void addjLink(model::Link& link);
+        void addLinkView(model::Link& link);
         
         //! @internal Link model is resident and internal value changed.
         void linkChanged(model::Link& link);
         
         //! @internal Link model will be removed from the document.
-        void removejLink(model::Link& link);
+        void removeLinkView(model::Link& link);
         
         //! @brief Add a new Object to the model at a given position.
         void createObjectModel(std::string const& text, double pos_x, double pos_y);
@@ -210,17 +210,17 @@ namespace kiwi
         
         void addToSelectionBasedOnModifiers(jObject& object, bool select_only);
         
-        void addToSelectionBasedOnModifiers(jLink& link, bool select_only);
+        void addToSelectionBasedOnModifiers(LinkView& link, bool select_only);
         
         bool selectOnMouseDown(jObject& object, bool select_only);
         
-        bool selectOnMouseDown(jLink& link, bool select_only);
+        bool selectOnMouseDown(LinkView& link, bool select_only);
         
         void selectOnMouseUp(jObject& box, bool select_only,
                              const bool box_was_dragged,
                              const bool result_of_mouse_down_select_method);
         
-        void selectOnMouseUp(jLink& link, bool select_only,
+        void selectOnMouseUp(LinkView& link, bool select_only,
                              const bool box_was_dragged,
                              const bool result_of_mouse_down_select_method);
         
@@ -243,19 +243,19 @@ namespace kiwi
         void selectObjectOnly(jObject& object);
         
         //! @brief Select a Link.
-        void selectLink(jLink& link);
+        void selectLink(LinkView& link);
         
         //! @brief Select multiple links
-        void selectLinks(std::vector<jLink*> const& links);
+        void selectLinks(std::vector<LinkView*> const& links);
         
         //! @brief Unselect all and select a link.
-        void selectLinkOnly(jLink& link);
+        void selectLinkOnly(LinkView& link);
         
         //! @brief Unselect an Object.
         void unselectObject(jObject& object);
         
         //! @brief Unselect a Link.
-        void unselectLink(jLink& link);
+        void unselectLink(LinkView& link);
         
         //! @brief Add all objects to the patcher selection.
         void selectAllObjects();
@@ -310,8 +310,8 @@ namespace kiwi
         //! @internal Find a jObject with a given Object model.
         jObjects::iterator findObject(model::Object const& object);
         
-        //! @internal Find a jLink with a given Link model.
-        jLinks::iterator findLink(model::Link const& link);
+        //! @internal Find a LinkView with a given Link model.
+        LinkViews::iterator findLink(model::Link const& link);
         
         //! @internal Returns true if a link can be created between two objects.
         bool canConnect(model::Object const& from, const size_t outlet,
@@ -342,7 +342,7 @@ namespace kiwi
         void showObjectPopupMenu(jObject const& object, juce::Point<int> const& position);
         
         //! @internal Show Link contextual Popup menu
-        void showLinkPopupMenu(jLink const& link, juce::Point<int> const& position);
+        void showLinkPopupMenu(LinkView const& link, juce::Point<int> const& position);
         
         //! @brief Bring all link components in front of object ones.
         void bringsLinksToFront();
@@ -361,7 +361,7 @@ namespace kiwi
         model::Patcher::View&                       m_view_model;
         
         jObjects                                    m_objects;
-        jLinks                                      m_links;
+        LinkViews                                      m_links;
         
         std::set<flip::Ref>                         m_local_objects_selection;
         std::set<flip::Ref>                         m_local_links_selection;
@@ -371,7 +371,7 @@ namespace kiwi
         
         std::unique_ptr<PatcherViewport>            m_viewport;
         std::unique_ptr<HitTester>                  m_hittester;
-        std::unique_ptr<jLinkCreator>               m_link_creator;
+        std::unique_ptr<LinkViewCreator>               m_link_creator;
         std::unique_ptr<IoletHighlighter>           m_io_highlighter;
         std::unique_ptr<Lasso>                      m_lasso;
         

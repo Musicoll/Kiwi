@@ -24,7 +24,7 @@
 
 #include "KiwiApp_PatcherView.hpp"
 #include "jObject.hpp"
-#include "jLink.hpp"
+#include "KiwiApp_LinkView.hpp"
 
 namespace kiwi
 {
@@ -101,7 +101,7 @@ namespace kiwi
         //! @param links The vector of links that will be filled.
         void test(juce::Rectangle<int> const& rect,
                   std::vector<jObject*>& objects,
-                  std::vector<jLink*>& links);
+                  std::vector<LinkView*>& links);
         
         //! @brief Test a rectangle.
         //! @details Try to find the objects that overlaps the given rectangle.
@@ -113,7 +113,7 @@ namespace kiwi
         //! @details Try to find the links that overlaps the given rectangle.
         //! @param rect The rectangle.
         //! @param links The vector of links that will be filled.
-        void testLinks(juce::Rectangle<int> const& rect, std::vector<jLink*>& links);
+        void testLinks(juce::Rectangle<int> const& rect, std::vector<LinkView*>& links);
         
         //! @brief Get the last touched Target.
         inline Target getTarget() const noexcept            { return m_target; }
@@ -137,7 +137,7 @@ namespace kiwi
         jObject* getObject() const noexcept;
         
         //! @brief Get the link that has been touched by the last hit-test.
-        jLink* getLink() const noexcept;
+        LinkView* getLink() const noexcept;
         
         //! @brief Get the Zone of the Target that result of the hit-test.
         //! @details Get the Zone of the Target that result of the hit-test.
@@ -162,13 +162,13 @@ namespace kiwi
         
         PatcherView const& m_patcher;
         jObject*        m_object    = nullptr;
-        jLink*          m_link      = nullptr;
+        LinkView*          m_link      = nullptr;
         Target          m_target	= Target::Nothing;
         Zone            m_zone		= Zone::Outside;
         int             m_border	= Border::None;
         size_t          m_index     = 0;
         
-        friend class jLink;
+        friend class LinkView;
         friend class jObject;
     };
     

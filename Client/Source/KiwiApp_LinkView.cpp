@@ -19,14 +19,18 @@
  ==============================================================================
  */
 
-#include "jLink.hpp"
-#include "KiwiApp_PatcherView.hpp"
 #include "KiwiApp.hpp"
+#include "KiwiApp_LinkView.hpp"
+#include "KiwiApp_PatcherView.hpp"
 #include "KiwiApp_PatcherViewHelper.hpp"
 
 namespace kiwi
 {
-    void jLinkBase::updateBounds()
+    // ================================================================================ //
+    //                                   LINK VIEW BASE                                 //
+    // ================================================================================ //
+
+    void LinkViewBase::updateBounds()
     {
         const juce::Rectangle<int> link_bounds(m_last_outlet_pos, m_last_inlet_pos);
         const juce::Rectangle<int> new_bounds = link_bounds.expanded(20);
@@ -52,7 +56,11 @@ namespace kiwi
         setBounds(new_bounds);
     }
     
-    jLink::jLink(PatcherView& patcherview, model::Link& link_m) :
+    // ================================================================================ //
+    //                                     LINK VIEW                                    //
+    // ================================================================================ //
+    
+    LinkView::LinkView(PatcherView& patcherview, model::Link& link_m) :
     m_patcherview(patcherview),
     m_model(&link_m)
     {
@@ -75,7 +83,7 @@ namespace kiwi
         setInterceptsMouseClicks(false, false);
     }
     
-    jLink::~jLink()
+    LinkView::~LinkView()
     {
         auto& sender_object_m = m_model->getSenderObject();
         jObject* jbox_sender = m_patcherview.getObject(sender_object_m);
@@ -92,22 +100,22 @@ namespace kiwi
         }
     }
     
-    bool jLink::isSelected() const noexcept
+    bool LinkView::isSelected() const noexcept
     {
         return m_is_selected;
     }
     
-    void jLink::linkChanged(model::Link& link)
+    void LinkView::linkChanged(model::Link& link)
     {
         ;
     }
     
-    void jLink::objectChanged(model::Object& object)
+    void LinkView::objectChanged(model::Object& object)
     {
         ;
     }
     
-    void jLink::localSelectionChanged(bool selected)
+    void LinkView::localSelectionChanged(bool selected)
     {
         if(m_is_selected != selected)
         {
@@ -116,13 +124,13 @@ namespace kiwi
         }
     }
     
-    void jLink::distantSelectionChanged(std::set<uint64_t> distant_user_id_selection)
+    void LinkView::distantSelectionChanged(std::set<uint64_t> distant_user_id_selection)
     {
         m_distant_selection = distant_user_id_selection;
         repaint();
     }
     
-    void jLink::componentMovedOrResized(Component& component, bool /*was_moved*/, bool /*was_resized*/)
+    void LinkView::componentMovedOrResized(Component& component, bool /*was_moved*/, bool /*was_resized*/)
     {
         jObject* jbox = dynamic_cast<jObject*>(&component);
         if(jbox)
@@ -140,7 +148,7 @@ namespace kiwi
         }
     }
     
-    void jLink::paint(juce::Graphics & g)
+    void LinkView::paint(juce::Graphics & g)
     {
         const juce::Colour link_color = juce::Colour::fromFloatRGBA(0.2, 0.2, 0.2, 1.);
         const juce::Colour selection_color = juce::Colour::fromFloatRGBA(0., 0.5, 1., 1.);
@@ -170,7 +178,7 @@ namespace kiwi
         g.strokePath(m_path, juce::PathStrokeType(1.f));
     }
     
-    bool jLink::hitTest(juce::Point<int> const& pt, HitTester& hit) const
+    bool LinkView::hitTest(juce::Point<int> const& pt, HitTester& hit) const
     {
         const float max_distance = 3.f;
         juce::Point<float> point_on_line;
@@ -187,7 +195,7 @@ namespace kiwi
         return false;
     }
     
-    bool jLink::hitTest(juce::Rectangle<float> const& rect)
+    bool LinkView::hitTest(juce::Rectangle<float> const& rect)
     {
         juce::Path p = m_path;
         p.applyTransform(juce::AffineTransform::translation(getPosition()));
@@ -200,10 +208,10 @@ namespace kiwi
     }
     
     // ================================================================================ //
-    //                                   JLINK CREATOR                                  //
+    //                                 LINK VIEW CREATOR                                //
     // ================================================================================ //
     
-    jLinkCreator::jLinkCreator(jObject& binded_object,
+    LinkViewCreator::LinkViewCreator(jObject& binded_object,
                                const size_t index,
                                bool is_sender,
                                juce::Point<int> dragged_pos) :
@@ -216,7 +224,7 @@ namespace kiwi
         updateBounds();
     }
     
-    void jLinkCreator::setEndPosition(juce::Point<int> const& pos)
+    void LinkViewCreator::setEndPosition(juce::Point<int> const& pos)
     {
         if(m_is_sender)
         {
@@ -230,12 +238,12 @@ namespace kiwi
         updateBounds();
     }
     
-    juce::Point<int> jLinkCreator::getEndPosition() const noexcept
+    juce::Point<int> LinkViewCreator::getEndPosition() const noexcept
     {
         return m_is_sender ? m_last_inlet_pos : m_last_outlet_pos;
     }
     
-    void jLinkCreator::paint(juce::Graphics & g)
+    void LinkViewCreator::paint(juce::Graphics & g)
     {
         const juce::Colour link_color = juce::Colour::fromFloatRGBA(0.2, 0.2, 0.2, 1.);
         g.setColour(link_color);

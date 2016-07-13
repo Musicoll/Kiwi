@@ -129,7 +129,7 @@ namespace kiwi
     }
     
     void HitTester::test(juce::Rectangle<int> const& rect,
-                         std::vector<jObject*>& objects, std::vector<jLink*>& links)
+                         std::vector<jObject*>& objects, std::vector<LinkView*>& links)
     {
         testObjects(rect, objects);
         testLinks(rect, links);
@@ -148,7 +148,7 @@ namespace kiwi
         }
     }
     
-    void HitTester::testLinks(juce::Rectangle<int> const& rect, std::vector<jLink*>& links)
+    void HitTester::testLinks(juce::Rectangle<int> const& rect, std::vector<LinkView*>& links)
     {
         links.clear();
         
@@ -176,7 +176,7 @@ namespace kiwi
         return nullptr;
     }
     
-    jLink* HitTester::getLink() const noexcept
+    LinkView* HitTester::getLink() const noexcept
     {
         if(m_target == Target::Link)
         {
@@ -722,17 +722,17 @@ namespace kiwi
             
             if(include_links)
             {
-                PatcherView::jLinks const& links = m_patcher.getLinks();
+                PatcherView::LinkViews const& links = m_patcher.getLinks();
                 
                 HitTester hit(m_patcher);
-                std::vector<jLink*> lasso_links;
+                std::vector<LinkView*> lasso_links;
                 hit.testLinks(bounds, lasso_links);
                 
-                for(auto& link_j_uptr : links)
+                for(auto& link_view_uptr : links)
                 {
-                    if(link_j_uptr)
+                    if(link_view_uptr)
                     {
-                        jLink& link = *link_j_uptr.get();
+                        LinkView& link = *link_view_uptr.get();
                         
                         const bool is_selected = link.isSelected();
                         const bool was_selected = m_links.find(link.getModel().ref()) != m_links.end();
@@ -772,7 +772,7 @@ namespace kiwi
             
             if(include_links)
             {
-                std::vector<jLink*> links;
+                std::vector<LinkView*> links;
                 hit.testLinks(bounds, links);
                 m_patcher.selectLinks(links);
             }

@@ -275,11 +275,11 @@ namespace kiwi
         return success;
     }
     
-    bool PatcherManager::closePatcherViewWindow(PatcherView& patcher_j)
+    bool PatcherManager::closePatcherViewWindow(PatcherView& patcher_view)
     {
         auto& patcher = getPatcher();
         auto& user = *patcher.getUser(m_instance.getUserId());
-        auto& patcher_view_m = patcher_j.getPatcherViewModel();
+        auto& patcher_view_m = patcher_view.getPatcherViewModel();
         
         auto& views = user.getViews();
         
