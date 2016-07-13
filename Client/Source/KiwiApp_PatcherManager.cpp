@@ -26,7 +26,7 @@
 #include "KiwiApp.hpp"
 #include "KiwiApp_Instance.hpp"
 #include "KiwiDocumentManager.hpp"
-#include "jPatcherManager.hpp"
+#include "KiwiApp_PatcherManager.hpp"
 #include "jPatcher.hpp"
 #include "jPatcherHelper.hpp"
 
@@ -36,7 +36,7 @@ namespace kiwi
     //                                  JPATCHER WINDOW                                 //
     // ================================================================================ //
 
-    jPatcherWindow::jPatcherWindow(jPatcherManager& manager, jPatcher& jpatcher) : jWindow(),
+    jPatcherWindow::jPatcherWindow(PatcherManager& manager, jPatcher& jpatcher) : jWindow(),
     m_manager(manager),
     m_jpatcher(jpatcher)
     {
@@ -48,7 +48,7 @@ namespace kiwi
         KiwiApp::use().closeWindow(*this);
     }
     
-    jPatcherManager& jPatcherWindow::getManager() const
+    PatcherManager& jPatcherWindow::getManager() const
     {
         return m_manager;
     }
@@ -62,7 +62,7 @@ namespace kiwi
     //                                  JPATCHER MANAGER                                //
     // ================================================================================ //
     
-    jPatcherManager::jPatcherManager(Instance& instance) :
+    PatcherManager::PatcherManager(Instance& instance) :
     m_instance(instance),
     m_document(model::DataModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
     m_is_remote(false)
@@ -75,7 +75,7 @@ namespace kiwi
         m_need_saving_flag = false;
     }
     
-    jPatcherManager::jPatcherManager(Instance& instance, juce::File const& file):
+    PatcherManager::PatcherManager(Instance& instance, juce::File const& file):
     m_instance(instance),
     m_document(model::DataModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
     m_is_remote(false)
@@ -93,7 +93,7 @@ namespace kiwi
         DocumentManager::commit(patcher, "Add User");
     }
     
-    jPatcherManager::jPatcherManager(Instance & instance, const std::string host, uint16_t port) :
+    PatcherManager::PatcherManager(Instance & instance, const std::string host, uint16_t port) :
     m_instance(instance),
     m_document(model::DataModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
     m_is_remote(true)
@@ -113,22 +113,22 @@ namespace kiwi
         DocumentManager::commit(patcher);
     }
     
-    jPatcherManager::~jPatcherManager()
+    PatcherManager::~PatcherManager()
     {
         ;
     }
     
-    model::Patcher& jPatcherManager::getPatcher()
+    model::Patcher& PatcherManager::getPatcher()
     {
         return m_document.root<model::Patcher>();
     }
     
-    model::Patcher const& jPatcherManager::getPatcher() const
+    model::Patcher const& PatcherManager::getPatcher() const
     {
         return m_document.root<model::Patcher>();
     }
     
-    void jPatcherManager::newView()
+    void PatcherManager::newView()
     {
         auto& patcher = getPatcher();
         auto* user = patcher.getUser(m_instance.getUserId());
@@ -140,7 +140,7 @@ namespace kiwi
         }
     }
     
-    size_t jPatcherManager::getNumberOfView()
+    size_t PatcherManager::getNumberOfView()
     {
         auto& patcher = getPatcher();
         auto& user = *patcher.getUser(m_instance.getUserId());
@@ -151,12 +151,12 @@ namespace kiwi
         });
     }
     
-    bool jPatcherManager::needsSaving() const
+    bool PatcherManager::needsSaving() const
     {
         return (!m_is_remote) && m_need_saving_flag;
     }
     
-    bool jPatcherManager::saveDocument()
+    bool PatcherManager::saveDocument()
     {
         auto& patcher = getPatcher();
         juce::File const& current_save_file = DocumentManager::getSelectedFile(patcher);
@@ -188,7 +188,7 @@ namespace kiwi
         return false;
     }
     
-    juce::FileBasedDocument::SaveResult jPatcherManager::saveIfNeededAndUserAgrees()
+    juce::FileBasedDocument::SaveResult PatcherManager::saveIfNeededAndUserAgrees()
     {
         if (! needsSaving())
         {
@@ -222,7 +222,7 @@ namespace kiwi
         return juce::FileBasedDocument::userCancelledSave;
     }
     
-    void jPatcherManager::forceCloseAllWindows()
+    void PatcherManager::forceCloseAllWindows()
     {
         auto& patcher = getPatcher();
         auto& user = *patcher.getUser(m_instance.getUserId());
@@ -242,7 +242,7 @@ namespace kiwi
         }
     }
     
-    bool jPatcherManager::askAllWindowsToClose()
+    bool PatcherManager::askAllWindowsToClose()
     {
         auto& patcher = getPatcher();
         auto& user = *patcher.getUser(m_instance.getUserId());
@@ -275,7 +275,7 @@ namespace kiwi
         return success;
     }
     
-    bool jPatcherManager::closePatcherViewWindow(jPatcher& patcher_j)
+    bool PatcherManager::closePatcherViewWindow(jPatcher& patcher_j)
     {
         auto& patcher = getPatcher();
         auto& user = *patcher.getUser(m_instance.getUserId());
@@ -305,7 +305,7 @@ namespace kiwi
         return false;
     }
     
-    void jPatcherManager::document_changed(model::Patcher& patcher)
+    void PatcherManager::document_changed(model::Patcher& patcher)
     {
         if(patcher.added())
         {
@@ -329,7 +329,7 @@ namespace kiwi
         }
     }
     
-    void jPatcherManager::notifyPatcherViews(model::Patcher& patcher)
+    void PatcherManager::notifyPatcherViews(model::Patcher& patcher)
     {
         for(auto& user : patcher.getUsers())
         {
@@ -359,7 +359,7 @@ namespace kiwi
         }
     }
 
-    void jPatcherManager::createPatcherWindow(model::Patcher& patcher,
+    void PatcherManager::createPatcherWindow(model::Patcher& patcher,
                                               model::Patcher::User& user,
                                               model::Patcher::View& view)
     {
@@ -374,7 +374,7 @@ namespace kiwi
         }
     }
 
-    void jPatcherManager::notifyPatcherView(model::Patcher& patcher,
+    void PatcherManager::notifyPatcherView(model::Patcher& patcher,
                                             model::Patcher::User& user,
                                             model::Patcher::View& view)
     {
@@ -386,7 +386,7 @@ namespace kiwi
         }
     }
 
-    void jPatcherManager::removePatcherWindow(model::Patcher& patcher,
+    void PatcherManager::removePatcherWindow(model::Patcher& patcher,
                                               model::Patcher::User& user,
                                               model::Patcher::View& view)
     {

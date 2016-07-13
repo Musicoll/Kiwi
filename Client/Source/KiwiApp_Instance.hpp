@@ -30,7 +30,7 @@
 
 #include "KiwiApp_Console.hpp"
 #include "DocumentExplorer.hpp"
-#include "jPatcherManager.hpp"
+#include "KiwiApp_PatcherManager.hpp"
 #include "KiwiApp_StoredSettings.hpp"
 #include "BeaconDispatcher.hpp"
 
@@ -96,10 +96,10 @@ namespace kiwi
         
     private: // methods
         
-        using jPatcherManagers = std::vector<std::unique_ptr<jPatcherManager>>;
+        using PatcherManagers = std::vector<std::unique_ptr<PatcherManager>>;
         
         //! @internal get the given patcher manager iterator.
-        jPatcherManagers::const_iterator getPatcherManager(jPatcherManager const& manager) const;
+        PatcherManagers::const_iterator getPatcherManager(PatcherManager const& manager) const;
         
         //! @brief Returns the next untitled number based on current documents
         size_t getNextUntitledNumberAndIncrement();
@@ -113,7 +113,7 @@ namespace kiwi
         
         std::unique_ptr<engine::Instance>           m_instance;
         
-        jPatcherManagers                            m_patcher_managers;
+        PatcherManagers                            m_patcher_managers;
         
         sConsoleHistory                             m_console_history;
         std::unique_ptr<ConsoleWindow>             m_console_window;

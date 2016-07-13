@@ -37,7 +37,7 @@ namespace kiwi
 {
     bool jPatcher::m_command_manager_binded = false;
     
-    jPatcher::jPatcher(jPatcherManager& manager,
+    jPatcher::jPatcher(PatcherManager& manager,
                        Instance& instance,
                        model::Patcher& patcher,
                        model::Patcher::View& view) :

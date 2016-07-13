@@ -34,10 +34,10 @@
             file="Source/BeaconDispatcher.cpp"/>
       <FILE id="WtjygW" name="BeaconDispatcher.hpp" compile="0" resource="0"
             file="Source/BeaconDispatcher.hpp"/>
-      <FILE id="oCQegP" name="jPatcherManager.cpp" compile="1" resource="0"
-            file="Source/jPatcherManager.cpp"/>
-      <FILE id="UPcwrk" name="jPatcherManager.hpp" compile="0" resource="0"
-            file="Source/jPatcherManager.hpp"/>
+      <FILE id="oCQegP" name="KiwiApp_PatcherManager.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_PatcherManager.cpp"/>
+      <FILE id="UPcwrk" name="KiwiApp_PatcherManager.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_PatcherManager.hpp"/>
       <FILE id="Nqov5I" name="KiwiApp_ConsoleHistory.cpp" compile="1" resource="0"
             file="Source/KiwiApp_ConsoleHistory.cpp"/>
       <FILE id="WjlzY2" name="KiwiApp_ConsoleHistory.hpp" compile="0" resource="0"

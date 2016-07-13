@@ -74,9 +74,9 @@ namespace kiwi
     
     void Instance::newPatcher()
     {
-        auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), new jPatcherManager(*this));
+        auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), new PatcherManager(*this));
         
-        jPatcherManager& manager = *(manager_it->get());
+        PatcherManager& manager = *(manager_it->get());
         model::Patcher& patcher = manager.getPatcher();
         
         const size_t next_untitled = getNextUntitledNumberAndIncrement();
@@ -102,9 +102,9 @@ namespace kiwi
         if(file.hasFileExtension("kiwi"))
         {
             auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(),
-                                                         new jPatcherManager(*this, file));
+                                                         new PatcherManager(*this, file));
             
-            jPatcherManager& manager = *(manager_it->get());
+            PatcherManager& manager = *(manager_it->get());
             if(manager.getNumberOfView() == 0)
             {
                 manager.newView();
@@ -144,7 +144,7 @@ namespace kiwi
         jPatcherWindow* pwin = dynamic_cast<jPatcherWindow*>(&window);
         if(pwin && !m_patcher_managers.empty())
         {
-            jPatcherManager& manager = pwin->getManager();
+            PatcherManager& manager = pwin->getManager();
             
             const auto manager_it = getPatcherManager(manager);
             if(manager_it != m_patcher_managers.end())
@@ -183,11 +183,11 @@ namespace kiwi
     
     void Instance::openRemotePatcher(std::string& host, uint16_t& port)
     {
-        std::unique_ptr<jPatcherManager> manager_uptr = nullptr;
+        std::unique_ptr<PatcherManager> manager_uptr = nullptr;
         
         try
         {
-            manager_uptr.reset(new jPatcherManager(*this, host, port));
+            manager_uptr.reset(new PatcherManager(*this, host, port));
         }
         catch(std::runtime_error &e)
         {
@@ -197,7 +197,7 @@ namespace kiwi
         if(manager_uptr)
         {
             auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), std::move(manager_uptr));
-            jPatcherManager& manager = *(manager_it->get());
+            PatcherManager& manager = *(manager_it->get());
             
             if(manager.getNumberOfView() == 0)
             {
@@ -255,9 +255,9 @@ namespace kiwi
         setUserId(set_cmp.getUserId());
     }
     
-    Instance::jPatcherManagers::const_iterator Instance::getPatcherManager(jPatcherManager const& manager) const
+    Instance::PatcherManagers::const_iterator Instance::getPatcherManager(PatcherManager const& manager) const
     {
-        const auto find_it = [&manager](std::unique_ptr<jPatcherManager> const& manager_uptr)
+        const auto find_it = [&manager](std::unique_ptr<PatcherManager> const& manager_uptr)
         {
             return &manager == manager_uptr.get();
         };

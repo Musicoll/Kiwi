@@ -30,7 +30,7 @@
 
 namespace kiwi
 {
-    class jPatcherManager;
+    class PatcherManager;
     class jObject;
     class jClassicBox;
     class jLink;
@@ -51,7 +51,7 @@ namespace kiwi
     public:
         
         //! @brief Constructor
-        jPatcher(jPatcherManager& manager,
+        jPatcher(PatcherManager& manager,
                  Instance& instance,
                  model::Patcher& patcher,
                  model::Patcher::View& view);
@@ -355,7 +355,7 @@ namespace kiwi
 
     private: // members
         
-        jPatcherManager&                            m_manager;
+        PatcherManager&                            m_manager;
         Instance&                                   m_instance;
         model::Patcher&                             m_patcher_model;
         model::Patcher::View&                       m_view_model;

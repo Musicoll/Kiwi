@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_JPATCHER_MANAGER_HPP_INCLUDED
-#define KIWI_JPATCHER_MANAGER_HPP_INCLUDED
+#ifndef KIWI_APP_PATCHER_MANAGER_HPP_INCLUDED
+#define KIWI_APP_PATCHER_MANAGER_HPP_INCLUDED
 
 #include "flip/Document.h"
 
@@ -41,17 +41,17 @@ namespace kiwi
     class jPatcherWindow : public jWindow
     {
     public:
-        jPatcherWindow(jPatcherManager& manager, jPatcher& jpatcher);
+        jPatcherWindow(PatcherManager& manager, jPatcher& jpatcher);
         void closeButtonPressed() override;
         
         //! @brief returns the patcher manager.
-        jPatcherManager& getManager() const;
+        PatcherManager& getManager() const;
         
         //! @brief returns the jPatcher.
         jPatcher& getjPatcher() const;
         
     private:
-        jPatcherManager& m_manager;
+        PatcherManager& m_manager;
         jPatcher& m_jpatcher;
     };
     
@@ -61,21 +61,21 @@ namespace kiwi
     
     //! @brief The main DocumentObserver.
     //! @details The Instance dispatch changes to all other DocumentObserver objects
-    class jPatcherManager : public flip::DocumentObserver<model::Patcher>
+    class PatcherManager : public flip::DocumentObserver<model::Patcher>
     {
     public:
         
         //! @brief Constructor.
-        jPatcherManager(Instance& instance);
+        PatcherManager(Instance& instance);
         
         //! @brief Constructs and load patcher from file
-        jPatcherManager(Instance& instance, juce::File const& file);
+        PatcherManager(Instance& instance, juce::File const& file);
 
         //! @brief Construct and connect to remote server
-        jPatcherManager(Instance & instance, const std::string host, uint16_t port);
+        PatcherManager(Instance & instance, const std::string host, uint16_t port);
         
         //! @brief Destructor.
-        ~jPatcherManager();
+        ~PatcherManager();
         
         //! @brief Returns the Patcher model
         model::Patcher& getPatcher();
@@ -146,4 +146,4 @@ namespace kiwi
     };
 }
 
-#endif // KIWI_JPATCHER_MANAGER_HPP_INCLUDED
+#endif // KIWI_APP_PATCHER_MANAGER_HPP_INCLUDED
