@@ -32,7 +32,7 @@ namespace kiwi
     //                                  BEACON DISPATCHER                               //
     // ================================================================================ //
     
-    //! @brief Explore service running on the Local Area Network.
+    //! @brief A Component that allows to dispatch messages to Beacon::Castaway objects.
     class BeaconDispatcher :
     public juce::Component,
     public juce::Button::Listener
