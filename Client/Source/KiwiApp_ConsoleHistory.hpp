@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_CONSOLE_HISTORY_HPP_INCLUDED
-#define KIWI_CONSOLE_HISTORY_HPP_INCLUDED
+#ifndef KIWI_APP_CONSOLE_HISTORY_HPP_INCLUDED
+#define KIWI_APP_CONSOLE_HISTORY_HPP_INCLUDED
 
 #include <KiwiEngine/KiwiEngineInstance.hpp>
 
@@ -130,4 +130,4 @@ namespace kiwi
     typedef std::weak_ptr<ConsoleHistory> wConsoleHistory;
 }
 
-#endif // KIWI_CONSOLE_HISTORY_HPP_INCLUDED
+#endif // KIWI_APP_CONSOLE_HISTORY_HPP_INCLUDED

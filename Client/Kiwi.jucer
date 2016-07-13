@@ -38,10 +38,10 @@
             file="Source/jPatcherManager.cpp"/>
       <FILE id="UPcwrk" name="jPatcherManager.hpp" compile="0" resource="0"
             file="Source/jPatcherManager.hpp"/>
-      <FILE id="Nqov5I" name="KiwiConsoleHistory.cpp" compile="1" resource="0"
-            file="Source/KiwiConsoleHistory.cpp"/>
-      <FILE id="WjlzY2" name="KiwiConsoleHistory.hpp" compile="0" resource="0"
-            file="Source/KiwiConsoleHistory.hpp"/>
+      <FILE id="Nqov5I" name="KiwiApp_ConsoleHistory.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_ConsoleHistory.cpp"/>
+      <FILE id="WjlzY2" name="KiwiApp_ConsoleHistory.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_ConsoleHistory.hpp"/>
       <FILE id="ZMqKKa" name="KiwiApp_Console.cpp" compile="1" resource="0"
             file="Source/KiwiApp_Console.cpp"/>
       <FILE id="jpbFUu" name="KiwiApp_Console.hpp" compile="0" resource="0"

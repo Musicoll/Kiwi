@@ -25,7 +25,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 
 #include "jWindow.hpp"
-#include "KiwiConsoleHistory.hpp"
+#include "KiwiApp_ConsoleHistory.hpp"
 
 namespace kiwi
 {
