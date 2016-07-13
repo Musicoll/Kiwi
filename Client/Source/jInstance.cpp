@@ -20,6 +20,7 @@
  */
 
 
+#include "Application.hpp"
 #include "jInstance.hpp"
 #include "KiwiDocumentManager.hpp"
 #include "jPatcher.hpp"
@@ -111,7 +112,7 @@ namespace kiwi
         }
         else
         {
-            //Console::error("can't open file");
+            KiwiApp::error("can't open file");
         }
         
         return false;
@@ -190,13 +191,14 @@ namespace kiwi
         }
         catch(std::runtime_error &e)
         {
-            //Console::error(e.what());
+            KiwiApp::error(e.what());
         }
         
         if(manager_uptr)
         {
             auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), std::move(manager_uptr));
             jPatcherManager& manager = *(manager_it->get());
+            
             if(manager.getNumberOfView() == 0)
             {
                 manager.newView();
