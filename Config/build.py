@@ -47,19 +47,19 @@ def build_osx(args):
 #==============================================================================
 
 def build_windows(args):
-    if(args.configuration == "Release"):
-        if(args.platform == "x64"):
-            cmd = "MSBuild.exe " + "/p:Configuration=Release /p:Platform=x64 " + os.path.join(project_dir, "Build", "Release", "x64", "Kiwi.sln");
-        elif(args.platform == "Win32"):
-            cmd = "MSBuild.exe " + "/p:Configuration=Release /p:Platform=Win32 " + os.path.join(project_dir, "Build", "Release", "Win32", "Kiwi.sln");
-    elif(args.configuration == "Debug"):
-        if(args.platform == "x64"):
-            cmd = "MSBuild.exe " + "/p:Configuration=Debug /p:Platform=x64 " + os.path.join(project_dir, "Build", "Debug", "x64", "Kiwi.sln");
-        elif(args.platform == "Win32"):
-            cmd = "MSBuild.exe " + "/p:Configuration=Debug /p:Platform=Win32 " + os.path.join(project_dir, "Build", "Debug", "Win32", "Kiwi.sln");
-
+	if(args.configuration == "Release"):
+		if(args.platform == "x64"):
+			cmd = "MSBuild.exe " + "/p:Configuration=Release /p:Platform=x64 " + os.path.join(project_dir, "Build", "Release", "x64", "Kiwi.sln");
+		elif(args.platform == "Win32"):
+			cmd = "MSBuild.exe " + "/p:Configuration=Release /p:Platform=Win32 " + os.path.join(project_dir, "Build", "Release", "Win32", "Kiwi.sln");
+	elif(args.configuration == "Debug"):
+		if(args.platform == "x64"):
+			cmd = "MSBuild.exe " + "/p:Configuration=Debug /p:Platform=x64 " + os.path.join(project_dir, "Build", "Debug", "x64", "Kiwi.sln");
+		elif(args.platform == "Win32"):
+			cmd = "MSBuild.exe " + "/p:Configuration=Debug /p:Platform=Win32 " + os.path.join(project_dir, "Build", "Debug", "Win32", "Kiwi.sln");
+	
 	subprocess.check_call(cmd, shell = True)
-
+	
 #==============================================================================
 # Name : main
 #==============================================================================
