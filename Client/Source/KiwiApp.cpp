@@ -76,7 +76,7 @@ namespace kiwi
     };
     
     // ================================================================================ //
-    //                                      APPLICATION                                 //
+    //                                  JUCEApplication                                 //
     // ================================================================================ //
     
     void KiwiApp::initialise(juce::String const& commandLine)
@@ -133,6 +133,25 @@ namespace kiwi
             }
         }
     }
+    
+    const juce::String KiwiApp::getApplicationName()
+    {
+        return ProjectInfo::projectName;
+    }
+    
+    const juce::String KiwiApp::getApplicationVersion()
+    {
+        return ProjectInfo::versionString;
+    }
+    
+    bool KiwiApp::moreThanOneInstanceAllowed()
+    {
+        return true;
+    }
+    
+    // ================================================================================ //
+    //                                    STATIC QUERY                                  //
+    // ================================================================================ //
     
     KiwiApp& KiwiApp::use()
     {
@@ -194,6 +213,10 @@ namespace kiwi
         
         return false;
     }
+    
+    // ================================================================================ //
+    //                                APPLICATION COMMAND                               //
+    // ================================================================================ //
     
     void KiwiApp::bindToCommandManager(ApplicationCommandTarget* target)
     {
@@ -455,7 +478,6 @@ namespace kiwi
     void KiwiApp::initCommandManager()
     {
         m_command_manager.reset(new juce::ApplicationCommandManager());
-        
         m_command_manager->registerAllCommandsForTarget(this);
     }
 }

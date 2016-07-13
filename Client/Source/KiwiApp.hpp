@@ -35,26 +35,32 @@ namespace kiwi
     
     class KiwiApp : public juce::JUCEApplication
     {
-    public:
+    public: // methods
         
         // ================================================================================ //
         //                                  JUCEApplication                                 //
         // ================================================================================ //
-
-        KiwiApp() = default;
-        ~KiwiApp() = default;
         
+        //! @brief Called when the application starts.
         void initialise(juce::String const& commandLine) override;
         
+        //! @brief Indicates that the user has tried to start up another instance of the app.
         void anotherInstanceStarted(juce::String const& command_line) override;
         
+        //! @brief Called to allow the application to clear up before exiting.
         void shutdown() override;
         
+        //! @brief Called when the operating system is trying to close the application.
         void systemRequestedQuit() override;
         
-        const juce::String getApplicationName() override        { return ProjectInfo::projectName; }
-        const juce::String getApplicationVersion() override     { return ProjectInfo::versionString; }
-        bool moreThanOneInstanceAllowed() override              { return true; }
+        //! @brief Returns the application's name.
+        const juce::String getApplicationName() override;
+        
+        //! @brief Returns the application's version number.
+        const juce::String getApplicationVersion() override;
+        
+        //! @brief Checks whether multiple instances of the app are allowed.
+        bool moreThanOneInstanceAllowed() override;
         
         //==============================================================================
         
@@ -157,6 +163,11 @@ namespace kiwi
         
         //! @brief This must actually perform the specified command.
         bool perform(InvocationInfo const& info) override;
+        
+    public: // internal methods
+        
+        KiwiApp() = default;
+        ~KiwiApp() = default;
         
     private: // methods
         
