@@ -6,57 +6,66 @@
               companyEmail="cicm.mshparisnord@gmail.com">
   <MAINGROUP id="HfN8up" name="Kiwi">
     <GROUP id="{E476D5A0-2E9D-DD18-D007-54A51ACF9459}" name="Application">
-      <FILE id="LWHJru" name="jObject.cpp" compile="1" resource="0" file="Source/jObject.cpp"/>
-      <FILE id="YYSxJ8" name="jObject.hpp" compile="0" resource="0" file="Source/jObject.hpp"/>
-      <FILE id="KpZNMh" name="jLink.cpp" compile="1" resource="0" file="Source/jLink.cpp"/>
-      <FILE id="MRxCah" name="jLink.hpp" compile="0" resource="0" file="Source/jLink.hpp"/>
-      <FILE id="mMQjEq" name="jPatcherHelper.cpp" compile="1" resource="0"
-            file="Source/jPatcherHelper.cpp"/>
-      <FILE id="unJYSB" name="jPatcherHelper.hpp" compile="0" resource="0"
-            file="Source/jPatcherHelper.hpp"/>
-      <FILE id="KxD69I" name="jPatcher.cpp" compile="1" resource="0" file="Source/jPatcher.cpp"/>
-      <FILE id="KQjSU2" name="jPatcher.hpp" compile="0" resource="0" file="Source/jPatcher.hpp"/>
-      <FILE id="QMh5qc" name="jWindow.cpp" compile="1" resource="0" file="Source/jWindow.cpp"/>
-      <FILE id="dmcYQZ" name="jWindow.hpp" compile="0" resource="0" file="Source/jWindow.hpp"/>
-      <FILE id="RRhAev" name="KiwiCarrierSocket.cpp" compile="1" resource="0"
-            file="Source/KiwiCarrierSocket.cpp"/>
-      <FILE id="fYrL64" name="KiwiCarrierSocket.hpp" compile="0" resource="0"
-            file="Source/KiwiCarrierSocket.hpp"/>
-      <FILE id="hHfaEF" name="KiwiFilePath.cpp" compile="1" resource="0"
-            file="Source/KiwiFilePath.cpp"/>
-      <FILE id="cYp1q8" name="KiwiFilePath.hpp" compile="0" resource="0"
-            file="Source/KiwiFilePath.hpp"/>
-      <FILE id="mEvXwg" name="KiwiDocumentManager.cpp" compile="1" resource="0"
-            file="Source/KiwiDocumentManager.cpp"/>
-      <FILE id="kWPSit" name="KiwiDocumentManager.hpp" compile="0" resource="0"
-            file="Source/KiwiDocumentManager.hpp"/>
-      <FILE id="DHSN5e" name="DocumentExplorer.cpp" compile="1" resource="0"
-            file="Source/DocumentExplorer.cpp"/>
-      <FILE id="SzKgac" name="DocumentExplorer.hpp" compile="0" resource="0"
-            file="Source/DocumentExplorer.hpp"/>
-      <FILE id="EOqi96" name="BeaconDispatcher.cpp" compile="1" resource="0"
-            file="Source/BeaconDispatcher.cpp"/>
-      <FILE id="WtjygW" name="BeaconDispatcher.hpp" compile="0" resource="0"
-            file="Source/BeaconDispatcher.hpp"/>
-      <FILE id="oCQegP" name="jPatcherManager.cpp" compile="1" resource="0"
-            file="Source/jPatcherManager.cpp"/>
-      <FILE id="UPcwrk" name="jPatcherManager.hpp" compile="0" resource="0"
-            file="Source/jPatcherManager.hpp"/>
-      <FILE id="Nqov5I" name="KiwiConsoleHistory.cpp" compile="1" resource="0"
-            file="Source/KiwiConsoleHistory.cpp"/>
-      <FILE id="WjlzY2" name="KiwiConsoleHistory.hpp" compile="0" resource="0"
-            file="Source/KiwiConsoleHistory.hpp"/>
-      <FILE id="ZMqKKa" name="jConsole.cpp" compile="1" resource="0" file="Source/jConsole.cpp"/>
-      <FILE id="jpbFUu" name="jConsole.hpp" compile="0" resource="0" file="Source/jConsole.hpp"/>
-      <FILE id="Jmu5NJ" name="jInstance.cpp" compile="1" resource="0" file="Source/jInstance.cpp"/>
-      <FILE id="dfUOAd" name="jInstance.hpp" compile="0" resource="0" file="Source/jInstance.hpp"/>
-      <FILE id="yC78kD" name="CommandIDs.hpp" compile="0" resource="0" file="Source/CommandIDs.hpp"/>
-      <FILE id="dQYnOl" name="StoredSettings.cpp" compile="1" resource="0"
-            file="Source/StoredSettings.cpp"/>
-      <FILE id="HZmZHb" name="StoredSettings.hpp" compile="0" resource="0"
-            file="Source/StoredSettings.hpp"/>
-      <FILE id="Je1Viq" name="Application.cpp" compile="1" resource="0" file="Source/Application.cpp"/>
-      <FILE id="gEGUnW" name="Application.hpp" compile="0" resource="0" file="Source/Application.hpp"/>
+      <FILE id="LWHJru" name="KiwiApp_ObjectView.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_ObjectView.cpp"/>
+      <FILE id="YYSxJ8" name="KiwiApp_ObjectView.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_ObjectView.hpp"/>
+      <FILE id="KpZNMh" name="KiwiApp_LinkView.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_LinkView.cpp"/>
+      <FILE id="MRxCah" name="KiwiApp_LinkView.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_LinkView.hpp"/>
+      <FILE id="mMQjEq" name="KiwiApp_PatcherViewHelper.cpp" compile="1"
+            resource="0" file="Source/KiwiApp_PatcherViewHelper.cpp"/>
+      <FILE id="unJYSB" name="KiwiApp_PatcherViewHelper.hpp" compile="0"
+            resource="0" file="Source/KiwiApp_PatcherViewHelper.hpp"/>
+      <FILE id="KxD69I" name="KiwiApp_PatcherView.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_PatcherView.cpp"/>
+      <FILE id="KQjSU2" name="KiwiApp_PatcherView.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_PatcherView.hpp"/>
+      <FILE id="QMh5qc" name="KiwiApp_Window.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_Window.cpp"/>
+      <FILE id="dmcYQZ" name="KiwiApp_Window.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_Window.hpp"/>
+      <FILE id="RRhAev" name="KiwiApp_CarrierSocket.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_CarrierSocket.cpp"/>
+      <FILE id="fYrL64" name="KiwiApp_CarrierSocket.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_CarrierSocket.hpp"/>
+      <FILE id="mEvXwg" name="KiwiApp_DocumentManager.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_DocumentManager.cpp"/>
+      <FILE id="kWPSit" name="KiwiApp_DocumentManager.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_DocumentManager.hpp"/>
+      <FILE id="DHSN5e" name="KiwiApp_DocumentExplorer.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_DocumentExplorer.cpp"/>
+      <FILE id="SzKgac" name="KiwiApp_DocumentExplorer.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_DocumentExplorer.hpp"/>
+      <FILE id="EOqi96" name="KiwiApp_BeaconDispatcher.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_BeaconDispatcher.cpp"/>
+      <FILE id="WtjygW" name="KiwiApp_BeaconDispatcher.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_BeaconDispatcher.hpp"/>
+      <FILE id="oCQegP" name="KiwiApp_PatcherManager.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_PatcherManager.cpp"/>
+      <FILE id="UPcwrk" name="KiwiApp_PatcherManager.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_PatcherManager.hpp"/>
+      <FILE id="Nqov5I" name="KiwiApp_ConsoleHistory.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_ConsoleHistory.cpp"/>
+      <FILE id="WjlzY2" name="KiwiApp_ConsoleHistory.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_ConsoleHistory.hpp"/>
+      <FILE id="ZMqKKa" name="KiwiApp_Console.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_Console.cpp"/>
+      <FILE id="jpbFUu" name="KiwiApp_Console.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_Console.hpp"/>
+      <FILE id="Jmu5NJ" name="KiwiApp_Instance.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_Instance.cpp"/>
+      <FILE id="dfUOAd" name="KiwiApp_Instance.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_Instance.hpp"/>
+      <FILE id="yC78kD" name="KiwiApp_CommandIDs.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_CommandIDs.hpp"/>
+      <FILE id="dQYnOl" name="KiwiApp_StoredSettings.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_StoredSettings.cpp"/>
+      <FILE id="HZmZHb" name="KiwiApp_StoredSettings.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_StoredSettings.hpp"/>
+      <FILE id="Je1Viq" name="KiwiApp.cpp" compile="1" resource="0" file="Source/KiwiApp.cpp"/>
+      <FILE id="gEGUnW" name="KiwiApp.hpp" compile="0" resource="0" file="Source/KiwiApp.hpp"/>
       <FILE id="EcI2R7" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
     </GROUP>
     <GROUP id="{8FA1C9D1-9F39-6B48-4CD5-95C1B98E14A6}" name="Modules">
