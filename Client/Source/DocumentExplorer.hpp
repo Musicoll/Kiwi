@@ -154,7 +154,7 @@ namespace kiwi
     //                               DOCUMENT EXPLORER WINDOW                           //
     // ================================================================================ //
     
-    //! @brief The jConsoleWindow is a jWindow that manages and display a jConsole Component.
+    //! @brief The ConsoleWindow is a jWindow that manages and display a Console Component.
     class DocumentExplorerWindow : public jWindow
     {
     public:

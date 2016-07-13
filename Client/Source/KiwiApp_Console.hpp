@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_JCONSOLE_HPP_INCLUDED
-#define KIWI_JCONSOLE_HPP_INCLUDED
+#ifndef KIWI_APP_CONSOLE_HPP_INCLUDED
+#define KIWI_APP_CONSOLE_HPP_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
@@ -30,13 +30,13 @@
 namespace kiwi
 {
     // ================================================================================ //
-    //                                  JCONSOLE COMPONENT                              //
+    //                                  CONSOLE COMPONENT                               //
     // ================================================================================ //
     
     //! @brief The juce Console Component
     //! @details The juce Console Component maintain a ConsoleHistory and display Console messages to the user.
     //! The user can select a message to copy it to the system clipboard, delete a specific message or a range of messages, sort messages, double-click on a row to hilight the corresponding object...
-    class jConsole :
+    class Console :
     public ConsoleHistory::Listener,
     public juce::Component,
     public juce::TableListBoxModel,
@@ -45,10 +45,10 @@ namespace kiwi
     public:
         
         //! @brief Constructor
-        jConsole(sConsoleHistory history);
+        Console(sConsoleHistory history);
         
         //! @brief Destructor
-        ~jConsole();
+        ~Console();
         
         //! @brief Gets the ConsoleHistory.
         sConsoleHistory getHistory();
@@ -156,16 +156,16 @@ namespace kiwi
     //                                  CONSOLE WINDOW                                  //
     // ================================================================================ //
     
-    //! @brief The jConsoleWindow is a jWindow that manages and display a jConsole Component.
-    class jConsoleWindow : public jWindow
+    //! @brief The ConsoleWindow is a jWindow that manages and display a Console Component.
+    class ConsoleWindow : public jWindow
     {
     public:
-        jConsoleWindow(sConsoleHistory history);
-        ~jConsoleWindow();
+        ConsoleWindow(sConsoleHistory history);
+        ~ConsoleWindow();
         
         void closeButtonPressed() override;
     };
 }
 
 
-#endif // KIWI_JCONSOLE_HPP_INCLUDED
+#endif // KIWI_APP_CONSOLE_HPP_INCLUDED

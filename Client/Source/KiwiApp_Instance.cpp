@@ -37,7 +37,7 @@ namespace kiwi
     m_user_id(flip::Ref::User::Offline),
     m_instance(new engine::Instance()),
     m_console_history(std::make_shared<ConsoleHistory>(*m_instance)),
-    m_console_window(new jConsoleWindow(m_console_history)),
+    m_console_window(new ConsoleWindow(m_console_history)),
     m_document_explorer(new DocumentExplorer()),
     m_document_explorer_window(new DocumentExplorerWindow(*m_document_explorer, *this)),
     m_beacon_dispatcher_window(new BeaconDispatcherWindow(*m_instance)),

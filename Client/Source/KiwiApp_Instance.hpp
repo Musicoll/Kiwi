@@ -28,7 +28,7 @@
 
 #include "flip/Document.h"
 
-#include "jConsole.hpp"
+#include "KiwiApp_Console.hpp"
 #include "DocumentExplorer.hpp"
 #include "jPatcherManager.hpp"
 #include "KiwiApp_StoredSettings.hpp"
@@ -116,7 +116,7 @@ namespace kiwi
         jPatcherManagers                            m_patcher_managers;
         
         sConsoleHistory                             m_console_history;
-        std::unique_ptr<jConsoleWindow>             m_console_window;
+        std::unique_ptr<ConsoleWindow>             m_console_window;
         
         std::unique_ptr<DocumentExplorer>           m_document_explorer;
         std::unique_ptr<DocumentExplorerWindow>     m_document_explorer_window;

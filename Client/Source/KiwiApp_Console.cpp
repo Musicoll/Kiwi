@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#include "jConsole.hpp"
 #include "KiwiApp.hpp"
+#include "KiwiApp_Console.hpp"
 #include "KiwiApp_StoredSettings.hpp"
 
 namespace kiwi
@@ -29,7 +29,7 @@ namespace kiwi
     //                                  CONSOLE COMPONENT                               //
     // ================================================================================ //
     
-    jConsole::jConsole(sConsoleHistory history) :
+    Console::Console(sConsoleHistory history) :
     m_history(history),
     m_font(13.f)
     {
@@ -75,7 +75,7 @@ namespace kiwi
         addAndMakeVisible(m_table);
     }
     
-    jConsole::~jConsole()
+    Console::~Console()
     {
         sConsoleHistory history = getHistory();
         if(history)
@@ -84,7 +84,7 @@ namespace kiwi
         }
     }
     
-    sConsoleHistory jConsole::getHistory()
+    sConsoleHistory Console::getHistory()
     {
         return m_history.lock();
     }
@@ -93,7 +93,7 @@ namespace kiwi
     //                                      COMMAND                                     //
     // ================================================================================ //
     
-    void jConsole::copy()
+    void Console::copy()
     {
         sConsoleHistory history = getHistory();
         if(history)
@@ -114,7 +114,7 @@ namespace kiwi
         }
     }
     
-    void jConsole::erase()
+    void Console::erase()
     {
         sConsoleHistory history = getHistory();
         if(history)
@@ -136,7 +136,7 @@ namespace kiwi
     //                                  HISTORY LISTENER                                //
     // ================================================================================ //
     
-    void jConsole::consoleHistoryChanged(ConsoleHistory const&)
+    void Console::consoleHistoryChanged(ConsoleHistory const&)
     {
         m_table.updateContent();
     }
@@ -145,13 +145,13 @@ namespace kiwi
     //                                      COMPONENT                                   //
     // ================================================================================ //
     
-    void jConsole::resized()
+    void Console::resized()
     {
         m_table.setBounds(getLocalBounds());
         updateRighmostColumnWidth(&m_table.getHeader());
     }
     
-    void jConsole::paint(juce::Graphics& g)
+    void Console::paint(juce::Graphics& g)
     {
         int width   = m_table.getVisibleContentWidth();
         int rowheight = m_table.getRowHeight();
@@ -166,28 +166,28 @@ namespace kiwi
     //                              TABLE LIST BOX MODEL                                //
     // ================================================================================ //
     
-    void jConsole::selectedRowsChanged(int row)
+    void Console::selectedRowsChanged(int row)
     {
         KiwiApp::commandStatusChanged();
     }
     
-    void jConsole::deleteKeyPressed(int lastRowSelected)
+    void Console::deleteKeyPressed(int lastRowSelected)
     {
         erase();
     }
     
-    void jConsole::backgroundClicked(const juce::MouseEvent& mouse)
+    void Console::backgroundClicked(const juce::MouseEvent& mouse)
     {
         m_table.deselectAllRows();
     }
     
-    int jConsole::getNumRows()
+    int Console::getNumRows()
     {
         sConsoleHistory history = getHistory();
         return history ? history->size() : 0;
     }
     
-    void jConsole::paintRowBackground(juce::Graphics& g, int rowNumber, int width, int height, bool selected)
+    void Console::paintRowBackground(juce::Graphics& g, int rowNumber, int width, int height, bool selected)
     {
         sConsoleHistory history = getHistory();
         if(!history) return; //abort
@@ -221,7 +221,7 @@ namespace kiwi
         g.drawLine(0, height, width, height);
     }
     
-    void jConsole::paintOverChildren(juce::Graphics &g)
+    void Console::paintOverChildren(juce::Graphics &g)
     {
         int numColumns = m_table.getHeader().getNumColumns(true);
         float left = 0, width = 0;
@@ -240,7 +240,7 @@ namespace kiwi
         }
     }
     
-    void jConsole::paintCell(juce::Graphics& g,
+    void Console::paintCell(juce::Graphics& g,
                              int rowNumber, int columnId, int width, int height,
                              bool rowIsSelected)
     {
@@ -274,7 +274,7 @@ namespace kiwi
         }
     }
     
-    void jConsole::sortOrderChanged(int newSortColumnId, bool isForwards)
+    void Console::sortOrderChanged(int newSortColumnId, bool isForwards)
     {
         sConsoleHistory history = getHistory();
         if(!history) return; //abort
@@ -283,12 +283,12 @@ namespace kiwi
         m_table.updateContent();
     }
     
-    void jConsole::cellDoubleClicked(int rowNumber, int columnId, const juce::MouseEvent& mouse)
+    void Console::cellDoubleClicked(int rowNumber, int columnId, const juce::MouseEvent& mouse)
     {
         // TODO : hilight (if possible) object corresponding to the dblclicked row
     }
     
-    juce::Component* jConsole::refreshComponentForCell(int, int, bool, Component* existingComponentToUpdate)
+    juce::Component* Console::refreshComponentForCell(int, int, bool, Component* existingComponentToUpdate)
     {
         // Just return 0, as we'll be painting these columns directly.
         jassert(existingComponentToUpdate == 0);
@@ -297,7 +297,7 @@ namespace kiwi
     
     // This is overloaded from TableListBoxModel, and should choose the best width for the specified
     // column.
-    int jConsole::getColumnAutoSizeWidth(int columnId)
+    int Console::getColumnAutoSizeWidth(int columnId)
     {
         if(columnId == Column::Id)
             return 30;
@@ -321,7 +321,7 @@ namespace kiwi
         return widest + 8;
     }
     
-    void jConsole::tableColumnsResized(juce::TableHeaderComponent* tableHeader)
+    void Console::tableColumnsResized(juce::TableHeaderComponent* tableHeader)
     {
         if(tableHeader == &m_table.getHeader())
         {
@@ -329,7 +329,7 @@ namespace kiwi
         }
     }
     
-    void jConsole::updateRighmostColumnWidth(juce::TableHeaderComponent* header)
+    void Console::updateRighmostColumnWidth(juce::TableHeaderComponent* header)
     {
         int rightmostColumnId   = 0;
         int rightmostColumnX    = 0;
@@ -355,10 +355,10 @@ namespace kiwi
     //                                  CONSOLE WINDOW                                  //
     // ================================================================================ //
     
-    jConsoleWindow::jConsoleWindow(sConsoleHistory history) :
+    ConsoleWindow::ConsoleWindow(sConsoleHistory history) :
     jWindow("Kiwi Console", juce::Colours::white, minimiseButton | closeButton, true)
     {
-        setContentOwned(new jConsole(history), false);
+        setContentOwned(new Console(history), false);
         setResizable(true, false);
         setResizeLimits(50, 50, 32000, 32000);
         
@@ -376,12 +376,12 @@ namespace kiwi
         }
     }
     
-    jConsoleWindow::~jConsoleWindow()
+    ConsoleWindow::~ConsoleWindow()
     {
         getGlobalProperties().setValue("console_window", getWindowStateAsString());
     }
     
-    void jConsoleWindow::closeButtonPressed()
+    void ConsoleWindow::closeButtonPressed()
     {
         setVisible(false);
     }

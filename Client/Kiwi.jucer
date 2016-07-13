@@ -42,8 +42,10 @@
             file="Source/KiwiConsoleHistory.cpp"/>
       <FILE id="WjlzY2" name="KiwiConsoleHistory.hpp" compile="0" resource="0"
             file="Source/KiwiConsoleHistory.hpp"/>
-      <FILE id="ZMqKKa" name="jConsole.cpp" compile="1" resource="0" file="Source/jConsole.cpp"/>
-      <FILE id="jpbFUu" name="jConsole.hpp" compile="0" resource="0" file="Source/jConsole.hpp"/>
+      <FILE id="ZMqKKa" name="KiwiApp_Console.cpp" compile="1" resource="0"
+            file="Source/KiwiApp_Console.cpp"/>
+      <FILE id="jpbFUu" name="KiwiApp_Console.hpp" compile="0" resource="0"
+            file="Source/KiwiApp_Console.hpp"/>
       <FILE id="Jmu5NJ" name="KiwiApp_Instance.cpp" compile="1" resource="0"
             file="Source/KiwiApp_Instance.cpp"/>
       <FILE id="dfUOAd" name="KiwiApp_Instance.hpp" compile="0" resource="0"
