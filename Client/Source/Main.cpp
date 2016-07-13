@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include "Application.hpp"
+#include "KiwiApp.hpp"
 
 //==============================================================================
 // This macro generates the main() routine that launches the app.

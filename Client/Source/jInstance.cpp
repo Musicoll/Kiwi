@@ -20,7 +20,7 @@
  */
 
 
-#include "Application.hpp"
+#include "KiwiApp.hpp"
 #include "jInstance.hpp"
 #include "KiwiDocumentManager.hpp"
 #include "jPatcher.hpp"

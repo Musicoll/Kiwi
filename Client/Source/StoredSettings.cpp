@@ -20,7 +20,7 @@
  */
 
 #include "StoredSettings.hpp"
-#include "Application.hpp"
+#include "KiwiApp.hpp"
 
 namespace kiwi
 {

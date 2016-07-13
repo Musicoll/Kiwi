@@ -20,7 +20,7 @@
  */
 
 #include "jConsole.hpp"
-#include "Application.hpp"
+#include "KiwiApp.hpp"
 #include "StoredSettings.hpp"
 
 namespace kiwi

@@ -23,7 +23,7 @@
 #include <KiwiModel/KiwiModelPatcherUser.hpp>
 #include <KiwiEngine/KiwiEnginePatcher.hpp>
 
-#include "Application.hpp"
+#include "KiwiApp.hpp"
 #include "jInstance.hpp"
 #include "KiwiDocumentManager.hpp"
 #include "jPatcherManager.hpp"

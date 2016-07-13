@@ -21,7 +21,7 @@
 
 #include <KiwiModel/KiwiModelDataModel.hpp>
 
-#include "Application.hpp"
+#include "KiwiApp.hpp"
 #include "CommandIDs.hpp"
 
 namespace kiwi

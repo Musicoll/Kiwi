@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_APPLICATION_HPP_INCLUDED
-#define KIWI_APPLICATION_HPP_INCLUDED
+#ifndef KIWI_KIWIAPP_HPP_INCLUDED
+#define KIWI_KIWIAPP_HPP_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
@@ -176,4 +176,4 @@ namespace kiwi
     };
 }
 
-#endif // KIWI_APPLICATION_HPP_INCLUDED
+#endif // KIWI_KIWIAPP_HPP_INCLUDED

@@ -55,8 +55,8 @@
             file="Source/StoredSettings.cpp"/>
       <FILE id="HZmZHb" name="StoredSettings.hpp" compile="0" resource="0"
             file="Source/StoredSettings.hpp"/>
-      <FILE id="Je1Viq" name="Application.cpp" compile="1" resource="0" file="Source/Application.cpp"/>
-      <FILE id="gEGUnW" name="Application.hpp" compile="0" resource="0" file="Source/Application.hpp"/>
+      <FILE id="Je1Viq" name="KiwiApp.cpp" compile="1" resource="0" file="Source/KiwiApp.cpp"/>
+      <FILE id="gEGUnW" name="KiwiApp.hpp" compile="0" resource="0" file="Source/KiwiApp.hpp"/>
       <FILE id="EcI2R7" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
     </GROUP>
     <GROUP id="{8FA1C9D1-9F39-6B48-4CD5-95C1B98E14A6}" name="Modules">

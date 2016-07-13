@@ -23,7 +23,7 @@
 
 #include "KiwiDocumentManager.hpp"
 #include "jObject.hpp"
-#include "Application.hpp"
+#include "KiwiApp.hpp"
 #include "jPatcherHelper.hpp"
 #include "jPatcher.hpp"
 

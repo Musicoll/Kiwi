@@ -21,7 +21,7 @@
 
 #include "jLink.hpp"
 #include "jPatcher.hpp"
-#include "Application.hpp"
+#include "KiwiApp.hpp"
 #include "jPatcherHelper.hpp"
 
 namespace kiwi

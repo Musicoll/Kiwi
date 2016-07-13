@@ -30,7 +30,7 @@
 #include "jPatcherHelper.hpp"
 #include "jObject.hpp"
 #include "jLink.hpp"
-#include "Application.hpp"
+#include "KiwiApp.hpp"
 #include "CommandIDs.hpp"
 
 namespace kiwi

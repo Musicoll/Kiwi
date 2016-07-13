@@ -21,7 +21,7 @@
 
 #include "jWindow.hpp"
 #include "CommandIDs.hpp"
-#include "Application.hpp"
+#include "KiwiApp.hpp"
 
 namespace kiwi
 {
