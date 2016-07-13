@@ -31,7 +31,7 @@
 #include "jConsole.hpp"
 #include "DocumentExplorer.hpp"
 #include "jPatcherManager.hpp"
-#include "StoredSettings.hpp"
+#include "KiwiApp_StoredSettings.hpp"
 #include "BeaconDispatcher.hpp"
 
 namespace kiwi

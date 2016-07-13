@@ -20,7 +20,7 @@
  */
 
 #include "BeaconDispatcher.hpp"
-#include "StoredSettings.hpp"
+#include "KiwiApp_StoredSettings.hpp"
 
 namespace kiwi
 {

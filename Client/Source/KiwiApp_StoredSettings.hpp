@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_STORED_SETTINGS_HPP_INCLUDED
-#define KIWI_STORED_SETTINGS_HPP_INCLUDED
+#ifndef KIWI_APP_STORED_SETTINGS_HPP_INCLUDED
+#define KIWI_APP_STORED_SETTINGS_HPP_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
@@ -57,11 +57,11 @@ namespace kiwi
         void changed();
         void updateGlobalPreferences();
 
-        void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier&) override     { changed(); }
-        void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override           { changed(); }
-        void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override    { changed(); }
-        void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override            { changed(); }
-        void valueTreeParentChanged(juce::ValueTree&) override                          { changed(); }
+        void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier&) override   { changed(); }
+        void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override               { changed(); }
+        void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override        { changed(); }
+        void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override                { changed(); }
+        void valueTreeParentChanged(juce::ValueTree&) override                              { changed(); }
         
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StoredSettings)
     };
@@ -70,4 +70,4 @@ namespace kiwi
     juce::PropertiesFile& getGlobalProperties();
 };
 
-#endif   // JUCER_STOREDSETTINGS_H_INCLUDED
+#endif // KIWI_APP_STORED_SETTINGS_HPP_INCLUDED

@@ -20,7 +20,7 @@
  */
 
 #include "jWindow.hpp"
-#include "CommandIDs.hpp"
+#include "KiwiApp_CommandIDs.hpp"
 #include "KiwiApp.hpp"
 
 namespace kiwi

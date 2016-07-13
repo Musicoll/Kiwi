@@ -25,7 +25,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 
 #include "jInstance.hpp"
-#include "StoredSettings.hpp"
+#include "KiwiApp_StoredSettings.hpp"
 
 namespace kiwi
 {

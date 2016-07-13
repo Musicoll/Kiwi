@@ -31,7 +31,7 @@
 #include "jObject.hpp"
 #include "jLink.hpp"
 #include "KiwiApp.hpp"
-#include "CommandIDs.hpp"
+#include "KiwiApp_CommandIDs.hpp"
 
 namespace kiwi
 {

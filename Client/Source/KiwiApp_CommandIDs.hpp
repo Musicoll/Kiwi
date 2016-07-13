@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_COMMAND_IDS_HPP_INCLUDED
-#define KIWI_COMMAND_IDS_HPP_INCLUDED
+#ifndef KIWI_APP_COMMAND_IDS_HPP_INCLUDED
+#define KIWI_APP_COMMAND_IDS_HPP_INCLUDED
 
 namespace kiwi
 {
@@ -92,4 +92,4 @@ namespace kiwi
     }
 }
 
-#endif // KIWI_COMMAND_IDS_HPP_INCLUDED
+#endif // KIWI_APP_COMMAND_IDS_HPP_INCLUDED

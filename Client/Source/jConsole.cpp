@@ -21,7 +21,7 @@
 
 #include "jConsole.hpp"
 #include "KiwiApp.hpp"
-#include "StoredSettings.hpp"
+#include "KiwiApp_StoredSettings.hpp"
 
 namespace kiwi
 {

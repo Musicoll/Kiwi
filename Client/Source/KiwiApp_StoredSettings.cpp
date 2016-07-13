@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include "StoredSettings.hpp"
+#include "KiwiApp_StoredSettings.hpp"
 #include "KiwiApp.hpp"
 
 namespace kiwi
