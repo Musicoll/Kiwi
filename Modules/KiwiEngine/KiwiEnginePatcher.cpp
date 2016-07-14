@@ -25,7 +25,7 @@
 #include "KiwiEngineFactory.hpp"
 #include "KiwiEngineInstance.hpp"
 
-#include <KiwiModel/KiwiModelPatcher.hpp>
+#include <KiwiModel/KiwiModelPatcherUser.hpp>
 
 namespace kiwi
 {

@@ -3,6 +3,7 @@
 ##### IMPORT #################################################################
 
 import argparse
+import glob
 import os
 import platform
 import subprocess
@@ -12,6 +13,16 @@ import distutils
 project_dir = os.path.abspath(".");
 
 test_list = ["test_atom"]
+
+#==============================================================================
+#Name : get_test_file
+#==============================================================================
+
+def get_test_file(test_name):
+	test_file = test_name;
+	if platform.system() == "Windows":
+		test_file = test + ".exe"
+	return test_file
 
 #==============================================================================
 #Name : parse_args
@@ -26,26 +37,6 @@ def parse_args ():
         arg_parser.add_argument('-p', '--platform', default = 'x64', choices = ['x64', 'Win32'])
 
     return arg_parser.parse_args (sys.argv[1:])
-
-#==============================================================================
-#Name : run_recurse
-#==============================================================================
-
-def run_test (dir):
-	subfiles = os.listdir(dir)
-
-	for filename in subfiles:
-		filepath = os.path.join(dir, filename);
-		print(filepath)
-
-		if os.path.isdir(filepath):
-			run_recurse(filepath)
-		else:
-			exe_file = distutils.spawn.find_executable(filename)
-			if (exe_file):
-				subprocess.check_call(exe_file, shell= True);
-
-	return arg_parser.parse_args (sys.argv[1:])
 
 #==============================================================================
 #Name : main
@@ -71,4 +62,4 @@ if platform.system() == "Windows":
 test_dir = os.path.join(project_dir, "Build", platform_path, "KiwiBuild", "Test", config_path)
 
 for test in test_list:
-	subprocess.check_call(os.path.join(test_dir, test), shell= True);
+	subprocess.check_call(os.path.join(test_dir, get_test_file(test)), shell= True);

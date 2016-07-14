@@ -24,7 +24,7 @@
 
 #include "flip/Document.h"
 
-#include <KiwiModel/KiwiModelPatcher.hpp>
+#include <KiwiModel/KiwiModelPatcherUser.hpp>
 #include <KiwiEngine/KiwiEngineInstance.hpp>
 
 #include "jWindow.hpp"

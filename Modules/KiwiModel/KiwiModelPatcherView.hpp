@@ -22,7 +22,7 @@
 #ifndef KIWI_MODEL_PATCHER_VIEW_HPP_INCLUDED
 #define KIWI_MODEL_PATCHER_VIEW_HPP_INCLUDED
 
-#include "KiwiModelPatcher.hpp"
+#include "KiwiModelPatcherUser.hpp"
 
 namespace kiwi
 {
