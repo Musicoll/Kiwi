@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiModelDataModel.hpp>
+#include <KiwiModel/KiwiModel_DataModel.hpp>
 
 #include "KiwiApp.hpp"
 #include "KiwiApp_CommandIDs.hpp"

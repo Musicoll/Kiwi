@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiModelPatcherView.hpp>
+#include <KiwiModel/KiwiModel_PatcherView.hpp>
 
 #include "KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_ObjectView.hpp"

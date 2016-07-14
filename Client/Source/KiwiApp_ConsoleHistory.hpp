@@ -22,7 +22,7 @@
 #ifndef KIWI_APP_CONSOLE_HISTORY_HPP_INCLUDED
 #define KIWI_APP_CONSOLE_HISTORY_HPP_INCLUDED
 
-#include <KiwiEngine/KiwiEngineInstance.hpp>
+#include <KiwiEngine/KiwiEngine_Instance.hpp>
 
 namespace kiwi
 {

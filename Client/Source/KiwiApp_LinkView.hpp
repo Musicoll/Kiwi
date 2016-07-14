@@ -22,7 +22,7 @@
 #ifndef KIWI_APP_LINKVIEW_HPP_INCLUDED
 #define KIWI_APP_LINKVIEW_HPP_INCLUDED
 
-#include <KiwiModel/KiwiModelLink.hpp>
+#include <KiwiModel/KiwiModel_Link.hpp>
 
 #include "KiwiApp_ObjectView.hpp"
 

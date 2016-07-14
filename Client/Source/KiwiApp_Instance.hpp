@@ -24,7 +24,7 @@
 
 #include <string>
 
-#include <KiwiEngine/KiwiEngineInstance.hpp>
+#include <KiwiEngine/KiwiEngine_Instance.hpp>
 
 #include "flip/Document.h"
 
