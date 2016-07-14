@@ -3,7 +3,7 @@
 if [[ "$TRAVIS_BRANCH" == "master" ]];
 then
 # Get a clean version of the HTML documentation repo.
-cd config
+cd Config
 rm -rf html
 mkdir -p html
 git clone -b gh-pages git@github.com:Musicoll/Kiwi.git --single-branch html

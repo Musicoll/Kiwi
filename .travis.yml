@@ -43,5 +43,4 @@ matrix:
       skip_cleanup: true
       on:
         repo: Musicoll/Kiwi
-        branch: master
         tags: true
