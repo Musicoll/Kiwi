@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiModelDataModel.hpp>
-#include <KiwiModel/KiwiModelPatcherUser.hpp>
+#include <KiwiModel/KiwiModel_DataModel.hpp>
+#include <KiwiModel/KiwiModel_PatcherUser.hpp>
 
 #include "flip/Mold.h"
 

@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include <KiwiEngine/KiwiEngineConsole.hpp>
+#include <KiwiEngine/KiwiEngine_Console.hpp>
 
 #include "KiwiApp_DocumentExplorer.hpp"
 #include "KiwiApp_Instance.hpp"

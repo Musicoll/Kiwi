@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ $TRAVIS_BRANCH = 'master' ]
+if [[ "$TRAVIS_BRANCH" == "master" ]];
 then
 # Get a clean version of the HTML documentation repo.
 cd config

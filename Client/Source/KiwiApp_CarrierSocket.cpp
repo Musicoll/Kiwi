@@ -24,7 +24,7 @@
 
 #include "KiwiApp_CarrierSocket.hpp"
 
-#include <KiwiModel/KiwiModelPatcherUser.hpp>
+#include <KiwiModel/KiwiModel_PatcherUser.hpp>
 
 namespace kiwi
 {

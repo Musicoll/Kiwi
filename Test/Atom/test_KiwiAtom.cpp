@@ -22,7 +22,7 @@
  */
 
 
-#include <KiwiModel/KiwiModelAtom.hpp>
+#include <KiwiModel/KiwiModel_Atom.hpp>
 #define CATCH_CONFIG_MAIN
 #include "../catch.hpp"
 #include <vector>
