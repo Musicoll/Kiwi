@@ -1,15 +1,40 @@
 
 environment:
    matrix:
-      - CONFIGURATION: Debug
+      - CONFIGURATION: Release
         PLATFORM: Win32
-      - CONFIGURATION: Debug
+      - CONFIGURATION: Release
         PLATFORM: x64
 
 os: Visual Studio 2015
 
+install:
+    - git submodule update --init --recursive ThirdParty/flip-public
+    - git submodule update --init --recursive ThirdParty/Juce
+    - set PATH=C:\Python27;%PATH%
+
 build_script:
-    - mkdir build
+    - python .\Config\configure.py
+    - python .\Config\build.py -c %CONFIGURATION% -p %PLATFORM%
+    - python .\Config\run_test.py -c %CONFIGURATION% -p %PLATFORM%
+
+after_build:
+    - del /F /S /Q /A %APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\Bin\%CONFIGURATION%\*.ilk
+    - 7z a Kiwi_%PLATFORM%.zip %APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\Bin\%CONFIGURATION%\
+
+artifacts:
+  - path: '*.zip'
+
+deploy:
+  provider: GitHub
+  auth_token:
+    secure: 1ee8291142b5432e70820313f3f421663b1bfb83
+  artifact: /.*\.zip/
+  draft: false
+  prerelease: false
+  on:
+    appveyor_repo_tag: true
+    branch: master
 
 #---------------------------------#
 #         notifications           #

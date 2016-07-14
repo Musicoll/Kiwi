@@ -22,7 +22,7 @@
 #ifndef KIWI_APP_PATCHERVIEW_HPP_INCLUDED
 #define KIWI_APP_PATCHERVIEW_HPP_INCLUDED
 
-#include <KiwiModel/KiwiModelPatcher.hpp>
+#include <KiwiModel/KiwiModelPatcherUser.hpp>
 
 #include "flip/DocumentObserver.h"
 

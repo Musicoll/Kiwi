@@ -22,8 +22,9 @@
  */
 
 
-#include "../../../Modules/KiwiCore/KiwiAtom.hpp"
-#include "../../catch.hpp"
+#include <KiwiModel/KiwiModelAtom.hpp>
+#define CATCH_CONFIG_MAIN
+#include "../catch.hpp"
 #include <vector>
 
 using namespace kiwi;

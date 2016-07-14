@@ -1870,7 +1870,7 @@ namespace kiwi
     
     model::Object& PatcherView::createObjectModel(std::string const& text)
     {
-        int to_clean;
+        // to clean
         std::vector<Atom> atoms = AtomHelper::parse(text);
         const std::string name = atoms[0].getString();
         if(model::Factory::has(name))

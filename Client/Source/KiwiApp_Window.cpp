@@ -32,10 +32,6 @@ namespace kiwi
     Window::Window(std::string const& name, juce::Colour color, int requiredButtons, bool addToDesktop) :
     DocumentWindow(name, color, requiredButtons, addToDesktop)
     {
-        #if ! JUCE_MAC
-        setMenuBar(KiwiApp::use().m_menu_model);
-        #endif
-        
         KiwiApp::bindToCommandManager(this);
         KiwiApp::bindToKeyMapping(this);
         

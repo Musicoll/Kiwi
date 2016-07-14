@@ -37,5 +37,5 @@ cmake_install.cmake
 Makefile
 
 # Project specific
-build/
+Build/
 config/html/

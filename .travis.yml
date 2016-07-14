@@ -6,8 +6,11 @@ notifications:
   email: false
 
 git:
-  submodules: true
-  depth: 3
+  submodules: false
+
+install:
+    - git submodule update --init --recursive ThirdParty/flip-public
+    - git submodule update --init --recursive ThirdParty/Juce
 
 matrix:
   include:
@@ -17,19 +20,21 @@ matrix:
     script:
     - ls
     after_success:
-    - openssl aes-256-cbc -K $encrypted_5a43ff9033eb_key -iv $encrypted_5a43ff9033eb_iv -in config/travisci_rsa.enc -out config/travisci_rsa -d
-    - chmod 0600 config/travisci_rsa
-    - cp config/travisci_rsa ~/.ssh/id_rsa
+    - openssl aes-256-cbc -K $encrypted_5a43ff9033eb_key -iv $encrypted_5a43ff9033eb_iv -in Config/travisci_rsa.enc -out Config/travisci_rsa -d
+    - chmod 0600 Config/travisci_rsa
+    - cp Config/travisci_rsa ~/.ssh/id_rsa
     - sudo apt-get install --yes doxygen graphviz
-    - ./config/publish-doxygen.sh
+    - ./Config/publish-doxygen.sh
 
   - os: osx
     compiler: clang++
     env: COMPILER=clang++
     script:
-    - xcodebuild -project Client/Builds/MacOSX/Kiwi.xcodeproj
+    - python ./Config/configure.py
+    - python ./Config/build.py -c Release
+    - python ./Config/run_test.py -c Release
     before_deploy:
-    - ./config/prepare-release.sh
+    - ./Config/prepare-release.sh
     deploy:
       provider: releases
       api_key:
@@ -38,5 +43,5 @@ matrix:
       skip_cleanup: true
       on:
         repo: Musicoll/Kiwi
-        branch: dev/deploy
+        branch: master
         tags: true

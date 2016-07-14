@@ -309,11 +309,6 @@ namespace kiwi
         menu.addCommandItem(m_command_manager.get(), CommandIDs::save);
         menu.addCommandItem(m_command_manager.get(), CommandIDs::saveAs);
         menu.addSeparator();
-        
-        #if ! JUCE_MAC
-        menu.addSeparator();
-        menu.addCommandItem(m_command_manager.get(), StandardApplicationCommandIDs::quit);
-        #endif
     }
     
     void KiwiApp::createEditMenu(juce::PopupMenu& menu)

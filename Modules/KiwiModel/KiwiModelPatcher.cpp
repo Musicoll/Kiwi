@@ -20,7 +20,7 @@
  */
 
 #include "KiwiModelDataModel.hpp"
-#include "KiwiModelPatcher.hpp"
+#include "KiwiModelPatcherUser.hpp"
 #include "KiwiModelPatcherUser.hpp"
 
 namespace kiwi
