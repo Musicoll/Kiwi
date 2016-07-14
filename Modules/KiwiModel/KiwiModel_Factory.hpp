@@ -22,7 +22,7 @@
 #ifndef KIWI_MODEL_FACTORY_HPP_INCLUDED
 #define KIWI_MODEL_FACTORY_HPP_INCLUDED
 
-#include "KiwiModelObject.hpp"
+#include "KiwiModel_Object.hpp"
 
 namespace kiwi
 {

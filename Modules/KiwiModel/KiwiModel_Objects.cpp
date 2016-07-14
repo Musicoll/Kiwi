@@ -19,9 +19,9 @@
  ==============================================================================
  */
 
-#include "KiwiModelObjects.hpp"
+#include "KiwiModel_Objects.hpp"
 
-#include "KiwiModelDataModel.hpp"
+#include "KiwiModel_DataModel.hpp"
 
 namespace kiwi
 {

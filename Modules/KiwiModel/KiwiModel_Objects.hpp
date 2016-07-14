@@ -22,8 +22,8 @@
 #ifndef KIWI_MODEL_TYPED_OBJECTS_HPP_INCLUDED
 #define KIWI_MODEL_TYPED_OBJECTS_HPP_INCLUDED
 
-#include "KiwiModelObject.hpp"
-#include "KiwiModelFactory.hpp"
+#include "KiwiModel_Object.hpp"
+#include "KiwiModel_Factory.hpp"
 
 namespace kiwi
 {

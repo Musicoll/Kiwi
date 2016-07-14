@@ -22,7 +22,7 @@
 #ifndef KIWI_APP_OBJECTVIEW_HPP_INCLUDED
 #define KIWI_APP_OBJECTVIEW_HPP_INCLUDED
 
-#include <KiwiModel/KiwiModelPatcherUser.hpp>
+#include <KiwiModel/KiwiModel_PatcherUser.hpp>
 
 #include "../JuceLibraryCode/JuceHeader.h"
 

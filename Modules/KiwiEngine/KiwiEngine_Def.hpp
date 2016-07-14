@@ -30,7 +30,7 @@
 #include <exception>
 #include <functional>
 
-#include <KiwiModel/KiwiModelAtom.hpp>
+#include <KiwiModel/KiwiModel_Atom.hpp>
 
 namespace kiwi
 {

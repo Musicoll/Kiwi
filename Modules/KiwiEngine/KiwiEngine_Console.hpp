@@ -22,7 +22,7 @@
 #ifndef KIWI_ENGINE_CONSOLE_HPP_INCLUDED
 #define KIWI_ENGINE_CONSOLE_HPP_INCLUDED
 
-#include <KiwiModel/KiwiModelAtom.hpp>
+#include <KiwiModel/KiwiModel_Atom.hpp>
 #include "KiwiEngine_Listeners.hpp"
 
 namespace kiwi

@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiModelFactory.hpp>
+#include <KiwiModel/KiwiModel_Factory.hpp>
 
 #include "KiwiEngine_Factory.hpp"
 #include "KiwiEngine_Objects.hpp"

@@ -22,7 +22,7 @@
 #ifndef KIWI_MODEL_OBJECT_HPP_INCLUDED
 #define KIWI_MODEL_OBJECT_HPP_INCLUDED
 
-#include <KiwiModel/KiwiModelAtom.hpp>
+#include <KiwiModel/KiwiModel_Atom.hpp>
 #include <mutex>
 #include <algorithm>
 #include <exception>

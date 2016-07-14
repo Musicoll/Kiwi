@@ -19,9 +19,9 @@
  ==============================================================================
  */
 
-#include "KiwiModelDataModel.hpp"
-#include "KiwiModelPatcherUser.hpp"
-#include "KiwiModelPatcherUser.hpp"
+#include "KiwiModel_DataModel.hpp"
+#include "KiwiModel_PatcherUser.hpp"
+#include "KiwiModel_PatcherUser.hpp"
 
 namespace kiwi
 {
