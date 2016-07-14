@@ -51,13 +51,13 @@ if (args.configuration == "Release"):
 elif(args.configuration == "Debug"):
     config_path = os.path.join(config_path, "Debug")
     
-platform_path = ""
+platform_path = config_path
     
 if platform.system() == "Windows":
     if (args.platform == "x64"):
-        platform_path = os.path.join(config_path, "x64")
+        platform_path = os.path.join(platform_path, "x64")
     elif(args.platform == "Win32"):
-        platform_path = os.path.join(config_path, "Win32")
+        platform_path = os.path.join(platform_path, "Win32")
 
 test_dir = os.path.join(project_dir, "Build", platform_path, "KiwiBuild", "Test", config_path)
 
