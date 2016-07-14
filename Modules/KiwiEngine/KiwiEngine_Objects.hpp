@@ -22,8 +22,8 @@
 #ifndef KIWI_ENGINE_TYPED_OBJECTS_HPP_INCLUDED
 #define KIWI_ENGINE_TYPED_OBJECTS_HPP_INCLUDED
 
-#include "KiwiEngineObject.hpp"
-#include "KiwiEngineBeacon.hpp"
+#include "KiwiEngine_Object.hpp"
+#include "KiwiEngine_Beacon.hpp"
 
 namespace kiwi
 {

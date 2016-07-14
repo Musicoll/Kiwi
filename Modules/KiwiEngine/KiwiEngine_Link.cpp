@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#include "KiwiEngineLink.hpp"
-#include "KiwiEngineObject.hpp"
+#include "KiwiEngine_Link.hpp"
+#include "KiwiEngine_Object.hpp"
 
 #include <KiwiModel/KiwiModelLink.hpp>
 #include <KiwiModel/KiwiModelObject.hpp>

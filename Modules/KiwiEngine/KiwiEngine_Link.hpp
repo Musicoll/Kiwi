@@ -22,7 +22,7 @@
 #ifndef KIWI_ENGINE_LINK_HPP_INCLUDED
 #define KIWI_ENGINE_LINK_HPP_INCLUDED
 
-#include "KiwiEngineDef.hpp"
+#include "KiwiEngine_Def.hpp"
 
 namespace kiwi
 {    

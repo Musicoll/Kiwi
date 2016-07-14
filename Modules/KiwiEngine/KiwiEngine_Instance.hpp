@@ -24,9 +24,9 @@
 
 #include "flip/Document.h"
 
-#include "KiwiEngineConsole.hpp"
-#include "KiwiEnginePatcher.hpp"
-#include "KiwiEngineBeacon.hpp"
+#include "KiwiEngine_Console.hpp"
+#include "KiwiEngine_Patcher.hpp"
+#include "KiwiEngine_Beacon.hpp"
 
 namespace kiwi
 {

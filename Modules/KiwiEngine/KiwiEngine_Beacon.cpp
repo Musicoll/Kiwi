@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include "KiwiEngineBeacon.hpp"
+#include "KiwiEngine_Beacon.hpp"
 
 namespace kiwi
 {

@@ -19,51 +19,56 @@
  ==============================================================================
  */
 
-#ifndef KIWI_ENGINE_OBJECT_HPP_INCLUDED
-#define KIWI_ENGINE_OBJECT_HPP_INCLUDED
+#ifndef KIWI_ENGINE_PATCHER_HPP_INCLUDED
+#define KIWI_ENGINE_PATCHER_HPP_INCLUDED
 
-#include "KiwiEngineDef.hpp"
+#include "KiwiEngine_Def.hpp"
+#include "KiwiEngine_Beacon.hpp"
 
 namespace kiwi
-{
+{    
     namespace engine
     {
         // ================================================================================ //
-        //                                      OBJECT                                      //
+        //                                      PATCHER                                     //
         // ================================================================================ //
         
-        //! @brief The Object reacts and interacts with other ones by sending and receiving messages via its inlets and outlets.
-        class Object
+        //! @brief The Patcher manages a set of Object and Link.
+        class Patcher
         {
         public: // methods
             
             //! @brief Constructor.
-            Object(model::Object const& model, Patcher& patcher) noexcept;
+            Patcher(model::Patcher const& model, Instance& instance) noexcept;
             
             //! @brief Destructor.
-            virtual ~Object() noexcept;
-
-            //! @brief Gets the name of the Object.
-            std::string getName() const;
+            ~Patcher();
             
-            //! @brief Gets the number of inlets of the Object.
-            size_t getNumberOfInlets() const;
+            //! @brief Returns the objects.
+            std::vector<Object const*> getObjects() const;
             
-            //! @brief Gets the number of outlets of the Object.
-            size_t getNumberOfOutlets() const;
+            //! @brief Returns the objects.
+            std::vector<Object*> getObjects();
             
-            //! @brief Receives a set of arguments via an inlet.
-            //! @details This method must be overriden by object's subclasses.
-            //! @todo see if the method must be noexcept.
-            virtual void receive(size_t index, std::vector<Atom> const& args) = 0;
+            //! @brief Returns the links.
+            std::vector<Link const*> getLinks() const;
             
-            //! @internal Appends a new Link to an outlet.
-            void addOutputLink(Link const& link);
+            //! @internal The model changed.
+            void modelChanged();
             
-            //! @internal Removes a Link from an outlet.
-            void removeOutputLink(Link const& link);
+            //! @brief Adds a link to the current stack overflow list (or create a new list if there is no).
+            //! @internal Only the Object should use this method.
+            void addStackOverflow(Link const& link);
             
-        protected: // methods
+            //! @brief Ends a list of stack overflow.
+            //! @internal Only the Object should use this method.
+            void endStackOverflow();
+            
+            //! @brief Gets the lists of stack overflow.
+            std::vector<std::queue<Link const*>> getStackOverflow() const;
+            
+            //! @brief Clears the lists of stack overflow.
+            void clearStackOverflow();
             
             // ================================================================================ //
             //                                      CONSOLE                                     //
@@ -88,34 +93,45 @@ namespace kiwi
             //! @brief Gets or creates a Beacon with a given name.
             Beacon& getBeacon(std::string const& name) const;
             
-            // ================================================================================ //
-            //                                       SEND                                       //
-            // ================================================================================ //
+        private: // methods
             
-            //! @brief Sends a vector of Atom via an outlet.
-            //! @todo Improve the stack overflow system.
-            //! @todo See if the method must be noexcept.
-            void send(const size_t index, std::vector<Atom> const& args);
+            //! @internal Object model has just been added to the document.
+            void objectAdded(model::Object& object);
             
+            //! @internal Object model has changed.
+            void objectChanged(model::Object& object);
+            
+            //! @internal Object model will be removed from the document.
+            void objectRemoved(model::Object& object);
+            
+            //! @internal Link model has just been added to the document.
+            void linkAdded(model::Link& link);
+            
+            //! @internal Link model has changed.
+            void linkChanged(model::Link& link);
+            
+            //! @internal Link model will be removed from the document.
+            void linkRemoved(model::Link& link);
+        
         private: // members
             
-            using Outlet = std::set<Link const*>;
-
-            model::Object const&    m_model;
-            Patcher&                m_patcher;
-            std::vector<Outlet>     m_outlets;
-            size_t                  m_stack_count = 0ul;
+            using SoLinks = std::queue<Link const*>;
+            
+            model::Patcher const&   m_model;
+            
+            Instance&               m_instance;
+            
+            std::vector<SoLinks>    m_so_links;
             
         private: // deleted methods
             
-            Object(Object const&) = delete;
-            Object(Object&&) = delete;
-            Object& operator=(Object const&) = delete;
-            Object& operator=(Object&&) = delete;
+            Patcher(Patcher const&) = delete;
+            Patcher(Patcher&&) = delete;
+            Patcher& operator=(Patcher const&) = delete;
+            Patcher& operator=(Patcher&&) = delete;
         };
-        
-        typedef std::shared_ptr<Object> sObject;
     }
 }
 
-#endif // KIWI_ENGINE_OBJECT_HPP_INCLUDED
+
+#endif // KIWI_ENGINE_PATCHER_HPP_INCLUDED

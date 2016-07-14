@@ -19,9 +19,9 @@
  ==============================================================================
  */
 
-#include "KiwiEngineFactory.hpp"
-#include "KiwiEngineObjects.hpp"
-#include "KiwiEngineInstance.hpp"
+#include "KiwiEngine_Factory.hpp"
+#include "KiwiEngine_Objects.hpp"
+#include "KiwiEngine_Instance.hpp"
 
 namespace kiwi
 {

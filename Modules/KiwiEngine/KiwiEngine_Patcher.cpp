@@ -19,11 +19,11 @@
  ==============================================================================
  */
 
-#include "KiwiEnginePatcher.hpp"
-#include "KiwiEngineObject.hpp"
-#include "KiwiEngineLink.hpp"
-#include "KiwiEngineFactory.hpp"
-#include "KiwiEngineInstance.hpp"
+#include "KiwiEngine_Patcher.hpp"
+#include "KiwiEngine_Object.hpp"
+#include "KiwiEngine_Link.hpp"
+#include "KiwiEngine_Factory.hpp"
+#include "KiwiEngine_Instance.hpp"
 
 #include <KiwiModel/KiwiModelPatcherUser.hpp>
 

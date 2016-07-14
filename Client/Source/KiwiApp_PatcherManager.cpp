@@ -21,7 +21,7 @@
 
 #include <KiwiModel/KiwiModelDataModel.hpp>
 #include <KiwiModel/KiwiModelPatcherUser.hpp>
-#include <KiwiEngine/KiwiEnginePatcher.hpp>
+#include <KiwiEngine/KiwiEngine_Patcher.hpp>
 
 #include "KiwiApp.hpp"
 #include "KiwiApp_Instance.hpp"
