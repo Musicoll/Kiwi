@@ -6,4 +6,4 @@
 	url = https://github.com/ohmtech/flip-public.git
 [submodule "ThirdParty/flip"]
 	path = ThirdParty/flip
-	url = https://pierreguillot@github.com/ohmtech/flip.git
+url=https://github.com/ohmtech/flip.git
