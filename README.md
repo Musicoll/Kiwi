@@ -24,6 +24,10 @@ python ./Config/run_test.py -c Release (optional)
 ```
 
 ### Run the Application
-```
-
-```
+* Launch the *server*
+* Type *open* in the server console
+* Launch the Kiwi Application
+* Change the user id in Kiwi/Settings if needed
+* Join the document
+* Play...
+* Type *close* in the server console
