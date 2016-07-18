@@ -6,7 +6,7 @@
 
 [![Documentation](https://img.shields.io/badge/docs-doxygen-blue.svg)](http://musicoll.github.io/Kiwi/)  
 [![Release](https://img.shields.io/github/release/Musicoll/Kiwi.svg)](https://github.com/Musicoll/Kiwi/releases)  
-[![license](https://img.shields.io/github/license/Musicoll/Kiwi.svg?maxAge=2592000)]()  
+[![license](https://img.shields.io/github/license/Musicoll/Kiwi.svg?maxAge=2592000)](https://github.com/Musicoll/Kiwi/blob/master/LICENSE)  
 [![Website](https://img.shields.io/website/http/shields.io.svg?maxAge=2592000)](http://cicm.mshparisnord.org)
 
 
@@ -21,4 +21,9 @@ git submodule update --init --recursive ThirdParty/Juce
 python ./Config/configure.py   
 python ./Config/build.py -c Release
 python ./Config/run_test.py -c Release (optional)
+```
+
+### Run the Application
+```
+
 ```
