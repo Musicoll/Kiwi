@@ -24,6 +24,7 @@
 #include "KiwiApp_Instance.hpp"
 #include "KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_PatcherView.hpp"
+#include <stdlib.h>
 
 namespace kiwi
 {
@@ -43,7 +44,7 @@ namespace kiwi
     m_beacon_dispatcher_window(new BeaconDispatcherWindow(*m_instance)),
     m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
     {
-        ;
+        m_user_id = std::rand();
     }
     
     Instance::~Instance()
