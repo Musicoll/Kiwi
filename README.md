@@ -18,7 +18,7 @@ git submodule update --init --recursive ThirdParty/Juce
 
 ### Compilation
 ```
-python ./Config/configure.py   
+python ./Config/configure.py [-flip (public|private)] (default public)
 python ./Config/build.py -c Release
 python ./Config/run_test.py -c Release (optional)
 ```
