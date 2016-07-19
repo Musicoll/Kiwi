@@ -44,6 +44,7 @@ namespace kiwi
     m_beacon_dispatcher_window(new BeaconDispatcherWindow(*m_instance)),
     m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
     {
+        std::srand(std::time(0));
         m_user_id = std::rand();
     }
     
