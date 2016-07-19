@@ -211,10 +211,10 @@ namespace kiwi
     //                                 Settings Component                               //
     // ================================================================================ //
     
-    class jSettings final : public juce::Component
+    class SettingsPanel final : public juce::Component
     {
     public:
-        jSettings(uint64_t user_id)
+        SettingsPanel(uint64_t user_id)
         {
             setSize(300, 100);
             setVisible(true);
@@ -224,7 +224,7 @@ namespace kiwi
             m_user_id.setText(juce::String(user_id));
         }
       
-        ~jSettings() = default;
+        ~SettingsPanel() = default;
         
         uint64_t getUserId() const
         {
@@ -235,15 +235,15 @@ namespace kiwi
         juce::TextEditor m_user_id;
         
     private:
-        jSettings(jSettings const & other) = delete;
-        jSettings(jSettings && other) = delete;
-        jSettings& operator=(jSettings const& other) = delete;
-        jSettings& operator=(jSettings && other) = delete;
+        SettingsPanel(SettingsPanel const & other) = delete;
+        SettingsPanel(SettingsPanel && other) = delete;
+        SettingsPanel& operator=(SettingsPanel const& other) = delete;
+        SettingsPanel& operator=(SettingsPanel && other) = delete;
     };
     
     void Instance::openSettings()
     {
-        jSettings set_cmp(getUserId());
+        SettingsPanel set_cmp(getUserId());
         juce::OptionalScopedPointer<juce::Component> settings_component(&set_cmp, false);
         
         juce::DialogWindow::LaunchOptions option;
