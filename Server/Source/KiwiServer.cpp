@@ -34,6 +34,11 @@ namespace kiwi
         //                                      SERVER                                      //
         // ================================================================================ //
         
+        Server::Server()
+        {
+            openPatcher(10, 12345, 9090, "Join this document !!");
+        }
+        
         Server::~Server()
         {
             m_patchers.clear();

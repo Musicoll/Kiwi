@@ -42,7 +42,7 @@ namespace kiwi
         public:
             
             //! @brief Constructor.
-            Server() = default;
+            Server();
             
             //! @brief Destructor.
             ~Server();
