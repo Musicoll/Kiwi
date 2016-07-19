@@ -35,6 +35,10 @@ namespace kiwi
         KiwiApp::bindToCommandManager(this);
         KiwiApp::bindToKeyMapping(this);
         
+        #if ! JUCE_MAC
+        setMenuBar(KiwiApp::getMenuBarModel());
+        #endif
+        
         setUsingNativeTitleBar(true);
         setSize(600, 500);
         centreWithSize(getWidth(), getHeight());

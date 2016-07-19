@@ -79,6 +79,9 @@ namespace kiwi
         //! @brief Returns the application stored settings.
         static StoredSettings& useSettings();
         
+        //! @brief Returns the MenuBarModel.
+        static juce::MenuBarModel* getMenuBarModel();
+        
         // ================================================================================ //
         //                                      CONSOLE                                     //
         // ================================================================================ //
