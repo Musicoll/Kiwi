@@ -24,7 +24,9 @@
 #include "KiwiApp_Instance.hpp"
 #include "KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_PatcherView.hpp"
+
 #include <stdlib.h>
+#include <time.h>
 
 namespace kiwi
 {
