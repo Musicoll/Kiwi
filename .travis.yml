@@ -37,7 +37,7 @@ matrix:
     - mkdir Kiwi
     - mv Build/Release/KiwiBuild/Bin/Release/Kiwi.app Kiwi/Kiwi.app
     - mv Build/Release/KiwiBuild/Bin/Release/Server Kiwi/Server
-    - zip -r Kiwi.zip Kiwi
+    - zip -r Kiwi_macos.zip Kiwi
     deploy:
       provider: releases
       api_key:

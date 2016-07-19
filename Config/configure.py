@@ -7,6 +7,7 @@ import sys
 import platform
 import subprocess
 import shutil
+import argparse
 
 project_dir = os.path.abspath(".");
 
@@ -14,22 +15,28 @@ cmd = "cmake";
 
 private_attr = ""
 
+#==============================================================================
+# Name : parse_args
+#==============================================================================
+
+def parse_args ():
+    arg_parser = argparse.ArgumentParser ()
+    arg_parser.add_argument('-flip', default = 'public', choices = ['public', 'private'])
+
+    return arg_parser.parse_args (sys.argv[1:])
 
 #==============================================================================
 # Name : flip_private
 #==============================================================================
 
-def flip_private():
-    global private_attr
-    flip_path = os.path.join(project_dir, "ThirdParty", "flip")
-    configure_path = os.path.join(flip_path, "configure.py")
-    build_path = os.path.join(flip_path, "build.py")
-    if os.path.exists(configure_path) and os.path.exists(build_path):
+def flip_private(args):
+    if(args.flip == "private"):
         os.chdir(flip_path);
         subprocess.check_call("python " + configure_path, shell= True);
         subprocess.check_call("python " + build_path + " -c Debug -t flip", shell= True);
         subprocess.check_call("python " + build_path + " -c Release -t flip", shell= True);
         private_attr += " -DFLIP_PRIVATE=1";
+
 
 #==============================================================================
 # Name : create_dir
@@ -174,7 +181,7 @@ os.makedirs(root_build_dir);
 
 create_dir(os.path.join(project_dir, "Build"))
 
-flip_private()
+flip_private(parse_args())
 
 if platform.system()=="Darwin":
     configure_mac();
