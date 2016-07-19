@@ -180,6 +180,11 @@ namespace kiwi
         return *KiwiApp::use().m_settings;
     }
     
+    juce::MenuBarModel* KiwiApp::getMenuBarModel()
+    {
+        return KiwiApp::use().m_menu_model.get();
+    }
+    
     // ================================================================================ //
     //                                      CONSOLE                                     //
     // ================================================================================ //
