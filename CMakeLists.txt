@@ -53,11 +53,11 @@ set_source_files_properties(${KIWI_ICON} ${KIWI_PLIST} PROPERTIES MACOSX_PACKAGE
 if (WIN32)
 	set(CMAKE_CXX_FLAGS "/EHsc")
 	set(CMAKE_EXE_LINKER_FLAGS "")
-    
+
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /Zi")
     endif()
-    
+
     if (CMAKE_CL_64)
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MACHINE:X64")
     else()
@@ -66,11 +66,11 @@ if (WIN32)
 
 elseif(APPLE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wno-unknown-warning-option -Wno-pessimizing-move -Wno-overloaded-virtual")
-    
+
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     endif()
-    
+
 endif()
 
 #--------------------------------------
@@ -103,7 +103,7 @@ else()
     set(CMAKE_FIND_LIBRARY_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES} "" "lib")
 	set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} ".a" ".so")
 endif()
-                                        
+
 #--------------------------------------
 # Macros
 #--------------------------------------
@@ -146,22 +146,22 @@ set(JUCE_MACRO_DEFINITIONS JUCE_MODULE_AVAILABLE_juce_core=1
                            JUCE_MODULE_AVAILABLE_juce_gui_extra=1
                            JUCE_STANDALONE_APPLICATION=1
                            JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1)
-               
-file (GLOB_RECURSE JUCE_SRC ${ROOT_DIR}/ThirdParty/Juce/modules/*.[h|c]pp 
+
+file (GLOB_RECURSE JUCE_SRC ${ROOT_DIR}/ThirdParty/Juce/modules/*.[h|c]pp
                             ${ROOT_DIR}/ThirdParty/Juce/modules/*.h
                             ${ROOT_DIR}/ThirdParty/Juce/modules/*.mm)
-                            
+
 set_source_files_properties(${JUCE_SRC} PROPERTIES HEADER_FILE_ONLY TRUE)
-               
+
 set(JUCE_COMPILED_SRC ${ROOT_DIR}/ThirdParty/Juce/modules/juce_core/juce_core.mm
                       ${ROOT_DIR}/ThirdParty/Juce/modules/juce_data_structures/juce_data_structures.mm
                       ${ROOT_DIR}/ThirdParty/Juce/modules/juce_events/juce_events.mm
                       ${ROOT_DIR}/ThirdParty/Juce/modules/juce_graphics/juce_graphics.mm
                       ${ROOT_DIR}/ThirdParty/Juce/modules/juce_gui_basics/juce_gui_basics.mm
                       ${ROOT_DIR}/ThirdParty/Juce/modules/juce_gui_extra/juce_gui_extra.mm)
-             
+
 set_source_files_properties(${JUCE_COMPILED_SRC} PROPERTIES HEADER_FILE_ONLY FALSE)
-               
+
 
 add_library(Juce STATIC ${JUCE_SRC})
 target_link_libraries(Juce ${JUCE_DEP})
@@ -207,7 +207,7 @@ elseif (WIN32)
             find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/Visual Studio 2015/Win32")
         endif()
 	endif()
-    
+
     find_library(WS2_32 ws2_32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
 	set(FLIP_DEP ${WS2_32} ${FlipLib})
 endif()
@@ -218,7 +218,7 @@ else()
     set(FLIP_DIR "${ROOT_DIR}/ThirdParty/flip-public")
 endif()
 
-file (GLOB_RECURSE FLIP_SRC ${FLIP_DIR}/*.[h|c]pp 
+file (GLOB_RECURSE FLIP_SRC ${FLIP_DIR}/*.[h|c]pp
                             ${FLIP_DIR}/*.h)
 add_custom_target(Flip SOURCES ${FLIP_SRC})
 set_target_properties (Flip PROPERTIES FOLDER ThirdParty
@@ -237,6 +237,16 @@ target_include_directories(KiwiModel PUBLIC ${ROOT_DIR}/Modules)
 target_add_dependency(KiwiModel Flip)
 set_target_properties(KiwiModel PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_MODEL_SRC}" ${ROOT_DIR}/Modules/KiwiModel)
+
+#----------------------------------
+# Dsp
+#----------------------------------
+
+file(GLOB_RECURSE KIWI_DSP_SRC ${ROOT_DIR}/Modules/KiwiDsp/*.[c|h]pp)
+add_library(KiwiDsp STATIC ${KIWI_DSP_SRC})
+target_include_directories(KiwiDsp PUBLIC ${ROOT_DIR}/Modules)
+set_target_properties(KiwiDsp PROPERTIES FOLDER Modules)
+source_group_rec("${KIWI_DSP_SRC}" ${ROOT_DIR}/Modules/KiwiDsp)
 
 #----------------------------------
 # Engine
