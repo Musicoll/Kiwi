@@ -33,7 +33,7 @@ namespace kiwi
     // ================================================================================ //
     
     CarrierSocket::CarrierSocket(flip::DocumentBase& document, std::string const& host, uint16_t port):
-    m_transport_socket(document, host, port),
+    m_transport_socket(document, 12345, host, port),
     m_transport_loop(),
     m_transport_running(false)
     {
