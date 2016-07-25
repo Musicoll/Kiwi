@@ -34,7 +34,7 @@ namespace kiwi
         // ==================================================================================== //
         //! @brief The pure virtual class that processes digital signal in a Chain object.
         //! @details The class is pure virtual and allows to implement digital signal processing.
-        //! You should implement the pure virtual methods prepare, perform and release.
+        //! You should implement the virtual methods prepare, perform and release.
         //! @see Buffer and Infos
         //! @todo see if the processor really need m_used...
         class Processor
@@ -61,16 +61,17 @@ namespace kiwi
             //! @see getNumberOfInputs()
             inline size_t getNumberOfOutputs() const noexcept {return m_noutputs;}
             
-        private:
+        private: // methods
+            
             //! @brief Prepares everything for the perform method.
-            //! @details This is a pure virtual method. You should use this method to check the
-            //! vector size, the sample rate, the connected inputs and outputs and to allocate
-            //! memory if needed. The method should return true if the perform method of the
+            //! @details You should use this method to check the vector size, the sample rate,
+            //! the connected inputs and outputs and to allocate memory if needed.
+            //! The method should return true if the perform method of the
             //! Processor object can be called, otherwise it should return false.
             //! @param infos The DSP informations.
             //! @return true if the perform method can be called, otherwise false.
             //! @see perform() and release()
-            virtual bool prepare(Infos& infos) = 0;
+            virtual bool prepare(Infos& infos) { return true; };
             
             //! @brief Performs the digital signal processing.
             //! @details This is a pure virtual method. You should use this method to perform the
@@ -87,10 +88,13 @@ namespace kiwi
             //! @see prepare() and perform()
             virtual void release() {};
             
-            size_t const        m_ninputs;
-            size_t const        m_noutputs;
-            std::atomic< bool > m_used;
-            friend class Chain;
+        private: // members
+            
+            const size_t        m_ninputs;
+            const size_t        m_noutputs;
+            std::atomic<bool>   m_used;
+            friend Node;
+            friend Chain;
         };
     }
 }

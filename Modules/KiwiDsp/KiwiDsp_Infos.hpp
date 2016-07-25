@@ -22,7 +22,7 @@
 #ifndef KIWI_DSP_INFOS_HPP_INCLUDED
 #define KIWI_DSP_INFOS_HPP_INCLUDED
 
-#include "KiwiDsp_Signal.hpp"
+#include "KiwiDsp_Buffer.hpp"
 
 namespace kiwi
 {
@@ -30,7 +30,8 @@ namespace kiwi
     {
         class Infos
         {
-        public:
+        public: // methods
+            
             //! @brief The destructor.
             //! @details Frees the content of the Infos object if needed.
             ~Infos();
@@ -77,13 +78,19 @@ namespace kiwi
             //! @see shouldBeAligned() and isInplace()
             bool isAligned() const noexcept;
             
+            //! @brief Checks if the processing should use interleaved buffers.
+            //! @details This method can be used to check if the buffers matrices are interleaved in a single Signal object during the call of the perform method of the Processor object.
+            //! @return true if the buffers are interleaved, otherwise false.
+            //! @see shouldBeInterleaved, isInplace, isAligned
+            bool isInterleaved() const noexcept;
+            
             //! @brief Sets if the processing should use inplace buffers.
             //! @details This method enables or disables if the buffers owns the same matrices of
             //! samples during the call of the perform method of the Processor object. By default
             //! the buffers are inplace if the number of inputs of the Processor object is
             //! superior or equal to its number of outputs.
             //! @param state True if the processing should be inplace, otherwise false.
-            //! @see shouldBeAligned()
+            //! @see shouldBeAligned, shouldBeInterleaved
             void shouldBeInplace(const bool state);
             
             //! @brief Sets if the processing should use aligned buffers.
@@ -92,11 +99,21 @@ namespace kiwi
             //! default the buffers are not necessarily aligned. The aligned option should be
             //! activated only when the processing really needs it to avoid unnecessary copy of
             //! matrices.
-            //! @param state True if the processing should be inplace, otherwise false.
-            //! @see shouldBeInplace()
+            //! @param state True if the processing should use aligned buffers, otherwise false.
+            //! @see shouldBeInplace, shouldBeInterleaved
             void shouldBeAligned(const bool state);
             
-        private:
+            //! @brief Sets if the processing should use interleaved buffers.
+            //! @details This method enables or disables if the buffers use interleaved buffers
+            //! during the call of the perform method of the Processor object.
+            //! By default the buffers are not interleaved. The interleaved option should be
+            //! activated only when the processing really needs it to avoid unnecessary copy of
+            //! matrices.
+            //! @param state True if the processing should use interleaved buffers, otherwise false.
+            //! @see shouldBeInplace, shouldBeAligned
+            void shouldBeInterleaved(const bool state);
+            
+        private: // methods
             
             //! @brief The constructor.
             //! @details Allocates a Infos object that describes the behavior of the DSP of a
@@ -106,15 +123,18 @@ namespace kiwi
             //! @param inputs     The inputs connection states.
             //! @param outputs    The outputs connection states.
             Infos(const size_t samplerate, const size_t vectorsize,
-                  std::vector< bool >&& inputs, std::vector< bool >&& outputs);
+                  std::vector<bool>&& inputs, std::vector<bool>&& outputs);
             
-            size_t const              m_sample_rate;
-            size_t const              m_vector_size;
-            std::vector< bool > const m_inputs;
-            std::vector< bool > const m_outputs;
-            bool                      m_inplace;
-            bool                      m_aligned;
-            friend class Chain;
+        private: // members
+            
+            bool                    m_inplace;
+            bool                    m_aligned;
+            bool                    m_interleaved;
+            const size_t            m_sample_rate;
+            const size_t            m_vector_size;
+            const std::vector<bool> m_inputs;
+            const std::vector<bool> m_outputs;
+            friend Node;
         };
     }
 }

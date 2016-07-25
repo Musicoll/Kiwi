@@ -37,21 +37,22 @@ namespace kiwi
         //! @see Chain and Processor
         class Link
         {
-        public:
+        public: // methods
+            
             //! @brief The constructor.
             //! @details Allocates and initializes the Link object.
             //! @param fromProcessor    The output Processor object.
             //! @param fromIndex        The index of the output.
             //! @param toProcessor      The input Processor object.
             //! @param toIndex          The index of the input.
-            Link(Processor const& fromProcessor, size_t const fromIndex,
-                 Processor const& toProcessor, size_t const toIndex) noexcept :
+            Link(Processor const& fromProcessor, const size_t fromIndex,
+                 Processor const& toProcessor, const size_t toIndex) noexcept :
             m_from_processor(fromProcessor), m_from_index(fromIndex),
             m_to_processor(toProcessor), m_to_index(toIndex)
             {
-                assert(m_from_processor.getNumberOfOutputs() > fromIndex &&
-                       m_to_processor.getNumberOfInputs() > toIndex &&
-                       "A link is invalid.");
+                assert(m_from_processor.getNumberOfOutputs() > fromIndex
+                       && m_to_processor.getNumberOfInputs() > toIndex
+                       && "A link is invalid.");
             }
             
             //! @brief The destructor.
@@ -68,11 +69,13 @@ namespace kiwi
             
             //! @brief Gets the index of the input Processor object.
             inline size_t getInputIndex() const noexcept {return m_to_index;}
-        private:
+            
+        private: // members
+            
             Processor const&    m_from_processor;
-            size_t const        m_from_index;
+            const size_t        m_from_index;
             Processor const&    m_to_processor;
-            size_t const        m_to_index;
+            const size_t        m_to_index;
         };
     }
 }

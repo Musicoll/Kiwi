@@ -12,7 +12,7 @@ import distutils
 
 project_dir = os.path.abspath(".");
 
-test_list = ["test_atom"]
+test_list = ["test_atom", "test_dsp"]
 
 #==============================================================================
 #Name : get_test_file
@@ -30,7 +30,7 @@ def get_test_file(test_name):
 
 def parse_args ():
     arg_parser = argparse.ArgumentParser ()
-    
+
     arg_parser.add_argument('-c', '--configuration', default = 'Release', choices = ['Release', 'Debug'])
 
     if platform.system() == "Windows":
@@ -50,9 +50,9 @@ if (args.configuration == "Release"):
     config_path = os.path.join(config_path, "Release")
 elif(args.configuration == "Debug"):
     config_path = os.path.join(config_path, "Debug")
-    
+
 platform_path = config_path
-    
+
 if platform.system() == "Windows":
     if (args.platform == "x64"):
         platform_path = os.path.join(platform_path, "x64")

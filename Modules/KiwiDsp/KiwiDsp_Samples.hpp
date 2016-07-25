@@ -22,7 +22,7 @@
 #ifndef KIWI_DSP_SAMPLES_HPP_INCLUDED
 #define KIWI_DSP_SAMPLES_HPP_INCLUDED
 
-#include "KiwiDsp_Misc.hpp"
+#include "KiwiDsp_misc.hpp"
 
 namespace kiwi
 {
@@ -35,32 +35,23 @@ namespace kiwi
         //! @details The class offers a set of optimized operations on vector and matrices
         //! @details samples. The methods are organized according to sections : memory, move,
         //! @details algebrica, ect.
-        template < typename Type = sample_t> class Samples
+        template <typename Type>
+        class Samples
         {
-            static_assert(std::is_floating_point< Type >::value, "The type of sample_t must be floating point.");
-            static_assert(!std::is_const< Type >::value, "The type of sample_tcan't be constant.");
-        public:
+            static_assert(std::is_floating_point<Type>::value, "The type of sample_t must be floating point.");
+            static_assert(!std::is_const<Type>::value, "The type of sample_t can not be constant.");
+            
+        public: // methods
             
             // ================================================================================ //
             //                                      TOOLS                                       //
             // ================================================================================ //
             
-            //! @brief Gets if a size is a power of two.
-            //! @param size The size.
-            //! @return true if the size if a power of two, otherwise false.
-            static inline constexpr bool isPowerOfTwo(const size_t size) noexcept
-            {
-                // Decrement and Compare method : 9.
-                // http://www.exploringbinary.com/ten-ways-to-check-if-an-integer-is-a-power-of-two-in-c/
-                
-                return size && ((size & (size - 1)) == 0);
-            }
-            
             //! @brief Gets ithe alignment of a vector.
             //! @return The alignment in bits.
             static inline constexpr size_t getAlignment() noexcept
             {
-                return static_cast< size_t >(std::pow(2ul, sizeof(Type)));
+                return static_cast<size_t>(std::pow(2ul, sizeof(Type)));
             }
             
             // ================================================================================ //
@@ -75,13 +66,13 @@ namespace kiwi
             static Type* allocate(const size_t size)
             {
                 assert("The size of a vector of samples must be non-null and a power of 2." && isPowerOfTwo(size));
-#ifdef __APPLE__
+                #ifdef KIWI_MAC
                 return static_cast< Type* >(std::malloc(size * sizeof(Type)));
-#elif _WINDOWS
+                #elif KIWI_WINDOWS
                 return static_cast< Type* >(_aligned_malloc( size * sizeof(Type), std::pow(2ul, sizeof(Type)) ));
-#else
+                #else
                 return static_cast< Type* >(memalign(std::pow(2ul, sizeof(Type)), size * sizeof(Type)));
-#endif
+                #endif
             }
             
             //! @brief Frees a vector of samples.
@@ -92,15 +83,13 @@ namespace kiwi
             static Type* release(Type* vec)
             {
                 if(vec)
-#ifdef _WINDOWS
                 {
+                #ifdef KIWI_WINDOWS
                     _aligned_free(vec);
-                }
-#else
-                {
+                #else
                     std::free(vec);
+                #endif
                 }
-#endif
                 return nullptr;
             }
             
@@ -109,7 +98,7 @@ namespace kiwi
             // ================================================================================ //
             
             //! @brief Clears a vector of samples.
-            //! @details Sets alla vector to zero.
+            //! @details Sets all vector to zero.
             //! @param size The size of the vector.
             //! @param vec  The pointer to a vector.
             static inline void clear(size_t const size, Type* vec) noexcept
@@ -125,7 +114,8 @@ namespace kiwi
             //! @param in    The input vector.
             static inline void fill(size_t const size, Type const& value, Type* in) noexcept
             {
-                assert("The vector can't be null." && in != nullptr);
+                assert(in != nullptr && "The vector can't be null.");
+                
                 const Type vec[8] = {value, value, value, value, value, value, value, value};
                 for(size_t i = size>>3; i; --i, in += 8)
                 {
@@ -170,7 +160,7 @@ namespace kiwi
             // ================================================================================ //
             
             //! @brief Adds a vector to another.
-            //! @details Addsa vector to another vector. The size must be inferior or equal to the
+            //! @details Adds a vector to another vector. The size must be inferior or equal to the
             //! @details size of both vectors.
             //! @param size The size of the vectors.
             //! @param in   The input vector.

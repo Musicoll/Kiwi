@@ -28,6 +28,21 @@ namespace kiwi
 {
     namespace dsp
     {
+        // ================================================================================ //
+        //                                      TOOLS                                       //
+        // ================================================================================ //
+        
+        //! @brief Gets if a size is a power of two.
+        //! @param size The size.
+        //! @return true if the size if a power of two, otherwise false.
+        static inline constexpr bool isPowerOfTwo(const size_t size) noexcept
+        {
+            // Decrement and Compare method : 9.
+            // http://www.exploringbinary.com/ten-ways-to-check-if-an-integer-is-a-power-of-two-in-c/
+            
+            return size && ((size & (size - 1)) == 0);
+        }
+        
         // ==================================================================================== //
         //                                          ERROR                                       //
         // ==================================================================================== //
@@ -41,12 +56,14 @@ namespace kiwi
             //! @param message The message of the error
             explicit Error(const std::string& message) :
             std::runtime_error(std::string("kiwi::dsp : ") + message) {}
+            
             //! @brief The const char* constructor.
             //! @param message The message of the error
             explicit Error(const char* message) :
             std::runtime_error(std::string("kiwi::dsp : ") + std::string(message)) {}
+            
             //! @brief The destructor.
-            virtual inline ~Error() noexcept {}
+            virtual inline ~Error() noexcept = default;
         };
         
         // ==================================================================================== //
@@ -57,7 +74,8 @@ namespace kiwi
         //! @details for a set of processes.
         class Timer
         {
-        public:
+        public: // methods
+            
             //! @brief The nanosecond precision.
             typedef std::chrono::nanoseconds nanoseconds;
             //! @brief The microseconds precision.
@@ -70,26 +88,38 @@ namespace kiwi
             typedef std::chrono::minutes minutes;
             //! @brief The hours precision.
             typedef std::chrono::hours hours;
+            
             //! @brief The constructor.
-            inline Timer() {};
+            Timer() = default;
+            
             //! @brief The destrcutor.
-            inline ~Timer() {};
+            ~Timer() {};
+            
             //! @brief Gets the ellapsed time.
-            template < typename Dur > inline double get(const bool reset) noexcept
+            template <typename TDur>
+            double get(const bool reset) noexcept
             {
-                static_assert(std::chrono::__is_duration< Dur >::value, "Kiwi::Dsp::Timer : The template must be a duration.");
+                static_assert(std::chrono::__is_duration<TDur>::value,
+                              "Kiwi::Dsp::Timer : The template must be a duration.");
+                
                 const std::chrono::high_resolution_clock::time_point next = std::chrono::high_resolution_clock::now();
-                const double time = std::chrono::duration_cast< Dur >(next - m_start).count();
+                const double time = std::chrono::duration_cast<TDur>(next - m_start).count();
                 if(reset)
                 {
                     m_start = next;
                 }
                 return time;
             }
+            
             //! @brief Starts the timer.
-            inline void start() noexcept {m_start = std::chrono::high_resolution_clock::now();}
-        private:
-            std::chrono::high_resolution_clock::time_point  m_start;
+            inline void start() noexcept
+            {
+                m_start = std::chrono::high_resolution_clock::now();
+            }
+            
+        private: // members
+            
+            std::chrono::high_resolution_clock::time_point m_start;
         };
     }
 }

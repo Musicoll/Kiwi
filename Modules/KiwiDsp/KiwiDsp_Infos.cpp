@@ -25,12 +25,17 @@ namespace kiwi
 {
     namespace dsp
     {
-        Infos::Infos(const size_t samplerate, const size_t vectorsize,
-                     std::vector< bool >&& inputs, std::vector< bool >&& outputs) :
-        m_sample_rate(samplerate), m_vector_size(vectorsize),
-        m_inputs(std::forward< std::vector< bool > >(inputs)),
-        m_outputs(std::forward< std::vector< bool > >(outputs)),
-        m_inplace(true), m_aligned(false)
+        Infos::Infos(const size_t samplerate,
+                     const size_t vectorsize,
+                     std::vector<bool>&& inputs,
+                     std::vector<bool>&& outputs) :
+        m_inplace(true),
+        m_aligned(false),
+        m_interleaved(false),
+        m_sample_rate(samplerate),
+        m_vector_size(vectorsize),
+        m_inputs(std::forward<std::vector<bool>>(inputs)),
+        m_outputs(std::forward<std::vector<bool>>(outputs))
         {
             
         }
@@ -52,13 +57,13 @@ namespace kiwi
         
         bool Infos::isInputConnected(const size_t index) const noexcept
         {
-            assert(index < static_cast< size_t >(m_inputs.size()) && "Index out of range");
+            assert(index < static_cast<size_t>(m_inputs.size()) && "Index out of range");
             return m_inputs[index];
         }
         
         bool Infos::isOutputConnected(const size_t index) const noexcept
         {
-            assert(index < static_cast< size_t >(m_outputs.size()) && "Index out of range");
+            assert(index < static_cast<size_t>(m_outputs.size()) && "Index out of range");
             return m_outputs[index];
         }
         
@@ -72,6 +77,11 @@ namespace kiwi
             return m_aligned;
         }
         
+        bool Infos::isInterleaved() const noexcept
+        {
+            return m_interleaved;
+        }
+        
         void Infos::shouldBeInplace(const bool state)
         {
             m_inplace = state;
@@ -80,6 +90,11 @@ namespace kiwi
         void Infos::shouldBeAligned(const bool state)
         {
             m_aligned = state;
+        }
+        
+        void Infos::shouldBeInterleaved(const bool state)
+        {
+            m_interleaved = state;
         }
     }
 }

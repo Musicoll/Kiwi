@@ -25,36 +25,19 @@ namespace kiwi
 {
     namespace dsp
     {
-        Buffer::Buffer() noexcept :
-        m_sample_rate(0ul), m_vector_size(0ul), m_nchannels(0ul), m_signals()
+        // ================================================================================ //
+        //                                       SIGNAL                                     //
+        // ================================================================================ //
+
+        Signal::Signal() noexcept : m_owner(true), m_size(0ul), m_samples(nullptr)
         {
             ;
-        }
-        
-        Buffer::Buffer(const size_t /*nchannels*/, const size_t /*nsamples*/, const sample_t /*val*/)
-        {
-            
-        }
-        
-        
-        Buffer::~Buffer()
-        {
-            ;
-        }
-        
-        
-        
-        
-        
-        
-        Signal::Signal() noexcept :
-        m_samples(nullptr), m_size(0ul), m_owner(true)
-        {
-            
         }
         
         Signal::Signal(const size_t size, const sample_t val) :
-        m_samples(nullptr), m_size(0ul), m_owner(true)
+        m_owner(true),
+        m_size(size),
+        m_samples(Samples<sample_t>::allocate(size))
         {
             m_samples = Samples< sample_t >::allocate(size);
             if(m_samples)
@@ -69,13 +52,12 @@ namespace kiwi
             }
         }
         
-        Signal::Signal(Signal const& other) :
-        m_samples(nullptr), m_size(0ul), m_owner(true)
+        Signal::Signal(Signal const& other) : Signal()
         {
             if(other.m_samples && other.m_size)
             {
                 m_samples = Samples< sample_t >::allocate(other.m_size);
-                if(m_samples)
+                if(m_samples != nullptr)
                 {
                     m_size  = other.m_size;
                     m_owner = true;
@@ -89,21 +71,102 @@ namespace kiwi
         }
         
         Signal::Signal(Signal&& other) noexcept :
-        m_samples(nullptr), m_size(0ul), m_owner(other.m_owner)
+        m_owner(other.m_owner),
+        m_size(std::move(other.m_size)),
+        m_samples(std::move(other.m_samples))
         {
-            other.m_owner = true;
-            std::swap(m_samples, other.m_samples);
-            std::swap(m_size, other.m_size);
+            other.m_owner = false;
+            other.m_size = 0ul;
+            other.m_samples = nullptr;
+        }
+        
+        Signal& Signal::operator=(Signal other)
+        {
+            using std::swap;
+            swap(m_owner, other.m_owner);
+            swap(m_size, other.m_size);
+            swap(m_samples, other.m_samples);
+            return *this;
         }
         
         Signal::~Signal()
         {
-            if(m_owner)
+            if(m_samples != nullptr && m_owner)
             {
                 Samples< sample_t >::release(m_samples);
             }
             m_samples = nullptr;
             m_size    = 0ul;
+        }
+        
+        void swap(Signal& first, Signal& second)
+        {
+            using std::swap;
+            swap(first.m_owner, second.m_owner);
+            swap(first.m_size, second.m_size);
+            swap(first.m_samples, second.m_samples);
+        }
+        
+        size_t Signal::size() const noexcept
+        {
+            return m_size;
+        }
+        
+        bool Signal::empty() const noexcept
+        {
+            return (m_size == 0ul);
+        }
+        
+        sample_t const* Signal::data() const noexcept
+        {
+            return const_cast<sample_t const*>(m_samples);
+        }
+        
+        sample_t* Signal::data() noexcept
+        {
+            return m_samples;
+        }
+        
+        sample_t const& Signal::operator[](const size_t index) const
+        {
+            assert(index < size() && "Index out of range.");
+            
+            return m_samples[index];
+        }
+        
+        sample_t& Signal::operator[](const size_t index)
+        {
+            assert(index < size() && "Index out of range.");
+            
+            return m_samples[index];
+        }
+        
+        void Signal::clear() noexcept
+        {
+            Samples<sample_t>::clear(m_size, m_samples);
+        }
+        
+        void Signal::fillWith(sample_t const& value) noexcept
+        {
+            Samples<sample_t>::fill(m_size, value, m_samples);
+        }
+        
+        void Signal::add(Signal const& signal) noexcept
+        {
+            Samples<sample_t>::add(m_size, signal.data(), m_samples);
+        }
+        
+        Signal Signal::add(Signal const& signal_1, Signal const& signal_2)
+        {
+            const size_t size = signal_1.size();
+            
+            assert(size == signal_2.size()
+                   && "The two signals must have an equal size");
+            
+            Signal result(size);
+            Samples<sample_t>::add(size, signal_1.data(), signal_2.data(), result.data());
+            
+            return std::move(result);
         }
     }
 }
