@@ -22,8 +22,9 @@
 #ifndef KIWI_DSP_CHAIN_HPP_INCLUDED
 #define KIWI_DSP_CHAIN_HPP_INCLUDED
 
+#include <map>
+
 #include "KiwiDsp_Node.hpp"
-#include "KiwiDsp_Link.hpp"
 
 namespace kiwi
 {
@@ -70,24 +71,15 @@ namespace kiwi
         //! @todo Make it a little bit more thread safe !
         //! @todo Checks exceptions and assertions !
         //! @todo Checks if what must be link and processors to send (unique_ptr ? object ? Pointer ?) !
-        class Chain
+        class Chain final
         {
         public: // methods
-            
-            //! @brief The possible states of a Chain object.
-            //! @see getState
-            enum class State : uint8_t
-            {
-                NotCompiled = 0, ///< If the object chain is not compiled.
-                Compiling   = 1, ///< If the object chain is compiling.
-                Ready       = 2  ///< If the object chain is ready to process.
-            };
             
             //! @brief The default constructor.
             //! @details Allocates and initializes an empty Chain object.
             //! All the initializations will be performed with the compile method of the Chain object.
             //! @see compile
-            Chain() noexcept;
+            Chain();
             
             //! @brief The destructor.
             //! @details Frees the Chain object and releases the digital signal processing if needed.
@@ -98,6 +90,14 @@ namespace kiwi
             //! @exception Error
             ~Chain();
             
+            //! @brief Prepares all datas before processing.
+            //! @details Calls prepare on Processors.
+            void prepare(size_t const samplerate, size_t const vectorsize);
+            
+            //! @brief Call release on nodes enabling processors to deallocate memory.
+            //! @details Tick will no longer be called after releasing.
+            void release();
+            
             //! @brief Gets the current sample rate.
             //! @see getVectorSize, isProcessing
             size_t getSampleRate() const noexcept;
@@ -106,54 +106,54 @@ namespace kiwi
             //! @see getSampleRate, isProcessing
             size_t getVectorSize() const noexcept;
             
-            //! @brief Gets the current state.
-            //! @see getSampleRate, getVectorSize, State
-            State getState() const noexcept;
+            //! @brief Adds a processor to the chain.
+            void addProcessor(uint64_t id, std::unique_ptr<Processor> processor);
             
-            //! @brief Compiles the dsp chain.
-            //! @details The function sorts Processor objects and call their prepares methods.
-            //! @param samplerate   The sample rate of the digital signal processing.
-            //! @param vectorsize   The vector size of the digital signal processing.
-            //! @param processors   The set of Processor objects to add to the Chain object.
-            //! @param links        The set of Links objects used to connect the Processor objects.
-            //! @see tick, release
-            //! @exception Error
-            //! @todo The documentation.
-            void compile(size_t const samplerate, size_t const vectorsize,
-                         std::set<Processor*> const& processors,
-                         std::set<Link*> const& links);
+            //! @brief Removes processors from the chain.
+            void removeProcessor(uint64_t id);
             
-            //! @brief Stops the digital signal processing.
-            //! @see compile, tick
-            //! @exception Error
-            //! @todo The documentation.
-            void release();
+            //! @brief Gets a const processor held by the node with id.
+            //! @details Caller shares ownership with chain so it's same to maniplate processor and remoing node.
+            std::shared_ptr<const Processor> getProcessor(uint64_t id) const;
+            
+            //! @brief Gets aprocessor held by the node with id.
+            //! @details Caller shares ownership with chain so it's same to maniplate processor and remoing node.
+            std::shared_ptr<Processor> getProcessor(uint64_t id);
+            
+            //! @brief Connects two processors.
+            //! @details Returns false if the connection already existed.
+            bool connect(uint64_t source_node, size_t outlet_index, uint64_t dest_node, size_t inlet_index);
+            
+            //! @brief Disconnect two processors.
+            //! @details Returns false if the connection didn't existed.
+            bool discconnect(uint64_t source_node, size_t outlet_index, uint64_t dest_node, size_t inlet_index);
             
             //! @brief Ticks once all the Processor objects.
             //! @see compile, release
             //! @todo The documentation.
-            void tick() const noexcept;
+            void tick() noexcept;
+            
+            //! @brief Cleans all nodes and buffers before ticking again.
+            void clean() noexcept;
+            
+            //! @brief Prepares the node without changing the sample rate and vector size.
+            void prepare();
             
         private: // methods
             
-            //! @internal Creates nodes.
-            void createNodes(std::set<Processor*> const& processors);
-            
-            //! @internal connect nodes based on links infos.
-            void connectNodes(std::set<Link*> const& links);
-            
-            //! @internal Prepares nodes.
-            void prepareNodes();
+            //! @brief Returns true if the processor is already in the graph
+            bool findProcessor(Processor const& processor) const;
             
         private: // members
             
-            std::vector<Node::uPtr> m_nodes;
-            std::atomic<State>      m_state;
-            mutable std::mutex      m_mutex;
-            size_t                  m_sample_rate;
-            size_t                  m_vector_size;
-            
-        };    
+            std::map<const uint64_t, Node>  m_nodes;
+            size_t                          m_sample_rate;
+            size_t                          m_vector_size;
+            std::atomic<PrepareState>       m_prepare_state;
+            std::atomic<ReleaseState>       m_release_state;
+            std::atomic<PerformState>       m_perform_state;
+            std::mutex                      m_tick_mutex;
+        };
     }
 }
 

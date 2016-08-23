@@ -2,21 +2,19 @@
  ==============================================================================
  
  This file is part of the KIWI library.
- Copyright (c) 2014 Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of either:
- a) the GPL v2 (or any later version)
- b) the Affero GPL v3
- 
- Details of these licenses can be found at: www.gnu.org/licenses
+ Permission is granted to use this software under the terms of the GPL v2
+ (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  
  ------------------------------------------------------------------------------
  
- To release a closed-source product which uses KIWI, contact : guillotpierre6@gmail.com
+ Contact : cicm.mshparisnord@gmail.com
  
  ==============================================================================
  */
@@ -41,8 +39,7 @@ public: // methods
                  size_t samplerate  = 44100ul,
                  size_t vectorsize  = 1024ul) :
     PortAudioExample(samplerate, vectorsize),
-    m_output_buffer(outputs, vectorsize, 0.),
-    m_dac(m_output_buffer)
+    m_output_buffer(outputs, vectorsize, 0.)
     {
         
     }
@@ -55,30 +52,11 @@ public: // methods
     void play()
     {
         m_chain.release();
-        m_links.clear();
         setup();
         
-        add(m_dac);
-        std::set<Link*> links;
-        for(auto& link_uptr : m_links)
-        {
-            links.emplace(link_uptr.get());
-        }
-        
-        m_chain.compile(getSampleRate(), getVectorSize(), m_processes, links);
+        m_chain.prepare(getSampleRate(), getVectorSize());
         
         start();
-    }
-    
-    void add(Processor& processor)
-    {
-        m_processes.insert(&processor);
-    }
-    
-    void connect(Processor const& from, size_t from_index, Processor const& to, size_t to_index)
-    {
-        //Link link(from, from_index, to, to_index);
-        m_links.emplace(new Link(from, from_index, to, to_index));
     }
     
     void perform(float*	out, unsigned long vectorsize) override
@@ -98,41 +76,30 @@ public: // methods
     
 protected: // methods
     
-    Dac const& getDac() const noexcept
-    {
-        return m_dac;
-    }
-    
     //! @brief Add nodes and connect them here.
     virtual void setup() = 0;
     
-private: // members
-    
+protected: // members
     Chain                   m_chain;
-    std::set<Processor*>    m_processes;
-    std::set<std::unique_ptr<Link>> m_links;
     Buffer                  m_output_buffer;
-    Dac                     m_dac;
 };
 
 class KiwiSynth : public AudioExample
 {
 public:
     
-    KiwiSynth() : AudioExample(0ul, 2ul),
-    m_osc(440.),
-    m_osc_gain_1(10.),
-    m_osc_gain_2(10.5)
+    KiwiSynth() : AudioExample(0ul, 2ul)
     {
         
     }
     
     void setup() override
     {
-        add(m_osc);
-        add(m_osc_gain_1);
-        add(m_osc_gain_2);
-        add(m_multiply);
+        m_chain.addProcessor(0, std::unique_ptr<Processor>(new Osc(440)));
+        m_chain.addProcessor(1, std::unique_ptr<Processor>(new Osc(10.)));
+        m_chain.addProcessor(2, std::unique_ptr<Processor>(new Osc(10.5)));
+        m_chain.addProcessor(3, std::unique_ptr<Processor>(new MultiplySignal()));
+        m_chain.addProcessor(4, std::unique_ptr<Processor>(new Dac(m_output_buffer)));
         
         //connect(m_osc, 0ul, m_multiply, 0ul);
         //connect(m_osc_gain_1, 0ul, m_multiply, 1ul);
@@ -141,21 +108,14 @@ public:
         //connect(m_multiply, 0ul, getDac(), 1ul);
         //connect(m_osc, 0ul, getDac(), 0ul);
         
-        connect(m_osc, 0ul, getDac(), 0ul);
-        connect(m_osc, 0ul, getDac(), 1ul);
+        m_chain.connect(0, 0, 4, 0);
+        m_chain.connect(0, 0, 4, 1);
     }
     
     void setFrequency(sample_t const& freq)
     {
-        m_osc.setFrequency(freq);
+        std::dynamic_pointer_cast<Osc>(m_chain.getProcessor(0))->setFrequency(freq);
     }
-    
-private:
-
-    Osc             m_osc;
-    Osc             m_osc_gain_1;
-    Osc             m_osc_gain_2;
-    MultiplySignal  m_multiply;
 };
 
 // ==================================================================================== //

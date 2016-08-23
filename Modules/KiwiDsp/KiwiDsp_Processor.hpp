@@ -23,20 +23,22 @@
 #define KIWI_DSP_PROCESSOR_HPP_INCLUDED
 
 #include "KiwiDsp_Infos.hpp"
+#include "KiwiDsp_Buffer.hpp"
 
 namespace kiwi
 {
     namespace dsp
     {
         class Chain;
+        
         // ==================================================================================== //
         //                                      PROCESSOR                                       //
         // ==================================================================================== //
+        
         //! @brief The pure virtual class that processes digital signal in a Chain object.
         //! @details The class is pure virtual and allows to implement digital signal processing.
         //! You should implement the virtual methods prepare, perform and release.
         //! @see Buffer and Infos
-        //! @todo see if the processor really need m_used...
         class Processor
         {
         public: // methods
@@ -46,7 +48,7 @@ namespace kiwi
             //! @param ninputs The number of inputs.
             //! @param noutputs The number of outputs.
             Processor(const size_t ninputs, const size_t noutputs) noexcept :
-            m_ninputs(ninputs), m_noutputs(noutputs), m_used(false) {}
+            m_ninputs(ninputs), m_noutputs(noutputs) {}
             
             //! @brief The destructor.
             virtual ~Processor() = default;
@@ -60,6 +62,16 @@ namespace kiwi
             //! @return The number of outputs of the Processor object.
             //! @see getNumberOfInputs()
             inline size_t getNumberOfOutputs() const noexcept {return m_noutputs;}
+            
+            //! @brief Returns true if the corresponding inlet should be inplace.
+            //! @details If given a size_t pointer sets it to the corresponding outlet index.
+            //! @details Default behavior is returning true if an outlet has the same index.
+            virtual bool isInletInplace(const size_t index, size_t * const outlet_index = nullptr) const;
+            
+            //! @brief Returns true if the corresponding outlet should be inplace.
+            //! @details If given a size_t pointer sets it to the corresponding inlet index.
+            //! @details Default behavior is returning true if an inlet has the same index.
+            virtual bool isOutletInplace(const size_t index, size_t * const outlet_index = nullptr) const;
             
         private: // methods
             
@@ -92,7 +104,6 @@ namespace kiwi
             
             const size_t        m_ninputs;
             const size_t        m_noutputs;
-            std::atomic<bool>   m_used;
             friend Node;
             friend Chain;
         };

@@ -20,6 +20,7 @@
  */
 
 #include "KiwiDsp_Chain.hpp"
+#include "KiwiDsp_Node.hpp"
 
 namespace kiwi
 {
@@ -29,22 +30,99 @@ namespace kiwi
         //                                          CHAIN                                       //
         // ==================================================================================== //
         
-        Chain::Chain() noexcept :
-        m_state(State::NotCompiled),
-        m_sample_rate(0ul),
-        m_vector_size(0ul)
+        Chain::Chain() :
+        m_nodes(),
+        m_sample_rate(),
+        m_vector_size(),
+        m_prepare_state(PrepareState::NotPrepared),
+        m_release_state(ReleaseState::Released),
+        m_perform_state(PerformState::NotReady),
+        m_tick_mutex()
         {
             ;
         }
         
         Chain::~Chain()
         {
-            /*
-            assert(m_state.load() != State::NotCompiled &&
-                   "The chain must be compiled to be destroyed !");
-            */
+            assert(m_release_state.load() == ReleaseState::Released && "Removing chain before releasing it :  ");
+            
+            m_nodes.clear();
         }
         
+        void Chain::prepare()
+        {
+            prepare(getSampleRate(), getVectorSize());
+        }
+        
+        void Chain::prepare(const size_t samplerate, const size_t vector_size)
+        {
+            if (m_prepare_state.load() == PrepareState::NotPrepared
+                || m_release_state.load() == ReleaseState::Released)
+            {
+                std::lock_guard<std::mutex> lock(m_tick_mutex);
+                
+                m_prepare_state.store(PrepareState::Preparing);
+                
+                m_sample_rate = samplerate;
+                m_vector_size = vector_size;
+                
+                // Removes all nodes that has been marked as deleted
+                for(auto node = m_nodes.begin(); node != m_nodes.end();)
+                {
+                    if(node->second.isDeleted())
+                    {
+                        node->second.release();
+                        m_nodes.erase(node++);
+                    }
+                    else
+                    {
+                        ++node;
+                    }
+                }
+                
+                try
+                {
+                    // Prepare all nodes that have been marked as notPrepared.
+                    for(auto node = m_nodes.begin(); node != m_nodes.end(); ++node)
+                    {
+                        node->second.prepare(m_sample_rate, m_vector_size);
+                    }
+                }
+                catch(Error & e)
+                {
+                    m_prepare_state.store(PrepareState::NotPrepared);
+                    m_release_state.store(ReleaseState::NotReleased);
+                    throw e;
+                }
+                
+                // look-for and store terminal nodes:
+                // - the ones who needs their perform method to be called directly.
+                
+                m_prepare_state.store(PrepareState::Prepared);
+                m_release_state.store(ReleaseState::NotReleased);
+                m_perform_state.store(PerformState::Ready);
+            }
+        }
+        
+        void Chain::release()
+        {
+            if (m_release_state.load() != ReleaseState::Released)
+            {
+                std::lock_guard<std::mutex> lock(m_tick_mutex);
+                
+                m_release_state.store(ReleaseState::Releasing);
+                
+                for(auto node = m_nodes.begin(); node != m_nodes.end(); ++node)
+                {
+                    node->second.release();
+                }
+                
+                m_release_state.store(ReleaseState::Released);
+                m_prepare_state.store(PrepareState::NotPrepared);
+                m_perform_state.store(PerformState::NotReady);
+            }
+        }
+    
         size_t Chain::getSampleRate() const noexcept
         {
             return m_sample_rate;
@@ -55,158 +133,174 @@ namespace kiwi
             return m_vector_size;
         }
         
-        Chain::State Chain::getState() const noexcept
+        void Chain::clean() noexcept
         {
-            return m_state.load();
-        }
-        
-        void Chain::release()
-        {
-            if(m_state.load() != State::NotCompiled)
+            if(m_perform_state.load() == PerformState::Performed)
             {
-                std::lock_guard<std::mutex> guard(m_mutex);
-                
-                // clear nodes
-                try
+                for(auto node = m_nodes.begin(); node != m_nodes.end(); ++node)
                 {
-                    m_nodes.clear();
-                }
-                catch(std::exception& e)
-                {
-                    throw Error("Clear nodes failed : " + std::string(e.what()));
+                    node->second.clean();
                 }
                 
-                m_sample_rate = 0ul;
-                m_vector_size = 0ul;
-                
-                m_state.store(State::NotCompiled);
+                m_perform_state.store(PerformState::Ready);
             }
         }
         
-        void Chain::tick() const noexcept
+        void Chain::tick() noexcept
         {
-            std::lock_guard<std::mutex> guard(m_mutex);
-            
-            // reset nodes (zeroes buffers and set ready-to-process flag)
-            for(Node::uPtr const& node_uptr : m_nodes)
+            if (m_perform_state.load() == PerformState::Ready)
             {
-                node_uptr->clean();
-            }
-            
-            for(Node::uPtr const& node_uptr : m_nodes)
-            {
-                if(node_uptr->isTerminal())
+                std::lock_guard<std::mutex> lock(m_tick_mutex);
+                
+                for(auto node = m_nodes.begin(); node != m_nodes.end(); ++node)
                 {
-                    node_uptr->perform();
+                    if(node->second.isTerminal())
+                    {
+                        node->second.perform();
+                    }
                 }
+                
+                m_perform_state.store(PerformState::Performed);
+                
+                clean();
             }
-        }
-        
-        void Chain::compile(size_t const samplerate, size_t const vectorsize,
-                            std::set<Processor*> const& processors,
-                            std::set<Link*> const& links)
-        {
-            assert(isPowerOfTwo(vectorsize) && "The vectorsize must be a power of two.");
-            
-            release();
-            
-            std::lock_guard<std::mutex> guard(m_mutex);
-            m_state.store(State::Compiling);
-            m_sample_rate = samplerate;
-            m_vector_size = vectorsize;
-            
-            createNodes(processors);
-            connectNodes(links);
-            
-            prepareNodes();
-            
-            // look-for and store terminal nodes:
-            // - the ones who needs their perform method to be called directly.
-            
-            m_state = State::Ready;
         }
         
         // ============================================================================ //
-        //                             NODE AND LINK CREATION                           //
+        //                             NODE AND LINK MODIFICATION                       //
         // ============================================================================ //
         
-        void Chain::createNodes(std::set<Processor*> const& processors)
+        bool Chain::findProcessor(Processor const& processor) const
         {
-            m_nodes.reserve(processors.size());
-            for(Processor* processor : processors)
+            struct compare_proc
             {
-                assert(processor != nullptr && "A Processor pointer is nullptr.");
+                compare_proc(Processor const& proc): m_proc(proc){};
                 
-                if(processor->m_used)
+                bool operator()(std::pair<const uint64_t, Node> const& node)
                 {
-                    throw Error("The Processor object is already in a Chain object.");
-                }
+                    return &(*node.second.getProcessor()) == &m_proc;
+                };
                 
-                try
-                {
-                    m_nodes.emplace_back(new Node(*processor));
-                }
-                catch(std::exception& e)
-                {
-                    processor->m_used = false;
-                    throw Error("Node creation failed : " + std::string(e.what()));
-                }
-                
-                processor->m_used = true;
-            }
+                Processor const& m_proc;
+            };
+            
+            return std::find_if(m_nodes.cbegin(), m_nodes.cend(), compare_proc(processor)) != m_nodes.cend();
         }
         
-        void Chain::connectNodes(std::set<Link*> const& links)
+        void Chain::addProcessor(const uint64_t id, std::unique_ptr<Processor> processor)
         {
-            for(Link* const link : links)
+            if (!findProcessor(*processor))
             {
-                Node* from = nullptr;
-                Node* to = nullptr;
-                
-                for(Node::uPtr const& node : m_nodes)
+                if (m_nodes.find(id) == m_nodes.end())
                 {
-                    if(&node->getProcessor() == &link->getInputProcessor())
-                    {
-                        to = node.get();
-                    }
-                    else if(&node->getProcessor() == &link->getOutputProcessor())
-                    {
-                        from = node.get();
-                    }
+                    std::lock_guard<std::mutex> lock(m_tick_mutex);
                     
-                    if(from && to)
-                    {
-                        break;
-                    }
+                    m_nodes.emplace(std::piecewise_construct,
+                                    std::forward_as_tuple(id),
+                                    std::forward_as_tuple(std::move(processor), id));
+                    
+                    m_prepare_state.store(PrepareState::NotPrepared);
                 }
-                
-                assert((from && to) && "Invalid Link.");
-                
-                try
+                else
                 {
-                    Node::connect(*from, link->getOutputIndex(),
-                                  *to, link->getInputIndex());
-                }
-                catch(std::exception& e)
-                {
-                    throw Error("Node connection failed : " + std::string(e.what()));
+                    throw Error("Adding processor with same id :");
                 }
             }
-        }
-        
-        // ============================================================================ //
-        //                              PREPARES THE NODES                              //
-        // ============================================================================ //
-        
-        void Chain::prepareNodes()
-        {
-            for(Node::uPtr const& node : m_nodes)
+            else
             {
-                if(node->isTerminal())
-                {
-                    node->prepare(m_sample_rate, m_vector_size);
-                }
+                processor.release();
+                throw Error("Inserting twice the same processor :");
             }
         }
+        
+        void Chain::removeProcessor(const uint64_t id)
+        {
+            auto node = m_nodes.find(id);
+            
+            if (node != m_nodes.end())
+            {
+                std::lock_guard<std::mutex> lock(m_tick_mutex);
+                
+                node->second.setAsDeleted();
+                
+                m_prepare_state.store(PrepareState::NotPrepared);
+            }
+            else
+            {
+                throw Error("Removing a processor with non existing id :");
+            }
+        }
+        
+        bool Chain::connect(uint64_t source_node, size_t outlet_index, uint64_t dest_node, size_t inlet_index)
+        {
+            bool connected = false;
+            
+            if (m_nodes.find(source_node) != m_nodes.end() &&
+                m_nodes.find(dest_node) != m_nodes.end())
+            {
+                std::lock_guard<std::mutex> lock(m_tick_mutex);
+                
+                connected = m_nodes.at(dest_node).connectInput(inlet_index, m_nodes.at(source_node), outlet_index);
+                
+                if (connected)
+                {
+                    m_prepare_state.store(PrepareState::NotPrepared);
+                }
+            }
+            else
+            {
+                throw Error("Trying to connect two non existing nodes : ");
+            }
+            
+            return connected;
+        }
+        
+        bool Chain::discconnect(uint64_t source_node, size_t outlet_index, uint64_t dest_node, size_t inlet_index)
+        {
+            bool disconnected = false;
+            
+            if (m_nodes.find(source_node) != m_nodes.end() &&
+                m_nodes.find(dest_node) != m_nodes.end())
+            {
+                std::lock_guard<std::mutex> lock(m_tick_mutex);
+                
+                disconnected = m_nodes.at(dest_node).disconnectInput(inlet_index, m_nodes.at(source_node), outlet_index);
+                
+                if (disconnected)
+                {
+                    m_prepare_state.store(PrepareState::NotPrepared);
+                }
+            }
+            else
+            {
+                throw Error("Trying to discconnect two non existing nodes : ");
+            }
+            
+            return disconnected;
+        }
+        
+        std::shared_ptr<const Processor> Chain::getProcessor(uint64_t id) const
+        {
+            try
+            {
+                return m_nodes.at(id).getProcessor();
+            }
+            catch (const std::out_of_range& e)
+            {
+                throw Error("Trying to access out of range processor : " + std::string(e.what()));
+            }
+        };
+        
+        std::shared_ptr<Processor> Chain::getProcessor(uint64_t id)
+        {
+            try
+            {
+                return m_nodes.at(id).getProcessor();
+            }
+            catch (const std::out_of_range& e)
+            {
+                throw Error("Trying to access out of range processor : " + std::string(e.what()));
+            }
+        };
     }
 }

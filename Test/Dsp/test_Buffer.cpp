@@ -32,31 +32,35 @@ using namespace dsp;
 
 TEST_CASE("Dsp - Buffer", "[Dsp, Buffer]")
 {
-    SECTION("Buffer - Default empty ctor")
+    SECTION("Buffer - aggregation constructor")
     {
-        Buffer buffer;
+        Signal::sPtr signal1 = std::make_shared<Signal>(4, 1);
+        Signal::sPtr signal2 = std::make_shared<Signal>(4, 2);
         
-        auto channels = buffer.getNumberOfChannels();
-        auto vectorsize = buffer.getVectorSize();
+        std::vector<Signal::sPtr> agg_signals ({signal1, signal2});
         
-        REQUIRE(channels == 0);
-        REQUIRE(vectorsize == 0);
-    }
-    
-    SECTION("Buffer - uninitialized signals ctor")
-    {
-        Buffer buffer(2);
+        Buffer buffer(agg_signals);
         
         auto channels = buffer.getNumberOfChannels();
         auto vectorsize = buffer.getVectorSize();
         
         REQUIRE(channels == 2);
-        REQUIRE(vectorsize == 0);
+        REQUIRE(vectorsize == 4);
         
-        CHECK(buffer[0].empty());
-        CHECK(buffer[1].empty());
-        CHECK(buffer[0].data() == nullptr);
-        CHECK(buffer[1].data() == nullptr);
+        CHECK(buffer[0][0] == 1);
+        CHECK(buffer[1][1] == 2);
+        
+        signal1->operator[](0) = 5;
+        signal2->operator[](1) = 3;
+        
+        CHECK(buffer[0][0] == 5);
+        CHECK(buffer[1][1] == 3);
+        
+        signal1.reset();
+        signal2.reset();
+        
+        CHECK(buffer[0][0] == 5);
+        CHECK(buffer[1][1] == 3);
     }
     
     SECTION("Buffer - filled ctor")

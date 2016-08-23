@@ -151,9 +151,18 @@ namespace kiwi
             Samples<sample_t>::fill(m_size, value, m_samples);
         }
         
-        void Signal::add(Signal const& signal) noexcept
+        void Signal::copy(Signal const& other_signal) noexcept
         {
-            Samples<sample_t>::add(m_size, signal.data(), m_samples);
+            assert(size() == other_signal.size() && "Copying signals of different size");
+            
+            Samples<sample_t>::copy(m_size, other_signal.data(), m_samples);
+        }
+        
+        void Signal::add(Signal const& other_signal) noexcept
+        {
+            assert(size() == other_signal.size() && "Adding signals of different size");
+            
+            Samples<sample_t>::add(m_size, other_signal.data(), m_samples);
         }
         
         Signal Signal::add(Signal const& signal_1, Signal const& signal_2)

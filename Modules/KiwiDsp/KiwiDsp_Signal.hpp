@@ -40,8 +40,9 @@ namespace kiwi
         {
         public: // methods
             
-            typedef std::shared_ptr<Signal> sPtr;
-            typedef std::unique_ptr<Signal> uPtr;
+            typedef std::shared_ptr<Signal>         sPtr;
+            typedef std::shared_ptr<const Signal>   scPtr;
+            typedef std::unique_ptr<Signal>         uPtr;
             
             //! @brief Default ctor.
             //! @details Creates an empty Signal object.
@@ -100,8 +101,11 @@ namespace kiwi
             //! @brief Fill this Signal with a new value.
             void fillWith(sample_t const& value) noexcept;
             
+            //! @brief Copies the samples of another signal into it.
+            void copy(Signal const& other_signal) noexcept;
+            
             //! @brief Adds a Signal to this one.
-            void add(Signal const& signal) noexcept;
+            void add(Signal const& other_signal) noexcept;
             
             //! @brief Adds two Signal together and returns the resulting Signal.
             static Signal add(Signal const& signal_1, Signal const& signal_2);

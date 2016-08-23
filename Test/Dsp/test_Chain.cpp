@@ -19,6 +19,8 @@
  ==============================================================================
  */
 
+#include <memory>
+
 #include "../catch.hpp"
 
 #include <KiwiDsp/KiwiDsp_Chain.hpp>
@@ -38,81 +40,167 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
     const size_t samplerate = 44100ul;
     const size_t vectorsize = 64ul;
     
-    Chain chain;
-    std::set<Processor*> processes;
-    std::set<Link*> links;
-    
-    Sig sig1(1.3);
-    Sig sig2(2.7);
-    PlusScalar plus_scalar(1.);
-    PlusSignal plus_signal;
-    
-    Link link1(sig1, 0, plus_scalar, 0);
-    Link link2(plus_scalar, 0, plus_signal, 0);
-    Link link3(sig2, 0, plus_signal, 1);
-    
     SECTION("Chain released not compiled")
     {
+        Chain chain;
         chain.release();
+    }
+    
+    SECTION("Chain modification")
+    {
+        Chain chain;
+        
+        Processor * sig = new Sig(1.);
+        
+        chain.addProcessor(0, std::move(std::unique_ptr<Processor>(sig)));
+        chain.addProcessor(1, std::move(std::unique_ptr<Processor>(new PlusScalar(2.))));
+        
+        // Reinserting processors
+        REQUIRE_THROWS_AS(chain.addProcessor(0, std::move(std::unique_ptr<Processor>(new Sig(2.)))), Error);
+        REQUIRE_THROWS_AS(chain.addProcessor(1, std::move(std::unique_ptr<Processor>(sig))), Error);
+    
+        // Connecting processors
+        REQUIRE(chain.connect(0, 0, 1, 0));
+        REQUIRE(!chain.connect(0, 0, 1, 0));
+        
+        // Connecting with non existing processor
+        REQUIRE_THROWS_AS(chain.connect(1, 0, 2, 0), Error);
+        
+        // Disconnecting processors
+        REQUIRE(chain.discconnect(0, 0, 1, 0));
+        REQUIRE(!chain.discconnect(0, 0, 1, 0));
+        
+        // Removing processors
+        REQUIRE_THROWS_AS(chain.removeProcessor(2), Error);
     }
     
     SECTION("Chain compiled")
     {
-        processes.insert(&sig1);
-        processes.insert(&plus_scalar);
-        links.insert(&link1);
+        Chain chain;
         
-        REQUIRE_NOTHROW(chain.compile(samplerate, vectorsize, processes, links));
+        std::unique_ptr<Processor> sig1(new Sig(1.3));
+        std::unique_ptr<Processor> plus_scalar(new PlusScalar(1.));
+        
+        chain.addProcessor(0, std::move(sig1));
+        chain.addProcessor(1, std::move(plus_scalar));
+        chain.connect(0, 0, 1, 0);
+        
+        REQUIRE_NOTHROW(chain.prepare(samplerate, vectorsize));
         
         chain.release();
     }
     
     SECTION("Fanning Inlet process")
     {
-        Sig sig_1(1.);
-        Sig sig_2(2.);
-        Sig sig_3(3.);
+        Chain chain;
         
-        PlusScalar plus_scalar_0(0.);
+        std::unique_ptr<Processor> sig_1(new Sig(1.));
+        std::unique_ptr<Processor> sig_2(new Sig(2.));
+        std::unique_ptr<Processor> sig_3(new Sig(3.));
         
-        Link link_1(sig_1, 0, plus_scalar_0, 0);
-        Link link_2(sig_2, 0, plus_scalar_0, 0);
-        Link link_3(sig_3, 0, plus_scalar_0, 0);
+        std::unique_ptr<Processor> plus_scalar_0(new PlusScalar(0.));
         
-        processes.insert(&sig_1);
-        processes.insert(&sig_2);
-        processes.insert(&sig_3);
-        processes.insert(&plus_scalar_0);
-        links.insert(&link_1);
-        links.insert(&link_2);
-        links.insert(&link_3);
+        chain.addProcessor(0, std::move(sig_1));
+        chain.addProcessor(1, std::move(sig_2));
+        chain.addProcessor(2, std::move(sig_3));
+        chain.addProcessor(3, std::move(plus_scalar_0));
         
-        REQUIRE_NOTHROW(chain.compile(samplerate, vectorsize, processes, links));
+        chain.connect(0, 0, 3, 0);
+        chain.connect(1, 0, 3, 0);
+        chain.connect(2, 0, 3, 0);
+        
+        REQUIRE_NOTHROW(chain.prepare(samplerate, vectorsize));
         
         chain.release();
     }
     
     SECTION("empty Chain compiled")
     {
-        REQUIRE_NOTHROW(chain.compile(samplerate, vectorsize, processes, links));
+        Chain chain;
+        
+        REQUIRE_NOTHROW(chain.prepare(samplerate, vectorsize));
         
         chain.release();
     }
     
     SECTION("Loop Detected")
     {
-        processes.insert(&sig1);
-        processes.insert(&sig2);
-        processes.insert(&plus_scalar);
-        processes.insert(&plus_signal);
-        links.insert(&link1);
-        links.insert(&link2);
-        links.insert(&link3);
+        Chain chain;
         
-        Link link_loop(plus_signal, 0, plus_scalar, 0);
-        links.insert(&link_loop);
+        std::unique_ptr<Processor> sig1(new Sig(1.3));
+        std::unique_ptr<Processor> sig2(new Sig(2.7));
+        std::unique_ptr<Processor> plus_scalar(new PlusScalar(1.));
+        std::unique_ptr<Processor> plus_signal(new PlusSignal());
         
-        REQUIRE_THROWS_AS(chain.compile(samplerate, vectorsize, processes, links), Error);
+        chain.addProcessor(0, std::move(sig1));
+        chain.addProcessor(1, std::move(sig2));
+        chain.addProcessor(2, std::move(plus_scalar));
+        chain.addProcessor(3, std::move(plus_signal));
+        
+        chain.connect(0, 0, 2, 0);
+        chain.connect(2, 0, 3, 0);
+        chain.connect(1, 0, 3, 1);
+        
+        REQUIRE_THROWS_AS(chain.connect(3, 0, 2, 0);, Error);
+    }
+    
+    SECTION("Prepare after updates")
+    {
+        Chain chain;
+        
+        chain.addProcessor(0, std::move(std::unique_ptr<Processor>(new Sig(1.))));
+        chain.addProcessor(2, std::move(std::unique_ptr<Processor>(new PlusSignal())));
+        std::string result;
+        chain.addProcessor(3, std::move(std::unique_ptr<Processor>(new Print(result))));
+        
+        chain.connect(0, 0, 2, 0);
+        chain.connect(2, 0, 3, 0);
+        
+        chain.prepare(samplerate, 4ul);
+        
+        chain.tick();
+        
+        CHECK(result == "[1.000000, 1.000000, 1.000000, 1.000000]");
+        
+        // Adding a processors
+        
+        chain.addProcessor(1, std::move(std::unique_ptr<Processor>(new Sig(2.))));
+        
+        chain.prepare();
+        
+        chain.tick();
+        
+        CHECK(result == "[1.000000, 1.000000, 1.000000, 1.000000]");
+        
+        // Connecting processor
+        
+        chain.connect(1, 0, 2, 1);
+        
+        chain.prepare();
+        
+        chain.tick();
+        
+        CHECK(result == "[3.000000, 3.000000, 3.000000, 3.000000]");
+        
+        // Disconnecting processor
+        
+        chain.discconnect(0, 0, 2, 0);
+        
+        chain.prepare();
+        
+        chain.tick();
+        
+        CHECK(result == "[2.000000, 2.000000, 2.000000, 2.000000]");
+        
+        // Removing processor
+        
+        chain.removeProcessor(2);
+        
+        chain.prepare();
+        
+        chain.tick();
+        
+        CHECK(result == "[0.000000, 0.000000, 0.000000, 0.000000]");
         
         chain.release();
     }
@@ -124,116 +212,110 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
     
     SECTION("Processor Throw Based on Infos")
     {
-        CopyThrow copy_throw;
-        Link link_throw(plus_signal, 0, copy_throw, 0);
+        Chain chain;
         
-        processes.insert(&sig1);
-        processes.insert(&sig2);
-        processes.insert(&plus_scalar);
-        processes.insert(&plus_signal);
-        links.insert(&link1);
-        links.insert(&link2);
-        links.insert(&link3);
+        std::unique_ptr<Processor> sig1(new Sig(1.3));
+        std::unique_ptr<Processor> sig2(new Sig(2.7));
+        std::unique_ptr<Processor> plus_scalar(new PlusScalar(1.));
+        std::unique_ptr<Processor> plus_signal(new PlusSignal());
         
-        processes.insert(&copy_throw);
-        links.insert(&link_throw);
+        std::unique_ptr<Processor> copy_throw(new CopyThrow());
         
-        REQUIRE_THROWS_AS(chain.compile(samplerate, 128ul, processes, links), Error);
+        chain.addProcessor(0, std::move(sig1));
+        chain.addProcessor(1, std::move(sig2));
+        chain.addProcessor(2, std::move(plus_scalar));
+        chain.addProcessor(3, std::move(plus_signal));
+        
+        chain.connect(0, 0, 2, 0);
+        chain.connect(2, 0, 3, 0);
+        chain.connect(1, 0, 3, 1);
+        
+        chain.addProcessor(4, std::move(copy_throw));
+        chain.connect(3, 0, 4, 0);
+        
+        REQUIRE_THROWS_AS(chain.prepare(samplerate, 128ul), Error);
         
         chain.release();
     }
     
     SECTION("Chain tick - WIP")
     {
-        Sig sig(1.);
-        PlusScalar plus(19.);
+        Chain chain;
+        
+        std::unique_ptr<Processor> sig(new Sig(1.));
+        std::unique_ptr<Processor> plus(new PlusScalar(19.));
         std::string result;
-        Print print(result);
-        //PlusScalar plus_unused(1.);
+        std::unique_ptr<Processor> print(new Print(result));
         
-        Link link_1(sig, 0, plus, 0);
-        Link link_2(plus, 0, print, 0);
-        //Link link_unused(sig, 0, plus_unused, 0);
+        chain.addProcessor(0, std::move(sig));
+        chain.addProcessor(1, std::move(plus));
+        chain.addProcessor(2, std::move(print));
         
-        processes.insert(&sig);
-        processes.insert(&plus);
-        processes.insert(&print);
-        //processes.insert(&plus_unused);
+        chain.connect(0, 0, 1, 0);
+        chain.connect(1, 0, 2, 0);
         
-        links.insert(&link_1);
-        links.insert(&link_2);
-        //links.insert(&link_unused);
-        
-        REQUIRE_NOTHROW(chain.compile(samplerate, 4ul, processes, links));
+        REQUIRE_NOTHROW(chain.prepare(samplerate, 4ul));
         
         chain.tick();
         chain.tick();
         
         CHECK(result == "[20.000000, 20.000000, 20.000000, 20.000000]");
         
-        //std::cout << result << std::endl;
-        
         chain.release();
     }
     
     SECTION("Chain tick - fanning inlet (inlet add)")
     {
-        Sig sig_1(1.);
-        Sig sig_2(2.);
-        Sig sig_3(3.);
+        Chain chain;
+        
+        std::unique_ptr<Processor> sig_1(new Sig(1.));
+        std::unique_ptr<Processor> sig_2(new Sig(2.));
+        std::unique_ptr<Processor> sig_3(new Sig(3.));
         std::string result;
-        Print print(result);
+        std::unique_ptr<Processor> print(new Print(result));
         
-        Link link_1(sig_1, 0, print, 0);
-        Link link_2(sig_2, 0, print, 0);
-        Link link_3(sig_3, 0, print, 0);
+        chain.addProcessor(1, std::move(sig_1));
+        chain.addProcessor(2, std::move(sig_2));
+        chain.addProcessor(3, std::move(sig_3));
+        chain.addProcessor(4, std::move(print));
         
-        processes.insert(&sig_1);
-        processes.insert(&sig_2);
-        processes.insert(&sig_3);
-        processes.insert(&print);
+        chain.connect(1, 0, 4, 0);
+        chain.connect(2, 0, 4, 0);
+        chain.connect(3, 0, 4, 0);
         
-        links.insert(&link_1);
-        links.insert(&link_2);
-        links.insert(&link_3);
-        
-        REQUIRE_NOTHROW(chain.compile(samplerate, 4ul, processes, links));
+        REQUIRE_NOTHROW(chain.prepare(samplerate, 4ul));
         
         chain.tick();
         chain.tick();
         
         CHECK(result == "[6.000000, 6.000000, 6.000000, 6.000000]");
         
-        //std::cout << result << std::endl;
-        
         chain.release();
     }
     
     SECTION("Chain tick - fanning outlet (outlet copy)")
     {
-        Sig sig(1.111111);
+        Chain chain;
+        
+        std::unique_ptr<Processor> sig(new Sig(1.111111));
         
         std::string result_1;
-        Print print_1(result_1);
+        std::unique_ptr<Processor> print_1(new Print(result_1));
         std::string result_2;
-        Print print_2(result_2);
+        std::unique_ptr<Processor> print_2(new Print(result_2));
         std::string result_3;
-        Print print_3(result_3);
+        std::unique_ptr<Processor> print_3(new Print(result_3));
         
-        Link link_1(sig, 0, print_1, 0);
-        Link link_2(sig, 0, print_2, 0);
-        Link link_3(sig, 0, print_3, 0);
+        chain.addProcessor(0, std::move(sig));
+        chain.addProcessor(1, std::move(print_1));
+        chain.addProcessor(2, std::move(print_2));
+        chain.addProcessor(3, std::move(print_3));
         
-        processes.insert(&sig);
-        processes.insert(&print_1);
-        processes.insert(&print_2);
-        processes.insert(&print_3);
+        chain.connect(0, 0, 1, 0);
+        chain.connect(0, 0, 2, 0);
+        chain.connect(0, 0, 3, 0);
         
-        links.insert(&link_1);
-        links.insert(&link_2);
-        links.insert(&link_3);
-        
-        REQUIRE_NOTHROW(chain.compile(samplerate, 4ul, processes, links));
+        REQUIRE_NOTHROW(chain.prepare(samplerate, 4ul));
         
         chain.tick();
         chain.tick();
@@ -247,19 +329,19 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
     
     SECTION("Chain tick - count example")
     {
-        Count count;
+        Chain chain;
+        
+        std::unique_ptr<Processor> count(new Count());
         
         std::string result;
-        Print print(result);
+        std::unique_ptr<Processor> print(new Print(result));
         
-        Link link(count, 0, print, 0);
+        chain.addProcessor(0, std::move(count));
+        chain.addProcessor(1, std::move(print));
         
-        processes.insert(&count);
-        processes.insert(&print);
+        chain.connect(0, 0, 1, 0);
         
-        links.insert(&link);
-        
-        REQUIRE_NOTHROW(chain.compile(samplerate, 4ul, processes, links));
+        REQUIRE_NOTHROW(chain.prepare(samplerate, 4ul));
         
         chain.tick();
         
@@ -278,26 +360,22 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
     
     SECTION("Chain tick - count example 2")
     {
-        Count count;
+        Chain chain;
         
-        PlusSignal plus;
-        
+        std::unique_ptr<Processor> count(new Count());
+        std::unique_ptr<Processor> plus(new PlusSignal());
         std::string result;
-        Print print(result);
+        std::unique_ptr<Processor> print(new Print(result));
         
-        Link link_1(count, 0, plus, 0);
-        Link link_2(count, 0, plus, 1);
-        Link link_3(plus, 0, print, 0);
+        chain.addProcessor(0, std::move(count));
+        chain.addProcessor(1, std::move(plus));
+        chain.addProcessor(2, std::move(print));
         
-        processes.insert(&count);
-        processes.insert(&plus);
-        processes.insert(&print);
+        chain.connect(0, 0, 1, 0);
+        chain.connect(0, 0, 1, 1);
+        chain.connect(1, 0, 2, 0);;
         
-        links.insert(&link_1);
-        links.insert(&link_2);
-        links.insert(&link_3);
-        
-        REQUIRE_NOTHROW(chain.compile(samplerate, 4ul, processes, links));
+        REQUIRE_NOTHROW(chain.prepare(samplerate, 4ul));
         
         chain.tick();
         

@@ -30,17 +30,10 @@ namespace kiwi
                      std::vector<bool>&& inputs,
                      std::vector<bool>&& outputs) :
         m_inplace(true),
-        m_aligned(false),
-        m_interleaved(false),
         m_sample_rate(samplerate),
         m_vector_size(vectorsize),
         m_inputs(std::forward<std::vector<bool>>(inputs)),
         m_outputs(std::forward<std::vector<bool>>(outputs))
-        {
-            
-        }
-        
-        Infos::~Infos()
         {
             
         }
@@ -72,29 +65,9 @@ namespace kiwi
             return m_inplace;
         }
         
-        bool Infos::isAligned() const noexcept
-        {
-            return m_aligned;
-        }
-        
-        bool Infos::isInterleaved() const noexcept
-        {
-            return m_interleaved;
-        }
-        
         void Infos::shouldBeInplace(const bool state)
         {
             m_inplace = state;
-        }
-        
-        void Infos::shouldBeAligned(const bool state)
-        {
-            m_aligned = state;
-        }
-        
-        void Infos::shouldBeInterleaved(const bool state)
-        {
-            m_interleaved = state;
         }
     }
 }

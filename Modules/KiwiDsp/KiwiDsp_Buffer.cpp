@@ -29,16 +29,26 @@ namespace kiwi
         //                                      BUFFER                                      //
         // ================================================================================ //
         
-        Buffer::Buffer() noexcept : m_vectorsize(0ul), m_signals()
+        Buffer::Buffer(std::vector<Signal::sPtr> signals):
+        m_signals(signals)
         {
-            ;
-        }
-        
-        Buffer::Buffer(const size_t nchannels) :
-        m_vectorsize(0ul),
-        m_signals(nchannels, std::make_shared<Signal>())
-        {
-            ;
+            if (m_signals.size() != 0)
+            {
+                size_t vector_size = signals[0]->size();
+                
+                for (int i = 0; i < signals.size(); ++i)
+                {
+                    assert(signals[i]->size() == vector_size
+                           && "Aggregating signals with different vector size");
+                }
+                
+                m_vectorsize = vector_size;
+            }
+            else
+            {
+                m_vectorsize = 0;
+            }
+            
         }
         
         Buffer::Buffer(const size_t nchannels, const size_t nsamples, const sample_t val) :
@@ -97,11 +107,6 @@ namespace kiwi
             assert(index < m_signals.size() && "Index out of range.");
             
             return *m_signals[index].get();
-        }
-        
-        Signal::sPtr& Buffer::getChannelPtr(const size_t index)
-        {
-            return m_signals[index];
         }
     }
 }

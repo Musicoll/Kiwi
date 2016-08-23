@@ -41,13 +41,10 @@ namespace kiwi
         {
         public: // methods
             
-            //! @brief The default empty constructor.
-            //! @details Constructs an empty Buffer object.
-            Buffer() noexcept;
-            
-            //! @brief Constructs a Buffer of n empty Signal objects.
-            //! @param nchannels    The number of channels of the buffer.
-            Buffer(const size_t nchannels);
+            //! @brief A constructor that aggregates signals
+            //! @details Beware that the buffer now share the ownership with caller.
+            //! @param signals A list of aggregated signals. Shall have same vectorsize.
+            Buffer(std::vector<Signal::sPtr> signals);
             
             //! @brief The filled constructor.
             //! @details Allocates a Buffer object with a specific number of channels and number
@@ -88,17 +85,13 @@ namespace kiwi
             //! @brief Gets the Signal object for a given channel.
             Signal& operator[](const size_t index);
             
-        private: // methods
-            
-            //! @internal Returns the Signal pointer for a given Buffer channel.
-            Signal::sPtr& getChannelPtr(const size_t index);
-            
         private: // members
             
             size_t                      m_vectorsize;
             std::vector<Signal::sPtr>   m_signals;
             
-            friend Node; // to get/set channel pointer
+        private: // deleted methods
+            Buffer() = delete;
         };
     }
 }

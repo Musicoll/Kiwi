@@ -22,19 +22,20 @@
 #ifndef KIWI_DSP_INFOS_HPP_INCLUDED
 #define KIWI_DSP_INFOS_HPP_INCLUDED
 
-#include "KiwiDsp_Buffer.hpp"
+#include "KiwiDsp_def.hpp"
 
 namespace kiwi
 {
     namespace dsp
     {
+        class Node;
+        
         class Infos
         {
         public: // methods
             
             //! @brief The destructor.
-            //! @details Frees the content of the Infos object if needed.
-            ~Infos();
+            ~Infos() = default;
             
             //! @brief Gets the sample rate of the DSP.
             //! @details Gets the sample rate of the DSP used during the perform method of the
@@ -71,47 +72,14 @@ namespace kiwi
             //! @see shouldBeInplace() and isAligned()
             bool isInplace() const noexcept;
             
-            //! @brief Checks if the processing should use aligned buffers.
-            //! @details This method can be used to check if the buffers owns the aligned matrices
-            //! of samples during the call of the perform method of the Processor object.
-            //! @return true if the processing should be inplace, otherwise false.
-            //! @see shouldBeAligned() and isInplace()
-            bool isAligned() const noexcept;
-            
-            //! @brief Checks if the processing should use interleaved buffers.
-            //! @details This method can be used to check if the buffers matrices are interleaved in a single Signal object during the call of the perform method of the Processor object.
-            //! @return true if the buffers are interleaved, otherwise false.
-            //! @see shouldBeInterleaved, isInplace, isAligned
-            bool isInterleaved() const noexcept;
-            
             //! @brief Sets if the processing should use inplace buffers.
             //! @details This method enables or disables if the buffers owns the same matrices of
             //! samples during the call of the perform method of the Processor object. By default
             //! the buffers are inplace if the number of inputs of the Processor object is
             //! superior or equal to its number of outputs.
             //! @param state True if the processing should be inplace, otherwise false.
-            //! @see shouldBeAligned, shouldBeInterleaved
+            //! @see isInplace
             void shouldBeInplace(const bool state);
-            
-            //! @brief Sets if the processing should use aligned buffers.
-            //! @details This method enables or disables if the buffers owns the aligned matrices
-            //! of samples during the call of the perform method of the Processor object. By
-            //! default the buffers are not necessarily aligned. The aligned option should be
-            //! activated only when the processing really needs it to avoid unnecessary copy of
-            //! matrices.
-            //! @param state True if the processing should use aligned buffers, otherwise false.
-            //! @see shouldBeInplace, shouldBeInterleaved
-            void shouldBeAligned(const bool state);
-            
-            //! @brief Sets if the processing should use interleaved buffers.
-            //! @details This method enables or disables if the buffers use interleaved buffers
-            //! during the call of the perform method of the Processor object.
-            //! By default the buffers are not interleaved. The interleaved option should be
-            //! activated only when the processing really needs it to avoid unnecessary copy of
-            //! matrices.
-            //! @param state True if the processing should use interleaved buffers, otherwise false.
-            //! @see shouldBeInplace, shouldBeAligned
-            void shouldBeInterleaved(const bool state);
             
         private: // methods
             
@@ -128,13 +96,15 @@ namespace kiwi
         private: // members
             
             bool                    m_inplace;
-            bool                    m_aligned;
-            bool                    m_interleaved;
             const size_t            m_sample_rate;
             const size_t            m_vector_size;
             const std::vector<bool> m_inputs;
             const std::vector<bool> m_outputs;
             friend Node;
+            
+        private: // deleted methods
+            
+            Infos() = delete;
         };
     }
 }
