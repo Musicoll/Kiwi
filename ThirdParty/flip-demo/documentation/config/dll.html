@@ -1,0 +1,273 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flip Configuration Guide: Using Flip as a Dynamic Linked Library (DLL)</title>
+<style>
+* {font-family: 'Lucida Grande', Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+body {background-color: #fff; }
+p {color: black; font-size: 13px; margin-bottom: 10px;}
+h1 {color: black; font-size: 28px; margin-bottom: 32px; padding-top: 24px; font-weight: normal; display: block; }
+h2 {color: #3c4c6c; display: block; font-size: 24px; font-weight: normal; margin-bottom: 20px; margin-top: 42px; border-bottom-color: #8391a8; border-bottom-style: solid; border-bottom-width: 1px;}
+h3 {color: black; font-size: 19px; margin-bottom: 4px; margin-top: 28px; font-weight: normal; display: block; }
+a {color: #36c; text-decoration: none; cursor:pointer; }
+a:active {color: #36c; text-decoration: none; cursor:pointer; }
+a:hover {color: #36c; text-decoration: underline; cursor:pointer; }
+.aerr {color: #f00}
+h2 a {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h2 a:active {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h2 a:hover {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h3 a {color: black; text-decoration: none; cursor:auto; }
+h3 a:active {color: black; text-decoration: none; cursor:auto; }
+h3 a:hover {color: black; text-decoration: none; cursor:auto; }
+footer {font-size: 10px; position: fixed; display: block; bottom: 0px; background-color: #f1f5f9; border-top-color: #c7cfd5; border-top-style: solid; border-top-width: 1px; width: 100%; height:22px; padding-top: 7px; padding-left: 7px;}
+div {display: block;}
+.codeblock {margin-top:17px; margin-bottom:17px; clear: both; display: block; color: #333; }
+pre {font-family: Courier, Consolas, monospace; font-size: 12px; height: 14px; line-height: 14px; margin-bottom: 0px; margin-left: 6px; margin-right: 4px; margin-top: -1px;}
+small pre {color:#888;}
+emph pre {color:#000;}
+table {padding-top:5px; padding-bottom:6px; margin-bottom:12px; background-color: #f1f5f9; border-color: #c7cfd5; border-style: solid; border-width: 1px; width: 100%;}
+tr {}
+td > p {margin-left: 6px; height: 12px;}
+.note {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #fff; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}
+.note strong {margin-right: 8px;}
+.note p {margin-top: 7px;}
+.important {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f1f5f9; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}
+.important strong {margin-right: 8px;}
+.important p {margin-top: 7px;}
+.warning {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f8e3e1; border-color: #c5443e; border-style: solid; border-width: 1px; display: block;}
+.warning strong {margin-right: 8px;}
+.warning p {margin-top: 7px;}
+.caption p {color: black; font-size: 10px; margin-bottom: 10px;}
+img {margin-top:10px; margin-bottom:10px;}
+ul {margin-left: 17px; margin-bottom: 10px;}
+ol {margin-left: 17px; margin-bottom: 10px;}
+li {color: black; font-size: 13px; margin-bottom: 7px;}
+code {font-family: Courier, Consolas, monospace;}
+#content {padding-left: 26px; padding-right: 26px; position: absolute; top: 30px; left: 230px; width: 750px;}
+#toc {width: 230px; position: fixed; top: 30px; background-color: #f1f5f9; height: 100%; border-right-color: #c7cfd5; border-right-style: solid; border-right-width: 1px; padding-left: 0px; padding-top: 17px; overflow: auto;}
+#toc > ul {list-style-type: none;}
+#toc > ul > li {font-size: 11px; }
+#toc > ul > li > ul {list-style-type: none; margin-top:8px;}
+#toc > ul > li > ul > li {font-size: 11px; }
+#toc > p {font-size: 13px; margin-left: 17px;}
+.codeblock > p {margin-bottom: 3px; font-size: 11px;}
+.codeblock > p > strong {margin-right: 10px; color: #222;}
+.nav {font-size: 10px; margin-top: 20px; }
+.nav > span {margin-right: 20px;}
+.bottomspacer {height:100px;}
+#header {width:100%; position: fixed; background-color: #111; height: 30px; z-index: 900;}
+#header > p {color:#fff; font-size: 13px; padding-top: 6px; padding-left: 17px; }
+#header > p > a {color:#fff; font-size: 13px; text-decoration: none; cursor:pointer; padding-right: 56px;}
+.sectioncode {background-color: #f6f6f6; padding: 12px; margin-top: 18px;}
+.sectioncode > h3 {margin-top: 0px; padding-bottom: 8px;}
+hr { display: block; height: 1px; border: 0; border-top: 1px solid #eee; margin: 28px 0; padding: 0; }</style>
+</head>
+
+<body>
+
+<div id="header">
+<div style="width: 1006px;"></div>
+<p><a href="../index.html">Flip Documentation Library</a><a href="../config/index.html">Flip Configuration Guide</a></p>
+</div>
+<div id="toc">
+<p>Flip Configuration Guide</p>
+<ul>
+<li><a href="../config/about.html">About Flip Configuration Guide</a></li>
+<li><a href="../config/files.html">Files Hierarchy</a></li>
+<li><a href="../config/gyp.html">Setting up Using gyp</a></li>
+<li><a href="../config/manual.html">Setting up Manually</a></li>
+<li><a href="../config/dll.html">Using Flip as a Dynamic Linked Library (DLL)</a>	<ul>
+	<li><a href="../config/dll.html#overview">Overview</a></li>
+	<li><a href="../config/dll.html#gyp">Using the gyp build system</a></li>
+	<li><a href="../config/dll.html#manual">Doing it Manually</a></li>
+	</ul>
+</li>
+<li><a href="../config/misc.html">Miscellaneous Configuration</a></li>
+<li><a href="../config/msvc.html">MSVC Warnings Notes</a></li>
+</ul>
+</div>
+
+<div id="content">
+<div class="nav" align="right">
+<a href="manual.html">previous</a><span>&nbsp;</span><a href="misc.html">next</a></div>
+
+<h1>Using Flip as a Dynamic Linked Library (DLL)</h1>
+
+<p>This chapter explains how to set up your build environment to use the Flip framework in a Dynamic Linked Library (dll).</p>
+
+<h2><a name="overview">Overview</a></h2>
+
+<p>Integrating the Flip framework as a Dynamic Linked Library consists on exporting, importing or changing the visibility of symbols. Those changes are platform specific.</p>
+
+<p>Even when not using the <code>gyp</code> build system, the <code>gyp</code> and <code>gypi</code> makes a good reference for the necessary tasks to execute to integrate the Flip framework.</p>
+
+<p>The following sections will describe tasks to achieve.</p>
+
+<h2><a name="gyp">Using the <code>gyp</code> build system</a></h2>
+
+<p>This section describes how to use the Flip framework as a Dynamic Linked Library when using the <code>gyp</code> build system.</p>
+
+<p>It consists of two parts :</p>
+
+<ul>
+<li>Setting up the options in the DLL target</li>
+<li>Setting up the options in the target using the DLL target</li>
+</ul>
+
+<p>The following two subsections will describe those two tasks.</p>
+
+<h3><a name="gyp-dll">In the DLL target</a></h3>
+
+<p>From the DLL target point of view, one will need to :</p>
+
+<ul>
+<li>Set the type of the target to <code>shared_library</code></li>
+<li>Enable the type registry</li>
+<li>On XCode, put the visibility of symbol to <code>default</code></li>
+<li>On Visual Studio, set the decl specifications to <code>dllexport</code></li>
+</ul>
+
+<p>The following block of code shows how this is done in a <code>gypi</code> file.</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>   &apos;target_name&apos;: &apos;my_dll_target&apos;,</pre></td></tr>
+<tr><td><pre>   &apos;type&apos;: &apos;shared_library&apos;,</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   &apos;xcode_settings&apos;: {</pre></td></tr>
+<tr><td><pre>      &apos;OTHER_CFLAGS&apos;: [</pre></td></tr>
+<tr><td><pre>         &apos;-fvisibility=default&apos;,</pre></td></tr>
+<tr><td><pre>      ],</pre></td></tr>
+<tr><td><pre>   },</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   &apos;defines&apos;: [</pre></td></tr>
+<tr><td><pre>      &apos;flip_TYPE_REGISTRY_MODE=flip_TYPE_REGISTRY_ENABLED&apos;,</pre></td></tr>
+<tr><td><pre>   ],</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   &apos;conditions&apos;: [</pre></td></tr>
+<tr><td><pre>      [&apos;OS==&quot;win&quot;&apos;, {</pre></td></tr>
+<tr><td><pre>         &apos;defines&apos;: [</pre></td></tr>
+<tr><td><pre>            &apos;flip_API=__declspec(dllexport)&apos;,</pre></td></tr>
+<tr><td><pre>            &apos;flip_API_EXPORT=__declspec(dllexport)&apos;,</pre></td></tr>
+<tr><td><pre>         ],</pre></td></tr>
+<tr><td><pre>      }],</pre></td></tr>
+<tr><td><pre>   ],</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   &apos;includes&apos; : [</pre></td></tr>
+<tr><td><pre>      &apos;relative/path/to/flip_src.gypi&apos;,</pre></td></tr>
+<tr><td><pre>   ],</pre></td></tr>
+<tr><td><pre>}</pre></td></tr>
+</table></div>
+
+<h3><a name="gyp-main">In the target using the DLL target</a></h3>
+
+<p>From the target using the DLL target point of view, one will need to :</p>
+
+<ul>
+<li>Enable the type registry</li>
+<li>On XCode, put the visibility of symbol to <code>default</code></li>
+<li>On Visual Studio, set the decl specifications to    <code>dllimport</code> or <code>dllexport</code> accordingly</li>
+</ul>
+
+<p>The following block of code shows how this is done in a <code>gypi</code> file.</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>   &apos;target_name&apos;: &apos;my_main_target&apos;,</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   &apos;xcode_settings&apos;: {</pre></td></tr>
+<tr><td><pre>      &apos;OTHER_CFLAGS&apos;: [</pre></td></tr>
+<tr><td><pre>         &apos;-fvisibility=default&apos;,</pre></td></tr>
+<tr><td><pre>      ],</pre></td></tr>
+<tr><td><pre>   },</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   &apos;dependencies&apos;: [</pre></td></tr>
+<tr><td><pre>      &apos;my_dll_target&apos;,</pre></td></tr>
+<tr><td><pre>   ],</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   &apos;defines&apos;: [</pre></td></tr>
+<tr><td><pre>      &apos;flip_TYPE_REGISTRY_MODE=flip_TYPE_REGISTRY_ENABLED&apos;,</pre></td></tr>
+<tr><td><pre>   ],</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   &apos;conditions&apos;: [</pre></td></tr>
+<tr><td><pre>      [&apos;OS==&quot;win&quot;&apos;, {</pre></td></tr>
+<tr><td><pre>         &apos;defines&apos;: [</pre></td></tr>
+<tr><td><pre>            &apos;flip_API=__declspec(dllimport)&apos;,</pre></td></tr>
+<tr><td><pre>            &apos;flip_API_EXPORT=__declspec(dllexport)&apos;,</pre></td></tr>
+<tr><td><pre>         ],</pre></td></tr>
+<tr><td><pre>      }],</pre></td></tr>
+<tr><td><pre>   ],</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   &apos;include_dirs&apos;: [</pre></td></tr>
+<tr><td><pre>      &apos;relative/path/to/include&apos;,</pre></td></tr>
+<tr><td><pre>   ],</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   ...your sources and everything else...</pre></td></tr>
+<tr><td><pre>}</pre></td></tr>
+</table></div>
+
+<h2><a name="manual">Doing it Manually</a></h2>
+
+<p>This section describes how to integrate the Flip framework as a Dynamic Linked Library manually in your build system.</p>
+
+<p>It consists of two parts :</p>
+
+<ul>
+<li>Setting up the options in the DLL target</li>
+<li>Setting up the options in the target using the DLL target</li>
+</ul>
+
+<p>The following two subsections will describe those two tasks for each platform.</p>
+
+<h3><a name="manual-xcode">XCode DLL Target</a></h3>
+
+<p>On XCode, one will need to set up a dynamic linked library like a bundle.</p>
+
+<p>All Flip framework core and optionnaly contribution files must be added to the target.</p>
+
+<p>The XCode setting "Other C Flags" (<code>OTHER_CFLAGS</code>) should add the line <code>-fvisibility=default</code></p>
+
+<p>The XCode setting "Preprocessor Macros" (<code>GCC_PREPROCESSOR_DEFINITIONS</code>) should add the line <code>flip_TYPE_REGISTRY_MODE=flip_TYPE_REGISTRY_ENABLED</code></p>
+
+<h3><a name="manual-visual">Visual Studio DLL Target</a></h3>
+
+<p>On Visual Studio, one will need to set up a dynamic linked library.</p>
+
+<p>All Flip framework core and optionnaly contribution files must be added to the target.</p>
+
+<p>The Visual Studio Configuration Properties for C/C++ for Preprocessor should add to the Preprocessor Definitions the following element :</p>
+
+<ul>
+<li><code>flip_TYPE_REGISTRY_MODE=flip_TYPE_REGISTRY_ENABLED</code></li>
+<li><code>flip_API=__declspec(dllexport)</code></li>
+<li><code>flip_API_EXPORT=__declspec(dllexport)</code></li>
+</ul>
+
+<h3><a name="manual-xcode2">XCode using the DLL Target</a></h3>
+
+<p>The XCode setting "Other C Flags" (<code>OTHER_CFLAGS</code>) should add the line <code>-fvisibility=default</code></p>
+
+<p>The XCode setting "Preprocessor Macros" (<code>GCC_PREPROCESSOR_DEFINITIONS</code>) should add the line <code>flip_TYPE_REGISTRY_MODE=flip_TYPE_REGISTRY_ENABLED</code></p>
+
+<h3><a name="manual-visual2">Visual Studio using the DLL Target</a></h3>
+
+<p>The Visual Studio Configuration Properties for C/C++ for Preprocessor should add to the Preprocessor Definitions the following element :</p>
+
+<ul>
+<li><code>flip_TYPE_REGISTRY_MODE=flip_TYPE_REGISTRY_ENABLED</code></li>
+<li><code>flip_API=__declspec(dllimport)</code></li>
+<li><code>flip_API_EXPORT=__declspec(dllexport)</code></li>
+</ul>
+
+<div class="note"><p><strong>Note:</strong> the declspec for flip_API_EXPORT must be dllexport and not dllimport.</p></div>
+
+<div class="nav" align="right">
+<a href="manual.html">previous</a><span>&nbsp;</span><a href="misc.html">next</a></div>
+
+<div class="bottomspacer">&nbsp;</div>
+</div>
+</body>
+</html>

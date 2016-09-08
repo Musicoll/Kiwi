@@ -1,0 +1,618 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flip Reference: DocumentServer</title>
+<style>
+* {font-family: 'Lucida Grande', Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+body {background-color: #fff; }
+p {color: black; font-size: 13px; margin-bottom: 10px;}
+h1 {color: black; font-size: 28px; margin-bottom: 32px; padding-top: 24px; font-weight: normal; display: block; }
+h2 {color: #3c4c6c; display: block; font-size: 24px; font-weight: normal; margin-bottom: 20px; margin-top: 42px; border-bottom-color: #8391a8; border-bottom-style: solid; border-bottom-width: 1px;}
+h3 {color: black; font-size: 19px; margin-bottom: 4px; margin-top: 28px; font-weight: normal; display: block; }
+a {color: #36c; text-decoration: none; cursor:pointer; }
+a:active {color: #36c; text-decoration: none; cursor:pointer; }
+a:hover {color: #36c; text-decoration: underline; cursor:pointer; }
+.aerr {color: #f00}
+h2 a {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h2 a:active {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h2 a:hover {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h3 a {color: black; text-decoration: none; cursor:auto; }
+h3 a:active {color: black; text-decoration: none; cursor:auto; }
+h3 a:hover {color: black; text-decoration: none; cursor:auto; }
+footer {font-size: 10px; position: fixed; display: block; bottom: 0px; background-color: #f1f5f9; border-top-color: #c7cfd5; border-top-style: solid; border-top-width: 1px; width: 100%; height:22px; padding-top: 7px; padding-left: 7px;}
+div {display: block;}
+.codeblock {margin-top:17px; margin-bottom:17px; clear: both; display: block; color: #333; }
+pre {font-family: Courier, Consolas, monospace; font-size: 12px; height: 14px; line-height: 14px; margin-bottom: 0px; margin-left: 6px; margin-right: 4px; margin-top: -1px;}
+small pre {color:#888;}
+emph pre {color:#000;}
+table {padding-top:5px; padding-bottom:6px; margin-bottom:12px; background-color: #f1f5f9; border-color: #c7cfd5; border-style: solid; border-width: 1px; width: 100%;}
+tr {}
+td > p {margin-left: 6px; height: 12px;}
+.note {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #fff; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}
+.note strong {margin-right: 8px;}
+.note p {margin-top: 7px;}
+.important {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f1f5f9; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}
+.important strong {margin-right: 8px;}
+.important p {margin-top: 7px;}
+.warning {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f8e3e1; border-color: #c5443e; border-style: solid; border-width: 1px; display: block;}
+.warning strong {margin-right: 8px;}
+.warning p {margin-top: 7px;}
+.caption p {color: black; font-size: 10px; margin-bottom: 10px;}
+img {margin-top:10px; margin-bottom:10px;}
+ul {margin-left: 17px; margin-bottom: 10px;}
+ol {margin-left: 17px; margin-bottom: 10px;}
+li {color: black; font-size: 13px; margin-bottom: 7px;}
+code {font-family: Courier, Consolas, monospace;}
+#content {padding-left: 26px; padding-right: 26px; position: absolute; top: 30px; left: 230px; width: 750px;}
+#toc {width: 230px; position: fixed; top: 30px; background-color: #f1f5f9; height: 100%; border-right-color: #c7cfd5; border-right-style: solid; border-right-width: 1px; padding-left: 0px; padding-top: 17px; overflow: auto;}
+#toc > ul {list-style-type: none;}
+#toc > ul > li {font-size: 11px; }
+#toc > ul > li > ul {list-style-type: none; margin-top:8px;}
+#toc > ul > li > ul > li {font-size: 11px; }
+#toc > p {font-size: 13px; margin-left: 17px;}
+.codeblock > p {margin-bottom: 3px; font-size: 11px;}
+.codeblock > p > strong {margin-right: 10px; color: #222;}
+.nav {font-size: 10px; margin-top: 20px; }
+.nav > span {margin-right: 20px;}
+.bottomspacer {height:100px;}
+#header {width:100%; position: fixed; background-color: #111; height: 30px; z-index: 900;}
+#header > p {color:#fff; font-size: 13px; padding-top: 6px; padding-left: 17px; }
+#header > p > a {color:#fff; font-size: 13px; text-decoration: none; cursor:pointer; padding-right: 56px;}
+.sectioncode {background-color: #f6f6f6; padding: 12px; margin-top: 18px;}
+.sectioncode > h3 {margin-top: 0px; padding-bottom: 8px;}
+hr { display: block; height: 1px; border: 0; border-top: 1px solid #eee; margin: 28px 0; padding: 0; }</style>
+</head>
+
+<body>
+
+<div id="header">
+<div style="width: 1006px;"></div>
+<p><a href="../index.html">Flip Documentation Library</a><a href="../reference/index.html">Flip Reference</a></p>
+</div>
+<div id="toc">
+<p>Flip Reference</p>
+<ul>
+<li><a href="../reference/Array.html">Array</a></li>
+<li><a href="../reference/Array.iterator.html">Array::iterator</a></li>
+<li><a href="../reference/array_iterator.html">array_iterator</a></li>
+<li><a href="../reference/BackEndBinary.html">BackEndBinary</a></li>
+<li><a href="../reference/BackEndIR.html">BackEndIR</a></li>
+<li><a href="../reference/BackEndMl.html">BackEndMl</a></li>
+<li><a href="../reference/Blob.html">Blob</a></li>
+<li><a href="../reference/Bool.html">Bool</a></li>
+<li><a href="../reference/Class.html">Class</a></li>
+<li><a href="../reference/Collection.html">Collection</a></li>
+<li><a href="../reference/Collection.iterator.html">Collection::iterator</a></li>
+<li><a href="../reference/collection_iterator.html">collection_iterator</a></li>
+<li><a href="../reference/DataConsumerFile.html">DataConsumerFile</a></li>
+<li><a href="../reference/DataConsumerMemory.html">DataConsumerMemory</a></li>
+<li><a href="../reference/DataModel.html">DataModel</a></li>
+<li><a href="../reference/DataProviderFile.html">DataProviderFile</a></li>
+<li><a href="../reference/DataProviderMemory.html">DataProviderMemory</a></li>
+<li><a href="../reference/Document.html">Document</a></li>
+<li><a href="../reference/DocumentObserver.html">DocumentObserver</a></li>
+<li><a href="../reference/DocumentServer.html">DocumentServer</a>	<ul>
+	</ul>
+</li>
+<li><a href="../reference/DocumentValidator.html">DocumentValidator</a></li>
+<li><a href="../reference/Entity.html">Entity</a></li>
+<li><a href="../reference/Enum.html">Enum</a></li>
+<li><a href="../reference/EnumClass.html">EnumClass</a></li>
+<li><a href="../reference/Float.html">Float</a></li>
+<li><a href="../reference/History.html">History</a></li>
+<li><a href="../reference/Hub.html">Hub</a></li>
+<li><a href="../reference/Int.html">Int</a></li>
+<li><a href="../reference/Message.html">Message</a></li>
+<li><a href="../reference/Mold.html">Mold</a></li>
+<li><a href="../reference/MulticastServiceExplorer.html">MulticastServiceExplorer</a></li>
+<li><a href="../reference/MulticastServiceProvider.html">MulticastServiceProvider</a></li>
+<li><a href="../reference/Object.html">Object</a></li>
+<li><a href="../reference/ObjectRef.html">ObjectRef</a></li>
+<li><a href="../reference/Optional.html">Optional</a></li>
+<li><a href="../reference/Ref.html">Ref</a></li>
+<li><a href="../reference/Signal.html">Signal</a></li>
+<li><a href="../reference/String.html">String</a></li>
+<li><a href="../reference/Transaction.html">Transaction</a></li>
+<li><a href="../reference/Variant.html">Variant</a></li>
+<li><a href="../reference/Vector.html">Vector</a></li>
+</ul>
+</div>
+
+<div id="content">
+<div class="nav" align="right">
+<a href="DocumentObserver.html">previous</a><span>&nbsp;</span><a href="DocumentValidator.html">next</a></div>
+
+<h1>DocumentServer Class Reference</h1>
+
+<table><tr><td><p>Declared in</p></td><td><p><code>flip/DocumentServer.h</code></p></td></tr>
+</table>
+
+<div class="codeblock"><table>
+<tr><td><pre>class DocumentServer;</pre></td></tr>
+</table></div>
+
+<p><code>flip::DocumentServer</code> is a type that represents a flip document on the server side.</p>
+
+<h2>Member Functions Synopsys</h2>
+
+<table><tr><td><p><a href="#member-function-constructor">Constructor</a></p></td><td><p>Constructs the <code>DocumentServer</code></p></td></tr>
+<tr><td><p><a href="#member-function-destructor">Destructor</a></p></td><td><p>Destructs the <code>DocumentServer</code></p></td></tr>
+<tr><td><p><code><a href="#member-function-listen_connecting">listen_connecting</a></code></p></td><td><p>Reacts just before a client join the document</p></td></tr>
+<tr><td><p><code><a href="#member-function-listen_connected">listen_connected</a></code></p></td><td><p>Reacts just after a client join the document</p></td></tr>
+<tr><td><p><code><a href="#member-function-listen_disconnected">listen_disconnected</a></code></p></td><td><p>Reacts just after a client left the document</p></td></tr>
+<tr><td><p><code><a href="#member-function-send_tx_if">send_tx_if</a></code></p></td><td><p>Send a transaction to every client meeting a condition</p></td></tr>
+<tr><td><p><code><a href="#member-function-reply_signal">reply_signal</a></code></p></td><td><p>Replies to a signal sent from one client</p></td></tr>
+<tr><td><p><code><a href="#member-function-send_signal_if">send_signal_if</a></code></p></td><td><p>Broadcasts a signal selectively</p></td></tr>
+</table>
+
+<h3>Manipulating</h3>
+
+<table><tr><td><p><code><a href="#member-function-set_label">set_label</a></code></p></td><td><p>Sets the label of the current modifications of the document</p></td></tr>
+<tr><td><p><code><a href="#member-function-set_metadata">set_metadata</a></code></p></td><td><p>Sets the metadata of the current modifications of the document</p></td></tr>
+<tr><td><p><code><a href="#member-function-commit">commit</a></code></p></td><td><p>Commits the current modifications of the document</p></td></tr>
+<tr><td><p><code><a href="#member-function-revert">revert</a></code></p></td><td><p>Reverts the current modifications of the document</p></td></tr>
+<tr><td><p><code><a href="#member-function-push">push</a></code></p></td><td><p>Pushes the transactions to the upstream</p></td></tr>
+<tr><td><p><code><a href="#member-function-pull">pull</a></code></p></td><td><p>Pulls document modifications from the upstream</p></td></tr>
+</table>
+
+<h3>Transaction</h3>
+
+<table><tr><td><p><code><a href="#member-function-execute_forward">execute_forward</a></code></p></td><td><p>Executes a transaction on a document in forward direction</p></td></tr>
+<tr><td><p><code><a href="#member-function-execute_backward">execute_backward</a></code></p></td><td><p>Executes a transaction on a document in backward direction</p></td></tr>
+<tr><td><p><code><a href="#member-function-execute_correct_forward">execute_correct_forward</a></code></p></td><td><p>Executes and corrects a transaction on a document in forward direction</p></td></tr>
+<tr><td><p><code><a href="#member-function-execute_correct_backward">execute_correct_backward</a></code></p></td><td><p>Executes and corrects a transaction on a document in backward direction</p></td></tr>
+</table>
+
+<h3>Observing</h3>
+
+<table><tr><td><p><code><a href="#member-function-controller">controller</a></code></p></td><td><p>Returns the current controller source of modification</p></td></tr>
+</table>
+
+<h3>Input/Ouput</h3>
+
+<table><tr><td><p><code><a href="#member-function-write">write</a></code></p></td><td><p>Write the current state of the document to an intermediate representation format</p></td></tr>
+<tr><td><p><code><a href="#member-function-read">read</a></code></p></td><td><p>Read from an intermediate representation format</p></td></tr>
+</table>
+
+<h3>Accessing Objects</h3>
+
+<table><tr><td><p><code><a href="#member-function-root">root</a></code></p></td><td><p>Returns the root object</p></td></tr>
+<tr><td><p><code><a href="#member-function-object">object</a></code></p></td><td><p>Returns an object given its unique flip reference number</p></td></tr>
+<tr><td><p><code><a href="#member-function-object_ptr">object_ptr</a></code></p></td><td><p>Returns an object pointer given its unique flip reference number, or <code>nullptr</code></p></td></tr>
+</table>
+
+<h2>Member Functions</h2>
+
+<h3 id="member-function-constructor">Constructor</h3>
+<div class="codeblock"><table>
+<tr><td><pre>DocumentServer (const DataModelBase &amp; data_model, DocumentValidatorBase &amp; validator, uint64_t session_id);</pre></td></tr>
+</table></div>
+
+<p>Constructs the document from a data model and a validator using unique session identifier.</p>
+
+<p>The data model represents the blueprint or template the document is going to rely on. The data model is previously defined and used for the document.</p>
+
+<p>The session identifier represents a unique number accross documents uniquely identifying this document. When the document is changed on the server side, the session identifier is used as a way to identify the server acting as a user.</p>
+
+<p>Example, server side :</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>#include &quot;flip/contrib/transport_tcp/PortTransportServerTcp.h&quot;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>// Setup a server for session number 1234567890123</pre></td></tr>
+<tr><td><pre>DocumentValidatorVoid validator;</pre></td></tr>
+<tr><td><pre>DocumentServer document_server (Model::use (), validator, 1234567890123ULL);</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>// Setup a socket listening on TCP port 9090 to accept new connections.</pre></td></tr>
+<tr><td><pre>PortTransportServerTcp port (document_server, 9090);</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>for (;;)</pre></td></tr>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>   // process incoming connections and transfers</pre></td></tr>
+<tr><td><pre>   port.process ();</pre></td></tr>
+<tr><td><pre>}</pre></td></tr>
+</table></div>
+
+<p>Example, client side :</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>#include &quot;flip/contrib/transport_tcp/CarrierTransportSocketTcp.h&quot;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>Document document (Model::use (), 123456789ULL, &apos;appl&apos;, &apos;gui &apos;);</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>// Setup a socket connecting on TCP port 9090 of server.</pre></td></tr>
+<tr><td><pre>CarrierTransportSocketTcp carrier (document, &quot;flip.myserver.com&quot;, 9090);</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>for (;;)</pre></td></tr>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>   // process incoming connections and transfers</pre></td></tr>
+<tr><td><pre>   carrier.process ();</pre></td></tr>
+<tr><td><pre>}</pre></td></tr>
+</table></div>
+
+<hr /><h3 id="member-function-destructor">Destructor</h3>
+<div class="codeblock"><table>
+<tr><td><pre>~DocumentServer ();</pre></td></tr>
+</table></div>
+
+<p>Destructor.</p>
+
+<hr /><h3 id="member-function-listen_connecting"><code>listen_connecting</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>void  listen_connecting (std::function &lt;void (PortBase &amp;)&gt; func);</pre></td></tr>
+</table></div>
+
+<p>Example :</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>DocumentServer server = ...;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>// listen on connections and create a specific Client class</pre></td></tr>
+<tr><td><pre>// in the root of the document for private data</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>server.listen_connecting ([&amp;server](PortBase &amp; port){</pre></td></tr>
+<tr><td><pre>   Root &amp; root = server.root &lt;Root&gt; ();</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   if (root._clients.count_if ([&amp;port](Client &amp; client){</pre></td></tr>
+<tr><td><pre>      return client.user () == port.user ();</pre></td></tr>
+<tr><td><pre>   }) == 0)</pre></td></tr>
+<tr><td><pre>   {</pre></td></tr>
+<tr><td><pre>      root._clients.emplace (port.user ());</pre></td></tr>
+<tr><td><pre>   }</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   Transaction tx = server.commit ();</pre></td></tr>
+<tr><td><pre>   server.send_tx_if (tx, [](PortBase &amp;){return true;});</pre></td></tr>
+<tr><td><pre>});</pre></td></tr>
+</table></div>
+
+<hr /><h3 id="member-function-listen_connected"><code>listen_connected</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>void  listen_connected (std::function &lt;void (PortBase &amp;)&gt; func);</pre></td></tr>
+</table></div>
+
+<p>Example :</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>DocumentServer server = ...;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>// hypothetic class representing a monitoring system for administration</pre></td></tr>
+<tr><td><pre>MonitoringSystem monitor = ...;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>server.listen_connected ([&amp;monitor](PortBase &amp; port){</pre></td></tr>
+<tr><td><pre>   monitor.add_user (port.user ());</pre></td></tr>
+<tr><td><pre>});</pre></td></tr>
+</table></div>
+
+<hr /><h3 id="member-function-listen_disconnected"><code>listen_disconnected</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>void  listen_disconnected (std::function &lt;void (PortBase &amp;)&gt; func);</pre></td></tr>
+</table></div>
+
+<p>Example :</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>DocumentServer server = ...;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>// hypothetic class representing a monitoring system for administration</pre></td></tr>
+<tr><td><pre>MonitoringSystem monitor = ...;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>listen_disconnected ([&amp;monitor](PortBase &amp; port){</pre></td></tr>
+<tr><td><pre>   monitor.remove_user (port.user ());</pre></td></tr>
+<tr><td><pre>});</pre></td></tr>
+</table></div>
+
+<hr /><h3 id="member-function-send_tx_if"><code>send_tx_if</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>template &lt;class UnaryPredicate&gt;  void  send_tx_if (const Transaction &amp; tx, UnaryPredicate p);</pre></td></tr>
+</table></div>
+
+<p>Send transaction <code>tx</code> to every client meeting condition using unary function <code>p</code>.</p>
+
+<p>Example :</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>DocumentServer server = ...;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>// listen on connections and create a specific Client class</pre></td></tr>
+<tr><td><pre>// in the root of the document for private data</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>server.listen_connecting ([&amp;server](PortBase &amp; port){</pre></td></tr>
+<tr><td><pre>   Root &amp; root = server.root &lt;Root&gt; ();</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   if (root._clients.count_if ([&amp;port](Client &amp; client){</pre></td></tr>
+<tr><td><pre>      return client.user () == port.user ();</pre></td></tr>
+<tr><td><pre>   }) == 0)</pre></td></tr>
+<tr><td><pre>   {</pre></td></tr>
+<tr><td><pre>      root._clients.emplace (port.user ());</pre></td></tr>
+<tr><td><pre>   }</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   Transaction tx = server.commit ();</pre></td></tr>
+<tr><td><pre>   server.send_tx_if (tx, [](PortBase &amp;){return true;});</pre></td></tr>
+<tr><td><pre>});</pre></td></tr>
+</table></div>
+
+<p>Sends the transaction to all attached clients.</p>
+
+<hr /><h3 id="member-function-reply_signal"><code>reply_signal</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>void  reply_signal (const SignalData &amp; data);</pre></td></tr>
+</table></div>
+
+<p>Replies to a signal sent from a client, when the signal on the client is configured on the client side to pass through local machine boundaries.</p>
+
+<p>Example :</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>class Root : public Object</pre></td></tr>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>   enum</pre></td></tr>
+<tr><td><pre>   {</pre></td></tr>
+<tr><td><pre>      Signal_SIGN_UPLOAD_REQUEST = 0,</pre></td></tr>
+<tr><td><pre>      Signal_SIGN_UPLOAD_SIGNATURE,</pre></td></tr>
+<tr><td><pre>   };</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   // from client to server</pre></td></tr>
+<tr><td><pre>   Signal &lt;std::string&gt; signal_sign_upload_request;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   // from client to server</pre></td></tr>
+<tr><td><pre>   Signal &lt;std::string&gt; signal_sign_upload_signature;</pre></td></tr>
+<tr><td><pre>};</pre></td></tr>
+</table></div>
+
+<p>The following example demonstrates a client sending a signal to the server to sign a request to upload data on a server.</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>/*   Client side   */</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>// don&apos;t forget to move cnx so that it is not destroyed</pre></td></tr>
+<tr><td><pre>auto cnx = root.signal_sign_upload_signature.connect ([](std::string signature){</pre></td></tr>
+<tr><td><pre>   // the client receives the reply to its sign request</pre></td></tr>
+<tr><td><pre>});</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>// send the sign request</pre></td></tr>
+<tr><td><pre>root.signal_sign_upload_request (&quot;string to sign&quot;);</pre></td></tr>
+</table></div>
+
+<p>The following example shows how a server is handling the signal and reply to it.</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>/*   Server side   */</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>DocumentServer = ...;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>// don&apos;t forget to move cnx so that it is not destroyed</pre></td></tr>
+<tr><td><pre>auto cnx = root.signal_sign_upload_request.connect ([&amp;root, &amp;server](std::string str_to_sign){</pre></td></tr>
+<tr><td><pre>   auto signature = sign_request (str_to_sign);</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   server.reply_signal (</pre></td></tr>
+<tr><td><pre>      root.signal_sign_upload_signature.make (signature)</pre></td></tr>
+<tr><td><pre>   ;</pre></td></tr>
+<tr><td><pre>});</pre></td></tr>
+</table></div>
+
+<hr /><h3 id="member-function-send_signal_if"><code>send_signal_if</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>template &lt;class UnaryPredicate&gt;</pre></td></tr>
+<tr><td><pre>void  send_signal_if (const SignalData &amp; data, UnaryPredicate p);</pre></td></tr>
+</table></div>
+
+<p>Broadcasts a signal selectively to clients.</p>
+
+<p>Example :</p>
+
+<p>The following example shows how a server is handling the previous signal but broadcast the signature to every connected clients.</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>/*   Server side   */</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>DocumentServer = ...;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>// don&apos;t forget to move cnx so that it is not destroyed</pre></td></tr>
+<tr><td><pre>auto cnx = root.signal_sign_upload_request.connect ([&amp;root, &amp;server](std::string str_to_sign){</pre></td></tr>
+<tr><td><pre>   auto signature = sign_request (str_to_sign);</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   server.send_signal_if (</pre></td></tr>
+<tr><td><pre>      root.signal_sign_upload_signature.make (signature),</pre></td></tr>
+<tr><td><pre>      [](){return true;}</pre></td></tr>
+<tr><td><pre>   ;</pre></td></tr>
+<tr><td><pre>});</pre></td></tr>
+</table></div>
+
+<hr /><h3 id="member-function-set_label"><code>set_label</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>void  set_label (std::string label);</pre></td></tr>
+</table></div>
+
+<p>Sets the label (ie. name) of the current modifications of the document. This metadata will be added to the transaction at <code>commit</code> stage.</p>
+
+<p>This is typically use to display the undo/redo name in the Edit menu of the menubar.</p>
+
+<p>If called multiple times before <code>commit</code>, only the last state of the metadata is taken into account at <code>commit</code> stage.</p>
+
+<p>Example :</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>Root &amp; root = document.root &lt;Root&gt; ();</pre></td></tr>
+<tr><td><pre>root.notes.emplace &lt;Note&gt; (2.0, 4.0);</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>document.set_label (&quot;Add note&quot;);</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>Transaction tx = document.commit ();</pre></td></tr>
+<tr><td><pre>// the transaction contains the new note modification in &apos;root.notes&apos;</pre></td></tr>
+<tr><td><pre>// as well as the metadata label &quot;Add note&quot;</pre></td></tr>
+</table></div>
+
+<hr /><h3 id="member-function-set_metadata"><code>set_metadata</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>void  set_metadata (std::string key, std::string value);</pre></td></tr>
+</table></div>
+
+<p>Sets the metadata <code>value</code> for <code>key</code> of the current modifications of the document. This metadata will be added to the transaction at <code>commit</code> stage.</p>
+
+<p>If called multiple times before <code>commit</code>, only the last state of the metadata is taken into account at <code>commit</code> stage.</p>
+
+<p>This is a more general version of <code>set_label</code>. Actually, <code>set_label</code> calls this methods with the <code>key</code> <code>"label"</code>.</p>
+
+<p>This can be used to present even more textual informations for undo/redo operations, for example detailing the nature of the change.</p>
+
+<hr /><h3 id="member-function-commit"><code>commit</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>Transaction commit ();</pre></td></tr>
+</table></div>
+
+<p>Commits the current modifications of the document and returns the resulting transaction. The modifications are validated through the validator if the document has one, and will throw if the document state is invalid.</p>
+
+<p>Once the function returns, the document is valid from a validation point of view and the transaction is put on the push stack for later upstream synchronization.</p>
+
+<hr /><h3 id="member-function-revert"><code>revert</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>void revert ();</pre></td></tr>
+</table></div>
+
+<p>Reverts the current modifications of the document.</p>
+
+<hr /><h3 id="member-function-push"><code>push</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>void push ();</pre></td></tr>
+</table></div>
+
+<p>Pushes the transactions in the push stack to the upstream and empty the push stack. If no upstream is present then this function will just empty the push stack.</p>
+
+<div class="warning"><p><strong>WARNING:</strong> Even if not connected to an upstream, it is important to call <code>push</code>    regularly to empty the push stack.</p></div>
+
+<hr /><h3 id="member-function-pull"><code>pull</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>void pull ();</pre></td></tr>
+</table></div>
+
+<p>Pulls document modifications from the upstream. If no upstream is present then this function does nothing.</p>
+
+<p>If the document contains modifications, they are temporarily saved and rollbacked, then external modifications are applied, and the local modifications are reapplied. If the local modifications cannot be reapplied, then they are dropped silently.</p>
+
+<hr /><h3 id="member-function-execute_forward"><code>execute_forward</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>bool  execute_forward (const Transaction &amp; tx, bool undo_mode_flag = false);</pre></td></tr>
+</table></div>
+
+<p>Executes a transaction on a document in forward direction. Returns <code>true</code> if the execution was successful, <code>false</code> otherwise. Executing a transaction does not call the validator nor commits the transaction.</p>
+
+<p>If <code>undo_mode_flag</code> is set to <code>true</code>, then the instructions of the transaction that are marked to be out of undo (through a prior call to <code>disable_in_undo</code>) won't be executed unless the top object disabled in undo has a container parent enabled in undo and the top object was either added or removed. This is the default mode when using flip <code>History</code> class.</p>
+
+<hr /><h3 id="member-function-execute_backward"><code>execute_backward</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>bool  execute_backward (const Transaction &amp; tx, bool undo_mode_flag = false);</pre></td></tr>
+</table></div>
+
+<p>Executes a transaction on a document in backward direction. Returns <code>true</code> if the execution was successful, <code>false</code> otherwise. Executing a transaction does not call the validator nor commits the transaction.</p>
+
+<p>If <code>undo_mode_flag</code> is set to <code>true</code>, then the instructions of the transaction that are marked to be out of undo (through a prior call to <code>disable_in_undo</code>) won't be executed. This is the default mode when using flip <code>History</code> class.</p>
+
+<hr /><h3 id="member-function-execute_correct_forward"><code>execute_correct_forward</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>bool  execute_correct_forward (const Transaction &amp; tx, bool undo_mode_flag = false);</pre></td></tr>
+</table></div>
+
+<p>Executes and corrects a transaction on a document in forward direction. Returns <code>true</code> if the execution was successful, <code>false</code> otherwise. Executing a transaction does not call the validator nor commits the transaction.</p>
+
+<p>Correcting allows to force a transaction to execute if possible. Transaction instructions are similar to compare & exchange processor instructions. Only if the old state of the document matches the instruction old value then the new value is applied. In this case correcting allows the virtual machine to force the execution and change the instruction to match virtual machine constraints.</p>
+
+<p>If <code>undo_mode_flag</code> is set to <code>true</code>, then the instructions of the transaction that are marked to be out of undo (through a prior call to <code>disable_in_undo</code>) won't be executed. This is the default mode when using flip <code>History</code> class.</p>
+
+<hr /><h3 id="member-function-execute_correct_backward"><code>execute_correct_backward</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>bool  execute_correct_forward (const Transaction &amp; tx, bool undo_mode_flag = false);</pre></td></tr>
+</table></div>
+
+<p>Executes and corrects a transaction on a document in backward direction. Returns <code>true</code> if the execution was successful, <code>false</code> otherwise. Executing a transaction does not call the validator nor commits the transaction.</p>
+
+<p>Correcting allows to force a transaction to execute if possible. Transaction instructions are similar to compare & exchange processor instructions. Only if the old state of the document matches the instruction old value then the new value is applied. In this case correcting allows the virtual machine to force the execution and change the instruction to match virtual machine constraints.</p>
+
+<p>If <code>undo_mode_flag</code> is set to <code>true</code>, then the instructions of the transaction that are marked to be out of undo (through a prior call to <code>disable_in_undo</code>) won't be executed. This is the default mode when using flip <code>History</code> class.</p>
+
+<hr /><h3 id="member-function-controller"><code>controller</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>Controller  controller () const;</pre></td></tr>
+</table></div>
+
+<p>When called from document observer callback, returns the current controller source of modification. If the callback resulted from a <code>pull</code> operation, the returned controller is the last one from the pull queue.</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>enum class Controller</pre></td></tr>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>   NONE,          (1)</pre></td></tr>
+<tr><td><pre>   SELF,          (2)</pre></td></tr>
+<tr><td><pre>   UNDO,          (3)</pre></td></tr>
+<tr><td><pre>   READ,          (4)</pre></td></tr>
+<tr><td><pre>   LOCAL,         (5)</pre></td></tr>
+<tr><td><pre>   EXTERNAL,      (6)</pre></td></tr>
+<tr><td><pre>   ACKNOWLEDGED,  (7)</pre></td></tr>
+<tr><td><pre>   DENIED,        (8)</pre></td></tr>
+<tr><td><pre>};</pre></td></tr>
+</table></div>
+
+<ol>
+<li>Returned when called outside of an observer callback</li>
+<li>Returned when originated to this document</li>
+<li>Returned when originated from an undo operation (<code>History</code>)</li>
+<li>Returned when originated from a read operation</li>
+<li>Returned when originated from a local change</li>
+<li>Returned when originated from a remote change</li>
+<li>Returned when the server accepted one of the pushed transaction</li>
+<li>Returned when the server rejected one of the pushed transaction</li>
+</ol>
+
+<hr /><h3 id="member-function-write"><code>write</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>BackEndIR   write ();</pre></td></tr>
+</table></div>
+
+<p>Write the current state of the document (with its potential modifications) to an intermediate representation format backend.</p>
+
+<p>The resulting object can be used with concrete backends format such as <code>BackEndBinary</code> or <code>BackEndMl</code> to store them on a media.</p>
+
+<p>See <a href="../reference/BackEndMl.html"><code>BackEndMl</code></a> or <a href="../reference/BackEndBinary.html"><code>BackEndBinary</code></a> for an example of use of this method.</p>
+
+<hr /><h3 id="member-function-read"><code>read</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>void  read (BackEndIR &amp; backend);</pre></td></tr>
+</table></div>
+
+<p>Read from an intermediate representation format backend. Internally this will create a transaction that represents the difference between the new backend and the current state of the document. As such, the document modification are not commited at the end of this operation.</p>
+
+<p>See <a href="../reference/BackEndMl.html"><code>BackEndMl</code></a> or <a href="../reference/BackEndBinary.html"><code>BackEndBinary</code></a> for an example of use of this method.</p>
+
+<hr /><h3 id="member-function-root"><code>root</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>template &lt;class T&gt;   T &amp; root ();</pre></td></tr>
+</table></div>
+
+<p>Returns the root object of the document.</p>
+
+<hr /><h3 id="member-function-object"><code>object</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>template &lt;class T&gt;   T &amp; object (const Ref &amp; ref);</pre></td></tr>
+</table></div>
+
+<p>Returns an object given its unique flip reference number. The function will throw if the reference number does not exist in the document or if the resulting object cannot be casted to <code>T</code>.</p>
+
+<p>See <a href="../reference/Ref.html"><code>Ref</code></a> for more details.</p>
+
+<hr /><h3 id="member-function-object_ptr"><code>object_ptr</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>template &lt;class T&gt;   T * object_ptr (const Ref &amp; ref);</pre></td></tr>
+</table></div>
+
+<p>Returns an object given its unique flip reference number. The function will return <code>nullptr</code> if the reference number does not exist in the document or if the resulting object cannot be casted to <code>T</code>.</p>
+
+<p>See <a href="../reference/Ref.html"><code>Ref</code></a> for more details.</p>
+
+<div class="nav" align="right">
+<a href="DocumentObserver.html">previous</a><span>&nbsp;</span><a href="DocumentValidator.html">next</a></div>
+
+<div class="bottomspacer">&nbsp;</div>
+</div>
+</body>
+</html>

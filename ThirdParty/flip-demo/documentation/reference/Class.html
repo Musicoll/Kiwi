@@ -1,0 +1,293 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flip Reference: Class</title>
+<style>
+* {font-family: 'Lucida Grande', Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+body {background-color: #fff; }
+p {color: black; font-size: 13px; margin-bottom: 10px;}
+h1 {color: black; font-size: 28px; margin-bottom: 32px; padding-top: 24px; font-weight: normal; display: block; }
+h2 {color: #3c4c6c; display: block; font-size: 24px; font-weight: normal; margin-bottom: 20px; margin-top: 42px; border-bottom-color: #8391a8; border-bottom-style: solid; border-bottom-width: 1px;}
+h3 {color: black; font-size: 19px; margin-bottom: 4px; margin-top: 28px; font-weight: normal; display: block; }
+a {color: #36c; text-decoration: none; cursor:pointer; }
+a:active {color: #36c; text-decoration: none; cursor:pointer; }
+a:hover {color: #36c; text-decoration: underline; cursor:pointer; }
+.aerr {color: #f00}
+h2 a {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h2 a:active {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h2 a:hover {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h3 a {color: black; text-decoration: none; cursor:auto; }
+h3 a:active {color: black; text-decoration: none; cursor:auto; }
+h3 a:hover {color: black; text-decoration: none; cursor:auto; }
+footer {font-size: 10px; position: fixed; display: block; bottom: 0px; background-color: #f1f5f9; border-top-color: #c7cfd5; border-top-style: solid; border-top-width: 1px; width: 100%; height:22px; padding-top: 7px; padding-left: 7px;}
+div {display: block;}
+.codeblock {margin-top:17px; margin-bottom:17px; clear: both; display: block; color: #333; }
+pre {font-family: Courier, Consolas, monospace; font-size: 12px; height: 14px; line-height: 14px; margin-bottom: 0px; margin-left: 6px; margin-right: 4px; margin-top: -1px;}
+small pre {color:#888;}
+emph pre {color:#000;}
+table {padding-top:5px; padding-bottom:6px; margin-bottom:12px; background-color: #f1f5f9; border-color: #c7cfd5; border-style: solid; border-width: 1px; width: 100%;}
+tr {}
+td > p {margin-left: 6px; height: 12px;}
+.note {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #fff; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}
+.note strong {margin-right: 8px;}
+.note p {margin-top: 7px;}
+.important {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f1f5f9; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}
+.important strong {margin-right: 8px;}
+.important p {margin-top: 7px;}
+.warning {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f8e3e1; border-color: #c5443e; border-style: solid; border-width: 1px; display: block;}
+.warning strong {margin-right: 8px;}
+.warning p {margin-top: 7px;}
+.caption p {color: black; font-size: 10px; margin-bottom: 10px;}
+img {margin-top:10px; margin-bottom:10px;}
+ul {margin-left: 17px; margin-bottom: 10px;}
+ol {margin-left: 17px; margin-bottom: 10px;}
+li {color: black; font-size: 13px; margin-bottom: 7px;}
+code {font-family: Courier, Consolas, monospace;}
+#content {padding-left: 26px; padding-right: 26px; position: absolute; top: 30px; left: 230px; width: 750px;}
+#toc {width: 230px; position: fixed; top: 30px; background-color: #f1f5f9; height: 100%; border-right-color: #c7cfd5; border-right-style: solid; border-right-width: 1px; padding-left: 0px; padding-top: 17px; overflow: auto;}
+#toc > ul {list-style-type: none;}
+#toc > ul > li {font-size: 11px; }
+#toc > ul > li > ul {list-style-type: none; margin-top:8px;}
+#toc > ul > li > ul > li {font-size: 11px; }
+#toc > p {font-size: 13px; margin-left: 17px;}
+.codeblock > p {margin-bottom: 3px; font-size: 11px;}
+.codeblock > p > strong {margin-right: 10px; color: #222;}
+.nav {font-size: 10px; margin-top: 20px; }
+.nav > span {margin-right: 20px;}
+.bottomspacer {height:100px;}
+#header {width:100%; position: fixed; background-color: #111; height: 30px; z-index: 900;}
+#header > p {color:#fff; font-size: 13px; padding-top: 6px; padding-left: 17px; }
+#header > p > a {color:#fff; font-size: 13px; text-decoration: none; cursor:pointer; padding-right: 56px;}
+.sectioncode {background-color: #f6f6f6; padding: 12px; margin-top: 18px;}
+.sectioncode > h3 {margin-top: 0px; padding-bottom: 8px;}
+hr { display: block; height: 1px; border: 0; border-top: 1px solid #eee; margin: 28px 0; padding: 0; }</style>
+</head>
+
+<body>
+
+<div id="header">
+<div style="width: 1006px;"></div>
+<p><a href="../index.html">Flip Documentation Library</a><a href="../reference/index.html">Flip Reference</a></p>
+</div>
+<div id="toc">
+<p>Flip Reference</p>
+<ul>
+<li><a href="../reference/Array.html">Array</a></li>
+<li><a href="../reference/Array.iterator.html">Array::iterator</a></li>
+<li><a href="../reference/array_iterator.html">array_iterator</a></li>
+<li><a href="../reference/BackEndBinary.html">BackEndBinary</a></li>
+<li><a href="../reference/BackEndIR.html">BackEndIR</a></li>
+<li><a href="../reference/BackEndMl.html">BackEndMl</a></li>
+<li><a href="../reference/Blob.html">Blob</a></li>
+<li><a href="../reference/Bool.html">Bool</a></li>
+<li><a href="../reference/Class.html">Class</a>	<ul>
+	</ul>
+</li>
+<li><a href="../reference/Collection.html">Collection</a></li>
+<li><a href="../reference/Collection.iterator.html">Collection::iterator</a></li>
+<li><a href="../reference/collection_iterator.html">collection_iterator</a></li>
+<li><a href="../reference/DataConsumerFile.html">DataConsumerFile</a></li>
+<li><a href="../reference/DataConsumerMemory.html">DataConsumerMemory</a></li>
+<li><a href="../reference/DataModel.html">DataModel</a></li>
+<li><a href="../reference/DataProviderFile.html">DataProviderFile</a></li>
+<li><a href="../reference/DataProviderMemory.html">DataProviderMemory</a></li>
+<li><a href="../reference/Document.html">Document</a></li>
+<li><a href="../reference/DocumentObserver.html">DocumentObserver</a></li>
+<li><a href="../reference/DocumentServer.html">DocumentServer</a></li>
+<li><a href="../reference/DocumentValidator.html">DocumentValidator</a></li>
+<li><a href="../reference/Entity.html">Entity</a></li>
+<li><a href="../reference/Enum.html">Enum</a></li>
+<li><a href="../reference/EnumClass.html">EnumClass</a></li>
+<li><a href="../reference/Float.html">Float</a></li>
+<li><a href="../reference/History.html">History</a></li>
+<li><a href="../reference/Hub.html">Hub</a></li>
+<li><a href="../reference/Int.html">Int</a></li>
+<li><a href="../reference/Message.html">Message</a></li>
+<li><a href="../reference/Mold.html">Mold</a></li>
+<li><a href="../reference/MulticastServiceExplorer.html">MulticastServiceExplorer</a></li>
+<li><a href="../reference/MulticastServiceProvider.html">MulticastServiceProvider</a></li>
+<li><a href="../reference/Object.html">Object</a></li>
+<li><a href="../reference/ObjectRef.html">ObjectRef</a></li>
+<li><a href="../reference/Optional.html">Optional</a></li>
+<li><a href="../reference/Ref.html">Ref</a></li>
+<li><a href="../reference/Signal.html">Signal</a></li>
+<li><a href="../reference/String.html">String</a></li>
+<li><a href="../reference/Transaction.html">Transaction</a></li>
+<li><a href="../reference/Variant.html">Variant</a></li>
+<li><a href="../reference/Vector.html">Vector</a></li>
+</ul>
+</div>
+
+<div id="content">
+<div class="nav" align="right">
+<a href="Bool.html">previous</a><span>&nbsp;</span><a href="Collection.html">next</a></div>
+
+<h1>Class Class Reference</h1>
+
+<table><tr><td><p>Declared in</p></td><td><p><code>flip/Class.h</code></p></td></tr>
+</table>
+
+<div class="codeblock"><table>
+<tr><td><pre>template &lt;class T&gt; class Class;</pre></td></tr>
+</table></div>
+
+<p><code>flip::Class</code> is a type that represents a declaration of a flip Class. A concrete instance of this class is acquired using an instance of the <a href="../reference/DataModel.html"><code>DataModel</code></a></p>
+
+<h2>Template Parameters</h2>
+
+<table><tr><td><p><code>T</code></p></td><td><p>The type to declare. <code>T</code> must inherit from <code>flip::Object</code></p></td></tr>
+</table>
+
+<h2>Member Functions Synopsys</h2>
+
+<h3>Declaring</h3>
+
+<table><tr><td><p><code><a href="#member-function-name">name</a></code></p></td><td><p>Set the name of the class</p></td></tr>
+<tr><td><p><code><a href="#member-function-inherit">inherit</a></code></p></td><td><p>Inherit from a class</p></td></tr>
+<tr><td><p><code><a href="#member-function-member">member</a></code></p></td><td><p>Declare a member of the class</p></td></tr>
+</table>
+
+<h3>Accessing</h3>
+
+<table><tr><td><p><code><a href="#member-function-name">name</a></code></p></td><td><p>Returns the name of the class</p></td></tr>
+<tr><td><p><code><a href="#member-function-members">members</a></code></p></td><td><p>Returns information on the members of the class</p></td></tr>
+</table>
+
+<h2>Member Functions</h2>
+
+<h3 id="member-function-name"><code>name</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>Class &amp;  name (const char * name_0);</pre></td></tr>
+</table></div>
+
+<p>Set the name of the class. The name must be in the <code>ascii-7</code> character set, with exception of spaces, control characters as well as <code>del</code> character.</p>
+
+<p>Names starting with <code>flip</code> are reserved.</p>
+
+<p>This function returns a reference to the <code>Class</code> to allow call chaining.</p>
+
+<p>Example :</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>class Model : public DataModel &lt;Model&gt; {};</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>class Root : public Object</pre></td></tr>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>public:</pre></td></tr>
+<tr><td><pre>   Int   value;</pre></td></tr>
+<tr><td><pre>};</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>auto &amp; root_class = Model::declare &lt;Root&gt; ();</pre></td></tr>
+<tr><td><pre>// &apos;root_class&apos; is of type &apos;Class &lt;Root&gt;&apos;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>root_class</pre></td></tr>
+<tr><td><pre>   .name (&quot;myapp.Root&quot;)</pre></td></tr>
+<tr><td><pre>   .member &lt;Int, &amp;Root::value&gt; (&quot;value&quot;);</pre></td></tr>
+</table></div>
+
+<hr /><h3 id="member-function-inherit"><code>inherit</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>template &lt;class U&gt;   Class &amp;  inherit ();</pre></td></tr>
+</table></div>
+
+<p>Inherits from class <code>U</code> passed as a template parameter. Multiple inheritance is not supported.</p>
+
+<p>This function returns a reference to the <code>Class</code> to allow call chaining.</p>
+
+<p>Example :</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>class Model : public DataModel &lt;Model&gt; {};</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>class A : public Object</pre></td></tr>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>public:</pre></td></tr>
+<tr><td><pre>   Int   value;</pre></td></tr>
+<tr><td><pre>};</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>class B : public A</pre></td></tr>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>public:</pre></td></tr>
+<tr><td><pre>   Float value2;</pre></td></tr>
+<tr><td><pre>};</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>// first declare base class</pre></td></tr>
+<tr><td><pre>Model::declare &lt;A&gt; ()</pre></td></tr>
+<tr><td><pre>   .name (&quot;myapp.A&quot;)</pre></td></tr>
+<tr><td><pre>   .member &lt;Int, &amp;A::value&gt; (&quot;value&quot;);</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>// then declare inherited classes</pre></td></tr>
+<tr><td><pre>Model::declare &lt;B&gt; ()</pre></td></tr>
+<tr><td><pre>   .name (&quot;myapp.B&quot;)</pre></td></tr>
+<tr><td><pre>   .inherit &lt;A&gt; ()</pre></td></tr>
+<tr><td><pre>   .member &lt;Float, &amp;B::value2&gt; (&quot;value2&quot;);</pre></td></tr>
+</table></div>
+
+<p>Inheriting imports all members of superclass in the class, therefore :</p>
+
+<ul>
+<li><code>inherit</code> must be done first before <code>member</code> declarations</li>
+<li>All member names must be different, taking into account inherited names</li>
+</ul>
+
+<hr /><h3 id="member-function-member"><code>member</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>template &lt;class U, U T::*ptr_to_member&gt;   Class &amp;  member (const char * name_0);</pre></td></tr>
+</table></div>
+
+<p>Declare a member of the class. The name must be in the <code>ascii-7</code> character set, with exception of spaces, control characters as well as <code>del</code> character.</p>
+
+<div class="warning"><p><strong>WARNING:</strong> flip Member declaration must follow the same order as in the C++ class declaration.</p></div>
+
+<p>All member names must be different.</p>
+
+<p>This function returns a reference to the <code>Class</code> to allow call chaining.</p>
+
+<p>Example :</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>class Model : public DataModel &lt;Model&gt; {};</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>class Root : public Object</pre></td></tr>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>public:</pre></td></tr>
+<tr><td><pre>   Int   value;</pre></td></tr>
+<tr><td><pre>   Float value2;</pre></td></tr>
+<tr><td><pre>};</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>Model::declare &lt;Root&gt; ()</pre></td></tr>
+<tr><td><pre>   .name (&quot;myapp.Root&quot;)</pre></td></tr>
+<tr><td><pre>   .member &lt;Int, &amp;Root::value&gt; (&quot;value&quot;)</pre></td></tr>
+<tr><td><pre>   .member &lt;Float, &amp;Root::value2&gt; (&quot;value2&quot;);</pre></td></tr>
+</table></div>
+
+<hr /><h3 id="member-function-name"><code>name</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>const char *   name () const</pre></td></tr>
+</table></div>
+
+<p>Returns the name of the class.</p>
+
+<hr /><h3 id="member-function-members"><code>members</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>const Members &amp;   members () const</pre></td></tr>
+</table></div>
+
+<p>Returns information on the members of the class. This allows for automatic introspection of an instance of the class.</p>
+
+<p>Example : \codeblock [language=c++] *** void  introspect (Root & root) {    for (const auto & member : root.get_class ().members ())    {       auto & obj = member._representative.from (root);       const char * name_0 = member._name_0;</p>
+
+<p>// on the first loop iteration,       // 'obj' represents a reference to 'root.value'       // 'name_0' is "value"</p>
+
+<p>// on the second loop iteration,       // 'obj' represents a reference to 'root.value2'       // 'name_0' is "value2"    } } ***</p>
+
+<div class="nav" align="right">
+<a href="Bool.html">previous</a><span>&nbsp;</span><a href="Collection.html">next</a></div>
+
+<div class="bottomspacer">&nbsp;</div>
+</div>
+</body>
+</html>

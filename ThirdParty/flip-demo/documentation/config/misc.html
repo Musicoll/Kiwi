@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flip Configuration Guide: Miscellaneous Configuration</title>
+<style>
+* {font-family: 'Lucida Grande', Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+body {background-color: #fff; }
+p {color: black; font-size: 13px; margin-bottom: 10px;}
+h1 {color: black; font-size: 28px; margin-bottom: 32px; padding-top: 24px; font-weight: normal; display: block; }
+h2 {color: #3c4c6c; display: block; font-size: 24px; font-weight: normal; margin-bottom: 20px; margin-top: 42px; border-bottom-color: #8391a8; border-bottom-style: solid; border-bottom-width: 1px;}
+h3 {color: black; font-size: 19px; margin-bottom: 4px; margin-top: 28px; font-weight: normal; display: block; }
+a {color: #36c; text-decoration: none; cursor:pointer; }
+a:active {color: #36c; text-decoration: none; cursor:pointer; }
+a:hover {color: #36c; text-decoration: underline; cursor:pointer; }
+.aerr {color: #f00}
+h2 a {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h2 a:active {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h2 a:hover {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h3 a {color: black; text-decoration: none; cursor:auto; }
+h3 a:active {color: black; text-decoration: none; cursor:auto; }
+h3 a:hover {color: black; text-decoration: none; cursor:auto; }
+footer {font-size: 10px; position: fixed; display: block; bottom: 0px; background-color: #f1f5f9; border-top-color: #c7cfd5; border-top-style: solid; border-top-width: 1px; width: 100%; height:22px; padding-top: 7px; padding-left: 7px;}
+div {display: block;}
+.codeblock {margin-top:17px; margin-bottom:17px; clear: both; display: block; color: #333; }
+pre {font-family: Courier, Consolas, monospace; font-size: 12px; height: 14px; line-height: 14px; margin-bottom: 0px; margin-left: 6px; margin-right: 4px; margin-top: -1px;}
+small pre {color:#888;}
+emph pre {color:#000;}
+table {padding-top:5px; padding-bottom:6px; margin-bottom:12px; background-color: #f1f5f9; border-color: #c7cfd5; border-style: solid; border-width: 1px; width: 100%;}
+tr {}
+td > p {margin-left: 6px; height: 12px;}
+.note {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #fff; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}
+.note strong {margin-right: 8px;}
+.note p {margin-top: 7px;}
+.important {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f1f5f9; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}
+.important strong {margin-right: 8px;}
+.important p {margin-top: 7px;}
+.warning {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f8e3e1; border-color: #c5443e; border-style: solid; border-width: 1px; display: block;}
+.warning strong {margin-right: 8px;}
+.warning p {margin-top: 7px;}
+.caption p {color: black; font-size: 10px; margin-bottom: 10px;}
+img {margin-top:10px; margin-bottom:10px;}
+ul {margin-left: 17px; margin-bottom: 10px;}
+ol {margin-left: 17px; margin-bottom: 10px;}
+li {color: black; font-size: 13px; margin-bottom: 7px;}
+code {font-family: Courier, Consolas, monospace;}
+#content {padding-left: 26px; padding-right: 26px; position: absolute; top: 30px; left: 230px; width: 750px;}
+#toc {width: 230px; position: fixed; top: 30px; background-color: #f1f5f9; height: 100%; border-right-color: #c7cfd5; border-right-style: solid; border-right-width: 1px; padding-left: 0px; padding-top: 17px; overflow: auto;}
+#toc > ul {list-style-type: none;}
+#toc > ul > li {font-size: 11px; }
+#toc > ul > li > ul {list-style-type: none; margin-top:8px;}
+#toc > ul > li > ul > li {font-size: 11px; }
+#toc > p {font-size: 13px; margin-left: 17px;}
+.codeblock > p {margin-bottom: 3px; font-size: 11px;}
+.codeblock > p > strong {margin-right: 10px; color: #222;}
+.nav {font-size: 10px; margin-top: 20px; }
+.nav > span {margin-right: 20px;}
+.bottomspacer {height:100px;}
+#header {width:100%; position: fixed; background-color: #111; height: 30px; z-index: 900;}
+#header > p {color:#fff; font-size: 13px; padding-top: 6px; padding-left: 17px; }
+#header > p > a {color:#fff; font-size: 13px; text-decoration: none; cursor:pointer; padding-right: 56px;}
+.sectioncode {background-color: #f6f6f6; padding: 12px; margin-top: 18px;}
+.sectioncode > h3 {margin-top: 0px; padding-bottom: 8px;}
+hr { display: block; height: 1px; border: 0; border-top: 1px solid #eee; margin: 28px 0; padding: 0; }</style>
+</head>
+
+<body>
+
+<div id="header">
+<div style="width: 1006px;"></div>
+<p><a href="../index.html">Flip Documentation Library</a><a href="../config/index.html">Flip Configuration Guide</a></p>
+</div>
+<div id="toc">
+<p>Flip Configuration Guide</p>
+<ul>
+<li><a href="../config/about.html">About Flip Configuration Guide</a></li>
+<li><a href="../config/files.html">Files Hierarchy</a></li>
+<li><a href="../config/gyp.html">Setting up Using gyp</a></li>
+<li><a href="../config/manual.html">Setting up Manually</a></li>
+<li><a href="../config/dll.html">Using Flip as a Dynamic Linked Library (DLL)</a></li>
+<li><a href="../config/misc.html">Miscellaneous Configuration</a>	<ul>
+	<li><a href="../config/misc.html#fatal">flip_FATAL_MODE</a></li>
+	<li><a href="../config/misc.html#nothing">flip_NOTHING</a></li>
+	<li><a href="../config/misc.html#entityuse">flip_ENTITY_USE</a></li>
+	<li><a href="../config/misc.html#entityloc">flip_ENTITY_LOCATION</a></li>
+	</ul>
+</li>
+<li><a href="../config/msvc.html">MSVC Warnings Notes</a></li>
+</ul>
+</div>
+
+<div id="content">
+<div class="nav" align="right">
+<a href="dll.html">previous</a><span>&nbsp;</span><a href="msvc.html">next</a></div>
+
+<h1>Miscellaneous Configuration</h1>
+
+<p>This chapter describes several preprocessor macros used to change specific behavior of the Flip framework.</p>
+
+<h2><a name="fatal"><code>flip_FATAL_MODE</code></a></h2>
+
+<p>When the Flip framework encounters an operation that put its state to subsequent undefined behavior, it will general a fatal error. The <code>flip_FATAL_MODE</code> will control how this fatal error is generated. It is for example used when the framework is able to detect an incorrect use of its API.</p>
+
+<ul>
+<li>if set to <code>flip_FATAL_MODE_ABORT</code>, the Flip framework will trigger    an abortion on debug and will throw on release, which is most likely desired when developping.    <em>This is the default behavior</em></li>
+<li>if set to <code>flip_FATAL_MODE_THROW</code>, the Flip framework will throw.    This is used in unit testing to ensure that programmers error can be    reliably detected</li>
+<li>if set to <code>flip_FATAL_MODE_USER</code>, the <code>flip_FATAL</code> macro    has to be defined by the user in some appropriate way.</li>
+</ul>
+
+<p>One will activate one option or another using the processor macros or definitions. For example :</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>flip_FATAL_MODE=flip_FATAL_MODE_THROW</pre></td></tr>
+</table></div>
+
+<p><code>flip_FATAL</code> can be defined in a user specific way.  To do this define <code>flip_FATAL_MODE</code> to <code>flip_FATAL_MODE_USER</code> and provide a definition of it using a compiler option.  The best way though is to provide a user config file <code>flip_user_config.h</code> somewhere in the header search path of the compiler and define <code>flip_HAS_FLIP_USER_CONFIG_H</code>.</p>
+
+<p>For example such a <code>flip_user_config.h</code> could look like this:</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>#pragma once</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>#include &lt;cassert&gt;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>extern void trace_error(char* msg);</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>#define flip_FATAL { trace_error(&quot;FATAL!&quot;); assert(false); throw; }</pre></td></tr>
+</table></div>
+
+<div class="important"><p><strong>Important:</strong> Since <code>flip_FATAL</code> is used as a terminate function, the implementation must make sure that it is never returning.  The <code>throw</code> in the example above ensures this.</p></div>
+
+<h2><a name="nothing"><code>flip_NOTHING</code></a></h2>
+
+<p>Values such as <code>Int</code>, <code>Float</code> or <code>Blob</code> in the flip framework may have conceptually "no value" at specific object life cycles.</p>
+
+<ul>
+<li>if a value is <code>added</code> then its <code>before</code> value is "no value",</li>
+<li>if a value is <code>removed</code> then its <code>value</code> is "no value".</li>
+</ul>
+
+<p>Flip provides two way to represents this value :</p>
+
+<ul>
+<li>either by implicitely considering that the "no value"    is defined and explicitely <code>0</code> for numbers or empty for dynamic sized data,    using <code>flip_NOTHING_ZERO</code>,    <em>This is the default behavior</em>,</li>
+<li>either considering "no value" to be an error    and <code>flip_FATAL</code> when attempting to access it,    using <code>flip_NOTHING_FATAL</code>.</li>
+</ul>
+
+<p>One will activate one option or another using the processor macros or definitions. For example :</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>flip_NOTHING=flip_NOTHING_FATAL</pre></td></tr>
+</table></div>
+
+<h2><a name="entityuse"><code>flip_ENTITY_USE</code></a></h2>
+
+<p>The flip Framework <code>Entity</code> system allows to bind an arbitraty object to a flip <code>Object</code> or <code>Type</code>. The system itself is type safe and memory leak safe. However if one does not erase from the <code>Entity</code> an object it previously emplaced, there is no way for the client of the Flip framework to exactly monitor when the underlying object is going to be effectively freed.</p>
+
+<p>For this reason, the Flip framework allows to detect those situation and may force the developer to erase explicitely the object to ensure it has control over the life span of the object.</p>
+
+<ul>
+<li>if set to <code>flip_ENTITY_USE_RELAXED</code>, the Flip framework will automatically    free any remaining object in the <code>Entity</code></li>
+<li>if set to <code>flip_ENTITY_USE_STRICT</code>, the Flip framework will trigger    a <code>flip_FATAL</code> if the <code>Entity</code> is not empty when the underlying Flip type    is removed.    <em>This is the default behavior</em></li>
+<li>if set to <code>flip_ENTITY_USE_PEDANTIC</code>, the Flip framework will trigger    a <code>flip_FATAL</code> as in <code>flip_ENTITY_USE_STRICT</code> and will also    ensure that any entity creation or erase only occurs from an observer    notification <code>document_changed</code>.</li>
+</ul>
+
+<div class="note"><p><strong>Note:</strong> <code>flip_ENTITY_USE</code> is ignored if <code>flip_ENTITY_LOCATION</code> is    set to <code>flip_ENTITY_LOCATION_NONE</code></p></div>
+
+<p>One will activate one option or another using the processor macros or definitions. For example :</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>flip_ENTITY_USE=flip_ENTITY_USE_RELAXED</pre></td></tr>
+</table></div>
+
+<h2><a name="entityloc"><code>flip_ENTITY_LOCATION</code></a></h2>
+
+<p>The flip Framework <code>Entity</code> system allows to bind an arbitraty object to a flip <code>Object</code> (or derived) or <code>Type</code>. While being convenient, its memory usage might be a concern if it is only used for object and never for basic types such as <code>Int</code> or <code>Float</code>, or never at all.</p>
+
+<p>For this reason, the Flip framework allows either to have the entity available for any kind of Flip object, to restrict only to flip <code>Object</code> (that is, not any basic types), or to remove completely the feature from Flip.</p>
+
+<ul>
+<li>if set to <code>flip_ENTITY_LOCATION_TYPE</code>, the Flip framework will make    the <code>Entity</code> system available for all types.    <em>This is the default behavior</em></li>
+<li>if set to <code>flip_ENTITY_LOCATION_OBJECT</code>, the Flip framework will restrict    the use of <code>Entity</code> to flip <code>Object</code> only</li>
+<li>if set to <code>flip_ENTITY_LOCATION_NONE</code>, the Flip framework will    remove the <code>Entity</code> feature</li>
+</ul>
+
+<div class="note"><p><strong>Note:</strong> <code>flip_ENTITY_USE</code> is ignored if <code>flip_ENTITY_LOCATION</code> is    set to <code>flip_ENTITY_LOCATION_NONE</code></p></div>
+
+<p>One will activate one option or another using the processor macros or definitions. For example :</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>flip_ENTITY_LOCATION=flip_ENTITY_LOCATION_OBJECT</pre></td></tr>
+</table></div>
+
+<div class="nav" align="right">
+<a href="dll.html">previous</a><span>&nbsp;</span><a href="msvc.html">next</a></div>
+
+<div class="bottomspacer">&nbsp;</div>
+</div>
+</body>
+</html>
