@@ -1,0 +1,273 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flip Reference: DataProviderMemory</title>
+<style>
+* {font-family: 'Lucida Grande', Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+body {background-color: #fff; }
+p {color: black; font-size: 13px; margin-bottom: 10px;}
+h1 {color: black; font-size: 28px; margin-bottom: 32px; padding-top: 24px; font-weight: normal; display: block; }
+h2 {color: #3c4c6c; display: block; font-size: 24px; font-weight: normal; margin-bottom: 20px; margin-top: 42px; border-bottom-color: #8391a8; border-bottom-style: solid; border-bottom-width: 1px;}
+h3 {color: black; font-size: 19px; margin-bottom: 4px; margin-top: 28px; font-weight: normal; display: block; }
+a {color: #36c; text-decoration: none; cursor:pointer; }
+a:active {color: #36c; text-decoration: none; cursor:pointer; }
+a:hover {color: #36c; text-decoration: underline; cursor:pointer; }
+.aerr {color: #f00}
+h2 a {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h2 a:active {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h2 a:hover {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h3 a {color: black; text-decoration: none; cursor:auto; }
+h3 a:active {color: black; text-decoration: none; cursor:auto; }
+h3 a:hover {color: black; text-decoration: none; cursor:auto; }
+footer {font-size: 10px; position: fixed; display: block; bottom: 0px; background-color: #f1f5f9; border-top-color: #c7cfd5; border-top-style: solid; border-top-width: 1px; width: 100%; height:22px; padding-top: 7px; padding-left: 7px;}
+div {display: block;}
+.codeblock {margin-top:17px; margin-bottom:17px; clear: both; display: block; color: #333; }
+pre {font-family: Courier, Consolas, monospace; font-size: 12px; height: 14px; line-height: 14px; margin-bottom: 0px; margin-left: 6px; margin-right: 4px; margin-top: -1px;}
+small pre {color:#888;}
+emph pre {color:#000;}
+table {padding-top:5px; padding-bottom:6px; margin-bottom:12px; background-color: #f1f5f9; border-color: #c7cfd5; border-style: solid; border-width: 1px; width: 100%;}
+tr {}
+td > p {margin-left: 6px; height: 12px;}
+.note {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #fff; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}
+.note strong {margin-right: 8px;}
+.note p {margin-top: 7px;}
+.important {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f1f5f9; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}
+.important strong {margin-right: 8px;}
+.important p {margin-top: 7px;}
+.warning {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f8e3e1; border-color: #c5443e; border-style: solid; border-width: 1px; display: block;}
+.warning strong {margin-right: 8px;}
+.warning p {margin-top: 7px;}
+.caption p {color: black; font-size: 10px; margin-bottom: 10px;}
+img {margin-top:10px; margin-bottom:10px;}
+ul {margin-left: 17px; margin-bottom: 10px;}
+ol {margin-left: 17px; margin-bottom: 10px;}
+li {color: black; font-size: 13px; margin-bottom: 7px;}
+code {font-family: Courier, Consolas, monospace;}
+#content {padding-left: 26px; padding-right: 26px; position: absolute; top: 30px; left: 230px; width: 750px;}
+#toc {width: 230px; position: fixed; top: 30px; background-color: #f1f5f9; height: 100%; border-right-color: #c7cfd5; border-right-style: solid; border-right-width: 1px; padding-left: 0px; padding-top: 17px; overflow: auto;}
+#toc > ul {list-style-type: none;}
+#toc > ul > li {font-size: 11px; }
+#toc > ul > li > ul {list-style-type: none; margin-top:8px;}
+#toc > ul > li > ul > li {font-size: 11px; }
+#toc > p {font-size: 13px; margin-left: 17px;}
+.codeblock > p {margin-bottom: 3px; font-size: 11px;}
+.codeblock > p > strong {margin-right: 10px; color: #222;}
+.nav {font-size: 10px; margin-top: 20px; }
+.nav > span {margin-right: 20px;}
+.bottomspacer {height:100px;}
+#header {width:100%; position: fixed; background-color: #111; height: 30px; z-index: 900;}
+#header > p {color:#fff; font-size: 13px; padding-top: 6px; padding-left: 17px; }
+#header > p > a {color:#fff; font-size: 13px; text-decoration: none; cursor:pointer; padding-right: 56px;}
+.sectioncode {background-color: #f6f6f6; padding: 12px; margin-top: 18px;}
+.sectioncode > h3 {margin-top: 0px; padding-bottom: 8px;}
+hr { display: block; height: 1px; border: 0; border-top: 1px solid #eee; margin: 28px 0; padding: 0; }</style>
+</head>
+
+<body>
+
+<div id="header">
+<div style="width: 1006px;"></div>
+<p><a href="../index.html">Flip Documentation Library</a><a href="../reference/index.html">Flip Reference</a></p>
+</div>
+<div id="toc">
+<p>Flip Reference</p>
+<ul>
+<li><a href="../reference/Array.html">Array</a></li>
+<li><a href="../reference/Array.iterator.html">Array::iterator</a></li>
+<li><a href="../reference/array_iterator.html">array_iterator</a></li>
+<li><a href="../reference/BackEndBinary.html">BackEndBinary</a></li>
+<li><a href="../reference/BackEndIR.html">BackEndIR</a></li>
+<li><a href="../reference/BackEndMl.html">BackEndMl</a></li>
+<li><a href="../reference/Blob.html">Blob</a></li>
+<li><a href="../reference/Bool.html">Bool</a></li>
+<li><a href="../reference/Class.html">Class</a></li>
+<li><a href="../reference/Collection.html">Collection</a></li>
+<li><a href="../reference/Collection.iterator.html">Collection::iterator</a></li>
+<li><a href="../reference/collection_iterator.html">collection_iterator</a></li>
+<li><a href="../reference/DataConsumerFile.html">DataConsumerFile</a></li>
+<li><a href="../reference/DataConsumerMemory.html">DataConsumerMemory</a></li>
+<li><a href="../reference/DataModel.html">DataModel</a></li>
+<li><a href="../reference/DataProviderFile.html">DataProviderFile</a></li>
+<li><a href="../reference/DataProviderMemory.html">DataProviderMemory</a>	<ul>
+	</ul>
+</li>
+<li><a href="../reference/Document.html">Document</a></li>
+<li><a href="../reference/DocumentObserver.html">DocumentObserver</a></li>
+<li><a href="../reference/DocumentServer.html">DocumentServer</a></li>
+<li><a href="../reference/DocumentValidator.html">DocumentValidator</a></li>
+<li><a href="../reference/Entity.html">Entity</a></li>
+<li><a href="../reference/Enum.html">Enum</a></li>
+<li><a href="../reference/EnumClass.html">EnumClass</a></li>
+<li><a href="../reference/Float.html">Float</a></li>
+<li><a href="../reference/History.html">History</a></li>
+<li><a href="../reference/Hub.html">Hub</a></li>
+<li><a href="../reference/Int.html">Int</a></li>
+<li><a href="../reference/Message.html">Message</a></li>
+<li><a href="../reference/Mold.html">Mold</a></li>
+<li><a href="../reference/MulticastServiceExplorer.html">MulticastServiceExplorer</a></li>
+<li><a href="../reference/MulticastServiceProvider.html">MulticastServiceProvider</a></li>
+<li><a href="../reference/Object.html">Object</a></li>
+<li><a href="../reference/ObjectRef.html">ObjectRef</a></li>
+<li><a href="../reference/Optional.html">Optional</a></li>
+<li><a href="../reference/Ref.html">Ref</a></li>
+<li><a href="../reference/Signal.html">Signal</a></li>
+<li><a href="../reference/String.html">String</a></li>
+<li><a href="../reference/Transaction.html">Transaction</a></li>
+<li><a href="../reference/Variant.html">Variant</a></li>
+<li><a href="../reference/Vector.html">Vector</a></li>
+</ul>
+</div>
+
+<div id="content">
+<div class="nav" align="right">
+<a href="DataProviderFile.html">previous</a><span>&nbsp;</span><a href="Document.html">next</a></div>
+
+<h1>DataProviderMemory Class Reference</h1>
+
+<table><tr><td><p>Declared in</p></td><td><p><code>flip/DataProviderMemory.h</code></p></td></tr>
+</table>
+
+<div class="codeblock"><table>
+<tr><td><pre>class DataProviderMemory;</pre></td></tr>
+</table></div>
+
+<p>Generally a data provider represents an abstraction of input serialized data that is platform (endianess and word size) independent.</p>
+
+<p><code>flip::DataProviderMemory</code> is a specialization of data provider which input is memory.</p>
+
+<p>Internally the data is presented in big-endian, and has byte alignment packing.</p>
+
+<p>To input from a file instead of memory, see <a href="../reference/DataProviderFile.html"><code>flip::DataProviderFile</code></a></p>
+
+<h2>Member Functions Synopsys</h2>
+
+<table><tr><td><p><a href="#member-function-constructor">Constructor</a></p></td><td><p>Constructs the <code>DataProviderMemory</code></p></td></tr>
+<tr><td><p><a href="#member-function-destructor">Destructor</a></p></td><td><p>Destructs the <code>DataProviderMemory</code></p></td></tr>
+<tr><td><p><code><a href="#member-function-operator >>">operator >></a></code></p></td><td><p>Extracts value from the provider</p></td></tr>
+<tr><td><p><code><a href="#member-function-read_string">read_string</a></code></p></td><td><p>Extracts string from the provider</p></td></tr>
+<tr><td><p><code><a href="#member-function-pull">pull</a></code></p></td><td><p>Extracts raw data from the provider</p></td></tr>
+<tr><td><p><code><a href="#member-function-pull">pull</a></code></p></td><td><p>Returns the current reading position in the stream</p></td></tr>
+<tr><td><p><code><a href="#member-function-seek_start">seek_start</a></code></p></td><td><p>Seek reading position relative to the beginning of the stream</p></td></tr>
+<tr><td><p><code><a href="#member-function-seek_relative">seek_relative</a></code></p></td><td><p>Seek reading position relative to the current position in the stream</p></td></tr>
+</table>
+
+<h2>Member Functions</h2>
+
+<h3 id="member-function-constructor">Constructor</h3>
+<div class="codeblock"><table>
+<tr><td><pre>DataProviderMemory (const std::vector &lt;uint8_t&gt; &amp; data);</pre></td></tr>
+</table></div>
+
+<p>Constructor. The input of serialization will come from <code>data</code>.</p>
+
+<hr /><h3 id="member-function-destructor">Destructor</h3>
+<div class="codeblock"><table>
+<tr><td><pre>~DataProviderMemory ();</pre></td></tr>
+</table></div>
+
+<p>Destructor.</p>
+
+<hr /><h3 id="member-function-operator >>"><code>operator >></code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>DataProviderMemory &amp; operator &gt;&gt; (bool &amp; val);</pre></td></tr>
+<tr><td><pre>DataProviderMemory &amp; operator &gt;&gt; (char &amp; val);</pre></td></tr>
+<tr><td><pre>DataProviderMemory &amp; operator &gt;&gt; (uint8_t &amp; val);</pre></td></tr>
+<tr><td><pre>DataProviderMemory &amp; operator &gt;&gt; (int32_t &amp; val);</pre></td></tr>
+<tr><td><pre>DataProviderMemory &amp; operator &gt;&gt; (uint32_t &amp; val);</pre></td></tr>
+<tr><td><pre>DataProviderMemory &amp; operator &gt;&gt; (int64_t &amp; val);</pre></td></tr>
+<tr><td><pre>DataProviderMemory &amp; operator &gt;&gt; (uint64_t &amp; val);</pre></td></tr>
+<tr><td><pre>DataProviderMemory &amp; operator &gt;&gt; (double &amp; val);</pre></td></tr>
+</table></div>
+
+<p>Extracts value from the provider.</p>
+
+<p>If any error occurs (such as reading past the end of the stream), the method will throw <code>std::runtime_error</code>.</p>
+
+<p>Example :</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>std::vector &lt;uint8_t&gt; data;</pre></td></tr>
+<tr><td><pre>DataConsumerMemory consumer (data);</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>std::string str (&quot;Flip&quot;);</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>consumer &lt;&lt; true;</pre></td></tr>
+<tr><td><pre>consumer &lt;&lt; int32_t (2);</pre></td></tr>
+<tr><td><pre>consumer &lt;&lt; 2.5;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>consumer &lt;&lt; uint64_t (str.size ());</pre></td></tr>
+<tr><td><pre>consumer &lt;&lt; str;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>DataProviderMemory provider (data);</pre></td></tr>
+<tr><td><pre>bool val_b;</pre></td></tr>
+<tr><td><pre>int32_t val_i;</pre></td></tr>
+<tr><td><pre>double val_d;</pre></td></tr>
+<tr><td><pre>std::string val_s;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>consumer &gt;&gt; val_b; // true</pre></td></tr>
+<tr><td><pre>consumer &gt;&gt; val_i; // 2</pre></td></tr>
+<tr><td><pre>consumer &gt;&gt; val_d; // 2.5</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>uint64_t str_size;</pre></td></tr>
+<tr><td><pre>consumer &gt;&gt; str_size;</pre></td></tr>
+<tr><td><pre>val_s = consumer.read_string (str_size);   // &quot;Flip&quot;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>char val_c;</pre></td></tr>
+<tr><td><pre>consumer &gt;&gt; val_c; // throws std::runtime_error</pre></td></tr>
+</table></div>
+
+<hr /><h3 id="member-function-read_string"><code>read_string</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>std::string read_string (size_t size);</pre></td></tr>
+</table></div>
+
+<p>Extracts string from the provider.</p>
+
+<p>If any error occurs (such as reading past the end of the stream), the method will throw <code>std::runtime_error</code>.</p>
+
+<hr /><h3 id="member-function-pull"><code>pull</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>const uint8_t *   pull (size_t data_size);</pre></td></tr>
+</table></div>
+
+<p>Extracts <code>data_size</code> bytes of raw data from the provider. No byte swap is performed and the packing of data is not changed.</p>
+
+<p>If any error occurs (such as reading past the end of the stream), the method will throw <code>std::runtime_error</code>.</p>
+
+<hr /><h3 id="member-function-pull"><code>pull</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>size_t tell ();</pre></td></tr>
+</table></div>
+
+<p>Returns the current reading position in the stream.</p>
+
+<p>If any error occurs (such as reading past the end of the stream), the method will throw <code>std::runtime_error</code>.</p>
+
+<hr /><h3 id="member-function-seek_start"><code>seek_start</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>seek_start (size_t offset_abs = 0);</pre></td></tr>
+</table></div>
+
+<p>Seek reading position to <code>offset_abs</code>, relative to the beginning of the stream.</p>
+
+<p>If any error occurs (such as reading past the end of the stream), the method will throw <code>std::runtime_error</code>.</p>
+
+<hr /><h3 id="member-function-seek_relative"><code>seek_relative</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>seek_start (size_t offset_rel = 0);</pre></td></tr>
+</table></div>
+
+<p>Seek reading position to <code>offset_rel</code>, relative to the current position in the stream.</p>
+
+<p>If any error occurs (such as reading past the end of the stream), the method will throw <code>std::runtime_error</code>.</p>
+
+<div class="nav" align="right">
+<a href="DataProviderFile.html">previous</a><span>&nbsp;</span><a href="Document.html">next</a></div>
+
+<div class="bottomspacer">&nbsp;</div>
+</div>
+</body>
+</html>

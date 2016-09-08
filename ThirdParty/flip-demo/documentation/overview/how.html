@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flip Overview: How it Works</title>
+<style>
+* {font-family: 'Lucida Grande', Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+body {background-color: #fff; }
+p {color: black; font-size: 13px; margin-bottom: 10px;}
+h1 {color: black; font-size: 28px; margin-bottom: 32px; padding-top: 24px; font-weight: normal; display: block; }
+h2 {color: #3c4c6c; display: block; font-size: 24px; font-weight: normal; margin-bottom: 20px; margin-top: 42px; border-bottom-color: #8391a8; border-bottom-style: solid; border-bottom-width: 1px;}
+h3 {color: black; font-size: 19px; margin-bottom: 4px; margin-top: 28px; font-weight: normal; display: block; }
+a {color: #36c; text-decoration: none; cursor:pointer; }
+a:active {color: #36c; text-decoration: none; cursor:pointer; }
+a:hover {color: #36c; text-decoration: underline; cursor:pointer; }
+.aerr {color: #f00}
+h2 a {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h2 a:active {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h2 a:hover {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h3 a {color: black; text-decoration: none; cursor:auto; }
+h3 a:active {color: black; text-decoration: none; cursor:auto; }
+h3 a:hover {color: black; text-decoration: none; cursor:auto; }
+footer {font-size: 10px; position: fixed; display: block; bottom: 0px; background-color: #f1f5f9; border-top-color: #c7cfd5; border-top-style: solid; border-top-width: 1px; width: 100%; height:22px; padding-top: 7px; padding-left: 7px;}
+div {display: block;}
+.codeblock {margin-top:17px; margin-bottom:17px; clear: both; display: block; color: #333; }
+pre {font-family: Courier, Consolas, monospace; font-size: 12px; height: 14px; line-height: 14px; margin-bottom: 0px; margin-left: 6px; margin-right: 4px; margin-top: -1px;}
+small pre {color:#888;}
+emph pre {color:#000;}
+table {padding-top:5px; padding-bottom:6px; margin-bottom:12px; background-color: #f1f5f9; border-color: #c7cfd5; border-style: solid; border-width: 1px; width: 100%;}
+tr {}
+td > p {margin-left: 6px; height: 12px;}
+.note {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #fff; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}
+.note strong {margin-right: 8px;}
+.note p {margin-top: 7px;}
+.important {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f1f5f9; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}
+.important strong {margin-right: 8px;}
+.important p {margin-top: 7px;}
+.warning {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f8e3e1; border-color: #c5443e; border-style: solid; border-width: 1px; display: block;}
+.warning strong {margin-right: 8px;}
+.warning p {margin-top: 7px;}
+.caption p {color: black; font-size: 10px; margin-bottom: 10px;}
+img {margin-top:10px; margin-bottom:10px;}
+ul {margin-left: 17px; margin-bottom: 10px;}
+ol {margin-left: 17px; margin-bottom: 10px;}
+li {color: black; font-size: 13px; margin-bottom: 7px;}
+code {font-family: Courier, Consolas, monospace;}
+#content {padding-left: 26px; padding-right: 26px; position: absolute; top: 30px; left: 230px; width: 750px;}
+#toc {width: 230px; position: fixed; top: 30px; background-color: #f1f5f9; height: 100%; border-right-color: #c7cfd5; border-right-style: solid; border-right-width: 1px; padding-left: 0px; padding-top: 17px; overflow: auto;}
+#toc > ul {list-style-type: none;}
+#toc > ul > li {font-size: 11px; }
+#toc > ul > li > ul {list-style-type: none; margin-top:8px;}
+#toc > ul > li > ul > li {font-size: 11px; }
+#toc > p {font-size: 13px; margin-left: 17px;}
+.codeblock > p {margin-bottom: 3px; font-size: 11px;}
+.codeblock > p > strong {margin-right: 10px; color: #222;}
+.nav {font-size: 10px; margin-top: 20px; }
+.nav > span {margin-right: 20px;}
+.bottomspacer {height:100px;}
+#header {width:100%; position: fixed; background-color: #111; height: 30px; z-index: 900;}
+#header > p {color:#fff; font-size: 13px; padding-top: 6px; padding-left: 17px; }
+#header > p > a {color:#fff; font-size: 13px; text-decoration: none; cursor:pointer; padding-right: 56px;}
+.sectioncode {background-color: #f6f6f6; padding: 12px; margin-top: 18px;}
+.sectioncode > h3 {margin-top: 0px; padding-bottom: 8px;}
+hr { display: block; height: 1px; border: 0; border-top: 1px solid #eee; margin: 28px 0; padding: 0; }</style>
+</head>
+
+<body>
+
+<div id="header">
+<div style="width: 1006px;"></div>
+<p><a href="../index.html">Flip Documentation Library</a><a href="../overview/index.html">Flip Overview</a></p>
+</div>
+<div id="toc">
+<p>Flip Overview</p>
+<ul>
+<li><a href="../overview/about.html">About Flip</a></li>
+<li><a href="../overview/how.html">How it Works</a>	<ul>
+	<li><a href="../overview/how.html#build">Building a Transaction</a></li>
+	<li><a href="../overview/how.html#validation">Validation</a></li>
+	<li><a href="../overview/how.html#approval">Validation Approval</a></li>
+	<li><a href="../overview/how.html#refusal">Validation Refusal</a></li>
+	</ul>
+</li>
+<li><a href="../overview/model.html">Interfacing with the Model</a></li>
+<li><a href="../overview/undo.html">Undo/Redo System</a></li>
+<li><a href="../overview/thread.html">Threading System</a></li>
+<li><a href="../overview/document.html">Document Format, Conversion</a></li>
+</ul>
+</div>
+
+<div id="content">
+<div class="nav" align="right">
+<a href="about.html">previous</a><span>&nbsp;</span><a href="model.html">next</a></div>
+
+<h1>How it Works</h1>
+
+<h2><a name="build">Building a Transaction</a></h2>
+
+<p>The client of the Flip framework will directly modify the model by either:</p>
+
+<ul>
+<li>modifying a value by assigning it</li>
+<li>insert, move or erase an object in a container</li>
+</ul>
+
+<p><center><img src="how.asm.png" /></center></p>
+
+<p>Assigning a value is done with the <code>operator =</code> and modifying a container follows the same kind of prototypes as found in the standard library  (<code>insert</code>, <code>erase</code>, etc.) which makes the use of Flip quite natural.</p>
+
+<p>In the background, each operation is translated in real-time in a simple assembler. When the client manipulates the model, Flip will apply and record all the changes made to the model and will make a program in this assembler language.</p>
+
+<p>This program is also a transaction in the sense that applying a transaction will transform the model from a valid state to another valid state.</p>
+
+<h2><a name="validation">Validation</a></h2>
+
+<p>This transaction is then sent to the server. The server interprets the assembler and makes changes to its own model. The transaction is then validated by the server. Validation ensures that the model is consistent and is done in two steps:</p>
+
+<ol>
+<li>structural validation</li>
+<li>logical validation</li>
+</ol>
+
+<p><center><img src="how.valid.png" /></center></p>
+
+<h3><a name="validation-structural">Structural Validation</a></h3>
+
+<p>Structural validation is handled by Flip. It ensures that an object can be either modified, inserted or erased. For example, structural validation may fail if two clients try to erase an object concurrently. In this case, the second transaction is rejected. Another example of this is where a client tries to change the value of an object that was erased concurrently, in which case the transaction would also be rejected.</p>
+
+<h3><a name="validation-logical">Logical Validation</a></h3>
+
+<p>Logical validation is handled by the client. It ensures that the model is consistent relative to the meaning that the client assigned to the model's structure. For example, the client might have a container which represents the length. The client must then ensure that an element's position and length do not exceed the container's length:</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>element._position + element._length &lt;= container._length</pre></td></tr>
+<tr><td><pre>0 &lt;= element._position</pre></td></tr>
+<tr><td><pre>0 &lt;= element._length</pre></td></tr>
+<tr><td><pre>0 &lt;= container._length</pre></td></tr>
+</table></div>
+
+<p><center><img src="how.valid.logic.png" /></center></p>
+
+<p>This kind of validation is possible in Flip, as it is dynamic (it is a program that the client writes) rather than static or semi-static (like an XML/DTD document).</p>
+
+<p>The architecture of Flip allows one to write validators very quickly and in a tree-parsing fashion.</p>
+
+<h2><a name="approval">Validation Approval</a></h2>
+
+<p><center><img src="how.valid.ok.png" /></center></p>
+
+<p>If the two-stage validation passes, the transaction is considered to be accepted. The server will broadcast the transaction to be executed by other clients, and will also send an approval message to the original client.</p>
+
+<h2><a name="refusal">Validation Refusal</a></h2>
+
+<p><center><img src="how.valid.fail.png" /></center></p>
+
+<p>If the two-stage validation fails, the transaction is considered to be refused. The server will send a disapproval message to the original client, which rolls back the transaction.</p>
+
+<p>When another client executes the transaction, it will make all the changes needed by that transaction. When it is done and succesfully applied, the client's observers are called.</p>
+
+<div class="nav" align="right">
+<a href="about.html">previous</a><span>&nbsp;</span><a href="model.html">next</a></div>
+
+<div class="bottomspacer">&nbsp;</div>
+</div>
+</body>
+</html>

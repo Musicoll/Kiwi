@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flip Reference: MulticastServiceProvider</title>
+<style>
+* {font-family: 'Lucida Grande', Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+body {background-color: #fff; }
+p {color: black; font-size: 13px; margin-bottom: 10px;}
+h1 {color: black; font-size: 28px; margin-bottom: 32px; padding-top: 24px; font-weight: normal; display: block; }
+h2 {color: #3c4c6c; display: block; font-size: 24px; font-weight: normal; margin-bottom: 20px; margin-top: 42px; border-bottom-color: #8391a8; border-bottom-style: solid; border-bottom-width: 1px;}
+h3 {color: black; font-size: 19px; margin-bottom: 4px; margin-top: 28px; font-weight: normal; display: block; }
+a {color: #36c; text-decoration: none; cursor:pointer; }
+a:active {color: #36c; text-decoration: none; cursor:pointer; }
+a:hover {color: #36c; text-decoration: underline; cursor:pointer; }
+.aerr {color: #f00}
+h2 a {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h2 a:active {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h2 a:hover {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h3 a {color: black; text-decoration: none; cursor:auto; }
+h3 a:active {color: black; text-decoration: none; cursor:auto; }
+h3 a:hover {color: black; text-decoration: none; cursor:auto; }
+footer {font-size: 10px; position: fixed; display: block; bottom: 0px; background-color: #f1f5f9; border-top-color: #c7cfd5; border-top-style: solid; border-top-width: 1px; width: 100%; height:22px; padding-top: 7px; padding-left: 7px;}
+div {display: block;}
+.codeblock {margin-top:17px; margin-bottom:17px; clear: both; display: block; color: #333; }
+pre {font-family: Courier, Consolas, monospace; font-size: 12px; height: 14px; line-height: 14px; margin-bottom: 0px; margin-left: 6px; margin-right: 4px; margin-top: -1px;}
+small pre {color:#888;}
+emph pre {color:#000;}
+table {padding-top:5px; padding-bottom:6px; margin-bottom:12px; background-color: #f1f5f9; border-color: #c7cfd5; border-style: solid; border-width: 1px; width: 100%;}
+tr {}
+td > p {margin-left: 6px; height: 12px;}
+.note {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #fff; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}
+.note strong {margin-right: 8px;}
+.note p {margin-top: 7px;}
+.important {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f1f5f9; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}
+.important strong {margin-right: 8px;}
+.important p {margin-top: 7px;}
+.warning {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f8e3e1; border-color: #c5443e; border-style: solid; border-width: 1px; display: block;}
+.warning strong {margin-right: 8px;}
+.warning p {margin-top: 7px;}
+.caption p {color: black; font-size: 10px; margin-bottom: 10px;}
+img {margin-top:10px; margin-bottom:10px;}
+ul {margin-left: 17px; margin-bottom: 10px;}
+ol {margin-left: 17px; margin-bottom: 10px;}
+li {color: black; font-size: 13px; margin-bottom: 7px;}
+code {font-family: Courier, Consolas, monospace;}
+#content {padding-left: 26px; padding-right: 26px; position: absolute; top: 30px; left: 230px; width: 750px;}
+#toc {width: 230px; position: fixed; top: 30px; background-color: #f1f5f9; height: 100%; border-right-color: #c7cfd5; border-right-style: solid; border-right-width: 1px; padding-left: 0px; padding-top: 17px; overflow: auto;}
+#toc > ul {list-style-type: none;}
+#toc > ul > li {font-size: 11px; }
+#toc > ul > li > ul {list-style-type: none; margin-top:8px;}
+#toc > ul > li > ul > li {font-size: 11px; }
+#toc > p {font-size: 13px; margin-left: 17px;}
+.codeblock > p {margin-bottom: 3px; font-size: 11px;}
+.codeblock > p > strong {margin-right: 10px; color: #222;}
+.nav {font-size: 10px; margin-top: 20px; }
+.nav > span {margin-right: 20px;}
+.bottomspacer {height:100px;}
+#header {width:100%; position: fixed; background-color: #111; height: 30px; z-index: 900;}
+#header > p {color:#fff; font-size: 13px; padding-top: 6px; padding-left: 17px; }
+#header > p > a {color:#fff; font-size: 13px; text-decoration: none; cursor:pointer; padding-right: 56px;}
+.sectioncode {background-color: #f6f6f6; padding: 12px; margin-top: 18px;}
+.sectioncode > h3 {margin-top: 0px; padding-bottom: 8px;}
+hr { display: block; height: 1px; border: 0; border-top: 1px solid #eee; margin: 28px 0; padding: 0; }</style>
+</head>
+
+<body>
+
+<div id="header">
+<div style="width: 1006px;"></div>
+<p><a href="../index.html">Flip Documentation Library</a><a href="../reference/index.html">Flip Reference</a></p>
+</div>
+<div id="toc">
+<p>Flip Reference</p>
+<ul>
+<li><a href="../reference/Array.html">Array</a></li>
+<li><a href="../reference/Array.iterator.html">Array::iterator</a></li>
+<li><a href="../reference/array_iterator.html">array_iterator</a></li>
+<li><a href="../reference/BackEndBinary.html">BackEndBinary</a></li>
+<li><a href="../reference/BackEndIR.html">BackEndIR</a></li>
+<li><a href="../reference/BackEndMl.html">BackEndMl</a></li>
+<li><a href="../reference/Blob.html">Blob</a></li>
+<li><a href="../reference/Bool.html">Bool</a></li>
+<li><a href="../reference/Class.html">Class</a></li>
+<li><a href="../reference/Collection.html">Collection</a></li>
+<li><a href="../reference/Collection.iterator.html">Collection::iterator</a></li>
+<li><a href="../reference/collection_iterator.html">collection_iterator</a></li>
+<li><a href="../reference/DataConsumerFile.html">DataConsumerFile</a></li>
+<li><a href="../reference/DataConsumerMemory.html">DataConsumerMemory</a></li>
+<li><a href="../reference/DataModel.html">DataModel</a></li>
+<li><a href="../reference/DataProviderFile.html">DataProviderFile</a></li>
+<li><a href="../reference/DataProviderMemory.html">DataProviderMemory</a></li>
+<li><a href="../reference/Document.html">Document</a></li>
+<li><a href="../reference/DocumentObserver.html">DocumentObserver</a></li>
+<li><a href="../reference/DocumentServer.html">DocumentServer</a></li>
+<li><a href="../reference/DocumentValidator.html">DocumentValidator</a></li>
+<li><a href="../reference/Entity.html">Entity</a></li>
+<li><a href="../reference/Enum.html">Enum</a></li>
+<li><a href="../reference/EnumClass.html">EnumClass</a></li>
+<li><a href="../reference/Float.html">Float</a></li>
+<li><a href="../reference/History.html">History</a></li>
+<li><a href="../reference/Hub.html">Hub</a></li>
+<li><a href="../reference/Int.html">Int</a></li>
+<li><a href="../reference/Message.html">Message</a></li>
+<li><a href="../reference/Mold.html">Mold</a></li>
+<li><a href="../reference/MulticastServiceExplorer.html">MulticastServiceExplorer</a></li>
+<li><a href="../reference/MulticastServiceProvider.html">MulticastServiceProvider</a>	<ul>
+	</ul>
+</li>
+<li><a href="../reference/Object.html">Object</a></li>
+<li><a href="../reference/ObjectRef.html">ObjectRef</a></li>
+<li><a href="../reference/Optional.html">Optional</a></li>
+<li><a href="../reference/Ref.html">Ref</a></li>
+<li><a href="../reference/Signal.html">Signal</a></li>
+<li><a href="../reference/String.html">String</a></li>
+<li><a href="../reference/Transaction.html">Transaction</a></li>
+<li><a href="../reference/Variant.html">Variant</a></li>
+<li><a href="../reference/Vector.html">Vector</a></li>
+</ul>
+</div>
+
+<div id="content">
+<div class="nav" align="right">
+<a href="MulticastServiceExplorer.html">previous</a><span>&nbsp;</span><a href="Object.html">next</a></div>
+
+<h1>MulticastServiceProvider Class Reference</h1>
+
+<table><tr><td><p>Declared in</p></td><td><p><code>flip/contrib/MulticastServiceProvider.h</code></p></td></tr>
+</table>
+
+<div class="codeblock"><table>
+<tr><td><pre>class MulticastServiceProvider;</pre></td></tr>
+</table></div>
+
+<div class="note"><p><strong>Note:</strong> Classes part of <code>contrib/</code> are not supported on every platform.</p></div>
+
+<p><code>MulticastServiceProvider</code> is used to automatically provide Flip services running on the Local Area Network. It uses UDP multicast to achieve it.</p>
+
+<p>It is used in conjunction with <code>MulticastServiceExplorer</code>, see <a href="../reference/MulticastServiceExplorer.html"><code>flip::MulticastServiceExplorer</code></a></p>
+
+<h2>Member Functions Synopsys</h2>
+
+<table><tr><td><p><a href="#member-function-constructor">Constructor</a></p></td><td><p>Constructs the <code>MulticastServiceProvider</code></p></td></tr>
+<tr><td><p><a href="#member-function-destructor">Destructor</a></p></td><td><p>Destructs the <code>MulticastServiceProvider</code></p></td></tr>
+<tr><td><p><code><a href="#member-function-process">process</a></code></p></td><td><p>Processes service providing</p></td></tr>
+</table>
+
+<h2>Member Functions</h2>
+
+<h3 id="member-function-constructor">Constructor</h3>
+<div class="codeblock"><table>
+<tr><td><pre>MulticastServiceProvider (uint16_t session_port, DocumentBase &amp; document, std::map &lt;std::string, std::string&gt; metadata);                                                               (1)</pre></td></tr>
+<tr><td><pre>MulticastServiceProvider (uint32_t multicast_ip, uint16_t port_min, uint16_t port_max, uint16_t session_port, DocumentBase &amp; document, std::map &lt;std::string, std::string&gt; metadata);  (2)</pre></td></tr>
+</table></div>
+
+<ol>
+<li>Convenience default constructor (see below).</li>
+<li>Constructor (see below).</li>
+</ol>
+
+<p>Version 2 of the constructor takes the multicast ip and a range of possible port to provide the service on. The range allows to find an available port in the case where ports are already used for multicast.</p>
+
+<p>It also provides the <code>session_port</code> which is the port on which the Flip document server is listening for new connections.</p>
+
+<p><code>DocumentBase</code> provides the model version to make sure that they are identical when connecting, and finally <code>metada</code> is arbitrary map of key values to provide more informational data to the service explorer.</p>
+
+<p>Version 1 of the constructor uses default values as given by the class <code>MulticastService</code>.</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>// Setup a server for session number 1234567890123</pre></td></tr>
+<tr><td><pre>DocumentValidatorVoid validator;</pre></td></tr>
+<tr><td><pre>DocumentServer document_server (Model::use (), validator, 1234567890123ULL);</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>// Setup a socket listening on TCP port 9090 to accept new connections.</pre></td></tr>
+<tr><td><pre>PortTransportServerTcp port (document_server, 9090);</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>std::map &lt;std::string, std::string&gt; metadata;</pre></td></tr>
+<tr><td><pre>metadata [&quot;name&quot;] = &quot;My great session!&quot;;</pre></td></tr>
+<tr><td><pre>metadata [&quot;date&quot;] = &quot;2015/05/06&quot;;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>MulticastServiceProvider provider (9090, document_server, metadata);</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>for (;;)</pre></td></tr>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>   // process incoming connections and transfers</pre></td></tr>
+<tr><td><pre>   port.process ();</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   // process provider</pre></td></tr>
+<tr><td><pre>   provider.process ();</pre></td></tr>
+<tr><td><pre>}</pre></td></tr>
+</table></div>
+
+<hr /><h3 id="member-function-destructor">Destructor</h3>
+<div class="codeblock"><table>
+<tr><td><pre>~MulticastServiceProvider ();</pre></td></tr>
+</table></div>
+
+<p>Destructor.</p>
+
+<hr /><h3 id="member-function-process"><code>process</code></h3>
+<div class="codeblock"><table>
+<tr><td><pre>void  process ();</pre></td></tr>
+</table></div>
+
+<p>Processes service providing. This function needs to be called regularly to let <code>MulticastServiceProvider</code> provide service. This function can be called often, as it only processes sockets when needed.</p>
+
+<div class="nav" align="right">
+<a href="MulticastServiceExplorer.html">previous</a><span>&nbsp;</span><a href="Object.html">next</a></div>
+
+<div class="bottomspacer">&nbsp;</div>
+</div>
+</body>
+</html>

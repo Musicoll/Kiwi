@@ -1,0 +1,315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flip Basics Programming Guide: Working with a Remote Server</title>
+<style>
+* {font-family: 'Lucida Grande', Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+body {background-color: #fff; }
+p {color: black; font-size: 13px; margin-bottom: 10px;}
+h1 {color: black; font-size: 28px; margin-bottom: 32px; padding-top: 24px; font-weight: normal; display: block; }
+h2 {color: #3c4c6c; display: block; font-size: 24px; font-weight: normal; margin-bottom: 20px; margin-top: 42px; border-bottom-color: #8391a8; border-bottom-style: solid; border-bottom-width: 1px;}
+h3 {color: black; font-size: 19px; margin-bottom: 4px; margin-top: 28px; font-weight: normal; display: block; }
+a {color: #36c; text-decoration: none; cursor:pointer; }
+a:active {color: #36c; text-decoration: none; cursor:pointer; }
+a:hover {color: #36c; text-decoration: underline; cursor:pointer; }
+.aerr {color: #f00}
+h2 a {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h2 a:active {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h2 a:hover {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h3 a {color: black; text-decoration: none; cursor:auto; }
+h3 a:active {color: black; text-decoration: none; cursor:auto; }
+h3 a:hover {color: black; text-decoration: none; cursor:auto; }
+footer {font-size: 10px; position: fixed; display: block; bottom: 0px; background-color: #f1f5f9; border-top-color: #c7cfd5; border-top-style: solid; border-top-width: 1px; width: 100%; height:22px; padding-top: 7px; padding-left: 7px;}
+div {display: block;}
+.codeblock {margin-top:17px; margin-bottom:17px; clear: both; display: block; color: #333; }
+pre {font-family: Courier, Consolas, monospace; font-size: 12px; height: 14px; line-height: 14px; margin-bottom: 0px; margin-left: 6px; margin-right: 4px; margin-top: -1px;}
+small pre {color:#888;}
+emph pre {color:#000;}
+table {padding-top:5px; padding-bottom:6px; margin-bottom:12px; background-color: #f1f5f9; border-color: #c7cfd5; border-style: solid; border-width: 1px; width: 100%;}
+tr {}
+td > p {margin-left: 6px; height: 12px;}
+.note {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #fff; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}
+.note strong {margin-right: 8px;}
+.note p {margin-top: 7px;}
+.important {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f1f5f9; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}
+.important strong {margin-right: 8px;}
+.important p {margin-top: 7px;}
+.warning {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f8e3e1; border-color: #c5443e; border-style: solid; border-width: 1px; display: block;}
+.warning strong {margin-right: 8px;}
+.warning p {margin-top: 7px;}
+.caption p {color: black; font-size: 10px; margin-bottom: 10px;}
+img {margin-top:10px; margin-bottom:10px;}
+ul {margin-left: 17px; margin-bottom: 10px;}
+ol {margin-left: 17px; margin-bottom: 10px;}
+li {color: black; font-size: 13px; margin-bottom: 7px;}
+code {font-family: Courier, Consolas, monospace;}
+#content {padding-left: 26px; padding-right: 26px; position: absolute; top: 30px; left: 230px; width: 750px;}
+#toc {width: 230px; position: fixed; top: 30px; background-color: #f1f5f9; height: 100%; border-right-color: #c7cfd5; border-right-style: solid; border-right-width: 1px; padding-left: 0px; padding-top: 17px; overflow: auto;}
+#toc > ul {list-style-type: none;}
+#toc > ul > li {font-size: 11px; }
+#toc > ul > li > ul {list-style-type: none; margin-top:8px;}
+#toc > ul > li > ul > li {font-size: 11px; }
+#toc > p {font-size: 13px; margin-left: 17px;}
+.codeblock > p {margin-bottom: 3px; font-size: 11px;}
+.codeblock > p > strong {margin-right: 10px; color: #222;}
+.nav {font-size: 10px; margin-top: 20px; }
+.nav > span {margin-right: 20px;}
+.bottomspacer {height:100px;}
+#header {width:100%; position: fixed; background-color: #111; height: 30px; z-index: 900;}
+#header > p {color:#fff; font-size: 13px; padding-top: 6px; padding-left: 17px; }
+#header > p > a {color:#fff; font-size: 13px; text-decoration: none; cursor:pointer; padding-right: 56px;}
+.sectioncode {background-color: #f6f6f6; padding: 12px; margin-top: 18px;}
+.sectioncode > h3 {margin-top: 0px; padding-bottom: 8px;}
+hr { display: block; height: 1px; border: 0; border-top: 1px solid #eee; margin: 28px 0; padding: 0; }</style>
+</head>
+
+<body>
+
+<div id="header">
+<div style="width: 1006px;"></div>
+<p><a href="../index.html">Flip Documentation Library</a><a href="../guide/index.html">Flip Basics Programming Guide</a></p>
+</div>
+<div id="toc">
+<p>Flip Basics Programming Guide</p>
+<ul>
+<li><a href="../guide/about.html">About Flip Programming Guide</a></li>
+<li><a href="../guide/declare.html">Declaring the Model</a></li>
+<li><a href="../guide/organize.html">Organizing your Code</a></li>
+<li><a href="../guide/control.html">Controlling the Model</a></li>
+<li><a href="../guide/observe.html">Observing the Model</a></li>
+<li><a href="../guide/signal.html">Signalling the Model</a></li>
+<li><a href="../guide/remote.html">Working with a Remote Server</a>	<ul>
+	<li><a href="../guide/remote.html#workflow">Commit/Push/Pull Model</a></li>
+	<li><a href="../guide/remote.html#remote">Working with a Remote Server, Client Part</a></li>
+	<li><a href="../guide/remote.html#server">Working with a Remote document, Server Part</a></li>
+	<li><a href="../guide/remote.html#validate">Validating Transactions</a></li>
+	<li><a href="../guide/remote.html#bind">Declaring and Binding a Validator</a></li>
+	<li><a href="../guide/remote.html#validator">Writing Validation Code</a></li>
+	</ul>
+</li>
+<li><a href="../guide/misc.html">More Fun with Flip</a></li>
+<li><a href="../guide/conversion.html">Model Versioning</a></li>
+</ul>
+</div>
+
+<div id="content">
+<div class="nav" align="right">
+<a href="signal.html">previous</a><span>&nbsp;</span><a href="misc.html">next</a></div>
+
+<h1>Working with a Remote Server</h1>
+
+<p>At this point, you are able to declare a model and interact with it by controlling it and observing it. But still this happens only on a local computer.</p>
+
+<p>This chapter exposes how Flip works with a remote server and brings collaboration features to your application.</p>
+
+<h2><a name="workflow">Commit/Push/Pull Model</a></h2>
+
+<p>When you call <code>commit</code> on a document, Flip will create the transaction that represents the change between the old and new states of the document.</p>
+
+<p>Additionnaly, Flip will store this transaction in a <em>Push Stack</em> ready to be pushed to the remote server.</p>
+
+<p>If you then call <code>push</code> on the document, and the document is set up to work with a remote server, Flip will send all the commits to that server, so that they can be executed by the server and arbitrated.</p>
+
+<p>Similarly, to receive the changes available on the remote server done by another user, or to know if the change on a document were acknowledge or denied, one will call <code>pull</code> on the document to receive and merge this changes into your local document. Internally, the transport layer will regurarly fetch the server for changes and store them in a <em>Pull Stack</em>. Calling <code>pull</code> will simply execute each element of the pull stack.</p>
+
+<p>Generally, you won't push to the remote server for every single commit you do. For example in the previous example, if a user drags a clip on the track by changing its position, then you may want to advertise those changes to the outside world only when the user has finished its gesture by releasing the mouse button. In this case you might do commit for every mouse moves, and then only push to the remote server once the user has released the mouse button. Depending on the case, you might also want not to commit on every mouse moves, and commit and push at the same time when the user released the mouse button.</p>
+
+<p>Additionally, one can <code>squash</code> the Push Stack, so that all transactions previously commited are squashed to one transaction before this transaction is pushed to the server. This is particularly useful in the case where the same values are changed over and over in a gesture, so that the resulting transaction is far smaller than every commits.</p>
+
+<p>Generally, you would pull almost constantly from the server.</p>
+
+<p>The next sections will show how to set up concretely the code to work with a remote server.</p>
+
+<h2><a name="remote">Working with a Remote Server, Client Part</a></h2>
+
+<p>Documents connect to a remote a server through a <em>Transport</em>. Flip can support many transports methods through its transport abstraction.</p>
+
+<p>For a simple TCP socket, one can use <code>CarrierTransportSocketTcp</code> in <code>flip/contrib/transport_tcp</code>. This will be the class used in the following examples.</p>
+
+<p>A client is assigned a <em>user identifier</em>. This user identifier must be unique for every user connecting to the same session. Typically this can be a facebook user number or an OpenId unique identifier. For a quick test, using a random generator might be good enough.</p>
+
+<p>Then the client is going to connect to a session, with a <em>session identifier</em>. A session represents a document on the server side, and is usually meant to be persistent.</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>#include &quot;flip/contrib/transport_tcp/CarrierTransportSocketTcp.h&quot;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>void  run (uint64_t user_id, uint64_t session_id)</pre></td></tr>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>   Document document (Model::use (), user_id, &apos;appl&apos;, &apos;gui &apos;);                   (1)</pre></td></tr>
+<tr><td><pre>   CarrierTransportSocketTcp carrier (document, session_id, &quot;localhost&quot;, 9000);  (2)</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   carrier.process ();                                                           (3)</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   document.pull ();                                                             (4)</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   Root &amp; root = document.root &lt;Root&gt; ();</pre></td></tr>
+<tr><td><pre>   root.happiness_level = 100.0;</pre></td></tr>
+<tr><td><pre>   document.commit ();</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   document.push ();                                                             (5)</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   carrier.process ();</pre></td></tr>
+<tr><td><pre>}</pre></td></tr>
+</table></div>
+
+<ol>
+<li>Create a new document for <code>user_id</code>. <code>user_id</code> must be unique for every    user connecting to the session</li>
+<li>Connect to <code>localhost</code> on port <code>9000</code>, for <code>session_id</code></li>
+<li><code>process</code> allows for this transport implementation to write and read from the socket as needed</li>
+<li>this call to <code>pull</code> will replace the current document with the one from the remote server</li>
+<li>this call to <code>push</code> will send the happiness level change to the document server</li>
+</ol>
+
+<div class="note"><p><strong>Note:</strong> The code above is simplified, as a single <code>process</code> code on a transport carrier    does not guarantee that the socket will be able to send or receive all data.</p></div>
+
+<p>The code above implies that a Flip server is running on <code>localhost</code> port <code>9000</code>. The next section will show how to set up this server.</p>
+
+<h2><a name="server">Working with a Remote document, Server Part</a></h2>
+
+<p>In this example, <code>ServerSimple</code> from <code>flip/contrib</code> is used. It is a simple server that allows to host multiple sessions, and is running all in one process. This is probably not suitable for production quality, but nethertheless very handy to set up a flip server quickly.</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>#include &quot;flip/contrib/DataConsumerFile.h&quot;</pre></td></tr>
+<tr><td><pre>#include &quot;flip/contrib/DataProviderFile.h&quot;</pre></td></tr>
+<tr><td><pre>#include &quot;flip/contrib/ServerSimple.h&quot;</pre></td></tr>
+<tr><td><pre>#include &quot;flip/BackEndBinary.h&quot;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>std::string path (uint64_t session_id)</pre></td></tr>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>   return std::string (&quot;/sessions/&quot;) + std::to_string (session_id);</pre></td></tr>
+<tr><td><pre>}</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>void run ()</pre></td></tr>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>   ServerSimple server (Model::use (), 9000);               (1)</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   server.bind_validator_factory ([](uint64_t session_id){</pre></td></tr>
+<tr><td><pre>      return std::make_unique &lt;MyModelValidator&gt; ();        (2)</pre></td></tr>
+<tr><td><pre>   });</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   server.bind_init ([](uint64_t session_id, DocumentBase &amp; document){</pre></td></tr>
+<tr><td><pre>      Root &amp; root = document.root &lt;Root&gt; ();</pre></td></tr>
+<tr><td><pre>      root.happiness_level = 42.0;                          (3)</pre></td></tr>
+<tr><td><pre>   });</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   server.bind_read ([](uint64_t session_id){</pre></td></tr>
+<tr><td><pre>      BackEndIR backend;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>      auto session_path = path (session_id);</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>      if (path_exists (session_path))</pre></td></tr>
+<tr><td><pre>      {</pre></td></tr>
+<tr><td><pre>         DataProviderFile provider (session_path.c_str ());</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>         backend.register_backend &lt;BackEndBinary&gt; ();</pre></td></tr>
+<tr><td><pre>         backend.read (provider);</pre></td></tr>
+<tr><td><pre>      }</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>      return backend;                                       (4)</pre></td></tr>
+<tr><td><pre>   });</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   server.bind_write ([](uint64_t session_id, const BackEndIR &amp; backend){</pre></td></tr>
+<tr><td><pre>      auto session_path = path (session_id);</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>      DataConsumerFile consumer (session_path.c_str ());</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>      backend.write &lt;BackEndBinary&gt; (consumer);             (5)</pre></td></tr>
+<tr><td><pre>   });</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   server.run ();                                           (6)</pre></td></tr>
+<tr><td><pre>}</pre></td></tr>
+</table></div>
+
+<ol>
+<li>Set up the server to listen on port <code>9000</code></li>
+<li>Bind the validator factory. This is run every time a new session is opened</li>
+<li>Bind the document initiator. When no session is already present (see 4. below),    it will create a non-empty initial document, should it be needed.</li>
+<li>Bind the document reader. Here it is using a <code>DataProviderFile</code>    with the <code>BackEndBinary</code> production document format.    If the returned backend is empty, then the document initiator (see 3. above) is called.    This is also where you would convert your document to the current model version if needed.</li>
+<li>Bind the document writer. Here it is using a <code>DataConsumerFile</code>    with the <code>BackEndBinary</code> production document format</li>
+<li>Finally run the server. This function will allow the server to process incoming client request</li>
+</ol>
+
+<h2><a name="validate">Validating Transactions</a></h2>
+
+<p>When a single user is working in a document, it can somehow be assumed that the changes made for the document are going to be valid, from the model logic point of view. While this can be ensured by proper coding in the single user case, there is no way to make sure of it in a concurrent environment.</p>
+
+<p>To solve this problems, Servers need to run validation code. The code will ensure that the new state of the document is valid from the model logic point of view. If the document is not valid, the validator will inform it to the Flip system which will rollback the transaction, ensuring that the document returns to the last known valid state.</p>
+
+<p>Validating the model is very similar to observing it. Actually the code to traverse the model will be exactly similar to the one to observe it. When the validator encounters an error, it will throw to notify the Flip system that the document state it is looking at is not valid. The convenience macro <code>flip_VALIDATION_FAILED</code> is provided for this matter.</p>
+
+<h2><a name="bind">Declaring and Binding a Validator</a></h2>
+
+<p>Validators are declared in a similar way to observers :</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>#include &quot;flip/DocumentValidator.h&quot;</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>class Validator : public flip::DocumentValidator &lt;Song&gt;                       (1)</pre></td></tr>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>public:</pre></td></tr>
+<tr><td><pre>   virtual void validate (Song &amp; song) override;                              (2)</pre></td></tr>
+<tr><td><pre>}</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>void  run ()</pre></td></tr>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>   ServerSimple server (Model::use (), 9000);</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   server.bind_validator_factory ([](uint64_t session_id){</pre></td></tr>
+<tr><td><pre>      return std::make_unique &lt;Validator&gt; ();                                 (3)</pre></td></tr>
+<tr><td><pre>   });</pre></td></tr>
+<tr><td><pre>}</pre></td></tr>
+</table></div>
+
+<ol>
+<li>Make a validator by inheriting from <code>DocumentValidator</code></li>
+<li>Override the pure virtual function declared in <code>DocumentValidator</code></li>
+<li>Create a new <code>Validator</code> that will be attached to every new document created by the server</li>
+</ol>
+
+<p>Now, every time the document session will be changed and the server receives this modification, <code>validate</code> will be fired.</p>
+
+<h2><a name="validator">Writing Validation Code</a></h2>
+
+<p>In the example, we might want to ensure that the clip positions are always positive or zero, and that the durations are always strictly positive. Implementing this validation scheme would be done like in the following code :</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>void  Validator::validate (Song &amp; song)</pre></td></tr>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>   if (song.tempo.changed ())</pre></td></tr>
+<tr><td><pre>   {</pre></td></tr>
+<tr><td><pre>      if (song.tempo &lt; 20) flip_VALIDATION_FAILED (&quot;incorrect tempo&quot;);</pre></td></tr>
+<tr><td><pre>   }</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   if (song.tracks.changed ())</pre></td></tr>
+<tr><td><pre>   {</pre></td></tr>
+<tr><td><pre>      for (auto &amp;&amp; track : song.tracks)</pre></td></tr>
+<tr><td><pre>      {</pre></td></tr>
+<tr><td><pre>         if (track.changed ())</pre></td></tr>
+<tr><td><pre>         {</pre></td></tr>
+<tr><td><pre>            for (auto &amp;&amp; clip : track.clips)</pre></td></tr>
+<tr><td><pre>            {</pre></td></tr>
+<tr><td><pre>               if (clip.changed ())</pre></td></tr>
+<tr><td><pre>               {</pre></td></tr>
+<tr><td><pre>                  if (clip.position &lt; 0.0) flip_VALIDATION_FAILED (&quot;incorrect position&quot;);</pre></td></tr>
+<tr><td><pre>                  if (clip.duration &lt;= 0.0) flip_VALIDATION_FAILED (&quot;incorrect duration&quot;);</pre></td></tr>
+<tr><td><pre>               }</pre></td></tr>
+<tr><td><pre>            }</pre></td></tr>
+<tr><td><pre>         }</pre></td></tr>
+<tr><td><pre>      }</pre></td></tr>
+<tr><td><pre>   }</pre></td></tr>
+<tr><td><pre>}</pre></td></tr>
+</table></div>
+
+<p>The next chapter, <a href="../guide/misc.html">More Fun with Flip</a> will guide you through more advanced use of Flip.</p>
+
+<div class="nav" align="right">
+<a href="signal.html">previous</a><span>&nbsp;</span><a href="misc.html">next</a></div>
+
+<div class="bottomspacer">&nbsp;</div>
+</div>
+</body>
+</html>

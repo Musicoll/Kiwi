@@ -1,0 +1,236 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flip Basics Programming Guide: Signalling the Model</title>
+<style>
+* {font-family: 'Lucida Grande', Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+body {background-color: #fff; }
+p {color: black; font-size: 13px; margin-bottom: 10px;}
+h1 {color: black; font-size: 28px; margin-bottom: 32px; padding-top: 24px; font-weight: normal; display: block; }
+h2 {color: #3c4c6c; display: block; font-size: 24px; font-weight: normal; margin-bottom: 20px; margin-top: 42px; border-bottom-color: #8391a8; border-bottom-style: solid; border-bottom-width: 1px;}
+h3 {color: black; font-size: 19px; margin-bottom: 4px; margin-top: 28px; font-weight: normal; display: block; }
+a {color: #36c; text-decoration: none; cursor:pointer; }
+a:active {color: #36c; text-decoration: none; cursor:pointer; }
+a:hover {color: #36c; text-decoration: underline; cursor:pointer; }
+.aerr {color: #f00}
+h2 a {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h2 a:active {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h2 a:hover {color: #3c4c6c; text-decoration: none; cursor:auto; }
+h3 a {color: black; text-decoration: none; cursor:auto; }
+h3 a:active {color: black; text-decoration: none; cursor:auto; }
+h3 a:hover {color: black; text-decoration: none; cursor:auto; }
+footer {font-size: 10px; position: fixed; display: block; bottom: 0px; background-color: #f1f5f9; border-top-color: #c7cfd5; border-top-style: solid; border-top-width: 1px; width: 100%; height:22px; padding-top: 7px; padding-left: 7px;}
+div {display: block;}
+.codeblock {margin-top:17px; margin-bottom:17px; clear: both; display: block; color: #333; }
+pre {font-family: Courier, Consolas, monospace; font-size: 12px; height: 14px; line-height: 14px; margin-bottom: 0px; margin-left: 6px; margin-right: 4px; margin-top: -1px;}
+small pre {color:#888;}
+emph pre {color:#000;}
+table {padding-top:5px; padding-bottom:6px; margin-bottom:12px; background-color: #f1f5f9; border-color: #c7cfd5; border-style: solid; border-width: 1px; width: 100%;}
+tr {}
+td > p {margin-left: 6px; height: 12px;}
+.note {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #fff; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}
+.note strong {margin-right: 8px;}
+.note p {margin-top: 7px;}
+.important {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f1f5f9; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}
+.important strong {margin-right: 8px;}
+.important p {margin-top: 7px;}
+.warning {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f8e3e1; border-color: #c5443e; border-style: solid; border-width: 1px; display: block;}
+.warning strong {margin-right: 8px;}
+.warning p {margin-top: 7px;}
+.caption p {color: black; font-size: 10px; margin-bottom: 10px;}
+img {margin-top:10px; margin-bottom:10px;}
+ul {margin-left: 17px; margin-bottom: 10px;}
+ol {margin-left: 17px; margin-bottom: 10px;}
+li {color: black; font-size: 13px; margin-bottom: 7px;}
+code {font-family: Courier, Consolas, monospace;}
+#content {padding-left: 26px; padding-right: 26px; position: absolute; top: 30px; left: 230px; width: 750px;}
+#toc {width: 230px; position: fixed; top: 30px; background-color: #f1f5f9; height: 100%; border-right-color: #c7cfd5; border-right-style: solid; border-right-width: 1px; padding-left: 0px; padding-top: 17px; overflow: auto;}
+#toc > ul {list-style-type: none;}
+#toc > ul > li {font-size: 11px; }
+#toc > ul > li > ul {list-style-type: none; margin-top:8px;}
+#toc > ul > li > ul > li {font-size: 11px; }
+#toc > p {font-size: 13px; margin-left: 17px;}
+.codeblock > p {margin-bottom: 3px; font-size: 11px;}
+.codeblock > p > strong {margin-right: 10px; color: #222;}
+.nav {font-size: 10px; margin-top: 20px; }
+.nav > span {margin-right: 20px;}
+.bottomspacer {height:100px;}
+#header {width:100%; position: fixed; background-color: #111; height: 30px; z-index: 900;}
+#header > p {color:#fff; font-size: 13px; padding-top: 6px; padding-left: 17px; }
+#header > p > a {color:#fff; font-size: 13px; text-decoration: none; cursor:pointer; padding-right: 56px;}
+.sectioncode {background-color: #f6f6f6; padding: 12px; margin-top: 18px;}
+.sectioncode > h3 {margin-top: 0px; padding-bottom: 8px;}
+hr { display: block; height: 1px; border: 0; border-top: 1px solid #eee; margin: 28px 0; padding: 0; }</style>
+</head>
+
+<body>
+
+<div id="header">
+<div style="width: 1006px;"></div>
+<p><a href="../index.html">Flip Documentation Library</a><a href="../guide/index.html">Flip Basics Programming Guide</a></p>
+</div>
+<div id="toc">
+<p>Flip Basics Programming Guide</p>
+<ul>
+<li><a href="../guide/about.html">About Flip Programming Guide</a></li>
+<li><a href="../guide/declare.html">Declaring the Model</a></li>
+<li><a href="../guide/organize.html">Organizing your Code</a></li>
+<li><a href="../guide/control.html">Controlling the Model</a></li>
+<li><a href="../guide/observe.html">Observing the Model</a></li>
+<li><a href="../guide/signal.html">Signalling the Model</a>	<ul>
+	<li><a href="../guide/signal.html#which">Signal and Message</a></li>
+	</ul>
+</li>
+<li><a href="../guide/remote.html">Working with a Remote Server</a></li>
+<li><a href="../guide/misc.html">More Fun with Flip</a></li>
+<li><a href="../guide/conversion.html">Model Versioning</a></li>
+</ul>
+</div>
+
+<div id="content">
+<div class="nav" align="right">
+<a href="observe.html">previous</a><span>&nbsp;</span><a href="remote.html">next</a></div>
+
+<h1>Signalling the Model</h1>
+
+<p>Now that we can control the model with persistent data, this chapter exposes how to control the model with non-persistent data, that is data that is not going to be saved. There multiple ways to achieve that in flip, with slightly different meaning, exposed here.</p>
+
+<p>This chapter will use the model declared in the chapter <a href="../guide/declare.html">Declaring the Model</a>.</p>
+
+<h2><a name="which"><code>Signal</code> and <code>Message</code></a></h2>
+
+<p>Flip has two signal types : <a href="../reference/Signal.html"><code>Signal</code></a> and <a href="../reference/Message.html"><code>Message</code></a>. They operate in a relative similar ways, but have different meanings.</p>
+
+<h3><a name="which-message"><code>Message</code></a></h3>
+
+<p><a href="../reference/Message.html"><code>Message</code></a> is a flip type. It does not store data, but allows to share non-persitent data between clients. For this reason, it is part of the document model.</p>
+
+<p>When a <code>Message</code> is signalled, the content of the data is shared with every documents and clients connected to the same document, but the data itself is not saved within the document.</p>
+
+<p>A <code>Message</code> describes a transient change of state of a flip Object. Receiving the data sent is done through the observer, as a <code>Message</code> is part of the model, which means that the data from a message is in a transaction where over members might be changed. This allows to receive synchronously changes of the model, that would be hard to manage with a <code>Signal</code>.</p>
+
+<p>Let's take an example to illustrate this point. Let's consider a play head in a audio or video application. From a feature point of view, the play head has a position and a state (playing or not playing). The position expresses the change in the model, not the actual position as shown in the view.</p>
+
+<p>If suddenly the user want to change both the position and the state of the play head, then using a <code>Message</code> ensure that those two properties are going to be changed synchronously and transactionally into the model.</p>
+
+<p>This is not the case with <code>Signal</code> where those changes would come one after the other, possibly in a different order.</p>
+
+<p>Example :</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>class PlayHead : public Object</pre></td></tr>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>public:</pre></td></tr>
+<tr><td><pre>   enum State</pre></td></tr>
+<tr><td><pre>   {</pre></td></tr>
+<tr><td><pre>      State_STOPPED = 0,</pre></td></tr>
+<tr><td><pre>      State_PLAYING,</pre></td></tr>
+<tr><td><pre>   };</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   Float position;</pre></td></tr>
+<tr><td><pre>   Message &lt;State&gt; state;</pre></td></tr>
+<tr><td><pre>};</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>// controlling the model, jumping to position 2.0</pre></td></tr>
+<tr><td><pre>// and playing at the same time</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>auto &amp; playhead = song.playhead;</pre></td></tr>
+<tr><td><pre>playhead.position = 2.0;</pre></td></tr>
+<tr><td><pre>playhead.state.send (PlayHead::State_PLAYING);</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>playhead.document ().commit ();</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>// observing the model, this allow to see the</pre></td></tr>
+<tr><td><pre>// changes as a transaction</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>void  document_changed (PlayHead &amp; playhead)</pre></td></tr>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>   if (playhead.position.changed ())</pre></td></tr>
+<tr><td><pre>   {</pre></td></tr>
+<tr><td><pre>      // ...</pre></td></tr>
+<tr><td><pre>   }</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   if (playhead.state.changed ())</pre></td></tr>
+<tr><td><pre>   {</pre></td></tr>
+<tr><td><pre>      playhead.state.get ([&amp;](bool forward_flag, State state) {</pre></td></tr>
+<tr><td><pre>         // ...</pre></td></tr>
+<tr><td><pre>      });</pre></td></tr>
+<tr><td><pre>   }</pre></td></tr>
+<tr><td><pre>}</pre></td></tr>
+</table></div>
+
+<p>Finally, because it is part of the document model, <code>Message</code> has a <code>forward_flag</code> as part of its function definition, to allow for the observer to take the direction of execution of the transaction to be taken into account. The semantic of backward for a <code>Message</code> data depends on the semantic of the model. The only rule is to have the proper behavior if the transaction containing the <code>Message</code> is refused by the server so rollbacked locally, or the meaning of undoing a transaction when the transaction contains operations over a <code>Message</code>.</p>
+
+<h3><a name="which-signal"><code>Signal</code></a></h3>
+
+<p>On the other hand, <a href="../reference/Signal.html"><code>Signal</code></a> is not a flip type. It also does not store data, and the data is not shared between other clients. It is not part of the document model.</p>
+
+<p>When a <code>Signal</code> is signalled, the content of the data is shared only with every documents connected through a <code>Hub</code> on the local machine, and the data itself is not saved within the document.</p>
+
+<p>A <code>Signal</code> describes a signal directed to a flip Object.</p>
+
+<p>Receiving the data sent is done with the help of a signal connection which is outside the model, and is not received through the <code>document_changed</code> virtual method of the observer. Therefore it is not synchronous to changes of the model.</p>
+
+<p>Because of the way it internally works, <code>Signal</code> is also preferred when the amount of data to exchange per second can be enormous.</p>
+
+<p>Let's take the previous example and let's say that the realtime position of the playhead (not the one reflected in the model) is going to be signaled from the audio engine to the GUI using a <code>Signal</code>.</p>
+
+<p>When the play head is constructed, the observer of the GUI will set up a signal connection to receive the realtime position, as illustrated below.</p>
+
+<div class="codeblock"><table>
+<tr><td><pre>class PlayHead : public Object</pre></td></tr>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>public:</pre></td></tr>
+<tr><td><pre>   enum</pre></td></tr>
+<tr><td><pre>   {</pre></td></tr>
+<tr><td><pre>      Signal_RT_POSITION = 0,</pre></td></tr>
+<tr><td><pre>   };</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   PlayHead () : signal_rt_position (Signal_RT_POSITION, *this) {}</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   Signal &lt;double&gt; signal_rt_position;</pre></td></tr>
+<tr><td><pre>};</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>void  document_changed (PlayHead &amp; playhead)</pre></td></tr>
+<tr><td><pre>{</pre></td></tr>
+<tr><td><pre>   if (playhead.added ())</pre></td></tr>
+<tr><td><pre>   {</pre></td></tr>
+<tr><td><pre>      // Store the SignalConnection in an entity</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>      playhead.entity ().emplace &lt;SignalConnection&gt; (</pre></td></tr>
+<tr><td><pre>         playhead.signal_rt_position.connect ([](double position){</pre></td></tr>
+<tr><td><pre>            // update realtime position in the GUI</pre></td></tr>
+<tr><td><pre>         });</pre></td></tr>
+<tr><td><pre>      );</pre></td></tr>
+<tr><td><pre>   }</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>   if (playhead.removed ())</pre></td></tr>
+<tr><td><pre>   {</pre></td></tr>
+<tr><td><pre>      playhead.entity ().erase &lt;SignalConnection&gt; ();</pre></td></tr>
+<tr><td><pre>   }</pre></td></tr>
+<tr><td><pre>}</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>// From audio engine :</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>double position = audio_engine.get_rt_position ();</pre></td></tr>
+<tr><td><pre></pre></td></tr>
+<tr><td><pre>playhead.signal_rt_position (position);</pre></td></tr>
+</table></div>
+
+<p>The signal also decouple the sender from the receiver, in the sense that the sender does not need to know who is going to receive the data, and even is the data is going to be received at all.</p>
+
+<p>This is also a safe mechanism, if an object is already deleted in a document, while still present in another document : if the signal does not have a recipient anymore, it is silently dropped.</p>
+
+<p>The next chapter, <a href="../guide/remote.html">Working with a Remote Server</a> will guide you through setting up a collaboration network.</p>
+
+<div class="nav" align="right">
+<a href="observe.html">previous</a><span>&nbsp;</span><a href="remote.html">next</a></div>
+
+<div class="bottomspacer">&nbsp;</div>
+</div>
+</body>
+</html>

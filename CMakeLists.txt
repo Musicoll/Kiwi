@@ -182,7 +182,7 @@ if (APPLE)
             find_library(FlipLib NAMES flip PATHS ${ROOT_DIR}/ThirdParty/flip/projects/build/Release)
         endif()
     else()
-        find_library(FlipLib NAMES flip PATHS ${ROOT_DIR}/ThirdParty/flip-public/lib/macos)
+        find_library(FlipLib NAMES flip PATHS ${ROOT_DIR}/ThirdParty/flip-demo/lib/mac)
     endif()
     set(FLIP_DEP ${FlipLib})
 elseif (WIN32)
@@ -194,7 +194,7 @@ elseif (WIN32)
                 find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip/projects/build/lib/x64/Release")
             endif()
         else()
-            find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/Visual Studio 2015/x64")
+            find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-demo/lib/windows/VS2015/x64/Release")
         endif()
 	else()
         if (${FLIP_PRIVATE})
@@ -204,7 +204,7 @@ elseif (WIN32)
                 find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip/projects/build/Win32/Release")
             endif()
         else()
-            find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/Visual Studio 2015/Win32")
+            find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-demo/lib/windows/VS2015/Win32/Release")
         endif()
 	endif()
     
@@ -214,12 +214,15 @@ endif()
 
 if (${FLIP_PRIVATE})
     set(FLIP_DIR "${ROOT_DIR}/ThirdParty/flip")
+    file (GLOB_RECURSE FLIP_SRC ${ROOT_DIR}/ThirdParty/flip/inlude/*.hpp
+                                ${ROOT_DIR}/ThirdParty/flip/include/*.h
+                                ${ROOT_DIR}/ThirdParty/flip/src/*.cpp)
 else()
-    set(FLIP_DIR "${ROOT_DIR}/ThirdParty/flip-public")
+    set(FLIP_DIR "${ROOT_DIR}/ThirdParty/flip-demo")
+    file (GLOB_RECURSE FLIP_SRC ${FLIP_DIR}/include/*.hpp 
+                                ${FLIP_DIR}/include/*.h)
 endif()
 
-file (GLOB_RECURSE FLIP_SRC ${FLIP_DIR}/*.[h|c]pp 
-                            ${FLIP_DIR}/*.h)
 add_custom_target(Flip SOURCES ${FLIP_SRC})
 set_target_properties (Flip PROPERTIES FOLDER ThirdParty
                                        INTERFACE_INCLUDE_DIRECTORIES ${FLIP_DIR}/include
