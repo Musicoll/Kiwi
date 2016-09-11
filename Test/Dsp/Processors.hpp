@@ -40,7 +40,7 @@ public:
 private:
     void perform(Buffer const& /*input*/, Buffer& output) noexcept final
     {
-        output[0ul].fillWith(m_value);
+        output[0ul].fill(m_value);
     }
     sample_t m_value;
 };
@@ -56,20 +56,19 @@ public:
     ~PlusScalar() = default;
 private:
     
-    bool prepare(Infos& infos) override final
+    bool prepare(PrepareInfo& infos) override final
     {
-        //infos.shouldBeInplace(false);
+        m_sig_value.reset(new Signal(infos.m_vector_size, m_value));
         return true;
     }
     
     void perform(Buffer const& input, Buffer& output) noexcept final
     {
-        // Check bug with (input.getVectorSize() == 0)
-        Signal const& in = input[0ul];
-        Signal& out = output[0ul];
-        Samples<sample_t>::add(in.size(), m_value, in.data(), out.data());
+        Signal::add(input[0ul], *m_sig_value.get(), output[0ul]);
     }
-    sample_t m_value;
+    
+    sample_t                        m_value;
+    std::unique_ptr<const Signal>   m_sig_value;
 };
 
 // ==================================================================================== //
@@ -85,7 +84,12 @@ private:
     
     void perform(Buffer const& input, Buffer& output) noexcept final
     {
-        output[0ul].add(input[1ul]);
+        Signal::add(input[0ul], input[1ul], output[0ul]);
+    }
+    
+    bool prepare(PrepareInfo& infos) override final
+    {
+        return true;
     }
 };
 
@@ -99,9 +103,9 @@ public:
     CopyThrow() noexcept : Processor(1ul, 0ul) {}
     ~CopyThrow()  noexcept{}
 private:
-    bool prepare(Infos& infos) final
+    bool prepare(PrepareInfo& infos) final
     {
-        if(infos.getSampleRate() != 44100ul || infos.getVectorSize() != 64ul)
+        if(infos.m_sample_rate != 44100ul || infos.m_vector_size != 64ul)
         {
             throw Error(std::string("CopyThrow wants a sample rate of 44100 and a vector size of 64."));
         }
@@ -177,4 +181,53 @@ private:
     }
     
     size_t m_count = 0ul;
+};
+
+// ==================================================================================== //
+//                                         NULLPROCESSOR                                //
+// ==================================================================================== //
+
+class NullProcessor : public Processor
+{
+public:
+    NullProcessor(size_t n_inlets, size_t n_outlets) noexcept : Processor(n_inlets, n_outlets) {}
+    NullProcessor() = default;
+    
+private:
+    
+    void perform(Buffer const&, Buffer& output) noexcept final
+    {
+    }
+};
+
+// ==================================================================================== //
+//                                         REMOVER                                      //
+// ==================================================================================== //
+
+class PlusScalarRemover : public Processor
+{
+public:
+    PlusScalarRemover() noexcept : Processor(1ul, 1ul) {}
+    ~PlusScalarRemover() = default;
+private:
+    
+    bool prepare(PrepareInfo& info) override
+    {
+        if (info.m_inputs[0])
+        {
+            m_signal_1.reset(new Signal(info.m_vector_size, 1.));
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    };
+    
+    void perform(Buffer const& input, Buffer& output) noexcept override final
+    {
+        Signal::add(output[0ul], input[0ul], *m_signal_1);
+    }
+    
+    std::unique_ptr<Signal> m_signal_1;
 };

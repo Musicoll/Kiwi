@@ -55,12 +55,12 @@ namespace kiwi
             //! @brief The std::string constructor.
             //! @param message The message of the error
             explicit Error(const std::string& message) :
-            std::runtime_error(std::string("kiwi::dsp : ") + message) {}
+            std::runtime_error(std::string("kiwi::dsp: ") + message) {}
             
             //! @brief The const char* constructor.
             //! @param message The message of the error
             explicit Error(const char* message) :
-            std::runtime_error(std::string("kiwi::dsp : ") + std::string(message)) {}
+            std::runtime_error(std::string("kiwi::dsp: ") + std::string(message)) {}
             
             //! @brief The destructor.
             virtual inline ~Error() noexcept = default;

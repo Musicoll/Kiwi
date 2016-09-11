@@ -61,8 +61,8 @@ public: // methods
     
     void perform(float*	out, unsigned long vectorsize) override
     {
-        m_output_buffer[0].clear();
-        m_output_buffer[1].clear();
+        m_output_buffer[0].fill(0.);
+        m_output_buffer[1].fill(0.);
         
         m_chain.tick();
         
@@ -84,38 +84,37 @@ protected: // members
     Buffer                  m_output_buffer;
 };
 
+// ==================================================================================== //
+//                                        KIWISYNTH                                     //
+// ==================================================================================== //
+
 class KiwiSynth : public AudioExample
 {
 public:
     
-    KiwiSynth() : AudioExample(0ul, 2ul)
+    KiwiSynth() : AudioExample(0ul, 2ul),
+    m_osc(new Osc(440)),
+    m_dac(new Dac(m_output_buffer))
     {
-        
     }
     
     void setup() override
     {
-        m_chain.addProcessor(0, std::unique_ptr<Processor>(new Osc(440)));
-        m_chain.addProcessor(1, std::unique_ptr<Processor>(new Osc(10.)));
-        m_chain.addProcessor(2, std::unique_ptr<Processor>(new Osc(10.5)));
-        m_chain.addProcessor(3, std::unique_ptr<Processor>(new MultiplySignal()));
-        m_chain.addProcessor(4, std::unique_ptr<Processor>(new Dac(m_output_buffer)));
+        m_chain.addProcessor(m_osc);
+        m_chain.addProcessor(m_dac);
         
-        //connect(m_osc, 0ul, m_multiply, 0ul);
-        //connect(m_osc_gain_1, 0ul, m_multiply, 1ul);
-        //connect(m_osc_gain_2, 0ul, m_multiply, 1ul);
-        //connect(m_multiply, 0ul, getDac(), 0ul);
-        //connect(m_multiply, 0ul, getDac(), 1ul);
-        //connect(m_osc, 0ul, getDac(), 0ul);
-        
-        m_chain.connect(0, 0, 4, 0);
-        m_chain.connect(0, 0, 4, 1);
+        m_chain.connect(*m_osc, 0, *m_dac, 0);
+        m_chain.connect(*m_osc, 0, *m_dac, 1);
     }
     
     void setFrequency(sample_t const& freq)
     {
-        std::dynamic_pointer_cast<Osc>(m_chain.getProcessor(0))->setFrequency(freq);
+        m_osc->setFrequency(freq);
     }
+    
+private:
+    std::shared_ptr<Osc> m_osc;
+    std::shared_ptr<Dac> m_dac;
 };
 
 // ==================================================================================== //

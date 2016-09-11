@@ -20,91 +20,51 @@
  */
 
 #include "KiwiDsp_Signal.hpp"
+#include "KiwiDsp_Misc.hpp"
 
 namespace kiwi
 {
     namespace dsp
     {
+        
         // ================================================================================ //
         //                                       SIGNAL                                     //
         // ================================================================================ //
-
-        Signal::Signal() noexcept : m_owner(true), m_size(0ul), m_samples(nullptr)
-        {
-            ;
-        }
         
         Signal::Signal(const size_t size, const sample_t val) :
-        m_owner(true),
         m_size(size),
-        m_samples(Samples<sample_t>::allocate(size))
+        m_samples(new sample_t[size])
         {
-            m_samples = Samples< sample_t >::allocate(size);
-            if(m_samples)
-            {
-                m_size  = size;
-                m_owner = true;
-                Samples< sample_t >::fill(size, val, m_samples);
-            }
-            else
-            {
-                throw Error("The Signal object can't allocate samples.");
-            }
-        }
-        
-        Signal::Signal(Signal const& other) : Signal()
-        {
-            if(other.m_samples && other.m_size)
-            {
-                m_samples = Samples< sample_t >::allocate(other.m_size);
-                if(m_samples != nullptr)
-                {
-                    m_size  = other.m_size;
-                    m_owner = true;
-                    Samples< sample_t >::copy(other.m_size, other.m_samples, m_samples);
-                }
-                else
-                {
-                    throw Error("The Signal object can't allocate samples.");
-                }
-            }
+            assert(size && "size must be greater than 0");
+            fill(val);
         }
         
         Signal::Signal(Signal&& other) noexcept :
-        m_owner(other.m_owner),
         m_size(std::move(other.m_size)),
         m_samples(std::move(other.m_samples))
         {
-            other.m_owner = false;
             other.m_size = 0ul;
             other.m_samples = nullptr;
         }
         
-        Signal& Signal::operator=(Signal other)
+        Signal& Signal::operator=(Signal&& other) noexcept
         {
-            using std::swap;
-            swap(m_owner, other.m_owner);
-            swap(m_size, other.m_size);
-            swap(m_samples, other.m_samples);
+            m_size = std::move(other.m_size);
+            m_samples = std::move(other.m_samples);
+            other.m_size = 0ul;
+            other.m_samples = nullptr;
+            
             return *this;
         }
         
         Signal::~Signal()
         {
-            if(m_samples != nullptr && m_owner)
+            if(m_samples != nullptr)
             {
-                Samples< sample_t >::release(m_samples);
+                delete [] m_samples;
             }
             m_samples = nullptr;
             m_size    = 0ul;
-        }
-        
-        void swap(Signal& first, Signal& second)
-        {
-            using std::swap;
-            swap(first.m_owner, second.m_owner);
-            swap(first.m_size, second.m_size);
-            swap(first.m_samples, second.m_samples);
         }
         
         size_t Signal::size() const noexcept
@@ -141,41 +101,201 @@ namespace kiwi
             return m_samples[index];
         }
         
-        void Signal::clear() noexcept
+        void Signal::fill(sample_t const& value) noexcept
         {
-            Samples<sample_t>::clear(m_size, m_samples);
-        }
-        
-        void Signal::fillWith(sample_t const& value) noexcept
-        {
-            Samples<sample_t>::fill(m_size, value, m_samples);
+            std::fill(m_samples, m_samples + m_size, value);
         }
         
         void Signal::copy(Signal const& other_signal) noexcept
         {
-            assert(size() == other_signal.size() && "Copying signals of different size");
+            assert(m_size == other_signal.size() && "Copying signals of different size");
             
-            Samples<sample_t>::copy(m_size, other_signal.data(), m_samples);
+            sample_t const* in = other_signal.m_samples;
+            sample_t* out = m_samples;
+            
+            for(size_t i = m_size>>3; i; --i, in += 8, out += 8)
+            {
+                out[0] = in[0]; out[1] = in[1]; out[2] = in[2]; out[3] = in[3];
+                out[4] = in[4]; out[5] = in[5]; out[6] = in[6]; out[7] = in[7];
+            }
+            for(size_t i = m_size&7; i; --i, in++, out++)
+            {
+                out[0] = in[0];
+            }
         }
         
         void Signal::add(Signal const& other_signal) noexcept
         {
-            assert(size() == other_signal.size() && "Adding signals of different size");
+            assert(m_size == other_signal.size() && "Adding signals of different size");
             
-            Samples<sample_t>::add(m_size, other_signal.data(), m_samples);
+            sample_t const* in = other_signal.m_samples;
+            sample_t* out = m_samples;
+            
+            for(size_t i = m_size>>3; i; --i, in += 8, out += 8)
+            {   
+                out[0] += in[0]; out[1] += in[1]; out[2] += in[2]; out[3] += in[3];
+                out[4] += in[4]; out[5] += in[5]; out[6] += in[6]; out[7] += in[7];
+            }
+            for(size_t i = m_size&7; i; --i, in++, out++)
+            {
+                out[0] += in[0];
+            }
         }
         
-        Signal Signal::add(Signal const& signal_1, Signal const& signal_2)
+        void Signal::add(Signal const& signal_1, Signal const& signal_2, Signal& result)
         {
             const size_t size = signal_1.size();
             
             assert(size == signal_2.size()
                    && "The two signals must have an equal size");
             
-            Signal result(size);
-            Samples<sample_t>::add(size, signal_1.data(), signal_2.data(), result.data());
+            sample_t const* in1 = signal_1.m_samples;
+            sample_t const* in2 = signal_2.m_samples;
+            sample_t* out = result.m_samples;
             
-            return std::move(result);
+            for(size_t i = size>>3; i; --i, in1 += 8, in2 += 8, out += 8)
+            {
+                out[0] = in1[0] + in2[0]; out[1] = in1[1] + in2[1];
+                out[2] = in1[3] + in2[2]; out[3] = in1[3] + in2[3];
+                out[4] = in1[4] + in2[4]; out[5] = in1[5] + in2[5];
+                out[6] = in1[6] + in2[6]; out[7] = in1[7] + in2[7];
+            }
+            for(size_t i = size&7; i; --i, in1++, in2++, out++)
+            {
+                out[0] = in1[0] + in2[0];
+            }
+        }
+        
+        // ================================================================================ //
+        //                                      BUFFER                                      //
+        // ================================================================================ //
+        
+        Buffer::Buffer():
+        m_vectorsize(),
+        m_signals()
+        {
+        }
+        
+        Buffer::Buffer(std::vector<Signal::sPtr> signals)
+        {
+            const size_t nsignals = signals.size();
+            if(nsignals)
+            {
+                m_signals.reserve(nsignals);
+                
+                const Signal::sPtr first_sig(signals[0]);
+                const size_t vectorsize = first_sig->size();
+                m_signals.emplace_back(std::move(first_sig));
+                
+                for(int i = 1; i < signals.size(); ++i)
+                {
+                    const Signal::sPtr sig(signals[i]);
+                    assert(sig->size() == vectorsize
+                           && "Aggregating signals with different vector size");
+                    
+                    m_signals.emplace_back(std::move(sig));
+                }
+                
+                m_vectorsize = vectorsize;
+            }
+            else
+            {
+                m_vectorsize = 0;
+            }
+        }
+        
+        Buffer::Buffer(const size_t nchannels, const size_t nsamples, const sample_t val) :
+        m_vectorsize(nsamples)
+        {
+            m_signals.reserve(nchannels);
+            for(size_t i = 0ul; i < nchannels; i++)
+            {
+                m_signals.emplace_back(std::make_shared<Signal>(nsamples, val));
+            }
+        }
+        
+        Buffer::Buffer(Buffer&& other) noexcept :
+        m_vectorsize(std::move(other.m_vectorsize)),
+        m_signals(std::move(other.m_signals))
+        {
+            other.m_vectorsize = 0ul;
+        }
+        
+        Buffer& Buffer::operator=(Buffer&& other) noexcept
+        {
+            m_vectorsize = std::move(other.m_vectorsize);
+            m_signals = std::move(other.m_signals);
+            other.m_vectorsize = 0;
+            return *this;
+        }
+        
+        Buffer::~Buffer()
+        {
+            ;
+        }
+        
+        void Buffer::setChannels(std::vector<Signal::sPtr> signals)
+        {
+            m_signals.clear();
+            
+            const size_t nsignals = signals.size();
+            if(nsignals)
+            {
+                m_signals.reserve(nsignals);
+                
+                const Signal::sPtr first_sig(signals[0]);
+                const size_t vectorsize = first_sig->size();
+                m_signals.emplace_back(std::move(first_sig));
+                
+                for(int i = 1; i < signals.size(); ++i)
+                {
+                    const Signal::sPtr sig(signals[i]);
+                    assert(sig->size() == vectorsize
+                           && "Aggregating signals with different vector size");
+                    
+                    m_signals.emplace_back(std::move(sig));
+                }
+                
+                m_vectorsize = vectorsize;
+            }
+            else
+            {
+                m_vectorsize = 0;
+            }
+        }
+
+        void Buffer::clear()
+        {
+            m_signals.clear();
+        }
+        
+        size_t Buffer::getVectorSize() const noexcept
+        {
+            return m_vectorsize;
+        }
+        
+        size_t Buffer::getNumberOfChannels() const noexcept
+        {
+            return m_signals.size();
+        }
+        
+        bool Buffer::empty() const noexcept
+        {
+            return (m_signals.size() == 0ul);
+        }
+        
+        Signal const& Buffer::operator[](const size_t index) const
+        {
+            assert(index < m_signals.size() && "Index out of range.");
+            
+            return *m_signals[index].get();
+        }
+        
+        Signal& Buffer::operator[](const size_t index)
+        {
+            assert(index < m_signals.size() && "Index out of range.");
+            
+            return *m_signals[index].get();
         }
     }
 }

@@ -20,12 +20,282 @@
  */
 
 #include "KiwiDsp_Chain.hpp"
-#include "KiwiDsp_Node.hpp"
+#include "KiwiDsp_Misc.hpp"
 
 namespace kiwi
 {
     namespace dsp
     {
+        // ==================================================================================== //
+        //                                          NODE                                        //
+        // ==================================================================================== //
+        
+        Chain::Node::Node(std::shared_ptr<Processor> processor) :
+        m_processor(processor),
+        m_inlets(),
+        m_outlets(),
+        m_inputs(),
+        m_outputs(),
+        m_buffer_copy(),
+        m_index(0)
+        {
+            const size_t inlets = processor->getNumberOfInputs();
+            const size_t outlets = processor->getNumberOfOutputs();
+            
+            if(inlets)
+            {
+                m_inlets.reserve(inlets);
+                for(size_t i = 0; i < inlets; ++i)
+                {
+                    m_inlets.emplace_back(*this, i);
+                }
+            }
+            
+            if(outlets)
+            {
+                m_outlets.reserve(outlets);
+                for(size_t i = 0; i < outlets; ++i)
+                {
+                    m_outlets.emplace_back(*this, i);
+                }
+            }
+            
+            m_buffer_copy.resize(processor->getNumberOfInputs());
+        }
+        
+        Chain::Node::~Node()
+        {
+            try
+            {
+                m_processor->release();
+            }
+            catch(Error & e)
+            {
+                
+            }
+        }
+        
+        bool Chain::Node::connectInput(const size_t input_index, Node& other_node, const size_t output_index)
+        {
+            assert(input_index < m_inlets.size() && output_index < other_node.m_outlets.size());
+            
+            return m_inlets[input_index].connect(other_node.m_outlets[output_index]);
+        }
+        
+        bool Chain::Node::disconnectInput(const size_t input_index, Node& other_node, const size_t output_index)
+        {
+            assert(input_index < m_inlets.size() && output_index < other_node.m_outlets.size());
+            
+            return m_inlets[input_index].disconnect(other_node.m_outlets[output_index]);
+        }
+        
+        bool Chain::Node::prepare(Chain& chain)
+        {
+            // ======================================================================== //
+            //                    INITIALIZE SAMPLE RATE, VECTOR SIZE                   //
+            // ======================================================================== //
+            
+            size_t samplerate = chain.getSampleRate();
+            size_t vectorsize = chain.getVectorSize();
+            
+            // ======================================================================== //
+            //                    PREPARES INLETS, INPUT BUFFER                         //
+            // ======================================================================== //
+            
+            std::vector<Signal::sPtr> inputs;
+            
+            for(Pin& inlet : m_inlets)
+            {
+                if (inlet.m_ties.size() == 0)
+                {
+                    inlet.m_signal = chain.getSignalIn();
+                }
+                else if(inlet.m_ties.size() == 1)
+                {
+                    inlet.m_signal = inlet.m_ties.begin()->m_pin.m_signal;
+                }
+                else
+                {
+                    inlet.m_signal = chain.getSignalInlet(inlet.m_index);
+                    
+                    std::vector<std::shared_ptr<Signal>> tie_signals;
+                    
+                    for(Tie tie : inlet.m_ties)
+                    {
+                        tie_signals.push_back(tie.m_pin.m_signal);
+                    }
+                    
+                    m_buffer_copy[inlet.m_index].setChannels(tie_signals);
+                }
+                
+                inputs.push_back(inlet.m_signal);
+            }
+            
+            m_inputs.setChannels(inputs);
+            
+            // ======================================================================== //
+            //                    PREPARE OUTLETS, OUTPUT BUFFER                        //
+            // ======================================================================== //
+            
+            std::vector<Signal::sPtr> outputs;
+            
+            for(Pin& outlet : m_outlets)
+            {
+                if (outlet.m_ties.size() == 0)
+                {
+                    outlet.m_signal = chain.getSignalOutlet(outlet.m_index);
+                }
+                else
+                {
+                    outlet.m_signal = std::make_shared<Signal>(vectorsize);
+                }
+                
+                outputs.push_back(outlet.m_signal);
+            }
+            
+            m_outputs.setChannels(outputs);
+            
+            // ======================================================================== //
+            //                  INITIALIZE INFO FOR PREPARING PROCESSOR                 //
+            // ======================================================================== //
+            
+            std::vector<bool> input_status(m_inlets.size());
+            
+            for (size_t i = 0; i < m_inlets.size(); ++i)
+            {
+                input_status[i] = !m_inlets[i].m_ties.empty();
+            }
+            
+            Processor::PrepareInfo prepare_info {samplerate, vectorsize, input_status};
+            
+            // ======================================================================== //
+            //                           PREPARE PROCESSORS                             //
+            // ======================================================================== //
+            
+            return m_processor->prepare(prepare_info);;
+        }
+        
+        void Chain::Node::perform() noexcept
+        {
+            const size_t nchannels = m_buffer_copy.size();
+            
+            for(size_t i = 0; i < nchannels; ++i)
+            {
+                Buffer const& buffer_copy = m_buffer_copy[i];
+                
+                if(!buffer_copy.empty())
+                {
+                    Signal& inputs = m_inputs[i];
+                    
+                    inputs.copy(buffer_copy[0]);
+                    
+                    const size_t ncopies = buffer_copy.getNumberOfChannels();
+                    
+                    for(size_t j = 1; j < ncopies; ++j)
+                    {
+                        inputs.add(buffer_copy[j]);
+                    }
+                }
+            }
+            
+            m_processor->perform(m_inputs, m_outputs);
+        }
+        
+        void Chain::Node::release()
+        {
+            m_index = 0;
+            
+            // ======================================================================== //
+            //                    RELEASE INLET AND INPUT BUFFER                        //
+            // ======================================================================== //
+            
+            for (Pin& inlet : m_inlets)
+            {
+                inlet.m_signal.reset();
+            }
+            
+            m_inputs.clear();
+            
+            // ======================================================================== //
+            //                    RELEASE INLET AND INPUT BUFFER                        //
+            // ======================================================================== //
+            
+            for (Pin& outlet : m_outlets)
+            {
+                outlet.m_signal.reset();
+            }
+            
+            m_outputs.clear();
+            
+            m_buffer_copy.clear();
+            
+            // ======================================================================== //
+            //                             RELEASE PROCESSOR                            //
+            // ======================================================================== /
+            
+            m_processor->release();
+        }
+        
+        // ==================================================================================== //
+        //                                          NODE::PIN                                   //
+        // ==================================================================================== //
+        
+        Chain::Node::Pin::Pin(Node& owner, const size_t index) :
+        m_owner(owner),
+        m_index(index),
+        m_signal(),
+        m_ties()
+        {
+            ;
+        }
+        
+        Chain::Node::Pin::Pin(Pin && other):
+        m_owner(other.m_owner),
+        m_index(other.m_index),
+        m_signal(std::move(other.m_signal)),
+        m_ties(std::move(other.m_ties))
+        {
+        }
+        
+        Chain::Node::Pin::~Pin()
+        {
+            disconnect();
+        }
+        
+        bool Chain::Node::Pin::connect(Pin& other_pin)
+        {
+            return m_ties.insert(Tie(other_pin)).second && other_pin.m_ties.insert(Tie(*this)).second;
+        }
+        
+        bool Chain::Node::Pin::disconnect(Pin& other_pin)
+        {
+            return m_ties.erase(Tie(other_pin)) && other_pin.m_ties.erase(Tie(*this));
+        }
+        
+        void Chain::Node::Pin::disconnect()
+        {
+            for (std::set<Tie>::iterator tie = m_ties.begin(); tie != m_ties.end();)
+            {
+                tie->m_pin.m_ties.erase(Tie(*this));
+                tie = m_ties.erase(tie);
+            }
+        }
+        
+        // ==================================================================================== //
+        //                                          NODE::TIE                                   //
+        // ==================================================================================== //
+        
+        Chain::Node::Tie::Tie(Pin& pin):
+        m_pin(pin)
+        {
+        }
+        
+        bool Chain::Node::Tie::operator<(Tie const& other) const noexcept
+        {
+            return (&m_pin.m_owner < &other.m_pin.m_owner
+                    || (&m_pin.m_owner == &other.m_pin.m_owner && m_pin.m_index < other.m_pin.m_index));
+        }
+        
         // ==================================================================================== //
         //                                          CHAIN                                       //
         // ==================================================================================== //
@@ -34,9 +304,7 @@ namespace kiwi
         m_nodes(),
         m_sample_rate(),
         m_vector_size(),
-        m_prepare_state(PrepareState::NotPrepared),
-        m_release_state(ReleaseState::Released),
-        m_perform_state(PerformState::NotReady),
+        m_state(State::NotPrepared),
         m_tick_mutex()
         {
             ;
@@ -44,85 +312,132 @@ namespace kiwi
         
         Chain::~Chain()
         {
-            assert(m_release_state.load() == ReleaseState::Released && "Removing chain before releasing it :  ");
-            
             m_nodes.clear();
         }
         
-        void Chain::prepare()
+        // ============================================================================ //
+        //                              THE UPDATE AND PREPARE                          //
+        // ============================================================================ //
+        
+        void Chain::update()
         {
-            prepare(getSampleRate(), getVectorSize());
+            if (!m_proc_commands.empty() || !m_link_commands.empty())
+            {
+                State prev_state = m_state;
+                
+                const size_t prev_samplerate = getSampleRate();
+                const size_t prev_vectorsize = getVectorSize();
+                
+                release();
+                
+                while(!m_proc_commands.empty())
+                {
+                    m_proc_commands.front().operator()();
+                    m_proc_commands.pop();
+                }
+                
+                while(!m_link_commands.empty())
+                {
+                    m_link_commands.front().operator()();
+                    m_link_commands.pop();
+                }
+                
+                if (prev_state == State::Prepared)
+                {
+                    prepare(prev_samplerate, prev_vectorsize);
+                }
+            }
         }
         
         void Chain::prepare(const size_t samplerate, const size_t vector_size)
         {
-            if (m_prepare_state.load() == PrepareState::NotPrepared
-                || m_release_state.load() == ReleaseState::Released)
+            m_state = State::NotPrepared;
+            
+            release();
+            
+            update();
+            
+            indexNodes();
+            
+            sortNodes();
+            
+            m_sample_rate = samplerate;
+            m_vector_size = vector_size;
+            
+            for(auto node = m_nodes.begin(); node != m_nodes.end();)
             {
-                std::lock_guard<std::mutex> lock(m_tick_mutex);
-                
-                m_prepare_state.store(PrepareState::Preparing);
-                
-                m_sample_rate = samplerate;
-                m_vector_size = vector_size;
-                
-                // Removes all nodes that has been marked as deleted
-                for(auto node = m_nodes.begin(); node != m_nodes.end();)
+                if ((*node)->prepare(*this))
                 {
-                    if(node->second.isDeleted())
-                    {
-                        node->second.release();
-                        m_nodes.erase(node++);
-                    }
-                    else
-                    {
-                        ++node;
-                    }
+                    ++node;
                 }
-                
-                try
+                else
                 {
-                    // Prepare all nodes that have been marked as notPrepared.
-                    for(auto node = m_nodes.begin(); node != m_nodes.end(); ++node)
-                    {
-                        node->second.prepare(m_sample_rate, m_vector_size);
-                    }
+                    restackNode(**node);
+                    node = m_nodes.erase(node);
                 }
-                catch(Error & e)
+            }
+            
+            m_state = State::Prepared;
+        }
+        
+        void Chain::restackNode(Node & node)
+        {
+            // ======================================================================== //
+            //                           RESTACK PROCESSOR                              //
+            // ======================================================================== //
+            
+            addProcessor(node.m_processor);
+            
+            // ======================================================================== //
+            //                    RESTACK INLET CONNECTIONS                             //
+            // ======================================================================== //
+            
+            for(Node::Pin& inlet : node.m_inlets)
+            {
+                for(Node::Tie tie : inlet.m_ties)
                 {
-                    m_prepare_state.store(PrepareState::NotPrepared);
-                    m_release_state.store(ReleaseState::NotReleased);
-                    throw e;
+                    Node::Pin& prev_pin = tie.m_pin;
+                    Node& prev_node  = tie.m_pin.m_owner;
+                    
+                    connect(*prev_node.m_processor, prev_pin.m_index, *node.m_processor, inlet.m_index);
                 }
-                
-                // look-for and store terminal nodes:
-                // - the ones who needs their perform method to be called directly.
-                
-                m_prepare_state.store(PrepareState::Prepared);
-                m_release_state.store(ReleaseState::NotReleased);
-                m_perform_state.store(PerformState::Ready);
+            }
+            
+            // ======================================================================== //
+            //                    RESTACK OUTLET CONNECTIONS                            //
+            // ======================================================================== //
+            
+            for(Node::Pin& outlet : node.m_outlets)
+            {
+                for(Node::Tie tie : outlet.m_ties)
+                {
+                    Node::Pin& next_pin = tie.m_pin;
+                    Node& next_node  = tie.m_pin.m_owner;
+                    
+                    connect(*node.m_processor, outlet.m_index, *next_node.m_processor, next_pin.m_index);
+                }
             }
         }
         
+        // ============================================================================ //
+        //                              THE RELEASE METHOD                              //
+        // ============================================================================ //
+        
         void Chain::release()
         {
-            if (m_release_state.load() != ReleaseState::Released)
+            std::lock_guard<std::mutex> lock(m_tick_mutex);
+            
+            m_state = State::NotPrepared;
+            
+            m_sample_rate = 0.;
+            m_vector_size = 0.;
+            
+            for(auto node = m_nodes.begin(); node != m_nodes.end(); ++node)
             {
-                std::lock_guard<std::mutex> lock(m_tick_mutex);
-                
-                m_release_state.store(ReleaseState::Releasing);
-                
-                for(auto node = m_nodes.begin(); node != m_nodes.end(); ++node)
-                {
-                    node->second.release();
-                }
-                
-                m_release_state.store(ReleaseState::Released);
-                m_prepare_state.store(PrepareState::NotPrepared);
-                m_perform_state.store(PerformState::NotReady);
+                (*node)->release();
             }
         }
-    
+        
         size_t Chain::getSampleRate() const noexcept
         {
             return m_sample_rate;
@@ -133,174 +448,250 @@ namespace kiwi
             return m_vector_size;
         }
         
-        void Chain::clean() noexcept
-        {
-            if(m_perform_state.load() == PerformState::Performed)
-            {
-                for(auto node = m_nodes.begin(); node != m_nodes.end(); ++node)
-                {
-                    node->second.clean();
-                }
-                
-                m_perform_state.store(PerformState::Ready);
-            }
-        }
-        
         void Chain::tick() noexcept
         {
-            if (m_perform_state.load() == PerformState::Ready)
+            std::unique_lock<std::mutex> lock(m_tick_mutex, std::defer_lock);
+            
+            if (m_state == State::Prepared && lock.try_lock())
             {
-                std::lock_guard<std::mutex> lock(m_tick_mutex);
+                size_t const node_number = m_nodes.size();
                 
-                for(auto node = m_nodes.begin(); node != m_nodes.end(); ++node)
+                for(size_t i = 0; i < node_number; ++i)
                 {
-                    if(node->second.isTerminal())
-                    {
-                        node->second.perform();
-                    }
+                    m_nodes[i]->perform();
                 }
                 
-                m_perform_state.store(PerformState::Performed);
-                
-                clean();
+                lock.unlock();
             }
         }
         
         // ============================================================================ //
-        //                             NODE AND LINK MODIFICATION                       //
+        //                                NODE MANGEMENT                                //
         // ============================================================================ //
         
-        bool Chain::findProcessor(Processor const& processor) const
+        struct Chain::compare_proc
         {
-            struct compare_proc
+            compare_proc(Processor const& proc):m_proc(proc){};
+            
+            bool operator()(Node::uPtr const& node)
             {
-                compare_proc(Processor const& proc): m_proc(proc){};
-                
-                bool operator()(std::pair<const uint64_t, Node> const& node)
-                {
-                    return &(*node.second.getProcessor()) == &m_proc;
-                };
-                
-                Processor const& m_proc;
+                return &m_proc == &(*node->m_processor);
             };
             
-            return std::find_if(m_nodes.cbegin(), m_nodes.cend(), compare_proc(processor)) != m_nodes.cend();
+            Processor const& m_proc;
+        };
+        
+        std::vector<Chain::Node::uPtr>::iterator Chain::findNode(Processor& proc)
+        {
+            return std::find_if(m_nodes.begin(), m_nodes.end(), compare_proc(proc));
         }
         
-        void Chain::addProcessor(const uint64_t id, std::unique_ptr<Processor> processor)
+        std::vector<std::unique_ptr<Chain::Node>>::const_iterator Chain::findNode(Processor& proc) const
         {
-            if (!findProcessor(*processor))
+            return std::find_if(m_nodes.begin(), m_nodes.end(), compare_proc(proc));
+        }
+        
+        struct Chain::index_node
+        {
+            index_node(): m_next_index(1ul){};
+            
+            void computeIndex(Node& node)
             {
-                if (m_nodes.find(id) == m_nodes.end())
+                if (node.m_index == 0)
                 {
-                    std::lock_guard<std::mutex> lock(m_tick_mutex);
+                    m_loop_nodes.insert(&node);
                     
-                    m_nodes.emplace(std::piecewise_construct,
-                                    std::forward_as_tuple(id),
-                                    std::forward_as_tuple(std::move(processor), id));
+                    for(Node::Pin& inlet : node.m_inlets)
+                    {
+                        for(Node::Tie tie : inlet.m_ties)
+                        {
+                            Node& parent_node = tie.m_pin.m_owner;
+                            
+                            if (!parent_node.m_index)
+                            {
+                                if (m_loop_nodes.find(&parent_node) != m_loop_nodes.end())
+                                {
+                                    throw Error("A loop is detected");
+                                }
+                                else
+                                {
+                                    this->computeIndex(parent_node);
+                                }
+                            }
+                        }
+                    }
                     
-                    m_prepare_state.store(PrepareState::NotPrepared);
+                    m_loop_nodes.erase(&node);
+                    node.m_index = m_next_index++;
                 }
-                else
+            }
+            
+            void operator()(Node::uPtr const& node)
+            {
+                computeIndex(*node.get());
+            };
+            
+            size_t          m_next_index;
+            std::set<Node*> m_loop_nodes;
+        };
+        
+        void Chain::indexNodes()
+        {
+            for_each(m_nodes.begin(), m_nodes.end(), index_node());
+        }
+        
+        void Chain::sortNodes()
+        {
+            struct compare_index
+            {
+                bool operator()(std::unique_ptr<Node>& l_node, std::unique_ptr<Node>& r_node)
                 {
-                    throw Error("Adding processor with same id :");
-                }
+                    return l_node->m_index < r_node->m_index;
+                };
+            };
+            
+            std::sort(m_nodes.begin(), m_nodes.end(), compare_index());
+        }
+        
+        // ============================================================================ //
+        //                                NODE MODIFICATIONS                            //
+        // ============================================================================ //
+        
+        void Chain::addProcessor(std::shared_ptr<Processor> processor)
+        {
+            std::function<void(void)> func = std::bind(&Chain::execAddProcessor, this, processor);
+            m_proc_commands.push(std::bind(&Chain::execAddProcessor, this, std::move(processor)));
+        }
+        
+        void Chain::removeProcessor(Processor& proc)
+        {
+            std::function<void(void)> func = std::bind(&Chain::execRemoveProcessor, this, &proc);
+            m_proc_commands.push(func);
+        }
+        
+        void Chain::connect(Processor& source, size_t outlet_index,
+                            Processor& dest, size_t inlet_index)
+        {
+            std::function<void(void)> call_back = std::bind(&Chain::execConnect,
+                                                            this,
+                                                            &source, outlet_index,
+                                                            &dest, inlet_index);
+            m_link_commands.push(call_back);
+        }
+        
+        void Chain::disconnect(Processor& source, size_t outlet_index,
+                               Processor& dest, size_t inlet_index)
+        {
+            std::function<void(void)> call_back = std::bind(&Chain::execDisconnect,
+                                                            this,
+                                                            &source, outlet_index,
+                                                            &dest, inlet_index);
+            m_link_commands.push(call_back);
+        }
+        
+        // ==================================================================================== //
+        //                                      SIGNAL MANAGEMENT                               //
+        // ==================================================================================== //
+        
+        std::shared_ptr<Signal> Chain::getSignalIn()
+        {
+            std::shared_ptr<Signal> signal_in = m_signal_in.lock();
+            
+            if (!signal_in)
+            {
+                signal_in = std::make_shared<Signal>(m_vector_size);
+                m_signal_in = signal_in;
+            }
+                
+            return signal_in;
+        }
+        
+        std::shared_ptr<Signal> Chain::getSignalInlet(size_t inlet_index)
+        {
+            std::shared_ptr<Signal> signal_inlet = m_signal_inlet[inlet_index].lock();
+            
+            if (!signal_inlet)
+            {
+                signal_inlet = std::make_shared<Signal>(m_vector_size);
+                m_signal_inlet[inlet_index] = signal_inlet;
+            }
+            
+            return signal_inlet;
+        }
+        
+        std::shared_ptr<Signal> Chain::getSignalOutlet(size_t outlet_index)
+        {
+            std::shared_ptr<Signal> signal_outlet = m_signal_outlet[outlet_index].lock();
+            
+            if (!signal_outlet)
+            {
+                signal_outlet = std::make_shared<Signal>(m_vector_size);
+                m_signal_outlet[outlet_index] = signal_outlet;
+            }
+            
+            return signal_outlet;
+        }
+        
+        // ==================================================================================== //
+        //                                      CHAIN COMMANDS                                  //
+        // ==================================================================================== //
+        
+        void Chain::execAddProcessor(std::shared_ptr<Processor> proc)
+        {
+            if (findNode(*proc) == m_nodes.end())
+            {
+                m_nodes.emplace_back(Node::uPtr(new Node(proc)));
             }
             else
             {
-                processor.release();
-                throw Error("Inserting twice the same processor :");
+                throw Error("Adding same processor twice");
             }
         }
         
-        void Chain::removeProcessor(const uint64_t id)
+        void Chain::execRemoveProcessor(Processor* proc)
         {
-            auto node = m_nodes.find(id);
+            auto node = findNode(*proc);
             
             if (node != m_nodes.end())
             {
-                std::lock_guard<std::mutex> lock(m_tick_mutex);
-                
-                node->second.setAsDeleted();
-                
-                m_prepare_state.store(PrepareState::NotPrepared);
+                m_nodes.erase(findNode(*proc));
             }
             else
             {
-                throw Error("Removing a processor with non existing id :");
+                throw Error("Removing non existing processor");
             }
         }
         
-        bool Chain::connect(uint64_t source_node, size_t outlet_index, uint64_t dest_node, size_t inlet_index)
+        void Chain::execConnect(Processor* source, size_t outlet_index,
+                                Processor* dest, size_t inlet_index)
         {
-            bool connected = false;
+            auto source_node = findNode(*source);
+            auto dest_node = findNode(*dest);
             
-            if (m_nodes.find(source_node) != m_nodes.end() &&
-                m_nodes.find(dest_node) != m_nodes.end())
+            if (source_node != m_nodes.end() && dest_node != m_nodes.end())
             {
-                std::lock_guard<std::mutex> lock(m_tick_mutex);
-                
-                connected = m_nodes.at(dest_node).connectInput(inlet_index, m_nodes.at(source_node), outlet_index);
-                
-                if (connected)
-                {
-                    m_prepare_state.store(PrepareState::NotPrepared);
-                }
+                (*dest_node)->connectInput(inlet_index, **source_node, outlet_index);
             }
             else
             {
-                throw Error("Trying to connect two non existing nodes : ");
+                throw Error("Connecting two non existing nodes : ");
             }
-            
-            return connected;
         }
         
-        bool Chain::discconnect(uint64_t source_node, size_t outlet_index, uint64_t dest_node, size_t inlet_index)
+        void Chain::execDisconnect(Processor* source, size_t outlet_index,
+                                   Processor* dest, size_t inlet_index)
         {
-            bool disconnected = false;
+            auto source_node = findNode(*source);
+            auto dest_node = findNode(*dest);
             
-            if (m_nodes.find(source_node) != m_nodes.end() &&
-                m_nodes.find(dest_node) != m_nodes.end())
+            if (source_node != m_nodes.end() && dest_node != m_nodes.end())
             {
-                std::lock_guard<std::mutex> lock(m_tick_mutex);
-                
-                disconnected = m_nodes.at(dest_node).disconnectInput(inlet_index, m_nodes.at(source_node), outlet_index);
-                
-                if (disconnected)
-                {
-                    m_prepare_state.store(PrepareState::NotPrepared);
-                }
+                (*dest_node)->disconnectInput(inlet_index, **source_node, outlet_index);
             }
             else
             {
-                throw Error("Trying to discconnect two non existing nodes : ");
+                throw Error("Disconnecting non existing node : ");
             }
-            
-            return disconnected;
         }
-        
-        std::shared_ptr<const Processor> Chain::getProcessor(uint64_t id) const
-        {
-            try
-            {
-                return m_nodes.at(id).getProcessor();
-            }
-            catch (const std::out_of_range& e)
-            {
-                throw Error("Trying to access out of range processor : " + std::string(e.what()));
-            }
-        };
-        
-        std::shared_ptr<Processor> Chain::getProcessor(uint64_t id)
-        {
-            try
-            {
-                return m_nodes.at(id).getProcessor();
-            }
-            catch (const std::out_of_range& e)
-            {
-                throw Error("Trying to access out of range processor : " + std::string(e.what()));
-            }
-        };
     }
 }

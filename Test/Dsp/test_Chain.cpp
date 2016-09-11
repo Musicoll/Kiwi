@@ -24,6 +24,7 @@
 #include "../catch.hpp"
 
 #include <KiwiDsp/KiwiDsp_Chain.hpp>
+#include <KiwiDsp/KiwiDsp_Misc.hpp>
 
 #include "Processors.hpp"
 
@@ -49,41 +50,44 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
     SECTION("Chain modification")
     {
         Chain chain;
+        const size_t sr = 2ul;
+        const size_t vs = 2ul;
         
-        Processor * sig = new Sig(1.);
+        std::shared_ptr<Processor> sig_1(new Sig(1.));
+        std::shared_ptr<Processor> plus_scalar(new PlusScalar(2.));
         
-        chain.addProcessor(0, std::move(std::unique_ptr<Processor>(sig)));
-        chain.addProcessor(1, std::move(std::unique_ptr<Processor>(new PlusScalar(2.))));
+        chain.addProcessor(sig_1);
+        chain.addProcessor(plus_scalar);
         
-        // Reinserting processors
-        REQUIRE_THROWS_AS(chain.addProcessor(0, std::move(std::unique_ptr<Processor>(new Sig(2.)))), Error);
-        REQUIRE_THROWS_AS(chain.addProcessor(1, std::move(std::unique_ptr<Processor>(sig))), Error);
-    
-        // Connecting processors
-        REQUIRE(chain.connect(0, 0, 1, 0));
-        REQUIRE(!chain.connect(0, 0, 1, 0));
+        chain.connect(*sig_1, 0, *plus_scalar, 0);
         
-        // Connecting with non existing processor
-        REQUIRE_THROWS_AS(chain.connect(1, 0, 2, 0), Error);
+        // Adding processor twice
+        chain.addProcessor(sig_1);
+        REQUIRE_THROWS_AS(chain.prepare(sr, vs), Error);
         
-        // Disconnecting processors
-        REQUIRE(chain.discconnect(0, 0, 1, 0));
-        REQUIRE(!chain.discconnect(0, 0, 1, 0));
+        std::shared_ptr<Processor> scalar_out(new PlusScalar(0.));
         
-        // Removing processors
-        REQUIRE_THROWS_AS(chain.removeProcessor(2), Error);
+        // Connect with non existing node.
+        chain.connect(*sig_1, 0, *scalar_out, 0);
+        REQUIRE_THROWS_AS(chain.prepare(sr, vs), Error);
+        
+        // Disconnect non existing node
+        chain.disconnect(*sig_1, 0, *scalar_out, 0);
+        REQUIRE_THROWS_AS(chain.prepare(sr, vs), Error);
+        
+        chain.release();
     }
     
     SECTION("Chain compiled")
     {
         Chain chain;
         
-        std::unique_ptr<Processor> sig1(new Sig(1.3));
-        std::unique_ptr<Processor> plus_scalar(new PlusScalar(1.));
+        std::shared_ptr<Processor> sig_1(new Sig(1.3));
+        std::shared_ptr<Processor> plus_scalar(new PlusScalar(1.));
         
-        chain.addProcessor(0, std::move(sig1));
-        chain.addProcessor(1, std::move(plus_scalar));
-        chain.connect(0, 0, 1, 0);
+        chain.addProcessor(sig_1);
+        chain.addProcessor(plus_scalar);
+        chain.connect(*sig_1, 0, *plus_scalar, 0);
         
         REQUIRE_NOTHROW(chain.prepare(samplerate, vectorsize));
         
@@ -94,20 +98,20 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
     {
         Chain chain;
         
-        std::unique_ptr<Processor> sig_1(new Sig(1.));
-        std::unique_ptr<Processor> sig_2(new Sig(2.));
-        std::unique_ptr<Processor> sig_3(new Sig(3.));
+        std::shared_ptr<Processor> sig_1(new Sig(1.));
+        std::shared_ptr<Processor> sig_2(new Sig(2.));
+        std::shared_ptr<Processor> sig_3(new Sig(3.));
         
-        std::unique_ptr<Processor> plus_scalar_0(new PlusScalar(0.));
+        std::shared_ptr<Processor> plus_scalar_0(new PlusScalar(0.));
         
-        chain.addProcessor(0, std::move(sig_1));
-        chain.addProcessor(1, std::move(sig_2));
-        chain.addProcessor(2, std::move(sig_3));
-        chain.addProcessor(3, std::move(plus_scalar_0));
+        chain.addProcessor(sig_1);
+        chain.addProcessor(sig_2);
+        chain.addProcessor(sig_3);
+        chain.addProcessor(plus_scalar_0);
         
-        chain.connect(0, 0, 3, 0);
-        chain.connect(1, 0, 3, 0);
-        chain.connect(2, 0, 3, 0);
+        chain.connect(*sig_1, 0, *plus_scalar_0, 0);
+        chain.connect(*sig_2, 0, *plus_scalar_0, 0);
+        chain.connect(*sig_3, 0, *plus_scalar_0, 0);
         
         REQUIRE_NOTHROW(chain.prepare(samplerate, vectorsize));
         
@@ -127,36 +131,103 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
     {
         Chain chain;
         
-        std::unique_ptr<Processor> sig1(new Sig(1.3));
-        std::unique_ptr<Processor> sig2(new Sig(2.7));
-        std::unique_ptr<Processor> plus_scalar(new PlusScalar(1.));
-        std::unique_ptr<Processor> plus_signal(new PlusSignal());
+        std::shared_ptr<Processor> sig_1(new Sig(1.3));
+        std::shared_ptr<Processor> sig_2(new Sig(2.7));
+        std::shared_ptr<Processor> plus_scalar(new PlusScalar(1.));
+        std::shared_ptr<Processor> plus_signal(new PlusSignal());
         
-        chain.addProcessor(0, std::move(sig1));
-        chain.addProcessor(1, std::move(sig2));
-        chain.addProcessor(2, std::move(plus_scalar));
-        chain.addProcessor(3, std::move(plus_signal));
+        chain.addProcessor(sig_1);
+        chain.addProcessor(sig_2);
+        chain.addProcessor(plus_scalar);
+        chain.addProcessor(plus_signal);
         
-        chain.connect(0, 0, 2, 0);
-        chain.connect(2, 0, 3, 0);
-        chain.connect(1, 0, 3, 1);
+        chain.connect(*sig_1, 0, *plus_scalar, 0);
+        chain.connect(*plus_scalar, 0, *plus_signal, 0);
+        chain.connect(*sig_2, 0, *plus_signal, 1);
         
-        REQUIRE_THROWS_AS(chain.connect(3, 0, 2, 0);, Error);
+        // Adding a connnection that creates a loop
+        chain.connect(*plus_signal, 0, *plus_scalar, 0);
+        
+        REQUIRE_THROWS_AS(chain.prepare(0, 0), Error);
     }
     
-    SECTION("Prepare after updates")
+    SECTION("non-connected inlets and outlets share same signals")
     {
+        class SharedSignalsChecker : public Processor
+        {
+        public:
+            SharedSignalsChecker() noexcept : Processor(3ul, 3ul) {}
+            ~SharedSignalsChecker()  noexcept {}
+            
+            Buffer const* m_input;
+            Buffer const* m_output;
+            
+        private:
+            
+            void perform(Buffer const& input, Buffer& output) noexcept final
+            {
+                m_input = &input;
+                m_output = &output;
+            }
+        };
+        
         Chain chain;
         
-        chain.addProcessor(0, std::move(std::unique_ptr<Processor>(new Sig(1.))));
-        chain.addProcessor(2, std::move(std::unique_ptr<Processor>(new PlusSignal())));
+        std::shared_ptr<Processor> sig_1(new Sig(1.));
+        std::shared_ptr<Processor> checker_1(new SharedSignalsChecker());
+        std::shared_ptr<Processor> checker_2(new SharedSignalsChecker());
+        
+        chain.addProcessor(sig_1);
+        chain.addProcessor(checker_1);
+        chain.addProcessor(checker_2);
+        
+        chain.connect(*sig_1, 0, *checker_1, 1);
+        chain.connect(*checker_1, 1, *checker_2, 1);
+        
+        REQUIRE_NOTHROW(chain.prepare(samplerate, vectorsize));
+        chain.tick();
+        
+        Buffer const& in_1 = *dynamic_cast<SharedSignalsChecker&>(*checker_1).m_input;
+        Buffer const& out_1 = *dynamic_cast<SharedSignalsChecker&>(*checker_1).m_output;
+        Buffer const& in_2 = *dynamic_cast<SharedSignalsChecker&>(*checker_2).m_input;
+        Buffer const& out_2 = *dynamic_cast<SharedSignalsChecker&>(*checker_2).m_output;
+        
+        // check that all unconnected inlet share the same signal pointer.
+        CHECK(in_1[0].data() == in_1[2].data());
+        CHECK(in_1[0].data() == in_2[0].data());
+        CHECK(in_1[0].data() == in_2[2].data());
+        // different than connected inlet signal
+        CHECK_FALSE(in_1[0].data() == in_1[1].data());
+        
+        // check that all unconnected outlet of same index share the same signal pointer.
+        CHECK(out_1[0].data() == out_2[0].data());
+        CHECK(out_1[2].data() == out_2[2].data());
+        CHECK_FALSE(out_1[0].data() == out_2[2].data());
+        CHECK_FALSE(out_1[1].data() == out_2[1].data());
+        
+        REQUIRE_NOTHROW(chain.release());
+    }
+    
+    SECTION("Updating after first prepare")
+    {
+        Chain chain;
+        const size_t sr = 2ul;
+        const size_t vs = 4ul;
+        
+        std::shared_ptr<Processor> sig_1(new Sig(1.));
+        std::shared_ptr<Processor> sig_2(new Sig(2.));
+        std::shared_ptr<Processor> plus_signal(new PlusSignal());
         std::string result;
-        chain.addProcessor(3, std::move(std::unique_ptr<Processor>(new Print(result))));
+        std::shared_ptr<Processor> print(new Print(result));
         
-        chain.connect(0, 0, 2, 0);
-        chain.connect(2, 0, 3, 0);
+        chain.addProcessor(sig_1);
+        chain.addProcessor(plus_signal);
+        chain.addProcessor(print);
         
-        chain.prepare(samplerate, 4ul);
+        chain.connect(*sig_1, 0, *plus_signal, 0);
+        chain.connect(*plus_signal, 0, *print, 0);
+        
+        chain.prepare(sr, vs);
         
         chain.tick();
         
@@ -164,9 +235,9 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
         
         // Adding a processors
         
-        chain.addProcessor(1, std::move(std::unique_ptr<Processor>(new Sig(2.))));
+        chain.addProcessor(sig_2);
         
-        chain.prepare();
+        chain.update();
         
         chain.tick();
         
@@ -174,9 +245,9 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
         
         // Connecting processor
         
-        chain.connect(1, 0, 2, 1);
+        chain.connect(*sig_2, 0, *plus_signal, 1);
         
-        chain.prepare();
+        chain.update();
         
         chain.tick();
         
@@ -184,9 +255,9 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
         
         // Disconnecting processor
         
-        chain.discconnect(0, 0, 2, 0);
+        chain.disconnect(*sig_1, 0, *plus_signal, 0);
         
-        chain.prepare();
+        chain.update();
         
         chain.tick();
         
@@ -194,9 +265,9 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
         
         // Removing processor
         
-        chain.removeProcessor(2);
+        chain.removeProcessor(*plus_signal);
         
-        chain.prepare();
+        chain.update();
         
         chain.tick();
         
@@ -214,24 +285,24 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
     {
         Chain chain;
         
-        std::unique_ptr<Processor> sig1(new Sig(1.3));
-        std::unique_ptr<Processor> sig2(new Sig(2.7));
-        std::unique_ptr<Processor> plus_scalar(new PlusScalar(1.));
-        std::unique_ptr<Processor> plus_signal(new PlusSignal());
+        std::shared_ptr<Processor> sig_1(new Sig(1.3));
+        std::shared_ptr<Processor> sig_2(new Sig(2.7));
+        std::shared_ptr<Processor> plus_scalar(new PlusScalar(1.));
+        std::shared_ptr<Processor> plus_signal(new PlusSignal());
         
-        std::unique_ptr<Processor> copy_throw(new CopyThrow());
+        std::shared_ptr<Processor> copy_throw(new CopyThrow());
         
-        chain.addProcessor(0, std::move(sig1));
-        chain.addProcessor(1, std::move(sig2));
-        chain.addProcessor(2, std::move(plus_scalar));
-        chain.addProcessor(3, std::move(plus_signal));
+        chain.addProcessor(sig_1);
+        chain.addProcessor(sig_2);
+        chain.addProcessor(plus_scalar);
+        chain.addProcessor(plus_signal);
         
-        chain.connect(0, 0, 2, 0);
-        chain.connect(2, 0, 3, 0);
-        chain.connect(1, 0, 3, 1);
+        chain.connect(*sig_1, 0, *plus_scalar, 0);
+        chain.connect(*plus_scalar, 0, *plus_signal, 0);
+        chain.connect(*sig_2, 0, *plus_signal, 1);
         
-        chain.addProcessor(4, std::move(copy_throw));
-        chain.connect(3, 0, 4, 0);
+        chain.addProcessor(copy_throw);
+        chain.connect(*plus_signal, 0, *copy_throw, 0);
         
         REQUIRE_THROWS_AS(chain.prepare(samplerate, 128ul), Error);
         
@@ -242,17 +313,17 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
     {
         Chain chain;
         
-        std::unique_ptr<Processor> sig(new Sig(1.));
-        std::unique_ptr<Processor> plus(new PlusScalar(19.));
+        std::shared_ptr<Processor> sig_1(new Sig(1.));
+        std::shared_ptr<Processor> plus(new PlusScalar(19.));
         std::string result;
-        std::unique_ptr<Processor> print(new Print(result));
+        std::shared_ptr<Processor> print(new Print(result));
         
-        chain.addProcessor(0, std::move(sig));
-        chain.addProcessor(1, std::move(plus));
-        chain.addProcessor(2, std::move(print));
+        chain.addProcessor(sig_1);
+        chain.addProcessor(plus);
+        chain.addProcessor(print);
         
-        chain.connect(0, 0, 1, 0);
-        chain.connect(1, 0, 2, 0);
+        chain.connect(*sig_1, 0, *plus, 0);
+        chain.connect(*plus, 0, *print, 0);
         
         REQUIRE_NOTHROW(chain.prepare(samplerate, 4ul));
         
@@ -268,24 +339,23 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
     {
         Chain chain;
         
-        std::unique_ptr<Processor> sig_1(new Sig(1.));
-        std::unique_ptr<Processor> sig_2(new Sig(2.));
-        std::unique_ptr<Processor> sig_3(new Sig(3.));
+        std::shared_ptr<Processor> sig_1(new Sig(1.));
+        std::shared_ptr<Processor> sig_2(new Sig(2.));
+        std::shared_ptr<Processor> sig_3(new Sig(3.));
         std::string result;
-        std::unique_ptr<Processor> print(new Print(result));
+        std::shared_ptr<Processor> print(new Print(result));
         
-        chain.addProcessor(1, std::move(sig_1));
-        chain.addProcessor(2, std::move(sig_2));
-        chain.addProcessor(3, std::move(sig_3));
-        chain.addProcessor(4, std::move(print));
+        chain.addProcessor(sig_1);
+        chain.addProcessor(sig_2);
+        chain.addProcessor(sig_3);
+        chain.addProcessor(print);
         
-        chain.connect(1, 0, 4, 0);
-        chain.connect(2, 0, 4, 0);
-        chain.connect(3, 0, 4, 0);
+        chain.connect(*sig_1, 0, *print, 0);
+        chain.connect(*sig_2, 0, *print, 0);
+        chain.connect(*sig_3, 0, *print, 0);
         
         REQUIRE_NOTHROW(chain.prepare(samplerate, 4ul));
         
-        chain.tick();
         chain.tick();
         
         CHECK(result == "[6.000000, 6.000000, 6.000000, 6.000000]");
@@ -297,23 +367,23 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
     {
         Chain chain;
         
-        std::unique_ptr<Processor> sig(new Sig(1.111111));
+        std::shared_ptr<Processor> sig(new Sig(1.111111));
         
         std::string result_1;
-        std::unique_ptr<Processor> print_1(new Print(result_1));
+        std::shared_ptr<Processor> print_1(new Print(result_1));
         std::string result_2;
-        std::unique_ptr<Processor> print_2(new Print(result_2));
+        std::shared_ptr<Processor> print_2(new Print(result_2));
         std::string result_3;
-        std::unique_ptr<Processor> print_3(new Print(result_3));
+        std::shared_ptr<Processor> print_3(new Print(result_3));
         
-        chain.addProcessor(0, std::move(sig));
-        chain.addProcessor(1, std::move(print_1));
-        chain.addProcessor(2, std::move(print_2));
-        chain.addProcessor(3, std::move(print_3));
+        chain.addProcessor(sig);
+        chain.addProcessor(print_1);
+        chain.addProcessor(print_2);
+        chain.addProcessor(print_3);
         
-        chain.connect(0, 0, 1, 0);
-        chain.connect(0, 0, 2, 0);
-        chain.connect(0, 0, 3, 0);
+        chain.connect(*sig, 0, *print_1, 0);
+        chain.connect(*sig, 0, *print_2, 0);
+        chain.connect(*sig, 0, *print_3, 0);
         
         REQUIRE_NOTHROW(chain.prepare(samplerate, 4ul));
         
@@ -331,15 +401,15 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
     {
         Chain chain;
         
-        std::unique_ptr<Processor> count(new Count());
+        std::shared_ptr<Processor> count(new Count());
         
         std::string result;
-        std::unique_ptr<Processor> print(new Print(result));
+        std::shared_ptr<Processor> print(new Print(result));
         
-        chain.addProcessor(0, std::move(count));
-        chain.addProcessor(1, std::move(print));
+        chain.addProcessor(count);
+        chain.addProcessor(print);
         
-        chain.connect(0, 0, 1, 0);
+        chain.connect(*count, 0, *print, 0);
         
         REQUIRE_NOTHROW(chain.prepare(samplerate, 4ul));
         
@@ -362,18 +432,18 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
     {
         Chain chain;
         
-        std::unique_ptr<Processor> count(new Count());
-        std::unique_ptr<Processor> plus(new PlusSignal());
+        std::shared_ptr<Processor> count(new Count());
+        std::shared_ptr<Processor> plus(new PlusSignal());
         std::string result;
-        std::unique_ptr<Processor> print(new Print(result));
+        std::shared_ptr<Processor> print(new Print(result));
         
-        chain.addProcessor(0, std::move(count));
-        chain.addProcessor(1, std::move(plus));
-        chain.addProcessor(2, std::move(print));
+        chain.addProcessor(count);
+        chain.addProcessor(plus);
+        chain.addProcessor(print);
         
-        chain.connect(0, 0, 1, 0);
-        chain.connect(0, 0, 1, 1);
-        chain.connect(1, 0, 2, 0);;
+        chain.connect(*count, 0, *plus, 0);
+        chain.connect(*count, 0, *plus, 1);
+        chain.connect(*plus, 0, *print, 0);
         
         REQUIRE_NOTHROW(chain.prepare(samplerate, 4ul));
         
@@ -388,6 +458,102 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
         chain.tick();
         
         CHECK(result == "[16.000000, 18.000000, 20.000000, 22.000000]");
+        
+        chain.release();
+    }
+    
+    SECTION("Chain tick - performance")
+    {
+        Chain chain;
+        
+        std::shared_ptr<Processor> nul1(new NullProcessor(1, 1));
+        std::shared_ptr<Processor> nul2(new NullProcessor(1, 1));
+        
+        chain.addProcessor(nul1);
+        chain.addProcessor(nul2);
+        
+        chain.connect(*nul1, 0, *nul2, 0);
+        
+        chain.prepare(44100, 64);
+        
+        std::chrono::time_point<std::chrono::system_clock> start, end;
+        start = std::chrono::system_clock::now();
+        
+        for (int i = 0; i < 10000000; ++i)
+        {
+            chain.tick();
+        }
+        
+        end = std::chrono::system_clock::now();
+        
+        int elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+        
+        std::cout << "Duration for 10000000 tick " << elapsed_time << "ms" << std::endl;
+        
+        chain.release();
+    }
+    
+    SECTION("Chain tick - performance fanning")
+    {
+        Chain chain;
+        
+        std::shared_ptr<Processor> nul1(new NullProcessor(1, 1));
+        std::shared_ptr<Processor> nul2(new NullProcessor(1, 1));
+        std::shared_ptr<Processor> nul3(new NullProcessor(1, 1));
+        
+        chain.addProcessor(nul1);
+        chain.addProcessor(nul2);
+        chain.addProcessor(nul3);
+        
+        chain.connect(*nul1, 0, *nul3, 0);
+        chain.connect(*nul2, 0, *nul3, 0);
+        
+        chain.prepare(44100, 64);
+        
+        std::chrono::time_point<std::chrono::system_clock> start, end;
+        start = std::chrono::system_clock::now();
+        
+        for (int i = 0; i < 10000000; ++i)
+        {
+            chain.tick();
+        }
+        
+        end = std::chrono::system_clock::now();
+        
+        int elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+        
+        std::cout << "Duration fanning for 10000000 tick " << elapsed_time << "ms" << std::endl;
+        
+        chain.release();
+    }
+    
+    SECTION("Chain prepare - performance node line")
+    {
+        Chain chain;
+        
+        std::shared_ptr<Processor> previous_proc(new NullProcessor(1, 1));
+        chain.addProcessor(previous_proc);
+        
+        for(int i = 0; i < 10000; ++i)
+        {
+            std::shared_ptr<Processor> new_proc(new NullProcessor(1, 1));
+            
+            chain.addProcessor(new_proc);
+            chain.connect(*previous_proc, 0, *new_proc, 0);
+            
+            previous_proc = new_proc;
+        }
+        
+        std::chrono::time_point<std::chrono::system_clock> start, end;
+        start = std::chrono::system_clock::now();
+        
+        chain.prepare(44100, 64);
+        
+        end = std::chrono::system_clock::now();
+        
+        int elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+        
+        std::cout << "Duration prepare line " << elapsed_time << "ms" << std::endl;
         
         chain.release();
     }

@@ -22,8 +22,7 @@
 #ifndef KIWI_DSP_PROCESSOR_HPP_INCLUDED
 #define KIWI_DSP_PROCESSOR_HPP_INCLUDED
 
-#include "KiwiDsp_Infos.hpp"
-#include "KiwiDsp_Buffer.hpp"
+#include "KiwiDsp_Signal.hpp"
 
 namespace kiwi
 {
@@ -41,6 +40,15 @@ namespace kiwi
         //! @see Buffer and Infos
         class Processor
         {
+        public: // classes
+            
+            struct PrepareInfo
+            {
+                const size_t             m_sample_rate;
+                const size_t             m_vector_size;
+                const std::vector<bool> &m_inputs;
+            };
+            
         public: // methods
             
             //! @brief The constructor.
@@ -63,16 +71,6 @@ namespace kiwi
             //! @see getNumberOfInputs()
             inline size_t getNumberOfOutputs() const noexcept {return m_noutputs;}
             
-            //! @brief Returns true if the corresponding inlet should be inplace.
-            //! @details If given a size_t pointer sets it to the corresponding outlet index.
-            //! @details Default behavior is returning true if an outlet has the same index.
-            virtual bool isInletInplace(const size_t index, size_t * const outlet_index = nullptr) const;
-            
-            //! @brief Returns true if the corresponding outlet should be inplace.
-            //! @details If given a size_t pointer sets it to the corresponding inlet index.
-            //! @details Default behavior is returning true if an inlet has the same index.
-            virtual bool isOutletInplace(const size_t index, size_t * const outlet_index = nullptr) const;
-            
         private: // methods
             
             //! @brief Prepares everything for the perform method.
@@ -83,7 +81,7 @@ namespace kiwi
             //! @param infos The DSP informations.
             //! @return true if the perform method can be called, otherwise false.
             //! @see perform() and release()
-            virtual bool prepare(Infos& infos) { return true; };
+            virtual bool prepare(PrepareInfo& infos) { return true; };
             
             //! @brief Performs the digital signal processing.
             //! @details This is a pure virtual method. You should use this method to perform the
@@ -104,8 +102,7 @@ namespace kiwi
             
             const size_t        m_ninputs;
             const size_t        m_noutputs;
-            friend Node;
-            friend Chain;
+            friend class Chain;
         };
     }
 }

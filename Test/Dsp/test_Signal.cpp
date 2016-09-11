@@ -21,7 +21,7 @@
 
 #include "../catch.hpp"
 
-#include <KiwiDsp/KiwiDsp_Buffer.hpp>
+#include <KiwiDsp/KiwiDsp_Signal.hpp>
 
 using namespace kiwi;
 using namespace dsp;
@@ -32,6 +32,11 @@ using namespace dsp;
 
 TEST_CASE("Dsp - Signal", "[Dsp, Signal]")
 {
+    SECTION("Signal ctor - throws as bad alloc")
+    {
+        REQUIRE_THROWS_AS(Signal(-1), std::bad_alloc);
+    }
+    
     SECTION("Signal - move ctor")
     {
         const size_t size = 64;
@@ -54,31 +59,16 @@ TEST_CASE("Dsp - Signal", "[Dsp, Signal]")
         }
     }
     
-    SECTION("Signal - copy ctor")
+    SECTION("Signal - copy")
     {
-        const size_t size = 64;
-        Signal sig1(size, 0.5);
-        Signal sig2 = sig1;
-        
-        CHECK(sig1.size() == sig2.size());
-        
-        for(int j = 0; j < size; ++j)
-        {
-            CHECK(sig1[j] == sig2[j]);
-        }
-    }
-    
-    SECTION("Signal - empty ctor and copy")
-    {
-        Signal sig1;
+        Signal sig1(64, 0.);
         Signal sig2(64, 0.5);
-        sig2 = sig1;
+        sig2.copy(sig1);
         
-        CHECK(sig1.size() == 0ul);
-        CHECK(sig1.data() == nullptr);
-        
-        CHECK(sig2.size() == 0ul);
-        CHECK(sig2.data() == nullptr);
+        for(int j = 0; j < sig2.size(); ++j)
+        {
+            CHECK(sig2[j] == sig1[j]);
+        }
     }
     
     SECTION("Signal - move assignment")
@@ -125,56 +115,11 @@ TEST_CASE("Dsp - Signal", "[Dsp, Signal]")
         CHECK(sig2.data() == nullptr);
     }
     
-    SECTION("Signal - swap")
-    {
-        const size_t size = 64;
-        Signal sig1(size, 0.5);
-        Signal sig2(size, 1.);
-        
-        std::swap(sig1, sig2);
-        
-        for(int j = 0; j < size; ++j)
-        {
-            CHECK(sig1[j] == 1.);
-            CHECK(sig2[j] == 0.5);
-        }
-    }
-    
-    SECTION("Signal - swap (different size)")
-    {
-        Signal sig1(64, 0.5);
-        Signal sig2(128, 1.);
-        
-        std::swap(sig1, sig2);
-        
-        for(int j = 0; j < 64; ++j)
-        {
-            CHECK(sig2[j] == 0.5);
-        }
-        
-        for(int j = 0; j < 128; ++j)
-        {
-            CHECK(sig1[j] == 1.);
-        }
-        
-        std::swap(sig1, sig2);
-        
-        for(int j = 0; j < 64; ++j)
-        {
-            CHECK(sig1[j] == 0.5);
-        }
-        
-        for(int j = 0; j < 128; ++j)
-        {
-            CHECK(sig2[j] == 1.);
-        }
-    }
-    
-    SECTION("Signal::fillWith(sample_t const&)")
+    SECTION("Signal::fill(sample_t const&)")
     {
         const size_t size = 64;
         Signal sig(size);
-        sig.fillWith(1.);
+        sig.fill(1.);
         
         for(int j = 0; j < size; ++j)
         {
@@ -187,11 +132,14 @@ TEST_CASE("Dsp - Signal", "[Dsp, Signal]")
         const size_t size = 64;
         Signal sig1(size, 0.5);
         Signal sig2(size, 1.5);
-        Signal result = Signal::add(sig1, sig2);
+        Signal result(size, 0);
+        Signal::add(sig1, sig2, result);
+        sig1.add(sig2);
         
         for(int j = 0; j < result.size(); ++j)
         {
             CHECK(result[j] == 2.);
+            CHECK(sig1[j] == 2.);
         }
     }
 }

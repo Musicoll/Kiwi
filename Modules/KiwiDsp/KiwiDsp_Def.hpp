@@ -40,8 +40,6 @@
 #include "malloc.h"
 #endif
 
-#include "KiwiDsp_platform.hpp"
-
 namespace kiwi
 {
     namespace dsp

@@ -39,9 +39,9 @@ public:
     Phasor(sample_t frequency) noexcept : Processor(0ul, 1ul), m_freq(frequency) {}
     ~Phasor() = default;
 private:
-    bool prepare(Infos& infos)
+    bool prepare(PrepareInfo& infos)
     {
-        m_sr = static_cast<sample_t>(infos.getSampleRate());
+        m_sr = static_cast<sample_t>(infos.m_sample_rate);
         return true;
     }
     
@@ -84,13 +84,14 @@ public:
     {
         m_freq = freq;
         m_phase_inc = (freq != 0.) ? (1./(m_sr/(m_freq))) : 0.;
+        //m_phase = 0.;
     }
     
 private:
     
-    bool prepare(Infos& infos)
+    bool prepare(PrepareInfo& infos)
     {
-        m_sr = static_cast<sample_t>(infos.getSampleRate());
+        m_sr = static_cast<sample_t>(infos.m_sample_rate);
         setFrequency(m_freq);
         return true;
     }
@@ -117,24 +118,6 @@ private: // members
 };
 
 // ==================================================================================== //
-//                                      *~ SIGNAL                                       //
-// ==================================================================================== //
-
-class MultiplySignal : public Processor
-{
-public:
-    MultiplySignal() noexcept : Processor(2ul, 1ul) {}
-    ~MultiplySignal()  noexcept {}
-private:
-    
-    void perform(Buffer const& input, Buffer& output) noexcept final
-    {
-        // this should be inplace
-        Samples<sample_t>::mul(input[1ul].size(), input[1ul].data(), output[0ul].data());
-    }
-};
-
-// ==================================================================================== //
 //                                          DAC (fake)                                  //
 // ==================================================================================== //
 
@@ -148,8 +131,8 @@ private:
     
     void perform(Buffer const& input, Buffer&) noexcept final
     {
-        Samples<sample_t>::copy(input[0].size(), input[0].data(), m_buffer[0].data());
-        Samples<sample_t>::copy(input[1].size(), input[1].data(), m_buffer[1].data());
+        m_buffer[0].copy(input[0]);
+        m_buffer[1].copy(input[1]);
     }
     
 private: // members
