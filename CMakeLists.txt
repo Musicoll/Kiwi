@@ -174,51 +174,43 @@ source_group_rec("${JUCE_SRC}" ${ROOT_DIR}/ThirdParty/Juce/modules)
 # Flip
 #----------------------------------
 
-if (APPLE)
-    if (${FLIP_PRIVATE})
+if (${FLIP_PRIVATE})
+    if(APPLE)
+    
         if(CMAKE_BUILD_TYPE STREQUAL "Debug")
             find_library(FlipLib NAMES flip PATHS ${ROOT_DIR}/ThirdParty/flip/projects/build/Debug)
         elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
             find_library(FlipLib NAMES flip PATHS ${ROOT_DIR}/ThirdParty/flip/projects/build/Release)
         endif()
-    else()
-        find_library(FlipLib NAMES flip PATHS ${ROOT_DIR}/ThirdParty/flip-demo/lib/mac)
-    endif()
-    set(FLIP_DEP ${FlipLib})
-elseif (WIN32)
-	if (CMAKE_CL_64)
-        if (${FLIP_PRIVATE})
-            if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-                find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip/projects/build/lib/x64/Debug")
-            elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-                find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip/projects/build/lib/x64/Release")
-            endif()
-        else()
-            find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-demo/lib/windows/VS2015/x64/Release")
-        endif()
-	else()
-        if (${FLIP_PRIVATE})
-            if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-                find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip/projects/build/Win32/Debug")
-            elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-                find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip/projects/build/Win32/Release")
-            endif()
-        else()
-            find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-demo/lib/windows/VS2015/Win32/Release")
-        endif()
-	endif()
     
-    find_library(WS2_32 ws2_32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
-	set(FLIP_DEP ${WS2_32} ${FlipLib})
-endif()
-
-if (${FLIP_PRIVATE})
-    set(FLIP_DIR "${ROOT_DIR}/ThirdParty/flip")
-    file (GLOB_RECURSE FLIP_SRC ${ROOT_DIR}/ThirdParty/flip/inlude/*.hpp
+        set(FLIP_DEP ${FlipLib})
+        set(FLIP_DIR "${ROOT_DIR}/ThirdParty/flip")
+        file (GLOB_RECURSE FLIP_SRC ${ROOT_DIR}/ThirdParty/flip/inlude/*.hpp
                                 ${ROOT_DIR}/ThirdParty/flip/include/*.h
                                 ${ROOT_DIR}/ThirdParty/flip/src/*.cpp)
+                                
+    endif()
 else()
-    set(FLIP_DIR "${ROOT_DIR}/ThirdParty/flip-demo")
+
+    if(APPLE)
+    
+        find_library(FlipLib NAMES flip PATHS ${ROOT_DIR}/ThirdParty/flip-demo/lib/mac)
+        set(FLIP_DEP ${FlipLib})
+        
+    elseif(WIN32)
+    
+        if (CMAKE_CL_64)
+            find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-demo/lib/windows/VS2015/x64/Release")
+	   else()
+            find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-demo/lib/windows/VS2015/Win32/Release")
+	   endif()
+       
+       find_library(WS2_32 ws2_32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
+	   set(FLIP_DEP ${WS2_32} ${FlipLib})
+       
+    endif()
+    
+    set(FLIP_DIR "${ROOT_DIR}/ThirdParty/flip-demo") 
     file (GLOB_RECURSE FLIP_SRC ${FLIP_DIR}/include/*.hpp 
                                 ${FLIP_DIR}/include/*.h)
 endif()
