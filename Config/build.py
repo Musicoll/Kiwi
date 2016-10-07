@@ -59,6 +59,19 @@ def build_windows(args):
 			cmd = "MSBuild.exe " + "/p:Configuration=Debug /p:Platform=Win32 " + os.path.join(project_dir, "Build", "Debug", "Win32", "Kiwi.sln");
 	
 	subprocess.check_call(cmd, shell = True)
+    
+#==============================================================================
+# Name : build_linux
+#==============================================================================
+
+def build_linux(args):
+    if(args.configuration == "Release"):
+        os.chdir(os.path.join(project_dir, "Build", "Release"))
+        subprocess.check_call("make", shell = True)
+    elif(args.configuration == "Debug"):
+        os.chdir(os.path.join(project_dir, "Build", "Debug"))
+        subprocess.check_call("make", shell = True)
+os.chdir(project_dir)
 	
 #==============================================================================
 # Name : main
@@ -68,3 +81,5 @@ if platform.system() == "Darwin":
     build_osx(parse_args())
 elif platform.system() == "Windows":
 	build_windows(parse_args());
+elif platform.system() == "Linux":
+	build_linux(parse_args());

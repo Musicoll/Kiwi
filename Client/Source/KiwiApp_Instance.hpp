@@ -99,7 +99,7 @@ namespace kiwi
         using PatcherManagers = std::vector<std::unique_ptr<PatcherManager>>;
         
         //! @internal get the given patcher manager iterator.
-        PatcherManagers::const_iterator getPatcherManager(PatcherManager const& manager) const;
+        PatcherManagers::iterator getPatcherManager(PatcherManager const& manager);
         
         //! @brief Returns the next untitled number based on current documents
         size_t getNextUntitledNumberAndIncrement();

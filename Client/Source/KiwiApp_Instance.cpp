@@ -150,7 +150,8 @@ namespace kiwi
         {
             PatcherManager& manager = pwin->getManager();
             
-            const auto manager_it = getPatcherManager(manager);
+            auto manager_it = getPatcherManager(manager);
+            
             if(manager_it != m_patcher_managers.end())
             {
                 PatcherView& patcherview = pwin->getPatcherView();
@@ -259,7 +260,7 @@ namespace kiwi
         setUserId(set_cmp.getUserId());
     }
     
-    Instance::PatcherManagers::const_iterator Instance::getPatcherManager(PatcherManager const& manager) const
+    Instance::PatcherManagers::iterator Instance::getPatcherManager(PatcherManager const& manager)
     {
         const auto find_it = [&manager](std::unique_ptr<PatcherManager> const& manager_uptr)
         {

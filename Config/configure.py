@@ -167,6 +167,44 @@ def configure_windows(args):
     return
 
 #==============================================================================
+# Name : linux_debug
+#==============================================================================
+
+def linux_debug():
+    cmd_loc = cmd;
+    build_dir = os.path.join(project_dir, "Build", "Debug");
+    os.makedirs(build_dir);
+    os.chdir(build_dir);
+    cmd_loc += " -DCMAKE_BUILD_TYPE:STRING=Debug"
+    cmd_loc += " " + project_dir
+    subprocess.check_call(cmd_loc, shell= True)
+    return
+
+#==============================================================================
+# Name : linux_release
+#==============================================================================
+
+def linux_release():
+    cmd_loc = cmd;
+    build_dir = os.path.join(project_dir, "Build", "Release");
+    os.makedirs(build_dir);
+    os.chdir(build_dir);
+    cmd_loc += " -DCMAKE_BUILD_TYPE:STRING=Release"
+    cmd_loc += " " + project_dir
+    subprocess.check_call(cmd_loc, shell= True)
+    return
+    
+
+#==============================================================================
+# Name : configure_linux
+#==============================================================================
+
+def configure_linux(args):
+    linux_debug()
+    linux_release()
+    return
+
+#==============================================================================
 # Name : main
 #==============================================================================
 
@@ -177,9 +215,9 @@ if os.path.exists(root_build_dir):
 
 os.makedirs(root_build_dir);
 
-create_dir(os.path.join(project_dir, "Build"))
-
 if platform.system()=="Darwin":
     configure_mac(parse_args());
 elif platform.system() == "Windows":
 	configure_windows(parse_args())
+elif platform.system() == "Linux":
+	configure_linux(parse_args())

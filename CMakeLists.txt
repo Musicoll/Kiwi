@@ -71,6 +71,12 @@ elseif(APPLE)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     endif()
     
+elseif(UNIX)
+
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+    endif()
+    
 endif()
 
 #--------------------------------------
@@ -102,6 +108,9 @@ if (WIN32)
 else()
     set(CMAKE_FIND_LIBRARY_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES} "" "lib")
 	set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} ".a" ".so")
+    if (UNIX)
+        include_directories(/usr/include/freetype2)
+    endif()
 endif()
                                         
 #--------------------------------------
@@ -136,6 +145,14 @@ elseif(WIN32)
 	find_library(RPCRT4 rpcrt4 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
 	find_library(WINMM winmm PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
 	set(JUCE_DEP ${WS2_32} ${UUID} ${WSOCK32} ${WININET} ${LIBVERSION} ${OLE32} ${OLEAUT32} ${COMDLG32} ${SHLWAPI} ${RPCRT4} ${WINMM})
+elseif(UNIX)
+    find_library(RT rt)
+    find_library(DL dl)
+    find_library(PTHREAD pthread)
+    find_library(X11 X11)
+    find_library(XEXT Xext)
+    find_library(FREETYPE freetype)
+    set(JUCE_DEP ${RT} ${DL} ${PTHREAD} ${FREETYPE} ${X11} ${XEXT})
 endif()
 
 set(JUCE_MACRO_DEFINITIONS JUCE_MODULE_AVAILABLE_juce_core=1
@@ -187,27 +204,26 @@ if (${FLIP_PRIVATE})
         set(FLIP_DIR "${ROOT_DIR}/ThirdParty/flip")
         file (GLOB_RECURSE FLIP_SRC ${ROOT_DIR}/ThirdParty/flip/inlude/*.hpp
                                 ${ROOT_DIR}/ThirdParty/flip/include/*.h
-                                ${ROOT_DIR}/ThirdParty/flip/src/*.cpp)
-                                
+                                ${ROOT_DIR}/ThirdParty/flip/src/*.cpp)                          
     endif()
 else()
 
     if(APPLE)
-    
         find_library(FlipLib NAMES flip PATHS ${ROOT_DIR}/ThirdParty/flip-demo/lib/mac)
         set(FLIP_DEP ${FlipLib})
         
     elseif(WIN32)
-    
         if (CMAKE_CL_64)
             find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-demo/lib/windows/VS2015/x64/Release")
 	   else()
             find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-demo/lib/windows/VS2015/Win32/Release")
 	   endif()
-       
        find_library(WS2_32 ws2_32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
 	   set(FLIP_DEP ${WS2_32} ${FlipLib})
        
+    elseif(UNIX)
+        find_library(FlipLib NAMES flip PATHS ${ROOT_DIR}/ThirdParty/flip-demo/lib/linux/gcc)
+        set(FLIP_DEP ${FlipLib})
     endif()
     
     set(FLIP_DIR "${ROOT_DIR}/ThirdParty/flip-demo") 
