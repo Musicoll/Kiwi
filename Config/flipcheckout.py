@@ -57,11 +57,17 @@ def checkout_mac(args):
     archive.extractall(mac_dir)
     archive.close()
     
-    # Copy include, lib and documentation into flip-demo
-    shutil.copytree (os.path.join(mac_dir, "flip-demo", "include"), os.path.join(os.getcwd(), "flip-demo", "include"))
-    shutil.copytree (os.path.join(mac_dir, "flip-demo", "documentation"), os.path.join(os.getcwd(), "flip-demo", "documentation"))
+    # copy include, lib and documentation into flip-demo
+    shutil.copytree (os.path.join(mac_dir, "flip-demo", "include"), 
+                     os.path.join(os.getcwd(), "flip-demo", "include"))
+    
+    shutil.copytree (os.path.join(mac_dir, "flip-demo", "documentation"), 
+                     os.path.join(os.getcwd(), "flip-demo", "documentation"))
+    
     os.makedirs(os.path.join(os.getcwd(), "flip-demo", "lib", "mac"))
-    shutil.copyfile (os.path.join(mac_dir, "flip-demo", "lib", "libflip.a"), os.path.join(os.getcwd(), "flip-demo", "lib", "mac", "libflip.a"))
+    
+    shutil.copyfile (os.path.join(mac_dir, "flip-demo", "lib", "libflip.a"), 
+                     os.path.join(os.getcwd(), "flip-demo", "lib", "mac", "libflip.a"))
     
     # remove archive
     os.remove(os.path.join(os.getcwd(), file))
@@ -85,13 +91,43 @@ def checkout_windows(args):
     archive.extractall(windows_dir)
     archive.close()
     
-    # Copy libraries into flip-demo
+    # copy libraries into flip-demo
     os.makedirs(os.path.join(os.getcwd(), "flip-demo", "lib", "windows"))
-    shutil.copytree (os.path.join(windows_dir, "lib", "VS2015"), os.path.join(os.getcwd(), "flip-demo", "lib", "windows", "VS2015"))
+    
+    shutil.copytree (os.path.join(windows_dir, "lib", "VS2015"), 
+                     os.path.join(os.getcwd(), "flip-demo", "lib", "windows", "VS2015"))
     
     # remove archive && directory
     shutil.rmtree(windows_dir)
     os.remove(file)
+    
+#==============================================================================
+# Name : checkout_linux
+#==============================================================================
+
+def checkout_linux(args):
+    
+    # download archive
+    file = "flip-demo-linux-" + args.commit + ".tar.gz"
+    urllib.urlretrieve (flip_url + file, file)
+    
+    # decompress archive
+    linux_dir = os.path.join(os.getcwd(), "flip-demo-linux")
+    os.mkdir(linux_dir)
+    
+    archive = tarfile.open(file, "r:gz")
+    archive.extractall(linux_dir)
+    archive.close
+    
+    # copy include, lib and documentation into flip-demo
+    os.makedirs(os.path.join(os.getcwd(), "flip-demo", "lib", "linux"))
+    
+    shutil.copytree (os.path.join(linux_dir, "flip-demo", "lib", "gcc"), 
+                     os.path.join(os.getcwd(), "flip-demo", "lib", "linux", "gcc"))
+    
+    # remove archive
+    os.remove(os.path.join(os.getcwd(), file))
+    shutil.rmtree(linux_dir)
 
 #==============================================================================
 # Name : main
@@ -101,8 +137,9 @@ os.chdir(os.path.join(project_dir, "ThirdParty"))
 
 if  os.path.exists(os.path.join(os.getcwd(), "flip-demo")):
         shutil.rmtree(os.path.join(os.getcwd(), "flip-demo"));
-        os.mkdir("flip-demo")
+os.mkdir("flip-demo")
 
 checkout_mac(parse_args())
 checkout_windows(parse_args())
+checkout_linux(parse_args())
 checkout_fip_submodule(parse_args())
