@@ -38,6 +38,12 @@ def build_flip_private():
     subprocess.check_call("python " + build_path + " -c Debug -t flip", shell= True);
     subprocess.check_call("python " + build_path + " -c Release -t flip", shell= True);
 
+#==============================================================================
+# Name : retrieve_flip_public
+#==============================================================================
+
+def retrieve_flip_public():
+    subprocess.check_call("python " + os.path.join(project_dir, "Config", "flip-public.py"), shell= True);
 
 #==============================================================================
 # Name : create_dir
@@ -208,11 +214,13 @@ def configure_linux(args):
 # Name : main
 #==============================================================================
 
+retrieve_flip_public();
+
 root_build_dir = os.path.join(project_dir, "Build")
 
 if os.path.exists(root_build_dir):
 	shutil.rmtree(root_build_dir);
-
+    
 os.makedirs(root_build_dir);
 
 if platform.system()=="Darwin":

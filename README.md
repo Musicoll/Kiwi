@@ -12,7 +12,6 @@
 
 ### Modules Initialization
 ```
-git submodule update --init --recursive ThirdParty/flip-public
 git submodule update --init --recursive ThirdParty/Juce
 ```
 
