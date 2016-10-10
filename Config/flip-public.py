@@ -14,39 +14,48 @@ import subprocess
 
 project_dir = os.path.abspath(".");
 flip_url = "http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files/"
-
-#==============================================================================
-# Name : parse_args
-#==============================================================================
-
-def parse_args ():
-    arg_parser = argparse.ArgumentParser ()
-    arg_parser.add_argument('-c', '--commit')
-
-    return arg_parser.parse_args (sys.argv[1:])
-
-#==============================================================================
-# Name : checkout_flip_submodule
-#==============================================================================
-
-def checkout_fip_submodule(args):
-    subprocess.check_call("git submodule update --init flip", shell= True)
     
-    os.chdir(os.path.join(os.getcwd(), "flip"))
-    subprocess.check_call("git fetch", shell= True)
-    subprocess.check_call("git checkout master ", shell= True)
-    subprocess.check_call("git checkout " + args.commit , shell= True)
-    os.chdir("../")
+#==============================================================================
+# Name : get_private_commit
+#==============================================================================
+
+def get_private_commit():
+    commit  = subprocess.check_output(["git", "submodule", "status", "flip"]).split(" ")
+    return commit[0][1:11]
+
+#==============================================================================
+# Name : get_public_commit
+#==============================================================================
+
+def get_public_commit():
     
+    commit = ""
+    
+    if  os.path.exists(os.path.join(os.getcwd(), "flip-public", "config")):
+        fo = open(os.path.join(os.getcwd(), "flip-public", "config"), "rw+")
+        commit = fo.readline()
+        fo.close()   
+
+    return commit[0:10]
+
+#==============================================================================
+# Name : set_public_commit
+#==============================================================================
+
+def set_public_commit(commit):
+    
+    fo = open(os.path.join(os.getcwd(), "flip-public", "config"), "w")
+    commit = fo.write(commit)
+    fo.close()
 
 #==============================================================================
 # Name : checkout_mac
 #==============================================================================
 
-def checkout_mac(args):
+def checkout_mac(commit):
     
     # download archive
-    file = "flip-demo-macos-" + args.commit + ".tar.gz"
+    file = "flip-demo-macos-" + commit + ".tar.gz"
     urllib.urlretrieve (flip_url + file, file)
     
     # decompress archive
@@ -77,10 +86,10 @@ def checkout_mac(args):
 # Name : checkout_windows
 #==============================================================================
 
-def checkout_windows(args):
+def checkout_windows(commit):
     
     # download archive
-    file = "flip-demo-windows-" + args.commit + ".zip"
+    file = "flip-demo-windows-" + commit + ".zip"
     urllib.urlretrieve (flip_url + file, file)
     
     # decompress archive
@@ -105,10 +114,10 @@ def checkout_windows(args):
 # Name : checkout_linux
 #==============================================================================
 
-def checkout_linux(args):
+def checkout_linux(commit):
     
     # download archive
-    file = "flip-demo-linux-" + args.commit + ".tar.gz"
+    file = "flip-demo-linux-" + commit + ".tar.gz"
     urllib.urlretrieve (flip_url + file, file)
     
     # decompress archive
@@ -135,11 +144,17 @@ def checkout_linux(args):
 
 os.chdir(os.path.join(project_dir, "ThirdParty"))
 
-if  os.path.exists(os.path.join(os.getcwd(), "flip-public")):
-        shutil.rmtree(os.path.join(os.getcwd(), "flip-public"));
-os.mkdir("flip-public")
+private_commit = get_private_commit()
+public_commit = get_public_commit()
 
-checkout_mac(parse_args())
-checkout_windows(parse_args())
-checkout_linux(parse_args())
-checkout_fip_submodule(parse_args())
+if  private_commit  != public_commit:
+    
+        if os.path.exists(os.path.join(os.getcwd(), "flip-public")):
+            shutil.rmtree(os.path.join(os.getcwd(), "flip-public"))
+        os.mkdir("flip-public")
+        
+        checkout_mac(private_commit)
+        checkout_windows(private_commit)
+        checkout_linux(private_commit)
+        
+        set_public_commit(private_commit)
