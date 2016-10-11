@@ -26,6 +26,14 @@ def parse_args ():
     return arg_parser.parse_args (sys.argv[1:])
 
 #==============================================================================
+# Name : create_dir
+#==============================================================================
+
+def create_dir(dir):
+	if not os.path.exists(dir):
+	   os.makedirs(dir);
+    
+#==============================================================================
 # Name : flip_private
 #==============================================================================
 
@@ -46,23 +54,13 @@ def retrieve_flip_public():
     subprocess.check_call("python " + os.path.join(project_dir, "Config", "flip-public.py"), shell= True);
 
 #==============================================================================
-# Name : create_dir
-#==============================================================================
-
-def create_dir(dir):
-	if (os.path.exists(dir)):
-		shutil.rmtree(dir);
-	os.makedirs(dir);
-	return
-
-#==============================================================================
 # Name : mac_release
 #==============================================================================
 
 def mac_release():
     cmd_loc = cmd;
     build_dir = os.path.join(project_dir, "Build", "Release");
-    os.makedirs(build_dir);
+    create_dir(build_dir);
     os.chdir(build_dir);
     cmd_loc+= " -DCMAKE_BUILD_TYPE:STRING=Release";
     cmd_loc+= " " + project_dir;
@@ -77,7 +75,7 @@ def mac_release():
 def mac_debug():
     cmd_loc = cmd;
     build_dir = os.path.join(project_dir, "Build", "Debug");
-    os.makedirs(build_dir);
+    create_dir(build_dir);
     os.chdir(build_dir);
     cmd_loc += " -DCMAKE_BUILD_TYPE:STRING=Debug"
     cmd_loc += " " + project_dir;
@@ -105,7 +103,7 @@ def configure_mac(args):
 def win_debug_32():
     cmd_loc = cmd;
     build_dir = os.path.join(project_dir, "Build", "Debug", "Win32");
-    os.makedirs(build_dir);
+    create_dir(build_dir);
     os.chdir(build_dir);
     cmd_loc += "\""
     cmd_loc += " -DCMAKE_BUILD_TYPE:STRING=Debug"
@@ -120,7 +118,7 @@ def win_debug_32():
 def win_debug_64():
     cmd_loc = cmd;
     build_dir = os.path.join(project_dir, "Build", "Debug", "x64");
-    os.makedirs(build_dir);
+    create_dir(build_dir);
     os.chdir(build_dir);
     cmd_loc += " Win64\""
     cmd_loc += " -DCMAKE_BUILD_TYPE:STRING=Debug"
@@ -135,7 +133,7 @@ def win_debug_64():
 def win_release_32():
     cmd_loc = cmd;
     build_dir = os.path.join(project_dir, "Build", "Release", "Win32");
-    os.makedirs(build_dir);
+    create_dir(build_dir);
     os.chdir(build_dir);
     cmd_loc += "\""
     cmd_loc += " -DCMAKE_BUILD_TYPE:STRING=Release"
@@ -151,7 +149,7 @@ def win_release_32():
 def win_release_64():
     cmd_loc = cmd;
     build_dir = os.path.join(project_dir, "Build", "Release", "x64");
-    os.makedirs(build_dir);
+    create_dir(build_dir);
     os.chdir(build_dir);
     cmd_loc += " Win64\""
     cmd_loc += " -DCMAKE_BUILD_TYPE:STRING=Release"
@@ -179,7 +177,7 @@ def configure_windows(args):
 def linux_debug():
     cmd_loc = cmd;
     build_dir = os.path.join(project_dir, "Build", "Debug");
-    os.makedirs(build_dir);
+    create_dir(build_dir);
     os.chdir(build_dir);
     cmd_loc += " -DCMAKE_BUILD_TYPE:STRING=Debug"
     cmd_loc += " " + project_dir
@@ -193,7 +191,7 @@ def linux_debug():
 def linux_release():
     cmd_loc = cmd;
     build_dir = os.path.join(project_dir, "Build", "Release");
-    os.makedirs(build_dir);
+    create_dir(build_dir);
     os.chdir(build_dir);
     cmd_loc += " -DCMAKE_BUILD_TYPE:STRING=Release"
     cmd_loc += " " + project_dir
@@ -218,10 +216,7 @@ retrieve_flip_public();
 
 root_build_dir = os.path.join(project_dir, "Build")
 
-if os.path.exists(root_build_dir):
-	shutil.rmtree(root_build_dir);
-    
-os.makedirs(root_build_dir);
+create_dir(root_build_dir)
 
 if platform.system()=="Darwin":
     configure_mac(parse_args());
