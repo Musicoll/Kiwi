@@ -108,6 +108,9 @@ if (WIN32)
 else()
     set(CMAKE_FIND_LIBRARY_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES} "" "lib")
 	set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} ".a" ".so")
+    if (UNIX)
+        include_directories(/usr/include/freetype2)
+    endif()
 endif()
                                         
 #--------------------------------------
@@ -147,10 +150,9 @@ elseif(UNIX)
     find_library(DL dl)
     find_library(PTHREAD pthread)
     find_library(X11 X11)
-    find_library(XINERAMA Xinerama)
     find_library(XEXT Xext)
     find_library(FREETYPE freetype)
-    set(JUCE_DEP ${RT} ${DL} ${PTHREAD} ${X11} ${XINERAMA} ${XEXT} ${FREETYPE})
+    set(JUCE_DEP ${RT} ${DL} ${PTHREAD} ${FREETYPE} ${X11} ${XEXT})
 endif()
 
 set(JUCE_MACRO_DEFINITIONS JUCE_MODULE_AVAILABLE_juce_core=1

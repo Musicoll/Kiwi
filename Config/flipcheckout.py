@@ -117,7 +117,7 @@ def checkout_linux(args):
     
     archive = tarfile.open(file, "r:gz")
     archive.extractall(linux_dir)
-    archive.close
+    archive.close()
     
     # copy include, lib and documentation into flip-demo
     os.makedirs(os.path.join(os.getcwd(), "flip-demo", "lib", "linux"))

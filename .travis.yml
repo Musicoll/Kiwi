@@ -16,6 +16,15 @@ matrix:
   - os: linux
     compiler: gcc
     env: COMPILER=g++-4.9
+    before_install:
+    - sudo apt-get update
+    - sudo apt-get install gobjc++
+    - sudo apt-get install libfreetype6-dev
+    - sudo apt-get install libx11-dev
+    - sudo apt-get install libxrandr-dev
+    - sudo apt-get install libxinerama1
+    - sudo apt-get install libxinerama-dev
+    - sudo apt-get install libxcursor-dev
     script:
     - python ./Config/configure.py
     - python ./Config/build.py -c Release
