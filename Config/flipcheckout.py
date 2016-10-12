@@ -55,7 +55,7 @@ def checkout_mac(args):
     
     archive = tarfile.open(file, "r:gz")
     archive.extractall(mac_dir)
-    archive.close
+    archive.close()
     
     # Copy include, lib and documentation into flip-demo
     shutil.copytree (os.path.join(mac_dir, "flip-demo", "include"), os.path.join(os.getcwd(), "flip-demo", "include"))
@@ -83,7 +83,7 @@ def checkout_windows(args):
     
     archive = zipfile.ZipFile(file, 'r')
     archive.extractall(windows_dir)
-    archive.close
+    archive.close()
     
     # Copy libraries into flip-demo
     os.makedirs(os.path.join(os.getcwd(), "flip-demo", "lib", "windows"))
