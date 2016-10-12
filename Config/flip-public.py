@@ -59,15 +59,15 @@ def checkout_mac(args):
     
     # copy include, lib and documentation into flip-demo
     shutil.copytree (os.path.join(mac_dir, "flip-demo", "include"), 
-                     os.path.join(os.getcwd(), "flip-demo", "include"))
+                     os.path.join(os.getcwd(), "flip-public", "include"))
     
     shutil.copytree (os.path.join(mac_dir, "flip-demo", "documentation"), 
-                     os.path.join(os.getcwd(), "flip-demo", "documentation"))
+                     os.path.join(os.getcwd(), "flip-public", "documentation"))
     
-    os.makedirs(os.path.join(os.getcwd(), "flip-demo", "lib", "mac"))
+    os.makedirs(os.path.join(os.getcwd(), "flip-public", "lib", "mac"))
     
     shutil.copyfile (os.path.join(mac_dir, "flip-demo", "lib", "libflip.a"), 
-                     os.path.join(os.getcwd(), "flip-demo", "lib", "mac", "libflip.a"))
+                     os.path.join(os.getcwd(), "flip-public", "lib", "mac", "libflip.a"))
     
     # remove archive
     os.remove(os.path.join(os.getcwd(), file))
@@ -92,10 +92,10 @@ def checkout_windows(args):
     archive.close()
     
     # copy libraries into flip-demo
-    os.makedirs(os.path.join(os.getcwd(), "flip-demo", "lib", "windows"))
+    os.makedirs(os.path.join(os.getcwd(), "flip-public", "lib", "windows"))
     
     shutil.copytree (os.path.join(windows_dir, "lib", "VS2015"), 
-                     os.path.join(os.getcwd(), "flip-demo", "lib", "windows", "VS2015"))
+                     os.path.join(os.getcwd(), "flip-public", "lib", "windows", "VS2015"))
     
     # remove archive && directory
     shutil.rmtree(windows_dir)
@@ -120,10 +120,10 @@ def checkout_linux(args):
     archive.close()
     
     # copy include, lib and documentation into flip-demo
-    os.makedirs(os.path.join(os.getcwd(), "flip-demo", "lib", "linux"))
+    os.makedirs(os.path.join(os.getcwd(), "flip-public", "lib", "linux"))
     
     shutil.copytree (os.path.join(linux_dir, "flip-demo", "lib", "gcc"), 
-                     os.path.join(os.getcwd(), "flip-demo", "lib", "linux", "gcc"))
+                     os.path.join(os.getcwd(), "flip-public", "lib", "linux", "gcc"))
     
     # remove archive
     os.remove(os.path.join(os.getcwd(), file))
@@ -135,9 +135,9 @@ def checkout_linux(args):
 
 os.chdir(os.path.join(project_dir, "ThirdParty"))
 
-if  os.path.exists(os.path.join(os.getcwd(), "flip-demo")):
-        shutil.rmtree(os.path.join(os.getcwd(), "flip-demo"));
-os.mkdir("flip-demo")
+if  os.path.exists(os.path.join(os.getcwd(), "flip-public")):
+        shutil.rmtree(os.path.join(os.getcwd(), "flip-public"));
+os.mkdir("flip-public")
 
 checkout_mac(parse_args())
 checkout_windows(parse_args())
