@@ -24,7 +24,7 @@
 
 #include <memory>
 
-#include "KiwiDsp_def.hpp"
+#include "KiwiDsp_Def.hpp"
 
 namespace kiwi
 {

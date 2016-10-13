@@ -544,7 +544,7 @@ namespace kiwi
         {
             struct compare_index
             {
-                bool operator()(std::unique_ptr<Node>& l_node, std::unique_ptr<Node>& r_node)
+                bool operator()(std::unique_ptr<Node> const& l_node, std::unique_ptr<Node> const& r_node)
                 {
                     return l_node->m_index < r_node->m_index;
                 };

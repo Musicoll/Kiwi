@@ -22,7 +22,7 @@
 #ifndef KIWI_DSP_MISC_HPP_INCLUDED
 #define KIWI_DSP_MISC_HPP_INCLUDED
 
-#include "KiwiDsp_def.hpp"
+#include "KiwiDsp_Def.hpp"
 
 namespace kiwi
 {
