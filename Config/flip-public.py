@@ -20,8 +20,8 @@ flip_url = "http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/file
 #==============================================================================
 
 def get_private_commit():
-    commit  = subprocess.check_output(["git", "submodule", "status", "flip"]).split(" ")
-    return commit[0][1:11]
+    commit  = subprocess.check_output(["git", "submodule", "status", "flip"])
+    return commit[1:11]
 
 #==============================================================================
 # Name : get_public_commit
