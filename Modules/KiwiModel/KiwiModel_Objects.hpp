@@ -63,11 +63,11 @@ namespace kiwi
             
             //! @brief Set the number of inlets.
             //! @param inlets The number of inlets.
-            void setNumberOfInlets(size_t inlets);
+            void setInlets(flip::Array<Inlet> const& inlets);
             
             //! @brief Set the number of inlets.
             //! @param inlets The number of inlets.
-            void setNumberOfOutlets(size_t outlets);
+            void setOutlets(flip::Array<Outlet> const& outlets);
             
             //! @internal flip static declare method
             static void declare();
@@ -125,6 +125,43 @@ namespace kiwi
             
             //! @internal flip static declare method
             static void declare();
+        };
+        
+        // ================================================================================ //
+        //                                       OBJECT OSC~                                //
+        // ================================================================================ //
+        
+        class OscTilde : public model::Object
+        {
+        public:
+            //! @brief flip Default Constructor
+            OscTilde(flip::Default& d): model::Object(d){};
+
+            //! @brief Constructor
+            OscTilde(std::string const& name, std::vector<Atom> const& args);
+
+            //! @internal flip static declare method
+            static void declare();
+            
+        };
+
+        // ================================================================================ //
+        //                                       OBJECT DAC~                                //
+        // ================================================================================ //
+        
+        
+        class DacTilde : public model::Object
+        {
+        public:
+            //! @brief flip Default Constructor
+            DacTilde(flip::Default& d): model::Object(d){}
+            
+            //! @brief Constructor
+            DacTilde(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @internal flip static declare method
+            static void declare();
+            
         };
     }
 }

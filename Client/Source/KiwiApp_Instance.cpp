@@ -24,6 +24,7 @@
 #include "KiwiApp_Instance.hpp"
 #include "KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_PatcherView.hpp"
+#include "KiwiApp_DspDeviceManager.hpp"
 
 #include <cstdlib>
 #include <ctime>
@@ -38,7 +39,7 @@ namespace kiwi
     
     Instance::Instance() :
     m_user_id(flip::Ref::User::Offline),
-    m_instance(new engine::Instance()),
+    m_instance(new engine::Instance(std::unique_ptr<engine::AudioControler>(new DspDeviceManager()))),
     m_console_history(std::make_shared<ConsoleHistory>(*m_instance)),
     m_console_window(new ConsoleWindow(m_console_history)),
     m_document_explorer(new DocumentExplorer()),
@@ -245,7 +246,7 @@ namespace kiwi
         SettingsPanel& operator=(SettingsPanel && other) = delete;
     };
     
-    void Instance::openSettings()
+    void Instance::showSettingsWindow()
     {
         SettingsPanel set_cmp(getUserId());
         juce::OptionalScopedPointer<juce::Component> settings_component(&set_cmp, false);
@@ -258,6 +259,29 @@ namespace kiwi
         option.runModal();
         
         setUserId(set_cmp.getUserId());
+    }
+    
+    // ================================================================================ //
+    //                                 Audio Settings                                   //
+    // ================================================================================ //
+    
+    void Instance::showAudioSettingsWindow()
+    {
+        DspDeviceManager& device_manager = dynamic_cast<DspDeviceManager&>(m_instance->getAudioControler());
+        juce::AudioDeviceSelectorComponent audio_settings(device_manager, 1, 20, 1, 20, false, false, false, true);
+        juce::OptionalScopedPointer<juce::Component> settings_component(&audio_settings, false);
+        
+        settings_component->setTopLeftPosition(10, 10);
+        settings_component->setSize(300, 440);
+        settings_component->setVisible(true);
+        
+        
+        juce::DialogWindow::LaunchOptions option;
+        option.dialogTitle = juce::String("Audio Settings");
+        option.content = settings_component;
+        option.resizable = true;
+        
+        option.runModal();
     }
     
     Instance::PatcherManagers::iterator Instance::getPatcherManager(PatcherManager const& manager)

@@ -25,6 +25,8 @@
 #include "KiwiEngine_Object.hpp"
 #include "KiwiEngine_Beacon.hpp"
 
+#include "KiwiEngine_AudioControler.hpp"
+
 namespace kiwi
 {
     namespace engine
@@ -107,6 +109,59 @@ namespace kiwi
         private:
             std::string m_name;
         };
+        
+        // ================================================================================ //
+        //                                       DAC~                                       //
+        // ================================================================================ //
+        
+        class DacTilde : public AudioObject
+        {
+        public:
+            
+            DacTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const& args) override final;
+            
+            void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept override final;
+            
+            bool prepare(dsp::Processor::PrepareInfo& infos) override final;
+            
+        private:
+            engine::AudioControler& m_audio_controler;
+        };
+        
+        // ================================================================================ //
+        //                                       OSC~                                       //
+        // ================================================================================ //
+        
+        class OscTilde : public AudioObject
+        {
+        public: // methods
+            
+            OscTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const& args) override;
+            
+            void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept override final;
+            
+            bool prepare(dsp::Processor::PrepareInfo& infos) override final;
+            
+        private: // methods
+            
+            void setFrequency(dsp::sample_t const& freq) noexcept;
+            
+            void setPhase(dsp::sample_t const& phase) noexcept;
+            
+            void setSampleRate(dsp::sample_t const& sample_rate);
+            
+        private: // members
+            
+            dsp::sample_t m_freq;
+            dsp::sample_t m_sr;
+            std::atomic<dsp::sample_t> m_phase;
+            std::atomic<dsp::sample_t> m_phase_inc;
+        };
+        
     }
 }
 

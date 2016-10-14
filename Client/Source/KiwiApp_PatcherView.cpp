@@ -1919,8 +1919,8 @@ namespace kiwi
             if(new_object_name == "errorbox")
             {
                 model::ErrorBox& error_box = dynamic_cast<model::ErrorBox&>(new_object_m);
-                error_box.setNumberOfInlets(old_object_m.getNumberOfInlets());
-                error_box.setNumberOfOutlets(old_object_m.getNumberOfOutlets());
+                error_box.setInlets(old_object_m.getInlets());
+                error_box.setOutlets(old_object_m.getOutlets());
             }
             
             // re-link object

@@ -203,8 +203,7 @@ namespace kiwi
             size_t                                      m_sample_rate;
             size_t                                      m_vector_size;
             State                                       m_state;
-            std::queue<std::function<void(void)>>       m_proc_commands;
-            std::queue<std::function<void(void)>>       m_link_commands;
+            std::deque<std::function<void(void)>>       m_commands;
             std::mutex                                  m_tick_mutex;
             
             std::weak_ptr<Signal>                       m_signal_in;

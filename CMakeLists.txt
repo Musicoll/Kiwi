@@ -69,7 +69,7 @@ if (WIN32)
     endif()
 
 elseif(APPLE)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wno-unknown-warning-option -Wno-pessimizing-move -Wno-overloaded-virtual")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-warning-option -Wno-pessimizing-move -Wno-overloaded-virtual -Wnounused-function")
 
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
@@ -134,7 +134,12 @@ if (APPLE)
     find_library(QUARTZCORE QuartzCore)
     find_library(CARBON Carbon)
     find_library(WEBKIT WebKit)
-    set(JUCE_DEP ${COCOA} ${IOKIT} ${QUARTZCORE} ${CARBON} ${WEBKIT})
+    find_library(COREAUDIO CoreAudio)
+    find_library(COREMIDI CoreMIDI)
+    find_library(ACCELERATE Accelerate)
+    find_library(DISCRECORDING DiscRecording)
+    find_library(AUDIOTOOLBOX AudioToolbox)
+    set(JUCE_DEP ${COCOA} ${IOKIT} ${QUARTZCORE} ${CARBON} ${WEBKIT} ${COREAUDIO} ${COREMIDI} ${ACCELERATE} ${DISCRECORDING} ${AUDIOTOOLBOX})
 elseif(WIN32)
 	find_library(WS2_32 ws2_32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
 	find_library(UUID uuid PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
@@ -156,7 +161,8 @@ elseif(LINUX)
     find_library(X11 X11)
     find_library(XEXT Xext)
     find_library(FREETYPE freetype)
-    set(JUCE_DEP ${RT} ${DL} ${PTHREAD} ${FREETYPE} ${X11} ${XEXT})
+    find_library(ASOUND asound)
+    set(JUCE_DEP ${RT} ${DL} ${PTHREAD} ${FREETYPE} ${X11} ${XEXT} ${ASOUND})
 endif()
 
 set(JUCE_MACRO_DEFINITIONS JUCE_MODULE_AVAILABLE_juce_core=1
@@ -165,6 +171,11 @@ set(JUCE_MACRO_DEFINITIONS JUCE_MODULE_AVAILABLE_juce_core=1
                            JUCE_MODULE_AVAILABLE_juce_graphics=1
                            JUCE_MODULE_AVAILABLE_juce_gui_basics=1
                            JUCE_MODULE_AVAILABLE_juce_gui_extra=1
+                           JUCE_MODULE_AVAILABLE_juce_audio_basics=1
+                           JUCE_MODULE_AVAILABLE_juce_audio_devices=1
+                           JUCE_MODULE_AVAILABLE_juce_audio_formats=1
+                           JUCE_MODULE_AVAILABLE_juce_audio_utils=1
+                           JUCE_MODULE_AVAILABLE_juce_audio_processors=1
                            JUCE_STANDALONE_APPLICATION=1
                            JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1)
 
@@ -174,14 +185,24 @@ file (GLOB_RECURSE JUCE_SRC ${ROOT_DIR}/ThirdParty/Juce/modules/*.[h|c]pp
 
 set_source_files_properties(${JUCE_SRC} PROPERTIES HEADER_FILE_ONLY TRUE)
 
-set(JUCE_COMPILED_SRC ${ROOT_DIR}/ThirdParty/Juce/modules/juce_core/juce_core.mm
-                      ${ROOT_DIR}/ThirdParty/Juce/modules/juce_data_structures/juce_data_structures.mm
-                      ${ROOT_DIR}/ThirdParty/Juce/modules/juce_events/juce_events.mm
-                      ${ROOT_DIR}/ThirdParty/Juce/modules/juce_graphics/juce_graphics.mm
-                      ${ROOT_DIR}/ThirdParty/Juce/modules/juce_gui_basics/juce_gui_basics.mm
-                      ${ROOT_DIR}/ThirdParty/Juce/modules/juce_gui_extra/juce_gui_extra.mm)
-
-set_source_files_properties(${JUCE_COMPILED_SRC} PROPERTIES HEADER_FILE_ONLY FALSE)
+set(JUCE_COMPILED_SRC ${ROOT_DIR}/ThirdParty/Juce/modules/juce_core/juce_core.cpp
+                      ${ROOT_DIR}/ThirdParty/Juce/modules/juce_data_structures/juce_data_structures.cpp
+                      ${ROOT_DIR}/ThirdParty/Juce/modules/juce_events/juce_events.cpp
+                      ${ROOT_DIR}/ThirdParty/Juce/modules/juce_graphics/juce_graphics.cpp
+                      ${ROOT_DIR}/ThirdParty/Juce/modules/juce_gui_basics/juce_gui_basics.cpp
+                      ${ROOT_DIR}/ThirdParty/Juce/modules/juce_gui_extra/juce_gui_extra.cpp
+                      ${ROOT_DIR}/ThirdParty/Juce/modules/juce_audio_basics/juce_audio_basics.cpp
+                      ${ROOT_DIR}/ThirdParty/Juce/modules/juce_audio_devices/juce_audio_devices.cpp
+                      ${ROOT_DIR}/ThirdParty/Juce/modules/juce_audio_formats/juce_audio_formats.cpp
+                      ${ROOT_DIR}/ThirdParty/Juce/modules/juce_audio_utils/juce_audio_utils.cpp
+                      ${ROOT_DIR}/ThirdParty/Juce/modules/juce_audio_processors/juce_audio_processors.cpp)
+                      
+if (APPLE)
+    set_source_files_properties(${JUCE_COMPILED_SRC} PROPERTIES COMPILE_FLAGS "-x objective-c++"
+                                                                HEADER_FILE_ONLY FALSE)
+else()
+    set_source_files_properties(${JUCE_COMPILED_SRC} PROPERTIES HEADER_FILE_ONLY FALSE)
+endif()
 
 
 add_library(Juce STATIC ${JUCE_SRC})
@@ -259,6 +280,7 @@ source_group_rec("${KIWI_MODEL_SRC}" ${ROOT_DIR}/Modules/KiwiModel)
 
 file(GLOB_RECURSE KIWI_DSP_SRC ${ROOT_DIR}/Modules/KiwiDsp/*.[c|h]pp)
 add_library(KiwiDsp STATIC ${KIWI_DSP_SRC})
+target_compile_definitions(KiwiDsp PUBLIC -DKIWI_DSP_FLOAT=1)
 target_include_directories(KiwiDsp PUBLIC ${ROOT_DIR}/Modules)
 set_target_properties(KiwiDsp PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_DSP_SRC}" ${ROOT_DIR}/Modules/KiwiDsp)
@@ -272,6 +294,7 @@ add_library(KiwiEngine STATIC ${KIWI_ENGINE_SRC})
 target_include_directories(KiwiEngine PUBLIC ${ROOT_DIR}/Modules)
 target_add_dependency(KiwiEngine Flip)
 target_add_dependency(KiwiEngine KiwiModel)
+target_add_dependency(KiwiEngine KiwiDsp)
 set_target_properties(KiwiEngine PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_ENGINE_SRC}" ${ROOT_DIR}/Modules/KiwiEngine)
 
@@ -283,6 +306,7 @@ file(GLOB_RECURSE KIWI_CLIENT_SRC ${ROOT_DIR}/Client/Source/*.[c|h]pp)
 add_executable(Kiwi ${KIWI_CLIENT_SRC} ${KIWI_ICON} ${KIWI_PLIST})
 target_add_dependency(Kiwi KiwiEngine)
 target_add_dependency(Kiwi KiwiModel)
+target_add_dependency(Kiwi KiwiDsp)
 target_add_dependency(Kiwi Juce)
 
 if (APPLE)

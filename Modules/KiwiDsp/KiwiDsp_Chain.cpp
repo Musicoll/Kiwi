@@ -227,7 +227,11 @@ namespace kiwi
             
             m_outputs.clear();
             
-            m_buffer_copy.clear();
+            // ======================================================================== //
+            //                         CLEAR BUFFER COPY                                //
+            // ======================================================================== //
+            
+            std::for_each(m_buffer_copy.begin(), m_buffer_copy.end(), [](Buffer &buf){ buf.clear();});
             
             // ======================================================================== //
             //                             RELEASE PROCESSOR                            //
@@ -321,7 +325,7 @@ namespace kiwi
         
         void Chain::update()
         {
-            if (!m_proc_commands.empty() || !m_link_commands.empty())
+            if (!m_commands.empty())
             {
                 State prev_state = m_state;
                 
@@ -330,16 +334,10 @@ namespace kiwi
                 
                 release();
                 
-                while(!m_proc_commands.empty())
+                while(!m_commands.empty())
                 {
-                    m_proc_commands.front().operator()();
-                    m_proc_commands.pop();
-                }
-                
-                while(!m_link_commands.empty())
-                {
-                    m_link_commands.front().operator()();
-                    m_link_commands.pop();
+                    m_commands.front().operator()();
+                    m_commands.pop_front();
                 }
                 
                 if (prev_state == State::Prepared)
@@ -383,12 +381,6 @@ namespace kiwi
         void Chain::restackNode(Node & node)
         {
             // ======================================================================== //
-            //                           RESTACK PROCESSOR                              //
-            // ======================================================================== //
-            
-            addProcessor(node.m_processor);
-            
-            // ======================================================================== //
             //                    RESTACK INLET CONNECTIONS                             //
             // ======================================================================== //
             
@@ -400,6 +392,12 @@ namespace kiwi
                     Node& prev_node  = tie.m_pin.m_owner;
                     
                     connect(*prev_node.m_processor, prev_pin.m_index, *node.m_processor, inlet.m_index);
+                    
+                    std::function<void(void)> call_back = std::bind(&Chain::execConnect,
+                                                                    this,
+                                                                    prev_node.m_processor.get(), prev_pin.m_index,
+                                                                    node.m_processor.get(), inlet.m_index);
+                    m_commands.push_front(call_back);
                 }
             }
             
@@ -415,8 +413,20 @@ namespace kiwi
                     Node& next_node  = tie.m_pin.m_owner;
                     
                     connect(*node.m_processor, outlet.m_index, *next_node.m_processor, next_pin.m_index);
+                    
+                    std::function<void(void)> call_back = std::bind(&Chain::execConnect,
+                                                                    this,
+                                                                    node.m_processor.get(), outlet.m_index,
+                                                                    next_node.m_processor.get(), next_pin.m_index);
+                    m_commands.push_front(call_back);
                 }
             }
+            
+            // ======================================================================== //
+            //                           RESTACK PROCESSOR                              //
+            // ======================================================================== //
+            
+            m_commands.push_front(std::bind(&Chain::execAddProcessor, this, node.m_processor));
         }
         
         // ============================================================================ //
@@ -560,13 +570,13 @@ namespace kiwi
         void Chain::addProcessor(std::shared_ptr<Processor> processor)
         {
             std::function<void(void)> func = std::bind(&Chain::execAddProcessor, this, processor);
-            m_proc_commands.push(std::bind(&Chain::execAddProcessor, this, std::move(processor)));
+            m_commands.push_back(func);
         }
         
         void Chain::removeProcessor(Processor& proc)
         {
             std::function<void(void)> func = std::bind(&Chain::execRemoveProcessor, this, &proc);
-            m_proc_commands.push(func);
+            m_commands.push_back(func);
         }
         
         void Chain::connect(Processor& source, size_t outlet_index,
@@ -576,7 +586,7 @@ namespace kiwi
                                                             this,
                                                             &source, outlet_index,
                                                             &dest, inlet_index);
-            m_link_commands.push(call_back);
+            m_commands.push_back(call_back);
         }
         
         void Chain::disconnect(Processor& source, size_t outlet_index,
@@ -586,7 +596,7 @@ namespace kiwi
                                                             this,
                                                             &source, outlet_index,
                                                             &dest, inlet_index);
-            m_link_commands.push(call_back);
+            m_commands.push_back(call_back);
         }
         
         // ==================================================================================== //
