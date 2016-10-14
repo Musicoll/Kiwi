@@ -57,11 +57,11 @@ set_source_files_properties(${KIWI_ICON} ${KIWI_PLIST} PROPERTIES MACOSX_PACKAGE
 if (WIN32)
 	set(CMAKE_CXX_FLAGS "/EHsc")
 	set(CMAKE_EXE_LINKER_FLAGS "")
-    
+
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /Zi")
     endif()
-    
+
     if (CMAKE_CL_64)
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MACHINE:X64")
     else()
@@ -70,7 +70,7 @@ if (WIN32)
 
 elseif(APPLE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wno-unknown-warning-option -Wno-pessimizing-move -Wno-overloaded-virtual")
-    
+
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     endif()
@@ -116,7 +116,7 @@ else()
         include_directories(/usr/include/freetype2)
     endif()
 endif()
-                                        
+
 #--------------------------------------
 # Macros
 #--------------------------------------
@@ -167,22 +167,22 @@ set(JUCE_MACRO_DEFINITIONS JUCE_MODULE_AVAILABLE_juce_core=1
                            JUCE_MODULE_AVAILABLE_juce_gui_extra=1
                            JUCE_STANDALONE_APPLICATION=1
                            JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1)
-               
-file (GLOB_RECURSE JUCE_SRC ${ROOT_DIR}/ThirdParty/Juce/modules/*.[h|c]pp 
+
+file (GLOB_RECURSE JUCE_SRC ${ROOT_DIR}/ThirdParty/Juce/modules/*.[h|c]pp
                             ${ROOT_DIR}/ThirdParty/Juce/modules/*.h
                             ${ROOT_DIR}/ThirdParty/Juce/modules/*.mm)
-                            
+
 set_source_files_properties(${JUCE_SRC} PROPERTIES HEADER_FILE_ONLY TRUE)
-               
+
 set(JUCE_COMPILED_SRC ${ROOT_DIR}/ThirdParty/Juce/modules/juce_core/juce_core.mm
                       ${ROOT_DIR}/ThirdParty/Juce/modules/juce_data_structures/juce_data_structures.mm
                       ${ROOT_DIR}/ThirdParty/Juce/modules/juce_events/juce_events.mm
                       ${ROOT_DIR}/ThirdParty/Juce/modules/juce_graphics/juce_graphics.mm
                       ${ROOT_DIR}/ThirdParty/Juce/modules/juce_gui_basics/juce_gui_basics.mm
                       ${ROOT_DIR}/ThirdParty/Juce/modules/juce_gui_extra/juce_gui_extra.mm)
-             
+
 set_source_files_properties(${JUCE_COMPILED_SRC} PROPERTIES HEADER_FILE_ONLY FALSE)
-               
+
 
 add_library(Juce STATIC ${JUCE_SRC})
 target_link_libraries(Juce ${JUCE_DEP})
@@ -254,6 +254,16 @@ set_target_properties(KiwiModel PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_MODEL_SRC}" ${ROOT_DIR}/Modules/KiwiModel)
 
 #----------------------------------
+# Dsp
+#----------------------------------
+
+file(GLOB_RECURSE KIWI_DSP_SRC ${ROOT_DIR}/Modules/KiwiDsp/*.[c|h]pp)
+add_library(KiwiDsp STATIC ${KIWI_DSP_SRC})
+target_include_directories(KiwiDsp PUBLIC ${ROOT_DIR}/Modules)
+set_target_properties(KiwiDsp PROPERTIES FOLDER Modules)
+source_group_rec("${KIWI_DSP_SRC}" ${ROOT_DIR}/Modules/KiwiDsp)
+
+#----------------------------------
 # Engine
 #----------------------------------
 
@@ -306,3 +316,31 @@ target_add_dependency(test_atom KiwiModel)
 set_target_properties(test_atom PROPERTIES FOLDER Test)
 source_group_rec("${TEST_ATOM_SRC}" ${ROOT_DIR}/Test/Atom)
 set_target_properties(test_atom PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
+
+# Test Dsp
+
+file(GLOB TEST_DSP_SRC ${ROOT_DIR}/Test/Dsp/*.[c|h]pp)
+add_executable(test_dsp ${TEST_DSP_SRC})
+target_add_dependency(test_dsp KiwiDsp)
+set_target_properties(test_dsp PROPERTIES FOLDER Test)
+source_group_rec("${TEST_DSP_SRC}" ${ROOT_DIR}/Test/Dsp)
+set_target_properties(test_dsp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
+
+#----------------------------------
+# Examples
+#----------------------------------
+
+# Dsp - PortAudio
+
+if(APPLE)
+  find_path(PORTAUDIO_INCLUDES "portaudio.h")
+  include_directories("${PORTAUDIO_INCLUDES}")
+  file(GLOB TEST_DSP_PORTAUDIO_SRC ${ROOT_DIR}/Test/DspPortAudio/*.[c|h]pp)
+  find_library(PORTAUDIO_LIB "portaudio")
+  add_executable(dsp_portaudio ${TEST_DSP_PORTAUDIO_SRC})
+  target_link_libraries(dsp_portaudio KiwiDsp ${PORTAUDIO_LIB} ${SUPPORT_LIBS})
+  set_target_properties(dsp_portaudio PROPERTIES FOLDER Test)
+  # PortAudio configured for x86_64 archs
+  set_target_properties(dsp_portaudio PROPERTIES XCODE_ATTRIBUTE_ARCHS "x86_64")
+  source_group_rec("${TEST_DSP_PORTAUDIO_SRC}" ${ROOT_DIR}/Test/DspPortAudio)
+endif()
