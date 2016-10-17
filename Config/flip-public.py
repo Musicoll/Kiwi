@@ -58,10 +58,10 @@ def copy_includes_and_doc(archive_dir):
     print "-- copying includes and documentation"
 
     # copy include, lib and documentation into flip-demo
-    shutil.copytree (os.path.join(archive_dir, "flip-demo", "include"),
+    shutil.copytree (os.path.join(archive_dir, "include"),
                      os.path.join(os.getcwd(), "flip-public", "include"))
 
-    shutil.copytree (os.path.join(archive_dir, "flip-demo", "documentation"),
+    shutil.copytree (os.path.join(archive_dir, "documentation"),
                      os.path.join(os.getcwd(), "flip-public", "documentation"))
 
 
@@ -87,7 +87,7 @@ def checkout_mac(commit):
     archive.close()
 
     # copy include, lib and documentation into flip-demo
-    copy_includes_and_doc(archive_dir)
+    copy_includes_and_doc(os.path.join(archive_dir, "flip-demo"))
 
     print "-- copying libs"
     os.makedirs(os.path.join(os.getcwd(), "flip-public", "lib", "mac"))
@@ -152,13 +152,13 @@ def checkout_linux(commit):
     os.mkdir(archive_dir)
 
     print "-- extracting archive in: " + archive_dir
-    
+
     archive = tarfile.open(file, "r:gz")
     archive.extractall(archive_dir)
     archive.close()
 
     # copy include, lib and documentation into flip-demo
-    copy_includes_and_doc(archive_dir)
+    copy_includes_and_doc(os.path.join(archive_dir, "flip-demo"))
 
     print "-- copying libs"
     os.makedirs(os.path.join(os.getcwd(), "flip-public", "lib", "linux"))
