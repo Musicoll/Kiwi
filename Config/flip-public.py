@@ -112,9 +112,11 @@ def checkout_windows(commit):
     urllib.urlretrieve (flip_url + file, file)
 
     # decompress archive
-    print "-- extracting archive in: " + archive_dir
     archive_dir = os.path.join(os.getcwd(), "flip-demo-windows")
     os.mkdir(archive_dir)
+
+    print "-- extracting archive in: " + archive_dir
+
     archive = zipfile.ZipFile(file, 'r')
     archive.extractall(archive_dir)
     archive.close()
@@ -146,9 +148,11 @@ def checkout_linux(commit):
     urllib.urlretrieve (flip_url + file, file)
 
     # decompress archive
-    print "-- extracting archive in: " + archive_dir
     archive_dir = os.path.join(os.getcwd(), "flip-demo-linux")
     os.mkdir(archive_dir)
+
+    print "-- extracting archive in: " + archive_dir
+    
     archive = tarfile.open(file, "r:gz")
     archive.extractall(archive_dir)
     archive.close()
