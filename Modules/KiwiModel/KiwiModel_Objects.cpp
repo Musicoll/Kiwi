@@ -91,7 +91,7 @@ namespace kiwi
             .name("cicm.kiwi.ObjectPlus")
             .inherit<model::Object>();
             
-            Factory::add<ObjectPlus>("plus");
+            Factory::add<ObjectPlus>("plus", {"+"});
         }
         
         ObjectPlus::ObjectPlus(std::string const& name, std::vector<Atom> const& args)
@@ -146,7 +146,7 @@ namespace kiwi
             .name("cicm.kiwi.ObjectReceive")
             .inherit<model::Object>();
             
-            Factory::add<ObjectReceive>("receive");
+            Factory::add<ObjectReceive>("receive", {"r"});
         }
     }
 }

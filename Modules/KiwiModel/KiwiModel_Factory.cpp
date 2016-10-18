@@ -36,9 +36,9 @@ namespace kiwi
             const auto it = creators.find(name);
             if(it != creators.end())
             {
-                const ctor_fn_t& model_ctor = it->second.ctor;
+                const ctor_fn_t& model_ctor = it->second->ctor;
                 auto object_uptr = std::unique_ptr<model::Object>(model_ctor(args));
-                object_uptr->m_name = name;
+                object_uptr->m_name = it->second->class_name;
                 object_uptr->m_text = args.empty() ? name : name + " " + AtomHelper::toString(args);
                 return object_uptr;
             }
@@ -56,7 +56,7 @@ namespace kiwi
             
             if(it != creators.cend())
             {
-                it->second.mold_maker(object, mold);
+                it->second->mold_maker(object, mold);
             }
             else
             {
@@ -70,7 +70,7 @@ namespace kiwi
             const auto it = creators.find(name);
             if(it != creators.end())
             {
-                const mold_caster_fn_t& mold_caster = it->second.mold_caster;
+                const mold_caster_fn_t& mold_caster = it->second->mold_caster;
                 return mold_caster(mold);
             }
             else
@@ -82,13 +82,15 @@ namespace kiwi
         bool Factory::has(std::string const& name)
         {
             const auto& creators = getCreators();
-            return (creators.find(name) != creators.end());
+            return (creators.find(name) != creators.cend());
         }
         
         std::vector<std::string> Factory::getNames()
         {
-            std::vector<std::string> names;
-            for(const auto& creator : getCreators())
+            const auto& creators = getCreators();
+            std::vector<std::string> names(creators.size());
+            
+            for(const auto& creator : creators)
             {
                 names.emplace_back(creator.first);
             }
