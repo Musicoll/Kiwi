@@ -302,7 +302,8 @@ namespace kiwi
         //! @brief Try to replace selected object by the object copied into clipboard.
         void pasteReplace();
         
-        model::Object& replaceObjectWith(model::Object& object_to_replace, flip::Mold const& mold);
+        //! @brief Replace an object by another one (trying to reconnect links)
+        model::Object& replaceObjectWith(model::Object& object_to_remove, model::Object& new_object);
         
         // ================================================================================ //
         //                                      MISC                                        //

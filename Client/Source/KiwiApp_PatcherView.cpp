@@ -718,10 +718,13 @@ namespace kiwi
                 flip::Mold mold(model::DataModel::use(), sbo);
                 model::Object const& object = *object_ptr;
                 
-                mold.make(object);
+                model::Factory::copy(object, mold);
                 mold.cure();
 
-                // store object ref to find links boundaries
+                // store object name to restore it later from the model::Factory.
+                sbo << object.getName();
+                
+                // store object ref to find links boundaries.
                 sbo << object_ptr->ref();
             }
         }
@@ -794,19 +797,19 @@ namespace kiwi
             
             for(uint32_t i = 0; i < number_of_objects; i++)
             {
-                flip::Mold mold(model::DataModel::use(), sbi);
+                const flip::Mold mold(model::DataModel::use(), sbi);
                 
-                if(mold.has<model::Object>())
-                {
-                    flip::Ref old_object_ref;
-                    sbi >> old_object_ref;
-                    
-                    model::Object& new_object = m_patcher_model.addObject(mold);
-                    new_object.setPosition(new_object.getX() + delta.x, new_object.getY() + delta.y);
-                    m_view_model.selectObject(new_object);
-                    
-                    molded_objects.insert({old_object_ref, &new_object});
-                }
+                std::string object_name;
+                sbi >> object_name;
+                
+                flip::Ref old_object_ref;
+                sbi >> old_object_ref;
+                
+                model::Object& new_object = m_patcher_model.addObject(object_name, mold);
+                new_object.setPosition(new_object.getX() + delta.x, new_object.getY() + delta.y);
+                m_view_model.selectObject(new_object);
+                
+                molded_objects.insert({old_object_ref, &new_object});
             }
             
             // paste links:
@@ -851,12 +854,9 @@ namespace kiwi
         deleteSelection();
     }
     
-    model::Object& PatcherView::replaceObjectWith(model::Object& object_to_replace,
-                                              flip::Mold const& mold)
+    model::Object& PatcherView::replaceObjectWith(model::Object& object_to_remove, model::Object& new_object)
     {
-        model::Object& new_object = m_patcher_model.addObject(mold);
-        
-        new_object.setPosition(object_to_replace.getX(), object_to_replace.getY());
+        new_object.setPosition(object_to_remove.getX(), object_to_remove.getY());
         
         // re-link object
         const size_t new_inlets = new_object.getNumberOfInlets();
@@ -871,7 +871,7 @@ namespace kiwi
                 const model::Object& to = link.getReceiverObject();
                 const size_t inlet_index = link.getReceiverIndex();
                 
-                if(&from == &object_to_replace)
+                if(&from == &object_to_remove)
                 {
                     if(outlet_index < new_outlets)
                     {
@@ -879,7 +879,7 @@ namespace kiwi
                     }
                 }
                 
-                if(&to == &object_to_replace)
+                if(&to == &object_to_remove)
                 {
                     if(inlet_index < new_inlets)
                     {
@@ -889,8 +889,8 @@ namespace kiwi
             }
         }
         
-        m_view_model.unselectObject(object_to_replace);
-        m_patcher_model.removeObject(object_to_replace);
+        m_view_model.unselectObject(object_to_remove);
+        m_patcher_model.removeObject(object_to_remove);
         
         m_view_model.selectObject(new_object);
         
@@ -916,31 +916,33 @@ namespace kiwi
                 {
                     flip::Mold mold(model::DataModel::use(), sbi);
                     
-                    if(mold.has<model::Object>())
+                    auto& document = m_patcher_model.entity().use<DocumentManager>();
+                    
+                    std::string new_object_name;
+                    sbi >> new_object_name;
+                    
+                    flip::Ref old_object_ref;
+                    sbi >> old_object_ref;
+                    
+                    for(auto const& obj_ref : selected_objects)
                     {
-                        auto& document = m_patcher_model.entity().use<DocumentManager>();
-                        
-                        flip::Ref old_object_ref;
-                        sbi >> old_object_ref;
-                        
-                        for(auto const& obj_ref : selected_objects)
+                        model::Object* selected_object = document.get<model::Object>(obj_ref);
+                        if(selected_object != nullptr && !selected_object->removed())
                         {
-                            model::Object* selected_object = document.get<model::Object>(obj_ref);
-                            if(selected_object != nullptr && !selected_object->removed())
+                            try
                             {
-                                try
-                                {
-                                    replaceObjectWith(*selected_object, mold);
-                                }
-                                catch(...)
-                                {
-                                    KiwiApp::error("replace object failed");
-                                }
+                                model::Object& new_object = m_patcher_model.addObject(new_object_name,
+                                                                                      mold);
+                                replaceObjectWith(*selected_object, new_object);
+                            }
+                            catch(...)
+                            {
+                                KiwiApp::error("replace object failed");
                             }
                         }
-                        
-                        DocumentManager::commit(m_patcher_model, "paste-replace objects");
                     }
+                    
+                    DocumentManager::commit(m_patcher_model, "paste-replace objects");
                 }
             }
         }
