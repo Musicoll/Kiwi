@@ -36,11 +36,42 @@ namespace kiwi
             const auto it = creators.find(name);
             if(it != creators.end())
             {
-                const ctor_fn_t& model_ctor = it->second;
+                const ctor_fn_t& model_ctor = it->second.ctor;
                 auto object_uptr = std::unique_ptr<model::Object>(model_ctor(args));
                 object_uptr->m_name = name;
                 object_uptr->m_text = args.empty() ? name : name + " " + AtomHelper::toString(args);
                 return object_uptr;
+            }
+            else
+            {
+                throw std::runtime_error("Factory can't create object");
+            }
+        }
+        
+        void Factory::copy(model::Object const& object, flip::Mold& mold)
+        {
+            const auto& creators = getCreators();
+            const auto object_name = object.getName();
+            const auto it = creators.find(object_name);
+            
+            if(it != creators.cend())
+            {
+                it->second.mold_maker(object, mold);
+            }
+            else
+            {
+                throw std::runtime_error("can't copy object " + object_name);
+            }
+        }
+        
+        std::unique_ptr<model::Object> Factory::create(std::string const& name, flip::Mold const& mold)
+        {
+            const auto& creators = getCreators();
+            const auto it = creators.find(name);
+            if(it != creators.end())
+            {
+                const mold_caster_fn_t& mold_caster = it->second.mold_caster;
+                return mold_caster(mold);
             }
             else
             {
