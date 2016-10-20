@@ -1153,7 +1153,12 @@ namespace kiwi
                         link_m.getReceiverIndex()           == inlet);
             };
             
-            return (std::find_if(m_links.begin(), m_links.end(), find_link) == m_links.cend());
+            // Check if inlets and outlets types are compatible
+            
+            if(std::find_if(m_links.begin(), m_links.end(), find_link) == m_links.cend())
+            {
+                return to.getInlet(inlet).hasType(from.getOutlet(outlet).getType());
+            }
         }
         
         return false;
