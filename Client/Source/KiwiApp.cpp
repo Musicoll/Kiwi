@@ -94,6 +94,7 @@ namespace kiwi
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAboutAppWindow);
         macMainMenuPopup.addSeparator();
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAppSettingsWindow);
+        macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAudioStatusWindow);
         juce::MenuBarModel::setMacMainMenu(m_menu_model.get(), &macMainMenuPopup, TRANS("Open Recent"));
         #endif
         
@@ -357,7 +358,8 @@ namespace kiwi
     
     void KiwiApp::createOptionsMenu(juce::PopupMenu& menu)
     {
-        ;
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::showAppSettingsWindow);
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::showAudioStatusWindow);
     }
     
     void KiwiApp::createWindowMenu(juce::PopupMenu& menu)
@@ -395,6 +397,7 @@ namespace kiwi
             CommandIDs::openFile,
             CommandIDs::showConsoleWindow,
             CommandIDs::showAppSettingsWindow,
+            CommandIDs::showAudioStatusWindow,
             CommandIDs::showDocumentExplorerWindow,
             CommandIDs::showBeaconDispatcherWindow
         };
@@ -437,6 +440,13 @@ namespace kiwi
                 
                 break;
             }
+            case CommandIDs::showAudioStatusWindow:
+            {
+                result.setInfo(TRANS("Audio Settings"), TRANS("Show kiwi settings"),
+                               CommandCategories::windows, 0);
+                
+                break;
+            }
             case CommandIDs::showDocumentExplorerWindow:
             {
                 result.setInfo(TRANS("Show Document Explorer panel"), TRANS("Show Document Explorer panel"),
@@ -465,7 +475,8 @@ namespace kiwi
             case CommandIDs::newPatcher :                   { m_instance->newPatcher(); break; }
             case CommandIDs::openFile :                     { m_instance->askUserToOpenPatcherDocument(); break; }
             case CommandIDs::showConsoleWindow :            { m_instance->showConsoleWindow(); break; }
-            case CommandIDs::showAppSettingsWindow :        { m_instance->openSettings(); break; }
+            case CommandIDs::showAppSettingsWindow :        { m_instance->showSettingsWindow(); break; }
+            case CommandIDs::showAudioStatusWindow :        { m_instance->showAudioSettingsWindow(); break; }
             case CommandIDs::showDocumentExplorerWindow :   { m_instance->showDocumentExplorerWindow(); break; }
             case CommandIDs::showBeaconDispatcherWindow :   { m_instance->showBeaconDispatcherWindow(); break; }
             

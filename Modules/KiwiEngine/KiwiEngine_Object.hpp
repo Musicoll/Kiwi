@@ -24,6 +24,8 @@
 
 #include "KiwiEngine_Def.hpp"
 
+#include <KiwiDsp/KiwiDsp_Processor.hpp>
+
 namespace kiwi
 {
     namespace engine
@@ -115,6 +117,23 @@ namespace kiwi
         };
         
         typedef std::shared_ptr<Object> sObject;
+        
+        // ================================================================================ //
+        //                                    AUDIOOBJECT                                   //
+        // ================================================================================ //
+        
+        //! @brief A pure interface that audio object must implement.
+        //! @biref audio objects will be held and triggered by both the engine and the dsp chain.
+        class AudioObject : public engine::Object, public dsp::Processor
+        {
+        public: // methods
+            
+            //! @brief Constructor.
+            AudioObject(model::Object const& model, Patcher& patcher) noexcept;
+            
+            //! @brief Destructor.
+            virtual ~AudioObject() = default;
+        };
     }
 }
 

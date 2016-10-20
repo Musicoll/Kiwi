@@ -80,7 +80,10 @@ namespace kiwi
         void openRemotePatcher(std::string& host, uint16_t& port);
         
         //! @brief Opens the settings
-        void openSettings();
+        void showSettingsWindow();
+        
+        //! @brief Opens a juce native audio setting pannel.
+        void showAudioSettingsWindow();
         
         //! @brief Brings the Console to front.
         void showConsoleWindow();

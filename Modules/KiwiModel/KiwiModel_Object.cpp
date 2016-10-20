@@ -28,6 +28,104 @@ namespace kiwi
     namespace model
     {
         // ================================================================================ //
+        //                                  INLET/OUTLET                                    //
+        // ================================================================================ //
+        
+        PinType::PinType(flip::Default&)
+        {
+            ;
+        }
+        
+        PinType::PinType(IType type):
+        m_type(type)
+        {
+            
+        }
+        
+        PinType::IType PinType::getType() const
+        {
+            return !removed() ? m_type.value() : m_type.before();
+        }
+        
+        bool PinType::operator<(PinType const& other) const
+        {
+            return getType() < other.getType();
+        }
+        
+        bool PinType::operator==(PinType const& other) const
+        {
+            return !(*this < other) && !(other < *this);
+        }
+        
+        void PinType::declare()
+        {
+            if(DataModel::has<model::PinType>()) return;
+            
+            DataModel::declare<PinType::IType>()
+            .name("cicm.kiwi.Type")
+            .enumerator<PinType::IType::Control>("Control")
+            .enumerator<PinType::IType::Signal>("Signal");
+            
+            DataModel::declare<model::PinType>()
+            .name("cicm.kiwi.PinType")
+            .member <flip::Enum<IType>, &PinType::m_type> ("type");
+        }
+        
+        Inlet::Inlet(flip::Default&)
+        {
+            ;
+        }
+        
+        Inlet::Inlet(std::set<PinType> types):
+        m_types()
+        {
+            m_types.insert(m_types.begin(), types.begin(), types.end());
+        }
+        
+        bool Inlet::hasType(PinType type) const
+        {
+            return m_types.find_if([type](PinType const& inlet_type){return inlet_type == type; }) != m_types.end();
+        }
+        
+        void Inlet::declare()
+        {
+            if(DataModel::has<model::Inlet>()) return;
+            
+            PinType::declare();
+            
+            DataModel::declare<model::Inlet>()
+            .name("cicm.kiwi.Inlet")
+            .member <flip::Array<PinType>, &Inlet::m_types> ("types");
+        };
+        
+        Outlet::Outlet(flip::Default&):
+        m_type(PinType::IType::Control)
+        {
+            ;
+        }
+        
+        Outlet::Outlet(PinType type):
+        m_type(type)
+        {
+        }
+        
+        PinType const& Outlet::getType() const
+        {
+            return m_type;
+        }
+        
+        void Outlet::declare()
+        {
+            if(DataModel::has<model::Outlet>()) return;
+            
+            PinType::declare();
+            
+            DataModel::declare<model::Outlet>()
+            .name("cicm.kiwi.Outlet")
+            .member <PinType, &Outlet::m_type> ("type");
+        };
+        
+        // ================================================================================ //
         //                                  OBJECT::declare                                 //
         // ================================================================================ //
         
@@ -35,12 +133,15 @@ namespace kiwi
         {
             if(DataModel::has<model::Object>()) return;
             
+            Outlet::declare();
+            Inlet::declare();
+            
             DataModel::declare<model::Object>()
             .name("cicm.kiwi.Object")
             .member<flip::String, &Object::m_name>("name")
             .member<flip::String, &Object::m_text>("text")
-            .member<flip::Int, &Object::m_inlets>("inlets")
-            .member<flip::Int, &Object::m_outlets>("outlets")
+            .member<flip::Array<Inlet>, &Object::m_inlets>("inlets")
+            .member<flip::Array<Outlet>, &Object::m_outlets>("outlets")
             .member<flip::Float, &Object::m_position_x>("pos_x")
             .member<flip::Float, &Object::m_position_y>("pos_y")
             .member<flip::Float, &Object::m_width>("width")
@@ -58,8 +159,8 @@ namespace kiwi
         
         Object::Object() :
         m_name("noobj"),
-        m_inlets(1),
-        m_outlets(0),
+        m_inlets(),
+        m_outlets(),
         m_position_x(0.),
         m_position_y(0.),
         m_width(60.),
@@ -78,9 +179,42 @@ namespace kiwi
             return m_text;
         }
         
+        flip::Array<Inlet> const& Object::getInlets() const
+        {
+            return m_inlets;
+        }
+        
+        Inlet const& Object::getInlet(size_t index) const
+        {
+            flip::Array<Inlet>::const_iterator it = m_inlets.begin();
+            std::advance(it, index);
+            return *it;
+        }
+        
         size_t Object::getNumberOfInlets() const
         {
-            return static_cast<size_t>(m_inlets);
+            return m_inlets.count_if([](Inlet const&){return true;});
+        }
+        
+        size_t Object::getNumberOfInlets(PinType type) const
+        {
+            return m_inlets.count_if([type](Inlet const& inlet){return inlet.hasType(type);});
+        }
+        
+        size_t Object::getInletIndex(size_t index, PinType type) const
+        {
+            size_t index_type = -1;
+            
+            flip::Array<Inlet>::const_iterator end_loop = m_inlets.begin();
+            std::advance(end_loop, index + 1);
+            
+            for(auto it = m_inlets.begin(); it != end_loop; ++it)
+            {
+                if (it->hasType(type))
+                    ++index_type;
+            }
+            
+            return index_type;
         }
         
         bool Object::inletsChanged() const noexcept
@@ -88,9 +222,42 @@ namespace kiwi
             return m_inlets.changed();
         }
         
+        flip::Array<Outlet> const& Object::getOutlets() const
+        {
+            return m_outlets;
+        }
+        
+        Outlet const& Object::getOutlet(size_t index) const
+        {
+            flip::Array<Outlet>::const_iterator it = m_outlets.begin();
+            std::advance(it, index);
+            return (*it);
+        }
+        
         size_t Object::getNumberOfOutlets() const
         {
-            return static_cast<size_t>(m_outlets);
+            return m_outlets.count_if([](Outlet const&){return true;});
+        }
+        
+        size_t Object::getNumberOfOutlets(PinType type) const
+        {
+            return m_outlets.count_if([type](Outlet const& outlet){return outlet.getType() == type;});
+        }
+        
+        size_t Object::getOutletIndex(size_t index, PinType type) const
+        {   
+            size_t index_type = -1;
+            
+            flip::Array<Outlet>::const_iterator end_loop = m_outlets.begin();
+            std::advance(end_loop, index + 1);
+            
+            for(auto it = m_outlets.begin(); it != end_loop; ++it)
+            {
+                if (it->getType() == type)
+                    ++index_type;
+            }
+            
+            return index_type;
         }
         
         bool Object::outletsChanged() const noexcept
@@ -149,14 +316,24 @@ namespace kiwi
             return !removed() ? m_height.value() : m_height.before();
         }
         
-        void Object::setNumberOfInlets(size_t inlets)
+        void Object::setInlets(flip::Array<Inlet> const& inlets)
         {
-            m_inlets = static_cast<flip::Int::internal_type>(inlets);
+            m_inlets = inlets;
         }
         
-        void Object::setNumberOfOutlets(size_t outlets)
+        void Object::setOutlets(flip::Array<Outlet> const& outlets)
         {
-            m_outlets = static_cast<flip::Int::internal_type>(outlets);
+            m_outlets = outlets;
+        }
+        
+        void Object::pushInlet(std::set<PinType> types)
+        {
+            m_inlets.insert(m_inlets.end(), Inlet(types));
+        }
+        
+        void Object::pushOutlet(PinType type)
+        {
+            m_outlets.insert(m_outlets.end(), Outlet(type));
         }
     }
 }

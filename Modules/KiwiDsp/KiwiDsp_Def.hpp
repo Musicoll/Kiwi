@@ -47,7 +47,7 @@ namespace kiwi
         #ifdef KIWI_DSP_FLOAT
         typedef float sample_t;
         #else
-        typedef double sample_t;
+//        typedef double sample_t;
         #endif
     }
 }

@@ -31,7 +31,8 @@ namespace kiwi
         //                                      INSTANCE                                    //
         // ================================================================================ //
         
-        Instance::Instance()
+        Instance::Instance(std::unique_ptr<AudioControler> audio_controler):
+        m_audio_controler(std::move(audio_controler))
         {
             addObjectsToFactory();
         }
@@ -82,6 +83,17 @@ namespace kiwi
             engine::Factory::add<ObjectPlus>("plus");
             engine::Factory::add<ObjectPrint>("print");
             engine::Factory::add<ObjectReceive>("receive");
+            engine::Factory::add<OscTilde>("osc~");
+            engine::Factory::add<DacTilde>("dac~");
+        }
+        
+        // ================================================================================ //
+        //                              AUDIO CONTROLER                                     //
+        // ================================================================================ //
+        
+        AudioControler& Instance::getAudioControler() const
+        {
+            return *m_audio_controler.get();
         }
     }
 }
