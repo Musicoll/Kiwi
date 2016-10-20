@@ -123,7 +123,7 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief A pure interface that audio object must implement.
-        //! @biref audio objects will be held and triggered by both the engine and the dsp chain.
+        //! @brief audio objects will be held and triggered by both the engine and the dsp chain.
         class AudioObject : public engine::Object, public dsp::Processor
         {
         public: // methods

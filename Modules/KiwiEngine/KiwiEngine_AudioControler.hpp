@@ -31,15 +31,17 @@ namespace kiwi
     {
         //! @brief AudioControler is a pure interface that enable controling audio in kiwi.
         //! @details AudioControler enables the engine to control audio without knowing
-        //  it's implementation depending on other libraries.
+        //! it's implementation depending on other libraries.
         //! @see DspDeviceManager
-        
         class AudioControler
         {
         public: // methods
             
             //! @brief the default constructor
             AudioControler() = default;
+            
+            //! @brief The destuctor.
+            virtual ~AudioControler() = default;
             
             //! @brief Starts the audio thread.
             virtual void startAudio() = 0;
@@ -56,10 +58,8 @@ namespace kiwi
             //! @brief Adds a signal to the output_buffer of the AudioControler.
             virtual void addSignal(dsp::Buffer const& output_buffer) = 0;
             
-            //! @brief The destuctor.
-            virtual ~AudioControler() = default;
+        private: // deleted methods
             
-        private:
             AudioControler(AudioControler const& other) = delete;
             AudioControler(AudioControler && other) = delete;
             AudioControler& operator=(AudioControler const& other) = delete;

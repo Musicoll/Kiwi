@@ -56,9 +56,9 @@ public:
     ~PlusScalar() = default;
 private:
     
-    bool prepare(PrepareInfo& infos) override final
+    bool prepare(PrepareInfo const& infos) override final
     {
-        m_sig_value.reset(new Signal(infos.m_vector_size, m_value));
+        m_sig_value.reset(new Signal(infos.vector_size, m_value));
         return true;
     }
     
@@ -87,7 +87,7 @@ private:
         Signal::add(input[0ul], input[1ul], output[0ul]);
     }
     
-    bool prepare(PrepareInfo& infos) override final
+    bool prepare(PrepareInfo const& infos) override final
     {
         return true;
     }
@@ -103,9 +103,9 @@ public:
     CopyThrow() noexcept : Processor(1ul, 0ul) {}
     ~CopyThrow()  noexcept{}
 private:
-    bool prepare(PrepareInfo& infos) final
+    bool prepare(PrepareInfo const& infos) final
     {
-        if(infos.m_sample_rate != 44100ul || infos.m_vector_size != 64ul)
+        if(infos.sample_rate != 44100ul || infos.vector_size != 64ul)
         {
             throw Error(std::string("CopyThrow wants a sample rate of 44100 and a vector size of 64."));
         }
@@ -211,11 +211,11 @@ public:
     ~PlusScalarRemover() = default;
 private:
     
-    bool prepare(PrepareInfo& info) override
+    bool prepare(PrepareInfo const& info) override
     {
-        if (info.m_inputs[0])
+        if (info.inputs[0])
         {
-            m_signal_1.reset(new Signal(info.m_vector_size, 1.));
+            m_signal_1.reset(new Signal(info.vector_size, 1.));
             return true;
         }
         else

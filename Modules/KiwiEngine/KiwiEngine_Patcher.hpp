@@ -124,12 +124,9 @@ namespace kiwi
             using SoLinks = std::queue<Link const*>;
             
             model::Patcher const&   m_model;
-            
-            dsp::Chain              m_chain;
-            
             Instance&               m_instance;
-            
             std::vector<SoLinks>    m_so_links;
+            dsp::Chain              m_chain;
             
         private: // deleted methods
             

@@ -46,7 +46,7 @@ namespace kiwi
         //! @brief Destructor.
         ~FileHandler() = default;
         
-        //! @biref Loads the document from file and sets the pointed file.
+        //! @brief Loads the document from file and sets the pointed file.
         void load(juce::File const& file);
         
         //! @brief Saves the document from file and sets the pointed file.

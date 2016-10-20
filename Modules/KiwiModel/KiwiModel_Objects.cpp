@@ -180,7 +180,6 @@ namespace kiwi
             .inherit<model::Object>();
             
             Factory::add<DacTilde>("dac~");
-            
         }
 
         
@@ -205,7 +204,6 @@ namespace kiwi
             .inherit<model::Object>();
 
             Factory::add<OscTilde>("osc~");
-            
         }
         
     }

@@ -128,7 +128,7 @@ namespace kiwi
         };
         
         // ================================================================================ //
-        //                                       OBJECT OSC~                                //
+        //                                    OBJECT OSC~                                   //
         // ================================================================================ //
         
         class OscTilde : public model::Object
@@ -142,17 +142,17 @@ namespace kiwi
 
             //! @internal flip static declare method
             static void declare();
-            
         };
-
+        
         // ================================================================================ //
-        //                                       OBJECT DAC~                                //
+        //                                     OBJECT DAC~                                  //
         // ================================================================================ //
         
         
         class DacTilde : public model::Object
         {
         public:
+            
             //! @brief flip Default Constructor
             DacTilde(flip::Default& d): model::Object(d){}
             
@@ -161,7 +161,24 @@ namespace kiwi
             
             //! @internal flip static declare method
             static void declare();
+        };
+        
+        // ================================================================================ //
+        //                                    OBJECT *~                                   //
+        // ================================================================================ //
+        
+        class MathsOperatorTildeBase : public model::Object
+        {
+        public:
             
+            //! @brief flip Default Constructor
+            MathsOperatorTildeBase(flip::Default& d): model::Object(d){};
+            
+            //! @brief Constructor
+            MathsOperatorTildeBase(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @internal flip static declare method
+            static void declare();
         };
     }
 }

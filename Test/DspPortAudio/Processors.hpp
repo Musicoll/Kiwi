@@ -41,7 +41,7 @@ public:
 private:
     bool prepare(PrepareInfo& infos)
     {
-        m_sr = static_cast<sample_t>(infos.m_sample_rate);
+        m_sr = static_cast<sample_t>(infos.sample_rate);
         return true;
     }
     
@@ -91,7 +91,7 @@ private:
     
     bool prepare(PrepareInfo& infos)
     {
-        m_sr = static_cast<sample_t>(infos.m_sample_rate);
+        m_sr = static_cast<sample_t>(infos.sample_rate);
         setFrequency(m_freq);
         return true;
     }

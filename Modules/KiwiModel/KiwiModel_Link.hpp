@@ -49,7 +49,7 @@ namespace kiwi
             Link(model::Object const& from, const size_t outlet, model::Object const& to, const size_t inlet);
             
             //! @brief Destructor.
-            virtual ~Link() = default;
+            ~Link() = default;
             
             //! @brief Gets the Object that sends messages.
             model::Object const& getSenderObject() const;

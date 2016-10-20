@@ -69,6 +69,8 @@ namespace kiwi
         //! @brief Adds a buffer to the output matrix of signal.
         void addSignal(dsp::Buffer const& output_buffer) override;
         
+    private: // methods
+        
         // ================================================================================ //
         //                               AudioIODeviceCallback                              //
         // ================================================================================ //
@@ -86,7 +88,9 @@ namespace kiwi
         //! @internal Called to indicate that the device has stopped.
         void audioDeviceStopped() override;
         
-    private: // methods
+        // ================================================================================ //
+        //                                    DSP DEVICE                                    //
+        // ================================================================================ //
         
         //! @brief Ticks all the chains.
         //! @details Called at each dsp cycle.

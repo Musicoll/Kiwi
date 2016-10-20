@@ -194,7 +194,7 @@ namespace kiwi
             m_audio_controler.addSignal(input);
         }
         
-        bool DacTilde::prepare(dsp::Processor::PrepareInfo& infos)
+        bool DacTilde::prepare(dsp::Processor::PrepareInfo const& infos)
         {
             return true;
         }
@@ -241,9 +241,9 @@ namespace kiwi
             }
         }
         
-        bool OscTilde::prepare(PrepareInfo& infos)
+        bool OscTilde::prepare(PrepareInfo const& infos)
         {
-            setSampleRate(static_cast<dsp::sample_t>(infos.m_sample_rate));
+            setSampleRate(static_cast<dsp::sample_t>(infos.sample_rate));
             return true;
         }
         
@@ -255,8 +255,8 @@ namespace kiwi
             while(framesize--)
             {
                 *sig_data++ = std::cos(m_phase * 6.283185307179586476925286766559);
-                if(m_phase >= 1.) m_phase = m_phase.load() - 1.;
-                    m_phase = m_phase + m_phase_inc;
+                if(m_phase >= 1.) { m_phase = m_phase.load() - 1.; }
+                m_phase = m_phase + m_phase_inc;
             }
         }
     }

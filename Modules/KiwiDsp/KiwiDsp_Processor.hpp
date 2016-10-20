@@ -44,9 +44,9 @@ namespace kiwi
             
             struct PrepareInfo
             {
-                const size_t             m_sample_rate;
-                const size_t             m_vector_size;
-                const std::vector<bool> &m_inputs;
+                const size_t             sample_rate;
+                const size_t             vector_size;
+                const std::vector<bool> &inputs;
             };
             
         public: // methods
@@ -81,7 +81,7 @@ namespace kiwi
             //! @param infos The DSP informations.
             //! @return true if the perform method can be called, otherwise false.
             //! @see perform() and release()
-            virtual bool prepare(PrepareInfo& infos) { return true; };
+            virtual bool prepare(PrepareInfo const& infos) { return true; };
             
             //! @brief Performs the digital signal processing.
             //! @details This is a pure virtual method. You should use this method to perform the

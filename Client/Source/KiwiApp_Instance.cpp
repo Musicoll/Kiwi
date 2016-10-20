@@ -39,7 +39,7 @@ namespace kiwi
     
     Instance::Instance() :
     m_user_id(flip::Ref::User::Offline),
-    m_instance(new engine::Instance(std::unique_ptr<engine::AudioControler>(new DspDeviceManager()))),
+    m_instance(new engine::Instance(std::make_unique<DspDeviceManager>())),
     m_console_history(std::make_shared<ConsoleHistory>(*m_instance)),
     m_console_window(new ConsoleWindow(m_console_history)),
     m_document_explorer(new DocumentExplorer()),

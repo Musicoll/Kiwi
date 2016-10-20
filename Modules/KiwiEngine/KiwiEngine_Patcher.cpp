@@ -37,9 +37,9 @@ namespace kiwi
         
         Patcher::Patcher(model::Patcher const& model, Instance& instance) noexcept :
         m_model(model),
-        m_chain(),
         m_instance(instance),
-        m_so_links(1)
+        m_so_links(1),
+        m_chain()
         {
             m_instance.getAudioControler().add(m_chain);
         }

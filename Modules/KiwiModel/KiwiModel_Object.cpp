@@ -68,7 +68,7 @@ namespace kiwi
             
             DataModel::declare<model::PinType>()
             .name("cicm.kiwi.PinType")
-            .member <flip::Enum<IType>, &PinType::m_type> ("type");
+            .member<flip::Enum<IType>, &PinType::m_type>("type");
         }
         
         Inlet::Inlet(flip::Default&)
@@ -95,7 +95,7 @@ namespace kiwi
             
             DataModel::declare<model::Inlet>()
             .name("cicm.kiwi.Inlet")
-            .member <flip::Array<PinType>, &Inlet::m_types> ("types");
+            .member<flip::Array<PinType>, &Inlet::m_types>("types");
         };
         
         Outlet::Outlet(flip::Default&):
@@ -122,7 +122,7 @@ namespace kiwi
             
             DataModel::declare<model::Outlet>()
             .name("cicm.kiwi.Outlet")
-            .member <PinType, &Outlet::m_type> ("type");
+            .member<PinType, &Outlet::m_type>("type");
         };
         
         // ================================================================================ //
@@ -328,12 +328,12 @@ namespace kiwi
         
         void Object::pushInlet(std::set<PinType> types)
         {
-            m_inlets.insert(m_inlets.end(), Inlet(types));
+            m_inlets.emplace(m_inlets.end(), types);
         }
         
         void Object::pushOutlet(PinType type)
         {
-            m_outlets.insert(m_outlets.end(), Outlet(type));
+            m_outlets.emplace(m_outlets.end(), type);
         }
     }
 }

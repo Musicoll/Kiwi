@@ -238,10 +238,10 @@ namespace kiwi
             //! @brief Clear and replace all the object's outlets.
             void setOutlets(flip::Array<Outlet> const& outlets);
             
-            //! @biref Adds an inlet at end of current inlet list.
+            //! @brief Adds an inlet at end of current inlet list.
             void pushInlet(std::set<PinType> type);
             
-            //! @biref Adds an outlet at end of current outlet list.
+            //! @brief Adds an outlet at end of current outlet list.
             void pushOutlet(PinType type);
             
         public: // internal methods

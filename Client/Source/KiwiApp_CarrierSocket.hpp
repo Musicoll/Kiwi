@@ -34,7 +34,7 @@ namespace kiwi
     //                                  CARRIER SOCKET                                  //
     // ================================================================================ //
     
-    //! @biref Class that encapsulate a TCP socket
+    //! @brief Class that encapsulate a TCP socket
     class CarrierSocket
     {
     public:
@@ -54,7 +54,7 @@ namespace kiwi
         //! @brief Starts a thread that continuously process the socket
         void startProcess();
         
-        //! @biref Process the socket once
+        //! @brief Process the socket once
         void process();
         
         //! @brief Stops the thread that processes the socket

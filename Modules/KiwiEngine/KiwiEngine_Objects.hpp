@@ -124,7 +124,7 @@ namespace kiwi
             
             void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept override final;
             
-            bool prepare(dsp::Processor::PrepareInfo& infos) override final;
+            bool prepare(dsp::Processor::PrepareInfo const& infos) override final;
             
         private:
             engine::AudioControler& m_audio_controler;
@@ -144,7 +144,7 @@ namespace kiwi
             
             void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept override final;
             
-            bool prepare(dsp::Processor::PrepareInfo& infos) override final;
+            bool prepare(dsp::Processor::PrepareInfo const& infos) override final;
             
         private: // methods
             

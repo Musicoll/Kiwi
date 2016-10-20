@@ -60,7 +60,7 @@ namespace kiwi
             }
             
             {
-                juce::GenericScopedLock <juce::CriticalSection> lock(getAudioCallbackLock());
+                juce::GenericScopedLock<juce::CriticalSection> lock(getAudioCallbackLock());
                 m_chains.push_back(&chain);
             }
         }
@@ -75,7 +75,7 @@ namespace kiwi
             (*it)->release();
             
             {
-                juce::GenericScopedLock <juce::CriticalSection> lock(getAudioCallbackLock());
+                juce::GenericScopedLock<juce::CriticalSection> lock(getAudioCallbackLock());
                 m_chains.erase(it);
             }
         }
@@ -168,30 +168,37 @@ namespace kiwi
         m_output_matrix.reset();
     }
     
-    void DspDeviceManager::audioDeviceIOCallback(const float** inputChannelData, int numInputChannels, float** outputChannelData, int numOutputChannels, int numSamples)
+    void DspDeviceManager::audioDeviceIOCallback(float const** inputs, int numins,
+                                                 float** outputs, int numouts,
+                                                 int vector_size)
     {
-        //@todo do accessing for every sample might not be optimal
         //@todo may be pointing to same samples instead of copying them
         
-        for(int i = 0; i < numInputChannels; ++i)
+        for(int i = 0; i < numins; ++i)
         {
-            for(int j = 0; j < numSamples; ++j)
+            dsp::Signal& channel = (*m_input_matrix)[i];
+            float const* const input_channel = inputs[i];
+            
+            for(int j = 0; j < vector_size; ++j)
             {
-                (*m_input_matrix)[i][j] = inputChannelData[i][j];
+                channel[j] = input_channel[j];
             }
         }
         
         tick();
         
-        for(int i = 0; i < numOutputChannels; ++i)
+        for(int i = 0; i < numouts; ++i)
         {
-            for(int j = 0; j < numSamples; ++j)
+            dsp::Signal const& channel = (*m_output_matrix)[i];
+            float* const output_channel = outputs[i];
+            
+            for(int j = 0; j < vector_size; ++j)
             {
-                outputChannelData[i][j] = (*m_output_matrix)[i][j];
+                output_channel[j] = channel[j];
             }
         }
         
-        for (int i = 0; i < numOutputChannels; ++i)
+        for (int i = 0; i < numouts; ++i)
         {
             (*m_output_matrix)[i].fill(0);
         }
