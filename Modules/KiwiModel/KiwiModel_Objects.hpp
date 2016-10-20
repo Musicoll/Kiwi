@@ -167,15 +167,15 @@ namespace kiwi
         //                                    OBJECT *~                                   //
         // ================================================================================ //
         
-        class MathsOperatorTildeBase : public model::Object
+        class TimesTilde : public model::Object
         {
         public:
             
             //! @brief flip Default Constructor
-            MathsOperatorTildeBase(flip::Default& d): model::Object(d){};
+            TimesTilde(flip::Default& d): model::Object(d){};
             
             //! @brief Constructor
-            MathsOperatorTildeBase(std::string const& name, std::vector<Atom> const& args);
+            TimesTilde(std::string const& name, std::vector<Atom> const& args);
             
             //! @internal flip static declare method
             static void declare();

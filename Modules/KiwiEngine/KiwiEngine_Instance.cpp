@@ -85,6 +85,7 @@ namespace kiwi
             engine::Factory::add<ObjectReceive>("receive");
             engine::Factory::add<OscTilde>("osc~");
             engine::Factory::add<DacTilde>("dac~");
+            engine::Factory::add<TimesTilde>("times~");
         }
         
         // ================================================================================ //

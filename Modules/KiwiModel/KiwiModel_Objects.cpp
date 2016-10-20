@@ -144,7 +144,7 @@ namespace kiwi
         }
         
         // ================================================================================ //
-        //                                       OBJECT DAC~                                //
+        //                                  OBJECT DAC~                                     //
         // ================================================================================ //
         
         DacTilde::DacTilde(std::string const& name, std::vector<Atom> const& args)
@@ -184,7 +184,7 @@ namespace kiwi
 
         
         // ================================================================================ //
-        //                                       OBJECT OSC~                                //
+        //                                  OBJECT OSC~                                     //
         // ================================================================================ //
         
         OscTilde::OscTilde(std::string const& name, std::vector<Atom> const& args)
@@ -204,6 +204,33 @@ namespace kiwi
             .inherit<model::Object>();
 
             Factory::add<OscTilde>("osc~");
+        }
+        
+        // ================================================================================ //
+        //                                  OBJECT TIMES~                                   //
+        // ================================================================================ //
+        
+        TimesTilde::TimesTilde(std::string const& name, std::vector<Atom> const& args)
+        {
+            pushInlet({PinType::IType::Signal, PinType::IType::Control});
+            
+            if (args.empty() || !args[0].isNumber())
+            {
+                pushInlet({PinType::IType::Signal, PinType::IType::Control});
+            }
+            
+            pushOutlet(PinType::IType::Signal);
+        }
+        
+        void TimesTilde::declare()
+        {
+            if(DataModel::has<TimesTilde>()) return;
+            
+            DataModel::declare<TimesTilde>()
+            .name("cicm.kiwi.TimesTilde")
+            .inherit<model::Object>();
+            
+            Factory::add<TimesTilde>("times~", {"*~"});
         }
         
     }

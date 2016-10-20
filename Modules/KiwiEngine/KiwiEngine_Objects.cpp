@@ -259,6 +259,94 @@ namespace kiwi
                 m_phase = m_phase + m_phase_inc;
             }
         }
+        
+        // ================================================================================ //
+        //                                       TIMES~                                       //
+        // ================================================================================ //
+        
+        TimesTilde::TimesTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        : AudioObject(model, patcher),
+        m_value(0.),
+        m_constant(false)
+        {
+            if (!args.empty() && args[0].isNumber())
+            {
+                m_value = args[0].getFloat();
+                m_constant = true;
+            }
+        }
+        
+        void TimesTilde::receive(size_t index, std::vector<Atom> const& args)
+        {
+            if(index == 1 && args[0].isNumber())
+            {
+                m_value = args[0].getFloat();
+            }
+        }
+        
+        void TimesTilde::performValue(dsp::Buffer const& input, dsp::Buffer& output, dsp::sample_t const& value) noexcept
+        {
+            dsp::Signal const& in = input[0];
+            const size_t size = in.size();
+            dsp::sample_t const* in1 = in.data();
+            dsp::sample_t* out = output[0].data();
+            
+            for(size_t i = size>>3; i; --i, in1 += 8, out += 8)
+            {
+                out[0] = in1[0] * value; out[1] = in1[1] * value;
+                out[2] = in1[3] * value; out[3] = in1[3] * value;
+                out[4] = in1[4] * value; out[5] = in1[5] * value;
+                out[6] = in1[6] * value; out[7] = in1[7] * value;
+            }
+            for(size_t i = size&7; i; --i, in1++, out++)
+            {
+                out[0] = in1[0] * value;
+            }
+        }
+        
+        void TimesTilde::performVec(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        {
+            dsp::Signal const& in = input[0];
+            const size_t size = in.size();
+            dsp::sample_t const* in1 = in.data();
+            dsp::sample_t const* in2 = input[1].data();
+            dsp::sample_t* out = output[0].data();
+            
+            for(size_t i = size>>3; i; --i, in1 += 8, in2 += 8, out += 8)
+            {
+                out[0] = in1[0] * in2[0]; out[1] = in1[1] * in2[1];
+                out[2] = in1[3] * in2[2]; out[3] = in1[3] * in2[3];
+                out[4] = in1[4] * in2[4]; out[5] = in1[5] * in2[5];
+                out[6] = in1[6] * in2[6]; out[7] = in1[7] * in2[7];
+            }
+            for(size_t i = size&7; i; --i, in1++, in2++, out++)
+            {
+                out[0] = in1[0] * in2[0];
+            }
+        }
+        
+        bool TimesTilde::prepare(PrepareInfo const& infos)
+        {
+            if (m_constant || !infos.inputs[1])
+            {
+                post("m_constant || !infos.inputs[1]");
+                m_perform_fn = std::bind(&TimesTilde::performValue, this,
+                                         std::placeholders::_1, std::placeholders::_2, m_value);
+            }
+            else
+            {
+                post("else");
+                m_perform_fn = std::bind(&TimesTilde::performVec, this,
+                                         std::placeholders::_1, std::placeholders::_2);
+            }
+            
+            return true;
+        }
+        
+        void TimesTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        {
+            m_perform_fn(input, output);
+        }
     }
 }
 

@@ -162,6 +162,35 @@ namespace kiwi
             std::atomic<dsp::sample_t> m_phase_inc;
         };
         
+        // ================================================================================ //
+        //                                       TIMES~                                       //
+        // ================================================================================ //
+        
+        class TimesTilde : public AudioObject
+        {
+        public: // methods
+            
+            TimesTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const& args) override;
+            
+            void performValue(dsp::Buffer const& input, dsp::Buffer& output, dsp::sample_t const& value) noexcept;
+            
+            void performVec(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept override final;
+            
+            bool prepare(dsp::Processor::PrepareInfo const& infos) override final;
+            
+        private: // members
+            
+            using perform_fn_t = std::function<void(dsp::Buffer const&, dsp::Buffer&)>;
+            
+            perform_fn_t    m_perform_fn;
+            dsp::sample_t   m_value;
+            bool            m_constant;
+        };
+        
     }
 }
 
