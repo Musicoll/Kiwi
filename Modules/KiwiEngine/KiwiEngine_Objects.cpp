@@ -230,7 +230,7 @@ namespace kiwi
         }
         
         void OscTilde::receive(size_t index, std::vector<Atom> const& args)
-        {
+        {            
             if (index == 0 && args[0].isNumber())
             {
                 setFrequency(args[0].getFloat());
@@ -284,12 +284,14 @@ namespace kiwi
             }
         }
         
-        void TimesTilde::performValue(dsp::Buffer const& input, dsp::Buffer& output, dsp::sample_t const& value) noexcept
+        void TimesTilde::performValue(dsp::Buffer const& input, dsp::Buffer& output) const noexcept
         {
             dsp::Signal const& in = input[0];
             const size_t size = in.size();
             dsp::sample_t const* in1 = in.data();
             dsp::sample_t* out = output[0].data();
+            
+            dsp::sample_t const value = m_value;
             
             for(size_t i = size>>3; i; --i, in1 += 8, out += 8)
             {
@@ -304,7 +306,7 @@ namespace kiwi
             }
         }
         
-        void TimesTilde::performVec(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        void TimesTilde::performVec(dsp::Buffer const& input, dsp::Buffer& output) const noexcept
         {
             dsp::Signal const& in = input[0];
             const size_t size = in.size();
@@ -327,15 +329,13 @@ namespace kiwi
         
         bool TimesTilde::prepare(PrepareInfo const& infos)
         {
-            if (m_constant || !infos.inputs[1])
+            if (m_constant || (!m_constant && !infos.inputs[1]))
             {
-                post("m_constant || !infos.inputs[1]");
                 m_perform_fn = std::bind(&TimesTilde::performValue, this,
-                                         std::placeholders::_1, std::placeholders::_2, m_value);
+                                         std::placeholders::_1, std::placeholders::_2);
             }
             else
             {
-                post("else");
                 m_perform_fn = std::bind(&TimesTilde::performVec, this,
                                          std::placeholders::_1, std::placeholders::_2);
             }

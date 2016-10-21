@@ -169,8 +169,6 @@ namespace kiwi
             }
         }
         
-        
-        
         void DacTilde::declare()
         {
             if(DataModel::has<DacTilde>()) return;
@@ -212,7 +210,7 @@ namespace kiwi
         
         TimesTilde::TimesTilde(std::string const& name, std::vector<Atom> const& args)
         {
-            pushInlet({PinType::IType::Signal, PinType::IType::Control});
+            pushInlet({PinType::IType::Signal});
             
             if (args.empty() || !args[0].isNumber())
             {

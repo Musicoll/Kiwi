@@ -174,9 +174,9 @@ namespace kiwi
             
             void receive(size_t index, std::vector<Atom> const& args) override;
             
-            void performValue(dsp::Buffer const& input, dsp::Buffer& output, dsp::sample_t const& value) noexcept;
+            void performValue(dsp::Buffer const& input, dsp::Buffer& output) const noexcept;
             
-            void performVec(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            void performVec(dsp::Buffer const& input, dsp::Buffer& output) const noexcept;
             
             void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept override final;
             
