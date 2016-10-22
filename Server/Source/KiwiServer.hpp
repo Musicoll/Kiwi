@@ -77,8 +77,6 @@ namespace kiwi
         {
         public:
             
-            static constexpr char kiwi_file_extension[] = { "kiwi" };
-            
             //! @brief Constructor.
             Server(uint16_t port);
             
@@ -131,6 +129,8 @@ namespace kiwi
             flip::MulticastServiceProvider  m_service_provider;
             
             std::string                     m_backend_files_path;
+            
+            static constexpr char kiwi_file_extension[] = "kiwi";
             
         private: // deleted methods
             

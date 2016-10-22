@@ -161,7 +161,7 @@ namespace kiwi
                 return true;
             });
             
-            std::cout << "Running..." << std::endl;
+            std::cout << "- KiwiServer running on port " << getPort() << '\n';
             
             run_loop.run();  // never returns
         }

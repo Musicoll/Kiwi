@@ -20,7 +20,7 @@ if(CMAKE_CONFIGURATION_TYPES)
      "Reset the configurations to what we need"
      FORCE)
  endif()
- 
+
  if(UNIX AND NOT APPLE)
         set(LINUX TRUE)
     endif()
@@ -74,13 +74,13 @@ elseif(APPLE)
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     endif()
-    
+
 elseif(LINUX)
 
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     endif()
-    
+
 endif()
 
 #--------------------------------------
@@ -196,7 +196,7 @@ set(JUCE_COMPILED_SRC ${ROOT_DIR}/ThirdParty/Juce/modules/juce_core/juce_core.cp
                       ${ROOT_DIR}/ThirdParty/Juce/modules/juce_audio_formats/juce_audio_formats.cpp
                       ${ROOT_DIR}/ThirdParty/Juce/modules/juce_audio_utils/juce_audio_utils.cpp
                       ${ROOT_DIR}/ThirdParty/Juce/modules/juce_audio_processors/juce_audio_processors.cpp)
-                      
+
 if (APPLE)
     set_source_files_properties(${JUCE_COMPILED_SRC} PROPERTIES COMPILE_FLAGS "-x objective-c++"
                                                                 HEADER_FILE_ONLY FALSE)
@@ -218,25 +218,25 @@ source_group_rec("${JUCE_SRC}" ${ROOT_DIR}/ThirdParty/Juce/modules)
 
 if (${FLIP_PRIVATE})
     if(APPLE)
-    
+
         if(CMAKE_BUILD_TYPE STREQUAL "Debug")
             find_library(FlipLib NAMES flip PATHS ${ROOT_DIR}/ThirdParty/flip/projects/build/Debug)
         elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
             find_library(FlipLib NAMES flip PATHS ${ROOT_DIR}/ThirdParty/flip/projects/build/Release)
         endif()
-    
+
         set(FLIP_DEP ${FlipLib})
         set(FLIP_DIR "${ROOT_DIR}/ThirdParty/flip")
         file (GLOB_RECURSE FLIP_SRC ${ROOT_DIR}/ThirdParty/flip/inlude/*.hpp
                                 ${ROOT_DIR}/ThirdParty/flip/include/*.h
-                                ${ROOT_DIR}/ThirdParty/flip/src/*.cpp)                          
+                                ${ROOT_DIR}/ThirdParty/flip/src/*.cpp)
     endif()
 else()
 
     if(APPLE)
         find_library(FlipLib NAMES flip PATHS ${ROOT_DIR}/ThirdParty/flip-public/lib/mac)
         set(FLIP_DEP ${FlipLib})
-        
+
     elseif(WIN32)
         if (CMAKE_CL_64)
             find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/x64/Release")
@@ -245,14 +245,14 @@ else()
 	   endif()
        find_library(WS2_32 ws2_32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
 	   set(FLIP_DEP ${WS2_32} ${FlipLib})
-       
+
     elseif(LINUX)
         find_library(FlipLib NAMES flip PATHS ${ROOT_DIR}/ThirdParty/flip-public/lib/linux/gcc)
         set(FLIP_DEP ${FlipLib})
     endif()
-    
-    set(FLIP_DIR "${ROOT_DIR}/ThirdParty/flip-public") 
-    file (GLOB_RECURSE FLIP_SRC ${FLIP_DIR}/include/*.hpp 
+
+    set(FLIP_DIR "${ROOT_DIR}/ThirdParty/flip-public")
+    file (GLOB_RECURSE FLIP_SRC ${FLIP_DIR}/include/*.hpp
                                 ${FLIP_DIR}/include/*.h)
 endif()
 
