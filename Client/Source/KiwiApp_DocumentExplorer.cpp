@@ -50,7 +50,6 @@ namespace kiwi
         m_listeners.add(listener);
     }
     
-    //! @brief remove a listener.
     void DocumentExplorer::removeListener(Listener& listener)
     {
         m_listeners.remove(listener);

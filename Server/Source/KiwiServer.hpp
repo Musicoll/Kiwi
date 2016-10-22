@@ -22,14 +22,52 @@
 #ifndef KIWI_SERVER_HPP_INCLUDED
 #define KIWI_SERVER_HPP_INCLUDED
 
-#include <map>
+#include "flip/Document.h"
+#include "flip/contrib/ServerSimple.h"
+#include "flip/contrib/MulticastServiceProvider.h"
+#include "flip/contrib/DataProviderFile.h"
+#include "flip/contrib/DataConsumerFile.h"
+#include "flip/BackEndBinary.h"
 
+#include <KiwiModel/KiwiModel_DataModel.hpp>
 #include "KiwiPatcherManager.hpp"
+
+#include "KiwiPatcherValidator.hpp"
 
 namespace kiwi
 {
     namespace server
     {
+        class FilePath
+        {
+        public: // methods
+            
+            #ifdef _WIN32
+            static constexpr char dir_sep = '\\';
+            #else
+            static constexpr char dir_sep = '/';
+            #endif
+            
+            //! @brief Constructor.
+            FilePath(std::string path);
+            
+            //! @brief Desctructor.
+            ~FilePath() = default;
+            
+            //! @brief Returns true if path exists, otherwise false.
+            bool exists();
+            
+            //! @brief Returns true if path exists, otherwise false.
+            static bool exists(std::string const& path);
+            
+            static bool createFile(std::string const& path);
+            
+        private: // members
+            
+            std::string m_path;
+        };
+        
+        
         // ================================================================================ //
         //                                      SERVER                                      //
         // ================================================================================ //
@@ -39,26 +77,60 @@ namespace kiwi
         {
         public:
             
+            static constexpr char kiwi_file_extension[] = { "kiwi" };
+            
             //! @brief Constructor.
-            Server();
+            Server(uint16_t port);
             
             //! @brief Destructor.
             ~Server();
             
+            //! @brief Server process
+            void process();
+            
             //! @brief Loop that retrieves user input to manager server.
-            void runCommand();
+            void run();
+            
+            //! @brief Get the server running port
+            uint16_t getPort() const noexcept;
+            
+            //! @brief Get the number of sessions currently running.
+            uint16_t getNumberOfActiveSessions() const noexcept;
+            
+            //! @brief set the sessions' backend files directory.
+            void setSessionsBackendDirectory(std::string const& directory);
             
         private: // methods
             
-            //! @brief Open the patcher that has document_id as id.
-            void openPatcher(uint64_t document_id, uint64_t session_id, uint16_t port, std::string const& title);
+            //! @brief Initialise a new empty patcher
+            std::unique_ptr<flip::DocumentValidatorBase> createValidator(uint64_t session_id);
             
-            //! @brief Close the patcher that has document_id as id.
-            void closePatcher(uint64_t patcher_id);
+            //! @brief Initialise a new empty patcher
+            void initEmptyDocument(uint64_t session_id, flip::DocumentBase & document);
+            
+            //! @brief read a session backend.
+            flip::BackEndIR readSessionBackend(uint64_t session_id);
+            
+            //! @brief write a session backend.
+            void writeSessionBackend(uint64_t session_id, flip::BackEndIR const& backend);
+            
+            //! @brief Authenticate a user.
+            bool authenticateUser(uint64_t user_id, uint64_t session_id, std::string metadata);
+            
+            //! @brief Get the path for a given session.
+            std::string getSessionPath(uint64_t session_id);
             
         private: // members
             
-            std::map<uint64_t, std::unique_ptr<PatcherManager>> m_patchers;
+            using metadata_t = std::map<std::string, std::string>;
+            using service_t = std::map<std::string, std::string>;
+            
+            const uint16_t                  m_port;
+            flip::ServerSimple              m_server;
+            flip::Document                  m_service_document;
+            flip::MulticastServiceProvider  m_service_provider;
+            
+            std::string                     m_backend_files_path;
             
         private: // deleted methods
             

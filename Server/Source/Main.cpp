@@ -26,8 +26,13 @@ int main(int argc, const char * argv[])
 {
     kiwi::model::DataModel::init();
     
-    kiwi::server::Server server;
-    server.runCommand();
+    kiwi::server::Server server(9090);
+    
+    std::cout << "- KiwiServer running on port " << server.getPort() << '\n';
+    
+    server.setSessionsBackendDirectory("/sessions/");
+    
+    server.run();
     
     return 0;
 }
