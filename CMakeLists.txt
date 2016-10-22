@@ -213,6 +213,62 @@ set_target_properties(Juce PROPERTIES FOLDER ThirdParty)
 source_group_rec("${JUCE_SRC}" ${ROOT_DIR}/ThirdParty/Juce/modules)
 
 #----------------------------------
+# Juce Core
+#----------------------------------
+
+if (APPLE)
+    find_library(COCOA Cocoa)
+    find_library(IOKIT IOKit)
+    set(JUCE_CORE_DEP ${COCOA} ${IOKIT})
+elseif(WIN32)
+	find_library(WS2_32 ws2_32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
+	find_library(UUID uuid PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
+	find_library(WSOCK32 wsock32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
+	find_library(WININET wininet PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
+	find_library(LIBVERSION version PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
+	find_library(OLE32 ole32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
+	find_library(OLEAUT32 oleaut32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
+	find_library(IMM32 imm32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
+	find_library(COMDLG32 comdlg32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
+	find_library(SHLWAPI shlwapi PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
+	find_library(RPCRT4 rpcrt4 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
+	find_library(WINMM winmm PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
+	set(JUCE_CORE_DEP ${WS2_32} ${UUID} ${WSOCK32} ${WININET} ${LIBVERSION} ${OLE32} ${OLEAUT32} ${COMDLG32} ${SHLWAPI} ${RPCRT4} ${WINMM})
+elseif(LINUX)
+    find_library(RT rt)
+    find_library(DL dl)
+    find_library(PTHREAD pthread)
+    set(JUCE_CORE_DEP ${RT} ${DL} ${PTHREAD})
+endif()
+
+set(JUCE_MACRO_DEFINITIONS JUCE_MODULE_AVAILABLE_juce_core=1
+                           JUCE_STANDALONE_APPLICATION=1
+                           JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1)
+
+file (GLOB_RECURSE JUCE_CORE_SRC ${ROOT_DIR}/ThirdParty/Juce/modules/juce_core/*.[h|c]pp
+                            ${ROOT_DIR}/ThirdParty/Juce/modules/juce_core/*.h
+                            ${ROOT_DIR}/ThirdParty/Juce/modules/juce_core/*.mm)
+
+set_source_files_properties(${JUCE_CORE_SRC} PROPERTIES HEADER_FILE_ONLY TRUE)
+
+set(JUCE_CORE_COMPILED_SRC ${ROOT_DIR}/ThirdParty/Juce/modules/juce_core/juce_core.cpp)
+
+if (APPLE)
+    set_source_files_properties(${JUCE_CORE_COMPILED_SRC} PROPERTIES COMPILE_FLAGS "-x objective-c++"
+                                                                HEADER_FILE_ONLY FALSE)
+else()
+    set_source_files_properties(${JUCE_CORE_COMPILED_SRC} PROPERTIES HEADER_FILE_ONLY FALSE)
+endif()
+
+
+add_library(JuceCore STATIC ${JUCE_CORE_SRC})
+target_link_libraries(JuceCore ${JUCE_CORE_DEP})
+target_compile_definitions(JuceCore PUBLIC ${JUCE_MACRO_DEFINITIONS})
+target_include_directories(JuceCore PUBLIC ${ROOT_DIR}/ThirdParty/Juce/modules)
+set_target_properties(JuceCore PROPERTIES FOLDER ThirdParty)
+source_group_rec("${JUCE_CORE_SRC}" ${ROOT_DIR}/ThirdParty/Juce/modules/juce_core)
+
+#----------------------------------
 # Flip
 #----------------------------------
 
@@ -326,6 +382,7 @@ file(GLOB_RECURSE KIWI_SERVER_SRC ${ROOT_DIR}/Server/Source/*.[c|h]pp)
 add_executable(Server ${KIWI_SERVER_SRC})
 target_add_dependency(Server KiwiModel)
 target_add_dependency(Server Flip)
+target_add_dependency(Server JuceCore)
 source_group_rec("${KIWI_SERVER_SRC}" ${ROOT_DIR}/Server/Source)
 
 #----------------------------------

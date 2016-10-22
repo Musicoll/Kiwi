@@ -34,40 +34,12 @@
 
 #include "KiwiPatcherValidator.hpp"
 
+#include <juce_core/juce_core.h>
+
 namespace kiwi
 {
     namespace server
     {
-        class FilePath
-        {
-        public: // methods
-            
-            #ifdef _WIN32
-            static constexpr char dir_sep = '\\';
-            #else
-            static constexpr char dir_sep = '/';
-            #endif
-            
-            //! @brief Constructor.
-            FilePath(std::string path);
-            
-            //! @brief Desctructor.
-            ~FilePath() = default;
-            
-            //! @brief Returns true if path exists, otherwise false.
-            bool exists();
-            
-            //! @brief Returns true if path exists, otherwise false.
-            static bool exists(std::string const& path);
-            
-            static bool createFile(std::string const& path);
-            
-        private: // members
-            
-            std::string m_path;
-        };
-        
-        
         // ================================================================================ //
         //                                      SERVER                                      //
         // ================================================================================ //
@@ -116,7 +88,10 @@ namespace kiwi
             bool authenticateUser(uint64_t user_id, uint64_t session_id, std::string metadata);
             
             //! @brief Get the path for a given session.
-            std::string getSessionPath(uint64_t session_id);
+            juce::File getSessionFile(uint64_t session_id);
+            
+            //! create a backend directory
+            bool initBackendDirectory(char const* name);
             
         private: // members
             
@@ -128,9 +103,9 @@ namespace kiwi
             flip::Document                  m_service_document;
             flip::MulticastServiceProvider  m_service_provider;
             
-            std::string                     m_backend_files_path;
+            juce::File                      m_backend_files_path;
             
-            static constexpr char kiwi_file_extension[] = "kiwi";
+            static const char* kiwi_file_extension;
             
         private: // deleted methods
             

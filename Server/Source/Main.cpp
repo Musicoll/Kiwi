@@ -27,7 +27,7 @@ int main(int argc, const char * argv[])
     kiwi::model::DataModel::init();
     
     kiwi::server::Server server(9090);
-    server.setSessionsBackendDirectory("/sessions/");
+    //server.setSessionsBackendDirectory("/sessions/");
     
     server.run();
     

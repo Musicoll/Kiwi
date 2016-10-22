@@ -29,30 +29,10 @@ namespace kiwi
     namespace server
     {
         // ================================================================================ //
-        //                                    FILEPATH                                      //
-        // ================================================================================ //
-        
-        FilePath::FilePath(std::string path) : m_path(path)
-        {
-            ;
-        }
-        
-        bool FilePath::exists(std::string const& path)
-        {
-            struct stat info;
-            return (stat(path.c_str(), &info) == 0);
-        }
-        
-        bool FilePath::exists()
-        {
-            return exists(m_path);
-        }
-        
-        // ================================================================================ //
         //                                      SERVER                                      //
         // ================================================================================ //
         
-        constexpr char Server::kiwi_file_extension[];
+        const char* Server::kiwi_file_extension = "kiwi";
         
         Server::Server(uint16_t port) :
         m_port(port),
@@ -67,6 +47,8 @@ namespace kiwi
             m_server.bind_read(std::bind(&Server::readSessionBackend, this, _1));
             m_server.bind_write(std::bind(&Server::writeSessionBackend, this, _1, _2));
             //m_server.bind_authenticate(std::bind(&Server::authenticateUser, this, _1, _2, _3));
+            
+            initBackendDirectory("server_backend");
         }
         
         Server::~Server()
@@ -74,14 +56,21 @@ namespace kiwi
             ;
         }
         
+        bool Server::initBackendDirectory(char const* name)
+        {
+            m_backend_files_path = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getSiblingFile(name);
+            
+            return juce::Result::ok() == m_backend_files_path.createDirectory();
+        }
+        
         void Server::setSessionsBackendDirectory(std::string const& directory)
         {
             m_backend_files_path = directory;
         }
         
-        std::string Server::getSessionPath(uint64_t session_id)
+        juce::File Server::getSessionFile(uint64_t session_id)
         {
-            return m_backend_files_path + std::to_string(session_id) + kiwi_file_extension;
+            return m_backend_files_path.getChildFile(juce::String(session_id)).withFileExtension(kiwi_file_extension);
         }
         
         uint16_t Server::getPort() const noexcept
@@ -122,11 +111,11 @@ namespace kiwi
             
             flip::BackEndIR backend;
             
-            auto session_path = getSessionPath(session_id);
+            const auto session_file = getSessionFile(session_id);
             
-            if (FilePath::exists(session_path))
+            if (session_file.exists())
             {
-                flip::DataProviderFile provider(session_path.c_str());
+                flip::DataProviderFile provider(session_file.getFullPathName().toStdString().c_str());
                 
                 backend.register_backend<flip::BackEndBinary>();
                 backend.read(provider);
@@ -139,13 +128,15 @@ namespace kiwi
         {
             std::cout << "Saving session [ " << std::to_string(session_id) << " ]\n";
             
-            auto session_path = getSessionPath(session_id);
+            const auto session_file = getSessionFile(session_id);
             
-            if(FilePath::exists(session_path))
+            if(!session_file.exists())
             {
-                flip::DataConsumerFile consumer(session_path.c_str());
-                backend.write<flip::BackEndBinary>(consumer);
+                session_file.create();
             }
+            
+            flip::DataConsumerFile consumer(session_file.getFullPathName().toStdString().c_str());
+            backend.write<flip::BackEndBinary>(consumer);
         }
         
         bool Server::authenticateUser(uint64_t user_id, uint64_t session_id, std::string metadata)
