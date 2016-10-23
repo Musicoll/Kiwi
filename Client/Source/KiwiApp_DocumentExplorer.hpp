@@ -63,6 +63,11 @@ namespace kiwi
         //! @brief remove a listener.
         void removeListener(Listener& listener);
         
+        //! @brief Retrieves a metadata entry in a session.
+        static std::string getSessionMetadata(flip::MulticastServiceExplorer::Session const& session,
+                                              std::string const& key,
+                                              std::string const& notfound = "");
+        
         class Panel;
         
     private: // methods
@@ -119,16 +124,20 @@ namespace kiwi
         //! @brief Called when the document list changed.
         void documentListChanged() override;
         
-    private: // classses
+    private: // classes
         
         class SessionItemButton : public juce::Button
         {
-        public:
-            SessionItemButton(flip::MulticastServiceExplorer::Session && session);
+        public: // methods
+            
+            //! @brief Constructor.
+            SessionItemButton(flip::MulticastServiceExplorer::Session session);
+            
+            //! @brief draw the button.
             void paintButton(juce::Graphics& g, bool isMouseOverButton, bool isButtonDown) override;
             
             //! @brief Returns the metadata associated to the given key.
-            std::string getMetadata(std::string const& key) const;
+            std::string getMetadata(std::string const& key, std::string const& ifnotfound = "") const;
             
             //! @brief Returns the session port.
             uint16_t getPort() const;
@@ -139,8 +148,12 @@ namespace kiwi
             //! @brief Returns the session host.
             std::string getHost() const;
             
-        private:
-            const flip::MulticastServiceExplorer::Session   m_session;
+            //! @brief Returns the session id.
+            uint64_t getSessionId() const;
+            
+        private: // members
+            
+            flip::MulticastServiceExplorer::Session const m_session;
         };
         
     private: // members

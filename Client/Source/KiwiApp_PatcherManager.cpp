@@ -93,7 +93,7 @@ namespace kiwi
         DocumentManager::commit(patcher, "Add User");
     }
     
-    PatcherManager::PatcherManager(Instance & instance, const std::string host, uint16_t port) :
+    PatcherManager::PatcherManager(Instance & instance, const std::string host, uint16_t port, uint64_t session_id) :
     m_instance(instance),
     m_document(model::DataModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
     m_is_remote(true)
@@ -102,7 +102,7 @@ namespace kiwi
         
         try
         {
-            DocumentManager::connect(patcher, host, port);
+            DocumentManager::connect(patcher, host, port, session_id);
         }
         catch (std::runtime_error& e)
         {

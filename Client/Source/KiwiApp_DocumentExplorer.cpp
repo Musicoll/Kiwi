@@ -55,6 +55,17 @@ namespace kiwi
         m_listeners.remove(listener);
     }
     
+    std::string DocumentExplorer::getSessionMetadata(flip::MulticastServiceExplorer::Session const& session,
+                                                     std::string const& key,
+                                                     std::string const& notfound)
+    {
+        assert(!key.empty());
+        
+        auto const& metadata = session.metadata;
+        const auto it = metadata.find(key);
+        return (it != metadata.end()) ? it->second : notfound;
+    }
+    
     void DocumentExplorer::timerCallback()
     {
         process();
@@ -128,14 +139,11 @@ namespace kiwi
     //                               DOCUMENT EXPLORER PANEL                            //
     // ================================================================================ //
     
-    DocumentExplorer::Panel::SessionItemButton::SessionItemButton(flip::MulticastServiceExplorer::Session && session) :
+    DocumentExplorer::Panel::SessionItemButton::SessionItemButton(flip::MulticastServiceExplorer::Session session) :
     juce::Button(""),
-    m_session(session)
+    m_session(std::move(session))
     {
-        auto const& metadata = session.metadata;
-        const auto it = metadata.find("name");
-        const std::string name = (it != metadata.end()) ? it->second : "Name error";
-        setButtonText(getMetadata("name"));
+        setButtonText(getMetadata("name", "no name"));
     }
     
     void DocumentExplorer::Panel::SessionItemButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool isButtonDown)
@@ -155,13 +163,10 @@ namespace kiwi
         g.drawFittedText(getButtonText(), bounds, juce::Justification::centred, 2);
     }
     
-    std::string DocumentExplorer::Panel::SessionItemButton::getMetadata(std::string const& key) const
+    std::string DocumentExplorer::Panel::SessionItemButton::getMetadata(std::string const& key,
+                                                                        std::string const& notfound) const
     {
-        assert(!key.empty());
-        
-        auto const& metadata = m_session.metadata;
-        const auto it = metadata.find(key);
-        return (it != metadata.end()) ? it->second : "";
+        return DocumentExplorer::getSessionMetadata(m_session, key, notfound);
     }
     
     uint16_t DocumentExplorer::Panel::SessionItemButton::getPort() const
@@ -191,6 +196,22 @@ namespace kiwi
         return host;
     }
     
+    uint64_t DocumentExplorer::Panel::SessionItemButton::getSessionId() const
+    {
+        uint64_t session_id = 12345;
+        
+        try
+        {
+            session_id = std::stoull(getMetadata("session_id"));
+        }
+        catch(std::exception const& e)
+        {
+            std::cerr << "fails to read session_id metadata, returns default value" << '\n';
+        }
+        
+        return session_id;
+    }
+    
     DocumentExplorer::Panel::Panel(DocumentExplorer& explorer, Instance& instance) :
     m_instance(instance),
     m_explorer(explorer)
@@ -216,7 +237,7 @@ namespace kiwi
         {
             juce::Rectangle<int> new_bounds
             {
-                last_top_left_pos.x + padding,
+                padding,
                 last_top_left_pos.y + padding,
                 button_width, button_height
             };
@@ -235,12 +256,12 @@ namespace kiwi
     
     void DocumentExplorer::Panel::buttonClicked(juce::Button* button)
     {        
-        const auto* session_item = dynamic_cast<SessionItemButton*>(button);
+        auto const* session_item = dynamic_cast<SessionItemButton*>(button);
         if(session_item)
         {
-            uint16_t port = session_item->getPort();
-            std::string host = session_item->getHost();
-            m_instance.openRemotePatcher(host, port);
+            m_instance.openRemotePatcher(session_item->getHost(),
+                                         session_item->getPort(),
+                                         session_item->getSessionId());
         }
     }
     
@@ -258,17 +279,28 @@ namespace kiwi
         const auto bounds = getLocalBounds();
         
         int counter = 0;
-        for(auto && session : m_explorer.getSessionList())
+        for(auto session : m_explorer.getSessionList())
         {
-            auto button_it = m_buttons.emplace(m_buttons.end(), std::make_unique<SessionItemButton>(std::move(session)));
+            juce::String files = getSessionMetadata(session, "backend_files_list");
             
-            SessionItemButton& button = *button_it->get();
-            button.addListener(this);
+            juce::StringArray tokens;
+            tokens.addTokens(files, ";", "\"");
             
-            button.setBounds(10, 10, bounds.getWidth() - 20, 30);
-            addAndMakeVisible(button);
-            
-            counter++;
+            for(auto token : tokens)
+            {
+                const std::string token_str = token.toStdString();
+                session.metadata["name"] = "Document - " + token_str;
+                session.metadata["session_id"] = token_str;
+                
+                auto button_it = m_buttons.emplace(m_buttons.end(), std::make_unique<SessionItemButton>(session));
+                
+                SessionItemButton& button = *button_it->get();
+                button.addListener(this);
+                
+                button.setBounds(10, 10 + (counter*30), bounds.getWidth() - 20, 30);
+                addAndMakeVisible(button);
+                counter++;
+            }
         }
     }
     

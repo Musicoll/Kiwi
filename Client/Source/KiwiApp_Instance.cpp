@@ -187,13 +187,13 @@ namespace kiwi
         return success;
     }
     
-    void Instance::openRemotePatcher(std::string& host, uint16_t& port)
+    void Instance::openRemotePatcher(std::string const& host, uint16_t port, uint64_t session_id)
     {
         std::unique_ptr<PatcherManager> manager_uptr = nullptr;
         
         try
         {
-            manager_uptr.reset(new PatcherManager(*this, host, port));
+            manager_uptr.reset(new PatcherManager(*this, host, port, session_id));
         }
         catch(std::runtime_error &e)
         {

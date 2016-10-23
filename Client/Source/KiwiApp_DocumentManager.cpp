@@ -37,13 +37,10 @@ namespace kiwi
     DocumentManager::DocumentManager(flip::DocumentBase& document) :
     m_document(document),
     m_history(document),
-    m_socket(m_document, "", 0, 12345),
     m_file_handler(m_document),
     m_loaded(false)
     {
-        m_socket.listenConnected(std::bind(&DocumentManager::onConnected, this));
-        m_socket.listenDisconnected(std::bind(&DocumentManager::onDisconnected, this));
-        m_socket.listenLoaded(std::bind(&DocumentManager::onLoaded, this));
+        ;
     }
     
     DocumentManager::~DocumentManager()
@@ -57,10 +54,11 @@ namespace kiwi
         patcher.entity().use<DocumentManager>().commit(action);
     }
     
-    void DocumentManager::connect(flip::Type& type, const std::string host, uint16_t port)
+    void DocumentManager::connect(flip::Type& type,
+                                  const std::string host, uint16_t port, uint64_t session_id)
     {
         model::Patcher& patcher = type.ancestor<model::Patcher>();
-        patcher.entity().use<DocumentManager>().connect(host, port);
+        patcher.entity().use<DocumentManager>().connect(host, port, session_id);
     }
     
     void DocumentManager::pull(flip::Type& type)
@@ -179,30 +177,34 @@ namespace kiwi
         m_document.push();
     }
     
-    void DocumentManager::connect(std::string const host, uint16_t port)
+    void DocumentManager::connect(std::string const host, uint16_t port, uint64_t session_id)
     {
         disconnect();
         
-        m_socket.connect(host, port);
+        m_socket.reset(new CarrierSocket(m_document, host, port, session_id));
         
-        std::chrono::steady_clock::time_point init_time = std::chrono::steady_clock::now();
-        std::chrono::duration<int> time_out(2);
+        m_socket->listenConnected(std::bind(&DocumentManager::onConnected, this));
+        m_socket->listenDisconnected(std::bind(&DocumentManager::onDisconnected, this));
+        m_socket->listenLoaded(std::bind(&DocumentManager::onLoaded, this));
         
-        while(!m_socket.isConnected() && std::chrono::steady_clock::now() - init_time < time_out)
+        const auto init_time = std::chrono::steady_clock::now();
+        const std::chrono::duration<int> time_out(2);
+        
+        while(!m_socket->isConnected() && std::chrono::steady_clock::now() - init_time < time_out)
         {
-            m_socket.process();
+            m_socket->process();
         }
         
-        if (m_socket.isConnected())
+        if (m_socket->isConnected())
         {
             while(!m_loaded.load())
             {
-                m_socket.process();
+                m_socket->process();
             }
             
             pull();
             
-            m_socket.startProcess();
+            m_socket->startProcess();
         }
         else
         {
@@ -213,12 +215,12 @@ namespace kiwi
     void DocumentManager::disconnect()
     {
         m_loaded.store(false);
-        m_socket.disconnect();
+        m_socket.reset();
     }
     
     bool DocumentManager::isConnected()
     {
-        return m_socket.isConnected();
+        return (m_socket && m_socket->isConnected());
     }
     
     void DocumentManager::startPulling()

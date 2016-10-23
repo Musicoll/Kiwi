@@ -77,7 +77,7 @@ namespace kiwi
         bool closeAllWindows();
         
         //! @brief Attempt to create a new patcher with given host and port parameters.
-        void openRemotePatcher(std::string& host, uint16_t& port);
+        void openRemotePatcher(std::string const& host, uint16_t port, uint64_t session_id);
         
         //! @brief Opens the settings
         void showSettingsWindow();

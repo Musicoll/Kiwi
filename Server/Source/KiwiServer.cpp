@@ -82,6 +82,31 @@ namespace kiwi
             metadata_t metadata;
             metadata["name"] = "Untitled document";
             
+            std::string computer_name = juce::SystemStats::getComputerName().toStdString();
+            metadata["computer_name"] = computer_name;
+            
+            juce::Array<juce::File> files;
+            juce::String wild_card_pattern("*.kiwi");
+            m_backend_files_path.findChildFiles(files, juce::File::findFiles, false, wild_card_pattern);
+            
+            std::string files_str;
+            if(!files.isEmpty())
+            {
+                auto it = files.begin();
+                files_str += it->getFileNameWithoutExtension().toStdString();
+                
+                for(;++it != files.end();)
+                {
+                    files_str += ";" + it->getFileNameWithoutExtension().toStdString();
+                }
+                
+                metadata["backend_files_list"] = files_str;
+            }
+            
+            std::cout << "computer_name " << computer_name << '\n';
+            
+            std::cout << "kiwi files : " << files_str << '\n';
+            
             m_service.reset(new ServiceProvider(*this, metadata));
         }
         
