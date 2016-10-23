@@ -22,16 +22,10 @@
 #ifndef KIWI_SERVER_HPP_INCLUDED
 #define KIWI_SERVER_HPP_INCLUDED
 
-#include "flip/Document.h"
-#include "flip/contrib/ServerSimple.h"
-#include "flip/contrib/MulticastServiceProvider.h"
-#include "flip/contrib/DataProviderFile.h"
-#include "flip/contrib/DataConsumerFile.h"
-#include "flip/BackEndBinary.h"
+#include <flip/contrib/ServerSimple.h>
+#include <flip/BackEndBinary.h>
 
-#include <KiwiModel/KiwiModel_DataModel.hpp>
-#include "KiwiPatcherManager.hpp"
-
+#include "KiwiServiceProvider.hpp"
 #include "KiwiPatcherValidator.hpp"
 
 #include <juce_core/juce_core.h>
@@ -90,20 +84,21 @@ namespace kiwi
             //! @brief Get the path for a given session.
             juce::File getSessionFile(uint64_t session_id);
             
-            //! create a backend directory
+            //! @brief Create a backend directory
             bool initBackendDirectory(char const* name);
+            
+            //! @brief Initialize the service.
+            void initService();
             
         private: // members
             
             using metadata_t = std::map<std::string, std::string>;
-            using service_t = std::map<std::string, std::string>;
             
-            const uint16_t                  m_port;
-            flip::ServerSimple              m_server;
-            flip::Document                  m_service_document;
-            flip::MulticastServiceProvider  m_service_provider;
+            const uint16_t                      m_port;
+            flip::ServerSimple                  m_server;
+            std::unique_ptr<ServiceProvider>    m_service;
             
-            juce::File                      m_backend_files_path;
+            juce::File                          m_backend_files_path;
             
             static const char* kiwi_file_extension;
             

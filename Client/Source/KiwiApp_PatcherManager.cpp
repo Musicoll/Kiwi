@@ -98,13 +98,13 @@ namespace kiwi
     m_document(model::DataModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
     m_is_remote(true)
     {
-        model::Patcher & patcher = getPatcher();
+        model::Patcher& patcher = getPatcher();
         
         try
         {
             DocumentManager::connect(patcher, host, port);
         }
-        catch (std::runtime_error &e)
+        catch (std::runtime_error& e)
         {
             throw e;
         }

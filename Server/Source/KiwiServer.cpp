@@ -19,10 +19,13 @@
  ==============================================================================
  */
 
-#include "KiwiServer.hpp"
+#include <flip/contrib/DataProviderFile.h>
+#include <flip/contrib/DataConsumerFile.h>
 
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <KiwiModel/KiwiModel_DataModel.hpp>
+#include <KiwiModel/KiwiModel_PatcherUser.hpp>
+
+#include "KiwiServer.hpp"
 
 namespace kiwi
 {
@@ -36,9 +39,7 @@ namespace kiwi
         
         Server::Server(uint16_t port) :
         m_port(port),
-        m_server(model::DataModel::use(), m_port),
-        m_service_document(model::DataModel::use(), 1, 'serv', 'serv'),
-        m_service_provider(m_port, m_service_document, metadata_t())
+        m_server(model::DataModel::use(), m_port)
         {
             using namespace std::placeholders; // for _1, _2 etc.
             
@@ -49,6 +50,7 @@ namespace kiwi
             //m_server.bind_authenticate(std::bind(&Server::authenticateUser, this, _1, _2, _3));
             
             initBackendDirectory("server_backend");
+            initService();
         }
         
         Server::~Server()
@@ -56,11 +58,31 @@ namespace kiwi
             ;
         }
         
+        void Server::run()
+        {
+            flip::RunLoopTimer run_loop ([this](){
+                process();
+                return true;
+            });
+            
+            std::cout << "- KiwiServer running on port " << getPort() << '\n';
+            
+            run_loop.run();  // never returns
+        }
+        
         bool Server::initBackendDirectory(char const* name)
         {
             m_backend_files_path = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getSiblingFile(name);
             
             return juce::Result::ok() == m_backend_files_path.createDirectory();
+        }
+        
+        void Server::initService()
+        {
+            metadata_t metadata;
+            metadata["name"] = "Untitled document";
+            
+            m_service.reset(new ServiceProvider(*this, metadata));
         }
         
         void Server::setSessionsBackendDirectory(std::string const& directory)
@@ -86,7 +108,7 @@ namespace kiwi
         void Server::process()
         {
             m_server.process();
-            m_service_provider.process();
+            m_service->process();
         }
         
         std::unique_ptr<flip::DocumentValidatorBase> Server::createValidator(uint64_t session_id)
@@ -143,18 +165,6 @@ namespace kiwi
         {
             // @todo do something here
             return true;
-        }
-        
-        void Server::run()
-        {
-            flip::RunLoopTimer run_loop ([this](){
-                process();
-                return true;
-            });
-            
-            std::cout << "- KiwiServer running on port " << getPort() << '\n';
-            
-            run_loop.run();  // never returns
         }
     }
 }

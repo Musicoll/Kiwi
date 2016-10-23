@@ -40,7 +40,7 @@ namespace kiwi
     public:
         
         //! @brief Constructor
-        CarrierSocket(flip::DocumentBase& document, std::string const& host, uint16_t port);
+        CarrierSocket(flip::DocumentBase& document, std::string const& host, uint16_t port, uint64_t session_id);
         
         // @brief Connects the socket to a remote socket
         void connect(std::string const& host, uint16_t port);
@@ -98,9 +98,9 @@ namespace kiwi
         std::thread                     m_transport_loop;
         std::atomic_bool                m_transport_running;
         
-        std::function<void ()> m_func_disonnected;
-        std::function<void ()> m_func_connected;
-        std::function<void ()> m_func_loaded;
+        std::function<void(void)> m_func_disonnected;
+        std::function<void(void)> m_func_connected;
+        std::function<void(void)> m_func_loaded;
         
     private:
         CarrierSocket(CarrierSocket const& other) = delete;

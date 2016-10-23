@@ -37,7 +37,7 @@ namespace kiwi
     DocumentManager::DocumentManager(flip::DocumentBase& document) :
     m_document(document),
     m_history(document),
-    m_socket(m_document, "", 0),
+    m_socket(m_document, "", 0, 12345),
     m_file_handler(m_document),
     m_loaded(false)
     {
