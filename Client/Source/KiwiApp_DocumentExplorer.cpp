@@ -153,10 +153,10 @@ namespace kiwi
         const juce::Colour bgcolor = isMouseOverButton ? juce::Colour(0xFFE0CA3C) : juce::Colour(0xFF5A54C4);
         g.setColour(bgcolor);
         
-        g.fillRoundedRectangle(bounds.reduced(1).toFloat(), 5);
+        g.fillRoundedRectangle(bounds.reduced(1).toFloat(), 0);
         
         g.setColour(bgcolor.darker(0.8));
-        g.drawRoundedRectangle(bounds.reduced(1).toFloat(), 5, 1);
+        g.drawRoundedRectangle(bounds.reduced(1).toFloat(), 0, 1);
         
         const juce::Colour text_color = isMouseOverButton ? juce::Colour(0xFF000000) : juce::Colour(0xFFFFFFFF);
         g.setColour(text_color);
@@ -228,17 +228,17 @@ namespace kiwi
     {
         const auto bounds = getLocalBounds();
         
-        const int padding = 10;
-        const int button_width = bounds.getWidth() - padding * 2;
+        const juce::Point<int> padding(10, 5);
+        const int button_width = bounds.getWidth() - padding.x * 2;
         const int button_height = 30;
-        juce::Point<int> last_top_left_pos(0, 0);
+        juce::Point<int> last_top_left_pos(padding.x, 30);
         
         for(auto& button_uptr : m_buttons)
         {
             juce::Rectangle<int> new_bounds
             {
-                padding,
-                last_top_left_pos.y + padding,
+                padding.x,
+                last_top_left_pos.y + padding.y,
                 button_width, button_height
             };
             
@@ -250,8 +250,21 @@ namespace kiwi
     
     void DocumentExplorer::Panel::paint(juce::Graphics& g)
     {
-        g.setColour(juce::Colour(0xFF3F3B4E));
+        const juce::Colour color(0xFF3F3B4E);
+        
+        g.setColour(color);
         g.fillAll();
+        
+        g.setColour(color.brighter(0.1));
+        g.fillRoundedRectangle(getLocalBounds().reduced(8).toFloat(), 5);
+        
+        g.setColour(juce::Colours::whitesmoke);
+        g.drawFittedText("Server Host : " + m_hostname,
+                         getLocalBounds().reduced(12, 8).removeFromTop(22),
+                         juce::Justification::centredLeft, 1);
+        
+        g.setColour(color);
+        g.drawLine(0, 30, getWidth(), 30, 3);
     }
     
     void DocumentExplorer::Panel::buttonClicked(juce::Button* button)
@@ -275,6 +288,7 @@ namespace kiwi
         
         removeAllChildren();
         m_buttons.clear();
+        m_hostname.clear();
         
         const auto bounds = getLocalBounds();
         
@@ -299,8 +313,11 @@ namespace kiwi
                 
                 button.setBounds(10, 10 + (counter*30), bounds.getWidth() - 20, 30);
                 addAndMakeVisible(button);
+                resized();
                 counter++;
             }
+            
+            m_hostname = getSessionMetadata(session, "computer_name");
         }
     }
     

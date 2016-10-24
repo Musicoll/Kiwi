@@ -104,7 +104,6 @@ namespace kiwi
             }
             
             std::cout << "computer_name " << computer_name << '\n';
-            
             std::cout << "kiwi files : " << files_str << '\n';
             
             m_service.reset(new ServiceProvider(*this, metadata));

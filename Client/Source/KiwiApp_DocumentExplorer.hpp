@@ -115,7 +115,10 @@ namespace kiwi
         //! @brief Destructor.
         ~Panel();
         
+        //! @brief Called when the panel is resized.
         void resized() override;
+        
+        //! @brief draw the panel.
         void paint(juce::Graphics& g) override;
         
         //! @brief Called when a juce::Button is clicked.
@@ -160,6 +163,7 @@ namespace kiwi
         
         Instance&                                       m_instance;
         DocumentExplorer&                               m_explorer;
+        juce::String                                    m_hostname;
         std::vector<std::unique_ptr<SessionItemButton>> m_buttons;
     };
 
