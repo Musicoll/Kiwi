@@ -173,12 +173,6 @@ namespace kiwi
             //! @brief Returns the number of inlets.
             size_t getNumberOfInlets() const;
             
-            //! @brief Returns the number of inlets having same type.
-            size_t getNumberOfInlets(PinType type) const;
-            
-            //! @brief Returns the inlet index among inlets having same type.
-            size_t getInletIndex(size_t index, PinType type) const;
-            
             //! @brief Returns true if the inlets changed.
             bool inletsChanged() const noexcept;
             
@@ -190,12 +184,6 @@ namespace kiwi
             
             //! @brief Returns the number of outlets.
             size_t getNumberOfOutlets() const;
-            
-            //! @brief Returns the number of inlets having same type.
-            size_t getNumberOfOutlets(PinType type) const;
-            
-            //! @brief Returns the outlet index among outlets of same type.
-            size_t getOutletIndex(size_t index, PinType type) const;
             
             //! @brief Returns true if the outlets changed.
             bool outletsChanged() const noexcept;

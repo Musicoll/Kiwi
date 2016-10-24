@@ -143,8 +143,7 @@ namespace kiwi
         
         AudioObject::AudioObject(model::Object const& model, Patcher& patcher) noexcept:
         Object(model, patcher),
-        dsp::Processor(model.getNumberOfInlets(model::PinType::IType::Signal),
-                       model.getNumberOfOutlets(model::PinType::IType::Signal))
+        dsp::Processor(model.getNumberOfInlets(), model.getNumberOfOutlets())
         {
         }
         
