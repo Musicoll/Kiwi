@@ -47,7 +47,7 @@ namespace kiwi
             m_server.bind_init(std::bind(&Server::initEmptyDocument, this, _1, _2));
             m_server.bind_read(std::bind(&Server::readSessionBackend, this, _1));
             m_server.bind_write(std::bind(&Server::writeSessionBackend, this, _1, _2));
-            //m_server.bind_authenticate(std::bind(&Server::authenticateUser, this, _1, _2, _3));
+            m_server.bind_authenticate(std::bind(&Server::authenticateUser, this, _1, _2, _3));
             
             initBackendDirectory("server_backend");
             initService();
@@ -63,7 +63,7 @@ namespace kiwi
             flip::RunLoopTimer run_loop ([this](){
                 process();
                 return true;
-            });
+            }, 0.1);
             
             std::cout << "- KiwiServer running on port " << getPort() << '\n';
             
@@ -80,10 +80,7 @@ namespace kiwi
         void Server::initService()
         {
             metadata_t metadata;
-            metadata["name"] = "Untitled document";
-            
-            std::string computer_name = juce::SystemStats::getComputerName().toStdString();
-            metadata["computer_name"] = computer_name;
+            metadata["computer_name"] = juce::SystemStats::getComputerName().toStdString();
             
             juce::Array<juce::File> files;
             juce::String wild_card_pattern("*.kiwi");
@@ -101,10 +98,9 @@ namespace kiwi
                 }
                 
                 metadata["backend_files_list"] = files_str;
+                
+                std::cout << "serving kiwi files : " << files_str << '\n';
             }
-            
-            std::cout << "computer_name " << computer_name << '\n';
-            std::cout << "kiwi files : " << files_str << '\n';
             
             m_service.reset(new ServiceProvider(*this, metadata));
         }
@@ -188,6 +184,9 @@ namespace kiwi
         bool Server::authenticateUser(uint64_t user_id, uint64_t session_id, std::string metadata)
         {
             // @todo do something here
+            
+            std::cout << "Authenticate user [ " << std::to_string(user_id) << " ] \n";
+            
             return true;
         }
     }

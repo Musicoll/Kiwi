@@ -25,6 +25,8 @@
 #include <flip/Document.h>
 #include <flip/contrib/MulticastServiceProvider.h>
 
+#include <mutex>
+
 namespace kiwi
 {
     namespace server
@@ -49,11 +51,16 @@ namespace kiwi
             //! @brief Process service
             void process();
             
+            //! Create a new multicast service provider with new metadata.
+            void setMetadata(std::map<std::string, std::string> metadata);
+            
         private: // members
             
             Server&                         m_server;
             flip::Document                  m_service_document;
-            flip::MulticastServiceProvider  m_service_provider;
+            std::unique_ptr<flip::MulticastServiceProvider>
+                                            m_service_provider;
+            std::mutex                      m_mutex;
             
         private: // deleted methods
             

@@ -305,7 +305,6 @@ namespace kiwi
                 const std::string token_str = token.toStdString();
                 session.metadata["name"] = "Document - " + token_str;
                 session.metadata["session_id"] = token_str;
-                
                 auto button_it = m_buttons.emplace(m_buttons.end(), std::make_unique<SessionItemButton>(session));
                 
                 SessionItemButton& button = *button_it->get();

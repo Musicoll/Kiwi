@@ -38,7 +38,7 @@ namespace kiwi
         ServiceProvider::ServiceProvider(Server& server, std::map<std::string, std::string> metadata) :
         m_server(server),
         m_service_document(model::DataModel::use(), 1, 'serv', 'serv'),
-        m_service_provider(m_server.getPort(), m_service_document, metadata)
+        m_service_provider(new flip::MulticastServiceProvider(m_server.getPort(), m_service_document, metadata))
         {
             ;
         }
@@ -48,9 +48,18 @@ namespace kiwi
             ;
         }
         
+        void ServiceProvider::setMetadata(std::map<std::string, std::string> metadata)
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            m_service_provider.reset(new flip::MulticastServiceProvider(m_server.getPort(),
+                                                                        m_service_document,
+                                                                        metadata));
+        }
+        
         void ServiceProvider::process()
         {
-            m_service_provider.process();
+            std::lock_guard<std::mutex> lock(m_mutex);
+            m_service_provider->process();
         }
     }
 }
