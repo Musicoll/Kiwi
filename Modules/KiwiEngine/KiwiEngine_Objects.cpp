@@ -296,7 +296,7 @@ namespace kiwi
             for(size_t i = size>>3; i; --i, in1 += 8, out += 8)
             {
                 out[0] = in1[0] * value; out[1] = in1[1] * value;
-                out[2] = in1[3] * value; out[3] = in1[3] * value;
+                out[2] = in1[2] * value; out[3] = in1[3] * value;
                 out[4] = in1[4] * value; out[5] = in1[5] * value;
                 out[6] = in1[6] * value; out[7] = in1[7] * value;
             }
@@ -317,7 +317,7 @@ namespace kiwi
             for(size_t i = size>>3; i; --i, in1 += 8, in2 += 8, out += 8)
             {
                 out[0] = in1[0] * in2[0]; out[1] = in1[1] * in2[1];
-                out[2] = in1[3] * in2[2]; out[3] = in1[3] * in2[3];
+                out[2] = in1[2] * in2[2]; out[3] = in1[3] * in2[3];
                 out[4] = in1[4] * in2[4]; out[5] = in1[5] * in2[5];
                 out[6] = in1[6] * in2[6]; out[7] = in1[7] * in2[7];
             }
@@ -329,15 +329,15 @@ namespace kiwi
         
         bool TimesTilde::prepare(PrepareInfo const& infos)
         {
+            using namespace std::placeholders;
+            
             if (m_constant || (!m_constant && !infos.inputs[1]))
             {
-                m_perform_fn = std::bind(&TimesTilde::performValue, this,
-                                         std::placeholders::_1, std::placeholders::_2);
+                m_perform_fn = std::bind(&TimesTilde::performValue, this, _1, _2);
             }
             else
             {
-                m_perform_fn = std::bind(&TimesTilde::performVec, this,
-                                         std::placeholders::_1, std::placeholders::_2);
+                m_perform_fn = std::bind(&TimesTilde::performVec, this, _1, _2);
             }
             
             return true;
