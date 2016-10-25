@@ -95,6 +95,9 @@ namespace kiwi
             //! @brief Update the service metadata.
             void updateMetadata();
             
+            //! @brief Get the new session id.
+            uint64_t getNewSessionId() const;
+            
         private: // members
             
             const uint16_t                      m_port;
