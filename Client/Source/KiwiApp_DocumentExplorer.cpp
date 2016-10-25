@@ -295,25 +295,47 @@ namespace kiwi
         int counter = 0;
         for(auto session : m_explorer.getSessionList())
         {
+            session.metadata["name"] = "new document";
+            session.metadata["session_id"] = getSessionMetadata(session, "new_session_id");
+            
+            auto button_it = m_buttons.emplace(m_buttons.end(), std::make_unique<SessionItemButton>(session));
+            
+            SessionItemButton& button = *button_it->get();
+            button.addListener(this);
+            
+            button.setBounds(10, 10 + (counter*30), bounds.getWidth() - 20, 30);
+            addAndMakeVisible(button);
+            resized();
+            counter++;
+            
             juce::String files = getSessionMetadata(session, "backend_files_list");
-            
-            juce::StringArray tokens;
-            tokens.addTokens(files, ";", "\"");
-            
-            for(auto token : tokens)
+            juce::var json_files;
+            if(juce::JSON::parse(files, json_files).wasOk())
             {
-                const std::string token_str = token.toStdString();
-                session.metadata["name"] = "Document - " + token_str;
-                session.metadata["session_id"] = token_str;
-                auto button_it = m_buttons.emplace(m_buttons.end(), std::make_unique<SessionItemButton>(session));
-                
-                SessionItemButton& button = *button_it->get();
-                button.addListener(this);
-                
-                button.setBounds(10, 10 + (counter*30), bounds.getWidth() - 20, 30);
-                addAndMakeVisible(button);
-                resized();
-                counter++;
+                if(json_files.isArray())
+                {
+                    const auto files_array = json_files.getArray();
+                    for(int i = 0; i < files_array->size(); ++i)
+                    {
+                        if(files_array->getReference(i).isObject())
+                        {
+                            auto file_obj = files_array->getReference(i).getDynamicObject();
+                            
+                            session.metadata["name"] = file_obj->getProperty("name").toString().toStdString();
+                            session.metadata["session_id"] = file_obj->getProperty("session_id").toString().toStdString();;
+                            
+                            auto button_it = m_buttons.emplace(m_buttons.end(), std::make_unique<SessionItemButton>(session));
+                            
+                            SessionItemButton& button = *button_it->get();
+                            button.addListener(this);
+                            
+                            button.setBounds(10, 10 + (counter*30), bounds.getWidth() - 20, 30);
+                            addAndMakeVisible(button);
+                            resized();
+                            counter++;
+                        }
+                    }
+                }
             }
             
             m_hostname = getSessionMetadata(session, "computer_name");

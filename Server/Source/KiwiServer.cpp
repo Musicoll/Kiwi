@@ -67,7 +67,7 @@ namespace kiwi
             
             std::cout << "- KiwiServer running on port " << getPort() << '\n';
             
-            run_loop.run();  // never returns
+            run_loop.run(); // never returns
         }
         
         bool Server::initBackendDirectory(char const* name)
@@ -79,30 +79,70 @@ namespace kiwi
         
         void Server::initService()
         {
-            metadata_t metadata;
+            ServiceProvider::metadata_t metadata;
             metadata["computer_name"] = juce::SystemStats::getComputerName().toStdString();
             
             juce::Array<juce::File> files;
             juce::String wild_card_pattern("*.kiwi");
             m_backend_files_path.findChildFiles(files, juce::File::findFiles, false, wild_card_pattern);
             
-            std::string files_str;
             if(!files.isEmpty())
             {
-                auto it = files.begin();
-                files_str += it->getFileNameWithoutExtension().toStdString();
+                juce::var var;
+                std::vector<juce::DynamicObject::Ptr> file_properties;
                 
-                for(;++it != files.end();)
+                for(auto file : files)
                 {
-                    files_str += ";" + it->getFileNameWithoutExtension().toStdString();
+                    juce::DynamicObject::Ptr file_prop = new juce::DynamicObject();
+                    
+                    file_prop->setProperty("name", file.getFileNameWithoutExtension());
+                    file_prop->setProperty("session_id", static_cast<long long>(m_files.size()));
+                    var.append(file_prop.get());
+                    file_properties.push_back(file_prop);
+                    
+                    m_files[m_files.size()] = file;
                 }
                 
-                metadata["backend_files_list"] = files_str;
+                std::string documents = juce::JSON::toString(var).toStdString();
                 
-                std::cout << "serving kiwi files : " << files_str << '\n';
+                file_properties.clear();
+                
+                metadata["backend_files_list"] = documents;
+                //std::cout << "serving kiwi files : " << documents << '\n';
             }
             
+            metadata["new_session_id"] = std::to_string(m_files.size()+1);
+            
             m_service.reset(new ServiceProvider(*this, metadata));
+        }
+        
+        void Server::updateMetadata()
+        {
+            if(!m_files.empty())
+            {
+                juce::var var;
+                std::vector<juce::DynamicObject::Ptr> file_properties;
+                
+                for(auto file_pair : m_files)
+                {
+                    juce::DynamicObject::Ptr file_prop = new juce::DynamicObject();
+                    
+                    const auto file = file_pair.second;
+                    
+                    file_prop->setProperty("name", file.getFileNameWithoutExtension());
+                    file_prop->setProperty("session_id", static_cast<long long>(file_pair.first));
+                    var.append(file_prop.get());
+                    file_properties.push_back(file_prop);
+                }
+                
+                std::string documents = juce::JSON::toString(var).toStdString();
+                
+                file_properties.clear();
+                
+                (*m_service)["backend_files_list"] = documents;
+                (*m_service)["new_session_id"] = std::to_string(m_files.size()+1);
+                m_service->update();
+            }
         }
         
         void Server::setSessionsBackendDirectory(std::string const& directory)
@@ -112,7 +152,19 @@ namespace kiwi
         
         juce::File Server::getSessionFile(uint64_t session_id)
         {
-            return m_backend_files_path.getChildFile(juce::String(session_id)).withFileExtension(kiwi_file_extension);
+            if(session_id < m_files.size())
+            {
+                return m_files[session_id];
+            }
+            else
+            {
+                juce::File file = m_backend_files_path.getChildFile("Document_" + juce::String(session_id))
+                .withFileExtension(kiwi_file_extension);
+                
+                m_files[session_id] = file;
+                
+                return file;
+            }
         }
         
         uint16_t Server::getPort() const noexcept
@@ -144,7 +196,7 @@ namespace kiwi
             
             // init default patcher here.
             model::Patcher& patcher = document.root<model::Patcher>();
-            patcher.setName("Untitled patcher");
+            patcher.setName("Document " + std::to_string(session_id));
         }
         
         flip::BackEndIR Server::readSessionBackend(uint64_t session_id)
@@ -163,12 +215,14 @@ namespace kiwi
                 backend.read(provider);
             }
             
+            updateMetadata();
+            
             return backend;
         }
         
         void Server::writeSessionBackend(uint64_t session_id, flip::BackEndIR const& backend)
         {
-            std::cout << "Saving session [ " << std::to_string(session_id) << " ]\n";
+            std::cout << "Saving session [ " << std::to_string(session_id) << " ]";
             
             const auto session_file = getSessionFile(session_id);
             
@@ -176,6 +230,8 @@ namespace kiwi
             {
                 session_file.create();
             }
+            
+            std::cout << " in file : " << session_file.getFileName() << "\n";
             
             flip::DataConsumerFile consumer(session_file.getFullPathName().toStdString().c_str());
             backend.write<flip::BackEndBinary>(consumer);

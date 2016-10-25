@@ -37,7 +37,7 @@ namespace kiwi
     //! @brief Class that encapsulate a TCP socket
     class CarrierSocket
     {
-    public:
+    public: // methods
         
         //! @brief Constructor
         CarrierSocket(flip::DocumentBase& document, std::string const& host, uint16_t port, uint64_t session_id);
@@ -72,7 +72,7 @@ namespace kiwi
         //! @brief Stops processing
         ~CarrierSocket();
         
-    private:
+    private: // methods
         
         //! @brief Function called on the processing thread
         void runProcess();
@@ -92,7 +92,7 @@ namespace kiwi
         //! @brief Called when receiving a signal
         void listenTransferSignal(size_t cur, size_t total);
         
-    private:
+    private: // members
         
         flip::CarrierTransportSocketTcp m_transport_socket;
         std::thread                     m_transport_loop;
@@ -102,7 +102,8 @@ namespace kiwi
         std::function<void(void)> m_func_connected;
         std::function<void(void)> m_func_loaded;
         
-    private:
+    private: // deleted methods
+        
         CarrierSocket(CarrierSocket const& other) = delete;
         CarrierSocket(CarrierSocket && other) = delete;
         CarrierSocket& operator=(CarrierSocket const& other) = delete;

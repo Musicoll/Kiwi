@@ -35,10 +35,11 @@ namespace kiwi
         //                                  PATCHER MANAGER                                 //
         // ================================================================================ //
         
-        ServiceProvider::ServiceProvider(Server& server, std::map<std::string, std::string> metadata) :
+        ServiceProvider::ServiceProvider(Server& server, metadata_t metadata) :
         m_server(server),
         m_service_document(model::DataModel::use(), 1, 'serv', 'serv'),
-        m_service_provider(new flip::MulticastServiceProvider(m_server.getPort(), m_service_document, metadata))
+        m_metadata(metadata),
+        m_service_provider(new flip::MulticastServiceProvider(m_server.getPort(), m_service_document, m_metadata))
         {
             ;
         }
@@ -48,18 +49,33 @@ namespace kiwi
             ;
         }
         
-        void ServiceProvider::setMetadata(std::map<std::string, std::string> metadata)
+        std::string const& ServiceProvider::operator[](std::string const& key) const
+        {
+            return m_metadata.at(key);
+        }
+        
+        std::string& ServiceProvider::operator[](std::string const& key)
+        {
+            return m_metadata.at(key);
+        }
+        
+        void ServiceProvider::update()
         {
             std::lock_guard<std::mutex> lock(m_mutex);
+            
             m_service_provider.reset(new flip::MulticastServiceProvider(m_server.getPort(),
                                                                         m_service_document,
-                                                                        metadata));
+                                                                        m_metadata));
         }
         
         void ServiceProvider::process()
         {
             std::lock_guard<std::mutex> lock(m_mutex);
-            m_service_provider->process();
+            
+            if(m_service_provider)
+            {
+                m_service_provider->process();
+            }
         }
     }
 }

@@ -40,10 +40,12 @@ namespace kiwi
         //! @brief The server Patcher manager.
         class ServiceProvider
         {
-        public:
+        public: // methods
+            
+            using metadata_t = std::map<std::string, std::string>;
             
             //! @brief Constructor.
-            ServiceProvider(Server& server, std::map<std::string, std::string> metadata);
+            ServiceProvider(Server& server, metadata_t metadata);
             
             //! @brief Destructor.
             ~ServiceProvider();
@@ -51,13 +53,21 @@ namespace kiwi
             //! @brief Process service
             void process();
             
-            //! Create a new multicast service provider with new metadata.
-            void setMetadata(std::map<std::string, std::string> metadata);
+            //! @brief Gets the metadata value for a given key.
+            std::string const& operator[](std::string const& key) const;
+            
+            //! @brief Gets the metadata value for a given key.
+            //! @details Call the update() method to take metadata modifications into account.
+            std::string& operator[](std::string const& key);
+            
+            //! @brief Recreate the multicast service provider with new metadata.
+            void update();
             
         private: // members
             
             Server&                         m_server;
             flip::Document                  m_service_document;
+            metadata_t                      m_metadata;
             std::unique_ptr<flip::MulticastServiceProvider>
                                             m_service_provider;
             std::mutex                      m_mutex;

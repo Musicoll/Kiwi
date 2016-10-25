@@ -30,6 +30,8 @@
 
 #include <juce_core/juce_core.h>
 
+#include <map>
+
 namespace kiwi
 {
     namespace server
@@ -90,17 +92,19 @@ namespace kiwi
             //! @brief Initialize the service.
             void initService();
             
-        private: // members
+            //! @brief Update the service metadata.
+            void updateMetadata();
             
-            using metadata_t = std::map<std::string, std::string>;
+        private: // members
             
             const uint16_t                      m_port;
             flip::ServerSimple                  m_server;
             std::unique_ptr<ServiceProvider>    m_service;
             
             juce::File                          m_backend_files_path;
+            std::map<uint64_t, juce::File>      m_files;
             
-            static const char* kiwi_file_extension;
+            static const char*  kiwi_file_extension;
             
         private: // deleted methods
             
