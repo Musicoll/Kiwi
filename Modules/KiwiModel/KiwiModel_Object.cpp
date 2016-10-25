@@ -196,27 +196,6 @@ namespace kiwi
             return m_inlets.count_if([](Inlet const&){return true;});
         }
         
-        size_t Object::getNumberOfInlets(PinType type) const
-        {
-            return m_inlets.count_if([type](Inlet const& inlet){return inlet.hasType(type);});
-        }
-        
-        size_t Object::getInletIndex(size_t index, PinType type) const
-        {
-            size_t index_type = -1;
-            
-            flip::Array<Inlet>::const_iterator end_loop = m_inlets.begin();
-            std::advance(end_loop, index + 1);
-            
-            for(auto it = m_inlets.begin(); it != end_loop; ++it)
-            {
-                if (it->hasType(type))
-                    ++index_type;
-            }
-            
-            return index_type;
-        }
-        
         bool Object::inletsChanged() const noexcept
         {
             return m_inlets.changed();
@@ -237,27 +216,6 @@ namespace kiwi
         size_t Object::getNumberOfOutlets() const
         {
             return m_outlets.count_if([](Outlet const&){return true;});
-        }
-        
-        size_t Object::getNumberOfOutlets(PinType type) const
-        {
-            return m_outlets.count_if([type](Outlet const& outlet){return outlet.getType() == type;});
-        }
-        
-        size_t Object::getOutletIndex(size_t index, PinType type) const
-        {   
-            size_t index_type = -1;
-            
-            flip::Array<Outlet>::const_iterator end_loop = m_outlets.begin();
-            std::advance(end_loop, index + 1);
-            
-            for(auto it = m_outlets.begin(); it != end_loop; ++it)
-            {
-                if (it->getType() == type)
-                    ++index_type;
-            }
-            
-            return index_type;
         }
         
         bool Object::outletsChanged() const noexcept

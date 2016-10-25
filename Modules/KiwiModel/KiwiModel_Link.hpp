@@ -60,14 +60,8 @@ namespace kiwi
             //! @brief Returns the sender outlet index.
             size_t getSenderIndex() const;
             
-            //! @brief Returns the sender outlet index among outlets of same type.
-            size_t getSenderIndex(PinType type) const;
-            
             //! @brief Returns the receiver inlet index.
             size_t getReceiverIndex() const;
-            
-            //! @brief Returns the sender inlet index among inlets of same type.
-            size_t getReceiverIndex(PinType type) const;
             
             //! Returns true if it is a signal link.
             bool isSignal() const;

@@ -258,8 +258,8 @@ namespace kiwi
                         std::shared_ptr<dsp::Processor> proc_from = std::dynamic_pointer_cast<AudioObject>(from);
                         std::shared_ptr<dsp::Processor> proc_to = std::dynamic_pointer_cast<AudioObject>(to);
                         
-                        m_chain.connect(*proc_from, link_m.getSenderIndex(model::PinType::IType::Signal),
-                                        *proc_to, link_m.getReceiverIndex(model::PinType::IType::Signal));
+                        m_chain.connect(*proc_from, link_m.getSenderIndex(),
+                                        *proc_to, link_m.getReceiverIndex());
                     }
                 }
             }
@@ -288,8 +288,8 @@ namespace kiwi
                 std::shared_ptr<dsp::Processor> proc_from = std::dynamic_pointer_cast<AudioObject>(from);
                 std::shared_ptr<dsp::Processor> proc_to = std::dynamic_pointer_cast<AudioObject>(to);
                 
-                m_chain.disconnect(*proc_from, link.getSenderIndex(model::PinType::IType::Signal),
-                                   *proc_to, link.getReceiverIndex(model::PinType::IType::Signal));
+                m_chain.disconnect(*proc_from, link.getSenderIndex(),
+                                   *proc_to, link.getReceiverIndex());
             }
         }
     }
