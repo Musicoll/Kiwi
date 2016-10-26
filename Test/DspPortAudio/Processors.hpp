@@ -39,13 +39,14 @@ public:
     Phasor(sample_t frequency) noexcept : Processor(0ul, 1ul), m_freq(frequency) {}
     ~Phasor() = default;
 private:
-    bool prepare(PrepareInfo& infos)
+    
+    void prepare(PrepareInfo const& infos) override final
     {
         m_sr = static_cast<sample_t>(infos.sample_rate);
-        return true;
+        setPerformCallBack(this, &Phasor::perform);
     }
     
-    void perform(Buffer const& /*input*/, Buffer& output) noexcept final
+    void perform(Buffer const& /*input*/, Buffer& output) noexcept
     {
         Signal& sig = output[0ul];
         sample_t* sig_data = sig.data();
@@ -89,14 +90,14 @@ public:
     
 private:
     
-    bool prepare(PrepareInfo& infos)
+    void prepare(PrepareInfo const& infos) override final
     {
         m_sr = static_cast<sample_t>(infos.sample_rate);
         setFrequency(m_freq);
-        return true;
+        setPerformCallBack(this, &Osc::perform);
     }
     
-    void perform(Buffer const& /*input*/, Buffer& output) noexcept final
+    void perform(Buffer const& /*input*/, Buffer& output) noexcept
     {
         Signal& sig = output[0ul];
         sample_t* sig_data = sig.data();
@@ -127,9 +128,15 @@ class Dac : public Processor
 public:
     Dac(Buffer& buffer) noexcept : Processor(2ul, 0ul), m_buffer(buffer) {}
     ~Dac() = default;
+    
 private:
     
-    void perform(Buffer const& input, Buffer&) noexcept final
+    void prepare(PrepareInfo const& infos) override final
+    {
+        setPerformCallBack(this, &Dac::perform);
+    }
+    
+    void perform(Buffer const& input, Buffer&) noexcept
     {
         m_buffer[0].copy(input[0]);
         m_buffer[1].copy(input[1]);

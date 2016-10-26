@@ -152,25 +152,7 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
     }
     
     SECTION("non-connected inlets and outlets share same signals")
-    {
-        class SharedSignalsChecker : public Processor
-        {
-        public:
-            SharedSignalsChecker() noexcept : Processor(3ul, 3ul) {}
-            ~SharedSignalsChecker()  noexcept {}
-            
-            Buffer const* m_input;
-            Buffer const* m_output;
-            
-        private:
-            
-            void perform(Buffer const& input, Buffer& output) noexcept final
-            {
-                m_input = &input;
-                m_output = &output;
-            }
-        };
-        
+    {   
         Chain chain;
         
         std::shared_ptr<Processor> sig_1(new Sig(1.));
@@ -523,6 +505,38 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
         int elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
         
         std::cout << "Duration fanning for 10000000 tick " << elapsed_time << "ms" << std::endl;
+        
+        chain.release();
+    }
+    
+    SECTION("Chain tick - performance conditional perform")
+    {
+        Chain chain;
+        
+        std::shared_ptr<Processor> cond(new CondPerform());
+        std::string result;
+        std::shared_ptr<Processor> print(new Print(result));
+        
+        chain.addProcessor(cond);
+        chain.addProcessor(print);
+        
+        chain.connect(*cond, 0, *print, 0);
+        
+        chain.prepare(1, 1);
+        
+        std::chrono::time_point<std::chrono::system_clock> start, end;
+        start = std::chrono::system_clock::now();
+        
+        for (int i = 0; i < 10000000; ++i)
+        {
+            chain.tick();
+        }
+        
+        end = std::chrono::system_clock::now();
+        
+        int elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+        
+        std::cout << "Duration conditional perform " << elapsed_time << "ms" << std::endl;
         
         chain.release();
     }

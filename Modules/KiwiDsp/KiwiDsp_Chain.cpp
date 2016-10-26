@@ -172,7 +172,9 @@ namespace kiwi
             //                           PREPARE PROCESSORS                             //
             // ======================================================================== //
             
-            return m_processor->prepare(prepare_info);;
+            m_processor->prepare(prepare_info);
+            
+            return m_processor->shouldPerform();
         }
         
         void Chain::Node::perform() noexcept

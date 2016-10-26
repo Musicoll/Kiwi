@@ -38,7 +38,13 @@ public:
     Sig(sample_t value) noexcept : Processor(0ul, 1ul), m_value(value) {}
     ~Sig() = default;
 private:
-    void perform(Buffer const& /*input*/, Buffer& output) noexcept final
+    
+    void prepare(PrepareInfo const& infos) override final
+    {
+        setPerformCallBack(this, &Sig::perform);
+    }
+    
+    void perform(Buffer const& /*input*/, Buffer& output)
     {
         output[0ul].fill(m_value);
     }
@@ -56,13 +62,13 @@ public:
     ~PlusScalar() = default;
 private:
     
-    bool prepare(PrepareInfo const& infos) override final
+    void prepare(PrepareInfo const& infos) override final
     {
         m_sig_value.reset(new Signal(infos.vector_size, m_value));
-        return true;
+        setPerformCallBack(this, &PlusScalar::perform);
     }
     
-    void perform(Buffer const& input, Buffer& output) noexcept final
+    void perform(Buffer const& input, Buffer& output) noexcept
     {
         Signal::add(input[0ul], *m_sig_value.get(), output[0ul]);
     }
@@ -80,16 +86,17 @@ class PlusSignal : public Processor
 public:
     PlusSignal() noexcept : Processor(2ul, 1ul) {}
     ~PlusSignal()  noexcept{}
+    
 private:
     
-    void perform(Buffer const& input, Buffer& output) noexcept final
+    void prepare(PrepareInfo const& infos) override final
     {
-        Signal::add(input[0ul], input[1ul], output[0ul]);
+        setPerformCallBack(this, &PlusSignal::perform);
     }
     
-    bool prepare(PrepareInfo const& infos) override final
+    void perform(Buffer const& input, Buffer& output) noexcept
     {
-        return true;
+        Signal::add(input[0ul], input[1ul], output[0ul]);
     }
 };
 
@@ -103,17 +110,20 @@ public:
     CopyThrow() noexcept : Processor(1ul, 0ul) {}
     ~CopyThrow()  noexcept{}
 private:
-    bool prepare(PrepareInfo const& infos) final
+    
+    void prepare(PrepareInfo const& infos) override final
     {
         if(infos.sample_rate != 44100ul || infos.vector_size != 64ul)
         {
             throw Error(std::string("CopyThrow wants a sample rate of 44100 and a vector size of 64."));
         }
-        
-        return true;
+        else
+        {
+            setPerformCallBack(this, &CopyThrow::perform);
+        }
     }
     
-    void perform(Buffer const& input, Buffer& output) noexcept final
+    void perform(Buffer const& input, Buffer& output) noexcept
     {
         output[0ul].add(input[0ul]);
         output[0ul].add(input[1ul]);
@@ -132,7 +142,12 @@ public:
     
 private:
     
-    void perform(Buffer const& input, Buffer&) noexcept final
+    void prepare(PrepareInfo const& infos) override final
+    {
+        setPerformCallBack(this, &Print::perform);
+    }
+    
+    void perform(Buffer const& input, Buffer&) noexcept
     {
         Signal const& sig = input[0];
         const size_t size = sig.size();
@@ -169,7 +184,12 @@ public:
     
 private:
     
-    void perform(Buffer const&, Buffer& output) noexcept final
+    void prepare(PrepareInfo const& infos) override final
+    {
+        setPerformCallBack(this, &Count::perform);
+    }
+    
+    void perform(Buffer const&, Buffer& output) noexcept
     {
         Signal& sig = output[0ul];
         sample_t* sig_data = sig.data();
@@ -195,7 +215,12 @@ public:
     
 private:
     
-    void perform(Buffer const&, Buffer& output) noexcept final
+    void prepare(PrepareInfo const& infos) override final
+    {
+        setPerformCallBack(this, &NullProcessor::perform);
+    }
+    
+    void perform(Buffer const&, Buffer& output) noexcept
     {
     }
 };
@@ -211,23 +236,82 @@ public:
     ~PlusScalarRemover() = default;
 private:
     
-    bool prepare(PrepareInfo const& info) override
+    void prepare(PrepareInfo const& info) override final
     {
         if (info.inputs[0])
         {
             m_signal_1.reset(new Signal(info.vector_size, 1.));
-            return true;
-        }
-        else
-        {
-            return false;
+            setPerformCallBack(this, &PlusScalarRemover::perform);
         }
     };
     
-    void perform(Buffer const& input, Buffer& output) noexcept override final
+    void perform(Buffer const& input, Buffer& output) noexcept
     {
         Signal::add(output[0ul], input[0ul], *m_signal_1);
     }
     
     std::unique_ptr<Signal> m_signal_1;
+};
+
+// ==================================================================================== //
+//                                     SHARED SIGNAL                                    //
+// ==================================================================================== //
+
+class SharedSignalsChecker : public Processor
+{
+public:
+    SharedSignalsChecker() noexcept : Processor(3ul, 3ul) {}
+    ~SharedSignalsChecker()  noexcept {}
+    
+    Buffer const* m_input;
+    Buffer const* m_output;
+    
+private:
+    
+    void prepare(PrepareInfo const& info) override final
+    {
+        setPerformCallBack(this, &SharedSignalsChecker::perform);
+    };
+    
+    void perform(Buffer const& input, Buffer& output) noexcept
+    {
+        m_input = &input;
+        m_output = &output;
+    }
+};
+
+// ==================================================================================== //
+//                                     CONDITIONAL PERFORM                              //
+// ==================================================================================== //
+
+class CondPerform : public Processor
+{
+public:
+    CondPerform() noexcept : Processor(2, 1) {}
+    
+    ~CondPerform() = default;
+    
+private:
+    
+    void perform1(Buffer const& input, Buffer& output) {output[0][0] = 1.; }
+    
+    void perform2(Buffer const& input, Buffer& output){ output[0][0] = 2.; }
+    
+    void perform0(Buffer const& input, Buffer& output){ output[0][0] = 0.; }
+    
+    void prepare(PrepareInfo const& infos) override final
+    {
+        if (infos.inputs[0])
+        {
+            setPerformCallBack(this, &CondPerform::perform1);
+        }
+        else if(infos.inputs[1])
+        {
+            setPerformCallBack(this, &CondPerform::perform2);
+        }
+        else
+        {
+            setPerformCallBack(this, &CondPerform::perform0);
+        }
+    }
 };

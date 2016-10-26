@@ -122,9 +122,9 @@ namespace kiwi
             
             void receive(size_t index, std::vector<Atom> const& args) override final;
             
-            void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept override final;
+            void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
             
-            bool prepare(dsp::Processor::PrepareInfo const& infos) override final;
+            void prepare(dsp::Processor::PrepareInfo const& infos) override final;
             
         private:
             engine::AudioControler& m_audio_controler;
@@ -142,9 +142,9 @@ namespace kiwi
             
             void receive(size_t index, std::vector<Atom> const& args) override;
             
-            void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept override final;
+            void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
             
-            bool prepare(dsp::Processor::PrepareInfo const& infos) override final;
+            void prepare(dsp::Processor::PrepareInfo const& infos) override final;
             
         private: // methods
             
@@ -174,19 +174,14 @@ namespace kiwi
             
             void receive(size_t index, std::vector<Atom> const& args) override;
             
-            void performValue(dsp::Buffer const& input, dsp::Buffer& output) const noexcept;
+            void performValue(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
             
-            void performVec(dsp::Buffer const& input, dsp::Buffer& output) const noexcept;
+            void performVec(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
             
-            void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept override final;
-            
-            bool prepare(dsp::Processor::PrepareInfo const& infos) override final;
+            void prepare(dsp::Processor::PrepareInfo const& infos) override final;
             
         private: // members
             
-            using perform_fn_t = std::function<void(dsp::Buffer const&, dsp::Buffer&)>;
-            
-            perform_fn_t    m_perform_fn;
             dsp::sample_t   m_value;
             bool            m_constant;
         };

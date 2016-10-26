@@ -194,9 +194,9 @@ namespace kiwi
             m_audio_controler.addSignal(input);
         }
         
-        bool DacTilde::prepare(dsp::Processor::PrepareInfo const& infos)
+        void DacTilde::prepare(dsp::Processor::PrepareInfo const& infos)
         {
-            return true;
+            setPerformCallBack(this, &DacTilde::perform);
         }
         
         // ================================================================================ //
@@ -241,10 +241,10 @@ namespace kiwi
             }
         }
         
-        bool OscTilde::prepare(PrepareInfo const& infos)
+        void OscTilde::prepare(PrepareInfo const& infos)
         {
             setSampleRate(static_cast<dsp::sample_t>(infos.sample_rate));
-            return true;
+            setPerformCallBack(this, &OscTilde::perform);
         }
         
         void OscTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
@@ -284,7 +284,7 @@ namespace kiwi
             }
         }
         
-        void TimesTilde::performValue(dsp::Buffer const& input, dsp::Buffer& output) const noexcept
+        void TimesTilde::performValue(dsp::Buffer const& input, dsp::Buffer& output) noexcept
         {
             dsp::Signal const& in = input[0];
             const size_t size = in.size();
@@ -306,7 +306,7 @@ namespace kiwi
             }
         }
         
-        void TimesTilde::performVec(dsp::Buffer const& input, dsp::Buffer& output) const noexcept
+        void TimesTilde::performVec(dsp::Buffer const& input, dsp::Buffer& output) noexcept
         {
             dsp::Signal const& in = input[0];
             const size_t size = in.size();
@@ -327,25 +327,16 @@ namespace kiwi
             }
         }
         
-        bool TimesTilde::prepare(PrepareInfo const& infos)
+        void TimesTilde::prepare(PrepareInfo const& infos)
         {
-            using namespace std::placeholders;
-            
             if (m_constant || (!m_constant && !infos.inputs[1]))
             {
-                m_perform_fn = std::bind(&TimesTilde::performValue, this, _1, _2);
+                setPerformCallBack(this, &TimesTilde::performValue);
             }
             else
             {
-                m_perform_fn = std::bind(&TimesTilde::performVec, this, _1, _2);
+                setPerformCallBack(this, &TimesTilde::performVec);
             }
-            
-            return true;
-        }
-        
-        void TimesTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
-        {
-            m_perform_fn(input, output);
         }
     }
 }
