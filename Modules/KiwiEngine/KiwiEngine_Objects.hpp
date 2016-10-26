@@ -142,11 +142,19 @@ namespace kiwi
             
             void receive(size_t index, std::vector<Atom> const& args) override;
             
-            void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            void performValue(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void performFreq(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void performPhase(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void performPaseAndFreq(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
             
             void prepare(dsp::Processor::PrepareInfo const& infos) override final;
             
         private: // methods
+            
+            dsp::sample_t computePhaseInc(dsp::sample_t const& freq, dsp::sample_t const& sr) noexcept;
             
             void setFrequency(dsp::sample_t const& freq) noexcept;
             

@@ -187,8 +187,8 @@ namespace kiwi
         
         OscTilde::OscTilde(std::string const& name, std::vector<Atom> const& args)
         {
-            pushInlet({PinType::IType::Control});
-            pushInlet({PinType::IType::Control});
+            pushInlet({PinType::IType::Control, PinType::IType::Signal});
+            pushInlet({PinType::IType::Control, PinType::IType::Signal});
          
             pushOutlet(PinType::IType::Signal);
         }
