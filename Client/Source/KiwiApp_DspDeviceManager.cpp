@@ -45,7 +45,7 @@ namespace kiwi
         juce::ScopedPointer<juce::XmlElement> data(createStateXml());
         getGlobalProperties().setValue("Audio Settings", data);
         
-        closeAudioDevice();
+        stopAudio();
     }
     
     void DspDeviceManager::add(dsp::Chain& chain)
@@ -54,7 +54,7 @@ namespace kiwi
         {
             juce::AudioIODevice* device = getCurrentAudioDevice();
             
-            if (device->isPlaying())
+            if (device && device->isPlaying())
             {
                 chain.prepare(device->getCurrentSampleRate(), device->getCurrentBufferSizeSamples());
             }
@@ -84,12 +84,10 @@ namespace kiwi
     void DspDeviceManager::startAudio()
     {
         addAudioCallback(this);
-        restartLastAudioDevice();
     }
     
     void DspDeviceManager::stopAudio()
     {
-        closeAudioDevice();
         removeAudioCallback(this);
     }
     
@@ -101,24 +99,6 @@ namespace kiwi
             for(int channel_index = 0; channel_index < m_output_matrix->getNumberOfChannels(); ++channel_index)
             {
                 (*m_output_matrix)[channel_index].add(output_buffer[channel_index]);
-            }
-        }
-    }
-    
-    void DspDeviceManager::close()
-    {
-        juce::AudioIODevice* device = getCurrentAudioDevice();
-        
-        if(device)
-        {
-            if(device->isPlaying())
-            {
-                device->stop();
-            }
-            
-            if(device->isOpen())
-            {
-                device->close();
             }
         }
     }

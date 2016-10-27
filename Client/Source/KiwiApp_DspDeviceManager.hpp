@@ -96,9 +96,6 @@ namespace kiwi
         //! @details Called at each dsp cycle.
         void tick() const noexcept;
         
-        //! @internal Close the dsp device.
-        void close();
-        
     private: // members
         
         std::unique_ptr<dsp::Buffer>                m_input_matrix;
