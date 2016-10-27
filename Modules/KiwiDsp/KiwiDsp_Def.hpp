@@ -50,7 +50,7 @@ namespace kiwi
         typedef double sample_t;
         #endif
         
-        const sample_t pi = M_PI;
+        const sample_t pi = 3.14159265358979323846264338327950288;
     }
 }
 
