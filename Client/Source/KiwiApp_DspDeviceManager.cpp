@@ -45,7 +45,7 @@ namespace kiwi
         juce::ScopedPointer<juce::XmlElement> data(createStateXml());
         getGlobalProperties().setValue("Audio Settings", data);
         
-        close();
+        closeAudioDevice();
     }
     
     void DspDeviceManager::add(dsp::Chain& chain)
@@ -83,16 +83,14 @@ namespace kiwi
     
     void DspDeviceManager::startAudio()
     {
-        juce::AudioIODevice* device = getCurrentAudioDevice();
-        
-        device->start(this);
+        addAudioCallback(this);
+        restartLastAudioDevice();
     }
     
     void DspDeviceManager::stopAudio()
     {
-        juce::AudioIODevice* device = getCurrentAudioDevice();
-        
-        device->stop();
+        closeAudioDevice();
+        removeAudioCallback(this);
     }
     
     void DspDeviceManager::addSignal(dsp::Buffer const& output_buffer)
