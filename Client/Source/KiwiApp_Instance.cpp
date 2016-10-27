@@ -62,11 +62,6 @@ namespace kiwi
         return m_user_id;
     }
     
-    void Instance::setUserId(uint64_t user_id)
-    {
-        m_user_id = user_id;
-    }
-    
     engine::Instance& Instance::useEngineInstance()
     {
         return *m_instance;
@@ -210,55 +205,6 @@ namespace kiwi
                 manager.newView();
             }
         }
-    }
-    
-    // ================================================================================ //
-    //                                 Settings Component                               //
-    // ================================================================================ //
-    
-    class SettingsPanel final : public juce::Component
-    {
-    public:
-        SettingsPanel(uint64_t user_id)
-        {
-            setSize(300, 100);
-            setVisible(true);
-            
-            addAndMakeVisible(m_user_id);
-            m_user_id.setBoundsRelative((1./5), (5./12), (3./5), (3./12));
-            m_user_id.setText(juce::String(user_id));
-        }
-      
-        ~SettingsPanel() = default;
-        
-        uint64_t getUserId() const
-        {
-            return m_user_id.getText().getFloatValue();
-        }
-        
-    private:
-        juce::TextEditor m_user_id;
-        
-    private:
-        SettingsPanel(SettingsPanel const & other) = delete;
-        SettingsPanel(SettingsPanel && other) = delete;
-        SettingsPanel& operator=(SettingsPanel const& other) = delete;
-        SettingsPanel& operator=(SettingsPanel && other) = delete;
-    };
-    
-    void Instance::showSettingsWindow()
-    {
-        SettingsPanel set_cmp(getUserId());
-        juce::OptionalScopedPointer<juce::Component> settings_component(&set_cmp, false);
-        
-        juce::DialogWindow::LaunchOptions option;
-        option.dialogTitle = juce::String("Settings");
-        option.content = settings_component;
-        option.resizable = false;
-        
-        option.runModal();
-        
-        setUserId(set_cmp.getUserId());
     }
     
     // ================================================================================ //
