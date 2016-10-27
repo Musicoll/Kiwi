@@ -24,12 +24,27 @@
 
 int main(int argc, const char * argv[])
 {
-    kiwi::model::DataModel::init();
+    using namespace kiwi;
     
-    kiwi::server::Server server(9090);
-    //server.setSessionsBackendDirectory("/sessions/");
+    model::DataModel::init();
     
-    server.run();
+    std::unique_ptr<server::Server> server(nullptr);
+    
+    try
+    {
+        server.reset(new server::Server(9090));
+    }
+    catch(std::runtime_error const& e)
+    {
+        std::cerr << "Server already running on this machine: \nerr: " << e.what() << "\n";
+        return 0;
+    }
+    
+    if(server)
+    {
+        //server->setSessionsBackendDirectory("/sessions/");
+        server->run();
+    }
     
     return 0;
 }
