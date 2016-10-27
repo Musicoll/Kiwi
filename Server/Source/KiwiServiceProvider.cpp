@@ -49,12 +49,12 @@ namespace kiwi
             ;
         }
         
-        std::string const& ServiceProvider::operator[](std::string const& key) const
+        void ServiceProvider::setMetadata(std::string const& key, std::string const& value)
         {
-            return m_metadata.at(key);
+            m_metadata[key] = value;
         }
         
-        std::string& ServiceProvider::operator[](std::string const& key)
+        std::string ServiceProvider::getMetadata(std::string const& key) const
         {
             return m_metadata.at(key);
         }

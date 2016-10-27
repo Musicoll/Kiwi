@@ -53,12 +53,12 @@ namespace kiwi
             //! @brief Process service
             void process();
             
-            //! @brief Gets the metadata value for a given key.
-            std::string const& operator[](std::string const& key) const;
+            //! @brief Set the metadata value for a given key.
+            //! @details Call the update() method to take metadata modifications into account.
+            void setMetadata(std::string const& key, std::string const& value);
             
             //! @brief Gets the metadata value for a given key.
-            //! @details Call the update() method to take metadata modifications into account.
-            std::string& operator[](std::string const& key);
+            std::string getMetadata(std::string const& key) const;
             
             //! @brief Recreate the multicast service provider with new metadata.
             void update();
