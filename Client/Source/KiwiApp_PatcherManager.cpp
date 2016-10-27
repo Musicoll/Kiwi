@@ -165,6 +165,7 @@ namespace kiwi
         {
             DocumentManager::save(patcher, current_save_file);
             m_need_saving_flag = false;
+            DocumentManager::commit(patcher);
             return true;
         }
         else
