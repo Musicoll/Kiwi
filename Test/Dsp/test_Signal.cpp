@@ -127,19 +127,44 @@ TEST_CASE("Dsp - Signal", "[Dsp, Signal]")
         }
     }
     
-    SECTION("Signal - add")
+    SECTION("Signal - add += signal")
     {
         const size_t size = 64;
-        Signal sig1(size, 0.5);
-        Signal sig2(size, 1.5);
-        Signal result(size, 0);
-        Signal::add(sig1, sig2, result);
+        
+        Signal sig1(size);
+        for (int i = 0; i < size; ++i)
+        {
+            sig1[i] = 4 * i;
+        }
+        
+        Signal sig2(size, 1.);
+        
         sig1.add(sig2);
+        
+        for(int j = 0; j < size; ++j)
+        {
+            CHECK(sig1[j] == 4 * j + 1.);
+        }
+    }
+    
+    SECTION("Signal - add +")
+    {
+        const size_t size = 64;
+        
+        Signal sig1(size);
+        for (int i = 0; i < size; ++i)
+        {
+            sig1[i] = 4 * i;
+        }
+        
+        Signal sig2(size, 1.);
+        Signal result(size, 0);
+        
+        Signal::add(sig1, sig2, result);
         
         for(int j = 0; j < result.size(); ++j)
         {
-            CHECK(result[j] == 2.);
-            CHECK(sig1[j] == 2.);
+            CHECK(result[j] == 4 * j + 1.);
         }
     }
 }
