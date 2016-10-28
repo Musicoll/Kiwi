@@ -2214,12 +2214,18 @@ namespace kiwi
     {
         for(model::Link* link : m_view_model.getSelectedLinks())
         {
-            m_patcher_model.removeLink(*link, &m_view_model);
+            if(link)
+            {
+                m_patcher_model.removeLink(*link, &m_view_model);
+            }
         }
         
         for(model::Object* object : m_view_model.getSelectedObjects())
         {
-            m_patcher_model.removeObject(*object, &m_view_model);
+            if(object)
+            {
+                m_patcher_model.removeObject(*object, &m_view_model);
+            }
         }
         
         DocumentManager::commit(m_patcher_model, "Delete objects and links");
