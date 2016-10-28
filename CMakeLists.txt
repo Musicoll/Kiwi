@@ -47,8 +47,9 @@ set(CMAKE_SUPPRESS_REGENERATION true)
 #--------------------------------------
 
 set(KIWI_ICON ${ROOT_DIR}/Config/Icon.icns)
+set(KIWI_PATCHER_FILETYPE_ICON ${ROOT_DIR}/Config/kiwi_filetype.icns)
 set(KIWI_PLIST ${ROOT_DIR}/Config/Info.plist)
-set_source_files_properties(${KIWI_ICON} ${KIWI_PLIST} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+set_source_files_properties(${KIWI_ICON} ${KIWI_PATCHER_FILETYPE_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
 #--------------------------------------
 # Flags
@@ -359,7 +360,7 @@ source_group_rec("${KIWI_ENGINE_SRC}" ${ROOT_DIR}/Modules/KiwiEngine)
 #----------------------------------
 
 file(GLOB_RECURSE KIWI_CLIENT_SRC ${ROOT_DIR}/Client/Source/*.[c|h]pp)
-add_executable(Kiwi ${KIWI_CLIENT_SRC} ${KIWI_ICON} ${KIWI_PLIST})
+add_executable(Kiwi ${KIWI_CLIENT_SRC} ${KIWI_ICON} ${KIWI_PATCHER_FILETYPE_ICON} ${KIWI_PLIST})
 target_add_dependency(Kiwi KiwiEngine)
 target_add_dependency(Kiwi KiwiModel)
 target_add_dependency(Kiwi KiwiDsp)
