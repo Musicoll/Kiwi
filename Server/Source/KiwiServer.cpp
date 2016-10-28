@@ -127,7 +127,7 @@ namespace kiwi
                 m_files[i] = files[i];
             }
             
-            m_service.reset(new ServiceProvider(*this, metadata));
+            m_service.reset(new ServiceProvider(m_port, metadata));
             updateMetadata();
         }
         

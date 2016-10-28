@@ -25,8 +25,6 @@
 
 #include <KiwiModel/KiwiModel_DataModel.hpp>
 
-#include "KiwiServer.hpp"
-
 namespace kiwi
 {
     namespace server
@@ -35,11 +33,11 @@ namespace kiwi
         //                                  PATCHER MANAGER                                 //
         // ================================================================================ //
         
-        ServiceProvider::ServiceProvider(Server& server, metadata_t metadata) :
-        m_server(server),
+        ServiceProvider::ServiceProvider(uint16_t port, metadata_t metadata) :
+        m_port(port),
         m_service_document(model::DataModel::use(), 1, 'serv', 'serv'),
         m_metadata(metadata),
-        m_service_provider(new flip::MulticastServiceProvider(m_server.getPort(), m_service_document, m_metadata))
+        m_service_provider(new flip::MulticastServiceProvider(m_port, m_service_document, m_metadata))
         {
             ;
         }
@@ -63,7 +61,7 @@ namespace kiwi
         {
             std::lock_guard<std::mutex> lock(m_mutex);
             
-            m_service_provider.reset(new flip::MulticastServiceProvider(m_server.getPort(),
+            m_service_provider.reset(new flip::MulticastServiceProvider(m_port,
                                                                         m_service_document,
                                                                         m_metadata));
         }
