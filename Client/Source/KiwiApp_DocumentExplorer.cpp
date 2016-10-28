@@ -50,10 +50,20 @@ namespace kiwi
         m_listeners.add(listener);
     }
     
-    //! @brief remove a listener.
     void DocumentExplorer::removeListener(Listener& listener)
     {
         m_listeners.remove(listener);
+    }
+    
+    std::string DocumentExplorer::getSessionMetadata(flip::MulticastServiceExplorer::Session const& session,
+                                                     std::string const& key,
+                                                     std::string const& notfound)
+    {
+        assert(!key.empty());
+        
+        auto const& metadata = session.metadata;
+        const auto it = metadata.find(key);
+        return (it != metadata.end()) ? it->second : notfound;
     }
     
     void DocumentExplorer::timerCallback()
@@ -129,14 +139,11 @@ namespace kiwi
     //                               DOCUMENT EXPLORER PANEL                            //
     // ================================================================================ //
     
-    DocumentExplorer::Panel::SessionItemButton::SessionItemButton(flip::MulticastServiceExplorer::Session && session) :
+    DocumentExplorer::Panel::SessionItemButton::SessionItemButton(flip::MulticastServiceExplorer::Session session) :
     juce::Button(""),
-    m_session(session)
+    m_session(std::move(session))
     {
-        auto const& metadata = session.metadata;
-        const auto it = metadata.find("name");
-        const std::string name = (it != metadata.end()) ? it->second : "Name error";
-        setButtonText(getMetadata("name"));
+        setButtonText(getMetadata("name", "no name"));
     }
     
     void DocumentExplorer::Panel::SessionItemButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool isButtonDown)
@@ -146,23 +153,20 @@ namespace kiwi
         const juce::Colour bgcolor = isMouseOverButton ? juce::Colour(0xFFE0CA3C) : juce::Colour(0xFF5A54C4);
         g.setColour(bgcolor);
         
-        g.fillRoundedRectangle(bounds.reduced(1).toFloat(), 5);
+        g.fillRoundedRectangle(bounds.reduced(1).toFloat(), 0);
         
         g.setColour(bgcolor.darker(0.8));
-        g.drawRoundedRectangle(bounds.reduced(1).toFloat(), 5, 1);
+        g.drawRoundedRectangle(bounds.reduced(1).toFloat(), 0, 1);
         
         const juce::Colour text_color = isMouseOverButton ? juce::Colour(0xFF000000) : juce::Colour(0xFFFFFFFF);
         g.setColour(text_color);
         g.drawFittedText(getButtonText(), bounds, juce::Justification::centred, 2);
     }
     
-    std::string DocumentExplorer::Panel::SessionItemButton::getMetadata(std::string const& key) const
+    std::string DocumentExplorer::Panel::SessionItemButton::getMetadata(std::string const& key,
+                                                                        std::string const& notfound) const
     {
-        assert(!key.empty());
-        
-        auto const& metadata = m_session.metadata;
-        const auto it = metadata.find(key);
-        return (it != metadata.end()) ? it->second : "";
+        return DocumentExplorer::getSessionMetadata(m_session, key, notfound);
     }
     
     uint16_t DocumentExplorer::Panel::SessionItemButton::getPort() const
@@ -192,6 +196,22 @@ namespace kiwi
         return host;
     }
     
+    uint64_t DocumentExplorer::Panel::SessionItemButton::getSessionId() const
+    {
+        uint64_t session_id = 12345;
+        
+        try
+        {
+            session_id = std::stoull(getMetadata("session_id"));
+        }
+        catch(std::exception const& e)
+        {
+            std::cerr << "fails to read session_id metadata, returns default value" << '\n';
+        }
+        
+        return session_id;
+    }
+    
     DocumentExplorer::Panel::Panel(DocumentExplorer& explorer, Instance& instance) :
     m_instance(instance),
     m_explorer(explorer)
@@ -208,17 +228,17 @@ namespace kiwi
     {
         const auto bounds = getLocalBounds();
         
-        const int padding = 10;
-        const int button_width = bounds.getWidth() - padding * 2;
+        const juce::Point<int> padding(10, 5);
+        const int button_width = bounds.getWidth() - padding.x * 2;
         const int button_height = 30;
-        juce::Point<int> last_top_left_pos(0, 0);
+        juce::Point<int> last_top_left_pos(padding.x, 30);
         
         for(auto& button_uptr : m_buttons)
         {
             juce::Rectangle<int> new_bounds
             {
-                last_top_left_pos.x + padding,
-                last_top_left_pos.y + padding,
+                padding.x,
+                last_top_left_pos.y + padding.y,
                 button_width, button_height
             };
             
@@ -230,18 +250,31 @@ namespace kiwi
     
     void DocumentExplorer::Panel::paint(juce::Graphics& g)
     {
-        g.setColour(juce::Colour(0xFF3F3B4E));
+        const juce::Colour color(0xFF3F3B4E);
+        
+        g.setColour(color);
         g.fillAll();
+        
+        g.setColour(color.brighter(0.1));
+        g.fillRoundedRectangle(getLocalBounds().reduced(8).toFloat(), 5);
+        
+        g.setColour(juce::Colours::whitesmoke);
+        g.drawFittedText("Server Host : " + m_hostname,
+                         getLocalBounds().reduced(12, 8).removeFromTop(22),
+                         juce::Justification::centredLeft, 1);
+        
+        g.setColour(color);
+        g.drawLine(0, 30, getWidth(), 30, 3);
     }
     
     void DocumentExplorer::Panel::buttonClicked(juce::Button* button)
     {        
-        const auto* session_item = dynamic_cast<SessionItemButton*>(button);
+        auto const* session_item = dynamic_cast<SessionItemButton*>(button);
         if(session_item)
         {
-            uint16_t port = session_item->getPort();
-            std::string host = session_item->getHost();
-            m_instance.openRemotePatcher(host, port);
+            m_instance.openRemotePatcher(session_item->getHost(),
+                                         session_item->getPort(),
+                                         session_item->getSessionId());
         }
     }
     
@@ -255,21 +288,57 @@ namespace kiwi
         
         removeAllChildren();
         m_buttons.clear();
+        m_hostname.clear();
         
         const auto bounds = getLocalBounds();
         
         int counter = 0;
-        for(auto && session : m_explorer.getSessionList())
+        for(auto session : m_explorer.getSessionList())
         {
-            auto button_it = m_buttons.emplace(m_buttons.end(), std::make_unique<SessionItemButton>(std::move(session)));
+            session.metadata["name"] = "new document";
+            session.metadata["session_id"] = getSessionMetadata(session, "new_session_id");
+            
+            auto button_it = m_buttons.emplace(m_buttons.end(), std::make_unique<SessionItemButton>(session));
             
             SessionItemButton& button = *button_it->get();
             button.addListener(this);
             
-            button.setBounds(10, 10, bounds.getWidth() - 20, 30);
+            button.setBounds(10, 10 + (counter*30), bounds.getWidth() - 20, 30);
             addAndMakeVisible(button);
-            
+            resized();
             counter++;
+            
+            juce::String files = getSessionMetadata(session, "backend_files_list");
+            juce::var json_files;
+            if(juce::JSON::parse(files, json_files).wasOk())
+            {
+                if(json_files.isArray())
+                {
+                    const auto files_array = json_files.getArray();
+                    for(int i = 0; i < files_array->size(); ++i)
+                    {
+                        if(files_array->getReference(i).isObject())
+                        {
+                            auto file_obj = files_array->getReference(i).getDynamicObject();
+                            
+                            session.metadata["name"] = file_obj->getProperty("name").toString().toStdString();
+                            session.metadata["session_id"] = file_obj->getProperty("session_id").toString().toStdString();;
+                            
+                            auto button_it = m_buttons.emplace(m_buttons.end(), std::make_unique<SessionItemButton>(session));
+                            
+                            SessionItemButton& button = *button_it->get();
+                            button.addListener(this);
+                            
+                            button.setBounds(10, 10 + (counter*30), bounds.getWidth() - 20, 30);
+                            addAndMakeVisible(button);
+                            resized();
+                            counter++;
+                        }
+                    }
+                }
+            }
+            
+            m_hostname = getSessionMetadata(session, "computer_name");
         }
     }
     

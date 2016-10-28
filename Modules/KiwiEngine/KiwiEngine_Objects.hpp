@@ -25,6 +25,8 @@
 #include "KiwiEngine_Object.hpp"
 #include "KiwiEngine_Beacon.hpp"
 
+#include "KiwiEngine_AudioControler.hpp"
+
 namespace kiwi
 {
     namespace engine
@@ -107,6 +109,91 @@ namespace kiwi
         private:
             std::string m_name;
         };
+        
+        // ================================================================================ //
+        //                                       DAC~                                       //
+        // ================================================================================ //
+        
+        class DacTilde : public AudioObject
+        {
+        public:
+            
+            DacTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const& args) override final;
+            
+            void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void prepare(dsp::Processor::PrepareInfo const& infos) override final;
+            
+        private:
+            engine::AudioControler& m_audio_controler;
+        };
+        
+        // ================================================================================ //
+        //                                       OSC~                                       //
+        // ================================================================================ //
+        
+        class OscTilde : public AudioObject
+        {
+        public: // methods
+            
+            OscTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const& args) override;
+            
+            void performValue(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void performFreq(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void performPhase(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void performPaseAndFreq(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void prepare(dsp::Processor::PrepareInfo const& infos) override final;
+            
+        private: // methods
+            
+            dsp::sample_t computePhaseInc(dsp::sample_t const& freq, dsp::sample_t const& sr) noexcept;
+            
+            void setFrequency(dsp::sample_t const& freq) noexcept;
+            
+            void setPhase(dsp::sample_t const& phase) noexcept;
+            
+            void setSampleRate(dsp::sample_t const& sample_rate);
+            
+        private: // members
+            
+            dsp::sample_t m_freq;
+            dsp::sample_t m_sr;
+            std::atomic<dsp::sample_t> m_phase;
+            std::atomic<dsp::sample_t> m_phase_inc;
+        };
+        
+        // ================================================================================ //
+        //                                       TIMES~                                       //
+        // ================================================================================ //
+        
+        class TimesTilde : public AudioObject
+        {
+        public: // methods
+            
+            TimesTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const& args) override;
+            
+            void performValue(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void performVec(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void prepare(dsp::Processor::PrepareInfo const& infos) override final;
+            
+        private: // members
+            
+            dsp::sample_t   m_value;
+            bool            m_constant;
+        };
+        
     }
 }
 

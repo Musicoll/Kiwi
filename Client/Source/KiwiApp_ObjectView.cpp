@@ -124,7 +124,10 @@ namespace kiwi
             std::string object_name = m_model->getName();
             if(object_name == "errorbox")
             {
-                g.drawFittedText(m_model->getText().c_str()+9,
+                std::string const& model_text = m_model->getText();
+                std::string draw_text =  model_text.substr(model_text.find(" ") + 1);
+                
+                g.drawFittedText(draw_text,
                                  box_bounds.reduced(5),
                                  juce::Justification::centredLeft, 1, 1.);
             }

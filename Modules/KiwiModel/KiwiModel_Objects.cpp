@@ -44,8 +44,7 @@ namespace kiwi
         
         NewBox::NewBox(std::string const& name, std::vector<Atom> const& args)
         {
-            setNumberOfInlets(1);
-            setNumberOfOutlets(0);
+            pushInlet({PinType::IType::Control});
         }
         
         // ================================================================================ //
@@ -65,18 +64,16 @@ namespace kiwi
         
         ErrorBox::ErrorBox(std::string const& name, std::vector<Atom> const& args)
         {
-            setNumberOfInlets(0);
-            setNumberOfOutlets(0);
         }
         
-        void ErrorBox::setNumberOfInlets(size_t inlets)
+        void ErrorBox::setInlets(flip::Array<Inlet> const& inlets)
         {
-            model::Object::setNumberOfInlets(inlets);
+            model::Object::setInlets(inlets);
         }
         
-        void ErrorBox::setNumberOfOutlets(size_t outlets)
+        void ErrorBox::setOutlets(flip::Array<Outlet> const& outlets)
         {
-            model::Object::setNumberOfOutlets(outlets);
+            model::Object::setOutlets(outlets);
         }
         
         // ================================================================================ //
@@ -96,16 +93,14 @@ namespace kiwi
         
         ObjectPlus::ObjectPlus(std::string const& name, std::vector<Atom> const& args)
         {
-            if(!args.empty() && args[0].isNumber())
+            pushInlet({PinType::IType::Control});
+            
+            if (args.empty() || !args[0].isNumber())
             {
-                setNumberOfInlets(1);
-            }
-            else
-            {
-                setNumberOfInlets(2);
+                pushInlet({PinType::IType::Control});
             }
             
-            setNumberOfOutlets(1);
+            pushOutlet(PinType::IType::Control);
         }
         
         // ================================================================================ //
@@ -114,7 +109,7 @@ namespace kiwi
         
         ObjectPrint::ObjectPrint(std::string const& name, std::vector<Atom> const& args)
         {
-            ;
+            pushInlet({PinType::IType::Control});
         }
         
         void ObjectPrint::declare()
@@ -134,8 +129,7 @@ namespace kiwi
         
         ObjectReceive::ObjectReceive(std::string const& name, std::vector<Atom> const& args)
         {
-            setNumberOfInlets(0);
-            setNumberOfOutlets(1);
+            pushOutlet(PinType::IType::Control);
         }
         
         void ObjectReceive::declare()
@@ -148,5 +142,94 @@ namespace kiwi
             
             Factory::add<ObjectReceive>("receive", {"r"});
         }
+        
+        // ================================================================================ //
+        //                                  OBJECT DAC~                                     //
+        // ================================================================================ //
+        
+        DacTilde::DacTilde(std::string const& name, std::vector<Atom> const& args)
+        {
+            size_t channels = 0;
+            
+            for(const Atom& atom : args)
+            {
+                if(atom.isNumber())
+                {
+                    channels++;
+                }
+            }
+            
+            if(channels == 0) channels = 2;
+            
+            pushInlet({PinType::IType::Signal, PinType::IType::Control});
+            
+            for (int i = 1; i < channels; ++i)
+            {
+                pushInlet({PinType::IType::Signal});
+            }
+        }
+        
+        void DacTilde::declare()
+        {
+            if(DataModel::has<DacTilde>()) return;
+            
+            DataModel::declare<DacTilde>()
+            .name("cicm.kiwi.DacTilde")
+            .inherit<model::Object>();
+            
+            Factory::add<DacTilde>("dac~");
+        }
+
+        
+        // ================================================================================ //
+        //                                  OBJECT OSC~                                     //
+        // ================================================================================ //
+        
+        OscTilde::OscTilde(std::string const& name, std::vector<Atom> const& args)
+        {
+            pushInlet({PinType::IType::Control, PinType::IType::Signal});
+            pushInlet({PinType::IType::Control, PinType::IType::Signal});
+         
+            pushOutlet(PinType::IType::Signal);
+        }
+        
+        void OscTilde::declare()
+        {
+            if(DataModel::has<OscTilde>()) return;
+            
+            DataModel::declare<OscTilde>()
+            .name("cicm.kiwi.OscTilde")
+            .inherit<model::Object>();
+
+            Factory::add<OscTilde>("osc~");
+        }
+        
+        // ================================================================================ //
+        //                                  OBJECT TIMES~                                   //
+        // ================================================================================ //
+        
+        TimesTilde::TimesTilde(std::string const& name, std::vector<Atom> const& args)
+        {
+            pushInlet({PinType::IType::Signal});
+            
+            if (args.empty() || !args[0].isNumber())
+            {
+                pushInlet({PinType::IType::Signal, PinType::IType::Control});
+            }
+            
+            pushOutlet(PinType::IType::Signal);
+        }
+        
+        void TimesTilde::declare()
+        {
+            if(DataModel::has<TimesTilde>()) return;
+            
+            DataModel::declare<TimesTilde>()
+            .name("cicm.kiwi.TimesTilde")
+            .inherit<model::Object>();
+            
+            Factory::add<TimesTilde>("times~", {"*~"});
+        }
+        
     }
 }

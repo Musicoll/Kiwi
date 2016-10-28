@@ -87,7 +87,8 @@ namespace kiwi
                     // define the mold make method
                     const mold_maker_fn_t mold_maker = [](model::Object const& object, flip::Mold& mold)
                     {
-                        mold.make(static_cast<TModel const&>(object), true);
+                        // make a mold with container_flag active
+                        mold.make(static_cast<TModel const&>(object), false);
                     };
                     
                     // define the mold cast method

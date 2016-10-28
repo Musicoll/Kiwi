@@ -49,6 +49,8 @@ namespace kiwi
         #else
         typedef double sample_t;
         #endif
+        
+        const sample_t pi = 3.14159265358979323846264338327950288;
     }
 }
 

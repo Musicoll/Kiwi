@@ -51,11 +51,13 @@ namespace kiwi
         
         size_t Link::getSenderIndex() const
         {
+            //return m_model.getSenderIndex(model::PinType::IType::Control);
             return m_model.getSenderIndex();
         }
         
         size_t Link::getReceiverIndex() const
         {
+            //return m_model.getReceiverIndex(model::PinType::IType::Control);
             return m_model.getReceiverIndex();
         }
     }

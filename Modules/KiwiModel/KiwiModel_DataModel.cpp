@@ -65,6 +65,9 @@ namespace kiwi
             ObjectPlus::declare();
             ObjectPrint::declare();
             ObjectReceive::declare();
+            DacTilde::declare();
+            OscTilde::declare();
+            TimesTilde::declare();
         }
     }
 }

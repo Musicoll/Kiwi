@@ -108,7 +108,12 @@ namespace kiwi
                             link_model.getReceiverIndex()           == inlet);
                 };
                 
-                return (std::find_if(m_links.begin(), m_links.end(), find_link) == m_links.cend());
+                // Check if inlets and outlets types are compatible
+                
+                if (std::find_if(m_links.begin(), m_links.end(), find_link) == m_links.cend())
+                {
+                    return to_it->getInlet(inlet).hasType(from_it->getOutlet(outlet).getType());
+                }
             }
             
             return false;

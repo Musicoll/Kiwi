@@ -148,9 +148,17 @@ namespace kiwi
         }
     }
     
+    bool LinkView::isSignal() const
+    {
+        return m_model->isSignal();
+    }
+    
     void LinkView::paint(juce::Graphics & g)
     {
-        const juce::Colour link_color = juce::Colour::fromFloatRGBA(0.2, 0.2, 0.2, 1.);
+        const juce::Colour link_color = isSignal() ?
+                                        juce::Colour::fromFloatRGBA(0.2, 0.8, 0.2, 1.) :
+                                        juce::Colour::fromFloatRGBA(0.2, 0.2, 0.2, 1.);
+        
         const juce::Colour selection_color = juce::Colour::fromFloatRGBA(0., 0.5, 1., 1.);
         const juce::Colour other_view_selected_color = juce::Colour::fromFloatRGBA(0.8, 0.3, 0.3, 1.);
         const juce::Colour distant_selected_color(0xAAFF9B71);

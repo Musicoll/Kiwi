@@ -22,8 +22,11 @@
 #ifndef KIWI_ENGINE_OBJECTS_HPP_INCLUDED
 #define KIWI_ENGINE_OBJECTS_HPP_INCLUDED
 
+#include <cmath>
+
 #include "KiwiEngine_Console.hpp"
 #include "KiwiEngine_Objects.hpp"
+#include "KiwiEngine_Patcher.hpp"
 
 namespace kiwi
 {
@@ -154,6 +157,251 @@ namespace kiwi
             if(!args.empty())
             {
                 send(0, args);
+            }
+        }
+        
+        // ================================================================================ //
+        //                                       DAC~                                       //
+        // ================================================================================ //
+        
+        DacTilde::DacTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        AudioObject(model, patcher),
+        m_audio_controler(patcher.getAudioControler())
+        {
+        }
+        
+        void DacTilde::receive(size_t, std::vector<Atom> const& args)
+        {
+            if(!args.empty())
+            {
+                if(args[0].isString())
+                {
+                    const std::string sym = args[0].getString();
+                    if(sym == "start")
+                    {
+                        m_audio_controler.startAudio();
+                    }
+                    else if(sym == "stop")
+                    {
+                        m_audio_controler.stopAudio();
+                    }
+                }
+            }
+        }
+        
+        void DacTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        {
+            m_audio_controler.addSignal(input);
+        }
+        
+        void DacTilde::prepare(dsp::Processor::PrepareInfo const& infos)
+        {
+            setPerformCallBack(this, &DacTilde::perform);
+        }
+        
+        // ================================================================================ //
+        //                                       OSC~                                       //
+        // ================================================================================ //
+        
+        OscTilde::OscTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        : AudioObject(model, patcher)
+        {
+            if (!args.empty() && args[0].isNumber())
+            {
+                m_freq = args[0].getFloat();
+            }
+        }
+        
+        dsp::sample_t OscTilde::computePhaseInc(dsp::sample_t const& freq, dsp::sample_t const& sr) noexcept
+        {
+            return (freq != 0.) ? (1./(sr/(freq))) : 0.;
+        }
+        
+        void OscTilde::setFrequency(dsp::sample_t const& freq) noexcept
+        {
+            m_freq = freq;
+            m_phase_inc = computePhaseInc(m_freq, m_sr);
+        }
+        
+        void OscTilde::setSampleRate(dsp::sample_t const& sample_rate)
+        {
+            m_sr = sample_rate;
+            m_phase_inc = computePhaseInc(m_freq, m_sr);
+        }
+        
+        void OscTilde::setPhase(dsp::sample_t const& phase) noexcept
+        {
+            m_phase = fmodf(phase, 1.);
+        }
+        
+        void OscTilde::receive(size_t index, std::vector<Atom> const& args)
+        {            
+            if (index == 0 && args[0].isNumber())
+            {
+                setFrequency(args[0].getFloat());
+            }
+            else if(index == 1 && args[0].isNumber())
+            {
+                setPhase(args[0].getFloat());
+            }
+        }
+        
+        void OscTilde::prepare(PrepareInfo const& infos)
+        {
+            setSampleRate(static_cast<dsp::sample_t>(infos.sample_rate));
+            
+            if (infos.inputs[0] && infos.inputs[1])
+            {
+                setPerformCallBack(this, &OscTilde::performPaseAndFreq);
+            }
+            else if(infos.inputs[0])
+            {
+                setPerformCallBack(this, &OscTilde::performFreq);
+            }
+            else if(infos.inputs[1])
+            {
+                setPerformCallBack(this, &OscTilde::performPhase);
+            }
+            else
+            {
+                setPerformCallBack(this, &OscTilde::performValue);
+            }
+        }
+        
+        void OscTilde::performValue(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        {
+            dsp::Signal& sig = output[0ul];
+            dsp::sample_t* sig_data = sig.data();
+            size_t framesize = sig.size();
+            
+            while(framesize--)
+            {
+                *sig_data++ = std::cos(m_phase * 2 * dsp::pi);
+                m_phase = m_phase + m_phase_inc;
+                m_phase = fmodf(m_phase, 1.);
+            }
+        }
+        
+        void OscTilde::performFreq(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        {
+            size_t sample_index = output[0].size();
+            dsp::sample_t* output_sig = output[0].data();
+            dsp::sample_t const* freq = input[0].data();
+            
+            while(sample_index--)
+            {
+                *output_sig++  = std::cos(m_phase * 2 * dsp::pi);
+                m_phase = m_phase + computePhaseInc(*freq++, m_sr);
+            }
+            
+            m_phase = fmodf(m_phase, 1.);
+        }
+        
+        void OscTilde::performPhase(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        {
+            size_t sample_index = output[0].size();
+            dsp::sample_t* output_sig = output[0].data();
+            dsp::sample_t const* phase = input[1].data();
+            
+            while(sample_index--)
+            {
+                m_phase = m_phase + m_phase_inc;
+                *output_sig++  = std::cos((m_phase + fmodf(*phase++, 1.)) * 2 * dsp::pi);
+            }
+        }
+        
+        void OscTilde::performPaseAndFreq(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        {
+            size_t sample_index = output[0].size();
+            dsp::sample_t* output_sig = output[0].data();
+            dsp::sample_t const* freq = input[0].data();
+            dsp::sample_t const* phase = input[1].data();
+            
+            while(sample_index--)
+            {
+                *output_sig++  = std::cos((m_phase + fmodf(*phase++, 1.)) * 2 * dsp::pi);
+                m_phase = m_phase + computePhaseInc(*freq++, m_sr);
+            }
+            
+            m_phase = fmodf(m_phase, 1.);
+        }
+        
+        // ================================================================================ //
+        //                                       TIMES~                                       //
+        // ================================================================================ //
+        
+        TimesTilde::TimesTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        : AudioObject(model, patcher),
+        m_value(0.),
+        m_constant(false)
+        {
+            if (!args.empty() && args[0].isNumber())
+            {
+                m_value = args[0].getFloat();
+                m_constant = true;
+            }
+        }
+        
+        void TimesTilde::receive(size_t index, std::vector<Atom> const& args)
+        {
+            if(index == 1 && args[0].isNumber())
+            {
+                m_value = args[0].getFloat();
+            }
+        }
+        
+        void TimesTilde::performValue(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        {
+            dsp::Signal const& in = input[0];
+            const size_t size = in.size();
+            dsp::sample_t const* in1 = in.data();
+            dsp::sample_t* out = output[0].data();
+            
+            dsp::sample_t const value = m_value;
+            
+            for(size_t i = size>>3; i; --i, in1 += 8, out += 8)
+            {
+                out[0] = in1[0] * value; out[1] = in1[1] * value;
+                out[2] = in1[2] * value; out[3] = in1[3] * value;
+                out[4] = in1[4] * value; out[5] = in1[5] * value;
+                out[6] = in1[6] * value; out[7] = in1[7] * value;
+            }
+            for(size_t i = size&7; i; --i, in1++, out++)
+            {
+                out[0] = in1[0] * value;
+            }
+        }
+        
+        void TimesTilde::performVec(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        {
+            dsp::Signal const& in = input[0];
+            const size_t size = in.size();
+            dsp::sample_t const* in1 = in.data();
+            dsp::sample_t const* in2 = input[1].data();
+            dsp::sample_t* out = output[0].data();
+            
+            for(size_t i = size>>3; i; --i, in1 += 8, in2 += 8, out += 8)
+            {
+                out[0] = in1[0] * in2[0]; out[1] = in1[1] * in2[1];
+                out[2] = in1[2] * in2[2]; out[3] = in1[3] * in2[3];
+                out[4] = in1[4] * in2[4]; out[5] = in1[5] * in2[5];
+                out[6] = in1[6] * in2[6]; out[7] = in1[7] * in2[7];
+            }
+            for(size_t i = size&7; i; --i, in1++, in2++, out++)
+            {
+                out[0] = in1[0] * in2[0];
+            }
+        }
+        
+        void TimesTilde::prepare(PrepareInfo const& infos)
+        {
+            if (m_constant || (!m_constant && !infos.inputs[1]))
+            {
+                setPerformCallBack(this, &TimesTilde::performValue);
+            }
+            else
+            {
+                setPerformCallBack(this, &TimesTilde::performVec);
             }
         }
     }

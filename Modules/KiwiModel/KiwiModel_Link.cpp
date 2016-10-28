@@ -73,11 +73,16 @@ namespace kiwi
             int64_t value = !removed() ? m_index_outlet.value() : m_index_outlet.before();
             return static_cast<size_t>(value);
         }
-
+        
         size_t Link::getReceiverIndex() const
         {
             int64_t value = !removed() ? m_index_inlet.value() : m_index_inlet.before();
             return static_cast<size_t>(value);
+        }
+        
+        bool Link::isSignal() const
+        {
+            return getSenderObject().getOutlet(getSenderIndex()).getType() == PinType(PinType::IType::Signal);
         }
     }
 }

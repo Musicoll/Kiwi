@@ -24,6 +24,7 @@
 #include "KiwiApp_Instance.hpp"
 #include "KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_PatcherView.hpp"
+#include "KiwiApp_DspDeviceManager.hpp"
 
 #include <cstdlib>
 #include <ctime>
@@ -38,7 +39,7 @@ namespace kiwi
     
     Instance::Instance() :
     m_user_id(flip::Ref::User::Offline),
-    m_instance(new engine::Instance()),
+    m_instance(new engine::Instance(std::make_unique<DspDeviceManager>())),
     m_console_history(std::make_shared<ConsoleHistory>(*m_instance)),
     m_console_window(new ConsoleWindow(m_console_history)),
     m_document_explorer(new DocumentExplorer()),
@@ -59,11 +60,6 @@ namespace kiwi
     uint64_t Instance::getUserId() const noexcept
     {
         return m_user_id;
-    }
-    
-    void Instance::setUserId(uint64_t user_id)
-    {
-        m_user_id = user_id;
     }
     
     engine::Instance& Instance::useEngineInstance()
@@ -186,13 +182,13 @@ namespace kiwi
         return success;
     }
     
-    void Instance::openRemotePatcher(std::string& host, uint16_t& port)
+    void Instance::openRemotePatcher(std::string const& host, uint16_t port, uint64_t session_id)
     {
         std::unique_ptr<PatcherManager> manager_uptr = nullptr;
         
         try
         {
-            manager_uptr.reset(new PatcherManager(*this, host, port));
+            manager_uptr.reset(new PatcherManager(*this, host, port, session_id));
         }
         catch(std::runtime_error &e)
         {
@@ -212,52 +208,26 @@ namespace kiwi
     }
     
     // ================================================================================ //
-    //                                 Settings Component                               //
+    //                                 Audio Settings                                   //
     // ================================================================================ //
     
-    class SettingsPanel final : public juce::Component
+    void Instance::showAudioSettingsWindow()
     {
-    public:
-        SettingsPanel(uint64_t user_id)
-        {
-            setSize(300, 100);
-            setVisible(true);
-            
-            addAndMakeVisible(m_user_id);
-            m_user_id.setBoundsRelative((1./5), (5./12), (3./5), (3./12));
-            m_user_id.setText(juce::String(user_id));
-        }
-      
-        ~SettingsPanel() = default;
+        DspDeviceManager& device_manager = dynamic_cast<DspDeviceManager&>(m_instance->getAudioControler());
+        juce::AudioDeviceSelectorComponent audio_settings(device_manager, 1, 20, 1, 20, false, false, false, true);
+        juce::OptionalScopedPointer<juce::Component> settings_component(&audio_settings, false);
         
-        uint64_t getUserId() const
-        {
-            return m_user_id.getText().getFloatValue();
-        }
+        settings_component->setTopLeftPosition(10, 10);
+        settings_component->setSize(300, 440);
+        settings_component->setVisible(true);
         
-    private:
-        juce::TextEditor m_user_id;
-        
-    private:
-        SettingsPanel(SettingsPanel const & other) = delete;
-        SettingsPanel(SettingsPanel && other) = delete;
-        SettingsPanel& operator=(SettingsPanel const& other) = delete;
-        SettingsPanel& operator=(SettingsPanel && other) = delete;
-    };
-    
-    void Instance::openSettings()
-    {
-        SettingsPanel set_cmp(getUserId());
-        juce::OptionalScopedPointer<juce::Component> settings_component(&set_cmp, false);
         
         juce::DialogWindow::LaunchOptions option;
-        option.dialogTitle = juce::String("Settings");
+        option.dialogTitle = juce::String("Audio Settings");
         option.content = settings_component;
-        option.resizable = false;
+        option.resizable = true;
         
         option.runModal();
-        
-        setUserId(set_cmp.getUserId());
     }
     
     Instance::PatcherManagers::iterator Instance::getPatcherManager(PatcherManager const& manager)

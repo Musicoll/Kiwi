@@ -77,10 +77,10 @@ namespace kiwi
         bool closeAllWindows();
         
         //! @brief Attempt to create a new patcher with given host and port parameters.
-        void openRemotePatcher(std::string& host, uint16_t& port);
+        void openRemotePatcher(std::string const& host, uint16_t port, uint64_t session_id);
         
-        //! @brief Opens the settings
-        void openSettings();
+        //! @brief Opens a juce native audio setting pannel.
+        void showAudioSettingsWindow();
         
         //! @brief Brings the Console to front.
         void showConsoleWindow();
@@ -103,9 +103,6 @@ namespace kiwi
         
         //! @brief Returns the next untitled number based on current documents
         size_t getNextUntitledNumberAndIncrement();
-        
-        //! @brief Sets the instance user id
-        void setUserId(uint64_t user_id);
         
     private: // members
         

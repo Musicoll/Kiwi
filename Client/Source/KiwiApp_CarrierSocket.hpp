@@ -34,13 +34,13 @@ namespace kiwi
     //                                  CARRIER SOCKET                                  //
     // ================================================================================ //
     
-    //! @biref Class that encapsulate a TCP socket
+    //! @brief Class that encapsulate a TCP socket
     class CarrierSocket
     {
-    public:
+    public: // methods
         
         //! @brief Constructor
-        CarrierSocket(flip::DocumentBase& document, std::string const& host, uint16_t port);
+        CarrierSocket(flip::DocumentBase& document, std::string const& host, uint16_t port, uint64_t session_id);
         
         // @brief Connects the socket to a remote socket
         void connect(std::string const& host, uint16_t port);
@@ -54,7 +54,7 @@ namespace kiwi
         //! @brief Starts a thread that continuously process the socket
         void startProcess();
         
-        //! @biref Process the socket once
+        //! @brief Process the socket once
         void process();
         
         //! @brief Stops the thread that processes the socket
@@ -72,7 +72,7 @@ namespace kiwi
         //! @brief Stops processing
         ~CarrierSocket();
         
-    private:
+    private: // methods
         
         //! @brief Function called on the processing thread
         void runProcess();
@@ -92,17 +92,18 @@ namespace kiwi
         //! @brief Called when receiving a signal
         void listenTransferSignal(size_t cur, size_t total);
         
-    private:
+    private: // members
         
         flip::CarrierTransportSocketTcp m_transport_socket;
         std::thread                     m_transport_loop;
         std::atomic_bool                m_transport_running;
         
-        std::function<void ()> m_func_disonnected;
-        std::function<void ()> m_func_connected;
-        std::function<void ()> m_func_loaded;
+        std::function<void(void)> m_func_disonnected;
+        std::function<void(void)> m_func_connected;
+        std::function<void(void)> m_func_loaded;
         
-    private:
+    private: // deleted methods
+        
         CarrierSocket(CarrierSocket const& other) = delete;
         CarrierSocket(CarrierSocket && other) = delete;
         CarrierSocket& operator=(CarrierSocket const& other) = delete;

@@ -72,7 +72,7 @@ namespace kiwi
         PatcherManager(Instance& instance, juce::File const& file);
 
         //! @brief Construct and connect to remote server
-        PatcherManager(Instance & instance, const std::string host, uint16_t port);
+        PatcherManager(Instance & instance, const std::string host, uint16_t port, uint64_t session_id);
         
         //! @brief Destructor.
         ~PatcherManager();

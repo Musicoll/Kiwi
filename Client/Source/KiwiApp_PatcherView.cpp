@@ -1153,7 +1153,12 @@ namespace kiwi
                         link_m.getReceiverIndex()           == inlet);
             };
             
-            return (std::find_if(m_links.begin(), m_links.end(), find_link) == m_links.cend());
+            // Check if inlets and outlets types are compatible
+            
+            if(std::find_if(m_links.begin(), m_links.end(), find_link) == m_links.cend())
+            {
+                return to.getInlet(inlet).hasType(from.getOutlet(outlet).getType());
+            }
         }
         
         return false;
@@ -1921,8 +1926,8 @@ namespace kiwi
             if(new_object_name == "errorbox")
             {
                 model::ErrorBox& error_box = dynamic_cast<model::ErrorBox&>(new_object_m);
-                error_box.setNumberOfInlets(old_object_m.getNumberOfInlets());
-                error_box.setNumberOfOutlets(old_object_m.getNumberOfOutlets());
+                error_box.setInlets(old_object_m.getInlets());
+                error_box.setOutlets(old_object_m.getOutlets());
             }
             
             // re-link object
