@@ -31,6 +31,7 @@
 #include <juce_core/juce_core.h>
 
 #include <map>
+#include <atomic>
 
 namespace kiwi
 {

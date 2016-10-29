@@ -236,7 +236,7 @@ namespace kiwi
         {
             // @todo do something here
             
-            DBG("[server] - Authenticate user : " << std::to_string(session_id));
+            DBG("[server] - Authenticate user: " << std::to_string(user_id) << " for session: " << std::to_string(session_id));
             
             return true;
         }
