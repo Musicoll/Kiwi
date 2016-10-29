@@ -22,8 +22,6 @@
 #ifndef KIWI_APP_INSTANCE_HPP_INCLUDED
 #define KIWI_APP_INSTANCE_HPP_INCLUDED
 
-#include <string>
-
 #include <KiwiEngine/KiwiEngine_Instance.hpp>
 
 #include "flip/Document.h"
@@ -33,6 +31,9 @@
 #include "KiwiApp_PatcherManager.hpp"
 #include "KiwiApp_StoredSettings.hpp"
 #include "KiwiApp_BeaconDispatcher.hpp"
+
+#include <KiwiServer.hpp>
+#include <thread>
 
 namespace kiwi
 {
@@ -109,11 +110,13 @@ namespace kiwi
         uint64_t m_user_id;
         
         std::unique_ptr<engine::Instance>           m_instance;
+        std::unique_ptr<server::Server>             m_server;
+        std::thread                                 m_server_thread;
         
-        PatcherManagers                            m_patcher_managers;
+        PatcherManagers                             m_patcher_managers;
         
         sConsoleHistory                             m_console_history;
-        std::unique_ptr<ConsoleWindow>             m_console_window;
+        std::unique_ptr<ConsoleWindow>              m_console_window;
         
         std::unique_ptr<DocumentExplorer>           m_document_explorer;
         std::unique_ptr<DocumentExplorerWindow>     m_document_explorer_window;

@@ -32,7 +32,7 @@ namespace kiwi
     
     DocumentExplorer::DocumentExplorer()
     {
-        startTimer(20);
+        startTimer(10);
     }
     
     DocumentExplorer::~DocumentExplorer()

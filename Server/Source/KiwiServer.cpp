@@ -39,7 +39,8 @@ namespace kiwi
         
         Server::Server(uint16_t port) :
         m_port(port),
-        m_server(model::DataModel::use(), m_port)
+        m_server(model::DataModel::use(), m_port),
+        m_running(false)
         {
             using namespace std::placeholders; // for _1, _2 etc.
             
@@ -60,14 +61,24 @@ namespace kiwi
         
         void Server::run()
         {
-            flip::RunLoopTimer run_loop ([this](){
-                process();
-                return true;
-            }, 0.1);
-            
-            std::cout << "- KiwiServer running on port " << getPort() << '\n';
-            
-            run_loop.run(); // never returns
+            if(!m_running)
+            {
+                flip::RunLoopTimer run_loop ([this](){
+                    process();
+                    return m_running.load();
+                }, 0.1);
+                
+                DBG("[server] - running on port " << getPort());
+                
+                m_running.store(true);
+                run_loop.run();
+            }
+        }
+        
+        void Server::stop()
+        {
+            m_running.store(false);
+            DBG("[server] - stopped");
         }
         
         uint64_t Server::getNewSessionId() const
@@ -171,14 +182,14 @@ namespace kiwi
         
         std::unique_ptr<flip::DocumentValidatorBase> Server::createValidator(uint64_t session_id)
         {
-            std::cout << "createValidator - session_id : " << std::to_string(session_id) << '\n';
+            DBG("[server] - createValidator for session_id : " << std::to_string(session_id));
             
             return std::make_unique<PatcherValidator>();
         }
         
         void Server::initEmptyDocument(uint64_t session_id, flip::DocumentBase& document)
         {
-            std::cout << "initEmptyDocument - session_id : " << std::to_string(session_id) << '\n';
+            DBG("[server] - initEmptyDocument for session_id : " << std::to_string(session_id));
             
             // init default patcher here.
             model::Patcher& patcher = document.root<model::Patcher>();
@@ -187,7 +198,7 @@ namespace kiwi
         
         flip::BackEndIR Server::readSessionBackend(uint64_t session_id)
         {
-            std::cout << "readSessionBackend - session_id : " << std::to_string(session_id) << '\n';
+            DBG("[server] - readSessionBackend for session_id : " << std::to_string(session_id));
             
             flip::BackEndIR backend;
             
@@ -208,8 +219,6 @@ namespace kiwi
         
         void Server::writeSessionBackend(uint64_t session_id, flip::BackEndIR const& backend)
         {
-            std::cout << "Saving session [ " << std::to_string(session_id) << " ]";
-            
             const auto session_file = getSessionFile(session_id);
             
             if(!session_file.exists())
@@ -217,7 +226,7 @@ namespace kiwi
                 session_file.create();
             }
             
-            std::cout << " in file : " << session_file.getFileName() << "\n";
+            DBG("[server] - Saving session : " << std::to_string(session_id) << " in file : " << session_file.getFileName());
             
             flip::DataConsumerFile consumer(session_file.getFullPathName().toStdString().c_str());
             backend.write<flip::BackEndBinary>(consumer);
@@ -227,7 +236,7 @@ namespace kiwi
         {
             // @todo do something here
             
-            std::cout << "Authenticate user [ " << std::to_string(user_id) << " ] \n";
+            DBG("[server] - Authenticate user : " << std::to_string(session_id));
             
             return true;
         }

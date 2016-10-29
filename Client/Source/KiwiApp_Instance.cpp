@@ -40,6 +40,7 @@ namespace kiwi
     Instance::Instance() :
     m_user_id(flip::Ref::User::Offline),
     m_instance(new engine::Instance(std::make_unique<DspDeviceManager>())),
+    m_server(nullptr),
     m_console_history(std::make_shared<ConsoleHistory>(*m_instance)),
     m_console_window(new ConsoleWindow(m_console_history)),
     m_document_explorer(new DocumentExplorer()),
@@ -49,12 +50,34 @@ namespace kiwi
     {
         std::srand(std::time(0));
         m_user_id = std::rand();
+        
+        // initialize and run server
+        try
+        {
+            m_server.reset(new server::Server(9090));
+        }
+        catch(std::runtime_error const& e)
+        {
+            m_server = nullptr;
+            std::cerr << "Server init failed: \nerr: " << e.what() << "\n";
+        }
+        
+        if(m_server)
+        {
+            m_server_thread = std::thread(&server::Server::run, m_server.get());
+        }
     }
     
     Instance::~Instance()
     {
         m_console_window.reset();
         m_patcher_managers.clear();
+        
+        if (m_server)
+        {
+            m_server->stop();
+            m_server_thread.join();
+        }
     }
     
     uint64_t Instance::getUserId() const noexcept
