@@ -83,10 +83,6 @@ namespace kiwi
         //! @brief Returns the Patcher model
         model::Patcher const& getPatcher() const;
         
-        //! @brief Initialize the patcher manager by creating a new document.
-        //! @return The newly created the Patcher model.
-        model::Patcher& init();
-        
         //! @brief Returns the number of patcher views.
         size_t getNumberOfView();
         

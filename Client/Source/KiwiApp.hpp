@@ -70,6 +70,9 @@ namespace kiwi
         //! @brief Get the current running application instance.
         static KiwiApp* getApp();
         
+        //! @brief Get the current running kiwi instance.
+        static Instance& useInstance();
+        
         //! @brief Get the current running engine instance.
         static engine::Instance& useEngineInstance();
         

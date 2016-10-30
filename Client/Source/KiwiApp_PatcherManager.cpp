@@ -25,7 +25,7 @@
 
 #include "KiwiApp.hpp"
 #include "KiwiApp_Instance.hpp"
-#include "KiwiApp_DocumentManager.hpp"
+#include "KiwiApp_Network/KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_PatcherManager.hpp"
 #include "KiwiApp_PatcherView.hpp"
 #include "KiwiApp_PatcherViewHelper.hpp"
@@ -100,14 +100,7 @@ namespace kiwi
     {
         model::Patcher& patcher = getPatcher();
         
-        try
-        {
-            DocumentManager::connect(patcher, host, port, session_id);
-        }
-        catch (std::runtime_error& e)
-        {
-            throw e;
-        }
+        DocumentManager::connect(patcher, host, port, session_id);
         
         patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
         DocumentManager::commit(patcher);

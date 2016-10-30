@@ -44,10 +44,10 @@ namespace kiwi
         //! @brief The Server class.
         class Server
         {
-        public:
+        public: // methods
             
             //! @brief Constructor.
-            Server(uint16_t port);
+            Server(uint16_t port, uint64_t user_id = flip::Ref::User::Server);
             
             //! @brief Destructor.
             ~Server();
@@ -60,6 +60,9 @@ namespace kiwi
             
             //! @brief Stops the server.
             void stop();
+            
+            //! @brief Returns true if the server is running.
+            bool isRunning() const noexcept;
             
             //! @brief Get the server running port
             uint16_t getPort() const noexcept;
@@ -105,6 +108,7 @@ namespace kiwi
         private: // members
             
             const uint16_t                      m_port;
+            uint64_t                            m_user_id;
             flip::ServerSimple                  m_server;
             std::unique_ptr<ServiceProvider>    m_service;
             std::atomic_bool                    m_running;

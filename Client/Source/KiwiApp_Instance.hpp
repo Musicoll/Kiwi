@@ -27,13 +27,12 @@
 #include "flip/Document.h"
 
 #include "KiwiApp_Console.hpp"
-#include "KiwiApp_DocumentExplorer.hpp"
+#include "KiwiApp_DocumentBrowserView.hpp"
 #include "KiwiApp_PatcherManager.hpp"
 #include "KiwiApp_StoredSettings.hpp"
 #include "KiwiApp_BeaconDispatcher.hpp"
 
-#include <KiwiServer.hpp>
-#include <thread>
+#include "KiwiApp_Network/KiwiApp_Server.hpp"
 
 namespace kiwi
 {
@@ -86,8 +85,8 @@ namespace kiwi
         //! @brief Brings the Console to front.
         void showConsoleWindow();
         
-        //! @brief Brings the DocumentExplorerWindow to front.
-        void showDocumentExplorerWindow();
+        //! @brief Brings the DocumentBrowserWindow to front.
+        void showDocumentBrowserWindow();
         
         //! @brief Brings the BeaconDispatcherWindow to front.
         void showBeaconDispatcherWindow();
@@ -107,20 +106,14 @@ namespace kiwi
         
     private: // members
         
-        uint64_t m_user_id;
-        
-        std::unique_ptr<engine::Instance>           m_instance;
-        std::unique_ptr<server::Server>             m_server;
-        std::thread                                 m_server_thread;
+        engine::Instance                            m_instance;
+        Server                                      m_server;
         
         PatcherManagers                             m_patcher_managers;
         
         sConsoleHistory                             m_console_history;
         std::unique_ptr<ConsoleWindow>              m_console_window;
-        
-        std::unique_ptr<DocumentExplorer>           m_document_explorer;
-        std::unique_ptr<DocumentExplorerWindow>     m_document_explorer_window;
-        
+        std::unique_ptr<DocumentBrowserWindow>      m_document_browser_window;
         std::unique_ptr<BeaconDispatcherWindow>     m_beacon_dispatcher_window;
         
         std::vector<uint8_t>                        m_patcher_clipboard;

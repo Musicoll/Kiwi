@@ -37,8 +37,9 @@ namespace kiwi
         
         const char* Server::kiwi_file_extension = "kiwi";
         
-        Server::Server(uint16_t port) :
+        Server::Server(uint16_t port, uint64_t user_id) :
         m_port(port),
+        m_user_id(user_id),
         m_server(model::DataModel::use(), m_port),
         m_running(false)
         {
@@ -81,6 +82,11 @@ namespace kiwi
             DBG("[server] - stopped");
         }
         
+        bool Server::isRunning() const noexcept
+        {
+            return m_running;
+        }
+        
         uint64_t Server::getNewSessionId() const
         {
             uint64_t new_session_id = 0;
@@ -120,6 +126,7 @@ namespace kiwi
                 m_service->setMetadata("backend_files_list", documents);
             }
             
+            m_service->setMetadata("user_id", std::to_string(m_user_id));
             m_service->setMetadata("new_session_id", std::to_string(getNewSessionId()));
             m_service->update();
         }
