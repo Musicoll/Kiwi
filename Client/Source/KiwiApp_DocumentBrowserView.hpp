@@ -188,7 +188,8 @@ namespace kiwi
     private: // members
         
         DocumentBrowser::Drive&                             m_drive;
-        std::vector<std::unique_ptr<DocumentSessionView>>   m_documents;
+        std::vector<std::unique_ptr<DocumentSessionView>>   m_documents = {};
+        std::unique_ptr<BrowserButton>                      m_create_document_btn = nullptr;
     };
 
     // ================================================================================ //

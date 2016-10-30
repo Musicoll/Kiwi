@@ -66,7 +66,7 @@ namespace kiwi
     
     void DocumentBrowserView::driveChanged(DocumentBrowser::Drive const& drive)
     {
-        // What can we do here ?
+        resized();
     }
     
     void DocumentBrowserView::resized()
@@ -96,7 +96,7 @@ namespace kiwi
     DocumentBrowserView::DriveView::BrowserButton::BrowserButton(juce::String const& button_text) :
     juce::Button(button_text)
     {
-        ;
+        setSize(30, 30);
     }
     
     void DocumentBrowserView::DriveView::BrowserButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool isButtonDown)
@@ -139,6 +139,7 @@ namespace kiwi
 
         m_open_btn.setCommand(std::bind(&DocumentBrowser::Drive::DocumentSession::open, m_document));
         m_open_btn.setSize(30, 20);
+        m_open_btn.setTooltip(m_open_btn.getButtonText() + " this patcher");
         addAndMakeVisible(m_open_btn);
     }
     
@@ -171,7 +172,7 @@ namespace kiwi
     {
         const auto bounds = getLocalBounds();
         const bool mouseover = isMouseOver();
-        const juce::Colour bg_color = juce::Colour(0xFFAAAAAA);
+        const juce::Colour bg_color = juce::Colour(0xDDFFFFFF);
         
         g.setColour(mouseover ? bg_color.brighter(0.1f) : bg_color);
         g.fillAll();
@@ -203,6 +204,15 @@ namespace kiwi
     DocumentBrowserView::DriveView::DriveView(DocumentBrowser::Drive& drive) :
     m_drive(drive)
     {
+        if(!m_drive.isRemote())
+        {
+            m_create_document_btn = std::make_unique<BrowserButton>("create");
+            m_create_document_btn->setCommand(std::bind(&DocumentBrowser::Drive::createNewDocument, &m_drive));
+            m_create_document_btn->setSize(35, 20);
+            m_create_document_btn->setTooltip("Create a new patcher on this drive");
+            addAndMakeVisible(m_create_document_btn.get());
+        }
+        
         for(auto const& document : m_drive.getDocuments())
         {
             documentAdded(document);
@@ -226,6 +236,11 @@ namespace kiwi
         for(auto& doc_view : m_documents)
         {
             doc_view->setSize(bounds.getWidth() - padding.x * 2, doc_view->getHeight());
+        }
+        
+        if(m_create_document_btn)
+        {
+            m_create_document_btn->setTopRightPosition(getWidth() - padding.x, 5);
         }
     }
     
@@ -291,6 +306,7 @@ namespace kiwi
             removeChildComponent((*doc_view_it).get());
             
             m_documents.erase(doc_view_it);
+            
             updateLayout();
         }
     }

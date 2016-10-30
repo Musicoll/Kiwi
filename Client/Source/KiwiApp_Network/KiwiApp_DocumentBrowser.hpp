@@ -143,6 +143,9 @@ namespace kiwi
         //! @brief Returns true if this is a remote drive.
         bool isRemote() const;
         
+        //! @brief Creates and opens a new document on this drive.
+        void createNewDocument() const;
+        
         //! @brief Returns the documents.
         std::list<DocumentSession> const& getDocuments() const;
         
@@ -164,6 +167,7 @@ namespace kiwi
         uint16_t                    m_port;
         std::string                 m_version;
         std::string                 m_hostname;
+        uint64_t                    m_new_session_id;
         bool                        m_is_remote;
         std::list<DocumentSession>  m_documents;
         engine::Listeners<Listener> m_listeners;

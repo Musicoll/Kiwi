@@ -205,6 +205,11 @@ namespace kiwi
         return m_is_remote;
     }
     
+    void DocumentBrowser::Drive::createNewDocument() const
+    {
+        KiwiApp::useInstance().openRemotePatcher(getHost(), getPort(), m_new_session_id);
+    }
+    
     std::list<DocumentBrowser::Drive::DocumentSession> const& DocumentBrowser::Drive::getDocuments() const
     {
         return m_documents;
@@ -228,6 +233,7 @@ namespace kiwi
         std::vector<DocumentSession> new_documents;
         
         m_hostname = DocumentBrowser::getSessionMetadata(session, "computer_name");
+        m_new_session_id = std::stoull(DocumentBrowser::getSessionMetadata(session, "new_session_id"));
 
         const juce::String files = DocumentBrowser::getSessionMetadata(session, "backend_files_list");
         juce::var json_files;
