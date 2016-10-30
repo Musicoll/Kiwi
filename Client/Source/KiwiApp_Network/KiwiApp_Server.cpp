@@ -20,6 +20,7 @@
  */
 
 #include "KiwiApp_Server.hpp"
+#include <ctime>
 
 namespace kiwi
 {
