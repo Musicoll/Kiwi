@@ -152,7 +152,8 @@ namespace kiwi
     m_ip(session.ip),
     m_port(session.port),
     m_version(session.version),
-    m_hostname(hostname)
+    m_hostname(hostname),
+    m_is_remote(m_hostname != juce::SystemStats::getComputerName().toStdString())
     {
         processSession(session);
     };
@@ -197,6 +198,11 @@ namespace kiwi
     std::string DocumentBrowser::Drive::getHostName() const
     {
         return m_hostname;
+    }
+    
+    bool DocumentBrowser::Drive::isRemote() const
+    {
+        return m_is_remote;
     }
     
     std::list<DocumentBrowser::Drive::DocumentSession> const& DocumentBrowser::Drive::getDocuments() const

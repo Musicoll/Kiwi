@@ -133,7 +133,7 @@ namespace kiwi
     
     DocumentBrowserView::DriveView::DocumentSessionView::DocumentSessionView(DocumentBrowser::Drive::DocumentSession const& document) :
     m_document(document),
-    m_open_btn("open")
+    m_open_btn(m_document.useDrive().isRemote() ? "join" : "open")
     {
         setRepaintsOnMouseActivity(true);
 

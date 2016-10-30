@@ -140,6 +140,9 @@ namespace kiwi
         //! @brief Returns the session hostname.
         std::string getHostName() const;
         
+        //! @brief Returns true if this is a remote drive.
+        bool isRemote() const;
+        
         //! @brief Returns the documents.
         std::list<DocumentSession> const& getDocuments() const;
         
@@ -161,6 +164,7 @@ namespace kiwi
         uint16_t                    m_port;
         std::string                 m_version;
         std::string                 m_hostname;
+        bool                        m_is_remote;
         std::list<DocumentSession>  m_documents;
         engine::Listeners<Listener> m_listeners;
         
