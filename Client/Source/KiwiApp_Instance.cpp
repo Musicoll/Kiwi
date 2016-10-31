@@ -182,7 +182,9 @@ namespace kiwi
         return success;
     }
     
-    void Instance::openRemotePatcher(std::string const& host, uint16_t port, uint64_t session_id)
+    PatcherManager* Instance::openRemotePatcher(std::string const& host,
+                                                uint16_t port,
+                                                uint64_t session_id)
     {
         std::unique_ptr<PatcherManager> manager_uptr = nullptr;
         
@@ -204,7 +206,11 @@ namespace kiwi
             {
                 manager.newView();
             }
+            
+            return manager_it->get();
         }
+        
+        return nullptr;
     }
     
     // ================================================================================ //

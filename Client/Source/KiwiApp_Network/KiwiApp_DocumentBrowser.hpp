@@ -29,7 +29,7 @@
 
 namespace kiwi
 {
-    class Instance;
+    class PatcherManager;
     
     // ================================================================================ //
     //                                 DOCUMENT BROWSER                                 //
@@ -208,6 +208,9 @@ namespace kiwi
         DocumentSession(DocumentBrowser::Drive const& parent, std::string name, uint64_t session_id);
         ~DocumentSession() = default;
         
+        //! @brief Tells the Kiwi instance to open up this document.
+        void open();
+        
         //! @brief Returns the document name
         std::string getName() const;
         
@@ -221,15 +224,13 @@ namespace kiwi
         //! @details this operator uses the session_id field to compare.
         bool operator==(DocumentSession const& other_doc) const;
         
-        //! @brief Opens the document.
-        void open() const;
-        
     private: // members
         
         DocumentBrowser::Drive const&       m_drive;
         std::string                         m_name;
         uint64_t                            m_session_id;
         //std::map<std::string, std::string>  m_metadata;
+        PatcherManager*                     m_patcher_manager = nullptr;
         
         friend class DocumentBrowser::Drive;
     };

@@ -299,6 +299,24 @@ namespace kiwi
         return false;
     }
     
+    void PatcherManager::bringsFirstViewToFront()
+    {
+        auto& patcher = getPatcher();
+        auto& user = *patcher.getUser(m_instance.getUserId());
+        auto& views = user.getViews();
+        
+        const auto view_it = views.begin();
+        
+        if(view_it != views.cend())
+        {
+            model::Patcher::View& view = *view_it;
+            if(view.entity().has<PatcherViewWindow>())
+            {
+                view.entity().use<PatcherViewWindow>().toFront(true);
+            }
+        }
+    }
+    
     void PatcherManager::document_changed(model::Patcher& patcher)
     {
         if(patcher.added())

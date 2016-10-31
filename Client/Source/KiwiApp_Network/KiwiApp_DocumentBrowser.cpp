@@ -232,10 +232,11 @@ namespace kiwi
         bool changed = false;
         std::vector<DocumentSession> new_documents;
         
-        m_hostname = DocumentBrowser::getSessionMetadata(session, "computer_name");
-        m_new_session_id = std::stoull(DocumentBrowser::getSessionMetadata(session, "new_session_id"));
+        const auto getMeta = &DocumentBrowser::getSessionMetadata;
+        
+        m_new_session_id = std::stoull(getMeta(session, "new_session_id", "12345"));
 
-        const juce::String files = DocumentBrowser::getSessionMetadata(session, "backend_files_list");
+        const juce::String files = getMeta(session, "backend_files_list", "");
         juce::var json_files;
         if(juce::JSON::parse(files, json_files).wasOk())
         {
@@ -334,14 +335,20 @@ namespace kiwi
     
     bool DocumentBrowser::Drive::DocumentSession::operator==(DocumentSession const& other_doc) const
     {
-        return (&m_drive == &other_doc.useDrive())
-        && (m_session_id == other_doc.m_session_id);
+        return (&m_drive == &other_doc.useDrive()) && (m_session_id == other_doc.m_session_id);
     }
     
-    void DocumentBrowser::Drive::DocumentSession::open() const
+    void DocumentBrowser::Drive::DocumentSession::open()
     {
-        KiwiApp::useInstance().openRemotePatcher(m_drive.getHost(),
-                                                 m_drive.getPort(),
-                                                 m_session_id);
+        if(m_patcher_manager != nullptr)
+        {
+            m_patcher_manager->bringsFirstViewToFront();
+        }
+        else
+        {
+            m_patcher_manager = KiwiApp::useInstance().openRemotePatcher(m_drive.getHost(),
+                                                                         m_drive.getPort(),
+                                                                         m_session_id);
+        }
     }
 }

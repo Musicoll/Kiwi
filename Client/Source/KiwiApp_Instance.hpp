@@ -77,7 +77,9 @@ namespace kiwi
         bool closeAllWindows();
         
         //! @brief Attempt to create a new patcher with given host and port parameters.
-        void openRemotePatcher(std::string const& host, uint16_t port, uint64_t session_id);
+        PatcherManager* openRemotePatcher(std::string const& host,
+                                          uint16_t port,
+                                          uint64_t session_id);
         
         //! @brief Opens a juce native audio setting pannel.
         void showAudioSettingsWindow();

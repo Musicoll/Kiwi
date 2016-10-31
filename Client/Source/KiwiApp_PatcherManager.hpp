@@ -89,6 +89,9 @@ namespace kiwi
         //! @brief create a new patcher view window.
         void newView();
         
+        //! @brief Brings the first patcher view to front.
+        void bringsFirstViewToFront();
+        
         //! @brief Force all windows to close without asking user to save document.
         void forceCloseAllWindows();
         
