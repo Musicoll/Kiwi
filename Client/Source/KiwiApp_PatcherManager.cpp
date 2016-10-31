@@ -108,7 +108,7 @@ namespace kiwi
     
     PatcherManager::~PatcherManager()
     {
-        ;
+        m_listeners.call(&Listener::patcherManagerRemoved, *this);
     }
     
     model::Patcher& PatcherManager::getPatcher()
@@ -147,6 +147,16 @@ namespace kiwi
     bool PatcherManager::needsSaving() const
     {
         return (!m_is_remote) && m_need_saving_flag;
+    }
+    
+    void PatcherManager::addListener(Listener& listener)
+    {
+        m_listeners.add(listener);
+    }
+    
+    void PatcherManager::removeListener(Listener& listener)
+    {
+        m_listeners.remove(listener);
     }
     
     bool PatcherManager::saveDocument()
@@ -302,8 +312,11 @@ namespace kiwi
     void PatcherManager::bringsFirstViewToFront()
     {
         auto& patcher = getPatcher();
-        auto& user = *patcher.getUser(m_instance.getUserId());
-        auto& views = user.getViews();
+        auto* user = patcher.getUser(m_instance.getUserId());
+        
+        if(user == nullptr) return; // abort
+            
+        auto& views = user->getViews();
         
         const auto view_it = views.begin();
         

@@ -63,7 +63,11 @@ namespace kiwi
     //! @details The Instance dispatch changes to all other DocumentObserver objects
     class PatcherManager : public flip::DocumentObserver<model::Patcher>
     {
-    public:
+    public: // nested classes
+        
+        struct Listener;
+        
+    public: // methods
         
         //! @brief Constructor.
         PatcherManager(Instance& instance);
@@ -100,7 +104,7 @@ namespace kiwi
         bool askAllWindowsToClose();
         
         //! @brief Close the window that contains a given patcherview.
-        //! @details if it's the last patcher view, it will ask the user the save the document before closing
+        //! @details if it's the last patcher view, it will ask the user the save the document before closing if needed.
         bool closePatcherViewWindow(PatcherView& patcherview);
         
         //! @brief Save the document.
@@ -108,6 +112,12 @@ namespace kiwi
         
         //! @brief Returns true if the patcher needs to be saved.
         bool needsSaving() const;
+        
+        //! @brief Add a listener.
+        void addListener(Listener& listener);
+        
+        //! @brief remove a listener.
+        void removeListener(Listener& listener);
         
     private:
         
@@ -142,6 +152,21 @@ namespace kiwi
         flip::Document  m_document;
         bool            m_need_saving_flag;
         bool            m_is_remote;
+        engine::Listeners<Listener> m_listeners;
+    };
+    
+    // ================================================================================ //
+    //                             PATCHER MANAGER LISTENER                             //
+    // ================================================================================ //
+    
+    //! @brief Listen to PatcherManager changes.
+    struct PatcherManager::Listener
+    {
+        //! @brief Destructor.
+        virtual ~Listener() = default;
+        
+        //! @brief Called when a document session has been added.
+        virtual void patcherManagerRemoved(PatcherManager const& manager) = 0;
     };
 }
 

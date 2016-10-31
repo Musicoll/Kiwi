@@ -318,6 +318,14 @@ namespace kiwi
         
     }
     
+    DocumentBrowser::Drive::DocumentSession::~DocumentSession()
+    {
+        if(m_patcher_manager)
+        {
+            m_patcher_manager->removeListener(*this);
+        }
+    }
+    
     std::string DocumentBrowser::Drive::DocumentSession::getName() const
     {
         return m_name;
@@ -331,6 +339,11 @@ namespace kiwi
     DocumentBrowser::Drive const& DocumentBrowser::Drive::DocumentSession::useDrive() const
     {
         return m_drive;
+    }
+    
+    void DocumentBrowser::Drive::DocumentSession::patcherManagerRemoved(PatcherManager const& manager)
+    {
+        m_patcher_manager = nullptr;
     }
     
     bool DocumentBrowser::Drive::DocumentSession::operator==(DocumentSession const& other_doc) const
@@ -349,6 +362,7 @@ namespace kiwi
             m_patcher_manager = KiwiApp::useInstance().openRemotePatcher(m_drive.getHost(),
                                                                          m_drive.getPort(),
                                                                          m_session_id);
+            m_patcher_manager->addListener(*this);
         }
     }
 }

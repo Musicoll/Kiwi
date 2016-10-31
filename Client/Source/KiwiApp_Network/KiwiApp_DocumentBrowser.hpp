@@ -27,9 +27,11 @@
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 
+#include "../KiwiApp_PatcherManager.hpp"
+
 namespace kiwi
 {
-    class PatcherManager;
+    //class PatcherManager;
     
     // ================================================================================ //
     //                                 DOCUMENT BROWSER                                 //
@@ -87,7 +89,7 @@ namespace kiwi
     };
     
     // ================================================================================ //
-    //                           DOCUMENT BROWSER LISTENER                           //
+    //                              DOCUMENT BROWSER LISTENER                           //
     // ================================================================================ //
     
     //! @brief Listen to document explorer changes.
@@ -181,7 +183,7 @@ namespace kiwi
     //                           DOCUMENT BROWSER LISTENER                           //
     // ================================================================================ //
     
-    //! @brief Listen to document explorer changes.
+    //! @brief Listen to document browser changes.
     struct DocumentBrowser::Drive::Listener
     {
         //! @brief Destructor.
@@ -201,12 +203,15 @@ namespace kiwi
     //                                  DRIVE DOCUMENT                                  //
     // ================================================================================ //
     
-    class DocumentBrowser::Drive::DocumentSession
+    class DocumentBrowser::Drive::DocumentSession : public PatcherManager::Listener
     {
     public: // methods
         
+        //! @brief Constructor.
         DocumentSession(DocumentBrowser::Drive const& parent, std::string name, uint64_t session_id);
-        ~DocumentSession() = default;
+        
+        //! @brief Destructor.
+        ~DocumentSession();
         
         //! @brief Tells the Kiwi instance to open up this document.
         void open();
@@ -219,6 +224,9 @@ namespace kiwi
         
         //! @brief Returns the drive that holds this document.
         DocumentBrowser::Drive const& useDrive() const;
+        
+        //! @brief Called when the PatcherManager is closed.
+        void patcherManagerRemoved(PatcherManager const& manager) override;
         
         //! @brief Returns true if the DocumentSession match another DocumentSession
         //! @details this operator uses the session_id field to compare.

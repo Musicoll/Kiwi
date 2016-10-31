@@ -30,7 +30,7 @@ namespace kiwi
     namespace server
     {
         // ================================================================================ //
-        //                                  PATCHER MANAGER                                 //
+        //                                 SERVICE PROVIDER                                 //
         // ================================================================================ //
         
         ServiceProvider::ServiceProvider(uint16_t port, metadata_t metadata) :
