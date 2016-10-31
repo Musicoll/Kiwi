@@ -109,15 +109,25 @@ namespace kiwi
         setContentOwned(new BeaconDispatcher(instance), false);
         setResizable(false, false);
         setResizeLimits(50, 50, 32000, 32000);
-        
-        setTopLeftPosition(10, 10);
         setSize(300, 100);
-        setVisible(true);
+        
+        const juce::String windowState(getGlobalProperties().getValue("beacon_dispatcher_window"));
+        
+        if(windowState.isNotEmpty())
+        {
+            restoreWindowStateFromString(windowState);
+        }
+        else
+        {
+            setTopLeftPosition(10, 10);
+            setSize(300, 100);
+            setVisible(true);
+        }
     }
     
     BeaconDispatcherWindow::~BeaconDispatcherWindow()
     {
-        ;
+        getGlobalProperties().setValue("beacon_dispatcher_window", getWindowStateAsString());
     }
     
     void BeaconDispatcherWindow::closeButtonPressed()
