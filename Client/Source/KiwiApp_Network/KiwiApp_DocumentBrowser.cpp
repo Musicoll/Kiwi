@@ -30,15 +30,7 @@ namespace kiwi
     
     DocumentBrowser::DocumentBrowser()
     {
-        try
-        {
-            m_explorer = std::make_unique<flip::MulticastServiceExplorer>();
-        }
-        catch(std::runtime_error const& e)
-        {
-            m_explorer = nullptr;
-            std::cerr << "fail to initialize the MulticastServiceExplorer (you may check your connection)\n";
-        }
+        ;
     }
     
     DocumentBrowser::~DocumentBrowser()
@@ -90,6 +82,19 @@ namespace kiwi
     
     void DocumentBrowser::timerCallback()
     {
+        if(m_explorer == nullptr)
+        {
+            try
+            {
+                m_explorer = std::make_unique<flip::MulticastServiceExplorer>();
+            }
+            catch(std::runtime_error const& e)
+            {
+                m_explorer = nullptr;
+                //std::cerr << "fail to initialize the MulticastServiceExplorer (you may check your connection)\n";
+            }
+        }
+        
         process();
     }
     
@@ -97,8 +102,8 @@ namespace kiwi
     {
         if(m_explorer == nullptr) return; // abort
         
-        auto& explorer = *m_explorer.get();
-        explorer.process();
+        m_explorer->process();
+        auto const& explorer = *m_explorer.get();
         
         std::vector<Drive*> drives_added;
         std::vector<Drive*> drives_changed;
