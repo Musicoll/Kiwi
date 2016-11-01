@@ -82,12 +82,28 @@ namespace kiwi
     
     void DocumentBrowser::timerCallback()
     {
+        if(m_explorer == nullptr)
+        {
+            try
+            {
+                m_explorer = std::make_unique<flip::MulticastServiceExplorer>();
+            }
+            catch(std::runtime_error const& e)
+            {
+                m_explorer = nullptr;
+                //std::cerr << "fail to initialize the MulticastServiceExplorer (you may check your connection)\n";
+            }
+        }
+        
         process();
     }
     
     void DocumentBrowser::process()
     {
-        m_explorer.process();
+        if(m_explorer == nullptr) return; // abort
+        
+        m_explorer->process();
+        auto const& explorer = *m_explorer.get();
         
         std::vector<Drive*> drives_added;
         std::vector<Drive*> drives_changed;
@@ -97,14 +113,14 @@ namespace kiwi
         for(auto const& drive_pair : m_drives)
         {
             Drive& drive = *drive_pair.second.get();
-            if(std::find(m_explorer.begin(), m_explorer.end(), drive) == m_explorer.end())
+            if(std::find(explorer.begin(), explorer.end(), drive) == explorer.end())
             {
                 drives_removed.emplace_back(&drive);
             }
         }
         
         // find and store new drives
-        for(auto const& session : m_explorer)
+        for(auto const& session : explorer)
         {
             const std::string hostname = getSessionMetadata(session, "computer_name");
             if(!m_drives.count(hostname))

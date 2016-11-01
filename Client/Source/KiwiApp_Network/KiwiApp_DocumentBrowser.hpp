@@ -83,9 +83,9 @@ namespace kiwi
         
     private: // members
         
-        flip::MulticastServiceExplorer                  m_explorer;
-        std::map<std::string, std::unique_ptr<Drive>>   m_drives;
-        engine::Listeners<Listener>                     m_listeners;
+        std::unique_ptr<flip::MulticastServiceExplorer> m_explorer = nullptr;
+        std::map<std::string, std::unique_ptr<Drive>>   m_drives = {};
+        engine::Listeners<Listener>                     m_listeners = {};
     };
     
     // ================================================================================ //
