@@ -170,6 +170,11 @@ namespace kiwi
         return KiwiApp::use().m_instance->useEngineInstance();
     }
     
+    Instance& KiwiApp::useInstance()
+    {
+        return *KiwiApp::use().m_instance.get();
+    }
+    
     uint64_t KiwiApp::userID()
     {
         return KiwiApp::use().m_instance->getUserId();
@@ -369,7 +374,7 @@ namespace kiwi
         menu.addCommandItem(m_command_manager.get(), CommandIDs::showConsoleWindow);
         menu.addSeparator();
         
-        menu.addCommandItem(m_command_manager.get(), CommandIDs::showDocumentExplorerWindow);
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::showDocumentBrowserWindow);
         menu.addCommandItem(m_command_manager.get(), CommandIDs::showBeaconDispatcherWindow);
     }
     
@@ -395,7 +400,7 @@ namespace kiwi
             CommandIDs::openFile,
             CommandIDs::showConsoleWindow,
             CommandIDs::showAudioStatusWindow,
-            CommandIDs::showDocumentExplorerWindow,
+            CommandIDs::showDocumentBrowserWindow,
             CommandIDs::showBeaconDispatcherWindow
         };
         
@@ -437,9 +442,9 @@ namespace kiwi
                 
                 break;
             }
-            case CommandIDs::showDocumentExplorerWindow:
+            case CommandIDs::showDocumentBrowserWindow:
             {
-                result.setInfo(TRANS("Show Document Explorer panel"), TRANS("Show Document Explorer panel"),
+                result.setInfo(TRANS("Show Document Browser panel"), TRANS("Show Document Browser panel"),
                                CommandCategories::windows, 0);
                 
                 break;
@@ -466,7 +471,7 @@ namespace kiwi
             case CommandIDs::openFile :                     { m_instance->askUserToOpenPatcherDocument(); break; }
             case CommandIDs::showConsoleWindow :            { m_instance->showConsoleWindow(); break; }
             case CommandIDs::showAudioStatusWindow :        { m_instance->showAudioSettingsWindow(); break; }
-            case CommandIDs::showDocumentExplorerWindow :   { m_instance->showDocumentExplorerWindow(); break; }
+            case CommandIDs::showDocumentBrowserWindow :   { m_instance->showDocumentBrowserWindow(); break; }
             case CommandIDs::showBeaconDispatcherWindow :   { m_instance->showBeaconDispatcherWindow(); break; }
             
             default : return JUCEApplication::perform(info);

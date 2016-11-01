@@ -31,10 +31,8 @@ namespace kiwi
 {
     namespace server
     {
-        class Server;
-        
         // ================================================================================ //
-        //                                  PATCHER MANAGER                                 //
+        //                                 SERVICE PROVIDER                                 //
         // ================================================================================ //
         
         //! @brief The server Patcher manager.
@@ -45,7 +43,7 @@ namespace kiwi
             using metadata_t = std::map<std::string, std::string>;
             
             //! @brief Constructor.
-            ServiceProvider(Server& server, metadata_t metadata);
+            ServiceProvider(uint16_t port, metadata_t metadata);
             
             //! @brief Destructor.
             ~ServiceProvider();
@@ -65,7 +63,7 @@ namespace kiwi
             
         private: // members
             
-            Server&                         m_server;
+            uint16_t                        m_port;
             flip::Document                  m_service_document;
             metadata_t                      m_metadata;
             std::unique_ptr<flip::MulticastServiceProvider>

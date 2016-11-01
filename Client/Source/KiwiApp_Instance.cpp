@@ -22,9 +22,10 @@
 
 #include "KiwiApp.hpp"
 #include "KiwiApp_Instance.hpp"
-#include "KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_PatcherView.hpp"
 #include "KiwiApp_DspDeviceManager.hpp"
+
+#include "KiwiApp_Network/KiwiApp_DocumentManager.hpp"
 
 #include <cstdlib>
 #include <ctime>
@@ -38,38 +39,37 @@ namespace kiwi
     size_t Instance::m_untitled_patcher_index(0);
     
     Instance::Instance() :
-    m_user_id(flip::Ref::User::Offline),
-    m_instance(new engine::Instance(std::make_unique<DspDeviceManager>())),
-    m_console_history(std::make_shared<ConsoleHistory>(*m_instance)),
+    m_instance(std::make_unique<DspDeviceManager>()),
+    m_server(9090),
+    m_console_history(std::make_shared<ConsoleHistory>(m_instance)),
     m_console_window(new ConsoleWindow(m_console_history)),
-    m_document_explorer(new DocumentExplorer()),
-    m_document_explorer_window(new DocumentExplorerWindow(*m_document_explorer, *this)),
-    m_beacon_dispatcher_window(new BeaconDispatcherWindow(*m_instance)),
+    m_document_browser_window(new DocumentBrowserWindow(m_server.getBrowser())),
+    m_beacon_dispatcher_window(new BeaconDispatcherWindow(m_instance)),
     m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
     {
-        std::srand(std::time(0));
-        m_user_id = std::rand();
+        m_server.run();
     }
     
     Instance::~Instance()
     {
         m_console_window.reset();
         m_patcher_managers.clear();
+        m_server.stop();
     }
     
     uint64_t Instance::getUserId() const noexcept
     {
-        return m_user_id;
+        return m_server.getUserId();
     }
     
     engine::Instance& Instance::useEngineInstance()
     {
-        return *m_instance;
+        return m_instance;
     }
     
     engine::Instance const& Instance::getEngineInstance() const
     {
-        return *m_instance;
+        return m_instance;
     }
     
     void Instance::newPatcher()
@@ -182,7 +182,9 @@ namespace kiwi
         return success;
     }
     
-    void Instance::openRemotePatcher(std::string const& host, uint16_t port, uint64_t session_id)
+    PatcherManager* Instance::openRemotePatcher(std::string const& host,
+                                                uint16_t port,
+                                                uint64_t session_id)
     {
         std::unique_ptr<PatcherManager> manager_uptr = nullptr;
         
@@ -204,7 +206,11 @@ namespace kiwi
             {
                 manager.newView();
             }
+            
+            return manager_it->get();
         }
+        
+        return nullptr;
     }
     
     // ================================================================================ //
@@ -213,7 +219,7 @@ namespace kiwi
     
     void Instance::showAudioSettingsWindow()
     {
-        DspDeviceManager& device_manager = dynamic_cast<DspDeviceManager&>(m_instance->getAudioControler());
+        DspDeviceManager& device_manager = dynamic_cast<DspDeviceManager&>(m_instance.getAudioControler());
         juce::AudioDeviceSelectorComponent audio_settings(device_manager, 1, 20, 1, 20, false, false, false, true);
         juce::OptionalScopedPointer<juce::Component> settings_component(&audio_settings, false);
         
@@ -246,10 +252,10 @@ namespace kiwi
         m_console_window->toFront(true);
     }
     
-    void Instance::showDocumentExplorerWindow()
+    void Instance::showDocumentBrowserWindow()
     {
-        m_document_explorer_window->setVisible(true);
-        m_document_explorer_window->toFront(true);
+        m_document_browser_window->setVisible(true);
+        m_document_browser_window->toFront(true);
     }
     
     void Instance::showBeaconDispatcherWindow()

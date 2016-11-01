@@ -25,7 +25,7 @@
 
 #include "KiwiApp.hpp"
 #include "KiwiApp_Instance.hpp"
-#include "KiwiApp_DocumentManager.hpp"
+#include "KiwiApp_Network/KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_PatcherManager.hpp"
 #include "KiwiApp_PatcherView.hpp"
 #include "KiwiApp_PatcherViewHelper.hpp"
@@ -100,14 +100,7 @@ namespace kiwi
     {
         model::Patcher& patcher = getPatcher();
         
-        try
-        {
-            DocumentManager::connect(patcher, host, port, session_id);
-        }
-        catch (std::runtime_error& e)
-        {
-            throw e;
-        }
+        DocumentManager::connect(patcher, host, port, session_id);
         
         patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
         DocumentManager::commit(patcher);
@@ -115,7 +108,7 @@ namespace kiwi
     
     PatcherManager::~PatcherManager()
     {
-        ;
+        m_listeners.call(&Listener::patcherManagerRemoved, *this);
     }
     
     model::Patcher& PatcherManager::getPatcher()
@@ -154,6 +147,16 @@ namespace kiwi
     bool PatcherManager::needsSaving() const
     {
         return (!m_is_remote) && m_need_saving_flag;
+    }
+    
+    void PatcherManager::addListener(Listener& listener)
+    {
+        m_listeners.add(listener);
+    }
+    
+    void PatcherManager::removeListener(Listener& listener)
+    {
+        m_listeners.remove(listener);
     }
     
     bool PatcherManager::saveDocument()
@@ -304,6 +307,27 @@ namespace kiwi
         }
         
         return false;
+    }
+    
+    void PatcherManager::bringsFirstViewToFront()
+    {
+        auto& patcher = getPatcher();
+        auto* user = patcher.getUser(m_instance.getUserId());
+        
+        if(user == nullptr) return; // abort
+            
+        auto& views = user->getViews();
+        
+        const auto view_it = views.begin();
+        
+        if(view_it != views.cend())
+        {
+            model::Patcher::View& view = *view_it;
+            if(view.entity().has<PatcherViewWindow>())
+            {
+                view.entity().use<PatcherViewWindow>().toFront(true);
+            }
+        }
     }
     
     void PatcherManager::document_changed(model::Patcher& patcher)

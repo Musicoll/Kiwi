@@ -356,26 +356,6 @@ set_target_properties(KiwiEngine PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_ENGINE_SRC}" ${ROOT_DIR}/Modules/KiwiEngine)
 
 #----------------------------------
-# Client
-#----------------------------------
-
-file(GLOB_RECURSE KIWI_CLIENT_SRC ${ROOT_DIR}/Client/Source/*.[c|h]pp)
-add_executable(Kiwi ${KIWI_CLIENT_SRC} ${KIWI_ICON} ${KIWI_PATCHER_FILETYPE_ICON} ${KIWI_PLIST})
-target_add_dependency(Kiwi KiwiEngine)
-target_add_dependency(Kiwi KiwiModel)
-target_add_dependency(Kiwi KiwiDsp)
-target_add_dependency(Kiwi Juce)
-
-if (APPLE)
-	set_target_properties(Kiwi PROPERTIES MACOSX_BUNDLE TRUE
-									      MACOSX_BUNDLE_INFO_PLIST ${KIWI_PLIST})
-elseif(WIN32)
-	set_target_properties(Kiwi PROPERTIES LINK_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
-endif()
-
-source_group_rec("${KIWI_CLIENT_SRC}" ${ROOT_DIR}/Client/Source)
-
-#----------------------------------
 # Server
 #----------------------------------
 
@@ -385,6 +365,33 @@ target_add_dependency(Server KiwiModel)
 target_add_dependency(Server Flip)
 target_add_dependency(Server JuceCore)
 source_group_rec("${KIWI_SERVER_SRC}" ${ROOT_DIR}/Server/Source)
+
+add_library(KiwiServer STATIC ${KIWI_SERVER_SRC})
+target_include_directories(KiwiServer PUBLIC ${ROOT_DIR}/Server/Source)
+target_add_dependency(KiwiServer KiwiModel)
+target_add_dependency(KiwiServer Flip)
+target_add_dependency(KiwiServer JuceCore)
+
+#----------------------------------
+# Client
+#----------------------------------
+
+file(GLOB_RECURSE KIWI_CLIENT_SRC ${ROOT_DIR}/Client/Source/*.[c|h]pp)
+add_executable(Kiwi ${KIWI_CLIENT_SRC} ${KIWI_ICON} ${KIWI_PATCHER_FILETYPE_ICON} ${KIWI_PLIST})
+target_add_dependency(Kiwi KiwiEngine)
+target_add_dependency(Kiwi KiwiModel)
+target_add_dependency(Kiwi KiwiDsp)
+target_add_dependency(Kiwi Juce)
+target_add_dependency(Kiwi KiwiServer)
+
+if (APPLE)
+	set_target_properties(Kiwi PROPERTIES MACOSX_BUNDLE TRUE
+									      MACOSX_BUNDLE_INFO_PLIST ${KIWI_PLIST})
+elseif(WIN32)
+	set_target_properties(Kiwi PROPERTIES LINK_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
+endif()
+
+source_group_rec("${KIWI_CLIENT_SRC}" ${ROOT_DIR}/Client/Source)
 
 #----------------------------------
 # Tests

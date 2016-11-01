@@ -26,7 +26,7 @@
 
 #include "KiwiApp.hpp"
 #include "KiwiApp_CommandIDs.hpp"
-#include "KiwiApp_DocumentManager.hpp"
+#include "KiwiApp_Network/KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_PatcherViewHelper.hpp"
 #include "KiwiApp_ObjectView.hpp"
 #include "KiwiApp_LinkView.hpp"
@@ -2214,12 +2214,18 @@ namespace kiwi
     {
         for(model::Link* link : m_view_model.getSelectedLinks())
         {
-            m_patcher_model.removeLink(*link, &m_view_model);
+            if(link)
+            {
+                m_patcher_model.removeLink(*link, &m_view_model);
+            }
         }
         
         for(model::Object* object : m_view_model.getSelectedObjects())
         {
-            m_patcher_model.removeObject(*object, &m_view_model);
+            if(object)
+            {
+                m_patcher_model.removeObject(*object, &m_view_model);
+            }
         }
         
         DocumentManager::commit(m_patcher_model, "Delete objects and links");

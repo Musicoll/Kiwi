@@ -25,9 +25,9 @@
 #include "flip/History.h"
 #include "flip/HistoryStoreMemory.h"
 
-#include "../JuceLibraryCode/JuceHeader.h"
-
 #include "KiwiApp_CarrierSocket.hpp"
+
+#include "../../JuceLibraryCode/JuceHeader.h"
 
 namespace kiwi
 {
