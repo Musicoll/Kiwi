@@ -70,6 +70,7 @@ namespace kiwi
             OscTilde::declare();
             TimesTilde::declare();
             PlusTilde::declare();
+            SigTilde::declare();
         }
     }
 }

@@ -285,5 +285,29 @@ namespace kiwi
             Factory::add<PlusTilde>("plus~", {"+~"});
         }
         
+        // ================================================================================ //
+        //                                  OBJECT SIG~                                     //
+        // ================================================================================ //
+        
+        SigTilde::SigTilde(std::string const& name, std::vector<Atom> const& args)
+        {
+            if (args.empty() || !args[0].isNumber())
+            {
+                pushInlet({PinType::IType::Control});
+            }
+            
+            pushOutlet(PinType::IType::Signal);
+        }
+        
+        void SigTilde::declare()
+        {
+            if(DataModel::has<SigTilde>()) return;
+            
+            DataModel::declare<SigTilde>()
+            .name("cicm.kiwi.SigTilde")
+            .inherit<model::Object>();
+            
+            Factory::add<SigTilde>("sig~");
+        }
     }
 }

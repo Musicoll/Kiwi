@@ -216,6 +216,24 @@ namespace kiwi
             //! @internal flip static declare method
             static void declare();
         };
+        
+        // ================================================================================ //
+        //                                      OBJECT SIG~                                 //
+        // ================================================================================ //
+        
+        class SigTilde : public model::Object
+        {
+        public:
+            
+            //! @brief flip Default Constructor
+            SigTilde(flip::Default& d): model::Object(d){};
+            
+            //! @brief Constructor
+            SigTilde(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @internal flip static declare method
+            static void declare();
+        };
     }
 }
 

@@ -448,7 +448,7 @@ namespace kiwi
         }
         
         // ================================================================================ //
-        //                                       PLUS~                                       //
+        //                                       PLUS~                                      //
         // ================================================================================ //
         
         PlusTilde::PlusTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
@@ -524,6 +524,45 @@ namespace kiwi
             {
                 setPerformCallBack(this, &PlusTilde::performVec);
             }
+        }
+        
+        // ================================================================================ //
+        //                                       SIG~                                       //
+        // ================================================================================ //
+        
+        SigTilde::SigTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        AudioObject(model, patcher),
+        m_value(0.)
+        {
+            if (!args.empty() && args[0].isNumber())
+            {
+                m_value = args[0].getFloat();
+            }
+        }
+        
+        void SigTilde::receive(size_t index, std::vector<Atom> const& args)
+        {
+            if (index == 0 && args[0].isNumber())
+            {
+                m_value = args[0].getFloat();
+            }
+        }
+        
+        void SigTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        {
+            size_t sample_index = output[0].size();
+            dsp::sample_t* output_sig = output[0].data();
+            dsp::sample_t value = m_value;
+            
+            while(sample_index--)
+            {
+                *output_sig++  = value;
+            }
+        }
+        
+        void SigTilde::prepare(dsp::Processor::PrepareInfo const& infos)
+        {
+            setPerformCallBack(this, &SigTilde::perform);
         }
     }
 }

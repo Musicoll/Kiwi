@@ -237,6 +237,26 @@ namespace kiwi
             bool            m_constant;
         };
         
+        // ================================================================================ //
+        //                                       SIG~                                       //
+        // ================================================================================ //
+        
+        class SigTilde : public AudioObject
+        {
+        public: // methods
+            
+            SigTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const& args) override final;
+            
+            void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void prepare(dsp::Processor::PrepareInfo const& infos) override final;
+            
+        private: // members
+            
+            float   m_value;
+        };
     }
 }
 
