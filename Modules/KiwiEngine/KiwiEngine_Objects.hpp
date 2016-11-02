@@ -194,6 +194,30 @@ namespace kiwi
             bool            m_constant;
         };
         
+        // ================================================================================ //
+        //                                       PLUS~                                      //
+        // ================================================================================ //
+        
+        class PlusTilde : public AudioObject
+        {
+        public: // methods
+            
+            PlusTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const& args) override;
+            
+            void performValue(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void performVec(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void prepare(dsp::Processor::PrepareInfo const& infos) override final;
+            
+        private: // members
+            
+            dsp::sample_t   m_value;
+            bool            m_constant;
+        };
+        
     }
 }
 

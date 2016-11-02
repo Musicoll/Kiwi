@@ -231,5 +231,32 @@ namespace kiwi
             Factory::add<TimesTilde>("times~", {"*~"});
         }
         
+        // ================================================================================ //
+        //                                  OBJECT PLUS~                                   //
+        // ================================================================================ //
+        
+        PlusTilde::PlusTilde(std::string const& name, std::vector<Atom> const& args)
+        {
+            pushInlet({PinType::IType::Signal});
+            
+            if (args.empty() || !args[0].isNumber())
+            {
+                pushInlet({PinType::IType::Signal, PinType::IType::Control});
+            }
+            
+            pushOutlet(PinType::IType::Signal);
+        }
+        
+        void PlusTilde::declare()
+        {
+            if(DataModel::has<PlusTilde>()) return;
+            
+            DataModel::declare<PlusTilde>()
+            .name("cicm.kiwi.PlusTilde")
+            .inherit<model::Object>();
+            
+            Factory::add<PlusTilde>("plus~", {"+~"});
+        }
+        
     }
 }

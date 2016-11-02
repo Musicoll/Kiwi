@@ -86,6 +86,7 @@ namespace kiwi
             engine::Factory::add<OscTilde>("osc~");
             engine::Factory::add<DacTilde>("dac~");
             engine::Factory::add<TimesTilde>("times~");
+            engine::Factory::add<PlusTilde>("plus~");
         }
         
         // ================================================================================ //

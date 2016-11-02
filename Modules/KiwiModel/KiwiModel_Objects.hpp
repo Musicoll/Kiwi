@@ -180,6 +180,24 @@ namespace kiwi
             //! @internal flip static declare method
             static void declare();
         };
+        
+        // ================================================================================ //
+        //                                      OBJECT +~                                   //
+        // ================================================================================ //
+        
+        class PlusTilde : public model::Object
+        {
+        public:
+            
+            //! @brief flip Default Constructor
+            PlusTilde(flip::Default& d): model::Object(d){};
+            
+            //! @brief Constructor
+            PlusTilde(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @internal flip static declare method
+            static void declare();
+        };
     }
 }
 
