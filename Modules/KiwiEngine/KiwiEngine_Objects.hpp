@@ -173,20 +173,21 @@ namespace kiwi
             
         private: // methods
             
-            dsp::sample_t computePhaseInc(dsp::sample_t const& freq, dsp::sample_t const& sr) noexcept;
+            dsp::sample_t computeTimeInc(dsp::sample_t const& freq, dsp::sample_t const& sr) noexcept;
             
             void setFrequency(dsp::sample_t const& freq) noexcept;
             
-            void setPhase(dsp::sample_t const& phase) noexcept;
+            void setOffset(dsp::sample_t const& offset) noexcept;
             
             void setSampleRate(dsp::sample_t const& sample_rate);
             
         private: // members
             
-            dsp::sample_t m_freq;
             dsp::sample_t m_sr;
-            std::atomic<dsp::sample_t> m_phase;
-            std::atomic<dsp::sample_t> m_phase_inc;
+            dsp::sample_t m_time;
+            dsp::sample_t m_freq;
+            std::atomic<dsp::sample_t> m_time_inc;
+            std::atomic<dsp::sample_t> m_offset;
         };
         
         // ================================================================================ //

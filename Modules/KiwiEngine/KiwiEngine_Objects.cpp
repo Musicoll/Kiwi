@@ -254,7 +254,7 @@ namespace kiwi
             }
         }
         
-        dsp::sample_t OscTilde::computePhaseInc(dsp::sample_t const& freq, dsp::sample_t const& sr) noexcept
+        dsp::sample_t OscTilde::computeTimeInc(dsp::sample_t const& freq, dsp::sample_t const& sr) noexcept
         {
             return (freq != 0.) ? (1./(sr/(freq))) : 0.;
         }
@@ -262,18 +262,18 @@ namespace kiwi
         void OscTilde::setFrequency(dsp::sample_t const& freq) noexcept
         {
             m_freq = freq;
-            m_phase_inc = computePhaseInc(m_freq, m_sr);
+            m_time_inc = computeTimeInc(m_freq, m_sr);
         }
         
         void OscTilde::setSampleRate(dsp::sample_t const& sample_rate)
         {
             m_sr = sample_rate;
-            m_phase_inc = computePhaseInc(m_freq, m_sr);
+            m_time_inc = computeTimeInc(m_freq, m_sr);
         }
         
-        void OscTilde::setPhase(dsp::sample_t const& phase) noexcept
+        void OscTilde::setOffset(dsp::sample_t const& offset) noexcept
         {
-            m_phase = fmodf(phase, 1.);
+            m_offset = fmodf(offset, 1.);
         }
         
         void OscTilde::receive(size_t index, std::vector<Atom> const& args)
@@ -284,7 +284,7 @@ namespace kiwi
             }
             else if(index == 1 && args[0].isNumber())
             {
-                setPhase(args[0].getFloat());
+                setOffset(args[0].getFloat());
             }
         }
         
@@ -318,10 +318,11 @@ namespace kiwi
             
             while(framesize--)
             {
-                *sig_data++ = std::cos(m_phase * 2 * dsp::pi);
-                m_phase = m_phase + m_phase_inc;
-                m_phase = fmodf(m_phase, 1.);
+                *sig_data++ = std::cos(2 * dsp::pi * (m_time + m_offset));
+                m_time = m_time + m_time_inc;
             }
+            
+            m_time = fmodf(m_time, 1.);
         }
         
         void OscTilde::performFreq(dsp::Buffer const& input, dsp::Buffer& output) noexcept
@@ -332,11 +333,11 @@ namespace kiwi
             
             while(sample_index--)
             {
-                *output_sig++  = std::cos(m_phase * 2 * dsp::pi);
-                m_phase = m_phase + computePhaseInc(*freq++, m_sr);
+                *output_sig++  = std::cos(2 *dsp::pi * (m_time + m_offset));
+                m_time = m_time + computeTimeInc(*freq++, m_sr);
             }
             
-            m_phase = fmodf(m_phase, 1.);
+            m_time = fmodf(m_time, 1.);
         }
         
         void OscTilde::performPhase(dsp::Buffer const& input, dsp::Buffer& output) noexcept
@@ -347,9 +348,11 @@ namespace kiwi
             
             while(sample_index--)
             {
-                m_phase = m_phase + m_phase_inc;
-                *output_sig++  = std::cos((m_phase + fmodf(*phase++, 1.)) * 2 * dsp::pi);
+                *output_sig++  = std::cos(2 * dsp::pi *(m_time + fmodf(*phase++, 1.)));
+                m_time = m_time + m_time_inc;
             }
+            
+            m_time = fmodf(m_time, 1.);
         }
         
         void OscTilde::performPaseAndFreq(dsp::Buffer const& input, dsp::Buffer& output) noexcept
@@ -361,11 +364,11 @@ namespace kiwi
             
             while(sample_index--)
             {
-                *output_sig++  = std::cos((m_phase + fmodf(*phase++, 1.)) * 2 * dsp::pi);
-                m_phase = m_phase + computePhaseInc(*freq++, m_sr);
+                *output_sig++  = std::cos(2 * dsp::pi *(m_time + fmodf(*phase++, 1.)));
+                m_time = m_time + computeTimeInc(*freq++, m_sr);
             }
             
-            m_phase = fmodf(m_phase, 1.);
+            m_time = fmodf(m_time, 1.);
         }
         
         // ================================================================================ //
