@@ -112,7 +112,7 @@ namespace kiwi
             if(DataModel::has<ObjectTimes>()) return;
             
             DataModel::declare<ObjectTimes>()
-            .name("cicm.kiwi.ObjectPlus")
+            .name("cicm.kiwi.ObjectTimes")
             .inherit<model::Object>();
             
             Factory::add<ObjectTimes>("times", {"*"});
