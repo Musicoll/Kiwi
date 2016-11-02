@@ -92,6 +92,24 @@ namespace kiwi
         };
         
         // ================================================================================ //
+        //                                    OBJECT TIMES                                  //
+        // ================================================================================ //
+        
+        class ObjectTimes : public model::Object
+        {
+        public:
+            
+            //! @brief flip Default Constructor
+            ObjectTimes(flip::Default& d) : model::Object(d) {}
+            
+            //! @brief Constructor
+            ObjectTimes(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @internal flip static declare method
+            static void declare();
+        };
+        
+        // ================================================================================ //
         //                                    OBJECT PRINT                                  //
         // ================================================================================ //
         

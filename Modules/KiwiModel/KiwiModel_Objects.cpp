@@ -104,6 +104,33 @@ namespace kiwi
         }
         
         // ================================================================================ //
+        //                                    OBJECT TIMES                                  //
+        // ================================================================================ //
+        
+        void ObjectTimes::declare()
+        {
+            if(DataModel::has<ObjectTimes>()) return;
+            
+            DataModel::declare<ObjectTimes>()
+            .name("cicm.kiwi.ObjectPlus")
+            .inherit<model::Object>();
+            
+            Factory::add<ObjectTimes>("times", {"*"});
+        }
+        
+        ObjectTimes::ObjectTimes(std::string const& name, std::vector<Atom> const& args)
+        {
+            pushInlet({PinType::IType::Control});
+            
+            if (args.empty() || !args[0].isNumber())
+            {
+                pushInlet({PinType::IType::Control});
+            }
+            
+            pushOutlet(PinType::IType::Control);
+        }
+        
+        // ================================================================================ //
         //                                    OBJECT PRINT                                  //
         // ================================================================================ //
         

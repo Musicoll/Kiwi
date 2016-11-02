@@ -105,6 +105,48 @@ namespace kiwi
         }
         
         // ================================================================================ //
+        //                                    OBJECT TIMES                                  //
+        // ================================================================================ //
+        
+        ObjectTimes::ObjectTimes(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        : Object(model, patcher)
+        {
+            m_lhs = 0.;
+            if(!args.empty() && args[0].isNumber())
+            {
+                m_rhs = args[0].getFloat();
+            }
+        }
+        
+        void ObjectTimes::receive(size_t index, std::vector<Atom> const& args)
+        {
+            if(!args.empty())
+            {
+                if(args[0].isNumber())
+                {
+                    if(index == 0)
+                    {
+                        m_lhs = args[0].getFloat();
+                        bang();
+                    }
+                    else if(index == 1)
+                    {
+                        m_rhs = args[0].getFloat();
+                    }
+                }
+                else if(index == 0 && args[0].getString() == "bang")
+                {
+                    bang();
+                }
+            }
+        }
+        
+        void ObjectTimes::bang()
+        {
+            send(0, {m_rhs * m_lhs});
+        }
+        
+        // ================================================================================ //
         //                                    OBJECT PRINT                                  //
         // ================================================================================ //
         

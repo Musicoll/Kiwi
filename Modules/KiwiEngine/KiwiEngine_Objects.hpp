@@ -75,7 +75,26 @@ namespace kiwi
         };
         
         // ================================================================================ //
-        //                                    OBJECT PLUS                                   //
+        //                                    OBJECT TIMES                                  //
+        // ================================================================================ //
+        
+        class ObjectTimes : public engine::Object
+        {
+        public:
+            
+            ObjectTimes(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const& args) override;
+            
+            void bang();
+            
+        private:
+            double m_lhs = 0.0;
+            double m_rhs = 0.0;
+        };
+        
+        // ================================================================================ //
+        //                                    OBJECT PRINT                                  //
         // ================================================================================ //
         
         class ObjectPrint : public engine::Object
