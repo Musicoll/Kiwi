@@ -1536,57 +1536,58 @@ namespace kiwi
         
         for(auto& object_m : patcher.getObjects())
         {
-            if(object_m.removed()) break;
-            
-            std::set<uint64_t> selected_for_users;
-            
-            for(auto& user : patcher.getUsers())
+            if(!object_m.removed())
             {
-                bool selected_for_local_view = false;
-                bool selected_for_other_view = false;
+                std::set<uint64_t> selected_for_users;
                 
-                const uint64_t user_id = user.getId();
-                const bool is_distant_user = user_id != m_instance.getUserId();
-                
-                for(auto& view : user.getViews())
+                for(auto& user : patcher.getUsers())
                 {
-                    const bool is_local_view = ( &m_view_model == &view );
+                    bool selected_for_local_view = false;
+                    bool selected_for_other_view = false;
                     
-                    const bool is_selected = view.isSelected(object_m);
+                    const uint64_t user_id = user.getId();
+                    const bool is_distant_user = user_id != m_instance.getUserId();
                     
-                    if(is_selected)
+                    for(auto& view : user.getViews())
                     {
-                        if(is_distant_user)
+                        const bool is_local_view = ( &m_view_model == &view );
+                        
+                        const bool is_selected = view.isSelected(object_m);
+                        
+                        if(is_selected)
                         {
-                            selected_for_other_view = true;
-                            
-                            // an object is considered selected for a given user
-                            // when it's selected in at least one of its patcher's views.
-                            break;
+                            if(is_distant_user)
+                            {
+                                selected_for_other_view = true;
+                                
+                                // an object is considered selected for a given user
+                                // when it's selected in at least one of its patcher's views.
+                                break;
+                            }
+                            else if(is_local_view)
+                            {
+                                selected_for_local_view = true;
+                            }
+                            else
+                            {
+                                selected_for_other_view = true;
+                            }
                         }
-                        else if(is_local_view)
-                        {
-                            selected_for_local_view = true;
-                        }
-                        else
-                        {
-                            selected_for_other_view = true;
-                        }
+                    }
+                    
+                    if(selected_for_local_view)
+                    {
+                        new_local_objects_selection.emplace(object_m.ref());
+                    }
+                    
+                    if(selected_for_other_view)
+                    {
+                        selected_for_users.emplace(user_id);
                     }
                 }
                 
-                if(selected_for_local_view)
-                {
-                    new_local_objects_selection.emplace(object_m.ref());
-                }
-                
-                if(selected_for_other_view)
-                {
-                    selected_for_users.emplace(user_id);
-                }
+                new_distant_objects_selection.insert({object_m.ref(), selected_for_users});
             }
-            
-            new_distant_objects_selection.insert({object_m.ref(), selected_for_users});
         }
         
         // check diff between old and new distant selection
