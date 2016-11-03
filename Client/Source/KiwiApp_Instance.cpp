@@ -19,6 +19,7 @@
  ==============================================================================
  */
 
+#include <juce_audio_utils/juce_audio_utils.h>
 
 #include "KiwiApp.hpp"
 #include "KiwiApp_Instance.hpp"

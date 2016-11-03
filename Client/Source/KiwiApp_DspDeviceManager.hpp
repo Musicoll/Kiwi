@@ -26,7 +26,7 @@
 #include <KiwiDsp/KiwiDsp_Chain.hpp>
 #include <KiwiEngine/KiwiEngine_AudioControler.hpp>
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <juce_audio_devices/juce_audio_devices.h>
 
 namespace kiwi
 {

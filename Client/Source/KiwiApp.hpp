@@ -22,10 +22,17 @@
 #ifndef KIWI_KIWIAPP_HPP_INCLUDED
 #define KIWI_KIWIAPP_HPP_INCLUDED
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <juce_gui_basics/juce_gui_basics.h>
 
 #include "KiwiApp_Instance.hpp"
 #include "KiwiApp_StoredSettings.hpp"
+
+namespace ProjectInfo
+{
+    const char* const  projectName    = "Kiwi";
+    const char* const  versionString  = "0.0.1";
+    const int          versionNumber  = 0x1;
+}
 
 namespace kiwi
 {

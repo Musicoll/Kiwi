@@ -22,6 +22,8 @@
 #ifndef KIWI_APP_PATCHER_MANAGER_HPP_INCLUDED
 #define KIWI_APP_PATCHER_MANAGER_HPP_INCLUDED
 
+#include <juce_gui_extra/juce_gui_extra.h>
+
 #include "flip/Document.h"
 
 #include <KiwiModel/KiwiModel_PatcherUser.hpp>

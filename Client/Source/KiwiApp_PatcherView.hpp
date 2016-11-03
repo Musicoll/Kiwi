@@ -22,11 +22,12 @@
 #ifndef KIWI_APP_PATCHERVIEW_HPP_INCLUDED
 #define KIWI_APP_PATCHERVIEW_HPP_INCLUDED
 
+#include <juce_gui_basics/juce_gui_basics.h>
+
 #include <KiwiModel/KiwiModel_PatcherUser.hpp>
 
 #include "flip/DocumentObserver.h"
 
-#include "../JuceLibraryCode/JuceHeader.h"
 
 namespace kiwi
 {
