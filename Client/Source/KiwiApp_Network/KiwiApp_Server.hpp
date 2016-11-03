@@ -27,7 +27,7 @@
 
 #include <juce_core/juce_core.h>
 
-#include <KiwiServer.hpp>
+#include <KiwiServer/KiwiServer_Server.hpp>
 #include <thread>
 
 #include "KiwiApp_DocumentBrowser.hpp"

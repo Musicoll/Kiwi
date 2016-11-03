@@ -292,18 +292,18 @@ source_group_rec("${KIWI_ENGINE_SRC}" ${ROOT_DIR}/Modules/KiwiEngine)
 # Server
 #----------------------------------
 
-file(GLOB_RECURSE KIWI_SERVER_SRC ${ROOT_DIR}/Server/Source/*.[c|h]pp)
-add_executable(Server ${KIWI_SERVER_SRC})
-target_add_dependency(Server KiwiModel)
-target_add_dependency(Server Flip)
-target_add_dependency(Server Juce)
-source_group_rec("${KIWI_SERVER_SRC}" ${ROOT_DIR}/Server/Source)
-
+file(GLOB_RECURSE KIWI_SERVER_SRC ${ROOT_DIR}/Modules/KiwiServer/*.[c|h]pp)
 add_library(KiwiServer STATIC ${KIWI_SERVER_SRC})
-target_include_directories(KiwiServer PUBLIC ${ROOT_DIR}/Server/Source)
+target_include_directories(KiwiEngine PUBLIC ${ROOT_DIR}/Modules)
 target_add_dependency(KiwiServer KiwiModel)
-target_add_dependency(KiwiServer Flip)
 target_add_dependency(KiwiServer Juce)
+set_target_properties(KiwiServer PROPERTIES FOLDER Modules)
+source_group_rec("${KIWI_SERVER_SRC}" ${ROOT_DIR}/Modules/KiwiServer)
+
+file(GLOB_RECURSE SERVER_SRC ${ROOT_DIR}/Server/Source/*.[c|h]pp)
+add_executable(Server ${SERVER_SRC})
+target_add_dependency(Server KiwiServer)
+source_group_rec("${SERVER_SRC}" ${ROOT_DIR}/Server/Source)
 
 #----------------------------------
 # Client
