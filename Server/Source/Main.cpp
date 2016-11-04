@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include "KiwiServer.hpp"
+#include <KiwiServer/KiwiServer_Server.hpp>
 #include <KiwiModel/KiwiModel_DataModel.hpp>
 
 int main(int argc, const char * argv[])

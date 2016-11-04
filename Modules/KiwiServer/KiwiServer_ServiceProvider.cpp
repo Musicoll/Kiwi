@@ -21,7 +21,7 @@
 
 #include "flip/contrib/MulticastServiceProvider.h"
 
-#include "KiwiServiceProvider.hpp"
+#include "KiwiServer_ServiceProvider.hpp"
 
 #include <KiwiModel/KiwiModel_DataModel.hpp>
 

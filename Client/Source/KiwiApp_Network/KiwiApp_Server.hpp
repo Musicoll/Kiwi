@@ -25,9 +25,9 @@
 #include "flip/contrib/MulticastServiceExplorer.h"
 #include <KiwiEngine/KiwiEngine_Listeners.hpp>
 
-#include "../../JuceLibraryCode/JuceHeader.h"
+#include <juce_core/juce_core.h>
 
-#include <KiwiServer.hpp>
+#include <KiwiServer/KiwiServer_Server.hpp>
 #include <thread>
 
 #include "KiwiApp_DocumentBrowser.hpp"

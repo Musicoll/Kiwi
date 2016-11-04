@@ -22,12 +22,13 @@
 #ifndef KIWI_APP_DOCUMENT_MANAGER_HPP_INCLUDED
 #define KIWI_APP_DOCUMENT_MANAGER_HPP_INCLUDED
 
+#include <juce_core/juce_core.h>
+#include <juce_events/juce_events.h>
+
 #include "flip/History.h"
 #include "flip/HistoryStoreMemory.h"
 
 #include "KiwiApp_CarrierSocket.hpp"
-
-#include "../../JuceLibraryCode/JuceHeader.h"
 
 namespace kiwi
 {

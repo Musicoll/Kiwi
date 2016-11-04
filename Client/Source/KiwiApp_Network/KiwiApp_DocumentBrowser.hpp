@@ -25,7 +25,7 @@
 #include "flip/contrib/MulticastServiceExplorer.h"
 #include <KiwiEngine/KiwiEngine_Listeners.hpp>
 
-#include "../../JuceLibraryCode/JuceHeader.h"
+#include <juce_events/juce_events.h>
 
 #include "../KiwiApp_PatcherManager.hpp"
 

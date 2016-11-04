@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include "KiwiPatcherValidator.hpp"
+#include "KiwiServer_PatcherValidator.hpp"
 
 namespace kiwi
 {

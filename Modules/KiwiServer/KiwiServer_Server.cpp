@@ -25,7 +25,7 @@
 #include <KiwiModel/KiwiModel_DataModel.hpp>
 #include <KiwiModel/KiwiModel_PatcherUser.hpp>
 
-#include "KiwiServer.hpp"
+#include "KiwiServer_Server.hpp"
 
 namespace kiwi
 {
