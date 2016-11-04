@@ -174,9 +174,6 @@ namespace kiwi
         
         //! @internal Utility to quit the app asynchronously.
         class AsyncQuitRetrier;
-
-        //! @brief Initialise the command manager
-        void initCommandManager();
         
     private: // members
         

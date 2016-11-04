@@ -66,6 +66,9 @@ namespace kiwi
         //! @brief Stops the device.
         void stopAudio() override;
         
+        //! @brief Returns true if the audio is on.
+        bool isAudioOn() const override;
+        
         //! @brief Adds a buffer to the output matrix of signal.
         void addSignal(dsp::Buffer const& output_buffer) override;
         
