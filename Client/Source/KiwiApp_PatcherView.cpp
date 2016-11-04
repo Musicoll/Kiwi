@@ -589,8 +589,38 @@ namespace kiwi
             m.addCommandItem(cm, juce::StandardApplicationCommandIDs::selectAll);
             m.addSeparator();
         }
-
-        m.show();
+        
+        juce::PopupMenu object_menu;
+        
+        object_menu.addItem(1, "+");
+        object_menu.addItem(2, "*");
+        object_menu.addItem(3, "loadmess");
+        object_menu.addItem(4, "receive");
+        object_menu.addItem(5, "print");
+        object_menu.addItem(6, "dac~");
+        object_menu.addItem(7, "+~");
+        object_menu.addItem(8, "*~");
+        object_menu.addItem(9, "sig~");
+        object_menu.addItem(10, "osc~");
+        
+        m.addSubMenu("Object", object_menu);
+        
+        const int result = m.show();
+        
+        switch(result)
+        {
+            case 1 : { createObjectModel("+", position.getX(), position.getY()); break; }
+            case 2 : { createObjectModel("*", position.getX(), position.getY()); break; }
+            case 3 : { createObjectModel("loadmess", position.getX(), position.getY()); break; }
+            case 4 : { createObjectModel("receive", position.getX(), position.getY()); break; }
+            case 5 : { createObjectModel("print", position.getX(), position.getY()); break; }
+            case 6 : { createObjectModel("dac~", position.getX(), position.getY()); break; }
+            case 7 : { createObjectModel("+~", position.getX(), position.getY()); break; }
+            case 8 : { createObjectModel("*~", position.getX(), position.getY()); break; }
+            case 9 : { createObjectModel("sig~", position.getX(), position.getY()); break; }
+            case 10 :{ createObjectModel("osc~", position.getX(), position.getY()); break; }
+            default: break;
+        }
     }
     
     void PatcherView::showObjectPopupMenu(ObjectView const& object, juce::Point<int> const& position)
@@ -608,9 +638,7 @@ namespace kiwi
             m.addCommandItem(cm, CommandIDs::pasteReplace);
             m.addCommandItem(cm, juce::StandardApplicationCommandIDs::del);
             m.addSeparator();
-            
-            m.addCommandItem(cm, CommandIDs::toFront);
-            m.addCommandItem(cm, CommandIDs::toBack);
+
             m.addSeparator();
             
             m.show();
@@ -1536,57 +1564,58 @@ namespace kiwi
         
         for(auto& object_m : patcher.getObjects())
         {
-            if(object_m.removed()) break;
-            
-            std::set<uint64_t> selected_for_users;
-            
-            for(auto& user : patcher.getUsers())
+            if(!object_m.removed())
             {
-                bool selected_for_local_view = false;
-                bool selected_for_other_view = false;
+                std::set<uint64_t> selected_for_users;
                 
-                const uint64_t user_id = user.getId();
-                const bool is_distant_user = user_id != m_instance.getUserId();
-                
-                for(auto& view : user.getViews())
+                for(auto& user : patcher.getUsers())
                 {
-                    const bool is_local_view = ( &m_view_model == &view );
+                    bool selected_for_local_view = false;
+                    bool selected_for_other_view = false;
                     
-                    const bool is_selected = view.isSelected(object_m);
+                    const uint64_t user_id = user.getId();
+                    const bool is_distant_user = user_id != m_instance.getUserId();
                     
-                    if(is_selected)
+                    for(auto& view : user.getViews())
                     {
-                        if(is_distant_user)
+                        const bool is_local_view = ( &m_view_model == &view );
+                        
+                        const bool is_selected = view.isSelected(object_m);
+                        
+                        if(is_selected)
                         {
-                            selected_for_other_view = true;
-                            
-                            // an object is considered selected for a given user
-                            // when it's selected in at least one of its patcher's views.
-                            break;
+                            if(is_distant_user)
+                            {
+                                selected_for_other_view = true;
+                                
+                                // an object is considered selected for a given user
+                                // when it's selected in at least one of its patcher's views.
+                                break;
+                            }
+                            else if(is_local_view)
+                            {
+                                selected_for_local_view = true;
+                            }
+                            else
+                            {
+                                selected_for_other_view = true;
+                            }
                         }
-                        else if(is_local_view)
-                        {
-                            selected_for_local_view = true;
-                        }
-                        else
-                        {
-                            selected_for_other_view = true;
-                        }
+                    }
+                    
+                    if(selected_for_local_view)
+                    {
+                        new_local_objects_selection.emplace(object_m.ref());
+                    }
+                    
+                    if(selected_for_other_view)
+                    {
+                        selected_for_users.emplace(user_id);
                     }
                 }
                 
-                if(selected_for_local_view)
-                {
-                    new_local_objects_selection.emplace(object_m.ref());
-                }
-                
-                if(selected_for_other_view)
-                {
-                    selected_for_users.emplace(user_id);
-                }
+                new_distant_objects_selection.insert({object_m.ref(), selected_for_users});
             }
-            
-            new_distant_objects_selection.insert({object_m.ref(), selected_for_users});
         }
         
         // check diff between old and new distant selection
@@ -2260,9 +2289,6 @@ namespace kiwi
         
         commands.add(CommandIDs::newBox);
         
-        commands.add(CommandIDs::toFront);
-        commands.add(CommandIDs::toBack);
-        
         commands.add(CommandIDs::zoomIn);
         commands.add(CommandIDs::zoomOut);
         commands.add(CommandIDs::zoomNormal);
@@ -2380,20 +2406,6 @@ namespace kiwi
                 result.setActive(!isLocked());
                 break;
             }
-            case CommandIDs::toFront:
-            {
-                result.setInfo(TRANS("Bring to Front"), TRANS("Bring selected boxes to front"), CommandCategories::editing, 0);
-                result.addDefaultKeypress('f', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
-                result.setActive(isAnyObjectSelected());
-                break;
-            }
-            case CommandIDs::toBack:
-            {
-                result.setInfo(TRANS("Send to Back"), TRANS("Send selected boxes to back"), CommandCategories::editing, 0);
-                result.addDefaultKeypress('b', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
-                result.setActive(isAnyObjectSelected());
-                break;
-            }
             case CommandIDs::zoomIn:
             {
                 result.setInfo(TRANS("Zoom in"), TRANS("Zoom in"), CommandCategories::view, 0);
@@ -2452,8 +2464,6 @@ namespace kiwi
             
             case CommandIDs::newBox:                            { createNewBoxModel(true); break; }
                 
-            case CommandIDs::toFront:                           { break; }
-            case CommandIDs::toBack:                            { break; }
             case CommandIDs::zoomIn:                            { zoomIn(); break; }
             case CommandIDs::zoomOut:                           { zoomOut(); break; }
             case CommandIDs::zoomNormal:                        { zoomNormal(); break; }

@@ -83,11 +83,14 @@ namespace kiwi
     {
         model::DataModel::init();
         
-        m_settings = std::make_unique<StoredSettings>();
-        initCommandManager();
-        m_menu_model.reset(new MainMenuModel());
+        m_command_manager = std::make_unique<juce::ApplicationCommandManager>();
         
+        m_settings = std::make_unique<StoredSettings>();
         m_instance = std::make_unique<Instance>();
+        
+        m_command_manager->registerAllCommandsForTarget(this);
+        
+        m_menu_model.reset(new MainMenuModel());
         
         #if JUCE_MAC
         juce::PopupMenu macMainMenuPopup;
@@ -281,7 +284,7 @@ namespace kiwi
     {
         const char* const names[] =
         {
-            "File", "Edit", "View", "Object", "Arrange", "Options", "Window", "Help", nullptr
+            "File", "Edit", "View", "Options", "Window", "Help", nullptr
         };
         
         return juce::StringArray(names);
@@ -292,8 +295,6 @@ namespace kiwi
         if		(menuName == "File")        createFileMenu		(menu);
         else if (menuName == "Edit")        createEditMenu		(menu);
         else if (menuName == "View")        createViewMenu		(menu);
-        else if (menuName == "Object")      createObjectMenu	(menu);
-        else if (menuName == "Arrange")     createArrangeMenu	(menu);
         else if (menuName == "Options")     createOptionsMenu	(menu);
         else if (menuName == "Window")      createWindowMenu	(menu);
         else if (menuName == "Help")		createHelpMenu		(menu);
@@ -349,19 +350,10 @@ namespace kiwi
         menu.addCommandItem(m_command_manager.get(), CommandIDs::zoomNormal);
     }
     
-    void KiwiApp::createObjectMenu(juce::PopupMenu& menu)
-    {
-        ;
-    }
-    
-    void KiwiApp::createArrangeMenu(juce::PopupMenu& menu)
-    {
-        menu.addCommandItem(m_command_manager.get(), CommandIDs::toFront);
-        menu.addCommandItem(m_command_manager.get(), CommandIDs::toBack);
-    }
-    
     void KiwiApp::createOptionsMenu(juce::PopupMenu& menu)
     {
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::startDsp);
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::stopDsp);
         menu.addCommandItem(m_command_manager.get(), CommandIDs::showAudioStatusWindow);
     }
     
@@ -401,7 +393,9 @@ namespace kiwi
             CommandIDs::showConsoleWindow,
             CommandIDs::showAudioStatusWindow,
             CommandIDs::showDocumentBrowserWindow,
-            CommandIDs::showBeaconDispatcherWindow
+            CommandIDs::showBeaconDispatcherWindow,
+            CommandIDs::startDsp,
+            CommandIDs::stopDsp
         };
         
         commands.addArray(ids, juce::numElementsInArray(ids));
@@ -456,6 +450,24 @@ namespace kiwi
                 
                 break;
             }
+            case CommandIDs::startDsp:
+            {
+                result.setInfo(TRANS("Start dsp"), TRANS("Start dsp"),
+                               CommandCategories::general, 0);
+
+                result.setActive(!m_instance->getEngineInstance().getAudioControler().isAudioOn());
+                
+                break;
+            }
+            case CommandIDs::stopDsp:
+            {
+                result.setInfo(TRANS("Stop dsp"), TRANS("Stop dsp"),
+                               CommandCategories::general, 0);
+                
+                result.setActive(m_instance->getEngineInstance().getAudioControler().isAudioOn());
+                
+                break;
+            }
             default:
             {
                 JUCEApplication::getCommandInfo(commandID, result); break;
@@ -467,22 +479,49 @@ namespace kiwi
     {
         switch(info.commandID)
         {
-            case CommandIDs::newPatcher :                   { m_instance->newPatcher(); break; }
-            case CommandIDs::openFile :                     { m_instance->askUserToOpenPatcherDocument(); break; }
-            case CommandIDs::showConsoleWindow :            { m_instance->showConsoleWindow(); break; }
-            case CommandIDs::showAudioStatusWindow :        { m_instance->showAudioSettingsWindow(); break; }
-            case CommandIDs::showDocumentBrowserWindow :   { m_instance->showDocumentBrowserWindow(); break; }
-            case CommandIDs::showBeaconDispatcherWindow :   { m_instance->showBeaconDispatcherWindow(); break; }
+            case CommandIDs::newPatcher :
+            {
+                m_instance->newPatcher();
+                break;
+            }
+            case CommandIDs::openFile :
+            {
+                m_instance->askUserToOpenPatcherDocument();
+                break;
+            }
+            case CommandIDs::showConsoleWindow :
+            {
+                m_instance->showConsoleWindow();
+                break;
+            }
+            case CommandIDs::showAudioStatusWindow :
+            {
+                m_instance->showAudioSettingsWindow();
+                break;
+            }
+            case CommandIDs::showDocumentBrowserWindow :
+            {
+                m_instance->showDocumentBrowserWindow(); break;
+            }
+            case CommandIDs::showBeaconDispatcherWindow :
+            {
+                m_instance->showBeaconDispatcherWindow();
+                break;
+            }
+            case CommandIDs::startDsp :
+            {
+                m_instance->useEngineInstance().getAudioControler().startAudio();
+                break;
+            }
+            case CommandIDs::stopDsp  :
+            {
+                m_instance->useEngineInstance().getAudioControler().stopAudio();
+                break;
+            }
             
             default : return JUCEApplication::perform(info);
         }
         
         return true;
-    }
-    
-    void KiwiApp::initCommandManager()
-    {
-        m_command_manager.reset(new juce::ApplicationCommandManager());
-        m_command_manager->registerAllCommandsForTarget(this);
     }
 }

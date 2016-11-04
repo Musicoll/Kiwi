@@ -76,6 +76,9 @@ namespace kiwi
             //! @brief Returns the audio controler held by the patcher's instance.
             AudioControler& getAudioControler() const;
             
+            //! @internal Call the loadbang method of all objects.
+            void sendLoadbang();
+            
             // ================================================================================ //
             //                                      CONSOLE                                     //
             // ================================================================================ //

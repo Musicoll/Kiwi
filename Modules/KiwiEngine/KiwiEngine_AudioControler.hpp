@@ -49,6 +49,9 @@ namespace kiwi
             //! @brief Stops the audio thread.
             virtual void stopAudio() = 0;
             
+            //! @brief Returns true if the audio is on.
+            virtual bool isAudioOn() const = 0;
+            
             //! @brief Adds a chain to be ticked by the audio thread.
             virtual void add(dsp::Chain& chain) = 0;
             
