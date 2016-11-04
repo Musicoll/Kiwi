@@ -127,7 +127,6 @@ namespace kiwi
         void createFileMenu(juce::PopupMenu& menu);
         void createEditMenu(juce::PopupMenu& menu);
         void createViewMenu(juce::PopupMenu& menu);
-        void createObjectMenu(juce::PopupMenu& menu);
         void createArrangeMenu(juce::PopupMenu& menu);
         void createOptionsMenu(juce::PopupMenu& menu);
         void createWindowMenu(juce::PopupMenu& menu);
