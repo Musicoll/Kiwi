@@ -59,11 +59,11 @@ namespace kiwi
         //                                    OBJECT PLUS                                   //
         // ================================================================================ //
         
-        class ObjectPlus : public engine::Object
+        class Plus : public engine::Object
         {
         public:
             
-            ObjectPlus(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            Plus(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
             void receive(size_t index, std::vector<Atom> const& args) override;
             
@@ -78,11 +78,11 @@ namespace kiwi
         //                                    OBJECT TIMES                                  //
         // ================================================================================ //
         
-        class ObjectTimes : public engine::Object
+        class Times : public engine::Object
         {
         public:
             
-            ObjectTimes(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            Times(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
             void receive(size_t index, std::vector<Atom> const& args) override;
             
@@ -97,11 +97,11 @@ namespace kiwi
         //                                    OBJECT PRINT                                  //
         // ================================================================================ //
         
-        class ObjectPrint : public engine::Object
+        class Print : public engine::Object
         {
         public:
             
-            ObjectPrint(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            Print(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
             void receive(size_t, std::vector<Atom> const& args) override;
             
@@ -113,13 +113,13 @@ namespace kiwi
         //                                  OBJECT RECEIVE                                  //
         // ================================================================================ //
         
-        class ObjectReceive : public engine::Object, public Beacon::Castaway
+        class Receive : public engine::Object, public Beacon::Castaway
         {
         public:
             
-            ObjectReceive(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            Receive(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
-            ~ObjectReceive();
+            ~Receive();
             
             void receive(size_t, std::vector<Atom> const& args) override;
             

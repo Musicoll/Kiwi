@@ -66,7 +66,7 @@ namespace kiwi
         //                                    OBJECT PLUS                                   //
         // ================================================================================ //
         
-        ObjectPlus::ObjectPlus(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        Plus::Plus(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
         : Object(model, patcher)
         {
             m_lhs = 0.;
@@ -76,7 +76,7 @@ namespace kiwi
             }
         }
         
-        void ObjectPlus::receive(size_t index, std::vector<Atom> const& args)
+        void Plus::receive(size_t index, std::vector<Atom> const& args)
         {
             if(!args.empty())
             {
@@ -99,7 +99,7 @@ namespace kiwi
             }
         }
         
-        void ObjectPlus::bang()
+        void Plus::bang()
         {
             send(0, {m_rhs + m_lhs});
         }
@@ -108,7 +108,7 @@ namespace kiwi
         //                                    OBJECT TIMES                                  //
         // ================================================================================ //
         
-        ObjectTimes::ObjectTimes(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        Times::Times(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
         : Object(model, patcher)
         {
             m_lhs = 0.;
@@ -118,7 +118,7 @@ namespace kiwi
             }
         }
         
-        void ObjectTimes::receive(size_t index, std::vector<Atom> const& args)
+        void Times::receive(size_t index, std::vector<Atom> const& args)
         {
             if(!args.empty())
             {
@@ -141,7 +141,7 @@ namespace kiwi
             }
         }
         
-        void ObjectTimes::bang()
+        void Times::bang()
         {
             send(0, {m_rhs * m_lhs});
         }
@@ -150,13 +150,13 @@ namespace kiwi
         //                                    OBJECT PRINT                                  //
         // ================================================================================ //
         
-        ObjectPrint::ObjectPrint(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        Print::Print(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
         : Object(model, patcher)
         {
             m_name = !args.empty() ? args[0].getString() : "print";
         }
         
-        void ObjectPrint::receive(size_t, std::vector<Atom> const& args)
+        void Print::receive(size_t, std::vector<Atom> const& args)
         {
             if(!args.empty())
             {
@@ -168,7 +168,7 @@ namespace kiwi
         //                                  OBJECT RECEIVE                                  //
         // ================================================================================ //
         
-        ObjectReceive::ObjectReceive(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        Receive::Receive(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
         : Object(model, patcher)
         {
             m_name = !args.empty() ? args[0].getString() : "";
@@ -180,7 +180,7 @@ namespace kiwi
             }
         }
         
-        ObjectReceive::~ObjectReceive()
+        Receive::~Receive()
         {
             if(!m_name.empty())
             {
@@ -189,12 +189,12 @@ namespace kiwi
             }
         }
         
-        void ObjectReceive::receive(size_t, std::vector<Atom> const& args)
+        void Receive::receive(size_t, std::vector<Atom> const& args)
         {
             
         }
         
-        void ObjectReceive::receive(std::vector<Atom> const& args)
+        void Receive::receive(std::vector<Atom> const& args)
         {
             if(!args.empty())
             {

@@ -36,7 +36,7 @@ namespace kiwi
             if(DataModel::has<NewBox>()) return;
             
             DataModel::declare<NewBox>()
-            .name("cicm.kiwi.NewBox")
+            .name("cicm.kiwi.object.NewBox")
             .inherit<model::Object>();
             
             Factory::add<NewBox>("newbox");
@@ -56,7 +56,7 @@ namespace kiwi
             if(DataModel::has<ErrorBox>()) return;
             
             DataModel::declare<ErrorBox>()
-            .name("cicm.kiwi.ErrorBox")
+            .name("cicm.kiwi.object.ErrorBox")
             .inherit<model::Object>();
             
             Factory::add<ErrorBox>("errorbox");
@@ -80,18 +80,18 @@ namespace kiwi
         //                                    OBJECT PLUS                                   //
         // ================================================================================ //
  
-        void ObjectPlus::declare()
+        void Plus::declare()
         {
-            if(DataModel::has<ObjectPlus>()) return;
+            if(DataModel::has<Plus>()) return;
             
-            DataModel::declare<ObjectPlus>()
-            .name("cicm.kiwi.ObjectPlus")
+            DataModel::declare<Plus>()
+            .name("cicm.kiwi.object.Plus")
             .inherit<model::Object>();
             
-            Factory::add<ObjectPlus>("plus", {"+"});
+            Factory::add<Plus>("plus", {"+"});
         }
         
-        ObjectPlus::ObjectPlus(std::string const& name, std::vector<Atom> const& args)
+        Plus::Plus(std::string const& name, std::vector<Atom> const& args)
         {
             pushInlet({PinType::IType::Control});
             
@@ -107,18 +107,18 @@ namespace kiwi
         //                                    OBJECT TIMES                                  //
         // ================================================================================ //
         
-        void ObjectTimes::declare()
+        void Times::declare()
         {
-            if(DataModel::has<ObjectTimes>()) return;
+            if(DataModel::has<Times>()) return;
             
-            DataModel::declare<ObjectTimes>()
-            .name("cicm.kiwi.ObjectTimes")
+            DataModel::declare<Times>()
+            .name("cicm.kiwi.object.Times")
             .inherit<model::Object>();
             
-            Factory::add<ObjectTimes>("times", {"*"});
+            Factory::add<Times>("times", {"*"});
         }
         
-        ObjectTimes::ObjectTimes(std::string const& name, std::vector<Atom> const& args)
+        Times::Times(std::string const& name, std::vector<Atom> const& args)
         {
             pushInlet({PinType::IType::Control});
             
@@ -134,40 +134,40 @@ namespace kiwi
         //                                    OBJECT PRINT                                  //
         // ================================================================================ //
         
-        ObjectPrint::ObjectPrint(std::string const& name, std::vector<Atom> const& args)
+        Print::Print(std::string const& name, std::vector<Atom> const& args)
         {
             pushInlet({PinType::IType::Control});
         }
         
-        void ObjectPrint::declare()
+        void Print::declare()
         {
-            if(DataModel::has<ObjectPrint>()) return;
+            if(DataModel::has<Print>()) return;
             
-            DataModel::declare<ObjectPrint>()
-            .name("cicm.kiwi.ObjectPrint")
+            DataModel::declare<Print>()
+            .name("cicm.kiwi.object.Print")
             .inherit<model::Object>();
             
-            Factory::add<ObjectPrint>("print");
+            Factory::add<Print>("print");
         }
         
         // ================================================================================ //
         //                                  OBJECT RECEIVE                                  //
         // ================================================================================ //
         
-        ObjectReceive::ObjectReceive(std::string const& name, std::vector<Atom> const& args)
+        Receive::Receive(std::string const& name, std::vector<Atom> const& args)
         {
             pushOutlet(PinType::IType::Control);
         }
         
-        void ObjectReceive::declare()
+        void Receive::declare()
         {
-            if(DataModel::has<ObjectReceive>()) return;
+            if(DataModel::has<Receive>()) return;
             
-            DataModel::declare<ObjectReceive>()
-            .name("cicm.kiwi.ObjectReceive")
+            DataModel::declare<Receive>()
+            .name("cicm.kiwi.object.Receive")
             .inherit<model::Object>();
             
-            Factory::add<ObjectReceive>("receive", {"r"});
+            Factory::add<Receive>("receive", {"r"});
         }
         
         // ================================================================================ //
@@ -201,7 +201,7 @@ namespace kiwi
             if(DataModel::has<DacTilde>()) return;
             
             DataModel::declare<DacTilde>()
-            .name("cicm.kiwi.DacTilde")
+            .name("cicm.kiwi.object.DacTilde")
             .inherit<model::Object>();
             
             Factory::add<DacTilde>("dac~");
@@ -225,7 +225,7 @@ namespace kiwi
             if(DataModel::has<OscTilde>()) return;
             
             DataModel::declare<OscTilde>()
-            .name("cicm.kiwi.OscTilde")
+            .name("cicm.kiwi.object.OscTilde")
             .inherit<model::Object>();
 
             Factory::add<OscTilde>("osc~");
@@ -252,7 +252,7 @@ namespace kiwi
             if(DataModel::has<TimesTilde>()) return;
             
             DataModel::declare<TimesTilde>()
-            .name("cicm.kiwi.TimesTilde")
+            .name("cicm.kiwi.object.TimesTilde")
             .inherit<model::Object>();
             
             Factory::add<TimesTilde>("times~", {"*~"});
@@ -279,7 +279,7 @@ namespace kiwi
             if(DataModel::has<PlusTilde>()) return;
             
             DataModel::declare<PlusTilde>()
-            .name("cicm.kiwi.PlusTilde")
+            .name("cicm.kiwi.object.PlusTilde")
             .inherit<model::Object>();
             
             Factory::add<PlusTilde>("plus~", {"+~"});
@@ -304,7 +304,7 @@ namespace kiwi
             if(DataModel::has<SigTilde>()) return;
             
             DataModel::declare<SigTilde>()
-            .name("cicm.kiwi.SigTilde")
+            .name("cicm.kiwi.object.SigTilde")
             .inherit<model::Object>();
             
             Factory::add<SigTilde>("sig~");

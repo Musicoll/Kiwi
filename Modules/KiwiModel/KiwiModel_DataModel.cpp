@@ -62,10 +62,10 @@ namespace kiwi
         {
             NewBox::declare();
             ErrorBox::declare();
-            ObjectPlus::declare();
-            ObjectTimes::declare();
-            ObjectPrint::declare();
-            ObjectReceive::declare();
+            Plus::declare();
+            Times::declare();
+            Print::declare();
+            Receive::declare();
             DacTilde::declare();
             OscTilde::declare();
             TimesTilde::declare();
