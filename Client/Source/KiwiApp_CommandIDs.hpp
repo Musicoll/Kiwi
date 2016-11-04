@@ -75,8 +75,11 @@ namespace kiwi
         
         showPatcherInspector        = 0xf20400,        ///< Shows the patcher properties inspector.
         
-        showObjectInspector         = 0xf20500,        ///< Shows the selected objects properties inspector.
-        openObjectHelp              = 0xf20510         ///< Open selected object help patcher.
+        showObjectInspector         = 0xf20410,        ///< Shows the selected objects properties inspector.
+        openObjectHelp              = 0xf20411,        ///< Open selected object help patcher.
+        
+        startDsp                    = 0xf20420,        ///< Starts the dsp
+        stopDsp                     = 0xf20421         ///< Stops the dsp
     };
     
     // ================================================================================ //

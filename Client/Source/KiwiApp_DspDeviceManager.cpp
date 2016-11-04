@@ -21,6 +21,7 @@
 
 #include "KiwiApp_DspDeviceManager.hpp"
 #include "KiwiApp_StoredSettings.hpp"
+#include "KiwiApp.hpp"
 
 namespace kiwi
 {
@@ -38,6 +39,9 @@ namespace kiwi
         {
             initialiseWithDefaultDevices(2, 2);
         }
+        
+        //! @todo Find a way to initilise setups without launching audio device.
+        stopAudio();
     }
     
     DspDeviceManager::~DspDeviceManager()
@@ -84,12 +88,24 @@ namespace kiwi
     void DspDeviceManager::startAudio()
     {
         addAudioCallback(this);
+        
+        closeAudioDevice();
+        restartLastAudioDevice();
+        
+        KiwiApp::commandStatusChanged();
     }
     
     void DspDeviceManager::stopAudio()
     {
+        getCurrentAudioDevice()->stop();
         removeAudioCallback(this);
+        KiwiApp::commandStatusChanged();
     }
+    
+    bool DspDeviceManager::isAudioOn() const
+    {
+        return getCurrentAudioDevice() ? getCurrentAudioDevice()->isPlaying() : false;
+    };
     
     void DspDeviceManager::addSignal(dsp::Buffer const& output_buffer)
     {

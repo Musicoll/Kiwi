@@ -121,6 +121,14 @@ namespace kiwi
             m_so_links.push_back(SoLinks());
         }
         
+        void Patcher::sendLoadbang()
+        {
+            for(auto& obj : m_model.getObjects())
+            {
+                obj.entity().use<std::shared_ptr<Object>>()->loadbang();
+            }
+        }
+        
         // ================================================================================ //
         //                                      CONSOLE                                     //
         // ================================================================================ //

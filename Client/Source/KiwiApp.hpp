@@ -137,8 +137,6 @@ namespace kiwi
         void createFileMenu(juce::PopupMenu& menu);
         void createEditMenu(juce::PopupMenu& menu);
         void createViewMenu(juce::PopupMenu& menu);
-        void createObjectMenu(juce::PopupMenu& menu);
-        void createArrangeMenu(juce::PopupMenu& menu);
         void createOptionsMenu(juce::PopupMenu& menu);
         void createWindowMenu(juce::PopupMenu& menu);
         void createHelpMenu(juce::PopupMenu& menu);
@@ -186,9 +184,6 @@ namespace kiwi
         
         //! @internal Utility to quit the app asynchronously.
         class AsyncQuitRetrier;
-
-        //! @brief Initialise the command manager
-        void initCommandManager();
         
     private: // members
         

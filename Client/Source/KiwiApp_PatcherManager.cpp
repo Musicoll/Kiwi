@@ -82,15 +82,13 @@ namespace kiwi
     {
         model::Patcher& patcher = getPatcher();
         DocumentManager::load(patcher, file);
+        patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
+        patcher.setName(file.getFileNameWithoutExtension().toStdString());
         
         DocumentManager::commit(patcher);
         m_need_saving_flag = false;
         
-        patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
-        
-        patcher.setName(file.getFileNameWithoutExtension().toStdString());
-        
-        DocumentManager::commit(patcher, "Add User");
+        patcher.entity().use<engine::Patcher>().sendLoadbang();
     }
     
     PatcherManager::PatcherManager(Instance & instance, const std::string host, uint16_t port, uint64_t session_id) :
@@ -104,6 +102,8 @@ namespace kiwi
         
         patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
         DocumentManager::commit(patcher);
+        
+        patcher.entity().use<engine::Patcher>().sendLoadbang();
     }
     
     PatcherManager::~PatcherManager()
