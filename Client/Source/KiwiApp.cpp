@@ -276,7 +276,7 @@ namespace kiwi
     {
         const char* const names[] =
         {
-            "File", "Edit", "View", "Arrange", "Options", "Window", "Help", nullptr
+            "File", "Edit", "View", "Options", "Window", "Help", nullptr
         };
         
         return juce::StringArray(names);
@@ -287,7 +287,6 @@ namespace kiwi
         if		(menuName == "File")        createFileMenu		(menu);
         else if (menuName == "Edit")        createEditMenu		(menu);
         else if (menuName == "View")        createViewMenu		(menu);
-        else if (menuName == "Arrange")     createArrangeMenu	(menu);
         else if (menuName == "Options")     createOptionsMenu	(menu);
         else if (menuName == "Window")      createWindowMenu	(menu);
         else if (menuName == "Help")		createHelpMenu		(menu);
@@ -341,12 +340,6 @@ namespace kiwi
         menu.addCommandItem(m_command_manager.get(), CommandIDs::zoomIn);
         menu.addCommandItem(m_command_manager.get(), CommandIDs::zoomOut);
         menu.addCommandItem(m_command_manager.get(), CommandIDs::zoomNormal);
-    }
-    
-    void KiwiApp::createArrangeMenu(juce::PopupMenu& menu)
-    {
-        menu.addCommandItem(m_command_manager.get(), CommandIDs::toFront);
-        menu.addCommandItem(m_command_manager.get(), CommandIDs::toBack);
     }
     
     void KiwiApp::createOptionsMenu(juce::PopupMenu& menu)

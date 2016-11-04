@@ -608,9 +608,7 @@ namespace kiwi
             m.addCommandItem(cm, CommandIDs::pasteReplace);
             m.addCommandItem(cm, juce::StandardApplicationCommandIDs::del);
             m.addSeparator();
-            
-            m.addCommandItem(cm, CommandIDs::toFront);
-            m.addCommandItem(cm, CommandIDs::toBack);
+
             m.addSeparator();
             
             m.show();
@@ -2255,9 +2253,6 @@ namespace kiwi
         
         commands.add(CommandIDs::newBox);
         
-        commands.add(CommandIDs::toFront);
-        commands.add(CommandIDs::toBack);
-        
         commands.add(CommandIDs::zoomIn);
         commands.add(CommandIDs::zoomOut);
         commands.add(CommandIDs::zoomNormal);
@@ -2375,20 +2370,6 @@ namespace kiwi
                 result.setActive(!isLocked());
                 break;
             }
-            case CommandIDs::toFront:
-            {
-                result.setInfo(TRANS("Bring to Front"), TRANS("Bring selected boxes to front"), CommandCategories::editing, 0);
-                result.addDefaultKeypress('f', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
-                result.setActive(isAnyObjectSelected());
-                break;
-            }
-            case CommandIDs::toBack:
-            {
-                result.setInfo(TRANS("Send to Back"), TRANS("Send selected boxes to back"), CommandCategories::editing, 0);
-                result.addDefaultKeypress('b', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
-                result.setActive(isAnyObjectSelected());
-                break;
-            }
             case CommandIDs::zoomIn:
             {
                 result.setInfo(TRANS("Zoom in"), TRANS("Zoom in"), CommandCategories::view, 0);
@@ -2447,8 +2428,6 @@ namespace kiwi
             
             case CommandIDs::newBox:                            { createNewBoxModel(true); break; }
                 
-            case CommandIDs::toFront:                           { break; }
-            case CommandIDs::toBack:                            { break; }
             case CommandIDs::zoomIn:                            { zoomIn(); break; }
             case CommandIDs::zoomOut:                           { zoomOut(); break; }
             case CommandIDs::zoomNormal:                        { zoomNormal(); break; }
