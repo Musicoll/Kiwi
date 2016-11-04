@@ -167,14 +167,12 @@ namespace kiwi
             
             void performPhase(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
             
-            void performPaseAndFreq(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            void performPhaseAndFreq(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
             
             void prepare(dsp::Processor::PrepareInfo const& infos) override final;
             
         private: // methods
-            
-            dsp::sample_t computeTimeInc(dsp::sample_t const& freq, dsp::sample_t const& sr) noexcept;
-            
+                        
             void setFrequency(dsp::sample_t const& freq) noexcept;
             
             void setOffset(dsp::sample_t const& offset) noexcept;

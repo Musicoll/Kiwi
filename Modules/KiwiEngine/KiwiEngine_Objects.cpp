@@ -254,26 +254,21 @@ namespace kiwi
             }
         }
         
-        dsp::sample_t OscTilde::computeTimeInc(dsp::sample_t const& freq, dsp::sample_t const& sr) noexcept
-        {
-            return (freq != 0.) ? (1./(sr/(freq))) : 0.;
-        }
-        
         void OscTilde::setFrequency(dsp::sample_t const& freq) noexcept
         {
             m_freq = freq;
-            m_time_inc = computeTimeInc(m_freq, m_sr);
+            m_time_inc = (m_freq/m_sr);
         }
         
         void OscTilde::setSampleRate(dsp::sample_t const& sample_rate)
         {
             m_sr = sample_rate;
-            m_time_inc = computeTimeInc(m_freq, m_sr);
+            m_time_inc = (m_freq/m_sr);
         }
         
         void OscTilde::setOffset(dsp::sample_t const& offset) noexcept
         {
-            m_offset = fmodf(offset, 1.);
+            m_offset = fmodf(offset, 1.f);
         }
         
         void OscTilde::receive(size_t index, std::vector<Atom> const& args)
@@ -294,7 +289,7 @@ namespace kiwi
             
             if (infos.inputs[0] && infos.inputs[1])
             {
-                setPerformCallBack(this, &OscTilde::performPaseAndFreq);
+                setPerformCallBack(this, &OscTilde::performPhaseAndFreq);
             }
             else if(infos.inputs[0])
             {
@@ -318,44 +313,44 @@ namespace kiwi
             
             while(framesize--)
             {
-                *sig_data++ = std::cos(2 * dsp::pi * (m_time + m_offset));
-                m_time = m_time + m_time_inc;
+                *sig_data++ = std::cos(2.f * dsp::pi * (m_time + m_offset));
+                m_time += m_time_inc;
             }
             
-            m_time = fmodf(m_time, 1.);
+            m_time = fmodf(m_time, 1.f);
         }
         
         void OscTilde::performFreq(dsp::Buffer const& input, dsp::Buffer& output) noexcept
         {
-            size_t sample_index = output[0].size();
-            dsp::sample_t* output_sig = output[0].data();
-            dsp::sample_t const* freq = input[0].data();
+            size_t sample_index = output[0ul].size();
+            dsp::sample_t* output_sig = output[0ul].data();
+            dsp::sample_t const* freq = input[0ul].data();
             
             while(sample_index--)
             {
-                *output_sig++  = std::cos(2 *dsp::pi * (m_time + m_offset));
-                m_time = m_time + computeTimeInc(*freq++, m_sr);
+                *output_sig++ = std::cos(2.f *dsp::pi * (m_time + m_offset));
+                m_time += (*freq++ / m_sr);
             }
             
-            m_time = fmodf(m_time, 1.);
+            m_time = fmodf(m_time, 1.f);
         }
         
         void OscTilde::performPhase(dsp::Buffer const& input, dsp::Buffer& output) noexcept
         {
-            size_t sample_index = output[0].size();
-            dsp::sample_t* output_sig = output[0].data();
-            dsp::sample_t const* phase = input[1].data();
+            dsp::sample_t* output_sig = output[0ul].data();
+            size_t sample_index = output[0ul].size();
+            dsp::sample_t const* phase = input[1ul].data();
             
             while(sample_index--)
             {
-                *output_sig++  = std::cos(2 * dsp::pi *(m_time + fmodf(*phase++, 1.)));
-                m_time = m_time + m_time_inc;
+                *output_sig++  = std::cos(2.f * dsp::pi * (m_time + fmodf(*phase++, 1.f)));
+                m_time += m_time_inc;
             }
             
-            m_time = fmodf(m_time, 1.);
+            m_time = fmodf(m_time, 1.f);
         }
         
-        void OscTilde::performPaseAndFreq(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        void OscTilde::performPhaseAndFreq(dsp::Buffer const& input, dsp::Buffer& output) noexcept
         {
             size_t sample_index = output[0].size();
             dsp::sample_t* output_sig = output[0].data();
@@ -364,11 +359,11 @@ namespace kiwi
             
             while(sample_index--)
             {
-                *output_sig++  = std::cos(2 * dsp::pi *(m_time + fmodf(*phase++, 1.)));
-                m_time = m_time + computeTimeInc(*freq++, m_sr);
+                *output_sig++  = std::cos(2.f * dsp::pi * (m_time + fmodf(*phase++, 1.f)));
+                m_time += (*freq++ / m_sr);
             }
             
-            m_time = fmodf(m_time, 1.);
+            m_time = fmodf(m_time, 1.f);
         }
         
         // ================================================================================ //
