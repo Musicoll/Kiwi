@@ -589,8 +589,38 @@ namespace kiwi
             m.addCommandItem(cm, juce::StandardApplicationCommandIDs::selectAll);
             m.addSeparator();
         }
-
-        m.show();
+        
+        juce::PopupMenu object_menu;
+        
+        object_menu.addItem(1, "+");
+        object_menu.addItem(2, "*");
+        object_menu.addItem(3, "loadmess");
+        object_menu.addItem(4, "receive");
+        object_menu.addItem(5, "print");
+        object_menu.addItem(6, "dac~");
+        object_menu.addItem(7, "+~");
+        object_menu.addItem(8, "*~");
+        object_menu.addItem(9, "sig~");
+        object_menu.addItem(10, "osc~");
+        
+        m.addSubMenu("Object", object_menu);
+        
+        const int result = m.show();
+        
+        switch(result)
+        {
+            case 1 : { createObjectModel("+", position.getX(), position.getY()); break; }
+            case 2 : { createObjectModel("*", position.getX(), position.getY()); break; }
+            case 3 : { createObjectModel("loadmess", position.getX(), position.getY()); break; }
+            case 4 : { createObjectModel("receive", position.getX(), position.getY()); break; }
+            case 5 : { createObjectModel("print", position.getX(), position.getY()); break; }
+            case 6 : { createObjectModel("dac~", position.getX(), position.getY()); break; }
+            case 7 : { createObjectModel("+~", position.getX(), position.getY()); break; }
+            case 8 : { createObjectModel("*~", position.getX(), position.getY()); break; }
+            case 9 : { createObjectModel("sig~", position.getX(), position.getY()); break; }
+            case 10 :{ createObjectModel("osc~", position.getX(), position.getY()); break; }
+            default: break;
+        }
     }
     
     void PatcherView::showObjectPopupMenu(ObjectView const& object, juce::Point<int> const& position)
