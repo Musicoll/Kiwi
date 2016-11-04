@@ -146,6 +146,24 @@ namespace kiwi
         };
         
         // ================================================================================ //
+        //                                  OBJECT LOADMESS                                 //
+        // ================================================================================ //
+        
+        class Loadmess : public model::Object
+        {
+        public:
+            
+            //! @brief flip Default Constructor
+            Loadmess(flip::Default& d) : model::Object(d) {}
+            
+            //! @brief Constructor
+            Loadmess(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @internal flip static declare method
+            static void declare();
+        };
+        
+        // ================================================================================ //
         //                                    OBJECT OSC~                                   //
         // ================================================================================ //
         

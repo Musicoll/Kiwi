@@ -171,6 +171,26 @@ namespace kiwi
         }
         
         // ================================================================================ //
+        //                                  OBJECT LOADMESS                                 //
+        // ================================================================================ //
+        
+        Loadmess::Loadmess(std::string const& name, std::vector<Atom> const& args)
+        {
+            pushOutlet(PinType::IType::Control);
+        }
+        
+        void Loadmess::declare()
+        {
+            if(DataModel::has<Loadmess>()) return;
+            
+            DataModel::declare<Loadmess>()
+            .name("cicm.kiwi.object.Loadmess")
+            .inherit<model::Object>();
+            
+            Factory::add<Loadmess>("loadmess");
+        }
+        
+        // ================================================================================ //
         //                                  OBJECT DAC~                                     //
         // ================================================================================ //
         

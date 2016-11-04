@@ -59,6 +59,9 @@ namespace kiwi
             //! @todo see if the method must be noexcept.
             virtual void receive(size_t index, std::vector<Atom> const& args) = 0;
             
+            //! @brief Called when the Patcher is loaded.
+            virtual void loadbang() {};
+            
             //! @internal Appends a new Link to an outlet.
             void addOutputLink(Link const& link);
             

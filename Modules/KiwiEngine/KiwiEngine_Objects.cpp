@@ -203,6 +203,27 @@ namespace kiwi
         }
         
         // ================================================================================ //
+        //                                  OBJECT LOADMESS                                 //
+        // ================================================================================ //
+        
+        Loadmess::Loadmess(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        : Object(model, patcher),
+        m_args(args)
+        {
+            ;
+        }
+        
+        void Loadmess::receive(size_t, std::vector<Atom> const& args)
+        {
+            send(0ul, m_args);
+        }
+        
+        void Loadmess::loadbang()
+        {
+            send(0ul, m_args);
+        }
+        
+        // ================================================================================ //
         //                                       DAC~                                       //
         // ================================================================================ //
         

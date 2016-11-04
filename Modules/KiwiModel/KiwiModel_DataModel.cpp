@@ -66,6 +66,7 @@ namespace kiwi
             Times::declare();
             Print::declare();
             Receive::declare();
+            Loadmess::declare();
             DacTilde::declare();
             OscTilde::declare();
             TimesTilde::declare();

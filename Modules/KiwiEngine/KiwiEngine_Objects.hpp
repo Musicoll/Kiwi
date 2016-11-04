@@ -130,6 +130,27 @@ namespace kiwi
         };
         
         // ================================================================================ //
+        //                                  OBJECT LOADMESS                                 //
+        // ================================================================================ //
+        
+        class Loadmess : public engine::Object
+        {
+        public:
+            
+            Loadmess(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            ~Loadmess() = default;
+            
+            void receive(size_t, std::vector<Atom> const& args) override;
+            
+            void loadbang() override;
+            
+        private:
+            
+            const std::vector<Atom> m_args;
+        };
+        
+        // ================================================================================ //
         //                                       DAC~                                       //
         // ================================================================================ //
         
