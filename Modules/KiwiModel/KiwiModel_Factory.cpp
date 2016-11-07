@@ -88,7 +88,8 @@ namespace kiwi
         std::vector<std::string> Factory::getNames()
         {
             const auto& creators = getCreators();
-            std::vector<std::string> names(creators.size());
+            std::vector<std::string> names;
+            names.reserve(creators.size());
             
             for(const auto& creator : creators)
             {

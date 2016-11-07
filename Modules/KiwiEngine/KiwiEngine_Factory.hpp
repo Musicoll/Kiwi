@@ -78,10 +78,6 @@ namespace kiwi
             //! @return true if the object has been added, otherwise false.
             static bool has(std::string const& name);
             
-            //! @brief Gets the names of the objects that has been added to the Factory.
-            //! @return A vector of Object names.
-            static std::vector<std::string> getNames();
-            
         private: // methods
             
             static bool modelHasObject(std::string const& name);
