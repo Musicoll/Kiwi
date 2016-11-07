@@ -19,7 +19,7 @@ build_script:
 
 after_build:
     - del /F /S /Q /A %APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\Bin\%CONFIGURATION%\*.ilk
-    - 7z a Kiwi_%PLATFORM%.zip %APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\Bin\%CONFIGURATION%\
+    - 7z a Kiwi_%PLATFORM%.zip %APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\Bin\%CONFIGURATION%\Kiwi.exe
 
 artifacts:
   - path: '*.zip'
