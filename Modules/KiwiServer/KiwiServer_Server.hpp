@@ -74,6 +74,9 @@ namespace kiwi
             //! @brief set the sessions' backend files directory.
             void setSessionsBackendDirectory(std::string const& directory);
             
+            //! @brief Rename a given document session.
+            bool renameDocumentSession(uint64_t session_id, std::string const& new_name);
+            
         private: // methods
             
             //! @brief Initialise a new empty patcher

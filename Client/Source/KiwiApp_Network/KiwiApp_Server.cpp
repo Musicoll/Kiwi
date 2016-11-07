@@ -80,4 +80,14 @@ namespace kiwi
             m_server_thread.join();
         }
     }
+    
+    bool Server::renameDocumentSession(uint64_t session_id, std::string const& new_name)
+    {
+        if(m_server)
+        {
+            return m_server->renameDocumentSession(session_id, new_name);
+        }
+        
+        return false;
+    }
 }

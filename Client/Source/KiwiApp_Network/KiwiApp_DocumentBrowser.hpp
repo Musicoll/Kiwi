@@ -151,6 +151,9 @@ namespace kiwi
         //! @brief Returns the documents.
         std::list<DocumentSession> const& getDocuments() const;
         
+        //! @brief Returns the documents.
+        std::list<DocumentSession>& getDocuments();
+        
         //! @brief Returns true if the drive match the session
         //! @details this operator only compares ip and port.
         bool operator==(Session const& session) const;
@@ -190,13 +193,13 @@ namespace kiwi
         virtual ~Listener() = default;
         
         //! @brief Called when a document session has been added.
-        virtual void documentAdded(DocumentBrowser::Drive::DocumentSession const& doc) = 0;
+        virtual void documentAdded(DocumentBrowser::Drive::DocumentSession& doc) = 0;
         
         //! @brief Called when a document session changed.
-        virtual void documentChanged(DocumentBrowser::Drive::DocumentSession const& doc) = 0;
+        virtual void documentChanged(DocumentBrowser::Drive::DocumentSession& doc) = 0;
         
         //! @brief Called when a document session has been removed.
-        virtual void documentRemoved(DocumentBrowser::Drive::DocumentSession const& doc) = 0;
+        virtual void documentRemoved(DocumentBrowser::Drive::DocumentSession& doc) = 0;
     };
     
     // ================================================================================ //
@@ -227,6 +230,9 @@ namespace kiwi
         
         //! @brief Called when the PatcherManager is closed.
         void patcherManagerRemoved(PatcherManager const& manager) override;
+        
+        //! @brief Rename the document session.
+        bool rename(std::string const& new_name);
         
         //! @brief Returns true if the DocumentSession match another DocumentSession
         //! @details this operator uses the session_id field to compare.

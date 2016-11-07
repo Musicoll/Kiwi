@@ -99,13 +99,13 @@ namespace kiwi
         void paint(juce::Graphics& g) override;
         
         //! @brief Called when a document session has been added.
-        void documentAdded(DocumentBrowser::Drive::DocumentSession const& doc) override;
+        void documentAdded(DocumentBrowser::Drive::DocumentSession& doc) override;
         
         //! @brief Called when a document session changed.
-        void documentChanged(DocumentBrowser::Drive::DocumentSession const& doc) override;
+        void documentChanged(DocumentBrowser::Drive::DocumentSession& doc) override;
         
         //! @brief Called when a document session has been removed.
-        void documentRemoved(DocumentBrowser::Drive::DocumentSession const& doc) override;
+        void documentRemoved(DocumentBrowser::Drive::DocumentSession& doc) override;
         
         //! @brief Returns true if the two drive view refer to the same drive.
         bool operator==(DocumentBrowser::Drive const& other_drive) const;
@@ -136,12 +136,12 @@ namespace kiwi
             std::function<void(void)> m_command;
         };
         
-        class DocumentSessionView : public juce::Component
+        class DocumentSessionView : public juce::Component, juce::Label::Listener
         {
         public: // methods
             
             //! @brief Constructor.
-            DocumentSessionView(DocumentBrowser::Drive::DocumentSession const& document);
+            DocumentSessionView(DocumentBrowser::Drive::DocumentSession& document);
             
             //! @brief Destructor.
             ~DocumentSessionView() = default;
@@ -151,6 +151,9 @@ namespace kiwi
             
             //! @brief Called when resized.
             void resized() override;
+            
+            //! @brief Called when a Label's text has changed.
+            void labelTextChanged(juce::Label* labelThatHasChanged) override;
             
             //! @brief Returns the metadata associated to the given key.
             std::string getMetadata(std::string const& key, std::string const& ifnotfound = "") const;
@@ -175,9 +178,9 @@ namespace kiwi
             
         private: // members
             
-            DocumentBrowser::Drive::DocumentSession const&  m_document;
-            BrowserButton                                   m_open_btn;
-            juce::Label                                     m_name_label;
+            DocumentBrowser::Drive::DocumentSession&    m_document;
+            BrowserButton                               m_open_btn;
+            juce::Label                                 m_name_label;
         };
         
     private: // methods

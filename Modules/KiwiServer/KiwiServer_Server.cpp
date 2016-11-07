@@ -155,6 +155,24 @@ namespace kiwi
             m_backend_files_path = directory;
         }
         
+        bool Server::renameDocumentSession(uint64_t session_id, std::string const& new_name)
+        {
+            if(m_files.find(session_id) != m_files.end())
+            {
+                auto& file = m_files[session_id];
+                auto new_file = m_backend_files_path.getChildFile(juce::String(new_name))
+                .withFileExtension(kiwi_file_extension);
+                
+                file.moveFileTo(new_file);
+                m_files[session_id] = new_file;
+                
+                updateMetadata();
+                return true;
+            }
+            
+            return false;
+        }
+        
         juce::File Server::getSessionFile(uint64_t session_id)
         {
             if(m_files.find(session_id) != m_files.end())

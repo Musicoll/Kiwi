@@ -63,6 +63,9 @@ namespace kiwi
         //! @brief Stop the server.
         void stop();
         
+        //! @brief Rename a given document session.
+        bool renameDocumentSession(uint64_t session_id, std::string const& new_name);
+        
     private: // members
         
         uint64_t                            m_user_id;

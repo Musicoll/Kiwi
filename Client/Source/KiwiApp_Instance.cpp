@@ -73,6 +73,11 @@ namespace kiwi
         return m_instance;
     }
     
+    Server& Instance::useServer()
+    {
+        return m_server;
+    }
+    
     void Instance::newPatcher()
     {
         auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), new PatcherManager(*this));

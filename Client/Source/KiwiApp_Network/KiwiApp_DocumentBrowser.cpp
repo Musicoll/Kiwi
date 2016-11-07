@@ -20,6 +20,7 @@
  */
 
 #include "KiwiApp_DocumentBrowser.hpp"
+#include "KiwiApp_DocumentManager.hpp"
 #include "../KiwiApp.hpp"
 
 namespace kiwi
@@ -231,6 +232,11 @@ namespace kiwi
         return m_documents;
     }
     
+    std::list<DocumentBrowser::Drive::DocumentSession>& DocumentBrowser::Drive::getDocuments()
+    {
+        return m_documents;
+    }
+    
     bool DocumentBrowser::Drive::operator==(Session const& session) const
     {
         return (m_ip == session.ip) && (m_port == session.port);
@@ -360,6 +366,23 @@ namespace kiwi
     void DocumentBrowser::Drive::DocumentSession::patcherManagerRemoved(PatcherManager const& manager)
     {
         m_patcher_manager = nullptr;
+    }
+    
+    bool DocumentBrowser::Drive::DocumentSession::rename(std::string const& new_name)
+    {
+        const bool ok = KiwiApp::useInstance().useServer().renameDocumentSession(m_session_id, new_name);
+        
+        std::cout << "doc renamed OK !!! = " << std::to_string(ok) << "\n";
+        
+        if(ok && m_patcher_manager != nullptr)
+        {
+            model::Patcher& patcher = m_patcher_manager->getPatcher();
+            patcher.setName(new_name);
+            DocumentManager::commit(patcher);
+            std::cout << "doc renamed !!!\n";
+        }
+        
+        return ok;
     }
     
     bool DocumentBrowser::Drive::DocumentSession::operator==(DocumentSession const& other_doc) const

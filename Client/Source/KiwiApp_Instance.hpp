@@ -64,6 +64,9 @@ namespace kiwi
         //! @brief Returns the engine::Instance
         engine::Instance const& getEngineInstance() const;
         
+        //! @brief Returns the embed application Server.
+        Server& useServer();
+        
         //! @brief Open a File.
         bool openFile(juce::File const& file);
         
