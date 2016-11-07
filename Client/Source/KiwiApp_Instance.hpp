@@ -31,6 +31,7 @@
 #include "KiwiApp_PatcherManager.hpp"
 #include "KiwiApp_StoredSettings.hpp"
 #include "KiwiApp_BeaconDispatcher.hpp"
+#include "KiwiApp_DspDeviceManager.hpp"
 
 #include "KiwiApp_Network/KiwiApp_Server.hpp"
 
@@ -117,7 +118,8 @@ namespace kiwi
         std::unique_ptr<ConsoleWindow>              m_console_window;
         std::unique_ptr<DocumentBrowserWindow>      m_document_browser_window;
         std::unique_ptr<BeaconDispatcherWindow>     m_beacon_dispatcher_window;
-        
+        std::unique_ptr<AudioSettingWindow>         m_audio_setting_window;
+    
         std::vector<uint8_t>                        m_patcher_clipboard;
         
         static size_t                               m_untitled_patcher_index;

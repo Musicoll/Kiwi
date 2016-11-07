@@ -24,7 +24,6 @@
 #include "KiwiApp.hpp"
 #include "KiwiApp_Instance.hpp"
 #include "KiwiApp_PatcherView.hpp"
-#include "KiwiApp_DspDeviceManager.hpp"
 
 #include "KiwiApp_Network/KiwiApp_DocumentManager.hpp"
 
@@ -46,6 +45,7 @@ namespace kiwi
     m_console_window(new ConsoleWindow(m_console_history)),
     m_document_browser_window(new DocumentBrowserWindow(m_server.getBrowser())),
     m_beacon_dispatcher_window(new BeaconDispatcherWindow(m_instance)),
+    m_audio_setting_window(new AudioSettingWindow(dynamic_cast<DspDeviceManager&>(m_instance.getAudioControler()))),
     m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
     {
         m_server.run();
@@ -214,29 +214,6 @@ namespace kiwi
         return nullptr;
     }
     
-    // ================================================================================ //
-    //                                 Audio Settings                                   //
-    // ================================================================================ //
-    
-    void Instance::showAudioSettingsWindow()
-    {
-        DspDeviceManager& device_manager = dynamic_cast<DspDeviceManager&>(m_instance.getAudioControler());
-        juce::AudioDeviceSelectorComponent audio_settings(device_manager, 1, 20, 1, 20, false, false, false, true);
-        juce::OptionalScopedPointer<juce::Component> settings_component(&audio_settings, false);
-        
-        settings_component->setTopLeftPosition(10, 10);
-        settings_component->setSize(300, 440);
-        settings_component->setVisible(true);
-        
-        
-        juce::DialogWindow::LaunchOptions option;
-        option.dialogTitle = juce::String("Audio Settings");
-        option.content = settings_component;
-        option.resizable = true;
-        
-        option.runModal();
-    }
-    
     Instance::PatcherManagers::iterator Instance::getPatcherManager(PatcherManager const& manager)
     {
         const auto find_it = [&manager](std::unique_ptr<PatcherManager> const& manager_uptr)
@@ -263,6 +240,13 @@ namespace kiwi
     {
         m_beacon_dispatcher_window->setVisible(true);
         m_beacon_dispatcher_window->toFront(true);
+    }
+    
+    void Instance::showAudioSettingsWindow()
+    {
+        m_audio_setting_window->addToDesktop();
+        m_audio_setting_window->setVisible(true);
+        m_audio_setting_window->toFront(true);
     }
     
     std::vector<uint8_t>& Instance::getPatcherClipboardData()

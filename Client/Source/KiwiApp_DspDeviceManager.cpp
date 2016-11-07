@@ -23,8 +23,15 @@
 #include "KiwiApp_StoredSettings.hpp"
 #include "KiwiApp.hpp"
 
+#include <juce_audio_utils/juce_audio_utils.h>
+
 namespace kiwi
 {
+    
+    // ================================================================================ //
+    //                               DSP DEVICE MANAGER                                 //
+    // ================================================================================ //
+    
     DspDeviceManager::DspDeviceManager() :
     m_input_matrix(nullptr),
     m_output_matrix(nullptr)
@@ -196,5 +203,26 @@ namespace kiwi
         {
             (*m_output_matrix)[i].fill(0);
         }
+    }
+    
+    // ================================================================================ //
+    //                               AUDIO SETTING WINDOW                               //
+    // ================================================================================ //
+    
+    AudioSettingWindow::AudioSettingWindow(DspDeviceManager& device_manager):
+    Window("Audio Settings", juce::Colours::white, allButtons, false)
+    {
+        juce::AudioDeviceSelectorComponent* audio_settings =
+        new juce::AudioDeviceSelectorComponent(device_manager, 1, 20, 1, 20, false, false, false, true);
+        
+        setContentOwned(audio_settings, false);
+        setSize(300, 440);
+        setTopLeftPosition(10, 10);
+        setResizable(false, false);
+    }
+    
+    void AudioSettingWindow::closeButtonPressed()
+    {
+        setVisible(false);
     }
 }
