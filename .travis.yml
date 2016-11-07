@@ -9,16 +9,26 @@ git:
   submodules: false
 
 install:
-    - git submodule update --init --recursive ThirdParty/flip-public
     - git submodule update --init --recursive ThirdParty/Juce
 
 matrix:
   include:
   - os: linux
-    compiler: gcc
+    compiler: g++
     env: COMPILER=g++-4.9
+    before_install:
+    - sudo apt-get update
+    - sudo apt-get install libfreetype6-dev
+    - sudo apt-get install libx11-dev
+    - sudo apt-get install libxrandr-dev
+    - sudo apt-get install libxinerama1
+    - sudo apt-get install libxinerama-dev
+    - sudo apt-get install libxcursor-dev
+    - sudo apt-get install libasound2-dev
     script:
-    - ls
+    - python ./Config/configure.py
+    - python ./Config/build.py -c Release
+    - python ./Config/run_test.py -c Release
     after_success:
     - openssl aes-256-cbc -K $encrypted_5a43ff9033eb_key -iv $encrypted_5a43ff9033eb_iv -in Config/travisci_rsa.enc -out Config/travisci_rsa -d
     - chmod 0600 Config/travisci_rsa
@@ -29,6 +39,8 @@ matrix:
   - os: osx
     compiler: clang++
     env: COMPILER=clang++
+    before_install:
+      - brew install portaudio
     script:
     - python ./Config/configure.py
     - python ./Config/build.py -c Release
@@ -36,7 +48,6 @@ matrix:
     before_deploy:
     - mkdir Kiwi
     - mv Build/Release/KiwiBuild/Bin/Release/Kiwi.app Kiwi/Kiwi.app
-    - mv Build/Release/KiwiBuild/Bin/Release/Server Kiwi/Server
     - zip -r Kiwi_macos.zip Kiwi
     deploy:
       provider: releases

@@ -56,7 +56,7 @@ namespace kiwi
             model::Object& addObject(std::string const& name, std::vector<Atom> const& args);
             
             //! @brief create an Object from a flip::Mold.
-            model::Object& addObject(flip::Mold const& mold);
+            model::Object& addObject(std::string const& name, flip::Mold const& mold);
             
             //! @brief Constructs and add a Link to the Patcher.
             //! @details Constructs a Link with given origin and destination Object

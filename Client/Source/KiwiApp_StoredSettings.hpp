@@ -22,7 +22,7 @@
 #ifndef KIWI_APP_STORED_SETTINGS_HPP_INCLUDED
 #define KIWI_APP_STORED_SETTINGS_HPP_INCLUDED
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <juce_data_structures/juce_data_structures.h>
 
 namespace kiwi
 {

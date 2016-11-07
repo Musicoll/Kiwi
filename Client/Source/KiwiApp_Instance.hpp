@@ -22,17 +22,17 @@
 #ifndef KIWI_APP_INSTANCE_HPP_INCLUDED
 #define KIWI_APP_INSTANCE_HPP_INCLUDED
 
-#include <string>
-
 #include <KiwiEngine/KiwiEngine_Instance.hpp>
 
 #include "flip/Document.h"
 
 #include "KiwiApp_Console.hpp"
-#include "KiwiApp_DocumentExplorer.hpp"
+#include "KiwiApp_DocumentBrowserView.hpp"
 #include "KiwiApp_PatcherManager.hpp"
 #include "KiwiApp_StoredSettings.hpp"
 #include "KiwiApp_BeaconDispatcher.hpp"
+
+#include "KiwiApp_Network/KiwiApp_Server.hpp"
 
 namespace kiwi
 {
@@ -77,16 +77,18 @@ namespace kiwi
         bool closeAllWindows();
         
         //! @brief Attempt to create a new patcher with given host and port parameters.
-        void openRemotePatcher(std::string& host, uint16_t& port);
+        PatcherManager* openRemotePatcher(std::string const& host,
+                                          uint16_t port,
+                                          uint64_t session_id);
         
-        //! @brief Opens the settings
-        void openSettings();
+        //! @brief Opens a juce native audio setting pannel.
+        void showAudioSettingsWindow();
         
         //! @brief Brings the Console to front.
         void showConsoleWindow();
         
-        //! @brief Brings the DocumentExplorerWindow to front.
-        void showDocumentExplorerWindow();
+        //! @brief Brings the DocumentBrowserWindow to front.
+        void showDocumentBrowserWindow();
         
         //! @brief Brings the BeaconDispatcherWindow to front.
         void showBeaconDispatcherWindow();
@@ -99,28 +101,21 @@ namespace kiwi
         using PatcherManagers = std::vector<std::unique_ptr<PatcherManager>>;
         
         //! @internal get the given patcher manager iterator.
-        PatcherManagers::const_iterator getPatcherManager(PatcherManager const& manager) const;
+        PatcherManagers::iterator getPatcherManager(PatcherManager const& manager);
         
         //! @brief Returns the next untitled number based on current documents
         size_t getNextUntitledNumberAndIncrement();
         
-        //! @brief Sets the instance user id
-        void setUserId(uint64_t user_id);
-        
     private: // members
         
-        uint64_t m_user_id;
+        engine::Instance                            m_instance;
+        Server                                      m_server;
         
-        std::unique_ptr<engine::Instance>           m_instance;
-        
-        PatcherManagers                            m_patcher_managers;
+        PatcherManagers                             m_patcher_managers;
         
         sConsoleHistory                             m_console_history;
-        std::unique_ptr<ConsoleWindow>             m_console_window;
-        
-        std::unique_ptr<DocumentExplorer>           m_document_explorer;
-        std::unique_ptr<DocumentExplorerWindow>     m_document_explorer_window;
-        
+        std::unique_ptr<ConsoleWindow>              m_console_window;
+        std::unique_ptr<DocumentBrowserWindow>      m_document_browser_window;
         std::unique_ptr<BeaconDispatcherWindow>     m_beacon_dispatcher_window;
         
         std::vector<uint8_t>                        m_patcher_clipboard;

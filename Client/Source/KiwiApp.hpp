@@ -22,10 +22,17 @@
 #ifndef KIWI_KIWIAPP_HPP_INCLUDED
 #define KIWI_KIWIAPP_HPP_INCLUDED
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <juce_gui_basics/juce_gui_basics.h>
 
 #include "KiwiApp_Instance.hpp"
 #include "KiwiApp_StoredSettings.hpp"
+
+namespace ProjectInfo
+{
+    const char* const  projectName    = "Kiwi";
+    const char* const  versionString  = "0.0.1";
+    const int          versionNumber  = 0x1;
+}
 
 namespace kiwi
 {
@@ -70,6 +77,9 @@ namespace kiwi
         //! @brief Get the current running application instance.
         static KiwiApp* getApp();
         
+        //! @brief Get the current running kiwi instance.
+        static Instance& useInstance();
+        
         //! @brief Get the current running engine instance.
         static engine::Instance& useEngineInstance();
         
@@ -78,6 +88,9 @@ namespace kiwi
         
         //! @brief Returns the application stored settings.
         static StoredSettings& useSettings();
+        
+        //! @brief Returns the MenuBarModel.
+        static juce::MenuBarModel* getMenuBarModel();
         
         // ================================================================================ //
         //                                      CONSOLE                                     //
@@ -124,8 +137,6 @@ namespace kiwi
         void createFileMenu(juce::PopupMenu& menu);
         void createEditMenu(juce::PopupMenu& menu);
         void createViewMenu(juce::PopupMenu& menu);
-        void createObjectMenu(juce::PopupMenu& menu);
-        void createArrangeMenu(juce::PopupMenu& menu);
         void createOptionsMenu(juce::PopupMenu& menu);
         void createWindowMenu(juce::PopupMenu& menu);
         void createHelpMenu(juce::PopupMenu& menu);
@@ -173,9 +184,6 @@ namespace kiwi
         
         //! @internal Utility to quit the app asynchronously.
         class AsyncQuitRetrier;
-
-        //! @brief Initialise the command manager
-        void initCommandManager();
         
     private: // members
         

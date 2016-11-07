@@ -26,6 +26,7 @@
 #include <mutex>
 #include <algorithm>
 #include <exception>
+#include <set>
 
 // ---- Flip headers ---- //
 #include "flip/Bool.h"
@@ -36,12 +37,110 @@
 #include "flip/Collection.h"
 #include "flip/Object.h"
 #include "flip/ObjectRef.h"
+#include "flip/Enum.h"
 
 namespace kiwi
 {
     namespace model
     {
         class Factory;
+        
+        // ================================================================================ //
+        //                                  INLET/OUTLET                                    //
+        // ================================================================================ //
+  
+        //! @brief Class that represent a type of pin.
+        //! @details This class is a flip object wrapper on an enum. It's needed for putting the type
+        //! into a flip::Array.
+        class PinType : public flip::Object
+        {
+        public: // classes
+            
+            enum class IType
+            {
+                Control,
+                Signal
+            };
+            
+        public: // methods
+            
+            // @brief Constructor of type.
+            PinType(IType type);
+            
+            //! @brief Comprison operator.
+            bool operator<(PinType const& other) const;
+            
+            //! @brief Equality comparator. Consistent with comparison operator.
+            bool operator==(PinType const& other) const;
+            
+        public: // internal methods
+            
+            //! @internal Flip default constructor.
+            PinType(flip::Default&);
+            
+            //! @internal Flip declarator.
+            static void declare();
+            
+        private: // methods
+            
+            //! @brief Returns the type or the previous type if the Type is deleted.
+            //! @details During document changed phase the type can be tagged as removed.
+            IType getType() const;
+            
+        private:
+            flip::Enum<IType> m_type;
+        };
+        
+        //! @brief Class that represent an inlet able to have multiple types.
+        class Inlet : public flip::Object
+        {
+        public:
+            //! @brief Initializes the Inlet with multiple types.
+            Inlet(std::set<PinType> types);
+            
+            //! @brief The destructor.
+            ~Inlet() = default;
+            
+            //! @brief Checks if the inlet is compatible  with type.
+            bool hasType(PinType type) const;
+            
+        public: // internal methods
+            
+            //! @internal Flip default constructor.
+            Inlet(flip::Default&);
+            
+            //! @internal Flip declarator.
+            static void declare();
+            
+        private:
+            flip::Array<PinType> m_types;
+        };
+        
+        //! @brief Class that represent a certain outlet having only one type.
+        class Outlet : public flip::Object
+        {
+        public:
+            //! @brief Initializes the Inlet with one type.
+            Outlet(PinType type);
+            
+            //! @brief The destructor.
+            ~Outlet() = default;
+            
+            // @brief Returns the type of the outlet.
+            PinType const& getType() const;
+            
+        public: // internal methods
+            
+            //! @internal Flip default constructor.
+            Outlet(flip::Default&);
+            
+            //! @internal Flip declarator.
+            static void declare();
+            
+        private:
+            PinType m_type;
+        };
+        
         
         // ================================================================================ //
         //                                      OBJECT                                      //
@@ -65,11 +164,23 @@ namespace kiwi
             //! @brief Returns the text of the Object.
             std::string getText() const;
             
+            //! @brief Returns the inlets of the Object.
+            flip::Array<Inlet> const& getInlets() const;
+            
+            //! @brief Returns the inlets at index
+            Inlet const& getInlet(size_t index) const;
+            
             //! @brief Returns the number of inlets.
             size_t getNumberOfInlets() const;
             
             //! @brief Returns true if the inlets changed.
             bool inletsChanged() const noexcept;
+            
+            //! @brief Returns the number of outlets.
+            flip::Array<Outlet> const& getOutlets() const;
+            
+            //! @brief Returns the outlets at corresponding index.
+            Outlet const& getOutlet(size_t index) const;
             
             //! @brief Returns the number of outlets.
             size_t getNumberOfOutlets() const;
@@ -107,13 +218,19 @@ namespace kiwi
             //! @brief Returns the object's height.
             double getHeight() const noexcept;
             
-        protected: // methods
+        protected:
             
-            //! @brief Sets the number of inlets.
-            void setNumberOfInlets(size_t inlets);
+            //! @brief Clear and replace all the object's inlets.
+            void setInlets(flip::Array<Inlet> const& inlets);
             
-            //! @brief Sets the number of inlets.
-            void setNumberOfOutlets(size_t outlets);
+            //! @brief Clear and replace all the object's outlets.
+            void setOutlets(flip::Array<Outlet> const& outlets);
+            
+            //! @brief Adds an inlet at end of current inlet list.
+            void pushInlet(std::set<PinType> type);
+            
+            //! @brief Adds an outlet at end of current outlet list.
+            void pushOutlet(PinType type);
             
         public: // internal methods
             
@@ -125,15 +242,15 @@ namespace kiwi
             
         private: // members
             
-            flip::String    m_name;
-            flip::String    m_text;
-            flip::Int       m_inlets;
-            flip::Int       m_outlets;
+            flip::String        m_name;
+            flip::String        m_text;
+            flip::Array<Inlet>  m_inlets;
+            flip::Array<Outlet> m_outlets;
             
-            flip::Float     m_position_x;
-            flip::Float     m_position_y;
-            flip::Float     m_width;
-            flip::Float     m_height;
+            flip::Float         m_position_x;
+            flip::Float         m_position_y;
+            flip::Float         m_width;
+            flip::Float         m_height;
             
             friend class Factory;
         

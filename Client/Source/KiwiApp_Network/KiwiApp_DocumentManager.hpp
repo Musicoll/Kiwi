@@ -22,10 +22,11 @@
 #ifndef KIWI_APP_DOCUMENT_MANAGER_HPP_INCLUDED
 #define KIWI_APP_DOCUMENT_MANAGER_HPP_INCLUDED
 
+#include <juce_core/juce_core.h>
+#include <juce_events/juce_events.h>
+
 #include "flip/History.h"
 #include "flip/HistoryStoreMemory.h"
-
-#include "../JuceLibraryCode/JuceHeader.h"
 
 #include "KiwiApp_CarrierSocket.hpp"
 
@@ -46,7 +47,7 @@ namespace kiwi
         //! @brief Destructor.
         ~FileHandler() = default;
         
-        //! @biref Loads the document from file and sets the pointed file.
+        //! @brief Loads the document from file and sets the pointed file.
         void load(juce::File const& file);
         
         //! @brief Saves the document from file and sets the pointed file.
@@ -93,7 +94,7 @@ namespace kiwi
         static void commit(flip::Type& type, std::string action = std::string());
         
         //! @brief  Connect the DocumentManager to a remote server
-        static void connect(flip::Type& type, const std::string host, uint16_t port);
+        static void connect(flip::Type& type, const std::string host, uint16_t port, uint64_t session_id);
         
         //! @brief Pull changes from remote server
         static void pull(flip::Type& type);
@@ -164,7 +165,7 @@ namespace kiwi
         void push();
         
         //! @brief Connects the document manager and download the patcher's initial state
-        void connect(std::string const host, uint16_t port);
+        void connect(std::string const host, uint16_t port, uint64_t session_id);
         
         //! @brief Returns true if the document manager is connected false otherwise
         bool isConnected();
@@ -201,12 +202,13 @@ namespace kiwi
         
         flip::DocumentBase&                     m_document;
         flip::History<flip::HistoryStoreMemory> m_history;
-        CarrierSocket                           m_socket;
         FileHandler                             m_file_handler;
+        
+        std::unique_ptr<CarrierSocket>          m_socket = nullptr;
+        std::atomic_bool                        m_loaded;
         
         bool                                    m_gesture_flag = false;
         size_t                                  m_gesture_cnt = 0;
-        std::atomic_bool                        m_loaded;
         
     private:
         

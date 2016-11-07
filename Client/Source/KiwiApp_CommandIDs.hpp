@@ -45,7 +45,7 @@ namespace kiwi
         showAudioStatusWindow       = 0x202010,        ///< Make visible the "audio status" window.
         showAboutAppWindow          = 0x202020,        ///< Make visible the "about app" window.
         showAppSettingsWindow       = 0x202030,        ///< Make visible the "application settings" window.
-        showDocumentExplorerWindow  = 0x202040,        ///< Make visible the "lan document explorer" window.
+        showDocumentBrowserWindow   = 0x202040,        ///< Make visible the "document browser" window.
         showBeaconDispatcherWindow  = 0x202050,        ///< Make visible the "beacon dispatcher" window.
         
         undo                        = 0xf1000a,        ///< Undo last action.
@@ -75,8 +75,11 @@ namespace kiwi
         
         showPatcherInspector        = 0xf20400,        ///< Shows the patcher properties inspector.
         
-        showObjectInspector         = 0xf20500,        ///< Shows the selected objects properties inspector.
-        openObjectHelp              = 0xf20510         ///< Open selected object help patcher.
+        showObjectInspector         = 0xf20410,        ///< Shows the selected objects properties inspector.
+        openObjectHelp              = 0xf20411,        ///< Open selected object help patcher.
+        
+        startDsp                    = 0xf20420,        ///< Starts the dsp
+        stopDsp                     = 0xf20421         ///< Stops the dsp
     };
     
     // ================================================================================ //

@@ -47,17 +47,6 @@ namespace kiwi
             return static_cast<bool>(getCreators().count(name));
         }
         
-        std::vector<std::string> Factory::getNames()
-        {
-            size_t index = 0;
-            std::vector<std::string> names(getCreators().size());
-            for(const auto& creator : getCreators())
-            {
-                names[index++] = creator.first;
-            }
-            return names;
-        }
-        
         auto Factory::getCreators() -> creator_map_t&
         {
             static creator_map_t static_creators;

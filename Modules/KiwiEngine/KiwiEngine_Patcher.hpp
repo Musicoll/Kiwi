@@ -24,6 +24,9 @@
 
 #include "KiwiEngine_Def.hpp"
 #include "KiwiEngine_Beacon.hpp"
+#include "KiwiEngine_AudioControler.hpp"
+
+#include <KiwiDsp/KiwiDsp_Chain.hpp>
 
 namespace kiwi
 {    
@@ -69,6 +72,12 @@ namespace kiwi
             
             //! @brief Clears the lists of stack overflow.
             void clearStackOverflow();
+            
+            //! @brief Returns the audio controler held by the patcher's instance.
+            AudioControler& getAudioControler() const;
+            
+            //! @internal Call the loadbang method of all objects.
+            void sendLoadbang();
             
             // ================================================================================ //
             //                                      CONSOLE                                     //
@@ -118,10 +127,9 @@ namespace kiwi
             using SoLinks = std::queue<Link const*>;
             
             model::Patcher const&   m_model;
-            
             Instance&               m_instance;
-            
             std::vector<SoLinks>    m_so_links;
+            dsp::Chain              m_chain;
             
         private: // deleted methods
             

@@ -21,7 +21,7 @@
 
 #include <KiwiModel/KiwiModel_PatcherView.hpp>
 
-#include "KiwiApp_DocumentManager.hpp"
+#include "KiwiApp_Network/KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_ObjectView.hpp"
 #include "KiwiApp.hpp"
 #include "KiwiApp_PatcherViewHelper.hpp"
@@ -36,13 +36,10 @@ namespace kiwi
     m_selection_width(4.f),
     m_is_selected(m_patcher_view.isSelected(*this)),
     m_is_editing(false),
-    m_is_errorbox(false)
+    m_is_errorbox((dynamic_cast<model::ErrorBox*>(m_model) != nullptr))
     {
         m_inlets = m_model->getNumberOfInlets();
         m_outlets = m_model->getNumberOfOutlets();
-        
-        m_is_errorbox = (dynamic_cast<model::ErrorBox*>(m_model) != nullptr);
-        //m_is_errorbox = (m_model->getName() == "errorbox");
         
         lockStatusChanged(m_patcher_view.isLocked());
         updateBounds();
@@ -124,7 +121,10 @@ namespace kiwi
             std::string object_name = m_model->getName();
             if(object_name == "errorbox")
             {
-                g.drawFittedText(m_model->getText().c_str()+9,
+                std::string const& model_text = m_model->getText();
+                std::string draw_text =  model_text.substr(model_text.find(" ") + 1);
+                
+                g.drawFittedText(draw_text,
                                  box_bounds.reduced(5),
                                  juce::Justification::centredLeft, 1, 1.);
             }

@@ -26,7 +26,7 @@
 
 #include "KiwiApp.hpp"
 #include "KiwiApp_CommandIDs.hpp"
-#include "KiwiApp_DocumentManager.hpp"
+#include "KiwiApp_Network/KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_PatcherViewHelper.hpp"
 #include "KiwiApp_ObjectView.hpp"
 #include "KiwiApp_LinkView.hpp"
@@ -588,9 +588,29 @@ namespace kiwi
             
             m.addCommandItem(cm, juce::StandardApplicationCommandIDs::selectAll);
             m.addSeparator();
+            
+            juce::PopupMenu object_menu;
+            
+            const auto names = model::Factory::getNames();
+            
+            for(int i = 0; i < names.size(); i++)
+            {
+                object_menu.addItem(i+1, names[i]);
+            }
+            
+            m.addSubMenu("Objects", object_menu);
+            
+            const int result = m.show();
+            
+            if(result > 0 && result <= names.size())
+            {
+                createObjectModel(names[result-1], position.getX(), position.getY());
+            }
         }
-
-        m.show();
+        else
+        {
+            m.show();
+        }
     }
     
     void PatcherView::showObjectPopupMenu(ObjectView const& object, juce::Point<int> const& position)
@@ -608,9 +628,7 @@ namespace kiwi
             m.addCommandItem(cm, CommandIDs::pasteReplace);
             m.addCommandItem(cm, juce::StandardApplicationCommandIDs::del);
             m.addSeparator();
-            
-            m.addCommandItem(cm, CommandIDs::toFront);
-            m.addCommandItem(cm, CommandIDs::toBack);
+
             m.addSeparator();
             
             m.show();
@@ -718,10 +736,13 @@ namespace kiwi
                 flip::Mold mold(model::DataModel::use(), sbo);
                 model::Object const& object = *object_ptr;
                 
-                mold.make(object);
+                model::Factory::copy(object, mold);
                 mold.cure();
 
-                // store object ref to find links boundaries
+                // store object name to restore it later from the model::Factory.
+                sbo << object.getName();
+                
+                // store object ref to find links boundaries.
                 sbo << object_ptr->ref();
             }
         }
@@ -794,19 +815,19 @@ namespace kiwi
             
             for(uint32_t i = 0; i < number_of_objects; i++)
             {
-                flip::Mold mold(model::DataModel::use(), sbi);
+                const flip::Mold mold(model::DataModel::use(), sbi);
                 
-                if(mold.has<model::Object>())
-                {
-                    flip::Ref old_object_ref;
-                    sbi >> old_object_ref;
-                    
-                    model::Object& new_object = m_patcher_model.addObject(mold);
-                    new_object.setPosition(new_object.getX() + delta.x, new_object.getY() + delta.y);
-                    m_view_model.selectObject(new_object);
-                    
-                    molded_objects.insert({old_object_ref, &new_object});
-                }
+                std::string object_name;
+                sbi >> object_name;
+                
+                flip::Ref old_object_ref;
+                sbi >> old_object_ref;
+                
+                model::Object& new_object = m_patcher_model.addObject(object_name, mold);
+                new_object.setPosition(new_object.getX() + delta.x, new_object.getY() + delta.y);
+                m_view_model.selectObject(new_object);
+                
+                molded_objects.insert({old_object_ref, &new_object});
             }
             
             // paste links:
@@ -851,12 +872,9 @@ namespace kiwi
         deleteSelection();
     }
     
-    model::Object& PatcherView::replaceObjectWith(model::Object& object_to_replace,
-                                              flip::Mold const& mold)
+    model::Object& PatcherView::replaceObjectWith(model::Object& object_to_remove, model::Object& new_object)
     {
-        model::Object& new_object = m_patcher_model.addObject(mold);
-        
-        new_object.setPosition(object_to_replace.getX(), object_to_replace.getY());
+        new_object.setPosition(object_to_remove.getX(), object_to_remove.getY());
         
         // re-link object
         const size_t new_inlets = new_object.getNumberOfInlets();
@@ -871,7 +889,7 @@ namespace kiwi
                 const model::Object& to = link.getReceiverObject();
                 const size_t inlet_index = link.getReceiverIndex();
                 
-                if(&from == &object_to_replace)
+                if(&from == &object_to_remove)
                 {
                     if(outlet_index < new_outlets)
                     {
@@ -879,7 +897,7 @@ namespace kiwi
                     }
                 }
                 
-                if(&to == &object_to_replace)
+                if(&to == &object_to_remove)
                 {
                     if(inlet_index < new_inlets)
                     {
@@ -889,8 +907,8 @@ namespace kiwi
             }
         }
         
-        m_view_model.unselectObject(object_to_replace);
-        m_patcher_model.removeObject(object_to_replace);
+        m_view_model.unselectObject(object_to_remove);
+        m_patcher_model.removeObject(object_to_remove);
         
         m_view_model.selectObject(new_object);
         
@@ -916,31 +934,33 @@ namespace kiwi
                 {
                     flip::Mold mold(model::DataModel::use(), sbi);
                     
-                    if(mold.has<model::Object>())
+                    auto& document = m_patcher_model.entity().use<DocumentManager>();
+                    
+                    std::string new_object_name;
+                    sbi >> new_object_name;
+                    
+                    flip::Ref old_object_ref;
+                    sbi >> old_object_ref;
+                    
+                    for(auto const& obj_ref : selected_objects)
                     {
-                        auto& document = m_patcher_model.entity().use<DocumentManager>();
-                        
-                        flip::Ref old_object_ref;
-                        sbi >> old_object_ref;
-                        
-                        for(auto const& obj_ref : selected_objects)
+                        model::Object* selected_object = document.get<model::Object>(obj_ref);
+                        if(selected_object != nullptr && !selected_object->removed())
                         {
-                            model::Object* selected_object = document.get<model::Object>(obj_ref);
-                            if(selected_object != nullptr && !selected_object->removed())
+                            try
                             {
-                                try
-                                {
-                                    replaceObjectWith(*selected_object, mold);
-                                }
-                                catch(...)
-                                {
-                                    KiwiApp::error("replace object failed");
-                                }
+                                model::Object& new_object = m_patcher_model.addObject(new_object_name,
+                                                                                      mold);
+                                replaceObjectWith(*selected_object, new_object);
+                            }
+                            catch(...)
+                            {
+                                KiwiApp::error("replace object failed");
                             }
                         }
-                        
-                        DocumentManager::commit(m_patcher_model, "paste-replace objects");
                     }
+                    
+                    DocumentManager::commit(m_patcher_model, "paste-replace objects");
                 }
             }
         }
@@ -1151,7 +1171,12 @@ namespace kiwi
                         link_m.getReceiverIndex()           == inlet);
             };
             
-            return (std::find_if(m_links.begin(), m_links.end(), find_link) == m_links.cend());
+            // Check if inlets and outlets types are compatible
+            
+            if(std::find_if(m_links.begin(), m_links.end(), find_link) == m_links.cend())
+            {
+                return to.getInlet(inlet).hasType(from.getOutlet(outlet).getType());
+            }
         }
         
         return false;
@@ -1529,57 +1554,58 @@ namespace kiwi
         
         for(auto& object_m : patcher.getObjects())
         {
-            if(object_m.removed()) break;
-            
-            std::set<uint64_t> selected_for_users;
-            
-            for(auto& user : patcher.getUsers())
+            if(!object_m.removed())
             {
-                bool selected_for_local_view = false;
-                bool selected_for_other_view = false;
+                std::set<uint64_t> selected_for_users;
                 
-                const uint64_t user_id = user.getId();
-                const bool is_distant_user = user_id != m_instance.getUserId();
-                
-                for(auto& view : user.getViews())
+                for(auto& user : patcher.getUsers())
                 {
-                    const bool is_local_view = ( &m_view_model == &view );
+                    bool selected_for_local_view = false;
+                    bool selected_for_other_view = false;
                     
-                    const bool is_selected = view.isSelected(object_m);
+                    const uint64_t user_id = user.getId();
+                    const bool is_distant_user = user_id != m_instance.getUserId();
                     
-                    if(is_selected)
+                    for(auto& view : user.getViews())
                     {
-                        if(is_distant_user)
+                        const bool is_local_view = ( &m_view_model == &view );
+                        
+                        const bool is_selected = view.isSelected(object_m);
+                        
+                        if(is_selected)
                         {
-                            selected_for_other_view = true;
-                            
-                            // an object is considered selected for a given user
-                            // when it's selected in at least one of its patcher's views.
-                            break;
+                            if(is_distant_user)
+                            {
+                                selected_for_other_view = true;
+                                
+                                // an object is considered selected for a given user
+                                // when it's selected in at least one of its patcher's views.
+                                break;
+                            }
+                            else if(is_local_view)
+                            {
+                                selected_for_local_view = true;
+                            }
+                            else
+                            {
+                                selected_for_other_view = true;
+                            }
                         }
-                        else if(is_local_view)
-                        {
-                            selected_for_local_view = true;
-                        }
-                        else
-                        {
-                            selected_for_other_view = true;
-                        }
+                    }
+                    
+                    if(selected_for_local_view)
+                    {
+                        new_local_objects_selection.emplace(object_m.ref());
+                    }
+                    
+                    if(selected_for_other_view)
+                    {
+                        selected_for_users.emplace(user_id);
                     }
                 }
                 
-                if(selected_for_local_view)
-                {
-                    new_local_objects_selection.emplace(object_m.ref());
-                }
-                
-                if(selected_for_other_view)
-                {
-                    selected_for_users.emplace(user_id);
-                }
+                new_distant_objects_selection.insert({object_m.ref(), selected_for_users});
             }
-            
-            new_distant_objects_selection.insert({object_m.ref(), selected_for_users});
         }
         
         // check diff between old and new distant selection
@@ -1919,8 +1945,8 @@ namespace kiwi
             if(new_object_name == "errorbox")
             {
                 model::ErrorBox& error_box = dynamic_cast<model::ErrorBox&>(new_object_m);
-                error_box.setNumberOfInlets(old_object_m.getNumberOfInlets());
-                error_box.setNumberOfOutlets(old_object_m.getNumberOfOutlets());
+                error_box.setInlets(old_object_m.getInlets());
+                error_box.setOutlets(old_object_m.getOutlets());
             }
             
             // re-link object
@@ -2207,12 +2233,18 @@ namespace kiwi
     {
         for(model::Link* link : m_view_model.getSelectedLinks())
         {
-            m_patcher_model.removeLink(*link, &m_view_model);
+            if(link)
+            {
+                m_patcher_model.removeLink(*link, &m_view_model);
+            }
         }
         
         for(model::Object* object : m_view_model.getSelectedObjects())
         {
-            m_patcher_model.removeObject(*object, &m_view_model);
+            if(object)
+            {
+                m_patcher_model.removeObject(*object, &m_view_model);
+            }
         }
         
         DocumentManager::commit(m_patcher_model, "Delete objects and links");
@@ -2246,9 +2278,6 @@ namespace kiwi
         commands.add(juce::StandardApplicationCommandIDs::selectAll);
         
         commands.add(CommandIDs::newBox);
-        
-        commands.add(CommandIDs::toFront);
-        commands.add(CommandIDs::toBack);
         
         commands.add(CommandIDs::zoomIn);
         commands.add(CommandIDs::zoomOut);
@@ -2367,20 +2396,6 @@ namespace kiwi
                 result.setActive(!isLocked());
                 break;
             }
-            case CommandIDs::toFront:
-            {
-                result.setInfo(TRANS("Bring to Front"), TRANS("Bring selected boxes to front"), CommandCategories::editing, 0);
-                result.addDefaultKeypress('f', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
-                result.setActive(isAnyObjectSelected());
-                break;
-            }
-            case CommandIDs::toBack:
-            {
-                result.setInfo(TRANS("Send to Back"), TRANS("Send selected boxes to back"), CommandCategories::editing, 0);
-                result.addDefaultKeypress('b', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);
-                result.setActive(isAnyObjectSelected());
-                break;
-            }
             case CommandIDs::zoomIn:
             {
                 result.setInfo(TRANS("Zoom in"), TRANS("Zoom in"), CommandCategories::view, 0);
@@ -2439,8 +2454,6 @@ namespace kiwi
             
             case CommandIDs::newBox:                            { createNewBoxModel(true); break; }
                 
-            case CommandIDs::toFront:                           { break; }
-            case CommandIDs::toBack:                            { break; }
             case CommandIDs::zoomIn:                            { zoomIn(); break; }
             case CommandIDs::zoomOut:                           { zoomOut(); break; }
             case CommandIDs::zoomNormal:                        { zoomNormal(); break; }

@@ -21,19 +21,19 @@
  ==============================================================================
  */
 
-#include "KiwiPatcherValidator.hpp"
+// Catch main function
 
-namespace kiwi
+#define CATCH_CONFIG_RUNNER
+#include "../catch.hpp"
+
+int main( int argc, char* const argv[] )
 {
-    namespace server
-    {
-        // ================================================================================ //
-        //                                 PATCHER VALIDATOR                                //
-        // ================================================================================ //
-        
-        void PatcherValidator::validate(model::Patcher & root)
-        {
-            
-        }
-    }
+    // global setup...
+    std::cout << "running Unit-Tests - KiwiDsp ..." << '\n';
+    
+    int result = Catch::Session().run( argc, argv );
+    
+    // global clean-up...
+    
+    return result;
 }

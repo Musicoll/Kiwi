@@ -32,8 +32,8 @@ namespace kiwi
     //                                  CARRIER SOCKET                                  //
     // ================================================================================ //
     
-    CarrierSocket::CarrierSocket(flip::DocumentBase& document, std::string const& host, uint16_t port):
-    m_transport_socket(document, host, port),
+    CarrierSocket::CarrierSocket(flip::DocumentBase& document, std::string const& host, uint16_t port, uint64_t session_id):
+    m_transport_socket(document, session_id, host, port),
     m_transport_loop(),
     m_transport_running(false)
     {
@@ -83,25 +83,19 @@ namespace kiwi
     
     void CarrierSocket::bindCallBacks()
     {
+        using namespace std::placeholders; // for _1, _2 etc.
+        
         m_transport_socket.listen_state_transition(std::bind(&CarrierSocket::listenStateTransition,
-                                                             this,
-                                                             std::placeholders::_1,
-                                                             std::placeholders::_2));
+                                                             this, _1, _2));
         
         m_transport_socket.listen_transfer_backend(std::bind(&CarrierSocket::listenTransferBackEnd,
-                                                             this,
-                                                             std::placeholders::_1,
-                                                             std::placeholders::_2));
+                                                             this, _1, _2));
         
         m_transport_socket.listen_transfer_transaction(std::bind(&CarrierSocket::listenTransferTransaction,
-                                                                 this,
-                                                                 std::placeholders::_1,
-                                                                 std::placeholders::_2));
+                                                                 this, _1, _2));
         
         m_transport_socket.listen_transfer_signal(std::bind(&CarrierSocket::listenTransferSignal,
-                                                            this,
-                                                            std::placeholders::_1,
-                                                            std::placeholders::_2));
+                                                            this, _1, _2));
     }
     
     void CarrierSocket::listenDisconnected(std::function<void ()> func)

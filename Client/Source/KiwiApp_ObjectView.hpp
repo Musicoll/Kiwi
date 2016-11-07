@@ -24,7 +24,7 @@
 
 #include <KiwiModel/KiwiModel_PatcherUser.hpp>
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <juce_gui_basics/juce_gui_basics.h>
 
 namespace kiwi
 {

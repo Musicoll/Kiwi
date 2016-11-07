@@ -22,7 +22,7 @@
 #ifndef KIWI_APP_CONSOLE_HPP_INCLUDED
 #define KIWI_APP_CONSOLE_HPP_INCLUDED
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <juce_gui_basics/juce_gui_basics.h>
 
 #include "KiwiApp_Window.hpp"
 #include "KiwiApp_ConsoleHistory.hpp"

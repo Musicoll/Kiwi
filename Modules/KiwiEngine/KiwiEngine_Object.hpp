@@ -24,6 +24,8 @@
 
 #include "KiwiEngine_Def.hpp"
 
+#include <KiwiDsp/KiwiDsp_Processor.hpp>
+
 namespace kiwi
 {
     namespace engine
@@ -56,6 +58,9 @@ namespace kiwi
             //! @details This method must be overriden by object's subclasses.
             //! @todo see if the method must be noexcept.
             virtual void receive(size_t index, std::vector<Atom> const& args) = 0;
+            
+            //! @brief Called when the Patcher is loaded.
+            virtual void loadbang() {};
             
             //! @internal Appends a new Link to an outlet.
             void addOutputLink(Link const& link);
@@ -115,6 +120,23 @@ namespace kiwi
         };
         
         typedef std::shared_ptr<Object> sObject;
+        
+        // ================================================================================ //
+        //                                    AUDIOOBJECT                                   //
+        // ================================================================================ //
+        
+        //! @brief A pure interface that audio object must implement.
+        //! @brief audio objects will be held and triggered by both the engine and the dsp chain.
+        class AudioObject : public engine::Object, public dsp::Processor
+        {
+        public: // methods
+            
+            //! @brief Constructor.
+            AudioObject(model::Object const& model, Patcher& patcher) noexcept;
+            
+            //! @brief Destructor.
+            virtual ~AudioObject() = default;
+        };
     }
 }
 

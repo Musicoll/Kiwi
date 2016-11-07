@@ -27,6 +27,7 @@
 #include "KiwiEngine_Console.hpp"
 #include "KiwiEngine_Patcher.hpp"
 #include "KiwiEngine_Beacon.hpp"
+#include "KiwiEngine_AudioControler.hpp"
 
 namespace kiwi
 {
@@ -44,7 +45,7 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructs an Instance and adds the engine objects to the engine::Factory.
-            Instance();
+            Instance(std::unique_ptr<AudioControler> audio_controler);
             
             //! @brief Destructor.
             ~Instance();
@@ -71,6 +72,12 @@ namespace kiwi
             //! @brief Removes a console listener.
             void removeConsoleListener(Console::Listener& listener);
             
+            // ================================================================================ //
+            //                              AUDIO CONTROLER                                     //
+            // ================================================================================ //
+            
+            AudioControler& getAudioControler() const;
+            
         private: // methods
             
             //! @internal Adds the engine objects to the engine::Factory
@@ -79,6 +86,8 @@ namespace kiwi
         private: // members
             
             Console m_console;
+            
+            std::unique_ptr<AudioControler> m_audio_controler;
             
         private: // deleted methods
             

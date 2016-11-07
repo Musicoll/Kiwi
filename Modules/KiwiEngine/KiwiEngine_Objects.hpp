@@ -25,6 +25,8 @@
 #include "KiwiEngine_Object.hpp"
 #include "KiwiEngine_Beacon.hpp"
 
+#include "KiwiEngine_AudioControler.hpp"
+
 namespace kiwi
 {
     namespace engine
@@ -57,11 +59,11 @@ namespace kiwi
         //                                    OBJECT PLUS                                   //
         // ================================================================================ //
         
-        class ObjectPlus : public engine::Object
+        class Plus : public engine::Object
         {
         public:
             
-            ObjectPlus(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            Plus(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
             void receive(size_t index, std::vector<Atom> const& args) override;
             
@@ -73,14 +75,33 @@ namespace kiwi
         };
         
         // ================================================================================ //
-        //                                    OBJECT PLUS                                   //
+        //                                    OBJECT TIMES                                  //
         // ================================================================================ //
         
-        class ObjectPrint : public engine::Object
+        class Times : public engine::Object
         {
         public:
             
-            ObjectPrint(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            Times(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const& args) override;
+            
+            void bang();
+            
+        private:
+            double m_lhs = 0.0;
+            double m_rhs = 0.0;
+        };
+        
+        // ================================================================================ //
+        //                                    OBJECT PRINT                                  //
+        // ================================================================================ //
+        
+        class Print : public engine::Object
+        {
+        public:
+            
+            Print(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
             void receive(size_t, std::vector<Atom> const& args) override;
             
@@ -92,13 +113,13 @@ namespace kiwi
         //                                  OBJECT RECEIVE                                  //
         // ================================================================================ //
         
-        class ObjectReceive : public engine::Object, public Beacon::Castaway
+        class Receive : public engine::Object, public Beacon::Castaway
         {
         public:
             
-            ObjectReceive(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            Receive(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
-            ~ObjectReceive();
+            ~Receive();
             
             void receive(size_t, std::vector<Atom> const& args) override;
             
@@ -106,6 +127,155 @@ namespace kiwi
             
         private:
             std::string m_name;
+        };
+        
+        // ================================================================================ //
+        //                                  OBJECT LOADMESS                                 //
+        // ================================================================================ //
+        
+        class Loadmess : public engine::Object
+        {
+        public:
+            
+            Loadmess(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            ~Loadmess() = default;
+            
+            void receive(size_t, std::vector<Atom> const& args) override;
+            
+            void loadbang() override;
+            
+        private:
+            
+            const std::vector<Atom> m_args;
+        };
+        
+        // ================================================================================ //
+        //                                       DAC~                                       //
+        // ================================================================================ //
+        
+        class DacTilde : public AudioObject
+        {
+        public:
+            
+            DacTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const& args) override final;
+            
+            void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void prepare(dsp::Processor::PrepareInfo const& infos) override final;
+            
+        private:
+            engine::AudioControler& m_audio_controler;
+        };
+        
+        // ================================================================================ //
+        //                                       OSC~                                       //
+        // ================================================================================ //
+        
+        class OscTilde : public AudioObject
+        {
+        public: // methods
+            
+            OscTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const& args) override;
+            
+            void performValue(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void performFreq(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void performPhase(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void performPhaseAndFreq(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void prepare(dsp::Processor::PrepareInfo const& infos) override final;
+            
+        private: // methods
+                        
+            void setFrequency(dsp::sample_t const& freq) noexcept;
+            
+            void setOffset(dsp::sample_t const& offset) noexcept;
+            
+            void setSampleRate(dsp::sample_t const& sample_rate);
+            
+        private: // members
+            
+            dsp::sample_t m_sr;
+            dsp::sample_t m_time;
+            dsp::sample_t m_freq;
+            std::atomic<dsp::sample_t> m_time_inc;
+            std::atomic<dsp::sample_t> m_offset;
+        };
+        
+        // ================================================================================ //
+        //                                       TIMES~                                       //
+        // ================================================================================ //
+        
+        class TimesTilde : public AudioObject
+        {
+        public: // methods
+            
+            TimesTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const& args) override;
+            
+            void performValue(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void performVec(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void prepare(dsp::Processor::PrepareInfo const& infos) override final;
+            
+        private: // members
+            
+            dsp::sample_t   m_value;
+            bool            m_constant;
+        };
+        
+        // ================================================================================ //
+        //                                       PLUS~                                      //
+        // ================================================================================ //
+        
+        class PlusTilde : public AudioObject
+        {
+        public: // methods
+            
+            PlusTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const& args) override;
+            
+            void performValue(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void performVec(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void prepare(dsp::Processor::PrepareInfo const& infos) override final;
+            
+        private: // members
+            
+            dsp::sample_t   m_value;
+            bool            m_constant;
+        };
+        
+        // ================================================================================ //
+        //                                       SIG~                                       //
+        // ================================================================================ //
+        
+        class SigTilde : public AudioObject
+        {
+        public: // methods
+            
+            SigTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const& args) override final;
+            
+            void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void prepare(dsp::Processor::PrepareInfo const& infos) override final;
+            
+        private: // members
+            
+            float   m_value;
         };
     }
 }

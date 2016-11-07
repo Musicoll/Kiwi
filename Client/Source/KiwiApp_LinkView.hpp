@@ -76,6 +76,9 @@ namespace kiwi
         void objectChanged(model::Object& object);
         void localSelectionChanged(bool selected_for_view);
         void distantSelectionChanged(std::set<uint64_t> distant_user_id_selection);
+        
+        // ! @brief Returns true if this link reprensent a signal connection.
+        bool isSignal() const;
                 
         // juce::Component
         void paint(juce::Graphics& g) override;

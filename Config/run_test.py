@@ -12,7 +12,7 @@ import distutils
 
 project_dir = os.path.abspath(".");
 
-test_list = ["test_atom"]
+test_list = ["test_atom", "test_dsp"]
 
 #==============================================================================
 #Name : get_test_file
@@ -30,7 +30,7 @@ def get_test_file(test_name):
 
 def parse_args ():
     arg_parser = argparse.ArgumentParser ()
-    
+
     arg_parser.add_argument('-c', '--configuration', default = 'Release', choices = ['Release', 'Debug'])
 
     if platform.system() == "Windows":
@@ -44,22 +44,14 @@ def parse_args ():
 
 args = parse_args()
 
-config_path = ""
 
-if (args.configuration == "Release"):
-    config_path = os.path.join(config_path, "Release")
-elif(args.configuration == "Debug"):
-    config_path = os.path.join(config_path, "Debug")
+if (platform.system() == "Darwin"):
+    test_dir = os.path.join(project_dir, "Build", args.configuration, "KiwiBuild", "Test", args.configuration)
+elif(platform.system() == "Windows"):
+    test_dir = os.path.join(project_dir, "Build", args.configuration, args.platform, "KiwiBuild", "Test", args.configuration)
+elif(platform.system() == "Linux"):
+    test_dir = os.path.join(project_dir, "Build", args.configuration, "KiwiBuild", "Test")
     
-platform_path = config_path
-    
-if platform.system() == "Windows":
-    if (args.platform == "x64"):
-        platform_path = os.path.join(platform_path, "x64")
-    elif(args.platform == "Win32"):
-        platform_path = os.path.join(platform_path, "Win32")
-
-test_dir = os.path.join(project_dir, "Build", platform_path, "KiwiBuild", "Test", config_path)
 
 for test in test_list:
 	subprocess.check_call(os.path.join(test_dir, get_test_file(test)), shell= True);

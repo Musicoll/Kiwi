@@ -67,9 +67,9 @@ namespace kiwi
             return *m_objects.insert(m_objects.end(), Factory::create(name, args));
         }
         
-        model::Object& Patcher::addObject(flip::Mold const& mold)
+        model::Object& Patcher::addObject(std::string const& name, flip::Mold const& mold)
         {
-            return *m_objects.emplace(m_objects.end(), mold);
+            return *m_objects.insert(m_objects.end(), Factory::create(name, mold));
         }
         
         model::Link* Patcher::addLink(model::Object const& from, const size_t outlet,
@@ -108,7 +108,12 @@ namespace kiwi
                             link_model.getReceiverIndex()           == inlet);
                 };
                 
-                return (std::find_if(m_links.begin(), m_links.end(), find_link) == m_links.cend());
+                // Check if inlets and outlets types are compatible
+                
+                if (std::find_if(m_links.begin(), m_links.end(), find_link) == m_links.cend())
+                {
+                    return to_it->getInlet(inlet).hasType(from_it->getOutlet(outlet).getType());
+                }
             }
             
             return false;

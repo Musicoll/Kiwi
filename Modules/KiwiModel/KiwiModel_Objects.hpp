@@ -63,11 +63,11 @@ namespace kiwi
             
             //! @brief Set the number of inlets.
             //! @param inlets The number of inlets.
-            void setNumberOfInlets(size_t inlets);
+            void setInlets(flip::Array<Inlet> const& inlets);
             
             //! @brief Set the number of inlets.
             //! @param inlets The number of inlets.
-            void setNumberOfOutlets(size_t outlets);
+            void setOutlets(flip::Array<Outlet> const& outlets);
             
             //! @internal flip static declare method
             static void declare();
@@ -77,15 +77,33 @@ namespace kiwi
         //                                    OBJECT PLUS                                   //
         // ================================================================================ //
         
-        class ObjectPlus : public model::Object
+        class Plus : public model::Object
         {
         public:
             
             //! @brief flip Default Constructor
-            ObjectPlus(flip::Default& d) : model::Object(d) {}
+            Plus(flip::Default& d) : model::Object(d) {}
             
             //! @brief Constructor
-            ObjectPlus(std::string const& name, std::vector<Atom> const& args);
+            Plus(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @internal flip static declare method
+            static void declare();
+        };
+        
+        // ================================================================================ //
+        //                                    OBJECT TIMES                                  //
+        // ================================================================================ //
+        
+        class Times : public model::Object
+        {
+        public:
+            
+            //! @brief flip Default Constructor
+            Times(flip::Default& d) : model::Object(d) {}
+            
+            //! @brief Constructor
+            Times(std::string const& name, std::vector<Atom> const& args);
             
             //! @internal flip static declare method
             static void declare();
@@ -95,15 +113,15 @@ namespace kiwi
         //                                    OBJECT PRINT                                  //
         // ================================================================================ //
         
-        class ObjectPrint : public model::Object
+        class Print : public model::Object
         {
         public:
             
             //! @brief flip Default Constructor
-            ObjectPrint(flip::Default& d) : model::Object(d) {}
+            Print(flip::Default& d) : model::Object(d) {}
             
             //! @brief Constructor
-            ObjectPrint(std::string const& name, std::vector<Atom> const& args);
+            Print(std::string const& name, std::vector<Atom> const& args);
             
             //! @internal flip static declare method
             static void declare();
@@ -113,15 +131,123 @@ namespace kiwi
         //                                  OBJECT RECEIVE                                  //
         // ================================================================================ //
         
-        class ObjectReceive : public model::Object
+        class Receive : public model::Object
         {
         public:
             
             //! @brief flip Default Constructor
-            ObjectReceive(flip::Default& d) : model::Object(d) {}
+            Receive(flip::Default& d) : model::Object(d) {}
             
             //! @brief Constructor
-            ObjectReceive(std::string const& name, std::vector<Atom> const& args);
+            Receive(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @internal flip static declare method
+            static void declare();
+        };
+        
+        // ================================================================================ //
+        //                                  OBJECT LOADMESS                                 //
+        // ================================================================================ //
+        
+        class Loadmess : public model::Object
+        {
+        public:
+            
+            //! @brief flip Default Constructor
+            Loadmess(flip::Default& d) : model::Object(d) {}
+            
+            //! @brief Constructor
+            Loadmess(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @internal flip static declare method
+            static void declare();
+        };
+        
+        // ================================================================================ //
+        //                                    OBJECT OSC~                                   //
+        // ================================================================================ //
+        
+        class OscTilde : public model::Object
+        {
+        public:
+            //! @brief flip Default Constructor
+            OscTilde(flip::Default& d): model::Object(d){};
+
+            //! @brief Constructor
+            OscTilde(std::string const& name, std::vector<Atom> const& args);
+
+            //! @internal flip static declare method
+            static void declare();
+        };
+        
+        // ================================================================================ //
+        //                                     OBJECT DAC~                                  //
+        // ================================================================================ //
+        
+        
+        class DacTilde : public model::Object
+        {
+        public:
+            
+            //! @brief flip Default Constructor
+            DacTilde(flip::Default& d): model::Object(d){}
+            
+            //! @brief Constructor
+            DacTilde(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @internal flip static declare method
+            static void declare();
+        };
+        
+        // ================================================================================ //
+        //                                    OBJECT *~                                   //
+        // ================================================================================ //
+        
+        class TimesTilde : public model::Object
+        {
+        public:
+            
+            //! @brief flip Default Constructor
+            TimesTilde(flip::Default& d): model::Object(d){};
+            
+            //! @brief Constructor
+            TimesTilde(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @internal flip static declare method
+            static void declare();
+        };
+        
+        // ================================================================================ //
+        //                                      OBJECT +~                                   //
+        // ================================================================================ //
+        
+        class PlusTilde : public model::Object
+        {
+        public:
+            
+            //! @brief flip Default Constructor
+            PlusTilde(flip::Default& d): model::Object(d){};
+            
+            //! @brief Constructor
+            PlusTilde(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @internal flip static declare method
+            static void declare();
+        };
+        
+        // ================================================================================ //
+        //                                      OBJECT SIG~                                 //
+        // ================================================================================ //
+        
+        class SigTilde : public model::Object
+        {
+        public:
+            
+            //! @brief flip Default Constructor
+            SigTilde(flip::Default& d): model::Object(d){};
+            
+            //! @brief Constructor
+            SigTilde(std::string const& name, std::vector<Atom> const& args);
             
             //! @internal flip static declare method
             static void declare();

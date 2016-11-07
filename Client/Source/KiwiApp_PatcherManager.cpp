@@ -25,7 +25,7 @@
 
 #include "KiwiApp.hpp"
 #include "KiwiApp_Instance.hpp"
-#include "KiwiApp_DocumentManager.hpp"
+#include "KiwiApp_Network/KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_PatcherManager.hpp"
 #include "KiwiApp_PatcherView.hpp"
 #include "KiwiApp_PatcherViewHelper.hpp"
@@ -82,40 +82,33 @@ namespace kiwi
     {
         model::Patcher& patcher = getPatcher();
         DocumentManager::load(patcher, file);
+        patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
+        patcher.setName(file.getFileNameWithoutExtension().toStdString());
         
         DocumentManager::commit(patcher);
         m_need_saving_flag = false;
         
-        patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
-        
-        patcher.setName(file.getFileNameWithoutExtension().toStdString());
-        
-        DocumentManager::commit(patcher, "Add User");
+        patcher.entity().use<engine::Patcher>().sendLoadbang();
     }
     
-    PatcherManager::PatcherManager(Instance & instance, const std::string host, uint16_t port) :
+    PatcherManager::PatcherManager(Instance & instance, const std::string host, uint16_t port, uint64_t session_id) :
     m_instance(instance),
     m_document(model::DataModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
     m_is_remote(true)
     {
-        model::Patcher & patcher = getPatcher();
+        model::Patcher& patcher = getPatcher();
         
-        try
-        {
-            DocumentManager::connect(patcher, host, port);
-        }
-        catch (std::runtime_error &e)
-        {
-            throw e;
-        }
+        DocumentManager::connect(patcher, host, port, session_id);
         
         patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
         DocumentManager::commit(patcher);
+        
+        patcher.entity().use<engine::Patcher>().sendLoadbang();
     }
     
     PatcherManager::~PatcherManager()
     {
-        ;
+        m_listeners.call(&Listener::patcherManagerRemoved, *this);
     }
     
     model::Patcher& PatcherManager::getPatcher()
@@ -156,6 +149,16 @@ namespace kiwi
         return (!m_is_remote) && m_need_saving_flag;
     }
     
+    void PatcherManager::addListener(Listener& listener)
+    {
+        m_listeners.add(listener);
+    }
+    
+    void PatcherManager::removeListener(Listener& listener)
+    {
+        m_listeners.remove(listener);
+    }
+    
     bool PatcherManager::saveDocument()
     {
         auto& patcher = getPatcher();
@@ -165,6 +168,7 @@ namespace kiwi
         {
             DocumentManager::save(patcher, current_save_file);
             m_need_saving_flag = false;
+            DocumentManager::commit(patcher);
             return true;
         }
         else
@@ -303,6 +307,27 @@ namespace kiwi
         }
         
         return false;
+    }
+    
+    void PatcherManager::bringsFirstViewToFront()
+    {
+        auto& patcher = getPatcher();
+        auto* user = patcher.getUser(m_instance.getUserId());
+        
+        if(user == nullptr) return; // abort
+            
+        auto& views = user->getViews();
+        
+        const auto view_it = views.begin();
+        
+        if(view_it != views.cend())
+        {
+            model::Patcher::View& view = *view_it;
+            if(view.entity().has<PatcherViewWindow>())
+            {
+                view.entity().use<PatcherViewWindow>().toFront(true);
+            }
+        }
     }
     
     void PatcherManager::document_changed(model::Patcher& patcher)

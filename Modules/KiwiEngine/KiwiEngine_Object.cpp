@@ -137,6 +137,16 @@ namespace kiwi
 
 #undef KIWI_ENGINE_STACKOVERFLOW_MAX
         
+        // ================================================================================ //
+        //                                    AUDIOOBJECT                                   //
+        // ================================================================================ //
+        
+        AudioObject::AudioObject(model::Object const& model, Patcher& patcher) noexcept:
+        Object(model, patcher),
+        dsp::Processor(model.getNumberOfInlets(), model.getNumberOfOutlets())
+        {
+        }
+        
     }
 }
 

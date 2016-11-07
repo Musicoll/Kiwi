@@ -22,6 +22,8 @@
 #ifndef KIWI_APP_PATCHER_MANAGER_HPP_INCLUDED
 #define KIWI_APP_PATCHER_MANAGER_HPP_INCLUDED
 
+#include <juce_gui_extra/juce_gui_extra.h>
+
 #include "flip/Document.h"
 
 #include <KiwiModel/KiwiModel_PatcherUser.hpp>
@@ -63,7 +65,11 @@ namespace kiwi
     //! @details The Instance dispatch changes to all other DocumentObserver objects
     class PatcherManager : public flip::DocumentObserver<model::Patcher>
     {
-    public:
+    public: // nested classes
+        
+        struct Listener;
+        
+    public: // methods
         
         //! @brief Constructor.
         PatcherManager(Instance& instance);
@@ -72,7 +78,7 @@ namespace kiwi
         PatcherManager(Instance& instance, juce::File const& file);
 
         //! @brief Construct and connect to remote server
-        PatcherManager(Instance & instance, const std::string host, uint16_t port);
+        PatcherManager(Instance & instance, const std::string host, uint16_t port, uint64_t session_id);
         
         //! @brief Destructor.
         ~PatcherManager();
@@ -83,15 +89,14 @@ namespace kiwi
         //! @brief Returns the Patcher model
         model::Patcher const& getPatcher() const;
         
-        //! @brief Initialize the patcher manager by creating a new document.
-        //! @return The newly created the Patcher model.
-        model::Patcher& init();
-        
         //! @brief Returns the number of patcher views.
         size_t getNumberOfView();
         
         //! @brief create a new patcher view window.
         void newView();
+        
+        //! @brief Brings the first patcher view to front.
+        void bringsFirstViewToFront();
         
         //! @brief Force all windows to close without asking user to save document.
         void forceCloseAllWindows();
@@ -101,7 +106,7 @@ namespace kiwi
         bool askAllWindowsToClose();
         
         //! @brief Close the window that contains a given patcherview.
-        //! @details if it's the last patcher view, it will ask the user the save the document before closing
+        //! @details if it's the last patcher view, it will ask the user the save the document before closing if needed.
         bool closePatcherViewWindow(PatcherView& patcherview);
         
         //! @brief Save the document.
@@ -109,6 +114,12 @@ namespace kiwi
         
         //! @brief Returns true if the patcher needs to be saved.
         bool needsSaving() const;
+        
+        //! @brief Add a listener.
+        void addListener(Listener& listener);
+        
+        //! @brief remove a listener.
+        void removeListener(Listener& listener);
         
     private:
         
@@ -143,6 +154,21 @@ namespace kiwi
         flip::Document  m_document;
         bool            m_need_saving_flag;
         bool            m_is_remote;
+        engine::Listeners<Listener> m_listeners;
+    };
+    
+    // ================================================================================ //
+    //                             PATCHER MANAGER LISTENER                             //
+    // ================================================================================ //
+    
+    //! @brief Listen to PatcherManager changes.
+    struct PatcherManager::Listener
+    {
+        //! @brief Destructor.
+        virtual ~Listener() = default;
+        
+        //! @brief Called when a document session has been added.
+        virtual void patcherManagerRemoved(PatcherManager const& manager) = 0;
     };
 }
 
