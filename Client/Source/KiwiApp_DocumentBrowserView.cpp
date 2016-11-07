@@ -219,6 +219,8 @@ namespace kiwi
         }
         
         m_drive.addListener(*this);
+        
+        updateLayout();
     }
     
     DocumentBrowserView::DriveView::~DriveView()
