@@ -138,7 +138,7 @@ namespace kiwi
     {
         setRepaintsOnMouseActivity(true);
 
-        m_open_btn.setCommand(std::bind(&DocumentBrowser::Drive::DocumentSession::open, m_document));
+        m_open_btn.setCommand(std::bind(&DocumentBrowser::Drive::DocumentSession::open, &m_document));
         m_open_btn.setSize(30, 20);
         m_open_btn.setTooltip(m_open_btn.getButtonText() + " this patcher");
         addAndMakeVisible(m_open_btn);

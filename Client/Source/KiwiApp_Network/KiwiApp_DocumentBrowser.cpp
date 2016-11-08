@@ -372,8 +372,6 @@ namespace kiwi
     {
         const bool ok = KiwiApp::useInstance().useServer().renameDocumentSession(m_session_id, new_name);
         
-        std::cout << "doc renamed OK !!! = " << std::to_string(ok) << "\n";
-        
         if(ok && m_patcher_manager != nullptr)
         {
             model::Patcher& patcher = m_patcher_manager->getPatcher();
