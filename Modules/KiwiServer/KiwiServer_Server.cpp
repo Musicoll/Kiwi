@@ -48,7 +48,6 @@ namespace kiwi
             
             m_server.bind_validator_factory(std::bind(&Server::createValidator, this, _1));
             m_server.bind_init(std::bind(&Server::initEmptyDocument, this, _1, _2));
-            m_server.bind_read(std::bind(&Server::readSessionBackend, this, _1));
             m_server.bind_write(std::bind(&Server::writeSessionBackend, this, _1, _2));
             m_server.bind_authenticate(std::bind(&Server::authenticateUser, this, _1, _2, _3));
             
@@ -217,15 +216,6 @@ namespace kiwi
         {
             DBG("[server] - initEmptyDocument for session_id : " << std::to_string(session_id));
             
-            // init default patcher here.
-            model::Patcher& patcher = document.root<model::Patcher>();
-            patcher.setName("Document_" + std::to_string(session_id));
-        }
-        
-        flip::BackEndIR Server::readSessionBackend(uint64_t session_id)
-        {
-            DBG("[server] - readSessionBackend for session_id : " << std::to_string(session_id));
-            
             flip::BackEndIR backend;
             
             const auto session_file = getSessionFile(session_id);
@@ -236,11 +226,14 @@ namespace kiwi
                 
                 backend.register_backend<flip::BackEndBinary>();
                 backend.read(provider);
+                document.read(backend);
             }
             
-            updateMetadata();
+            // init default patcher here.
+            model::Patcher& patcher = document.root<model::Patcher>();
+            patcher.setName(session_file.getFileNameWithoutExtension().toStdString());
             
-            return backend;
+            updateMetadata();
         }
         
         void Server::writeSessionBackend(uint64_t session_id, flip::BackEndIR const& backend)

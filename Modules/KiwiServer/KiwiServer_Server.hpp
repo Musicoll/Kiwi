@@ -85,9 +85,6 @@ namespace kiwi
             //! @brief Initialise a new empty patcher
             void initEmptyDocument(uint64_t session_id, flip::DocumentBase & document);
             
-            //! @brief read a session backend.
-            flip::BackEndIR readSessionBackend(uint64_t session_id);
-            
             //! @brief write a session backend.
             void writeSessionBackend(uint64_t session_id, flip::BackEndIR const& backend);
             

@@ -377,7 +377,6 @@ namespace kiwi
             model::Patcher& patcher = m_patcher_manager->getPatcher();
             patcher.setName(new_name);
             DocumentManager::commit(patcher);
-            std::cout << "doc renamed !!!\n";
         }
         
         return ok;
