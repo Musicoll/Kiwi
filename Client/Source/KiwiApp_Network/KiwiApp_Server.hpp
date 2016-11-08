@@ -66,6 +66,9 @@ namespace kiwi
         //! @brief Rename a given document session.
         bool renameDocumentSession(uint64_t session_id, std::string const& new_name);
         
+        //! @brief Deletes a given document session.
+        bool deleteDocumentSession(uint64_t session_id);
+        
     private: // members
         
         uint64_t                            m_user_id;

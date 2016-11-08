@@ -172,6 +172,20 @@ namespace kiwi
             return false;
         }
         
+        bool Server::deleteDocumentSession(uint64_t session_id)
+        {
+            if(m_files.find(session_id) != m_files.end())
+            {
+                m_files[session_id].deleteFile();
+                m_files.erase(session_id);
+                
+                updateMetadata();
+                return true;
+            }
+            
+            return false;
+        }
+        
         juce::File Server::getSessionFile(uint64_t session_id)
         {
             if(m_files.find(session_id) != m_files.end())

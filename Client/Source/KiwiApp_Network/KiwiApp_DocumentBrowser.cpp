@@ -345,6 +345,7 @@ namespace kiwi
         if(m_patcher_manager)
         {
             m_patcher_manager->removeListener(*this);
+            m_patcher_manager = nullptr;
         }
     }
     
@@ -365,6 +366,7 @@ namespace kiwi
     
     void DocumentBrowser::Drive::DocumentSession::patcherManagerRemoved(PatcherManager const& manager)
     {
+        m_patcher_manager->removeListener(*this);
         m_patcher_manager = nullptr;
     }
     
@@ -400,5 +402,15 @@ namespace kiwi
                                                                          m_session_id);
             m_patcher_manager->addListener(*this);
         }
+    }
+    
+    void DocumentBrowser::Drive::DocumentSession::deleteDocument()
+    {
+        if(m_patcher_manager != nullptr)
+        {
+            KiwiApp::useInstance().closeDocument(*m_patcher_manager);
+        }
+        
+        KiwiApp::useInstance().useServer().deleteDocumentSession(m_session_id);
     }
 }

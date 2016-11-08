@@ -90,4 +90,14 @@ namespace kiwi
         
         return false;
     }
+    
+    bool Server::deleteDocumentSession(uint64_t session_id)
+    {
+        if(m_server)
+        {
+            return m_server->deleteDocumentSession(session_id);
+        }
+        
+        return false;
+    }
 }

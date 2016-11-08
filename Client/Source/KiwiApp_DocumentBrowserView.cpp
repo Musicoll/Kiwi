@@ -151,6 +151,13 @@ namespace kiwi
         {
             m_name_label.setEditable(false, true, true);
             m_name_label.addListener(this);
+            
+            m_delete_btn.reset(new BrowserButton("delete"));
+            m_delete_btn->setCommand(std::bind(&DocumentBrowser::Drive::DocumentSession::deleteDocument,
+                                               &m_document));
+            m_delete_btn->setSize(35, 20);
+            m_delete_btn->setTooltip("delete this patcher");
+            addAndMakeVisible(m_delete_btn.get());
         }
         
         addAndMakeVisible(m_name_label);
@@ -200,7 +207,17 @@ namespace kiwi
         m_open_btn.setTopRightPosition(bounds.getWidth() - 5,
                                        bounds.getHeight() * 0.5 - m_open_btn.getHeight() * 0.5);
         
-        m_name_label.setBounds(bounds.reduced(5).withRight(m_open_btn.getX() - 5));
+        if(m_delete_btn)
+        {
+            m_delete_btn->setTopRightPosition(m_open_btn.getX() - 5,
+                                              bounds.getHeight() * 0.5 - m_delete_btn->getHeight() * 0.5);
+            
+            m_name_label.setBounds(bounds.reduced(5).withRight(m_delete_btn->getX() - 5));
+        }
+        else
+        {
+            m_name_label.setBounds(bounds.reduced(5).withRight(m_open_btn.getX() - 5));
+        }
     }
     
     void DocumentBrowserView::DriveView::DocumentSessionView::labelTextChanged(juce::Label* label)

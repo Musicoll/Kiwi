@@ -219,6 +219,9 @@ namespace kiwi
         //! @brief Tells the Kiwi instance to open up this document.
         void open();
         
+        //! @brief Delete this document.
+        void deleteDocument();
+        
         //! @brief Returns the document name
         std::string getName() const;
         

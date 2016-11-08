@@ -169,6 +169,24 @@ namespace kiwi
         return success;
     }
     
+    bool Instance::closeDocument(PatcherManager& manager)
+    {
+        bool success = false;
+        auto manager_it = getPatcherManager(manager);
+        
+        if(manager_it != m_patcher_managers.end())
+        {
+            success = manager.askAllWindowsToClose();
+            
+            if(success && manager.getNumberOfView() == 0)
+            {
+                m_patcher_managers.erase(manager_it);
+            }
+        }
+        
+        return false;
+    }
+    
     bool Instance::closeAllWindows()
     {
         bool success = true;

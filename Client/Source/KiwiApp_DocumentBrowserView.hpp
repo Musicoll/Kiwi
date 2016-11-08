@@ -180,6 +180,7 @@ namespace kiwi
             
             DocumentBrowser::Drive::DocumentSession&    m_document;
             BrowserButton                               m_open_btn;
+            std::unique_ptr<BrowserButton>              m_delete_btn = nullptr;
             juce::Label                                 m_name_label;
         };
         
