@@ -47,12 +47,14 @@ namespace kiwi
         //                                      ERRORBOX                                    //
         // ================================================================================ //
         
-        class ErrorBox : public engine::Object
+        class ErrorBox : public AudioObject
         {
         public:
             ErrorBox(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
             void receive(size_t index, std::vector<Atom> const& args) override;
+            
+            void prepare(dsp::Processor::PrepareInfo const& infos) override final;
         };
         
         // ================================================================================ //

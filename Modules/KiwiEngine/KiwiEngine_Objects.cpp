@@ -52,12 +52,17 @@ namespace kiwi
         // ================================================================================ //
         
         ErrorBox::ErrorBox(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
-        : Object(model, patcher)
+        : AudioObject(model, patcher)
         {
             ;
         }
         
         void ErrorBox::receive(size_t index, std::vector<Atom> const& args)
+        {
+            ;
+        }
+        
+        void ErrorBox::prepare(dsp::Processor::PrepareInfo const& infos)
         {
             ;
         }
