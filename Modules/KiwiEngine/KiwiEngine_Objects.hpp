@@ -202,11 +202,10 @@ namespace kiwi
             
         private: // members
             
-            dsp::sample_t m_sr;
-            dsp::sample_t m_time;
-            dsp::sample_t m_freq;
-            std::atomic<dsp::sample_t> m_time_inc;
-            std::atomic<dsp::sample_t> m_offset;
+            dsp::sample_t m_sr = 0.f;
+            dsp::sample_t m_time = 0.f;
+            std::atomic<dsp::sample_t> m_freq{0.f};
+            std::atomic<dsp::sample_t> m_offset{0.f};
         };
         
         // ================================================================================ //
@@ -229,8 +228,7 @@ namespace kiwi
             
         private: // members
             
-            dsp::sample_t   m_value;
-            bool            m_constant;
+            std::atomic<dsp::sample_t>   m_value{0.f};
         };
         
         // ================================================================================ //
@@ -253,8 +251,7 @@ namespace kiwi
             
         private: // members
             
-            dsp::sample_t   m_value;
-            bool            m_constant;
+            std::atomic<dsp::sample_t>   m_value{0.f};
         };
         
         // ================================================================================ //
@@ -275,7 +272,7 @@ namespace kiwi
             
         private: // members
             
-            float   m_value;
+            std::atomic<float>   m_value{0.f};
         };
     }
 }

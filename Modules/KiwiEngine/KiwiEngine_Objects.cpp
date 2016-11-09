@@ -271,20 +271,18 @@ namespace kiwi
         {
             if (!args.empty() && args[0].isNumber())
             {
-                m_freq = args[0].getFloat();
+                setFrequency(args[0].getFloat());
             }
         }
         
         void OscTilde::setFrequency(dsp::sample_t const& freq) noexcept
         {
             m_freq = freq;
-            m_time_inc = (m_freq/m_sr);
         }
         
         void OscTilde::setSampleRate(dsp::sample_t const& sample_rate)
         {
             m_sr = sample_rate;
-            m_time_inc = (m_freq/m_sr);
         }
         
         void OscTilde::setOffset(dsp::sample_t const& offset) noexcept
@@ -328,14 +326,15 @@ namespace kiwi
         
         void OscTilde::performValue(dsp::Buffer const& input, dsp::Buffer& output) noexcept
         {
-            dsp::Signal& sig = output[0ul];
-            dsp::sample_t* sig_data = sig.data();
-            size_t framesize = sig.size();
+            dsp::sample_t *sig_data = output[0ul].data();
+            size_t sample_index = output[0ul].size();
+            dsp::sample_t const time_inc = m_freq/m_sr;
+            dsp::sample_t const offset = m_offset;
             
-            while(framesize--)
+            while(sample_index--)
             {
-                *sig_data++ = std::cos(2.f * dsp::pi * (m_time + m_offset));
-                m_time += m_time_inc;
+                *sig_data++ = std::cos(2.f * dsp::pi * (m_time + offset));
+                m_time += time_inc;
             }
             
             m_time = fmodf(m_time, 1.f);
@@ -346,10 +345,11 @@ namespace kiwi
             size_t sample_index = output[0ul].size();
             dsp::sample_t* output_sig = output[0ul].data();
             dsp::sample_t const* freq = input[0ul].data();
+            dsp::sample_t const offset = m_offset;
             
             while(sample_index--)
             {
-                *output_sig++ = std::cos(2.f *dsp::pi * (m_time + m_offset));
+                *output_sig++ = std::cos(2.f *dsp::pi * (m_time + offset));
                 m_time += (*freq++ / m_sr);
             }
             
@@ -361,11 +361,12 @@ namespace kiwi
             dsp::sample_t* output_sig = output[0ul].data();
             size_t sample_index = output[0ul].size();
             dsp::sample_t const* phase = input[1ul].data();
+            dsp::sample_t const time_inc = m_freq/m_sr;
             
             while(sample_index--)
             {
                 *output_sig++  = std::cos(2.f * dsp::pi * (m_time + fmodf(*phase++, 1.f)));
-                m_time += m_time_inc;
+                m_time += time_inc;
             }
             
             m_time = fmodf(m_time, 1.f);
@@ -392,14 +393,11 @@ namespace kiwi
         // ================================================================================ //
         
         TimesTilde::TimesTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
-        : AudioObject(model, patcher),
-        m_value(0.),
-        m_constant(false)
+        : AudioObject(model, patcher)
         {
             if (!args.empty() && args[0].isNumber())
             {
                 m_value = args[0].getFloat();
-                m_constant = true;
             }
         }
         
@@ -413,10 +411,9 @@ namespace kiwi
         
         void TimesTilde::performValue(dsp::Buffer const& input, dsp::Buffer& output) noexcept
         {
-            dsp::Signal const& in = input[0];
-            const size_t size = in.size();
-            dsp::sample_t const* in1 = in.data();
-            dsp::sample_t* out = output[0].data();
+            const size_t size = input[0ul].size();
+            dsp::sample_t const* in1 = input[0ul].data();
+            dsp::sample_t* out = output[0ul].data();
             
             dsp::sample_t const value = m_value;
             
@@ -435,11 +432,10 @@ namespace kiwi
         
         void TimesTilde::performVec(dsp::Buffer const& input, dsp::Buffer& output) noexcept
         {
-            dsp::Signal const& in = input[0];
-            const size_t size = in.size();
-            dsp::sample_t const* in1 = in.data();
-            dsp::sample_t const* in2 = input[1].data();
-            dsp::sample_t* out = output[0].data();
+            const size_t size = input[0ul].size();
+            dsp::sample_t const* in1 = input[0ul].data();
+            dsp::sample_t const* in2 = input[1ul].data();
+            dsp::sample_t* out = output[0ul].data();
             
             for(size_t i = size>>3; i; --i, in1 += 8, in2 += 8, out += 8)
             {
@@ -456,13 +452,13 @@ namespace kiwi
         
         void TimesTilde::prepare(PrepareInfo const& infos)
         {
-            if (m_constant || (!m_constant && !infos.inputs[1]))
+            if (infos.inputs.size() > 1 && infos.inputs[1])
             {
-                setPerformCallBack(this, &TimesTilde::performValue);
+                setPerformCallBack(this, &TimesTilde::performVec);
             }
             else
             {
-                setPerformCallBack(this, &TimesTilde::performVec);
+                setPerformCallBack(this, &TimesTilde::performValue);
             }
         }
         
@@ -471,14 +467,11 @@ namespace kiwi
         // ================================================================================ //
         
         PlusTilde::PlusTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
-        : AudioObject(model, patcher),
-        m_value(0.),
-        m_constant(false)
+        : AudioObject(model, patcher)
         {
             if (!args.empty() && args[0].isNumber())
             {
                 m_value = args[0].getFloat();
-                m_constant = true;
             }
         }
         
@@ -535,13 +528,13 @@ namespace kiwi
         
         void PlusTilde::prepare(PrepareInfo const& infos)
         {
-            if (m_constant || (!m_constant && !infos.inputs[1]))
+            if (infos.inputs.size() > 1 && infos.inputs[1])
             {
-                setPerformCallBack(this, &PlusTilde::performValue);
+                setPerformCallBack(this, &PlusTilde::performVec);
             }
             else
             {
-                setPerformCallBack(this, &PlusTilde::performVec);
+                setPerformCallBack(this, &PlusTilde::performValue);
             }
         }
         
@@ -550,8 +543,7 @@ namespace kiwi
         // ================================================================================ //
         
         SigTilde::SigTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
-        AudioObject(model, patcher),
-        m_value(0.)
+        AudioObject(model, patcher)
         {
             if (!args.empty() && args[0].isNumber())
             {
@@ -571,7 +563,7 @@ namespace kiwi
         {
             size_t sample_index = output[0].size();
             dsp::sample_t* output_sig = output[0].data();
-            dsp::sample_t value = m_value;
+            dsp::sample_t const value = m_value;
             
             while(sample_index--)
             {
