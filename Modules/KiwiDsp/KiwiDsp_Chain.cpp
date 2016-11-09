@@ -342,7 +342,7 @@ namespace kiwi
                     m_commands.pop_front();
                 }
                 
-                if (prev_state == State::Prepared)
+                if (prev_state == State::Prepared || prev_state == State::Preparing)
                 {
                     prepare(prev_samplerate, prev_vectorsize);
                 }
@@ -351,18 +351,18 @@ namespace kiwi
         
         void Chain::prepare(const size_t samplerate, const size_t vector_size)
         {
-            m_state = State::NotPrepared;
-            
             release();
             
             update();
             
-            indexNodes();
-            
-            sortNodes();
+            m_state = State::Preparing;
             
             m_sample_rate = samplerate;
             m_vector_size = vector_size;
+            
+            indexNodes();
+            
+            sortNodes();
             
             for(auto node = m_nodes.begin(); node != m_nodes.end();)
             {
@@ -523,7 +523,7 @@ namespace kiwi
                             {
                                 if (m_loop_nodes.find(&parent_node) != m_loop_nodes.end())
                                 {
-                                    throw Error("A loop is detected");
+                                    throw LoopError("A loop is detected");
                                 }
                                 else
                                 {

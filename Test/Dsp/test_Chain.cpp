@@ -148,7 +148,7 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
         // Adding a connnection that creates a loop
         chain.connect(*plus_signal, 0, *plus_scalar, 0);
         
-        REQUIRE_THROWS_AS(chain.prepare(0, 0), Error);
+        REQUIRE_THROWS_AS(chain.prepare(0, 0), LoopError);
     }
     
     SECTION("non-connected inlets and outlets share same signals")

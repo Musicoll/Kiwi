@@ -139,7 +139,14 @@ namespace kiwi
         
         for(dsp::Chain * chain : m_chains)
         {
-            chain->prepare(sample_rate, buffer_size);
+            try
+            {
+                chain->prepare(sample_rate, buffer_size);
+            }
+            catch(dsp::LoopError & e)
+            {
+                KiwiApp::use().error(e.what());
+            }
         }
         
         // allocate input matrix
