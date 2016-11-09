@@ -34,7 +34,10 @@ namespace kiwi
     
     DspDeviceManager::DspDeviceManager() :
     m_input_matrix(nullptr),
-    m_output_matrix(nullptr)
+    m_output_matrix(nullptr),
+    m_chains(),
+    m_is_playing(false),
+    m_mutex()
     {
         juce::ScopedPointer<juce::XmlElement> previous_settings(getGlobalProperties().getXmlValue("Audio Settings"));
         
@@ -46,9 +49,6 @@ namespace kiwi
         {
             initialiseWithDefaultDevices(2, 2);
         }
-        
-        //! @todo Find a way to initilise setups without launching audio device.
-        stopAudio();
     }
     
     DspDeviceManager::~DspDeviceManager()
@@ -63,10 +63,9 @@ namespace kiwi
     {
         if(std::find(m_chains.begin(), m_chains.end(), &chain) == m_chains.cend())
         {
-            juce::AudioIODevice* device = getCurrentAudioDevice();
-            
-            if (device && device->isPlaying())
+            if (m_is_playing)
             {
+                juce::AudioIODevice * const device = getCurrentAudioDevice();
                 chain.prepare(device->getCurrentSampleRate(), device->getCurrentBufferSizeSamples());
             }
             
@@ -95,23 +94,20 @@ namespace kiwi
     void DspDeviceManager::startAudio()
     {
         addAudioCallback(this);
-        
-        closeAudioDevice();
-        restartLastAudioDevice();
-        
+        m_is_playing = true;
         KiwiApp::commandStatusChanged();
     }
     
     void DspDeviceManager::stopAudio()
     {
-        getCurrentAudioDevice()->stop();
         removeAudioCallback(this);
+        m_is_playing = false;
         KiwiApp::commandStatusChanged();
     }
     
     bool DspDeviceManager::isAudioOn() const
     {
-        return getCurrentAudioDevice() ? getCurrentAudioDevice()->isPlaying() : false;
+        return m_is_playing;
     };
     
     void DspDeviceManager::addSignal(dsp::Buffer const& output_buffer)
@@ -216,13 +212,28 @@ namespace kiwi
         new juce::AudioDeviceSelectorComponent(device_manager, 1, 20, 1, 20, false, false, false, true);
         
         setContentOwned(audio_settings, false);
-        setSize(300, 440);
-        setTopLeftPosition(10, 10);
         setResizable(false, false);
+        
+        const juce::String windowState(getGlobalProperties().getValue("audio_setting_window"));
+        
+        if (!windowState.isEmpty())
+        {
+            restoreWindowStateFromString(windowState);
+        }
+        else
+        {
+            setSize(300, 440);
+            setTopLeftPosition(10, 10);
+        }
     }
     
     void AudioSettingWindow::closeButtonPressed()
     {
         setVisible(false);
+    }
+    
+    AudioSettingWindow::~AudioSettingWindow()
+    {
+        getGlobalProperties().setValue("audio_setting_window", getWindowStateAsString());
     }
 }

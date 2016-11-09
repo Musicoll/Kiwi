@@ -106,6 +106,7 @@ namespace kiwi
         std::unique_ptr<dsp::Buffer>                m_input_matrix;
         std::unique_ptr<dsp::Buffer>                m_output_matrix;
         std::vector<dsp::Chain*>                    m_chains;
+        bool                                        m_is_playing;
         mutable std::mutex                          m_mutex;
     };
     
@@ -117,7 +118,7 @@ namespace kiwi
     {
     public:
         AudioSettingWindow(DspDeviceManager& device_manager);
-        ~AudioSettingWindow() = default;
+        ~AudioSettingWindow();
         
         void closeButtonPressed() override;
     };
