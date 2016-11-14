@@ -26,6 +26,7 @@
 #include <queue>
 
 #include "KiwiDsp_Processor.hpp"
+#include "KiwiDsp_Misc.hpp"
 
 namespace kiwi
 {
@@ -127,8 +128,9 @@ namespace kiwi
             //! @details If chain is not prepared tick will do nothing.
             enum class State : uint8_t
             {
-                NotPrepared     = 0,    ///< The Node has not been prepared.
-                Prepared        = 1,    ///< The Node has been prepared.
+                NotPrepared     = 0,    ///< The Chain has not been prepared.
+                Preparing       = 1,    ///< The Chain is being prepared.
+                Prepared        = 2,    ///< The chain has been prepared.
             };
             
             class Node;
@@ -351,6 +353,30 @@ namespace kiwi
         private: // deleted methods
             
             Tie() = delete;
+        };
+        
+        // ==================================================================================== //
+        //                                          LOOPERROR                                   //
+        // ==================================================================================== //
+        //! @brief An exception to detect loops.
+        //! @details An exception that is thrown whenever a loop is detected in a chain.
+        //! @todo Add more infos about the detected loop.
+        class LoopError : public Error
+        {
+        public:
+            //! @brief The std::string constructor.
+            //! @param message The message of the error
+            explicit LoopError(const std::string& message) :
+            Error("looperror: " + message)
+            {}
+            
+            //! @brief The const char* constructor.
+            //! @param message The message of the error
+            explicit LoopError(const char* message) :
+            Error(std::string("looperror: ") + std::string(message)) {}
+            
+            //! @brief The destructor.
+            ~LoopError() noexcept override = default;
         };
     }
 }
