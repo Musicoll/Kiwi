@@ -202,7 +202,33 @@ namespace kiwi
             {
                 if(atom.isNumber())
                 {
+                    if (atom.getInt() <= 0)
+                    {
+                        throw std::runtime_error("null or negative channel");
+                    }
+                    
                     channels++;
+                }
+                else if(atom.isString())
+                {
+                    std::string inputs(atom.getString());
+                    
+                    size_t sep_pos = inputs.find(":");
+                    
+                    if (sep_pos == std::string::npos)
+                    {
+                        throw std::runtime_error("wrong symbol syntax");
+                    }
+                    
+                    int left_input = std::stoi(inputs.substr(0, sep_pos));
+                    int right_input = std::stoi(inputs.substr(inputs.find(":") + 1));
+                    
+                    if (left_input <= 0 || right_input <= 0)
+                    {
+                        throw std::runtime_error("null or negative channel");
+                    }
+                    
+                    channels += std::abs(right_input - left_input) + 1;
                 }
             }
             

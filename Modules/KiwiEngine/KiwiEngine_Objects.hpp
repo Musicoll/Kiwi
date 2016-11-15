@@ -169,7 +169,8 @@ namespace kiwi
             void prepare(dsp::Processor::PrepareInfo const& infos) override final;
             
         private:
-            engine::AudioControler& m_audio_controler;
+            std::vector<size_t>         m_router;
+            engine::AudioControler&     m_audio_controler;
         };
         
         // ================================================================================ //

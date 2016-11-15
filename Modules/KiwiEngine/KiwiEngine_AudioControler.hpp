@@ -59,7 +59,7 @@ namespace kiwi
             virtual void remove(dsp::Chain& chain) = 0;
             
             //! @brief Adds a signal to the output_buffer of the AudioControler.
-            virtual void addSignal(dsp::Buffer const& output_buffer) = 0;
+            virtual void addToChannel(size_t const channel, dsp::Signal const& output_signal) = 0;
             
         private: // deleted methods
             

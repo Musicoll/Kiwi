@@ -234,8 +234,35 @@ namespace kiwi
         
         DacTilde::DacTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
         AudioObject(model, patcher),
+        m_router(),
         m_audio_controler(patcher.getAudioControler())
         {
+            for(Atom const& arg : args)
+            {
+                if (arg.isNumber())
+                {
+                    m_router.push_back(arg.getInt() - 1);
+                }
+                else if(arg.isString())
+                {
+                    std::string inputs(arg.getString());
+                    
+                    int left_input = std::stoi(inputs.substr(0, inputs.find(":"))) - 1;
+                    int right_input = std::stoi(inputs.substr(inputs.find(":") + 1)) - 1;
+                    
+                    bool rev = left_input > right_input;
+                    
+                    for (int channel = left_input; rev ? channel >= right_input : channel <= right_input; rev ? --channel : ++channel)
+                    {
+                        m_router.push_back(channel);
+                    }
+                }
+            }
+            
+            if (m_router.empty())
+            {
+                m_router = {0, 1};
+            }
         }
         
         void DacTilde::receive(size_t, std::vector<Atom> const& args)
@@ -259,7 +286,10 @@ namespace kiwi
         
         void DacTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
         {
-            m_audio_controler.addSignal(input);
+            for (int inlet_number = 0; inlet_number < input.getNumberOfChannels(); ++inlet_number)
+            {
+                m_audio_controler.addToChannel(m_router[inlet_number], input[inlet_number]);
+            }
         }
         
         void DacTilde::prepare(dsp::Processor::PrepareInfo const& infos)
