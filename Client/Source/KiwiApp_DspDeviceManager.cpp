@@ -43,11 +43,11 @@ namespace kiwi
         
         if (previous_settings)
         {
-            initialise(2, 2, previous_settings, false);
+            initialise(256, 256, previous_settings, false);
         }
         else
         {
-            initialiseWithDefaultDevices(2, 2);
+            initialiseWithDefaultDevices(256, 256);
         }
     }
     
