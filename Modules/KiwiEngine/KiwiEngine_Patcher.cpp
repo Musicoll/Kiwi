@@ -211,7 +211,14 @@ namespace kiwi
                     }
                 }
                 
-                m_chain.update();
+                try
+                {
+                    m_chain.update();
+                }
+                catch (dsp::LoopError & e)
+                {
+                    error(e.what());
+                }
             }
         }
 

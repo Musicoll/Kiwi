@@ -22,6 +22,8 @@
 #ifndef KIWI_APP_DSP_DEVICE_MANAGER_HPP_INCLUDED
 #define KIWI_APP_DSP_DEVICE_MANAGER_HPP_INCLUDED
 
+#include "KiwiApp_Window.hpp"
+
 #include <KiwiDsp/KiwiDsp_Signal.hpp>
 #include <KiwiDsp/KiwiDsp_Chain.hpp>
 #include <KiwiEngine/KiwiEngine_AudioControler.hpp>
@@ -104,7 +106,21 @@ namespace kiwi
         std::unique_ptr<dsp::Buffer>                m_input_matrix;
         std::unique_ptr<dsp::Buffer>                m_output_matrix;
         std::vector<dsp::Chain*>                    m_chains;
+        bool                                        m_is_playing;
         mutable std::mutex                          m_mutex;
+    };
+    
+    // ================================================================================ //
+    //                               AUDIO SETTING WINDOW                               //
+    // ================================================================================ //
+    
+    class AudioSettingWindow : public Window
+    {
+    public:
+        AudioSettingWindow(DspDeviceManager& device_manager);
+        ~AudioSettingWindow();
+        
+        void closeButtonPressed() override;
     };
 }
 
