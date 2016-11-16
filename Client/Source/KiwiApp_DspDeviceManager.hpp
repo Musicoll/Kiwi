@@ -72,7 +72,7 @@ namespace kiwi
         bool isAudioOn() const override;
         
         //! @brief Adds a buffer to the output matrix of signal.
-        void addSignal(dsp::Buffer const& output_buffer) override;
+        void addToChannel(size_t const channel, dsp::Signal const& output_buffer) override;
         
     private: // methods
         
