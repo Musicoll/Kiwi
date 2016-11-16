@@ -43,11 +43,11 @@ namespace kiwi
         
         if (previous_settings)
         {
-            initialise(2, 2, previous_settings, false);
+            initialise(256, 256, previous_settings, false);
         }
         else
         {
-            initialiseWithDefaultDevices(2, 2);
+            initialiseWithDefaultDevices(256, 256);
         }
     }
     
@@ -110,15 +110,11 @@ namespace kiwi
         return m_is_playing;
     };
     
-    void DspDeviceManager::addSignal(dsp::Buffer const& output_buffer)
+    void DspDeviceManager::addToChannel(size_t const channel, dsp::Signal const& output_signal)
     {
-        if (output_buffer.getNumberOfChannels() == m_output_matrix->getNumberOfChannels()
-            && output_buffer.getVectorSize() == m_output_matrix->getVectorSize())
+        if (channel < m_output_matrix->getNumberOfChannels() && output_signal.size() == m_output_matrix->getVectorSize())
         {
-            for(int channel_index = 0; channel_index < m_output_matrix->getNumberOfChannels(); ++channel_index)
-            {
-                (*m_output_matrix)[channel_index].add(output_buffer[channel_index]);
-            }
+            (*m_output_matrix)[channel].add(output_signal);
         }
     }
     

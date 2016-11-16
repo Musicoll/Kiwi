@@ -1908,7 +1908,7 @@ namespace kiwi
             }
             catch(...)
             {
-                return m_patcher_model.addObject("errorbox", std::vector<Atom>(atoms.begin()+1, atoms.end()));
+                return m_patcher_model.addObject("errorbox", std::vector<Atom>(atoms.begin(), atoms.end()));
             }
             return *model;
         }
