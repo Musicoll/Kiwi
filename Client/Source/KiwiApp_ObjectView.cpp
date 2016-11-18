@@ -412,7 +412,9 @@ namespace kiwi
     //                                   CLASSIC BOX                                    //
     // ================================================================================ //
     
-    ClassicBox::ClassicBox(PatcherView& patcher_view, model::Object& object_m) : ObjectView(patcher_view, object_m)
+    ClassicBox::ClassicBox(PatcherView& patcher_view, model::Object& object_m) :
+    ObjectView(patcher_view, object_m),
+    m_suggest_list(std::make_unique<SuggestList>(model::Factory::getNames()))
     {
         setWantsKeyboardFocus(true);
         setMouseClickGrabsKeyboardFocus(true);
@@ -425,6 +427,8 @@ namespace kiwi
     
     void ClassicBox::grabKeyboardFocus()
     {
+        if(m_is_editing) return; // abort
+        
         setInterceptsMouseClicks(true, true);
         
         m_editor.reset(new juce::TextEditor());
@@ -493,14 +497,31 @@ namespace kiwi
         }
     }
     
+    void ClassicBox::suggestMenuStaticCallback(int result, ClassicBox* box)
+    {
+        if(box && result > 0)
+        {
+            box->suggestMenuCallback(result);
+        }
+    }
+    
+    void ClassicBox::suggestMenuCallback(int result)
+    {
+        const auto& suggest_list = *m_suggest_list;
+        const auto selected_object_it = (suggest_list.begin() + result - 1);
+        if(selected_object_it != suggest_list.end())
+        {
+            m_suggest_popup.reset();
+            removeTextEditor();
+            m_patcher_view.boxHasBeenEdited(*this, *selected_object_it);
+        }
+    }
+    
     void ClassicBox::textEditorTextChanged(juce::TextEditor& e)
     {
         const juce::String new_text = e.getText();
         const juce::Font font = e.getFont();
         const int text_width = font.getStringWidth(new_text);
-        
-        //auto ed_borders = e.getBorder();
-        
         const int ed_width = e.getWidth();
         
         // box grows only up
@@ -510,6 +531,25 @@ namespace kiwi
             m_local_box_bounds.setWidth(new_width-8);
             setSize(new_width, getHeight());
         }
+        
+        //m_patcher_view.bindSuggestPopup(this);
+        juce::PopupMenu::dismissAllActiveMenus();
+        m_suggest_popup.reset(new SuggestPopup(model::Factory::getNames()));
+        m_suggest_list->applyFilter(new_text.toStdString());
+        int count = 1;
+        for(auto const& str : *m_suggest_list)
+        {
+            m_suggest_popup->addItem(count++, str);
+        }
+        
+        m_suggest_popup->showMenuAsync(juce::PopupMenu::Options()
+                                       .withMinimumWidth(200)
+                                       .withMaximumNumColumns(1)
+                                       .withStandardItemHeight(18)
+                                       .withTargetComponent(this),
+                                       juce::ModalCallbackFunction::forComponent(suggestMenuStaticCallback, this));
+        
+        grabKeyboardFocus();
     }
     
     void ClassicBox::textEditorReturnKeyPressed(juce::TextEditor& e)

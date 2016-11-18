@@ -35,7 +35,7 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief Suggestion list Popup Component.
-    class SuggestPopup : public juce::Component
+    class SuggestPopup : public juce::PopupMenu
     {
     public: // methods
         
@@ -46,7 +46,7 @@ namespace kiwi
         ~SuggestPopup();
         
         // juce::Component
-        void paint(juce::Graphics& g) override;
+        //void paint(juce::Graphics& g) override;
         
     private: // methods
         

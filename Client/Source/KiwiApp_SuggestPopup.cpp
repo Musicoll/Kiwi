@@ -34,9 +34,11 @@ namespace kiwi
         ;
     }
     
+    /*
     void SuggestPopup::paint(juce::Graphics & g)
     {
         g.setColour(juce::Colours::beige);
         g.fillAll();
     }
+    */
 }

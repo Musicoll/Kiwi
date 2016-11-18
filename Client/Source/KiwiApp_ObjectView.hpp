@@ -26,6 +26,10 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "KiwiApp_Utils/KiwiApp_SuggestList.hpp"
+
+#include "KiwiApp_SuggestPopup.hpp"
+
 namespace kiwi
 {
     class HitTester;
@@ -94,7 +98,7 @@ namespace kiwi
         
     private: // members
         
-        PatcherView&               m_patcher_view;
+        PatcherView&            m_patcher_view;
         model::Object*          m_model = nullptr;
         const unsigned int      m_io_width = 6;
         const unsigned int      m_io_height = 3;
@@ -149,9 +153,14 @@ namespace kiwi
         void textEditorEscapeKeyPressed(juce::TextEditor&) override;
         void textEditorFocusLost(juce::TextEditor&) override;
         
+        static void suggestMenuStaticCallback(int, ClassicBox*);
+        void suggestMenuCallback(int);
+        
     private: // members
         
-        std::unique_ptr<juce::TextEditor> m_editor;
+        std::unique_ptr<juce::TextEditor>   m_editor;
+        std::unique_ptr<SuggestList>        m_suggest_list;
+        std::unique_ptr<SuggestPopup>       m_suggest_popup;
     };
 }
 

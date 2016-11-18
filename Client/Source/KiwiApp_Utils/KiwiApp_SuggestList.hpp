@@ -233,7 +233,6 @@ namespace kiwi
         entries_t   m_filtered_entries;
         std::string m_last_filter_pattern;
     };
-    
-} // namespace fss
+}
 
 #endif // KIWI_KIWIAPP_SUGGEST_LIST_HPP_INCLUDED
