@@ -34,6 +34,7 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief A string container that provide suggestion list based on given patterns.
+    //! @details This class maintain
     class SuggestList
     {
     public: // methods
@@ -97,6 +98,15 @@ namespace kiwi
             m_entries.insert(m_entries.end(), entries.begin(), entries.end());
             updateFilteredEntries();
         }
+        
+        //! @brief Returns the size of the current filtered selection
+        entries_t::size_type size() const noexcept { return m_filtered_entries.size(); }
+        
+        //! @brief Returns true if there is no suggestion entry.
+        bool empty() const noexcept { return m_filtered_entries.empty(); }
+        
+        //! @brief Clear all entries.
+        void clear() { m_entries.clear(); m_filtered_entries.clear(); }
         
         //! @brief Returns the current filter pattern applied to the list
         std::string const& getCurrentFilter() const { return m_last_filter_pattern; }

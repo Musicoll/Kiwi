@@ -413,8 +413,7 @@ namespace kiwi
     // ================================================================================ //
     
     ClassicBox::ClassicBox(PatcherView& patcher_view, model::Object& object_m) :
-    ObjectView(patcher_view, object_m),
-    m_suggest_list(std::make_unique<SuggestList>(model::Factory::getNames()))
+    ObjectView(patcher_view, object_m)
     {
         setWantsKeyboardFocus(true);
         setMouseClickGrabsKeyboardFocus(true);
@@ -427,7 +426,7 @@ namespace kiwi
     
     void ClassicBox::grabKeyboardFocus()
     {
-        if(m_is_editing) return; // abort
+        if(hasKeyboardFocus(true)) return; // abort
         
         setInterceptsMouseClicks(true, true);
         
@@ -444,9 +443,14 @@ namespace kiwi
             text.clear();
         }
         
-        m_editor->setColour(juce::TextEditor::highlightColourId, juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
-        m_editor->setColour(juce::TextEditor::focusedOutlineColourId, juce::Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
-        m_editor->setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentWhite);
+        m_editor->setColour(juce::TextEditor::highlightColourId,
+                            juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
+        
+        m_editor->setColour(juce::TextEditor::focusedOutlineColourId,
+                            juce::Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
+        
+        m_editor->setColour(juce::TextEditor::backgroundColourId,
+                            juce::Colours::transparentWhite);
 
         m_editor->setScrollbarsShown(false);
         m_editor->setScrollToShowCursor(true);
@@ -460,6 +464,27 @@ namespace kiwi
         addAndMakeVisible(m_editor.get());
         
         m_editor->setSelectAllWhenFocused(true);
+        
+        m_suggest_popup.reset(new SuggestPopup());
+        m_suggest_popup->populate(model::Factory::getNames());
+        
+        const auto change_text_fn = [this](juce::String text)
+        {
+            m_editor->setText(text, juce::dontSendNotification);
+            m_editor->grabKeyboardFocus();
+        };
+        
+        m_suggest_popup->setSelectedItemAction(change_text_fn);
+        m_suggest_popup->setItemClickedAction(change_text_fn);
+        m_suggest_popup->setItemDoubleClickedAction([this](juce::String text)
+                                                    {
+                                                        m_editor->setText(text, juce::dontSendNotification);
+                                                        m_suggest_popup->close();
+                                                        m_editor->grabKeyboardFocus();
+                                                    });
+        
+        m_suggest_popup->show(m_editor.get());
+        
         m_editor->grabKeyboardFocus();
         
         m_is_editing = true;
@@ -475,6 +500,8 @@ namespace kiwi
             
             m_patcher_view.grabKeyboardFocus();
             m_is_editing = false;
+            
+            m_suggest_popup.reset();
         }
     }
     
@@ -497,28 +524,6 @@ namespace kiwi
         }
     }
     
-    void ClassicBox::suggestMenuStaticCallback(int result, ClassicBox* box)
-    {
-        if(box && result > 0)
-        {
-            box->suggestMenuCallback(result);
-        }
-    }
-    
-    void ClassicBox::suggestMenuCallback(int result)
-    {
-        /*
-        const auto& suggest_list = *m_suggest_list;
-        const auto selected_object_it = (suggest_list.begin() + result - 1);
-        if(selected_object_it != suggest_list.end())
-        {
-            m_suggest_popup.reset();
-            removeTextEditor();
-            m_patcher_view.boxHasBeenEdited(*this, *selected_object_it);
-        }
-        */
-    }
-    
     void ClassicBox::textEditorTextChanged(juce::TextEditor& e)
     {
         const juce::String new_text = e.getText();
@@ -534,22 +539,7 @@ namespace kiwi
             setSize(new_width, getHeight());
         }
         
-        juce::PopupMenu::dismissAllActiveMenus();
-        
-        m_suggest_popup.reset(new SuggestPopup(model::Factory::getNames()));
-        m_suggest_list->applyFilter(new_text.toStdString());
-        int count = 1;
-        for(auto const& str : *m_suggest_list)
-        {
-            m_suggest_popup->addItem(count++, str);
-        }
-        
-        m_suggest_popup->showMenuAsync(juce::PopupMenu::Options()
-                                       .withMinimumWidth(200)
-                                       .withMaximumNumColumns(1)
-                                       .withStandardItemHeight(18)
-                                       .withTargetComponent(this),
-                                       juce::ModalCallbackFunction::forComponent(suggestMenuStaticCallback, this));
+        m_suggest_popup->applyFilter(new_text.toStdString());
     }
     
     void ClassicBox::textEditorReturnKeyPressed(juce::TextEditor& e)

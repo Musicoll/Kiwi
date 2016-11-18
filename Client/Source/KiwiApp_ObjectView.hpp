@@ -153,13 +153,9 @@ namespace kiwi
         void textEditorEscapeKeyPressed(juce::TextEditor&) override;
         void textEditorFocusLost(juce::TextEditor&) override;
         
-        static void suggestMenuStaticCallback(int, ClassicBox*);
-        void suggestMenuCallback(int);
-        
     private: // members
         
         std::unique_ptr<juce::TextEditor>   m_editor;
-        std::unique_ptr<SuggestList>        m_suggest_list;
         std::unique_ptr<SuggestPopup>       m_suggest_popup;
     };
 }
