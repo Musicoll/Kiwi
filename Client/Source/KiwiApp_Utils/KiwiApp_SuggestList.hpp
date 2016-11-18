@@ -41,13 +41,16 @@ namespace kiwi
         using entries_t = std::vector<std::string>;
         
         //! @brief Constructor.
-        template<class TEntryType>
-        SuggestList(TEntryType entries = TEntryType()) :
+        SuggestList() = default;
+        
+        //! @brief Constructor.
+        SuggestList(entries_t entries) :
         m_options(),
         m_entries(entries.begin(), entries.end()),
-        m_last_filter_pattern("none")
+        m_last_filter_pattern(""),
+        m_need_update(true)
         {
-            applyFilter("");
+            updateFilteredEntries();
         }
         
         //! @brief Destructor.
@@ -77,13 +80,31 @@ namespace kiwi
         //! @brief Set the sorting options.
         void setOptions(Options options)    { m_options = options; }
         
+        //! @brief Add a suggestion entry to the list.
+        //! @details This will also update the filtered list.
+        //! @see addEntries
+        void addEntry(std::string const& entry)
+        {
+            m_entries.emplace_back(entry);
+            updateFilteredEntries();
+        }
+        
+        //! @brief Add suggestion entries to the list.
+        //! @detail This will also update the filtered list.
+        //! @see addEntry
+        void addEntries(std::vector<std::string> const& entries)
+        {
+            m_entries.insert(m_entries.end(), entries.begin(), entries.end());
+            updateFilteredEntries();
+        }
+        
         //! @brief Returns the current filter pattern applied to the list
         std::string const& getCurrentFilter() const { return m_last_filter_pattern; }
         
         //! @brief Apply a pattern matching filter to the entries.
         void applyFilter(std::string const& pattern)
         {
-            if(m_last_filter_pattern != pattern)
+            if(m_need_update || (m_last_filter_pattern != pattern))
             {
                 m_last_filter_pattern = pattern;
                 if(m_last_filter_pattern == "")
@@ -120,6 +141,8 @@ namespace kiwi
                 {
                     m_filtered_entries.emplace_back(std::move(scored_entry.string));
                 }
+                
+                m_need_update = false;
             }
         }
         
@@ -224,14 +247,21 @@ namespace kiwi
             return {true, score};
         }
         
+        void updateFilteredEntries()
+        {
+            m_need_update = true;
+            applyFilter(m_last_filter_pattern);
+        }
+        
     private: // members
         
         static constexpr char end_char = '\0';
         
-        Options     m_options;
-        entries_t   m_entries;
-        entries_t   m_filtered_entries;
-        std::string m_last_filter_pattern;
+        Options     m_options = {};
+        entries_t   m_entries = {};
+        entries_t   m_filtered_entries = {};
+        std::string m_last_filter_pattern = "";
+        bool        m_need_update = true;
     };
 }
 

@@ -24,7 +24,7 @@
 
 namespace kiwi
 {
-    SuggestPopup::SuggestPopup(SuggestList::entries_t const& entries) : m_list(entries)
+    SuggestPopup::SuggestPopup(SuggestList::entries_t entries) : m_suggest_list(std::move(entries))
     {
         ;
     }

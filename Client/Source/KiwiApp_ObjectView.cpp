@@ -507,6 +507,7 @@ namespace kiwi
     
     void ClassicBox::suggestMenuCallback(int result)
     {
+        /*
         const auto& suggest_list = *m_suggest_list;
         const auto selected_object_it = (suggest_list.begin() + result - 1);
         if(selected_object_it != suggest_list.end())
@@ -515,6 +516,7 @@ namespace kiwi
             removeTextEditor();
             m_patcher_view.boxHasBeenEdited(*this, *selected_object_it);
         }
+        */
     }
     
     void ClassicBox::textEditorTextChanged(juce::TextEditor& e)
@@ -532,8 +534,8 @@ namespace kiwi
             setSize(new_width, getHeight());
         }
         
-        //m_patcher_view.bindSuggestPopup(this);
         juce::PopupMenu::dismissAllActiveMenus();
+        
         m_suggest_popup.reset(new SuggestPopup(model::Factory::getNames()));
         m_suggest_list->applyFilter(new_text.toStdString());
         int count = 1;
@@ -548,8 +550,6 @@ namespace kiwi
                                        .withStandardItemHeight(18)
                                        .withTargetComponent(this),
                                        juce::ModalCallbackFunction::forComponent(suggestMenuStaticCallback, this));
-        
-        grabKeyboardFocus();
     }
     
     void ClassicBox::textEditorReturnKeyPressed(juce::TextEditor& e)

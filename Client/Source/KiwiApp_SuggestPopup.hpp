@@ -40,7 +40,7 @@ namespace kiwi
     public: // methods
         
         //! @brief Constructor.
-        SuggestPopup(SuggestList::entries_t const& entries);
+        SuggestPopup(SuggestList::entries_t entries = SuggestList::entries_t());
         
         //! @brief Destructor.
         ~SuggestPopup();
@@ -48,11 +48,15 @@ namespace kiwi
         // juce::Component
         //void paint(juce::Graphics& g) override;
         
-    private: // methods
+    private: // nested classes
+        
+        //class ListBoxModel;
         
     private: // members
         
-        SuggestList m_list;
+        SuggestList         m_suggest_list;
+        //ListBoxModel        m_suggest_list_box_model;
+        juce::ListBox       m_suggest_list_box;
     };
 }
 
