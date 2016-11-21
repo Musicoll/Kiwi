@@ -43,7 +43,7 @@ namespace kiwi
         using action_method_t = std::function<void(juce::String)>;
         
         //! @brief Constructor.
-        SuggestPopup(SuggestList::entries_t entries = SuggestList::entries_t());
+        SuggestPopup(SuggestList& list);
         
         //! @brief Destructor.
         ~SuggestPopup();
@@ -114,7 +114,7 @@ namespace kiwi
         
     private: // members
         
-        SuggestList     m_suggest_list;
+        SuggestList&    m_suggest_list;
         juce::ListBox   m_suggest_list_box;
         action_method_t m_clicked_action;
         action_method_t m_double_clicked_action;
@@ -179,6 +179,7 @@ namespace kiwi
 
     private: // members
         
+        SuggestList                     m_suggest_list;
         std::unique_ptr<SuggestPopup>   m_popup = nullptr;
         juce::TextEditor                m_editor;
         juce::String                    m_typed_text;

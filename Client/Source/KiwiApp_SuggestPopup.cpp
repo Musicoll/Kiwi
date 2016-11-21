@@ -28,7 +28,7 @@ namespace kiwi
     //                                   SUGGEST POPUP                                  //
     // ================================================================================ //
 
-    SuggestPopup::SuggestPopup(SuggestList::entries_t entries) : m_suggest_list(std::move(entries))
+    SuggestPopup::SuggestPopup(SuggestList& list) : m_suggest_list(list)
     {
         setAlwaysOnTop(true);
         setOpaque(true);
@@ -196,7 +196,7 @@ namespace kiwi
     //                              SUGGEST POPUP EDITOR                                //
     // ================================================================================ //
     
-    SuggestPopupEditor::SuggestPopupEditor()
+    SuggestPopupEditor::SuggestPopupEditor() : m_suggest_list(model::Factory::getNames())
     {
         addAndMakeVisible(m_editor);
         
@@ -226,8 +226,7 @@ namespace kiwi
     
     void SuggestPopupEditor::showMenu()
     {
-        m_popup.reset(new SuggestPopup(model::Factory::getNames()));
-        m_popup->applyFilter(m_editor.getText().toStdString());
+        m_popup.reset(new SuggestPopup(m_suggest_list));
         
         m_popup->addToDesktop(juce::ComponentPeer::StyleFlags::windowIsTemporary
                               | juce::ComponentPeer::windowHasDropShadow);
@@ -270,18 +269,13 @@ namespace kiwi
     void SuggestPopupEditor::textEditorTextChanged(juce::TextEditor&)
     {
         const auto text = m_editor.getText().toStdString();
+        m_suggest_list.applyFilter(text);
         
-        if(m_popup)
+        if(m_popup && m_suggest_list.empty())
         {
-            m_popup->applyFilter(m_editor.getText().toStdString());
-            const bool no_suggestion = m_popup->useSuggestList().empty();
-            
-            if(no_suggestion)
-            {
-                dismissMenu();
-            }
+            dismissMenu();
         }
-        else
+        else if(!m_suggest_list.empty())
         {
             showMenu();
         }
