@@ -442,17 +442,18 @@ namespace kiwi
         {
             text.clear();
         }
-        
-        m_editor->setColour(juce::TextEditor::highlightColourId,
-                            juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
-        
-        m_editor->setColour(juce::TextEditor::focusedOutlineColourId,
-                            juce::Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
-        
-        m_editor->setColour(juce::TextEditor::backgroundColourId,
-                            juce::Colours::transparentWhite);
 
         juce::TextEditor& editor = m_editor->useEditor();
+        
+        editor.setColour(juce::TextEditor::highlightColourId,
+                         juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
+        
+        editor.setColour(juce::TextEditor::focusedOutlineColourId,
+                         juce::Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
+        
+        editor.setColour(juce::TextEditor::backgroundColourId,
+                         juce::Colours::transparentWhite);
+
         editor.setScrollbarsShown(false);
         editor.setScrollToShowCursor(true);
         editor.setReturnKeyStartsNewLine(false);
@@ -461,7 +462,7 @@ namespace kiwi
         editor.setText(text);
         editor.setCaretPosition(text.length());
         
-        m_editor->addListener(this);
+        m_editor->addListener(*this);
         addAndMakeVisible(m_editor.get());
         
         //editor.setSelectAllWhenFocused(true);
@@ -474,7 +475,7 @@ namespace kiwi
     {
         if(m_editor)
         {
-            m_editor->removeListener(this);
+            m_editor->removeListener(*this);
             removeChildComponent(m_editor.get());
             m_editor.reset();
             
@@ -502,14 +503,15 @@ namespace kiwi
         }
     }
     
-    void ClassicBox::textEditorTextChanged(juce::TextEditor& e)
+    void ClassicBox::textEditorTextChanged(SuggestPopupEditor& e)
     {
-        const juce::String new_text = e.getText();
-        const juce::Font font = e.getFont();
+        auto const& editor = e.useEditor();
+        const juce::String new_text = editor.getText();
+        const juce::Font font = editor.getFont();
         const int text_width = font.getStringWidth(new_text);
         const int ed_width = e.getWidth();
         
-        // box grows only up
+        // boxes only grows up
         if(ed_width < text_width + 16)
         {
             const int new_width = text_width + 24;
@@ -518,21 +520,21 @@ namespace kiwi
         }
     }
     
-    void ClassicBox::textEditorReturnKeyPressed(juce::TextEditor& e)
+    void ClassicBox::textEditorReturnKeyPressed(SuggestPopupEditor& e)
     {
         //KiwiApp::post("textEditorReturnKeyPressed");
         
         m_patcher_view.grabKeyboardFocus();
     }
     
-    void ClassicBox::textEditorEscapeKeyPressed(juce::TextEditor& e)
+    void ClassicBox::textEditorEscapeKeyPressed(SuggestPopupEditor& e)
     {
         //KiwiApp::post("textEditorEscapeKeyPressed");
         
         removeTextEditor();
     }
     
-    void ClassicBox::textEditorFocusLost(juce::TextEditor& e)
+    void ClassicBox::textEditorFocusLost(SuggestPopupEditor& e)
     {
         /*
         const bool locked = m_is_locked;

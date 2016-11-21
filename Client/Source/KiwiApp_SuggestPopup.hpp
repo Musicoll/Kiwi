@@ -23,6 +23,7 @@
 #define KIWI_APP_SUGGESTPOPUP_HPP_INCLUDED
 
 #include <KiwiModel/KiwiModel_Factory.hpp>
+#include <KiwiEngine/KiwiEngine_Listeners.hpp>
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -131,6 +132,10 @@ namespace kiwi
     public juce::KeyListener,
     public juce::Timer
     {
+    public: // classes
+        
+        class Listener;
+        
     public: // methods
         
         //! @brief Constructor.
@@ -143,10 +148,10 @@ namespace kiwi
         juce::TextEditor& useEditor();
         
         //! @brief Adds a TextEditor' listener.
-        void addListener(juce::TextEditor::Listener* listener);
+        void addListener(SuggestPopupEditor::Listener& listener);
         
         //! @brief Removes a TextEditor' listener.
-        void removeListener(juce::TextEditor::Listener* listener);
+        void removeListener(SuggestPopupEditor::Listener& listener);
         
         //! @brief juce::Component.
         void mouseDown(juce::MouseEvent const& event) override;
@@ -174,8 +179,36 @@ namespace kiwi
 
     private: // members
         
-        std::unique_ptr<SuggestPopup>   m_popup;
+        std::unique_ptr<SuggestPopup>   m_popup = nullptr;
         juce::TextEditor                m_editor;
+        juce::String                    m_typed_text;
+        engine::Listeners<Listener>     m_listeners;
+    };
+    
+    // ================================================================================ //
+    //                          SUGGEST POPUP EDITOR LISTENER                           //
+    // ================================================================================ //
+    
+    //! @brief Receives callbacks from a SuggestPopupEditor component.
+    //! @see SuggestPopupEditor::addListener
+    class SuggestPopupEditor::Listener
+    {
+    public: // methods
+        
+        //! @brief Destructor.
+        virtual ~Listener() {}
+        
+        //! @brief Called when the user changes the text in some way.
+        virtual void textEditorTextChanged(SuggestPopupEditor& ed) {}
+        
+        //! @brief Called when the user presses the return key.
+        virtual void textEditorReturnKeyPressed(SuggestPopupEditor& ed) {}
+        
+        //! @brief Called when the user presses the escape key.
+        virtual void textEditorEscapeKeyPressed(SuggestPopupEditor& ed) {}
+        
+        //! @brief Called when the text editor loses focus.
+        virtual void textEditorFocusLost(SuggestPopupEditor& ed) {}
     };
 }
 

@@ -32,14 +32,14 @@ namespace kiwi
     {
         setAlwaysOnTop(true);
         setOpaque(true);
-        m_suggest_list_box.setColour(juce::ListBox::ColourIds::backgroundColourId,
-                                     juce::Colours::transparentBlack);
+        setSize(200, 150);
         
         m_suggest_list_box.setModel(this);
-        
-        setSize(200, 150);
-        m_suggest_list_box.setMultipleSelectionEnabled(false);
         m_suggest_list_box.setSize(getWidth(), getHeight());
+        m_suggest_list_box.setRowHeight(18);
+        m_suggest_list_box.setMultipleSelectionEnabled(false);
+        m_suggest_list_box.setColour(juce::ListBox::ColourIds::backgroundColourId,
+                                     juce::Colours::transparentBlack);
         
         addAndMakeVisible(m_suggest_list_box);
     }
@@ -148,8 +148,6 @@ namespace kiwi
     
     void SuggestPopup::listBoxItemClicked(int row, juce::MouseEvent const& e)
     {
-        std::cout << "listBoxItemClicked" << "\n";
-        
         if(m_clicked_action && (row < m_suggest_list.size()))
         {
             std::string const& str = *(m_suggest_list.begin() + row);
@@ -182,12 +180,16 @@ namespace kiwi
     
     void SuggestPopup::deleteKeyPressed(int last_row_selected)
     {
-        ;
+        
     }
     
     void SuggestPopup::returnKeyPressed(int last_row_selected)
     {
-        ;
+        if(m_double_clicked_action && (last_row_selected < m_suggest_list.size()))
+        {
+            std::string const& str = *(m_suggest_list.begin() + last_row_selected);
+            m_double_clicked_action(str);
+        }
     }
     
     // ================================================================================ //
@@ -212,14 +214,14 @@ namespace kiwi
         return m_editor;
     }
     
-    void SuggestPopupEditor::addListener(juce::TextEditor::Listener* listener)
+    void SuggestPopupEditor::addListener(SuggestPopupEditor::Listener& listener)
     {
-        m_editor.addListener(listener);
+        m_listeners.add(listener);
     }
     
-    void SuggestPopupEditor::removeListener(juce::TextEditor::Listener* listener)
+    void SuggestPopupEditor::removeListener(SuggestPopupEditor::Listener& listener)
     {
-        m_editor.removeListener(listener);
+        m_listeners.remove(listener);
     }
     
     void SuggestPopupEditor::showMenu()
@@ -283,6 +285,8 @@ namespace kiwi
         {
             showMenu();
         }
+        
+        m_listeners.call(&Listener::textEditorTextChanged, *this);
     }
     
     void SuggestPopupEditor::dismissMenu()

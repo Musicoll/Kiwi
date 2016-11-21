@@ -123,7 +123,7 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The ClassicBox let the user change the text of the box
-    class ClassicBox : public ObjectView, public juce::TextEditor::Listener
+    class ClassicBox : public ObjectView, public SuggestPopupEditor::Listener
     {
     public:
         
@@ -148,10 +148,10 @@ namespace kiwi
         //! @brief called when the object is resized.
         void resized() override;
         
-        void textEditorTextChanged(juce::TextEditor&) override;
-        void textEditorReturnKeyPressed(juce::TextEditor&) override;
-        void textEditorEscapeKeyPressed(juce::TextEditor&) override;
-        void textEditorFocusLost(juce::TextEditor&) override;
+        void textEditorTextChanged(SuggestPopupEditor& ed) override;
+        void textEditorReturnKeyPressed(SuggestPopupEditor& ed) override;
+        void textEditorEscapeKeyPressed(SuggestPopupEditor& ed) override;
+        void textEditorFocusLost(SuggestPopupEditor& ed) override;
         
     private: // members
         
