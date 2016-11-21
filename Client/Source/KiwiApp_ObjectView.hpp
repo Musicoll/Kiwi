@@ -155,8 +155,7 @@ namespace kiwi
         
     private: // members
         
-        std::unique_ptr<juce::TextEditor>   m_editor;
-        std::unique_ptr<SuggestPopup>       m_suggest_popup;
+        std::unique_ptr<SuggestPopupEditor> m_editor;
     };
 }
 

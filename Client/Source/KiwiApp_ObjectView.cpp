@@ -430,7 +430,7 @@ namespace kiwi
         
         setInterceptsMouseClicks(true, true);
         
-        m_editor.reset(new juce::TextEditor());
+        m_editor.reset(new SuggestPopupEditor());
         m_editor->setBounds(m_local_box_bounds.expanded(m_selection_width*0.5));
         
         std::string text = m_model->getText();
@@ -452,42 +452,22 @@ namespace kiwi
         m_editor->setColour(juce::TextEditor::backgroundColourId,
                             juce::Colours::transparentWhite);
 
-        m_editor->setScrollbarsShown(false);
-        m_editor->setScrollToShowCursor(true);
-        m_editor->setReturnKeyStartsNewLine(false);
-        m_editor->setMultiLine(true, false);
+        juce::TextEditor& editor = m_editor->useEditor();
+        editor.setScrollbarsShown(false);
+        editor.setScrollToShowCursor(true);
+        editor.setReturnKeyStartsNewLine(false);
+        editor.setMultiLine(true, false);
         
-        m_editor->setText(text);
-        m_editor->setCaretPosition(text.length());
+        editor.setText(text);
+        editor.setCaretPosition(text.length());
         
         m_editor->addListener(this);
         addAndMakeVisible(m_editor.get());
         
-        m_editor->setSelectAllWhenFocused(true);
-        
-        m_suggest_popup.reset(new SuggestPopup());
-        m_suggest_popup->populate(model::Factory::getNames());
-        
-        const auto change_text_fn = [this](juce::String text)
-        {
-            m_editor->setText(text, juce::dontSendNotification);
-            m_editor->grabKeyboardFocus();
-        };
-        
-        m_suggest_popup->setSelectedItemAction(change_text_fn);
-        m_suggest_popup->setItemClickedAction(change_text_fn);
-        m_suggest_popup->setItemDoubleClickedAction([this](juce::String text)
-                                                    {
-                                                        m_editor->setText(text, juce::dontSendNotification);
-                                                        m_suggest_popup->close();
-                                                        m_editor->grabKeyboardFocus();
-                                                    });
-        
-        m_suggest_popup->show(m_editor.get());
-        
-        m_editor->grabKeyboardFocus();
-        
+        //editor.setSelectAllWhenFocused(true);
+
         m_is_editing = true;
+        m_editor->grabKeyboardFocus();
     }
     
     void ClassicBox::removeTextEditor()
@@ -500,8 +480,6 @@ namespace kiwi
             
             m_patcher_view.grabKeyboardFocus();
             m_is_editing = false;
-            
-            m_suggest_popup.reset();
         }
     }
     
@@ -538,8 +516,6 @@ namespace kiwi
             m_local_box_bounds.setWidth(new_width-8);
             setSize(new_width, getHeight());
         }
-        
-        m_suggest_popup->applyFilter(new_text.toStdString());
     }
     
     void ClassicBox::textEditorReturnKeyPressed(juce::TextEditor& e)
@@ -558,6 +534,7 @@ namespace kiwi
     
     void ClassicBox::textEditorFocusLost(juce::TextEditor& e)
     {
+        /*
         const bool locked = m_is_locked;
         setInterceptsMouseClicks(locked, locked);
         
@@ -566,5 +543,6 @@ namespace kiwi
         removeTextEditor();
         
         m_patcher_view.boxHasBeenEdited(*this, new_text);
+        */
     }
 }

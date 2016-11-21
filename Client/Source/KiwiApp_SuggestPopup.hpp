@@ -72,11 +72,7 @@ namespace kiwi
         void setSelectedItemAction(action_method_t function);
         
         //! @brief Select the first item of the list
-        void setFirstItemFocused()
-        {
-            toFront(true);
-            m_suggest_list_box.selectRow(0);
-        }
+        void setFirstItemFocused();
         
         // juce::Component
         void paint(juce::Graphics& g) override;
@@ -124,6 +120,10 @@ namespace kiwi
         action_method_t m_selected_action;
     };
     
+    // ================================================================================ //
+    //                              SUGGEST POPUP EDITOR                                //
+    // ================================================================================ //
+    
     //! @brief A text editor component that shows a pop-up menu/combo box below it.
     class SuggestPopupEditor
     : public juce::Component,
@@ -134,118 +134,44 @@ namespace kiwi
     public: // methods
         
         //! @brief Constructor.
-        SuggestPopupEditor()
-        {
-            addAndMakeVisible(m_editor);
-            
-            m_editor.addListener(this);
-            m_editor.addKeyListener(this);
-        }
+        SuggestPopupEditor();
         
-        void mouseDown(const juce::MouseEvent& event) override
-        {
-            if (!isParentOf(event.eventComponent))
-                dismissMenu();
-        }
+        //! @brief Destructor.
+        ~SuggestPopupEditor();
         
-        ~SuggestPopupEditor()
-        {
-            juce::Desktop::getInstance().removeGlobalMouseListener(static_cast<juce::MouseListener*>(this));
-        }
+        //! @brief Returns the TextEditor.
+        juce::TextEditor& useEditor();
         
-        void showMenu()
-        {
-            m_popup.reset(new SuggestPopup());
-            m_popup->addToDesktop(juce::ComponentPeer::StyleFlags::windowIsTemporary);
-            m_popup->setVisible(true);
-            m_popup->setBounds(getScreenBounds().translated(0, getHeight()).withHeight(100));
-            
-            m_popup->setSelectedItemAction([this](juce::String text)
-                                          {
-                                              m_editor.setText(text, juce::dontSendNotification);
-                                              m_popup.reset();
-                                          });
-            
-            m_popup->addKeyListener(this);
-            
-            juce::Desktop::getInstance().addGlobalMouseListener(this);
-            
-            startTimer(200);
-        }
+        //! @brief Adds a TextEditor' listener.
+        void addListener(juce::TextEditor::Listener* listener);
         
-        void textEditorTextChanged(juce::TextEditor&) override
-        {
-            const auto text = m_editor.getText().toStdString();
-            m_popup->applyFilter(text);
-            
-            if(m_popup->useSuggestList().empty())
-            {
-                dismissMenu();
-            }
-            else
-            {
-                if(!m_popup)
-                    showMenu();
-            }
-        }
+        //! @brief Removes a TextEditor' listener.
+        void removeListener(juce::TextEditor::Listener* listener);
         
-        void dismissMenu()
-        {
-            m_popup.reset();
-            stopTimer();
-            juce::Desktop::getInstance().removeGlobalMouseListener(this);
-        }
+        //! @brief juce::Component.
+        void mouseDown(juce::MouseEvent const& event) override;
         
-        void timerCallback() override
-        {
-            if (!juce::Process::isForegroundProcess())
-                dismissMenu();
-            
-            if(m_popup)
-            {
-                if (!hasKeyboardFocus(true) && !m_popup->hasKeyboardFocus(true))
-                    dismissMenu();
-            }
-            else
-            {
-                if (!hasKeyboardFocus(true))
-                    dismissMenu();
-            }
-        }
+        //! @brief juce::Component.
+        void resized() override;
         
-        bool keyPressed(juce::KeyPress const& key, Component* component) override
-        {
-            if(component == &m_editor)
-            {
-                if(key == juce::KeyPress::downKey)
-                {
-                    if(m_popup)
-                        m_popup->setFirstItemFocused();
-                    
-                    return true;
-                }
-            }
-            else if(component == m_popup.get())
-            {
-                // if the user tries to type into the menu lets move the focus back there and inject the keypress
-                m_editor.toFront(true);
-                return m_editor.keyPressed(key);
-            }
-            
-            return false;
-        }
+        //! @brief juce::Component.
+        void focusLost(FocusChangeType cause) override;
         
-        void focusLost(FocusChangeType cause) override
-        {
-            if (m_popup && !m_popup->hasKeyboardFocus(true))
-                m_popup.reset();
-        }
+        //! @brief Shows the menu.
+        void showMenu();
         
-        void resized() override
-        {
-            m_editor.setBounds(getLocalBounds());
-        }
+        //! @brief juce::Timer.
+        void dismissMenu();
         
+        //! @brief juce::TextEditor::Listener
+        void textEditorTextChanged(juce::TextEditor&) override;
+        
+        //! @brief juce::KeyListener.
+        bool keyPressed(juce::KeyPress const& key, Component* component) override;
+        
+        //! @brief juce::Timer.
+        void timerCallback() override;
+
     private: // members
         
         std::unique_ptr<SuggestPopup>   m_popup;
