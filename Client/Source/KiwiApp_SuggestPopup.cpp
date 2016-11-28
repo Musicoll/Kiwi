@@ -41,6 +41,8 @@ namespace kiwi
         m_suggest_list_box.setColour(juce::ListBox::ColourIds::backgroundColourId,
                                      juce::Colours::transparentBlack);
         
+        setWantsKeyboardFocus(false);
+        setMouseClickGrabsKeyboardFocus(false);
         addAndMakeVisible(m_suggest_list_box);
     }
     
@@ -177,7 +179,6 @@ namespace kiwi
     
     void SuggestPopup::deleteKeyPressed(int last_row_selected)
     {
-        //std::cout << "deleteKeyPressed" << std::endl;
         if(m_deletekey_pressed_action && (last_row_selected < m_suggest_list.size()))
         {
             std::string const& str = *(m_suggest_list.begin() + last_row_selected);
