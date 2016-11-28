@@ -460,10 +460,10 @@ namespace kiwi
         editor.setMultiLine(true, false);
         
         editor.setText(text);
-        editor.setCaretPosition(text.length());
+        editor.setHighlightedRegion({0, static_cast<int>(text.length())});
         
         m_editor->addListener(*this);
-        addAndMakeVisible(m_editor.get());
+        addAndMakeVisible(*m_editor);
         
         //editor.setSelectAllWhenFocused(true);
 
@@ -498,7 +498,6 @@ namespace kiwi
     {
         if(m_editor)
         {
-            //auto ed_borders = m_editor->getBorder();
             m_editor->setBounds(m_local_box_bounds.expanded(m_selection_width*0.5));
         }
     }
@@ -522,9 +521,15 @@ namespace kiwi
     
     void ClassicBox::textEditorReturnKeyPressed(SuggestPopupEditor& e)
     {
-        //KiwiApp::post("textEditorReturnKeyPressed");
+        const bool locked = m_is_locked;
+        setInterceptsMouseClicks(locked, locked);
         
-        m_patcher_view.grabKeyboardFocus();
+        auto const& editor = e.useEditor();
+        std::string new_text = editor.getText().toStdString();
+        
+        removeTextEditor();
+        
+        m_patcher_view.boxHasBeenEdited(*this, new_text);
     }
     
     void ClassicBox::textEditorEscapeKeyPressed(SuggestPopupEditor& e)
@@ -536,15 +541,14 @@ namespace kiwi
     
     void ClassicBox::textEditorFocusLost(SuggestPopupEditor& e)
     {
-        /*
         const bool locked = m_is_locked;
         setInterceptsMouseClicks(locked, locked);
         
-        std::string new_text = e.getText().toStdString();
+        auto const& editor = e.useEditor();
+        std::string new_text = editor.getText().toStdString();
         
         removeTextEditor();
         
         m_patcher_view.boxHasBeenEdited(*this, new_text);
-        */
     }
 }

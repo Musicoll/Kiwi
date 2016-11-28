@@ -54,15 +54,6 @@ namespace kiwi
         //! @brief Apply a filter to the given pattern.
         void applyFilter(std::string const& filter_pattern);
         
-        //! @brief Return the SuggestList.
-        SuggestList const& useSuggestList() const;
-        
-        //! @brief Show the popup.
-        void show(Component* target_comp);
-        
-        //! @brief Close the popup.
-        void close();
-        
         //! @brief Set the action to execute when an item has been clicked.
         void setItemClickedAction(action_method_t function);
         
@@ -71,6 +62,9 @@ namespace kiwi
         
         //! @brief Set the action to execute when an item has been selected.
         void setSelectedItemAction(action_method_t function);
+        
+        //! @brief Set the action to execute when the deleteKey has been pressed.
+        void setDeleteKeyPressedAction(action_method_t function);
         
         //! @brief Select the first item of the list
         void setFirstItemFocused();
@@ -119,6 +113,7 @@ namespace kiwi
         action_method_t m_clicked_action;
         action_method_t m_double_clicked_action;
         action_method_t m_selected_action;
+        action_method_t m_deletekey_pressed_action;
     };
     
     // ================================================================================ //
@@ -165,11 +160,23 @@ namespace kiwi
         //! @brief Shows the menu.
         void showMenu();
         
+        //! @brief Updates the menu.
+        void updateMenu();
+        
         //! @brief juce::Timer.
         void dismissMenu();
         
         //! @brief juce::TextEditor::Listener
-        void textEditorTextChanged(juce::TextEditor&) override;
+        void textEditorTextChanged(juce::TextEditor& ed) override;
+        
+        //! @brief Called when the user presses the return key.
+        void textEditorReturnKeyPressed(juce::TextEditor& ed) override;
+        
+        //! @brief Called when the user presses the escape key.
+        void textEditorEscapeKeyPressed(juce::TextEditor& ed) override;
+        
+        //! @brief Called when the text editor loses focus.
+        void textEditorFocusLost(juce::TextEditor& ed) override;
         
         //! @brief juce::KeyListener.
         bool keyPressed(juce::KeyPress const& key, Component* component) override;

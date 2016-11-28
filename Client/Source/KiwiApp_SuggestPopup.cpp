@@ -46,7 +46,7 @@ namespace kiwi
     
     SuggestPopup::~SuggestPopup()
     {
-        close();
+        ;
     }
     
     void SuggestPopup::populate(SuggestList::entries_t entries)
@@ -60,37 +60,6 @@ namespace kiwi
     {
         m_suggest_list.applyFilter(filter_pattern);
         m_suggest_list_box.updateContent();
-    }
-    
-    SuggestList const& SuggestPopup::useSuggestList() const
-    {
-        return m_suggest_list;
-    }
-    
-    void SuggestPopup::show(Component* target_comp)
-    {
-        if(isOnDesktop()) return; // abort
-        
-        assert(target_comp != nullptr);
-        
-        setTopLeftPosition(target_comp->getX(), target_comp->getBottom());
-        setSize(200, 150);
-        m_suggest_list_box.setSize(getWidth(), getHeight());
-        
-        //Component* parent_comp = target_comp->getTopLevelComponent();
-        target_comp->addAndMakeVisible(this);
-        addToDesktop(juce::ComponentPeer::windowIsTemporary
-                     | juce::ComponentPeer::windowHasDropShadow);
-        
-        enterModalState(false);
-        
-        setVisible(true);
-    }
-    
-    void SuggestPopup::close()
-    {
-        exitModalState(0);
-        removeFromDesktop();
     }
     
     void SuggestPopup::paint(juce::Graphics & g)
@@ -107,6 +76,17 @@ namespace kiwi
     {
         toFront(true);
         m_suggest_list_box.selectRow(0);
+        return;
+        int rows = getNumRows();
+        auto new_selected_row = m_suggest_list_box.getSelectedRow() + 1;
+        if(new_selected_row >= rows)
+        {
+            m_suggest_list_box.selectRow(0);
+        }
+        else
+        {
+            m_suggest_list_box.selectRow(new_selected_row);
+        }
     }
     
     void SuggestPopup::setItemClickedAction(action_method_t function)
@@ -122,6 +102,11 @@ namespace kiwi
     void SuggestPopup::setSelectedItemAction(action_method_t function)
     {
         m_selected_action = function;
+    }
+    
+    void SuggestPopup::setDeleteKeyPressedAction(action_method_t function)
+    {
+        m_deletekey_pressed_action = function;
     }
     
     // ================================================================================ //
@@ -180,7 +165,12 @@ namespace kiwi
     
     void SuggestPopup::deleteKeyPressed(int last_row_selected)
     {
-        
+        //std::cout << "deleteKeyPressed" << std::endl;
+        if(m_deletekey_pressed_action && (last_row_selected < m_suggest_list.size()))
+        {
+            std::string const& str = *(m_suggest_list.begin() + last_row_selected);
+            m_deletekey_pressed_action(str);
+        }
     }
     
     void SuggestPopup::returnKeyPressed(int last_row_selected)
@@ -198,6 +188,7 @@ namespace kiwi
     
     SuggestPopupEditor::SuggestPopupEditor() : m_suggest_list(model::Factory::getNames())
     {
+        setWantsKeyboardFocus(true);
         addAndMakeVisible(m_editor);
         
         m_editor.addListener(this);
@@ -228,42 +219,76 @@ namespace kiwi
     {
         m_popup.reset(new SuggestPopup(m_suggest_list));
         
-        m_popup->addToDesktop(juce::ComponentPeer::StyleFlags::windowIsTemporary
-                              | juce::ComponentPeer::windowHasDropShadow);
+        const auto on_select_change_fn = [this](juce::String text)
+        {
+            juce::String old_text = m_editor.getText();
+            m_editor.setText(text, juce::dontSendNotification);
+            
+            //m_editor.setHighlightedRegion({old_text.length(), text.length()});
+            m_editor.grabKeyboardFocus();
+            m_editor.setHighlightedRegion({0, static_cast<int>(m_editor.getText().length())});
+        };
         
-        m_popup->setVisible(true);
-        m_popup->setBounds(getScreenBounds().translated(0, getHeight()).withSize(200, 150));
-        
-        const auto change_text_fn = [this](juce::String text)
+        const auto on_item_clicked_fn = [this](juce::String text)
         {
             juce::String old_text = m_editor.getText();
             m_editor.setText(text, juce::dontSendNotification);
             m_editor.setHighlightedRegion({old_text.length(), text.length()});
-            //m_editor.grabKeyboardFocus();
         };
         
-        m_popup->setSelectedItemAction(change_text_fn);
-        m_popup->setItemClickedAction(change_text_fn);
+        m_popup->setSelectedItemAction(on_select_change_fn);
+        m_popup->setItemClickedAction(on_item_clicked_fn);
         m_popup->setItemDoubleClickedAction([this](juce::String text)
                                             {
                                                 m_editor.setText(text, juce::dontSendNotification);
                                                 dismissMenu();
                                                 m_editor.grabKeyboardFocus();
+                                                m_listeners.call(&Listener::textEditorReturnKeyPressed, *this);
                                             });
+        
+        m_popup->setDeleteKeyPressedAction([this](juce::String text)
+                                           {
+                                               m_editor.toFront(true);
+                                               m_editor.deleteBackwards(false);
+                                           });
+        
+        m_popup->addToDesktop(juce::ComponentPeer::StyleFlags::windowIsTemporary
+                              | juce::ComponentPeer::windowHasDropShadow);
+
+        m_popup->setBounds(getScreenBounds().translated(-2, getHeight() + 2).withSize(200, 150));
+        m_popup->setVisible(true);
         
         m_popup->addKeyListener(this);
         
         juce::Desktop::getInstance().addGlobalMouseListener(this);
         
+        m_popup->setFirstItemFocused();
         m_editor.grabKeyboardFocus();
+        m_editor.setHighlightedRegion({0, static_cast<int>(m_editor.getText().length())});
         
         startTimer(200);
+    }
+    
+    void SuggestPopupEditor::updateMenu()
+    {
+        assert(m_popup && "Call showMenu() before");
+        assert(m_popup->isOnDesktop());
+        
+        m_popup->setVisible(true);
+        m_popup->setBounds(getScreenBounds().translated(-2, getHeight() + 2).withSize(200, 150));
+        
+        m_popup->repaint();
+
+        //m_popup->setFirstItemFocused();
+        m_editor.grabKeyboardFocus();
     }
     
     void SuggestPopupEditor::mouseDown(juce::MouseEvent const& event)
     {
         if (!isParentOf(event.eventComponent))
+        {
             dismissMenu();
+        }
     }
     
     void SuggestPopupEditor::textEditorTextChanged(juce::TextEditor&)
@@ -277,17 +302,48 @@ namespace kiwi
         }
         else if(!m_suggest_list.empty())
         {
-            showMenu();
+            if(m_popup)
+                updateMenu();
+            else
+                showMenu();
         }
         
         m_listeners.call(&Listener::textEditorTextChanged, *this);
     }
     
+    void SuggestPopupEditor::textEditorReturnKeyPressed(juce::TextEditor& ed)
+    {
+        m_listeners.call(&Listener::textEditorReturnKeyPressed, *this);
+    }
+    
+    void SuggestPopupEditor::textEditorEscapeKeyPressed(juce::TextEditor& ed)
+    {
+        m_listeners.call(&Listener::textEditorEscapeKeyPressed, *this);
+    }
+    
+    void SuggestPopupEditor::textEditorFocusLost(juce::TextEditor& ed)
+    {
+        std::cout << "SuggestPopupEditor::textEditorFocusLost" << '\n';
+        
+        if (m_popup && !m_popup->hasKeyboardFocus(true))
+        {
+            std::cout << "m_popup && !m_popup->hasKeyboardFocus(true)" << '\n';
+            
+            //m_popup.reset();
+            //m_listeners.call(&Listener::textEditorFocusLost, *this);
+        }
+        
+        //m_listeners.call(&Listener::textEditorFocusLost, *this);
+    }
+    
     void SuggestPopupEditor::dismissMenu()
     {
-        m_popup.reset();
-        stopTimer();
-        juce::Desktop::getInstance().removeGlobalMouseListener(this);
+        if(m_popup)
+        {
+            m_popup.reset();
+            stopTimer();
+            juce::Desktop::getInstance().removeGlobalMouseListener(this);
+        }
     }
     
     void SuggestPopupEditor::timerCallback()
@@ -333,8 +389,13 @@ namespace kiwi
     
     void SuggestPopupEditor::focusLost(FocusChangeType cause)
     {
+        std::cout << "SuggestPopupEditor::focusLost" << '\n';
+        
         if (m_popup && !m_popup->hasKeyboardFocus(true))
-            m_popup.reset();
+        {
+            //m_popup.reset();
+            //m_listeners.call(&Listener::textEditorFocusLost, *this);
+        }
     }
     
     void SuggestPopupEditor::resized()
