@@ -69,6 +69,12 @@ namespace kiwi
         //! @brief Select the first item of the list
         void setFirstItemFocused();
         
+        //! @brief Select the previous item of the list
+        void selectPreviousRow();
+        
+        //! @brief Select the next item of the list
+        void selectNextRow();
+        
         // juce::Component
         void paint(juce::Graphics& g) override;
         
@@ -122,7 +128,7 @@ namespace kiwi
     
     //! @brief A text editor component that shows a pop-up menu/combo box below it.
     class SuggestPopupEditor
-    : public juce::Component,
+    : public juce::TextEditor,
     public juce::TextEditor::Listener,
     public juce::KeyListener,
     public juce::Timer
@@ -139,9 +145,6 @@ namespace kiwi
         //! @brief Destructor.
         ~SuggestPopupEditor();
         
-        //! @brief Returns the TextEditor.
-        juce::TextEditor& useEditor();
-        
         //! @brief Adds a TextEditor' listener.
         void addListener(SuggestPopupEditor::Listener& listener);
         
@@ -149,10 +152,7 @@ namespace kiwi
         void removeListener(SuggestPopupEditor::Listener& listener);
         
         //! @brief juce::Component.
-        void mouseDown(juce::MouseEvent const& event) override;
-        
-        //! @brief juce::Component.
-        void resized() override;
+        //void mouseDown(juce::MouseEvent const& event) override;
         
         //! @brief juce::Component.
         void focusLost(FocusChangeType cause) override;
@@ -188,7 +188,6 @@ namespace kiwi
         
         SuggestList                     m_suggest_list;
         std::unique_ptr<SuggestPopup>   m_popup = nullptr;
-        juce::TextEditor                m_editor;
         juce::String                    m_typed_text;
         engine::Listeners<Listener>     m_listeners;
     };

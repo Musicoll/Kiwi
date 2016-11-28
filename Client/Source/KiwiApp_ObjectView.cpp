@@ -442,25 +442,23 @@ namespace kiwi
         {
             text.clear();
         }
+        
+        m_editor->setColour(juce::TextEditor::highlightColourId,
+                            juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
+        
+        m_editor->setColour(juce::TextEditor::focusedOutlineColourId,
+                            juce::Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
+        
+        m_editor->setColour(juce::TextEditor::backgroundColourId,
+                            juce::Colours::transparentWhite);
 
-        juce::TextEditor& editor = m_editor->useEditor();
+        m_editor->setScrollbarsShown(false);
+        m_editor->setScrollToShowCursor(true);
+        m_editor->setReturnKeyStartsNewLine(false);
+        m_editor->setMultiLine(true, false);
         
-        editor.setColour(juce::TextEditor::highlightColourId,
-                         juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
-        
-        editor.setColour(juce::TextEditor::focusedOutlineColourId,
-                         juce::Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
-        
-        editor.setColour(juce::TextEditor::backgroundColourId,
-                         juce::Colours::transparentWhite);
-
-        editor.setScrollbarsShown(false);
-        editor.setScrollToShowCursor(true);
-        editor.setReturnKeyStartsNewLine(false);
-        editor.setMultiLine(true, false);
-        
-        editor.setText(text);
-        editor.setHighlightedRegion({0, static_cast<int>(text.length())});
+        m_editor->setText(text);
+        m_editor->setHighlightedRegion({0, static_cast<int>(text.length())});
         
         m_editor->addListener(*this);
         addAndMakeVisible(*m_editor);
@@ -504,9 +502,8 @@ namespace kiwi
     
     void ClassicBox::textEditorTextChanged(SuggestPopupEditor& e)
     {
-        auto const& editor = e.useEditor();
-        const juce::String new_text = editor.getText();
-        const juce::Font font = editor.getFont();
+        const juce::String new_text = e.getText();
+        const juce::Font font = e.getFont();
         const int text_width = font.getStringWidth(new_text);
         const int ed_width = e.getWidth();
         
@@ -524,8 +521,7 @@ namespace kiwi
         const bool locked = m_is_locked;
         setInterceptsMouseClicks(locked, locked);
         
-        auto const& editor = e.useEditor();
-        std::string new_text = editor.getText().toStdString();
+        std::string new_text = e.getText().toStdString();
         
         removeTextEditor();
         
@@ -544,8 +540,7 @@ namespace kiwi
         const bool locked = m_is_locked;
         setInterceptsMouseClicks(locked, locked);
         
-        auto const& editor = e.useEditor();
-        std::string new_text = editor.getText().toStdString();
+        std::string new_text = e.getText().toStdString();
         
         removeTextEditor();
         

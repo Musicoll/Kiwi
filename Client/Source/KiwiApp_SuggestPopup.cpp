@@ -77,6 +77,18 @@ namespace kiwi
         toFront(true);
         m_suggest_list_box.selectRow(0);
         return;
+    }
+    
+    void SuggestPopup::selectPreviousRow()
+    {
+        int rows = getNumRows();
+        const auto selected_row = m_suggest_list_box.getSelectedRow();
+        auto new_selected_row = (selected_row == -1) ? -1 : (selected_row <= 0) ? rows - 1 : selected_row - 1;
+        m_suggest_list_box.selectRow(new_selected_row);
+    }
+    
+    void SuggestPopup::selectNextRow()
+    {
         int rows = getNumRows();
         auto new_selected_row = m_suggest_list_box.getSelectedRow() + 1;
         if(new_selected_row >= rows)
@@ -189,20 +201,14 @@ namespace kiwi
     SuggestPopupEditor::SuggestPopupEditor() : m_suggest_list(model::Factory::getNames())
     {
         setWantsKeyboardFocus(true);
-        addAndMakeVisible(m_editor);
         
-        m_editor.addListener(this);
-        m_editor.addKeyListener(this);
+        juce::TextEditor::addListener(this);
+        addKeyListener(this);
     }
     
     SuggestPopupEditor::~SuggestPopupEditor()
     {
         juce::Desktop::getInstance().removeGlobalMouseListener(static_cast<juce::MouseListener*>(this));
-    }
-    
-    juce::TextEditor& SuggestPopupEditor::useEditor()
-    {
-        return m_editor;
     }
     
     void SuggestPopupEditor::addListener(SuggestPopupEditor::Listener& listener)
@@ -221,35 +227,34 @@ namespace kiwi
         
         const auto on_select_change_fn = [this](juce::String text)
         {
-            juce::String old_text = m_editor.getText();
-            m_editor.setText(text, juce::dontSendNotification);
+            juce::String old_text = getText();
+            setText(text, juce::dontSendNotification);
             
-            //m_editor.setHighlightedRegion({old_text.length(), text.length()});
-            m_editor.grabKeyboardFocus();
-            m_editor.setHighlightedRegion({0, static_cast<int>(m_editor.getText().length())});
+            grabKeyboardFocus();
+            setHighlightedRegion({0, static_cast<int>(getText().length())});
         };
         
         const auto on_item_clicked_fn = [this](juce::String text)
         {
-            juce::String old_text = m_editor.getText();
-            m_editor.setText(text, juce::dontSendNotification);
-            m_editor.setHighlightedRegion({old_text.length(), text.length()});
+            juce::String old_text = getText();
+            setText(text, juce::dontSendNotification);
+            setHighlightedRegion({old_text.length(), old_text.length() + text.length()});
         };
         
         m_popup->setSelectedItemAction(on_select_change_fn);
         m_popup->setItemClickedAction(on_item_clicked_fn);
         m_popup->setItemDoubleClickedAction([this](juce::String text)
                                             {
-                                                m_editor.setText(text, juce::dontSendNotification);
+                                                setText(text, juce::dontSendNotification);
                                                 dismissMenu();
-                                                m_editor.grabKeyboardFocus();
+                                                grabKeyboardFocus();
                                                 m_listeners.call(&Listener::textEditorReturnKeyPressed, *this);
                                             });
         
         m_popup->setDeleteKeyPressedAction([this](juce::String text)
                                            {
-                                               m_editor.toFront(true);
-                                               m_editor.deleteBackwards(false);
+                                               toFront(true);
+                                               deleteBackwards(false);
                                            });
         
         m_popup->addToDesktop(juce::ComponentPeer::StyleFlags::windowIsTemporary
@@ -263,8 +268,8 @@ namespace kiwi
         juce::Desktop::getInstance().addGlobalMouseListener(this);
         
         m_popup->setFirstItemFocused();
-        m_editor.grabKeyboardFocus();
-        m_editor.setHighlightedRegion({0, static_cast<int>(m_editor.getText().length())});
+        grabKeyboardFocus();
+        setHighlightedRegion({0, static_cast<int>(getText().length())});
         
         startTimer(200);
     }
@@ -276,13 +281,13 @@ namespace kiwi
         
         m_popup->setVisible(true);
         m_popup->setBounds(getScreenBounds().translated(-2, getHeight() + 2).withSize(200, 150));
-        
         m_popup->repaint();
 
         //m_popup->setFirstItemFocused();
-        m_editor.grabKeyboardFocus();
+        grabKeyboardFocus();
     }
     
+    /*
     void SuggestPopupEditor::mouseDown(juce::MouseEvent const& event)
     {
         if (!isParentOf(event.eventComponent))
@@ -290,10 +295,11 @@ namespace kiwi
             dismissMenu();
         }
     }
+    */
     
     void SuggestPopupEditor::textEditorTextChanged(juce::TextEditor&)
     {
-        const auto text = m_editor.getText().toStdString();
+        const auto text = getText().toStdString();
         m_suggest_list.applyFilter(text);
         
         if(m_popup && m_suggest_list.empty())
@@ -365,23 +371,34 @@ namespace kiwi
     
     bool SuggestPopupEditor::keyPressed(juce::KeyPress const& key, Component* component)
     {
-        if(component == &m_editor)
+        repaint();
+        if(component == this)
         {
             if(key == juce::KeyPress::downKey)
             {
                 if(m_popup)
                 {
-                    m_popup->setFirstItemFocused();
+                    m_popup->selectNextRow();
                 }
                 
                 return true;
             }
+            else if(key == juce::KeyPress::upKey)
+            {
+                if(m_popup)
+                {
+                    m_popup->selectPreviousRow();
+                }
+                
+                return true;
+            }
+            else return juce::TextEditor::keyPressed(key);
         }
         else if(component == m_popup.get())
         {
             // if the user tries to type into the menu lets move the focus back there and inject the keypress
-            m_editor.toFront(true);
-            return m_editor.keyPressed(key);
+            toFront(true);
+            return juce::TextEditor::keyPressed(key);
         }
         
         return false;
@@ -396,10 +413,5 @@ namespace kiwi
             //m_popup.reset();
             //m_listeners.call(&Listener::textEditorFocusLost, *this);
         }
-    }
-    
-    void SuggestPopupEditor::resized()
-    {
-        m_editor.setBounds(getLocalBounds());
     }
 }
