@@ -155,7 +155,7 @@ namespace kiwi
         //void mouseDown(juce::MouseEvent const& event) override;
         
         //! @brief juce::Component.
-        void focusLost(FocusChangeType cause) override;
+        //void focusLost(FocusChangeType cause) override;
         
         //! @brief Shows the menu.
         void showMenu();

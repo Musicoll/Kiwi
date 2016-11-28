@@ -209,7 +209,8 @@ namespace kiwi
     
     SuggestPopupEditor::~SuggestPopupEditor()
     {
-        juce::Desktop::getInstance().removeGlobalMouseListener(static_cast<juce::MouseListener*>(this));
+        dismissMenu();
+        //juce::Desktop::getInstance().removeGlobalMouseListener(static_cast<juce::MouseListener*>(this));
     }
     
     void SuggestPopupEditor::addListener(SuggestPopupEditor::Listener& listener)
@@ -228,35 +229,37 @@ namespace kiwi
         
         const auto on_select_change_fn = [this](juce::String text)
         {
-            juce::String old_text = getText();
             setText(text, juce::dontSendNotification);
-            
+            setHighlightedRegion({m_typed_text.length(), static_cast<int>(text.length())});
             grabKeyboardFocus();
-            setHighlightedRegion({0, static_cast<int>(getText().length())});
+            m_listeners.call(&Listener::textEditorTextChanged, *this);
         };
         
         const auto on_item_clicked_fn = [this](juce::String text)
         {
-            juce::String old_text = getText();
             setText(text, juce::dontSendNotification);
-            setHighlightedRegion({old_text.length(), old_text.length() + text.length()});
+            setHighlightedRegion({m_typed_text.length(), static_cast<int>(text.length())});
+            grabKeyboardFocus();
+        };
+        
+        const auto on_item_double_clicked_fn = [this](juce::String text)
+        {
+            setText(text, juce::dontSendNotification);
+            grabKeyboardFocus();
+            dismissMenu();
+            m_listeners.call(&Listener::textEditorReturnKeyPressed, *this);
+        };
+        
+        const auto on_delete_key_pressed_fn = [this](juce::String text)
+        {
+            toFront(true);
+            deleteBackwards(false);
         };
         
         m_popup->setSelectedItemAction(on_select_change_fn);
         m_popup->setItemClickedAction(on_item_clicked_fn);
-        m_popup->setItemDoubleClickedAction([this](juce::String text)
-                                            {
-                                                setText(text, juce::dontSendNotification);
-                                                dismissMenu();
-                                                grabKeyboardFocus();
-                                                m_listeners.call(&Listener::textEditorReturnKeyPressed, *this);
-                                            });
-        
-        m_popup->setDeleteKeyPressedAction([this](juce::String text)
-                                           {
-                                               toFront(true);
-                                               deleteBackwards(false);
-                                           });
+        m_popup->setItemDoubleClickedAction(on_item_double_clicked_fn);
+        m_popup->setDeleteKeyPressedAction(on_delete_key_pressed_fn);
         
         m_popup->addToDesktop(juce::ComponentPeer::StyleFlags::windowIsTemporary
                               | juce::ComponentPeer::windowHasDropShadow);
@@ -264,13 +267,16 @@ namespace kiwi
         m_popup->setBounds(getScreenBounds().translated(-2, getHeight() + 2).withSize(200, 150));
         m_popup->setVisible(true);
         
-        m_popup->addKeyListener(this);
+        //m_popup->addKeyListener(this);
         
-        juce::Desktop::getInstance().addGlobalMouseListener(this);
+        //juce::Desktop::getInstance().addGlobalMouseListener(this);
         
         m_popup->setFirstItemFocused();
         grabKeyboardFocus();
-        setHighlightedRegion({0, static_cast<int>(getText().length())});
+        if(!getText().isEmpty())
+        {
+            setHighlightedRegion({0, static_cast<int>(getText().length())});
+        }
         
         startTimer(200);
     }
@@ -284,24 +290,14 @@ namespace kiwi
         m_popup->setBounds(getScreenBounds().translated(-2, getHeight() + 2).withSize(200, 150));
         m_popup->repaint();
 
-        //m_popup->setFirstItemFocused();
+        m_popup->setFirstItemFocused();
         grabKeyboardFocus();
     }
     
-    /*
-    void SuggestPopupEditor::mouseDown(juce::MouseEvent const& event)
-    {
-        if (!isParentOf(event.eventComponent))
-        {
-            dismissMenu();
-        }
-    }
-    */
-    
     void SuggestPopupEditor::textEditorTextChanged(juce::TextEditor&)
     {
-        const auto text = getText().toStdString();
-        m_suggest_list.applyFilter(text);
+        m_typed_text = getText();
+        m_suggest_list.applyFilter(m_typed_text.toStdString());
         
         if(m_popup && m_suggest_list.empty())
         {
@@ -330,17 +326,15 @@ namespace kiwi
     
     void SuggestPopupEditor::textEditorFocusLost(juce::TextEditor& ed)
     {
-        std::cout << "SuggestPopupEditor::textEditorFocusLost" << '\n';
-        
-        if (m_popup && !m_popup->hasKeyboardFocus(true))
+        auto const* const focus_comp = getCurrentlyFocusedComponent();
+        if(focus_comp
+           && ((focus_comp != this)
+               && (!m_popup
+                   || (m_popup
+                       && (focus_comp != m_popup.get())))))
         {
-            std::cout << "m_popup && !m_popup->hasKeyboardFocus(true)" << '\n';
-            
-            //m_popup.reset();
-            //m_listeners.call(&Listener::textEditorFocusLost, *this);
+            m_listeners.call(&Listener::textEditorFocusLost, *this);
         }
-        
-        //m_listeners.call(&Listener::textEditorFocusLost, *this);
     }
     
     void SuggestPopupEditor::dismissMenu()
@@ -349,7 +343,6 @@ namespace kiwi
         {
             m_popup.reset();
             stopTimer();
-            juce::Desktop::getInstance().removeGlobalMouseListener(this);
         }
     }
     
@@ -405,6 +398,7 @@ namespace kiwi
         return false;
     }
     
+    /*
     void SuggestPopupEditor::focusLost(FocusChangeType cause)
     {
         std::cout << "SuggestPopupEditor::focusLost" << '\n';
@@ -415,4 +409,5 @@ namespace kiwi
             //m_listeners.call(&Listener::textEditorFocusLost, *this);
         }
     }
+    */
 }

@@ -444,7 +444,8 @@ namespace kiwi
                 ObjectView* object_view = hit.getObject();
                 if(object_view)
                 {
-                    selectOnMouseUp(*object_view, !e.mods.isShiftDown(), m_is_dragging, m_select_on_mouse_down_status);
+                    selectOnMouseUp(*object_view, !e.mods.isShiftDown(), m_is_dragging,
+                                    m_select_on_mouse_down_status);
                 }
             }
             else if(hit.linkTouched())
