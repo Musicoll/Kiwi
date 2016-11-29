@@ -234,7 +234,7 @@ namespace kiwi
         
         m_popup.reset(new SuggestPopup(m_suggest_list));
         
-        const auto on_select_change_fn = [this](juce::String text)
+        const auto on_select_change_fn = [this](juce::String const& text)
         {
             std::cout << "on_select_change_fn" << "\n";
             setText(text, juce::dontSendNotification);
@@ -243,7 +243,7 @@ namespace kiwi
             m_listeners.call(&Listener::textEditorTextChanged, *this);
         };
         
-        const auto on_item_clicked_fn = [this](juce::String text)
+        const auto on_item_clicked_fn = [this](juce::String const& text)
         {
             std::cout << "on_item_clicked_fn" << "\n";
             setText(text, juce::dontSendNotification);
@@ -251,7 +251,7 @@ namespace kiwi
             grabKeyboardFocus();
         };
         
-        const auto on_item_double_clicked_fn = [this](juce::String text)
+        const auto on_item_double_clicked_fn = [this](juce::String const& text)
         {
             setText(text, juce::dontSendNotification);
             setHighlightedRegion({m_typed_text.length(), text.length()});
@@ -260,7 +260,7 @@ namespace kiwi
             //m_listeners.call(&Listener::textEditorReturnKeyPressed, *this);
         };
         
-        const auto on_delete_key_pressed_fn = [this](juce::String text)
+        const auto on_delete_key_pressed_fn = [this](juce::String const& text)
         {
             toFront(true);
             deleteBackwards(false);
@@ -271,7 +271,9 @@ namespace kiwi
         m_popup->setItemDoubleClickedAction(on_item_double_clicked_fn);
         m_popup->setDeleteKeyPressedAction(on_delete_key_pressed_fn);
         
-        m_popup->addToDesktop(juce::ComponentPeer::windowHasDropShadow);
+        m_popup->addToDesktop(juce::ComponentPeer::windowIsTemporary
+                              | juce::ComponentPeer::windowHasDropShadow
+                              | juce::ComponentPeer::windowIgnoresKeyPresses);
 
         m_popup->setBounds(getScreenBounds().translated(-2, getHeight() + 2).withSize(200, 150));
         m_popup->setVisible(true);
