@@ -159,7 +159,7 @@ namespace kiwi
         
         if(!isLocked())
         {
-            HitTester& hit = *m_hittester.get();
+            HitTester& hit = *m_hittester;
             hit.test(e.getPosition());
 
             if(hit.objectTouched())
@@ -293,7 +293,7 @@ namespace kiwi
                 }
             }
             
-            HitTester& hit = *m_hittester.get();
+            HitTester& hit = *m_hittester;
             
             if(hit.objectTouched())
             {
@@ -414,7 +414,7 @@ namespace kiwi
                 m_link_creator.reset();
             }
             
-            HitTester& hit = *m_hittester.get();
+            HitTester& hit = *m_hittester;
             
             if(hit.objectTouched() && hit.getZone() == HitTester::Zone::Inside)
             {
@@ -453,7 +453,8 @@ namespace kiwi
                 LinkView* link_view = hit.getLink();
                 if(link_view)
                 {
-                    selectOnMouseUp(*link_view, !e.mods.isShiftDown(), m_is_dragging, m_select_on_mouse_down_status);
+                    selectOnMouseUp(*link_view, !e.mods.isShiftDown(), m_is_dragging,
+                                    m_select_on_mouse_down_status);
                 }
             }
             else if(e.mods.isCommandDown())
@@ -666,7 +667,7 @@ namespace kiwi
         m_is_in_move_or_resize_gesture = false;
         m_viewport->updatePatcherArea(true);
 
-        HitTester& hit = *m_hittester.get();
+        HitTester& hit = *m_hittester;
         
         if(hit.objectTouched())
         {

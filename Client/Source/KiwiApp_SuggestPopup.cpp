@@ -43,6 +43,7 @@ namespace kiwi
         
         setWantsKeyboardFocus(false);
         setMouseClickGrabsKeyboardFocus(false);
+        m_suggest_list_box.setMouseClickGrabsKeyboardFocus(false);
         addAndMakeVisible(m_suggest_list_box);
     }
     
@@ -76,9 +77,8 @@ namespace kiwi
     
     void SuggestPopup::setFirstItemFocused()
     {
-        toFront(true);
+        //toFront(true);
         m_suggest_list_box.selectRow(0);
-        return;
     }
     
     void SuggestPopup::selectPreviousRow()
@@ -101,6 +101,11 @@ namespace kiwi
         {
             m_suggest_list_box.selectRow(new_selected_row);
         }
+    }
+    
+    void SuggestPopup::update()
+    {
+        m_suggest_list_box.updateContent();
     }
     
     void SuggestPopup::setItemClickedAction(action_method_t function)
@@ -165,7 +170,7 @@ namespace kiwi
     
     void SuggestPopup::backgroundClicked(juce::MouseEvent const& e)
     {
-        ;
+        std::cout << "bg clicked" << std::endl;
     }
     
     void SuggestPopup::selectedRowsChanged(int last_row_selected)
@@ -210,7 +215,6 @@ namespace kiwi
     SuggestPopupEditor::~SuggestPopupEditor()
     {
         dismissMenu();
-        //juce::Desktop::getInstance().removeGlobalMouseListener(static_cast<juce::MouseListener*>(this));
     }
     
     void SuggestPopupEditor::addListener(SuggestPopupEditor::Listener& listener)
@@ -225,29 +229,34 @@ namespace kiwi
     
     void SuggestPopupEditor::showMenu()
     {
+        assert(!isMenuOpened() && "Menu already opened");
+        
         m_popup.reset(new SuggestPopup(m_suggest_list));
         
         const auto on_select_change_fn = [this](juce::String text)
         {
+            std::cout << "on_select_change_fn" << "\n";
             setText(text, juce::dontSendNotification);
-            setHighlightedRegion({m_typed_text.length(), static_cast<int>(text.length())});
+            setHighlightedRegion({m_typed_text.length(), text.length()});
             grabKeyboardFocus();
             m_listeners.call(&Listener::textEditorTextChanged, *this);
         };
         
         const auto on_item_clicked_fn = [this](juce::String text)
         {
+            std::cout << "on_item_clicked_fn" << "\n";
             setText(text, juce::dontSendNotification);
-            setHighlightedRegion({m_typed_text.length(), static_cast<int>(text.length())});
+            setHighlightedRegion({m_typed_text.length(), text.length()});
             grabKeyboardFocus();
         };
         
         const auto on_item_double_clicked_fn = [this](juce::String text)
         {
             setText(text, juce::dontSendNotification);
+            setHighlightedRegion({m_typed_text.length(), text.length()});
             grabKeyboardFocus();
             dismissMenu();
-            m_listeners.call(&Listener::textEditorReturnKeyPressed, *this);
+            //m_listeners.call(&Listener::textEditorReturnKeyPressed, *this);
         };
         
         const auto on_delete_key_pressed_fn = [this](juce::String text)
@@ -261,53 +270,54 @@ namespace kiwi
         m_popup->setItemDoubleClickedAction(on_item_double_clicked_fn);
         m_popup->setDeleteKeyPressedAction(on_delete_key_pressed_fn);
         
-        m_popup->addToDesktop(juce::ComponentPeer::StyleFlags::windowIsTemporary
-                              | juce::ComponentPeer::windowHasDropShadow);
+        m_popup->addToDesktop(juce::ComponentPeer::windowHasDropShadow);
 
         m_popup->setBounds(getScreenBounds().translated(-2, getHeight() + 2).withSize(200, 150));
         m_popup->setVisible(true);
         
-        //m_popup->addKeyListener(this);
-        
-        //juce::Desktop::getInstance().addGlobalMouseListener(this);
-        
-        m_popup->setFirstItemFocused();
         grabKeyboardFocus();
-        if(!getText().isEmpty())
-        {
-            setHighlightedRegion({0, static_cast<int>(getText().length())});
-        }
+        toFront(true);
         
         startTimer(200);
     }
     
     void SuggestPopupEditor::updateMenu()
     {
-        assert(m_popup && "Call showMenu() before");
+        assert(isMenuOpened() && "Call showMenu() before");
         assert(m_popup->isOnDesktop());
         
-        m_popup->setVisible(true);
+        //m_popup->setVisible(true);
         m_popup->setBounds(getScreenBounds().translated(-2, getHeight() + 2).withSize(200, 150));
-        m_popup->repaint();
-
-        m_popup->setFirstItemFocused();
+        if(!m_suggest_list.empty() && m_typed_text == *m_suggest_list.begin())
+        {
+            m_popup->setFirstItemFocused();
+        }
+        
+        m_popup->update();
+        
         grabKeyboardFocus();
+    }
+    
+    bool SuggestPopupEditor::isMenuOpened() const noexcept
+    {
+        return static_cast<bool>(m_popup);
     }
     
     void SuggestPopupEditor::textEditorTextChanged(juce::TextEditor&)
     {
+        const auto old_text = m_typed_text;
         m_typed_text = getText();
         m_suggest_list.applyFilter(m_typed_text.toStdString());
         
-        if(m_popup && m_suggest_list.empty())
+        if(isMenuOpened() && m_suggest_list.empty())
         {
             dismissMenu();
         }
         else if(!m_suggest_list.empty())
         {
-            if(m_popup)
+            if(isMenuOpened())
                 updateMenu();
-            else
+            else if(!m_typed_text.isEmpty())
                 showMenu();
         }
         
@@ -327,19 +337,35 @@ namespace kiwi
     void SuggestPopupEditor::textEditorFocusLost(juce::TextEditor& ed)
     {
         auto const* const focus_comp = getCurrentlyFocusedComponent();
+        
+        std::cout << "focus lost" << "\n";
+        
         if(focus_comp
            && ((focus_comp != this)
-               && (!m_popup
-                   || (m_popup
-                       && (focus_comp != m_popup.get())))))
+               && (!isMenuOpened()
+                   || (isMenuOpened()
+                       && (focus_comp != m_popup.get()
+                           || (!m_popup->isParentOf(focus_comp)))))))
+        {
+            //m_listeners.call(&Listener::textEditorFocusLost, *this);
+        }
+        
+        /*
+        if(focus_comp
+           && ((focus_comp != this)
+               && (!isMenuOpened()
+                   || (isMenuOpened()
+                       && (focus_comp != m_popup.get()
+                           || (focus_comp && m_popup->getTopLevelComponent() == focus_comp->getTopLevelComponent()))))))
         {
             m_listeners.call(&Listener::textEditorFocusLost, *this);
         }
+        */
     }
     
     void SuggestPopupEditor::dismissMenu()
     {
-        if(m_popup)
+        if(isMenuOpened())
         {
             m_popup.reset();
             stopTimer();
@@ -351,7 +377,7 @@ namespace kiwi
         if(!juce::Process::isForegroundProcess())
             dismissMenu();
         
-        if(m_popup)
+        if(isMenuOpened())
         {
             if (!hasKeyboardFocus(true) && !m_popup->hasKeyboardFocus(true))
                 dismissMenu();
@@ -365,12 +391,11 @@ namespace kiwi
     
     bool SuggestPopupEditor::keyPressed(juce::KeyPress const& key, Component* component)
     {
-        repaint();
         if(component == this)
         {
             if(key == juce::KeyPress::downKey)
             {
-                if(m_popup)
+                if(isMenuOpened())
                 {
                     m_popup->selectNextRow();
                 }
@@ -379,35 +404,29 @@ namespace kiwi
             }
             else if(key == juce::KeyPress::upKey)
             {
-                if(m_popup)
+                if(isMenuOpened())
                 {
                     m_popup->selectPreviousRow();
                 }
                 
                 return true;
             }
-            else return juce::TextEditor::keyPressed(key);
+            else if(key == juce::KeyPress::rightKey)
+            {
+                m_typed_text = getText();
+                setText(m_typed_text, juce::dontSendNotification);
+                return false;
+            }
+            //else return juce::TextEditor::keyPressed(key);
         }
+        /*
         else if(component == m_popup.get())
         {
             // if the user tries to type into the menu lets move the focus back there and inject the keypress
             toFront(true);
             return juce::TextEditor::keyPressed(key);
         }
-        
+        */
         return false;
     }
-    
-    /*
-    void SuggestPopupEditor::focusLost(FocusChangeType cause)
-    {
-        std::cout << "SuggestPopupEditor::focusLost" << '\n';
-        
-        if (m_popup && !m_popup->hasKeyboardFocus(true))
-        {
-            //m_popup.reset();
-            //m_listeners.call(&Listener::textEditorFocusLost, *this);
-        }
-    }
-    */
 }

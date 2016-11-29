@@ -66,14 +66,17 @@ namespace kiwi
         //! @brief Set the action to execute when the deleteKey has been pressed.
         void setDeleteKeyPressedAction(action_method_t function);
         
-        //! @brief Select the first item of the list
+        //! @brief Select the first item of the list.
         void setFirstItemFocused();
         
-        //! @brief Select the previous item of the list
+        //! @brief Select the previous item of the list.
         void selectPreviousRow();
         
-        //! @brief Select the next item of the list
+        //! @brief Select the next item of the list.
         void selectNextRow();
+        
+        //! @brief Update the list.
+        void update();
         
         // juce::Component
         void paint(juce::Graphics& g) override;
@@ -151,17 +154,14 @@ namespace kiwi
         //! @brief Removes a TextEditor' listener.
         void removeListener(SuggestPopupEditor::Listener& listener);
         
-        //! @brief juce::Component.
-        //void mouseDown(juce::MouseEvent const& event) override;
-        
-        //! @brief juce::Component.
-        //void focusLost(FocusChangeType cause) override;
-        
         //! @brief Shows the menu.
         void showMenu();
         
         //! @brief Updates the menu.
         void updateMenu();
+        
+        //! @brief Returns true if the menu is currently opened.
+        bool isMenuOpened() const noexcept;
         
         //! @brief juce::Timer.
         void dismissMenu();
