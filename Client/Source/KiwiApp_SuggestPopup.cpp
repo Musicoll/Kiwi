@@ -44,6 +44,7 @@ namespace kiwi
         setWantsKeyboardFocus(false);
         setMouseClickGrabsKeyboardFocus(false);
         m_suggest_list_box.setMouseClickGrabsKeyboardFocus(false);
+        m_suggest_list_box.setWantsKeyboardFocus(false);
         addAndMakeVisible(m_suggest_list_box);
     }
     
@@ -347,20 +348,8 @@ namespace kiwi
                        && (focus_comp != m_popup.get()
                            || (!m_popup->isParentOf(focus_comp)))))))
         {
-            //m_listeners.call(&Listener::textEditorFocusLost, *this);
-        }
-        
-        /*
-        if(focus_comp
-           && ((focus_comp != this)
-               && (!isMenuOpened()
-                   || (isMenuOpened()
-                       && (focus_comp != m_popup.get()
-                           || (focus_comp && m_popup->getTopLevelComponent() == focus_comp->getTopLevelComponent()))))))
-        {
             m_listeners.call(&Listener::textEditorFocusLost, *this);
         }
-        */
     }
     
     void SuggestPopupEditor::dismissMenu()
