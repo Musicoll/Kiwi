@@ -166,8 +166,8 @@ namespace kiwi
         //! @brief Returns true if the menu is currently opened.
         bool isMenuOpened() const noexcept;
         
-        //! @brief juce::Timer.
-        void dismissMenu();
+        //! @brief Close the menu.
+        void closeMenu();
         
         //! @brief juce::TextEditor::Listener
         void textEditorTextChanged(juce::TextEditor& ed) override;

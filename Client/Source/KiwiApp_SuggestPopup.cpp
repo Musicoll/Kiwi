@@ -225,7 +225,7 @@ namespace kiwi
     
     SuggestPopupEditor::~SuggestPopupEditor()
     {
-        dismissMenu();
+        closeMenu();
     }
     
     void SuggestPopupEditor::addListener(SuggestPopupEditor::Listener& listener)
@@ -264,7 +264,7 @@ namespace kiwi
             setText(text, juce::dontSendNotification);
             setHighlightedRegion({m_typed_text.length(), text.length()});
             grabKeyboardFocus();
-            dismissMenu();
+            closeMenu();
             //m_listeners.call(&Listener::textEditorReturnKeyPressed, *this);
         };
         
@@ -322,7 +322,7 @@ namespace kiwi
         
         if(isMenuOpened() && m_suggest_list.empty())
         {
-            dismissMenu();
+            closeMenu();
         }
         else if(!m_suggest_list.empty())
         {
@@ -362,7 +362,7 @@ namespace kiwi
         }
     }
     
-    void SuggestPopupEditor::dismissMenu()
+    void SuggestPopupEditor::closeMenu()
     {
         if(isMenuOpened())
         {
@@ -374,17 +374,21 @@ namespace kiwi
     void SuggestPopupEditor::timerCallback()
     {
         if(!juce::Process::isForegroundProcess())
-            dismissMenu();
+            closeMenu();
         
         if(isMenuOpened())
         {
-            if (!hasKeyboardFocus(true) && !m_popup->hasKeyboardFocus(true))
-                dismissMenu();
+            // Menu should always stay at same relative position
+            const bool same_pos = m_popup->getPosition() != getScreenPosition().translated(-2, getHeight() + 2);
+            const bool loose_focus = (!hasKeyboardFocus(true) && !m_popup->hasKeyboardFocus(true));
+            
+            if(!same_pos || loose_focus)
+                closeMenu();
         }
         else
         {
             if (!hasKeyboardFocus(true))
-                dismissMenu();
+                closeMenu();
         }
     }
     
@@ -416,16 +420,7 @@ namespace kiwi
                 setText(m_typed_text, juce::dontSendNotification);
                 return false;
             }
-            //else return juce::TextEditor::keyPressed(key);
         }
-        /*
-        else if(component == m_popup.get())
-        {
-            // if the user tries to type into the menu lets move the focus back there and inject the keypress
-            toFront(true);
-            return juce::TextEditor::keyPressed(key);
-        }
-        */
         return false;
     }
 }
