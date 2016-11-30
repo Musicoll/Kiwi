@@ -85,7 +85,7 @@ namespace kiwi
             return (creators.find(name) != creators.cend());
         }
         
-        std::vector<std::string> Factory::getNames(const bool ignore_aliases)
+        std::vector<std::string> Factory::getNames(const bool ignore_aliases, const bool ignore_internals)
         {
             const auto& creators = getCreators();
             std::vector<std::string> names;
@@ -93,7 +93,8 @@ namespace kiwi
             
             for(const auto& creator : creators)
             {
-                if(!ignore_aliases || (creator.second->class_name == creator.first))
+                if((!creator.second->internal || !ignore_internals) &&
+                   (!ignore_aliases || (creator.second->class_name == creator.first)))
                 {
                     names.emplace_back(creator.first);
                 }
