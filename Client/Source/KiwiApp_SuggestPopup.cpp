@@ -378,12 +378,12 @@ namespace kiwi
         
         if(isMenuOpened())
         {
-            // Menu should always stay at same relative position
-            const bool same_pos = m_popup->getPosition() != getScreenPosition().translated(-2, getHeight() + 2);
-            const bool loose_focus = (!hasKeyboardFocus(true) && !m_popup->hasKeyboardFocus(true));
-            
-            if(!same_pos || loose_focus)
+            // check focus lost or menu position change
+            if((!hasKeyboardFocus(true) && !m_popup->hasKeyboardFocus(true))
+               || m_popup->getPosition() != getScreenPosition().translated(-2, getHeight() + 2))
+            {
                 closeMenu();
+            }
         }
         else
         {
