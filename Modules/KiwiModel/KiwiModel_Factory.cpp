@@ -93,15 +93,10 @@ namespace kiwi
             
             for(const auto& creator : creators)
             {
-                if(!ignore_aliases)
+                if(!ignore_aliases || (creator.second->class_name == creator.first))
                 {
                     names.emplace_back(creator.first);
                 }
-                else if(creator.second->class_name == creator.first)
-                {
-                    names.emplace_back(creator.first);
-                }
-                
             }
             
             return names;
