@@ -282,8 +282,9 @@ namespace kiwi
         m_popup->addToDesktop(juce::ComponentPeer::windowIsTemporary
                               | juce::ComponentPeer::windowHasDropShadow
                               | juce::ComponentPeer::windowIgnoresKeyPresses);
-
-        m_popup->setBounds(getScreenBounds().translated(-2, getHeight() + 2).withSize(200, 150));
+        
+        const auto sb = getScreenBounds();
+        m_popup->setBounds(sb.getX() - 2, sb.getBottom() + 2, 200, 150);
         m_popup->setVisible(true);
         
         grabKeyboardFocus();
@@ -296,9 +297,10 @@ namespace kiwi
     {
         assert(isMenuOpened() && "Call showMenu() before");
         assert(m_popup->isOnDesktop());
+
+        const auto sb = getScreenBounds();
+        m_popup->setBounds(sb.getX() - 2, sb.getBottom() + 2, 200, 150);
         
-        //m_popup->setVisible(true);
-        m_popup->setBounds(getScreenBounds().translated(-2, getHeight() + 2).withSize(200, 150));
         if(!m_suggest_list.empty() && m_typed_text == *m_suggest_list.begin())
         {
             m_popup->setFirstItemFocused();
@@ -378,9 +380,11 @@ namespace kiwi
         
         if(isMenuOpened())
         {
+            const auto sb = getScreenBounds();
+            
             // check focus lost or menu position change
             if((!hasKeyboardFocus(true) && !m_popup->hasKeyboardFocus(true))
-               || m_popup->getPosition() != getScreenPosition().translated(-2, getHeight() + 2))
+               || m_popup->getPosition() != juce::Point<int>(sb.getX() - 2, sb.getBottom() + 2))
             {
                 closeMenu();
             }
