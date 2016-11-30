@@ -117,7 +117,6 @@ namespace kiwi
         
     private: // members
         
-        
         SuggestList&                        m_suggest_list;
         juce::ListBox                       m_suggest_list_box;
         juce::ResizableCornerComponent      m_resizable_corner;

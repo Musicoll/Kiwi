@@ -52,11 +52,26 @@ namespace kiwi
         m_constrainer.setMinimumSize(200, 150);
         m_resizable_corner.setAlwaysOnTop(true);
         addAndMakeVisible(m_resizable_corner);
+        
+        const juce::String popup_size(getGlobalProperties().getValue("suggest_popup_size"));
+        if(!popup_size.isEmpty())
+        {
+            juce::StringArray tokens;
+            tokens.addTokens(popup_size, false);
+            tokens.removeEmptyStrings();
+            tokens.trim();
+            
+            if(tokens.size() == 2)
+            {
+                setSize(tokens[0].getIntValue(), tokens[1].getIntValue());
+            }
+        }
     }
     
     SuggestPopup::~SuggestPopup()
     {
-        ;
+        const juce::Point<int> size(getWidth(), getHeight());
+        getGlobalProperties().setValue("suggest_popup_size", size.toString());
     }
     
     void SuggestPopup::populate(SuggestList::entries_t entries)
@@ -285,7 +300,7 @@ namespace kiwi
                               | juce::ComponentPeer::windowIgnoresKeyPresses);
         
         const auto sb = getScreenBounds();
-        m_popup->setBounds(sb.getX() - 2, sb.getBottom() + 2, 200, 150);
+        m_popup->setTopLeftPosition(sb.getX() - 2, sb.getBottom() + 2);
         m_popup->setVisible(true);
         
         grabKeyboardFocus();
@@ -300,7 +315,7 @@ namespace kiwi
         assert(m_popup->isOnDesktop());
 
         const auto sb = getScreenBounds();
-        m_popup->setBounds(sb.getX() - 2, sb.getBottom() + 2, 200, 150);
+        m_popup->setTopLeftPosition(sb.getX() - 2, sb.getBottom() + 2);
         
         if(!m_suggest_list.empty() && m_typed_text == *m_suggest_list.begin())
         {
