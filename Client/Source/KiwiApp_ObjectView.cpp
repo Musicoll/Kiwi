@@ -530,7 +530,8 @@ namespace kiwi
     
     void ClassicBox::textEditorEscapeKeyPressed(SuggestPopupEditor& e)
     {
-        //KiwiApp::post("textEditorEscapeKeyPressed");
+        const bool locked = m_is_locked;
+        setInterceptsMouseClicks(locked, locked);
         
         removeTextEditor();
     }
