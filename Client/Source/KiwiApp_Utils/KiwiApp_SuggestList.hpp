@@ -128,7 +128,7 @@ namespace kiwi
                 struct ScoredEntry
                 {
                     ScoredEntry(std::string const& _str, int _score) : string(_str), score(_score) {}
-                    bool operator<(ScoredEntry const& entry) const { return (score > entry.score); }
+                    bool operator<(ScoredEntry const& entry) const { return (score >= entry.score); }
                     
                     std::string string = "";
                     int score = 0;
