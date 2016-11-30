@@ -30,7 +30,7 @@ namespace kiwi
 
     SuggestPopup::SuggestPopup(SuggestList& list) :
     m_suggest_list(list),
-    m_resizable_corner(this, nullptr)
+    m_resizable_corner(this, &m_constrainer)
     {
         setAlwaysOnTop(true);
         setOpaque(true);
@@ -49,6 +49,7 @@ namespace kiwi
         m_suggest_list_box.setWantsKeyboardFocus(false);
         addAndMakeVisible(m_suggest_list_box);
         
+        m_constrainer.setMinimumSize(200, 150);
         m_resizable_corner.setAlwaysOnTop(true);
         addAndMakeVisible(m_resizable_corner);
     }
@@ -350,8 +351,6 @@ namespace kiwi
     void SuggestPopupEditor::textEditorFocusLost(juce::TextEditor& ed)
     {
         auto const* const focus_comp = getCurrentlyFocusedComponent();
-        
-        std::cout << "focus lost" << "\n";
         
         if(focus_comp
            && ((focus_comp != this)
