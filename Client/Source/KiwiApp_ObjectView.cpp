@@ -463,8 +463,6 @@ namespace kiwi
         m_editor->addListener(*this);
         addAndMakeVisible(*m_editor);
         
-        //editor.setSelectAllWhenFocused(true);
-
         m_is_editing = true;
         m_editor->grabKeyboardFocus();
     }

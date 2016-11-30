@@ -1146,6 +1146,7 @@ namespace kiwi
         if(locked)
         {
             m_view_model.unselectAll();
+            grabKeyboardFocus();
         }
         
         m_view_model.setLock(locked);
@@ -1994,8 +1995,12 @@ namespace kiwi
             m_patcher_model.removeObject(old_object_m);
             DocumentManager::commit(m_patcher_model, "Edit Object");
             
-            m_view_model.selectObject(new_object_m);
-            DocumentManager::commit(m_patcher_model);
+            if(!isLocked())
+            {
+                m_view_model.selectObject(new_object_m);
+                DocumentManager::commit(m_patcher_model);
+            }
+            
             KiwiApp::commandStatusChanged();
         }
     }
