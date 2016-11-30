@@ -28,7 +28,9 @@ namespace kiwi
     //                                   SUGGEST POPUP                                  //
     // ================================================================================ //
 
-    SuggestPopup::SuggestPopup(SuggestList& list) : m_suggest_list(list)
+    SuggestPopup::SuggestPopup(SuggestList& list) :
+    m_suggest_list(list),
+    m_resizable_corner(this, nullptr)
     {
         setAlwaysOnTop(true);
         setOpaque(true);
@@ -46,6 +48,9 @@ namespace kiwi
         m_suggest_list_box.setMouseClickGrabsKeyboardFocus(false);
         m_suggest_list_box.setWantsKeyboardFocus(false);
         addAndMakeVisible(m_suggest_list_box);
+        
+        m_resizable_corner.setAlwaysOnTop(true);
+        addAndMakeVisible(m_resizable_corner);
     }
     
     SuggestPopup::~SuggestPopup()
@@ -74,6 +79,11 @@ namespace kiwi
     void SuggestPopup::resized()
     {
         m_suggest_list_box.setBounds(getLocalBounds());
+        
+        const int resizer_size = 18;
+        m_resizable_corner.setBounds(getWidth() - resizer_size,
+                                     getHeight() - resizer_size,
+                                     resizer_size, resizer_size);
     }
     
     void SuggestPopup::setFirstItemFocused()
@@ -171,7 +181,7 @@ namespace kiwi
     
     void SuggestPopup::backgroundClicked(juce::MouseEvent const& e)
     {
-        std::cout << "bg clicked" << std::endl;
+        ;
     }
     
     void SuggestPopup::selectedRowsChanged(int last_row_selected)
@@ -236,7 +246,6 @@ namespace kiwi
         
         const auto on_select_change_fn = [this](juce::String const& text)
         {
-            std::cout << "on_select_change_fn" << "\n";
             setText(text, juce::dontSendNotification);
             setHighlightedRegion({m_typed_text.length(), text.length()});
             grabKeyboardFocus();
@@ -245,7 +254,6 @@ namespace kiwi
         
         const auto on_item_clicked_fn = [this](juce::String const& text)
         {
-            std::cout << "on_item_clicked_fn" << "\n";
             setText(text, juce::dontSendNotification);
             setHighlightedRegion({m_typed_text.length(), text.length()});
             grabKeyboardFocus();
