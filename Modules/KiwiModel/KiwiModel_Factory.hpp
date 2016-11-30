@@ -136,8 +136,9 @@ namespace kiwi
             static bool has(std::string const& name);
             
             //! @brief Gets the names of the objects that has been added to the Factory.
+            //! @param ignore_aliases Default false, you may pass false to exclude them.
             //! @return A vector of Object names.
-            static std::vector<std::string> getNames();
+            static std::vector<std::string> getNames(const bool ignore_aliases = false);
             
         private: // methods
             
