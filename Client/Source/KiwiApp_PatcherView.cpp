@@ -431,7 +431,7 @@ namespace kiwi
                         ClassicBox* box = dynamic_cast<ClassicBox*>(object_view);
                         if(box)
                         {
-                            box->grabKeyboardFocus();
+                            box->edit();
                         }
                     }
                 }
@@ -1089,7 +1089,7 @@ namespace kiwi
                         ClassicBox* box = dynamic_cast<ClassicBox*>(it->get());
                         if(box)
                         {
-                            box->grabKeyboardFocus();
+                            box->edit();
                             return true;
                         }
                     }
@@ -2067,7 +2067,7 @@ namespace kiwi
                         ClassicBox* box = dynamic_cast<ClassicBox*>(it->get());
                         if(box)
                         {
-                            box->grabKeyboardFocus();
+                            box->edit();
                         }
                     }
                 }

@@ -133,17 +133,11 @@ namespace kiwi
         //! @brief Destructor.
         ~ClassicBox();
         
-        //! @brief Give focus to the text editor.
-        void grabKeyboardFocus();
+        //! @brief Let the user edit the text of the box.
+        void edit();
         
         //! @brief Remove the text editor and give focus back to the PatcherView.
         void removeTextEditor();
-        
-        //! @brief Called when this component has just gained the keyboard focus.
-        void focusGained(FocusChangeType cause) override;
-        
-        //! @brief Called when this component has just lost the keyboard focus.
-        void focusLost(FocusChangeType cause) override;
         
         //! @brief called when the object is resized.
         void resized() override;

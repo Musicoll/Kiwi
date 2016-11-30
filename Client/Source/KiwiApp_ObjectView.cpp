@@ -424,7 +424,7 @@ namespace kiwi
         removeTextEditor();
     }
     
-    void ClassicBox::grabKeyboardFocus()
+    void ClassicBox::edit()
     {
         if(hasKeyboardFocus(true)) return; // abort
         
@@ -480,16 +480,6 @@ namespace kiwi
             m_patcher_view.grabKeyboardFocus();
             m_is_editing = false;
         }
-    }
-    
-    void ClassicBox::focusGained(FocusChangeType cause)
-    {
-        //KiwiApp::post("focusGained");
-    }
-    
-    void ClassicBox::focusLost(FocusChangeType cause)
-    {
-        //KiwiApp::post("focusLost");
     }
     
     void ClassicBox::resized()
