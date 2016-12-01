@@ -430,7 +430,7 @@ namespace kiwi
         
         setInterceptsMouseClicks(true, true);
         
-        m_editor.reset(new SuggestEditor());
+        m_editor.reset(new SuggestEditor(model::Factory::getNames()));
         m_editor->setBounds(m_local_box_bounds.expanded(m_selection_width*0.5));
         
         std::string text = m_model->getText();
@@ -488,7 +488,7 @@ namespace kiwi
         }
     }
     
-    void ClassicBox::textEditorTextChanged(SuggestEditor& e)
+    void ClassicBox::suggestEditorTextChanged(SuggestEditor& e)
     {
         const juce::String new_text = e.getText();
         const juce::Font font = e.getFont();
@@ -504,7 +504,7 @@ namespace kiwi
         }
     }
     
-    void ClassicBox::textEditorReturnKeyPressed(SuggestEditor& e)
+    void ClassicBox::suggestEditorReturnKeyPressed(SuggestEditor& e)
     {
         const bool locked = m_is_locked;
         setInterceptsMouseClicks(locked, locked);
@@ -516,7 +516,7 @@ namespace kiwi
         m_patcher_view.boxHasBeenEdited(*this, new_text);
     }
     
-    void ClassicBox::textEditorEscapeKeyPressed(SuggestEditor& e)
+    void ClassicBox::suggestEditorEscapeKeyPressed(SuggestEditor& e)
     {
         const bool locked = m_is_locked;
         setInterceptsMouseClicks(locked, locked);
@@ -524,7 +524,7 @@ namespace kiwi
         removeTextEditor();
     }
     
-    void ClassicBox::textEditorFocusLost(SuggestEditor& e)
+    void ClassicBox::suggestEditorFocusLost(SuggestEditor& e)
     {
         const bool locked = m_is_locked;
         setInterceptsMouseClicks(locked, locked);

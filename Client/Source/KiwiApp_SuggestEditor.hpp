@@ -36,11 +36,10 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief A text editor with auto-completion.
-    //! @details This component shows a dropdown list below it.
+    //! @details This component shows a dropdown menu list below it.
     class SuggestEditor
     : public juce::TextEditor,
     public juce::TextEditor::Listener,
-    public juce::KeyListener,
     public juce::Timer
     {
     public: // classes
@@ -50,22 +49,20 @@ namespace kiwi
     public: // methods
         
         //! @brief Constructor.
-        SuggestEditor();
+        //! @param entries Populate suggestion list with these entries.
+        SuggestEditor(SuggestList::entries_t entries);
         
         //! @brief Destructor.
         ~SuggestEditor();
         
-        //! @brief Adds a TextEditor' listener.
+        //! @brief Adds a SuggestEditor::Listener.
         void addListener(SuggestEditor::Listener& listener);
         
-        //! @brief Removes a TextEditor' listener.
+        //! @brief Removes a SuggestEditor::Listener.
         void removeListener(SuggestEditor::Listener& listener);
         
         //! @brief Shows the menu.
         void showMenu();
-        
-        //! @brief Updates the menu.
-        void updateMenu();
         
         //! @brief Returns true if the menu is currently opened.
         bool isMenuOpened() const noexcept;
@@ -77,16 +74,16 @@ namespace kiwi
         void textEditorTextChanged(juce::TextEditor& ed) override;
         
         //! @brief Called when the user presses the return key.
-        void textEditorReturnKeyPressed(juce::TextEditor& ed) override;
+        void returnPressed() override;
         
         //! @brief Called when the user presses the escape key.
-        void textEditorEscapeKeyPressed(juce::TextEditor& ed) override;
+        void escapePressed() override;
         
         //! @brief Called when the text editor loses focus.
-        void textEditorFocusLost(juce::TextEditor& ed) override;
+        void focusLost(juce::Component::FocusChangeType focus_change) override;
         
-        //! @brief juce::KeyListener.
-        bool keyPressed(juce::KeyPress const& key, Component* component) override;
+        //! @brief juce::TextEditor.
+        bool keyPressed(juce::KeyPress const& key) override;
         
     private: // methods
         
@@ -95,6 +92,15 @@ namespace kiwi
         //! or if editor lost the keyboard focus.
         void timerCallback() override;
         
+        //! @brief Called when the menu selection has changed.
+        void menuSelectionChanged(juce::String const& text);
+        
+        //! @brief Called when a menu item has been clicked.
+        void menuItemClicked(juce::String const& text);
+        
+        //! @brief Called when a menu item has been double-clicked.
+        void menuItemDoubleClicked(juce::String const& text);
+        
     private: // classes
         
         class Menu;
@@ -102,7 +108,7 @@ namespace kiwi
     private: // members
         
         SuggestList                     m_suggest_list;
-        std::unique_ptr<Menu>           m_popup = nullptr;
+        std::unique_ptr<Menu>           m_menu = nullptr;
         juce::String                    m_typed_text;
         engine::Listeners<Listener>     m_listeners;
     };
@@ -119,16 +125,16 @@ namespace kiwi
         virtual ~Listener() {}
         
         //! @brief Called when the user changes the text in some way.
-        virtual void textEditorTextChanged(SuggestEditor& ed) {}
+        virtual void suggestEditorTextChanged(SuggestEditor& editor) {}
         
         //! @brief Called when the user presses the return key.
-        virtual void textEditorReturnKeyPressed(SuggestEditor& ed) {}
+        virtual void suggestEditorReturnKeyPressed(SuggestEditor& editor) {}
         
         //! @brief Called when the user presses the escape key.
-        virtual void textEditorEscapeKeyPressed(SuggestEditor& ed) {}
+        virtual void suggestEditorEscapeKeyPressed(SuggestEditor& editor) {}
         
         //! @brief Called when the text editor loses focus.
-        virtual void textEditorFocusLost(SuggestEditor& ed) {}
+        virtual void suggestEditorFocusLost(SuggestEditor& editor) {}
     };
     
     // ================================================================================ //
@@ -148,12 +154,6 @@ namespace kiwi
         //! @brief Destructor.
         ~Menu();
         
-        //! @brief Populate the list with some entries.
-        void populate(SuggestList::entries_t entries);
-        
-        //! @brief Apply a filter to the given pattern.
-        void applyFilter(std::string const& filter_pattern);
-        
         //! @brief Set the action to execute when an item has been clicked.
         void setItemClickedAction(action_method_t function);
         
@@ -163,8 +163,8 @@ namespace kiwi
         //! @brief Set the action to execute when an item has been selected.
         void setSelectedItemAction(action_method_t function);
         
-        //! @brief Set the action to execute when the deleteKey has been pressed.
-        void setDeleteKeyPressedAction(action_method_t function);
+        //! @brief Select an item of the list.
+        void selectRow(int idx);
         
         //! @brief Select the first item of the list.
         void selectFirstRow();
@@ -203,17 +203,8 @@ namespace kiwi
         //! @brief User double-clicked on a row.
         void listBoxItemDoubleClicked(int row, juce::MouseEvent const& e) override;
         
-        //! @brief User clicked on a part of the list where there are no rows.
-        void backgroundClicked(juce::MouseEvent const& e) override;
-        
         //! @brief Called when rows are selected or deselected.
         void selectedRowsChanged(int last_row_selected) override;
-        
-        //! @brief Called when the delete key is pressed.
-        void deleteKeyPressed(int last_row_selected) override;
-        
-        //! @brief Called when the return key is pressed.
-        void returnKeyPressed(int last_row_selected) override;
         
     private: // members
         
@@ -225,7 +216,6 @@ namespace kiwi
         action_method_t                     m_clicked_action;
         action_method_t                     m_double_clicked_action;
         action_method_t                     m_selected_action;
-        action_method_t                     m_deletekey_pressed_action;
     };
 }
 

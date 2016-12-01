@@ -142,10 +142,10 @@ namespace kiwi
         //! @brief called when the object is resized.
         void resized() override;
         
-        void textEditorTextChanged(SuggestEditor& ed) override;
-        void textEditorReturnKeyPressed(SuggestEditor& ed) override;
-        void textEditorEscapeKeyPressed(SuggestEditor& ed) override;
-        void textEditorFocusLost(SuggestEditor& ed) override;
+        void suggestEditorTextChanged(SuggestEditor& ed) override;
+        void suggestEditorReturnKeyPressed(SuggestEditor& ed) override;
+        void suggestEditorEscapeKeyPressed(SuggestEditor& ed) override;
+        void suggestEditorFocusLost(SuggestEditor& ed) override;
         
     private: // members
         
