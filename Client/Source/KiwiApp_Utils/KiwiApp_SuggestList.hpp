@@ -64,7 +64,7 @@ namespace kiwi
             int adjacency_bonus             = 5;    //! For adjacent matches.
             
             // Score penalties
-            int leading_letter_penalty      = -3;   //! For every letter in str before the first match.
+            int leading_letter_penalty      = -9;   //! For every letter in str before the first match.
             int max_leading_letter_penalty  = -9;   //! Maximum penalty for leading letters
             int unmatched_letter_penalty    = -1;   //! For every letter that doesn't matter
         };
