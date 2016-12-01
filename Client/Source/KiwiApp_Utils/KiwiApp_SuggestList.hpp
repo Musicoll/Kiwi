@@ -57,7 +57,7 @@ namespace kiwi
         //! @brief Destructor.
         ~SuggestList() = default;
         
-        //! @brief options
+        //! @brief Score bonuses and penalties to sort entries.
         struct Options
         {
             // Score bonuses
@@ -65,8 +65,8 @@ namespace kiwi
             
             // Score penalties
             int leading_letter_penalty      = -9;   //! For every letter in str before the first match.
-            int max_leading_letter_penalty  = -9;   //! Maximum penalty for leading letters
-            int unmatched_letter_penalty    = -1;   //! For every letter that doesn't matter
+            int max_leading_letter_penalty  = -9;   //! Maximum penalty for leading letters.
+            int unmatched_letter_penalty    = -1;   //! For every letter that doesn't matter.
         };
         
         // iterators
@@ -91,7 +91,7 @@ namespace kiwi
         }
         
         //! @brief Add suggestion entries to the list.
-        //! @detail This will also update the filtered list.
+        //! @details This will also update the filtered list.
         //! @see addEntry
         void addEntries(std::vector<std::string> const& entries)
         {
@@ -181,14 +181,14 @@ namespace kiwi
             {
                 const char pattern_letter = *pattern_iter;
                 const char str_letter = *str_iter;
-                const char pattern_letter_lower = tolower(pattern_letter);
-                const char str_letter_lower = tolower(str_letter);
+                const char pattern_letter_lower = std::tolower(pattern_letter);
+                const char str_letter_lower = std::tolower(str_letter);
                 
                 const bool pattern_valid_char = (pattern_letter != end_char);
                 const bool next_match = pattern_valid_char && (pattern_letter_lower == str_letter_lower);
-                const bool rematch = best_letter && (tolower(*best_letter) == str_letter_lower);
+                const bool rematch = best_letter && (std::tolower(*best_letter) == str_letter_lower);
                 const bool advanced = (next_match && best_letter);
-                const bool pattern_repeat = best_letter && pattern_valid_char && (tolower(*best_letter) == pattern_letter_lower);
+                const bool pattern_repeat = best_letter && pattern_valid_char && (std::tolower(*best_letter) == pattern_letter_lower);
                 
                 if(advanced || pattern_repeat)
                 {

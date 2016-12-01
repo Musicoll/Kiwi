@@ -19,16 +19,16 @@
  ==============================================================================
  */
 
-#include "KiwiApp_SuggestPopup.hpp"
+#include "KiwiApp_SuggestEditor.hpp"
 #include "KiwiApp.hpp"
 
 namespace kiwi
 {
     // ================================================================================ //
-    //                                   SUGGEST POPUP                                  //
+    //                                SUGGEST EDITOR MENU                               //
     // ================================================================================ //
 
-    SuggestPopup::SuggestPopup(SuggestList& list) :
+    SuggestEditor::Menu::Menu(SuggestList& list) :
     m_suggest_list(list),
     m_resizable_corner(this, &m_constrainer)
     {
@@ -68,31 +68,31 @@ namespace kiwi
         }
     }
     
-    SuggestPopup::~SuggestPopup()
+    SuggestEditor::Menu::~Menu()
     {
         const juce::Point<int> size(getWidth(), getHeight());
         getGlobalProperties().setValue("suggest_popup_size", size.toString());
     }
     
-    void SuggestPopup::populate(SuggestList::entries_t entries)
+    void SuggestEditor::Menu::populate(SuggestList::entries_t entries)
     {
         m_suggest_list.clear();
         m_suggest_list.addEntries(std::move(entries));
         m_suggest_list_box.updateContent();
     }
     
-    void SuggestPopup::applyFilter(std::string const& filter_pattern)
+    void SuggestEditor::Menu::applyFilter(std::string const& filter_pattern)
     {
         m_suggest_list.applyFilter(filter_pattern);
         m_suggest_list_box.updateContent();
     }
     
-    void SuggestPopup::paint(juce::Graphics & g)
+    void SuggestEditor::Menu::paint(juce::Graphics & g)
     {
         g.fillAll(juce::Colours::white);
     }
     
-    void SuggestPopup::resized()
+    void SuggestEditor::Menu::resized()
     {
         m_suggest_list_box.setBounds(getLocalBounds());
         
@@ -102,55 +102,48 @@ namespace kiwi
                                      resizer_size, resizer_size);
     }
     
-    void SuggestPopup::setFirstItemFocused()
+    void SuggestEditor::Menu::selectFirstRow()
     {
-        //toFront(true);
         m_suggest_list_box.selectRow(0);
     }
     
-    void SuggestPopup::selectPreviousRow()
+    void SuggestEditor::Menu::selectPreviousRow()
     {
-        int rows = getNumRows();
-        const auto selected_row = m_suggest_list_box.getSelectedRow();
-        auto new_selected_row = (selected_row == -1) ? -1 : (selected_row <= 0) ? rows - 1 : selected_row - 1;
-        m_suggest_list_box.selectRow(new_selected_row);
+        const auto rows = getNumRows();
+        const auto row_sel = m_suggest_list_box.getSelectedRow();
+        const auto new_row_sel = (row_sel == -1) ? rows - 1 : ((row_sel <= 0) ? rows - 1 : row_sel - 1);
+        m_suggest_list_box.selectRow(new_row_sel);
     }
     
-    void SuggestPopup::selectNextRow()
+    void SuggestEditor::Menu::selectNextRow()
     {
-        int rows = getNumRows();
-        auto new_selected_row = m_suggest_list_box.getSelectedRow() + 1;
-        if(new_selected_row >= rows)
-        {
-            m_suggest_list_box.selectRow(0);
-        }
-        else
-        {
-            m_suggest_list_box.selectRow(new_selected_row);
-        }
+        const auto rows = getNumRows();
+        const auto row_sel = m_suggest_list_box.getSelectedRow();
+        const auto new_row_sel = (row_sel == -1) ? 0 : ((row_sel >= rows) ? 0 : row_sel + 1);
+        m_suggest_list_box.selectRow(new_row_sel);
     }
     
-    void SuggestPopup::update()
+    void SuggestEditor::Menu::update()
     {
         m_suggest_list_box.updateContent();
     }
     
-    void SuggestPopup::setItemClickedAction(action_method_t function)
+    void SuggestEditor::Menu::setItemClickedAction(action_method_t function)
     {
         m_clicked_action = function;
     }
     
-    void SuggestPopup::setItemDoubleClickedAction(action_method_t function)
+    void SuggestEditor::Menu::setItemDoubleClickedAction(action_method_t function)
     {
         m_double_clicked_action = function;
     }
     
-    void SuggestPopup::setSelectedItemAction(action_method_t function)
+    void SuggestEditor::Menu::setSelectedItemAction(action_method_t function)
     {
         m_selected_action = function;
     }
     
-    void SuggestPopup::setDeleteKeyPressedAction(action_method_t function)
+    void SuggestEditor::Menu::setDeleteKeyPressedAction(action_method_t function)
     {
         m_deletekey_pressed_action = function;
     }
@@ -159,12 +152,12 @@ namespace kiwi
     //                               SUGGEST LISTBOX MODEL                              //
     // ================================================================================ //
     
-    int SuggestPopup::getNumRows()
+    int SuggestEditor::Menu::getNumRows()
     {
         return m_suggest_list.size();
     }
     
-    void SuggestPopup::paintListBoxItem(int row_number, juce::Graphics& g,
+    void SuggestEditor::Menu::paintListBoxItem(int row_number, juce::Graphics& g,
                                                       int width, int height, bool selected)
     {
         const bool is_odd = (row_number % 2) == 0;
@@ -177,7 +170,7 @@ namespace kiwi
         }
     }
     
-    void SuggestPopup::listBoxItemClicked(int row, juce::MouseEvent const& e)
+    void SuggestEditor::Menu::listBoxItemClicked(int row, juce::MouseEvent const& e)
     {
         if(m_clicked_action && (row < m_suggest_list.size()))
         {
@@ -186,7 +179,7 @@ namespace kiwi
         }
     }
     
-    void SuggestPopup::listBoxItemDoubleClicked(int row, juce::MouseEvent const& e)
+    void SuggestEditor::Menu::listBoxItemDoubleClicked(int row, juce::MouseEvent const& e)
     {
         if(m_double_clicked_action && (row < m_suggest_list.size()))
         {
@@ -195,12 +188,12 @@ namespace kiwi
         }
     }
     
-    void SuggestPopup::backgroundClicked(juce::MouseEvent const& e)
+    void SuggestEditor::Menu::backgroundClicked(juce::MouseEvent const& e)
     {
         ;
     }
     
-    void SuggestPopup::selectedRowsChanged(int last_row_selected)
+    void SuggestEditor::Menu::selectedRowsChanged(int last_row_selected)
     {
         if(m_selected_action && (last_row_selected < m_suggest_list.size()))
         {
@@ -209,7 +202,7 @@ namespace kiwi
         }
     }
     
-    void SuggestPopup::deleteKeyPressed(int last_row_selected)
+    void SuggestEditor::Menu::deleteKeyPressed(int last_row_selected)
     {
         if(m_deletekey_pressed_action && (last_row_selected < m_suggest_list.size()))
         {
@@ -218,7 +211,7 @@ namespace kiwi
         }
     }
     
-    void SuggestPopup::returnKeyPressed(int last_row_selected)
+    void SuggestEditor::Menu::returnKeyPressed(int last_row_selected)
     {
         if(m_double_clicked_action && (last_row_selected < m_suggest_list.size()))
         {
@@ -231,7 +224,7 @@ namespace kiwi
     //                              SUGGEST POPUP EDITOR                                //
     // ================================================================================ //
     
-    SuggestPopupEditor::SuggestPopupEditor() : m_suggest_list(model::Factory::getNames())
+    SuggestEditor::SuggestEditor() : m_suggest_list(model::Factory::getNames())
     {
         setWantsKeyboardFocus(true);
         
@@ -239,26 +232,26 @@ namespace kiwi
         addKeyListener(this);
     }
     
-    SuggestPopupEditor::~SuggestPopupEditor()
+    SuggestEditor::~SuggestEditor()
     {
         closeMenu();
     }
     
-    void SuggestPopupEditor::addListener(SuggestPopupEditor::Listener& listener)
+    void SuggestEditor::addListener(SuggestEditor::Listener& listener)
     {
         m_listeners.add(listener);
     }
     
-    void SuggestPopupEditor::removeListener(SuggestPopupEditor::Listener& listener)
+    void SuggestEditor::removeListener(SuggestEditor::Listener& listener)
     {
         m_listeners.remove(listener);
     }
     
-    void SuggestPopupEditor::showMenu()
+    void SuggestEditor::showMenu()
     {
         assert(!isMenuOpened() && "Menu already opened");
         
-        m_popup.reset(new SuggestPopup(m_suggest_list));
+        m_popup.reset(new Menu(m_suggest_list));
         
         const auto on_select_change_fn = [this](juce::String const& text)
         {
@@ -309,7 +302,7 @@ namespace kiwi
         startTimer(200);
     }
     
-    void SuggestPopupEditor::updateMenu()
+    void SuggestEditor::updateMenu()
     {
         assert(isMenuOpened() && "Call showMenu() before");
         assert(m_popup->isOnDesktop());
@@ -319,7 +312,7 @@ namespace kiwi
         
         if(!m_suggest_list.empty() && m_typed_text == *m_suggest_list.begin())
         {
-            m_popup->setFirstItemFocused();
+            m_popup->selectFirstRow();
         }
         
         m_popup->update();
@@ -327,12 +320,12 @@ namespace kiwi
         grabKeyboardFocus();
     }
     
-    bool SuggestPopupEditor::isMenuOpened() const noexcept
+    bool SuggestEditor::isMenuOpened() const noexcept
     {
         return static_cast<bool>(m_popup);
     }
     
-    void SuggestPopupEditor::textEditorTextChanged(juce::TextEditor&)
+    void SuggestEditor::textEditorTextChanged(juce::TextEditor&)
     {
         const auto old_text = m_typed_text;
         m_typed_text = getText();
@@ -353,17 +346,17 @@ namespace kiwi
         m_listeners.call(&Listener::textEditorTextChanged, *this);
     }
     
-    void SuggestPopupEditor::textEditorReturnKeyPressed(juce::TextEditor& ed)
+    void SuggestEditor::textEditorReturnKeyPressed(juce::TextEditor& ed)
     {
         m_listeners.call(&Listener::textEditorReturnKeyPressed, *this);
     }
     
-    void SuggestPopupEditor::textEditorEscapeKeyPressed(juce::TextEditor& ed)
+    void SuggestEditor::textEditorEscapeKeyPressed(juce::TextEditor& ed)
     {
         m_listeners.call(&Listener::textEditorEscapeKeyPressed, *this);
     }
     
-    void SuggestPopupEditor::textEditorFocusLost(juce::TextEditor& ed)
+    void SuggestEditor::textEditorFocusLost(juce::TextEditor& ed)
     {
         auto const* const focus_comp = getCurrentlyFocusedComponent();
         
@@ -378,7 +371,7 @@ namespace kiwi
         }
     }
     
-    void SuggestPopupEditor::closeMenu()
+    void SuggestEditor::closeMenu()
     {
         if(isMenuOpened())
         {
@@ -387,7 +380,7 @@ namespace kiwi
         }
     }
     
-    void SuggestPopupEditor::timerCallback()
+    void SuggestEditor::timerCallback()
     {
         if(!juce::Process::isForegroundProcess())
             closeMenu();
@@ -410,7 +403,7 @@ namespace kiwi
         }
     }
     
-    bool SuggestPopupEditor::keyPressed(juce::KeyPress const& key, Component* component)
+    bool SuggestEditor::keyPressed(juce::KeyPress const& key, Component* component)
     {
         if(component == this)
         {

@@ -32,21 +32,121 @@
 namespace kiwi
 {
     // ================================================================================ //
-    //                                   SUGGEST POPUP                                  //
+    //                                  SUGGEST EDITOR                                  //
     // ================================================================================ //
     
-    //! @brief Suggestion list Popup Component.
-    class SuggestPopup : public juce::Component, public juce::ListBoxModel
+    //! @brief A text editor with auto-completion.
+    //! @details This component shows a dropdown list below it.
+    class SuggestEditor
+    : public juce::TextEditor,
+    public juce::TextEditor::Listener,
+    public juce::KeyListener,
+    public juce::Timer
+    {
+    public: // classes
+        
+        struct Listener;
+        
+    public: // methods
+        
+        //! @brief Constructor.
+        SuggestEditor();
+        
+        //! @brief Destructor.
+        ~SuggestEditor();
+        
+        //! @brief Adds a TextEditor' listener.
+        void addListener(SuggestEditor::Listener& listener);
+        
+        //! @brief Removes a TextEditor' listener.
+        void removeListener(SuggestEditor::Listener& listener);
+        
+        //! @brief Shows the menu.
+        void showMenu();
+        
+        //! @brief Updates the menu.
+        void updateMenu();
+        
+        //! @brief Returns true if the menu is currently opened.
+        bool isMenuOpened() const noexcept;
+        
+        //! @brief Close the menu.
+        void closeMenu();
+        
+        //! @brief juce::TextEditor::Listener
+        void textEditorTextChanged(juce::TextEditor& ed) override;
+        
+        //! @brief Called when the user presses the return key.
+        void textEditorReturnKeyPressed(juce::TextEditor& ed) override;
+        
+        //! @brief Called when the user presses the escape key.
+        void textEditorEscapeKeyPressed(juce::TextEditor& ed) override;
+        
+        //! @brief Called when the text editor loses focus.
+        void textEditorFocusLost(juce::TextEditor& ed) override;
+        
+        //! @brief juce::KeyListener.
+        bool keyPressed(juce::KeyPress const& key, Component* component) override;
+        
+    private: // methods
+        
+        //! @internal Called every 200ms by a juce::Timer.
+        //! @details This method will close the menu if its relative position changed
+        //! or if editor lost the keyboard focus.
+        void timerCallback() override;
+        
+    private: // classes
+        
+        class Menu;
+    
+    private: // members
+        
+        SuggestList                     m_suggest_list;
+        std::unique_ptr<Menu>           m_popup = nullptr;
+        juce::String                    m_typed_text;
+        engine::Listeners<Listener>     m_listeners;
+    };
+    
+    // ================================================================================ //
+    //                              SUGGEST EDITOR LISTENER                             //
+    // ================================================================================ //
+    
+    //! @brief Receives callbacks from a SuggestEditor component.
+    //! @see SuggestEditor::addListener
+    struct SuggestEditor::Listener
+    {
+        //! @brief Destructor.
+        virtual ~Listener() {}
+        
+        //! @brief Called when the user changes the text in some way.
+        virtual void textEditorTextChanged(SuggestEditor& ed) {}
+        
+        //! @brief Called when the user presses the return key.
+        virtual void textEditorReturnKeyPressed(SuggestEditor& ed) {}
+        
+        //! @brief Called when the user presses the escape key.
+        virtual void textEditorEscapeKeyPressed(SuggestEditor& ed) {}
+        
+        //! @brief Called when the text editor loses focus.
+        virtual void textEditorFocusLost(SuggestEditor& ed) {}
+    };
+    
+    // ================================================================================ //
+    //                                       MENU                                       //
+    // ================================================================================ //
+    
+    //! @brief Suggestion menu.
+    class SuggestEditor::Menu : public juce::Component, public juce::ListBoxModel
     {
     public: // methods
         
         using action_method_t = std::function<void(juce::String)>;
         
         //! @brief Constructor.
-        SuggestPopup(SuggestList& list);
+        Menu(SuggestList& list);
         
         //! @brief Destructor.
-        ~SuggestPopup();
+        ~Menu();
         
         //! @brief Populate the list with some entries.
         void populate(SuggestList::entries_t entries);
@@ -67,7 +167,7 @@ namespace kiwi
         void setDeleteKeyPressedAction(action_method_t function);
         
         //! @brief Select the first item of the list.
-        void setFirstItemFocused();
+        void selectFirstRow();
         
         //! @brief Select the previous item of the list.
         void selectPreviousRow();
@@ -126,99 +226,6 @@ namespace kiwi
         action_method_t                     m_double_clicked_action;
         action_method_t                     m_selected_action;
         action_method_t                     m_deletekey_pressed_action;
-    };
-    
-    // ================================================================================ //
-    //                              SUGGEST POPUP EDITOR                                //
-    // ================================================================================ //
-    
-    //! @brief A text editor component that shows a pop-up menu/combo box below it.
-    class SuggestPopupEditor
-    : public juce::TextEditor,
-    public juce::TextEditor::Listener,
-    public juce::KeyListener,
-    public juce::Timer
-    {
-    public: // classes
-        
-        class Listener;
-        
-    public: // methods
-        
-        //! @brief Constructor.
-        SuggestPopupEditor();
-        
-        //! @brief Destructor.
-        ~SuggestPopupEditor();
-        
-        //! @brief Adds a TextEditor' listener.
-        void addListener(SuggestPopupEditor::Listener& listener);
-        
-        //! @brief Removes a TextEditor' listener.
-        void removeListener(SuggestPopupEditor::Listener& listener);
-        
-        //! @brief Shows the menu.
-        void showMenu();
-        
-        //! @brief Updates the menu.
-        void updateMenu();
-        
-        //! @brief Returns true if the menu is currently opened.
-        bool isMenuOpened() const noexcept;
-        
-        //! @brief Close the menu.
-        void closeMenu();
-        
-        //! @brief juce::TextEditor::Listener
-        void textEditorTextChanged(juce::TextEditor& ed) override;
-        
-        //! @brief Called when the user presses the return key.
-        void textEditorReturnKeyPressed(juce::TextEditor& ed) override;
-        
-        //! @brief Called when the user presses the escape key.
-        void textEditorEscapeKeyPressed(juce::TextEditor& ed) override;
-        
-        //! @brief Called when the text editor loses focus.
-        void textEditorFocusLost(juce::TextEditor& ed) override;
-        
-        //! @brief juce::KeyListener.
-        bool keyPressed(juce::KeyPress const& key, Component* component) override;
-        
-        //! @brief juce::Timer.
-        void timerCallback() override;
-
-    private: // members
-        
-        SuggestList                     m_suggest_list;
-        std::unique_ptr<SuggestPopup>   m_popup = nullptr;
-        juce::String                    m_typed_text;
-        engine::Listeners<Listener>     m_listeners;
-    };
-    
-    // ================================================================================ //
-    //                          SUGGEST POPUP EDITOR LISTENER                           //
-    // ================================================================================ //
-    
-    //! @brief Receives callbacks from a SuggestPopupEditor component.
-    //! @see SuggestPopupEditor::addListener
-    class SuggestPopupEditor::Listener
-    {
-    public: // methods
-        
-        //! @brief Destructor.
-        virtual ~Listener() {}
-        
-        //! @brief Called when the user changes the text in some way.
-        virtual void textEditorTextChanged(SuggestPopupEditor& ed) {}
-        
-        //! @brief Called when the user presses the return key.
-        virtual void textEditorReturnKeyPressed(SuggestPopupEditor& ed) {}
-        
-        //! @brief Called when the user presses the escape key.
-        virtual void textEditorEscapeKeyPressed(SuggestPopupEditor& ed) {}
-        
-        //! @brief Called when the text editor loses focus.
-        virtual void textEditorFocusLost(SuggestPopupEditor& ed) {}
     };
 }
 

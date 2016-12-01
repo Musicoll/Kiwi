@@ -28,7 +28,7 @@
 
 #include "KiwiApp_Utils/KiwiApp_SuggestList.hpp"
 
-#include "KiwiApp_SuggestPopup.hpp"
+#include "KiwiApp_SuggestEditor.hpp"
 
 namespace kiwi
 {
@@ -123,7 +123,7 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The ClassicBox let the user change the text of the box
-    class ClassicBox : public ObjectView, public SuggestPopupEditor::Listener
+    class ClassicBox : public ObjectView, public SuggestEditor::Listener
     {
     public:
         
@@ -142,14 +142,14 @@ namespace kiwi
         //! @brief called when the object is resized.
         void resized() override;
         
-        void textEditorTextChanged(SuggestPopupEditor& ed) override;
-        void textEditorReturnKeyPressed(SuggestPopupEditor& ed) override;
-        void textEditorEscapeKeyPressed(SuggestPopupEditor& ed) override;
-        void textEditorFocusLost(SuggestPopupEditor& ed) override;
+        void textEditorTextChanged(SuggestEditor& ed) override;
+        void textEditorReturnKeyPressed(SuggestEditor& ed) override;
+        void textEditorEscapeKeyPressed(SuggestEditor& ed) override;
+        void textEditorFocusLost(SuggestEditor& ed) override;
         
     private: // members
         
-        std::unique_ptr<SuggestPopupEditor> m_editor;
+        std::unique_ptr<SuggestEditor> m_editor;
     };
 }
 
