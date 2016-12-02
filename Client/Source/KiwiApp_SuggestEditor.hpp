@@ -111,6 +111,8 @@ namespace kiwi
         std::unique_ptr<Menu>           m_menu = nullptr;
         juce::String                    m_typed_text;
         engine::Listeners<Listener>     m_listeners;
+        
+        bool                            m_need_complete = true;
     };
     
     // ================================================================================ //

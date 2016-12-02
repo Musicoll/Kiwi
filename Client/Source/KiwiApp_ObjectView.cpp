@@ -457,8 +457,9 @@ namespace kiwi
         m_editor->setReturnKeyStartsNewLine(false);
         m_editor->setMultiLine(true, false);
         
-        m_editor->setText(text);
+        m_editor->setText(text, juce::dontSendNotification);
         m_editor->setHighlightedRegion({0, static_cast<int>(text.length())});
+        m_editor->setCaretVisible(false);
         
         m_editor->addListener(*this);
         addAndMakeVisible(*m_editor);

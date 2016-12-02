@@ -230,6 +230,8 @@ namespace kiwi
         m_menu->setTopLeftPosition(sb.getX() - 2, sb.getBottom() + 2);
         m_menu->setVisible(true);
         
+        m_need_complete = true;
+        
         startTimer(200);
     }
     
@@ -249,9 +251,10 @@ namespace kiwi
     
     void SuggestEditor::textEditorTextChanged(juce::TextEditor&)
     {
-        const auto old_text = m_typed_text;
         m_typed_text = getText();
         m_suggest_list.applyFilter(m_typed_text.toStdString());
+        
+        setCaretVisible(true);
         
         if(isMenuOpened() && m_suggest_list.empty())
         {
@@ -263,8 +266,22 @@ namespace kiwi
                 m_menu->update();
             else if(!m_typed_text.isEmpty())
                 showMenu();
+            
+            if(!m_typed_text.isEmpty() && m_need_complete)
+            {
+                const juce::String best_suggestion = *m_suggest_list.begin();
+                const auto caret_pos = getCaretPosition();
+                const int suggest_length = static_cast<int>(best_suggestion.length());
+                if(caret_pos < suggest_length && best_suggestion.startsWith(m_typed_text))
+                {
+                    setText(best_suggestion, juce::dontSendNotification);
+                    setHighlightedRegion({caret_pos, suggest_length});
+                    setCaretVisible(false);
+                }
+            }
         }
         
+        m_need_complete = true;
         m_listeners.call(&Listener::suggestEditorTextChanged, *this);
     }
     
@@ -287,20 +304,23 @@ namespace kiwi
     void SuggestEditor::menuSelectionChanged(juce::String const& text)
     {
         setText(text, juce::dontSendNotification);
-        setHighlightedRegion({m_typed_text.length(), text.length()});
+        setHighlightedRegion({getCaretPosition(), text.length()});
+        setCaretVisible(false);
         m_listeners.call(&Listener::suggestEditorTextChanged, *this);
     }
     
     void SuggestEditor::menuItemClicked(juce::String const& text)
     {
         setText(text, juce::dontSendNotification);
-        setHighlightedRegion({m_typed_text.length(), text.length()});
+        setHighlightedRegion({getCaretPosition(), text.length()});
+        setCaretVisible(false);
     }
     
     void SuggestEditor::menuItemDoubleClicked(juce::String const& text)
     {
         setText(text, juce::dontSendNotification);
-        setHighlightedRegion({m_typed_text.length(), text.length()});
+        setCaretPosition(text.length());
+        setCaretVisible(true);
         closeMenu();
     }
     
@@ -329,6 +349,10 @@ namespace kiwi
     
     bool SuggestEditor::keyPressed(juce::KeyPress const& key)
     {
+        setCaretVisible(true);
+        
+        m_need_complete = !(key == juce::KeyPress::deleteKey || key == juce::KeyPress::backspaceKey);
+        
         bool result = juce::TextEditor::keyPressed(key);
         
         if(isMenuOpened() && key == juce::KeyPress::downKey)
@@ -339,12 +363,6 @@ namespace kiwi
         else if(isMenuOpened() && key == juce::KeyPress::upKey)
         {
             m_menu->selectPreviousRow();
-            result = true;
-        }
-        else if(key == juce::KeyPress::rightKey)
-        {
-            m_typed_text = getText();
-            setText(m_typed_text, juce::dontSendNotification);
             result = true;
         }
         
