@@ -39,7 +39,7 @@ namespace kiwi
             .name("cicm.kiwi.object.NewBox")
             .inherit<model::Object>();
             
-            Factory::add<NewBox>("newbox");
+            Factory::add<NewBox>("newbox", {}, true);
         }
         
         NewBox::NewBox(std::string const& name, std::vector<Atom> const& args)
@@ -59,7 +59,7 @@ namespace kiwi
             .name("cicm.kiwi.object.ErrorBox")
             .inherit<model::Object>();
             
-            Factory::add<ErrorBox>("errorbox");
+            Factory::add<ErrorBox>("errorbox", {}, true);
         }
         
         ErrorBox::ErrorBox(std::string const& name, std::vector<Atom> const& args)

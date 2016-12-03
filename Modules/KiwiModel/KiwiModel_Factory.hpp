@@ -45,7 +45,7 @@ namespace kiwi
             template <class TModel, typename
             std::enable_if<std::is_base_of<model::Object, TModel>::value,
             model::Object>::type* = nullptr>
-            static void add(std::string const& name, std::set<std::string> aliases = {})
+            static void add(std::string const& name, std::set<std::string> aliases = {}, bool internal = false)
             {
                 static_assert(!std::is_abstract<TModel>::value,
                               "The class must not be abstract.");
@@ -102,7 +102,7 @@ namespace kiwi
                         return object_uptr;
                     };
                     
-                    const auto infos_sptr = std::make_shared<const object_infos>(name, ctor, mold_maker, mold_caster);
+                    const auto infos_sptr = std::make_shared<const object_infos>(name, ctor, mold_maker, mold_caster, internal);
                     
                     // store infos for class name
                     creators.emplace(std::make_pair(name, infos_sptr));
@@ -136,8 +136,11 @@ namespace kiwi
             static bool has(std::string const& name);
             
             //! @brief Gets the names of the objects that has been added to the Factory.
+            //! @param ignore_aliases Default false, you may pass true to exclude them.
+            //! @param ignore_internals Default true, you may pass false to include them.
             //! @return A vector of Object names.
-            static std::vector<std::string> getNames();
+            static std::vector<std::string> getNames(const bool ignore_aliases = false,
+                                                     const bool ignore_internals = true);
             
         private: // methods
             
@@ -150,17 +153,20 @@ namespace kiwi
                 object_infos(const std::string class_name_,
                              const ctor_fn_t ctor_,
                              const mold_maker_fn_t mold_maker_,
-                             const mold_caster_fn_t  mold_caster_)
+                             const mold_caster_fn_t  mold_caster_,
+                             const bool internal_)
                 :
                 class_name(class_name_),
                 ctor(ctor_),
                 mold_maker(mold_maker_),
-                mold_caster(mold_caster_) {}
+                mold_caster(mold_caster_),
+                internal(internal_) {}
                 
-                const std::string       class_name;
-                const ctor_fn_t         ctor;
-                const mold_maker_fn_t   mold_maker;
-                const mold_caster_fn_t  mold_caster;
+                const std::string       class_name {};
+                const ctor_fn_t         ctor {};
+                const mold_maker_fn_t   mold_maker {};
+                const mold_caster_fn_t  mold_caster {};
+                const bool internal = true;
             };
             
             using creator_map_t = std::map<std::string, const std::shared_ptr<const object_infos>>;

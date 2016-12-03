@@ -412,7 +412,8 @@ namespace kiwi
     //                                   CLASSIC BOX                                    //
     // ================================================================================ //
     
-    ClassicBox::ClassicBox(PatcherView& patcher_view, model::Object& object_m) : ObjectView(patcher_view, object_m)
+    ClassicBox::ClassicBox(PatcherView& patcher_view, model::Object& object_m) :
+    ObjectView(patcher_view, object_m)
     {
         setWantsKeyboardFocus(true);
         setMouseClickGrabsKeyboardFocus(true);
@@ -423,11 +424,13 @@ namespace kiwi
         removeTextEditor();
     }
     
-    void ClassicBox::grabKeyboardFocus()
+    void ClassicBox::edit()
     {
+        if(hasKeyboardFocus(true)) return; // abort
+        
         setInterceptsMouseClicks(true, true);
         
-        m_editor.reset(new juce::TextEditor());
+        m_editor.reset(new SuggestEditor(model::Factory::getNames()));
         m_editor->setBounds(m_local_box_bounds.expanded(m_selection_width*0.5));
         
         std::string text = m_model->getText();
@@ -440,32 +443,36 @@ namespace kiwi
             text.clear();
         }
         
-        m_editor->setColour(juce::TextEditor::highlightColourId, juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
-        m_editor->setColour(juce::TextEditor::focusedOutlineColourId, juce::Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
-        m_editor->setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentWhite);
+        m_editor->setColour(juce::TextEditor::highlightColourId,
+                            juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
+        
+        m_editor->setColour(juce::TextEditor::focusedOutlineColourId,
+                            juce::Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
+        
+        m_editor->setColour(juce::TextEditor::backgroundColourId,
+                            juce::Colours::transparentWhite);
 
         m_editor->setScrollbarsShown(false);
         m_editor->setScrollToShowCursor(true);
         m_editor->setReturnKeyStartsNewLine(false);
         m_editor->setMultiLine(true, false);
         
-        m_editor->setText(text);
-        m_editor->setCaretPosition(text.length());
+        m_editor->setText(text, juce::dontSendNotification);
+        m_editor->setHighlightedRegion({0, static_cast<int>(text.length())});
+        m_editor->setCaretVisible(false);
         
-        m_editor->addListener(this);
-        addAndMakeVisible(m_editor.get());
-        
-        m_editor->setSelectAllWhenFocused(true);
-        m_editor->grabKeyboardFocus();
+        m_editor->addListener(*this);
+        addAndMakeVisible(*m_editor);
         
         m_is_editing = true;
+        m_editor->grabKeyboardFocus();
     }
     
     void ClassicBox::removeTextEditor()
     {
         if(m_editor)
         {
-            m_editor->removeListener(this);
+            m_editor->removeListener(*this);
             removeChildComponent(m_editor.get());
             m_editor.reset();
             
@@ -474,36 +481,22 @@ namespace kiwi
         }
     }
     
-    void ClassicBox::focusGained(FocusChangeType cause)
-    {
-        //KiwiApp::post("focusGained");
-    }
-    
-    void ClassicBox::focusLost(FocusChangeType cause)
-    {
-        //KiwiApp::post("focusLost");
-    }
-    
     void ClassicBox::resized()
     {
         if(m_editor)
         {
-            //auto ed_borders = m_editor->getBorder();
             m_editor->setBounds(m_local_box_bounds.expanded(m_selection_width*0.5));
         }
     }
     
-    void ClassicBox::textEditorTextChanged(juce::TextEditor& e)
+    void ClassicBox::suggestEditorTextChanged(SuggestEditor& e)
     {
         const juce::String new_text = e.getText();
         const juce::Font font = e.getFont();
         const int text_width = font.getStringWidth(new_text);
-        
-        //auto ed_borders = e.getBorder();
-        
         const int ed_width = e.getWidth();
         
-        // box grows only up
+        // boxes only grows up
         if(ed_width < text_width + 16)
         {
             const int new_width = text_width + 24;
@@ -512,21 +505,27 @@ namespace kiwi
         }
     }
     
-    void ClassicBox::textEditorReturnKeyPressed(juce::TextEditor& e)
+    void ClassicBox::suggestEditorReturnKeyPressed(SuggestEditor& e)
     {
-        //KiwiApp::post("textEditorReturnKeyPressed");
+        const bool locked = m_is_locked;
+        setInterceptsMouseClicks(locked, locked);
         
-        m_patcher_view.grabKeyboardFocus();
+        std::string new_text = e.getText().toStdString();
+        
+        removeTextEditor();
+        
+        m_patcher_view.boxHasBeenEdited(*this, new_text);
     }
     
-    void ClassicBox::textEditorEscapeKeyPressed(juce::TextEditor& e)
+    void ClassicBox::suggestEditorEscapeKeyPressed(SuggestEditor& e)
     {
-        //KiwiApp::post("textEditorEscapeKeyPressed");
+        const bool locked = m_is_locked;
+        setInterceptsMouseClicks(locked, locked);
         
         removeTextEditor();
     }
     
-    void ClassicBox::textEditorFocusLost(juce::TextEditor& e)
+    void ClassicBox::suggestEditorFocusLost(SuggestEditor& e)
     {
         const bool locked = m_is_locked;
         setInterceptsMouseClicks(locked, locked);
