@@ -334,15 +334,6 @@ source_group_rec("${KIWI_CLIENT_SRC}" ${ROOT_DIR}/Client/Source)
 # Tests
 #----------------------------------
 
-# Test Atom
-
-file(GLOB TEST_ATOM_SRC ${ROOT_DIR}/Test/Atom/*.[c|h]pp)
-add_executable(test_atom ${TEST_ATOM_SRC})
-target_add_dependency(test_atom KiwiModel)
-set_target_properties(test_atom PROPERTIES FOLDER Test)
-source_group_rec("${TEST_ATOM_SRC}" ${ROOT_DIR}/Test/Atom)
-set_target_properties(test_atom PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
-
 # Test Dsp
 
 file(GLOB TEST_DSP_SRC ${ROOT_DIR}/Test/Dsp/*.[c|h]pp)
@@ -351,6 +342,15 @@ target_add_dependency(test_dsp KiwiDsp)
 set_target_properties(test_dsp PROPERTIES FOLDER Test)
 source_group_rec("${TEST_DSP_SRC}" ${ROOT_DIR}/Test/Dsp)
 set_target_properties(test_dsp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
+
+# Test Model
+
+file(GLOB TEST_MODEL_SRC ${ROOT_DIR}/Test/Model/*.[c|h]pp)
+add_executable(test_model ${TEST_MODEL_SRC})
+target_add_dependency(test_model KiwiModel)
+set_target_properties(test_model PROPERTIES FOLDER Test)
+source_group_rec("${TEST_MODEL_SRC}" ${ROOT_DIR}/Test/Model)
+set_target_properties(test_model PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
 
 #----------------------------------
 # Examples

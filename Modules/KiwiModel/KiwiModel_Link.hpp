@@ -57,6 +57,12 @@ namespace kiwi
             //! @brief Gets the Object that receives messages.
             model::Object const& getReceiverObject() const;
             
+            //! @brief Checks if the sender object is still in document.
+            bool isSenderValid() const;
+            
+            //! @brief Checks if the sender object is still in document.
+            bool isReceiverValid() const;
+            
             //! @brief Returns the sender outlet index.
             size_t getSenderIndex() const;
             

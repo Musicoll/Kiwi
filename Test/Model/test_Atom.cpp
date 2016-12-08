@@ -19,11 +19,11 @@
  ==============================================================================
  */
 
+#include <vector>
+
+#include "../catch.hpp"
 
 #include <KiwiModel/KiwiModel_Atom.hpp>
-#define CATCH_CONFIG_MAIN
-#include "../catch.hpp"
-#include <vector>
 
 using namespace kiwi;
 

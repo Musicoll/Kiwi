@@ -64,7 +64,8 @@ namespace kiwi
     
     PatcherManager::PatcherManager(Instance& instance) :
     m_instance(instance),
-    m_document(model::DataModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
+    m_validator(),
+    m_document(model::DataModel::use(), *this, m_validator, m_instance.getUserId(), 'cicm', 'kpat'),
     m_is_remote(false)
     {
         model::Patcher & patcher = getPatcher();
@@ -77,7 +78,8 @@ namespace kiwi
     
     PatcherManager::PatcherManager(Instance& instance, juce::File const& file):
     m_instance(instance),
-    m_document(model::DataModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
+    m_validator(),
+    m_document(model::DataModel::use(), *this, m_validator, m_instance.getUserId(), 'cicm', 'kpat'),
     m_is_remote(false)
     {
         model::Patcher& patcher = getPatcher();
@@ -93,7 +95,8 @@ namespace kiwi
     
     PatcherManager::PatcherManager(Instance & instance, const std::string host, uint16_t port, uint64_t session_id) :
     m_instance(instance),
-    m_document(model::DataModel::use(), *this, m_instance.getUserId(), 'cicm', 'kpat'),
+    m_validator(),
+    m_document(model::DataModel::use(), *this, m_validator, m_instance.getUserId(), 'cicm', 'kpat'),
     m_is_remote(true)
     {
         model::Patcher& patcher = getPatcher();
