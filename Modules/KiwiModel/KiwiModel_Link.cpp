@@ -68,6 +68,16 @@ namespace kiwi
             return !removed() ? *m_receiver.value() : *m_receiver.before();
         }
         
+        bool Link::isSenderValid() const
+        {
+            return m_sender.value() != nullptr;
+        }
+        
+        bool Link::isReceiverValid() const
+        {
+            return m_receiver.value() != nullptr;
+        }
+        
         size_t Link::getSenderIndex() const
         {
             int64_t value = !removed() ? m_index_outlet.value() : m_index_outlet.before();

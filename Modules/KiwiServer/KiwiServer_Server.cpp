@@ -24,6 +24,7 @@
 
 #include <KiwiModel/KiwiModel_DataModel.hpp>
 #include <KiwiModel/KiwiModel_PatcherUser.hpp>
+#include <KiwiModel/KiwiModel_PatcherValidator.hpp>
 
 #include "KiwiServer_Server.hpp"
 
@@ -191,7 +192,7 @@ namespace kiwi
         {
             DBG("[server] - createValidator for session_id : " << std::to_string(session_id));
             
-            return std::make_unique<PatcherValidator>();
+            return std::make_unique<model::PatcherValidator>();
         }
         
         void Server::initEmptyDocument(uint64_t session_id, flip::DocumentBase& document)

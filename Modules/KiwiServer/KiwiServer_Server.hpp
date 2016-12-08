@@ -25,8 +25,9 @@
 #include <flip/contrib/ServerSimple.h>
 #include <flip/BackEndBinary.h>
 
+#include <KiwiModel/KiwiModel_PatcherUser.hpp>
+
 #include "KiwiServer_ServiceProvider.hpp"
-#include "KiwiServer_PatcherValidator.hpp"
 
 #include <juce_core/juce_core.h>
 
