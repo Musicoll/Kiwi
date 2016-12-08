@@ -277,6 +277,7 @@ namespace kiwi
                     setText(best_suggestion, juce::dontSendNotification);
                     setHighlightedRegion({caret_pos, suggest_length});
                     setCaretVisible(false);
+                    m_menu->selectFirstRow();
                 }
             }
         }
@@ -304,16 +305,22 @@ namespace kiwi
     void SuggestEditor::menuSelectionChanged(juce::String const& text)
     {
         setText(text, juce::dontSendNotification);
-        setHighlightedRegion({getCaretPosition(), text.length()});
-        setCaretVisible(false);
+        const auto caret_pos = getCaretPosition();
+        const auto typed_text_lenght = m_typed_text.length();
+        const auto startpos = typed_text_lenght >= caret_pos ? caret_pos : typed_text_lenght;
+        setHighlightedRegion({startpos, text.length()});
+        setCaretVisible(text.isEmpty());
         m_listeners.call(&Listener::suggestEditorTextChanged, *this);
     }
     
     void SuggestEditor::menuItemClicked(juce::String const& text)
     {
         setText(text, juce::dontSendNotification);
-        setHighlightedRegion({getCaretPosition(), text.length()});
-        setCaretVisible(false);
+        const auto caret_pos = getCaretPosition();
+        const auto typed_text_lenght = m_typed_text.length();
+        const auto startpos = typed_text_lenght >= caret_pos ? caret_pos : typed_text_lenght;
+        setHighlightedRegion({startpos, text.length()});
+        setCaretVisible(text.isEmpty());
     }
     
     void SuggestEditor::menuItemDoubleClicked(juce::String const& text)
@@ -353,7 +360,7 @@ namespace kiwi
         
         m_need_complete = !(key == juce::KeyPress::deleteKey || key == juce::KeyPress::backspaceKey);
         
-        bool result = juce::TextEditor::keyPressed(key);
+        bool result = false;
         
         if(isMenuOpened() && key == juce::KeyPress::downKey)
         {
@@ -364,6 +371,11 @@ namespace kiwi
         {
             m_menu->selectPreviousRow();
             result = true;
+        }
+        
+        if(!result)
+        {
+            result = juce::TextEditor::keyPressed(key);
         }
         
         return result;

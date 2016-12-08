@@ -459,7 +459,7 @@ namespace kiwi
         
         m_editor->setText(text, juce::dontSendNotification);
         m_editor->setHighlightedRegion({0, static_cast<int>(text.length())});
-        m_editor->setCaretVisible(false);
+        m_editor->setCaretVisible(text.empty());
         
         m_editor->addListener(*this);
         addAndMakeVisible(*m_editor);
