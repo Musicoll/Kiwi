@@ -29,7 +29,7 @@
 int main( int argc, char* const argv[] )
 {
     // global setup...
-    std::cout << "running Unit-Tests - KiwiDsp ..." << '\n';
+    std::cout << "running Unit-Tests - KiwiDsp ..." << '\n' << '\n';
     
     int result = Catch::Session().run( argc, argv );
     

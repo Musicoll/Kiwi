@@ -12,7 +12,7 @@ import distutils
 
 project_dir = os.path.abspath(".");
 
-test_list = ["test_atom", "test_dsp"]
+test_list = ["test_dsp", "test_model"]
 
 #==============================================================================
 #Name : get_test_file
