@@ -590,29 +590,9 @@ namespace kiwi
             
             m.addCommandItem(cm, juce::StandardApplicationCommandIDs::selectAll);
             m.addSeparator();
-            
-            juce::PopupMenu object_menu;
-            
-            const auto names = model::Factory::getNames();
-            
-            for(int i = 0; i < names.size(); i++)
-            {
-                object_menu.addItem(i+1, names[i]);
-            }
-            
-            m.addSubMenu("Objects", object_menu);
-            
-            const int result = m.show();
-            
-            if(result > 0 && result <= names.size())
-            {
-                createObjectModel(names[result-1], position.getX(), position.getY());
-            }
         }
-        else
-        {
-            m.show();
-        }
+        
+        m.show();
     }
     
     void PatcherView::showObjectPopupMenu(ObjectView const& object, juce::Point<int> const& position)
