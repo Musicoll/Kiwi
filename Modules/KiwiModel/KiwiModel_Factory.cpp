@@ -30,14 +30,14 @@ namespace kiwi
         //                                      FACTORY                                     //
         // ================================================================================ //
         
-        std::unique_ptr<model::Object> Factory::create(std::string const& name, std::vector<Atom> const& args)
+        std::unique_ptr<model::Object> Factory::create(std::string const& name,
+                                                       std::vector<Atom> const& args)
         {
             const auto& creators = getCreators();
             const auto it = creators.find(name);
             if(it != creators.end())
             {
-                const ctor_fn_t& model_ctor = it->second->ctor;
-                auto object_uptr = std::unique_ptr<model::Object>(model_ctor(args));
+                auto object_uptr = it->second->ctor(args);
                 object_uptr->m_name = it->second->class_name;
                 object_uptr->m_text = args.empty() ? name : name + " " + AtomHelper::toString(args);
                 return object_uptr;
