@@ -23,6 +23,7 @@
 #define KIWI_MODEL_FACTORY_HPP_INCLUDED
 
 #include "KiwiModel_Object.hpp"
+#include "KiwiModel_DataModel.hpp"
 
 namespace kiwi
 {
@@ -35,149 +36,258 @@ namespace kiwi
         //! @brief The model Object's factory
         class Factory
         {
+        public: // classes
+            
+            class ObjectClassBase;
+            template<class T> class ObjectClass;
+            
         public: // methods
             
-            //! @brief Adds an object model into the Factory.
-            //! @details This function adds a new object model to the factory.
-            //! If the name of the object already exists, the function does nothing,
-            //! otherwise the object is added to the factory.
-            //! @param name The name of the object.
-            template <class TModel, typename
-            std::enable_if<std::is_base_of<model::Object, TModel>::value,
-            model::Object>::type* = nullptr>
-            static void add(std::string const& name, std::set<std::string> aliases = {}, bool internal = false)
+            //! @brief isValidObject type traits
+            //! @details To be considered as valid an object must:
+            //! - not be abstract.
+            //! - inherit from model::Object.
+            //! - be constructible with flip::Default.
+            //! - be constructible with a string and a vector of atoms.
+            template<typename TModel> struct isValidObject
             {
-                static_assert(!std::is_abstract<TModel>::value,
-                              "The class must not be abstract.");
-                
-                static_assert(std::is_constructible<TModel, std::string, std::vector<Atom>>::value,
-                              "Bad model object constructor");
-                
-                static_assert(std::is_constructible<TModel, flip::Default &>::value,
-                              "Class must be constructible with flip::Default");
-                
-                if(!name.empty())
+                enum
                 {
-                    auto& creators = getCreators();
-                    
-                    // check if the name match the name of another object in the factory.
-                    if(creators.count(name) != 0)
-                    {
-                        throw std::runtime_error("The \"" + name + "\" object already exists in the factory");
-                    }
-                    
-                    // check if an alias name match the name of another object in the factory.
-                    if(!aliases.empty())
-                    {
-                        for(const auto& alias : aliases)
-                        {
-                            if(creators.count(alias) != 0)
-                            {
-                                throw std::runtime_error("There is already an object with the alias : \"" + alias + "\"");
-                            }
-                        }
-                    }
-                    
-                    // define the object constructor
-                    const ctor_fn_t ctor = [name](std::vector<Atom> const& args) -> TModel*
-                    {
-                        return new TModel(name, args);
-                    };
-                    
-                    // define the mold make method
-                    const mold_maker_fn_t mold_maker = [](model::Object const& object, flip::Mold& mold)
-                    {
-                        // make a mold with container_flag active
-                        mold.make(static_cast<TModel const&>(object), false);
-                    };
-                    
-                    // define the mold cast method
-                    const mold_caster_fn_t mold_caster = [](flip::Mold const& mold)
-                    {
-                        flip::Default d;
-                        auto object_uptr = std::unique_ptr<TModel>(new TModel(d));
-                        
-                        mold.cast<TModel>(static_cast<TModel&>(*(object_uptr.get())));
-                        
-                        return object_uptr;
-                    };
-                    
-                    const auto infos_sptr = std::make_shared<const object_infos>(name, ctor, mold_maker, mold_caster, internal);
-                    
-                    // store infos for class name
-                    creators.emplace(std::make_pair(name, infos_sptr));
-                    
-                    // store infos for aliases
-                    for(const auto& alias : aliases)
-                    {
-                        creators.emplace(std::make_pair(alias, infos_sptr));
-                    }
+                    value = std::is_base_of<model::Object, TModel>::value
+                    && !std::is_abstract<TModel>::value
+                    && std::is_constructible<TModel, std::string, std::vector<Atom>>::value
+                    && std::is_constructible<TModel, flip::Default &>::value
+                };
+            };
+            
+            //! @brief Adds an object model into the Factory.
+            //! @details The function throw if the object has already been added.
+            //! @param name The name of the object.
+            template<class TModel>
+            static ObjectClass<TModel>& add(std::string const& name)
+            {
+                static_assert(isValidObject<TModel>::value, "Not a valid Object");
+                
+                assert((!name.empty() && !DataModel::has<TModel>())
+                       && "Object name empty or object class already added");
+                
+                // check if the name match the name of another object in the factory.
+                if(has(name))
+                {
+                    throw std::runtime_error("The \"" + name + "\" object is already in the factory");
                 }
+
+                auto& object_classes = getClasses();
+                const auto it = object_classes.emplace(object_classes.end(),
+                                                       std::make_unique<ObjectClass<TModel>>(name));
+                
+                return static_cast<ObjectClass<TModel>&>(*(it->get()));
             }
             
-            //! @brief Creates a new Object with a text.
+            //! @brief Creates a new Object with a name and arguments.
+            //! @details This function will throw if the object name does not exist.
             //! @param name The name of the Object.
-            //! @return An object (if the name matches a registered Object name).
+            //! @param args A list of arguments as a vector of Atom.
+            //! @return A ptr to a model::Object.
             static std::unique_ptr<model::Object> create(std::string const& name,
                                                          std::vector<Atom> const& args);
             
-            //! @brief Creates a new Object with from a flip::Mold.
+            //! @brief Creates a new Object from a flip::Mold.
+            //! @details This function will throw if the object name does not exist.
             //! @param name The name of the Object to create.
-            //! @return An object (if the name matches a registered Object name).
+            //! @param mold The flip::Mold from which to create the object.
+            //! @return A ptr to a model::Object.
             static std::unique_ptr<model::Object> create(std::string const& name,
                                                          flip::Mold const& mold);
             
             //! @brief Make a mold of this object.
+            //! @details This function will throw if the object does not exist.
+            //! @param object The Object to copy.
+            //! @param mold The flip::Mold from which to create the object.
+            //! @return A ptr to a model::Object.
             static void copy(model::Object const& object, flip::Mold& mold);
             
-            //! @brief Returns true if a given string match a registered Object model name.
-            //! @param name The name of the object model to find.
-            //! @return true if the object has been added, otherwise false.
+            //! @brief Returns a ptr to an object class thas has this name or alias name.
+            //! @details This method returns nullptr if the name is not found.
+            //! @param name The name or an alias name of the class.
+            //! @param ignore_aliases Default to false, pass true to ignore aliases.
+            //! @return A ptr to an ObjectClassBase.
+            static ObjectClassBase* getClassByName(std::string const& name,
+                                                   const bool ignore_aliases = false);
+            
+            //! @brief Returns true if a given string match a registered object class name.
+            //! @param name The name of the object class to find.
+            //! @return true if the object class has been added, otherwise false.
             static bool has(std::string const& name);
             
             //! @brief Gets the names of the objects that has been added to the Factory.
-            //! @param ignore_aliases Default false, you may pass true to exclude them.
-            //! @param ignore_internals Default true, you may pass false to include them.
-            //! @return A vector of Object names.
+            //! @param ignore_aliases Default to false, you may pass true to exclude them.
+            //! @param ignore_internals Default to true, you may pass false to include them.
+            //! @return A vector of object class names.
             static std::vector<std::string> getNames(const bool ignore_aliases = false,
                                                      const bool ignore_internals = true);
             
         private: // methods
             
-            using ctor_fn_t = std::function<model::Object*(std::vector<Atom>)>;
-            using mold_maker_fn_t = std::function<void(model::Object const&, flip::Mold& mold)>;
-            using mold_caster_fn_t = std::function<std::unique_ptr<model::Object>(flip::Mold const& mold)>;
+            using object_classes_t = std::vector<std::unique_ptr<ObjectClassBase>>;
             
-            struct object_infos
+            using ctor_fn_t = std::function<std::unique_ptr<model::Object>(std::vector<Atom>)>;
+            using mold_maker_fn_t = std::function<void(model::Object const&, flip::Mold&)>;
+            using mold_caster_fn_t = std::function<std::unique_ptr<model::Object>(flip::Mold const&)>;
+            
+            //! @internal Returns a constructor function.
+            template<class TModel>
+            static ctor_fn_t getCtor(std::string const& name)
             {
-                object_infos(const std::string class_name_,
-                             const ctor_fn_t ctor_,
-                             const mold_maker_fn_t mold_maker_,
-                             const mold_caster_fn_t  mold_caster_,
-                             const bool internal_)
-                :
-                class_name(class_name_),
-                ctor(ctor_),
-                mold_maker(mold_maker_),
-                mold_caster(mold_caster_),
-                internal(internal_) {}
-                
-                const std::string       class_name {};
-                const ctor_fn_t         ctor {};
-                const mold_maker_fn_t   mold_maker {};
-                const mold_caster_fn_t  mold_caster {};
-                const bool internal = true;
-            };
+                return [name](std::vector<Atom> const& args) -> std::unique_ptr<model::Object>
+                {
+                    return std::make_unique<TModel>(name, args);
+                };
+            }
             
-            using creator_map_t = std::map<std::string, const std::shared_ptr<const object_infos>>;
+            //! @internal Returns a mold maker function.
+            template<class TModel>
+            static mold_maker_fn_t getMoldMaker()
+            {
+                return [](model::Object const& object, flip::Mold& mold) -> void
+                {
+                    // make a mold with container_flag active
+                    mold.make(static_cast<TModel const&>(object), false);
+                };
+            }
             
-            //! @internal Returns the static map of creators.
-            static creator_map_t& getCreators();
+            //! @internal Returns a mold caster function.
+            template<class TModel>
+            static mold_caster_fn_t getMoldCaster()
+            {
+                return [](flip::Mold const& mold)
+                {
+                    flip::Default d;
+                    auto object_uptr = std::make_unique<TModel>(d);
+                    mold.cast<TModel>(static_cast<TModel&>(*(object_uptr.get())));
+                    return object_uptr;
+                };
+            }
+            
+            //! @internal Returns a sanitized version of the string.
+            static std::string sanitizeName(std::string const& name);
+            
+            //! @internal Returns the object classes.
+            static object_classes_t& getClasses();
             
         private: // deleted methods
             
             Factory() = delete;
             ~Factory() = delete;
+        };
+        
+        // ================================================================================ //
+        //                             FACTORY OBJECT CLASS BASE                            //
+        // ================================================================================ //
+        
+        //! @brief ObjectClass base class
+        class Factory::ObjectClassBase
+        {
+        public: // methods
+            
+            //! @brief Constructor.
+            ObjectClassBase(std::string const& name,
+                            const ctor_fn_t ctor,
+                            const mold_maker_fn_t mold_maker,
+                            const mold_caster_fn_t  mold_caster)
+            :
+            m_name(name),
+            m_ctor(ctor),
+            m_mold_maker(mold_maker),
+            m_mold_caster(mold_caster) {}
+            
+            //! @brief Destructor.
+            virtual ~ObjectClassBase() = default;
+            
+            //! @brief Returns the name of the object.
+            std::string const& getName() const { return m_name; }
+            
+            //! @brief Returns true if it's an internal object.
+            bool isInternal() const noexcept { return m_internal; }
+            
+            //! @brief Pass true if this is an internal object.
+            void setInternal(const bool is_internal) noexcept { m_internal = is_internal; }
+            
+            //! @brief Returns true if this object class has aliases.
+            bool hasAlias() const noexcept { return !m_aliases.empty(); }
+            
+            //! @brief Pass true if this is an internal object.
+            std::set<std::string> const& getAliases() const noexcept { return m_aliases; }
+            
+            //! @brief Returns true if this class has this alias name.
+            bool hasAlias(std::string const& alias) const noexcept { return (m_aliases.count(alias) != 0); }
+            
+            //! @brief Adds a creator name alias to the class.
+            void addAlias(std::string alias)
+            {
+                if(!Factory::has(alias))
+                {
+                    m_aliases.emplace(std::move(alias));
+                }
+            }
+            
+            //! @brief Returns a new Object by mold cast.
+            std::unique_ptr<model::Object> create(std::vector<Atom> const& args) const
+            { return m_ctor(args); }
+            
+            //! @brief Returns a new Object by mold cast.
+            void moldMake(model::Object const& object, flip::Mold& mold) const
+            { m_mold_maker(object, mold); }
+            
+            //! @brief Returns a new Object by mold cast.
+            std::unique_ptr<model::Object> moldCast(flip::Mold const& mold) const
+            { return m_mold_caster(mold); }
+            
+        private: // members
+            
+            const std::string       m_name {};
+            std::set<std::string>   m_aliases {};
+            const ctor_fn_t         m_ctor {};
+            const mold_maker_fn_t   m_mold_maker {};
+            const mold_caster_fn_t  m_mold_caster {};
+            bool                    m_internal = false;
+        };
+        
+        // ================================================================================ //
+        //                               FACTORY OBJECT CLASS                               //
+        // ================================================================================ //
+        
+        //! @brief ObjectClass
+        template<class TObjectClass>
+        class Factory::ObjectClass : public ObjectClassBase
+        {
+        public: // methods
+            
+            using class_t = TObjectClass;
+            
+            ObjectClass(std::string const& name)
+            : ObjectClassBase(name,
+                              getCtor<class_t>(name),
+                              getMoldMaker<class_t>(),
+                              getMoldCaster<class_t>())
+            {
+                const std::string flip_name(name_prefix + Factory::sanitizeName(name));
+                m_flip_class.name(flip_name.c_str())
+                .template inherit<model::Object>();
+            }
+            
+            //! @brief Add a flip member to the ObjectClass.
+            template<class U, U TObjectClass::*ptr_to_member>
+            void addMember(char const* name)
+            {
+                m_flip_class.template member(name);
+            }
+
+        private: // members
+            
+            static constexpr auto name_prefix = "cicm.kiwi.object.";
+            
+            flip::Class<TObjectClass>& m_flip_class = DataModel::declare<TObjectClass>();
         };
     }
 }
