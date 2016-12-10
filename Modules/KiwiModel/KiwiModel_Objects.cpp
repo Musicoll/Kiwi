@@ -33,13 +33,7 @@ namespace kiwi
         
         void NewBox::declare()
         {
-            if(DataModel::has<NewBox>()) return;
-            
-            DataModel::declare<NewBox>()
-            .name("cicm.kiwi.object.NewBox")
-            .inherit<model::Object>();
-            
-            Factory::add<NewBox>("newbox", {}, true);
+            Factory::add<NewBox>("newbox").setInternal(true);
         }
         
         NewBox::NewBox(std::string const& name, std::vector<Atom> const& args)
@@ -53,13 +47,7 @@ namespace kiwi
         
         void ErrorBox::declare()
         {
-            if(DataModel::has<ErrorBox>()) return;
-            
-            DataModel::declare<ErrorBox>()
-            .name("cicm.kiwi.object.ErrorBox")
-            .inherit<model::Object>();
-            
-            Factory::add<ErrorBox>("errorbox", {}, true);
+            Factory::add<ErrorBox>("errorbox").setInternal(true);
         }
         
         ErrorBox::ErrorBox(std::string const& name, std::vector<Atom> const& args)
@@ -82,13 +70,7 @@ namespace kiwi
  
         void Plus::declare()
         {
-            if(DataModel::has<Plus>()) return;
-            
-            DataModel::declare<Plus>()
-            .name("cicm.kiwi.object.Plus")
-            .inherit<model::Object>();
-            
-            Factory::add<Plus>("plus", {"+"});
+            Factory::add<Plus>("plus").addAlias("+");
         }
         
         Plus::Plus(std::string const& name, std::vector<Atom> const& args)
@@ -109,13 +91,7 @@ namespace kiwi
         
         void Times::declare()
         {
-            if(DataModel::has<Times>()) return;
-            
-            DataModel::declare<Times>()
-            .name("cicm.kiwi.object.Times")
-            .inherit<model::Object>();
-            
-            Factory::add<Times>("times", {"*"});
+            Factory::add<Times>("times").addAlias("*");
         }
         
         Times::Times(std::string const& name, std::vector<Atom> const& args)
@@ -141,12 +117,6 @@ namespace kiwi
         
         void Print::declare()
         {
-            if(DataModel::has<Print>()) return;
-            
-            DataModel::declare<Print>()
-            .name("cicm.kiwi.object.Print")
-            .inherit<model::Object>();
-            
             Factory::add<Print>("print");
         }
         
@@ -161,13 +131,7 @@ namespace kiwi
         
         void Receive::declare()
         {
-            if(DataModel::has<Receive>()) return;
-            
-            DataModel::declare<Receive>()
-            .name("cicm.kiwi.object.Receive")
-            .inherit<model::Object>();
-            
-            Factory::add<Receive>("receive", {"r"});
+            Factory::add<Receive>("receive").addAlias("r");
         }
         
         // ================================================================================ //
@@ -181,12 +145,6 @@ namespace kiwi
         
         void Loadmess::declare()
         {
-            if(DataModel::has<Loadmess>()) return;
-            
-            DataModel::declare<Loadmess>()
-            .name("cicm.kiwi.object.Loadmess")
-            .inherit<model::Object>();
-            
             Factory::add<Loadmess>("loadmess");
         }
         
@@ -244,12 +202,6 @@ namespace kiwi
         
         void DacTilde::declare()
         {
-            if(DataModel::has<DacTilde>()) return;
-            
-            DataModel::declare<DacTilde>()
-            .name("cicm.kiwi.object.DacTilde")
-            .inherit<model::Object>();
-            
             Factory::add<DacTilde>("dac~");
         }
 
@@ -268,12 +220,6 @@ namespace kiwi
         
         void OscTilde::declare()
         {
-            if(DataModel::has<OscTilde>()) return;
-            
-            DataModel::declare<OscTilde>()
-            .name("cicm.kiwi.object.OscTilde")
-            .inherit<model::Object>();
-
             Factory::add<OscTilde>("osc~");
         }
         
@@ -295,13 +241,7 @@ namespace kiwi
         
         void TimesTilde::declare()
         {
-            if(DataModel::has<TimesTilde>()) return;
-            
-            DataModel::declare<TimesTilde>()
-            .name("cicm.kiwi.object.TimesTilde")
-            .inherit<model::Object>();
-            
-            Factory::add<TimesTilde>("times~", {"*~"});
+            Factory::add<TimesTilde>("times~").addAlias("*~");
         }
         
         // ================================================================================ //
@@ -322,13 +262,7 @@ namespace kiwi
         
         void PlusTilde::declare()
         {
-            if(DataModel::has<PlusTilde>()) return;
-            
-            DataModel::declare<PlusTilde>()
-            .name("cicm.kiwi.object.PlusTilde")
-            .inherit<model::Object>();
-            
-            Factory::add<PlusTilde>("plus~", {"+~"});
+            Factory::add<PlusTilde>("plus~").addAlias("+~");
         }
         
         // ================================================================================ //
@@ -347,12 +281,6 @@ namespace kiwi
         
         void SigTilde::declare()
         {
-            if(DataModel::has<SigTilde>()) return;
-            
-            DataModel::declare<SigTilde>()
-            .name("cicm.kiwi.object.SigTilde")
-            .inherit<model::Object>();
-            
             Factory::add<SigTilde>("sig~");
         }
     }
