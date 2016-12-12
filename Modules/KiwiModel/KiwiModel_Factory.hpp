@@ -62,6 +62,7 @@ namespace kiwi
             
             //! @brief Adds an object model into the Factory.
             //! @details The function throw if the object has already been added.
+            //! Calling this function will imply a change of datamodel.
             //! @param name The name of the object.
             template<class TModel>
             static ObjectClass<TModel>& add(std::string const& name)
@@ -81,7 +82,7 @@ namespace kiwi
                 const auto it = object_classes.emplace(object_classes.end(),
                                                        std::make_unique<ObjectClass<TModel>>(name));
                 
-                return static_cast<ObjectClass<TModel>&>(*(it->get()));
+                return dynamic_cast<ObjectClass<TModel>&>(*(it->get()));
             }
             
             //! @brief Creates a new Object with a name and arguments.
@@ -269,7 +270,8 @@ namespace kiwi
             : ObjectClassBase(name,
                               getCtor<class_t>(name),
                               getMoldMaker<class_t>(),
-                              getMoldCaster<class_t>())
+                              getMoldCaster<class_t>()),
+            m_flip_class(DataModel::declare<class_t>())
             {
                 const std::string flip_name(name_prefix + Factory::sanitizeName(name));
                 m_flip_class.name(flip_name.c_str())
@@ -277,7 +279,7 @@ namespace kiwi
             }
             
             //! @brief Add a flip member to the ObjectClass.
-            template<class U, U TObjectClass::*ptr_to_member>
+            template<class U, U class_t::*ptr_to_member>
             void addMember(char const* name)
             {
                 m_flip_class.template member(name);
@@ -287,7 +289,7 @@ namespace kiwi
             
             static constexpr auto name_prefix = "cicm.kiwi.object.";
             
-            flip::Class<TObjectClass>& m_flip_class = DataModel::declare<TObjectClass>();
+            flip::Class<class_t>& m_flip_class;
         };
     }
 }
