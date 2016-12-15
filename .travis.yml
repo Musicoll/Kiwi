@@ -28,7 +28,6 @@ matrix:
     script:
     - python ./Config/configure.py
     - python ./Config/build.py -c Release
-    - python ./Config/run_test.py -c Release
     after_success:
     - openssl aes-256-cbc -K $encrypted_5a43ff9033eb_key -iv $encrypted_5a43ff9033eb_iv -in Config/travisci_rsa.enc -out Config/travisci_rsa -d
     - chmod 0600 Config/travisci_rsa
@@ -44,7 +43,6 @@ matrix:
     script:
     - python ./Config/configure.py
     - python ./Config/build.py -c Release
-    - python ./Config/run_test.py -c Release
     before_deploy:
     - mkdir Kiwi
     - mv Build/Release/KiwiBuild/Bin/Release/Kiwi.app Kiwi/Kiwi.app

@@ -353,6 +353,16 @@ set_target_properties(test_model PROPERTIES FOLDER Test)
 source_group_rec("${TEST_MODEL_SRC}" ${ROOT_DIR}/Test/Model)
 set_target_properties(test_model PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
 
+# Tests Target
+
+add_custom_target(Tests ALL DEPENDS test_dsp test_model)
+set_target_properties(Tests PROPERTIES FOLDER Test)
+
+add_custom_command(TARGET Tests
+                   POST_BUILD COMMAND test_dsp 
+                              COMMAND test_model
+                   USES_TERMINAL)
+
 #----------------------------------
 # Examples
 #----------------------------------
