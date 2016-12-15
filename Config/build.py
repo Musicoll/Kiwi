@@ -18,6 +18,8 @@ def parse_args ():
     arg_parser = argparse.ArgumentParser ()
     
     arg_parser.add_argument('-c', '--configuration', default = 'Release', choices = ['Debug', 'Release'])
+    
+    arg_parser.add_argument('-t', '--target', default = 'alltargets')
 
     if platform.system() == "Windows":
         arg_parser.add_argument('-p','--platform', default = 'x64', choices = ['x64', 'Win32'])
@@ -35,10 +37,12 @@ def build_osx(args):
     elif(args.configuration == "Release"):
         target_xcode = os.path.join(project_dir, "Build", "Release", "Kiwi.xcodeproj")
 
-    cmd =  "xcodebuild"
-    cmd += " -project " + target_xcode
-    cmd += " -configuration %s " % args.configuration
-    cmd += ' -alltargets '
+    cmd =  "xcodebuild "
+    cmd += "-project %s " % target_xcode
+    cmd += "-configuration %s " % args.configuration
+    
+    if(args.target != "alltargets"):
+        cmd += "-target %s " % args.target
 
     return subprocess.check_call(cmd, shell = True)
 
@@ -47,30 +51,45 @@ def build_osx(args):
 #==============================================================================
 
 def build_windows(args):
-	if(args.configuration == "Release"):
-		if(args.platform == "x64"):
-			cmd = "MSBuild.exe " + "/p:Configuration=Release /p:Platform=x64 " + os.path.join(project_dir, "Build", "Release", "x64", "Kiwi.sln");
-		elif(args.platform == "Win32"):
-			cmd = "MSBuild.exe " + "/p:Configuration=Release /p:Platform=Win32 " + os.path.join(project_dir, "Build", "Release", "Win32", "Kiwi.sln");
-	elif(args.configuration == "Debug"):
-		if(args.platform == "x64"):
-			cmd = "MSBuild.exe " + "/p:Configuration=Debug /p:Platform=x64 " + os.path.join(project_dir, "Build", "Debug", "x64", "Kiwi.sln");
-		elif(args.platform == "Win32"):
-			cmd = "MSBuild.exe " + "/p:Configuration=Debug /p:Platform=Win32 " + os.path.join(project_dir, "Build", "Debug", "Win32", "Kiwi.sln");
-	
-	subprocess.check_call(cmd, shell = True)
+    
+    cmd = "MSBuild.exe "
+    
+    if(args.target != "alltargets"):
+        target = "%s.vcxproj" % args.target
+    else:
+        target = "Kiwi.sln"
+    
+    if(args.configuration == "Release"):
+        if(args.platform == "x64"):
+            cmd += "/p:Configuration=Release /p:Platform=x64 " + os.path.join(project_dir, "Build", "Release", "x64", target);
+        elif(args.platform == "Win32"):
+            cmd += "/p:Configuration=Release /p:Platform=Win32 " + os.path.join(project_dir, "Build", "Release", "Win32", target);
+    elif(args.configuration == "Debug"):
+        if(args.platform == "x64"):
+            cmd += "/p:Configuration=Debug /p:Platform=x64 " + os.path.join(project_dir, "Build", "Debug", "x64", target);
+        elif(args.platform == "Win32"):
+            cmd += "/p:Configuration=Debug /p:Platform=Win32 " + os.path.join(project_dir, "Build", "Debug", "Win32", target);
+    
+    
+    subprocess.check_call(cmd, shell = True)
     
 #==============================================================================
 # Name : build_linux
 #==============================================================================
 
 def build_linux(args):
+    
+    cmd = "make "
+    
+    if(args.target != "alltargets"):
+        cmd += "%s" % args.target
+    
     if(args.configuration == "Release"):
         os.chdir(os.path.join(project_dir, "Build", "Release"))
-        subprocess.check_call("make", shell = True)
+        subprocess.check_call(cmd, shell = True)
     elif(args.configuration == "Debug"):
         os.chdir(os.path.join(project_dir, "Build", "Debug"))
-        subprocess.check_call("make", shell = True)
+        subprocess.check_call(cmd, shell = True)
 os.chdir(project_dir)
 	
 #==============================================================================
