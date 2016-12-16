@@ -72,11 +72,6 @@ namespace kiwi
             return m_size;
         }
         
-        bool Signal::empty() const noexcept
-        {
-            return (m_size == 0ul);
-        }
-        
         sample_t const* Signal::data() const noexcept
         {
             return const_cast<sample_t const*>(m_samples);
