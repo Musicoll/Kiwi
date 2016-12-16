@@ -6,6 +6,8 @@ project (Kiwi CXX)
 # Global Settings
 #--------------------------------------
 
+option(GCOV_SUPPORT "Build for gcov" Off)
+
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(ROOT_DIR ${PROJECT_SOURCE_DIR})
@@ -81,10 +83,11 @@ elseif(APPLE)
     endif()
 
 elseif(LINUX)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-multichar")
 
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-    endif()
+  if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+  endif()
 
 endif()
 
@@ -351,6 +354,47 @@ target_add_dependency(test_model KiwiModel)
 set_target_properties(test_model PROPERTIES FOLDER Test)
 source_group_rec("${TEST_MODEL_SRC}" ${ROOT_DIR}/Test/Model)
 set_target_properties(test_model PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
+
+# Test Engine
+
+file(GLOB TEST_ENGINE_SRC ${ROOT_DIR}/Test/Engine/*.[c|h]pp)
+add_executable(test_engine ${TEST_ENGINE_SRC})
+target_add_dependency(test_engine KiwiEngine)
+set_target_properties(test_engine PROPERTIES FOLDER Test)
+source_group_rec("${TEST_ENGINE_SRC}" ${ROOT_DIR}/Test/Engine)
+set_target_properties(test_engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
+
+# Test Server
+
+file(GLOB TEST_SERVER_SRC ${ROOT_DIR}/Test/Server/*.[c|h]pp)
+add_executable(test_server ${TEST_SERVER_SRC})
+target_add_dependency(test_server KiwiServer)
+set_target_properties(test_server PROPERTIES FOLDER Test)
+source_group_rec("${TEST_SERVER_SRC}" ${ROOT_DIR}/Test/Server)
+set_target_properties(test_server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
+
+# Coverage setting
+if(${GCOV_SUPPORT} STREQUAL "On" AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+  set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
+  target_link_libraries(test_dsp PUBLIC gcov)
+  target_link_libraries(test_model PUBLIC gcov)
+  target_link_libraries(test_engine PUBLIC gcov)
+  target_link_libraries(test_server PUBLIC gcov)
+endif()
+
+# Tests Target
+
+add_custom_target(Tests ALL DEPENDS test_dsp test_model test_engine test_server)
+set_target_properties(Tests PROPERTIES FOLDER Test)
+
+add_custom_command(TARGET Tests
+                   POST_BUILD COMMAND test_dsp 
+                              COMMAND test_model
+                              COMMAND test_engine
+                              COMMAND test_server
+                   USES_TERMINAL)
 
 #----------------------------------
 # Examples

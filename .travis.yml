@@ -25,16 +25,23 @@ matrix:
     - sudo apt-get install libxinerama-dev
     - sudo apt-get install libxcursor-dev
     - sudo apt-get install libasound2-dev
+    addons:
+      apt:
+        packages: ['python-pip', 'python-yaml']
+    install:
+      - git submodule update --init --recursive ThirdParty/Juce
+      - pip install --user cpp-coveralls
     script:
-    - python ./Config/configure.py
+    - python ./Config/configure.py -coverage
     - python ./Config/build.py -c Release
-    - python ./Config/run_test.py -c Release
+    - python ./Config/build.py -c Debug -t Tests
     after_success:
     - openssl aes-256-cbc -K $encrypted_5a43ff9033eb_key -iv $encrypted_5a43ff9033eb_iv -in Config/travisci_rsa.enc -out Config/travisci_rsa -d
     - chmod 0600 Config/travisci_rsa
     - cp Config/travisci_rsa ~/.ssh/id_rsa
     - sudo apt-get install --yes doxygen graphviz
     - ./Config/publish-doxygen.sh
+    - coveralls -i Modules --gcov-options '\-lp' > /dev/null
 
   - os: osx
     compiler: clang++
@@ -43,8 +50,7 @@ matrix:
       - brew install portaudio
     script:
     - python ./Config/configure.py
-    - python ./Config/build.py -c Release
-    - python ./Config/run_test.py -c Release
+    - python ./Config/build.py -c Release | xcpretty
     before_deploy:
     - mkdir Kiwi
     - mv Build/Release/KiwiBuild/Bin/Release/Kiwi.app Kiwi/Kiwi.app
