@@ -59,6 +59,8 @@ def build_windows(args):
     else:
         target = "Kiwi.sln"
     
+    cmd += "/verbosity:minimal "
+    
     if(args.configuration == "Release"):
         if(args.platform == "x64"):
             cmd += "/p:Configuration=Release /p:Platform=x64 " + os.path.join(project_dir, "Build", "Release", "x64", target);
