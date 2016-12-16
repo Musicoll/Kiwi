@@ -70,9 +70,6 @@ namespace kiwi
             //! @brief Gets the number of samples that the Signal object currently holds.
             size_t size() const noexcept;
             
-            //! @brief Returns true if the Signal object contains no data.
-            bool empty() const noexcept;
-            
             //! @brief Returns a read pointer to the samples data.
             sample_t const* data() const noexcept;
             
