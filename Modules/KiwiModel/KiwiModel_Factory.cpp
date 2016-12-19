@@ -124,8 +124,7 @@ namespace kiwi
         
         std::string Factory::sanitizeName(std::string const& name)
         {
-            std::string pretty;
-            pretty.reserve(name.size());
+            std::string model_name = "cicm.kiwi.object.";
             
             static const std::string valid_chars("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.");
             
@@ -133,14 +132,14 @@ namespace kiwi
             {
                 if(c == '~')
                 {
-                    pretty.append("_tilde");
+                    model_name.append("_tilde");
                     continue;
                 }
                 
-                pretty += (valid_chars.find(c) != std::string::npos) ? c : '_';
+                model_name += (valid_chars.find(c) != std::string::npos) ? c : '_';
             }
             
-            return name;
+            return model_name;
         }
         
         auto Factory::getClasses() -> object_classes_t&
