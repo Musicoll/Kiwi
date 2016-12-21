@@ -395,22 +395,3 @@ add_custom_command(TARGET Tests
                               COMMAND test_engine
                               COMMAND test_server
                    USES_TERMINAL)
-
-#----------------------------------
-# Examples
-#----------------------------------
-
-# Dsp - PortAudio
-
-if(APPLE)
-  find_path(PORTAUDIO_INCLUDES "portaudio.h")
-  include_directories("${PORTAUDIO_INCLUDES}")
-  file(GLOB TEST_DSP_PORTAUDIO_SRC ${ROOT_DIR}/Test/DspPortAudio/*.[c|h]pp)
-  find_library(PORTAUDIO_LIB "portaudio")
-  add_executable(dsp_portaudio ${TEST_DSP_PORTAUDIO_SRC})
-  target_link_libraries(dsp_portaudio KiwiDsp ${PORTAUDIO_LIB} ${SUPPORT_LIBS})
-  set_target_properties(dsp_portaudio PROPERTIES FOLDER Test)
-  # PortAudio configured for x86_64 archs
-  set_target_properties(dsp_portaudio PROPERTIES XCODE_ATTRIBUTE_ARCHS "x86_64")
-  source_group_rec("${TEST_DSP_PORTAUDIO_SRC}" ${ROOT_DIR}/Test/DspPortAudio)
-endif()

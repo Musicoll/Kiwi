@@ -15,11 +15,6 @@
 git submodule update --init --recursive ThirdParty/Juce
 ```
 
-### Prerequisites
-
-On **Mac** some examples require PortAudio.
-The easiest way to install it is to install Homebrew and then run `brew install portaudio`
-
 ### Compilation
 ```
 python ./Config/configure.py [-flip (public|private)] (default public)
