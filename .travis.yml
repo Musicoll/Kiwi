@@ -46,8 +46,6 @@ matrix:
   - os: osx
     compiler: clang++
     env: COMPILER=clang++
-    before_install:
-      - brew install portaudio
     script:
     - python ./Config/configure.py
     - python ./Config/build.py -c Release | xcpretty
