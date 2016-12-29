@@ -62,8 +62,9 @@ namespace kiwi
             
             //! @brief Adds an object model into the Factory.
             //! @details The function throw if the object has already been added.
-            //! Calling this function will imply a change of datamodel.
-            //! @param name The name of the object.
+            //! The name you pass in parameter will be used and stored in the DataModel,
+            //! thus if you pass a different name later, this will imply a breaking change in the DataModel.
+            //! @param name The name of the object (must not be empty and not already used by another object or alias name in the Factory).
             template<class TModel>
             static ObjectClass<TModel>& add(std::string const& name)
             {
@@ -232,15 +233,21 @@ namespace kiwi
                 }
             }
             
-            //! @brief Returns a new Object by mold cast.
+            //! @brief Creates and returns a new Object with a vector of Atom as parameter.
+            //! @param args A vector of Atom.
+            //! @return A new model::Object.
             std::unique_ptr<model::Object> create(std::vector<Atom> const& args) const
             { return m_ctor(args); }
             
-            //! @brief Returns a new Object by mold cast.
+            //! @brief Copy the content an object instance into a flip::Mold.
+            //! @param object The object instance.
+            //! @param mold The The flip::Mold where to copy object instance data.
             void moldMake(model::Object const& object, flip::Mold& mold) const
             { m_mold_maker(object, mold); }
             
-            //! @brief Returns a new Object by mold cast.
+            //! @brief Creates and returns a new Object from a flip::Mold.
+            //! @param mold The The flip::Mold from which to retrieve object instance data.
+            //! @return A new model::Object.
             std::unique_ptr<model::Object> moldCast(flip::Mold const& mold) const
             { return m_mold_caster(mold); }
             
