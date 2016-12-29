@@ -194,11 +194,13 @@ namespace kiwi
             
             //! @brief Constructor.
             ObjectClassBase(std::string const& name,
+                            std::string const& model_name,
                             const ctor_fn_t ctor,
                             const mold_maker_fn_t mold_maker,
                             const mold_caster_fn_t  mold_caster)
             :
             m_name(name),
+            m_model_name(model_name),
             m_ctor(ctor),
             m_mold_maker(mold_maker),
             m_mold_caster(mold_caster) {}
@@ -208,6 +210,9 @@ namespace kiwi
             
             //! @brief Returns the name of the object.
             std::string const& getName() const { return m_name; }
+            
+            //! @brief Returns the name used into the data model of kiwi.
+            std::string const& getModelName() const { return m_model_name; }
             
             //! @brief Returns true if it's an internal object.
             bool isInternal() const noexcept { return m_internal; }
@@ -254,6 +259,7 @@ namespace kiwi
         private: // members
             
             const std::string       m_name {};
+            const std::string       m_model_name {};
             std::set<std::string>   m_aliases {};
             const ctor_fn_t         m_ctor {};
             const mold_maker_fn_t   m_mold_maker {};
@@ -275,13 +281,13 @@ namespace kiwi
             
             ObjectClass(std::string const& name)
             : ObjectClassBase(name,
+                              Factory::sanitizeName(name),
                               getCtor<class_t>(name),
                               getMoldMaker<class_t>(),
                               getMoldCaster<class_t>()),
             m_flip_class(DataModel::declare<class_t>())
             {
-                const std::string flip_name(name_prefix + Factory::sanitizeName(name));
-                m_flip_class.name(flip_name.c_str())
+                m_flip_class.name(getModelName().c_str())
                 .template inherit<model::Object>();
             }
             
@@ -293,9 +299,6 @@ namespace kiwi
             }
 
         private: // members
-            
-            static constexpr auto name_prefix = "cicm.kiwi.object.";
-            
             flip::Class<class_t>& m_flip_class;
         };
     }
