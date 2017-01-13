@@ -42,7 +42,7 @@ namespace kiwi
         m_outlets = m_model->getNumberOfOutlets();
         
         lockStatusChanged(m_patcher_view.isLocked());
-        updateBounds();
+        updateBounds(false);
     }
     
     ObjectView::~ObjectView()
@@ -50,7 +50,7 @@ namespace kiwi
         ;
     }
     
-    void ObjectView::updateBounds()
+    void ObjectView::updateBounds(const bool animate)
     {
         if(m_model && !m_model->removed())
         {
@@ -66,7 +66,15 @@ namespace kiwi
             m_local_box_bounds = bounds.withPosition(bounds.getX() - new_bounds.getX(),
                                                      bounds.getY() - new_bounds.getY());
             
-            setBounds(new_bounds);
+            if(animate)
+            {
+                juce::ComponentAnimator& animator = juce::Desktop::getInstance().getAnimator();
+                animator.animateComponent(this, new_bounds, 1., 150., false, 0.8, 1.);
+            }
+            else
+            {
+                setBounds(new_bounds);
+            }
         }
     }
     
@@ -294,7 +302,12 @@ namespace kiwi
         
         if(object.boundsChanged())
         {
-            updateBounds();
+            const auto ctrl = m_model->document().controller();
+            const bool animate = (ctrl == flip::Controller::UNDO
+                                  || ctrl == flip::Controller::EXTERNAL);
+            
+            updateBounds(animate);
+            
             need_redraw = false;
         }
         
@@ -395,7 +408,7 @@ namespace kiwi
     
     void ObjectView::patcherViewOriginPositionChanged()
     {
-        updateBounds();
+        updateBounds(false);
     }
     
     void ObjectView::mouseDown(juce::MouseEvent const& event)

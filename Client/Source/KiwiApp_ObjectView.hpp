@@ -85,7 +85,7 @@ namespace kiwi
         
     private:
         
-        void updateBounds();
+        void updateBounds(const bool animate);
         void drawInletsOutlets(juce::Graphics & g);
         
         //! @brief Returns the inlet local bounds for a given index.
