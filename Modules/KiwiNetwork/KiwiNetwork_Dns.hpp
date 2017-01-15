@@ -29,6 +29,9 @@
 #if JUCE_WINDOWS
     #include <winsock2.h>
     #include <ws2tcpip.h>
+
+    #pragma warning (push)
+    #pragma warning (disable : 4127 4389 4018)
 #else
     #include <netdb.h>
     #include <arpa/inet.h>
