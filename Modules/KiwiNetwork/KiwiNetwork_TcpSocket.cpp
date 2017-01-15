@@ -27,6 +27,9 @@
 
     typedef int       kiwi_socklen_t;
     typedef SOCKET    SocketHandle;
+
+    #pragma warning (push)
+    #pragma warning (disable : 4127 4389 4018)
 #else
     #include <netinet/ip.h>
     #include <sys/socket.h>
