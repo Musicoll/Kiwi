@@ -31,6 +31,7 @@
     #include <netinet/ip.h>
     #include <sys/socket.h>
     #include <arpa/inet.h>
+    #include <fcntl.h>
 
     typedef socklen_t kiwi_socklen_t;
     typedef int       SocketHandle;
@@ -66,7 +67,7 @@ namespace kiwi
             SocketHandle handle = m_socket->getRawSocketHandle();
             
             #if JUCE_WINDOWS
-            u_long nonBlocking = shouldBlock ? 0 : (u_long) 1;
+            u_long nonBlocking = shall_block ? 0 : (u_long) 1;
             return ioctlsocket (handle, FIONBIO, &nonBlocking) == 0;
             #else
             int socketFlags = fcntl (handle, F_GETFL, 0);
