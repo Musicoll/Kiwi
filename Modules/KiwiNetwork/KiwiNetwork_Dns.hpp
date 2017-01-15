@@ -60,8 +60,9 @@ namespace kiwi
                 // Initialize hints before querry
                 std::memset(&hints, 0, sizeof hints);
                 hints.ai_family = AF_UNSPEC;     // AF_INET or AF_INET6 to force version
-                hints.ai_socktype = SOCK_STREAM; // Protocol TCP
+                hints.ai_socktype = SOCK_STREAM; // Sockets
                 hints.ai_flags = AI_PASSIVE;     // Automatically fill local IP adress.
+                hints.ai_protocol = IPPROTO_TCP; // Tcp protocole
                 
                 if (getaddrinfo(host_url.c_str(), NULL, &hints, &res) == 0)
                 {
