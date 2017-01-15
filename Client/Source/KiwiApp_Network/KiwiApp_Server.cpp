@@ -36,7 +36,7 @@ namespace kiwi
         // initialize and run server
         try
         {
-            m_server.reset(new server::Server(port, m_user_id));
+            m_server.reset(new network::Server(port, m_user_id));
         }
         catch(std::runtime_error const& e)
         {
@@ -66,7 +66,7 @@ namespace kiwi
     {
         if(m_server)
         {
-            m_server_thread = std::thread(&server::Server::run, m_server.get());
+            m_server_thread = std::thread(&network::Server::run, m_server.get());
         }
     }
     

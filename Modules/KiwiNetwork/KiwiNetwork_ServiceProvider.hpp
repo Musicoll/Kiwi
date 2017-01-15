@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_SERVER_SERVICE_PROVIDER_HPP_INCLUDED
-#define KIWI_SERVER_SERVICE_PROVIDER_HPP_INCLUDED
+#ifndef KIWI_NETWORK_SERVICE_PROVIDER_HPP_INCLUDED
+#define KIWI_NETWORK_SERVICE_PROVIDER_HPP_INCLUDED
 
 #include <flip/Document.h>
 #include <flip/contrib/MulticastServiceProvider.h>
@@ -29,7 +29,7 @@
 
 namespace kiwi
 {
-    namespace server
+    namespace network
     {
         // ================================================================================ //
         //                                 SERVICE PROVIDER                                 //
@@ -80,4 +80,4 @@ namespace kiwi
     }
 }
 
-#endif //KIWI_SERVER_SERVICE_PROVIDER_HPP_INCLUDED
+#endif //KIWI_NETWORK_SERVICE_PROVIDER_HPP_INCLUDED

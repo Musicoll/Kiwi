@@ -25,7 +25,7 @@
 
 int main( int argc, char* const argv[] )
 {
-    std::cout << "running Unit-Tests - KiwiServer ..." << '\n' << '\n';
+    std::cout << "running Unit-Tests - KiwiNetwork ..." << '\n' << '\n';
     
     int result = Catch::Session().run( argc, argv );
     
