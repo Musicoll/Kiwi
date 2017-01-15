@@ -22,6 +22,10 @@
 #ifndef KIWI_NETWORK_DNS_HPP_INCLUDED
 #define KIWI_NETWORK_DNS_HPP_INCLUDED
 
+#include <cstring>
+
+#include <juce_core/juce_core.h>
+
 #if JUCE_WINDOWS
     #include <winsock2.h>
     #include <ws2tcpip.h>
@@ -54,7 +58,7 @@ namespace kiwi
                 struct addrinfo *res = nullptr;
                 
                 // Initialize hints before querry
-                memset(&hints, 0, sizeof hints);
+                std::memset(&hints, 0, sizeof hints);
                 hints.ai_family = AF_UNSPEC; // AF_INET or AF_INET6 to force version
                 hints.ai_socktype = SOCK_STREAM; // Protocol TCP
                 
