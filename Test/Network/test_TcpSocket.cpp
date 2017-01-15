@@ -96,15 +96,13 @@ TEST_CASE("client server connexion", "[TcpSocket]")
         
         size_t listen_port = socket_server.getLocalPort();
         
-        std::thread cnx_thread([&socket_client, listen_port]()
-        {
-            while(!socket_client.isConnected())
-            {
-                socket_client.connect("127.0.0.1", listen_port, 10);
-            }
-        });
+        std::unique_ptr<network::TcpSocket> server_side(nullptr);
         
-        std::unique_ptr<network::TcpSocket> server_side = socket_server.accept(true);
+        while(!socket_client.isConnected() && server_side == nullptr)
+        {
+            socket_client.connect("127.0.0.1", listen_port, 10);
+            server_side = std::move(socket_server.accept(false));
+        }
         
         size_t client_port = socket_client.getLocalPort();
         
@@ -129,34 +127,29 @@ TEST_CASE("client server connexion", "[TcpSocket]")
         CHECK(server_side->isConnected());
         server_side->close();
         CHECK(!server_side->isConnected());
-        
-        cnx_thread.join();
     }
 
-    SECTION("blocking connection")
+    SECTION("blocking accept connexion")
     {
         socket_server.listen(0);
         
         size_t listen_port = socket_server.getLocalPort();
         
-        std::thread cnx_thread([&socket_server]()
+        std::thread cnx_thread([&socket_client, listen_port]()
         {
-            std::unique_ptr<network::TcpSocket> server_side;
-            
-            while(server_side == nullptr)
+            while(!socket_client.isConnected())
             {
-                server_side = socket_server.accept(false);
+                socket_client.connect("127.0.0.1", listen_port, 10);
             }
         });
         
-        while(!socket_client.isConnected())
-        {
-            socket_client.connect("127.0.0.1", listen_port, 10);
-        }
-        
-        CHECK(socket_client.isConnected());;
+        std::unique_ptr<network::TcpSocket> server_side = socket_server.accept(true);
         
         cnx_thread.join();
+        
+        CHECK(server_side != nullptr);
+        CHECK(server_side->isConnected());
+        CHECK(socket_client.isConnected());
     }
 }
 
