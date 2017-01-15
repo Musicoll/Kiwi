@@ -19,15 +19,15 @@
  ==============================================================================
  */
 
-#ifndef KIWI_SERVER_HPP_INCLUDED
-#define KIWI_SERVER_HPP_INCLUDED
+#ifndef KIWI_NETWORK_HPP_INCLUDED
+#define KIWI_NETWORK_HPP_INCLUDED
 
 #include <flip/contrib/ServerSimple.h>
 #include <flip/BackEndBinary.h>
 
 #include <KiwiModel/KiwiModel_PatcherUser.hpp>
 
-#include "KiwiServer_ServiceProvider.hpp"
+#include "KiwiNetwork_ServiceProvider.hpp"
 
 #include <juce_core/juce_core.h>
 
@@ -36,7 +36,7 @@
 
 namespace kiwi
 {
-    namespace server
+    namespace network
     {
         // ================================================================================ //
         //                                      SERVER                                      //
@@ -132,4 +132,4 @@ namespace kiwi
     }
 }
 
-#endif // KIWI_SERVER_HPP_INCLUDED
+#endif // KIWI_NETWORK_HPP_INCLUDED

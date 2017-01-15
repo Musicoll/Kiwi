@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include <KiwiServer/KiwiServer_Server.hpp>
+#include <KiwiNetwork/KiwiNetwork_Server.hpp>
 #include <KiwiModel/KiwiModel_DataModel.hpp>
 
 int main(int argc, const char * argv[])
@@ -28,11 +28,11 @@ int main(int argc, const char * argv[])
     
     model::DataModel::init();
     
-    std::unique_ptr<server::Server> server(nullptr);
+    std::unique_ptr<network::Server> server(nullptr);
     
     try
     {
-        server.reset(new server::Server(9090));
+        server.reset(new network::Server(9090));
     }
     catch(std::runtime_error const& e)
     {

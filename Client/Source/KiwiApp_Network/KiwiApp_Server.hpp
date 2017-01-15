@@ -27,7 +27,7 @@
 
 #include <juce_core/juce_core.h>
 
-#include <KiwiServer/KiwiServer_Server.hpp>
+#include <KiwiNetwork/KiwiNetwork_Server.hpp>
 #include <thread>
 
 #include "KiwiApp_DocumentBrowser.hpp"
@@ -72,7 +72,7 @@ namespace kiwi
     private: // members
         
         uint64_t                            m_user_id;
-        std::unique_ptr<server::Server>     m_server;
+        std::unique_ptr<network::Server>     m_server;
         std::thread                         m_server_thread;
         
         DocumentBrowser                     m_browser;

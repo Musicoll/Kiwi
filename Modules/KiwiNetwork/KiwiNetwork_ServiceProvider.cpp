@@ -21,13 +21,13 @@
 
 #include "flip/contrib/MulticastServiceProvider.h"
 
-#include "KiwiServer_ServiceProvider.hpp"
+#include "KiwiNetwork_ServiceProvider.hpp"
 
 #include <KiwiModel/KiwiModel_DataModel.hpp>
 
 namespace kiwi
 {
-    namespace server
+    namespace network
     {
         // ================================================================================ //
         //                                 SERVICE PROVIDER                                 //

@@ -26,11 +26,11 @@
 #include <KiwiModel/KiwiModel_PatcherUser.hpp>
 #include <KiwiModel/KiwiModel_PatcherValidator.hpp>
 
-#include "KiwiServer_Server.hpp"
+#include "KiwiNetwork_Server.hpp"
 
 namespace kiwi
 {
-    namespace server
+    namespace network
     {
         // ================================================================================ //
         //                                      SERVER                                      //
