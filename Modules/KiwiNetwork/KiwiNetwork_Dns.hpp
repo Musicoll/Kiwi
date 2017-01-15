@@ -37,10 +37,30 @@
     #include <arpa/inet.h>
 #endif
 
+#include "KiwiNetwork_Error.hpp"
+
 namespace kiwi
 {
     namespace network
     {
+        // ==================================================================================== //
+        //                                       DNS ERROR                                      //
+        // ==================================================================================== //
+        
+        //! @brief A error that dnslookup might throw
+        
+        class DnsError final : public network::Error
+        {
+        public:
+            explicit DnsError(const std::string& message) :
+            Error(std::string("DnsError:") + message) {}
+            
+            explicit DnsError(const char* message) :
+            Error(std::string("TcpSocket:") + std::string(message)) {}
+            
+            //! @brief The destructor.
+            ~DnsError() noexcept override = default;
+        };
         
         // ==================================================================================== //
         //                                       Dns                                            //
@@ -60,14 +80,21 @@ namespace kiwi
                 struct addrinfo hints;
                 struct addrinfo *res = nullptr;
                 
+                #if JUCE_WINDOWS // Starting socket services on windows
+                WSADATA wsaData;
+                // 2.2 is the latest but already available on Windows 95
+                const WORD wVersionRequested = MAKEWORD (2, 2);
+                WSAStartup (wVersionRequested, &wsaData);
+                #endif
+                
                 // Initialize hints before querry
                 std::memset(&hints, 0, sizeof hints);
                 hints.ai_family = AF_UNSPEC;     // AF_INET or AF_INET6 to force version
                 hints.ai_socktype = SOCK_STREAM; // Sockets
-                hints.ai_flags = AI_PASSIVE;     // Automatically fill local IP adress.
-                hints.ai_protocol = IPPROTO_TCP; // Tcp protocole
                 
-                if (getaddrinfo(host_url.c_str(), NULL, &hints, &res) == 0)
+                int error = getaddrinfo(host_url.c_str(), NULL, &hints, &res);
+                
+                if (error == 0)
                 {
                     if (res->ai_family == AF_INET) // IPv4
                     {
@@ -84,6 +111,14 @@ namespace kiwi
                         inet_adress.append(ipstr6);
                     }
                 }
+                else
+                {
+                    throw DnsError("Dnslookup failed with error" + std::to_string(error));
+                }
+                
+                #if JUCE_WINDOWS // Stoping services socket
+                WSACleanup();
+                #endif
                 
                 return inet_adress;
             }
