@@ -20,6 +20,7 @@
  */
 
 #include <cstdio>
+#include <cstring>
 
 #include "KiwiNetwork_ByteArray.hpp"
 
@@ -153,7 +154,7 @@ namespace kiwi
             }
             else
             {
-                memcpy(m_data + offset, data, num_bytes);
+                std::memcpy(m_data + offset, data, num_bytes);
             }
         }
         
@@ -169,7 +170,7 @@ namespace kiwi
             }
             else
             {
-                memcpy(data, m_data + offset, num_bytes);
+                std::memcpy(data, m_data + offset, num_bytes);
             }
         }
         
