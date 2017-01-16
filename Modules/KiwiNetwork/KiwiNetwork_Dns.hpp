@@ -92,9 +92,7 @@ namespace kiwi
                 hints.ai_family = AF_UNSPEC;     // AF_INET or AF_INET6 to force version
                 hints.ai_socktype = SOCK_STREAM; // Sockets
                 
-                int error = getaddrinfo(host_url.c_str(), NULL, &hints, &res);
-                
-                if (error == 0)
+                if (getaddrinfo(host_url.c_str(), NULL, &hints, &res) == 0)
                 {
                     if (res->ai_family == AF_INET) // IPv4
                     {
@@ -110,10 +108,6 @@ namespace kiwi
                         inet_ntop(res->ai_family, &(ipv6->sin6_addr), ipstr6, INET6_ADDRSTRLEN);
                         inet_adress.append(ipstr6);
                     }
-                }
-                else
-                {
-                    throw DnsError("Dnslookup failed with error" + std::to_string(error));
                 }
                 
                 #if JUCE_WINDOWS // Stoping services socket

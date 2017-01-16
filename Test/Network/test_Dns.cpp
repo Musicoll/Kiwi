@@ -28,5 +28,4 @@ using namespace kiwi;
 TEST_CASE("URL resolution", "[DNS]")
 {
     CHECK(network::Dns::getHost("www.google.com") != "");
-    REQUIRE_THROWS_AS(network::Dns::getHost(""), network::DnsError);
 }
