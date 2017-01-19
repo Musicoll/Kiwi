@@ -78,7 +78,7 @@ TEST_CASE("Testing query types", "[Query]")
     SECTION("Int64")
     {
         network::Query send_query;
-        int64_t send_value = 666;
+        juce::int64 send_value = 666;
         
         send_query.setProperty("prop", send_value);
         CHECK(send_query.hasProperty("prop"));
@@ -87,7 +87,7 @@ TEST_CASE("Testing query types", "[Query]")
         
         network::Query rec_query(mes);
         CHECK(rec_query.hasProperty("prop"));
-        CHECK(static_cast<int64_t>(rec_query.getProperty("prop")) == 666);
+        CHECK(static_cast<juce::int64>(rec_query.getProperty("prop")) == 666);
     }
     
     SECTION("Float")
