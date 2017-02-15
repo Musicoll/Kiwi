@@ -206,11 +206,11 @@ namespace kiwi
             m_patcher_name = new_name;
         }
         
-        Patcher::User* Patcher::getUser(uint32_t user_id)
+        Patcher::User* Patcher::getUser(uint64_t user_id)
         {
             const auto has_same_id = [user_id] (User const& user)
             {
-                return user_id == user.m_user_id;
+                return user_id == user.getId();
             };
             
             const auto it = std::find_if(m_users.begin(), m_users.end(), has_same_id);
@@ -238,16 +238,16 @@ namespace kiwi
             return m_users;
         }
         
-        Patcher::User& Patcher::createUserIfNotAlreadyThere(uint32_t user_id)
+        Patcher::User& Patcher::useSelfUser()
         {
-            auto* user = getUser(user_id);
+            const auto self_id = document().user();
             
-            if(user == nullptr)
-            {
-                return *m_users.emplace(user_id);
-            }
+            auto it = std::find_if(m_users.begin(), m_users.end (), [self_id](User & user){
+                return (user.getId() == self_id);
+            });
             
-            return *user;
+            // creates and returns a new user if it didn't exist.
+            return (it != m_users.end()) ? *it : *m_users.emplace();
         }
         
         flip::Array<model::Object>::const_iterator Patcher::findObject(model::Object const& object) const

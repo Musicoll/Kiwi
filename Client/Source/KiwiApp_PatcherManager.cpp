@@ -70,7 +70,7 @@ namespace kiwi
     {
         model::Patcher & patcher = getPatcher();
         
-        patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
+        patcher.useSelfUser();
         DocumentManager::commit(patcher);
         
         m_need_saving_flag = false;
@@ -84,7 +84,7 @@ namespace kiwi
     {
         model::Patcher& patcher = getPatcher();
         DocumentManager::load(patcher, file);
-        patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
+        patcher.useSelfUser();
         patcher.setName(file.getFileNameWithoutExtension().toStdString());
         
         DocumentManager::commit(patcher);
@@ -103,7 +103,7 @@ namespace kiwi
         
         DocumentManager::connect(patcher, host, port, session_id);
         
-        patcher.createUserIfNotAlreadyThere(m_instance.getUserId());
+        patcher.useSelfUser();
         DocumentManager::commit(patcher);
         
         patcher.entity().use<engine::Patcher>().sendLoadbang();
@@ -317,7 +317,8 @@ namespace kiwi
         auto& patcher = getPatcher();
         auto* user = patcher.getUser(m_instance.getUserId());
         
-        if(user == nullptr) return; // abort
+        if(user == nullptr)
+            return; // abort
             
         auto& views = user->getViews();
         
