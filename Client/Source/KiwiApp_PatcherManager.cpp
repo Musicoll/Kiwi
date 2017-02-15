@@ -127,22 +127,17 @@ namespace kiwi
     void PatcherManager::newView()
     {
         auto& patcher = getPatcher();
-        auto* user = patcher.getUser(m_instance.getUserId());
-        if(user)
-        {
-            user->addView();
-            
-            DocumentManager::commit(patcher);
-        }
+        patcher.useSelfUser().addView();
+        DocumentManager::commit(patcher);
     }
     
     size_t PatcherManager::getNumberOfView()
     {
         auto& patcher = getPatcher();
-        auto& user = *patcher.getUser(m_instance.getUserId());
+        auto& user = patcher.useSelfUser();
         auto& views = user.getViews();
         
-        return std::count_if(views.begin(), views.end(), [](model::Patcher::View& view){
+        return std::count_if(views.begin(), views.end(), [](model::Patcher::View const& view){
             return !view.removed();
         });
     }
@@ -232,7 +227,7 @@ namespace kiwi
     void PatcherManager::forceCloseAllWindows()
     {
         auto& patcher = getPatcher();
-        auto& user = *patcher.getUser(m_instance.getUserId());
+        auto& user = patcher.useSelfUser();
         auto& views = user.getViews();
         
         bool view_has_been_removed = false;
@@ -252,7 +247,7 @@ namespace kiwi
     bool PatcherManager::askAllWindowsToClose()
     {
         auto& patcher = getPatcher();
-        auto& user = *patcher.getUser(m_instance.getUserId());
+        auto& user = patcher.useSelfUser();
         auto& views = user.getViews();
         
         size_t number_of_views = std::count_if(views.begin(), views.end(), [](model::Patcher::View& view){
@@ -285,7 +280,7 @@ namespace kiwi
     bool PatcherManager::closePatcherViewWindow(PatcherView& patcher_view)
     {
         auto& patcher = getPatcher();
-        auto& user = *patcher.getUser(m_instance.getUserId());
+        auto& user = patcher.useSelfUser();
         auto& patcher_view_m = patcher_view.getPatcherViewModel();
         
         auto& views = user.getViews();
@@ -315,12 +310,9 @@ namespace kiwi
     void PatcherManager::bringsFirstViewToFront()
     {
         auto& patcher = getPatcher();
-        auto* user = patcher.getUser(m_instance.getUserId());
-        
-        if(user == nullptr)
-            return; // abort
+        auto& user = patcher.useSelfUser();
             
-        auto& views = user->getViews();
+        auto& views = user.getViews();
         
         const auto view_it = views.begin();
         

@@ -103,11 +103,6 @@ namespace kiwi
             //! @return The user.
             User& useSelfUser();
             
-            //! @brief Get a User by id.
-            //! @param user_id The user unique id.
-            //! @return The User pointer if found or nullptr.
-            User* getUser(uint64_t user_id);
-            
             //! @brief Gets the objects.
             flip::Array<model::Object> const& getObjects() const noexcept;
             

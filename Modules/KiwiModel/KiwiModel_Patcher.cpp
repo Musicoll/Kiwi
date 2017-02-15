@@ -206,23 +206,6 @@ namespace kiwi
             m_patcher_name = new_name;
         }
         
-        Patcher::User* Patcher::getUser(uint64_t user_id)
-        {
-            const auto has_same_id = [user_id] (User const& user)
-            {
-                return user_id == user.getId();
-            };
-            
-            const auto it = std::find_if(m_users.begin(), m_users.end(), has_same_id);
-            
-            if(it != m_users.end() && !it->removed())
-            {
-                return it.operator->();
-            }
-            
-            return nullptr;
-        }
-        
         flip::Array<model::Object> const& Patcher::getObjects() const noexcept
         {
             return m_objects;

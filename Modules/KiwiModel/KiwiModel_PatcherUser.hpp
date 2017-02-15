@@ -39,7 +39,6 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            //! @user_id The unique user id.
             User();
             
             //! @brief Destructor.
@@ -58,9 +57,6 @@ namespace kiwi
             uint64_t getId() const;
             
         public: // internal methods
-            
-            //! @brief flip default Constructor.
-            User(flip::Default&) {}
             
             //! @brief flip declare method
             static void declare();
