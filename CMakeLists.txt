@@ -31,7 +31,7 @@ if(CMAKE_CONFIGURATION_TYPES)
 # Compiler Check
 #--------------------------------------
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #--------------------------------------
@@ -39,7 +39,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #--------------------------------------
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
-set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
+set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++14")
 set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
 set(CMAKE_OSX_ARCHITECTURES "i386;x86_64")
 set(CMAKE_SUPPRESS_REGENERATION true)
@@ -390,7 +390,7 @@ add_custom_target(Tests ALL DEPENDS test_dsp test_model test_engine test_server)
 set_target_properties(Tests PROPERTIES FOLDER Test)
 
 add_custom_command(TARGET Tests
-                   POST_BUILD COMMAND test_dsp 
+                   POST_BUILD COMMAND test_dsp
                               COMMAND test_model
                               COMMAND test_engine
                               COMMAND test_server
