@@ -39,8 +39,7 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            //! @user_id The unique user id.
-            User(uint32_t user_id);
+            User();
             
             //! @brief Destructor.
             ~User() = default;
@@ -55,19 +54,15 @@ namespace kiwi
             flip::Collection<Patcher::View> const& getViews() const noexcept;
             
             //! @brief Get the User id
-            uint32_t getId() const;
+            uint64_t getId() const;
             
         public: // internal methods
-            
-            //! @brief flip default Constructor.
-            User(flip::Default&) {}
             
             //! @brief flip declare method
             static void declare();
             
         private: // members
             
-            flip::Int                       m_user_id;
             flip::Collection<Patcher::View> m_views;
             
             friend Patcher;

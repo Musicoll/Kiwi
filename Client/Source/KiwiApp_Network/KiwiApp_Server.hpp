@@ -40,7 +40,7 @@ namespace kiwi
     //                                    EMBED SERVER                                  //
     // ================================================================================ //
     
-    //! @brief An emmbed Server.
+    //! @brief An embed Server.
     class Server
     {   
     public: // methods

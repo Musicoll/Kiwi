@@ -299,6 +299,7 @@ namespace kiwi
             }
 
         private: // members
+            
             flip::Class<class_t>& m_flip_class;
         };
     }
