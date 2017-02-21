@@ -77,9 +77,7 @@ namespace kiwi
         {
             if(canConnect(from, outlet, to, inlet))
             {
-                auto link_uptr = std::unique_ptr<model::Link>(new model::Link(from, outlet, to, inlet));
-                const auto it = m_links.insert(m_links.end(), std::move(link_uptr));
-                
+                const auto it = m_links.emplace(m_links.end(), from, outlet, to, inlet);
                 return it.operator->();
             }
             
