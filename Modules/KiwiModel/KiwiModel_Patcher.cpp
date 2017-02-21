@@ -221,9 +221,8 @@ namespace kiwi
         
         Patcher::User& Patcher::useSelfUser()
         {
-            const auto self_id = document().user();
-            
-            auto it = std::find_if(m_users.begin(), m_users.end(), [self_id](User const& user){
+            auto it = std::find_if(m_users.begin(), m_users.end(),
+                                   [self_id = document().user()](User const& user) {
                 return (user.getId() == self_id);
             });
             

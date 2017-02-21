@@ -44,7 +44,7 @@ namespace kiwi
     
     void DocumentBrowserView::driveAdded(DocumentBrowser::Drive& drive)
     {
-        std::unique_ptr<DriveView> drive_view = std::make_unique<DriveView>(drive);
+        auto drive_view = std::make_unique<DriveView>(drive);
         drive_view->setSize(getWidth(), drive_view->getHeight());
         addAndMakeVisible(drive_view.get());
         m_drives.emplace_back(std::move(drive_view));
@@ -287,7 +287,7 @@ namespace kiwi
     
     void DocumentBrowserView::DriveView::documentAdded(DocumentBrowser::Drive::DocumentSession const& doc)
     {
-        std::unique_ptr<DocumentSessionView> doc_view = std::make_unique<DocumentSessionView>(doc);
+        auto doc_view = std::make_unique<DocumentSessionView>(doc);
         
         doc_view->setSize(getWidth(), 50);
         addAndMakeVisible(doc_view.get());
@@ -315,7 +315,8 @@ namespace kiwi
     
     void DocumentBrowserView::DriveView::documentChanged(DocumentBrowser::Drive::DocumentSession const& doc)
     {
-        const auto doc_view_it = std::find_if(m_documents.begin(), m_documents.end(), [&doc](std::unique_ptr<DocumentSessionView> const& document){
+        const auto doc_view_it = std::find_if(m_documents.begin(), m_documents.end(),
+                                              [&doc](std::unique_ptr<DocumentSessionView> const& document) {
             return (*document.get() == doc);
         });
         
