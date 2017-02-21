@@ -113,7 +113,8 @@ namespace kiwi
             
             //! @brief Returns the current User.
             //! @details The function will look for a User that match
-            // the current user id of the document, if it's not found, the User will be created.
+            //! the current user id of the document, if it's not found, the User will be created,
+            //! therefore, do not use this method while observing the model.
             //! @return The current User.
             User& useSelfUser();
             
