@@ -141,7 +141,7 @@ namespace kiwi
             template<class TModel>
             static ctor_fn_t getCtor(std::string const& name)
             {
-                return [name](std::vector<Atom> const& args) -> std::unique_ptr<model::Object>
+                return [name](std::vector<Atom> const& args)
                 {
                     return std::make_unique<TModel>(name, args);
                 };
@@ -151,7 +151,7 @@ namespace kiwi
             template<class TModel>
             static mold_maker_fn_t getMoldMaker()
             {
-                return [](model::Object const& object, flip::Mold& mold) -> void
+                return [](model::Object const& object, flip::Mold& mold)
                 {
                     // make a mold with container_flag active
                     mold.make(static_cast<TModel const&>(object), false);
