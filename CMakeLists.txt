@@ -25,7 +25,11 @@ if(CMAKE_CONFIGURATION_TYPES)
 
  if(UNIX AND NOT APPLE)
         set(LINUX TRUE)
-    endif()
+endif()
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	set(DEBUG TRUE)
+endif()
 
 #--------------------------------------
 # Compiler Check
@@ -65,9 +69,9 @@ if (WIN32)
 	set(CMAKE_CXX_FLAGS "/EHsc")
 	set(CMAKE_EXE_LINKER_FLAGS "")
 
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /Zi")
-    endif()
+	if (DEBUG)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zi")
+	endif()
 
     if (CMAKE_CL_64)
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MACHINE:X64")
@@ -78,14 +82,14 @@ if (WIN32)
 elseif(APPLE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-warning-option -Wno-pessimizing-move -Wno-overloaded-virtual -Wnounused-function")
 
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    if (DEBUG)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     endif()
 
 elseif(LINUX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-multichar")
 
-  if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  if (DEBUG)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
   endif()
 
@@ -97,9 +101,13 @@ endif()
 
 if (WIN32)
     add_definitions("-D_CPPUNWIND")
+	
+	if (DEBUG)
+		add_definitions("-D_CONSOLE=1")
+	endif()
 endif()
 
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+if (DEBUG)
     add_definitions(-DDEBUG=1)
 else()
     add_definitions(-DNDEBUG=1)
@@ -216,9 +224,9 @@ source_group_rec("${JUCE_SRC}" ${ROOT_DIR}/ThirdParty/Juce/modules)
 if (${FLIP_PRIVATE})
     if(APPLE)
 
-        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        if(DEBUG)
             find_library(FlipLib NAMES flip PATHS ${ROOT_DIR}/ThirdParty/flip/projects/build/Debug)
-        elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+        else()
             find_library(FlipLib NAMES flip PATHS ${ROOT_DIR}/ThirdParty/flip/projects/build/Release)
         endif()
 
@@ -236,17 +244,17 @@ else()
 
     elseif(WIN32)
 	
-		if (CMAKE_CL_64) 
-			if (CMAKE_BUILD_TYPE STREQUAL "Release") 
-				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/x64/Release") 
-			elseif(CMAKE_BUILD_TYPE STREQUAL "Debug") 
-				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/x64/Debug") 
+		if (CMAKE_CL_64)  
+			if(DEBUG) 
+				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/x64/Debug")
+			else()
+				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/x64/Release")
 			endif() 
 		else() 
-			if (CMAKE_BUILD_TYPE STREQUAL "Release") 
-				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/Win32/Release") 
-			elseif(CMAKE_BUILD_TYPE STREQUAL "Debug") 
-				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/Win32/Debug") 
+			if(DEBUG) 
+				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/Win32/Debug")
+			else()
+				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/Win32/Release")
 			endif() 
 		endif()
 		
@@ -338,7 +346,11 @@ if (APPLE)
 	set_target_properties(Kiwi PROPERTIES MACOSX_BUNDLE TRUE
 									      MACOSX_BUNDLE_INFO_PLIST ${KIWI_PLIST})
 elseif(WIN32)
-	set_target_properties(Kiwi PROPERTIES LINK_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
+	if (DEBUG)
+		set_target_properties(Kiwi PROPERTIES LINK_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:CONSOLE")
+	else()
+		set_target_properties(Kiwi PROPERTIES LINK_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
+	endif()
 endif()
 
 source_group_rec("${KIWI_CLIENT_SRC}" ${ROOT_DIR}/Client/Source)
@@ -384,7 +396,7 @@ source_group_rec("${TEST_SERVER_SRC}" ${ROOT_DIR}/Test/Server)
 set_target_properties(test_server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
 
 # Coverage setting
-if(${GCOV_SUPPORT} STREQUAL "On" AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+if(${GCOV_SUPPORT} STREQUAL "On" AND DEBUG)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
   set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
