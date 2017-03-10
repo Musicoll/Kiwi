@@ -484,12 +484,15 @@ namespace kiwi
     {
         juce::MouseCursor::StandardCursorType mc = juce::MouseCursor::NormalCursor;
         
-        m_io_highlighter->hide();
-        
         if(!isLocked())
         {
             HitTester hit(*this);
             hit.test(event.getPosition());
+
+            if (hit.getZone() != HitTester::Zone::Outlet && hit.getZone() != HitTester::Zone::Inlet)
+            {
+                m_io_highlighter->hide();
+            }
             
             if(hit.objectTouched())
             {
