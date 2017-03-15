@@ -153,24 +153,53 @@ namespace kiwi
         };
         
         // ================================================================================ //
+        //                                       AUDIOIO                                    //
+        // ================================================================================ //
+        
+        class AudioIOObject : public AudioObject
+        {
+        public:
+            
+            AudioIOObject(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const & args) override final;
+            
+            virtual ~AudioIOObject() = default;
+            
+        protected:
+            
+            std::vector<size_t>         m_router;
+            engine::AudioControler&     m_audio_controler;
+        };
+        
+        // ================================================================================ //
+        //                                       ADC~                                       //
+        // ================================================================================ //
+        
+        class AdcTilde : public AudioIOObject
+        {
+        public:
+            
+            AdcTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void prepare(dsp::Processor::PrepareInfo const& infos) override final;
+        };
+        
+        // ================================================================================ //
         //                                       DAC~                                       //
         // ================================================================================ //
         
-        class DacTilde : public AudioObject
+        class DacTilde : public AudioIOObject
         {
         public:
             
             DacTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
-            void receive(size_t index, std::vector<Atom> const& args) override final;
-            
             void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
             
             void prepare(dsp::Processor::PrepareInfo const& infos) override final;
-            
-        private:
-            std::vector<size_t>         m_router;
-            engine::AudioControler&     m_audio_controler;
         };
         
         // ================================================================================ //

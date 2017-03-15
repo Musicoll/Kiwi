@@ -61,6 +61,9 @@ namespace kiwi
             //! @brief Adds a signal to the output_buffer of the AudioControler.
             virtual void addToChannel(size_t const channel, dsp::Signal const& output_signal) = 0;
             
+            //! @brief Gets a signal from one of the input channels of the AudioControler.
+            virtual void getFromChannel(size_t const channel, dsp::Signal & input_signal) = 0;
+            
         private: // deleted methods
             
             AudioControler(AudioControler const& other) = delete;

@@ -229,10 +229,10 @@ namespace kiwi
         }
         
         // ================================================================================ //
-        //                                       DAC~                                       //
+        //                                       AUDIOIO                                    //
         // ================================================================================ //
         
-        DacTilde::DacTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        AudioIOObject::AudioIOObject(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
         AudioObject(model, patcher),
         m_router(),
         m_audio_controler(patcher.getAudioControler())
@@ -265,13 +265,14 @@ namespace kiwi
             }
         }
         
-        void DacTilde::receive(size_t, std::vector<Atom> const& args)
+        void AudioIOObject::receive(size_t index, std::vector<Atom> const & args)
         {
             if(!args.empty())
             {
                 if(args[0].isString())
                 {
                     const std::string sym = args[0].getString();
+                    
                     if(sym == "start")
                     {
                         m_audio_controler.startAudio();
@@ -282,6 +283,37 @@ namespace kiwi
                     }
                 }
             }
+        }
+        
+        // ================================================================================ //
+        //                                       ADC~                                       //
+        // ================================================================================ //
+        
+        AdcTilde::AdcTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        AudioIOObject(model, patcher, args)
+        {
+        }
+        
+        void AdcTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        {
+            for (int outlet_number = 0; outlet_number < output.getNumberOfChannels(); ++outlet_number)
+            {
+                m_audio_controler.getFromChannel(m_router[outlet_number], output[outlet_number]);
+            }
+        }
+        
+        void AdcTilde::prepare(dsp::Processor::PrepareInfo const& infos)
+        {
+            setPerformCallBack(this, &AdcTilde::perform);
+        }
+        
+        // ================================================================================ //
+        //                                       DAC~                                       //
+        // ================================================================================ //
+        
+        DacTilde::DacTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        AudioIOObject(model, patcher, args)
+        {
         }
         
         void DacTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
