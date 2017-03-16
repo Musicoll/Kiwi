@@ -239,7 +239,6 @@ namespace kiwi
         DocumentBrowser::Drive const&       m_drive;
         std::string                         m_name;
         uint64_t                            m_session_id;
-        //std::map<std::string, std::string>  m_metadata;
         PatcherManager*                     m_patcher_manager = nullptr;
         
         friend class DocumentBrowser::Drive;

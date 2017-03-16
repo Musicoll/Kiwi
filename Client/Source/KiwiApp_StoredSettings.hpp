@@ -50,6 +50,9 @@ namespace kiwi
         //! @brief Reload settings.
         void reload();
         
+        //! @brief Returns the default settings value tree
+        juce::ValueTree& useDefault();
+        
     private: // methods
         
         void changed();

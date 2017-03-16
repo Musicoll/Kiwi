@@ -43,6 +43,7 @@ namespace kiwi
     m_server(9090),
     m_console_history(std::make_shared<ConsoleHistory>(m_instance)),
     m_console_window(new ConsoleWindow(m_console_history)),
+    m_app_settings_window(new SettingsPanelWindow()),
     m_document_browser_window(new DocumentBrowserWindow(m_server.getBrowser())),
     m_beacon_dispatcher_window(new BeaconDispatcherWindow(m_instance)),
     m_audio_setting_window(new AudioSettingWindow(dynamic_cast<DspDeviceManager&>(m_instance.getAudioControler()))),
@@ -54,6 +55,7 @@ namespace kiwi
     Instance::~Instance()
     {
         m_console_window.reset();
+        m_app_settings_window.reset();
         m_patcher_managers.clear();
         m_server.stop();
     }
@@ -240,6 +242,12 @@ namespace kiwi
     {
         m_beacon_dispatcher_window->setVisible(true);
         m_beacon_dispatcher_window->toFront(true);
+    }
+    
+    void Instance::showAppSettingsWindow()
+    {
+        m_app_settings_window->setVisible(true);
+        m_app_settings_window->toFront(true);
     }
     
     void Instance::showAudioSettingsWindow()

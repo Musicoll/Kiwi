@@ -104,6 +104,11 @@ namespace kiwi
         }
     }
     
+    juce::ValueTree& StoredSettings::useDefault()
+    {
+        return m_defaults;
+    }
+    
     void StoredSettings::changed()
     {
         juce::ScopedPointer<juce::XmlElement> data(m_defaults.createXml());

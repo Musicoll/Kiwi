@@ -27,6 +27,7 @@
 #include "flip/Document.h"
 
 #include "KiwiApp_Console.hpp"
+#include "KiwiApp_Components/KiwiApp_SettingsPanel.hpp"
 #include "KiwiApp_DocumentBrowserView.hpp"
 #include "KiwiApp_PatcherManager.hpp"
 #include "KiwiApp_StoredSettings.hpp"
@@ -82,6 +83,9 @@ namespace kiwi
                                           uint16_t port,
                                           uint64_t session_id);
         
+        //! @brief Brings the Application settings window to front.
+        void showAppSettingsWindow();
+        
         //! @brief Opens a juce native audio setting pannel.
         void showAudioSettingsWindow();
         
@@ -116,6 +120,7 @@ namespace kiwi
         
         sConsoleHistory                             m_console_history;
         std::unique_ptr<ConsoleWindow>              m_console_window;
+        std::unique_ptr<SettingsPanelWindow>        m_app_settings_window;
         std::unique_ptr<DocumentBrowserWindow>      m_document_browser_window;
         std::unique_ptr<BeaconDispatcherWindow>     m_beacon_dispatcher_window;
         std::unique_ptr<AudioSettingWindow>         m_audio_setting_window;
