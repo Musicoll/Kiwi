@@ -22,7 +22,6 @@
 #ifndef KIWI_APP_DOCUMENT_BROWSER_HPP_INCLUDED
 #define KIWI_APP_DOCUMENT_BROWSER_HPP_INCLUDED
 
-#include "flip/contrib/MulticastServiceExplorer.h"
 #include <KiwiEngine/KiwiEngine_Listeners.hpp>
 
 #include <juce_events/juce_events.h>
@@ -31,8 +30,6 @@
 
 namespace kiwi
 {
-    //class PatcherManager;
-    
     // ================================================================================ //
     //                                 DOCUMENT BROWSER                                 //
     // ================================================================================ //
@@ -47,7 +44,13 @@ namespace kiwi
         
     public: // methods
         
-        using Session = flip::MulticastServiceExplorer::Session;
+        struct Session
+        {
+            uint32_t    ip;
+            uint16_t    port;
+            std::string version;
+            std::map<std::string, std::string> metadata;
+        };
         
         //! @brief Constructor
         DocumentBrowser();
@@ -83,7 +86,6 @@ namespace kiwi
         
     private: // members
         
-        std::unique_ptr<flip::MulticastServiceExplorer> m_explorer = nullptr;
         std::map<std::string, std::unique_ptr<Drive>>   m_drives = {};
         engine::Listeners<Listener>                     m_listeners = {};
     };

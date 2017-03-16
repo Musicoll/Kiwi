@@ -82,24 +82,12 @@ namespace kiwi
     
     void DocumentBrowser::timerCallback()
     {
-        if(m_explorer == nullptr)
-        {
-            try
-            {
-                m_explorer = std::make_unique<flip::MulticastServiceExplorer>();
-            }
-            catch(std::runtime_error const& e)
-            {
-                m_explorer = nullptr;
-                //std::cerr << "fail to initialize the MulticastServiceExplorer (you may check your connection)\n";
-            }
-        }
-        
         process();
     }
     
     void DocumentBrowser::process()
     {
+        /*
         if(m_explorer == nullptr) return; // abort
         
         m_explorer->process();
@@ -158,6 +146,7 @@ namespace kiwi
             m_listeners.call(&Listener::driveRemoved, *drive);
             m_drives.erase(drive->getHostName());
         }
+        */
     }
     
     // ================================================================================ //
