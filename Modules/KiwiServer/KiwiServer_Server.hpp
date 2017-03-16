@@ -27,8 +27,6 @@
 
 #include <KiwiModel/KiwiModel_PatcherUser.hpp>
 
-#include "KiwiServer_ServiceProvider.hpp"
-
 #include <juce_core/juce_core.h>
 
 #include <map>
@@ -48,7 +46,7 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            Server(uint16_t port, uint64_t user_id = flip::Ref::User::Server);
+            Server(uint16_t port);
             
             //! @brief Destructor.
             ~Server();
@@ -97,21 +95,13 @@ namespace kiwi
             //! @brief Create a backend directory
             bool initBackendDirectory(char const* name);
             
-            //! @brief Initialize the service.
-            void initService();
-            
-            //! @brief Update the service metadata.
-            void updateMetadata();
-            
             //! @brief Get the new session id.
             uint64_t getNewSessionId() const;
             
         private: // members
             
             const uint16_t                      m_port;
-            uint64_t                            m_user_id;
             flip::ServerSimple                  m_server;
-            std::unique_ptr<ServiceProvider>    m_service;
             std::atomic_bool                    m_running;
             
             juce::File                          m_backend_files_path;

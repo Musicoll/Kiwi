@@ -36,7 +36,7 @@ namespace kiwi
         // initialize and run server
         try
         {
-            m_server.reset(new server::Server(port, m_user_id));
+            m_server.reset(new server::Server(port));
         }
         catch(std::runtime_error const& e)
         {

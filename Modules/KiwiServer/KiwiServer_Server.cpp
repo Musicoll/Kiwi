@@ -38,9 +38,8 @@ namespace kiwi
         
         const char* Server::kiwi_file_extension = "kiwi";
         
-        Server::Server(uint16_t port, uint64_t user_id) :
+        Server::Server(uint16_t port) :
         m_port(port),
-        m_user_id(user_id),
         m_server(model::DataModel::use(), m_port),
         m_running(false)
         {
@@ -53,7 +52,6 @@ namespace kiwi
             m_server.bind_authenticate(std::bind(&Server::authenticateUser, this, _1, _2, _3));
             
             initBackendDirectory("server_backend");
-            initService();
         }
         
         Server::~Server()
@@ -102,54 +100,6 @@ namespace kiwi
             return juce::Result::ok() == m_backend_files_path.createDirectory();
         }
         
-        void Server::updateMetadata()
-        {
-            if(!m_files.empty())
-            {
-                juce::var var;
-                std::vector<juce::DynamicObject::Ptr> file_properties;
-                
-                for(auto file_pair : m_files)
-                {
-                    juce::DynamicObject::Ptr file_prop(new juce::DynamicObject());
-                    
-                    const auto file = file_pair.second;
-                    
-                    file_prop->setProperty("name", file.getFileNameWithoutExtension());
-                    file_prop->setProperty("session_id", static_cast<long long>(file_pair.first));
-                    var.append(file_prop.get());
-                    file_properties.push_back(file_prop);
-                }
-                
-                std::string documents = juce::JSON::toString(var).toStdString();
-                file_properties.clear();
-                
-                m_service->setMetadata("backend_files_list", documents);
-            }
-            
-            m_service->setMetadata("user_id", std::to_string(m_user_id));
-            m_service->setMetadata("new_session_id", std::to_string(getNewSessionId()));
-            m_service->update();
-        }
-        
-        void Server::initService()
-        {
-            ServiceProvider::metadata_t metadata;
-            metadata["computer_name"] = juce::SystemStats::getComputerName().toStdString();
-            
-            juce::Array<juce::File> files;
-            juce::String wild_card_pattern("*.kiwi");
-            m_backend_files_path.findChildFiles(files, juce::File::findFiles, false, wild_card_pattern);
-            
-            for(int i = 0; i < files.size(); i++)
-            {
-                m_files[i] = files[i];
-            }
-            
-            m_service.reset(new ServiceProvider(m_port, metadata));
-            updateMetadata();
-        }
-        
         void Server::setSessionsBackendDirectory(std::string const& directory)
         {
             m_backend_files_path = directory;
@@ -185,7 +135,6 @@ namespace kiwi
         void Server::process()
         {
             m_server.process();
-            m_service->process();
         }
         
         std::unique_ptr<flip::DocumentValidatorBase> Server::createValidator(uint64_t session_id)
@@ -219,8 +168,6 @@ namespace kiwi
                 backend.register_backend<flip::BackEndBinary>();
                 backend.read(provider);
             }
-            
-            updateMetadata();
             
             return backend;
         }
