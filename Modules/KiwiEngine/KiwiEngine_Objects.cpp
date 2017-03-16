@@ -229,19 +229,85 @@ namespace kiwi
         }
         
         // ================================================================================ //
-        //                                       AUDIOIO                                    //
+        //                                       AUDIO_INTERFACE                            //
         // ================================================================================ //
         
-        AudioIOObject::AudioIOObject(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        AudioInterfaceObject::Router::Router(size_t number_of_inputs, size_t number_of_outputs):
+        m_matrix(number_of_outputs, std::vector<bool>(number_of_inputs))
+        {
+        }
+        
+        size_t AudioInterfaceObject::Router::getNumberOfInput() const
+        {
+            return m_matrix.size();
+        }
+        
+        size_t AudioInterfaceObject::Router::getNumberOfOutput() const
+        {
+            return m_matrix.size() > 0 ? m_matrix[0].size() : 0;
+        }
+        
+        void AudioInterfaceObject::Router::resize(size_t number_of_inputs, size_t number_of_outputs)
+        {
+            if (number_of_outputs != getNumberOfOutput())
+            {
+                m_matrix.resize(number_of_outputs);
+            }
+            
+            if (number_of_inputs != getNumberOfInput())
+            {
+                for (size_t row = 0; row < m_matrix.size(); ++row)
+                {
+                    m_matrix[row].resize(number_of_inputs);
+                }
+            }
+        }
+        
+        void AudioInterfaceObject::Router::connect(size_t input_index, size_t output_index, bool enable_resize)
+        {
+            if (enable_resize)
+            {
+                size_t new_output_number = std::max(output_index, getNumberOfOutput());
+                size_t new_input_number = std::max(input_index, getNumberOfInput());
+                
+                resize(new_input_number, new_output_number);
+            }
+                
+            if (input_index < getNumberOfInput() && output_index < getNumberOfOutput())
+            {
+                m_matrix[output_index][input_index] = true;
+            }
+        }
+        
+        void AudioInterfaceObject::Router::disconnect(size_t input_index, size_t output_index)
+        {
+            if (input_index < getNumberOfInput() && output_index < getNumberOfOutput())
+            {
+                m_matrix[output_index][input_index] = false;
+            }
+        }
+        
+        bool AudioInterfaceObject::Router::isConnected(size_t input_index, size_t output_index) const
+        {
+            return (input_index < getNumberOfInput() && output_index < getNumberOfOutput())
+                    ? m_matrix[input_index][output_index]
+                    : false;
+        }
+        
+        AudioInterfaceObject::AudioInterfaceObject(model::Object const& model,
+                                                   Patcher& patcher,
+                                                   std::vector<Atom> const& args):
         AudioObject(model, patcher),
         m_router(),
         m_audio_controler(patcher.getAudioControler())
         {
+            size_t input_index = 0;
+            
             for(Atom const& arg : args)
             {
                 if (arg.isNumber())
                 {
-                    m_router.push_back(arg.getInt() - 1);
+                    m_router.connect(input_index++, arg.getInt() - 1, true);
                 }
                 else if(arg.isString())
                 {
@@ -254,18 +320,19 @@ namespace kiwi
                     
                     for (int channel = left_input; rev ? channel >= right_input : channel <= right_input; rev ? --channel : ++channel)
                     {
-                        m_router.push_back(channel);
+                        m_router.connect(input_index++, channel, true);
                     }
                 }
             }
             
-            if (m_router.empty())
+            if (m_router.getNumberOfOutput() == 0)
             {
-                m_router = {0, 1};
+                m_router.connect(0, 0, true);
+                m_router.connect(1, 1, true);
             }
         }
         
-        void AudioIOObject::receive(size_t index, std::vector<Atom> const & args)
+        void AudioInterfaceObject::receive(size_t index, std::vector<Atom> const & args)
         {
             if(!args.empty())
             {
@@ -290,15 +357,21 @@ namespace kiwi
         // ================================================================================ //
         
         AdcTilde::AdcTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
-        AudioIOObject(model, patcher, args)
+        AudioInterfaceObject(model, patcher, args)
         {
         }
         
         void AdcTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
         {
-            for (int outlet_number = 0; outlet_number < output.getNumberOfChannels(); ++outlet_number)
+            for (size_t input_index = 0; input_index < m_router.getNumberOfInput(); ++input_index)
             {
-                m_audio_controler.getFromChannel(m_router[outlet_number], output[outlet_number]);
+                for (size_t output_index = 0; output_index < m_router.getNumberOfOutput(); ++output_index)
+                {
+                    if (m_router.isConnected(input_index, output_index))
+                    {
+                        m_audio_controler.getFromChannel(input_index, output[output_index]);
+                    }
+                }
             }
         }
         
@@ -312,15 +385,21 @@ namespace kiwi
         // ================================================================================ //
         
         DacTilde::DacTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
-        AudioIOObject(model, patcher, args)
+        AudioInterfaceObject(model, patcher, args)
         {
         }
         
         void DacTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
         {
-            for (int inlet_number = 0; inlet_number < input.getNumberOfChannels(); ++inlet_number)
+            for (size_t input_index = 0; input_index < m_router.getNumberOfInput(); ++input_index)
             {
-                m_audio_controler.addToChannel(m_router[inlet_number], input[inlet_number]);
+                for(size_t output_index = 0; output_index < m_router.getNumberOfOutput(); ++output_index)
+                {
+                    if (m_router.isConnected(input_index, output_index))
+                    {
+                        m_audio_controler.addToChannel(output_index, input[input_index]);
+                    }
+                }
             }
         }
         

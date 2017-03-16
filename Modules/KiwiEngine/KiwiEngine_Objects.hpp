@@ -22,6 +22,8 @@
 #ifndef KIWI_ENGINE_TYPED_OBJECTS_HPP_INCLUDED
 #define KIWI_ENGINE_TYPED_OBJECTS_HPP_INCLUDED
 
+#include <vector>
+
 #include "KiwiEngine_Object.hpp"
 #include "KiwiEngine_Beacon.hpp"
 
@@ -153,22 +155,51 @@ namespace kiwi
         };
         
         // ================================================================================ //
-        //                                       AUDIOIO                                    //
+        //                                       AUDIO_INTERFACE                            //
         // ================================================================================ //
         
-        class AudioIOObject : public AudioObject
+        class AudioInterfaceObject : public AudioObject
         {
-        public:
+        public: // classes
             
-            AudioIOObject(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            class Router
+            {
+            public: // method
+                
+                Router() = default;
+                
+                Router(size_t number_of_inputs, size_t number_of_ouputs);
+                
+                void resize(size_t number_of_inputs, size_t number_of_ouputs);
+                
+                size_t getNumberOfInput() const;
+                
+                size_t getNumberOfOutput() const;
+                
+                void connect(size_t input_index, size_t output_index, bool enable_resize = false);
+                
+                void disconnect(size_t intput_index, size_t output_index);
+                
+                bool isConnected(size_t intput_index, size_t output_index) const;
+                
+                ~Router() = default;
+                
+            private: // members
+                
+                std::vector<std::vector<bool>> m_matrix;
+            };
+            
+        public: // methods
+            
+            AudioInterfaceObject(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
             void receive(size_t index, std::vector<Atom> const & args) override final;
             
-            virtual ~AudioIOObject() = default;
+            virtual ~AudioInterfaceObject() = default;
             
-        protected:
+        protected: // members
             
-            std::vector<size_t>         m_router;
+            Router                      m_router;
             engine::AudioControler&     m_audio_controler;
         };
         
@@ -176,9 +207,9 @@ namespace kiwi
         //                                       ADC~                                       //
         // ================================================================================ //
         
-        class AdcTilde : public AudioIOObject
+        class AdcTilde : public AudioInterfaceObject
         {
-        public:
+        public: // methods
             
             AdcTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
@@ -191,9 +222,9 @@ namespace kiwi
         //                                       DAC~                                       //
         // ================================================================================ //
         
-        class DacTilde : public AudioIOObject
+        class DacTilde : public AudioInterfaceObject
         {
-        public:
+        public: // methods
             
             DacTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
