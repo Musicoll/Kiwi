@@ -164,6 +164,8 @@ namespace kiwi
             
             struct Cnx
             {
+                Cnx(size_t input, size_t output);
+                
                 bool operator<(Cnx const& other) const;
              
                 size_t m_input = 0;

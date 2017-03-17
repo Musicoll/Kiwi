@@ -232,6 +232,12 @@ namespace kiwi
         //                                       ROUTER                                     //
         // ================================================================================ //
         
+        Router::Cnx::Cnx(size_t input, size_t output):
+        m_input(input),
+        m_output(output)
+        {
+        }
+        
         bool Router::Cnx::operator<(Cnx const& other) const
         {
             return m_input < other.m_input
@@ -240,12 +246,12 @@ namespace kiwi
         
         void Router::connect(size_t input_index, size_t output_index)
         {
-            m_cnx.insert({input_index, output_index});
+            m_cnx.insert(Cnx(input_index, output_index));
         }
         
         void Router::disconnect(size_t input_index, size_t ouptut_index)
         {
-            m_cnx.erase({input_index, ouptut_index});
+            m_cnx.erase(Cnx(input_index, ouptut_index));
         }
         
         size_t Router::getNumberOfConnections() const
