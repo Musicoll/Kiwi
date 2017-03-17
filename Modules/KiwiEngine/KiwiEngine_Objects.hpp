@@ -155,45 +155,53 @@ namespace kiwi
         };
         
         // ================================================================================ //
+        //                                       ROUTER                                     //
+        // ================================================================================ //
+        
+        class Router
+        {
+        public: // classes
+            
+            struct Cnx
+            {
+                bool operator<(Cnx const& other) const;
+             
+                size_t m_input = 0;
+                size_t m_output = 0;
+            };
+            
+        public: // method
+            
+            Router() = default;
+            
+            void connect(size_t input_index, size_t output_index);
+            
+            void disconnect(size_t intput_index, size_t output_index);
+            
+            size_t getNumberOfConnections() const;
+            
+            std::set<Cnx> const& getConnections() const;
+            
+            ~Router() = default;
+            
+        private: // memebers
+            
+            std::set<Cnx> m_cnx;
+        };
+        
+        // ================================================================================ //
         //                                       AUDIO_INTERFACE                            //
         // ================================================================================ //
         
         class AudioInterfaceObject : public AudioObject
         {
-        public: // classes
-            
-            class Router
-            {
-            public: // method
-                
-                Router() = default;
-                
-                Router(size_t number_of_inputs, size_t number_of_ouputs);
-                
-                void resize(size_t number_of_inputs, size_t number_of_ouputs);
-                
-                size_t getNumberOfInput() const;
-                
-                size_t getNumberOfOutput() const;
-                
-                void connect(size_t input_index, size_t output_index, bool enable_resize = false);
-                
-                void disconnect(size_t intput_index, size_t output_index);
-                
-                bool isConnected(size_t intput_index, size_t output_index) const;
-                
-                ~Router() = default;
-                
-            private: // members
-                
-                std::vector<std::vector<bool>> m_matrix;
-            };
-            
         public: // methods
             
             AudioInterfaceObject(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
             void receive(size_t index, std::vector<Atom> const & args) override final;
+            
+            std::vector<size_t> parseArgs(std::vector<Atom> const& args) const;
             
             virtual ~AudioInterfaceObject() = default;
             

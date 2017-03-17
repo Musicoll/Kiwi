@@ -122,7 +122,7 @@ namespace kiwi
     {
         if (channel < m_input_matrix->getNumberOfChannels() && input_signal.size() == m_input_matrix->getVectorSize())
         {
-            input_signal.add((*m_input_matrix)[channel]);
+            input_signal.copy((*m_input_matrix)[channel]);
         }
     }
     
