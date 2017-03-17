@@ -9,7 +9,7 @@ git:
   submodules: false
 
 install:
-    - git submodule update --init --recursive ThirdParty/Juce
+    - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr
 
 matrix:
   include:
