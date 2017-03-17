@@ -133,20 +133,10 @@ include(./Config/group.cmake)
 include(./Config/dependency.cmake)
 
 #--------------------------------------
-# CPR
+# ThirdParties
 #--------------------------------------
 
-if(WIN32)
-    option(CMAKE_USE_OPENSSL "Use OpenSSL code. Experimental" OFF)
-endif()
-
-set(BUILD_CPR_TESTS OFF CACHE BOOL "Don't build cpr tests")
-find_package(CURL)
-if(CURL_FOUND)
-    set(USE_SYSTEM_CURL ON CACHE BOOL "Use the system curl for faster builds")
-endif()
-
-add_subdirectory(ThirdParty/cpr)
+add_subdirectory(ThirdParty)
 
 #----------------------------------
 # Juce
