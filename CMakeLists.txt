@@ -132,12 +132,6 @@ endif()
 include(./Config/group.cmake)
 include(./Config/dependency.cmake)
 
-#--------------------------------------
-# ThirdParties
-#--------------------------------------
-
-add_subdirectory(ThirdParty)
-
 #----------------------------------
 # Juce
 #----------------------------------
@@ -321,6 +315,8 @@ source_group_rec("${SERVER_SRC}" ${ROOT_DIR}/Server/Source)
 #----------------------------------
 # Client
 #----------------------------------
+
+add_subdirectory(ThirdParty)
 
 include_directories(${CPR_INCLUDE_DIRS})
 

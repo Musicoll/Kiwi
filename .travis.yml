@@ -29,7 +29,7 @@ matrix:
       apt:
         packages: ['python-pip', 'python-yaml']
     install:
-      - git submodule update --init --recursive ThirdParty/Juce
+      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr
       - pip install --user cpp-coveralls
     script:
     - python ./Config/configure.py -coverage
