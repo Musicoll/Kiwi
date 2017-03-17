@@ -38,7 +38,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # IDE Settings
 #--------------------------------------
 
-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.8)
 set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++14")
 set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
 set(CMAKE_OSX_ARCHITECTURES "i386;x86_64")
@@ -131,6 +131,22 @@ endif()
 
 include(./Config/group.cmake)
 include(./Config/dependency.cmake)
+
+#--------------------------------------
+# CPR
+#--------------------------------------
+
+if(WIN32)
+    option(CMAKE_USE_OPENSSL "Use OpenSSL code. Experimental" OFF)
+endif()
+
+set(BUILD_CPR_TESTS OFF CACHE BOOL "Don't build cpr tests")
+find_package(CURL)
+if(CURL_FOUND)
+    set(USE_SYSTEM_CURL ON CACHE BOOL "Use the system curl for faster builds")
+endif()
+
+add_subdirectory(ThirdParty/cpr)
 
 #----------------------------------
 # Juce
@@ -316,6 +332,8 @@ source_group_rec("${SERVER_SRC}" ${ROOT_DIR}/Server/Source)
 # Client
 #----------------------------------
 
+include_directories(${CPR_INCLUDE_DIRS})
+
 file(GLOB_RECURSE KIWI_CLIENT_SRC ${ROOT_DIR}/Client/Source/*.[c|h]pp)
 add_executable(Kiwi ${KIWI_CLIENT_SRC} "${KIWI_CLIENT_RESSOURCES}")
 target_add_dependency(Kiwi KiwiEngine)
@@ -323,6 +341,7 @@ target_add_dependency(Kiwi KiwiModel)
 target_add_dependency(Kiwi KiwiDsp)
 target_add_dependency(Kiwi Juce)
 target_add_dependency(Kiwi KiwiServer)
+target_add_dependency(Kiwi ${CPR_LIBRARIES})
 
 if (APPLE)
 	set_target_properties(Kiwi PROPERTIES MACOSX_BUNDLE TRUE
