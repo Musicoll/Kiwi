@@ -318,7 +318,7 @@ source_group_rec("${SERVER_SRC}" ${ROOT_DIR}/Server/Source)
 
 add_subdirectory(ThirdParty)
 
-include_directories(${CPR_INCLUDE_DIRS})
+include_directories(${CPR_INCLUDE_DIRS} ${JSON_INCLUDE_DIRS})
 
 file(GLOB_RECURSE KIWI_CLIENT_SRC ${ROOT_DIR}/Client/Source/*.[c|h]pp)
 add_executable(Kiwi ${KIWI_CLIENT_SRC} "${KIWI_CLIENT_RESSOURCES}")
