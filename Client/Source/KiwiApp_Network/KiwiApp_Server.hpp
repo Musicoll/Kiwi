@@ -22,7 +22,6 @@
 #ifndef KIWI_APP_SERVER_HPP_INCLUDED
 #define KIWI_APP_SERVER_HPP_INCLUDED
 
-#include "flip/contrib/MulticastServiceExplorer.h"
 #include <KiwiEngine/KiwiEngine_Listeners.hpp>
 
 #include <juce_core/juce_core.h>

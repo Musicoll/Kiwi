@@ -35,6 +35,10 @@ namespace kiwi
     {
         setSize(1, 1);
         m_browser.addListener(*this);
+        for(auto* drive : m_browser.getDrives())
+        {
+            driveAdded(*drive);
+        }
     }
     
     DocumentBrowserView::~DocumentBrowserView()
@@ -133,24 +137,19 @@ namespace kiwi
     
     DocumentBrowserView::DriveView::DocumentSessionView::DocumentSessionView(DocumentBrowser::Drive::DocumentSession const& document) :
     m_document(document),
-    m_open_btn(m_document.useDrive().isRemote() ? "join" : "open")
+    m_open_btn("open")
     {
         setRepaintsOnMouseActivity(true);
 
         m_open_btn.setCommand(std::bind(&DocumentBrowser::Drive::DocumentSession::open, m_document));
         m_open_btn.setSize(30, 20);
-        m_open_btn.setTooltip(m_open_btn.getButtonText() + " this patcher");
+        m_open_btn.setTooltip("open this patcher");
         addAndMakeVisible(m_open_btn);
     }
     
     uint16_t DocumentBrowserView::DriveView::DocumentSessionView::getPort() const
     {
         return m_document.useDrive().getPort();
-    }
-    
-    uint32_t DocumentBrowserView::DriveView::DocumentSessionView::getIp() const
-    {
-        return m_document.useDrive().getIp();
     }
     
     std::string DocumentBrowserView::DriveView::DocumentSessionView::getHost() const
@@ -204,14 +203,11 @@ namespace kiwi
     DocumentBrowserView::DriveView::DriveView(DocumentBrowser::Drive& drive) :
     m_drive(drive)
     {
-        if(!m_drive.isRemote())
-        {
-            m_create_document_btn = std::make_unique<BrowserButton>("create");
-            m_create_document_btn->setCommand(std::bind(&DocumentBrowser::Drive::createNewDocument, &m_drive));
-            m_create_document_btn->setSize(35, 20);
-            m_create_document_btn->setTooltip("Create a new patcher on this drive");
-            addAndMakeVisible(m_create_document_btn.get());
-        }
+        m_create_document_btn = std::make_unique<BrowserButton>("create");
+        m_create_document_btn->setCommand(std::bind(&DocumentBrowser::Drive::createNewDocument, &m_drive));
+        m_create_document_btn->setSize(35, 20);
+        m_create_document_btn->setTooltip("Create a new patcher on this drive");
+        addAndMakeVisible(m_create_document_btn.get());
         
         for(auto const& document : m_drive.getDocuments())
         {
@@ -277,7 +273,7 @@ namespace kiwi
         g.fillRoundedRectangle(getLocalBounds().reduced(2).toFloat(), 0 );
         
         g.setColour(juce::Colours::whitesmoke);
-        g.drawFittedText("• Server Host : " + m_drive.getHostName(),
+        g.drawFittedText("• Server Host : " + m_drive.getName(),
                          getLocalBounds().reduced(8, 6).removeFromTop(22),
                          juce::Justification::centredLeft, 1);
         

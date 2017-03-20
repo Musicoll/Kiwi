@@ -41,6 +41,12 @@ namespace kiwi
         props.add(new juce::TextPropertyComponent(settings.getPropertyAsValue("distant_server_flip_port", nullptr), "Distant server Flip Port", 5, false));
         
         addSection("Network", props, true, 0);
+        
+        props.clear();
+        
+        props.add(new juce::TextPropertyComponent(settings.getPropertyAsValue("local_documents_path", nullptr), "Local documents", 100, false));
+        
+        addSection("Paths", props, true, 0);
     }
     
     

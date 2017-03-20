@@ -158,9 +158,6 @@ namespace kiwi
             //! @brief Returns the session port.
             uint16_t getPort() const;
             
-            //! @brief Returns the session ip.
-            uint32_t getIp() const;
-            
             //! @brief Returns the session host.
             std::string getHost() const;
             
