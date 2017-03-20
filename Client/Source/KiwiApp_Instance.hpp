@@ -34,8 +34,6 @@
 #include "KiwiApp_BeaconDispatcher.hpp"
 #include "KiwiApp_DspDeviceManager.hpp"
 
-#include "KiwiApp_Network/KiwiApp_Server.hpp"
-
 namespace kiwi
 {
     // ================================================================================ //
@@ -114,7 +112,10 @@ namespace kiwi
     private: // members
         
         engine::Instance                            m_instance;
-        Server                                      m_server;
+        
+        uint64_t                                    m_user_id;
+        
+        DocumentBrowser                             m_browser;
         
         PatcherManagers                             m_patcher_managers;
         

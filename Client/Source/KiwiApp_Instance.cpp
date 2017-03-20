@@ -40,16 +40,19 @@ namespace kiwi
     
     Instance::Instance() :
     m_instance(std::make_unique<DspDeviceManager>()),
-    m_server(9090),
+    m_browser(),
     m_console_history(std::make_shared<ConsoleHistory>(m_instance)),
     m_console_window(new ConsoleWindow(m_console_history)),
     m_app_settings_window(new SettingsPanelWindow()),
-    m_document_browser_window(new DocumentBrowserWindow(m_server.getBrowser())),
+    m_document_browser_window(new DocumentBrowserWindow(m_browser)),
     m_beacon_dispatcher_window(new BeaconDispatcherWindow(m_instance)),
     m_audio_setting_window(new AudioSettingWindow(dynamic_cast<DspDeviceManager&>(m_instance.getAudioControler()))),
     m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
     {
-        m_server.run();
+        std::srand(std::time(0));
+        m_user_id = std::rand();
+        
+        m_browser.start();
     }
     
     Instance::~Instance()
@@ -57,12 +60,11 @@ namespace kiwi
         m_console_window.reset();
         m_app_settings_window.reset();
         m_patcher_managers.clear();
-        m_server.stop();
     }
     
     uint64_t Instance::getUserId() const noexcept
     {
-        return m_server.getUserId();
+        return m_user_id;
     }
     
     engine::Instance& Instance::useEngineInstance()
@@ -234,6 +236,7 @@ namespace kiwi
     
     void Instance::showDocumentBrowserWindow()
     {
+        m_browser.start();
         m_document_browser_window->setVisible(true);
         m_document_browser_window->toFront(true);
     }

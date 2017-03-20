@@ -66,11 +66,11 @@ namespace kiwi
         std::string getApiRootUrl() const;
         
         //! @brief Make an API request to get a list of documents
-        void getDocuments(std::function<void(Api::Documents)> const& callback);
+        void getDocuments(std::function<void(Api::Documents)> const& success_callback);
         
         //! @brief Make an API request to create a new document
         //! @param callback
-        void createDocument(std::function<void(Api::Document)> const& callback,
+        void createDocument(std::function<void(Api::Document)> const& success,
                             std::string const& document_name = "");
         
     private: // members
