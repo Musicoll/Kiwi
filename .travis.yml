@@ -27,7 +27,8 @@ matrix:
     - sudo apt-get install libasound2-dev
     addons:
       apt:
-        packages: ['python-pip', 'python-yaml']
+        sources: ['ubuntu-toolchain-r-test']
+        packages: [g++-4.9, 'python-pip', 'python-yaml']
     install:
       - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr
       - pip install --user cpp-coveralls
