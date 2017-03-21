@@ -14,7 +14,7 @@ install:
 matrix:
   include:
   - os: linux
-    compiler: g++
+    compiler: gcc
     env: COMPILER=g++-4.9
     before_install:
     - sudo apt-get update
