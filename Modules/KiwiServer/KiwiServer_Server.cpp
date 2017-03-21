@@ -76,7 +76,7 @@ namespace kiwi
                     return m_running.load();
                 }, 0.1);
                 
-                DBG("[server] - running on port " << getPort());
+                std::cout << "[server] - running on port " << getPort() << std::endl;;
                 
                 m_running.store(true);
                 run_loop.run();
@@ -86,7 +86,7 @@ namespace kiwi
         void Server::stop()
         {
             m_running.store(false);
-            DBG("[server] - stopped");
+            std::cout << "[server] - stopped" << std::endl;
         }
         
         bool Server::isRunning() const noexcept
