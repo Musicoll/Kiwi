@@ -38,10 +38,11 @@ namespace kiwi
         
         const char* Server::kiwi_file_extension = "kiwi";
         
-        Server::Server(uint16_t port) :
+        Server::Server(uint16_t port, std::string const& backend_directory) :
         m_port(port),
         m_server(model::DataModel::use(), m_port),
-        m_running(false)
+        m_running(false),
+        m_backend_directory(backend_directory)
         {
             using namespace std::placeholders; // for _1, _2 etc.
             
@@ -51,7 +52,14 @@ namespace kiwi
             m_server.bind_write(std::bind(&Server::writeSessionBackend, this, _1, _2));
             m_server.bind_authenticate(std::bind(&Server::authenticateUser, this, _1, _2, _3));
             
-            initBackendDirectory("server_backend");
+            if (m_backend_directory.exists() && !m_backend_directory.isDirectory())
+            {
+                throw std::runtime_error("Specified backend directory is a file");
+            }
+            else if(!m_backend_directory.exists())
+            {
+                m_backend_directory.createDirectory();
+            }
         }
         
         Server::~Server()
@@ -93,18 +101,6 @@ namespace kiwi
             return new_session_id - 1;
         }
         
-        bool Server::initBackendDirectory(char const* name)
-        {
-            m_backend_files_path = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getSiblingFile(name);
-            
-            return juce::Result::ok() == m_backend_files_path.createDirectory();
-        }
-        
-        void Server::setSessionsBackendDirectory(std::string const& directory)
-        {
-            m_backend_files_path = directory;
-        }
-        
         juce::File Server::getSessionFile(uint64_t session_id)
         {
             if(m_files.find(session_id) != m_files.end())
@@ -113,7 +109,7 @@ namespace kiwi
             }
             else
             {
-                juce::File file = m_backend_files_path.getChildFile("Document_" + juce::String(session_id))
+                juce::File file = m_backend_directory.getChildFile("Document_" + juce::String(session_id))
                 .withFileExtension(kiwi_file_extension);
                 
                 m_files[session_id] = file;

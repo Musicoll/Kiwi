@@ -19,6 +19,9 @@
  ==============================================================================
  */
 
+#include <juce_core/juce_core.h>
+#include <json.hpp>
+
 #include <KiwiServer/KiwiServer_Server.hpp>
 #include <KiwiModel/KiwiModel_DataModel.hpp>
 
@@ -30,19 +33,32 @@ int main(int argc, const char * argv[])
     
     std::unique_ptr<server::Server> server(nullptr);
     
+    juce::File configuration_file(argv[1]);
+
     try
     {
-        server.reset(new server::Server(9090));
+        nlohmann::json configuration = nlohmann::json::parse(configuration_file.loadFileAsString().toStdString());
+        
+        server.reset(new server::Server(configuration["port"], configuration["backend_directory"]));
+    }
+    catch(nlohmann::detail::parse_error const& e)
+    {
+        std::cerr << "Parsing config file failed : " << e.what() << "\n";
+        return 0;
+    }
+    catch(nlohmann::detail::type_error const& e)
+    {
+        std::cerr << "Accessing element json element failed : " << e.what() << "\n";
+        return 0;
     }
     catch(std::runtime_error const& e)
     {
-        std::cerr << "Server already running on this machine: \nerr: " << e.what() << "\n";
+        std::cerr << "Launching server failed: \nerr : " << e.what() << "\n";
         return 0;
     }
     
     if(server)
     {
-        //server->setSessionsBackendDirectory("/sessions/");
         server->run();
     }
     

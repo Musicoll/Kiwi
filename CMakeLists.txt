@@ -301,7 +301,7 @@ source_group_rec("${KIWI_ENGINE_SRC}" ${ROOT_DIR}/Modules/KiwiEngine)
 
 file(GLOB_RECURSE KIWI_SERVER_SRC ${ROOT_DIR}/Modules/KiwiServer/*.[c|h]pp)
 add_library(KiwiServer STATIC ${KIWI_SERVER_SRC})
-target_include_directories(KiwiEngine PUBLIC ${ROOT_DIR}/Modules)
+target_include_directories(KiwiEngine PUBLIC ${ROOT_DIR}/Modules ${JSON_INCLUDE_DIRS})
 target_add_dependency(KiwiServer KiwiModel)
 target_add_dependency(KiwiServer Juce)
 set_target_properties(KiwiServer PROPERTIES FOLDER Modules)

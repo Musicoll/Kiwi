@@ -46,7 +46,7 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            Server(uint16_t port);
+            Server(uint16_t port, std::string const& backend_directory);
             
             //! @brief Destructor.
             ~Server();
@@ -69,9 +69,6 @@ namespace kiwi
             //! @brief Get the number of sessions currently running.
             uint16_t getNumberOfActiveSessions() const noexcept;
             
-            //! @brief set the sessions' backend files directory.
-            void setSessionsBackendDirectory(std::string const& directory);
-            
         private: // methods
             
             //! @brief Initialise a new empty patcher
@@ -92,9 +89,6 @@ namespace kiwi
             //! @brief Get the path for a given session.
             juce::File getSessionFile(uint64_t session_id);
             
-            //! @brief Create a backend directory
-            bool initBackendDirectory(char const* name);
-            
             //! @brief Get the new session id.
             uint64_t getNewSessionId() const;
             
@@ -104,7 +98,7 @@ namespace kiwi
             flip::ServerSimple                  m_server;
             std::atomic_bool                    m_running;
             
-            juce::File                          m_backend_files_path;
+            juce::File                          m_backend_directory;
             std::map<uint64_t, juce::File>      m_files;
             
             static const char*  kiwi_file_extension;
