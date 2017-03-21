@@ -33,10 +33,6 @@ matrix:
         packages: [g++-4.9, 'python-pip', 'python-yaml']
 
     install:
-      # create deps dir if not existing
-      - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
-      - mkdir -p ${DEPS_DIR}
-
       # make sure CXX is correctly set
       - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
 
@@ -44,10 +40,6 @@ matrix:
       - pip install --user cpp-coveralls
 
     script:
-      # show OS/compiler version
-      - uname -a
-      - $CXX --version
-
       - python ./Config/configure.py -coverage
       - python ./Config/build.py -c Release
       - python ./Config/build.py -c Debug -t Tests
