@@ -149,7 +149,7 @@ namespace kiwi
     
     bool KiwiApp::moreThanOneInstanceAllowed()
     {
-        return true;
+        return false;
     }
     
     // ================================================================================ //
