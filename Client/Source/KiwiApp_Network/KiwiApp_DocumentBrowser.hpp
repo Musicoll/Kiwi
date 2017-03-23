@@ -28,6 +28,8 @@
 
 #include "../KiwiApp_PatcherManager.hpp"
 
+#include "KiwiApp_Api.hpp"
+
 namespace kiwi
 {
     // ================================================================================ //
@@ -43,14 +45,6 @@ namespace kiwi
         class Drive;
         
     public: // methods
-        
-        struct Session
-        {
-            std::string host;
-            uint16_t    port;
-            std::string version;
-            std::map<std::string, std::string> metadata;
-        };
         
         //! @brief Constructor
         DocumentBrowser();
@@ -80,8 +74,6 @@ namespace kiwi
         void removeListener(Listener& listener);
         
     private: // members
-        
-        std::map<std::string, std::unique_ptr<Drive>>   m_drives = {};
         
         std::unique_ptr<Drive>                          m_distant_drive;
         engine::Listeners<Listener>                     m_listeners = {};
@@ -122,7 +114,8 @@ namespace kiwi
         
         Drive(std::string const& name,
               std::string const& host,
-              uint16_t port);
+              uint16_t api_port,
+              uint16_t session_port);
         
         ~Drive() = default;
         
@@ -132,8 +125,11 @@ namespace kiwi
         //! @brief remove a listener.
         void removeListener(Listener& listener);
         
-        //! @brief Returns the session port.
-        uint16_t getPort() const;
+        //! @brief Returns the kiwi api port.
+        uint16_t getApiPort() const;
+        
+        //! @brief Returns the kiwi document session port.
+        uint16_t getSessionsPort() const;
         
         //! @brief Returns the session host.
         std::string getHost() const;
@@ -142,14 +138,10 @@ namespace kiwi
         std::string getName() const;
         
         //! @brief Creates and opens a new document on this drive.
-        void createNewDocument() const;
+        void createNewDocument();
         
         //! @brief Returns the documents.
         std::list<DocumentSession> const& getDocuments() const;
-        
-        //! @brief Returns true if the drive match the session
-        //! @details this operator only compares ip and port.
-        bool operator==(Session const& session) const;
         
         //! @brief Returns true if the drive match the other drive
         //! @details this operator only compares ip and port.
@@ -161,16 +153,15 @@ namespace kiwi
         
     private: // members
         
-        std::string                 m_host = "127.0.0.1";
-        uint16_t                    m_port = 8080;
+        Api                         m_api;
+        std::string                 m_host = "localhost";
+        uint16_t                    m_sessions_port = 9090;
         std::string                 m_name = "Drive";
         std::list<DocumentSession>  m_documents;
         engine::Listeners<Listener> m_listeners;
         
         friend class DocumentBrowser;
     };
-    
-    bool operator==(DocumentBrowser::Session const& session, DocumentBrowser::Drive const& drive);
     
     // ================================================================================ //
     //                           DOCUMENT BROWSER LISTENER                           //
@@ -201,7 +192,7 @@ namespace kiwi
     public: // methods
         
         //! @brief Constructor.
-        DocumentSession(DocumentBrowser::Drive const& parent, std::string name, uint64_t session_id);
+        DocumentSession(DocumentBrowser::Drive const& parent, Api::Document document);
         
         //! @brief Destructor.
         ~DocumentSession();
@@ -228,8 +219,7 @@ namespace kiwi
     private: // members
         
         DocumentBrowser::Drive const&       m_drive;
-        std::string                         m_name;
-        uint64_t                            m_session_id;
+        Api::Document                       m_document;
         PatcherManager*                     m_patcher_manager = nullptr;
         
         friend class DocumentBrowser::Drive;

@@ -35,7 +35,7 @@ namespace kiwi
     // ================================================================================ //
     
     DocumentBrowser::DocumentBrowser() :
-    m_distant_drive(new Drive("Remote", "localhost", 9090))
+    m_distant_drive(new Drive("Remote", "54.234.132.205", 80, 9090))
     {
         ;
     }
@@ -57,17 +57,6 @@ namespace kiwi
     
     std::vector<DocumentBrowser::Drive*> DocumentBrowser::getDrives() const
     {
-        /*
-        std::vector<DocumentBrowser::Drive*> drives(m_drives.size());
-        
-        drives.emplace_back(m_distant_drive.get());
-        
-        for(auto& drive_pair : m_drives)
-        {
-            drives.emplace_back(drive_pair.second.get());
-        }
-        */
-        
         return {m_distant_drive.get()};
     }
     
@@ -97,9 +86,11 @@ namespace kiwi
     
     DocumentBrowser::Drive::Drive(std::string const& name,
                                   std::string const& host,
-                                  uint16_t port) :
+                                  uint16_t api_port,
+                                  uint16_t session_port) :
+    m_api(host, api_port),
     m_host(host),
-    m_port(port),
+    m_sessions_port(session_port),
     m_name(name)
     {
         //processSession(session);
@@ -115,9 +106,14 @@ namespace kiwi
         m_listeners.remove(listener);
     }
     
-    uint16_t DocumentBrowser::Drive::getPort() const
+    uint16_t DocumentBrowser::Drive::getApiPort() const
     {
-        return m_port;
+        return m_api.getPort();
+    }
+    
+    uint16_t DocumentBrowser::Drive::getSessionsPort() const
+    {
+        return m_sessions_port;
     }
     
     std::string DocumentBrowser::Drive::getHost() const
@@ -130,13 +126,17 @@ namespace kiwi
         return m_name;
     }
     
-    void DocumentBrowser::Drive::createNewDocument() const
+    void DocumentBrowser::Drive::createNewDocument()
     {
-        Api api(m_host, 8080);
-        api.createDocument([host = m_host, port = m_port](Api::Document document) {
+        m_api.createDocument([this](Api::Document document) {
             
-            juce::MessageManager::callAsync([&host, port, session_id = document.session_id]() {
-                KiwiApp::useInstance().openRemotePatcher(host, port, session_id);
+            juce::MessageManager::callAsync([this, document]() {
+                
+                auto it = m_documents.emplace(m_documents.end(), *this, std::move(document));
+                
+                m_listeners.call(&Listener::documentAdded, *it);
+                
+                it->open();
             });
             
         });
@@ -148,29 +148,24 @@ namespace kiwi
         return m_documents;
     }
     
-    bool DocumentBrowser::Drive::operator==(Session const& session) const
-    {
-        return (m_host == session.host) && (m_port == session.port);
-    }
-    
     bool DocumentBrowser::Drive::operator==(Drive const& drive) const
     {
-        return (m_host == drive.m_host) && (m_port == drive.m_port);
+        return (m_host == drive.m_host)
+        && (getApiPort() == drive.getApiPort())
+        && (m_sessions_port == drive.m_sessions_port)
+        && (m_name == drive.m_name);
     }
     
     void DocumentBrowser::Drive::refresh()
     {
-        Api api(m_host, 8080);
-        
-        api.getDocuments([this](Api::Documents docs) {
+        m_api.getDocuments([this](Api::Documents docs) {
             
-            bool changed = false;
             std::vector<DocumentSession> new_documents;
             new_documents.reserve(docs.size());
             
-            for(auto& doc : docs)
+            for(auto && doc : docs)
             {
-                new_documents.emplace_back(*this, doc.name, doc.session_id);
+                new_documents.emplace_back(*this, std::move(doc));
             }
             
             // drive removed notification
@@ -185,7 +180,6 @@ namespace kiwi
                     });
                     
                     doc_it = m_documents.erase(doc_it);
-                    changed = true;
                     continue;
                 }
                 
@@ -205,30 +199,21 @@ namespace kiwi
                     juce::MessageManager::callAsync([this, it](){
                         m_listeners.call(&Listener::documentAdded, *it);
                     });
-                    
-                    changed = true;
                 }
                 else
                 {
                     // name is currently the only document field that can change.
                     if(new_doc.getName() != it->getName())
                     {
-                        it->m_name = new_doc.getName();
+                        it->m_document.name = new_doc.getName();
                         
                         juce::MessageManager::callAsync([this, it](){
                             m_listeners.call(&Listener::documentChanged, *it);
                         });
-                        
-                        changed = true;
                     }
                 }
             }
         });
-    }
-    
-    bool operator==(DocumentBrowser::Session const& session, DocumentBrowser::Drive const& drive)
-    {
-        return (drive.getHost() == session.host) && (drive.getPort() == session.port);
     }
     
     // ================================================================================ //
@@ -236,10 +221,9 @@ namespace kiwi
     // ================================================================================ //
     
     DocumentBrowser::Drive::DocumentSession::DocumentSession(DocumentBrowser::Drive const& parent,
-                                                             std::string name, uint64_t session_id) :
+                                                             Api::Document document) :
     m_drive(parent),
-    m_name(name),
-    m_session_id(session_id)
+    m_document(std::move(document))
     {
         
     }
@@ -254,12 +238,12 @@ namespace kiwi
     
     std::string DocumentBrowser::Drive::DocumentSession::getName() const
     {
-        return m_name;
+        return m_document.name;
     }
     
     uint64_t DocumentBrowser::Drive::DocumentSession::getSessionId() const
     {
-        return m_session_id;
+        return m_document.session_id;
     }
     
     DocumentBrowser::Drive const& DocumentBrowser::Drive::DocumentSession::useDrive() const
@@ -274,7 +258,7 @@ namespace kiwi
     
     bool DocumentBrowser::Drive::DocumentSession::operator==(DocumentSession const& other_doc) const
     {
-        return (&m_drive == &other_doc.useDrive()) && (m_session_id == other_doc.m_session_id);
+        return (&m_drive == &other_doc.useDrive()) && (m_document == other_doc.m_document);
     }
     
     void DocumentBrowser::Drive::DocumentSession::open()
@@ -285,10 +269,28 @@ namespace kiwi
         }
         else
         {
+            const auto settings = getAppSettings().useDefault();
+            
+            std::string host = settings.getProperty("distant_server_host", "localhost")
+            .toString().toStdString();
+            
+            std::string port_str = settings.getProperty("distant_server_flip_port", "9090").toString().toStdString();
+            
+            uint16_t port = std::stoul(port_str);
+            
+            m_patcher_manager = KiwiApp::useInstance().openRemotePatcher(host,
+                                                                         port,
+                                                                         m_document.session_id);
+            
+            /*
             m_patcher_manager = KiwiApp::useInstance().openRemotePatcher(m_drive.getHost(),
                                                                          m_drive.getPort(),
                                                                          m_session_id);
-            m_patcher_manager->addListener(*this);
+            */
+            if(m_patcher_manager)
+            {
+                m_patcher_manager->addListener(*this);
+            }
         }
     }
 }

@@ -40,6 +40,12 @@ namespace kiwi
     {   
     public: // methods
         
+        enum class Protocol : bool
+        {
+            HTTP = 0,
+            HTTPS = 1
+        };
+        
         struct Error
         {
             
@@ -50,6 +56,9 @@ namespace kiwi
             std::string _id = "0";
             std::string name = "";
             uint64_t    session_id = 0ul;
+            
+            //! @brief Returns true if the DocumentSession match another DocumentSession
+            bool operator==(Document const& other_doc) const;
         };
         
         using Documents = std::vector<Api::Document>;
@@ -57,26 +66,52 @@ namespace kiwi
         class User;
         
         //! @brief Constructor
-        Api(std::string const& host, uint16_t port = 80);
+        Api(std::string const& host, uint16_t port = 80, Protocol protocol = Api::Protocol::HTTP);
         
         //! @brief Destructor
         ~Api();
         
+        //! @brief Get the API protocol as a string.
+        std::string getProtocolStr() const;
+        
         //! @brief Get the API root URL
         std::string getApiRootUrl() const;
         
+        //! @brief Set the API host.
+        void setHost(std::string const& host);
+        
+        //! @brief Get the API host.
+        std::string getHost() const;
+        
+        //! @brief Set the API port.
+        void setPort(uint16_t port) noexcept;
+        
+        //! @brief Get the API port.
+        uint16_t getPort() const noexcept;
+        
         //! @brief Make an API request to get a list of documents
-        void getDocuments(std::function<void(Api::Documents)> const& success_callback);
+        void getDocuments(std::function<void(Api::Documents)> success_callback);
         
         //! @brief Make an API request to create a new document
         //! @param callback
-        void createDocument(std::function<void(Api::Document)> const& success,
+        void createDocument(std::function<void(Api::Document)> success_callback,
                             std::string const& document_name = "");
+    
+    private: // methods
         
-    private: // members
+        //! @internal Store the async future request in a vector
+        void storeRequest(std::future<void> && future);
+        
+    private: // variables
         
         const std::string sep = "/";
         const std::string api_root = "/api";
+        
+        Protocol        m_protocol;
+        std::string     m_host;
+        uint16_t        m_port;
+        
+        std::vector<std::future<void>> m_pending_requests;
     };
     
     //! @brief Helper function to convert an Api::Document into a json object

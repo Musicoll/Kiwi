@@ -49,11 +49,19 @@ namespace kiwi
         }
     }
     
+    bool Api::Document::operator==(Api::Document const& other_doc) const
+    {
+        return (_id == other_doc._id);
+    }
+    
     // ================================================================================ //
     //                                    API REQUEST                                   //
     // ================================================================================ //
     
-    Api::Api(std::string const& host, uint16_t port)
+    Api::Api(std::string const& host, uint16_t port, Protocol protocol) :
+    m_protocol(protocol),
+    m_host(host),
+    m_port(port)
     {
         ;
     }
@@ -64,28 +72,67 @@ namespace kiwi
         
     }
     
+    void Api::setHost(std::string const& host)
+    {
+        m_host = host;
+    }
+    
+    std::string Api::getHost() const
+    {
+        return m_host;
+    }
+    
+    void Api::setPort(uint16_t port) noexcept
+    {
+        m_port = port;
+    }
+    
+    uint16_t Api::getPort() const noexcept
+    {
+        return m_port;
+    }
+    
+    std::string Api::getProtocolStr() const
+    {
+        return (m_protocol == Protocol::HTTP) ? "http" : "https";
+    }
+    
     std::string Api::getApiRootUrl() const
     {
+        cpr::Url url{getProtocolStr() + "://" + m_host};
+        
+        if(m_port != 80)
+        {
+            url += ':' + std::to_string(m_port);
+        }
+        
+        url += api_root + sep;
+        
+        return url;
+        
+        /*
         const auto settings = getAppSettings().useDefault();
         cpr::Url url{"http://"};
         
         url += settings.getProperty("distant_server_host", "localhost")
         .toString().toStdString();
         
-        url += ':' + settings.getProperty("distant_server_port", "8080")
+        url += ':' + settings.getProperty("distant_server_api_port", "8080")
         .toString().toStdString();
         
         url += api_root + sep;
         
+        //url = "http://54.234.132.205:80/api/documents";
         //url = "http://localhost:8080/api/";
         
         return url;
+        */
     }
     
-    void Api::getDocuments(std::function<void(Api::Documents)> const& callback)
+    void Api::getDocuments(std::function<void(Api::Documents)> callback)
     {
-        cpr::GetCallback([&callback](cpr::Response res) {
-            
+        auto res_callback = [callback = std::move(callback)](cpr::Response res) {
+
             if(res.status_code == 200)
             {
                 auto j = json::parse(res.text);
@@ -93,20 +140,32 @@ namespace kiwi
                 if(j.is_array())
                 {
                     // parse each json objects as document and store them in a vector.
-                    callback({j.begin(), j.end()});
+                    callback(j);
                     return;
                 }
             }
             
             callback({});
-            
-        }, getApiRootUrl() + "documents", cpr::Timeout{1000}).wait();
+        };
+        
+        
+        storeRequest(cpr::GetCallback(std::move(res_callback),
+                                      getApiRootUrl() + "documents",
+                                      cpr::Timeout{3000}));
     }
     
-    void Api::createDocument(std::function<void(Document)> const& callback,
+    void Api::createDocument(std::function<void(Document)> callback,
                              std::string const& document_name)
     {
-        cpr::PostCallback([&callback](cpr::Response res) {
+        
+        cpr::Payload payload{{}};
+        
+        if(!document_name.empty())
+        {
+            payload.AddPair({"name", document_name});
+        }
+        
+        auto res_callback = [callback = std::move(callback)](cpr::Response res) {
             
             if(res.status_code == 200)
             {
@@ -122,8 +181,25 @@ namespace kiwi
             
             callback({});
             
-        }, getApiRootUrl() + "documents",
-                          cpr::Payload{{"name", document_name}},
-                          cpr::Timeout{1000}).wait();
+        };
+        
+        storeRequest(cpr::PostCallback(std::move(res_callback),
+                                       getApiRootUrl() + "documents",
+                                       std::move(payload),
+                                       cpr::Timeout{3000}));
+    }
+    
+    void Api::storeRequest(std::future<void> && future)
+    {
+        for(std::future<void>& f : m_pending_requests)
+        {
+            if(f.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+            {
+                f = std::move(future);
+                return;
+            }
+        }
+        
+        m_pending_requests.emplace_back(std::move(future));
     }
 }

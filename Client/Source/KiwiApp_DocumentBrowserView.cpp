@@ -149,7 +149,7 @@ namespace kiwi
     
     uint16_t DocumentBrowserView::DriveView::DocumentSessionView::getPort() const
     {
-        return m_document.useDrive().getPort();
+        return m_document.useDrive().getSessionsPort();
     }
     
     std::string DocumentBrowserView::DriveView::DocumentSessionView::getHost() const
