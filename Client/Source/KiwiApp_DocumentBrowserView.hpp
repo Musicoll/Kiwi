@@ -186,7 +186,8 @@ namespace kiwi
         
         DocumentBrowser::Drive&                             m_drive;
         std::vector<std::unique_ptr<DocumentSessionView>>   m_documents = {};
-        std::unique_ptr<BrowserButton>                      m_create_document_btn = nullptr;
+        BrowserButton                                       m_create_document_btn;
+        BrowserButton                                       m_refresh_btn;
     };
 
     // ================================================================================ //

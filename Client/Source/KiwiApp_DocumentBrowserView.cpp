@@ -201,13 +201,19 @@ namespace kiwi
     // ================================================================================ //
     
     DocumentBrowserView::DriveView::DriveView(DocumentBrowser::Drive& drive) :
-    m_drive(drive)
+    m_drive(drive),
+    m_create_document_btn("create"),
+    m_refresh_btn("refresh")
     {
-        m_create_document_btn = std::make_unique<BrowserButton>("create");
-        m_create_document_btn->setCommand(std::bind(&DocumentBrowser::Drive::createNewDocument, &m_drive));
-        m_create_document_btn->setSize(35, 20);
-        m_create_document_btn->setTooltip("Create a new patcher on this drive");
-        addAndMakeVisible(m_create_document_btn.get());
+        m_create_document_btn.setCommand(std::bind(&DocumentBrowser::Drive::createNewDocument, &m_drive));
+        m_create_document_btn.setSize(35, 20);
+        m_create_document_btn.setTooltip("Create a new patcher on this drive");
+        addAndMakeVisible(m_create_document_btn);
+        
+        m_refresh_btn.setCommand(std::bind(&DocumentBrowser::Drive::refresh, &m_drive));
+        m_refresh_btn.setSize(40, 20);
+        m_refresh_btn.setTooltip("Refresh Document list");
+        addAndMakeVisible(m_refresh_btn);
         
         for(auto const& document : m_drive.getDocuments())
         {
@@ -236,10 +242,8 @@ namespace kiwi
             doc_view->setSize(bounds.getWidth() - padding.x * 2, doc_view->getHeight());
         }
         
-        if(m_create_document_btn)
-        {
-            m_create_document_btn->setTopRightPosition(getWidth() - padding.x, 5);
-        }
+        m_refresh_btn.setTopRightPosition(getWidth() - padding.x, 5);
+        m_create_document_btn.setTopRightPosition(m_refresh_btn.getX() - 5, 5);
     }
     
     void DocumentBrowserView::DriveView::updateLayout()
