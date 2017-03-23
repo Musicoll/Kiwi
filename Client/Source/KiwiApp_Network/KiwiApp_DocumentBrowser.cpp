@@ -128,7 +128,17 @@ namespace kiwi
     
     void DocumentBrowser::Drive::createNewDocument()
     {
-        m_api.createDocument([this](Api::Document document) {
+        m_api.createDocument([this](Api::Response res, Api::Document document) {
+            
+            if(res.error)
+            {
+                juce::MessageManager::callAsync([message = res.error.message](){
+                    KiwiApp::error("Error: can't create document");
+                    KiwiApp::error("=> " + message);
+                });
+                
+                return;
+            }
             
             juce::MessageManager::callAsync([this, document]() {
                 
@@ -158,7 +168,17 @@ namespace kiwi
     
     void DocumentBrowser::Drive::refresh()
     {
-        m_api.getDocuments([this](Api::Documents docs) {
+        m_api.getDocuments([this](Api::Response res, Api::Documents docs) {
+            
+            if(res.error)
+            {
+                juce::MessageManager::callAsync([message = res.error.message](){
+                    KiwiApp::error("Error: can't get documents");
+                    KiwiApp::error("=> " + message);
+                });
+                
+                return;
+            }
             
             std::vector<DocumentSession> new_documents;
             new_documents.reserve(docs.size());

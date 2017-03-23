@@ -65,6 +65,8 @@ namespace kiwi
         
         class User;
         
+        using Response = cpr::Response;
+        
         //! @brief Constructor
         Api(std::string const& host, uint16_t port = 80, Protocol protocol = Api::Protocol::HTTP);
         
@@ -90,11 +92,11 @@ namespace kiwi
         uint16_t getPort() const noexcept;
         
         //! @brief Make an API request to get a list of documents
-        void getDocuments(std::function<void(Api::Documents)> success_callback);
+        void getDocuments(std::function<void(Api::Response res, Api::Documents)> callback);
         
         //! @brief Make an API request to create a new document
         //! @param callback
-        void createDocument(std::function<void(Api::Document)> success_callback,
+        void createDocument(std::function<void(Api::Response res, Api::Document)> success_callback,
                             std::string const& document_name = "");
     
     private: // methods
@@ -102,10 +104,10 @@ namespace kiwi
         //! @internal Store the async future request in a vector
         void storeRequest(std::future<void> && future);
         
-    private: // variables
+        //! @internal Check if the response header has a JSON content-type
+        static bool hasJsonHeader(Api::Response const& res);
         
-        const std::string sep = "/";
-        const std::string api_root = "/api";
+    private: // variables
         
         Protocol        m_protocol;
         std::string     m_host;

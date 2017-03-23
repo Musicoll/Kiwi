@@ -147,8 +147,7 @@ namespace kiwi
         //! @details this operator only compares ip and port.
         bool operator==(Drive const& drive) const;
         
-    private: // methods
-        
+        //! @brief Refresh all the document list.
         void refresh();
         
     private: // members

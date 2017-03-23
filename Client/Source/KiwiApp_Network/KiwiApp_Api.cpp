@@ -106,55 +106,43 @@ namespace kiwi
             url += ':' + std::to_string(m_port);
         }
         
-        url += api_root + sep;
+        url += "/api";
         
         return url;
-        
-        /*
-        const auto settings = getAppSettings().useDefault();
-        cpr::Url url{"http://"};
-        
-        url += settings.getProperty("distant_server_host", "localhost")
-        .toString().toStdString();
-        
-        url += ':' + settings.getProperty("distant_server_api_port", "8080")
-        .toString().toStdString();
-        
-        url += api_root + sep;
-        
-        //url = "http://54.234.132.205:80/api/documents";
-        //url = "http://localhost:8080/api/";
-        
-        return url;
-        */
     }
     
-    void Api::getDocuments(std::function<void(Api::Documents)> callback)
+    void Api::getDocuments(std::function<void(Api::Response res, Api::Documents)> callback)
     {
-        auto res_callback = [callback = std::move(callback)](cpr::Response res) {
+        auto res_callback = [callback = std::move(callback)](Api::Response res) {
 
             if(res.status_code == 200)
             {
-                auto j = json::parse(res.text);
-                
-                if(j.is_array())
+                if(hasJsonHeader(res))
                 {
-                    // parse each json objects as document and store them in a vector.
-                    callback(j);
-                    return;
+                    auto j = json::parse(res.text);
+                    
+                    if(j.is_array())
+                    {
+                        // parse each json objects as document and store them in a vector.
+                        callback(std::move(res), j);
+                        return;
+                    }
                 }
+                
+                res.error.code = cpr::ErrorCode::UNKNOWN_ERROR;
+                res.error.message = "Unable to parse response";
             }
             
-            callback({});
+            callback(std::move(res), {});
         };
         
         
         storeRequest(cpr::GetCallback(std::move(res_callback),
-                                      getApiRootUrl() + "documents",
+                                      getApiRootUrl() + "/documents",
                                       cpr::Timeout{3000}));
     }
     
-    void Api::createDocument(std::function<void(Document)> callback,
+    void Api::createDocument(std::function<void(Api::Response, Document)> callback,
                              std::string const& document_name)
     {
         
@@ -169,22 +157,27 @@ namespace kiwi
             
             if(res.status_code == 200)
             {
-                auto j = json::parse(res.text);
-                
-                if(j.is_object())
+                if(hasJsonHeader(res))
                 {
-                    // parse object as a document
-                    callback(j);
-                    return;
+                    auto j = json::parse(res.text);
+                    
+                    if(j.is_object())
+                    {
+                        // parse object as a document
+                        callback(std::move(res), j);
+                        return;
+                    }
                 }
+                
+                res.error.code = cpr::ErrorCode::UNKNOWN_ERROR;
+                res.error.message = "Unable to parse response";
             }
             
-            callback({});
-            
+            callback(std::move(res), {});
         };
         
         storeRequest(cpr::PostCallback(std::move(res_callback),
-                                       getApiRootUrl() + "documents",
+                                       getApiRootUrl() + "/documents",
                                        std::move(payload),
                                        cpr::Timeout{3000}));
     }
@@ -201,5 +194,10 @@ namespace kiwi
         }
         
         m_pending_requests.emplace_back(std::move(future));
+    }
+    
+    bool Api::hasJsonHeader(Api::Response const& res)
+    {
+        return (res.header.at("content-type") == "application/json; charset=utf-8");
     }
 }
