@@ -94,28 +94,10 @@ namespace kiwi
             return m_running;
         }
         
-        uint64_t Server::getNewSessionId() const
-        {
-            uint64_t new_session_id = 0;
-            while(m_files.find(new_session_id++) != m_files.end()) {}
-            return new_session_id - 1;
-        }
-        
         juce::File Server::getSessionFile(uint64_t session_id)
         {
-            if(m_files.find(session_id) != m_files.end())
-            {
-                return m_files[session_id];
-            }
-            else
-            {
-                juce::File file = m_backend_directory.getChildFile("Document_" + juce::String(session_id))
-                .withFileExtension(kiwi_file_extension);
-                
-                m_files[session_id] = file;
-                
-                return file;
-            }
+            return m_backend_directory.getChildFile(juce::String(hexadecimal_convert(session_id)))
+            .withFileExtension(kiwi_file_extension);
         }
         
         uint16_t Server::getPort() const noexcept
@@ -135,23 +117,19 @@ namespace kiwi
         
         std::unique_ptr<flip::DocumentValidatorBase> Server::createValidator(uint64_t session_id)
         {
-            DBG("[server] - createValidator for session_id : " << std::to_string(session_id));
+            DBG("[server] - createValidator for session_id : " << hexadecimal_convert(session_id));
             
             return std::make_unique<model::PatcherValidator>();
         }
         
         void Server::initEmptyDocument(uint64_t session_id, flip::DocumentBase& document)
         {
-            DBG("[server] - initEmptyDocument for session_id : " << std::to_string(session_id));
-            
-            // init default patcher here.
-            model::Patcher& patcher = document.root<model::Patcher>();
-            patcher.setName("Document_" + std::to_string(session_id));
+            DBG("[server] - initEmptyDocument for session_id : " << hexadecimal_convert(session_id));
         }
         
         flip::BackEndIR Server::readSessionBackend(uint64_t session_id)
         {
-            DBG("[server] - readSessionBackend for session_id : " << std::to_string(session_id));
+            DBG("[server] - readSessionBackend for session_id : " << hexadecimal_convert(session_id));
             
             flip::BackEndIR backend;
             
@@ -177,7 +155,7 @@ namespace kiwi
                 session_file.create();
             }
             
-            DBG("[server] - Saving session : " << std::to_string(session_id) << " in file : " << session_file.getFileName());
+            DBG("[server] - Saving session : " << hexadecimal_convert(session_id) << " in file : " << session_file.getFileName());
             
             flip::DataConsumerFile consumer(session_file.getFullPathName().toStdString().c_str());
             backend.write<flip::BackEndBinary>(consumer);
@@ -187,9 +165,29 @@ namespace kiwi
         {
             // @todo do something here
             
-            DBG("[server] - Authenticate user: " << std::to_string(user_id) << " for session: " << std::to_string(session_id));
+            DBG("[server] - Authenticate user: " << std::to_string(user_id) << " for session: " << hexadecimal_convert(session_id));
             
             return true;
         }
+        
+        /*
+        uint64_t Server::hexadecimal_convert(std::string const& hexa_string)
+        {
+            uint64_t hexa_decimal = 0ul;
+            std::stringstream converter(hexa_string);
+            converter >> std::hex >> hexa_decimal;
+            
+            return hexa_decimal;
+        }
+        */
+        
+        std::string Server::hexadecimal_convert(uint64_t hexa_decimal)
+        {
+            std::stringstream converter;
+            converter << std::hex << hexa_decimal;
+            
+            return converter.str();
+        }
+        
     }
 }

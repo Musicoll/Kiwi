@@ -89,17 +89,18 @@ namespace kiwi
             //! @brief Get the path for a given session.
             juce::File getSessionFile(uint64_t session_id);
             
-            //! @brief Get the new session id.
-            uint64_t getNewSessionId() const;
+        private: // methods
             
-        private: // members
+            //static uint64_t hexadecimal_convert(std::string const& hexa_string);
+            static std::string hexadecimal_convert(uint64_t hexa_decimal);
+            
+        private: // variables
             
             const uint16_t                      m_port;
             flip::ServerSimple                  m_server;
             std::atomic_bool                    m_running;
             
             juce::File                          m_backend_directory;
-            std::map<uint64_t, juce::File>      m_files;
             
             static const char*  kiwi_file_extension;
             
