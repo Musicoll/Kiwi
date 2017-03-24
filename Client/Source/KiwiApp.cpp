@@ -217,14 +217,12 @@ namespace kiwi
         useEngineInstance().error(text);
     }
     
-    bool KiwiApp::closeWindow(Window& window)
+    void KiwiApp::closeWindow(AppWindow& window)
     {
         if(m_instance)
         {
-            return m_instance->closeWindow(window);
+            m_instance->closeWindow(window);
         }
-        
-        return false;
     }
     
     // ================================================================================ //

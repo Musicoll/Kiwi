@@ -42,18 +42,17 @@ namespace kiwi
     m_instance(std::make_unique<DspDeviceManager>()),
     m_server(9090),
     m_console_history(std::make_shared<ConsoleHistory>(m_instance)),
-    m_console_window(new ConsoleWindow(m_console_history)),
-    m_document_browser_window(new DocumentBrowserWindow(m_server.getBrowser())),
-    m_beacon_dispatcher_window(new BeaconDispatcherWindow(m_instance)),
-    m_audio_setting_window(new AudioSettingWindow(dynamic_cast<DspDeviceManager&>(m_instance.getAudioControler()))),
     m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
     {
+        m_windows.emplace(new ConsoleWindow(m_console_history));
+        m_windows.emplace(new DocumentBrowserWindow(m_server.getBrowser()));
+        m_windows.emplace(new BeaconDispatcherWindow(m_instance));
         m_server.run();
     }
     
     Instance::~Instance()
     {
-        m_console_window.reset();
+        closeAllWindows();
         m_patcher_managers.clear();
         m_server.stop();
     }
@@ -138,30 +137,35 @@ namespace kiwi
         }
     }
     
-    bool Instance::closeWindow(Window& window)
+    void Instance::closeWindow(AppWindow& window)
     {
-        bool success = true;
-        
-        PatcherViewWindow* pwin = dynamic_cast<PatcherViewWindow*>(&window);
-        if(pwin && !m_patcher_managers.empty())
+        struct IsEqual
         {
-            PatcherManager& manager = pwin->getManager();
+            IsEqual(AppWindow const& window):m_window(window){}
             
-            auto manager_it = getPatcherManager(manager);
+            bool operator()(std::unique_ptr<AppWindow> const& window){return window.get() == &m_window;};
             
-            if(manager_it != m_patcher_managers.end())
-            {
-                PatcherView& patcherview = pwin->getPatcherView();
-                
-                success = manager.closePatcherViewWindow(patcherview);
-                if(success && manager.getNumberOfView() == 0)
-                {
-                    m_patcher_managers.erase(manager_it);
-                }
-            }
-        }
+            AppWindow const& m_window;
+        };
         
-        return success;
+        std::set<std::unique_ptr<AppWindow>>::iterator found_window =
+                std::find_if(m_windows.begin(), m_windows.end(), IsEqual(window));
+        
+        m_windows.erase(found_window);
+        
+        #if ! JUCE_MAC
+        struct IsMainWindow
+        {
+            bool operator()(std::unique_ptr<AppWindow> const& app_window){return app_window->isMainWindow();};
+        };
+        
+        size_t main_windows = std::count_if(m_windows.begin(), m_windows.end(), IsMainWindow());
+        
+        if (main_windows == 0)
+        {
+            KiwiApp::use().systemRequestedQuit();
+        }
+        #endif
     }
     
     bool Instance::closeAllWindows()
@@ -214,6 +218,27 @@ namespace kiwi
         return nullptr;
     }
     
+    void Instance::removePatcher(PatcherManager const& patcher_manager)
+    {
+        struct IsEqual
+        {
+            IsEqual(PatcherManager const& manager):m_patcher_manager(manager){};
+            
+            bool operator()(std::unique_ptr<PatcherManager> const& patcher){return patcher.get() == &m_patcher_manager;}
+            
+            PatcherManager const& m_patcher_manager;
+        };
+        
+        PatcherManagers::iterator found_patcher =
+            std::find_if(m_patcher_managers.begin(), m_patcher_managers.end(), IsEqual(patcher_manager));
+        
+        if (found_patcher != m_patcher_managers.end())
+        {
+            m_patcher_managers.erase(found_patcher);
+        }
+        
+    }
+    
     Instance::PatcherManagers::iterator Instance::getPatcherManager(PatcherManager const& manager)
     {
         const auto find_it = [&manager](std::unique_ptr<PatcherManager> const& manager_uptr)
@@ -226,27 +251,22 @@ namespace kiwi
     
     void Instance::showConsoleWindow()
     {
-        m_console_window->setVisible(true);
-        m_console_window->toFront(true);
+        m_windows.emplace(new ConsoleWindow(m_console_history));;
     }
     
     void Instance::showDocumentBrowserWindow()
     {
-        m_document_browser_window->setVisible(true);
-        m_document_browser_window->toFront(true);
+        m_windows.emplace(new DocumentBrowserWindow(m_server.getBrowser()));
     }
     
     void Instance::showBeaconDispatcherWindow()
     {
-        m_beacon_dispatcher_window->setVisible(true);
-        m_beacon_dispatcher_window->toFront(true);
+        m_windows.emplace(new BeaconDispatcherWindow(m_instance));
     }
     
     void Instance::showAudioSettingsWindow()
     {
-        m_audio_setting_window->addToDesktop();
-        m_audio_setting_window->setVisible(true);
-        m_audio_setting_window->toFront(true);
+        m_windows.emplace(new AudioSettingWindow(dynamic_cast<DspDeviceManager&>(m_instance.getAudioControler())));
     }
     
     std::vector<uint8_t>& Instance::getPatcherClipboardData()

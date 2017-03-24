@@ -111,7 +111,7 @@ namespace kiwi
         //==============================================================================
         
         //! @brief Attempt to close the given window asking user to save file if needed.
-        bool closeWindow(Window& window);
+        void closeWindow(AppWindow& window);
         
         // ================================================================================ //
         //                                  APPLICATION MENU                                //

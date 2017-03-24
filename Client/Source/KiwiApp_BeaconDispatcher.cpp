@@ -104,34 +104,28 @@ namespace kiwi
     // ================================================================================ //
     
     BeaconDispatcherWindow::BeaconDispatcherWindow(engine::Instance& instance) :
-    Window("Beacon dispatcher", juce::Colours::white, minimiseButton | closeButton, true)
+    AppWindow("Beacon dispatcher")
     {
         setContentOwned(new BeaconDispatcher(instance), false);
+        
+        juce::Rectangle<int> screen_area = getParentMonitorArea();
+        
+        int width = 300;
+        int height = 100;
+        
+        juce::Rectangle<int> bounds(screen_area.getX() + ((15. / 100.) * screen_area.getWidth() - ((float) width / 2.)),
+                                    screen_area.getY() + ((20. / 100.) * screen_area.getHeight()) - ((float) height / 2.),
+                                    width,
+                                    height);
+        
+        initBounds(bounds);
+        
         setResizable(false, false);
-        setResizeLimits(50, 50, 32000, 32000);
-        setSize(300, 100);
-        
-        const juce::String windowState(getGlobalProperties().getValue("beacon_dispatcher_window"));
-        
-        if(windowState.isNotEmpty())
-        {
-            restoreWindowStateFromString(windowState);
-        }
-        else
-        {
-            setTopLeftPosition(10, 10);
-            setSize(300, 100);
-            setVisible(true);
-        }
+        setVisible(true);
     }
     
-    BeaconDispatcherWindow::~BeaconDispatcherWindow()
+    bool BeaconDispatcherWindow::isMainWindow()
     {
-        getGlobalProperties().setValue("beacon_dispatcher_window", getWindowStateAsString());
-    }
-    
-    void BeaconDispatcherWindow::closeButtonPressed()
-    {
-        setVisible(false);
+        return true;
     }
 }

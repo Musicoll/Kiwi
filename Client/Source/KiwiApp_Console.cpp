@@ -356,33 +356,28 @@ namespace kiwi
     // ================================================================================ //
     
     ConsoleWindow::ConsoleWindow(sConsoleHistory history) :
-    Window("Kiwi Console", juce::Colours::white, minimiseButton | closeButton, true)
+    AppWindow("Kiwi Console")
     {
         setContentOwned(new Console(history), false);
         setResizable(true, false);
-        setResizeLimits(50, 50, 32000, 32000);
+        setResizeLimits(300, 100, 32000, 32000);
         
-        const juce::String windowState(getGlobalProperties().getValue("console_window"));
+        juce::Rectangle<int> screen_area = getParentMonitorArea();
         
-        if(windowState.isNotEmpty())
-        {
-            restoreWindowStateFromString(windowState);
-        }
-        else
-        {
-            setTopLeftPosition(0, 0);
-            setSize(300, 440);
-            setVisible(true);
-        }
+        int width = 300;
+        int height = 440;
+        
+        juce::Rectangle<int> bounds(screen_area.getX() + ((85. / 100.) * screen_area.getWidth() - ((float) width / 2.)),
+                                    screen_area.getY() + ((30. / 100.) * screen_area.getHeight()),
+                                    width,
+                                    height);
+        
+        initBounds(bounds);
+        setVisible(true);
     }
     
-    ConsoleWindow::~ConsoleWindow()
+    bool ConsoleWindow::isMainWindow()
     {
-        getGlobalProperties().setValue("console_window", getWindowStateAsString());
-    }
-    
-    void ConsoleWindow::closeButtonPressed()
-    {
-        setVisible(false);
+        return true;
     }
 }

@@ -69,13 +69,14 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The BeaconDispatcherWindow
-    class BeaconDispatcherWindow : public Window
+    class BeaconDispatcherWindow final : public AppWindow
     {
     public:
         BeaconDispatcherWindow(engine::Instance& instance);
-        ~BeaconDispatcherWindow();
         
-        void closeButtonPressed() override;
+        bool isMainWindow() override;
+        
+        ~BeaconDispatcherWindow() = default;
     };
 }
 

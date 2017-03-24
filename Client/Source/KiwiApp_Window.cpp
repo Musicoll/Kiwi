@@ -19,6 +19,8 @@
  ==============================================================================
  */
 
+#include <juce_gui_basics/juce_gui_basics.h>
+
 #include "KiwiApp.hpp"
 #include "KiwiApp_Window.hpp"
 #include "KiwiApp_CommandIDs.hpp"
@@ -29,31 +31,13 @@ namespace kiwi
     //                                      WINDOW                                      //
     // ================================================================================ //
     
-    Window::Window(std::string const& name, juce::Colour color, int requiredButtons, bool addToDesktop) :
-    DocumentWindow(name, color, requiredButtons, addToDesktop)
+    Window::Window(std::string const& name, bool addToDesktop) :
+    DocumentWindow(name, juce::Colours::white, allButtons, addToDesktop)
     {
+        setUsingNativeTitleBar(true);
+        
         KiwiApp::bindToCommandManager(this);
         KiwiApp::bindToKeyMapping(this);
-        
-        #if ! JUCE_MAC
-        setMenuBar(KiwiApp::getMenuBarModel());
-        #endif
-        
-        setUsingNativeTitleBar(true);
-        setSize(600, 500);
-        centreWithSize(getWidth(), getHeight());
-        setResizable(true, true);
-        setVisible(true);
-    }
-    
-    Window::~Window()
-    {
-        ;
-    }
-    
-    void Window::closeButtonPressed()
-    {
-        juce::JUCEApplication::quit();
     }
     
     // ================================================================================ //
@@ -107,5 +91,38 @@ namespace kiwi
             default: return false;
         }
         return true;
+    }
+    
+    // ================================================================================ //
+    //                                      APPWINDOW                                   //
+    // ================================================================================ //
+    
+    AppWindow::AppWindow(std::string const& name):
+    Window(name, true)
+    {
+    }
+    
+    void AppWindow::initBounds(juce::Rectangle<int> bounds)
+    {
+        const juce::String windowState(getGlobalProperties().getValue(getName()));
+        
+        if (!windowState.isEmpty())
+        {
+            restoreWindowStateFromString(windowState);
+        }
+        else
+        {
+            setBounds(bounds);
+        }
+    }
+    
+    void AppWindow::closeButtonPressed()
+    {
+        KiwiApp::use().closeWindow(*this);
+    }
+    
+    AppWindow::~AppWindow()
+    {
+        getGlobalProperties().setValue(getName(), getWindowStateAsString());
     }
 }
