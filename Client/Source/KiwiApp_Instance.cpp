@@ -51,8 +51,6 @@ namespace kiwi
     {
         std::srand(std::time(0));
         m_user_id = std::rand();
-        
-        m_browser.start();
     }
     
     Instance::~Instance()
@@ -236,7 +234,6 @@ namespace kiwi
     
     void Instance::showDocumentBrowserWindow()
     {
-        m_browser.start();
         m_document_browser_window->setVisible(true);
         m_document_browser_window->toFront(true);
     }
