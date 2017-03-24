@@ -36,7 +36,7 @@ namespace kiwi
     //                                 DOCUMENT BROWSER                                 //
     // ================================================================================ //
     
-    //! @brief Explore service running on the Local Area Network.
+    //! @brief Request Patcher document informations through a Kiwi API.
     class DocumentBrowser : public juce::Timer, public juce::ValueTree::Listener
     {
     public: // nested classes
