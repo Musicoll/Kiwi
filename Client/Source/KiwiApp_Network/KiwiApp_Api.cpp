@@ -20,7 +20,6 @@
  */
 
 #include "KiwiApp_Api.hpp"
-#include "../KiwiApp.hpp"
 
 namespace kiwi
 {
@@ -77,7 +76,7 @@ namespace kiwi
         m_host = host;
     }
     
-    std::string Api::getHost() const
+    std::string const& Api::getHost() const
     {
         return m_host;
     }
@@ -99,7 +98,7 @@ namespace kiwi
     
     std::string Api::getApiRootUrl() const
     {
-        cpr::Url url{getProtocolStr() + "://" + m_host};
+        std::string url{getProtocolStr() + "://" + m_host};
         
         if(m_port != 80)
         {

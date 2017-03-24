@@ -37,7 +37,7 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief Explore service running on the Local Area Network.
-    class DocumentBrowser : public juce::Timer
+    class DocumentBrowser : public juce::Timer, public juce::ValueTree::Listener
     {
     public: // nested classes
         
@@ -73,7 +73,15 @@ namespace kiwi
         //! @brief remove a listener.
         void removeListener(Listener& listener);
         
-    private: // members
+    private: // methods
+        
+        void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier&) override;
+        void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override               { }
+        void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override        { }
+        void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override                { }
+        void valueTreeParentChanged(juce::ValueTree&) override                              { }
+        
+    private: // variables
         
         std::unique_ptr<Drive>                          m_distant_drive;
         engine::Listeners<Listener>                     m_listeners = {};
@@ -125,17 +133,29 @@ namespace kiwi
         //! @brief remove a listener.
         void removeListener(Listener& listener);
         
+        //! @brief Set the kiwi api port.
+        void setApiPort(uint16_t port);
+        
         //! @brief Returns the kiwi api port.
         uint16_t getApiPort() const;
         
+        //! @brief Set the kiwi document session port.
+        void setSessionPort(uint16_t port);
+        
         //! @brief Returns the kiwi document session port.
-        uint16_t getSessionsPort() const;
+        uint16_t getSessionPort() const;
+        
+        //! @brief Set both the api's and session's host.
+        void setHost(std::string const& host);
         
         //! @brief Returns the session host.
-        std::string getHost() const;
+        std::string const& getHost() const;
+        
+        //! @brief Set the name of this drive.
+        void setName(std::string const& host);
         
         //! @brief Returns the name of this drive.
-        std::string getName() const;
+        std::string const& getName() const;
         
         //! @brief Creates and opens a new document on this drive.
         void createNewDocument();
@@ -153,8 +173,7 @@ namespace kiwi
     private: // members
         
         Api                         m_api;
-        std::string                 m_host = "localhost";
-        uint16_t                    m_sessions_port = 9090;
+        uint16_t                    m_session_port = 9090;
         std::string                 m_name = "Drive";
         std::list<DocumentSession>  m_documents;
         engine::Listeners<Listener> m_listeners;

@@ -152,17 +152,14 @@ namespace kiwi
             //! @brief Called when resized.
             void resized() override;
             
-            //! @brief Returns the metadata associated to the given key.
-            std::string getMetadata(std::string const& key, std::string const& ifnotfound = "") const;
-            
-            //! @brief Returns the session port.
-            uint16_t getPort() const;
+            //! @brief Returns the document name.
+            std::string getName() const;
             
             //! @brief Returns the session host.
             std::string getHost() const;
             
-            //! @brief Returns the document name.
-            std::string getName() const;
+            //! @brief Returns the session port.
+            uint16_t getSessionPort() const;
             
             //! @brief Returns the session id.
             uint64_t getSessionId() const;

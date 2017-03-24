@@ -147,9 +147,9 @@ namespace kiwi
         addAndMakeVisible(m_open_btn);
     }
     
-    uint16_t DocumentBrowserView::DriveView::DocumentSessionView::getPort() const
+    uint16_t DocumentBrowserView::DriveView::DocumentSessionView::getSessionPort() const
     {
-        return m_document.useDrive().getSessionsPort();
+        return m_document.useDrive().getSessionPort();
     }
     
     std::string DocumentBrowserView::DriveView::DocumentSessionView::getHost() const
@@ -277,7 +277,7 @@ namespace kiwi
         g.fillRoundedRectangle(getLocalBounds().reduced(2).toFloat(), 0 );
         
         g.setColour(juce::Colours::whitesmoke);
-        g.drawFittedText("• Server Host : " + m_drive.getName(),
+        g.drawFittedText("• " + m_drive.getName(),
                          getLocalBounds().reduced(8, 6).removeFromTop(22),
                          juce::Justification::centredLeft, 1);
         

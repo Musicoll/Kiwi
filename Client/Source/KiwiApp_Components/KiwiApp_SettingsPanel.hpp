@@ -41,7 +41,7 @@ namespace kiwi
         SettingsPanel();
         
         //! @brief Destructor.
-        ~SettingsPanel() = default;
+        ~SettingsPanel();
         
     private: // variables
     };

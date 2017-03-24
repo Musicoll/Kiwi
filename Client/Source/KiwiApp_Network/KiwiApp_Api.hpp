@@ -32,7 +32,7 @@ using nlohmann::json;
 namespace kiwi
 {
     // ================================================================================ //
-    //                                    API REQUEST                                   //
+    //                                         API                                      //
     // ================================================================================ //
     
     //! @brief An API request handler class.
@@ -40,16 +40,7 @@ namespace kiwi
     {   
     public: // methods
         
-        enum class Protocol : bool
-        {
-            HTTP = 0,
-            HTTPS = 1
-        };
-        
-        struct Error
-        {
-            
-        };
+        enum class Protocol : uint8_t { HTTP = 0, HTTPS = 1 };
         
         struct Document
         {
@@ -57,7 +48,7 @@ namespace kiwi
             std::string name = "";
             uint64_t    session_id = 0ul;
             
-            //! @brief Returns true if the DocumentSession match another DocumentSession
+            //! @brief Returns true if the Document match another Document
             bool operator==(Document const& other_doc) const;
         };
         
@@ -83,7 +74,7 @@ namespace kiwi
         void setHost(std::string const& host);
         
         //! @brief Get the API host.
-        std::string getHost() const;
+        std::string const& getHost() const;
         
         //! @brief Set the API port.
         void setPort(uint16_t port) noexcept;

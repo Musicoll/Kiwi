@@ -35,13 +35,22 @@ namespace kiwi
     // ================================================================================ //
     
     DocumentBrowser::DocumentBrowser() :
-    m_distant_drive(new Drive("Remote", "54.234.132.205", 80, 9090))
+    m_distant_drive(nullptr)
     {
-        ;
+        auto& net_config = getAppSettings().network();
+        
+        std::string host = net_config.getProperty("host", "54.234.132.205").toString().toStdString();
+        int api_port = net_config.getProperty("api_port", 80);
+        int session_port = net_config.getProperty("session_port", 9090);
+        
+        net_config.addListener(this);
+        
+        m_distant_drive.reset(new Drive("Remote patchers", host, api_port, session_port));
     }
     
     DocumentBrowser::~DocumentBrowser()
     {
+        getAppSettings().network().removeListener(this);
         stop();
     }
     
@@ -58,6 +67,24 @@ namespace kiwi
     std::vector<DocumentBrowser::Drive*> DocumentBrowser::getDrives() const
     {
         return {m_distant_drive.get()};
+    }
+    
+    void DocumentBrowser::valueTreePropertyChanged(juce::ValueTree& vt, const juce::Identifier& id)
+    {
+        if(id == juce::Identifier("host"))
+        {
+            m_distant_drive->setHost(vt.getProperty("host").toString().toStdString());
+        }
+        else if(id == juce::Identifier("api_port"))
+        {
+            int port = vt.getProperty("api_port");
+            m_distant_drive->setApiPort(port);
+        }
+        else if(id == juce::Identifier("session_port"))
+        {
+            int port = vt.getProperty("session_port");
+            m_distant_drive->setSessionPort(port);
+        }
     }
     
     void DocumentBrowser::addListener(Listener& listener)
@@ -89,11 +116,10 @@ namespace kiwi
                                   uint16_t api_port,
                                   uint16_t session_port) :
     m_api(host, api_port),
-    m_host(host),
-    m_sessions_port(session_port),
+    m_session_port(session_port),
     m_name(name)
     {
-        //processSession(session);
+        ;
     };
     
     void DocumentBrowser::Drive::addListener(Listener& listener)
@@ -111,17 +137,37 @@ namespace kiwi
         return m_api.getPort();
     }
     
-    uint16_t DocumentBrowser::Drive::getSessionsPort() const
+    void DocumentBrowser::Drive::setApiPort(uint16_t port)
     {
-        return m_sessions_port;
+        m_api.setPort(port);
     }
     
-    std::string DocumentBrowser::Drive::getHost() const
+    void DocumentBrowser::Drive::setSessionPort(uint16_t port)
     {
-        return m_host;
+        m_session_port = port;
     }
     
-    std::string DocumentBrowser::Drive::getName() const
+    uint16_t DocumentBrowser::Drive::getSessionPort() const
+    {
+        return m_session_port;
+    }
+    
+    void DocumentBrowser::Drive::setHost(std::string const& host)
+    {
+        m_api.setHost(host);
+    }
+    
+    std::string const& DocumentBrowser::Drive::getHost() const
+    {
+        return m_api.getHost();
+    }
+    
+    void DocumentBrowser::Drive::setName(std::string const& name)
+    {
+        m_name = name;
+    }
+    
+    std::string const& DocumentBrowser::Drive::getName() const
     {
         return m_name;
     }
@@ -160,10 +206,10 @@ namespace kiwi
     
     bool DocumentBrowser::Drive::operator==(Drive const& drive) const
     {
-        return (m_host == drive.m_host)
+        return (getHost() == drive.getHost())
         && (getApiPort() == drive.getApiPort())
-        && (m_sessions_port == drive.m_sessions_port)
-        && (m_name == drive.m_name);
+        && (getSessionPort() == drive.getSessionPort())
+        && (m_name == drive.getName());
     }
     
     void DocumentBrowser::Drive::refresh()
@@ -289,24 +335,9 @@ namespace kiwi
         }
         else
         {
-            const auto settings = getAppSettings().useDefault();
-            
-            std::string host = settings.getProperty("distant_server_host", "localhost")
-            .toString().toStdString();
-            
-            std::string port_str = settings.getProperty("distant_server_flip_port", "9090").toString().toStdString();
-            
-            uint16_t port = std::stoul(port_str);
-            
-            m_patcher_manager = KiwiApp::useInstance().openRemotePatcher(host,
-                                                                         port,
-                                                                         m_document.session_id);
-            
-            /*
             m_patcher_manager = KiwiApp::useInstance().openRemotePatcher(m_drive.getHost(),
-                                                                         m_drive.getPort(),
-                                                                         m_session_id);
-            */
+                                                                         m_drive.getSessionPort(),
+                                                                         m_document.session_id);
             if(m_patcher_manager)
             {
                 m_patcher_manager->addListener(*this);

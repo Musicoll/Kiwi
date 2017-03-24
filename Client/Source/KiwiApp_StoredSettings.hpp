@@ -51,12 +51,16 @@ namespace kiwi
         void reload();
         
         //! @brief Returns the default settings value tree
-        juce::ValueTree& useDefault();
+        juce::ValueTree& globals();
+        
+        //! @brief Returns a network settings value tree
+        juce::ValueTree& network();
         
     private: // methods
         
         void changed();
-        void updateGlobalPreferences();
+        
+        void saveValueTree(juce::ValueTree const& vt, std::string const& key_name);
 
         void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier&) override   { changed(); }
         void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override               { changed(); }
@@ -67,7 +71,8 @@ namespace kiwi
     private: // members
         
         std::vector<std::unique_ptr<juce::PropertiesFile>> m_property_files;
-        juce::ValueTree                                    m_defaults;
+        juce::ValueTree                                    m_globals;
+        juce::ValueTree                                    m_network;
         
     private: // deleted methods
         

@@ -59,15 +59,19 @@ namespace kiwi
     //                                  STORED SETTINGS                                 //
     // ================================================================================ //
     
-    StoredSettings::StoredSettings() : m_defaults("KIWI_APP_DEFAULT_SETTINGS")
+    StoredSettings::StoredSettings() :
+    m_globals("GLOBAL_SETTINGS"),
+    m_network("NETWORK_CONFIG")
     {
         reload();
-        m_defaults.addListener(this);
+        m_globals.addListener(this);
+        m_network.addListener(this);
     }
     
     StoredSettings::~StoredSettings()
     {
-        m_defaults.removeListener(this);
+        m_globals.removeListener(this);
+        m_network.removeListener(this);
         flush();
     }
     
@@ -76,15 +80,8 @@ namespace kiwi
         return *m_property_files[0];
     }
     
-    void StoredSettings::updateGlobalPreferences()
-    {
-        ;
-    }
-    
     void StoredSettings::flush()
     {
-        updateGlobalPreferences();
-        
         for(int i = m_property_files.size(); --i >= 0;)
         {
             m_property_files[i]->saveIfNeeded();
@@ -96,22 +93,48 @@ namespace kiwi
         m_property_files.clear();
         m_property_files.emplace_back(createPropsFile("kiwi_settings"));
         
-        std::unique_ptr<juce::XmlElement> defaults(m_property_files[0]->getXmlValue("KIWI_APP_DEFAULT_SETTINGS"));
-        
-        if(defaults != nullptr)
         {
-            m_defaults = juce::ValueTree::fromXml(*defaults);
+            // reload Global Settings
+            std::unique_ptr<juce::XmlElement> globals(getGlobalProperties()
+                                                      .getXmlValue("Global Settings"));
+            
+            if(globals != nullptr)
+            {
+                m_globals = juce::ValueTree::fromXml(*globals);
+            }
+        }
+   
+        {
+            // reload Network settings
+            std::unique_ptr<juce::XmlElement> networks(getGlobalProperties()
+                                                       .getXmlValue("Network Settings"));
+            
+            if(networks != nullptr)
+            {
+                m_network = juce::ValueTree::fromXml(*networks);
+            }
         }
     }
     
-    juce::ValueTree& StoredSettings::useDefault()
+    juce::ValueTree& StoredSettings::globals()
     {
-        return m_defaults;
+        return m_globals;
+    }
+    
+    juce::ValueTree& StoredSettings::network()
+    {
+        return m_network;
+    }
+    
+    void StoredSettings::saveValueTree(juce::ValueTree const& vt, std::string const& key_name)
+    {
+        std::unique_ptr<juce::XmlElement> xml_value(vt.createXml());
+        getGlobalProperties().setValue(key_name, xml_value.get());
     }
     
     void StoredSettings::changed()
     {
-        juce::ScopedPointer<juce::XmlElement> data(m_defaults.createXml());
-        m_property_files[0]->setValue("KIWI_APP_DEFAULT_SETTINGS", data);
+        saveValueTree(m_globals, "Global Settings");
+        saveValueTree(m_network, "Network Settings");
     }
 }

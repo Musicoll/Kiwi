@@ -30,23 +30,26 @@ namespace kiwi
     
     SettingsPanel::SettingsPanel() : juce::PropertyPanel("Application settings")
     {
-        auto& settings = getAppSettings().useDefault();
+        auto& net_config = getAppSettings().network();
         
-        juce::Array<juce::PropertyComponent*> props;
+        juce::Array<juce::PropertyComponent*> props {
+            
+            new juce::TextPropertyComponent(net_config.getPropertyAsValue("host", nullptr),
+                                            "Host", 20, false),
+            
+            new juce::TextPropertyComponent(net_config.getPropertyAsValue("api_port", nullptr),
+                                            "API Port", 5, false),
+            
+            new juce::TextPropertyComponent(net_config.getPropertyAsValue("session_port", nullptr),
+                                            "Session Port", 5, false)
+        };
         
-        props.add(new juce::TextPropertyComponent(settings.getPropertyAsValue("distant_server_host", nullptr), "Distant server Host", 20, false));
-        
-        props.add(new juce::TextPropertyComponent(settings.getPropertyAsValue("distant_server_api_port", nullptr), "Distant server API Port", 5, false));
-        
-        props.add(new juce::TextPropertyComponent(settings.getPropertyAsValue("distant_server_flip_port", nullptr), "Distant server Flip Port", 5, false));
-        
-        addSection("Network", props, true, 0);
-        
-        props.clear();
-        
-        props.add(new juce::TextPropertyComponent(settings.getPropertyAsValue("local_documents_path", nullptr), "Local documents", 100, false));
-        
-        addSection("Paths", props, true, 0);
+        addSection("Network config", props, true, 0);
+    }
+    
+    SettingsPanel::~SettingsPanel()
+    {
+        clear();
     }
     
     
