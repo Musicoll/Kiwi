@@ -21,24 +21,46 @@
 
 #include <KiwiModel/KiwiModel_DataModel.hpp>
 #include "KiwiServer_Server.hpp"
+#include "KiwiServer_CommandLineParser.hpp"
 
 #include <json.hpp>
 
-int main(int argc, const char * argv[])
+void showHelp()
+{
+    std::cout << "Usage:\n";
+    std::cout << " -h shows this help message. \n";
+    std::cout << " -f set the json configuration file to use (needed). \n";
+}
+
+int main(int argc, char const* argv[])
 {
     using namespace kiwi;
+    using nlohmann::json;
+    
+    CommandLineParser cl_parser(argc, argv);
+    
+    if(cl_parser.hasOption("-h"))
+    {
+        showHelp();
+        return 0;
+    }
+    
+    juce::File configuration_file(cl_parser.getOption("-f"));
+    
+    if(!configuration_file.exists())
+    {
+        std::cerr << "Error: Config file does not exist or is unspecified.." << std::endl;
+        showHelp();
+        return 0;
+    }
     
     model::DataModel::init();
-    
     std::unique_ptr<server::Server> server(nullptr);
     
-    juce::File configuration_file(argv[1]);
-
     try
     {
-        nlohmann::json configuration = nlohmann::json::parse(configuration_file.loadFileAsString().toStdString());
-        
-        server.reset(new server::Server(configuration["port"], configuration["backend_directory"]));
+        json config = json::parse(configuration_file.loadFileAsString().toStdString());
+        server.reset(new server::Server(config["port"], config["backend_directory"]));
     }
     catch(nlohmann::detail::parse_error const& e)
     {
