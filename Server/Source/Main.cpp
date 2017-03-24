@@ -19,11 +19,10 @@
  ==============================================================================
  */
 
-#include <juce_core/juce_core.h>
-#include <json.hpp>
-
-#include <KiwiServer/KiwiServer_Server.hpp>
 #include <KiwiModel/KiwiModel_DataModel.hpp>
+#include "KiwiServer_Server.hpp"
+
+#include <json.hpp>
 
 int main(int argc, const char * argv[])
 {
