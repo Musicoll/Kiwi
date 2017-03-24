@@ -74,6 +74,9 @@ namespace kiwi
         //! @brief Adds a buffer to the output matrix of signal.
         void addToChannel(size_t const channel, dsp::Signal const& output_buffer) override;
         
+        //! @brief Gets a buffer from the input matrix signal.
+        void getFromChannel(size_t const channel, dsp::Signal & input_signal) override;
+        
     private: // methods
         
         // ================================================================================ //

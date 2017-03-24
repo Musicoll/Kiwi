@@ -118,6 +118,14 @@ namespace kiwi
         }
     }
     
+    void DspDeviceManager::getFromChannel(size_t const channel, dsp::Signal & input_signal)
+    {
+        if (channel < m_input_matrix->getNumberOfChannels() && input_signal.size() == m_input_matrix->getVectorSize())
+        {
+            input_signal.copy((*m_input_matrix)[channel]);
+        }
+    }
+    
     
     void DspDeviceManager::tick() const noexcept
     {
