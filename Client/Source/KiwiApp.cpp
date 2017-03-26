@@ -99,6 +99,8 @@ namespace kiwi
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAudioStatusWindow);
         juce::MenuBarModel::setMacMainMenu(m_menu_model.get(), &macMainMenuPopup, TRANS("Open Recent"));
         #endif
+
+        juce::Desktop::getInstance().setGlobalScaleFactor(1.);
         
         juce::LookAndFeel::getDefaultLookAndFeel().setUsingNativeAlertWindows(true);
     }
