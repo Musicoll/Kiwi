@@ -69,6 +69,9 @@ namespace kiwi
         
         //! @brief Open a patcher from file
         void askUserToOpenPatcherDocument();
+
+        //! @brief Removes the view of a certain patcher.
+        void removePatcherWindow(PatcherViewWindow & patcher_window);
         
         //! @brief Attempt to close the given window asking user to save file if needed.
         void closeWindow(AppWindow& window);

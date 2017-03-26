@@ -136,6 +136,28 @@ namespace kiwi
             }
         }
     }
+
+    void Instance::removePatcherWindow(PatcherViewWindow & patcher_window)
+    {
+        if (!m_patcher_managers.empty())
+        {
+            PatcherManager& manager = patcher_window.getPatcherManager();
+
+            auto manager_it = getPatcherManager(manager);
+
+            if (manager_it != m_patcher_managers.end())
+            {
+                PatcherView& patcherview = patcher_window.getPatcherView();
+
+                 manager.closePatcherViewWindow(patcherview);
+
+                if ( manager.getNumberOfView() == 0)
+                {
+                    m_patcher_managers.erase(manager_it);
+                }
+            }
+        }
+    }
     
     void Instance::closeWindow(AppWindow& window)
     {

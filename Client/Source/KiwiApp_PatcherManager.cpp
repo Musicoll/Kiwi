@@ -50,13 +50,20 @@ namespace kiwi
         setResizable(true, true);
         setVisible(true);
     }
+
+    PatcherManager& PatcherViewWindow::getPatcherManager() const
+    {
+        return m_patcher_manager;
+    }
+
+    PatcherView& PatcherViewWindow::getPatcherView() const
+    {
+        return m_patcherview;
+    }
     
     void PatcherViewWindow::closeButtonPressed()
     {
-        if(m_patcher_manager.closePatcherViewWindow(m_patcherview) && m_patcher_manager.getNumberOfView() == 0)
-        {
-            KiwiApp::use().useInstance().removePatcher(m_patcher_manager);
-        }
+        KiwiApp::use().useInstance().removePatcherWindow(*this);
     }
     
     // ================================================================================ //

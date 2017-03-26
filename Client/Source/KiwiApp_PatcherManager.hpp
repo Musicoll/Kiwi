@@ -46,6 +46,12 @@ namespace kiwi
     public: // methods
         
         PatcherViewWindow(PatcherManager& manager, PatcherView& patcherview);
+
+        //! @brief returns the patcher manager.
+        PatcherManager& getPatcherManager() const;
+
+        //! @brief returns the PatcherView.
+        PatcherView& getPatcherView() const;
         
         //! @brief Called whenever a patcher is closed. Asks the user to save before closing.
         void closeButtonPressed() override;
