@@ -133,6 +133,9 @@ namespace kiwi
         //! @brief remove a listener.
         void removeListener(Listener& listener);
         
+        //! @brief Returns the API object reference.
+        Api& useApi();
+        
         //! @brief Set the kiwi api port.
         void setApiPort(uint16_t port);
         
@@ -163,6 +166,9 @@ namespace kiwi
         //! @brief Returns the documents.
         std::list<DocumentSession> const& getDocuments() const;
         
+        //! @brief Returns the documents.
+        std::list<DocumentSession>& getDocuments();
+        
         //! @brief Returns true if the drive match the other drive
         //! @details this operator only compares ip and port.
         bool operator==(Drive const& drive) const;
@@ -192,13 +198,13 @@ namespace kiwi
         virtual ~Listener() = default;
         
         //! @brief Called when a document session has been added.
-        virtual void documentAdded(DocumentBrowser::Drive::DocumentSession const& doc) = 0;
+        virtual void documentAdded(DocumentBrowser::Drive::DocumentSession& doc) = 0;
         
         //! @brief Called when a document session changed.
-        virtual void documentChanged(DocumentBrowser::Drive::DocumentSession const& doc) = 0;
+        virtual void documentChanged(DocumentBrowser::Drive::DocumentSession& doc) = 0;
         
         //! @brief Called when a document session has been removed.
-        virtual void documentRemoved(DocumentBrowser::Drive::DocumentSession const& doc) = 0;
+        virtual void documentRemoved(DocumentBrowser::Drive::DocumentSession& doc) = 0;
     };
     
     // ================================================================================ //
@@ -210,7 +216,7 @@ namespace kiwi
     public: // methods
         
         //! @brief Constructor.
-        DocumentSession(DocumentBrowser::Drive const& parent, Api::Document document);
+        DocumentSession(DocumentBrowser::Drive& parent, Api::Document document);
         
         //! @brief Destructor.
         ~DocumentSession();
@@ -230,13 +236,16 @@ namespace kiwi
         //! @brief Called when the PatcherManager is closed.
         void patcherManagerRemoved(PatcherManager const& manager) override;
         
+        //! @brief Rename the document.
+        void rename(std::string const& new_name);
+        
         //! @brief Returns true if the DocumentSession match another DocumentSession
         //! @details this operator uses the session_id field to compare.
         bool operator==(DocumentSession const& other_doc) const;
         
     private: // members
         
-        DocumentBrowser::Drive const&       m_drive;
+        DocumentBrowser::Drive&             m_drive;
         Api::Document                       m_document;
         PatcherManager*                     m_patcher_manager = nullptr;
         

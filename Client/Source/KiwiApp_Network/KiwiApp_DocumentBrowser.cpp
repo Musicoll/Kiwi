@@ -132,6 +132,11 @@ namespace kiwi
         m_listeners.remove(listener);
     }
     
+    Api& DocumentBrowser::Drive::useApi()
+    {
+        return m_api;
+    }
+    
     uint16_t DocumentBrowser::Drive::getApiPort() const
     {
         return m_api.getPort();
@@ -200,6 +205,11 @@ namespace kiwi
     }
     
     std::list<DocumentBrowser::Drive::DocumentSession> const& DocumentBrowser::Drive::getDocuments() const
+    {
+        return m_documents;
+    }
+    
+    std::list<DocumentBrowser::Drive::DocumentSession>& DocumentBrowser::Drive::getDocuments()
     {
         return m_documents;
     }
@@ -286,7 +296,7 @@ namespace kiwi
     //                                  DRIVE DOCUMENT                                  //
     // ================================================================================ //
     
-    DocumentBrowser::Drive::DocumentSession::DocumentSession(DocumentBrowser::Drive const& parent,
+    DocumentBrowser::Drive::DocumentSession::DocumentSession(DocumentBrowser::Drive& parent,
                                                              Api::Document document) :
     m_drive(parent),
     m_document(std::move(document))
@@ -320,6 +330,22 @@ namespace kiwi
     void DocumentBrowser::Drive::DocumentSession::patcherManagerRemoved(PatcherManager const& manager)
     {
         m_patcher_manager = nullptr;
+    }
+    
+    void DocumentBrowser::Drive::DocumentSession::rename(std::string const& new_name)
+    {
+        m_drive.useApi().renameDocument([](Api::Response res) {
+            
+            if(!res.error)
+            {
+                std::cout << "document successfully updated";
+            }
+            else
+            {
+                std::cout << "document update failed, err: " + res.error.message << '\n';
+            }
+            
+        }, m_document._id, new_name);
     }
     
     bool DocumentBrowser::Drive::DocumentSession::operator==(DocumentSession const& other_doc) const

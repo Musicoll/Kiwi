@@ -135,16 +135,28 @@ namespace kiwi
     //                               DOCUMENT SESSION VIEW                              //
     // ================================================================================ //
     
-    DocumentBrowserView::DriveView::DocumentSessionView::DocumentSessionView(DocumentBrowser::Drive::DocumentSession const& document) :
+    DocumentBrowserView::DriveView::DocumentSessionView::DocumentSessionView(DocumentBrowser::Drive::DocumentSession& document) :
     m_document(document),
     m_open_btn("open")
     {
         setRepaintsOnMouseActivity(true);
 
-        m_open_btn.setCommand(std::bind(&DocumentBrowser::Drive::DocumentSession::open, m_document));
+        m_open_btn.setCommand(std::bind(&DocumentBrowser::Drive::DocumentSession::open, &m_document));
         m_open_btn.setSize(30, 20);
         m_open_btn.setTooltip("open this patcher");
         addAndMakeVisible(m_open_btn);
+        
+        // label setup
+        m_name_label.setText(getName(), juce::NotificationType::dontSendNotification);
+        m_name_label.setSize(1, 1);
+        
+        m_name_label.setEditable(false, true, true);
+        m_name_label.addListener(this);
+        
+        addAndMakeVisible(m_name_label);
+        
+        resized();
+
     }
     
     uint16_t DocumentBrowserView::DriveView::DocumentSessionView::getSessionPort() const
@@ -175,12 +187,6 @@ namespace kiwi
         
         g.setColour(mouseover ? bg_color.brighter(0.1f) : bg_color);
         g.fillAll();
-        
-        const juce::Colour text_color = juce::Colours::black;
-        g.setColour(text_color);
-        g.drawFittedText(getName(),
-                         bounds.withX(5).withRight(m_open_btn.getX() - 5),
-                         juce::Justification::centredLeft, 5);
     }
     
     void DocumentBrowserView::DriveView::DocumentSessionView::resized()
@@ -189,6 +195,16 @@ namespace kiwi
         
         m_open_btn.setTopRightPosition(bounds.getWidth() - 5,
                                        bounds.getHeight() * 0.5 - m_open_btn.getHeight() * 0.5);
+        
+        m_name_label.setBounds(bounds.reduced(5).withRight(m_open_btn.getX() - 5));
+    }
+    
+    void DocumentBrowserView::DriveView::DocumentSessionView::labelTextChanged(juce::Label* label)
+    {
+        if(label == &m_name_label)
+        {
+            m_document.rename(m_name_label.getText().toStdString());
+        }
     }
     
     bool DocumentBrowserView::DriveView::DocumentSessionView::operator==(DocumentBrowser::Drive::DocumentSession const& other_document) const
@@ -215,7 +231,7 @@ namespace kiwi
         m_refresh_btn.setTooltip("Refresh Document list");
         addAndMakeVisible(m_refresh_btn);
         
-        for(auto const& document : m_drive.getDocuments())
+        for(auto& document : m_drive.getDocuments())
         {
             documentAdded(document);
         }
@@ -285,7 +301,7 @@ namespace kiwi
         g.drawLine(0, 30, getWidth(), 30, 3);
     }
     
-    void DocumentBrowserView::DriveView::documentAdded(DocumentBrowser::Drive::DocumentSession const& doc)
+    void DocumentBrowserView::DriveView::documentAdded(DocumentBrowser::Drive::DocumentSession& doc)
     {
         auto doc_view = std::make_unique<DocumentSessionView>(doc);
         
@@ -297,7 +313,7 @@ namespace kiwi
         updateLayout();
     }
     
-    void DocumentBrowserView::DriveView::documentRemoved(DocumentBrowser::Drive::DocumentSession const& doc)
+    void DocumentBrowserView::DriveView::documentRemoved(DocumentBrowser::Drive::DocumentSession& doc)
     {
         const auto doc_view_it = std::find_if(m_documents.begin(), m_documents.end(), [&doc](std::unique_ptr<DocumentSessionView> const& document){
             return (*document.get() == doc);
@@ -313,7 +329,7 @@ namespace kiwi
         }
     }
     
-    void DocumentBrowserView::DriveView::documentChanged(DocumentBrowser::Drive::DocumentSession const& doc)
+    void DocumentBrowserView::DriveView::documentChanged(DocumentBrowser::Drive::DocumentSession& doc)
     {
         const auto doc_view_it = std::find_if(m_documents.begin(), m_documents.end(),
                                               [&doc](std::unique_ptr<DocumentSessionView> const& document) {

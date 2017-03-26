@@ -181,6 +181,17 @@ namespace kiwi
                                        cpr::Timeout{3000}));
     }
     
+    void Api::renameDocument(std::function<void(Api::Response res)> callback,
+                             std::string document_id, std::string const& new_name)
+    {
+        assert(!new_name.empty() && "name should not be empty!");
+        
+        storeRequest(cpr::PutCallback(callback,
+                                      getApiRootUrl() + "/documents/" + document_id,
+                                      cpr::Payload{{"name", new_name}},
+                                      cpr::Timeout{3000}));
+    }
+    
     void Api::storeRequest(std::future<void> && future)
     {
         for(std::future<void>& f : m_pending_requests)

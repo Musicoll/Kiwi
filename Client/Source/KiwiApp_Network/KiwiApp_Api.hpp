@@ -82,13 +82,18 @@ namespace kiwi
         //! @brief Get the API port.
         uint16_t getPort() const noexcept;
         
-        //! @brief Make an API request to get a list of documents
+        //! @brief Make an async API request to get a list of documents
         void getDocuments(std::function<void(Api::Response res, Api::Documents)> callback);
         
-        //! @brief Make an API request to create a new document
+        //! @brief Make an async API request to create a new document
         //! @param callback
-        void createDocument(std::function<void(Api::Response res, Api::Document)> success_callback,
+        void createDocument(std::function<void(Api::Response res, Api::Document)> callback,
                             std::string const& document_name = "");
+        
+        //! @brief Rename a document asynchronously.
+        //! @param callback The callback method that will be called when the request is completed.
+        void renameDocument(std::function<void(Api::Response res)> callback,
+                            std::string document_id, std::string const& new_name);
     
     private: // methods
         
