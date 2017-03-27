@@ -17,7 +17,7 @@ install:
     - set PATH=C:\Python27;%PATH%
 
 build_script:
-    - python .\Config\configure.py
+    - python .\Config\configure.py -c %CONFIGURATION% -p %PLATFORM%
     - python .\Config\build.py -c %CONFIGURATION% -p %PLATFORM%
 
 after_build:
