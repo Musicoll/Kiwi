@@ -105,9 +105,12 @@ namespace kiwi
         if(file.hasFileExtension("kiwi"))
         {
             auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(),
-                                                         new PatcherManager(*this, file));
+                                                         new PatcherManager(*this));
             
             PatcherManager& manager = *(manager_it->get());
+            
+            manager.loadFromFile(file);
+            
             if(manager.getNumberOfView() == 0)
             {
                 manager.newView();
@@ -185,35 +188,37 @@ namespace kiwi
         return success;
     }
     
-    PatcherManager* Instance::openRemotePatcher(std::string const& host,
-                                                uint16_t port,
-                                                uint64_t session_id)
+    PatcherManager* Instance::openRemotePatcher(DocumentBrowser::Drive::DocumentSession& session)
     {
-        std::unique_ptr<PatcherManager> manager_uptr = nullptr;
+        auto mng_it = getPatcherManagerForSession(session);
+        if(mng_it != m_patcher_managers.end())
+        {
+            PatcherManager& manager = *(mng_it->get());
+            manager.bringsFirstViewToFront();
+            return &manager;
+        }
+        
+        auto manager_uptr = std::make_unique<PatcherManager>(*this);
         
         try
         {
-            manager_uptr.reset(new PatcherManager(*this, host, port, session_id));
+            manager_uptr->connect(session);
         }
         catch(std::runtime_error &e)
         {
             KiwiApp::error(e.what());
+            return nullptr;
         }
         
-        if(manager_uptr)
+        auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), std::move(manager_uptr));
+        PatcherManager& manager = *(manager_it->get());
+        
+        if(manager.getNumberOfView() == 0)
         {
-            auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), std::move(manager_uptr));
-            PatcherManager& manager = *(manager_it->get());
-            
-            if(manager.getNumberOfView() == 0)
-            {
-                manager.newView();
-            }
-            
-            return manager_it->get();
+            manager.newView();
         }
         
-        return nullptr;
+        return manager_it->get();
     }
     
     Instance::PatcherManagers::iterator Instance::getPatcherManager(PatcherManager const& manager)
@@ -221,6 +226,20 @@ namespace kiwi
         const auto find_it = [&manager](std::unique_ptr<PatcherManager> const& manager_uptr)
         {
             return &manager == manager_uptr.get();
+        };
+        
+        return std::find_if(m_patcher_managers.begin(), m_patcher_managers.end(), find_it);
+    }
+    
+    Instance::PatcherManagers::iterator Instance::getPatcherManagerForSession(DocumentBrowser::Drive::DocumentSession& session)
+    {
+        const auto find_it = [session_id = session.getSessionId()](std::unique_ptr<PatcherManager> const& manager_uptr)
+        {
+            return (manager_uptr->isRemote()
+                    && session_id != 0
+                    && session_id == manager_uptr->getSessionId());
+            
+            return false;
         };
         
         return std::find_if(m_patcher_managers.begin(), m_patcher_managers.end(), find_it);

@@ -76,10 +76,8 @@ namespace kiwi
         //! @return True if all document have been closed, false if the user cancel the action.
         bool closeAllWindows();
         
-        //! @brief Attempt to create a new patcher with given host and port parameters.
-        PatcherManager* openRemotePatcher(std::string const& host,
-                                          uint16_t port,
-                                          uint64_t session_id);
+        //! @brief Attempt to create a new patcher with document Session informations.
+        PatcherManager* openRemotePatcher(DocumentBrowser::Drive::DocumentSession& session);
         
         //! @brief Brings the Application settings window to front.
         void showAppSettingsWindow();
@@ -106,10 +104,13 @@ namespace kiwi
         //! @internal get the given patcher manager iterator.
         PatcherManagers::iterator getPatcherManager(PatcherManager const& manager);
         
-        //! @brief Returns the next untitled number based on current documents
+        //! @internal get the given patcher manager iterator.
+        PatcherManagers::iterator getPatcherManagerForSession(DocumentBrowser::Drive::DocumentSession& session);
+        
+        //! @internal Returns the next untitled number based on current documents
         size_t getNextUntitledNumberAndIncrement();
         
-    private: // members
+    private: // variables
         
         engine::Instance                            m_instance;
         

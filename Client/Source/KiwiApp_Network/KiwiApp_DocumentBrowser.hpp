@@ -24,11 +24,12 @@
 
 #include <KiwiEngine/KiwiEngine_Listeners.hpp>
 
+#include <juce_data_structures/juce_data_structures.h>
 #include <juce_events/juce_events.h>
 
-#include "../KiwiApp_PatcherManager.hpp"
-
 #include "KiwiApp_Api.hpp"
+
+#include <list>
 
 namespace kiwi
 {
@@ -211,7 +212,7 @@ namespace kiwi
     //                                  DRIVE DOCUMENT                                  //
     // ================================================================================ //
     
-    class DocumentBrowser::Drive::DocumentSession : public PatcherManager::Listener
+    class DocumentBrowser::Drive::DocumentSession
     {
     public: // methods
         
@@ -221,20 +222,26 @@ namespace kiwi
         //! @brief Destructor.
         ~DocumentSession();
         
+        //! @brief Returns the document drive
+        Drive& useDrive();
+        
         //! @brief Tells the Kiwi instance to open up this document.
         void open();
         
         //! @brief Returns the document name
         std::string getName() const;
         
+        //! @brief Returns the document session host
+        std::string getHost() const;
+        
         //! @brief Returns the session id of the document.
         uint64_t getSessionId() const;
         
+        //! @brief Returns the document session port.
+        uint16_t getSessionPort() const;
+        
         //! @brief Returns the drive that holds this document.
         DocumentBrowser::Drive const& useDrive() const;
-        
-        //! @brief Called when the PatcherManager is closed.
-        void patcherManagerRemoved(PatcherManager const& manager) override;
         
         //! @brief Rename the document.
         void rename(std::string const& new_name);
@@ -247,7 +254,6 @@ namespace kiwi
         
         DocumentBrowser::Drive&             m_drive;
         Api::Document                       m_document;
-        PatcherManager*                     m_patcher_manager = nullptr;
         
         friend class DocumentBrowser::Drive;
     };

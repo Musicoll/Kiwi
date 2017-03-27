@@ -306,10 +306,7 @@ namespace kiwi
     
     DocumentBrowser::Drive::DocumentSession::~DocumentSession()
     {
-        if(m_patcher_manager)
-        {
-            m_patcher_manager->removeListener(*this);
-        }
+        ;
     }
     
     std::string DocumentBrowser::Drive::DocumentSession::getName() const
@@ -317,9 +314,19 @@ namespace kiwi
         return m_document.name;
     }
     
+    std::string DocumentBrowser::Drive::DocumentSession::getHost() const
+    {
+        return m_drive.getHost();
+    }
+    
     uint64_t DocumentBrowser::Drive::DocumentSession::getSessionId() const
     {
         return m_document.session_id;
+    }
+    
+    uint16_t DocumentBrowser::Drive::DocumentSession::getSessionPort() const
+    {
+        return m_drive.getSessionPort();
     }
     
     DocumentBrowser::Drive const& DocumentBrowser::Drive::DocumentSession::useDrive() const
@@ -327,18 +334,18 @@ namespace kiwi
         return m_drive;
     }
     
-    void DocumentBrowser::Drive::DocumentSession::patcherManagerRemoved(PatcherManager const& manager)
-    {
-        m_patcher_manager = nullptr;
-    }
-    
     void DocumentBrowser::Drive::DocumentSession::rename(std::string const& new_name)
     {
+        if(new_name.empty())
+        {
+            return;
+        }
+        
         m_drive.useApi().renameDocument([](Api::Response res) {
             
             if(!res.error)
             {
-                std::cout << "document successfully updated";
+                std::cout << "document successfully updated" << '\n';
             }
             else
             {
@@ -353,21 +360,13 @@ namespace kiwi
         return (&m_drive == &other_doc.useDrive()) && (m_document == other_doc.m_document);
     }
     
+    DocumentBrowser::Drive& DocumentBrowser::Drive::DocumentSession::useDrive()
+    {
+        return m_drive;
+    }
+    
     void DocumentBrowser::Drive::DocumentSession::open()
     {
-        if(m_patcher_manager != nullptr)
-        {
-            m_patcher_manager->bringsFirstViewToFront();
-        }
-        else
-        {
-            m_patcher_manager = KiwiApp::useInstance().openRemotePatcher(m_drive.getHost(),
-                                                                         m_drive.getSessionPort(),
-                                                                         m_document.session_id);
-            if(m_patcher_manager)
-            {
-                m_patcher_manager->addListener(*this);
-            }
-        }
+        KiwiApp::useInstance().openRemotePatcher(*this);
     }
 }

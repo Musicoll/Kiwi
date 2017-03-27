@@ -33,30 +33,11 @@
 #include "KiwiApp_Window.hpp"
 #include "KiwiApp_PatcherView.hpp"
 
+#include "KiwiApp_Network/KiwiApp_DocumentBrowser.hpp"
+
 namespace kiwi
 {
     class Instance;
-    
-    // ================================================================================ //
-    //                                PATCHER VIEW WINDOW                               //
-    // ================================================================================ //
-    
-    class PatcherViewWindow : public Window
-    {
-    public:
-        PatcherViewWindow(PatcherManager& manager, PatcherView& patcherview);
-        void closeButtonPressed() override;
-        
-        //! @brief returns the patcher manager.
-        PatcherManager& getManager() const;
-        
-        //! @brief returns the PatcherView.
-        PatcherView& getPatcherView() const;
-        
-    private:
-        PatcherManager& m_manager;
-        PatcherView& m_patcherview;
-    };
     
     // ================================================================================ //
     //                                  PATCHER MANAGER                                 //
@@ -64,7 +45,8 @@ namespace kiwi
     
     //! @brief The main DocumentObserver.
     //! @details The Instance dispatch changes to all other DocumentObserver objects
-    class PatcherManager : public flip::DocumentObserver<model::Patcher>
+    class PatcherManager :  public flip::DocumentObserver<model::Patcher>,
+                            public DocumentBrowser::Drive::Listener
     {
     public: // nested classes
         
@@ -75,14 +57,14 @@ namespace kiwi
         //! @brief Constructor.
         PatcherManager(Instance& instance);
         
-        //! @brief Constructs and load patcher from file
-        PatcherManager(Instance& instance, juce::File const& file);
-
-        //! @brief Construct and connect to remote server
-        PatcherManager(Instance & instance, const std::string host, uint16_t port, uint64_t session_id);
-        
         //! @brief Destructor.
         ~PatcherManager();
+        
+        //! @brief Try to connect this patcher to a remote server.
+        void connect(DocumentBrowser::Drive::DocumentSession& session);
+        
+        //! @brief Load patcher datas from file.
+        void loadFromFile(juce::File const& file);
         
         //! @brief Returns the Patcher model
         model::Patcher& getPatcher();
@@ -92,6 +74,16 @@ namespace kiwi
         
         //! @brief Returns true if the this is a remotely connected document.
         bool isRemote() const noexcept;
+        
+        //! @brief Returns the session ID of the document.
+        //! @details This function returns 0 if the document is loaded from disk or memory.
+        //! @see isRemote
+        uint64_t getSessionId() const noexcept;
+        
+        //! @brief Returns the name of the document.
+        //! @details This function returns 0 if the document is loaded from disk or memory.
+        //! @see isRemote
+        std::string getDocumentName() const;
         
         //! @brief Returns the number of patcher views.
         size_t getNumberOfView();
@@ -125,6 +117,15 @@ namespace kiwi
         //! @brief remove a listener.
         void removeListener(Listener& listener);
         
+        //! @brief Called when a document session has been added.
+        void documentAdded(DocumentBrowser::Drive::DocumentSession& doc) override;
+        
+        //! @brief Called when a document session changed.
+        void documentChanged(DocumentBrowser::Drive::DocumentSession& doc) override;
+        
+        //! @brief Called when a document session has been removed.
+        void documentRemoved(DocumentBrowser::Drive::DocumentSession& doc) override;
+        
     private:
         
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
@@ -154,26 +155,33 @@ namespace kiwi
 
     private: // members
         
-        Instance&                   m_instance;
-        model::PatcherValidator     m_validator;
-        flip::Document              m_document;
-        bool                        m_need_saving_flag;
-        bool                        m_is_remote;
-        engine::Listeners<Listener> m_listeners;
+        Instance&                                   m_instance;
+        model::PatcherValidator                     m_validator;
+        flip::Document                              m_document;
+        bool                                        m_need_saving_flag;
+        bool                                        m_is_remote;
+        DocumentBrowser::Drive::DocumentSession*    m_session {nullptr};
     };
     
     // ================================================================================ //
-    //                             PATCHER MANAGER LISTENER                             //
+    //                                PATCHER VIEW WINDOW                               //
     // ================================================================================ //
     
-    //! @brief Listen to PatcherManager changes.
-    struct PatcherManager::Listener
+    class PatcherViewWindow : public Window
     {
-        //! @brief Destructor.
-        virtual ~Listener() = default;
+    public:
+        PatcherViewWindow(PatcherManager& manager, PatcherView& patcherview);
+        void closeButtonPressed() override;
         
-        //! @brief Called when a document session has been added.
-        virtual void patcherManagerRemoved(PatcherManager const& manager) = 0;
+        //! @brief returns the patcher manager.
+        PatcherManager& getManager() const;
+        
+        //! @brief returns the PatcherView.
+        PatcherView& getPatcherView() const;
+        
+    private:
+        PatcherManager& m_manager;
+        PatcherView& m_patcherview;
     };
 }
 
