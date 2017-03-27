@@ -169,12 +169,19 @@ namespace kiwi
             
             //! @brief Returns true if the two documents refer to the same session_id
             bool operator==(DocumentBrowser::Drive::DocumentSession const& other_document) const;
+        
+        private: // methods
             
-        private: // members
+            //! @internal Called by the DriveView when the document has changed.
+            void documentSessionChanged();
+            
+        private: // variables
             
             DocumentBrowser::Drive::DocumentSession&    m_document;
             BrowserButton                               m_open_btn;
             juce::Label                                 m_name_label;
+            
+            friend DriveView;
         };
         
     private: // methods

@@ -406,8 +406,8 @@ namespace kiwi
     }
 
     void PatcherManager::notifyPatcherView(model::Patcher& patcher,
-                                            model::Patcher::User& user,
-                                            model::Patcher::View& view)
+                                           model::Patcher::User& user,
+                                           model::Patcher::View& view)
     {
         if(user.getId() == m_instance.getUserId())
         {
@@ -418,8 +418,8 @@ namespace kiwi
     }
 
     void PatcherManager::removePatcherWindow(model::Patcher& patcher,
-                                              model::Patcher::User& user,
-                                              model::Patcher::View& view)
+                                             model::Patcher::User& user,
+                                             model::Patcher::View& view)
     {
         if(user.getId() == m_instance.getUserId())
         {

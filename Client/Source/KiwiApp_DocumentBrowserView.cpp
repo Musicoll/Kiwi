@@ -179,6 +179,11 @@ namespace kiwi
         return m_document.getSessionId();
     }
     
+    void DocumentBrowserView::DriveView::DocumentSessionView::documentSessionChanged()
+    {
+        m_name_label.setText(m_document.getName(), juce::NotificationType::dontSendNotification);
+    }
+    
     void DocumentBrowserView::DriveView::DocumentSessionView::paint(juce::Graphics& g)
     {
         const auto bounds = getLocalBounds();
@@ -338,7 +343,7 @@ namespace kiwi
         
         if(doc_view_it != m_documents.end())
         {
-            (*doc_view_it)->repaint();
+            (*doc_view_it)->documentSessionChanged();
         }
     }
     
