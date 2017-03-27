@@ -90,6 +90,9 @@ namespace kiwi
         //! @brief Returns the Patcher model
         model::Patcher const& getPatcher() const;
         
+        //! @brief Returns true if the this is a remotely connected document.
+        bool isRemote() const noexcept;
+        
         //! @brief Returns the number of patcher views.
         size_t getNumberOfView();
         
@@ -114,7 +117,7 @@ namespace kiwi
         bool saveDocument();
         
         //! @brief Returns true if the patcher needs to be saved.
-        bool needsSaving() const;
+        bool needsSaving() const noexcept;
         
         //! @brief Add a listener.
         void addListener(Listener& listener);

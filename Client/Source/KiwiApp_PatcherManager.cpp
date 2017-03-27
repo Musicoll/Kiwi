@@ -124,6 +124,11 @@ namespace kiwi
         return m_document.root<model::Patcher>();
     }
     
+    bool PatcherManager::isRemote() const noexcept
+    {
+        return m_is_remote;
+    }
+    
     void PatcherManager::newView()
     {
         auto& patcher = getPatcher();
@@ -142,7 +147,7 @@ namespace kiwi
         });
     }
     
-    bool PatcherManager::needsSaving() const
+    bool PatcherManager::needsSaving() const noexcept
     {
         return (!m_is_remote) && m_need_saving_flag;
     }
@@ -159,6 +164,11 @@ namespace kiwi
     
     bool PatcherManager::saveDocument()
     {
+        if(!needsSaving())
+        {
+            return false;
+        }
+        
         auto& patcher = getPatcher();
         juce::File const& current_save_file = DocumentManager::getSelectedFile(patcher);
         
@@ -381,8 +391,8 @@ namespace kiwi
     }
 
     void PatcherManager::createPatcherWindow(model::Patcher& patcher,
-                                              model::Patcher::User& user,
-                                              model::Patcher::View& view)
+                                             model::Patcher::User& user,
+                                             model::Patcher::View& view)
     {
         if(user.getId() == m_instance.getUserId())
         {
