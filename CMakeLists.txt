@@ -261,6 +261,31 @@ set_target_properties (Flip PROPERTIES FOLDER ThirdParty
 source_group_rec("${FLIP_SRC}" ${FLIP_DIR})
 
 #----------------------------------
+# Cpr
+#----------------------------------
+
+# Cpr settings
+set(CMAKE_USE_OPENSSL OFF CACHE BOOL "Don't use openssl")
+set(USE_SYSTEM_CURL OFF CACHE BOOL "Don't use system curl")
+set(BUILD_CPR_TESTS OFF CACHE BOOL "Don't build cpr tests")
+
+# Curl settings
+set(CURL_STATICLIB ON CACHE BOOL "Build static library for curl")
+set(BUILD_TESTING OFF CACHE BOOL "Don't build curl tests")
+
+add_subdirectory(ThirdParty/cpr)
+
+target_compile_definitions(${CPR_LIBRARIES} PUBLIC "CURL_STATICLIB=1")
+set_target_properties(${CPR_LIBRARIES} PROPERTIES FOLDER ThirdParty)
+
+
+#----------------------------------
+# Json
+#----------------------------------
+
+set(JSON_INCLUDE_DIRS ${ROOT_DIR}/ThirdParty/json)
+
+#----------------------------------
 # Model
 #----------------------------------
 
@@ -310,10 +335,6 @@ source_group_rec("${SERVER_SRC}" ${ROOT_DIR}/Server/Source)
 # Client
 #----------------------------------
 
-add_subdirectory(ThirdParty)
-
-include_directories(${CPR_INCLUDE_DIRS} ${JSON_INCLUDE_DIRS})
-
 file(GLOB_RECURSE KIWI_CLIENT_SRC ${ROOT_DIR}/Client/Source/*.[c|h]pp)
 add_executable(Kiwi ${KIWI_CLIENT_SRC} "${KIWI_CLIENT_RESSOURCES}")
 target_add_dependency(Kiwi KiwiEngine)
@@ -321,6 +342,7 @@ target_add_dependency(Kiwi KiwiModel)
 target_add_dependency(Kiwi KiwiDsp)
 target_add_dependency(Kiwi Juce)
 target_add_dependency(Kiwi ${CPR_LIBRARIES})
+target_include_directories(Kiwi PUBLIC ${JSON_INCLUDE_DIRS} ${CPR_INCLUDE_DIRS})
 
 if (APPLE)
 	set_target_properties(Kiwi PROPERTIES MACOSX_BUNDLE TRUE
