@@ -19,18 +19,19 @@ cmd = "cmake";
 
 def parse_args ():
     arg_parser = argparse.ArgumentParser ()
-	
+
     arg_parser.add_argument('-c', '--configuration', default = 'All', choices = ['Debug', 'Release' ,'All'])
-    
+    arg_parser.add_argument('-curlsystem', '--curlsystem', default = 'Off', choices = ['On', 'Off'])
+
     if platform.system () == 'Darwin':
         arg_parser.add_argument('-flip', default = 'public', choices = ['public', 'private'])
-    
+
     if platform.system () == 'Linux':
         arg_parser.add_argument('-coverage', required=False, action='store_true', help='activate coverage')
-	
+
     if platform.system() == "Windows":
         arg_parser.add_argument('-p','--platform', default = 'All', choices = ['x64', 'Win32', 'All'])
-	
+
     return arg_parser.parse_args (sys.argv[1:])
 
 #==============================================================================
@@ -40,7 +41,7 @@ def parse_args ():
 def create_dir(dir):
 	if not os.path.exists(dir):
 	   os.makedirs(dir);
-    
+
 #==============================================================================
 # Name : flip_private
 #==============================================================================
@@ -100,13 +101,18 @@ def configure_mac(args):
     if (args.flip == "private"):
         build_flip_private()
         cmd += " -DFLIP_PRIVATE=1"
-		
+
+    if (args.curlsystem == "Off"):
+        cmd += " -DUSE_SYSTEM_CURL=Off"
+    elif (args.curlsystem == "On"):
+        cmd += " -DUSE_SYSTEM_CURL=On"
+
     if (args.configuration == "Debug" or args.configuration == "All"):
         mac_debug();
-	
+
     if (args.configuration == "Release" or args.configuration == "All"):
         mac_release();
-		
+
     return
 
 #==============================================================================
@@ -177,19 +183,24 @@ def win_release_64():
 def configure_windows(args):
     global cmd
     cmd += " -G \"Visual Studio 14 2015"
-	
+
+    if (args.curlsystem == "Off"):
+        cmd += " -DUSE_SYSTEM_CURL=Off"
+    elif (args.curlsystem == "On"):
+        cmd += " -DUSE_SYSTEM_CURL=On"
+
     if (args.platform == "x64" or args.configuration == "All"):
         if (args.configuration == "Debug" or args.configuration == "All"):
             win_debug_64();
         if(args.configuration == "Release" or args.configuration == "All"):
             win_release_64();
-			
+
     if(args.platform == "Win32" or args.platform == "All"):
         if (args.configuration == "Debug" or args.configuration == "All"):
             win_debug_32();
         if (args.configuration == "Release" or args.configuration == "All"):
             win_release_32();
-			
+
     return
 
 #==============================================================================
@@ -219,7 +230,7 @@ def linux_release():
     cmd_loc += " " + project_dir
     subprocess.check_call(cmd_loc, shell= True)
     return
-    
+
 
 #==============================================================================
 # Name : configure_linux
@@ -229,13 +240,18 @@ def configure_linux(args):
     global cmd;
     if (args.coverage):
         cmd += " -DGCOV_SUPPORT=On"
-        
+
+    if (args.curlsystem == "Off"):
+        cmd += " -DUSE_SYSTEM_CURL=Off"
+    elif (args.curlsystem == "On"):
+        cmd += " -DUSE_SYSTEM_CURL=On"
+
     if (args.configuration == "Debug" or args.configuration == "All"):
         linux_debug()
-	
+
     if (args.configuration == "Release" or args.configuration == "All"):
         linux_release()
-		
+
     return
 
 #==============================================================================
