@@ -26,6 +26,7 @@
 #include "KiwiApp.hpp"
 #include "KiwiApp_PatcherViewHelper.hpp"
 #include "KiwiApp_PatcherView.hpp"
+#include "KiwiApp_BinaryData.hpp"
 
 namespace kiwi
 {
@@ -33,6 +34,7 @@ namespace kiwi
     m_patcher_view(patcher_view),
     m_model(&object_m),
     m_io_color(0.3, 0.3, 0.3),
+    m_font(juce::Typeface::createSystemTypefaceFor(OpenSans_Regular_ttf, OpenSans_Regular_ttf_len)),
     m_selection_width(4.f),
     m_is_selected(m_patcher_view.isSelected(*this)),
     m_is_editing(false),
@@ -125,6 +127,7 @@ namespace kiwi
         if(!m_is_editing)
         {
             g.setColour(juce::Colours::black);
+            g.setFont(getFont());
 
             std::string object_name = m_model->getName();
             if(object_name == "errorbox")
@@ -170,6 +173,12 @@ namespace kiwi
         {
             g.fillRect(getOutletLocalBounds(i, bounds));
         }
+    }
+    
+    
+    juce::Font const& ObjectView::getFont() const
+    {
+        return m_font;
     }
     
     juce::Rectangle<int> ObjectView::getBoxBounds() const
@@ -445,6 +454,7 @@ namespace kiwi
         
         m_editor.reset(new SuggestEditor(model::Factory::getNames()));
         m_editor->setBounds(m_local_box_bounds.expanded(m_selection_width*0.5));
+        m_editor->setFont(getFont());
         
         std::string text = m_model->getText();
         if(text.compare(0, 8, "errorbox") == 0)

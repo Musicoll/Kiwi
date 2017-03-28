@@ -59,6 +59,9 @@ namespace kiwi
         void mouseDown(juce::MouseEvent const& event) override;
         void mouseDrag(juce::MouseEvent const& event) override;
         
+        //! Returns the font of the object box.
+        juce::Font const& getFont() const;
+        
         //! @brief Returns The box bounds relative to the parent Component
         juce::Rectangle<int> getBoxBounds() const;
         
@@ -105,6 +108,7 @@ namespace kiwi
         size_t                  m_inlets = 0;
         size_t                  m_outlets = 0;
         const juce::Colour      m_io_color;
+        const juce::Font        m_font;
         float                   m_selection_width = 3.;
         juce::Rectangle<int>    m_local_box_bounds;
         
