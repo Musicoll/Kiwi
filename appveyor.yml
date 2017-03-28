@@ -19,10 +19,10 @@ install:
     - set PATH=C:\Python27;%PATH%
 
 before_build:
-    - dir %APPVEYOR_BUILD_FOLDER%\ThirdParty\wincurl\%PLATFORM%\
     - dir C:\Tools\curl\bin\
     - move /Y %APPVEYOR_BUILD_FOLDER%\ThirdParty\wincurl\%PLATFORM%\libcurl.dll C:\Tools\curl\bin\libcurl.dll
-
+    - dir C:\Tools\curl\bin\
+    
 build_script:
     - python .\Config\configure.py -c %CONFIGURATION% -p %PLATFORM%
     - python .\Config\build.py -c %CONFIGURATION% -p %PLATFORM%

@@ -277,8 +277,7 @@ add_subdirectory(ThirdParty/cpr)
 
 target_compile_definitions(${CPR_LIBRARIES} PUBLIC "CURL_STATICLIB=1")
 set_target_properties(${CPR_LIBRARIES} PROPERTIES FOLDER ThirdParty)
-message("cpr include" ${CPR_INCLUDE_DIRS})
-message("cpr libraries" ${CPR_LIBRARIES})
+
 
 #----------------------------------
 # Json
