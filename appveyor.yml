@@ -1,5 +1,6 @@
 
 os: Visual Studio 2015
+clone_depth: 3
 
 environment:
    matrix:
@@ -13,7 +14,8 @@ environment:
         PLATFORM: x64
 
 install:
-    - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr
+    - git submodule update --init --depth 3 --recursive ThirdParty/Juce
+    - git submodule update --init --depth 3 --recursive ThirdParty/cpr
     - set PATH=C:\Python27;%PATH%
 
 before_build:
