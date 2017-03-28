@@ -196,6 +196,12 @@ def configure_windows(args):
     elif (args.curlsystem == "On"):
         cmd += " -DUSE_SYSTEM_CURL=On"
 
+    if (args.curllib):
+        cmd += " -DCURL_LIBRARIES=" + args.curllib
+
+    if (args.curlinclude):
+        cmd += " -DCURL_INCLUDE_DIRS=" + args.curlinclude
+
     cmd += " -G \"Visual Studio 14 2015"
 
     if (args.platform == "x64" or args.configuration == "All"):
