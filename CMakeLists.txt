@@ -270,7 +270,7 @@ set(USE_SYSTEM_CURL ON CACHE BOOL "Don't use system curl")
 set(BUILD_CPR_TESTS OFF CACHE BOOL "Don't build cpr tests")
 
 # Curl settings
-set(CURL_STATICLIB ON CACHE BOOL "Build static library for curl")
+set(CURL_STATICLIB OFF CACHE BOOL "Build static library for curl")
 set(BUILD_TESTING OFF CACHE BOOL "Don't build curl tests")
 
 add_subdirectory(ThirdParty/cpr)
