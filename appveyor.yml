@@ -14,12 +14,12 @@ environment:
         PLATFORM: x64
 
 install:
-    - git submodule update --init --recursive ThirdParty/Juce
-    - git submodule update --init --recursive ThirdParty/cpr
+    #- git submodule update --init --recursive ThirdParty/Juce
+    #- git submodule update --init --recursive ThirdParty/cpr
     - set PATH=C:\Python27;%PATH%
 
 before_build:
-    - dir %APPVEYOR_BUILD_FOLDER%\ThirdParty\wincurl\
+    - dir %APPVEYOR_BUILD_FOLDER%\ThirdParty\wincurl\%CONFIGURATION%
     - move /Y %APPVEYOR_BUILD_FOLDER%\ThirdParty\wincurl\%CONFIGURATION%\libcurl.dll C:\Tools\curl\bin\libcurl.dll
 
 build_script:
