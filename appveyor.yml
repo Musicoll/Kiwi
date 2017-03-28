@@ -13,8 +13,7 @@ environment:
         PLATFORM: x64
 
 install:
-    - curl -fsS -o %APPVEYOR_BUILD_FOLDER%\libcurl_win32.zip 'https://github.com/Musicoll/Kiwi/files/875523/libcurl_win32.zip'
-    - 7z x %APPVEYOR_BUILD_FOLDER%\libcurl_win32.zip -aoa -y -r
+    
     - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr
     - set PATH=C:\Python27;%PATH%
 
