@@ -19,7 +19,7 @@ install:
     - set PATH=C:\Python27;%PATH%
 
 build_script:
-    - python .\Config\configure.py -c %CONFIGURATION% -p %PLATFORM% -curlsystem=On -args.curllib="%APPVEYOR_BUILD_FOLDER%\ThirdParty\wincurl\%PLATFORM%\libcurl.dll" -args.curlinclude="%APPVEYOR_BUILD_FOLDER%\ThirdParty\wincurl\include"
+    - python .\Config\configure.py -c %CONFIGURATION% -p %PLATFORM% -curlsystem=On -curllib="%APPVEYOR_BUILD_FOLDER%\ThirdParty\wincurl\%PLATFORM%\libcurl.dll" -curlinclude="%APPVEYOR_BUILD_FOLDER%\ThirdParty\wincurl\include"
     - python .\Config\build.py -c %CONFIGURATION% -p %PLATFORM%
 
 after_build:
