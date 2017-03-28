@@ -21,8 +21,10 @@ install:
 before_build:
     - dir C:\Tools\curl\bin\
     - move /Y %APPVEYOR_BUILD_FOLDER%\ThirdParty\wincurl\%PLATFORM%\libcurl.dll C:\Tools\curl\bin\libcurl.dll
-    - dir C:\Tools\curl\bin\
-    
+    - dir C:\Tools\curl\include\
+    - xcopy /S /Y %APPVEYOR_BUILD_FOLDER%\ThirdParty\cpr\opt\curl\include\curl C:\Tools\curl\include
+    - dir C:\Tools\curl\include\
+
 build_script:
     - python .\Config\configure.py -c %CONFIGURATION% -p %PLATFORM%
     - python .\Config\build.py -c %CONFIGURATION% -p %PLATFORM%
