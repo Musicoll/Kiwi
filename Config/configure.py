@@ -110,10 +110,10 @@ def configure_mac(args):
         cmd += " -DUSE_SYSTEM_CURL=On"
 
     if (args.curllib):
-        print(args.curllib) #CURL_LIBRARIES
+        cmd += " -DCURL_LIBRARIES=" + args.curllib
 
     if (args.curlinclude):
-        print(args.curlinclude) #CURL_INCLUDE_DIRS
+        cmd += " -DCURL_INCLUDE_DIRS=" + args.curlinclude
 
     if (args.configuration == "Debug" or args.configuration == "All"):
         mac_debug();
