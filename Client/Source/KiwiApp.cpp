@@ -81,6 +81,8 @@ namespace kiwi
     
     void KiwiApp::initialise(juce::String const& commandLine)
     {
+        juce::Desktop::getInstance().setGlobalScaleFactor(1.);
+
         model::DataModel::init();
         
         m_command_manager = std::make_unique<juce::ApplicationCommandManager>();
@@ -99,8 +101,6 @@ namespace kiwi
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAudioStatusWindow);
         juce::MenuBarModel::setMacMainMenu(m_menu_model.get(), &macMainMenuPopup, TRANS("Open Recent"));
         #endif
-
-        juce::Desktop::getInstance().setGlobalScaleFactor(1.);
         
         juce::LookAndFeel::getDefaultLookAndFeel().setUsingNativeAlertWindows(true);
     }
