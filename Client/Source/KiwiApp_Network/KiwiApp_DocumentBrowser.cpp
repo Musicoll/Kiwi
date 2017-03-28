@@ -46,6 +46,12 @@ namespace kiwi
         net_config.addListener(this);
         
         m_distant_drive.reset(new Drive("Remote patchers", host, api_port, session_port));
+        
+        int refresh_time = net_config.getProperty("refresh_interval", "0").toString().getIntValue();
+        if(refresh_time > 0)
+        {
+            start(refresh_time);
+        }
     }
     
     DocumentBrowser::~DocumentBrowser()
@@ -84,6 +90,19 @@ namespace kiwi
         {
             int port = vt.getProperty("session_port");
             m_distant_drive->setSessionPort(port);
+        }
+        else if(id == juce::Identifier("refresh_interval"))
+        {
+            int refresh_time = vt.getProperty("refresh_interval").toString().getIntValue();
+            
+            if(refresh_time > 0)
+            {
+                start(refresh_time);
+            }
+            else
+            {
+                stop();
+            }
         }
     }
     
