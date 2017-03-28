@@ -275,7 +275,7 @@ set(BUILD_TESTING OFF CACHE BOOL "Don't build curl tests")
 
 add_subdirectory(ThirdParty/cpr)
 
-target_compile_definitions(${CPR_LIBRARIES} PUBLIC "CURL_STATICLIB=1")
+#target_compile_definitions(${CPR_LIBRARIES} PUBLIC "CURL_STATICLIB=1")
 set_target_properties(${CPR_LIBRARIES} PROPERTIES FOLDER ThirdParty)
 
 
