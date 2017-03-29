@@ -364,7 +364,7 @@ namespace kiwi
         
         juce::Rectangle<int> screen_area = getParentMonitorArea();
         
-        int width = 300;
+        int width = 400;
         int height = 440;
         
         juce::Rectangle<int> bounds(screen_area.getX() + ((85. / 100.) * screen_area.getWidth() - ((float) width / 2.)),
@@ -373,6 +373,11 @@ namespace kiwi
                                     height);
         
         initBounds(bounds);
+
+        #if ! JUCE_MAC
+        setMenuBar(KiwiApp::getMenuBarModel());
+        #endif
+
         setVisible(true);
     }
     

@@ -93,11 +93,11 @@ namespace kiwi
         m_command_manager = std::make_unique<juce::ApplicationCommandManager>();
         
         m_settings = std::make_unique<StoredSettings>();
-        m_instance = std::make_unique<Instance>();
-        
-        m_command_manager->registerAllCommandsForTarget(this);
         
         m_menu_model.reset(new MainMenuModel());
+
+        m_instance = std::make_unique<Instance>();
+        m_command_manager->registerAllCommandsForTarget(this);
         
         #if JUCE_MAC
         juce::PopupMenu macMainMenuPopup;
