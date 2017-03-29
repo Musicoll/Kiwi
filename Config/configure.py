@@ -22,7 +22,7 @@ def parse_args ():
 
     arg_parser.add_argument('-c', '--configuration', default = 'All', choices = ['Debug', 'Release' ,'All'])
     
-    arg_parser.add_argument('-curlsystem', '--curlsystem', default = 'On', choices = ['On', 'Off'] 
+    arg_parser.add_argument('-curlsystem', '--curlsystem', default = 'On', choices = ['On', 'Off'], 
                             help='set curlsystem to off if you want to build curl from source')
 
     if platform.system () == 'Darwin':
