@@ -32,9 +32,9 @@ namespace kiwi
         
         if (font.getTypefaceName() == juce::Font::getDefaultSansSerifFontName())
         {
-            if (font.getStyleFlags() & bold)
+            if (font.getStyleFlags() & juce::Font::FontStyleFlags::bold)
             {
-                if (font.getStyleFlags() & italic)
+                if (font.getStyleFlags() & juce::Font::FontStyleFlags::italic)
                 {
                     typeface =
                     juce::Typeface::createSystemTypefaceFor(bfonts::open_sans::OpenSans_BoldItalic_ttf,
@@ -47,7 +47,7 @@ namespace kiwi
                                                             bfonts::open_sans::OpenSans_Bold_ttf_size);
                 }
             }
-            else if(font.getStyleFlags() & italic)
+            else if(font.getStyleFlags() & juce::Font::FontStyleFlags::italic)
             {
                 typeface =
                 juce::Typeface::createSystemTypefaceFor(bfonts::open_sans::OpenSans_SemiboldItalic_ttf,

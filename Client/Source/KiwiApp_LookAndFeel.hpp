@@ -23,7 +23,6 @@
 #define KIWI_APP_LOOK_AND_FEEL_HPP_INCLUDED
 
 #include <juce_gui_basics/juce_gui_basics.h>
-#include <juce_graphics/juce_graphics.h>
 
 namespace kiwi
 {   
