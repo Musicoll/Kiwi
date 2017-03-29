@@ -56,7 +56,7 @@ matrix:
     compiler: clang++
     env: COMPILER=clang++
     script:
-    - python ./Config/configure.py
+    - python ./Config/configure.py -c Release
     - python ./Config/build.py -c Release | xcpretty
     before_deploy:
     - mkdir Kiwi
