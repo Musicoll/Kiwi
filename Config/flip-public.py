@@ -33,7 +33,7 @@ def get_public_commit():
     commit = ""
 
     if  os.path.exists(os.path.join(os.getcwd(), "flip-public", "config")):
-        fo = open(os.path.join(os.getcwd(), "flip-public", "config"), "rw+")
+        fo = open(os.path.join(os.getcwd(), "flip-public", "config"), "r")
         commit = fo.readline()
         fo.close()
 

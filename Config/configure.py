@@ -21,9 +21,9 @@ def parse_args ():
     arg_parser = argparse.ArgumentParser ()
 
     arg_parser.add_argument('-c', '--configuration', default = 'All', choices = ['Debug', 'Release' ,'All'])
-    arg_parser.add_argument('-curlsystem', '--curlsystem', default = 'On', choices = ['On', 'Off'])
-    arg_parser.add_argument('-curllib', '--curllib', required=False, default = '')
-    arg_parser.add_argument('-curlinclude', '--curlinclude', required=False, default = '')
+    
+    arg_parser.add_argument('-curlsystem', '--curlsystem', default = 'On', choices = ['On', 'Off'] 
+                            help='set curlsystem to off if you want to build curl from source')
 
     if platform.system () == 'Darwin':
         arg_parser.add_argument('-flip', default = 'public', choices = ['public', 'private'])
@@ -109,12 +109,6 @@ def configure_mac(args):
     elif (args.curlsystem == "On"):
         cmd += " -DUSE_SYSTEM_CURL=On"
 
-    if (args.curllib):
-        cmd += " -DCURL_LIBRARIES=" + args.curllib
-
-    if (args.curlinclude):
-        cmd += " -DCURL_INCLUDE_DIRS=" + args.curlinclude
-
     if (args.configuration == "Debug" or args.configuration == "All"):
         mac_debug();
 
@@ -195,12 +189,6 @@ def configure_windows(args):
         cmd += " -DUSE_SYSTEM_CURL=Off"
     elif (args.curlsystem == "On"):
         cmd += " -DUSE_SYSTEM_CURL=On"
-
-    if (args.curllib):
-        cmd += " -DCURL_LIBRARIES=" + args.curllib
-
-    if (args.curlinclude):
-        cmd += " -DCURL_INCLUDE_DIRS=" + args.curlinclude
 
     cmd += " -G \"Visual Studio 14 2015"
 

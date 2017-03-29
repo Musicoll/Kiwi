@@ -59,7 +59,7 @@ def build_windows(args):
     else:
         target = "Kiwi.sln"
 
-    #cmd += "/verbosity:minimal "
+    cmd += "/verbosity:minimal "
 
     if(args.configuration == "Release"):
         if(args.platform == "x64"):

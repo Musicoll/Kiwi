@@ -266,16 +266,14 @@ source_group_rec("${FLIP_SRC}" ${FLIP_DIR})
 
 # Cpr settings
 set(CMAKE_USE_OPENSSL OFF CACHE BOOL "Don't use openssl")
-set(USE_SYSTEM_CURL ON CACHE BOOL "Don't use system curl")
 set(BUILD_CPR_TESTS OFF CACHE BOOL "Don't build cpr tests")
 message("Use system curl " ${USE_SYSTEM_CURL})
+
 # Curl settings
 set(CURL_STATICLIB OFF CACHE BOOL "Build static library for curl")
 set(BUILD_TESTING OFF CACHE BOOL "Don't build curl tests")
 
 add_subdirectory(ThirdParty/cpr)
-
-#target_compile_definitions(${CPR_LIBRARIES} PUBLIC "CURL_STATICLIB=1")
 set_target_properties(${CPR_LIBRARIES} PROPERTIES FOLDER ThirdParty)
 
 
