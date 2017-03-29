@@ -1917,7 +1917,8 @@ namespace kiwi
 
             const std::string new_object_name = new_object_m.getName();
             const std::string new_object_text = new_object_m.getText();
-            int text_width = box.getFont().getStringWidth(new_object_text);
+            
+            int text_width = juce::Font().getStringWidth(new_object_text);
             
             const juce::Point<int> origin = getOriginPosition();
             juce::Rectangle<int> box_bounds = box.getBoxBounds();

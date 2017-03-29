@@ -55,13 +55,13 @@ set(CMAKE_SUPPRESS_REGENERATION true)
 set(KIWI_RESSOURCES_DIR ${ROOT_DIR}/Ressources)
 
 if (APPLE)
-	set(KIWI_APP_ICON ${KIWI_RESSOURCES_DIR}/Icon.icns)
-	set(KIWI_PATCHER_FILETYPE_ICON ${KIWI_RESSOURCES_DIR}/kiwi_filetype.icns)
-	set(KIWI_PLIST ${KIWI_RESSOURCES_DIR}/Info.plist)
+	set(KIWI_APP_ICON ${KIWI_RESSOURCES_DIR}/Project/XCode/Icon.icns)
+	set(KIWI_PATCHER_FILETYPE_ICON ${KIWI_RESSOURCES_DIR}/Project/XCode/kiwi_filetype.icns)
+	set(KIWI_PLIST ${KIWI_RESSOURCES_DIR}/Project/XCode/Info.plist)
 	set_source_files_properties(${KIWI_APP_ICON} ${KIWI_PATCHER_FILETYPE_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 	set(KIWI_CLIENT_RESSOURCES ${KIWI_APP_ICON} ${KIWI_PATCHER_FILETYPE_ICON} ${KIWI_PLIST})
 elseif(WIN32)
-	set(KIWI_CLIENT_RESSOURCES ${KIWI_RESSOURCES_DIR}/Kiwi.rc)
+	set(KIWI_CLIENT_RESSOURCES ${KIWI_RESSOURCES_DIR}/Project/VisualStudio15/Kiwi.rc)
 endif()
 
 #--------------------------------------
@@ -104,7 +104,7 @@ endif()
 
 if (WIN32)
     add_definitions("-D_CPPUNWIND")
-	
+
 	if (DEBUG)
 		add_definitions("-D_CONSOLE=1")
 	endif()
