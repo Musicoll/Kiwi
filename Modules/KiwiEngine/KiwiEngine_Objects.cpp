@@ -165,7 +165,7 @@ namespace kiwi
         {
             if(!args.empty())
             {
-                post(m_name + " \u2022 " + AtomHelper::toString(args));
+                post(m_name + " \xe2\x80\xa2 " + AtomHelper::toString(args));
             }
         }
         

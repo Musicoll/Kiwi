@@ -336,33 +336,28 @@ namespace kiwi
     // ================================================================================ //
     
     DocumentBrowserWindow::DocumentBrowserWindow(DocumentBrowser& browser) :
-    Window("Document Browser", juce::Colours::white, minimiseButton | closeButton, true)
+    AppWindow("Document Browser")
     {
         setContentOwned(new DocumentBrowserView(browser), true);
         setResizable(true, false);
-        setResizeLimits(50, 50, 32000, 32000);
+        setResizeLimits(300, 100, 32000, 32000);
         
-        const juce::String windowState(getGlobalProperties().getValue("document_browser_window"));
+        juce::Rectangle<int> screen_area = getParentMonitorArea();
         
-        if(windowState.isNotEmpty())
-        {
-            restoreWindowStateFromString(windowState);
-        }
-        else
-        {
-            setTopLeftPosition(10, 10);
-            setSize(300, 440);
-            setVisible(true);
-        }
+        int width = 300;
+        int height = 440;
+        
+        juce::Rectangle<int> bounds(screen_area.getX() + ((15. / 100.) * screen_area.getWidth() - ((float) width / 2.)),
+                                    screen_area.getY() + ((30. / 100.) * screen_area.getHeight()),
+                                    width,
+                                    height);
+        
+        initBounds(bounds);
+        setVisible(true);
     }
     
-    DocumentBrowserWindow::~DocumentBrowserWindow()
+    bool DocumentBrowserWindow::isMainWindow()
     {
-        getGlobalProperties().setValue("document_browser_window", getWindowStateAsString());
-    }
-    
-    void DocumentBrowserWindow::closeButtonPressed()
-    {
-        setVisible(false);
+        return true;
     }
 }

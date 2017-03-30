@@ -70,7 +70,7 @@ namespace kiwi
                     return m_running.load();
                 }, 0.1);
                 
-                DBG("[server] - running on port " << getPort());
+                DBG("[server] - running on port " + getPort());
                 
                 m_running.store(true);
                 run_loop.run();

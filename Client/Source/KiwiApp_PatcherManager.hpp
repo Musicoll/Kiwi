@@ -41,21 +41,25 @@ namespace kiwi
     //                                PATCHER VIEW WINDOW                               //
     // ================================================================================ //
     
-    class PatcherViewWindow : public Window
+    class PatcherViewWindow final : public Window
     {
-    public:
+    public: // methods
+        
         PatcherViewWindow(PatcherManager& manager, PatcherView& patcherview);
-        void closeButtonPressed() override;
-        
+
         //! @brief returns the patcher manager.
-        PatcherManager& getManager() const;
-        
+        PatcherManager& getPatcherManager() const;
+
         //! @brief returns the PatcherView.
         PatcherView& getPatcherView() const;
         
-    private:
-        PatcherManager& m_manager;
-        PatcherView& m_patcherview;
+        //! @brief Called whenever a patcher is closed. Asks the user to save before closing.
+        void closeButtonPressed() override;
+        
+    private: // members
+        
+        PatcherManager& m_patcher_manager;
+        PatcherView&    m_patcherview;
     };
     
     // ================================================================================ //

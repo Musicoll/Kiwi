@@ -117,13 +117,15 @@ namespace kiwi
     //                               AUDIO SETTING WINDOW                               //
     // ================================================================================ //
     
-    class AudioSettingWindow : public Window
+    class AudioSettingWindow final : public AppWindow
     {
     public:
-        AudioSettingWindow(DspDeviceManager& device_manager);
-        ~AudioSettingWindow();
         
-        void closeButtonPressed() override;
+        AudioSettingWindow(DspDeviceManager& device_manager);
+        
+        bool isMainWindow() override;
+        
+        ~AudioSettingWindow() = default;
     };
 }
 

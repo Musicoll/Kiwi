@@ -27,6 +27,8 @@
 #include "KiwiApp_Instance.hpp"
 #include "KiwiApp_StoredSettings.hpp"
 
+#include "KiwiApp_LookAndFeel.hpp"
+
 namespace ProjectInfo
 {
     const char* const  projectName    = "Kiwi";
@@ -111,7 +113,7 @@ namespace kiwi
         //==============================================================================
         
         //! @brief Attempt to close the given window asking user to save file if needed.
-        bool closeWindow(Window& window);
+        void closeWindow(AppWindow& window);
         
         // ================================================================================ //
         //                                  APPLICATION MENU                                //
@@ -191,6 +193,7 @@ namespace kiwi
         std::unique_ptr<juce::ApplicationCommandManager>	m_command_manager;
         std::unique_ptr<MainMenuModel>                      m_menu_model;
         
+        std::unique_ptr<LookAndFeel>                        m_look;
         std::unique_ptr<StoredSettings>                     m_settings;
     };
 }

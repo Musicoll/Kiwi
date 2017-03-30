@@ -484,12 +484,15 @@ namespace kiwi
     {
         juce::MouseCursor::StandardCursorType mc = juce::MouseCursor::NormalCursor;
         
-        m_io_highlighter->hide();
-        
         if(!isLocked())
         {
             HitTester hit(*this);
             hit.test(event.getPosition());
+
+            if (hit.getZone() != HitTester::Zone::Outlet && hit.getZone() != HitTester::Zone::Inlet)
+            {
+                m_io_highlighter->hide();
+            }
             
             if(hit.objectTouched())
             {
@@ -1914,8 +1917,8 @@ namespace kiwi
 
             const std::string new_object_name = new_object_m.getName();
             const std::string new_object_text = new_object_m.getText();
-            juce::Font font;
-            int text_width = font.getStringWidth(new_object_text);
+            
+            int text_width = juce::Font().getStringWidth(new_object_text);
             
             const juce::Point<int> origin = getOriginPosition();
             juce::Rectangle<int> box_bounds = box.getBoxBounds();
@@ -1981,26 +1984,6 @@ namespace kiwi
                 DocumentManager::commit(m_patcher_model);
             }
             
-            KiwiApp::commandStatusChanged();
-        }
-    }
-    
-    void PatcherView::createObjectModel(std::string const& text, double pos_x, double pos_y)
-    {
-        if(! DocumentManager::isInCommitGesture(m_patcher_model))
-        {
-            auto& obj = createObjectModel(text);
-            obj.setPosition(pos_x, pos_y);
-            
-            std::string text = obj.getText();
-            juce::Font font;
-            int text_width = font.getStringWidth(text);
-            
-            obj.setWidth(text_width + 12);
-            
-            m_view_model.selectObject(obj);
-            
-            DocumentManager::commit(m_patcher_model, "Insert Object");
             KiwiApp::commandStatusChanged();
         }
     }
