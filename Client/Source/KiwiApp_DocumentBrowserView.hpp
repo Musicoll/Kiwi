@@ -202,13 +202,14 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The DocumentBrowserWindow is a Window that manages and displays a Document browser.
-    class DocumentBrowserWindow : public Window
+    class DocumentBrowserWindow final : public AppWindow
     {
     public:
         DocumentBrowserWindow(DocumentBrowser& browser);
-        ~DocumentBrowserWindow();
         
-        void closeButtonPressed() override;
+        bool isMainWindow() override;
+        
+        ~DocumentBrowserWindow() = default;
     };
 }
 

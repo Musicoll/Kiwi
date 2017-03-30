@@ -22,6 +22,8 @@
 #ifndef KIWI_ENGINE_TYPED_OBJECTS_HPP_INCLUDED
 #define KIWI_ENGINE_TYPED_OBJECTS_HPP_INCLUDED
 
+#include <vector>
+
 #include "KiwiEngine_Object.hpp"
 #include "KiwiEngine_Beacon.hpp"
 
@@ -153,24 +155,92 @@ namespace kiwi
         };
         
         // ================================================================================ //
-        //                                       DAC~                                       //
+        //                                       ROUTER                                     //
         // ================================================================================ //
         
-        class DacTilde : public AudioObject
+        class Router
         {
-        public:
+        public: // classes
             
-            DacTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            struct Cnx
+            {
+                Cnx(size_t input, size_t output);
+                
+                bool operator<(Cnx const& other) const;
+             
+                size_t m_input = 0;
+                size_t m_output = 0;
+            };
             
-            void receive(size_t index, std::vector<Atom> const& args) override final;
+        public: // method
+            
+            Router() = default;
+            
+            void connect(size_t input_index, size_t output_index);
+            
+            void disconnect(size_t intput_index, size_t output_index);
+            
+            size_t getNumberOfConnections() const;
+            
+            std::set<Cnx> const& getConnections() const;
+            
+            ~Router() = default;
+            
+        private: // memebers
+            
+            std::set<Cnx> m_cnx;
+        };
+        
+        // ================================================================================ //
+        //                                       AUDIO_INTERFACE                            //
+        // ================================================================================ //
+        
+        class AudioInterfaceObject : public AudioObject
+        {
+        public: // methods
+            
+            AudioInterfaceObject(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const & args) override final;
+            
+            std::vector<size_t> parseArgs(std::vector<Atom> const& args) const;
+            
+            virtual ~AudioInterfaceObject() = default;
+            
+        protected: // members
+            
+            Router                      m_router;
+            engine::AudioControler&     m_audio_controler;
+        };
+        
+        // ================================================================================ //
+        //                                       ADC~                                       //
+        // ================================================================================ //
+        
+        class AdcTilde : public AudioInterfaceObject
+        {
+        public: // methods
+            
+            AdcTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
             void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
             
             void prepare(dsp::Processor::PrepareInfo const& infos) override final;
+        };
+        
+        // ================================================================================ //
+        //                                       DAC~                                       //
+        // ================================================================================ //
+        
+        class DacTilde : public AudioInterfaceObject
+        {
+        public: // methods
             
-        private:
-            std::vector<size_t>         m_router;
-            engine::AudioControler&     m_audio_controler;
+            DacTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void prepare(dsp::Processor::PrepareInfo const& infos) override final;
         };
         
         // ================================================================================ //

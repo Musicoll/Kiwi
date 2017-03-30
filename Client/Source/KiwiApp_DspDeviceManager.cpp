@@ -118,6 +118,14 @@ namespace kiwi
         }
     }
     
+    void DspDeviceManager::getFromChannel(size_t const channel, dsp::Signal & input_signal)
+    {
+        if (channel < m_input_matrix->getNumberOfChannels() && input_signal.size() == m_input_matrix->getVectorSize())
+        {
+            input_signal.copy((*m_input_matrix)[channel]);
+        }
+    }
+    
     
     void DspDeviceManager::tick() const noexcept
     {
@@ -209,34 +217,30 @@ namespace kiwi
     // ================================================================================ //
     
     AudioSettingWindow::AudioSettingWindow(DspDeviceManager& device_manager):
-    Window("Audio Settings", juce::Colours::white, allButtons, false)
+    AppWindow("Audio Settings")
     {
         juce::AudioDeviceSelectorComponent* audio_settings =
         new juce::AudioDeviceSelectorComponent(device_manager, 1, 20, 1, 20, false, false, false, true);
         
         setContentOwned(audio_settings, false);
+        
+        juce::Rectangle<int> screen_area = getParentMonitorArea();
+        
+        int width = 400;
+        int height = 400;
+        
+        juce::Rectangle<int> bounds(screen_area.getX() + ((15 / 100.) * screen_area.getWidth() - ((float) width / 2.)),
+                                    screen_area.getY() + ((8. / 100.) * screen_area.getHeight()),
+                                    width,
+                                    height);
+        
+        initBounds(bounds);
         setResizable(false, false);
-        
-        const juce::String windowState(getGlobalProperties().getValue("audio_setting_window"));
-        
-        if (!windowState.isEmpty())
-        {
-            restoreWindowStateFromString(windowState);
-        }
-        else
-        {
-            setSize(300, 440);
-            setTopLeftPosition(10, 10);
-        }
+        setVisible(true);
     }
     
-    void AudioSettingWindow::closeButtonPressed()
+    bool AudioSettingWindow::isMainWindow()
     {
-        setVisible(false);
-    }
-    
-    AudioSettingWindow::~AudioSettingWindow()
-    {
-        getGlobalProperties().setValue("audio_setting_window", getWindowStateAsString());
+        return false;
     }
 }

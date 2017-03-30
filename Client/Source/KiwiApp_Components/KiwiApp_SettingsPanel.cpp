@@ -62,34 +62,18 @@ namespace kiwi
     // ================================================================================ //
     
     SettingsPanelWindow::SettingsPanelWindow() :
-    Window("Application settings", juce::Colours::grey, minimiseButton | closeButton, true)
+    AppWindow("Application settings")
     {
         setContentOwned(new SettingsPanel(), false);
-        setResizable(true, true);
+        initBounds({0, 0, 300, 400});
+        
         setResizeLimits(50, 50, 32000, 32000);
-        setSize(300, 100);
-        
-        const juce::String windowState(getGlobalProperties().getValue("app_settings_window"));
-        
-        if(windowState.isNotEmpty())
-        {
-            restoreWindowStateFromString(windowState);
-        }
-        else
-        {
-            setTopLeftPosition(10, 10);
-            setSize(300, 100);
-            setVisible(true);
-        }
+        setResizable(true, true);
+        //setVisible(true);
     }
     
-    SettingsPanelWindow::~SettingsPanelWindow()
+    bool SettingsPanelWindow::isMainWindow()
     {
-        getGlobalProperties().setValue("app_settings_window", getWindowStateAsString());
-    }
-    
-    void SettingsPanelWindow::closeButtonPressed()
-    {
-        setVisible(false);
+        return true;
     }
 }

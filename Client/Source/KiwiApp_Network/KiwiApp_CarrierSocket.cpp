@@ -167,6 +167,6 @@ namespace kiwi
     
     CarrierSocket::~CarrierSocket()
     {
-        stopProcess();
+        disconnect();
     }
 }

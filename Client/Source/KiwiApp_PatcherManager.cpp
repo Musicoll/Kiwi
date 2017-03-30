@@ -36,26 +36,34 @@ namespace kiwi
     //                                PATCHER VIEW WINDOW                               //
     // ================================================================================ //
 
-    PatcherViewWindow::PatcherViewWindow(PatcherManager& manager, PatcherView& patcherview) : Window(),
-    m_manager(manager),
+    PatcherViewWindow::PatcherViewWindow(PatcherManager& manager, PatcherView& patcherview) :
+    Window("Untitled", true),
+    m_patcher_manager(manager),
     m_patcherview(patcherview)
     {
-        ;
+        #if ! JUCE_MAC
+        setMenuBar(KiwiApp::getMenuBarModel());
+        #endif
+        
+        setSize(600, 500);
+        centreWithSize(getWidth(), getHeight());
+        setResizable(true, true);
+        setVisible(true);
+    }
+
+    PatcherManager& PatcherViewWindow::getPatcherManager() const
+    {
+        return m_patcher_manager;
+    }
+
+    PatcherView& PatcherViewWindow::getPatcherView() const
+    {
+        return m_patcherview;
     }
     
     void PatcherViewWindow::closeButtonPressed()
     {
-        KiwiApp::use().closeWindow(*this);
-    }
-    
-    PatcherManager& PatcherViewWindow::getManager() const
-    {
-        return m_manager;
-    }
-    
-    PatcherView& PatcherViewWindow::getPatcherView() const
-    {
-        return m_patcherview;
+        KiwiApp::use().useInstance().removePatcherWindow(*this);
     }
     
     // ================================================================================ //

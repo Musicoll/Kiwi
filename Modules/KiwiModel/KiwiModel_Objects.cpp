@@ -149,10 +149,10 @@ namespace kiwi
         }
         
         // ================================================================================ //
-        //                                  OBJECT DAC~                                     //
+        //                                  OBJECT ADC~                                     //
         // ================================================================================ //
         
-        DacTilde::DacTilde(std::string const& name, std::vector<Atom> const& args)
+        size_t getNumberOfChannels(std::vector<Atom> const& args)
         {
             size_t channels = 0;
             
@@ -191,6 +191,34 @@ namespace kiwi
             }
             
             if(channels == 0) channels = 2;
+            
+            return channels;
+        };
+        
+        AdcTilde::AdcTilde(std::string const& name, std::vector<Atom> const& args)
+        {
+            size_t channels = getNumberOfChannels(args);
+            
+            pushInlet({PinType::IType::Control});
+            
+            for (int i = 0; i < channels; ++i)
+            {
+                pushOutlet({PinType::IType::Signal});
+            }
+        }
+        
+        void AdcTilde::declare()
+        {
+            Factory::add<AdcTilde>("adc~");
+        }
+        
+        // ================================================================================ //
+        //                                  OBJECT DAC~                                     //
+        // ================================================================================ //
+        
+        DacTilde::DacTilde(std::string const& name, std::vector<Atom> const& args)
+        {
+            size_t channels = getNumberOfChannels(args);
             
             pushInlet({PinType::IType::Signal, PinType::IType::Control});
             

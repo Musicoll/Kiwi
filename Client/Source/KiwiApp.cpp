@@ -83,14 +83,21 @@ namespace kiwi
     {
         model::DataModel::init();
         
+        juce::Desktop::getInstance().setGlobalScaleFactor(1.);
+        
+        m_look = std::make_unique<LookAndFeel>();
+        
+        juce::LookAndFeel::setDefaultLookAndFeel(m_look.get());
+        juce::LookAndFeel::getDefaultLookAndFeel().setUsingNativeAlertWindows(true);
+        
         m_command_manager = std::make_unique<juce::ApplicationCommandManager>();
         
         m_settings = std::make_unique<StoredSettings>();
-        m_instance = std::make_unique<Instance>();
-        
-        m_command_manager->registerAllCommandsForTarget(this);
         
         m_menu_model.reset(new MainMenuModel());
+
+        m_instance = std::make_unique<Instance>();
+        m_command_manager->registerAllCommandsForTarget(this);
         
         #if JUCE_MAC
         juce::PopupMenu macMainMenuPopup;
@@ -100,8 +107,6 @@ namespace kiwi
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAudioStatusWindow);
         juce::MenuBarModel::setMacMainMenu(m_menu_model.get(), &macMainMenuPopup, TRANS("Open Recent"));
         #endif
-        
-        juce::LookAndFeel::getDefaultLookAndFeel().setUsingNativeAlertWindows(true);
     }
     
     void KiwiApp::anotherInstanceStarted(juce::String const& command_line)
@@ -150,7 +155,7 @@ namespace kiwi
     
     bool KiwiApp::moreThanOneInstanceAllowed()
     {
-        return true;
+        return false;
     }
     
     // ================================================================================ //
@@ -218,14 +223,12 @@ namespace kiwi
         useEngineInstance().error(text);
     }
     
-    bool KiwiApp::closeWindow(Window& window)
+    void KiwiApp::closeWindow(AppWindow& window)
     {
         if(m_instance)
         {
-            return m_instance->closeWindow(window);
+            m_instance->closeWindow(window);
         }
-        
-        return false;
     }
     
     // ================================================================================ //

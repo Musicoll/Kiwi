@@ -51,13 +51,13 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The SettingsPanelWindow
-    class SettingsPanelWindow : public Window
+    class SettingsPanelWindow : public AppWindow
     {
     public:
         SettingsPanelWindow();
-        ~SettingsPanelWindow();
+        ~SettingsPanelWindow() = default;
         
-        void closeButtonPressed() override;
+        bool isMainWindow() override;
     };
 }
 

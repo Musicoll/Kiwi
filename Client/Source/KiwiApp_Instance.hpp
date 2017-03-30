@@ -68,9 +68,12 @@ namespace kiwi
         
         //! @brief Open a patcher from file
         void askUserToOpenPatcherDocument();
+
+        //! @brief Removes the view of a certain patcher.
+        void removePatcherWindow(PatcherViewWindow & patcher_window);
         
         //! @brief Attempt to close the given window asking user to save file if needed.
-        bool closeWindow(Window& window);
+        void closeWindow(AppWindow& window);
         
         //! @brief Attempt to close all document, after asking user to save them if needed.
         //! @return True if all document have been closed, false if the user cancel the action.
@@ -81,6 +84,9 @@ namespace kiwi
         
         //! @brief Brings the Application settings window to front.
         void showAppSettingsWindow();
+        
+        //! @brief Removes a patcher from cach.
+        void removePatcher(PatcherManager const& patcher_manager);
         
         //! @brief Opens a juce native audio setting pannel.
         void showAudioSettingsWindow();
@@ -121,11 +127,8 @@ namespace kiwi
         PatcherManagers                             m_patcher_managers;
         
         sConsoleHistory                             m_console_history;
-        std::unique_ptr<ConsoleWindow>              m_console_window;
-        std::unique_ptr<SettingsPanelWindow>        m_app_settings_window;
-        std::unique_ptr<DocumentBrowserWindow>      m_document_browser_window;
-        std::unique_ptr<BeaconDispatcherWindow>     m_beacon_dispatcher_window;
-        std::unique_ptr<AudioSettingWindow>         m_audio_setting_window;
+
+        std::set<std::unique_ptr<AppWindow>>        m_windows;
     
         std::vector<uint8_t>                        m_patcher_clipboard;
         

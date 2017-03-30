@@ -165,7 +165,7 @@ namespace kiwi
         {
             if(!args.empty())
             {
-                post(m_name + " \u2022 " + AtomHelper::toString(args));
+                post(m_name + " \xe2\x80\xa2 " + AtomHelper::toString(args));
             }
         }
         
@@ -229,19 +229,63 @@ namespace kiwi
         }
         
         // ================================================================================ //
-        //                                       DAC~                                       //
+        //                                       ROUTER                                     //
         // ================================================================================ //
         
-        DacTilde::DacTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        Router::Cnx::Cnx(size_t input, size_t output):
+        m_input(input),
+        m_output(output)
+        {
+        }
+        
+        bool Router::Cnx::operator<(Cnx const& other) const
+        {
+            return m_input < other.m_input
+                   || (m_input == other.m_input && m_output < other.m_output);
+        }
+        
+        void Router::connect(size_t input_index, size_t output_index)
+        {
+            m_cnx.insert(Cnx(input_index, output_index));
+        }
+        
+        void Router::disconnect(size_t input_index, size_t ouptut_index)
+        {
+            m_cnx.erase(Cnx(input_index, ouptut_index));
+        }
+        
+        size_t Router::getNumberOfConnections() const
+        {
+            return m_cnx.size();
+        }
+        
+        std::set<Router::Cnx> const& Router::getConnections() const
+        {
+            return m_cnx;
+        }
+        
+        // ================================================================================ //
+        //                                       AUDIOINTERFACE                             //
+        // ================================================================================ //
+        
+        AudioInterfaceObject::AudioInterfaceObject(model::Object const& model,
+                                                   Patcher& patcher,
+                                                   std::vector<Atom> const& args):
         AudioObject(model, patcher),
         m_router(),
         m_audio_controler(patcher.getAudioControler())
         {
+        }
+        
+        std::vector<size_t> AudioInterfaceObject::parseArgs(std::vector<Atom> const& args) const
+        {
+            std::vector<size_t> routes;
+            
             for(Atom const& arg : args)
             {
                 if (arg.isNumber())
                 {
-                    m_router.push_back(arg.getInt() - 1);
+                    routes.push_back(arg.getInt() - 1);
                 }
                 else if(arg.isString())
                 {
@@ -254,24 +298,27 @@ namespace kiwi
                     
                     for (int channel = left_input; rev ? channel >= right_input : channel <= right_input; rev ? --channel : ++channel)
                     {
-                        m_router.push_back(channel);
+                        routes.push_back(channel);
                     }
                 }
             }
             
-            if (m_router.empty())
+            if (routes.empty())
             {
-                m_router = {0, 1};
+                routes = {0, 1};
             }
+            
+            return routes;
         }
         
-        void DacTilde::receive(size_t, std::vector<Atom> const& args)
+        void AudioInterfaceObject::receive(size_t index, std::vector<Atom> const & args)
         {
             if(!args.empty())
             {
                 if(args[0].isString())
                 {
                     const std::string sym = args[0].getString();
+                    
                     if(sym == "start")
                     {
                         m_audio_controler.startAudio();
@@ -284,11 +331,58 @@ namespace kiwi
             }
         }
         
+        // ================================================================================ //
+        //                                       ADC~                                       //
+        // ================================================================================ //
+        
+        AdcTilde::AdcTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        AudioInterfaceObject(model, patcher, args)
+        {
+            std::vector<size_t> routes = parseArgs(args);
+            
+            for (size_t index = 0; index < routes.size(); ++index)
+            {
+                m_router.connect(routes[index], index);
+            }
+        }
+        
+        void AdcTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        {
+            std::set<Router::Cnx> const& connections = m_router.getConnections();
+            
+            for(Router::Cnx const& connection : connections)
+            {
+                m_audio_controler.getFromChannel(connection.m_input, output[connection.m_output]);
+            }
+        }
+        
+        void AdcTilde::prepare(dsp::Processor::PrepareInfo const& infos)
+        {
+            setPerformCallBack(this, &AdcTilde::perform);
+        }
+        
+        // ================================================================================ //
+        //                                       DAC~                                       //
+        // ================================================================================ //
+        
+        DacTilde::DacTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        AudioInterfaceObject(model, patcher, args)
+        {
+            std::vector<size_t> routes = parseArgs(args);
+            
+            for (size_t index = 0; index < routes.size(); ++index)
+            {
+                m_router.connect(index, routes[index]);
+            }
+        }
+        
         void DacTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
         {
-            for (int inlet_number = 0; inlet_number < input.getNumberOfChannels(); ++inlet_number)
+            std::set<Router::Cnx> const& connections = m_router.getConnections();
+            
+            for(Router::Cnx const& connection : connections)
             {
-                m_audio_controler.addToChannel(m_router[inlet_number], input[inlet_number]);
+                m_audio_controler.addToChannel(connection.m_output, input[connection.m_input]);
             }
         }
         

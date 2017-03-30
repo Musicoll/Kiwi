@@ -157,13 +157,15 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The ConsoleWindow is a Window that manages and display a Console Component.
-    class ConsoleWindow : public Window
+    class ConsoleWindow final : public AppWindow
     {
     public:
-        ConsoleWindow(sConsoleHistory history);
-        ~ConsoleWindow();
         
-        void closeButtonPressed() override;
+        ConsoleWindow(sConsoleHistory history);
+        
+        bool isMainWindow() override;
+        
+        ~ConsoleWindow() = default;
     };
 }
 

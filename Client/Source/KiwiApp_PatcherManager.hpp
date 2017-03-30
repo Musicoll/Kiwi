@@ -174,13 +174,13 @@ namespace kiwi
         void closeButtonPressed() override;
         
         //! @brief returns the patcher manager.
-        PatcherManager& getManager() const;
+        PatcherManager& getPatcherManager() const;
         
         //! @brief returns the PatcherView.
         PatcherView& getPatcherView() const;
         
     private:
-        PatcherManager& m_manager;
+        PatcherManager& m_patcher_manager;
         PatcherView& m_patcherview;
     };
 }

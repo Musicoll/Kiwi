@@ -1,0 +1,179 @@
+#!/usr/bin/env python
+
+##### IMPORT #################################################################
+
+import os
+import sys
+import argparse
+import binascii
+
+##### VERSION #################################################################
+
+if sys.version_info[0] != 2 or sys.version_info[1] < 7:
+    print("This script requires version python 2, 2.7 or higher")
+    sys.exit(1)
+
+#==============================================================================
+# Name : global variables
+#==============================================================================
+
+tab_count = 0
+
+#==============================================================================
+# Name : parse_args
+#==============================================================================
+
+def parse_args ():
+
+    arg_parser = argparse.ArgumentParser ()
+
+    arg_parser.add_argument('-o', '--output', required=True, help="output directory for generated files")
+
+    arg_parser.add_argument('-i', '--input', required=True, help="input directory in which to search ressources")
+
+    return arg_parser.parse_args (sys.argv[1:])
+
+#==============================================================================
+# Name : tabulate
+#==============================================================================
+
+def write_with_tab(file, message):
+    global tab_count
+    for tab in range(0, tab_count): file.write("\t")
+    file.write(message)
+    return
+
+def inc_tab():
+    global tab_count
+    tab_count = tab_count + 1
+    return
+
+def dec_tab():
+    global tab_count
+    tab_count = tab_count - 1
+    return
+
+#==============================================================================
+# Name : Extract binary data
+#==============================================================================
+
+def extract_binary_data(output_hpp_file, output_cpp_file, input_file_path):
+
+    file = open(input_file_path, "rb")
+
+    filename = os.path.basename(input_file_path).replace(".", "_").replace("-", "_")
+
+    # Read all bytes
+    bytes = file.read()
+    size = len(bytes)
+
+    # Write hpp file info
+    write_with_tab(output_hpp_file, "extern const char * " + filename + ";\n")
+    write_with_tab(output_hpp_file, "const int " + filename + "_size = " + str(size) + ";\n\n")
+
+    # Write cpp file info
+    write_with_tab(output_cpp_file, "static const unsigned char " + filename + "_array[] = \n")
+    write_with_tab(output_cpp_file, "{\n");
+
+    line_counter = 0
+
+    for byte_index in range(0, size - 1):
+        byte_hexa = binascii.hexlify(bytes[byte_index])
+        output_cpp_file.write("0x" + byte_hexa + ", ")
+        line_counter = line_counter + 1
+        if line_counter > 15:
+            output_cpp_file.write("\n");
+            line_counter = 0;
+
+    output_cpp_file.write("0x" + binascii.hexlify(bytes[size - 1]) + "\n")
+    write_with_tab(output_cpp_file, "};\n\n")
+    write_with_tab(output_cpp_file, "const char* " + filename + " = (const char *) " + filename + "_array;\n\n")
+
+    file.close()
+
+    return
+
+#==============================================================================
+# Name : Traverse
+#==============================================================================
+
+def traverse(directory, output_hpp_file, output_cpp_file):
+
+    for file in os.listdir(directory):
+
+        file_path = os.path.join(directory, file)
+
+        if (os.path.isfile(file_path) and not file.startswith('.')):
+            print("Exctracing binary data for file " + file_path)
+            extract_binary_data(output_hpp_file, output_cpp_file, file_path)
+        elif(os.path.isdir(file_path) and not file.startswith('.')):
+            write_with_tab(output_hpp_file, "namespace " + file.lower() + "\n")
+            write_with_tab(output_hpp_file, "{\n")
+            write_with_tab(output_cpp_file, "namespace " + file.lower() + "\n")
+            write_with_tab(output_cpp_file, "{\n")
+            inc_tab()
+            traverse(file_path, output_hpp_file, output_cpp_file)
+            dec_tab()
+            write_with_tab(output_cpp_file, "}\n")
+            write_with_tab(output_hpp_file, "}\n")
+
+    return
+
+#==============================================================================
+# Name : Main
+#==============================================================================
+
+args = parse_args()
+
+tab_count = 0
+
+# Creating Binary Data files to write
+
+if os.path.exists(os.path.join(args.output, "KiwiApp_BinaryData.cpp")):
+    os.remove(os.path.join(args.output, "KiwiApp_BinaryData.cpp"))
+output_cpp_file = open(os.path.join(args.output, "KiwiApp_BinaryData.cpp"), "a")
+
+if os.path.exists(os.path.join(args.output, "KiwiApp_BinaryData.hpp")):
+    os.remove(os.path.join(args.output, "KiwiApp_BinaryData.hpp"))
+output_hpp_file = open(os.path.join(args.output, "KiwiApp_BinaryData.hpp"), "a")
+
+# Append license header info
+
+header_file = open(os.path.join(os.getcwd(), "Ressources", "SourceHeader.txt"), "r")
+
+output_cpp_file.write(header_file.read())
+header_file.seek(0, 0)
+output_hpp_file.write(header_file.read())
+
+header_file.close()
+
+output_hpp_file.write("\n")
+output_hpp_file.write("#ifndef KIWI_KIWIAPP_BINARY_DATA_INCLUDED\n#define KIWI_KIWIAPP_BINARY_DATA_INCLUDED\n\n")
+
+write_with_tab(output_hpp_file, "namespace kiwi\n{\n")
+write_with_tab(output_cpp_file, "namespace kiwi\n{\n")
+
+inc_tab()
+write_with_tab(output_cpp_file, "namespace binary_data\n")
+write_with_tab(output_cpp_file, "{\n")
+write_with_tab(output_hpp_file, "namespace binary_data\n")
+write_with_tab(output_hpp_file, "{\n")
+
+inc_tab()
+
+traverse(args.input, output_hpp_file, output_cpp_file)
+
+dec_tab()
+write_with_tab(output_hpp_file, "}\n")
+write_with_tab(output_cpp_file, "}\n")
+
+dec_tab()
+write_with_tab(output_hpp_file, "}\n\n")
+write_with_tab(output_cpp_file, "}\n\n")
+
+output_hpp_file.write("#endif //KIWI_KIWIAPP_BINARY_DATA_INCLUDED\n")
+
+output_cpp_file.close()
+output_hpp_file.close()
+
+sys.exit(0)

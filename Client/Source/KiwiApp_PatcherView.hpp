@@ -172,9 +172,6 @@ namespace kiwi
         //! @internal Link model will be removed from the document.
         void removeLinkView(model::Link& link);
         
-        //! @brief Add a new Object to the model at a given position.
-        void createObjectModel(std::string const& text, double pos_x, double pos_y);
-        
         //! @brief Add a newbox Object at current mouse position and give it focus.
         void createNewBoxModel(bool give_focus);
         
