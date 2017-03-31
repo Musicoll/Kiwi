@@ -49,31 +49,12 @@ namespace kiwi
         };
         
         addSection("Network config", props, true, 0);
+        
+        setSize(300, 400);
     }
     
     SettingsPanel::~SettingsPanel()
     {
         clear();
-    }
-    
-    
-    // ================================================================================ //
-    //                               SETTINGS PANEL WINDOW                              //
-    // ================================================================================ //
-    
-    SettingsPanelWindow::SettingsPanelWindow() :
-    AppWindow("Application settings")
-    {
-        setContentOwned(new SettingsPanel(), false);
-        initBounds({0, 0, 300, 400});
-        
-        setResizeLimits(50, 50, 32000, 32000);
-        setResizable(true, true);
-        //setVisible(true);
-    }
-    
-    bool SettingsPanelWindow::isMainWindow() const
-    {
-        return true;
     }
 }

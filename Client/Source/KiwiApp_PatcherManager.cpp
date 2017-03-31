@@ -37,17 +37,12 @@ namespace kiwi
     // ================================================================================ //
 
     PatcherViewWindow::PatcherViewWindow(PatcherManager& manager, PatcherView& patcherview) :
-    Window("Untitled", true),
+    Window("Untitled", nullptr, true, true, juce::String::empty, true),
     m_patcher_manager(manager),
     m_patcherview(patcherview)
     {
-        #if ! JUCE_MAC
-        setMenuBar(KiwiApp::getMenuBarModel());
-        #endif
-        
         setSize(600, 500);
         centreWithSize(getWidth(), getHeight());
-        setResizable(true, true);
         setVisible(true);
     }
 

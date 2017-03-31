@@ -223,7 +223,7 @@ namespace kiwi
         useEngineInstance().error(text);
     }
     
-    void KiwiApp::closeWindow(AppWindow& window)
+    void KiwiApp::closeWindow(Window& window)
     {
         if(m_instance)
         {

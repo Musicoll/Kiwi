@@ -158,9 +158,9 @@ namespace kiwi
             {
                 PatcherView& patcherview = patcher_window.getPatcherView();
 
-                 manager.closePatcherViewWindow(patcherview);
+                manager.closePatcherViewWindow(patcherview);
 
-                if (manager.getNumberOfView() == 0)
+                if(manager.getNumberOfView() == 0)
                 {
                     m_patcher_managers.erase(manager_it);
                 }
@@ -168,9 +168,9 @@ namespace kiwi
         }
     }
     
-    void Instance::closeWindow(AppWindow& window)
+    void Instance::closeWindow(Window& window)
     {
-        auto is_equal_fn = [&window](std::unique_ptr<AppWindow> const& w)
+        auto is_equal_fn = [&window](std::unique_ptr<Window> const& w)
         {
             return (w.get() == &window);
         };
@@ -191,7 +191,7 @@ namespace kiwi
         }
         
         #if ! JUCE_MAC
-        auto is_main_window_fn = [](std::unique_ptr<AppWindow> const& window)
+        auto is_main_window_fn = [](std::unique_ptr<Window> const& window)
         {
             return window->isMainWindow();
         };
@@ -293,28 +293,56 @@ namespace kiwi
     
     void Instance::showConsoleWindow()
     {
-        showWindowWithId<ConsoleWindow>(WindowId::Console, m_console_history);
+        showWindowWithId(WindowId::Console, [&history = m_console_history](){
+            return std::make_unique<Window>("Kiwi Console",
+                                            std::make_unique<Console>(history),
+                                            true, true, "console_window", true);
+        });
     }
     
     void Instance::showDocumentBrowserWindow()
     {
-        showWindowWithId<DocumentBrowserWindow>(WindowId::DocumentBrowser, m_browser);
+        showWindowWithId(WindowId::DocumentBrowser, [&browser = m_browser](){
+            return std::make_unique<Window>("Document Browser",
+                                            std::make_unique<DocumentBrowserView>(browser),
+                                            true, false, "document_browser_window");
+        });
     }
     
     void Instance::showBeaconDispatcherWindow()
     {
-        showWindowWithId<BeaconDispatcherWindow>(WindowId::BeaconDispatcher, m_instance);
+        showWindowWithId(WindowId::BeaconDispatcher, [&instance = m_instance](){
+            return std::make_unique<Window>("Beacon dispatcher",
+                                            std::make_unique<BeaconDispatcher>(instance),
+                                            true, true, "beacon_dispatcher_window");
+        });
     }
     
     void Instance::showAppSettingsWindow()
     {
-        showWindowWithId<SettingsPanelWindow>(WindowId::ApplicationSettings);
+        showWindowWithId(WindowId::ApplicationSettings, [](){
+            return std::make_unique<Window>("Application settings",
+                                            std::make_unique<SettingsPanel>(),
+                                            true, true, "application_settings_window");
+        });
     }
     
     void Instance::showAudioSettingsWindow()
     {
-        auto& audio_device = dynamic_cast<DspDeviceManager&>(m_instance.getAudioControler());
-        showWindowWithId<AudioSettingWindow>(WindowId::AudioSettings, audio_device);
+        showWindowWithId(WindowId::AudioSettings, [&instance = m_instance](){
+            
+            auto& manager = dynamic_cast<DspDeviceManager&>(instance.getAudioControler());
+            auto device_selector =
+            std::make_unique<juce::AudioDeviceSelectorComponent>(manager,
+                                                                 1, 20, 1, 20,
+                                                                 false, false, false, true);
+            
+            device_selector->setSize(300, 300);
+            
+            return std::make_unique<Window>("Audio Settings",
+                                            std::move(device_selector),
+                                            false, false, "audio_settings_window");
+        });
     }
     
     std::vector<uint8_t>& Instance::getPatcherClipboardData()
@@ -325,5 +353,17 @@ namespace kiwi
     size_t Instance::getNextUntitledNumberAndIncrement()
     {
         return m_untitled_patcher_index++;
+    }
+    
+    void Instance::showWindowWithId(WindowId id, std::function<std::unique_ptr<Window>()> create_fn)
+    {
+        auto& window_uptr = m_windows[std::size_t(id)];
+        if(!window_uptr)
+        {
+            window_uptr = create_fn();
+        }
+        
+        window_uptr->setVisible(true);
+        window_uptr->toFront(true);
     }
 }

@@ -69,6 +69,8 @@ namespace kiwi
         addAndMakeVisible(m_beacon_name_editor.get());
         addAndMakeVisible(m_message_editor.get());
         addAndMakeVisible(m_send_button.get());
+        
+        setSize(280, 75);
     }
     
     void BeaconDispatcher::resized()
@@ -97,35 +99,5 @@ namespace kiwi
             engine::Beacon& beacon = m_instance.getBeacon(name);
             beacon.dispatch(args);
         }
-    }
-    
-    // ================================================================================ //
-    //                               BEACON DISPATCHER WINDOW                           //
-    // ================================================================================ //
-    
-    BeaconDispatcherWindow::BeaconDispatcherWindow(engine::Instance& instance) :
-    AppWindow("Beacon dispatcher")
-    {
-        setContentOwned(new BeaconDispatcher(instance), false);
-        
-        juce::Rectangle<int> screen_area = getParentMonitorArea();
-        
-        int width = 300;
-        int height = 100;
-        
-        juce::Rectangle<int> bounds(screen_area.getX() + ((15. / 100.) * screen_area.getWidth() - ((float) width / 2.)),
-                                    screen_area.getY() + ((20. / 100.) * screen_area.getHeight()) - ((float) height / 2.),
-                                    width,
-                                    height);
-        
-        initBounds(bounds);
-        
-        setResizable(false, false);
-        setVisible(true);
-    }
-    
-    bool BeaconDispatcherWindow::isMainWindow() const
-    {
-        return true;
     }
 }

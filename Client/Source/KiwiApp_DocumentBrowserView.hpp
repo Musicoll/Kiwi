@@ -196,21 +196,6 @@ namespace kiwi
         BrowserButton                                       m_create_document_btn;
         BrowserButton                                       m_refresh_btn;
     };
-
-    // ================================================================================ //
-    //                               DOCUMENT BROWSER WINDOW                           //
-    // ================================================================================ //
-    
-    //! @brief The DocumentBrowserWindow is a Window that manages and displays a Document browser.
-    class DocumentBrowserWindow final : public AppWindow
-    {
-    public:
-        DocumentBrowserWindow(DocumentBrowser& browser);
-        
-        bool isMainWindow() const override;
-        
-        ~DocumentBrowserWindow() = default;
-    };
 }
 
 

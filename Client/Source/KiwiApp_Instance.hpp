@@ -73,7 +73,7 @@ namespace kiwi
         void removePatcherWindow(PatcherViewWindow & patcher_window);
         
         //! @brief Attempt to close the given window asking user to save file if needed.
-        void closeWindow(AppWindow& window);
+        void closeWindow(Window& window);
         
         //! @brief Attempt to close all document, after asking user to save them if needed.
         //! @return True if all document have been closed, false if the user cancel the action.
@@ -117,19 +117,8 @@ namespace kiwi
         size_t getNextUntitledNumberAndIncrement();
         
         //! @internal Creates the window if needed then the brings it to front.
-        //! @see WindowId
-        template<class WindowType, class... Args>
-        void showWindowWithId(WindowId id, Args&&... args)
-        {
-            auto& window_uptr = m_windows[std::size_t(id)];
-            if(!window_uptr)
-            {
-                window_uptr = std::make_unique<WindowType>(std::forward<Args>(args)...);
-            }
-            
-            window_uptr->setVisible(true);
-            window_uptr->toFront(true);
-        }
+        //! @param create_fn The window factory function.
+        void showWindowWithId(WindowId id, std::function<std::unique_ptr<Window>()> create_fn);
         
     private: // variables
         
@@ -143,7 +132,7 @@ namespace kiwi
         
         sConsoleHistory                             m_console_history;
 
-        std::vector<std::unique_ptr<AppWindow>>     m_windows;
+        std::vector<std::unique_ptr<Window>>        m_windows;
     
         std::vector<uint8_t>                        m_patcher_clipboard;
         

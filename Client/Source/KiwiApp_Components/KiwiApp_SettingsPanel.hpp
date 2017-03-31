@@ -24,8 +24,6 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 
-#include "../KiwiApp_Window.hpp"
-
 namespace kiwi
 {
     // ================================================================================ //
@@ -42,22 +40,6 @@ namespace kiwi
         
         //! @brief Destructor.
         ~SettingsPanel();
-        
-    private: // variables
-    };
-    
-    // ================================================================================ //
-    //                               SETTINGS PANEL WINDOW                              //
-    // ================================================================================ //
-    
-    //! @brief The SettingsPanelWindow
-    class SettingsPanelWindow : public AppWindow
-    {
-    public:
-        SettingsPanelWindow();
-        ~SettingsPanelWindow() = default;
-        
-        bool isMainWindow() const override;
     };
 }
 

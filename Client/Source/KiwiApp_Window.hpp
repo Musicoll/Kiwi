@@ -26,6 +26,66 @@
 
 namespace kiwi
 {
+    // ================================================================================ //
+    //                                      WINDOW                                      //
+    // ================================================================================ //
+
+    //! @brief Common interface for all windows held by the application.
+    class Window : public juce::DocumentWindow, public juce::ApplicationCommandTarget
+    {
+    public: // methods
+        
+        //! @brief Constructor restore Window state from stored settings it they exist.
+        Window(std::string const& name,
+               std::unique_ptr<Component> content,
+               bool resizable = false,
+               bool is_main_window = true,
+               juce::String settings_name = juce::String::empty,
+               bool add_windows_menubar = false);
+        
+        //! @brief Window destructor. Called whenever buttonPressed is called.
+        //! @details Will store position into settings if needed.
+        virtual ~Window();
+        
+        //! @brief Initialise Window bounds with either stored settings if there or specified bounds if not.
+        void initBounds(juce::Rectangle<int> bounds);
+        
+        //! @brief Return true if window shall be a main window of kiwi.
+        //! @details On windows platform, the application quit when all main windows are closed.
+        bool isMainWindow() const;
+        
+        //! @brief Restore the window state
+        //! @details If the settings name you passed in the ctor is not empty,
+        //! the function will try to read and apply these settings.
+        //! @see saveWindowState
+        virtual void restoreWindowState();
+        
+        //! @brief Save the window state
+        //! @details If the settings name you passed in the ctor is not empty,
+        //! the function will save window state.
+        //! @see restoreWindowState
+        virtual void saveWindowState();
+        
+        // ================================================================================ //
+        //                              APPLICATION COMMAND TARGET                          //
+        // ================================================================================ //
+        
+        ApplicationCommandTarget* getNextCommandTarget() override;
+        void getAllCommands (juce::Array<juce::CommandID>& commands) override;
+        void getCommandInfo (const juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
+        bool perform (const InvocationInfo& info) override;
+        
+    protected: // methods
+        
+        //! @brief Called when close button is pressed. Request instance to close the window.
+        void closeButtonPressed() override;
+        
+    private: // variables
+        
+        juce::String    m_settings_name     {};
+        bool            m_is_main_window    {false};
+    };
+    
     //! @brief Singleton application window's ids
     //! @see Instance::showWindowWithId
     enum class WindowId : std::size_t
@@ -37,58 +97,6 @@ namespace kiwi
         BeaconDispatcher,
         count               // Number of WindowIds
     };
-    
-    // ================================================================================ //
-    //                                      WINDOW                                      //
-    // ================================================================================ //
-
-    //! @brief Common interface for all windows held by the application.
-    class Window : public juce::DocumentWindow, public juce::ApplicationCommandTarget
-    {
-    public: // methods
-        Window(std::string const& name, bool addToDesktop);
-        
-        //! @brief Window destructor. Called whenever buttonPressed is called.
-        virtual ~Window() = default;
-        
-        // ================================================================================ //
-        //                              APPLICATION COMMAND TARGET                          //
-        // ================================================================================ //
-        
-        ApplicationCommandTarget* getNextCommandTarget() override;
-        void getAllCommands (juce::Array<juce::CommandID>& commands) override;
-        void getCommandInfo (const juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
-        bool perform (const InvocationInfo& info) override;
-    };
-    
-    // ================================================================================ //
-    //                                      APPWINDOW                                   //
-    // ================================================================================ //
-    
-    //! @brief A class used for application windows as settings windows and managers.
-    //! @details Distinction is made between AppWindow and Patcher Windows that countain PatcherViews.
-    class AppWindow : public Window
-    {
-    public: // methods
-        
-        //! @brief Constructor restore AppWindow position from stored settings it they exist.
-        AppWindow(std::string const& name);
-        
-        //! @brief Initialise AppWindow bounds with either stored settings if there or specified bounds if not.
-        void initBounds(juce::Rectangle<int> bounds);
-        
-        //! @brief Return true if window shall be a main window of kiwi.
-        //! @details On windows platform, the application quit when all main windows are closed.
-        virtual bool isMainWindow() const = 0;
-        
-        //! @brief Destructor store position into settings.
-        virtual ~AppWindow();
-        
-    protected: // methods
-        
-        //! @biref Called when close button is pressed. Request instance to close the window.
-        void closeButtonPressed() override final;
-    };
 }
-
+    
 #endif // KIWI_APP_WINDOW_HPP_INCLUDED
