@@ -77,7 +77,7 @@ namespace kiwi
         
         //! @brief Attempt to close all document, after asking user to save them if needed.
         //! @return True if all document have been closed, false if the user cancel the action.
-        bool closeAllWindows();
+        bool closeAllPatcherWindows();
         
         //! @brief Attempt to create a new patcher with document Session informations.
         PatcherManager* openRemotePatcher(DocumentBrowser::Drive::DocumentSession& session);

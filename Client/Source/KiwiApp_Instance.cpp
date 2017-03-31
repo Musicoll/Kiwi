@@ -160,7 +160,7 @@ namespace kiwi
 
                  manager.closePatcherViewWindow(patcherview);
 
-                if ( manager.getNumberOfView() == 0)
+                if (manager.getNumberOfView() == 0)
                 {
                     m_patcher_managers.erase(manager_it);
                 }
@@ -205,7 +205,7 @@ namespace kiwi
         #endif
     }
     
-    bool Instance::closeAllWindows()
+    bool Instance::closeAllPatcherWindows()
     {
         bool success = true;
         

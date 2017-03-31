@@ -134,7 +134,7 @@ namespace kiwi
         }
         else
         {
-            if(m_instance->closeAllWindows())
+            if(m_instance->closeAllPatcherWindows())
             {
                 m_instance.reset();
                 
