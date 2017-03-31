@@ -116,6 +116,21 @@ namespace kiwi
         //! @internal Returns the next untitled number based on current documents
         size_t getNextUntitledNumberAndIncrement();
         
+        //! @internal Creates the window if needed then the brings it to front.
+        //! @see WindowId
+        template<class WindowType, class... Args>
+        void showWindowWithId(WindowId id, Args&&... args)
+        {
+            auto& window_uptr = m_windows[std::size_t(id)];
+            if(!window_uptr)
+            {
+                window_uptr = std::make_unique<WindowType>(std::forward<Args>(args)...);
+            }
+            
+            window_uptr->setVisible(true);
+            window_uptr->toFront(true);
+        }
+        
     private: // variables
         
         engine::Instance                            m_instance;
@@ -128,7 +143,7 @@ namespace kiwi
         
         sConsoleHistory                             m_console_history;
 
-        std::set<std::unique_ptr<AppWindow>>        m_windows;
+        std::vector<std::unique_ptr<AppWindow>>     m_windows;
     
         std::vector<uint8_t>                        m_patcher_clipboard;
         

@@ -74,7 +74,7 @@ namespace kiwi
     public:
         BeaconDispatcherWindow(engine::Instance& instance);
         
-        bool isMainWindow() override;
+        bool isMainWindow() const override;
         
         ~BeaconDispatcherWindow() = default;
     };

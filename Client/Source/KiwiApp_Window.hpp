@@ -26,6 +26,18 @@
 
 namespace kiwi
 {
+    //! @brief Singleton application window's ids
+    //! @see Instance::showWindowWithId
+    enum class WindowId : std::size_t
+    {
+        Console = 0,
+        DocumentBrowser,
+        ApplicationSettings,
+        AudioSettings,
+        BeaconDispatcher,
+        count               // Number of WindowIds
+    };
+    
     // ================================================================================ //
     //                                      WINDOW                                      //
     // ================================================================================ //
@@ -67,7 +79,7 @@ namespace kiwi
         
         //! @brief Return true if window shall be a main window of kiwi.
         //! @details On windows platform, the application quit when all main windows are closed.
-        virtual bool isMainWindow() = 0;
+        virtual bool isMainWindow() const = 0;
         
         //! @brief Destructor store position into settings.
         virtual ~AppWindow();

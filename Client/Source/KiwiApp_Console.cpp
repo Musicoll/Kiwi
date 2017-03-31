@@ -381,7 +381,7 @@ namespace kiwi
         setVisible(true);
     }
     
-    bool ConsoleWindow::isMainWindow()
+    bool ConsoleWindow::isMainWindow() const
     {
         return true;
     }

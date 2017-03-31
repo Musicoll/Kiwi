@@ -124,7 +124,7 @@ namespace kiwi
         setVisible(true);
     }
     
-    bool BeaconDispatcherWindow::isMainWindow()
+    bool BeaconDispatcherWindow::isMainWindow() const
     {
         return true;
     }

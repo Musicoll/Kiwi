@@ -30,6 +30,8 @@
 #include <cstdlib>
 #include <ctime>
 
+#include "KiwiApp_Window.hpp"
+
 namespace kiwi
 {
     // ================================================================================ //
@@ -47,16 +49,18 @@ namespace kiwi
         std::srand(std::time(0));
         m_user_id = std::rand();
         
-        m_windows.emplace(std::make_unique<ConsoleWindow>(m_console_history));
-        m_windows.emplace(std::make_unique<DocumentBrowserWindow>(m_browser));
-        m_windows.emplace(std::make_unique<BeaconDispatcherWindow>(m_instance));
-        m_windows.emplace(std::make_unique<SettingsPanelWindow>());
+        // reserve space for singleton windows.
+        m_windows.resize(std::size_t(WindowId::count));
+        
+        //showAppSettingsWindow();
+        showBeaconDispatcherWindow();
+        showDocumentBrowserWindow();
+        showConsoleWindow();
     }
     
     Instance::~Instance()
     {
         closeAllWindows();
-        m_patcher_managers.clear();
     }
     
     uint64_t Instance::getUserId() const noexcept
@@ -166,27 +170,33 @@ namespace kiwi
     
     void Instance::closeWindow(AppWindow& window)
     {
-        struct IsEqual
+        auto is_equal_fn = [&window](std::unique_ptr<AppWindow> const& w)
         {
-            IsEqual(AppWindow const& window):m_window(window){}
-            
-            bool operator()(std::unique_ptr<AppWindow> const& window){return window.get() == &m_window;};
-            
-            AppWindow const& m_window;
+            return (w.get() == &window);
         };
+
+        auto found_window = std::find_if(m_windows.begin(), m_windows.end(), is_equal_fn);
         
-        std::set<std::unique_ptr<AppWindow>>::iterator found_window =
-                std::find_if(m_windows.begin(), m_windows.end(), IsEqual(window));
-        
-        m_windows.erase(found_window);
+        if(found_window != m_windows.end())
+        {
+            // if it's a regular window, simply reset the ptr
+            if(found_window < m_windows.begin() + std::size_t(WindowId::count))
+            {
+                found_window->reset();
+            }
+            else
+            {
+                m_windows.erase(found_window);
+            }
+        }
         
         #if ! JUCE_MAC
-        struct IsMainWindow
+        auto is_main_window_fn = [](std::unique_ptr<AppWindow> const& window)
         {
-            bool operator()(std::unique_ptr<AppWindow> const& app_window){return app_window->isMainWindow();};
+            return window->isMainWindow();
         };
         
-        size_t main_windows = std::count_if(m_windows.begin(), m_windows.end(), IsMainWindow());
+        size_t main_windows = std::count_if(m_windows.begin(), m_windows.end(), is_main_window_fn);
         
         if (main_windows == 0)
         {
@@ -249,33 +259,22 @@ namespace kiwi
     
     void Instance::removePatcher(PatcherManager const& patcher_manager)
     {
-        struct IsEqual
-        {
-            IsEqual(PatcherManager const& manager):m_patcher_manager(manager){};
-            
-            bool operator()(std::unique_ptr<PatcherManager> const& patcher){return patcher.get() == &m_patcher_manager;}
-            
-            PatcherManager const& m_patcher_manager;
-        };
+        const auto it = getPatcherManager(patcher_manager);
         
-        PatcherManagers::iterator found_patcher =
-            std::find_if(m_patcher_managers.begin(), m_patcher_managers.end(), IsEqual(patcher_manager));
-        
-        if (found_patcher != m_patcher_managers.end())
+        if (it != m_patcher_managers.end())
         {
-            m_patcher_managers.erase(found_patcher);
+            m_patcher_managers.erase(it);
         }
-        
     }
     
     Instance::PatcherManagers::iterator Instance::getPatcherManager(PatcherManager const& manager)
     {
-        const auto find_it = [&manager](std::unique_ptr<PatcherManager> const& manager_uptr)
+        const auto find_fn = [&manager](std::unique_ptr<PatcherManager> const& other)
         {
-            return &manager == manager_uptr.get();
+            return &manager == other.get();
         };
         
-        return std::find_if(m_patcher_managers.begin(), m_patcher_managers.end(), find_it);
+        return std::find_if(m_patcher_managers.begin(), m_patcher_managers.end(), find_fn);
     }
     
     Instance::PatcherManagers::iterator Instance::getPatcherManagerForSession(DocumentBrowser::Drive::DocumentSession& session)
@@ -294,27 +293,28 @@ namespace kiwi
     
     void Instance::showConsoleWindow()
     {
-        m_windows.emplace(std::make_unique<ConsoleWindow>(m_console_history));;
+        showWindowWithId<ConsoleWindow>(WindowId::Console, m_console_history);
     }
     
     void Instance::showDocumentBrowserWindow()
     {
-        m_windows.emplace(std::make_unique<DocumentBrowserWindow>(m_browser));
+        showWindowWithId<DocumentBrowserWindow>(WindowId::DocumentBrowser, m_browser);
     }
     
     void Instance::showBeaconDispatcherWindow()
     {
-        m_windows.emplace(std::make_unique<BeaconDispatcherWindow>(m_instance));
+        showWindowWithId<BeaconDispatcherWindow>(WindowId::BeaconDispatcher, m_instance);
     }
     
     void Instance::showAppSettingsWindow()
     {
-        m_windows.emplace(std::make_unique<SettingsPanelWindow>());
+        showWindowWithId<SettingsPanelWindow>(WindowId::ApplicationSettings);
     }
     
     void Instance::showAudioSettingsWindow()
     {
-        m_windows.emplace(std::make_unique<AudioSettingWindow>(dynamic_cast<DspDeviceManager&>(m_instance.getAudioControler())));
+        auto& audio_device = dynamic_cast<DspDeviceManager&>(m_instance.getAudioControler());
+        showWindowWithId<AudioSettingWindow>(WindowId::AudioSettings, audio_device);
     }
     
     std::vector<uint8_t>& Instance::getPatcherClipboardData()

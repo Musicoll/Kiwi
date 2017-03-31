@@ -207,7 +207,7 @@ namespace kiwi
     public:
         DocumentBrowserWindow(DocumentBrowser& browser);
         
-        bool isMainWindow() override;
+        bool isMainWindow() const override;
         
         ~DocumentBrowserWindow() = default;
     };

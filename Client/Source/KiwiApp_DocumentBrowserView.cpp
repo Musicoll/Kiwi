@@ -377,7 +377,7 @@ namespace kiwi
         setVisible(true);
     }
     
-    bool DocumentBrowserWindow::isMainWindow()
+    bool DocumentBrowserWindow::isMainWindow() const
     {
         return true;
     }

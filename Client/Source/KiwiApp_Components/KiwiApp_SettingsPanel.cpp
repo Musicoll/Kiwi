@@ -72,7 +72,7 @@ namespace kiwi
         //setVisible(true);
     }
     
-    bool SettingsPanelWindow::isMainWindow()
+    bool SettingsPanelWindow::isMainWindow() const
     {
         return true;
     }

@@ -163,7 +163,7 @@ namespace kiwi
         
         ConsoleWindow(sConsoleHistory history);
         
-        bool isMainWindow() override;
+        bool isMainWindow() const override;
         
         ~ConsoleWindow() = default;
     };

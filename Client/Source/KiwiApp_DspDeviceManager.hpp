@@ -123,7 +123,7 @@ namespace kiwi
         
         AudioSettingWindow(DspDeviceManager& device_manager);
         
-        bool isMainWindow() override;
+        bool isMainWindow() const override;
         
         ~AudioSettingWindow() = default;
     };

@@ -57,7 +57,7 @@ namespace kiwi
         SettingsPanelWindow();
         ~SettingsPanelWindow() = default;
         
-        bool isMainWindow() override;
+        bool isMainWindow() const override;
     };
 }
 

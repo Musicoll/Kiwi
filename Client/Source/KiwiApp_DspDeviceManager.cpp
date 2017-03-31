@@ -239,7 +239,7 @@ namespace kiwi
         setVisible(true);
     }
     
-    bool AudioSettingWindow::isMainWindow()
+    bool AudioSettingWindow::isMainWindow() const
     {
         return false;
     }
