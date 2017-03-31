@@ -60,7 +60,7 @@ namespace kiwi
     
     Instance::~Instance()
     {
-        closeAllWindows();
+        closeAllPatcherWindows();
     }
     
     uint64_t Instance::getUserId() const noexcept
