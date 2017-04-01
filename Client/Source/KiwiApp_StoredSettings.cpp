@@ -61,17 +61,22 @@ namespace kiwi
     
     StoredSettings::StoredSettings() :
     m_globals("GLOBAL_SETTINGS"),
-    m_network("NETWORK_CONFIG")
+    m_network("NETWORK_CONFIG"),
+    m_windows_state("WINDOWS_STATE")
     {
         reload();
         m_globals.addListener(this);
         m_network.addListener(this);
+        m_windows_state.addListener(this);
+        
+        changed();
     }
     
     StoredSettings::~StoredSettings()
     {
         m_globals.removeListener(this);
         m_network.removeListener(this);
+        m_windows_state.removeListener(this);
         flush();
     }
     
@@ -114,6 +119,17 @@ namespace kiwi
                 m_network = juce::ValueTree::fromXml(*networks);
             }
         }
+        
+        {
+            // reload Windows state settings
+            std::unique_ptr<juce::XmlElement> windows_state(getGlobalProperties()
+                                                            .getXmlValue("Windows State"));
+            
+            if(windows_state != nullptr)
+            {
+                m_windows_state = juce::ValueTree::fromXml(*windows_state);
+            }
+        }
     }
     
     juce::ValueTree& StoredSettings::globals()
@@ -126,6 +142,47 @@ namespace kiwi
         return m_network;
     }
     
+    std::unique_ptr<juce::XmlElement> StoredSettings::getWindowState(juce::String const& window_settings_name)
+    {
+        std::unique_ptr<juce::XmlElement> windows_state(getGlobalProperties()
+                                                        .getXmlValue("Windows State"));
+        
+        if(windows_state)
+        {
+            auto* xml = windows_state->getChildByName(window_settings_name);
+            
+            if(xml)
+            {
+                return std::make_unique<juce::XmlElement>(*xml);
+            }
+        }
+        
+        return nullptr;
+    }
+    
+    void StoredSettings::setWindowState(juce::String const& window_settings_name,
+                                        juce::XmlElement const& new_state)
+    {
+        
+        std::unique_ptr<juce::XmlElement> windows_state(getGlobalProperties()
+                                                        .getXmlValue("Windows State"));
+        
+        if(windows_state)
+        {
+            auto* xml = windows_state->getChildByName(window_settings_name);
+            if(xml)
+            {
+                *xml = new_state;
+            }
+            else
+            {
+                windows_state->addChildElement(new juce::XmlElement(new_state));
+            }
+            
+            saveValueTree(juce::ValueTree::fromXml(*windows_state), "Windows State");
+        }
+    }
+    
     void StoredSettings::saveValueTree(juce::ValueTree const& vt, std::string const& key_name)
     {
         std::unique_ptr<juce::XmlElement> xml_value(vt.createXml());
@@ -136,5 +193,6 @@ namespace kiwi
     {
         saveValueTree(m_globals, "Global Settings");
         saveValueTree(m_network, "Network Settings");
+        saveValueTree(m_windows_state, "Windows State");
     }
 }

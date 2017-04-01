@@ -56,6 +56,12 @@ namespace kiwi
         //! @brief Returns a network settings value tree
         juce::ValueTree& network();
         
+        //! @brief Returns the state of a window as a value tree
+        std::unique_ptr<juce::XmlElement> getWindowState(juce::String const& window_settings_name);
+        
+        //! @brief Save the state of a window as a value tree
+        void setWindowState(juce::String const& window_settings_name, juce::XmlElement const& xml);
+        
     private: // methods
         
         void changed();
@@ -73,6 +79,7 @@ namespace kiwi
         std::vector<std::unique_ptr<juce::PropertiesFile>> m_property_files;
         juce::ValueTree                                    m_globals;
         juce::ValueTree                                    m_network;
+        juce::ValueTree                                    m_windows_state;
         
     private: // deleted methods
         

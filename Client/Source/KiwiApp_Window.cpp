@@ -43,7 +43,7 @@ namespace kiwi
         
         if(content)
         {
-            int width = content->getWidth() > 0 ? content->getWidth() : 200;
+            int width = content->getWidth() > 0 ? content->getWidth() : 300;
             int height = content->getHeight() > 0 ? content->getHeight() : 300;
             
             content->setSize(width, height);
@@ -73,11 +73,16 @@ namespace kiwi
     {
         if(m_settings_name.isNotEmpty())
         {
-            const juce::String state(getGlobalProperties().getValue(m_settings_name));
+            auto state(getAppSettings().getWindowState(m_settings_name));
             
-            if (!state.isEmpty())
+            if(state)
             {
-                restoreWindowStateFromString(state);
+                auto jwindow_state = state->getStringAttribute("jwindow");
+                
+                if(jwindow_state.isNotEmpty())
+                {
+                    restoreWindowStateFromString(jwindow_state);
+                }
             }
         }
     }
@@ -86,13 +91,34 @@ namespace kiwi
     {
         if(m_settings_name.isNotEmpty())
         {
-            getGlobalProperties().setValue(m_settings_name, getWindowStateAsString());
+            juce::XmlElement xml(m_settings_name);
+            xml.setAttribute("jwindow", getWindowStateAsString());
+            getAppSettings().setWindowState(m_settings_name, xml);
         }
     }
     
     bool Window::isMainWindow() const
     {
         return m_is_main_window;
+    }
+    
+    void Window::closeButtonPressed()
+    {
+        KiwiApp::use().closeWindow(*this);
+    }
+    
+    void Window::initBounds(juce::Rectangle<int> bounds)
+    {
+        const juce::String windowState(getGlobalProperties().getValue(getName()));
+        
+        if (!windowState.isEmpty())
+        {
+            restoreWindowStateFromString(windowState);
+        }
+        else
+        {
+            setBounds(bounds);
+        }
     }
     
     // ================================================================================ //
@@ -146,24 +172,5 @@ namespace kiwi
             default: return false;
         }
         return true;
-    }
-    
-    void Window::initBounds(juce::Rectangle<int> bounds)
-    {
-        const juce::String windowState(getGlobalProperties().getValue(getName()));
-        
-        if (!windowState.isEmpty())
-        {
-            restoreWindowStateFromString(windowState);
-        }
-        else
-        {
-            setBounds(bounds);
-        }
-    }
-    
-    void Window::closeButtonPressed()
-    {
-        KiwiApp::use().closeWindow(*this);
     }
 }
