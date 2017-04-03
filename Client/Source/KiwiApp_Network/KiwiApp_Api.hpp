@@ -22,8 +22,6 @@
 #ifndef KIWI_APP_API_REQUEST_HPP_INCLUDED
 #define KIWI_APP_API_REQUEST_HPP_INCLUDED
 
-#include <juce_core/juce_core.h>
-
 #include <cpr/cpr.h>
 
 #include <json.hpp>

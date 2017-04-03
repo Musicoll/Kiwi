@@ -315,7 +315,7 @@ namespace kiwi
         showWindowWithId(WindowId::BeaconDispatcher, [&instance = m_instance](){
             return std::make_unique<Window>("Beacon dispatcher",
                                             std::make_unique<BeaconDispatcher>(instance),
-                                            true, true, "beacon_dispatcher_window");
+                                            false, true, "beacon_dispatcher_window");
         });
     }
     

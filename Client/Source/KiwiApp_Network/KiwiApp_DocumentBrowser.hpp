@@ -29,6 +29,8 @@
 
 #include "KiwiApp_Api.hpp"
 
+#include "../KiwiApp_StoredSettings.hpp"
+
 #include <list>
 
 namespace kiwi
@@ -38,7 +40,7 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief Request Patcher document informations through a Kiwi API.
-    class DocumentBrowser : public juce::Timer, public juce::ValueTree::Listener
+    class DocumentBrowser : public juce::Timer, public NetworkSettings::Listener
     {
     public: // nested classes
         
@@ -76,11 +78,7 @@ namespace kiwi
         
     private: // methods
         
-        void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier&) override;
-        void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override               { }
-        void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override        { }
-        void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override                { }
-        void valueTreeParentChanged(juce::ValueTree&) override                              { }
+        void networkSettingsChanged(NetworkSettings const&, const juce::Identifier& id) override;
         
     private: // variables
         

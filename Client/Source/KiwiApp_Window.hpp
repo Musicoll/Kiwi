@@ -35,7 +35,14 @@ namespace kiwi
     {
     public: // methods
         
-        //! @brief Constructor restore Window state from stored settings it they exist.
+        //! @brief Constructor.
+        //! @details Setup the window and restore its state from stored settings it they exist.
+        //! @param content A component that will be owned and displayed by the window
+        //! @param resizable Pass true to make a resizable window.
+        //! @param is_main_window see isMainWindow()
+        //! @param settings_name The name of the window settings
+        //! (pass an empty string if you dont want to save the window state)
+        //! @param add_menubar Pass true to add the kiwi application menubar to the window
         Window(std::string const& name,
                std::unique_ptr<juce::Component> content,
                bool resizable = false,
@@ -55,13 +62,13 @@ namespace kiwi
         //! @details If the settings name you passed in the ctor is not empty,
         //! the function will try to read and apply these settings.
         //! @see saveWindowState
-        virtual void restoreWindowState();
+        void restoreWindowState();
         
         //! @brief Save the window state
         //! @details If the settings name you passed in the ctor is not empty,
         //! the function will save window state.
         //! @see restoreWindowState
-        virtual void saveWindowState();
+        void saveWindowState();
         
         // ================================================================================ //
         //                              APPLICATION COMMAND TARGET                          //

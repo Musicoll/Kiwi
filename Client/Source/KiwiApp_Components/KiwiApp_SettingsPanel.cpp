@@ -34,17 +34,10 @@ namespace kiwi
         
         juce::Array<juce::PropertyComponent*> props {
             
-            new juce::TextPropertyComponent(net_config.getPropertyAsValue("host", nullptr),
-                                            "Host", 20, false),
-            
-            new juce::TextPropertyComponent(net_config.getPropertyAsValue("api_port", nullptr),
-                                            "API Port", 5, false),
-            
-            new juce::TextPropertyComponent(net_config.getPropertyAsValue("session_port", nullptr),
-                                            "Session Port", 5, false),
-            
-            new juce::TextPropertyComponent(net_config.getPropertyAsValue("refresh_interval", nullptr),
-                                            "Refresh interval time", 5, false)
+            new juce::TextPropertyComponent(net_config.getHostValue(), "Host", 20, false),
+            new juce::TextPropertyComponent(net_config.getApiPortValue(), "API Port", 5, false),
+            new juce::TextPropertyComponent(net_config.getSessionPortValue(), "Session Port", 5, false),
+            new juce::TextPropertyComponent(net_config.getRefreshIntervalValue(), "Refresh interval time", 5, false)
             
         };
         

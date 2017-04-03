@@ -22,8 +22,16 @@
 #include "KiwiApp_StoredSettings.hpp"
 #include "KiwiApp.hpp"
 
+#include "KiwiApp_BinaryData.hpp"
+
+#include "KiwiApp_IDs.hpp"
+
 namespace kiwi
 {
+    // ================================================================================ //
+    //                                  GLOBAL FUNCTIONS                                //
+    // ================================================================================ //
+    
     StoredSettings& getAppSettings()
     {
         return KiwiApp::useSettings();
@@ -56,27 +64,134 @@ namespace kiwi
     }
     
     // ================================================================================ //
+    //                                  NETWORK SETTINGS                                //
+    // ================================================================================ //
+    
+    NetworkSettings::NetworkSettings() : m_settings(Ids::NETWORK_CONFIG)
+    {
+        resetToDefault();
+        m_settings.addListener(this);
+    }
+    
+    NetworkSettings::~NetworkSettings()
+    {
+        m_settings.removeListener(this);
+    }
+    
+    void NetworkSettings::resetToDefault()
+    {
+        m_settings.removeAllChildren(nullptr);
+        m_settings.removeAllProperties(nullptr);
+        
+        std::unique_ptr<juce::XmlElement> xml(nullptr);
+        
+        auto str = juce::String::createStringFromData(binary_data::settings::network_settings,
+                                                      binary_data::settings::network_settings_size);
+        
+        xml.reset(juce::XmlDocument::parse(str));
+        assert(xml != nullptr);
+        
+        // load default settings
+        m_settings = juce::ValueTree::fromXml(*xml);
+    }
+    
+    bool NetworkSettings::readFromXml(juce::XmlElement const& xml)
+    {
+        if(xml.hasTagName(m_settings.getType().toString()))
+        {
+            const auto new_settings(juce::ValueTree::fromXml(xml));
+            
+            for(int i = new_settings.getNumProperties(); --i >= 0;)
+            {
+                const auto key = new_settings.getPropertyName(i);
+                if(m_settings.hasProperty(key))
+                {
+                    m_settings.setProperty(key, new_settings.getProperty(key), nullptr);
+                }
+            }
+            
+            return true;
+        }
+        
+        return false;
+    }
+    
+    juce::ValueTree& NetworkSettings::use()
+    {
+        return m_settings;
+    }
+    
+    std::string NetworkSettings::getHost() const
+    {
+        return m_settings.getProperty(Ids::host).toString().toStdString();
+    }
+    
+    juce::Value NetworkSettings::getHostValue()
+    {
+        return m_settings.getPropertyAsValue(Ids::host, nullptr);
+    }
+    
+    uint16_t NetworkSettings::getApiPort() const
+    {
+        int port = m_settings.getProperty(Ids::api_port);
+        return static_cast<uint16_t>(port);
+    }
+    
+    juce::Value NetworkSettings::getApiPortValue()
+    {
+        return m_settings.getPropertyAsValue(Ids::api_port, nullptr);
+    }
+    
+    uint16_t NetworkSettings::getSessionPort() const
+    {
+        int port = m_settings.getProperty(Ids::session_port);
+        return static_cast<uint16_t>(port);
+    }
+    
+    juce::Value NetworkSettings::getSessionPortValue()
+    {
+        return m_settings.getPropertyAsValue(Ids::session_port, nullptr);
+    }
+    
+    uint16_t NetworkSettings::getRefreshInterval() const
+    {
+        int time = m_settings.getProperty(Ids::refresh_interval);
+        return static_cast<uint16_t>(time);
+    }
+    
+    juce::Value NetworkSettings::getRefreshIntervalValue()
+    {
+        return m_settings.getPropertyAsValue(Ids::refresh_interval, nullptr);
+    }
+    
+    void NetworkSettings::addListener(Listener& listener)
+    {
+        m_listeners.add(listener);
+    }
+    
+    void NetworkSettings::removeListener(Listener& listener)
+    {
+        m_listeners.remove(listener);
+    }
+    
+    void NetworkSettings::valueTreePropertyChanged(juce::ValueTree&, juce::Identifier const& id)
+    {
+        m_listeners.call(&Listener::networkSettingsChanged, *this, id);
+    }
+    
+    // ================================================================================ //
     //                                  STORED SETTINGS                                 //
     // ================================================================================ //
     
-    StoredSettings::StoredSettings() :
-    m_globals("GLOBAL_SETTINGS"),
-    m_network("NETWORK_CONFIG"),
-    m_windows_state("WINDOWS_STATE")
+    StoredSettings::StoredSettings()
     {
         reload();
-        m_globals.addListener(this);
-        m_network.addListener(this);
-        m_windows_state.addListener(this);
-        
-        changed();
+        m_network.use().addListener(this);
     }
     
     StoredSettings::~StoredSettings()
     {
-        m_globals.removeListener(this);
-        m_network.removeListener(this);
-        m_windows_state.removeListener(this);
+        m_network.use().removeListener(this);
         flush();
     }
     
@@ -97,90 +212,18 @@ namespace kiwi
     {
         m_property_files.clear();
         m_property_files.emplace_back(createPropsFile("kiwi_settings"));
-        
-        {
-            // reload Global Settings
-            std::unique_ptr<juce::XmlElement> globals(getGlobalProperties()
-                                                      .getXmlValue("Global Settings"));
-            
-            if(globals != nullptr)
-            {
-                m_globals = juce::ValueTree::fromXml(*globals);
-            }
-        }
    
+        // Try to reload User settings
+        std::unique_ptr<juce::XmlElement> xml(getGlobalProperties().getXmlValue("Network Settings"));
+        if(xml)
         {
-            // reload Network settings
-            std::unique_ptr<juce::XmlElement> networks(getGlobalProperties()
-                                                       .getXmlValue("Network Settings"));
-            
-            if(networks != nullptr)
-            {
-                m_network = juce::ValueTree::fromXml(*networks);
-            }
-        }
-        
-        {
-            // reload Windows state settings
-            std::unique_ptr<juce::XmlElement> windows_state(getGlobalProperties()
-                                                            .getXmlValue("Windows State"));
-            
-            if(windows_state != nullptr)
-            {
-                m_windows_state = juce::ValueTree::fromXml(*windows_state);
-            }
+            m_network.readFromXml(*xml);
         }
     }
     
-    juce::ValueTree& StoredSettings::globals()
-    {
-        return m_globals;
-    }
-    
-    juce::ValueTree& StoredSettings::network()
+    NetworkSettings& StoredSettings::network()
     {
         return m_network;
-    }
-    
-    std::unique_ptr<juce::XmlElement> StoredSettings::getWindowState(juce::String const& window_settings_name)
-    {
-        std::unique_ptr<juce::XmlElement> windows_state(getGlobalProperties()
-                                                        .getXmlValue("Windows State"));
-        
-        if(windows_state)
-        {
-            auto* xml = windows_state->getChildByName(window_settings_name);
-            
-            if(xml)
-            {
-                return std::make_unique<juce::XmlElement>(*xml);
-            }
-        }
-        
-        return nullptr;
-    }
-    
-    void StoredSettings::setWindowState(juce::String const& window_settings_name,
-                                        juce::XmlElement const& new_state)
-    {
-        
-        std::unique_ptr<juce::XmlElement> windows_state(getGlobalProperties()
-                                                        .getXmlValue("Windows State"));
-        
-        if(windows_state)
-        {
-            auto* xml = windows_state->getChildByName(window_settings_name);
-            if(xml)
-            {
-                *xml = new_state;
-            }
-            else
-            {
-                windows_state->addChildElement(new juce::XmlElement(new_state));
-            }
-            
-            saveValueTree(juce::ValueTree::fromXml(*windows_state), "Windows State");
-        }
     }
     
     void StoredSettings::saveValueTree(juce::ValueTree const& vt, std::string const& key_name)
@@ -191,8 +234,6 @@ namespace kiwi
     
     void StoredSettings::changed()
     {
-        saveValueTree(m_globals, "Global Settings");
-        saveValueTree(m_network, "Network Settings");
-        saveValueTree(m_windows_state, "Windows State");
+        saveValueTree(m_network.use(), "Network Settings");
     }
 }

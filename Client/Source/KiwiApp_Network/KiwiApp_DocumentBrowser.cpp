@@ -28,6 +28,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include "../KiwiApp_IDs.hpp"
+
 namespace kiwi
 {
     // ================================================================================ //
@@ -37,26 +39,25 @@ namespace kiwi
     DocumentBrowser::DocumentBrowser() :
     m_distant_drive(nullptr)
     {
-        auto& net_config = getAppSettings().network();
+        auto& settings = getAppSettings().network();
         
-        std::string host = net_config.getProperty("host", "54.234.132.205").toString().toStdString();
-        int api_port = net_config.getProperty("api_port", 80);
-        int session_port = net_config.getProperty("session_port", 9090);
+        m_distant_drive.reset(new Drive("Remote patchers",
+                                        settings.getHost(),
+                                        settings.getApiPort(),
+                                        settings.getSessionPort()));
         
-        net_config.addListener(this);
-        
-        m_distant_drive.reset(new Drive("Remote patchers", host, api_port, session_port));
-        
-        int refresh_time = net_config.getProperty("refresh_interval", "0").toString().getIntValue();
-        if(refresh_time > 0)
+        int time = settings.getRefreshInterval();
+        if(time > 0)
         {
-            start(refresh_time);
+            start(time);
         }
+        
+        settings.addListener(*this);
     }
     
     DocumentBrowser::~DocumentBrowser()
     {
-        getAppSettings().network().removeListener(this);
+        getAppSettings().network().removeListener(*this);
         stop();
     }
     
@@ -75,29 +76,27 @@ namespace kiwi
         return {m_distant_drive.get()};
     }
     
-    void DocumentBrowser::valueTreePropertyChanged(juce::ValueTree& vt, const juce::Identifier& id)
+    void DocumentBrowser::networkSettingsChanged(NetworkSettings const& settings, const juce::Identifier& id)
     {
-        if(id == juce::Identifier("host"))
+        if(id == Ids::host)
         {
-            m_distant_drive->setHost(vt.getProperty("host").toString().toStdString());
+            m_distant_drive->setHost(settings.getHost());
         }
-        else if(id == juce::Identifier("api_port"))
+        else if(id == Ids::api_port)
         {
-            int port = vt.getProperty("api_port");
-            m_distant_drive->setApiPort(port);
+            m_distant_drive->setApiPort(settings.getApiPort());
         }
-        else if(id == juce::Identifier("session_port"))
+        else if(id == Ids::session_port)
         {
-            int port = vt.getProperty("session_port");
-            m_distant_drive->setSessionPort(port);
+            m_distant_drive->setSessionPort(settings.getSessionPort());
         }
-        else if(id == juce::Identifier("refresh_interval"))
+        else if(id == Ids::refresh_interval)
         {
-            int refresh_time = vt.getProperty("refresh_interval").toString().getIntValue();
+            auto time = settings.getRefreshInterval();
             
-            if(refresh_time > 0)
+            if(time > 0)
             {
-                start(refresh_time);
+                start(time);
             }
             else
             {

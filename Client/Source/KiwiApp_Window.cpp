@@ -41,6 +41,12 @@ namespace kiwi
     {
         setUsingNativeTitleBar(true);
         
+        if(!resizable)
+        {
+            setTitleBarButtonsRequired(juce::DocumentWindow::minimiseButton
+                                       | juce::DocumentWindow::closeButton, true);
+        }
+        
         if(content)
         {
             int width = content->getWidth() > 0 ? content->getWidth() : 300;
@@ -71,16 +77,11 @@ namespace kiwi
     {
         if(m_settings_name.isNotEmpty())
         {
-            auto state(getAppSettings().getWindowState(m_settings_name));
+            juce::String window_state(getGlobalProperties().getValue(m_settings_name));
             
-            if(state)
+            if(window_state.isNotEmpty())
             {
-                auto jwindow_state = state->getStringAttribute("jwindow");
-                
-                if(jwindow_state.isNotEmpty())
-                {
-                    restoreWindowStateFromString(jwindow_state);
-                }
+                restoreWindowStateFromString(window_state);
             }
         }
     }
@@ -89,9 +90,7 @@ namespace kiwi
     {
         if(m_settings_name.isNotEmpty())
         {
-            juce::XmlElement xml(m_settings_name);
-            xml.setAttribute("jwindow", getWindowStateAsString());
-            getAppSettings().setWindowState(m_settings_name, xml);
+            getGlobalProperties().setValue(m_settings_name, getWindowStateAsString());
         }
     }
     
