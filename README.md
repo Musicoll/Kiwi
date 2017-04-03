@@ -57,3 +57,17 @@ $ ./Server -f ./config/dev.json
 - Launch the kiwi app then change open the preference panel and setup the network config.
 - You should see a list of documents in the Document Browser window.
 - Click on a document to open it.
+
+#### (Re)generate binary data
+
+You can generate binary data for ressources with the `Config/ressource.py` script.  
+This script takes 2 required arguments:
+ - `-i / --input` : The ressources input directory
+ - `-o / --output` : The output directory in which the binary data files will be generated.
+
+ ex:
+
+ ```sh
+ $ cd {kiwi_directory_path}
+ $ python ./Config/ressource.py -i ./Ressources/BinaryRes -o ./Client/Source
+ ```
