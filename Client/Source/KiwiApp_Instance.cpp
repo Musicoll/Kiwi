@@ -297,7 +297,7 @@ namespace kiwi
             return std::make_unique<Window>("Kiwi Console",
                                             std::make_unique<Console>(history),
                                             true, true, "console_window",
-                                            juce::SystemStats::getOperatingSystemType() != juce::SystemStats::MacOSX);
+                                            !KiwiApp::isMacOSX());
         });
     }
     

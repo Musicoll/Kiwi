@@ -71,6 +71,15 @@ namespace kiwi
         //! @brief Checks whether multiple instances of the app are allowed.
         bool moreThanOneInstanceAllowed() override;
         
+        //! @brief Returns true if the app is running in a Mac OSX operating system.
+        static bool isMacOSX();
+        
+        //! @brief Returns true if the app is running in a Linux operating system.
+        static bool isLinux();
+        
+        //! @brief Returns true if the app is running in a Windows operating system.
+        static bool isWindows();
+        
         //==============================================================================
         
         //! @brief Get the current running application instance.

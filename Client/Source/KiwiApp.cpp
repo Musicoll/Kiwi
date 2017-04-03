@@ -158,6 +158,23 @@ namespace kiwi
         return false;
     }
     
+    bool KiwiApp::isMacOSX()
+    {
+        return (juce::SystemStats::getOperatingSystemType()
+                & juce::SystemStats::MacOSX) != 0;
+    }
+    
+    bool KiwiApp::isLinux()
+    {
+        return juce::SystemStats::getOperatingSystemType() == juce::SystemStats::Linux;
+    }
+    
+    bool KiwiApp::isWindows()
+    {
+        return (juce::SystemStats::getOperatingSystemType()
+                & juce::SystemStats::Windows) != 0;
+    }
+    
     // ================================================================================ //
     //                                    STATIC QUERY                                  //
     // ================================================================================ //

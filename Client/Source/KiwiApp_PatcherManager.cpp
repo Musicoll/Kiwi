@@ -37,8 +37,7 @@ namespace kiwi
     // ================================================================================ //
 
     PatcherViewWindow::PatcherViewWindow(PatcherManager& manager, PatcherView& patcherview) :
-    Window("Untitled", nullptr, true, true, juce::String::empty,
-           juce::SystemStats::getOperatingSystemType() != juce::SystemStats::MacOSX),
+    Window("Untitled", nullptr, true, true, juce::String::empty, !KiwiApp::isMacOSX()),
     m_patcher_manager(manager),
     m_patcherview(patcherview)
     {
