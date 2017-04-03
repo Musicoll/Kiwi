@@ -105,20 +105,6 @@ namespace kiwi
         KiwiApp::use().closeWindow(*this);
     }
     
-    void Window::initBounds(juce::Rectangle<int> bounds)
-    {
-        const juce::String windowState(getGlobalProperties().getValue(getName()));
-        
-        if (!windowState.isEmpty())
-        {
-            restoreWindowStateFromString(windowState);
-        }
-        else
-        {
-            setBounds(bounds);
-        }
-    }
-    
     // ================================================================================ //
     //                              APPLICATION COMMAND TARGET                          //
     // ================================================================================ //

@@ -47,9 +47,6 @@ namespace kiwi
         //! @details Will store position into settings if needed.
         virtual ~Window();
         
-        //! @brief Initialise Window bounds with either stored settings if there or specified bounds if not.
-        void initBounds(juce::Rectangle<int> bounds);
-        
         //! @brief Return true if window shall be a main window of kiwi.
         //! @details On windows platform, the application quit when all main windows are closed.
         bool isMainWindow() const;
