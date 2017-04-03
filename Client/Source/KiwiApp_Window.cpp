@@ -31,11 +31,11 @@ namespace kiwi
     //                                      WINDOW                                      //
     // ================================================================================ //
     
-    Window::Window(std::string const& name, std::unique_ptr<Component> content,
+    Window::Window(std::string const& name, std::unique_ptr<juce::Component> content,
                    bool resizable,
                    bool is_main_window,
                    juce::String settings_name,
-                   bool add_windows_menubar) :
+                   bool add_menubar) :
     DocumentWindow(name, juce::Colours::white, allButtons, true),
     m_settings_name(settings_name)
     {
@@ -53,12 +53,10 @@ namespace kiwi
         KiwiApp::bindToCommandManager(this);
         KiwiApp::bindToKeyMapping(this);
         
-        #if ! JUCE_MAC
-        if(add_windows_menubar)
+        if(add_menubar)
         {
             setMenuBar(KiwiApp::getMenuBarModel());
         }
-        #endif
         
         setResizable(resizable, false);
         restoreWindowState();

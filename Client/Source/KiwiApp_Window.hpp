@@ -37,11 +37,11 @@ namespace kiwi
         
         //! @brief Constructor restore Window state from stored settings it they exist.
         Window(std::string const& name,
-               std::unique_ptr<Component> content,
+               std::unique_ptr<juce::Component> content,
                bool resizable = false,
                bool is_main_window = true,
                juce::String settings_name = juce::String::empty,
-               bool add_windows_menubar = false);
+               bool add_menubar = false);
         
         //! @brief Window destructor. Called whenever buttonPressed is called.
         //! @details Will store position into settings if needed.

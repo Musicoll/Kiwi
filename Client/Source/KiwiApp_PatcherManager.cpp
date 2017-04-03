@@ -37,12 +37,18 @@ namespace kiwi
     // ================================================================================ //
 
     PatcherViewWindow::PatcherViewWindow(PatcherManager& manager, PatcherView& patcherview) :
-    Window("Untitled", nullptr, true, true, juce::String::empty, true),
+    Window("Untitled", nullptr, true, true, juce::String::empty, !JUCE_MAC),
     m_patcher_manager(manager),
     m_patcherview(patcherview)
     {
+        // Todo: Add size infos to the Patcher Model
         setSize(600, 500);
         centreWithSize(getWidth(), getHeight());
+        
+        setContentNonOwned(&patcherview.getViewport(), true);
+        patcherview.updateWindowTitle();
+        patcherview.grabKeyboardFocus();
+
         setVisible(true);
     }
 
@@ -438,11 +444,7 @@ namespace kiwi
         if(user.getId() == m_instance.getUserId())
         {
             auto& patcherview = view.entity().emplace<PatcherView>(*this, m_instance, patcher, view);
-            
-            auto& window = view.entity().emplace<PatcherViewWindow>(*this, patcherview);
-            window.setContentNonOwned(&patcherview.getViewport(), true);
-            patcherview.updateWindowTitle();
-            patcherview.grabKeyboardFocus();
+            view.entity().emplace<PatcherViewWindow>(*this, patcherview);
         }
     }
 
