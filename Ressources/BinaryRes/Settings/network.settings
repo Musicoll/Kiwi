@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<NETWORK_CONFIG host="54.234.132.205" api_port="80" session_port="9090" refresh_interval="1000"/>

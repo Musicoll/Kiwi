@@ -19,30 +19,67 @@
  ==============================================================================
  */
 
-#include <KiwiServer/KiwiServer_Server.hpp>
 #include <KiwiModel/KiwiModel_DataModel.hpp>
+#include "KiwiServer_Server.hpp"
+#include "KiwiServer_CommandLineParser.hpp"
 
-int main(int argc, const char * argv[])
+#include <json.hpp>
+
+void showHelp()
+{
+    std::cout << "Usage:\n";
+    std::cout << " -h shows this help message. \n";
+    std::cout << " -f set the json configuration file to use (needed). \n";
+}
+
+int main(int argc, char const* argv[])
 {
     using namespace kiwi;
+    using nlohmann::json;
+    
+    CommandLineParser cl_parser(argc, argv);
+    
+    if(cl_parser.hasOption("-h"))
+    {
+        showHelp();
+        return 0;
+    }
+    
+    juce::File configuration_file(cl_parser.getOption("-f"));
+    
+    if(!configuration_file.exists())
+    {
+        std::cerr << "Error: Config file does not exist or is unspecified.." << std::endl;
+        showHelp();
+        return 0;
+    }
     
     model::DataModel::init();
-    
     std::unique_ptr<server::Server> server(nullptr);
     
     try
     {
-        server.reset(new server::Server(9090));
+        json config = json::parse(configuration_file.loadFileAsString().toStdString());
+        server.reset(new server::Server(config["port"], config["backend_directory"]));
+    }
+    catch(nlohmann::detail::parse_error const& e)
+    {
+        std::cerr << "Parsing config file failed : " << e.what() << "\n";
+        return 0;
+    }
+    catch(nlohmann::detail::type_error const& e)
+    {
+        std::cerr << "Accessing element json element failed : " << e.what() << "\n";
+        return 0;
     }
     catch(std::runtime_error const& e)
     {
-        std::cerr << "Server already running on this machine: \nerr: " << e.what() << "\n";
+        std::cerr << "Launching server failed: \nerr : " << e.what() << "\n";
         return 0;
     }
     
     if(server)
     {
-        //server->setSessionsBackendDirectory("/sessions/");
         server->run();
     }
     

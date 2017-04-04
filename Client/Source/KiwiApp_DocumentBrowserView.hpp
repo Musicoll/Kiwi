@@ -99,13 +99,13 @@ namespace kiwi
         void paint(juce::Graphics& g) override;
         
         //! @brief Called when a document session has been added.
-        void documentAdded(DocumentBrowser::Drive::DocumentSession const& doc) override;
+        void documentAdded(DocumentBrowser::Drive::DocumentSession& doc) override;
         
         //! @brief Called when a document session changed.
-        void documentChanged(DocumentBrowser::Drive::DocumentSession const& doc) override;
+        void documentChanged(DocumentBrowser::Drive::DocumentSession& doc) override;
         
         //! @brief Called when a document session has been removed.
-        void documentRemoved(DocumentBrowser::Drive::DocumentSession const& doc) override;
+        void documentRemoved(DocumentBrowser::Drive::DocumentSession& doc) override;
         
         //! @brief Returns true if the two drive view refer to the same drive.
         bool operator==(DocumentBrowser::Drive const& other_drive) const;
@@ -136,12 +136,12 @@ namespace kiwi
             std::function<void(void)> m_command;
         };
         
-        class DocumentSessionView : public juce::Component
+        class DocumentSessionView : public juce::Component, juce::Label::Listener
         {
         public: // methods
             
             //! @brief Constructor.
-            DocumentSessionView(DocumentBrowser::Drive::DocumentSession const& document);
+            DocumentSessionView(DocumentBrowser::Drive::DocumentSession& document);
             
             //! @brief Destructor.
             ~DocumentSessionView() = default;
@@ -152,32 +152,36 @@ namespace kiwi
             //! @brief Called when resized.
             void resized() override;
             
-            //! @brief Returns the metadata associated to the given key.
-            std::string getMetadata(std::string const& key, std::string const& ifnotfound = "") const;
-            
-            //! @brief Returns the session port.
-            uint16_t getPort() const;
-            
-            //! @brief Returns the session ip.
-            uint32_t getIp() const;
+            //! @brief Called when a Label's text has changed.
+            void labelTextChanged(juce::Label* labelThatHasChanged) override;
+
+            //! @brief Returns the document name.
+            std::string getName() const;
             
             //! @brief Returns the session host.
             std::string getHost() const;
             
-            //! @brief Returns the document name.
-            std::string getName() const;
+            //! @brief Returns the session port.
+            uint16_t getSessionPort() const;
             
             //! @brief Returns the session id.
             uint64_t getSessionId() const;
             
             //! @brief Returns true if the two documents refer to the same session_id
             bool operator==(DocumentBrowser::Drive::DocumentSession const& other_document) const;
+        
+        private: // methods
             
-        private: // members
+            //! @internal Called by the DriveView when the document has changed.
+            void documentSessionChanged();
             
-            DocumentBrowser::Drive::DocumentSession const&  m_document;
-            BrowserButton                                   m_open_btn;
-            juce::Label                                     m_name_label;
+        private: // variables
+            
+            DocumentBrowser::Drive::DocumentSession&    m_document;
+            BrowserButton                               m_open_btn;
+            juce::Label                                 m_name_label;
+            
+            friend DriveView;
         };
         
     private: // methods
@@ -189,22 +193,8 @@ namespace kiwi
         
         DocumentBrowser::Drive&                             m_drive;
         std::vector<std::unique_ptr<DocumentSessionView>>   m_documents = {};
-        std::unique_ptr<BrowserButton>                      m_create_document_btn = nullptr;
-    };
-
-    // ================================================================================ //
-    //                               DOCUMENT BROWSER WINDOW                           //
-    // ================================================================================ //
-    
-    //! @brief The DocumentBrowserWindow is a Window that manages and displays a Document browser.
-    class DocumentBrowserWindow final : public AppWindow
-    {
-    public:
-        DocumentBrowserWindow(DocumentBrowser& browser);
-        
-        bool isMainWindow() override;
-        
-        ~DocumentBrowserWindow() = default;
+        BrowserButton                                       m_create_document_btn;
+        BrowserButton                                       m_refresh_btn;
     };
 }
 

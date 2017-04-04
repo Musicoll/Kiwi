@@ -27,13 +27,12 @@
 #include "flip/Document.h"
 
 #include "KiwiApp_Console.hpp"
+#include "KiwiApp_Components/KiwiApp_SettingsPanel.hpp"
 #include "KiwiApp_DocumentBrowserView.hpp"
 #include "KiwiApp_PatcherManager.hpp"
 #include "KiwiApp_StoredSettings.hpp"
 #include "KiwiApp_BeaconDispatcher.hpp"
 #include "KiwiApp_DspDeviceManager.hpp"
-
-#include "KiwiApp_Network/KiwiApp_Server.hpp"
 
 namespace kiwi
 {
@@ -74,16 +73,17 @@ namespace kiwi
         void removePatcherWindow(PatcherViewWindow & patcher_window);
         
         //! @brief Attempt to close the given window asking user to save file if needed.
-        void closeWindow(AppWindow& window);
+        void closeWindow(Window& window);
         
         //! @brief Attempt to close all document, after asking user to save them if needed.
         //! @return True if all document have been closed, false if the user cancel the action.
-        bool closeAllWindows();
+        bool closeAllPatcherWindows();
         
-        //! @brief Attempt to create a new patcher with given host and port parameters.
-        PatcherManager* openRemotePatcher(std::string const& host,
-                                          uint16_t port,
-                                          uint64_t session_id);
+        //! @brief Attempt to create a new patcher with document Session informations.
+        PatcherManager* openRemotePatcher(DocumentBrowser::Drive::DocumentSession& session);
+        
+        //! @brief Brings the Application settings window to front.
+        void showAppSettingsWindow();
         
         //! @brief Removes a patcher from cach.
         void removePatcher(PatcherManager const& patcher_manager);
@@ -110,18 +110,29 @@ namespace kiwi
         //! @internal get the given patcher manager iterator.
         PatcherManagers::iterator getPatcherManager(PatcherManager const& manager);
         
-        //! @brief Returns the next untitled number based on current documents
+        //! @internal get the given patcher manager iterator.
+        PatcherManagers::iterator getPatcherManagerForSession(DocumentBrowser::Drive::DocumentSession& session);
+        
+        //! @internal Returns the next untitled number based on current documents
         size_t getNextUntitledNumberAndIncrement();
         
-    private: // members
+        //! @internal Creates the window if needed then the brings it to front.
+        //! @param create_fn The window factory function.
+        void showWindowWithId(WindowId id, std::function<std::unique_ptr<Window>()> create_fn);
+        
+    private: // variables
         
         engine::Instance                            m_instance;
-        Server                                      m_server;
+        
+        uint64_t                                    m_user_id;
+        
+        DocumentBrowser                             m_browser;
         
         PatcherManagers                             m_patcher_managers;
         
         sConsoleHistory                             m_console_history;
-        std::set<std::unique_ptr<AppWindow>>        m_windows;
+
+        std::vector<std::unique_ptr<Window>>        m_windows;
     
         std::vector<uint8_t>                        m_patcher_clipboard;
         

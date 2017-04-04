@@ -39,18 +39,18 @@ def parse_args ():
 
 def write_with_tab(file, message):
     global tab_count
-    for tab in range(0, tab_count): file.write("\t")
+    for tab in range(0, tab_count): file.write("    ")
     file.write(message)
     return
 
 def inc_tab():
     global tab_count
-    tab_count = tab_count + 1
+    tab_count += 1
     return
 
 def dec_tab():
     global tab_count
-    tab_count = tab_count - 1
+    tab_count -= 1
     return
 
 #==============================================================================
@@ -68,7 +68,7 @@ def extract_binary_data(output_hpp_file, output_cpp_file, input_file_path):
     size = len(bytes)
 
     # Write hpp file info
-    write_with_tab(output_hpp_file, "extern const char * " + filename + ";\n")
+    write_with_tab(output_hpp_file, "extern char const* " + filename + ";\n")
     write_with_tab(output_hpp_file, "const int " + filename + "_size = " + str(size) + ";\n\n")
 
     # Write cpp file info
@@ -104,7 +104,7 @@ def traverse(directory, output_hpp_file, output_cpp_file):
         file_path = os.path.join(directory, file)
 
         if (os.path.isfile(file_path) and not file.startswith('.')):
-            print("Exctracing binary data for file " + file_path)
+            print("Extracting binary data for file " + file_path)
             extract_binary_data(output_hpp_file, output_cpp_file, file_path)
         elif(os.path.isdir(file_path) and not file.startswith('.')):
             write_with_tab(output_hpp_file, "namespace " + file.lower() + "\n")
@@ -141,14 +141,16 @@ output_hpp_file = open(os.path.join(args.output, "KiwiApp_BinaryData.hpp"), "a")
 
 header_file = open(os.path.join(os.getcwd(), "Ressources", "SourceHeader.txt"), "r")
 
-output_cpp_file.write(header_file.read())
-header_file.seek(0, 0)
-output_hpp_file.write(header_file.read())
-
+header_txt = header_file.read() + '\n';
 header_file.close()
 
-output_hpp_file.write("\n")
-output_hpp_file.write("#ifndef KIWI_KIWIAPP_BINARY_DATA_INCLUDED\n#define KIWI_KIWIAPP_BINARY_DATA_INCLUDED\n\n")
+header_txt += "// ============================================================================\n"
+header_txt += "// This is an auto-generated file: Any edits you make may be overwritten!\n"
+header_txt += "// ============================================================================\n\n"
+output_cpp_file.write(header_txt)
+output_hpp_file.write(header_txt)
+
+output_hpp_file.write("#ifndef KIWI_APP_BINARY_DATA_HPP_INCLUDED\n#define KIWI_APP_BINARY_DATA_HPP_INCLUDED\n\n")
 
 write_with_tab(output_hpp_file, "namespace kiwi\n{\n")
 write_with_tab(output_cpp_file, "namespace kiwi\n{\n")
@@ -171,7 +173,7 @@ dec_tab()
 write_with_tab(output_hpp_file, "}\n\n")
 write_with_tab(output_cpp_file, "}\n\n")
 
-output_hpp_file.write("#endif //KIWI_KIWIAPP_BINARY_DATA_INCLUDED\n")
+output_hpp_file.write("#endif // KIWI_APP_BINARY_DATA_HPP_INCLUDED\n")
 
 output_cpp_file.close()
 output_hpp_file.close()

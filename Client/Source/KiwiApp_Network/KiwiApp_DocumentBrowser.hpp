@@ -22,23 +22,25 @@
 #ifndef KIWI_APP_DOCUMENT_BROWSER_HPP_INCLUDED
 #define KIWI_APP_DOCUMENT_BROWSER_HPP_INCLUDED
 
-#include "flip/contrib/MulticastServiceExplorer.h"
 #include <KiwiEngine/KiwiEngine_Listeners.hpp>
 
+#include <juce_data_structures/juce_data_structures.h>
 #include <juce_events/juce_events.h>
 
-#include "../KiwiApp_PatcherManager.hpp"
+#include "KiwiApp_Api.hpp"
+
+#include "../KiwiApp_StoredSettings.hpp"
+
+#include <list>
 
 namespace kiwi
 {
-    //class PatcherManager;
-    
     // ================================================================================ //
     //                                 DOCUMENT BROWSER                                 //
     // ================================================================================ //
     
-    //! @brief Explore service running on the Local Area Network.
-    class DocumentBrowser : public juce::Timer
+    //! @brief Request Patcher document informations through a Kiwi API.
+    class DocumentBrowser : public juce::Timer, public NetworkSettings::Listener
     {
     public: // nested classes
         
@@ -47,8 +49,6 @@ namespace kiwi
         
     public: // methods
         
-        using Session = flip::MulticastServiceExplorer::Session;
-        
         //! @brief Constructor
         DocumentBrowser();
         
@@ -56,7 +56,7 @@ namespace kiwi
         ~DocumentBrowser();
         
         //! @brief start processing
-        void start(const int interval = 10);
+        void start(const int interval = 5000);
         
         //! @brief stop processing
         void stop();
@@ -76,15 +76,13 @@ namespace kiwi
         //! @brief remove a listener.
         void removeListener(Listener& listener);
         
-        //! @brief Retrieves a metadata entry in a session.
-        static std::string getSessionMetadata(Session const& session,
-                                              std::string const& key,
-                                              std::string const& notfound = "");
+    private: // methods
         
-    private: // members
+        void networkSettingsChanged(NetworkSettings const&, const juce::Identifier& id) override;
         
-        std::unique_ptr<flip::MulticastServiceExplorer> m_explorer = nullptr;
-        std::map<std::string, std::unique_ptr<Drive>>   m_drives = {};
+    private: // variables
+        
+        std::unique_ptr<Drive>                          m_distant_drive;
         engine::Listeners<Listener>                     m_listeners = {};
     };
     
@@ -121,7 +119,11 @@ namespace kiwi
         
     public: // methods
         
-        Drive(std::string hostname, DocumentBrowser::Session const& session);
+        Drive(std::string const& name,
+              std::string const& host,
+              uint16_t api_port,
+              uint16_t session_port);
+        
         ~Drive() = default;
         
         //! @brief Add a listener.
@@ -130,54 +132,59 @@ namespace kiwi
         //! @brief remove a listener.
         void removeListener(Listener& listener);
         
-        //! @brief Returns the session port.
-        uint16_t getPort() const;
+        //! @brief Returns the API object reference.
+        Api& useApi();
         
-        //! @brief Returns the session ip.
-        uint32_t getIp() const;
+        //! @brief Set the kiwi api port.
+        void setApiPort(uint16_t port);
+        
+        //! @brief Returns the kiwi api port.
+        uint16_t getApiPort() const;
+        
+        //! @brief Set the kiwi document session port.
+        void setSessionPort(uint16_t port);
+        
+        //! @brief Returns the kiwi document session port.
+        uint16_t getSessionPort() const;
+        
+        //! @brief Set both the api's and session's host.
+        void setHost(std::string const& host);
         
         //! @brief Returns the session host.
-        std::string getHost() const;
+        std::string const& getHost() const;
         
-        //! @brief Returns the session hostname.
-        std::string getHostName() const;
+        //! @brief Set the name of this drive.
+        void setName(std::string const& host);
         
-        //! @brief Returns true if this is a remote drive.
-        bool isRemote() const;
+        //! @brief Returns the name of this drive.
+        std::string const& getName() const;
         
         //! @brief Creates and opens a new document on this drive.
-        void createNewDocument() const;
+        void createNewDocument();
         
         //! @brief Returns the documents.
         std::list<DocumentSession> const& getDocuments() const;
         
-        //! @brief Returns true if the drive match the session
-        //! @details this operator only compares ip and port.
-        bool operator==(Session const& session) const;
+        //! @brief Returns the documents.
+        std::list<DocumentSession>& getDocuments();
         
         //! @brief Returns true if the drive match the other drive
         //! @details this operator only compares ip and port.
         bool operator==(Drive const& drive) const;
         
-    private: // methods
-        
-        bool processSession(DocumentBrowser::Session const& session);
+        //! @brief Refresh all the document list.
+        void refresh();
         
     private: // members
         
-        uint32_t                    m_ip;
-        uint16_t                    m_port;
-        std::string                 m_version;
-        std::string                 m_hostname;
-        uint64_t                    m_new_session_id;
-        bool                        m_is_remote;
+        Api                         m_api;
+        uint16_t                    m_session_port = 9090;
+        std::string                 m_name = "Drive";
         std::list<DocumentSession>  m_documents;
         engine::Listeners<Listener> m_listeners;
         
         friend class DocumentBrowser;
     };
-    
-    bool operator==(DocumentBrowser::Session const& session, DocumentBrowser::Drive const& drive);
     
     // ================================================================================ //
     //                           DOCUMENT BROWSER LISTENER                           //
@@ -190,28 +197,31 @@ namespace kiwi
         virtual ~Listener() = default;
         
         //! @brief Called when a document session has been added.
-        virtual void documentAdded(DocumentBrowser::Drive::DocumentSession const& doc) = 0;
+        virtual void documentAdded(DocumentBrowser::Drive::DocumentSession& doc) = 0;
         
         //! @brief Called when a document session changed.
-        virtual void documentChanged(DocumentBrowser::Drive::DocumentSession const& doc) = 0;
+        virtual void documentChanged(DocumentBrowser::Drive::DocumentSession& doc) = 0;
         
         //! @brief Called when a document session has been removed.
-        virtual void documentRemoved(DocumentBrowser::Drive::DocumentSession const& doc) = 0;
+        virtual void documentRemoved(DocumentBrowser::Drive::DocumentSession& doc) = 0;
     };
     
     // ================================================================================ //
     //                                  DRIVE DOCUMENT                                  //
     // ================================================================================ //
     
-    class DocumentBrowser::Drive::DocumentSession : public PatcherManager::Listener
+    class DocumentBrowser::Drive::DocumentSession
     {
     public: // methods
         
         //! @brief Constructor.
-        DocumentSession(DocumentBrowser::Drive const& parent, std::string name, uint64_t session_id);
+        DocumentSession(DocumentBrowser::Drive& parent, Api::Document document);
         
         //! @brief Destructor.
         ~DocumentSession();
+        
+        //! @brief Returns the document drive
+        Drive& useDrive();
         
         //! @brief Tells the Kiwi instance to open up this document.
         void open();
@@ -219,14 +229,20 @@ namespace kiwi
         //! @brief Returns the document name
         std::string getName() const;
         
+        //! @brief Returns the document session host
+        std::string getHost() const;
+        
         //! @brief Returns the session id of the document.
         uint64_t getSessionId() const;
+        
+        //! @brief Returns the document session port.
+        uint16_t getSessionPort() const;
         
         //! @brief Returns the drive that holds this document.
         DocumentBrowser::Drive const& useDrive() const;
         
-        //! @brief Called when the PatcherManager is closed.
-        void patcherManagerRemoved(PatcherManager const& manager) override;
+        //! @brief Rename the document.
+        void rename(std::string const& new_name);
         
         //! @brief Returns true if the DocumentSession match another DocumentSession
         //! @details this operator uses the session_id field to compare.
@@ -234,11 +250,8 @@ namespace kiwi
         
     private: // members
         
-        DocumentBrowser::Drive const&       m_drive;
-        std::string                         m_name;
-        uint64_t                            m_session_id;
-        //std::map<std::string, std::string>  m_metadata;
-        PatcherManager*                     m_patcher_manager = nullptr;
+        DocumentBrowser::Drive&             m_drive;
+        Api::Document                       m_document;
         
         friend class DocumentBrowser::Drive;
     };

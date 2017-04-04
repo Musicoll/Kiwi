@@ -112,21 +112,6 @@ namespace kiwi
         bool                                        m_is_playing;
         mutable std::mutex                          m_mutex;
     };
-    
-    // ================================================================================ //
-    //                               AUDIO SETTING WINDOW                               //
-    // ================================================================================ //
-    
-    class AudioSettingWindow final : public AppWindow
-    {
-    public:
-        
-        AudioSettingWindow(DspDeviceManager& device_manager);
-        
-        bool isMainWindow() override;
-        
-        ~AudioSettingWindow() = default;
-    };
 }
 
 #endif // KIWI_APP_DSP_DEVICE_MANAGER_HPP_INCLUDED

@@ -211,36 +211,4 @@ namespace kiwi
             (*m_output_matrix)[i].fill(0);
         }
     }
-    
-    // ================================================================================ //
-    //                               AUDIO SETTING WINDOW                               //
-    // ================================================================================ //
-    
-    AudioSettingWindow::AudioSettingWindow(DspDeviceManager& device_manager):
-    AppWindow("Audio Settings")
-    {
-        juce::AudioDeviceSelectorComponent* audio_settings =
-        new juce::AudioDeviceSelectorComponent(device_manager, 1, 20, 1, 20, false, false, false, true);
-        
-        setContentOwned(audio_settings, false);
-        
-        juce::Rectangle<int> screen_area = getParentMonitorArea();
-        
-        int width = 400;
-        int height = 400;
-        
-        juce::Rectangle<int> bounds(screen_area.getX() + ((15 / 100.) * screen_area.getWidth() - ((float) width / 2.)),
-                                    screen_area.getY() + ((8. / 100.) * screen_area.getHeight()),
-                                    width,
-                                    height);
-        
-        initBounds(bounds);
-        setResizable(false, false);
-        setVisible(true);
-    }
-    
-    bool AudioSettingWindow::isMainWindow()
-    {
-        return false;
-    }
 }

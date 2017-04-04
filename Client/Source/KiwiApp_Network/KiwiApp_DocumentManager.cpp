@@ -208,7 +208,7 @@ namespace kiwi
         }
         else
         {
-            throw std::runtime_error("Connexion failed");
+            throw std::runtime_error("Failed to connect to the document");
         }
     }
     

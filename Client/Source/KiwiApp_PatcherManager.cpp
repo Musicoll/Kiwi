@@ -37,17 +37,18 @@ namespace kiwi
     // ================================================================================ //
 
     PatcherViewWindow::PatcherViewWindow(PatcherManager& manager, PatcherView& patcherview) :
-    Window("Untitled", true),
+    Window("Untitled", nullptr, true, true, juce::String::empty, !KiwiApp::isMacOSX()),
     m_patcher_manager(manager),
     m_patcherview(patcherview)
     {
-        #if ! JUCE_MAC
-        setMenuBar(KiwiApp::getMenuBarModel());
-        #endif
-        
+        // Todo: Add size infos to the Patcher Model
         setSize(600, 500);
         centreWithSize(getWidth(), getHeight());
-        setResizable(true, true);
+        
+        setContentNonOwned(&patcherview.getViewport(), true);
+        patcherview.updateWindowTitle();
+        patcherview.grabKeyboardFocus();
+
         setVisible(true);
     }
 
@@ -84,11 +85,41 @@ namespace kiwi
         m_need_saving_flag = false;
     }
     
-    PatcherManager::PatcherManager(Instance& instance, juce::File const& file):
-    m_instance(instance),
-    m_validator(),
-    m_document(model::DataModel::use(), *this, m_validator, m_instance.getUserId(), 'cicm', 'kpat'),
-    m_is_remote(false)
+    PatcherManager::~PatcherManager()
+    {
+        if(m_session)
+        {
+            m_session->useDrive().removeListener(*this);
+        }
+    }
+    
+    void PatcherManager::connect(DocumentBrowser::Drive::DocumentSession& session)
+    {
+        if(m_session)
+        {
+            m_session->useDrive().removeListener(*this);
+            m_session = nullptr;
+        }
+        
+        m_is_remote = true;
+        m_session = &session;
+        
+        m_session->useDrive().addListener(*this);
+        
+        model::Patcher& patcher = getPatcher();
+        
+        DocumentManager::connect(patcher,
+                                 session.getHost(),
+                                 session.getSessionPort(),
+                                 session.getSessionId());
+        
+        patcher.useSelfUser();
+        DocumentManager::commit(patcher);
+        
+        patcher.entity().use<engine::Patcher>().sendLoadbang();
+    }
+    
+    void PatcherManager::loadFromFile(juce::File const& file)
     {
         model::Patcher& patcher = getPatcher();
         DocumentManager::load(patcher, file);
@@ -101,27 +132,6 @@ namespace kiwi
         patcher.entity().use<engine::Patcher>().sendLoadbang();
     }
     
-    PatcherManager::PatcherManager(Instance & instance, const std::string host, uint16_t port, uint64_t session_id) :
-    m_instance(instance),
-    m_validator(),
-    m_document(model::DataModel::use(), *this, m_validator, m_instance.getUserId(), 'cicm', 'kpat'),
-    m_is_remote(true)
-    {
-        model::Patcher& patcher = getPatcher();
-        
-        DocumentManager::connect(patcher, host, port, session_id);
-        
-        patcher.useSelfUser();
-        DocumentManager::commit(patcher);
-        
-        patcher.entity().use<engine::Patcher>().sendLoadbang();
-    }
-    
-    PatcherManager::~PatcherManager()
-    {
-        m_listeners.call(&Listener::patcherManagerRemoved, *this);
-    }
-    
     model::Patcher& PatcherManager::getPatcher()
     {
         return m_document.root<model::Patcher>();
@@ -130,6 +140,21 @@ namespace kiwi
     model::Patcher const& PatcherManager::getPatcher() const
     {
         return m_document.root<model::Patcher>();
+    }
+    
+    bool PatcherManager::isRemote() const noexcept
+    {
+        return m_is_remote;
+    }
+    
+    uint64_t PatcherManager::getSessionId() const noexcept
+    {
+        return m_session ? m_session->getSessionId() : 0ull;
+    }
+    
+    std::string PatcherManager::getDocumentName() const
+    {
+        return m_session ? m_session->getName() : "";
     }
     
     void PatcherManager::newView()
@@ -150,19 +175,9 @@ namespace kiwi
         });
     }
     
-    bool PatcherManager::needsSaving() const
+    bool PatcherManager::needsSaving() const noexcept
     {
         return (!m_is_remote) && m_need_saving_flag;
-    }
-    
-    void PatcherManager::addListener(Listener& listener)
-    {
-        m_listeners.add(listener);
-    }
-    
-    void PatcherManager::removeListener(Listener& listener)
-    {
-        m_listeners.remove(listener);
     }
     
     bool PatcherManager::saveDocument()
@@ -179,9 +194,8 @@ namespace kiwi
         }
         else
         {
-            juce::FileChooser saveFileChooser("Save file",
-                                              juce::File::getSpecialLocation (juce::File::userHomeDirectory),
-                                              "*.kiwi");
+            auto directory = juce::File::getSpecialLocation(juce::File::userHomeDirectory);
+            juce::FileChooser saveFileChooser("Save file", directory, "*.kiwi");
             
             if(saveFileChooser.browseForFileToSave(true))
             {
@@ -334,6 +348,41 @@ namespace kiwi
         }
     }
     
+    void PatcherManager::documentAdded(DocumentBrowser::Drive::DocumentSession& doc)
+    {
+        ;
+    }
+    
+    void PatcherManager::documentChanged(DocumentBrowser::Drive::DocumentSession& doc)
+    {
+        if(m_session && (m_session == &doc))
+        {
+            for(auto& view : getPatcher().useSelfUser().getViews())
+            {
+                auto& patcherview = view.entity().use<PatcherView>();
+                patcherview.updateWindowTitle();
+            }
+        }
+    }
+    
+    void PatcherManager::documentRemoved(DocumentBrowser::Drive::DocumentSession& doc)
+    {
+        if(m_session && (m_session == &doc))
+        {
+            m_session->useDrive().removeListener(*this);
+            m_session = nullptr;
+            m_is_remote = false;
+            
+            for(auto& view : getPatcher().useSelfUser().getViews())
+            {
+                auto& patcherview = view.entity().use<PatcherView>();
+                patcherview.updateWindowTitle();
+            }
+            // disconnect
+            // propose document fork ?
+        }
+    }
+    
     void PatcherManager::document_changed(model::Patcher& patcher)
     {
         if(patcher.added())
@@ -389,23 +438,19 @@ namespace kiwi
     }
 
     void PatcherManager::createPatcherWindow(model::Patcher& patcher,
-                                              model::Patcher::User& user,
-                                              model::Patcher::View& view)
+                                             model::Patcher::User& user,
+                                             model::Patcher::View& view)
     {
         if(user.getId() == m_instance.getUserId())
         {
             auto& patcherview = view.entity().emplace<PatcherView>(*this, m_instance, patcher, view);
-            
-            auto& window = view.entity().emplace<PatcherViewWindow>(*this, patcherview);
-            window.setContentNonOwned(&patcherview.getViewport(), true);
-            patcherview.updateWindowTitle();
-            patcherview.grabKeyboardFocus();
+            view.entity().emplace<PatcherViewWindow>(*this, patcherview);
         }
     }
 
     void PatcherManager::notifyPatcherView(model::Patcher& patcher,
-                                            model::Patcher::User& user,
-                                            model::Patcher::View& view)
+                                           model::Patcher::User& user,
+                                           model::Patcher::View& view)
     {
         if(user.getId() == m_instance.getUserId())
         {
@@ -416,8 +461,8 @@ namespace kiwi
     }
 
     void PatcherManager::removePatcherWindow(model::Patcher& patcher,
-                                              model::Patcher::User& user,
-                                              model::Patcher::View& view)
+                                             model::Patcher::User& user,
+                                             model::Patcher::View& view)
     {
         if(user.getId() == m_instance.getUserId())
         {

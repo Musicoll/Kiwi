@@ -1478,18 +1478,27 @@ namespace kiwi
         PatcherViewWindow* window = findParentComponentOfClass<PatcherViewWindow>();
         if(window)
         {
-            juce::String title = m_patcher_model.getName();
-            const bool edited = m_manager.needsSaving();
+            juce::String title;
             
-            juce::File kiwi_file = DocumentManager::getSelectedFile(m_patcher_model);
-            
-            if(juce::ComponentPeer* peer = window->getPeer())
+            if(!m_manager.isRemote())
             {
-                if (!peer->setDocumentEditedStatus(edited))
-                    if (edited)
-                        title << "*";
+                title = m_patcher_model.getName();
+                const bool edited = m_manager.needsSaving();
                 
-                peer->setRepresentedFile(kiwi_file);
+                juce::File kiwi_file = DocumentManager::getSelectedFile(m_patcher_model);
+                
+                if(juce::ComponentPeer* peer = window->getPeer())
+                {
+                    if (!peer->setDocumentEditedStatus(edited))
+                        if (edited)
+                            title << "*";
+                    
+                    peer->setRepresentedFile(kiwi_file);
+                }
+            }
+            else
+            {
+                title = "[Remote] " + m_manager.getDocumentName();
             }
             
             std::string new_name = title.toStdString() + (isLocked() ? "" : " (edit) ");
@@ -2268,6 +2277,7 @@ namespace kiwi
             {
                 result.setInfo(TRANS("Save"), TRANS("Save document"), CommandCategories::general, 0);
                 result.addDefaultKeypress('s', juce::ModifierKeys::commandModifier);
+                result.setActive(!m_manager.isRemote());
                 break;
             }
             case CommandIDs::newPatcherView:

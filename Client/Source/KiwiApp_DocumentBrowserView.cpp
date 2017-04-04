@@ -35,6 +35,12 @@ namespace kiwi
     {
         setSize(1, 1);
         m_browser.addListener(*this);
+        for(auto* drive : m_browser.getDrives())
+        {
+            driveAdded(*drive);
+        }
+        
+        setSize(200, 300);
     }
     
     DocumentBrowserView::~DocumentBrowserView()
@@ -131,26 +137,33 @@ namespace kiwi
     //                               DOCUMENT SESSION VIEW                              //
     // ================================================================================ //
     
-    DocumentBrowserView::DriveView::DocumentSessionView::DocumentSessionView(DocumentBrowser::Drive::DocumentSession const& document) :
+    DocumentBrowserView::DriveView::DocumentSessionView::DocumentSessionView(DocumentBrowser::Drive::DocumentSession& document) :
     m_document(document),
-    m_open_btn(m_document.useDrive().isRemote() ? "join" : "open")
+    m_open_btn("open")
     {
         setRepaintsOnMouseActivity(true);
 
-        m_open_btn.setCommand(std::bind(&DocumentBrowser::Drive::DocumentSession::open, m_document));
+        m_open_btn.setCommand(std::bind(&DocumentBrowser::Drive::DocumentSession::open, &m_document));
         m_open_btn.setSize(30, 20);
-        m_open_btn.setTooltip(m_open_btn.getButtonText() + " this patcher");
+        m_open_btn.setTooltip("open this patcher");
         addAndMakeVisible(m_open_btn);
+        
+        // label setup
+        m_name_label.setText(getName(), juce::NotificationType::dontSendNotification);
+        m_name_label.setSize(1, 1);
+        
+        m_name_label.setEditable(false, true, true);
+        m_name_label.addListener(this);
+        
+        addAndMakeVisible(m_name_label);
+        
+        resized();
+
     }
     
-    uint16_t DocumentBrowserView::DriveView::DocumentSessionView::getPort() const
+    uint16_t DocumentBrowserView::DriveView::DocumentSessionView::getSessionPort() const
     {
-        return m_document.useDrive().getPort();
-    }
-    
-    uint32_t DocumentBrowserView::DriveView::DocumentSessionView::getIp() const
-    {
-        return m_document.useDrive().getIp();
+        return m_document.useDrive().getSessionPort();
     }
     
     std::string DocumentBrowserView::DriveView::DocumentSessionView::getHost() const
@@ -168,6 +181,11 @@ namespace kiwi
         return m_document.getSessionId();
     }
     
+    void DocumentBrowserView::DriveView::DocumentSessionView::documentSessionChanged()
+    {
+        m_name_label.setText(m_document.getName(), juce::NotificationType::dontSendNotification);
+    }
+    
     void DocumentBrowserView::DriveView::DocumentSessionView::paint(juce::Graphics& g)
     {
         const auto bounds = getLocalBounds();
@@ -176,12 +194,6 @@ namespace kiwi
         
         g.setColour(mouseover ? bg_color.brighter(0.1f) : bg_color);
         g.fillAll();
-        
-        const juce::Colour text_color = juce::Colours::black;
-        g.setColour(text_color);
-        g.drawFittedText(getName(),
-                         bounds.withX(5).withRight(m_open_btn.getX() - 5),
-                         juce::Justification::centredLeft, 5);
     }
     
     void DocumentBrowserView::DriveView::DocumentSessionView::resized()
@@ -190,6 +202,16 @@ namespace kiwi
         
         m_open_btn.setTopRightPosition(bounds.getWidth() - 5,
                                        bounds.getHeight() * 0.5 - m_open_btn.getHeight() * 0.5);
+        
+        m_name_label.setBounds(bounds.reduced(5).withRight(m_open_btn.getX() - 5));
+    }
+    
+    void DocumentBrowserView::DriveView::DocumentSessionView::labelTextChanged(juce::Label* label)
+    {
+        if(label == &m_name_label)
+        {
+            m_document.rename(m_name_label.getText().toStdString());
+        }
     }
     
     bool DocumentBrowserView::DriveView::DocumentSessionView::operator==(DocumentBrowser::Drive::DocumentSession const& other_document) const
@@ -202,18 +224,21 @@ namespace kiwi
     // ================================================================================ //
     
     DocumentBrowserView::DriveView::DriveView(DocumentBrowser::Drive& drive) :
-    m_drive(drive)
+    m_drive(drive),
+    m_create_document_btn("create"),
+    m_refresh_btn("refresh")
     {
-        if(!m_drive.isRemote())
-        {
-            m_create_document_btn = std::make_unique<BrowserButton>("create");
-            m_create_document_btn->setCommand(std::bind(&DocumentBrowser::Drive::createNewDocument, &m_drive));
-            m_create_document_btn->setSize(35, 20);
-            m_create_document_btn->setTooltip("Create a new patcher on this drive");
-            addAndMakeVisible(m_create_document_btn.get());
-        }
+        m_create_document_btn.setCommand(std::bind(&DocumentBrowser::Drive::createNewDocument, &m_drive));
+        m_create_document_btn.setSize(35, 20);
+        m_create_document_btn.setTooltip("Create a new patcher on this drive");
+        addAndMakeVisible(m_create_document_btn);
         
-        for(auto const& document : m_drive.getDocuments())
+        m_refresh_btn.setCommand(std::bind(&DocumentBrowser::Drive::refresh, &m_drive));
+        m_refresh_btn.setSize(40, 20);
+        m_refresh_btn.setTooltip("Refresh Document list");
+        addAndMakeVisible(m_refresh_btn);
+        
+        for(auto& document : m_drive.getDocuments())
         {
             documentAdded(document);
         }
@@ -240,10 +265,8 @@ namespace kiwi
             doc_view->setSize(bounds.getWidth() - padding.x * 2, doc_view->getHeight());
         }
         
-        if(m_create_document_btn)
-        {
-            m_create_document_btn->setTopRightPosition(getWidth() - padding.x, 5);
-        }
+        m_refresh_btn.setTopRightPosition(getWidth() - padding.x, 5);
+        m_create_document_btn.setTopRightPosition(m_refresh_btn.getX() - 5, 5);
     }
     
     void DocumentBrowserView::DriveView::updateLayout()
@@ -277,7 +300,7 @@ namespace kiwi
         g.fillRoundedRectangle(getLocalBounds().reduced(2).toFloat(), 0 );
         
         g.setColour(juce::Colours::whitesmoke);
-        g.drawFittedText("• Server Host : " + m_drive.getHostName(),
+        g.drawFittedText("• " + m_drive.getName(),
                          getLocalBounds().reduced(8, 6).removeFromTop(22),
                          juce::Justification::centredLeft, 1);
         
@@ -285,7 +308,7 @@ namespace kiwi
         g.drawLine(0, 30, getWidth(), 30, 3);
     }
     
-    void DocumentBrowserView::DriveView::documentAdded(DocumentBrowser::Drive::DocumentSession const& doc)
+    void DocumentBrowserView::DriveView::documentAdded(DocumentBrowser::Drive::DocumentSession& doc)
     {
         auto doc_view = std::make_unique<DocumentSessionView>(doc);
         
@@ -297,7 +320,7 @@ namespace kiwi
         updateLayout();
     }
     
-    void DocumentBrowserView::DriveView::documentRemoved(DocumentBrowser::Drive::DocumentSession const& doc)
+    void DocumentBrowserView::DriveView::documentRemoved(DocumentBrowser::Drive::DocumentSession& doc)
     {
         const auto doc_view_it = std::find_if(m_documents.begin(), m_documents.end(), [&doc](std::unique_ptr<DocumentSessionView> const& document){
             return (*document.get() == doc);
@@ -313,7 +336,7 @@ namespace kiwi
         }
     }
     
-    void DocumentBrowserView::DriveView::documentChanged(DocumentBrowser::Drive::DocumentSession const& doc)
+    void DocumentBrowserView::DriveView::documentChanged(DocumentBrowser::Drive::DocumentSession& doc)
     {
         const auto doc_view_it = std::find_if(m_documents.begin(), m_documents.end(),
                                               [&doc](std::unique_ptr<DocumentSessionView> const& document) {
@@ -322,42 +345,12 @@ namespace kiwi
         
         if(doc_view_it != m_documents.end())
         {
-            (*doc_view_it)->repaint();
+            (*doc_view_it)->documentSessionChanged();
         }
     }
     
     bool DocumentBrowserView::DriveView::operator==(DocumentBrowser::Drive const& other_drive) const
     {
         return (m_drive == other_drive);
-    }
-    
-    // ================================================================================ //
-    //                               DOCUMENT EXPLORER WINDOW                           //
-    // ================================================================================ //
-    
-    DocumentBrowserWindow::DocumentBrowserWindow(DocumentBrowser& browser) :
-    AppWindow("Document Browser")
-    {
-        setContentOwned(new DocumentBrowserView(browser), true);
-        setResizable(true, false);
-        setResizeLimits(300, 100, 32000, 32000);
-        
-        juce::Rectangle<int> screen_area = getParentMonitorArea();
-        
-        int width = 300;
-        int height = 440;
-        
-        juce::Rectangle<int> bounds(screen_area.getX() + ((15. / 100.) * screen_area.getWidth() - ((float) width / 2.)),
-                                    screen_area.getY() + ((30. / 100.) * screen_area.getHeight()),
-                                    width,
-                                    height);
-        
-        initBounds(bounds);
-        setVisible(true);
-    }
-    
-    bool DocumentBrowserWindow::isMainWindow()
-    {
-        return true;
     }
 }

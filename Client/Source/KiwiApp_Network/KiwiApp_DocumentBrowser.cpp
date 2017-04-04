@@ -22,19 +22,42 @@
 #include "KiwiApp_DocumentBrowser.hpp"
 #include "../KiwiApp.hpp"
 
+#include "../KiwiApp_Network/KiwiApp_Api.hpp"
+
+#include <iostream>
+#include <sstream>
+#include <iomanip>
+
+#include "../KiwiApp_IDs.hpp"
+
 namespace kiwi
 {
     // ================================================================================ //
     //                                 DOCUMENT BROWSER                                 //
     // ================================================================================ //
     
-    DocumentBrowser::DocumentBrowser()
+    DocumentBrowser::DocumentBrowser() :
+    m_distant_drive(nullptr)
     {
-        ;
+        auto& settings = getAppSettings().network();
+        
+        m_distant_drive.reset(new Drive("Remote patchers",
+                                        settings.getHost(),
+                                        settings.getApiPort(),
+                                        settings.getSessionPort()));
+        
+        int time = settings.getRefreshInterval();
+        if(time > 0)
+        {
+            start(time);
+        }
+        
+        settings.addListener(*this);
     }
     
     DocumentBrowser::~DocumentBrowser()
     {
+        getAppSettings().network().removeListener(*this);
         stop();
     }
     
@@ -50,13 +73,36 @@ namespace kiwi
     
     std::vector<DocumentBrowser::Drive*> DocumentBrowser::getDrives() const
     {
-        std::vector<DocumentBrowser::Drive*> drives(m_drives.size());
-        for(auto& drive_pair : m_drives)
+        return {m_distant_drive.get()};
+    }
+    
+    void DocumentBrowser::networkSettingsChanged(NetworkSettings const& settings, const juce::Identifier& id)
+    {
+        if(id == Ids::host)
         {
-            drives.emplace_back(drive_pair.second.get());
+            m_distant_drive->setHost(settings.getHost());
         }
-        
-        return drives;
+        else if(id == Ids::api_port)
+        {
+            m_distant_drive->setApiPort(settings.getApiPort());
+        }
+        else if(id == Ids::session_port)
+        {
+            m_distant_drive->setSessionPort(settings.getSessionPort());
+        }
+        else if(id == Ids::refresh_interval)
+        {
+            auto time = settings.getRefreshInterval();
+            
+            if(time > 0)
+            {
+                start(time);
+            }
+            else
+            {
+                stop();
+            }
+        }
     }
     
     void DocumentBrowser::addListener(Listener& listener)
@@ -69,109 +115,29 @@ namespace kiwi
         m_listeners.remove(listener);
     }
     
-    std::string DocumentBrowser::getSessionMetadata(Session const& session,
-                                                    std::string const& key,
-                                                    std::string const& notfound)
-    {
-        assert(!key.empty());
-        
-        auto const& metadata = session.metadata;
-        const auto it = metadata.find(key);
-        return (it != metadata.end()) ? it->second : notfound;
-    }
-    
     void DocumentBrowser::timerCallback()
     {
-        if(m_explorer == nullptr)
-        {
-            try
-            {
-                m_explorer = std::make_unique<flip::MulticastServiceExplorer>();
-            }
-            catch(std::runtime_error const& e)
-            {
-                m_explorer = nullptr;
-                //std::cerr << "fail to initialize the MulticastServiceExplorer (you may check your connection)\n";
-            }
-        }
-        
         process();
     }
     
     void DocumentBrowser::process()
     {
-        if(m_explorer == nullptr) return; // abort
-        
-        m_explorer->process();
-        auto const& explorer = *m_explorer.get();
-        
-        std::vector<Drive*> drives_added;
-        std::vector<Drive*> drives_changed;
-        std::vector<Drive*> drives_removed;
-        
-        // find and store removed drives
-        for(auto const& drive_pair : m_drives)
-        {
-            Drive& drive = *drive_pair.second.get();
-            if(std::find(explorer.begin(), explorer.end(), drive) == explorer.end())
-            {
-                drives_removed.emplace_back(&drive);
-            }
-        }
-        
-        // find and store new drives
-        for(auto const& session : explorer)
-        {
-            const std::string hostname = getSessionMetadata(session, "computer_name");
-            if(!m_drives.count(hostname))
-            {
-                auto it = m_drives.emplace(hostname, std::make_unique<Drive>(hostname, session));
-                drives_added.emplace_back(it.first->second.get());
-            }
-            else
-            {
-                Drive& drive = *m_drives[hostname].get();
-                
-                // look for document session changes
-                if(drive.processSession(session))
-                {
-                    drives_changed.emplace_back(&drive);
-                }
-            }
-        }
-        
-        // drive added notification
-        for(Drive* const drive : drives_added)
-        {
-            m_listeners.call(&Listener::driveAdded, *drive);
-        }
-        
-        // drive changed notification
-        for(Drive* const drive : drives_changed)
-        {
-            m_listeners.call(&Listener::driveChanged, *drive);
-        }
-        
-        // drive removed notification
-        for(Drive* const drive : drives_removed)
-        {
-            m_listeners.call(&Listener::driveRemoved, *drive);
-            m_drives.erase(drive->getHostName());
-        }
+        m_distant_drive->refresh();
     }
     
     // ================================================================================ //
     //                              DOCUMENT BROWSER DRIVE                              //
     // ================================================================================ //
     
-    DocumentBrowser::Drive::Drive(std::string hostname, DocumentBrowser::Session const& session) :
-    m_ip(session.ip),
-    m_port(session.port),
-    m_version(session.version),
-    m_hostname(hostname),
-    m_is_remote(m_hostname != juce::SystemStats::getComputerName().toStdString())
+    DocumentBrowser::Drive::Drive(std::string const& name,
+                                  std::string const& host,
+                                  uint16_t api_port,
+                                  uint16_t session_port) :
+    m_api(host, api_port),
+    m_session_port(session_port),
+    m_name(name)
     {
-        processSession(session);
+        ;
     };
     
     void DocumentBrowser::Drive::addListener(Listener& listener)
@@ -184,46 +150,76 @@ namespace kiwi
         m_listeners.remove(listener);
     }
     
-    uint16_t DocumentBrowser::Drive::getPort() const
+    Api& DocumentBrowser::Drive::useApi()
     {
-        return m_port;
+        return m_api;
     }
     
-    uint32_t DocumentBrowser::Drive::getIp() const
+    uint16_t DocumentBrowser::Drive::getApiPort() const
     {
-        return m_ip;
+        return m_api.getPort();
     }
     
-    std::string DocumentBrowser::Drive::getHost() const
+    void DocumentBrowser::Drive::setApiPort(uint16_t port)
     {
-        const uint32_t ip_address = getIp();
-        char host[16];
+        m_api.setPort(port);
+    }
+    
+    void DocumentBrowser::Drive::setSessionPort(uint16_t port)
+    {
+        m_session_port = port;
+    }
+    
+    uint16_t DocumentBrowser::Drive::getSessionPort() const
+    {
+        return m_session_port;
+    }
+    
+    void DocumentBrowser::Drive::setHost(std::string const& host)
+    {
+        m_api.setHost(host);
+    }
+    
+    std::string const& DocumentBrowser::Drive::getHost() const
+    {
+        return m_api.getHost();
+    }
+    
+    void DocumentBrowser::Drive::setName(std::string const& name)
+    {
+        m_name = name;
+    }
+    
+    std::string const& DocumentBrowser::Drive::getName() const
+    {
+        return m_name;
+    }
+    
+    void DocumentBrowser::Drive::createNewDocument()
+    {
+        m_api.createDocument([this](Api::Response res, Api::Document document) {
+            
+            if(res.error)
+            {
+                juce::MessageManager::callAsync([message = res.error.message](){
+                    KiwiApp::error("Error: can't create document");
+                    KiwiApp::error("=> " + message);
+                });
+                
+                return;
+            }
+            
+            juce::MessageManager::callAsync([this, document]() {
+                
+                auto it = m_documents.emplace(m_documents.end(), *this, std::move(document));
+                
+                m_listeners.call(&Listener::documentAdded, *it);
+                
+                it->open();
+            });
+            
+        });
         
-        if(ip_address)
-        {
-            snprintf(host, sizeof host, "%u.%u.%u.%u",
-                     (ip_address & 0xff000000) >> 24,
-                     (ip_address & 0x00ff0000) >> 16,
-                     (ip_address & 0x0000ff00) >> 8,
-                     (ip_address & 0x000000ff));
-        }
-        
-        return host;
-    }
-    
-    std::string DocumentBrowser::Drive::getHostName() const
-    {
-        return m_hostname;
-    }
-    
-    bool DocumentBrowser::Drive::isRemote() const
-    {
-        return m_is_remote;
-    }
-    
-    void DocumentBrowser::Drive::createNewDocument() const
-    {
-        KiwiApp::useInstance().openRemotePatcher(getHost(), getPort(), m_new_session_id);
     }
     
     std::list<DocumentBrowser::Drive::DocumentSession> const& DocumentBrowser::Drive::getDocuments() const
@@ -231,125 +227,124 @@ namespace kiwi
         return m_documents;
     }
     
-    bool DocumentBrowser::Drive::operator==(Session const& session) const
+    std::list<DocumentBrowser::Drive::DocumentSession>& DocumentBrowser::Drive::getDocuments()
     {
-        return (m_ip == session.ip) && (m_port == session.port);
+        return m_documents;
     }
     
     bool DocumentBrowser::Drive::operator==(Drive const& drive) const
     {
-        return (m_ip == drive.m_ip) && (m_port == drive.m_port);
+        return (getHost() == drive.getHost())
+        && (getApiPort() == drive.getApiPort())
+        && (getSessionPort() == drive.getSessionPort())
+        && (m_name == drive.getName());
     }
     
-    bool DocumentBrowser::Drive::processSession(DocumentBrowser::Session const& session)
+    void DocumentBrowser::Drive::refresh()
     {
-        assert(*this == session);
-        
-        bool changed = false;
-        std::vector<DocumentSession> new_documents;
-        
-        const auto getMeta = &DocumentBrowser::getSessionMetadata;
-        
-        m_new_session_id = std::stoull(getMeta(session, "new_session_id", "12345"));
-
-        const juce::String files = getMeta(session, "backend_files_list", "");
-        juce::var json_files;
-        if(juce::JSON::parse(files, json_files).wasOk())
-        {
-            if(json_files.isArray())
+        m_api.getDocuments([this](Api::Response res, Api::Documents docs) {
+            
+            if(res.error)
             {
-                for(juce::var const& var : *json_files.getArray())
+                juce::MessageManager::callAsync([message = res.error.message](){
+                    KiwiApp::error("Error: can't get documents");
+                    KiwiApp::error("=> " + message);
+                });
+                
+                return;
+            }
+            
+            std::vector<DocumentSession> new_documents;
+            new_documents.reserve(docs.size());
+            
+            for(auto && doc : docs)
+            {
+                new_documents.emplace_back(*this, std::move(doc));
+            }
+            
+            // drive removed notification
+            for(auto doc_it = m_documents.begin(); doc_it != m_documents.end();)
+            {
+                auto it = std::find(new_documents.begin(), new_documents.end(), *doc_it);
+                
+                if(it == new_documents.end())
                 {
-                    if(var.isObject())
+                    juce::MessageManager::callAsync([this, doc_it](){
+                        m_listeners.call(&Listener::documentRemoved, *doc_it);
+                    });
+                    
+                    doc_it = m_documents.erase(doc_it);
+                    continue;
+                }
+                
+                ++doc_it;
+            }
+            
+            // drive added or changed notification
+            for(auto const& new_doc : new_documents)
+            {
+                auto it = std::find(m_documents.begin(), m_documents.end(), new_doc);
+                
+                // new document
+                if(it == m_documents.end())
+                {
+                    it = m_documents.emplace(it, new_doc);
+                    
+                    juce::MessageManager::callAsync([this, it](){
+                        m_listeners.call(&Listener::documentAdded, *it);
+                    });
+                }
+                else
+                {
+                    // name is currently the only document field that can change.
+                    if(new_doc.getName() != it->getName())
                     {
-                        const auto obj = var.getDynamicObject();
-                        const auto name = obj->getProperty("name").toString().toStdString();
-                        const auto session_id = obj->getProperty("session_id").toString().toStdString();
+                        it->m_document.name = new_doc.getName();
                         
-                        new_documents.emplace_back(*this, name, std::stoull(session_id));
+                        juce::MessageManager::callAsync([this, it](){
+                            m_listeners.call(&Listener::documentChanged, *it);
+                        });
                     }
                 }
             }
-        }
-        
-        // drive removed notification
-        for(auto doc_it = m_documents.begin(); doc_it != m_documents.end();)
-        {
-            auto it = std::find(new_documents.begin(), new_documents.end(), *doc_it);
-            
-            if(it == new_documents.end())
-            {
-                m_listeners.call(&Listener::documentRemoved, *doc_it);
-                
-                doc_it = m_documents.erase(doc_it);
-                changed = true;
-                continue;
-            }
-            
-            ++doc_it;
-        }
-        
-        // drive added or changed notification
-        for(auto const& new_doc : new_documents)
-        {
-            auto it = std::find(m_documents.begin(), m_documents.end(), new_doc);
-            
-            // new document
-            if(it == m_documents.end())
-            {
-                it = m_documents.emplace(it, new_doc);
-                m_listeners.call(&Listener::documentAdded, *it);
-                changed = true;
-            }
-            else
-            {
-                // name is currently the only document field that can change.
-                if(new_doc.getName() != it->getName())
-                {
-                    it->m_name = new_doc.getName();
-                    m_listeners.call(&Listener::documentChanged, *it);
-                    changed = true;
-                }
-            }
-        }
-        
-        return changed;
-    }
-    
-    bool operator==(DocumentBrowser::Session const& session, DocumentBrowser::Drive const& drive)
-    {
-        return (drive.getIp() == session.ip) && (drive.getPort() == session.port);
+        });
     }
     
     // ================================================================================ //
     //                                  DRIVE DOCUMENT                                  //
     // ================================================================================ //
     
-    DocumentBrowser::Drive::DocumentSession::DocumentSession(DocumentBrowser::Drive const& parent,
-                                                             std::string name, uint64_t session_id) :
+    DocumentBrowser::Drive::DocumentSession::DocumentSession(DocumentBrowser::Drive& parent,
+                                                             Api::Document document) :
     m_drive(parent),
-    m_name(name),
-    m_session_id(session_id)
+    m_document(std::move(document))
     {
         
     }
     
     DocumentBrowser::Drive::DocumentSession::~DocumentSession()
     {
-        if(m_patcher_manager)
-        {
-            m_patcher_manager->removeListener(*this);
-        }
+        ;
     }
     
     std::string DocumentBrowser::Drive::DocumentSession::getName() const
     {
-        return m_name;
+        return m_document.name;
+    }
+    
+    std::string DocumentBrowser::Drive::DocumentSession::getHost() const
+    {
+        return m_drive.getHost();
     }
     
     uint64_t DocumentBrowser::Drive::DocumentSession::getSessionId() const
     {
-        return m_session_id;
+        return m_document.session_id;
+    }
+    
+    uint16_t DocumentBrowser::Drive::DocumentSession::getSessionPort() const
+    {
+        return m_drive.getSessionPort();
     }
     
     DocumentBrowser::Drive const& DocumentBrowser::Drive::DocumentSession::useDrive() const
@@ -357,28 +352,39 @@ namespace kiwi
         return m_drive;
     }
     
-    void DocumentBrowser::Drive::DocumentSession::patcherManagerRemoved(PatcherManager const& manager)
+    void DocumentBrowser::Drive::DocumentSession::rename(std::string const& new_name)
     {
-        m_patcher_manager = nullptr;
+        if(new_name.empty())
+        {
+            return;
+        }
+        
+        m_drive.useApi().renameDocument([](Api::Response res) {
+            
+            if(!res.error)
+            {
+                std::cout << "document successfully updated" << '\n';
+            }
+            else
+            {
+                std::cout << "document update failed, err: " + res.error.message << '\n';
+            }
+            
+        }, m_document._id, new_name);
     }
     
     bool DocumentBrowser::Drive::DocumentSession::operator==(DocumentSession const& other_doc) const
     {
-        return (&m_drive == &other_doc.useDrive()) && (m_session_id == other_doc.m_session_id);
+        return (&m_drive == &other_doc.useDrive()) && (m_document == other_doc.m_document);
+    }
+    
+    DocumentBrowser::Drive& DocumentBrowser::Drive::DocumentSession::useDrive()
+    {
+        return m_drive;
     }
     
     void DocumentBrowser::Drive::DocumentSession::open()
     {
-        if(m_patcher_manager != nullptr)
-        {
-            m_patcher_manager->bringsFirstViewToFront();
-        }
-        else
-        {
-            m_patcher_manager = KiwiApp::useInstance().openRemotePatcher(m_drive.getHost(),
-                                                                         m_drive.getPort(),
-                                                                         m_session_id);
-            m_patcher_manager->addListener(*this);
-        }
+        KiwiApp::useInstance().openRemotePatcher(*this);
     }
 }

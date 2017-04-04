@@ -102,6 +102,7 @@ namespace kiwi
         #if JUCE_MAC
         juce::PopupMenu macMainMenuPopup;
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAboutAppWindow);
+        macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAppSettingsWindow);
         macMainMenuPopup.addSeparator();
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAudioStatusWindow);
         juce::MenuBarModel::setMacMainMenu(m_menu_model.get(), &macMainMenuPopup, TRANS("Open Recent"));
@@ -133,7 +134,7 @@ namespace kiwi
         }
         else
         {
-            if(m_instance->closeAllWindows())
+            if(m_instance->closeAllPatcherWindows())
             {
                 m_instance.reset();
                 
@@ -155,6 +156,23 @@ namespace kiwi
     bool KiwiApp::moreThanOneInstanceAllowed()
     {
         return false;
+    }
+    
+    bool KiwiApp::isMacOSX()
+    {
+        return (juce::SystemStats::getOperatingSystemType()
+                & juce::SystemStats::MacOSX) != 0;
+    }
+    
+    bool KiwiApp::isLinux()
+    {
+        return juce::SystemStats::getOperatingSystemType() == juce::SystemStats::Linux;
+    }
+    
+    bool KiwiApp::isWindows()
+    {
+        return (juce::SystemStats::getOperatingSystemType()
+                & juce::SystemStats::Windows) != 0;
     }
     
     // ================================================================================ //
@@ -222,7 +240,7 @@ namespace kiwi
         useEngineInstance().error(text);
     }
     
-    void KiwiApp::closeWindow(AppWindow& window)
+    void KiwiApp::closeWindow(Window& window)
     {
         if(m_instance)
         {
@@ -395,6 +413,7 @@ namespace kiwi
             CommandIDs::openFile,
             CommandIDs::showConsoleWindow,
             CommandIDs::showAudioStatusWindow,
+            CommandIDs::showAppSettingsWindow,
             CommandIDs::showDocumentBrowserWindow,
             CommandIDs::showBeaconDispatcherWindow,
             CommandIDs::startDsp,
@@ -430,6 +449,14 @@ namespace kiwi
                                CommandCategories::windows, 0);
                 
                 result.addDefaultKeypress('k', juce::ModifierKeys::commandModifier);
+                break;
+            }
+            case CommandIDs::showAppSettingsWindow:
+            {
+                result.setInfo(TRANS("Preferences..."), TRANS("Show kiwi application settings"),
+                               CommandCategories::windows, 0);
+                
+                result.addDefaultKeypress(',', juce::ModifierKeys::commandModifier);
                 break;
             }
             case CommandIDs::showAudioStatusWindow:
@@ -495,6 +522,11 @@ namespace kiwi
             case CommandIDs::showConsoleWindow :
             {
                 m_instance->showConsoleWindow();
+                break;
+            }
+            case CommandIDs::showAppSettingsWindow :
+            {
+                m_instance->showAppSettingsWindow();
                 break;
             }
             case CommandIDs::showAudioStatusWindow :

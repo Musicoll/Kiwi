@@ -151,23 +151,6 @@ namespace kiwi
         juce::Font          m_font;
         juce::TableListBox  m_table;
     };
-
-    // ================================================================================ //
-    //                                  CONSOLE WINDOW                                  //
-    // ================================================================================ //
-    
-    //! @brief The ConsoleWindow is a Window that manages and display a Console Component.
-    class ConsoleWindow final : public AppWindow
-    {
-    public:
-        
-        ConsoleWindow(sConsoleHistory history);
-        
-        bool isMainWindow() override;
-        
-        ~ConsoleWindow() = default;
-    };
 }
-
 
 #endif // KIWI_APP_CONSOLE_HPP_INCLUDED

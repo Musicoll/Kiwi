@@ -13,11 +13,12 @@ environment:
         PLATFORM: x64
 
 install:
-    - git submodule update --init --recursive ThirdParty/Juce
+    - git submodule update --init --recursive "ThirdParty/Juce"
+    - git submodule update --init --recursive "ThirdParty/cpr"
     - set PATH=C:\Python27;%PATH%
 
 build_script:
-    - python .\Config\configure.py
+    - python .\Config\configure.py -c %CONFIGURATION% -p %PLATFORM% -curlsystem=Off
     - python .\Config\build.py -c %CONFIGURATION% -p %PLATFORM%
 
 after_build:

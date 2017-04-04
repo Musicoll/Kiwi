@@ -31,13 +31,77 @@ namespace kiwi
     //                                      WINDOW                                      //
     // ================================================================================ //
     
-    Window::Window(std::string const& name, bool addToDesktop) :
-    DocumentWindow(name, juce::Colours::white, allButtons, addToDesktop)
+    Window::Window(std::string const& name, std::unique_ptr<juce::Component> content,
+                   bool resizable,
+                   bool is_main_window,
+                   juce::String settings_name,
+                   bool add_menubar) :
+    DocumentWindow(name, juce::Colours::white, allButtons, true),
+    m_settings_name(settings_name)
     {
         setUsingNativeTitleBar(true);
         
+        if(!resizable)
+        {
+            setTitleBarButtonsRequired(juce::DocumentWindow::minimiseButton
+                                       | juce::DocumentWindow::closeButton, true);
+        }
+        
+        if(content)
+        {
+            int width = content->getWidth() > 0 ? content->getWidth() : 300;
+            int height = content->getHeight() > 0 ? content->getHeight() : 300;
+            
+            content->setSize(width, height);
+            setContentOwned(content.release(), true);
+        }
+        
         KiwiApp::bindToCommandManager(this);
         KiwiApp::bindToKeyMapping(this);
+        
+        if(add_menubar)
+        {
+            setMenuBar(KiwiApp::getMenuBarModel());
+        }
+        
+        setResizable(resizable, false);
+        restoreWindowState();
+    }
+    
+    Window::~Window()
+    {
+        saveWindowState();
+    }
+    
+    void Window::restoreWindowState()
+    {
+        if(m_settings_name.isNotEmpty())
+        {
+            juce::String window_state(getGlobalProperties().getValue(m_settings_name));
+            
+            if(window_state.isNotEmpty())
+            {
+                restoreWindowStateFromString(window_state);
+            }
+        }
+    }
+    
+    void Window::saveWindowState()
+    {
+        if(m_settings_name.isNotEmpty())
+        {
+            getGlobalProperties().setValue(m_settings_name, getWindowStateAsString());
+        }
+    }
+    
+    bool Window::isMainWindow() const
+    {
+        return m_is_main_window;
+    }
+    
+    void Window::closeButtonPressed()
+    {
+        KiwiApp::use().closeWindow(*this);
     }
     
     // ================================================================================ //
@@ -91,38 +155,5 @@ namespace kiwi
             default: return false;
         }
         return true;
-    }
-    
-    // ================================================================================ //
-    //                                      APPWINDOW                                   //
-    // ================================================================================ //
-    
-    AppWindow::AppWindow(std::string const& name):
-    Window(name, true)
-    {
-    }
-    
-    void AppWindow::initBounds(juce::Rectangle<int> bounds)
-    {
-        const juce::String windowState(getGlobalProperties().getValue(getName()));
-        
-        if (!windowState.isEmpty())
-        {
-            restoreWindowStateFromString(windowState);
-        }
-        else
-        {
-            setBounds(bounds);
-        }
-    }
-    
-    void AppWindow::closeButtonPressed()
-    {
-        KiwiApp::use().closeWindow(*this);
-    }
-    
-    AppWindow::~AppWindow()
-    {
-        getGlobalProperties().setValue(getName(), getWindowStateAsString());
     }
 }

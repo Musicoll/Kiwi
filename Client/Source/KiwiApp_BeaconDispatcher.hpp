@@ -63,21 +63,6 @@ namespace kiwi
         std::unique_ptr<juce::TextEditor>   m_message_editor;
         std::unique_ptr<juce::TextButton>   m_send_button;
     };
-    
-    // ================================================================================ //
-    //                              BEACON DISPATCHER WINDOW                            //
-    // ================================================================================ //
-    
-    //! @brief The BeaconDispatcherWindow
-    class BeaconDispatcherWindow final : public AppWindow
-    {
-    public:
-        BeaconDispatcherWindow(engine::Instance& instance);
-        
-        bool isMainWindow() override;
-        
-        ~BeaconDispatcherWindow() = default;
-    };
 }
 
 

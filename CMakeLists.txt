@@ -42,7 +42,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # IDE Settings
 #--------------------------------------
 
-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.8)
 set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++14")
 set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
 set(CMAKE_OSX_ARCHITECTURES "i386;x86_64")
@@ -282,6 +282,29 @@ set_target_properties (Flip PROPERTIES FOLDER ThirdParty
 source_group_rec("${FLIP_SRC}" ${FLIP_DIR})
 
 #----------------------------------
+# Cpr
+#----------------------------------
+
+# Cpr settings
+set(CMAKE_USE_OPENSSL OFF CACHE BOOL "Don't use openssl")
+set(BUILD_CPR_TESTS OFF CACHE BOOL "Don't build cpr tests")
+message("Use system curl " ${USE_SYSTEM_CURL})
+
+# Curl settings
+set(CURL_STATICLIB OFF CACHE BOOL "Build static library for curl")
+set(BUILD_TESTING OFF CACHE BOOL "Don't build curl tests")
+
+add_subdirectory(ThirdParty/cpr)
+set_target_properties(${CPR_LIBRARIES} PROPERTIES FOLDER ThirdParty)
+
+
+#----------------------------------
+# Json
+#----------------------------------
+
+set(JSON_INCLUDE_DIRS ${ROOT_DIR}/ThirdParty/json)
+
+#----------------------------------
 # Model
 #----------------------------------
 
@@ -320,17 +343,11 @@ source_group_rec("${KIWI_ENGINE_SRC}" ${ROOT_DIR}/Modules/KiwiEngine)
 # Server
 #----------------------------------
 
-file(GLOB_RECURSE KIWI_SERVER_SRC ${ROOT_DIR}/Modules/KiwiServer/*.[c|h]pp)
-add_library(KiwiServer STATIC ${KIWI_SERVER_SRC})
-target_include_directories(KiwiEngine PUBLIC ${ROOT_DIR}/Modules)
-target_add_dependency(KiwiServer KiwiModel)
-target_add_dependency(KiwiServer Juce)
-set_target_properties(KiwiServer PROPERTIES FOLDER Modules)
-source_group_rec("${KIWI_SERVER_SRC}" ${ROOT_DIR}/Modules/KiwiServer)
-
 file(GLOB_RECURSE SERVER_SRC ${ROOT_DIR}/Server/Source/*.[c|h]pp)
 add_executable(Server ${SERVER_SRC})
-target_add_dependency(Server KiwiServer)
+target_include_directories(Server PUBLIC ${JSON_INCLUDE_DIRS})
+target_add_dependency(Server KiwiModel)
+target_add_dependency(Server Juce)
 source_group_rec("${SERVER_SRC}" ${ROOT_DIR}/Server/Source)
 
 #----------------------------------
@@ -343,7 +360,8 @@ target_add_dependency(Kiwi KiwiEngine)
 target_add_dependency(Kiwi KiwiModel)
 target_add_dependency(Kiwi KiwiDsp)
 target_add_dependency(Kiwi Juce)
-target_add_dependency(Kiwi KiwiServer)
+target_add_dependency(Kiwi ${CPR_LIBRARIES})
+target_include_directories(Kiwi PUBLIC ${JSON_INCLUDE_DIRS} ${CPR_INCLUDE_DIRS})
 
 if (APPLE)
 	set_target_properties(Kiwi PROPERTIES MACOSX_BUNDLE TRUE
@@ -389,15 +407,6 @@ set_target_properties(test_engine PROPERTIES FOLDER Test)
 source_group_rec("${TEST_ENGINE_SRC}" ${ROOT_DIR}/Test/Engine)
 set_target_properties(test_engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
 
-# Test Server
-
-file(GLOB TEST_SERVER_SRC ${ROOT_DIR}/Test/Server/*.[c|h]pp)
-add_executable(test_server ${TEST_SERVER_SRC})
-target_add_dependency(test_server KiwiServer)
-set_target_properties(test_server PROPERTIES FOLDER Test)
-source_group_rec("${TEST_SERVER_SRC}" ${ROOT_DIR}/Test/Server)
-set_target_properties(test_server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
-
 # Coverage setting
 if(${GCOV_SUPPORT} STREQUAL "On" AND DEBUG)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
@@ -406,17 +415,15 @@ if(${GCOV_SUPPORT} STREQUAL "On" AND DEBUG)
   target_link_libraries(test_dsp PUBLIC gcov)
   target_link_libraries(test_model PUBLIC gcov)
   target_link_libraries(test_engine PUBLIC gcov)
-  target_link_libraries(test_server PUBLIC gcov)
 endif()
 
 # Tests Target
 
-add_custom_target(Tests ALL DEPENDS test_dsp test_model test_engine test_server)
+add_custom_target(Tests ALL DEPENDS test_dsp test_model test_engine)
 set_target_properties(Tests PROPERTIES FOLDER Test)
 
 add_custom_command(TARGET Tests
                    POST_BUILD COMMAND test_dsp
                               COMMAND test_model
                               COMMAND test_engine
-                              COMMAND test_server
                    USES_TERMINAL)
