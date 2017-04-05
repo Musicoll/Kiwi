@@ -31,12 +31,16 @@ namespace kiwi
     public: // methods
         
         LookAndFeel() = default;
+        ~LookAndFeel() = default;
         
         //! @brief Returns the typeface for a certain font name and style.
         //! @details LookAndFeel doesn't cache typeface because juce has its own caching mechanism
         juce::Typeface::Ptr getTypefaceForFont(juce::Font const& font) override;
         
-        ~LookAndFeel() = default;
+        //! @brief Overriden to draw a custom PropertyPanel section header
+        void drawPropertyPanelSectionHeader(juce::Graphics& g,
+                                            const juce::String& name,
+                                            bool is_open, int width, int height) override;
         
     private: // deleted methods
         
