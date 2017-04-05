@@ -9,6 +9,12 @@ import subprocess
 import shutil
 import argparse
 
+##### VERSION #################################################################
+
+if sys.version_info[0] != 2 or sys.version_info[1] < 7:
+    print("This script requires version python 2, 2.7 or higher")
+    sys.exit(1)
+
 project_dir = os.path.abspath(".");
 
 cmd = "cmake";
@@ -20,19 +26,22 @@ cmd = "cmake";
 def parse_args ():
     arg_parser = argparse.ArgumentParser ()
 
-    arg_parser.add_argument('-c', '--configuration', default = 'All', choices = ['Debug', 'Release' ,'All'])
+    arg_parser.add_argument('-c', '--configuration', default = 'All', choices = ['Debug', 'Release' ,'All'],
+                            help="the chosen configuration  to initialize either Release or Debug")
     
     arg_parser.add_argument('-curlsystem', '--curlsystem', default = 'On', choices = ['On', 'Off'], 
-                            help='set curlsystem to off if you want to build curl from source')
+                            help="set curlsystem to off if you want to build curl from source")
 
     if platform.system () == 'Darwin':
-        arg_parser.add_argument('-flip', default = 'public', choices = ['public', 'private'])
+        arg_parser.add_argument('-flip', default = 'public', choices = ['public', 'private'],
+                                help="on Mac platforms use flip private to use flip private repository")
 
     if platform.system () == 'Linux':
         arg_parser.add_argument('-coverage', required=False, action='store_true', help='activate coverage')
 
     if platform.system() == "Windows":
-        arg_parser.add_argument('-p','--platform', default = 'All', choices = ['x64', 'Win32', 'All'])
+        arg_parser.add_argument('-p','--platform', default = 'All', choices = ['x64', 'Win32', 'All'],
+                                help="the chosen platform for which you want to later build kiwi")
 
     return arg_parser.parse_args (sys.argv[1:])
 

@@ -8,6 +8,12 @@ import sys
 import argparse
 import platform
 
+##### VERSION #################################################################
+
+if sys.version_info[0] != 2 or sys.version_info[1] < 7:
+    print("This script requires version python 2, 2.7 or higher")
+    sys.exit(1)
+
 project_dir = os.path.abspath(".");
 
 #==============================================================================
@@ -17,12 +23,15 @@ project_dir = os.path.abspath(".");
 def parse_args ():
     arg_parser = argparse.ArgumentParser ()
 
-    arg_parser.add_argument('-c', '--configuration', default = 'Release', choices = ['Debug', 'Release'])
+    arg_parser.add_argument('-c', '--configuration', default = 'Release', choices = ['Debug', 'Release'],
+                            help="the configuration that you wish to build either Release or Debug")
 
-    arg_parser.add_argument('-t', '--target', default = 'alltargets')
+    arg_parser.add_argument('-t', '--target', default = 'alltargets',
+                            help="specify the target to build. By default all targets are built. ex: build.py -t Tests")
 
     if platform.system() == "Windows":
-        arg_parser.add_argument('-p','--platform', default = 'x64', choices = ['x64', 'Win32'])
+        arg_parser.add_argument('-p','--platform', default = 'x64', choices = ['x64', 'Win32'],
+                                help="the target platform")
 
     return arg_parser.parse_args (sys.argv[1:])
 
