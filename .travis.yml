@@ -63,7 +63,7 @@ matrix:
     - python ./Config/build.py -c Release | xcpretty
     before_deploy:
     - mkdir Kiwi
-    - mv Build/Release/KiwiBuild/Bin/Release/Kiwi.app Kiwi/Kiwi.app
+    - mv Build/Release/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
     - zip -r Kiwi_macos.zip Kiwi
     deploy:
       provider: releases

@@ -12,9 +12,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(ROOT_DIR ${PROJECT_SOURCE_DIR})
 
-set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/KiwiBuild/Bin")
-set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/KiwiBuild/Lib")
-set(TEST_OUTPUT_PATH "${CMAKE_BINARY_DIR}/KiwiBuild/Test")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/KiwiBuild")
+set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/KiwiBuild")
 
 if(CMAKE_CONFIGURATION_TYPES)
    set(CMAKE_CONFIGURATION_TYPES ${CMAKE_BUILD_TYPE})
@@ -301,7 +300,7 @@ set(BUILD_TESTING OFF CACHE BOOL "Don't build curl tests")
 
 add_subdirectory(ThirdParty/cpr)
 set_target_properties(${CPR_LIBRARIES} PROPERTIES FOLDER ThirdParty)
-
+set_target_properties(${CPR_LIBRARIES} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 #----------------------------------
 # Json
@@ -399,7 +398,6 @@ add_executable(test_dsp ${TEST_DSP_SRC})
 target_add_dependency(test_dsp KiwiDsp)
 set_target_properties(test_dsp PROPERTIES FOLDER Test)
 source_group_rec("${TEST_DSP_SRC}" ${ROOT_DIR}/Test/Dsp)
-set_target_properties(test_dsp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
 
 # Test Model
 
@@ -409,7 +407,6 @@ add_executable(test_model ${TEST_MODEL_SRC})
 target_add_dependency(test_model KiwiModel)
 set_target_properties(test_model PROPERTIES FOLDER Test)
 source_group_rec("${TEST_MODEL_SRC}" ${ROOT_DIR}/Test/Model)
-set_target_properties(test_model PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
 
 # Test Engine
 
@@ -422,7 +419,6 @@ if (LINUX)
 endif()
 set_target_properties(test_engine PROPERTIES FOLDER Test)
 source_group_rec("${TEST_ENGINE_SRC}" ${ROOT_DIR}/Test/Engine)
-set_target_properties(test_engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
 
 # Coverage setting
 if(${GCOV_SUPPORT} STREQUAL "On" AND DEBUG)
