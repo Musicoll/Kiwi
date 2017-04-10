@@ -117,6 +117,8 @@ namespace kiwi
         struct Listener;
         class DocumentSession;
         
+        using DocumentSessions = std::vector<std::unique_ptr<DocumentSession>>;
+        
     public: // methods
         
         Drive(std::string const& name,
@@ -163,10 +165,10 @@ namespace kiwi
         void createNewDocument();
         
         //! @brief Returns the documents.
-        std::list<DocumentSession> const& getDocuments() const;
+        DocumentSessions const& getDocuments() const;
         
         //! @brief Returns the documents.
-        std::list<DocumentSession>& getDocuments();
+        DocumentSessions& getDocuments();
         
         //! @brief Returns true if the drive match the other drive
         //! @details this operator only compares ip and port.
@@ -180,7 +182,7 @@ namespace kiwi
         Api                         m_api;
         uint16_t                    m_session_port = 9090;
         std::string                 m_name = "Drive";
-        std::list<DocumentSession>  m_documents;
+        DocumentSessions            m_documents;
         engine::Listeners<Listener> m_listeners;
         
         friend class DocumentBrowser;
@@ -204,6 +206,9 @@ namespace kiwi
         
         //! @brief Called when a document session has been removed.
         virtual void documentRemoved(DocumentBrowser::Drive::DocumentSession& doc) = 0;
+        
+        //! @brief Called when one or more documents has been added, removed or changed.
+        virtual void driveChanged() {};
     };
     
     // ================================================================================ //

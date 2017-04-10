@@ -79,6 +79,7 @@ namespace kiwi
     //! @brief Listen to document browser changes.
     class DocumentBrowserView::DriveView :
     public juce::Component,
+    public juce::ListBoxModel,
     public DocumentBrowser::Drive::Listener
     {
     public:
@@ -98,91 +99,42 @@ namespace kiwi
         //! @brief juce::Component::paint
         void paint(juce::Graphics& g) override;
         
+        // ========= DocumentBrowser::Drive::Listener
+        
         //! @brief Called when a document session has been added.
-        void documentAdded(DocumentBrowser::Drive::DocumentSession& doc) override;
+        void documentAdded(DocumentBrowser::Drive::DocumentSession& doc) override {
+            std::cout << "documentAdded" << '\n';};
         
         //! @brief Called when a document session changed.
-        void documentChanged(DocumentBrowser::Drive::DocumentSession& doc) override;
+        void documentChanged(DocumentBrowser::Drive::DocumentSession& doc) override {std::cout << "documentChanged" << '\n';};
         
         //! @brief Called when a document session has been removed.
-        void documentRemoved(DocumentBrowser::Drive::DocumentSession& doc) override;
+        void documentRemoved(DocumentBrowser::Drive::DocumentSession& doc) override {std::cout << "documentRemoved" << '\n';};
+        
+        void driveChanged() override;
+        
+        // ========= juce::ListBoxModel
+        
+        //! @brief Returns the number of items in the list.
+        int getNumRows() override;
+        
+        //! @brief Draw a row of the list.
+        //! @details Note that the rowNumber value may be greater than the number of rows in your
+        //! list, so be careful that you don't assume it's less than getNumRows().
+        void paintListBoxItem(int rowNumber, juce::Graphics& g, int width, int height, bool selected) override;
+        
+        //! @brief Used to create or update a custom component to go in a row of the list.
+        juce::Component* refreshComponentForRow(int row, bool selected,
+                                                juce::Component* component_to_update) override;
         
         //! @brief Returns true if the two drive view refer to the same drive.
         bool operator==(DocumentBrowser::Drive const& other_drive) const;
         
     private: // classes
         
-        class BrowserButton : public juce::Button
-        {
-        public: // methods
-            
-            //! @brief Constructor.
-            BrowserButton(juce::String const& button_text);
-            
-            //! @brief Destructor.
-            ~BrowserButton() = default;
-            
-            //! @brief draw the button.
-            void paintButton(juce::Graphics& g, bool isMouseOverButton, bool isButtonDown) override;
-            
-            //! @brief This method is called when the button has been clicked.
-            void clicked(juce::ModifierKeys const& modifiers) override;
-            
-            //! @brief Set the command to execute when the button has been clicked.
-            void setCommand(std::function<void(void)> fn);
-            
-        private: // members
-            
-            std::function<void(void)> m_command;
-        };
-        
-        class DocumentSessionView : public juce::Component, juce::Label::Listener
-        {
-        public: // methods
-            
-            //! @brief Constructor.
-            DocumentSessionView(DocumentBrowser::Drive::DocumentSession& document);
-            
-            //! @brief Destructor.
-            ~DocumentSessionView() = default;
-            
-            //! @brief juce::Component::paint
-            void paint(juce::Graphics& g) override;
-            
-            //! @brief Called when resized.
-            void resized() override;
-            
-            //! @brief Called when a Label's text has changed.
-            void labelTextChanged(juce::Label* labelThatHasChanged) override;
-
-            //! @brief Returns the document name.
-            std::string getName() const;
-            
-            //! @brief Returns the session host.
-            std::string getHost() const;
-            
-            //! @brief Returns the session port.
-            uint16_t getSessionPort() const;
-            
-            //! @brief Returns the session id.
-            uint64_t getSessionId() const;
-            
-            //! @brief Returns true if the two documents refer to the same session_id
-            bool operator==(DocumentBrowser::Drive::DocumentSession const& other_document) const;
-        
-        private: // methods
-            
-            //! @internal Called by the DriveView when the document has changed.
-            void documentSessionChanged();
-            
-        private: // variables
-            
-            DocumentBrowser::Drive::DocumentSession&    m_document;
-            BrowserButton                               m_open_btn;
-            juce::Label                                 m_name_label;
-            
-            friend DriveView;
-        };
+        class Header;
+        class BrowserButton;
+        class DocumentSessionView;
         
     private: // methods
         
@@ -191,10 +143,121 @@ namespace kiwi
         
     private: // members
         
-        DocumentBrowser::Drive&                             m_drive;
-        std::vector<std::unique_ptr<DocumentSessionView>>   m_documents = {};
-        BrowserButton                                       m_create_document_btn;
-        BrowserButton                                       m_refresh_btn;
+        DocumentBrowser::Drive&                                 m_drive;
+        std::vector<juce::ScopedPointer<DocumentSessionView>>   m_documents = {};
+        juce::ListBox                                       	m_document_list;
+    };
+    
+    // ================================================================================ //
+    //                            DOCUMENT BROWSER PANEL HEADER                         //
+    // ================================================================================ //
+    
+    class DocumentBrowserView::DriveView::Header : public juce::Component
+    {
+    public: // methods
+        
+        //! @brief Constructor
+        Header(DocumentBrowser::Drive& drive);
+        
+        //! @brief Destructor
+        ~Header() = default;
+        
+        //! @brief juce::Component::paint
+        void paint(juce::Graphics& g) override;
+        
+        //! @brief juce::Component::resized
+        void resized() override;
+        
+    private: // members
+        DocumentBrowser::Drive&         m_drive;
+        std::unique_ptr<BrowserButton>  m_refresh_btn;
+        std::unique_ptr<BrowserButton>  m_create_document_btn;
+    };
+    
+    // ================================================================================ //
+    //                            DOCUMENT BROWSER PANEL BUTTON                         //
+    // ================================================================================ //
+    
+    class DocumentBrowserView::DriveView::BrowserButton : public juce::Button
+    {
+    public: // methods
+        
+        //! @brief Constructor.
+        BrowserButton(juce::String const& button_text);
+        
+        //! @brief Destructor.
+        ~BrowserButton() = default;
+        
+        //! @brief draw the button.
+        void paintButton(juce::Graphics& g, bool isMouseOverButton, bool isButtonDown) override;
+        
+        //! @brief This method is called when the button has been clicked.
+        void clicked(juce::ModifierKeys const& modifiers) override;
+        
+        //! @brief Set the command to execute when the button has been clicked.
+        void setCommand(std::function<void(void)> fn);
+        
+    private: // members
+        
+        std::function<void(void)> m_command;
+    };
+    
+    // ================================================================================ //
+    //                          DOCUMENT BROWSER PANEL SESSION VIEW                     //
+    // ================================================================================ //
+    
+    class DocumentBrowserView::DriveView::DocumentSessionView : public juce::Component, juce::Label::Listener
+    {
+    public: // methods
+        
+        //! @brief Constructor.
+        DocumentSessionView(DocumentBrowser::Drive::DocumentSession& document);
+        
+        //! @brief Destructor.
+        ~DocumentSessionView() = default;
+        
+        //! @brief juce::Component::paint
+        void paint(juce::Graphics& g) override;
+        
+        //! @brief Called when resized.
+        void resized() override;
+        
+        //! @brief Called when a Label's text has changed.
+        void labelTextChanged(juce::Label* labelThatHasChanged) override;
+        
+        //! @brief Returns the document name.
+        std::string getName() const;
+        
+        //! @brief Returns the session host.
+        std::string getHost() const;
+        
+        //! @brief Returns the session port.
+        uint16_t getSessionPort() const;
+        
+        //! @brief Returns the session id.
+        uint64_t getSessionId() const;
+        
+        //! @brief Update the document session
+        void update(DocumentBrowser::Drive::DocumentSession* doc, int row, bool now_selected);
+        
+        //! @brief Returns true if the two documents refer to the same session_id
+        bool operator==(DocumentBrowser::Drive::DocumentSession const& other_document) const;
+        
+    private: // methods
+        
+        //! @internal Called by the DriveView when the document has changed.
+        void documentSessionChanged();
+        
+    private: // variables
+        
+        DocumentBrowser::Drive::DocumentSession*    m_document;
+        BrowserButton                               m_open_btn;
+        juce::Label                                 m_name_label;
+        
+        int                                         m_row;
+        bool                                        m_selected;
+        
+        friend DriveView;
     };
 }
 
