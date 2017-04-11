@@ -24,6 +24,8 @@
 #include "KiwiApp_DocumentBrowserView.hpp"
 #include "KiwiApp_Instance.hpp"
 
+#include "KiwiApp_BinaryData.hpp"
+
 namespace kiwi
 {
     // ================================================================================ //
@@ -141,7 +143,9 @@ namespace kiwi
     
     DocumentBrowserView::DriveView::DocumentSessionView::DocumentSessionView(DocumentBrowser::Drive::DocumentSession& document) :
     m_document(&document),
-    m_open_btn("open")
+    m_open_btn("open"),
+    m_kiwi_filetype_img(juce::ImageCache::getFromMemory(binary_data::images::kiwi_filetype_png,
+                                                        binary_data::images::kiwi_filetype_png_size))
     {
         m_open_btn.setCommand(std::bind(&DocumentBrowser::Drive::DocumentSession::open, m_document));
         m_open_btn.setSize(30, 20);
@@ -225,6 +229,10 @@ namespace kiwi
         
         g.setColour(bg_color.darker(0.5f));
         g.fillRect(0, getBottom() - 1, getWidth(), getBottom());
+        
+        g.drawImage(m_kiwi_filetype_img,
+                    juce::Rectangle<float>(10, 5, 30, 30),
+                    juce::RectanglePlacement::stretchToFit, false);
     }
     
     void DocumentBrowserView::DriveView::DocumentSessionView::resized()
@@ -234,7 +242,7 @@ namespace kiwi
         m_open_btn.setTopRightPosition(bounds.getWidth() - 5,
                                        bounds.getHeight() * 0.5 - m_open_btn.getHeight() * 0.5);
         
-        m_name_label.setBounds(bounds.reduced(5).withRight(m_open_btn.getX() - 5));
+        m_name_label.setBounds(bounds.reduced(5).withRight(m_open_btn.getX() - 5).withLeft(40));
     }
     
     void DocumentBrowserView::DriveView::DocumentSessionView::mouseEnter(juce::MouseEvent const& event)
@@ -274,7 +282,9 @@ namespace kiwi
     DocumentBrowserView::DriveView::Header::Header(DocumentBrowser::Drive& drive) :
     m_drive(drive),
     m_refresh_btn(std::make_unique<BrowserButton>("refresh")),
-    m_create_document_btn(std::make_unique<BrowserButton>("create"))
+    m_create_document_btn(std::make_unique<BrowserButton>("create")),
+    m_folder_img(juce::ImageCache::getFromMemory(binary_data::images::folder_png,
+                                                 binary_data::images::folder_png_size))
     {
         m_create_document_btn->setCommand(std::bind(&DocumentBrowser::Drive::createNewDocument, &m_drive));
         m_create_document_btn->setSize(35, 20);
@@ -302,9 +312,15 @@ namespace kiwi
     {
         g.fillAll(juce::Colour(0xFF4E4E4E));
         
+        g.drawImage(m_folder_img,
+                    juce::Rectangle<float>(15, 5, 20, 20),
+                    juce::RectanglePlacement::stretchToFit, false);
+        
         g.setColour(juce::Colours::whitesmoke);
-        g.drawFittedText("• " + m_drive.getName(),
-                         getLocalBounds().reduced(8, 6).removeFromTop(22),
+        g.drawFittedText(m_drive.getName(),
+                         getLocalBounds()
+                         .withLeft(40)
+                         .withRight(m_create_document_btn->getX() - 5),
                          juce::Justification::centredLeft, 1);
         
         const juce::Colour color(0xFF3F3B4E);
@@ -324,7 +340,7 @@ namespace kiwi
         
         m_document_list.setMultipleSelectionEnabled(false);
         m_document_list.setRowSelectedOnMouseDown(true);
-        m_document_list.setRowHeight(30);
+        m_document_list.setRowHeight(40);
         
         auto* header = new Header(m_drive);
         header->setSize(getWidth(), 30);

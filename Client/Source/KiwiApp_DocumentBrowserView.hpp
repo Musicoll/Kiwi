@@ -172,6 +172,7 @@ namespace kiwi
         DocumentBrowser::Drive&         m_drive;
         std::unique_ptr<BrowserButton>  m_refresh_btn;
         std::unique_ptr<BrowserButton>  m_create_document_btn;
+        const juce::Image               m_folder_img;
     };
     
     // ================================================================================ //
@@ -262,6 +263,8 @@ namespace kiwi
         DocumentBrowser::Drive::DocumentSession*    m_document;
         BrowserButton                               m_open_btn;
         juce::Label                                 m_name_label;
+        
+        const juce::Image                           m_kiwi_filetype_img;
         
         int                                         m_row;
         bool                                        m_selected;

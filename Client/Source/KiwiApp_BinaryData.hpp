@@ -66,6 +66,15 @@ namespace kiwi
 
             }
         }
+        namespace images
+        {
+            extern char const* folder_png;
+            const int folder_png_size = 2557;
+
+            extern char const* kiwi_filetype_png;
+            const int kiwi_filetype_png_size = 40975;
+
+        }
         namespace settings
         {
             extern char const* network_settings;
