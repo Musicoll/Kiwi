@@ -222,6 +222,15 @@ namespace kiwi
         //! @brief Called when resized.
         void resized() override;
         
+        //! @brief juce::Component::mouseEnter
+        void mouseEnter(juce::MouseEvent const& event) override;
+        
+        //! @brief juce::Component::mouseExit
+        void mouseExit(juce::MouseEvent const& event) override;
+        
+        //! @brief juce::Component::mouseDoubleClick
+        void mouseDoubleClick(juce::MouseEvent const& event) override;
+        
         //! @brief Called when a Label's text has changed.
         void labelTextChanged(juce::Label* labelThatHasChanged) override;
         
@@ -256,6 +265,7 @@ namespace kiwi
         
         int                                         m_row;
         bool                                        m_selected;
+        bool                                        m_mouseover = false;
         
         friend DriveView;
     };

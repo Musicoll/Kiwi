@@ -155,6 +155,8 @@ namespace kiwi
         m_name_label.setEditable(false, true, true);
         m_name_label.addListener(this);
         
+        m_name_label.setInterceptsMouseClicks(false, false);
+        
         addAndMakeVisible(m_name_label);
     }
     
@@ -213,10 +215,9 @@ namespace kiwi
     void DocumentBrowserView::DriveView::DocumentSessionView::paint(juce::Graphics& g)
     {
         const auto bounds = getLocalBounds();
-        const bool mouseover = m_selected;
         const juce::Colour bg_color = juce::Colour(0xDDFFFFFF);
         
-        g.setColour(mouseover ? bg_color.brighter(0.1f) : bg_color);
+        g.setColour(m_mouseover ? bg_color.darker(0.1f) : bg_color);
         g.fillAll();
         
         g.setColour(juce::Colours::grey);
@@ -234,6 +235,23 @@ namespace kiwi
                                        bounds.getHeight() * 0.5 - m_open_btn.getHeight() * 0.5);
         
         m_name_label.setBounds(bounds.reduced(5).withRight(m_open_btn.getX() - 5));
+    }
+    
+    void DocumentBrowserView::DriveView::DocumentSessionView::mouseEnter(juce::MouseEvent const& event)
+    {
+        m_mouseover = true;
+        repaint();
+    }
+    
+    void DocumentBrowserView::DriveView::DocumentSessionView::mouseExit(juce::MouseEvent const& event)
+    {
+        m_mouseover = false;
+        repaint();
+    }
+    
+    void DocumentBrowserView::DriveView::DocumentSessionView::mouseDoubleClick(juce::MouseEvent const& event)
+    {
+        m_name_label.showEditor();
     }
     
     void DocumentBrowserView::DriveView::DocumentSessionView::labelTextChanged(juce::Label* label)
@@ -329,8 +347,6 @@ namespace kiwi
     
     void DocumentBrowserView::DriveView::resized()
     {
-        std::cout << "resized" << std::endl;
-        std::cout << "bounds : " << getLocalBounds().toString() << std::endl;
         m_document_list.setBounds(getLocalBounds());
     }
     
@@ -358,10 +374,7 @@ namespace kiwi
     void DocumentBrowserView::DriveView::paintListBoxItem(int rowNumber, juce::Graphics& g,
                                                           int width, int height, bool selected)
     {
-        const juce::Colour color(0xFF3F3B4E);
-        
-        g.setColour(color);
-        g.fillAll();
+        ;
     }
     
     juce::Component* DocumentBrowserView::DriveView::refreshComponentForRow(int row, bool selected,
