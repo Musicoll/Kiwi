@@ -133,7 +133,6 @@ namespace kiwi
     private: // classes
         
         class Header;
-        class BrowserButton;
         class DocumentSessionView;
         
     private: // methods
@@ -147,6 +146,32 @@ namespace kiwi
         std::vector<juce::ScopedPointer<DocumentSessionView>>   m_documents = {};
         juce::ListBox                                       	m_document_list;
     };
+    
+    // ================================================================================ //
+    //                            DOCUMENT BROWSER IMAGE BUTTON                         //
+    // ================================================================================ //
+    
+    class ImageButton : public juce::DrawableButton
+    {
+    public: // methods
+        
+        //! @brief Constructor.
+        ImageButton(juce::String const& button_text);
+        
+        //! @brief Destructor.
+        ~ImageButton() = default;
+        
+        //! @brief This method is called when the button has been clicked.
+        void clicked(juce::ModifierKeys const& modifiers) override;
+        
+        //! @brief Set the command to execute when the button has been clicked.
+        void setCommand(std::function<void(void)> fn);
+        
+    private: // members
+        
+        std::function<void(void)> m_command;
+    };
+    
     
     // ================================================================================ //
     //                            DOCUMENT BROWSER PANEL HEADER                         //
@@ -170,37 +195,11 @@ namespace kiwi
         
     private: // members
         DocumentBrowser::Drive&         m_drive;
-        std::unique_ptr<BrowserButton>  m_refresh_btn;
-        std::unique_ptr<BrowserButton>  m_create_document_btn;
+        std::unique_ptr<ImageButton>    m_refresh_btn;
+        std::unique_ptr<ImageButton>    m_create_document_btn;
         const juce::Image               m_folder_img;
-    };
-    
-    // ================================================================================ //
-    //                            DOCUMENT BROWSER PANEL BUTTON                         //
-    // ================================================================================ //
-    
-    class DocumentBrowserView::DriveView::BrowserButton : public juce::Button
-    {
-    public: // methods
-        
-        //! @brief Constructor.
-        BrowserButton(juce::String const& button_text);
-        
-        //! @brief Destructor.
-        ~BrowserButton() = default;
-        
-        //! @brief draw the button.
-        void paintButton(juce::Graphics& g, bool isMouseOverButton, bool isButtonDown) override;
-        
-        //! @brief This method is called when the button has been clicked.
-        void clicked(juce::ModifierKeys const& modifiers) override;
-        
-        //! @brief Set the command to execute when the button has been clicked.
-        void setCommand(std::function<void(void)> fn);
-        
-    private: // members
-        
-        std::function<void(void)> m_command;
+        std::unique_ptr<juce::Drawable> m_refresh_img;
+        std::unique_ptr<juce::Drawable> m_create_img;
     };
     
     // ================================================================================ //
@@ -212,7 +211,7 @@ namespace kiwi
     public: // methods
         
         //! @brief Constructor.
-        DocumentSessionView(DocumentBrowser::Drive::DocumentSession& document);
+        DocumentSessionView(DriveView& drive_view, DocumentBrowser::Drive::DocumentSession& document);
         
         //! @brief Destructor.
         ~DocumentSessionView() = default;
@@ -260,11 +259,13 @@ namespace kiwi
         
     private: // variables
         
-        DocumentBrowser::Drive::DocumentSession*    m_document;
-        BrowserButton                               m_open_btn;
+        DriveView&                                  m_drive_view;
+        DocumentBrowser::Drive::DocumentSession*    m_document = nullptr;
+        std::unique_ptr<ImageButton>                m_open_btn;
         juce::Label                                 m_name_label;
         
         const juce::Image                           m_kiwi_filetype_img;
+        std::unique_ptr<juce::Drawable>             m_open_img;
         
         int                                         m_row;
         bool                                        m_selected;
