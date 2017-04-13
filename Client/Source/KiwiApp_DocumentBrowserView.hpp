@@ -127,6 +127,12 @@ namespace kiwi
         juce::Component* refreshComponentForRow(int row, bool selected,
                                                 juce::Component* component_to_update) override;
         
+        //! @brief Called when the user clicking on a part of the list where there are no rows.
+        void backgroundClicked(juce::MouseEvent const& e) override;
+        
+        //! @brief Called when the return key is pressed.
+        void returnKeyPressed(int last_row_selected) override;
+        
         //! @brief Returns true if the two drive view refer to the same drive.
         bool operator==(DocumentBrowser::Drive const& other_drive) const;
         
@@ -182,7 +188,7 @@ namespace kiwi
     public: // methods
         
         //! @brief Constructor
-        Header(DocumentBrowser::Drive& drive);
+        Header(juce::ListBox& listbox, DocumentBrowser::Drive& drive);
         
         //! @brief Destructor
         ~Header() = default;
@@ -193,7 +199,12 @@ namespace kiwi
         //! @brief juce::Component::resized
         void resized() override;
         
+        //! @brief juce::Component::mouseDown
+        void mouseDown(juce::MouseEvent const& event) override;
+        
     private: // members
+        
+        juce::ListBox&                  m_listbox;
         DocumentBrowser::Drive&         m_drive;
         std::unique_ptr<ImageButton>    m_refresh_btn;
         std::unique_ptr<ImageButton>    m_create_document_btn;
@@ -211,10 +222,13 @@ namespace kiwi
     public: // methods
         
         //! @brief Constructor.
-        DocumentSessionView(DriveView& drive_view, DocumentBrowser::Drive::DocumentSession& document);
+        DocumentSessionView(juce::ListBox& listbox, DocumentBrowser::Drive::DocumentSession& document);
         
         //! @brief Destructor.
-        ~DocumentSessionView() = default;
+        ~DocumentSessionView();
+        
+        //! @brief Show the document name editor.
+        void showEditor();
         
         //! @brief juce::Component::paint
         void paint(juce::Graphics& g) override;
@@ -227,6 +241,12 @@ namespace kiwi
         
         //! @brief juce::Component::mouseExit
         void mouseExit(juce::MouseEvent const& event) override;
+        
+        //! @brief juce::Component::mouseDown
+        void mouseDown(juce::MouseEvent const& event) override;
+        
+        //! @brief juce::Component::mouseUp
+        void mouseUp(juce::MouseEvent const& event) override;
         
         //! @brief juce::Component::mouseDoubleClick
         void mouseDoubleClick(juce::MouseEvent const& event) override;
@@ -259,7 +279,7 @@ namespace kiwi
         
     private: // variables
         
-        DriveView&                                  m_drive_view;
+        juce::ListBox&                              m_listbox;
         DocumentBrowser::Drive::DocumentSession*    m_document = nullptr;
         std::unique_ptr<ImageButton>                m_open_btn;
         juce::Label                                 m_name_label;
@@ -270,6 +290,7 @@ namespace kiwi
         int                                         m_row;
         bool                                        m_selected;
         bool                                        m_mouseover = false;
+        bool                                        m_select_row_on_mouse_up = false;
         
         friend DriveView;
     };

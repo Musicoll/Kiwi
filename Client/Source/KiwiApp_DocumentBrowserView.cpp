@@ -84,8 +84,6 @@ namespace kiwi
         int last_bottom = 0;
         for(auto const& drive_view_uptr : m_drives)
         {
-            //drive_view_uptr->setBounds(0, last_bottom, bounds.getWidth(), drive_view_uptr->getHeight());
-            
             drive_view_uptr->setBounds(bounds);
             last_bottom = drive_view_uptr->getBottom();
         }
@@ -97,7 +95,7 @@ namespace kiwi
     }
     
     // ================================================================================ //
-    //                                  BROWSER BUTTON                                  //
+    //                                   IMAGE BUTTON                                   //
     // ================================================================================ //
     
     ImageButton::ImageButton(juce::String const& button_text) :
@@ -120,9 +118,9 @@ namespace kiwi
     //                               DOCUMENT SESSION VIEW                              //
     // ================================================================================ //
     
-    DocumentBrowserView::DriveView::DocumentSessionView::DocumentSessionView(DriveView& drive_view,
+    DocumentBrowserView::DriveView::DocumentSessionView::DocumentSessionView(juce::ListBox& listbox,
                                                                              DocumentBrowser::Drive::DocumentSession& document) :
-    m_drive_view(drive_view),
+    m_listbox(listbox),
     m_document(&document),
     m_open_btn(std::make_unique<ImageButton>("open")),
     m_kiwi_filetype_img(juce::ImageCache::getFromMemory(binary_data::images::kiwi_filetype_png,
@@ -130,12 +128,14 @@ namespace kiwi
     m_open_img(juce::Drawable::createFromImageData(binary_data::images::open_png,
                                                    binary_data::images::open_png_size))
     {
+        addMouseListener(this, true);
+        
         m_open_btn->setCommand(std::bind(&DocumentBrowser::Drive::DocumentSession::open, m_document));
         m_open_btn->setSize(40, 40);
         m_open_btn->setTooltip("open this patcher");
         m_open_btn->setImages(m_open_img.get());
         m_open_btn->setButtonStyle(juce::DrawableButton::ButtonStyle::ImageFitted);
-        addAndMakeVisible(*m_open_btn);
+        addChildComponent(*m_open_btn);
         
         // label setup
         m_name_label.setText(getName(), juce::NotificationType::dontSendNotification);
@@ -147,6 +147,11 @@ namespace kiwi
         m_name_label.setInterceptsMouseClicks(false, false);
         
         addAndMakeVisible(m_name_label);
+    }
+    
+    DocumentBrowserView::DriveView::DocumentSessionView::~DocumentSessionView()
+    {
+        removeMouseListener(this);
     }
     
     uint16_t DocumentBrowserView::DriveView::DocumentSessionView::getSessionPort() const
@@ -180,6 +185,7 @@ namespace kiwi
     void DocumentBrowserView::DriveView::DocumentSessionView::update(DocumentBrowser::Drive::DocumentSession* doc, int row, bool now_selected)
     {
         m_document = doc;
+        m_row = row;
         
         if(m_document != nullptr)
         {
@@ -201,16 +207,18 @@ namespace kiwi
     void DocumentBrowserView::DriveView::DocumentSessionView::paint(juce::Graphics& g)
     {
         const auto bounds = getLocalBounds();
-        const juce::Colour bg_color = juce::Colour(0xDDFFFFFF);
+        const juce::Colour bg_color(0xDDFFFFFF);
+        const juce::Colour selected_color_color(juce::Colours::lightblue);
         
-        g.setColour(m_mouseover ? bg_color.darker(0.1f) : bg_color);
+        g.setColour(m_selected ? selected_color_color : m_mouseover ? bg_color.darker(0.1f) : bg_color);
         g.fillAll();
         
+        // document status notifier (connected / disconnected / not-connected)
         g.setColour(juce::Colours::grey);
         g.fillRect(0, 0, 5, getHeight());
         
         g.setColour(bg_color.darker(0.5f));
-        g.fillRect(0, getBottom() - 1, getWidth(), getBottom());
+        g.drawHorizontalLine(getBottom() - 1, 0., getWidth());
         
         g.drawImage(m_kiwi_filetype_img,
                     juce::Rectangle<float>(10, 5, 30, 30),
@@ -220,27 +228,55 @@ namespace kiwi
     void DocumentBrowserView::DriveView::DocumentSessionView::resized()
     {
         const auto bounds = getLocalBounds();
-        
         m_open_btn->setBounds(bounds.reduced(5).withLeft(bounds.getWidth() - 40));
-        
         m_name_label.setBounds(bounds.reduced(5).withRight(m_open_btn->getX() - 5).withLeft(40));
     }
     
-    void DocumentBrowserView::DriveView::DocumentSessionView::mouseEnter(juce::MouseEvent const& event)
+    void DocumentBrowserView::DriveView::DocumentSessionView::mouseEnter(juce::MouseEvent const& e)
     {
         m_mouseover = true;
+        m_open_btn->setVisible(true);
         repaint();
     }
     
-    void DocumentBrowserView::DriveView::DocumentSessionView::mouseExit(juce::MouseEvent const& event)
+    void DocumentBrowserView::DriveView::DocumentSessionView::mouseExit(juce::MouseEvent const& e)
     {
         m_mouseover = false;
+        m_open_btn->setVisible(false);
         repaint();
+    }
+    
+    void DocumentBrowserView::DriveView::DocumentSessionView::mouseDown(juce::MouseEvent const& e)
+    {
+        m_select_row_on_mouse_up = false;
+        
+        if(isEnabled())
+        {
+            if(!m_selected)
+            {
+                m_listbox.selectRowsBasedOnModifierKeys(m_row, e.mods, false);
+            }
+            else
+            {
+                m_select_row_on_mouse_up = true;
+            }
+        }
+    }
+    
+    void DocumentBrowserView::DriveView::DocumentSessionView::mouseUp(juce::MouseEvent const& e)
+    {
+        if(m_select_row_on_mouse_up && e.mouseWasClicked() && isEnabled())
+        {
+            m_listbox.selectRowsBasedOnModifierKeys(m_row, e.mods, true);
+        }
     }
     
     void DocumentBrowserView::DriveView::DocumentSessionView::mouseDoubleClick(juce::MouseEvent const& event)
     {
-        m_name_label.showEditor();
+        if(m_document)
+        {
+            m_document->open();
+        }
     }
     
     void DocumentBrowserView::DriveView::DocumentSessionView::labelTextChanged(juce::Label* label)
@@ -249,6 +285,11 @@ namespace kiwi
         {
             m_document->rename(m_name_label.getText().toStdString());
         }
+    }
+    
+    void DocumentBrowserView::DriveView::DocumentSessionView::showEditor()
+    {
+        m_name_label.showEditor();
     }
     
     bool DocumentBrowserView::DriveView::DocumentSessionView::operator==(DocumentBrowser::Drive::DocumentSession const& other_document) const
@@ -260,7 +301,8 @@ namespace kiwi
     //                            DOCUMENT BROWSER PANEL HEADER                         //
     // ================================================================================ //
     
-    DocumentBrowserView::DriveView::Header::Header(DocumentBrowser::Drive& drive) :
+    DocumentBrowserView::DriveView::Header::Header(juce::ListBox& listbox, DocumentBrowser::Drive& drive) :
+    m_listbox(listbox),
     m_drive(drive),
     m_refresh_btn(std::make_unique<ImageButton>("refresh")),
     m_create_document_btn(std::make_unique<ImageButton>("create")),
@@ -312,7 +354,12 @@ namespace kiwi
                          juce::Justification::centredLeft, 1);
         
         g.setColour(color.darker(0.3));
-        g.drawHorizontalLine(bounds.getBottom() - 2, 0, getWidth());
+        g.drawHorizontalLine(bounds.getBottom() - 1, 0, getWidth());
+    }
+    
+    void DocumentBrowserView::DriveView::Header::mouseDown(juce::MouseEvent const& e)
+    {
+        m_listbox.getModel()->backgroundClicked(e);
     }
     
     // ================================================================================ //
@@ -329,7 +376,7 @@ namespace kiwi
         m_document_list.setRowSelectedOnMouseDown(true);
         m_document_list.setRowHeight(40);
         
-        auto* header = new Header(m_drive);
+        auto* header = new Header(m_document_list, m_drive);
         header->setSize(getWidth(), 50);
         m_document_list.setHeaderComponent(header);
         
@@ -384,7 +431,7 @@ namespace kiwi
         auto const& documents = m_drive.getDocuments();
         if(row < documents.size() && component_to_update == nullptr)
         {
-            component_to_update = new DocumentSessionView(*this, *documents[row]);
+            component_to_update = new DocumentSessionView(m_document_list, *documents[row]);
             std::cout << "component created for row: " << row << std::endl;
         }
         
@@ -394,6 +441,23 @@ namespace kiwi
         }
 
         return component_to_update;
+    }
+    
+    void DocumentBrowserView::DriveView::backgroundClicked(juce::MouseEvent const&)
+    {
+        m_document_list.deselectAllRows();
+    }
+    
+    void DocumentBrowserView::DriveView::returnKeyPressed(int last_row_selected)
+    {
+        if(m_document_list.getNumSelectedRows() > 0)
+        {
+            auto* c = m_document_list.getComponentForRowNumber(last_row_selected);
+            if(c)
+            {
+                static_cast<DocumentSessionView*>(c)->showEditor();
+            }
+        }
     }
     
     bool DocumentBrowserView::DriveView::operator==(DocumentBrowser::Drive const& other_drive) const
