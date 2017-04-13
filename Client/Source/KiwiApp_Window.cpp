@@ -36,7 +36,7 @@ namespace kiwi
                    bool is_main_window,
                    juce::String settings_name,
                    bool add_menubar) :
-    DocumentWindow(name, juce::Colours::white, allButtons, true),
+    DocumentWindow(name, juce::Colours::lightgrey, allButtons, true),
     m_settings_name(settings_name)
     {
         setUsingNativeTitleBar(true);

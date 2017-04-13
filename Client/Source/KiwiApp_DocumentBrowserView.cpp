@@ -93,10 +93,7 @@ namespace kiwi
     
     void DocumentBrowserView::paint(juce::Graphics& g)
     {
-        const juce::Colour color(0xFF3F3B4E);
-        
-        g.setColour(color);
-        g.fillAll();
+        ;
     }
     
     // ================================================================================ //

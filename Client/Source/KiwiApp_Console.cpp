@@ -153,7 +153,9 @@ namespace kiwi
     
     void Console::paint(juce::Graphics& g)
     {
-        int width   = m_table.getVisibleContentWidth();
+        g.fillAll(juce::Colours::lightgrey);
+        
+        int width = m_table.getVisibleContentWidth();
         int rowheight = m_table.getRowHeight();
         g.setColour(juce::Colours::black.withAlpha(0.15f));
         for(int i = m_table.getHeaderHeight() - 1; i < getHeight(); i+= rowheight)
@@ -192,6 +194,8 @@ namespace kiwi
         sConsoleHistory history = getHistory();
         if(!history) return; //abort
         
+        const juce::Colour bgcolor(juce::Colours::lightgrey);
+        
         auto msg = history->get(rowNumber);
         if(msg)
         {
@@ -209,16 +213,16 @@ namespace kiwi
             }
             else
             {
-                g.fillAll(juce::Colour(0xfffefefe));
+                g.fillAll(bgcolor);
             }
         }
         else
         {
-            g.fillAll(juce::Colour(0xfffefefe));
+            g.fillAll(bgcolor);
         }
     
         g.setColour(juce::Colours::black.withAlpha(0.15f));
-        g.drawLine(0, height, width, height);
+        g.drawHorizontalLine(height - 1, 0, width);
     }
     
     void Console::paintOverChildren(juce::Graphics &g)
@@ -226,14 +230,14 @@ namespace kiwi
         int numColumns = m_table.getHeader().getNumColumns(true);
         float left = 0, width = 0;
         
-        for(int i = 0; i < numColumns; i++)
+        for(int i = 0; i < numColumns - 1; i++)
         {
             width = m_table.getHeader().getColumnWidth(m_table.getHeader().getColumnIdOfIndex(i, true));
             
             if(m_table.getVisibleContentWidth() >= width + left)
             {
                 g.setColour(juce::Colours::black.withAlpha(0.15f));
-                g.drawLine(left + width, m_table.getHeaderHeight(), left + width, getHeight());
+                g.drawVerticalLine(left + width - 0.5, m_table.getHeaderHeight(), getHeight());
             }
             
             left += width;
