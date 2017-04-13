@@ -31,7 +31,7 @@ namespace kiwi
     
     Console::Console(sConsoleHistory history) :
     m_history(history),
-    m_font(13.f)
+    m_font(16.f)
     {
         assert(history);
 

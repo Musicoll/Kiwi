@@ -140,11 +140,11 @@ namespace kiwi
         
         const auto bdcolor = juce::Colours::black.withAlpha(0.5f);
         
-        g.setColour(bdcolor);
-        g.fillRect(r.removeFromBottom(1));
-        
         g.setColour(juce::Colour(0xFF4E4E4E));
         g.fillRect(r);
+        
+        g.setColour(bdcolor);
+        g.fillRect(r.removeFromBottom(1));
         
         g.setColour(bdcolor);
         for(int i = header.getNumColumns(true) - 1; --i >= 0;)
