@@ -29,6 +29,8 @@
 #include "KiwiApp_Network/KiwiApp_DocumentBrowser.hpp"
 #include "KiwiApp_Window.hpp"
 
+#include "KiwiApp_Components/KiwiApp_ImageButton.hpp"
+
 namespace kiwi
 {
     class Instance;
@@ -154,32 +156,6 @@ namespace kiwi
     };
     
     // ================================================================================ //
-    //                            DOCUMENT BROWSER IMAGE BUTTON                         //
-    // ================================================================================ //
-    
-    class ImageButton : public juce::DrawableButton
-    {
-    public: // methods
-        
-        //! @brief Constructor.
-        ImageButton(juce::String const& button_text);
-        
-        //! @brief Destructor.
-        ~ImageButton() = default;
-        
-        //! @brief This method is called when the button has been clicked.
-        void clicked(juce::ModifierKeys const& modifiers) override;
-        
-        //! @brief Set the command to execute when the button has been clicked.
-        void setCommand(std::function<void(void)> fn);
-        
-    private: // members
-        
-        std::function<void(void)> m_command;
-    };
-    
-    
-    // ================================================================================ //
     //                            DOCUMENT BROWSER PANEL HEADER                         //
     // ================================================================================ //
     
@@ -209,8 +185,6 @@ namespace kiwi
         std::unique_ptr<ImageButton>    m_refresh_btn;
         std::unique_ptr<ImageButton>    m_create_document_btn;
         const juce::Image               m_folder_img;
-        std::unique_ptr<juce::Drawable> m_refresh_img;
-        std::unique_ptr<juce::Drawable> m_create_img;
     };
     
     // ================================================================================ //
@@ -285,7 +259,6 @@ namespace kiwi
         juce::Label                                 m_name_label;
         
         const juce::Image                           m_kiwi_filetype_img;
-        std::unique_ptr<juce::Drawable>             m_open_img;
         
         int                                         m_row;
         bool                                        m_selected;

@@ -95,26 +95,6 @@ namespace kiwi
     }
     
     // ================================================================================ //
-    //                                   IMAGE BUTTON                                   //
-    // ================================================================================ //
-    
-    ImageButton::ImageButton(juce::String const& button_text) :
-    juce::DrawableButton(button_text, juce::DrawableButton::ButtonStyle::ImageAboveTextLabel)
-    {
-        setSize(30, 30);
-    }
-    
-    void ImageButton::setCommand(std::function<void(void)> fn)
-    {
-        m_command = fn;
-    }
-    
-    void ImageButton::clicked(juce::ModifierKeys const& modifiers)
-    {
-        if(m_command) { m_command(); }
-    }
-    
-    // ================================================================================ //
     //                               DOCUMENT SESSION VIEW                              //
     // ================================================================================ //
     
@@ -122,30 +102,24 @@ namespace kiwi
                                                                              DocumentBrowser::Drive::DocumentSession& document) :
     m_listbox(listbox),
     m_document(&document),
-    m_open_btn(std::make_unique<ImageButton>("open")),
+    m_open_btn(std::make_unique<ImageButton>("open", std::unique_ptr<juce::Drawable>(juce::Drawable::createFromImageData(binary_data::images::open_png, binary_data::images::open_png_size)),
+                                             ImageButton::ButtonStyle::ImageFitted)),
     m_kiwi_filetype_img(juce::ImageCache::getFromMemory(binary_data::images::kiwi_filetype_png,
-                                                        binary_data::images::kiwi_filetype_png_size)),
-    m_open_img(juce::Drawable::createFromImageData(binary_data::images::open_png,
-                                                   binary_data::images::open_png_size))
+                                                        binary_data::images::kiwi_filetype_png_size))
     {
         addMouseListener(this, true);
         
         m_open_btn->setCommand(std::bind(&DocumentBrowser::Drive::DocumentSession::open, m_document));
         m_open_btn->setSize(40, 40);
         m_open_btn->setTooltip("open this patcher");
-        m_open_btn->setImages(m_open_img.get());
-        m_open_btn->setButtonStyle(juce::DrawableButton::ButtonStyle::ImageFitted);
         addChildComponent(*m_open_btn);
         
         // label setup
         m_name_label.setText(getName(), juce::NotificationType::dontSendNotification);
         m_name_label.setSize(1, 1);
-        
         m_name_label.setEditable(false, true, true);
         m_name_label.addListener(this);
-        
         m_name_label.setInterceptsMouseClicks(false, false);
-        
         addAndMakeVisible(m_name_label);
     }
     
@@ -190,10 +164,6 @@ namespace kiwi
         if(m_document != nullptr)
         {
             m_open_btn->setCommand(std::bind(&DocumentBrowser::Drive::DocumentSession::open, m_document));
-        }
-        
-        if(m_document)
-        {
             m_name_label.setText(getName(), juce::NotificationType::dontSendNotification);
         }
         
@@ -304,27 +274,21 @@ namespace kiwi
     DocumentBrowserView::DriveView::Header::Header(juce::ListBox& listbox, DocumentBrowser::Drive& drive) :
     m_listbox(listbox),
     m_drive(drive),
-    m_refresh_btn(std::make_unique<ImageButton>("refresh")),
-    m_create_document_btn(std::make_unique<ImageButton>("create")),
+    m_refresh_btn(std::make_unique<ImageButton>("refresh", std::unique_ptr<juce::Drawable>(juce::Drawable::createFromImageData(binary_data::images::refresh_png, binary_data::images::refresh_png_size)))),
+    m_create_document_btn(std::make_unique<ImageButton>("create", std::unique_ptr<juce::Drawable>(juce::Drawable::createFromImageData(binary_data::images::plus_png, binary_data::images::plus_png_size)))),
     m_folder_img(juce::ImageCache::getFromMemory(binary_data::images::folder_png,
-                                                 binary_data::images::folder_png_size)),
-    m_refresh_img(juce::Drawable::createFromImageData(binary_data::images::refresh_png,
-                                                            binary_data::images::refresh_png_size)),
-    m_create_img(juce::Drawable::createFromImageData(binary_data::images::plus_png,
-                                                     binary_data::images::plus_png_size))
+                                                 binary_data::images::folder_png_size))
     {
-        m_create_document_btn->setImages(m_create_img.get());
         m_create_document_btn->setCommand(std::bind(&DocumentBrowser::Drive::createNewDocument, &m_drive));
         m_create_document_btn->setSize(40, 40);
         m_create_document_btn->setTooltip("Create a new patcher on this drive");
-        m_create_document_btn->setColour(ImageButton::textColourId, juce::Colours::whitesmoke);
+        m_create_document_btn->setColour(ImageButton::ColourIds::textColourId, juce::Colours::whitesmoke);
         addAndMakeVisible(*m_create_document_btn);
         
-        m_refresh_btn->setImages(m_refresh_img.get());
         m_refresh_btn->setCommand(std::bind(&DocumentBrowser::Drive::refresh, &m_drive));
         m_refresh_btn->setSize(40, 40);
         m_refresh_btn->setTooltip("Refresh Document list");
-        m_refresh_btn->setColour(ImageButton::textColourId, juce::Colours::whitesmoke);
+        m_refresh_btn->setColour(ImageButton::ColourIds::textColourId, juce::Colours::whitesmoke);
         addAndMakeVisible(*m_refresh_btn);
     }
     
@@ -428,8 +392,14 @@ namespace kiwi
     juce::Component* DocumentBrowserView::DriveView::refreshComponentForRow(int row, bool selected,
                                                                             juce::Component* component_to_update)
     {
+        std::cout << "refreshComponentForRow " << row << '\n';
         auto const& documents = m_drive.getDocuments();
-        if(row < documents.size() && component_to_update == nullptr)
+        
+        if(row >= documents.size())
+        {
+            component_to_update = nullptr;
+        }
+        else if(component_to_update == nullptr)
         {
             component_to_update = new DocumentSessionView(m_document_list, *documents[row]);
             std::cout << "component created for row: " << row << std::endl;
