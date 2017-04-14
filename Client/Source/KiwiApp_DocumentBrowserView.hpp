@@ -80,7 +80,7 @@ namespace kiwi
     
     //! @brief Listen to document browser changes.
     class DocumentBrowserView::DriveView :
-    public juce::Component,
+    public juce::ListBox,
     public juce::ListBoxModel,
     public DocumentBrowser::Drive::Listener
     {
@@ -94,12 +94,6 @@ namespace kiwi
         
         //! @brief Returns the session host name.
         std::string getHostName() const;
-        
-        //! @brief Called when resized.
-        void resized() override;
-        
-        //! @brief juce::Component::paint
-        void paint(juce::Graphics& g) override;
         
         // ========= DocumentBrowser::Drive::Listener
         
@@ -152,7 +146,6 @@ namespace kiwi
         
         DocumentBrowser::Drive&                                 m_drive;
         std::vector<juce::ScopedPointer<DocumentSessionView>>   m_documents = {};
-        juce::ListBox                                       	m_document_list;
     };
     
     // ================================================================================ //

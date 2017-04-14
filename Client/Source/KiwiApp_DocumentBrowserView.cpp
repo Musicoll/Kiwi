@@ -331,25 +331,23 @@ namespace kiwi
     // ================================================================================ //
     
     DocumentBrowserView::DriveView::DriveView(DocumentBrowser::Drive& drive) :
-    m_drive(drive),
-    m_document_list("document list", this)
+    juce::ListBox("document list", this),
+    m_drive(drive)
     {
         m_drive.addListener(*this);
         
-        m_document_list.setMultipleSelectionEnabled(false);
-        m_document_list.setRowSelectedOnMouseDown(true);
-        m_document_list.setRowHeight(40);
+        setMultipleSelectionEnabled(false);
+        setRowSelectedOnMouseDown(true);
+        setRowHeight(40);
         
-        auto* header = new Header(m_document_list, m_drive);
+        auto* header = new Header(*this, m_drive);
         header->setSize(getWidth(), 50);
-        m_document_list.setHeaderComponent(header);
+        setHeaderComponent(header);
         
-        addAndMakeVisible(m_document_list);
+        getViewport()->setScrollBarThickness(10);
+        juce::ListBox::setColour(juce::ListBox::backgroundColourId, juce::Colour(0xFFD4D4D4));
         
-        m_document_list.getViewport()->setScrollBarThickness(10);
-        m_document_list.setColour(juce::ListBox::backgroundColourId, juce::Colour(0xFFD4D4D4));
-        
-        updateLayout();
+        updateContent();
     }
     
     DocumentBrowserView::DriveView::~DriveView()
@@ -357,25 +355,10 @@ namespace kiwi
         m_drive.removeListener(*this);
     }
     
-    void DocumentBrowserView::DriveView::resized()
-    {
-        m_document_list.setBounds(getLocalBounds());
-    }
-    
-    void DocumentBrowserView::DriveView::updateLayout()
-    {
-        m_document_list.updateContent();
-    }
-    
-    void DocumentBrowserView::DriveView::paint(juce::Graphics& g)
-    {
-        ;
-    }
-    
     void DocumentBrowserView::DriveView::driveChanged()
     {
         std::cout << "driveChanged" << '\n';
-        updateLayout();
+        updateContent();
     }
     
     int DocumentBrowserView::DriveView::getNumRows()
@@ -401,7 +384,7 @@ namespace kiwi
         }
         else if(component_to_update == nullptr)
         {
-            component_to_update = new DocumentSessionView(m_document_list, *documents[row]);
+            component_to_update = new DocumentSessionView(*this, *documents[row]);
             std::cout << "component created for row: " << row << std::endl;
         }
         
@@ -415,14 +398,14 @@ namespace kiwi
     
     void DocumentBrowserView::DriveView::backgroundClicked(juce::MouseEvent const&)
     {
-        m_document_list.deselectAllRows();
+        deselectAllRows();
     }
     
     void DocumentBrowserView::DriveView::returnKeyPressed(int last_row_selected)
     {
-        if(m_document_list.getNumSelectedRows() > 0)
+        if(getNumSelectedRows() > 0)
         {
-            auto* c = m_document_list.getComponentForRowNumber(last_row_selected);
+            auto* c = getComponentForRowNumber(last_row_selected);
             if(c)
             {
                 static_cast<DocumentSessionView*>(c)->showEditor();
