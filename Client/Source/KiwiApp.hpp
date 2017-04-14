@@ -203,6 +203,7 @@ namespace kiwi
         std::unique_ptr<MainMenuModel>                      m_menu_model;
         
         std::unique_ptr<LookAndFeel>                        m_look;
+        juce::TooltipWindow                                 m_tooltip_window;
         std::unique_ptr<StoredSettings>                     m_settings;
     };
 }

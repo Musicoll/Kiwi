@@ -30,7 +30,10 @@ namespace kiwi
     {
     public: // methods
         
-        LookAndFeel() = default;
+        //! @brief Constructor.
+        LookAndFeel();
+        
+        //! @brief Destructor.
         ~LookAndFeel() = default;
         
         //! @brief Returns the typeface for a certain font name and style.

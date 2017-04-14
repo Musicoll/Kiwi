@@ -26,6 +26,12 @@ namespace bfonts = kiwi::binary_data::fonts;
 
 namespace kiwi
 {
+    LookAndFeel::LookAndFeel()
+    {
+        setColour(juce::TooltipWindow::backgroundColourId, juce::Colour(0xff444444));
+        setColour(juce::TooltipWindow::textColourId, juce::Colours::whitesmoke);
+    }
+    
     juce::Typeface::Ptr LookAndFeel::getTypefaceForFont(juce::Font const& font)
     {
         juce::Typeface::Ptr typeface;
