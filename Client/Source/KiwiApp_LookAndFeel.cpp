@@ -28,8 +28,8 @@ namespace kiwi
 {
     LookAndFeel::LookAndFeel()
     {
-        setColour(juce::TooltipWindow::backgroundColourId, juce::Colour(0xff444444));
-        setColour(juce::TooltipWindow::textColourId, juce::Colours::whitesmoke);
+        setColour(juce::TooltipWindow::backgroundColourId, juce::Colours::lightgrey);
+        setColour(juce::TooltipWindow::textColourId, juce::Colour(0xff444444));
     }
     
     juce::Typeface::Ptr LookAndFeel::getTypefaceForFont(juce::Font const& font)
