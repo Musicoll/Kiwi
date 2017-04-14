@@ -1,0 +1,208 @@
+/*
+ ==============================================================================
+ 
+ This file is part of the KIWI library.
+ - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ 
+ Permission is granted to use this software under the terms of the GPL v2
+ (or any later version). Details can be found at: www.gnu.org/licenses
+ 
+ KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ 
+ ------------------------------------------------------------------------------
+ 
+ Contact : cicm.mshparisnord@gmail.com
+ 
+ ==============================================================================
+ */
+
+#ifndef KIWI_ENGINE_SCHEDULER_HPP_INCLUDED
+#define KIWI_ENGINE_SCHEDULER_HPP_INCLUDED
+
+#include <cstdint>
+#include <map>
+#include <list>
+#include <chrono>
+#include <stdexcept>
+#include <string>
+
+#include "KiwiEngine_ConcurrentQueue.hpp"
+
+namespace kiwi
+{
+    namespace engine
+    {
+        // ==================================================================================== //
+        //                                       SCHEDULER                                      //
+        // ==================================================================================== //
+        
+        template<class Clock>
+        class Scheduler final
+        {
+        public: // classes
+            
+            using token_t = uint64_t;
+            using clock_t = Clock;
+            using time_point_t = typename Clock::time_point;
+            using duration_t = typename Clock::duration;
+            
+            class Task;
+            
+        private: // classes
+        
+            class Producer;
+            
+            class Event;
+            
+        public: // methods
+            
+            Scheduler();
+            
+            ~Scheduler();
+            
+            token_t createProducerToken();
+            
+            void schedule(Task * task, duration_t delay = std::chrono::milliseconds(0));
+            
+            void unschedule(Task * task);
+            
+            void process();
+            
+        private: // members
+            
+            std::map<token_t, Producer> m_producers;
+            token_t                     m_next_token;
+            
+        private: // deleted methods
+            
+            Scheduler(Scheduler const& other) = delete;
+            Scheduler(Scheduler && other) = delete;
+            Scheduler& operator=(Scheduler const& other) = delete;
+            Scheduler& operator=(Scheduler && other) = delete;
+        };
+        
+        // ==================================================================================== //
+        //                                       PRODUCER                                       //
+        // ==================================================================================== //
+        
+        template <class Clock>
+        class Scheduler<Clock>::Producer final
+        {
+        public: // classes
+            
+            struct Command
+            {
+                std::weak_ptr<Event>    m_event;
+                time_point_t            m_time;
+            };
+            
+        public: // methods
+            
+            Producer();
+            
+            ~Producer();
+            
+            void schedule(Task * task, duration_t delay);
+
+            void unschedule(Task * task);
+            
+            void process(time_point_t process_time);
+            
+        private: // methods
+            
+            void remove(std::shared_ptr<Event> event);
+            
+            void insert(std::shared_ptr<Event> event);
+            
+        private: // members
+            
+            std::list<std::weak_ptr<Event>> m_events;
+            ConcurrentQueue<Command>        m_commands;
+            
+            
+        private: // deleted methods
+            
+            Producer(Producer const& other) = delete;
+            Producer(Producer && other) = delete;
+            Producer& operator=(Producer const& other) = delete;
+            Producer& operator=(Producer && other) = delete;
+        };
+        
+        // ==================================================================================== //
+        //                                       TASK                                           //
+        // ==================================================================================== //
+        
+        template <class Clock>
+        class Scheduler<Clock>::Task
+        {
+        public: // methods
+            
+            Task(Scheduler & scheduler, token_t token);
+            
+            virtual ~Task();
+            
+        private: // methods
+            
+            virtual void execute() = 0;
+            
+        private: // members
+            
+            Scheduler &             m_scheduler;
+            token_t                 m_token;
+            std::shared_ptr<Event>  m_event;
+            
+        private: // friends
+            
+            friend class Scheduler;
+            
+        private: // deleted methods
+            
+            Task();
+            Task(Task const& other) = delete;
+            Task(Task && other) = delete;
+            Task& operator=(Task const& other) = delete;
+            Task& operator=(Task && other) = delete;
+        };
+        
+        // ==================================================================================== //
+        //                                       EVENT                                          //
+        // ==================================================================================== //
+        
+        template<class Clock>
+        class Scheduler<Clock>::Event final
+        {
+        public: // methods
+            
+            Event(Task & task);
+            
+            ~Event();
+            
+            void execute();
+            
+        private: // friends
+            
+            friend class Scheduler;
+            
+        private: // members
+            
+            Task&                   m_task;
+            time_point_t            m_time;
+            
+        private: // deleted methods
+            
+            Event() = delete;
+            Event(Event const& other) = delete;
+            Event(Event && other) = delete;;
+            Event& operator=(Event && other);
+            Event& operator=(Event const& other) = delete;
+        };
+    }
+}
+
+#include "KiwiEngine_Scheduler.hpp"
+
+
+#endif // KIWI_ENGINE_SCHEDULER_HPP_INCLUDED
