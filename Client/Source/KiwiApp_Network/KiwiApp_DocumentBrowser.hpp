@@ -31,8 +31,6 @@
 
 #include "../KiwiApp_StoredSettings.hpp"
 
-#include <list>
-
 namespace kiwi
 {
     // ================================================================================ //
@@ -179,6 +177,9 @@ namespace kiwi
         
     private: // members
         
+        //! @internal Update the document list (need to be called in the juce Message thread)
+        void updateDocumentList(Api::Documents docs);
+        
         Api                         m_api;
         uint16_t                    m_session_port = 9090;
         std::string                 m_name = "Drive";
@@ -199,13 +200,13 @@ namespace kiwi
         virtual ~Listener() = default;
         
         //! @brief Called when a document session has been added.
-        virtual void documentAdded(DocumentBrowser::Drive::DocumentSession& doc) = 0;
+        virtual void documentAdded(DocumentBrowser::Drive::DocumentSession& doc) {};
         
         //! @brief Called when a document session changed.
-        virtual void documentChanged(DocumentBrowser::Drive::DocumentSession& doc) = 0;
+        virtual void documentChanged(DocumentBrowser::Drive::DocumentSession& doc) {};
         
         //! @brief Called when a document session has been removed.
-        virtual void documentRemoved(DocumentBrowser::Drive::DocumentSession& doc) = 0;
+        virtual void documentRemoved(DocumentBrowser::Drive::DocumentSession& doc) {};
         
         //! @brief Called when one or more documents has been added, removed or changed.
         virtual void driveChanged() {};

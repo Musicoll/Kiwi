@@ -22,19 +22,13 @@
 #ifndef KIWI_APP_DOCUMENT_BROWSER_VIEW_HPP_INCLUDED
 #define KIWI_APP_DOCUMENT_BROWSER_VIEW_HPP_INCLUDED
 
-#include "flip/contrib/MulticastServiceExplorer.h"
-
 #include <KiwiEngine/KiwiEngine_Listeners.hpp>
 
 #include "KiwiApp_Network/KiwiApp_DocumentBrowser.hpp"
-#include "KiwiApp_Window.hpp"
-
 #include "KiwiApp_Components/KiwiApp_ImageButton.hpp"
 
 namespace kiwi
 {
-    class Instance;
-    
     // ================================================================================ //
     //                               DOCUMENT BROWSER VIEW                              //
     // ================================================================================ //
@@ -75,7 +69,7 @@ namespace kiwi
     };
     
     // ================================================================================ //
-    //                               DOCUMENT BROWSER PANEL                             //
+    //                                 BROWSER DRIVE VIEW                               //
     // ================================================================================ //
     
     //! @brief Listen to document browser changes.
@@ -95,21 +89,9 @@ namespace kiwi
         //! @brief Returns the session host name.
         std::string getHostName() const;
         
-        // ========= DocumentBrowser::Drive::Listener
-        
-        //! @brief Called when a document session has been added.
-        void documentAdded(DocumentBrowser::Drive::DocumentSession& doc) override {
-            std::cout << "documentAdded" << '\n';};
-        
-        //! @brief Called when a document session changed.
-        void documentChanged(DocumentBrowser::Drive::DocumentSession& doc) override {std::cout << "documentChanged" << '\n';};
-        
-        //! @brief Called when a document session has been removed.
-        void documentRemoved(DocumentBrowser::Drive::DocumentSession& doc) override {std::cout << "documentRemoved" << '\n';};
-        
+        //! @brief Called by the DocumentBrowser::Drive changed.
+        //! @details Called when one or more document has been changed / removed or added.
         void driveChanged() override;
-        
-        // ========= juce::ListBoxModel
         
         //! @brief Returns the number of items in the list.
         int getNumRows() override;
@@ -129,27 +111,30 @@ namespace kiwi
         //! @brief Called when the return key is pressed.
         void returnKeyPressed(int last_row_selected) override;
         
+        //! @brief Called when the user double-clicking on a row.
+        void listBoxItemDoubleClicked(int row, juce::MouseEvent const& e) override;
+        
         //! @brief Returns true if the two drive view refer to the same drive.
         bool operator==(DocumentBrowser::Drive const& other_drive) const;
+        
+        //! @brief Opens document for the given row.
+        void openDocument(int row);
+        
+        //! @brief Make an API call to rename the remote document
+        void renameDocumentForRow(int row, std::string const& new_name);
         
     private: // classes
         
         class Header;
-        class DocumentSessionView;
-        
-    private: // methods
-        
-        //! @internal update layout.
-        void updateLayout();
+        class RowElem;
         
     private: // members
         
-        DocumentBrowser::Drive&                                 m_drive;
-        std::vector<juce::ScopedPointer<DocumentSessionView>>   m_documents = {};
+        DocumentBrowser::Drive& m_drive;
     };
     
     // ================================================================================ //
-    //                            DOCUMENT BROWSER PANEL HEADER                         //
+    //                             BROWSER DRIVE VIEW HEADER                            //
     // ================================================================================ //
     
     class DocumentBrowserView::DriveView::Header : public juce::Component
@@ -173,26 +158,26 @@ namespace kiwi
         
     private: // members
         
-        juce::ListBox&                  m_listbox;
-        DocumentBrowser::Drive&         m_drive;
-        std::unique_ptr<ImageButton>    m_refresh_btn;
-        std::unique_ptr<ImageButton>    m_create_document_btn;
-        const juce::Image               m_folder_img;
+        juce::ListBox&              m_listbox;
+        DocumentBrowser::Drive&     m_drive;
+        ImageButton                 m_refresh_btn;
+        ImageButton                 m_create_document_btn;
+        const juce::Image           m_folder_img;
     };
     
     // ================================================================================ //
-    //                          DOCUMENT BROWSER PANEL SESSION VIEW                     //
+    //                            BROWSER DRIVE VIEW ROW ELEM                           //
     // ================================================================================ //
     
-    class DocumentBrowserView::DriveView::DocumentSessionView : public juce::Component, juce::Label::Listener
+    class DocumentBrowserView::DriveView::RowElem : public juce::Component, juce::Label::Listener
     {
     public: // methods
         
         //! @brief Constructor.
-        DocumentSessionView(juce::ListBox& listbox, DocumentBrowser::Drive::DocumentSession& document);
+        RowElem(DriveView& drive_view, std::string const& name);
         
         //! @brief Destructor.
-        ~DocumentSessionView();
+        ~RowElem();
         
         //! @brief Show the document name editor.
         void showEditor();
@@ -219,46 +204,24 @@ namespace kiwi
         void mouseDoubleClick(juce::MouseEvent const& event) override;
         
         //! @brief Called when a Label's text has changed.
-        void labelTextChanged(juce::Label* labelThatHasChanged) override;
-        
-        //! @brief Returns the document name.
-        std::string getName() const;
-        
-        //! @brief Returns the session host.
-        std::string getHost() const;
-        
-        //! @brief Returns the session port.
-        uint16_t getSessionPort() const;
-        
-        //! @brief Returns the session id.
-        uint64_t getSessionId() const;
+        void labelTextChanged(juce::Label* label_text_that_has_changed) override;
         
         //! @brief Update the document session
-        void update(DocumentBrowser::Drive::DocumentSession* doc, int row, bool now_selected);
-        
-        //! @brief Returns true if the two documents refer to the same session_id
-        bool operator==(DocumentBrowser::Drive::DocumentSession const& other_document) const;
-        
-    private: // methods
-        
-        //! @internal Called by the DriveView when the document has changed.
-        void documentSessionChanged();
+        void update(std::string const& name, int row, bool now_selected);
         
     private: // variables
         
-        juce::ListBox&                              m_listbox;
-        DocumentBrowser::Drive::DocumentSession*    m_document = nullptr;
-        std::unique_ptr<ImageButton>                m_open_btn;
-        juce::Label                                 m_name_label;
+        DriveView&          m_drive_view;
+        std::string         m_name;
+        ImageButton         m_open_btn;
+        juce::Label         m_name_label;
         
-        const juce::Image                           m_kiwi_filetype_img;
+        const juce::Image   m_kiwi_filetype_img;
         
-        int                                         m_row;
-        bool                                        m_selected;
-        bool                                        m_mouseover = false;
-        bool                                        m_select_row_on_mouse_up = false;
-        
-        friend DriveView;
+        int                 m_row;
+        bool                m_selected;
+        bool                m_mouseover = false;
+        bool                m_select_row_on_mouse_up = false;
     };
 }
 
