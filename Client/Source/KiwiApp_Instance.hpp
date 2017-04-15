@@ -94,6 +94,9 @@ namespace kiwi
         //! @brief Brings the Console to front.
         void showConsoleWindow();
         
+        //! @brief Brings the "About Kiwi" window to front.
+        void showAboutKiwiWindow();
+        
         //! @brief Brings the DocumentBrowserWindow to front.
         void showDocumentBrowserWindow();
         

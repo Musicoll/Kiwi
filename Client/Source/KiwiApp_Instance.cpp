@@ -31,6 +31,7 @@
 #include <ctime>
 
 #include "KiwiApp_Window.hpp"
+#include "KiwiApp_AboutWindow.hpp"
 
 namespace kiwi
 {
@@ -299,6 +300,11 @@ namespace kiwi
                                             true, true, "console_window",
                                             !KiwiApp::isMacOSX());
         });
+    }
+    
+    void Instance::showAboutKiwiWindow()
+    {
+        showWindowWithId(WindowId::AboutKiwi, [](){ return std::make_unique<AboutWindow>(); });
     }
     
     void Instance::showDocumentBrowserWindow()

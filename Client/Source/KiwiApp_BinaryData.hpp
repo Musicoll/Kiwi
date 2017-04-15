@@ -74,6 +74,9 @@ namespace kiwi
             extern char const* kiwi_filetype_png;
             const int kiwi_filetype_png_size = 40975;
 
+            extern char const* kiwi_icon_png;
+            const int kiwi_icon_png_size = 24099;
+
             extern char const* open_png;
             const int open_png_size = 1100;
 
