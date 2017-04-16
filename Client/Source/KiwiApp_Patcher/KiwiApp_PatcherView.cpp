@@ -46,7 +46,7 @@ namespace kiwi
     m_patcher_model(patcher),
     m_view_model(view),
     m_viewport(*this),
-    m_hittester(new HitTester(*this)),
+    m_hittester(*this),
     m_io_highlighter(new IoletHighlighter()),
     m_lasso(new Lasso(*this)),
     m_grid_size(20),
@@ -151,7 +151,7 @@ namespace kiwi
         
         if(!isLocked())
         {
-            HitTester& hit = *m_hittester;
+            HitTester& hit = m_hittester;
             hit.test(e.getPosition());
 
             if(hit.objectTouched())
@@ -285,7 +285,7 @@ namespace kiwi
                 }
             }
             
-            HitTester& hit = *m_hittester;
+            HitTester& hit = m_hittester;
             
             if(hit.objectTouched())
             {
@@ -406,7 +406,7 @@ namespace kiwi
                 m_link_creator.reset();
             }
             
-            HitTester& hit = *m_hittester;
+            HitTester& hit = m_hittester;
             
             if(hit.objectTouched() && hit.getZone() == HitTester::Zone::Inside)
             {
@@ -642,7 +642,7 @@ namespace kiwi
         m_is_in_move_or_resize_gesture = false;
         m_viewport.updatePatcherArea(true);
 
-        HitTester& hit = *m_hittester;
+        HitTester& hit = m_hittester;
         
         if(hit.objectTouched())
         {

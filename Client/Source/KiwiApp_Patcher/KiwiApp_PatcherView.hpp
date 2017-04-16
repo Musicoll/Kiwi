@@ -29,6 +29,7 @@
 #include "flip/DocumentObserver.h"
 
 #include "KiwiApp_PatcherViewport.hpp"
+#include "KiwiApp_PatcherViewHitTester.hpp"
 
 namespace kiwi
 {
@@ -38,7 +39,6 @@ namespace kiwi
     class LinkView;
     class LinkViewCreator;
     class Instance;
-    class HitTester;
     class IoletHighlighter;
     class Lasso;
     
@@ -372,7 +372,7 @@ namespace kiwi
         std::map<flip::Ref, std::set<uint64_t>>     m_distant_links_selection;
         
         PatcherViewport                             m_viewport;
-        std::unique_ptr<HitTester>                  m_hittester;
+        HitTester                                   m_hittester;
         std::unique_ptr<LinkViewCreator>            m_link_creator;
         std::unique_ptr<IoletHighlighter>           m_io_highlighter;
         std::unique_ptr<Lasso>                      m_lasso;
