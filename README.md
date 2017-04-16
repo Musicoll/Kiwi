@@ -72,6 +72,6 @@ This script takes 2 required arguments:
  $ python ./Config/ressource.py -i ./Ressources/BinaryRes -o ./Client/Source
  ```
 
- Credits:
+### Credits:
 
  - Some of the application icons are *designed by Freepik and distributed by Flaticon*.
