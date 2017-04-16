@@ -35,6 +35,8 @@
 
 #include "../KiwiApp_Network/KiwiApp_DocumentBrowser.hpp"
 
+#include "KiwiApp_PatcherComponent.hpp"
+
 namespace kiwi
 {
     class Instance;
@@ -170,18 +172,21 @@ namespace kiwi
     class PatcherViewWindow : public Window
     {
     public:
+        
         PatcherViewWindow(PatcherManager& manager, PatcherView& patcherview);
+        
         void closeButtonPressed() override;
         
         //! @brief returns the patcher manager.
         PatcherManager& getPatcherManager() const;
         
         //! @brief returns the PatcherView.
-        PatcherView& getPatcherView() const;
+        PatcherView& getPatcherView();
         
-    private:
-        PatcherManager& m_patcher_manager;
-        PatcherView& m_patcherview;
+    private: // variables
+        
+        PatcherManager&     m_patcher_manager;
+        PatcherComponent    m_patcher_component;
     };
 }
 

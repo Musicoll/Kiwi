@@ -74,6 +74,12 @@ namespace kiwi
             extern char const* arrow_up_png;
             const int arrow_up_png_size = 1635;
 
+            extern char const* dsp_off_png;
+            const int dsp_off_png_size = 12813;
+
+            extern char const* dsp_on_png;
+            const int dsp_on_png_size = 16455;
+
             extern char const* folder_png;
             const int folder_png_size = 2557;
 
@@ -82,6 +88,9 @@ namespace kiwi
 
             extern char const* kiwi_icon_png;
             const int kiwi_icon_png_size = 24099;
+
+            extern char const* locked_png;
+            const int locked_png_size = 6215;
 
             extern char const* open_png;
             const int open_png_size = 1100;
@@ -94,6 +103,15 @@ namespace kiwi
 
             extern char const* trash_png;
             const int trash_png_size = 6810;
+
+            extern char const* unlocked_png;
+            const int unlocked_png_size = 6499;
+
+            extern char const* zoom_in_png;
+            const int zoom_in_png_size = 14970;
+
+            extern char const* zoom_out_png;
+            const int zoom_out_png_size = 14388;
 
         }
         namespace settings

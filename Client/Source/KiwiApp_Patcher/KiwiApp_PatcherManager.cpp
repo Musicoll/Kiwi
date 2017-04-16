@@ -39,16 +39,13 @@ namespace kiwi
     PatcherViewWindow::PatcherViewWindow(PatcherManager& manager, PatcherView& patcherview) :
     Window("Untitled", nullptr, true, true, juce::String::empty, !KiwiApp::isMacOSX()),
     m_patcher_manager(manager),
-    m_patcherview(patcherview)
+    m_patcher_component(patcherview)
     {
         // Todo: Add size infos to the Patcher Model
         setSize(600, 500);
         centreWithSize(getWidth(), getHeight());
         
-        setContentNonOwned(&patcherview.getViewport(), true);
-        patcherview.updateWindowTitle();
-        patcherview.grabKeyboardFocus();
-
+        setContentNonOwned(&m_patcher_component, true);
         setVisible(true);
     }
 
@@ -57,9 +54,9 @@ namespace kiwi
         return m_patcher_manager;
     }
 
-    PatcherView& PatcherViewWindow::getPatcherView() const
+    PatcherView& PatcherViewWindow::getPatcherView()
     {
-        return m_patcherview;
+        return m_patcher_component.usePatcherView();
     }
     
     void PatcherViewWindow::closeButtonPressed()

@@ -418,6 +418,7 @@ namespace kiwi
             CommandIDs::showAppSettingsWindow,
             CommandIDs::showDocumentBrowserWindow,
             CommandIDs::showBeaconDispatcherWindow,
+            CommandIDs::switchDsp,
             CommandIDs::startDsp,
             CommandIDs::stopDsp
         };
@@ -488,6 +489,15 @@ namespace kiwi
                 
                 break;
             }
+            case CommandIDs::switchDsp:
+            {
+                result.setInfo(TRANS("Switch global DSP state"), TRANS("Switch global DSP state"),
+                               CommandCategories::general, 0);
+                
+                result.setTicked(m_instance->getEngineInstance().getAudioControler().isAudioOn());
+                
+                break;
+            }
             case CommandIDs::startDsp:
             {
                 result.setInfo(TRANS("Start dsp"), TRANS("Start dsp"),
@@ -554,6 +564,20 @@ namespace kiwi
             case CommandIDs::showBeaconDispatcherWindow :
             {
                 m_instance->showBeaconDispatcherWindow();
+                break;
+            }
+            case CommandIDs::switchDsp :
+            {
+                auto& audio_controler = m_instance->useEngineInstance().getAudioControler();
+                if(audio_controler.isAudioOn())
+                {
+                    audio_controler.stopAudio();
+                }
+                else
+                {
+                    audio_controler.startAudio();
+                }
+                
                 break;
             }
             case CommandIDs::startDsp :
