@@ -398,14 +398,13 @@ namespace kiwi
         ids.add(scroll_to_bottom);
         ids.add(separatorBarId);
         ids.add(spacerId);
+        ids.add(flexibleSpacerId);
     }
     
     void ConsoleToolbarFactory::getDefaultItemSet(juce::Array<int>& ids)
     {
         ids.add(clear);
-        ids.add(spacerId);
-        ids.add(separatorBarId);
-        ids.add(spacerId);
+        ids.add(flexibleSpacerId);
         ids.add(scroll_to_top);
         ids.add(scroll_to_bottom);
     }
