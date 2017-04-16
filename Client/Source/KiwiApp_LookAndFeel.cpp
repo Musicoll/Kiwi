@@ -26,6 +26,12 @@ namespace bfonts = kiwi::binary_data::fonts;
 
 namespace kiwi
 {
+    LookAndFeel::LookAndFeel()
+    {
+        setColour(juce::TooltipWindow::backgroundColourId, juce::Colours::lightgrey);
+        setColour(juce::TooltipWindow::textColourId, juce::Colour(0xff444444));
+    }
+    
     juce::Typeface::Ptr LookAndFeel::getTypefaceForFont(juce::Font const& font)
     {
         juce::Typeface::Ptr typeface;
@@ -102,5 +108,54 @@ namespace kiwi
         p.addTriangle(0.0f, 0.0f, 1.0f, is_open ? 0.0f : 0.5f, is_open ? 0.5f : 0.0f, 1.0f);
         g.setColour(juce::Colours::white.contrasting().withAlpha(0.5f));
         g.fillPath(p, p.getTransformToScaleToFit(plusRect.reduced(2, plusRect.getHeight() / 4), true));
+    }
+    
+    void LookAndFeel::drawTableHeaderColumn(juce::Graphics& g, juce::String const& columnName,
+                                            int /*columnId*/,
+                                            int width, int height,
+                                            bool isMouseOver, bool isMouseDown,
+                                            int columnFlags)
+    {
+        if(isMouseDown)
+            g.fillAll(juce::Colours::white.withAlpha(0.2f));
+        else if(isMouseOver)
+            g.fillAll(juce::Colours::white.withAlpha(0.1f));
+        
+        juce::Rectangle<int> area(width, height);
+        area.reduce(4, 0);
+        
+        if ((columnFlags & (juce::TableHeaderComponent::sortedForwards | juce::TableHeaderComponent::sortedBackwards)) != 0)
+        {
+            juce::Path sortArrow;
+            sortArrow.addTriangle (0.0f, 0.0f,
+                                   0.5f, (columnFlags & juce::TableHeaderComponent::sortedForwards) != 0 ? -0.8f : 0.8f,
+                                   1.0f, 0.0f);
+            
+            g.setColour(juce::Colour (0x99000000));
+            g.fillPath(sortArrow, sortArrow.getTransformToScaleToFit(area.removeFromRight(height / 2).reduced (2).toFloat(), true));
+        }
+        
+        g.setColour(juce::Colours::whitesmoke);
+        g.setFont(juce::Font(height * 0.5f, juce::Font::bold));
+        g.drawFittedText(columnName, area, juce::Justification::centredLeft, 1);
+    }
+    
+    void LookAndFeel::drawTableHeaderBackground(juce::Graphics& g, juce::TableHeaderComponent& header)
+    {
+        auto r(header.getLocalBounds());
+        
+        const auto bdcolor = juce::Colours::black.withAlpha(0.5f);
+        
+        g.setColour(juce::Colour(0xFF4E4E4E));
+        g.fillRect(r);
+        
+        g.setColour(bdcolor);
+        g.fillRect(r.removeFromBottom(1));
+        
+        g.setColour(bdcolor);
+        for(int i = header.getNumColumns(true) - 1; --i >= 0;)
+        {
+            g.fillRect(header.getColumnPosition(i).removeFromRight(1));
+        }
     }
 }

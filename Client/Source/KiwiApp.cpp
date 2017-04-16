@@ -102,6 +102,7 @@ namespace kiwi
         #if JUCE_MAC
         juce::PopupMenu macMainMenuPopup;
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAboutAppWindow);
+        macMainMenuPopup.addSeparator();
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAppSettingsWindow);
         macMainMenuPopup.addSeparator();
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAudioStatusWindow);
@@ -412,6 +413,7 @@ namespace kiwi
             CommandIDs::newPatcher,
             CommandIDs::openFile,
             CommandIDs::showConsoleWindow,
+            CommandIDs::showAboutAppWindow,
             CommandIDs::showAudioStatusWindow,
             CommandIDs::showAppSettingsWindow,
             CommandIDs::showDocumentBrowserWindow,
@@ -449,6 +451,12 @@ namespace kiwi
                                CommandCategories::windows, 0);
                 
                 result.addDefaultKeypress('k', juce::ModifierKeys::commandModifier);
+                break;
+            }
+            case CommandIDs::showAboutAppWindow:
+            {
+                result.setInfo(TRANS("About Kiwi"), TRANS("Show the \"About Kiwi\" Window"),
+                               CommandCategories::windows, 0);
                 break;
             }
             case CommandIDs::showAppSettingsWindow:
@@ -522,6 +530,11 @@ namespace kiwi
             case CommandIDs::showConsoleWindow :
             {
                 m_instance->showConsoleWindow();
+                break;
+            }
+            case CommandIDs::showAboutAppWindow :
+            {
+                m_instance->showAboutKiwiWindow();
                 break;
             }
             case CommandIDs::showAppSettingsWindow :

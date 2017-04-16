@@ -30,7 +30,10 @@ namespace kiwi
     {
     public: // methods
         
-        LookAndFeel() = default;
+        //! @brief Constructor.
+        LookAndFeel();
+        
+        //! @brief Destructor.
         ~LookAndFeel() = default;
         
         //! @brief Returns the typeface for a certain font name and style.
@@ -41,6 +44,16 @@ namespace kiwi
         void drawPropertyPanelSectionHeader(juce::Graphics& g,
                                             const juce::String& name,
                                             bool is_open, int width, int height) override;
+        
+        //! @brief Overriden to draw a custom Table header background.
+        void drawTableHeaderBackground(juce::Graphics& g, juce::TableHeaderComponent& header) override;
+        
+        //! @brief Overriden to draw a custom Table header column.
+        void drawTableHeaderColumn(juce::Graphics& g, juce::String const& columnName,
+                                   int /*columnId*/,
+                                   int width, int height,
+                                   bool isMouseOver, bool isMouseDown,
+                                   int columnFlags) override;
         
     private: // deleted methods
         

@@ -211,23 +211,24 @@ namespace kiwi
             
             juce::MessageManager::callAsync([this, document]() {
                 
-                auto it = m_documents.emplace(m_documents.end(), *this, std::move(document));
+                auto it = m_documents.emplace(m_documents.end(), std::make_unique<DocumentSession>(*this, std::move(document)));
                 
-                m_listeners.call(&Listener::documentAdded, *it);
+                m_listeners.call(&Listener::documentAdded, *(it->get()));
+                m_listeners.call(&Listener::driveChanged);
                 
-                it->open();
+                (*it)->open();
             });
             
         });
         
     }
     
-    std::list<DocumentBrowser::Drive::DocumentSession> const& DocumentBrowser::Drive::getDocuments() const
+    DocumentBrowser::Drive::DocumentSessions const& DocumentBrowser::Drive::getDocuments() const
     {
         return m_documents;
     }
     
-    std::list<DocumentBrowser::Drive::DocumentSession>& DocumentBrowser::Drive::getDocuments()
+    DocumentBrowser::Drive::DocumentSessions& DocumentBrowser::Drive::getDocuments()
     {
         return m_documents;
     }
@@ -238,6 +239,74 @@ namespace kiwi
         && (getApiPort() == drive.getApiPort())
         && (getSessionPort() == drive.getSessionPort())
         && (m_name == drive.getName());
+    }
+    
+    void DocumentBrowser::Drive::updateDocumentList(Api::Documents docs)
+    {
+        bool changed = false;
+        
+        DocumentSessions new_documents;
+        new_documents.reserve(docs.size());
+        
+        for(auto && doc : docs)
+        {
+            new_documents.emplace_back(std::make_unique<DocumentSession>(*this, std::move(doc)));
+        }
+        
+        // drive removed notification
+        for(auto doc_it = m_documents.begin(); doc_it != m_documents.end();)
+        {
+            auto it = std::find_if(new_documents.begin(), new_documents.end(),
+                                   [&new_doc = *(doc_it->get())](auto const& doc){
+                                       return *(doc.get()) == new_doc;
+                                   });
+            
+            if(it == new_documents.end())
+            {
+                m_listeners.call(&Listener::documentRemoved, *(doc_it->get()));
+                doc_it = m_documents.erase(doc_it);
+                changed = true;
+                continue;
+            }
+            
+            ++doc_it;
+        }
+        
+        // drive added or changed notification
+        for(auto && new_doc : new_documents)
+        {
+            auto it = std::find_if(m_documents.begin(), m_documents.end(),
+                                   [&new_doc = *new_doc](auto const& doc){
+                                       return *(doc.get()) == new_doc;
+                                   });
+            
+            // new document
+            if(it == m_documents.end())
+            {
+                it = m_documents.emplace(it, std::move(new_doc));
+                auto& doc = *(it->get());
+                
+                m_listeners.call(&Listener::documentAdded, doc);
+                changed = true;
+            }
+            else
+            {
+                // name is currently the only document field that can change.
+                if(new_doc->getName() != (*it)->getName())
+                {
+                    (*it)->m_document.name = new_doc->getName();
+                    auto& doc = *(it->get());
+                    
+                    m_listeners.call(&Listener::documentChanged, doc);
+                    changed = true;
+                }
+            }
+        }
+        
+        if(changed)
+        {
+            m_listeners.call(&Listener::driveChanged);
+        }
     }
     
     void DocumentBrowser::Drive::refresh()
@@ -254,59 +323,9 @@ namespace kiwi
                 return;
             }
             
-            std::vector<DocumentSession> new_documents;
-            new_documents.reserve(docs.size());
-            
-            for(auto && doc : docs)
-            {
-                new_documents.emplace_back(*this, std::move(doc));
-            }
-            
-            // drive removed notification
-            for(auto doc_it = m_documents.begin(); doc_it != m_documents.end();)
-            {
-                auto it = std::find(new_documents.begin(), new_documents.end(), *doc_it);
-                
-                if(it == new_documents.end())
-                {
-                    juce::MessageManager::callAsync([this, doc_it](){
-                        m_listeners.call(&Listener::documentRemoved, *doc_it);
-                    });
-                    
-                    doc_it = m_documents.erase(doc_it);
-                    continue;
-                }
-                
-                ++doc_it;
-            }
-            
-            // drive added or changed notification
-            for(auto const& new_doc : new_documents)
-            {
-                auto it = std::find(m_documents.begin(), m_documents.end(), new_doc);
-                
-                // new document
-                if(it == m_documents.end())
-                {
-                    it = m_documents.emplace(it, new_doc);
-                    
-                    juce::MessageManager::callAsync([this, it](){
-                        m_listeners.call(&Listener::documentAdded, *it);
-                    });
-                }
-                else
-                {
-                    // name is currently the only document field that can change.
-                    if(new_doc.getName() != it->getName())
-                    {
-                        it->m_document.name = new_doc.getName();
-                        
-                        juce::MessageManager::callAsync([this, it](){
-                            m_listeners.call(&Listener::documentChanged, *it);
-                        });
-                    }
-                }
-            }
+            juce::MessageManager::callAsync([this, docs](){
+                updateDocumentList(docs);
+            });
         });
     }
     

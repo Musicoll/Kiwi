@@ -32,8 +32,8 @@
 namespace ProjectInfo
 {
     const char* const  projectName    = "Kiwi";
-    const char* const  versionString  = "0.0.1";
-    const int          versionNumber  = 0x1;
+    const char* const  versionString  = "0.0.3";
+    const int          versionNumber  = 0x003;
 }
 
 namespace kiwi
@@ -203,6 +203,7 @@ namespace kiwi
         std::unique_ptr<MainMenuModel>                      m_menu_model;
         
         std::unique_ptr<LookAndFeel>                        m_look;
+        juce::TooltipWindow                                 m_tooltip_window;
         std::unique_ptr<StoredSettings>                     m_settings;
     };
 }
