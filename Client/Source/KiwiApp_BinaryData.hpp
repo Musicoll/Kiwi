@@ -68,6 +68,12 @@ namespace kiwi
         }
         namespace images
         {
+            extern char const* arrow_down_png;
+            const int arrow_down_png_size = 1647;
+
+            extern char const* arrow_up_png;
+            const int arrow_up_png_size = 1635;
+
             extern char const* folder_png;
             const int folder_png_size = 2557;
 
@@ -85,6 +91,9 @@ namespace kiwi
 
             extern char const* refresh_png;
             const int refresh_png_size = 15500;
+
+            extern char const* trash_png;
+            const int trash_png_size = 6810;
 
         }
         namespace settings

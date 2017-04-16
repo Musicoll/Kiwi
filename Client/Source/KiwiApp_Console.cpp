@@ -22,6 +22,9 @@
 #include "KiwiApp.hpp"
 #include "KiwiApp_Console.hpp"
 #include "KiwiApp_StoredSettings.hpp"
+#include "KiwiApp_BinaryData.hpp"
+
+#include "KiwiApp_CommandIDs.hpp"
 
 namespace kiwi
 {
@@ -29,7 +32,7 @@ namespace kiwi
     //                                  CONSOLE COMPONENT                               //
     // ================================================================================ //
     
-    Console::Console(sConsoleHistory history) :
+    ConsoleContent::ConsoleContent(sConsoleHistory history) :
     m_history(history),
     m_font(16.f)
     {
@@ -75,7 +78,7 @@ namespace kiwi
         addAndMakeVisible(m_table);
     }
     
-    Console::~Console()
+    ConsoleContent::~ConsoleContent()
     {
         sConsoleHistory history = getHistory();
         if(history)
@@ -84,7 +87,7 @@ namespace kiwi
         }
     }
     
-    sConsoleHistory Console::getHistory()
+    sConsoleHistory ConsoleContent::getHistory()
     {
         return m_history.lock();
     }
@@ -93,7 +96,7 @@ namespace kiwi
     //                                      COMMAND                                     //
     // ================================================================================ //
     
-    void Console::copy()
+    void ConsoleContent::copy()
     {
         sConsoleHistory history = getHistory();
         if(history)
@@ -114,7 +117,7 @@ namespace kiwi
         }
     }
     
-    void Console::erase()
+    void ConsoleContent::erase()
     {
         sConsoleHistory history = getHistory();
         if(history)
@@ -136,7 +139,7 @@ namespace kiwi
     //                                  HISTORY LISTENER                                //
     // ================================================================================ //
     
-    void Console::consoleHistoryChanged(ConsoleHistory const&)
+    void ConsoleContent::consoleHistoryChanged(ConsoleHistory const&)
     {
         m_table.updateContent();
     }
@@ -145,13 +148,13 @@ namespace kiwi
     //                                      COMPONENT                                   //
     // ================================================================================ //
     
-    void Console::resized()
+    void ConsoleContent::resized()
     {
         m_table.setBounds(getLocalBounds());
         updateRighmostColumnWidth(&m_table.getHeader());
     }
     
-    void Console::paint(juce::Graphics& g)
+    void ConsoleContent::paint(juce::Graphics& g)
     {
         g.fillAll(juce::Colours::lightgrey);
         
@@ -164,32 +167,55 @@ namespace kiwi
         }
     }
     
+    void ConsoleContent::scrollToTop()
+    {
+        m_table.scrollToEnsureRowIsOnscreen(0);
+    }
+    
+    void ConsoleContent::scrollToBottom()
+    {
+        m_table.scrollToEnsureRowIsOnscreen(m_table.getNumRows());
+    }
+    
+    void ConsoleContent::clearAll()
+    {
+        m_table.selectRangeOfRows(0, m_table.getNumRows());
+        erase();
+    }
+    
     // ================================================================================ //
     //                              TABLE LIST BOX MODEL                                //
     // ================================================================================ //
     
-    void Console::selectedRowsChanged(int row)
+    void ConsoleContent::selectedRowsChanged(int row)
     {
         KiwiApp::commandStatusChanged();
     }
     
-    void Console::deleteKeyPressed(int lastRowSelected)
+    void ConsoleContent::deleteKeyPressed(int lastRowSelected)
     {
         erase();
     }
     
-    void Console::backgroundClicked(const juce::MouseEvent& mouse)
+    void ConsoleContent::backgroundClicked(const juce::MouseEvent& mouse)
     {
         m_table.deselectAllRows();
     }
     
-    int Console::getNumRows()
+    int ConsoleContent::getNumRows()
     {
         sConsoleHistory history = getHistory();
         return history ? history->size() : 0;
     }
     
-    void Console::paintRowBackground(juce::Graphics& g, int rowNumber, int width, int height, bool selected)
+    int ConsoleContent::getNumSelectedRows() const
+    {
+        return m_table.getNumSelectedRows();
+    }
+    
+    void ConsoleContent::paintRowBackground(juce::Graphics& g,
+                                            int rowNumber, int width, int height,
+                                            bool selected)
     {
         sConsoleHistory history = getHistory();
         if(!history) return; //abort
@@ -225,7 +251,7 @@ namespace kiwi
         g.drawHorizontalLine(height - 1, 0, width);
     }
     
-    void Console::paintOverChildren(juce::Graphics &g)
+    void ConsoleContent::paintOverChildren(juce::Graphics &g)
     {
         int numColumns = m_table.getHeader().getNumColumns(true);
         float left = 0, width = 0;
@@ -244,7 +270,7 @@ namespace kiwi
         }
     }
     
-    void Console::paintCell(juce::Graphics& g,
+    void ConsoleContent::paintCell(juce::Graphics& g,
                              int rowNumber, int columnId, int width, int height,
                              bool rowIsSelected)
     {
@@ -278,7 +304,7 @@ namespace kiwi
         }
     }
     
-    void Console::sortOrderChanged(int newSortColumnId, bool isForwards)
+    void ConsoleContent::sortOrderChanged(int newSortColumnId, bool isForwards)
     {
         sConsoleHistory history = getHistory();
         if(!history) return; //abort
@@ -287,21 +313,22 @@ namespace kiwi
         m_table.updateContent();
     }
     
-    void Console::cellDoubleClicked(int rowNumber, int columnId, const juce::MouseEvent& mouse)
+    void ConsoleContent::cellDoubleClicked(int rowNumber, int columnId, const juce::MouseEvent& mouse)
     {
         // TODO : hilight (if possible) object corresponding to the dblclicked row
     }
     
-    juce::Component* Console::refreshComponentForCell(int, int, bool, Component* existingComponentToUpdate)
+    juce::Component* ConsoleContent::refreshComponentForCell(int, int, bool,
+                                                             Component* existingComponentToUpdate)
     {
         // Just return 0, as we'll be painting these columns directly.
         jassert(existingComponentToUpdate == 0);
-        return 0;
+        return nullptr;
     }
     
     // This is overloaded from TableListBoxModel, and should choose the best width for the specified
     // column.
-    int Console::getColumnAutoSizeWidth(int columnId)
+    int ConsoleContent::getColumnAutoSizeWidth(int columnId)
     {
         if(columnId == Column::Id)
             return 30;
@@ -325,7 +352,7 @@ namespace kiwi
         return widest + 8;
     }
     
-    void Console::tableColumnsResized(juce::TableHeaderComponent* tableHeader)
+    void ConsoleContent::tableColumnsResized(juce::TableHeaderComponent* tableHeader)
     {
         if(tableHeader == &m_table.getHeader())
         {
@@ -333,7 +360,7 @@ namespace kiwi
         }
     }
     
-    void Console::updateRighmostColumnWidth(juce::TableHeaderComponent* header)
+    void ConsoleContent::updateRighmostColumnWidth(juce::TableHeaderComponent* header)
     {
         int rightmostColumnId   = 0;
         int rightmostColumnX    = 0;
@@ -353,5 +380,159 @@ namespace kiwi
         {
             m_table.getHeader().setColumnWidth(rightmostColumnId, getWidth() - rightmostColumnX);
         }
+    }
+    
+    // ================================================================================ //
+    //                                   CONSOLE TOOLBAR                                //
+    // ================================================================================ //
+    
+    ConsoleToolbarFactory::ConsoleToolbarFactory()
+    {
+        
+    }
+    
+    void ConsoleToolbarFactory::getAllToolbarItemIds(juce::Array<int>& ids)
+    {
+        ids.add(clear);
+        ids.add(scroll_to_top);
+        ids.add(scroll_to_bottom);
+        ids.add(separatorBarId);
+        ids.add(spacerId);
+        ids.add(flexibleSpacerId);
+    }
+    
+    void ConsoleToolbarFactory::getDefaultItemSet(juce::Array<int>& ids)
+    {
+        ids.add(clear);
+        ids.add(flexibleSpacerId);
+        ids.add(scroll_to_top);
+        ids.add(scroll_to_bottom);
+    }
+
+    juce::ToolbarItemComponent* ConsoleToolbarFactory::createItem(int itemId)
+    {
+        juce::ToolbarItemComponent* btn = nullptr;
+        
+        if(itemId == clear)
+        {
+            btn = new juce::ToolbarButton(itemId, "clear", juce::Drawable::createFromImageData(binary_data::images::trash_png, binary_data::images::trash_png_size), nullptr);
+            
+            btn->setCommandToTrigger(&KiwiApp::getCommandManager(), CommandIDs::clearAll, true);
+        }
+        else if(itemId == scroll_to_top)
+        {
+            btn = new juce::ToolbarButton(itemId, "top", juce::Drawable::createFromImageData(binary_data::images::arrow_up_png, binary_data::images::arrow_up_png_size), nullptr);
+            
+            btn->setCommandToTrigger(&KiwiApp::getCommandManager(), CommandIDs::scrollToTop, true);
+        }
+        else if(itemId == scroll_to_bottom)
+        {
+            btn = new juce::ToolbarButton(itemId, "bottom", juce::Drawable::createFromImageData(binary_data::images::arrow_down_png, binary_data::images::arrow_down_png_size), nullptr);
+            
+            btn->setCommandToTrigger(&KiwiApp::getCommandManager(), CommandIDs::scrollToBottom, true);
+        }
+        
+        return btn;
+    }
+    
+    // ================================================================================ //
+    //                                  CONSOLE COMPONENT                               //
+    // ================================================================================ //
+    
+    Console::Console(sConsoleHistory history) :
+    m_console(history)
+    {
+        addAndMakeVisible(m_console);
+        
+        KiwiApp::bindToCommandManager(this);
+        KiwiApp::bindToKeyMapping(this);
+        
+        m_toolbar.setVertical(false);
+        m_toolbar.setStyle(juce::Toolbar::ToolbarItemStyle::iconsOnly);
+        m_toolbar.setColour(juce::Toolbar::ColourIds::backgroundColourId, juce::Colours::transparentBlack);
+        m_toolbar.setColour(juce::Toolbar::ColourIds::labelTextColourId, juce::Colours::whitesmoke);
+        m_toolbar.setColour(juce::Toolbar::ColourIds::buttonMouseOverBackgroundColourId, juce::Colour(0xff4a4a4a).contrasting(0.1));
+        m_toolbar.setColour(juce::Toolbar::ColourIds::buttonMouseDownBackgroundColourId, juce::Colour(0xff4a4a4a).contrasting(0.2));
+        
+        addAndMakeVisible(m_toolbar);
+        
+        // And use our item factory to add a set of default icons to it...
+        m_toolbar.addDefaultItems(m_toolbar_factory);
+    }
+    
+    void Console::resized()
+    {
+        const int toolbar_size = 40;
+        const int toolbar_limit = getHeight() - toolbar_size;
+        m_console.setBounds(getLocalBounds().withBottom(toolbar_limit));
+        m_toolbar.setBounds(getLocalBounds().withTop(toolbar_limit).reduced(7));
+    }
+    
+    void Console::paint(juce::Graphics& g)
+    {
+        const int toolbar_size = 40;
+        const auto header_bounds = getLocalBounds().withTop(getHeight() - toolbar_size);
+        
+        g.setColour(juce::Colour(0xff4a4a4a));
+        g.fillRect(header_bounds);
+    }
+    
+    // ================================================================================ //
+    //                              APPLICATION COMMAND TARGET                          //
+    // ================================================================================ //
+    
+    juce::ApplicationCommandTarget* Console::getNextCommandTarget()
+    {
+        return findFirstTargetParentComponent();
+    }
+    
+    void Console::getAllCommands(juce::Array<juce::CommandID>& commands)
+    {
+        commands.add(juce::StandardApplicationCommandIDs::copy);
+        commands.add(CommandIDs::clearAll);
+        commands.add(CommandIDs::scrollToTop);
+        commands.add(CommandIDs::scrollToBottom);
+    }
+    
+    void Console::getCommandInfo(const juce::CommandID commandID, juce::ApplicationCommandInfo& result)
+    {
+        switch (commandID)
+        {
+            case juce::StandardApplicationCommandIDs::copy:
+            {
+                result.setInfo(TRANS("Copy"), TRANS("Copy"), CommandCategories::editing, 0);
+                result.addDefaultKeypress('c', juce::ModifierKeys::commandModifier);
+                result.setActive(m_console.getNumSelectedRows() > 0);
+                break;
+            }
+            case CommandIDs::clearAll:
+            {
+                result.setInfo(TRANS("Clear console history"), TRANS("Clear console history"), CommandCategories::editing, 0);
+                //result.setActive(m_console.getNumRows() > 0);
+                break;
+            }
+            case CommandIDs::scrollToTop:
+                result.setInfo(TRANS("Scroll to the top"), TRANS("Scroll to the top"), CommandCategories::windows, 0);
+                break;
+                
+            case CommandIDs::scrollToBottom:
+                result.setInfo(TRANS("Scroll to the bottom"), TRANS("Scroll to the bottom"), CommandCategories::windows, 0);
+                break;
+                
+            default: break;
+        }
+    }
+    
+    bool Console::perform(InvocationInfo const& info)
+    {
+        switch (info.commandID)
+        {
+            case juce::StandardApplicationCommandIDs::copy: m_console.copy(); break;
+            case CommandIDs::clearAll:                      m_console.clearAll(); break;
+            case CommandIDs::scrollToTop:                   m_console.scrollToTop(); break;
+            case CommandIDs::scrollToBottom:                m_console.scrollToBottom(); break;
+            default: return false;
+        }
+        return true;
     }
 }
