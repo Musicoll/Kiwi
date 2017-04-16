@@ -24,9 +24,9 @@
 
 #include "flip/Mold.h"
 
-#include "KiwiApp.hpp"
-#include "KiwiApp_CommandIDs.hpp"
-#include "KiwiApp_Network/KiwiApp_DocumentManager.hpp"
+#include "../KiwiApp.hpp"
+#include "../KiwiApp_CommandIDs.hpp"
+#include "../KiwiApp_Network/KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_PatcherViewHelper.hpp"
 #include "KiwiApp_ObjectView.hpp"
 #include "KiwiApp_LinkView.hpp"
@@ -36,8 +36,6 @@ namespace kiwi
     // ================================================================================ //
     //                                    PATCHER VIEW                                  //
     // ================================================================================ //
-
-    bool PatcherView::m_command_manager_binded = false;
     
     PatcherView::PatcherView(PatcherManager& manager,
                        Instance& instance,
@@ -54,12 +52,7 @@ namespace kiwi
     m_grid_size(20),
     m_object_border_down_status(HitTester::Border::None)
     {
-        if(!m_command_manager_binded)
-        {
-            KiwiApp::bindToCommandManager(this);
-            m_command_manager_binded = true;
-        }
-        
+        KiwiApp::bindToCommandManager(this);
         KiwiApp::bindToKeyMapping(this);
         setWantsKeyboardFocus(true);
         

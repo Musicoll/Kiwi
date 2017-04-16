@@ -23,7 +23,7 @@
 
 #include "KiwiApp.hpp"
 #include "KiwiApp_Instance.hpp"
-#include "KiwiApp_PatcherView.hpp"
+#include "KiwiApp_Patcher/KiwiApp_PatcherView.hpp"
 
 #include "KiwiApp_Network/KiwiApp_DocumentManager.hpp"
 

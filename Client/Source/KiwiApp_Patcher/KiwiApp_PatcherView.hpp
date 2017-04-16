@@ -392,9 +392,6 @@ namespace kiwi
         bool m_is_in_move_or_resize_gesture = false;
         long m_object_border_down_status;
         
-        // here to initialise PatcherView commands only one time.
-        static bool m_command_manager_binded;
-        
         friend PatcherViewport;
         friend Lasso;
     };

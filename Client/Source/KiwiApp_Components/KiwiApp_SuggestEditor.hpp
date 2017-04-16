@@ -27,7 +27,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include "KiwiApp_Utils/KiwiApp_SuggestList.hpp"
+#include "../KiwiApp_Utils/KiwiApp_SuggestList.hpp"
 
 namespace kiwi
 {

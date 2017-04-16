@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include "KiwiApp.hpp"
+#include "../KiwiApp.hpp"
 #include "KiwiApp_LinkView.hpp"
 #include "KiwiApp_PatcherView.hpp"
 #include "KiwiApp_PatcherViewHelper.hpp"

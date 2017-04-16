@@ -21,12 +21,12 @@
 
 #include <KiwiModel/KiwiModel_PatcherView.hpp>
 
-#include "KiwiApp_Network/KiwiApp_DocumentManager.hpp"
+#include "../KiwiApp.hpp"
+#include "../KiwiApp_Network/KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_ObjectView.hpp"
-#include "KiwiApp.hpp"
 #include "KiwiApp_PatcherViewHelper.hpp"
 #include "KiwiApp_PatcherView.hpp"
-#include "KiwiApp_BinaryData.hpp"
+#include "../KiwiApp_BinaryData.hpp"
 
 namespace kiwi
 {

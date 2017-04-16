@@ -23,9 +23,9 @@
 #include <KiwiModel/KiwiModel_PatcherUser.hpp>
 #include <KiwiEngine/KiwiEngine_Patcher.hpp>
 
-#include "KiwiApp.hpp"
-#include "KiwiApp_Instance.hpp"
-#include "KiwiApp_Network/KiwiApp_DocumentManager.hpp"
+#include "../KiwiApp.hpp"
+#include "../KiwiApp_Instance.hpp"
+#include "../KiwiApp_Network/KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_PatcherManager.hpp"
 #include "KiwiApp_PatcherView.hpp"
 #include "KiwiApp_PatcherViewHelper.hpp"

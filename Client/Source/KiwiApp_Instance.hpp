@@ -29,7 +29,7 @@
 #include "KiwiApp_Console.hpp"
 #include "KiwiApp_Components/KiwiApp_SettingsPanel.hpp"
 #include "KiwiApp_DocumentBrowserView.hpp"
-#include "KiwiApp_PatcherManager.hpp"
+#include "KiwiApp_Patcher/KiwiApp_PatcherManager.hpp"
 #include "KiwiApp_StoredSettings.hpp"
 #include "KiwiApp_BeaconDispatcher.hpp"
 #include "KiwiApp_DspDeviceManager.hpp"

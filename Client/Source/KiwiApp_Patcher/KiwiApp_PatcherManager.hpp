@@ -30,10 +30,10 @@
 #include <KiwiModel/KiwiModel_PatcherValidator.hpp>
 #include <KiwiEngine/KiwiEngine_Instance.hpp>
 
-#include "KiwiApp_Window.hpp"
+#include "../KiwiApp_Window.hpp"
 #include "KiwiApp_PatcherView.hpp"
 
-#include "KiwiApp_Network/KiwiApp_DocumentBrowser.hpp"
+#include "../KiwiApp_Network/KiwiApp_DocumentBrowser.hpp"
 
 namespace kiwi
 {

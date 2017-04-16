@@ -20,7 +20,7 @@
  */
 
 #include "KiwiApp_SuggestEditor.hpp"
-#include "KiwiApp.hpp"
+#include "../KiwiApp.hpp"
 
 namespace kiwi
 {

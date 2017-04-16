@@ -238,7 +238,7 @@ namespace kiwi
         
     private: // members
         
-        PatcherView&                   m_patcher;
+        PatcherView&                m_patcher;
         juce::Viewport              m_viewport;
         Component                   m_magnifier;
         juce::Rectangle<int>        m_last_bounds;
