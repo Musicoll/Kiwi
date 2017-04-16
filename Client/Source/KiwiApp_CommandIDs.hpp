@@ -79,7 +79,12 @@ namespace kiwi
         openObjectHelp              = 0xf20411,        ///< Open selected object help patcher.
         
         startDsp                    = 0xf20420,        ///< Starts the dsp
-        stopDsp                     = 0xf20421         ///< Stops the dsp
+        stopDsp                     = 0xf20421,        ///< Stops the dsp
+        
+        scrollToTop                 = 0xf30001,        ///< Scroll to the top
+        scrollToBottom              = 0xf30002,        ///< Scroll to the bottom
+        
+        clearAll                    = 0xf40001         ///< Clear all content
     };
     
     // ================================================================================ //

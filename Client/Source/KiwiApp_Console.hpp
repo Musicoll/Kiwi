@@ -29,14 +29,16 @@
 
 namespace kiwi
 {
+    class Console;
+    
     // ================================================================================ //
-    //                                  CONSOLE COMPONENT                               //
+    //                              CONSOLE CONTENT COMPONENT                           //
     // ================================================================================ //
     
-    //! @brief The juce Console Component
+    //! @brief The juce ConsoleContent Component
     //! @details The juce Console Component maintain a ConsoleHistory and display Console messages to the user.
     //! The user can select a message to copy it to the system clipboard, delete a specific message or a range of messages, sort messages, double-click on a row to hilight the corresponding object...
-    class Console :
+    class ConsoleContent :
     public ConsoleHistory::Listener,
     public juce::Component,
     public juce::TableListBoxModel,
@@ -45,10 +47,10 @@ namespace kiwi
     public:
         
         //! @brief Constructor
-        Console(sConsoleHistory history);
+        ConsoleContent(sConsoleHistory history);
         
         //! @brief Destructor
-        ~Console();
+        ~ConsoleContent();
         
         //! @brief Gets the ConsoleHistory.
         sConsoleHistory getHistory();
@@ -76,6 +78,9 @@ namespace kiwi
         
         //! @brief Get the number of rows currently displayed by the console
         int getNumRows() override;
+        
+        //! @brief Get the number of selected rows.
+        int getNumSelectedRows() const;
         
         //! @brief This is overloaded from TableListBoxModel, and should fill in the background of the whole row
         void paintRowBackground(juce::Graphics& g,
@@ -111,6 +116,15 @@ namespace kiwi
         //! @brief This is overloaded from TableListBoxModel.
         //! @details Should choose and return the best width for the specified column.
         int getColumnAutoSizeWidth(int columnId) override;
+        
+        //! @brief Scroll the list to the top.
+        void scrollToTop();
+        
+        //! @brief Scroll the list to the bottom.
+        void scrollToBottom();
+        
+        //! @brief Clear all the console content.
+        void clearAll();
         
         // ================================================================================ //
         //                          TABLE HEADER COMPONENT LISTENER                         //
@@ -150,6 +164,69 @@ namespace kiwi
         wConsoleHistory     m_history;
         juce::Font          m_font;
         juce::TableListBox  m_table;
+        
+        friend class Console;
+    };
+    
+    // ================================================================================ //
+    //                                   CONSOLE TOOLBAR                                //
+    // ================================================================================ //
+    
+    class ConsoleToolbarFactory : public juce::ToolbarItemFactory
+    {
+    public: // methods
+        
+        //! @brief Constructor.
+        ConsoleToolbarFactory();
+        
+        enum ItemIds
+        {
+            clear               = 1,
+            scroll_to_top       = 2,
+            scroll_to_bottom    = 3,
+        };
+        
+        void getAllToolbarItemIds(juce::Array<int>& ids) override;
+        
+        void getDefaultItemSet(juce::Array<int>& ids) override;
+        
+        juce::ToolbarItemComponent* createItem(int itemId) override;
+        
+    private: // variables
+        
+    };
+    
+    // ================================================================================ //
+    //                                  CONSOLE COMPONENT                               //
+    // ================================================================================ //
+    
+    class Console : public juce::Component, public juce::ApplicationCommandTarget
+    {
+    public: // methods
+        
+        //! @brief Constructor
+        Console(sConsoleHistory history);
+        
+        //! @brief juce::Component::resized
+        void resized() override;
+        
+        //! @brief juce::Component::paint
+        void paint(juce::Graphics& g) override;
+        
+        // ================================================================================ //
+        //                              APPLICATION COMMAND TARGET                          //
+        // ================================================================================ //
+        
+        juce::ApplicationCommandTarget* getNextCommandTarget() override;
+        void getAllCommands(juce::Array<juce::CommandID>& commands) override;
+        void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
+        bool perform(const InvocationInfo& info) override;
+        
+    private: // variables
+        
+        ConsoleContent  m_console;
+        juce::Toolbar   m_toolbar;
+        ConsoleToolbarFactory m_toolbar_factory;
     };
 }
 
