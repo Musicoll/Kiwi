@@ -45,7 +45,7 @@ namespace kiwi
     m_instance(instance),
     m_patcher_model(patcher),
     m_view_model(view),
-    m_viewport(new PatcherViewport(*this)),
+    m_viewport(*this),
     m_hittester(new HitTester(*this)),
     m_io_highlighter(new IoletHighlighter()),
     m_lasso(new Lasso(*this)),
@@ -60,7 +60,7 @@ namespace kiwi
         addChildComponent(m_lasso.get());
 
         loadPatcher();
-        m_viewport->updatePatcherArea(true);
+        m_viewport.updatePatcherArea(true);
     }
     
     PatcherView::~PatcherView()
@@ -69,7 +69,6 @@ namespace kiwi
         removeChildComponent(m_lasso.get());
         m_io_highlighter.reset();
         m_lasso.reset();
-        m_viewport.reset();
         
         m_local_objects_selection.clear();
         m_local_links_selection.clear();
@@ -181,7 +180,7 @@ namespace kiwi
                                     m_select_on_mouse_down_status = selectOnMouseDown(*object_view, true);
                                 }
                                 
-                                const auto pos = e.getPosition() - m_viewport->getOriginPosition();
+                                const auto pos = e.getPosition() - m_viewport.getOriginPosition();
                                 showObjectPopupMenu(*object_view, pos);
                                                     
                             }
@@ -215,7 +214,7 @@ namespace kiwi
                                 m_select_on_mouse_down_status = selectOnMouseDown(*link_view, true);
                             }
   
-                            const auto pos = e.getPosition() - m_viewport->getOriginPosition();
+                            const auto pos = e.getPosition() - m_viewport.getOriginPosition();
                             showLinkPopupMenu(*link_view, pos);
                         }
                         else
@@ -229,7 +228,7 @@ namespace kiwi
             {
                 if(e.mods.isRightButtonDown())
                 {
-                    showPatcherPopupMenu(e.getPosition() - m_viewport->getOriginPosition());
+                    showPatcherPopupMenu(e.getPosition() - m_viewport.getOriginPosition());
                 }
                 else
                 {
@@ -239,7 +238,7 @@ namespace kiwi
         }
         else if(e.mods.isRightButtonDown())
         {
-            showPatcherPopupMenu(e.getPosition() - m_viewport->getOriginPosition());
+            showPatcherPopupMenu(e.getPosition() - m_viewport.getOriginPosition());
         }
         
         m_last_drag = e.getPosition();
@@ -340,17 +339,17 @@ namespace kiwi
                             moveSelectedObjects(delta, true, true);
                             m_last_drag = pos;
                             
-                            if(! m_viewport->getRelativeViewArea().contains(pos))
+                            if(! m_viewport.getRelativeViewArea().contains(pos))
                             {
                                 // scroll viewport
                                 beginDragAutoRepeat(50);
-                                const juce::MouseEvent e2(e.getEventRelativeTo(m_viewport.get()));
-                                m_viewport->autoScroll(e2.x, e2.y, 5, 5);
+                                const juce::MouseEvent e2(e.getEventRelativeTo(&m_viewport));
+                                m_viewport.autoScroll(e2.x, e2.y, 5, 5);
                             }
                         }
                         else
                         {
-                            m_viewport->updatePatcherArea(true);
+                            m_viewport.updatePatcherArea(true);
                         }
                     }
                 }
@@ -641,7 +640,7 @@ namespace kiwi
     {
         DocumentManager::endCommitGesture(m_patcher_model);
         m_is_in_move_or_resize_gesture = false;
-        m_viewport->updatePatcherArea(true);
+        m_viewport.updatePatcherArea(true);
 
         HitTester& hit = *m_hittester;
         
@@ -650,7 +649,7 @@ namespace kiwi
             ObjectView* object_view = hit.getObject();
             if(object_view)
             {
-                m_viewport->jumpViewToObject(*object_view);
+                m_viewport.jumpViewToObject(*object_view);
             }
         }
     }
@@ -1304,7 +1303,7 @@ namespace kiwi
     
     juce::Point<int> PatcherView::getOriginPosition() const
     {
-        return m_viewport->getOriginPosition();
+        return m_viewport.getOriginPosition();
     }
     
     void PatcherView::originPositionChanged()
@@ -1324,7 +1323,7 @@ namespace kiwi
         
         if(isAnyObjectSelected())
         {
-            m_viewport->bringRectToCentre(getSelectionBounds());
+            m_viewport.bringRectToCentre(getSelectionBounds());
         }
     }
     
@@ -1335,7 +1334,7 @@ namespace kiwi
         
         if(isAnyObjectSelected())
         {
-            m_viewport->bringRectToCentre(getSelectionBounds());
+            m_viewport.bringRectToCentre(getSelectionBounds());
         }
     }
     
@@ -1349,7 +1348,7 @@ namespace kiwi
             
             if(isAnyObjectSelected())
             {
-                m_viewport->bringRectToCentre(getSelectionBounds());
+                m_viewport.bringRectToCentre(getSelectionBounds());
             }
         }
     }
@@ -1416,7 +1415,7 @@ namespace kiwi
         
         if(objects_bounds_changed && !view.removed() && !m_is_in_move_or_resize_gesture)
         {
-            m_viewport->updatePatcherArea(true);
+            m_viewport.updatePatcherArea(true);
         }
         
         if(!view.removed() && patcher.nameChanged())
@@ -1516,7 +1515,7 @@ namespace kiwi
                 
                 if(m_is_locked)
                 {
-                    m_viewport->resetObjectsArea();
+                    m_viewport.resetObjectsArea();
                 }
                 
                 updateWindowTitle();
@@ -1528,7 +1527,7 @@ namespace kiwi
             if(m_view_model.zoomFactorChanged())
             {
                 const double zoom = m_view_model.getZoomFactor();
-                m_viewport->setZoomFactor(zoom);
+                m_viewport.setZoomFactor(zoom);
             }
         }
     }
@@ -2221,7 +2220,7 @@ namespace kiwi
         
         DocumentManager::commit(m_patcher_model, "Delete objects and links");
         
-        m_viewport->updatePatcherArea(false);
+        m_viewport.updatePatcherArea(false);
     }
     
     // ================================================================================ //

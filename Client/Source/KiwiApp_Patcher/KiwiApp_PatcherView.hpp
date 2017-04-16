@@ -28,6 +28,7 @@
 
 #include "flip/DocumentObserver.h"
 
+#include "KiwiApp_PatcherViewport.hpp"
 
 namespace kiwi
 {
@@ -38,7 +39,6 @@ namespace kiwi
     class LinkViewCreator;
     class Instance;
     class HitTester;
-    class PatcherViewport;
     class IoletHighlighter;
     class Lasso;
     
@@ -95,7 +95,7 @@ namespace kiwi
         
         //! @brief Returns the Viewport that contains this patcher view.
         //! @details You must use this method if you want to add this component into an other one.
-        PatcherViewport& getViewport() { return *m_viewport.get(); }
+        PatcherViewport& getViewport() { return m_viewport; }
         
         //! @brief Returns the position of the patcher origin relative to the component position.
         juce::Point<int> getOriginPosition() const;
@@ -371,7 +371,7 @@ namespace kiwi
         std::map<flip::Ref, std::set<uint64_t>>     m_distant_objects_selection;
         std::map<flip::Ref, std::set<uint64_t>>     m_distant_links_selection;
         
-        std::unique_ptr<PatcherViewport>            m_viewport;
+        PatcherViewport                             m_viewport;
         std::unique_ptr<HitTester>                  m_hittester;
         std::unique_ptr<LinkViewCreator>            m_link_creator;
         std::unique_ptr<IoletHighlighter>           m_io_highlighter;
