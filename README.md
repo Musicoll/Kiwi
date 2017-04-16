@@ -71,3 +71,7 @@ This script takes 2 required arguments:
  $ cd {kiwi_directory_path}
  $ python ./Config/ressource.py -i ./Ressources/BinaryRes -o ./Client/Source
  ```
+
+ Credits:
+
+ - Some of the application icons are *designed by Freepik and distributed by Flaticon*.
