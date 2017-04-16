@@ -22,12 +22,15 @@
 #ifndef KIWI_APP_PATCHERVIEW_HELPER_HPP_INCLUDED
 #define KIWI_APP_PATCHERVIEW_HELPER_HPP_INCLUDED
 
-#include "KiwiApp_PatcherView.hpp"
-#include "KiwiApp_ObjectView.hpp"
-#include "KiwiApp_LinkView.hpp"
+#include <juce_gui_extra/juce_gui_extra.h>
+#include <flip/Ref.h>
+#include <set>
 
 namespace kiwi
 {
+    class PatcherView;
+    class ObjectView;
+    
     // ================================================================================ //
     //                                   IOLET HILIGHTER                                //
     // ================================================================================ //

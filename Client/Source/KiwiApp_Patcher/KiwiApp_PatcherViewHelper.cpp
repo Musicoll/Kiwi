@@ -20,6 +20,9 @@
  */
 
 #include "KiwiApp_PatcherViewHelper.hpp"
+#include "KiwiApp_PatcherView.hpp"
+#include "KiwiApp_ObjectView.hpp"
+#include "KiwiApp_LinkView.hpp"
 
 namespace kiwi
 {

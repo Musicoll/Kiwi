@@ -30,6 +30,7 @@
 
 #include "KiwiApp_PatcherViewport.hpp"
 #include "KiwiApp_PatcherViewHitTester.hpp"
+#include "KiwiApp_PatcherViewHelper.hpp"
 
 namespace kiwi
 {
@@ -39,8 +40,6 @@ namespace kiwi
     class LinkView;
     class LinkViewCreator;
     class Instance;
-    class IoletHighlighter;
-    class Lasso;
     
     // ================================================================================ //
     //                                    PATCHER VIEW                                  //
@@ -373,9 +372,9 @@ namespace kiwi
         
         PatcherViewport                             m_viewport;
         HitTester                                   m_hittester;
+        IoletHighlighter                            m_io_highlighter;
+        Lasso                                       m_lasso;
         std::unique_ptr<LinkViewCreator>            m_link_creator;
-        std::unique_ptr<IoletHighlighter>           m_io_highlighter;
-        std::unique_ptr<Lasso>                      m_lasso;
         
         bool    m_is_locked;
         int     m_grid_size;

@@ -47,8 +47,8 @@ namespace kiwi
     m_view_model(view),
     m_viewport(*this),
     m_hittester(*this),
-    m_io_highlighter(new IoletHighlighter()),
-    m_lasso(new Lasso(*this)),
+    m_io_highlighter(),
+    m_lasso(*this),
     m_grid_size(20),
     m_object_border_down_status(HitTester::Border::None)
     {
@@ -56,8 +56,8 @@ namespace kiwi
         KiwiApp::bindToKeyMapping(this);
         setWantsKeyboardFocus(true);
         
-        addChildComponent(m_io_highlighter.get());
-        addChildComponent(m_lasso.get());
+        addChildComponent(m_io_highlighter);
+        addChildComponent(m_lasso);
 
         loadPatcher();
         m_viewport.updatePatcherArea(true);
@@ -65,10 +65,8 @@ namespace kiwi
     
     PatcherView::~PatcherView()
     {
-        removeChildComponent(m_io_highlighter.get());
-        removeChildComponent(m_lasso.get());
-        m_io_highlighter.reset();
-        m_lasso.reset();
+        removeChildComponent(&m_io_highlighter);
+        removeChildComponent(&m_lasso);
         
         m_local_objects_selection.clear();
         m_local_links_selection.clear();
@@ -232,7 +230,7 @@ namespace kiwi
                 }
                 else
                 {
-                    m_lasso->begin(e.getPosition(), e.mods.isShiftDown());
+                    m_lasso.begin(e.getPosition(), e.mods.isShiftDown());
                 }
             }
         }
@@ -254,9 +252,9 @@ namespace kiwi
         
         if(!isLocked())
         {
-            if(m_lasso->isPerforming())
+            if(m_lasso.isPerforming())
             {
-                m_lasso->perform(e.getPosition(), true, e.mods.isAltDown(), e.mods.isShiftDown());
+                m_lasso.perform(e.getPosition(), true, e.mods.isAltDown(), e.mods.isShiftDown());
             }
     
             if(m_link_creator)
@@ -271,17 +269,17 @@ namespace kiwi
                     {
                         if(sender)
                         {
-                            m_io_highlighter->highlightInlet(*object_view, end_pair.second);
+                            m_io_highlighter.highlightInlet(*object_view, end_pair.second);
                         }
                         else
                         {
-                            m_io_highlighter->highlightOutlet(*object_view, end_pair.second);
+                            m_io_highlighter.highlightOutlet(*object_view, end_pair.second);
                         }
                     }
                 }
                 else
                 {
-                    m_io_highlighter->hide();
+                    m_io_highlighter.hide();
                 }
             }
             
@@ -370,15 +368,15 @@ namespace kiwi
         
         if(!isLocked())
         {
-            if(m_lasso->isPerforming())
+            if(m_lasso.isPerforming())
             {
-                m_lasso->end();
+                m_lasso.end();
                 return;
             }
    
             if(m_link_creator)
             {
-                m_io_highlighter->hide();
+                m_io_highlighter.hide();
                 
                 auto end_pair = getLinkCreatorNearestEndingIolet();
                 if(end_pair.first != nullptr)
@@ -483,7 +481,7 @@ namespace kiwi
 
             if (hit.getZone() != HitTester::Zone::Outlet && hit.getZone() != HitTester::Zone::Inlet)
             {
-                m_io_highlighter->hide();
+                m_io_highlighter.hide();
             }
             
             if(hit.objectTouched())
@@ -497,11 +495,11 @@ namespace kiwi
                 {
                     if(hit.getZone() == HitTester::Zone::Inlet)
                     {
-                        m_io_highlighter->highlightInlet(*hit.getObject(), hit.getIndex());
+                        m_io_highlighter.highlightInlet(*hit.getObject(), hit.getIndex());
                     }
                     else
                     {
-                        m_io_highlighter->highlightOutlet(*hit.getObject(), hit.getIndex());
+                        m_io_highlighter.highlightOutlet(*hit.getObject(), hit.getIndex());
                     }
                     
                     mc = juce::MouseCursor::PointingHandCursor;
@@ -1449,7 +1447,7 @@ namespace kiwi
                     {
                         removeChildComponent(m_link_creator.get());
                         m_link_creator.reset();
-                        m_io_highlighter->hide();
+                        m_io_highlighter.hide();
                     }
                 }
                 
