@@ -30,12 +30,33 @@ namespace kiwi
     //                            PATCHER COMPONENT TOOLBAR                             //
     // ================================================================================ //
     
-    PatcherToolbarFactory::PatcherToolbarFactory()
+    PatcherToolbar::PatcherToolbar()
     {
+        m_toolbar.setVertical(false);
+        m_toolbar.setStyle(juce::Toolbar::ToolbarItemStyle::iconsOnly);
+        m_toolbar.setColour(juce::Toolbar::ColourIds::backgroundColourId, juce::Colours::whitesmoke);
+        m_toolbar.setColour(juce::Toolbar::ColourIds::labelTextColourId, juce::Colours::black);
+        m_toolbar.setColour(juce::Toolbar::ColourIds::buttonMouseOverBackgroundColourId, juce::Colours::whitesmoke.contrasting(0.1));
+        m_toolbar.setColour(juce::Toolbar::ColourIds::buttonMouseDownBackgroundColourId, juce::Colours::whitesmoke.contrasting(0.2));
         
+        m_toolbar.setWantsKeyboardFocus(false);
+        setWantsKeyboardFocus(false);
+        
+        addAndMakeVisible(m_toolbar);
+        m_toolbar.addDefaultItems(m_factory);
     }
     
-    void PatcherToolbarFactory::getAllToolbarItemIds(juce::Array<int>& ids)
+    void PatcherToolbar::resized()
+    {
+        m_toolbar.setBounds(getLocalBounds().reduced(0, 2));
+    }
+    
+    void PatcherToolbar::paint(juce::Graphics& g)
+    {
+        g.fillAll(juce::Colour(0xff444444));
+    }
+    
+    void PatcherToolbar::Factory::getAllToolbarItemIds(juce::Array<int>& ids)
     {
         ids.add(lock_unlock);
         ids.add(zoom_in);
@@ -46,7 +67,7 @@ namespace kiwi
         ids.add(dsp_on_off);
     }
     
-    void PatcherToolbarFactory::getDefaultItemSet(juce::Array<int>& ids)
+    void PatcherToolbar::Factory::getDefaultItemSet(juce::Array<int>& ids)
     {
         ids.add(dsp_on_off);
         ids.add(separatorBarId);
@@ -57,7 +78,7 @@ namespace kiwi
         ids.add(zoom_out);
     }
     
-    juce::ToolbarItemComponent* PatcherToolbarFactory::createItem(int itemId)
+    juce::ToolbarItemComponent* PatcherToolbar::Factory::createItem(int itemId)
     {
         juce::ToolbarItemComponent* btn = nullptr;
         
@@ -108,19 +129,8 @@ namespace kiwi
         
         KiwiApp::bindToCommandManager(this);
         KiwiApp::bindToKeyMapping(this);
-        
-        m_toolbar.setVertical(false);
-        m_toolbar.setStyle(juce::Toolbar::ToolbarItemStyle::iconsOnly);
-        m_toolbar.setColour(juce::Toolbar::ColourIds::backgroundColourId, juce::Colours::whitesmoke);
-        m_toolbar.setColour(juce::Toolbar::ColourIds::labelTextColourId, juce::Colours::black);
-        m_toolbar.setColour(juce::Toolbar::ColourIds::buttonMouseOverBackgroundColourId, juce::Colours::whitesmoke.contrasting(0.1));
-        m_toolbar.setColour(juce::Toolbar::ColourIds::buttonMouseDownBackgroundColourId, juce::Colours::whitesmoke.contrasting(0.2));
-        
-        m_toolbar.setWantsKeyboardFocus(false);
+
         addAndMakeVisible(m_toolbar);
-        
-        // And use our item factory to add a set of default icons to it...
-        m_toolbar.addDefaultItems(m_toolbar_factory);
     }
     
     PatcherView& PatcherComponent::usePatcherView()
@@ -131,17 +141,13 @@ namespace kiwi
     void PatcherComponent::resized()
     {
         const int toolbar_size = 40;
-        m_toolbar.setBounds(getLocalBounds().withBottom(toolbar_size).reduced(0, 2));
+        m_toolbar.setBounds(getLocalBounds().withBottom(toolbar_size));
         m_patcherview.getViewport().setBounds(getLocalBounds().withTop(toolbar_size));
     }
     
     void PatcherComponent::paint(juce::Graphics& g)
     {
-        const int toolbar_size = 40;
-        const auto header_bounds = getLocalBounds().withBottom(toolbar_size);
-        
-        g.setColour(juce::Colour(0xff444444));
-        g.fillRect(header_bounds);
+        ;
     }
     
     // ================================================================================ //

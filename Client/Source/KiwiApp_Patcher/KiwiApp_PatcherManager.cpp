@@ -71,15 +71,12 @@ namespace kiwi
     PatcherManager::PatcherManager(Instance& instance) :
     m_instance(instance),
     m_validator(),
-    m_document(model::DataModel::use(), *this, m_validator, m_instance.getUserId(), 'cicm', 'kpat'),
+    m_document(model::DataModel::use(), *this, m_validator,
+               m_instance.getUserId(), 'cicm', 'kpat'),
+    m_need_saving_flag(false),
     m_is_remote(false)
     {
-        model::Patcher & patcher = getPatcher();
-        
-        patcher.useSelfUser();
-        DocumentManager::commit(patcher);
-        
-        m_need_saving_flag = false;
+        ;
     }
     
     PatcherManager::~PatcherManager()
@@ -442,6 +439,7 @@ namespace kiwi
         {
             auto& patcherview = view.entity().emplace<PatcherView>(*this, m_instance, patcher, view);
             view.entity().emplace<PatcherViewWindow>(*this, patcherview);
+            patcherview.updateWindowTitle();
         }
     }
 

@@ -30,26 +30,43 @@ namespace kiwi
     //                            PATCHER COMPONENT TOOLBAR                             //
     // ================================================================================ //
     
-    class PatcherToolbarFactory : public juce::ToolbarItemFactory
+    class PatcherToolbar : public juce::Component
     {
     public: // methods
         
         //! @brief Constructor.
-        PatcherToolbarFactory();
+        PatcherToolbar();
         
-        enum ItemIds
+        //! @brief juce::Component::resized
+        void resized() override;
+        
+        //! @brief juce::Component::paint
+        void paint(juce::Graphics& g) override;
+        
+    private: // classes
+        
+        //! @internal Toolbar item factory
+        struct Factory : public juce::ToolbarItemFactory
         {
-            lock_unlock         = 1,
-            zoom_in             = 2,
-            zoom_out            = 3,
-            dsp_on_off          = 4,
+            enum ItemIds
+            {
+                lock_unlock         = 1,
+                zoom_in             = 2,
+                zoom_out            = 3,
+                dsp_on_off          = 4,
+            };
+            
+            void getAllToolbarItemIds(juce::Array<int>& ids) override;
+            
+            void getDefaultItemSet(juce::Array<int>& ids) override;
+            
+            juce::ToolbarItemComponent* createItem(int itemId) override;
         };
         
-        void getAllToolbarItemIds(juce::Array<int>& ids) override;
+    private: // variables
         
-        void getDefaultItemSet(juce::Array<int>& ids) override;
-        
-        juce::ToolbarItemComponent* createItem(int itemId) override;
+        juce::Toolbar   m_toolbar;
+        Factory         m_factory;
     };
     
     // ================================================================================ //
@@ -87,9 +104,8 @@ namespace kiwi
 
     private: // members
         
-        PatcherView&            m_patcherview;
-        juce::Toolbar           m_toolbar;
-        PatcherToolbarFactory   m_toolbar_factory;
+        PatcherView&    m_patcherview;
+        PatcherToolbar  m_toolbar;
     };
 }
 
