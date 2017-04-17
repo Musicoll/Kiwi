@@ -27,7 +27,7 @@
 #include <list>
 #include <chrono>
 #include <stdexcept>
-#include <string>
+#include <mutex>
 
 #include "KiwiEngine_ConcurrentQueue.hpp"
 
@@ -56,6 +56,8 @@ namespace kiwi
             class Producer;
             
             class Event;
+            
+            using event_t = std::shared_ptr<Event>;
             
         public: // methods
             
@@ -95,7 +97,7 @@ namespace kiwi
             
             struct Command
             {
-                std::weak_ptr<Event>    m_event;
+                std::shared_ptr<Event>  m_event;
                 time_point_t            m_time;
             };
             
@@ -105,6 +107,8 @@ namespace kiwi
             
             ~Producer();
             
+            std::shared_ptr<Event> createEvent(Task * task);
+            
             void schedule(Task * task, duration_t delay);
 
             void unschedule(Task * task);
@@ -113,14 +117,18 @@ namespace kiwi
             
         private: // methods
             
-            void remove(std::shared_ptr<Event> event);
+            void remove(std::shared_ptr<Event> const& event);
             
-            void insert(std::shared_ptr<Event> event);
+            void insert(std::shared_ptr<Event> const& event);
             
         private: // members
             
-            std::list<std::weak_ptr<Event>> m_events;
-            ConcurrentQueue<Command>        m_commands;
+            std::shared_ptr<Event>              m_head;
+            
+            std::vector<std::shared_ptr<Event>> m_pool;
+            std::mutex                          m_pool_mutex;
+            
+            ConcurrentQueue<Command>            m_commands;
             
             
         private: // deleted methods
@@ -176,11 +184,15 @@ namespace kiwi
         {
         public: // methods
             
-            Event(Task & task);
+            Event(Task * task);
             
             ~Event();
             
             void execute();
+            
+        private: // methods
+            
+            void removeTask();
             
         private: // friends
             
@@ -188,8 +200,9 @@ namespace kiwi
             
         private: // members
             
-            Task&                   m_task;
-            time_point_t            m_time;
+            Task *                      m_task;
+            time_point_t                m_time;
+            std::shared_ptr<Event>      m_next;
             
         private: // deleted methods
             

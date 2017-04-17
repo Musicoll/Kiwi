@@ -277,3 +277,165 @@ TEST_CASE("Scheduler", "[Scheduler]")
         CHECK(process_counter.load() == 1500);
     }
 }
+
+// ==================================================================================== //
+//                                          SCHEDULER BENCHMARK                         //
+// ==================================================================================== //
+
+void check_precision(std::vector<Scheduler::duration_t> * precision, Scheduler::time_point_t expected_time)
+{
+    precision->push_back(Scheduler::clock_t::now() - expected_time);
+}
+
+size_t mean(std::vector<Scheduler::duration_t> &duration_list)
+{
+    size_t mean = 0;
+    
+    for (int i = 0; i < duration_list.size(); ++i)
+    {
+        mean = mean + std::chrono::duration_cast<std::chrono::nanoseconds>(duration_list[i]).count();
+    }
+    
+    return mean / duration_list.size();
+}
+
+void construct_delay_list(std::vector<size_t> &delay_list, size_t size)
+{
+    std::vector<size_t> increment_list = {11, 56, 12, 70, 2, 92, 32, 66, 3, 102};
+    
+    size_t cursor = 0;
+    size_t delay = 0;
+    
+    for (int i = 0; i < size; ++i)
+    {
+        delay_list.push_back(delay);
+        
+        delay  = (delay + increment_list[cursor])  % 100;
+        
+        cursor = cursor = increment_list.size() ? 0 : cursor + 1;
+    }
+}
+
+TEST_CASE("Scheduler Benchmark", "[Scheduler]")
+{
+    SECTION("Benchmark no delay MonoProducer")
+    {
+        Scheduler sch;
+        
+        Scheduler::token_t token = sch.createProducerToken();
+        
+        // vector to check the mean of insertion time
+        std::vector<Scheduler::duration_t> insert;
+        insert.reserve(2048);
+        
+        // vector to check the execution precision of the callback
+        std::vector<Scheduler::duration_t> precision;
+        precision.reserve(2048);
+        
+        Scheduler::time_point_t before_launch = Scheduler::clock_t::now();
+        
+        std::thread producer([&sch, &token, &insert, &precision]()
+        {
+            size_t counter = 0;
+            
+            while(counter < 2048)
+            {
+                Scheduler::duration_t delay = std::chrono::milliseconds(0);
+                
+                Scheduler::Task* task =
+                    new Task(sch,
+                             token,
+                             std::bind(check_precision, &precision, Scheduler::clock_t::now()));
+                                     
+                                     
+                Scheduler::time_point_t before = Scheduler::clock_t::now();
+                
+                sch.schedule(task, delay);
+                
+                insert.push_back(Scheduler::clock_t::now() - before);
+                ++counter;
+            }
+        });
+        
+        std::thread consumer([&sch, &precision]()
+        {
+            while(precision.size() < 2048)
+            {
+                sch.process();
+            }
+        });
+        
+        producer.join();
+        consumer.join();
+        
+        size_t exec_time = std::chrono::duration_cast<std::chrono::microseconds>(Scheduler::clock_t::now() - before_launch).count();
+        
+        std::cout << "Benchmark no delay results ------------" << std::endl;
+        std::cout << "Global Time : " << exec_time << " microseconds" << std::endl;
+        std::cout << "Mean insert time : " << mean(insert) << " nanoseconds" << std::endl;
+        std::cout << "Mean precision : " << mean(precision) << " nanoseconds" << std::endl << std::endl;
+    }
+    
+    SECTION("Benchmark random delay MonoProducer")
+    {
+        Scheduler sch;
+        
+        size_t token = sch.createProducerToken();
+        
+        // vector to check the mean of insertion time
+        std::vector<Scheduler::duration_t> insert;
+        insert.reserve(2048);
+        
+        // vector to check the execution precision of the callback
+        std::vector<Scheduler::duration_t> precision;
+        precision.reserve(2048);
+        
+        // vector of pseudo random delay time between 0 and 100
+        std::vector<size_t> delay_list;
+        construct_delay_list(delay_list, 2048);
+        
+        Scheduler::time_point_t before_launch = Scheduler::clock_t::now();
+        
+        std::thread producer([&sch, &token, &insert, &precision, &delay_list]()
+        {
+            size_t counter = 0;
+            
+            while(counter < 2048)
+            {
+                Scheduler::duration_t delay = std::chrono::milliseconds(delay_list[counter]);
+                
+                std::function<void(void)> func =
+                    std::bind(check_precision, &precision, Scheduler::clock_t::now() + delay);
+                
+                Task* task = new Task(sch, token, func);
+                
+                Scheduler::time_point_t before = Scheduler::clock_t::now();
+                
+                sch.schedule(task, delay);
+                
+                insert.push_back(Scheduler::clock_t::now() - before);
+                ++counter;
+            }
+        });
+        
+        std::thread consumer([&sch, &precision]()
+        {
+            while(precision.size() < 2048)
+            {
+                sch.process();
+            }
+        });
+        
+        consumer.join();
+        producer.join();
+        
+        size_t exec_time =
+        std::chrono::duration_cast<std::chrono::microseconds>(Scheduler::clock_t::now() - before_launch).count();
+        
+        std::cout << "Benchmark delay results -------------------" << std::endl;
+        std::cout << "Global Time : " << exec_time << " microseconds" << std::endl;
+        std::cout << "Mean insert time : " << mean(insert) << " nanoseconds" << std::endl;
+        std::cout << "Mean precision nanoseconds: " << mean(precision) << " nanoseconds" << std::endl << std::endl;
+    }
+}
+

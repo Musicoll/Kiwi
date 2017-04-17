@@ -82,7 +82,8 @@ namespace kiwi
         
         template<class Clock>
         Scheduler<Clock>::Producer::Producer():
-        m_events(),
+        m_head(),
+        m_pool(),
         m_commands(1024, 256)
         {
         }
@@ -90,6 +91,20 @@ namespace kiwi
         template<class Clock>
         Scheduler<Clock>::Producer::~Producer()
         {
+        }
+        
+        template<class Clock>
+        std::shared_ptr<typename Scheduler<Clock>::Event> Scheduler<Clock>::Producer::createEvent(Task * task)
+        {
+            // clean up pool before inserting new elements
+            m_pool.erase(std::remove_if(m_pool.begin(), m_pool.end(),
+                                        [](auto & event){return event.use_count() <= 1;}),
+                         m_pool.end());
+            
+            // Create new element in event pool.
+            m_pool.emplace_back(std::make_shared<Event>(task));
+            
+            return m_pool.back();
         }
         
         template<class Clock>
@@ -107,51 +122,72 @@ namespace kiwi
         }
         
         template<class Clock>
-        void Scheduler<Clock>::Producer::remove(std::shared_ptr<Event> event)
+        void Scheduler<Clock>::Producer::remove(std::shared_ptr<Event> const& event)
         {
-            typename std::list<std::weak_ptr<Event>>::iterator event_it = m_events.begin();
-            
-            bool removed = false;
-            
-            while(event_it != m_events.end() && !removed)
+            if (m_head)
             {
-                std::shared_ptr<Event> list_event = (*event_it).lock();
-                
-                if (list_event == nullptr || list_event == event)
+                if(m_head == event)
                 {
-                    m_events.erase(event_it);
-                    removed = true;
+                    m_head = event->m_next;
                 }
-                
-                ++event_it;
+                else
+                {
+                    Event* current = m_head->m_next.get();
+                    Event* previous = m_head.get();
+                    
+                    while(current)
+                    {
+                        if(current == event.get())
+                        {
+                            previous->m_next = current->m_next;
+                            return;
+                        }
+                        previous = current;
+                        current = current->m_next.get();
+                    }
+                }
             }
         }
-        
+    
         template<class Clock>
-        void Scheduler<Clock>::Producer::insert(std::shared_ptr<Event> event)
+        void Scheduler<Clock>::Producer::insert(std::shared_ptr<Event> const& event)
         {
             remove(event);
             
-            typename std::list<std::weak_ptr<Event>>::iterator event_it = m_events.begin();
-            
-            bool inserted = false;
-            
-            while(event_it != m_events.end() && !inserted)
+            if(m_head)
             {
-                std::shared_ptr<Event> list_event = (*event_it).lock();
-                
-                if (list_event && (event->m_time < list_event->m_time))
+                if(m_head->m_time > event->m_time)
                 {
-                    m_events.insert(event_it, event);
-                    inserted = true;
+                    event->m_next = m_head;
+                    m_head = event;
+                    return;
                 }
                 
-                ++event_it;
+                Event* previous = m_head.get();
+                Event* current = previous->m_next.get();
+                
+                while(current)
+                {
+                    if(current->m_time > event->m_time)
+                    {
+                        event->m_next = previous->m_next;
+                        previous->m_next = event;
+                        return;
+                    }
+                    previous = current;
+                    current = current->m_next.get();
+                }
+                
+                previous->m_next = event;
+                event->m_next = nullptr;
             }
-            
-            if (!inserted) {m_events.push_back(event);}
+            else
+            {
+                m_head = event;
+                event->m_next = nullptr;
+            }
         }
-        
+    
         template<class Clock>
         void Scheduler<Clock>::Producer::process(time_point_t process_time)
         {
@@ -163,44 +199,37 @@ namespace kiwi
                 
                 if (m_commands.pop(command))
                 {
-                    std::shared_ptr<Event> event = command.m_event.lock();
-                    
-                    if (event)
+                    if (command.m_event)
                     {
                         if (command.m_time != clock_t::time_point::max())
                         {
-                            event->m_time = command.m_time;
-                            insert(event);
+                            command.m_event->m_time = command.m_time;
+                            insert(command.m_event);
                         }
                         else
                         {
-                            remove(event);
+                            remove(command.m_event);
                         }
                     }
                 }
             }
             
-            typename std::list<std::weak_ptr<Event>>::iterator event_it = m_events.begin();
+            Event* event = nullptr;
             
             bool time_reached = false;
             
-            while(event_it != m_events.end() && !time_reached)
+            while((event = m_head.get()) != nullptr && !time_reached)
             {
-                std::shared_ptr<Event> event = event_it->lock();
-                
-                if (event)
+                if (event->m_time <= process_time)
                 {
-                    if (event->m_time <= process_time)
-                    {
-                        event->execute();
-                    }
-                    else
-                    {
-                        time_reached = true;
-                    }
+                    event->execute();
+                    remove(m_head);
+                    
                 }
-                
-                ++event_it;
+                else
+                {
+                    time_reached = true;
+                }
             }
         }
         
@@ -212,7 +241,7 @@ namespace kiwi
         Scheduler<Clock>::Task::Task(Scheduler & scheduler, token_t token):
         m_scheduler(scheduler),
         m_token(token),
-        m_event(std::make_shared<Event>(*this))
+        m_event(scheduler.m_producers[m_token].createEvent(this))
         {
             assert(token < m_scheduler.m_next_token);
         }
@@ -220,6 +249,7 @@ namespace kiwi
         template<class Clock>
         Scheduler<Clock>::Task::~Task()
         {
+            m_event->removeTask();
         }
         
         // ==================================================================================== //
@@ -227,10 +257,12 @@ namespace kiwi
         // ==================================================================================== //
         
         template<class Clock>
-        Scheduler<Clock>::Event::Event(Task & task):
+        Scheduler<Clock>::Event::Event(Task * task):
         m_task(task),
-        m_time(clock_t::time_point::max())
+        m_time(clock_t::time_point::max()),
+        m_next()
         {
+            assert(task != nullptr);
         }
         
         template<class Clock>
@@ -239,9 +271,18 @@ namespace kiwi
         }
         
         template<class Clock>
+        void Scheduler<Clock>::Event::removeTask()
+        {
+            m_task = nullptr;
+        }
+        
+        template<class Clock>
         void Scheduler<Clock>::Event::execute()
         {
-            m_task.execute();
+            if (m_task)
+            {
+                m_task->execute();
+            }
         }
     }
 }
