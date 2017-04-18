@@ -316,8 +316,7 @@ namespace kiwi
             if(res.error)
             {
                 juce::MessageManager::callAsync([message = res.error.message](){
-                    KiwiApp::error("Error: can't get documents");
-                    KiwiApp::error("=> " + message);
+                    KiwiApp::error("Kiwi API error: can't get documents => " + message);
                 });
                 
                 return;

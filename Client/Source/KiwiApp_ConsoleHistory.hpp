@@ -60,7 +60,7 @@ namespace kiwi
         size_t size();
         
         //! @brief Get a message from the history at a given index.
-        engine::Console::Message const* get(size_t index);
+        std::pair<engine::Console::Message const*, size_t> get(size_t index);
         
         //! @brief Erase a message from the history.
         //! @param index The index of the message.
@@ -92,6 +92,7 @@ namespace kiwi
         {
             engine::Console::Message    m_message;
             size_t                      m_index;
+            size_t                      m_repeat_times;
         };
         
         static bool compareIndex(MessageHolder const& i, MessageHolder const& j);

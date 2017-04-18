@@ -44,12 +44,37 @@ namespace kiwi
     void ConsoleHistory::newConsoleMessage(engine::Console::Message const& message)
     {
         {
-            std::lock_guard<std::mutex> guard(m_message_mutex);
-            size_t index = m_messages.size() + 1;
-            m_messages.push_back({message, index});
+            if(!message.text.empty())
+            {
+                bool changed = false;
+                {
+                    std::lock_guard<std::mutex> guard(m_message_mutex);
+                    
+                    if(!m_messages.empty())
+                    {
+                        auto& last = m_messages.back();
+                        auto& last_message = last.m_message;
+                        if(last_message.text == message.text
+                           && last_message.type == message.type)
+                        {
+                            last.m_repeat_times++;
+                            changed = true;
+                        }
+                    }
+                    
+                    if(!changed)
+                    {
+                        m_messages.push_back({message, m_messages.size() + 1});
+                        changed = true;
+                    }
+                }
+                
+                if(changed)
+                {
+                    m_listeners.call(&Listener::consoleHistoryChanged, *this);
+                }
+            }
         }
-        
-        m_listeners.call(&Listener::consoleHistoryChanged, *this);
     }
     
     void ConsoleHistory::clear()
@@ -67,17 +92,16 @@ namespace kiwi
         return m_messages.size();
     }
     
-    engine::Console::Message const* ConsoleHistory::get(size_t index)
+    std::pair<engine::Console::Message const*, size_t> ConsoleHistory::get(size_t index)
     {
         std::lock_guard<std::mutex> guard(m_message_mutex);
         if(index < m_messages.size())
         {
-            return &m_messages[index].m_message;
+            auto const& msg = m_messages[index];
+            return {&msg.m_message, msg.m_repeat_times};
         }
-        else
-        {
-            return nullptr;
-        }
+        
+        return {};
     }
     
     void ConsoleHistory::erase(size_t index)

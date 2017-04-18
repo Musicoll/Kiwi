@@ -106,7 +106,7 @@ namespace kiwi
             
             for(size_t i = 0; i < selection.size(); i++)
             {
-                auto msg = history->get(selection[i]);
+                auto msg = history->get(selection[i]).first;
                 if(msg && !msg->text.empty())
                 {
                     text += msg->text + "\n";
@@ -142,6 +142,7 @@ namespace kiwi
     void ConsoleContent::consoleHistoryChanged(ConsoleHistory const&)
     {
         m_table.updateContent();
+        m_table.repaint();
     }
     
     // ================================================================================ //
@@ -222,7 +223,7 @@ namespace kiwi
         
         const juce::Colour bgcolor(juce::Colours::lightgrey);
         
-        auto msg = history->get(rowNumber);
+        auto msg = history->get(rowNumber).first;
         if(msg)
         {
             if(selected)
@@ -277,8 +278,8 @@ namespace kiwi
         sConsoleHistory history = getHistory();
         if(!history) return; //abort
         
-        auto msg = history->get(rowNumber);
-        
+        auto pair = history->get(rowNumber);
+        auto msg = pair.first;
         if(msg)
         {
             g.setColour(juce::Colours::black.brighter(0.4));
@@ -294,8 +295,18 @@ namespace kiwi
                     
                 case Column::Message:
                 {
-                    g.drawText(msg->text, 2, 0, width - 4, height,
-                               juce::Justification::centredLeft, true);
+                    auto repeat_times = pair.second;
+                    if(repeat_times == 0)
+                    {
+                        g.drawText(msg->text, 2, 0, width - 4, height,
+                                   juce::Justification::centredLeft, true);
+                    }
+                    else
+                    {
+                        g.drawText("[" + std::to_string(repeat_times) + "x] " + msg->text,
+                                   2, 0, width - 4, height,
+                                   juce::Justification::centredLeft, true);
+                    }
                     break;
                 }
                     
@@ -341,8 +352,7 @@ namespace kiwi
             // find the widest bit of text in this column..
             for(int i = getNumRows(); --i >= 0;)
             {
-                const auto msg = history->get(i);
-                if(msg)
+                if(auto msg = history->get(i).first)
                 {
                     widest = std::max(widest, m_font.getStringWidth(msg->text));
                 }
