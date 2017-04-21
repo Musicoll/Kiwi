@@ -23,7 +23,7 @@
 
 #include "KiwiApp.hpp"
 #include "KiwiApp_Instance.hpp"
-#include "KiwiApp_PatcherView.hpp"
+#include "KiwiApp_Patcher/KiwiApp_PatcherView.hpp"
 
 #include "KiwiApp_Network/KiwiApp_DocumentManager.hpp"
 
@@ -32,6 +32,8 @@
 
 #include "KiwiApp_Window.hpp"
 #include "KiwiApp_AboutWindow.hpp"
+
+#include "KiwiApp_Patcher/KiwiApp_PatcherComponent.hpp"
 
 namespace kiwi
 {
@@ -147,7 +149,7 @@ namespace kiwi
         }
     }
 
-    void Instance::removePatcherWindow(PatcherViewWindow & patcher_window)
+    void Instance::removePatcherWindow(PatcherViewWindow& patcher_window)
     {
         if (!m_patcher_managers.empty())
         {

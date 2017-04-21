@@ -78,8 +78,9 @@ namespace kiwi
         showObjectInspector         = 0xf20410,        ///< Shows the selected objects properties inspector.
         openObjectHelp              = 0xf20411,        ///< Open selected object help patcher.
         
-        startDsp                    = 0xf20420,        ///< Starts the dsp
-        stopDsp                     = 0xf20421,        ///< Stops the dsp
+        switchDsp                   = 0xf20420,        ///< Toggle DSP state
+        startDsp                    = 0xf20421,        ///< Starts the dsp
+        stopDsp                     = 0xf20422,        ///< Stops the dsp
         
         scrollToTop                 = 0xf30001,        ///< Scroll to the top
         scrollToBottom              = 0xf30002,        ///< Scroll to the bottom

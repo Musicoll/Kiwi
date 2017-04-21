@@ -53,6 +53,9 @@ namespace kiwi
             //! @brief Get views.
             flip::Collection<Patcher::View> const& getViews() const noexcept;
             
+            //! @brief Get the number of active views.
+            size_t getNumberOfViews() const noexcept;
+            
             //! @brief Get the User id
             uint64_t getId() const;
             
