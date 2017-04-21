@@ -30,6 +30,11 @@ namespace kiwi
     {
         setColour(juce::TooltipWindow::backgroundColourId, juce::Colours::lightgrey);
         setColour(juce::TooltipWindow::textColourId, juce::Colour(0xff444444));
+        
+        // text editors
+        setColour(juce::TextEditor::highlightColourId, juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
+        setColour(juce::TextEditor::focusedOutlineColourId, juce::Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
+        setColour(juce::TextEditor::outlineColourId, juce::Colour::fromFloatRGBA(0.6, 0.6, 0.6, 0.6));
     }
     
     juce::Typeface::Ptr LookAndFeel::getTypefaceForFont(juce::Font const& font)

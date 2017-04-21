@@ -33,9 +33,7 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief A Component that allows to dispatch messages to Beacon::Castaway objects.
-    class BeaconDispatcher :
-    public juce::Component,
-    public juce::Button::Listener
+    class BeaconDispatcher : public juce::Component, public juce::Button::Listener
     {
     public:
         
@@ -58,10 +56,10 @@ namespace kiwi
         
     private: // members
         
-        engine::Instance&                   m_instance;
-        std::unique_ptr<juce::TextEditor>   m_beacon_name_editor;
-        std::unique_ptr<juce::TextEditor>   m_message_editor;
-        std::unique_ptr<juce::TextButton>   m_send_button;
+        engine::Instance&   m_instance;
+        juce::TextEditor    m_beacon_name_editor, m_message_editor;
+        juce::Label         m_beacon_name_label, m_message_label;
+        juce::TextButton    m_send_button;
     };
 }
 
