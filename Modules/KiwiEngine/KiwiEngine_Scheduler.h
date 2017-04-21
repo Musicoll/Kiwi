@@ -28,6 +28,7 @@
 #include <chrono>
 #include <stdexcept>
 #include <mutex>
+#include <set>
 
 #include "KiwiEngine_ConcurrentQueue.hpp"
 
@@ -39,12 +40,13 @@ namespace kiwi
         //                                       SCHEDULER                                      //
         // ==================================================================================== //
         
+        using thread_token = uint64_t;
+        
         template<class Clock>
         class Scheduler final
         {
         public: // classes
             
-            using token_t = uint64_t;
             using clock_t = Clock;
             using time_point_t = typename Clock::time_point;
             using duration_t = typename Clock::duration;
@@ -53,30 +55,41 @@ namespace kiwi
             
         private: // classes
         
-            class Producer;
+            class Queue;
             
             class Event;
             
-            using event_t = std::shared_ptr<Event>;
-            
         public: // methods
             
-            Scheduler();
+            static void createInstance();
+            
+            static Scheduler& getInstance();
             
             ~Scheduler();
             
-            token_t createProducerToken();
+            void registerConsumer(thread_token consumer);
+            
+            void registerProducer(thread_token producer, thread_token consumer);
             
             void schedule(Task * task, duration_t delay = std::chrono::milliseconds(0));
             
             void unschedule(Task * task);
             
-            void process();
+            void deleteTask(Task * task);
+            
+            void process(thread_token consumer);
+            
+        private: // methods
+            
+            Scheduler();
             
         private: // members
             
-            std::map<token_t, Producer> m_producers;
-            token_t                     m_next_token;
+            std::map<thread_token, std::map<thread_token, Queue>>   m_queues;
+            
+        private: // static members
+            
+            static std::unique_ptr<Scheduler> m_instance;
             
         private: // deleted methods
             
@@ -91,7 +104,7 @@ namespace kiwi
         // ==================================================================================== //
         
         template <class Clock>
-        class Scheduler<Clock>::Producer final
+        class Scheduler<Clock>::Queue final
         {
         public: // classes
             
@@ -103,11 +116,9 @@ namespace kiwi
             
         public: // methods
             
-            Producer();
+            Queue();
             
-            ~Producer();
-            
-            std::shared_ptr<Event> createEvent(Task * task);
+            ~Queue();
             
             void schedule(Task * task, duration_t delay);
 
@@ -123,20 +134,16 @@ namespace kiwi
             
         private: // members
             
-            std::shared_ptr<Event>              m_head;
-            
-            std::vector<std::shared_ptr<Event>> m_pool;
-            std::mutex                          m_pool_mutex;
-            
+            std::vector<std::shared_ptr<Event>> m_events;
             ConcurrentQueue<Command>            m_commands;
             
             
         private: // deleted methods
             
-            Producer(Producer const& other) = delete;
-            Producer(Producer && other) = delete;
-            Producer& operator=(Producer const& other) = delete;
-            Producer& operator=(Producer && other) = delete;
+            Queue(Queue const& other) = delete;
+            Queue(Queue && other) = delete;
+            Queue& operator=(Queue const& other) = delete;
+            Queue& operator=(Queue && other) = delete;
         };
         
         // ==================================================================================== //
@@ -146,21 +153,24 @@ namespace kiwi
         template <class Clock>
         class Scheduler<Clock>::Task
         {
-        public: // methods
+        protected: // methods
             
-            Task(Scheduler & scheduler, token_t token);
+            Task(thread_token producer, thread_token consumer);
             
             virtual ~Task();
             
-        private: // methods
+            void disable();
             
+        private: // methods
+
             virtual void execute() = 0;
             
-        private: // members
+        private: // methods
             
-            Scheduler &             m_scheduler;
-            token_t                 m_token;
+            thread_token            m_producer;
+            thread_token            m_consumer;
             std::shared_ptr<Event>  m_event;
+            mutable std::mutex      m_mutex;
             
         private: // friends
             
@@ -168,7 +178,6 @@ namespace kiwi
             
         private: // deleted methods
             
-            Task();
             Task(Task const& other) = delete;
             Task(Task && other) = delete;
             Task& operator=(Task const& other) = delete;
@@ -184,15 +193,17 @@ namespace kiwi
         {
         public: // methods
             
-            Event(Task * task);
+            Event(Task * task, time_point_t time);
             
             ~Event();
+            
+            bool operator==(Event const& other) const;
             
             void execute();
             
         private: // methods
             
-            void removeTask();
+            void disable();
             
         private: // friends
             
@@ -202,7 +213,7 @@ namespace kiwi
             
             Task *                      m_task;
             time_point_t                m_time;
-            std::shared_ptr<Event>      m_next;
+            mutable std::mutex          m_mutex;
             
         private: // deleted methods
             

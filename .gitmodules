@@ -9,4 +9,4 @@
 	url = https://github.com/whoshuu/cpr.git
 [submodule "ThirdParty/concurrentqueue"]
 	path = ThirdParty/concurrentqueue
-	url = git@github.com:cameron314/concurrentqueue.git
+	url = https://github.com/cameron314/concurrentqueue.git

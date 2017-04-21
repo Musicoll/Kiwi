@@ -50,45 +50,28 @@ namespace kiwi
             
         public: // methods
             
-            ConcurrentQueue(size_t capacity, size_t limit):
-            m_producer_queue(new mc::ConcurrentQueue<T, Traits>(capacity)),
-            m_consumer_queue(m_producer_queue.load()),
-            m_capacity(capacity),
-            m_limit(limit),
-            m_size(0),
-            m_alloc_thread()
+            ConcurrentQueue(size_t capacity):
+            m_queue(new mc::ConcurrentQueue<T, Traits>(capacity)),
+            m_size(0)
             {
             }
             
             ~ConcurrentQueue()
             {
-                if (m_alloc_thread.joinable())
-                {
-                    m_alloc_thread.join();
-                }
-                
-                delete m_producer_queue.load();
             }
             
             void push(T const& value)
             {
-                while(!m_producer_queue.load()->try_enqueue(value)){}
+                m_queue->enqueue(value);
                 
-                size_t new_size = std::atomic_fetch_add(&m_size, 1) + 1;
-                
-                if (m_alloc_thread.joinable()){m_alloc_thread.join();};
-                
-                if (new_size >= (m_capacity.load() - m_limit))
-                {
-                    m_alloc_thread = std::thread(std::bind(&ConcurrentQueue::reallocate, this));
-                }
+                std::atomic_fetch_add(&m_size, 1);
             }
             
             bool pop(T & value)
             {
-                bool success = m_consumer_queue.load()->try_dequeue(value);
+                bool success = m_queue->try_dequeue(value);
                 
-                std::atomic_fetch_add(&m_size, -1);
+                if (success) { std::atomic_fetch_add(&m_size, -1);}
                 
                 return success;
             }
@@ -98,34 +81,10 @@ namespace kiwi
                 return m_size.load();
             }
             
-        private: // methods
-            
-            void reallocate()
-            {
-                int capacity = m_capacity.load();
-                
-                mc::ConcurrentQueue<T, Traits>* new_queue = new mc::ConcurrentQueue<T, Traits>(2 * capacity);
-                mc::ConcurrentQueue<T, Traits>* former_queue = m_producer_queue.exchange(new_queue);
-                
-                while(former_queue->size_approx() != 0)
-                {
-                }
-                
-                m_consumer_queue.exchange(new_queue);
-                
-                delete former_queue;
-                
-                m_capacity.store(2 * capacity);
-            }
-            
         private: // members
             
-            std::atomic<mc::ConcurrentQueue<T, Traits> *>   m_producer_queue;
-            std::atomic<mc::ConcurrentQueue<T, Traits> *>   m_consumer_queue;
-            std::atomic<int>                                m_capacity;
-            size_t                                          m_limit;
+            std::unique_ptr<mc::ConcurrentQueue<T, Traits>> m_queue;
             std::atomic<int>                                m_size;
-            std::thread                                     m_alloc_thread;
             
         private: // deleted methods
             
