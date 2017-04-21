@@ -47,6 +47,7 @@ namespace kiwi
         m_message_editor.setReturnKeyStartsNewLine(false);
         m_message_editor.setMultiLine(false, false);
         
+        // message slider
         m_message_slider.setRange(0., 1.);
         m_message_slider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
         m_message_slider.addListener(this);

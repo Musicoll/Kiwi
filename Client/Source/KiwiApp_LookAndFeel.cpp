@@ -35,6 +35,8 @@ namespace kiwi
         setColour(juce::TextEditor::highlightColourId, juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
         setColour(juce::TextEditor::focusedOutlineColourId, juce::Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
         setColour(juce::TextEditor::outlineColourId, juce::Colour::fromFloatRGBA(0.6, 0.6, 0.6, 0.6));
+        
+        setColour(juce::TextButton::buttonColourId, juce::Colour(0xffdedede));
     }
     
     juce::Typeface::Ptr LookAndFeel::getTypefaceForFont(juce::Font const& font)
@@ -161,6 +163,44 @@ namespace kiwi
         for(int i = header.getNumColumns(true) - 1; --i >= 0;)
         {
             g.fillRect(header.getColumnPosition(i).removeFromRight(1));
+        }
+    }
+    
+    void LookAndFeel::drawButtonBackground(juce::Graphics& g, juce::Button& btn,
+                                           juce::Colour const& bgcolor,
+                                           bool mouse_over, bool mouse_down)
+    {
+        juce::Colour baseColour(bgcolor.withMultipliedSaturation(btn.hasKeyboardFocus (true) ? 1.3f : 0.9f).withMultipliedAlpha(btn.isEnabled() ? 0.9f : 0.5f));
+        
+        if (mouse_down || mouse_over)
+            baseColour = baseColour.contrasting(mouse_down ? 0.2f : 0.1f);
+        
+        const bool flatOnLeft   = btn.isConnectedOnLeft();
+        const bool flatOnRight  = btn.isConnectedOnRight();
+        const bool flatOnTop    = btn.isConnectedOnTop();
+        const bool flatOnBottom = btn.isConnectedOnBottom();
+        
+        const float width  = btn.getWidth() - 1.0f;
+        const float height = btn.getHeight() - 1.0f;
+        
+        if(width > 0 && height > 0)
+        {
+            const float cornerSize = 1.0f;
+            
+            juce::Path outline;
+            outline.addRoundedRectangle(0.5f, 0.5f, width, height, cornerSize, cornerSize,
+                                        ! (flatOnLeft  || flatOnTop),
+                                        ! (flatOnRight || flatOnTop),
+                                        ! (flatOnLeft  || flatOnBottom),
+                                        ! (flatOnRight || flatOnBottom));
+            
+            
+            
+            g.setColour(baseColour);
+            g.fillPath(outline);
+            
+            g.setColour(btn.hasKeyboardFocus(false) ? baseColour.contrasting(0.5) : baseColour.contrasting(0.2));
+            g.strokePath(outline, juce::PathStrokeType(1.0f));
         }
     }
 }

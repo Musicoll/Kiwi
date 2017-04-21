@@ -55,6 +55,11 @@ namespace kiwi
                                    bool isMouseOver, bool isMouseDown,
                                    int columnFlags) override;
         
+        //! @brief Custom Button background drawing
+        void drawButtonBackground(juce::Graphics& g, juce::Button& b,
+                                  juce::Colour const& bgcolor,
+                                  bool mouse_over, bool mouse_down) override;
+        
     private: // deleted methods
         
         LookAndFeel(LookAndFeel const& other) = delete;
