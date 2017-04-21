@@ -22,24 +22,20 @@
 #ifndef KIWI_APP_PATCHER_MANAGER_HPP_INCLUDED
 #define KIWI_APP_PATCHER_MANAGER_HPP_INCLUDED
 
-#include <juce_gui_extra/juce_gui_extra.h>
-
 #include "flip/Document.h"
+#include "flip/DocumentObserver.h"
 
 #include <KiwiModel/KiwiModel_PatcherUser.hpp>
 #include <KiwiModel/KiwiModel_PatcherValidator.hpp>
-#include <KiwiEngine/KiwiEngine_Instance.hpp>
 
-#include "../KiwiApp_Window.hpp"
-#include "KiwiApp_PatcherView.hpp"
+#include <juce_gui_extra/juce_gui_extra.h>
 
 #include "../KiwiApp_Network/KiwiApp_DocumentBrowser.hpp"
-
-#include "KiwiApp_PatcherComponent.hpp"
 
 namespace kiwi
 {
     class Instance;
+    class PatcherView;
     
     // ================================================================================ //
     //                                  PATCHER MANAGER                                 //
@@ -86,6 +82,9 @@ namespace kiwi
         //! @details This function returns 0 if the document is loaded from disk or memory.
         //! @see isRemote
         std::string getDocumentName() const;
+        
+        //! @brief Returns the number of users connected to the patcher document.
+        size_t getNumberOfUsers();
         
         //! @brief Returns the number of patcher views.
         size_t getNumberOfView();
@@ -163,30 +162,23 @@ namespace kiwi
         bool                                        m_need_saving_flag;
         bool                                        m_is_remote;
         DocumentBrowser::Drive::DocumentSession*    m_session {nullptr};
+        
+        engine::Listeners<Listener>                 m_listeners;
     };
     
     // ================================================================================ //
-    //                                PATCHER VIEW WINDOW                               //
+    //                              PATCHER MANAGER LISTENER                            //
     // ================================================================================ //
-    
-    class PatcherViewWindow : public Window
+ 
+    struct PatcherManager::Listener
     {
-    public:
+        virtual ~Listener() {};
         
-        PatcherViewWindow(PatcherManager& manager, PatcherView& patcherview);
+        //! @brief Called when the document state changed.
+        virtual void documentStateChanged() {};
         
-        void closeButtonPressed() override;
-        
-        //! @brief returns the patcher manager.
-        PatcherManager& getPatcherManager() const;
-        
-        //! @brief returns the PatcherView.
-        PatcherView& getPatcherView();
-        
-    private: // variables
-        
-        PatcherManager&     m_patcher_manager;
-        PatcherComponent    m_patcher_component;
+        //! @brief Called when one or more users are connecting or disconnecting to the Patcher Document.
+        virtual void connectedUserChanged(PatcherManager& manager) {};
     };
 }
 

@@ -36,6 +36,8 @@
 
 namespace kiwi
 {
+    class PatcherViewWindow;
+    
     // ================================================================================ //
     //                                      INSTANCE                                    //
     // ================================================================================ //
@@ -70,7 +72,7 @@ namespace kiwi
         void askUserToOpenPatcherDocument();
 
         //! @brief Removes the view of a certain patcher.
-        void removePatcherWindow(PatcherViewWindow & patcher_window);
+        void removePatcherWindow(PatcherViewWindow& patcher_window);
         
         //! @brief Attempt to close the given window asking user to save file if needed.
         void closeWindow(Window& window);

@@ -19,51 +19,20 @@
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiModel_DataModel.hpp>
-#include <KiwiModel/KiwiModel_PatcherUser.hpp>
+#include "KiwiApp_PatcherManager.hpp"
+
 #include <KiwiEngine/KiwiEngine_Patcher.hpp>
+#include <KiwiEngine/KiwiEngine_Instance.hpp>
 
 #include "../KiwiApp.hpp"
 #include "../KiwiApp_Instance.hpp"
 #include "../KiwiApp_Network/KiwiApp_DocumentManager.hpp"
-#include "KiwiApp_PatcherManager.hpp"
 #include "KiwiApp_PatcherView.hpp"
-#include "KiwiApp_PatcherViewHelper.hpp"
+
+#include "KiwiApp_PatcherComponent.hpp"
 
 namespace kiwi
 {
-    // ================================================================================ //
-    //                                PATCHER VIEW WINDOW                               //
-    // ================================================================================ //
-
-    PatcherViewWindow::PatcherViewWindow(PatcherManager& manager, PatcherView& patcherview) :
-    Window("Untitled", nullptr, true, true, juce::String::empty, !KiwiApp::isMacOSX()),
-    m_patcher_manager(manager),
-    m_patcher_component(patcherview)
-    {
-        // Todo: Add size infos to the Patcher Model
-        setSize(600, 500);
-        centreWithSize(getWidth(), getHeight());
-        
-        setContentNonOwned(&m_patcher_component, true);
-        setVisible(true);
-    }
-
-    PatcherManager& PatcherViewWindow::getPatcherManager() const
-    {
-        return m_patcher_manager;
-    }
-
-    PatcherView& PatcherViewWindow::getPatcherView()
-    {
-        return m_patcher_component.usePatcherView();
-    }
-    
-    void PatcherViewWindow::closeButtonPressed()
-    {
-        KiwiApp::use().useInstance().removePatcherWindow(*this);
-    }
-    
     // ================================================================================ //
     //                                  PATCHER MANAGER                                 //
     // ================================================================================ //
@@ -85,6 +54,16 @@ namespace kiwi
         {
             m_session->useDrive().removeListener(*this);
         }
+    }
+    
+    void PatcherManager::addListener(Listener& listener)
+    {
+        m_listeners.add(listener);
+    }
+    
+    void PatcherManager::removeListener(Listener& listener)
+    {
+        m_listeners.remove(listener);
     }
     
     void PatcherManager::connect(DocumentBrowser::Drive::DocumentSession& session)
@@ -156,6 +135,16 @@ namespace kiwi
         auto& patcher = getPatcher();
         patcher.useSelfUser().addView();
         DocumentManager::commit(patcher);
+    }
+    
+    size_t PatcherManager::getNumberOfUsers()
+    {
+        auto& patcher = getPatcher();
+        auto& user = patcher.getUsers();
+        
+        return std::count_if(user.begin(), user.end(), [](model::Patcher::User const& user){
+            return (!user.removed() && user.getNumberOfViews() > 0);
+        });
     }
     
     size_t PatcherManager::getNumberOfView()
@@ -252,6 +241,8 @@ namespace kiwi
         {
             model::Patcher::View& view = *it;
             it = user.removeView(view);
+            
+            view_has_been_removed = view_has_been_removed || (it != views.end());
         }
         
         if(view_has_been_removed)
@@ -403,8 +394,11 @@ namespace kiwi
     
     void PatcherManager::notifyPatcherViews(model::Patcher& patcher)
     {
+        bool changed = false;
         for(auto& user : patcher.getUsers())
         {
+            changed = (changed || user.added() || user.removed());
+            
             if(user.getId() == m_instance.getUserId())
             {
                 for(auto& view : user.getViews())
@@ -422,13 +416,14 @@ namespace kiwi
                     }
                 }
             }
-            else
-            {
-                // handle external users.
-                
-                //KiwiApp::post("New user !!");
-            }
         }
+        
+        /*
+        if(!patcher.removed() && changed)
+        {
+            m_listeners.call(&Listener::connectedUserChanged, *this);
+        }
+        */
     }
 
     void PatcherManager::createPatcherWindow(model::Patcher& patcher,

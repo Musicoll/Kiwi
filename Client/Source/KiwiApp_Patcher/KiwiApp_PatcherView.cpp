@@ -19,10 +19,7 @@
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiModel_DataModel.hpp>
-#include <KiwiModel/KiwiModel_PatcherUser.hpp>
-
-#include "flip/Mold.h"
+#include "KiwiApp_PatcherView.hpp"
 
 #include "../KiwiApp.hpp"
 #include "../KiwiApp_CommandIDs.hpp"
@@ -30,6 +27,8 @@
 #include "KiwiApp_PatcherViewHelper.hpp"
 #include "KiwiApp_ObjectView.hpp"
 #include "KiwiApp_LinkView.hpp"
+
+#include "KiwiApp_PatcherComponent.hpp"
 
 namespace kiwi
 {
@@ -75,6 +74,11 @@ namespace kiwi
         
         m_links.clear();
         m_objects.clear();
+    }
+    
+    PatcherManager& PatcherView::usePatcherManager()
+    {
+        return m_manager;
     }
     
     // ================================================================================ //
@@ -129,8 +133,7 @@ namespace kiwi
         }
         else
         {
-            g.setColour(bgcolor);
-            g.fillAll();
+            g.fillAll(bgcolor);
         }
     }
     

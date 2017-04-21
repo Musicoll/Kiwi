@@ -24,9 +24,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include <KiwiModel/KiwiModel_PatcherUser.hpp>
-
-#include "flip/DocumentObserver.h"
+#include <KiwiModel/KiwiModel_Patcher.hpp>
 
 #include "KiwiApp_PatcherViewport.hpp"
 #include "KiwiApp_PatcherViewHitTester.hpp"
@@ -61,6 +59,9 @@ namespace kiwi
         
         using ObjectViews = std::vector<std::unique_ptr<ObjectView>>;
         using LinkViews = std::vector<std::unique_ptr<LinkView>>;
+        
+        //! @brief Returns the PatcherManager.
+        PatcherManager& usePatcherManager();
         
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
         void patcherChanged(model::Patcher& patcher, model::Patcher::View& view);

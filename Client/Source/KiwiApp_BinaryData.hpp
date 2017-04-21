@@ -107,6 +107,9 @@ namespace kiwi
             extern char const* unlocked_png;
             const int unlocked_png_size = 6499;
 
+            extern char const* users_png;
+            const int users_png_size = 8538;
+
             extern char const* zoom_in_png;
             const int zoom_in_png_size = 14970;
 

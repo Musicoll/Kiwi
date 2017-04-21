@@ -156,7 +156,7 @@ namespace kiwi
     
     bool KiwiApp::moreThanOneInstanceAllowed()
     {
-        return false;
+        return true;
     }
     
     bool KiwiApp::isMacOSX()

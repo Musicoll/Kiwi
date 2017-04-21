@@ -76,5 +76,10 @@ namespace kiwi
         {
             return m_views;
         }
+        
+        size_t Patcher::User::getNumberOfViews() const noexcept
+        {
+            return std::count_if(m_views.begin(), m_views.end(), [](auto){return true;});
+        }
     }
 }
