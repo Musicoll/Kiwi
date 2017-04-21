@@ -288,6 +288,7 @@ namespace kiwi
     
     void SuggestEditor::returnPressed()
     {
+        TextEditor::returnPressed();
         m_listeners.call(&Listener::suggestEditorReturnKeyPressed, *this);
     }
     
