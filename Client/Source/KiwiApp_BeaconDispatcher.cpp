@@ -28,67 +28,88 @@ namespace kiwi
     //                                  BEACON DISPATCHER                               //
     // ================================================================================ //
     
-    BeaconDispatcher::BeaconDispatcher(engine::Instance& instance) : m_instance(instance)
+    BeaconDispatcher::BeaconDispatcher(engine::Instance& instance) :
+    m_instance(instance),
+    m_beacon_name_editor("beacon_name_editor"),
+    m_message_editor("message_editor"),
+    m_beacon_name_label("beacon_name_label", "Name: "),
+    m_message_label("message_label", "Message: "),
+    m_message_slider("message_slider"),
+    m_send_button("Send")
     {
         setInterceptsMouseClicks(false, true);
         
         // beacon name field
-        m_beacon_name_editor.reset(new juce::TextEditor("beacon_name_editor"));
-        m_beacon_name_editor->setReturnKeyStartsNewLine(false);
-        m_beacon_name_editor->setMultiLine(false, false);
-        m_beacon_name_editor->setColour(juce::TextEditor::highlightColourId,
-                                        juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
-        
-        m_beacon_name_editor->setColour(juce::TextEditor::focusedOutlineColourId,
-                                        juce::Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
-        
-        m_beacon_name_editor->setColour(juce::TextEditor::outlineColourId,
-                                        juce::Colour::fromFloatRGBA(0.6, 0.6, 0.6, 0.6));
-        
-        m_beacon_name_editor->setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentWhite);
+        m_beacon_name_editor.setReturnKeyStartsNewLine(false);
+        m_beacon_name_editor.setMultiLine(false, false);
         
         // message field
-        m_message_editor.reset(new juce::TextEditor("message_editor"));
-        m_message_editor->setReturnKeyStartsNewLine(false);
-        m_message_editor->setMultiLine(false, false);
-        m_message_editor->setColour(juce::TextEditor::highlightColourId,
-                                        juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
+        m_message_editor.setReturnKeyStartsNewLine(false);
+        m_message_editor.setMultiLine(false, false);
         
-        m_message_editor->setColour(juce::TextEditor::focusedOutlineColourId,
-                                    juce::Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
-        
-        m_message_editor->setColour(juce::TextEditor::outlineColourId,
-                                    juce::Colour::fromFloatRGBA(0.6, 0.6, 0.6, 0.6));
-        
-        m_message_editor->setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentWhite);
+        // message slider
+        m_message_slider.setRange(0., 1.);
+        m_message_slider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
+        m_message_slider.addListener(this);
         
         //button
-        m_send_button.reset(new juce::TextButton("Send"));
-        m_send_button->addListener(this);
+        m_send_button.addListener(this);
         
-        addAndMakeVisible(m_beacon_name_editor.get());
-        addAndMakeVisible(m_message_editor.get());
-        addAndMakeVisible(m_send_button.get());
+        addAndMakeVisible(m_beacon_name_label);
+        addAndMakeVisible(m_beacon_name_editor);
+        addAndMakeVisible(m_message_editor);
+        addAndMakeVisible(m_message_label);
+        addAndMakeVisible(m_message_slider);
+        addAndMakeVisible(m_send_button);
         
-        setSize(280, 75);
+        setSize(310, 150);
+    }
+    
+    BeaconDispatcher::~BeaconDispatcher()
+    {
+        m_message_slider.removeListener(this);
+        m_send_button.removeListener(this);
     }
     
     void BeaconDispatcher::resized()
     {
-        m_beacon_name_editor->setBounds(10, 10, getWidth() - 20, 20);
-        m_message_editor->setBounds(10, 40, getWidth() - 20, 20);
+        int padding = 4;
+        int row_height = 44;
+        int label_height = 20;
         
-        m_send_button->setSize(60, 20);
-        m_send_button->setTopRightPosition(getWidth() - 10, 70);
+        auto bounds = getLocalBounds().reduced(padding);
+        
+        auto row_bounds = bounds.removeFromTop(row_height);
+        m_beacon_name_label.setBounds(row_bounds.removeFromTop(label_height));
+        row_bounds.reduce(padding, 0);
+        m_beacon_name_editor.setBounds(row_bounds);
+        
+        row_bounds = bounds.removeFromTop(row_height);
+        m_message_label.setBounds(row_bounds.removeFromTop(label_height));
+        m_send_button.setBounds(row_bounds.removeFromRight(60).reduced(padding, 0));
+        row_bounds.reduce(padding, 0);
+        m_message_editor.setBounds(row_bounds);
+        
+        row_bounds = bounds.removeFromTop(row_height);
+        m_message_slider.setBounds(row_bounds.removeFromBottom(30).withLeft(padding * 2));
     }
     
     void BeaconDispatcher::buttonClicked(juce::Button* btn)
     {
-        if(btn == m_send_button.get())
+        if(btn == &m_send_button)
         {
-            std::string name = m_beacon_name_editor->getText().toStdString();
-            std::string args = m_message_editor->getText().toStdString();
+            std::string name = m_beacon_name_editor.getText().toStdString();
+            std::string args = m_message_editor.getText().toStdString();
             send(name, AtomHelper::parse(args));
+        }
+    }
+    
+    void BeaconDispatcher::sliderValueChanged(juce::Slider* slider)
+    {
+        if(slider == &m_message_slider)
+        {
+            std::string name = m_beacon_name_editor.getText().toStdString();
+            send(name, {m_message_slider.getValue()});
         }
     }
     

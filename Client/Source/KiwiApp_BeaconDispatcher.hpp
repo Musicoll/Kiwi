@@ -33,9 +33,7 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief A Component that allows to dispatch messages to Beacon::Castaway objects.
-    class BeaconDispatcher :
-    public juce::Component,
-    public juce::Button::Listener
+    class BeaconDispatcher : public juce::Component, public juce::Button::Listener, juce::Slider::Listener
     {
     public:
         
@@ -43,7 +41,7 @@ namespace kiwi
         BeaconDispatcher(engine::Instance& instance);
         
         //! @brief Destructor.
-        ~BeaconDispatcher() = default;
+        ~BeaconDispatcher();
         
         //! @brief Called when resized.
         void resized() override;
@@ -56,12 +54,18 @@ namespace kiwi
         //! @brief dispatch message to castaways
         void send(std::string const& name, std::vector<Atom> const& args) const;
         
+        //! @brief Called when a slider value changed.
+        void sliderValueChanged(juce::Slider* slider) override;
+        
     private: // members
         
-        engine::Instance&                   m_instance;
-        std::unique_ptr<juce::TextEditor>   m_beacon_name_editor;
-        std::unique_ptr<juce::TextEditor>   m_message_editor;
-        std::unique_ptr<juce::TextButton>   m_send_button;
+        engine::Instance&   m_instance;
+        juce::TextEditor    m_beacon_name_editor, m_message_editor;
+        juce::Label         m_beacon_name_label, m_message_label;
+        
+        juce::Slider        m_message_slider;
+        
+        juce::TextButton    m_send_button;
     };
 }
 
