@@ -81,7 +81,13 @@ namespace kiwi
             
             if(window_state.isNotEmpty())
             {
+                auto last_bounds = getBounds();
                 restoreWindowStateFromString(window_state);
+                
+                if(!isResizable())
+                {
+                    setSize(last_bounds.getWidth(), last_bounds.getHeight());
+                }
             }
         }
     }
