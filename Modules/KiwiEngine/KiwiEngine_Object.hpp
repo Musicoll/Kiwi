@@ -26,6 +26,8 @@
 
 #include <KiwiDsp/KiwiDsp_Processor.hpp>
 
+#include "KiwiEngine_ValueBeacon.hpp"
+
 namespace kiwi
 {
     namespace engine
@@ -91,7 +93,10 @@ namespace kiwi
             // ================================================================================ //
             
             //! @brief Gets or creates a Beacon with a given name.
-            Beacon& getBeacon(std::string const& name) const;
+            Beacon& useBeacon(std::string const& name) const;
+            
+            //! @brief Gets or creates a ValueBeacon with a given name.
+            ValueBeacon& useValueBeacon(std::string const& name) const;
             
             // ================================================================================ //
             //                                       SEND                                       //

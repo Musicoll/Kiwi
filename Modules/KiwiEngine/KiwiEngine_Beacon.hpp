@@ -22,7 +22,11 @@
 #ifndef KIWI_ENGINE_BEACON_HPP_INCLUDED
 #define KIWI_ENGINE_BEACON_HPP_INCLUDED
 
-#include "KiwiEngine_Def.hpp"
+#include <KiwiModel/KiwiModel_Atom.hpp>
+
+#include <string>
+#include <map>
+#include <set>
 
 namespace kiwi
 {
@@ -86,7 +90,7 @@ namespace kiwi
             public:
                 Factory() = default;
                 ~Factory() = default;
-                Beacon& getBeacon(std::string const& name);
+                Beacon& useBeacon(std::string const& name);
                 
             private:
                 std::map<std::string, std::unique_ptr<Beacon>> m_beacons;

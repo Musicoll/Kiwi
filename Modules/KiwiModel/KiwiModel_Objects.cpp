@@ -311,5 +311,38 @@ namespace kiwi
         {
             Factory::add<SigTilde>("sig~");
         }
+        
+        // ================================================================================ //
+        //                                  OBJECT DELWRITE~                                //
+        // ================================================================================ //
+        
+        DelWriteTilde::DelWriteTilde(std::string const& name, std::vector<Atom> const& args)
+        {
+            pushInlet({PinType::IType::Signal});
+        }
+        
+        void DelWriteTilde::declare()
+        {
+            Factory::add<DelWriteTilde>("delwrite~");
+        }
+        
+        // ================================================================================ //
+        //                                  OBJECT DELREAD~                                 //
+        // ================================================================================ //
+        
+        DelReadTilde::DelReadTilde(std::string const& name, std::vector<Atom> const& args)
+        {
+            if (args.empty() || !args[0].isNumber())
+            {
+                pushInlet({PinType::IType::Control});
+            }
+  
+            pushOutlet(PinType::IType::Signal);
+        }
+        
+        void DelReadTilde::declare()
+        {
+            Factory::add<DelReadTilde>("delread~");
+        }
     }
 }

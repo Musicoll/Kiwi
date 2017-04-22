@@ -100,9 +100,14 @@ namespace kiwi
         //                                      BEACON                                      //
         // ================================================================================ //
         
-        Beacon& Object::getBeacon(std::string const& name) const
+        Beacon& Object::useBeacon(std::string const& name) const
         {
-            return m_patcher.getBeacon(name);
+            return m_patcher.useBeacon(name);
+        }
+        
+        ValueBeacon& Object::useValueBeacon(std::string const& name) const
+        {
+            return m_patcher.useValueBeacon(name);
         }
         
 #define KIWI_ENGINE_STACKOVERFLOW_MAX 256

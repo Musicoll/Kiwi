@@ -117,7 +117,7 @@ namespace kiwi
     {
         if(!name.empty() && !args.empty())
         {
-            engine::Beacon& beacon = m_instance.getBeacon(name);
+            engine::Beacon& beacon = m_instance.useBeacon(name);
             beacon.dispatch(args);
         }
     }

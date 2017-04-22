@@ -157,9 +157,14 @@ namespace kiwi
         //                                      BEACON                                      //
         // ================================================================================ //
         
-        Beacon& Patcher::getBeacon(std::string const& name) const
+        Beacon& Patcher::useBeacon(std::string const& name) const
         {
-            return m_instance.getBeacon(name);
+            return m_instance.useBeacon(name);
+        }
+        
+        ValueBeacon& Patcher::useValueBeacon(std::string const& name) const
+        {
+            return m_instance.useValueBeacon(name);
         }
         
         // ================================================================================ //

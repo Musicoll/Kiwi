@@ -27,6 +27,7 @@
 #include "KiwiEngine_Console.hpp"
 #include "KiwiEngine_Patcher.hpp"
 #include "KiwiEngine_Beacon.hpp"
+#include "KiwiEngine_ValueBeacon.hpp"
 #include "KiwiEngine_AudioControler.hpp"
 
 namespace kiwi
@@ -40,7 +41,7 @@ namespace kiwi
         //! @brief The Instance adds the engine objects to the engine::Factory
         //! @details The patcher document model must be initialised before creating the Instance
         //! The Instance is also the entry point to retrieve beacons and output messages to the console.
-        class Instance : public Beacon::Factory
+        class Instance : public Beacon::Factory, public ValueBeacon::Factory
         {
         public: // methods
             

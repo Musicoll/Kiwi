@@ -24,6 +24,7 @@
 
 #include "KiwiEngine_Def.hpp"
 #include "KiwiEngine_Beacon.hpp"
+#include "KiwiEngine_ValueBeacon.hpp"
 #include "KiwiEngine_AudioControler.hpp"
 
 #include <KiwiDsp/KiwiDsp_Chain.hpp>
@@ -100,7 +101,10 @@ namespace kiwi
             // ================================================================================ //
             
             //! @brief Gets or creates a Beacon with a given name.
-            Beacon& getBeacon(std::string const& name) const;
+            Beacon& useBeacon(std::string const& name) const;
+            
+            //! @brief Gets or creates a Beacon with a given name.
+            ValueBeacon& useValueBeacon(std::string const& name) const;
             
         private: // methods
             

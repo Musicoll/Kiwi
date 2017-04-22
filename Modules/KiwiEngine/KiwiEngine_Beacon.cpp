@@ -56,7 +56,7 @@ namespace kiwi
         //                                  BEACON FACTORY                                  //
         // ================================================================================ //
         
-        Beacon& Beacon::Factory::getBeacon(std::string const& name)
+        Beacon& Beacon::Factory::useBeacon(std::string const& name)
         {
             auto it = m_beacons.find(name);
             if(it != m_beacons.end())

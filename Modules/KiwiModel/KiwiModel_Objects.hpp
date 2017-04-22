@@ -270,6 +270,42 @@ namespace kiwi
             //! @internal flip static declare method
             static void declare();
         };
+        
+        // ================================================================================ //
+        //                                  OBJECT DELWRITE~                                //
+        // ================================================================================ //
+        
+        class DelWriteTilde : public model::Object
+        {
+        public:
+            
+            //! @brief flip Default Constructor
+            DelWriteTilde(flip::Default& d): model::Object(d){};
+            
+            //! @brief Constructor
+            DelWriteTilde(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @internal flip static declare method
+            static void declare();
+        };
+        
+        // ================================================================================ //
+        //                                  OBJECT DELREAD~                                 //
+        // ================================================================================ //
+        
+        class DelReadTilde : public model::Object
+        {
+        public:
+            
+            //! @brief flip Default Constructor
+            DelReadTilde(flip::Default& d): model::Object(d){};
+            
+            //! @brief Constructor
+            DelReadTilde(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @internal flip static declare method
+            static void declare();
+        };
     }
 }
 

@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#ifndef KIWI_ENGINE_OBJECTS_HPP_INCLUDED
-#define KIWI_ENGINE_OBJECTS_HPP_INCLUDED
+#ifndef KIWI_ENGINE_OBJECTS_CPP_INCLUDED
+#define KIWI_ENGINE_OBJECTS_CPP_INCLUDED
 
 #include <cmath>
 
@@ -180,7 +180,7 @@ namespace kiwi
             
             if(!m_name.empty())
             {
-                Beacon& beacon = getBeacon(m_name);
+                Beacon& beacon = useBeacon(m_name);
                 beacon.bind(*this);
             }
         }
@@ -189,7 +189,7 @@ namespace kiwi
         {
             if(!m_name.empty())
             {
-                Beacon& beacon = getBeacon(m_name);
+                Beacon& beacon = useBeacon(m_name);
                 beacon.unbind(*this);
             }
         }
@@ -704,8 +704,244 @@ namespace kiwi
         {
             setPerformCallBack(this, &SigTilde::perform);
         }
+        
+        // ================================================================================ //
+        //                                     DELWRITE~                                    //
+        // ================================================================================ //
+        
+        DelWriteTilde::DelWriteTilde(model::Object const& model,
+                                     Patcher& patcher, std::vector<Atom> const& args)
+        : AudioObject(model, patcher)
+        {
+            if(!args.empty())
+            {
+                m_name = !args.empty() ? args[0].getString() : "";
+                
+                if(!m_name.empty())
+                {
+                    ValueBeacon& beacon = useValueBeacon(m_name);
+                    auto* value = dynamic_cast<ObjectValue<DelWriteTilde>*>(beacon.getValue());
+                    
+                    if(value == nullptr)
+                    {
+                        beacon.setValue(std::make_unique<ObjectValue<DelWriteTilde>>(this));
+                    }
+                    else
+                    {
+                        error("delwrite objects must have a unique name");
+                    }
+                    
+                    beacon.bind(*this);
+                }
+                
+                int size = (args.size() > 1 && args[1].isNumber()) ? args[1].getInt() : 0;
+                m_size_in_ms = (size < 0) ? 0 : size;
+            }
+        }
+        
+        DelWriteTilde::~DelWriteTilde()
+        {
+            if(!m_name.empty())
+            {
+                ValueBeacon& beacon = useValueBeacon(m_name);
+                beacon.unbind(*this);
+                
+                auto* value = dynamic_cast<ObjectValue<DelWriteTilde>*>(beacon.getValue());
+                
+                if(value && value->get() == this)
+                {
+                    beacon.setValue(nullptr);
+                }
+            }
+        }
+        
+        void DelWriteTilde::receive(size_t, std::vector<Atom> const& args)
+        {
+            ;
+        }
+        
+        size_t DelWriteTilde::getBufferSize() const
+        {
+            return m_buffer ? m_buffer->size() : 0ul;
+        }
+        
+        dsp::Signal* DelWriteTilde::getBufferData()
+        {
+            return m_buffer ? m_buffer.get() : nullptr;
+        }
+        
+        size_t DelWriteTilde::getWriteHeadPosition() const
+        {
+            return m_write_head;
+        }
+        
+        void DelWriteTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        {
+            if(m_buffer)
+            {
+                auto& buffer_signal = *m_buffer;
+                const auto buffer_size = buffer_signal.size();
+                
+                size_t vs = input[0].size();
+                dsp::sample_t const* input_sig = input[0].data();
+                
+                for(size_t i = 0; i < vs; ++i)
+                {
+                    // then store incoming sample to the buffer.
+                    buffer_signal[m_write_head] = input_sig[i];
+                    
+                    // increment then wrap counter between buffer boundaries
+                    if(++m_write_head >= buffer_size) m_write_head -= buffer_size;
+                }
+            }
+        }
+        
+        size_t msToSamples(size_t ms, size_t sample_rate) {
+            return (size_t)(((long) ms) * sample_rate / 1000);
+        }
+        
+        void DelWriteTilde::prepare(dsp::Processor::PrepareInfo const& infos)
+        {
+            ValueBeacon& beacon = useValueBeacon(m_name);
+            auto* value = beacon.getValue();
+            
+            if(m_size_in_ms > 0)
+            {
+                size_t size_in_samps = msToSamples(m_size_in_ms, infos.sample_rate);
+                
+                if(m_buffer == nullptr || m_buffer->size() != size_in_samps)
+                {
+                    m_buffer.reset(new dsp::Signal(size_in_samps, 0.));
+                }
+            }
+            else if(value != nullptr)
+            {
+                beacon.setValue(nullptr);
+                m_buffer.reset();
+            }
+            
+            if(m_buffer)
+            {
+                setPerformCallBack(this, &DelWriteTilde::perform);
+            }
+        }
+        
+        // ================================================================================ //
+        //                                     DELREAD~                                     //
+        // ================================================================================ //
+        
+        DelReadTilde::DelReadTilde(model::Object const& model,
+                                   Patcher& patcher, std::vector<Atom> const& args)
+        : AudioObject(model, patcher)
+        {
+            m_name = !args.empty() ? args[0].getString() : "";
+            
+            if(!m_name.empty())
+            {
+                ValueBeacon& beacon = useValueBeacon(m_name);
+                beacon.bind(*this);
+                
+                int size = (args.size() > 1 && args[1].isNumber()) ? args[1].getInt() : 0;
+                m_delay_ms = (size < 0) ? 0 : size;
+            }
+        }
+        
+        DelReadTilde::~DelReadTilde()
+        {
+            if(!m_name.empty())
+            {
+                ValueBeacon& beacon = useValueBeacon(m_name);
+                beacon.unbind(*this);
+            }
+        }
+        
+        void DelReadTilde::receive(size_t, std::vector<Atom> const& args)
+        {
+            
+        }
+        
+        double getSignalValue(dsp::Signal& signal, long idx)
+        {
+            const long buffersize = signal.size();
+            
+            // wrap idx between low and high buffer boundaries.
+            while(idx < 0) { idx += buffersize; }
+            while(idx >= buffersize) { idx -= buffersize; }
+            
+            return signal[idx];
+        }
+        
+        double lerp(double y1, double y2, double delta)
+        {
+            return y1 + delta * (y2 - y1);
+        }
+        
+        void DelReadTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        {
+            if(DelWriteTilde* delwrite = m_delwrite_object->get())
+            {
+                auto* buffer_ptr = delwrite->getBufferData();
+                if(buffer_ptr)
+                {
+                    auto& buffer_signal = *buffer_ptr;
+                    const auto buffer_size = buffer_signal.size();
+                    
+                    size_t vs = output[0].size();
+                    dsp::sample_t* output_sig = output[0].data();
+                    
+                    size_t read_head = 0ul;
+                    double y1, y2, delta;
+                    
+                    long write_head = delwrite->getWriteHeadPosition();
+                    
+                    while(vs--)
+                    {
+                        // clip delay size to buffersize - 1
+                        if(m_delay_samps >= buffer_size)
+                        {
+                            m_delay_samps = (double)(buffer_size - 1);
+                        }
+                        else if(m_delay_samps < 1.) // read first implementation : 0 samps delay = max delay
+                        {
+                            m_delay_samps = 1.;
+                        }
+                        
+                        // extract the fractional part
+                        delta = m_delay_samps - (long)m_delay_samps;
+                        
+                        read_head = write_head - (long)m_delay_samps;
+                        
+                        // Reading our buffer.
+                        y1 = getSignalValue(buffer_signal, read_head);
+                        y2 = getSignalValue(buffer_signal, read_head - 1);
+                        
+                        // with linear interpolation
+                        *output_sig++ = lerp(y1, y2, delta);
+                        
+                        // increment then wrap counter between buffer boundaries
+                        if(++write_head >= buffer_size) write_head -= buffer_size;
+                    }
+                }
+            }
+        }
+        
+        void DelReadTilde::prepare(dsp::Processor::PrepareInfo const& infos)
+        {
+            m_delay_samps = msToSamples(m_delay_ms, infos.sample_rate);
+            
+            m_delwrite_object = nullptr;
+            
+            ValueBeacon& beacon = useValueBeacon(m_name);
+            
+            m_delwrite_object = dynamic_cast<ObjectValue<DelWriteTilde>*>(beacon.getValue());
+            
+            if(m_delwrite_object)
+            {
+                setPerformCallBack(this, &DelReadTilde::perform);
+            }
+        }
     }
 }
 
 
-#endif // KIWI_ENGINE_OBJECTS_HPP_INCLUDED
+#endif // KIWI_ENGINE_OBJECTS_CPP_INCLUDED

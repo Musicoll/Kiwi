@@ -73,6 +73,8 @@ namespace kiwi
             TimesTilde::declare();
             PlusTilde::declare();
             SigTilde::declare();
+            DelWriteTilde::declare();
+            DelReadTilde::declare();
         }
     }
 }

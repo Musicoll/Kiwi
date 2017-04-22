@@ -91,6 +91,8 @@ namespace kiwi
             engine::Factory::add<TimesTilde>("times~");
             engine::Factory::add<PlusTilde>("plus~");
             engine::Factory::add<SigTilde>("sig~");
+            engine::Factory::add<DelWriteTilde>("delwrite~");
+            engine::Factory::add<DelReadTilde>("delread~");
         }
         
         // ================================================================================ //

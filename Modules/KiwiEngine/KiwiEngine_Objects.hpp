@@ -347,6 +347,65 @@ namespace kiwi
             
             std::atomic<float>   m_value{0.f};
         };
+        
+        // ================================================================================ //
+        //                                     DELWRITE~                                    //
+        // ================================================================================ //
+        
+        class DelWriteTilde : public AudioObject, public ValueBeacon::Castaway
+        {
+        public:
+            
+            DelWriteTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            ~DelWriteTilde();
+            
+            void receive(size_t, std::vector<Atom> const& args) override;
+            
+            void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void prepare(dsp::Processor::PrepareInfo const& infos) override final;
+            
+            size_t getBufferSize() const;
+            
+            dsp::Signal* getBufferData();
+            
+            size_t getWriteHeadPosition() const;
+            
+        private:
+            
+            std::string         m_name = "";
+            size_t              m_size_in_ms = 0;
+            
+            dsp::Signal::uPtr   m_buffer = nullptr;
+            size_t              m_write_head = 0;
+        };
+        
+        // ================================================================================ //
+        //                                     DELREAD~                                     //
+        // ================================================================================ //
+        
+        class DelReadTilde : public AudioObject, public ValueBeacon::Castaway
+        {
+        public:
+            
+            DelReadTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            ~DelReadTilde();
+            
+            void receive(size_t, std::vector<Atom> const& args) override;
+            
+            void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void prepare(dsp::Processor::PrepareInfo const& infos) override final;
+            
+        private:
+            
+            std::string                 m_name = "";
+            size_t                      m_delay_ms = 0;
+            double                      m_delay_samps = 0;
+            ObjectValue<DelWriteTilde>* m_delwrite_object = nullptr;
+        };
     }
 }
 
