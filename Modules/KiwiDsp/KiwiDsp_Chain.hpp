@@ -22,11 +22,11 @@
 #ifndef KIWI_DSP_CHAIN_HPP_INCLUDED
 #define KIWI_DSP_CHAIN_HPP_INCLUDED
 
-#include <map>
-#include <queue>
-
 #include "KiwiDsp_Processor.hpp"
 #include "KiwiDsp_Misc.hpp"
+
+#include <map>
+#include <queue>
 
 namespace kiwi
 {
@@ -37,48 +37,50 @@ namespace kiwi
         // ==================================================================================== //
         
         //! @brief An audio rendering class that manages processors in a graph structure.
-        //! @details Updating the chain can be updated by incrementingly adding processors and connecting them.
-        //! The chain can then be prepared with a certain samplerate and vectorsize making it's tick
+        //! @details The chain can be updated by incrementingly adding processors and connecting them.
+        //! The chain can then be prepared with a given samplerate and vectorsize making it's tick
         //! function ready to be called in a separate thread.
         //! The chain is transactional that's to say that changes will not be effective
         //! until either prepare or update is called.
-        
         class Chain final
         {
         public: // methods
             
-            //! @brief The default constructor.
+            //! @brief Constructor.
             //! @details Allocates and initializes an empty Chain object.
             //! All the initializations will be performed with the compile method of the Chain object.
             //! @see prepare
             Chain();
             
-            //! @brief The destructor.
-            //! @details Deallocate memory initialized during prepare and will call every processors release method
-            //! as their computation. Note that as processors ownership are shared, chain destructor might not call
-            //! processor destructor. As releasing might throw it's better practice to call release
+            //! @brief Destructor.
+            //! @details Deallocates memory initialized during prepare.
+            //! This will also call every processors release method.
+            //! Note that as processors have shared ownership, chain destructor might not call
+            //! processor destructor. As releasing might throw it's a better practice to call release
             //! before calling the chain destructor and catch exception if needed.
             ~Chain();
             
             //! @brief Updates the chain making changes effective.
-            //! @details As the chain is transactional changes are not effective immediatly. Changes are stored in
-            //! a command stack that update will unstack and execute. Updating the chain will keep in it's previous
-            //! state that it's to say that is the chain was prepared it will keep it that way. Update can be called
-            //! concurrently with tick.
+            //! @details As the chain is transactional, changes are not effective immediatly.
+            //! Changes are stored in a command stack that update will unstack and execute.
+            //! Updating the chain will keep it in it's previous state,
+            //! that is to say that if the chain was prepared it will remain prepared.
+            //! Update can be called concurrently with tick.
             void update();
             
             //! @brief Allocates memory needed for chain execution.
-            //! @details The prepare method will allocate that signal that will passed through the graph.
-            //! All processors prepare method will be called. If the prepare method is called twice, the second
-            //! call will first release and reallocate the entire graph. If changes have been made to the chain
-            //! prepare will make them effective as update would do. Ticking the chain without preparing
-            //! is legal but does nothing. Prepare can be called concurretly with tick.
+            //! @details The prepare method will allocate that signal that will be passed through the graph.
+            //! All processors prepare method will be called.
+            //! If the prepare method is called twice, the second call will first release and reallocate the entire graph.
+            //! If changes have been made to the chain, prepare will make them effective as update would do.
+            //! Ticking the chain without preparing is legal but does nothing.
+            //! Prepare can be called concurrently with tick.
             void prepare(size_t const samplerate, size_t const vectorsize);
             
             //! @brief Deallocate memory needed to perform tick method.
-            //! @details Will call release on every processor and will deallocate signal memory.
-            //! As release might throw it shal be called before chain destructor. Calling release
-            //! will disable chain tick.
+            //! @details Will call release on every processors and will deallocate signal memory.
+            //! As release might throw it shall be called before chain destructor.
+            //! Calling release will disable chain tick.
             //! @exception Error
             void release();
             
@@ -91,22 +93,23 @@ namespace kiwi
             size_t getVectorSize() const noexcept;
             
             //! @brief Adds a processor to the chain.
-            //! @details Ownership is shared between caller and chain. The caller might
-            //! keep a reference to the processor and update it. Calling addProcessor will add a command
-            //! to the stack that will be executed at update or prepare time. Adding the same processor
-            //! twice will cause an exception to be thrown at update time.
+            //! @details Ownership is shared between caller and chain.
+            //! The caller might keep a reference to the processor and update it.
+            //! Calling addProcessor will add a command to the stack that will be executed at update or prepare time.
+            //! Adding the same processor twice will cause an exception to be thrown at update time.
             void addProcessor(std::shared_ptr<Processor> processor);
             
             //! @brief Removes processors from the chain.
-            //! @details Removes processor from the chain. The shared pointer then decrements its count.
-            //! The change will be effective as soon as update or prepare is called. Removing a non existing
-            //! processor will throw at update time.
+            //! @details The shared pointer then decrements its count.
+            //! The change will be effective as soon as update or prepare is called.
+            //! Removing a non existing processor will throw at update time.
             void removeProcessor(Processor& proc);
             
             //! @brief Connects two processors.
             //! @details Connects the source node (upper node) to dest node (lower node) making
-            //! signal transimission effective. Connecting an non existing node will result in
-            //! exception being called at update time. Connecting might also detect loop and throw.
+            //! signal transmission effective.
+            //! Connecting a non existing node will make an exception to be thrown at update time.
+            //! Connecting might also detect a loop and throw.
             void connect(Processor& source, size_t outlet_index,
                          Processor& dest, size_t inlet_index);
             
@@ -117,7 +120,7 @@ namespace kiwi
                             Processor& destination, size_t inlet_index);
             
             //! @brief Ticks once all the Processor objects. Not recursive.
-            //! @details Call iteratively all the node on their perform method.
+            //! @details Iterates over all nodes and calls their perform method.
             //! if the chain is not prepared the tick will result in doing nothing.
             //! Prepare, release, updates can be made concurrently to tick.
             void tick() noexcept;
@@ -141,10 +144,6 @@ namespace kiwi
             //! @details To avoid too many recursion on the graph, index_node will also
             //! detect loops.
             struct index_node;
-            
-            //! @brief Funtor that checks if the node countains the processor
-            //! @detail Used to retrieve the node that have a certain processor in findNode;
-            struct compare_proc;
             
             //! @brief Returns an iterator to the object having processor proc.
             std::vector<std::unique_ptr<Node>>::iterator findNode(Processor& proc);
@@ -179,7 +178,7 @@ namespace kiwi
                                 Processor* dest, size_t inlet_index);
             
             //! @brief Puts back a node in to the commands' list in order to add it again.
-            //! @details If a nodes processor doesn't require compuration, for optimization concern,
+            //! @details If a nodes processor doesn't require computation, for optimization concern,
             //! we remove it from the chain but it back into the command list. If the node status changes afterward
             //! the chain may be able to reinsert it into the chain.
             void restackNode(Node & node);
@@ -218,9 +217,9 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief The Node object wraps and manages a Processor object inside a Chain object.
-        //! @details The node can be connected to other node and enables signal data
-        //! to go through its pins (inlet, outlet). Node also manages its signal allocation via
-        //! its prepare and release method.
+        //! @details The node can be connected to other nodes enabling signal data
+        //! to go through its pins (inlet, outlet).
+        //! Node also manages its signal allocation via its prepare and release methods.
         class Chain::Node final
         {
         public: // typedefs
@@ -236,7 +235,7 @@ namespace kiwi
             ~Node();
             
             //! @brief Connects the node input pin to another node output pin.
-            //! @details Returns true didn't exist yet and was effectively inserted.
+            //! @details Returns true if it didn't exist yet and has effectively been inserted.
             bool connectInput(const size_t input_index, Node& other_node, const size_t output_index);
             
             //! @brief Disconnect the node input pin from another node output pin.
@@ -283,14 +282,14 @@ namespace kiwi
         //                                    NODE::PIN                                     //
         // ================================================================================ //
         
-        //! @brief The pin helds a set of tie that points to other pins.
+        //! @brief The pin holds a set of Tie that are bounds to other pins.
         class Chain::Node::Pin
         {
         public: // methods
             
             //! @brief Constructor.
-            //! @param owner    The Node that holds this Pin.
-            //! @param index    The index of the Pin.
+            //! @param owner The Node that holds this Pin.
+            //! @param index The index of the Pin.
             Pin(Node& owner, const size_t index);
             
             //! @brief move constructor.
@@ -330,7 +329,7 @@ namespace kiwi
         //                                   NODE::CONNECTION                                   //
         // ==================================================================================== //
         
-        //! @brief A tie is a reference held by a pin to another pin.
+        //! @brief A Tie is a reference held by a Pin to another Pin.
         class Chain::Node::Tie final
         {
         public: // methods
@@ -356,14 +355,14 @@ namespace kiwi
         };
         
         // ==================================================================================== //
-        //                                          LOOPERROR                                   //
+        //                                     LOOPERROR                                        //
         // ==================================================================================== //
+        
         //! @brief An exception to detect loops.
         //! @details An exception that is thrown whenever a loop is detected in a chain.
         //! @todo Add more infos about the detected loop.
-        class LoopError : public Error
+        struct LoopError : public Error
         {
-        public:
             //! @brief The std::string constructor.
             //! @param message The message of the error
             explicit LoopError(const std::string& message) :

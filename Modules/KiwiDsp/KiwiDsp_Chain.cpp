@@ -31,7 +31,7 @@ namespace kiwi
         // ==================================================================================== //
         
         Chain::Node::Node(std::shared_ptr<Processor> processor) :
-        m_processor(processor),
+        m_processor(std::move(processor)),
         m_inlets(),
         m_outlets(),
         m_inputs(),
@@ -39,8 +39,8 @@ namespace kiwi
         m_buffer_copy(),
         m_index(0)
         {
-            const size_t inlets = processor->getNumberOfInputs();
-            const size_t outlets = processor->getNumberOfOutputs();
+            const size_t inlets = m_processor->getNumberOfInputs();
+            const size_t outlets = m_processor->getNumberOfOutputs();
             
             if(inlets)
             {
@@ -60,7 +60,7 @@ namespace kiwi
                 }
             }
             
-            m_buffer_copy.resize(processor->getNumberOfInputs());
+            m_buffer_copy.resize(m_processor->getNumberOfInputs());
         }
         
         Chain::Node::~Node()
@@ -75,14 +75,18 @@ namespace kiwi
             }
         }
         
-        bool Chain::Node::connectInput(const size_t input_index, Node& other_node, const size_t output_index)
+        bool Chain::Node::connectInput(const size_t input_index,
+                                       Node& other_node,
+                                       const size_t output_index)
         {
             assert(input_index < m_inlets.size() && output_index < other_node.m_outlets.size());
             
             return m_inlets[input_index].connect(other_node.m_outlets[output_index]);
         }
         
-        bool Chain::Node::disconnectInput(const size_t input_index, Node& other_node, const size_t output_index)
+        bool Chain::Node::disconnectInput(const size_t input_index,
+                                          Node& other_node,
+                                          const size_t output_index)
         {
             assert(input_index < m_inlets.size() && output_index < other_node.m_outlets.size());
             
@@ -103,6 +107,7 @@ namespace kiwi
             // ======================================================================== //
             
             std::vector<Signal::sPtr> inputs;
+            inputs.reserve(m_inlets.size());
             
             for(Pin& inlet : m_inlets)
             {
@@ -119,29 +124,32 @@ namespace kiwi
                     inlet.m_signal = chain.getSignalInlet(inlet.m_index);
                     
                     std::vector<std::shared_ptr<Signal>> tie_signals;
+                    const auto& ties = inlet.m_ties;
+                    tie_signals.reserve(ties.size());
                     
-                    for(Tie tie : inlet.m_ties)
+                    for(Tie const& tie : ties)
                     {
-                        tie_signals.push_back(tie.m_pin.m_signal);
+                        tie_signals.emplace_back(tie.m_pin.m_signal);
                     }
                     
-                    m_buffer_copy[inlet.m_index].setChannels(tie_signals);
+                    m_buffer_copy[inlet.m_index].setChannels(std::move(tie_signals));
                 }
                 
-                inputs.push_back(inlet.m_signal);
+                inputs.emplace_back(inlet.m_signal);
             }
             
-            m_inputs.setChannels(inputs);
+            m_inputs.setChannels(std::move(inputs));
             
             // ======================================================================== //
             //                    PREPARE OUTLETS, OUTPUT BUFFER                        //
             // ======================================================================== //
             
             std::vector<Signal::sPtr> outputs;
+            outputs.reserve(m_outlets.size());
             
             for(Pin& outlet : m_outlets)
             {
-                if (outlet.m_ties.size() == 0)
+                if(outlet.m_ties.size() == 0)
                 {
                     outlet.m_signal = chain.getSignalOutlet(outlet.m_index);
                 }
@@ -150,10 +158,10 @@ namespace kiwi
                     outlet.m_signal = std::make_shared<Signal>(vectorsize);
                 }
                 
-                outputs.push_back(outlet.m_signal);
+                outputs.emplace_back(outlet.m_signal);
             }
             
-            m_outputs.setChannels(outputs);
+            m_outputs.setChannels(std::move(outputs));
             
             // ======================================================================== //
             //                  INITIALIZE INFO FOR PREPARING PROCESSOR                 //
@@ -166,13 +174,13 @@ namespace kiwi
                 input_status[i] = !m_inlets[i].m_ties.empty();
             }
             
-            Processor::PrepareInfo prepare_info {samplerate, vectorsize, input_status};
+            Processor::PrepareInfo prepare_info {samplerate, vectorsize, std::move(input_status)};
             
             // ======================================================================== //
             //                           PREPARE PROCESSORS                             //
             // ======================================================================== //
             
-            m_processor->prepare(prepare_info);
+            m_processor->prepare(std::move(prepare_info));
             
             return m_processor->shouldPerform();
         }
@@ -211,29 +219,21 @@ namespace kiwi
             //                    RELEASE INLET AND INPUT BUFFER                        //
             // ======================================================================== //
             
-            for (Pin& inlet : m_inlets)
-            {
-                inlet.m_signal.reset();
-            }
-            
+            for(Pin& inlet : m_inlets) { inlet.m_signal.reset(); }
             m_inputs.clear();
             
             // ======================================================================== //
             //                    RELEASE INLET AND INPUT BUFFER                        //
             // ======================================================================== //
             
-            for (Pin& outlet : m_outlets)
-            {
-                outlet.m_signal.reset();
-            }
-            
+            for(Pin& outlet : m_outlets) { outlet.m_signal.reset(); }
             m_outputs.clear();
             
             // ======================================================================== //
             //                         CLEAR BUFFER COPY                                //
             // ======================================================================== //
-            
-            std::for_each(m_buffer_copy.begin(), m_buffer_copy.end(), [](Buffer &buf){ buf.clear();});
+
+            for(Buffer& buffer : m_buffer_copy) { buffer.clear(); }
             
             // ======================================================================== //
             //                             RELEASE PROCESSOR                            //
@@ -318,7 +318,7 @@ namespace kiwi
         
         Chain::~Chain()
         {
-            m_nodes.clear();
+            ;
         }
         
         // ============================================================================ //
@@ -327,7 +327,7 @@ namespace kiwi
         
         void Chain::update()
         {
-            if (!m_commands.empty())
+            if(!m_commands.empty())
             {
                 State prev_state = m_state;
                 
@@ -361,19 +361,18 @@ namespace kiwi
             m_vector_size = vector_size;
             
             indexNodes();
-            
             sortNodes();
             
-            for(auto node = m_nodes.begin(); node != m_nodes.end();)
+            for(auto node_it = m_nodes.begin(); node_it != m_nodes.end();)
             {
-                if ((*node)->prepare(*this))
+                if((*node_it)->prepare(*this))
                 {
-                    ++node;
+                    ++node_it;
                 }
                 else
                 {
-                    restackNode(**node);
-                    node = m_nodes.erase(node);
+                    restackNode(**node_it);
+                    node_it = m_nodes.erase(node_it);
                 }
             }
             
@@ -395,11 +394,13 @@ namespace kiwi
                     
                     connect(*prev_node.m_processor, prev_pin.m_index, *node.m_processor, inlet.m_index);
                     
-                    std::function<void(void)> call_back = std::bind(&Chain::execConnect,
-                                                                    this,
-                                                                    prev_node.m_processor.get(), prev_pin.m_index,
-                                                                    node.m_processor.get(), inlet.m_index);
-                    m_commands.push_front(call_back);
+                    m_commands.emplace_front([this,
+                                              source = prev_node.m_processor.get(),
+                                              source_idx = prev_pin.m_index,
+                                              dest = node.m_processor.get(),
+                                              dest_idx = inlet.m_index]() {
+                        execConnect(source, source_idx, dest, dest_idx);
+                    });
                 }
             }
             
@@ -416,11 +417,13 @@ namespace kiwi
                     
                     connect(*node.m_processor, outlet.m_index, *next_node.m_processor, next_pin.m_index);
                     
-                    std::function<void(void)> call_back = std::bind(&Chain::execConnect,
-                                                                    this,
-                                                                    node.m_processor.get(), outlet.m_index,
-                                                                    next_node.m_processor.get(), next_pin.m_index);
-                    m_commands.push_front(call_back);
+                    m_commands.emplace_front([this,
+                                              source = node.m_processor.get(),
+                                              source_idx = outlet.m_index,
+                                              dest = next_node.m_processor.get(),
+                                              dest_idx = next_pin.m_index]() {
+                        execConnect(source, source_idx, dest, dest_idx);
+                    });
                 }
             }
             
@@ -428,7 +431,9 @@ namespace kiwi
             //                           RESTACK PROCESSOR                              //
             // ======================================================================== //
             
-            m_commands.push_front(std::bind(&Chain::execAddProcessor, this, node.m_processor));
+            m_commands.emplace_front([this, proc = node.m_processor]() {
+                execAddProcessor(proc);
+            });
         }
         
         // ============================================================================ //
@@ -440,13 +445,11 @@ namespace kiwi
             std::lock_guard<std::mutex> lock(m_tick_mutex);
             
             m_state = State::NotPrepared;
+            m_sample_rate = m_vector_size = 0.;
             
-            m_sample_rate = 0.;
-            m_vector_size = 0.;
-            
-            for(auto node = m_nodes.begin(); node != m_nodes.end(); ++node)
+            for(Node::uPtr& node : m_nodes)
             {
-                (*node)->release();
+                node->release();
             }
         }
         
@@ -464,13 +467,11 @@ namespace kiwi
         {
             std::unique_lock<std::mutex> lock(m_tick_mutex, std::defer_lock);
             
-            if (m_state == State::Prepared && lock.try_lock())
+            if(m_state == State::Prepared && lock.try_lock())
             {
-                size_t const node_number = m_nodes.size();
-                
-                for(size_t i = 0; i < node_number; ++i)
+                for(Node::uPtr& node : m_nodes)
                 {
-                    m_nodes[i]->perform();
+                    node->perform();
                 }
                 
                 lock.unlock();
@@ -481,35 +482,27 @@ namespace kiwi
         //                                NODE MANGEMENT                                //
         // ============================================================================ //
         
-        struct Chain::compare_proc
-        {
-            compare_proc(Processor const& proc):m_proc(proc){};
-            
-            bool operator()(Node::uPtr const& node)
-            {
-                return &m_proc == &(*node->m_processor);
-            };
-            
-            Processor const& m_proc;
-        };
-        
         std::vector<Chain::Node::uPtr>::iterator Chain::findNode(Processor& proc)
         {
-            return std::find_if(m_nodes.begin(), m_nodes.end(), compare_proc(proc));
+            return std::find_if(m_nodes.begin(), m_nodes.end(), [&proc](auto const& proc_uptr){
+                return &proc == &(*proc_uptr->m_processor);
+            });
         }
         
-        std::vector<std::unique_ptr<Chain::Node>>::const_iterator Chain::findNode(Processor& proc) const
+        std::vector<Chain::Node::uPtr>::const_iterator Chain::findNode(Processor& proc) const
         {
-            return std::find_if(m_nodes.begin(), m_nodes.end(), compare_proc(proc));
+            return std::find_if(m_nodes.begin(), m_nodes.end(), [&proc](auto const& proc_uptr){
+                return &proc == &(*proc_uptr->m_processor);
+            });
         }
         
         struct Chain::index_node
         {
-            index_node(): m_next_index(1ul){};
+            index_node() : m_next_index(1ul){};
             
             void computeIndex(Node& node)
             {
-                if (node.m_index == 0)
+                if(node.m_index == 0)
                 {
                     m_loop_nodes.insert(&node);
                     
@@ -519,9 +512,9 @@ namespace kiwi
                         {
                             Node& parent_node = tie.m_pin.m_owner;
                             
-                            if (!parent_node.m_index)
+                            if(!parent_node.m_index)
                             {
-                                if (m_loop_nodes.find(&parent_node) != m_loop_nodes.end())
+                                if(m_loop_nodes.find(&parent_node) != m_loop_nodes.end())
                                 {
                                     throw LoopError("A loop is detected");
                                 }
@@ -554,15 +547,9 @@ namespace kiwi
         
         void Chain::sortNodes()
         {
-            struct compare_index
-            {
-                bool operator()(std::unique_ptr<Node> const& l_node, std::unique_ptr<Node> const& r_node)
-                {
-                    return l_node->m_index < r_node->m_index;
-                };
-            };
-            
-            std::sort(m_nodes.begin(), m_nodes.end(), compare_index());
+            std::sort(m_nodes.begin(), m_nodes.end(), [](auto const& lhs_node, auto const& rhs_node){
+                return lhs_node->m_index < rhs_node->m_index;
+            });
         }
         
         // ============================================================================ //
@@ -571,34 +558,32 @@ namespace kiwi
         
         void Chain::addProcessor(std::shared_ptr<Processor> processor)
         {
-            std::function<void(void)> func = std::bind(&Chain::execAddProcessor, this, processor);
-            m_commands.push_back(func);
+            m_commands.emplace_back([this, proc = std::move(processor)](){
+                execAddProcessor(std::move(proc));
+            });
         }
         
         void Chain::removeProcessor(Processor& proc)
         {
-            std::function<void(void)> func = std::bind(&Chain::execRemoveProcessor, this, &proc);
-            m_commands.push_back(func);
+            m_commands.emplace_back(std::bind(&Chain::execRemoveProcessor, this, &proc));
         }
         
         void Chain::connect(Processor& source, size_t outlet_index,
                             Processor& dest, size_t inlet_index)
         {
-            std::function<void(void)> call_back = std::bind(&Chain::execConnect,
-                                                            this,
-                                                            &source, outlet_index,
-                                                            &dest, inlet_index);
-            m_commands.push_back(call_back);
+            m_commands.emplace_back(std::bind(&Chain::execConnect,
+                                              this,
+                                              &source, outlet_index,
+                                              &dest, inlet_index));
         }
         
         void Chain::disconnect(Processor& source, size_t outlet_index,
                                Processor& dest, size_t inlet_index)
         {
-            std::function<void(void)> call_back = std::bind(&Chain::execDisconnect,
-                                                            this,
-                                                            &source, outlet_index,
-                                                            &dest, inlet_index);
-            m_commands.push_back(call_back);
+            m_commands.emplace_back(std::bind(&Chain::execDisconnect,
+                                              this,
+                                              &source, outlet_index,
+                                              &dest, inlet_index));
         }
         
         // ==================================================================================== //
@@ -652,7 +637,7 @@ namespace kiwi
         {
             if (findNode(*proc) == m_nodes.end())
             {
-                m_nodes.emplace_back(Node::uPtr(new Node(proc)));
+                m_nodes.emplace_back(std::make_unique<Node>(std::move(proc)));
             }
             else
             {
@@ -666,7 +651,7 @@ namespace kiwi
             
             if (node != m_nodes.end())
             {
-                m_nodes.erase(findNode(*proc));
+                m_nodes.erase(node);
             }
             else
             {
