@@ -90,6 +90,9 @@ namespace kiwi
                 }
             }
         }
+        
+        // fix: https://forum.juce.com/t/native-titlebar-window-position/8239/3
+        getConstrainer()->checkComponentBounds(this);
     }
     
     void Window::saveWindowState()
