@@ -9,7 +9,7 @@ git:
   submodules: false
 
 install:
-    - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr ThirdParty/concurrentqueue
+    - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr ThirdParty/readerwriterqueue
 
 matrix:
   include:
@@ -39,7 +39,7 @@ matrix:
       # make sure CXX is correctly set
       - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
 
-      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr ThirdParty/concurrentqueue
+      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr ThirdParty/readerwriterqueue
       - pip install --user cpp-coveralls
 
     script:

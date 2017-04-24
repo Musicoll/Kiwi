@@ -340,7 +340,7 @@ source_group_rec("${KIWI_DSP_SRC}" ${ROOT_DIR}/Modules/KiwiDsp)
 file(GLOB_RECURSE KIWI_ENGINE_SRC ${ROOT_DIR}/Modules/KiwiEngine/*.[c|h]pp
                                   ${ROOT_DIR}/Modules/KiwiEngine/*.h)
 add_library(KiwiEngine STATIC ${KIWI_ENGINE_SRC})
-target_include_directories(KiwiEngine PUBLIC ${ROOT_DIR}/ThirdParty/concurrentqueue)
+target_include_directories(KiwiEngine PUBLIC ${ROOT_DIR}/ThirdParty/readerwriterqueue)
 target_include_directories(KiwiEngine PUBLIC ${ROOT_DIR}/Modules)
 target_add_dependency(KiwiEngine Flip)
 target_add_dependency(KiwiEngine KiwiModel)

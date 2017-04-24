@@ -26,7 +26,7 @@
 #include <atomic>
 #include <thread>
 
-#include <concurrentqueue.h>
+#include <readerwriterqueue.h>
 
 namespace kiwi
 {
@@ -41,17 +41,11 @@ namespace kiwi
         template <class T>
         class ConcurrentQueue final
         {
-        private: // classes
-            
-            struct Traits : public mc::ConcurrentQueueDefaultTraits
-            {
-                static const size_t BLOCK_SIZE = 1024;
-            };
             
         public: // methods
             
             ConcurrentQueue(size_t capacity):
-            m_queue(new mc::ConcurrentQueue<T, Traits>(capacity)),
+            m_queue(new mc::ReaderWriterQueue<T, 1024>(capacity)),
             m_size(0)
             {
             }
@@ -83,7 +77,7 @@ namespace kiwi
             
         private: // members
             
-            std::unique_ptr<mc::ConcurrentQueue<T, Traits>> m_queue;
+            std::unique_ptr<mc::ReaderWriterQueue<T, 1024>> m_queue;
             std::atomic<int>                                m_size;
             
         private: // deleted methods
