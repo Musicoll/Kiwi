@@ -34,8 +34,8 @@ namespace kiwi
         // ================================================================================ //
         
         Object::Object(model::Object const& model, Patcher& patcher) noexcept :
-        m_model(model),
         m_patcher(patcher),
+        m_inlets(model.getNumberOfInlets()),
         m_outlets(model.getNumberOfOutlets()),
         m_stack_count(0ul)
         {
@@ -47,29 +47,14 @@ namespace kiwi
             m_outlets.clear();
         }
         
-        std::string Object::getName() const
+        void Object::addOutputLink(size_t outlet_index, Object & receiver, size_t inlet_index)
         {
-            return m_model.getName();
+            m_outlets[outlet_index].insert(Link(receiver, inlet_index));
         }
         
-        size_t Object::getNumberOfInlets() const
+        void Object::removeOutputLink(size_t outlet_index, Object & receiver, size_t inlet_index)
         {
-            return m_model.getNumberOfInlets();
-        }
-        
-        size_t Object::getNumberOfOutlets() const
-        {
-            return m_model.getNumberOfOutlets();
-        }
-        
-        void Object::addOutputLink(Link const& link)
-        {
-            m_outlets[link.getSenderIndex()].insert(&link);
-        }
-        
-        void Object::removeOutputLink(Link const& link)
-        {
-            m_outlets[link.getSenderIndex()].erase(&link);
+            m_outlets[outlet_index].erase(Link(receiver, inlet_index));
         }
         
         // ================================================================================ //
@@ -113,17 +98,17 @@ namespace kiwi
             
             if(idx < m_outlets.size())
             {
-                for(auto const* link : m_outlets[idx])
+                for(Link const& link : m_outlets[idx])
                 {
-                    Object& receiver = link->getReceiverObject();
+                    Object& receiver = link.getReceiver();
                     if(++(receiver.m_stack_count) < KIWI_ENGINE_STACKOVERFLOW_MAX)
                     {
-                        receiver.receive(link->getReceiverIndex(), args);
+                        receiver.receive(link.getReceiverIndex(), args);
                     }
                     else if(++(receiver.m_stack_count) == KIWI_ENGINE_STACKOVERFLOW_MAX)
                     {
-                        m_patcher.addStackOverflow(*link);
-                        receiver.receive(link->getReceiverIndex(), args);
+                        m_patcher.addStackOverflow(link);
+                        receiver.receive(link.getReceiverIndex(), args);
                     }
                     else
                     {

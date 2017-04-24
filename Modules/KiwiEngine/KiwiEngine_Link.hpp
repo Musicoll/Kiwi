@@ -38,31 +38,33 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            Link(model::Link const& model);
+            Link(Object & receiver, size_t index);
+            
+            //! @brief Copy constructor
+            Link(Link const& other) = default;
+            
+            //! @brief Move constructor
+            Link(Link && other) = default;
             
             //! @brief Destructor.
             ~Link() = default;
             
-            //! @brief Gets the Object that sends messages.
-            Object& getSenderObject() const;
+            //! @brief Comparison operator
+            bool operator<(Link const& other) const;
             
             //! @brief Gets the Object that receives messages.
-            Object& getReceiverObject() const;
-            
-            //! @brief Gets the index of the outlet of the Link.
-            size_t getSenderIndex() const;
+            Object & getReceiver() const;
             
             //! @brief Gets the index of the inlet of the Link.
             size_t getReceiverIndex() const;
             
         private: // members
             
-            model::Link const& m_model;
+            engine::Object & m_receiver;
+            size_t           m_index;
             
         private: // deleted methods
             
-            Link(Link const&) = delete;
-            Link(Link&&) = delete;
             Link& operator=(Link const&) = delete;
             Link& operator=(Link&&) = delete;
         };

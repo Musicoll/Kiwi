@@ -35,8 +35,7 @@ namespace kiwi
         //                                      PATCHER                                     //
         // ================================================================================ //
         
-        Patcher::Patcher(model::Patcher const& model, Instance& instance) noexcept :
-        m_model(model),
+        Patcher::Patcher(Instance& instance) noexcept :
         m_instance(instance),
         m_so_links(1),
         m_chain()
@@ -47,51 +46,6 @@ namespace kiwi
         Patcher::~Patcher()
         {
             m_instance.getAudioControler().remove(m_chain);
-        }
-        
-        std::vector<Object const*> Patcher::getObjects() const
-        {
-            std::vector<Object const*> objects;
-            for(auto& obj : m_model.getObjects())
-            {
-                if(obj.resident())
-                {
-                    auto object_engine = obj.entity().use<std::shared_ptr<Object>>();
-                    objects.push_back(object_engine.get());
-                }
-            }
-            
-            return objects;
-        }
-        
-        std::vector<Object*> Patcher::getObjects()
-        {
-            std::vector<Object*> objects;
-            for(auto& obj : m_model.getObjects())
-            {
-                if(obj.resident())
-                {
-                    auto object_engine = obj.entity().use<std::shared_ptr<Object>>();
-                    objects.push_back(object_engine.get());
-                }
-            }
-            
-            return objects;
-        }
-        
-        std::vector<Link const*> Patcher::getLinks() const
-        {
-            std::vector<Link const*> links;
-            for(auto& link : m_model.getLinks())
-            {
-                if(link.resident())
-                {
-                    Link const* link_engine = link.entity().get<Link>();
-                    links.push_back(link_engine);
-                }
-            }
-            
-            return links;
         }
         
         AudioControler& Patcher::getAudioControler() const
@@ -123,9 +77,9 @@ namespace kiwi
         
         void Patcher::sendLoadbang()
         {
-            for(auto& obj : m_model.getObjects())
+            for(auto& object : m_objects)
             {
-                obj.entity().use<std::shared_ptr<Object>>()->loadbang();
+                object.second->loadbang();
             }
         }
         
@@ -166,16 +120,16 @@ namespace kiwi
         //                                    MODEL CHANGED                                 //
         // ================================================================================ //
         
-        void Patcher::modelChanged()
+        void Patcher::modelChanged(model::Patcher const& model)
         {
-            if(m_model.changed())
+            if(model.changed())
             {
-                const bool link_changed = m_model.linksChanged();
+                const bool link_changed = model.linksChanged();
                 
                 // check links before objects
                 if(link_changed)
                 {
-                    for(auto& link : m_model.getLinks())
+                    for(auto& link : model.getLinks())
                     {
                         if(link.removed())
                         {
@@ -184,9 +138,9 @@ namespace kiwi
                     }
                 }
 
-                if(m_model.objectsChanged())
+                if(model.objectsChanged())
                 {
-                    for(auto& object : m_model.getObjects())
+                    for(auto& object : model.getObjects())
                     {
                         if(object.added())
                         {
@@ -202,7 +156,7 @@ namespace kiwi
                 // check links before objects
                 if(link_changed)
                 {
-                    for(auto& link : m_model.getLinks())
+                    for(auto& link : model.getLinks())
                     {
                         if(link.added())
                         {
@@ -224,10 +178,11 @@ namespace kiwi
 
         void Patcher::objectAdded(model::Object& object_m)
         {
-            std::shared_ptr<Object> obj_sptr = Factory::create(*this, object_m);
-            object_m.entity().emplace<std::shared_ptr<Object>>(obj_sptr);
+            std::shared_ptr<Object> object = std::move(Factory::create(*this, object_m));
             
-            std::shared_ptr<dsp::Processor> processor = std::dynamic_pointer_cast<AudioObject>(obj_sptr);
+            m_objects[object_m.ref().obj()] = object;
+            
+            std::shared_ptr<dsp::Processor> processor = std::dynamic_pointer_cast<AudioObject>(object);
             
             if (processor)
             {
@@ -238,33 +193,26 @@ namespace kiwi
         void Patcher::objectRemoved(model::Object& object_m)
         {   
             std::shared_ptr<dsp::Processor> processor =
-            std::dynamic_pointer_cast<AudioObject>(object_m.entity().use<std::shared_ptr<Object>>());
+                std::dynamic_pointer_cast<AudioObject>(m_objects[object_m.ref().obj()]);
             
             if (processor)
             {
                 m_chain.removeProcessor(*processor);
             }
             
-            object_m.entity().erase<std::shared_ptr<Object>>();
+            m_objects.erase(object_m.ref().obj());
         }
 
         void Patcher::linkAdded(model::Link& link_m)
         {
-            auto& sender_entity = link_m.getSenderObject().entity();
-            auto& receiver_entity = link_m.getReceiverObject().entity();
-            
-            assert(sender_entity.has<std::shared_ptr<Object>>());
-            assert(receiver_entity.has<std::shared_ptr<Object>>());
-            
-            auto from = sender_entity.use<std::shared_ptr<Object>>();
-            auto to = receiver_entity.use<std::shared_ptr<Object>>();
+            std::shared_ptr<Object> from = m_objects[link_m.getSenderObject().ref().obj()];
+            std::shared_ptr<Object> to = m_objects[link_m.getReceiverObject().ref().obj()];
             
             if(from && to)
             {
                 if (!link_m.isSignal())
                 {
-                    auto& link_e = link_m.entity().emplace<Link>(link_m);
-                    from->addOutputLink(link_e);
+                    from->addOutputLink(link_m.getSenderIndex(), *to, link_m.getReceiverIndex());
                 }
                 else
                 {
@@ -282,21 +230,12 @@ namespace kiwi
         
         void Patcher::linkRemoved(model::Link& link)
         {
-            auto& sender_entity = link.getSenderObject().entity();
-            auto& receiver_entity = link.getReceiverObject().entity();
-            
-            assert(sender_entity.has<std::shared_ptr<Object>>());
-            assert(receiver_entity.has<std::shared_ptr<Object>>());
-            
-            auto from = sender_entity.use<std::shared_ptr<Object>>();
-            auto to = receiver_entity.use<std::shared_ptr<Object>>();
+            std::shared_ptr<Object> from = m_objects[link.getSenderObject().ref().obj()];
+            std::shared_ptr<Object> to = m_objects[link.getReceiverObject().ref().obj()];
             
             if (!link.isSignal())
             {
-                auto& link_engine = link.entity().use<Link>();
-                auto from = sender_entity.use<std::shared_ptr<Object>>();
-                from->removeOutputLink(link_engine);
-                link.entity().erase<Link>();
+                from->removeOutputLink(link.getSenderIndex(), *to, link.getReceiverIndex());
             }
             else
             {

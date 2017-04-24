@@ -22,6 +22,8 @@
 #ifndef KIWI_ENGINE_PATCHER_HPP_INCLUDED
 #define KIWI_ENGINE_PATCHER_HPP_INCLUDED
 
+#include <map>
+
 #include "KiwiEngine_Def.hpp"
 #include "KiwiEngine_Beacon.hpp"
 #include "KiwiEngine_AudioControler.hpp"
@@ -42,22 +44,13 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            Patcher(model::Patcher const& model, Instance& instance) noexcept;
+            Patcher(Instance& instance) noexcept;
             
             //! @brief Destructor.
             ~Patcher();
             
-            //! @brief Returns the objects.
-            std::vector<Object const*> getObjects() const;
-            
-            //! @brief Returns the objects.
-            std::vector<Object*> getObjects();
-            
-            //! @brief Returns the links.
-            std::vector<Link const*> getLinks() const;
-            
             //! @internal The model changed.
-            void modelChanged();
+            void modelChanged(model::Patcher const& model);
             
             //! @brief Adds a link to the current stack overflow list (or create a new list if there is no).
             //! @internal Only the Object should use this method.
@@ -126,10 +119,10 @@ namespace kiwi
             
             using SoLinks = std::queue<Link const*>;
             
-            model::Patcher const&   m_model;
-            Instance&               m_instance;
-            std::vector<SoLinks>    m_so_links;
-            dsp::Chain              m_chain;
+            Instance&                                       m_instance;
+            std::map<uint64_t, std::shared_ptr<Object>>     m_objects;
+            std::vector<SoLinks>                            m_so_links;
+            dsp::Chain                                      m_chain;
             
         private: // deleted methods
             

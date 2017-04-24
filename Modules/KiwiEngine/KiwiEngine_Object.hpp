@@ -44,15 +44,6 @@ namespace kiwi
             
             //! @brief Destructor.
             virtual ~Object() noexcept;
-
-            //! @brief Gets the name of the Object.
-            std::string getName() const;
-            
-            //! @brief Gets the number of inlets of the Object.
-            size_t getNumberOfInlets() const;
-            
-            //! @brief Gets the number of outlets of the Object.
-            size_t getNumberOfOutlets() const;
             
             //! @brief Receives a set of arguments via an inlet.
             //! @details This method must be overriden by object's subclasses.
@@ -63,10 +54,10 @@ namespace kiwi
             virtual void loadbang() {};
             
             //! @internal Appends a new Link to an outlet.
-            void addOutputLink(Link const& link);
+            void addOutputLink(size_t outlet_index, Object & receiver, size_t inlet_index);
             
             //! @internal Removes a Link from an outlet.
-            void removeOutputLink(Link const& link);
+            void removeOutputLink(size_t outlet_index, Object & receiver, size_t inlet_index);
             
         protected: // methods
             
@@ -104,10 +95,10 @@ namespace kiwi
             
         private: // members
             
-            using Outlet = std::set<Link const*>;
+            using Outlet = std::set<Link>;
 
-            model::Object const&    m_model;
             Patcher&                m_patcher;
+            size_t                  m_inlets;
             std::vector<Outlet>     m_outlets;
             size_t                  m_stack_count = 0ul;
             
