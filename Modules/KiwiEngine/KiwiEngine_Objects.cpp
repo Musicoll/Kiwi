@@ -173,8 +173,39 @@ namespace kiwi
         //                                  OBJECT RECEIVE                                  //
         // ================================================================================ //
         
-        Receive::Receive(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
-        : Object(model, patcher)
+        class Receive::CallBack final : public Scheduler<>::Task
+        {
+        public: // methods
+            
+            CallBack(Receive& object, std::vector<Atom> const& atoms):
+            Task(Thread::Gui, Thread::Engine),
+            m_object(object),
+            m_atoms(atoms)
+            {
+                m_object.m_tasks.insert(this);
+            }
+            
+            ~CallBack()
+            {
+                m_object.m_tasks.erase(this);
+            }
+            
+            void execute() override
+            {
+                m_object.send(0, m_atoms);
+                delete this;
+            }
+            
+        private: // members
+            
+            Receive&            m_object;
+            std::vector<Atom>   m_atoms;
+        };
+        
+        Receive::Receive(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        Object(model, patcher),
+        m_name(),
+        m_tasks()
         {
             m_name = !args.empty() ? args[0].getString() : "";
             
@@ -187,6 +218,12 @@ namespace kiwi
         
         Receive::~Receive()
         {
+            for (auto & task : m_tasks)
+            {
+                task->disable();
+                delete task;
+            }
+            
             if(!m_name.empty())
             {
                 Beacon& beacon = getBeacon(m_name);
@@ -201,9 +238,9 @@ namespace kiwi
         
         void Receive::receive(std::vector<Atom> const& args)
         {
-            if(!args.empty())
+            if (!args.empty())
             {
-                send(0, args);
+                Scheduler<>::getInstance().schedule(new CallBack(*this, args));
             }
         }
         

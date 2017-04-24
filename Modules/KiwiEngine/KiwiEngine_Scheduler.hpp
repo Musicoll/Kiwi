@@ -44,12 +44,14 @@ namespace kiwi
         }
         
         template<class Clock>
-        void Scheduler<Clock>::createInstance()
+        Scheduler<Clock>& Scheduler<Clock>::createInstance()
         {
             if (m_instance == nullptr)
             {
                 m_instance.reset(new Scheduler());
             }
+            
+            return *m_instance;
         }
         
         template<class Clock>
@@ -238,6 +240,31 @@ namespace kiwi
         void Scheduler<Clock>::Task::disable()
         {
             m_event->disable();
+        }
+        
+        // ==================================================================================== //
+        //                                       CALLBACK                                       //
+        // ==================================================================================== //
+        
+        template<class Clock>
+        Scheduler<Clock>::CallBack::CallBack(thread_token producer,
+                                             thread_token consumer,
+                                             std::function<void(void)> callback):
+        Task(producer, consumer),
+        m_callback(callback)
+        {
+        }
+        
+        template<class Clock>
+        Scheduler<Clock>::CallBack::~CallBack()
+        {
+        }
+        
+        template<class Clock>
+        void Scheduler<Clock>::CallBack::execute()
+        {
+            m_callback();
+            delete this;
         }
         
         // ==================================================================================== //

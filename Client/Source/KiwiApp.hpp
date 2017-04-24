@@ -22,7 +22,11 @@
 #ifndef KIWI_KIWIAPP_HPP_INCLUDED
 #define KIWI_KIWIAPP_HPP_INCLUDED
 
+#include <thread>
+
 #include <juce_gui_basics/juce_gui_basics.h>
+
+#include <KiwiEngine/KiwiEngine_Scheduler.h>
 
 #include "KiwiApp_Instance.hpp"
 #include "KiwiApp_StoredSettings.hpp"
@@ -79,6 +83,9 @@ namespace kiwi
         
         //! @brief Returns true if the app is running in a Windows operating system.
         static bool isWindows();
+        
+        //! @brief Run the engine scheduler executed queued events.
+        void processEngine();
         
         //==============================================================================
         
@@ -204,6 +211,8 @@ namespace kiwi
         std::unique_ptr<Instance>                           m_instance;
         std::unique_ptr<juce::ApplicationCommandManager>	m_command_manager;
         std::unique_ptr<MainMenuModel>                      m_menu_model;
+        std::thread                                         m_engine_thread;
+        std::atomic<bool>                                   m_quit_requested;
         
         LookAndFeel                                         m_looknfeel;
         juce::TooltipWindow                                 m_tooltip_window;

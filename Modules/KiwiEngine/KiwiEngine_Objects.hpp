@@ -23,11 +23,12 @@
 #define KIWI_ENGINE_TYPED_OBJECTS_HPP_INCLUDED
 
 #include <vector>
+#include <set>
 
 #include "KiwiEngine_Object.hpp"
 #include "KiwiEngine_Beacon.hpp"
-
 #include "KiwiEngine_AudioControler.hpp"
+#include "KiwiEngine_Scheduler.h"
 
 namespace kiwi
 {
@@ -119,7 +120,11 @@ namespace kiwi
         
         class Receive : public engine::Object, public Beacon::Castaway
         {
-        public:
+        private: // classes
+            
+            class CallBack;
+            
+        public: // methods
             
             Receive(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
@@ -129,8 +134,14 @@ namespace kiwi
             
             void receive(std::vector<Atom> const& args) override;
             
-        private:
-            std::string m_name;
+        private: // friends
+            
+            friend class CallBack;
+            
+        private: // members
+            
+            std::string                         m_name;
+            std::set<CallBack*>                 m_tasks;
         };
         
         // ================================================================================ //

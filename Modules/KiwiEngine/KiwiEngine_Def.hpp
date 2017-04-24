@@ -32,6 +32,8 @@
 
 #include <KiwiModel/KiwiModel_Atom.hpp>
 
+#include "KiwiEngine_Scheduler.h"
+
 namespace kiwi
 {
     namespace model
@@ -49,6 +51,13 @@ namespace kiwi
         class Patcher;
         class Instance;
     }
+    
+    enum Thread : engine::thread_token
+    {
+        Gui     = 0,
+        Engine  = 1,
+        Dsp     = 2,
+    };
 }
 
 

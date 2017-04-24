@@ -42,7 +42,7 @@ namespace kiwi
         
         using thread_token = uint64_t;
         
-        template<class Clock>
+        template<class Clock = std::chrono::high_resolution_clock>
         class Scheduler final
         {
         public: // classes
@@ -53,6 +53,8 @@ namespace kiwi
             
             class Task;
             
+            class CallBack;
+            
         private: // classes
         
             class Queue;
@@ -61,7 +63,7 @@ namespace kiwi
             
         public: // methods
             
-            static void createInstance();
+            static Scheduler& createInstance();
             
             static Scheduler& getInstance();
             
@@ -153,13 +155,15 @@ namespace kiwi
         template <class Clock>
         class Scheduler<Clock>::Task
         {
+        public: // methods
+            
+            void disable();
+            
         protected: // methods
             
             Task(thread_token producer, thread_token consumer);
             
             virtual ~Task();
-            
-            void disable();
             
         private: // methods
 
@@ -182,6 +186,37 @@ namespace kiwi
             Task(Task && other) = delete;
             Task& operator=(Task const& other) = delete;
             Task& operator=(Task && other) = delete;
+        };
+        
+        // ==================================================================================== //
+        //                                       CALLBACK                                       //
+        // ==================================================================================== //
+        
+        template<class Clock>
+        class Scheduler<Clock>::CallBack : public Scheduler<Clock>::Task
+        {
+        public: // methods
+            
+            CallBack(thread_token  producer, thread_token consumer, std::function<void(void)> func);
+            
+            virtual ~CallBack();
+            
+        private: // methods
+            
+            void execute() override final;
+            
+        private: // members
+            
+            std::function<void(void)> m_callback;
+            
+        private: // deleted methods
+            
+            CallBack() = delete;
+            CallBack(CallBack const& other) = delete;
+            CallBack(CallBack && other) = delete;
+            CallBack& operator=(CallBack const& other) = delete;
+            CallBack& operator=(CallBack && other) = delete;
+            
         };
         
         // ==================================================================================== //

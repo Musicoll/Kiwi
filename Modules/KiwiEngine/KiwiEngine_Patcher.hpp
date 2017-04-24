@@ -23,6 +23,7 @@
 #define KIWI_ENGINE_PATCHER_HPP_INCLUDED
 
 #include <map>
+#include <set>
 
 #include "KiwiEngine_Def.hpp"
 #include "KiwiEngine_Beacon.hpp"
@@ -41,6 +42,10 @@ namespace kiwi
         //! @brief The Patcher manages a set of Object and Link.
         class Patcher
         {
+        private: // classes
+            
+            class CallBack;
+            
         public: // methods
             
             //! @brief Constructor.
@@ -48,6 +53,21 @@ namespace kiwi
             
             //! @brief Destructor.
             ~Patcher();
+            
+            //! @brief Adds an object to the patcher.
+            void addObject(uint64_t object_id, std::shared_ptr<Object> object);
+            
+            //! @brief Removes an object from the patcher.
+            void removeObject(uint64_t object_id);
+            
+            //! @brief Adds a link between to object of the patcher.
+            void addLink(uint64_t from_id, size_t outlet, uint64_t to_id, size_t inlet, bool is_signal);
+            
+            //! @brief Removes a link between two objects.
+            void removeLink(uint64_t from_id, size_t outlet, uint64_t to_id, size_t inlet, bool is_signal);
+            
+            //! @brief Updates the dsp chain held by the engine patcher
+            void updateChain();
             
             //! @internal The model changed.
             void modelChanged(model::Patcher const& model);
@@ -71,6 +91,11 @@ namespace kiwi
             
             //! @internal Call the loadbang method of all objects.
             void sendLoadbang();
+            
+            //! @brief Disable all commands previously scheduled for this patcher.
+            //! @details This method shall be called before erasing patcher in order to prevent callbacks
+            //! to be later called on a deleted patcher.
+            void disableCommands();
             
             // ================================================================================ //
             //                                      CONSOLE                                     //
@@ -110,10 +135,10 @@ namespace kiwi
             void linkAdded(model::Link& link);
             
             //! @internal Link model has changed.
-            void linkChanged(model::Link& link);
+            void linkChanged(model::Link& link_m);
             
             //! @internal Link model will be removed from the document.
-            void linkRemoved(model::Link& link);
+            void linkRemoved(model::Link& link_m);
         
         private: // members
             
@@ -121,6 +146,8 @@ namespace kiwi
             
             Instance&                                       m_instance;
             std::map<uint64_t, std::shared_ptr<Object>>     m_objects;
+            std::set<CallBack*>                             m_callbacks;
+            mutable std::mutex                              m_mutex;
             std::vector<SoLinks>                            m_so_links;
             dsp::Chain                                      m_chain;
             
@@ -130,6 +157,27 @@ namespace kiwi
             Patcher(Patcher&&) = delete;
             Patcher& operator=(Patcher const&) = delete;
             Patcher& operator=(Patcher&&) = delete;
+        };
+        
+        // ================================================================================ //
+        //                                PATCHER CALLBACK                                  //
+        // ================================================================================ //
+        
+        class Patcher::CallBack final : public Scheduler<>::CallBack
+        {
+        public: // methods
+            
+            CallBack(Patcher& patcher, std::function<void(void)> callback);
+            
+            ~CallBack();
+            
+        private: // members
+            
+            Patcher&                  m_patcher;
+            
+        private: // friends
+            
+            friend class Patcher;
         };
     }
 }

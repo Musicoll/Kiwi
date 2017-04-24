@@ -382,6 +382,7 @@ namespace kiwi
         
         if(patcher.removed())
         {
+            patcher.entity().use<engine::Patcher>().disableCommands();
             patcher.entity().erase<engine::Patcher>();
             patcher.entity().erase<DocumentManager>();
         }
