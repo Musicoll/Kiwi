@@ -111,8 +111,6 @@ namespace kiwi
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAboutAppWindow);
         macMainMenuPopup.addSeparator();
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAppSettingsWindow);
-        macMainMenuPopup.addSeparator();
-        macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAudioStatusWindow);
         juce::MenuBarModel::setMacMainMenu(m_menu_model.get(), &macMainMenuPopup, TRANS("Open Recent"));
         #endif
     }
@@ -348,7 +346,11 @@ namespace kiwi
         
         menu.addCommandItem(m_command_manager.get(), CommandIDs::save);
         menu.addCommandItem(m_command_manager.get(), CommandIDs::saveAs);
+        
+        #if ! JUCE_MAC
         menu.addSeparator();
+        menu.addCommandItem(m_command_manager.get(), juce::StandardApplicationCommandIDs::quit);
+        #endif
     }
     
     void KiwiApp::createEditMenu(juce::PopupMenu& menu)
@@ -527,7 +529,13 @@ namespace kiwi
             }
             default:
             {
-                JUCEApplication::getCommandInfo(commandID, result); break;
+                if(commandID == juce::StandardApplicationCommandIDs::quit)
+                {
+                    result.setInfo(TRANS("Quit Kiwi"), TRANS("Quits the application"),
+                                   CommandCategories::general, 0);
+                    
+                    result.addDefaultKeypress('q', juce::ModifierKeys::commandModifier);
+                }
             }
         }
     }
