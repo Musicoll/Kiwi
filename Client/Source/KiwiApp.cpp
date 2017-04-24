@@ -394,7 +394,9 @@ namespace kiwi
     
     void KiwiApp::createHelpMenu(juce::PopupMenu& menu)
     {
-        ;
+        #if JUCE_MAC
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::showAboutAppWindow);
+        #endif
     }
     
     void KiwiApp::handleMainMenuCommand(int menuItemID)
