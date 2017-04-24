@@ -81,6 +81,13 @@ namespace kiwi
     
     void KiwiApp::initialise(juce::String const& commandLine)
     {
+        if(sendCommandLineToPreexistingInstance())
+        {
+            DBG ("Another instance is running - quitting...");
+            quit();
+            return;
+        }
+   
         model::DataModel::init();
         
         juce::Desktop::getInstance().setGlobalScaleFactor(1.);
