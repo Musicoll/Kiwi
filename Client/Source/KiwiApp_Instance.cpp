@@ -196,7 +196,7 @@ namespace kiwi
         #if ! JUCE_MAC
         auto is_main_window_fn = [](std::unique_ptr<Window> const& window)
         {
-            return window->isMainWindow();
+            return window && window->isMainWindow();
         };
         
         size_t main_windows = std::count_if(m_windows.begin(), m_windows.end(), is_main_window_fn);
