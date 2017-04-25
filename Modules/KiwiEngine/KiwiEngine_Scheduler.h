@@ -53,6 +53,8 @@ namespace kiwi
             
             class Task;
             
+            class Timer;
+            
             class CallBack;
             
         private: // classes
@@ -186,6 +188,47 @@ namespace kiwi
             Task(Task && other) = delete;
             Task& operator=(Task const& other) = delete;
             Task& operator=(Task && other) = delete;
+        };
+        
+        // ==================================================================================== //
+        //                                       TIMER                                          //
+        // ==================================================================================== //
+        
+        template<class Clock>
+        class Scheduler<Clock>::Timer
+        {
+        private: // classes
+            
+            class Task;
+            
+        public: // methods
+            
+            Timer(thread_token producer_token, thread_token consumer_token);
+            
+            ~Timer();
+            
+            void startTimer(duration_t period);
+            
+            void stopTimer();
+            
+            virtual void timerCallBack() = 0;
+            
+        private: // methods
+            
+            void callBackInternal();
+            
+        private: // members
+            
+            std::unique_ptr<Task>   m_task;
+            duration_t              m_period;
+            
+        private: // deleted methods
+            
+            Timer() = delete;
+            Timer(Timer const& other) = delete;
+            Timer(Timer && other) = delete;
+            Timer& operator=(Timer const& other) = delete;
+            Timer& operator=(Timer && other) = delete;
         };
         
         // ==================================================================================== //

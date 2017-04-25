@@ -266,6 +266,194 @@ namespace kiwi
         }
         
         // ================================================================================ //
+        //                                     OBJECT DELAY                                 //
+        // ================================================================================ //
+        
+        class Delay::Task final : public Scheduler<>::Task
+        {
+        public:
+            
+            Task(Delay & object):
+            Scheduler<>::Task(Thread::Engine, Thread::Engine),
+            m_object(object)
+            {
+            }
+            
+            ~Task() =  default;
+            
+            void execute()
+            {
+                m_object.send(0, {"bang"});
+            }
+            
+        private:
+            
+            Delay& m_object;
+        };
+        
+        Delay::Delay(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        Object(model, patcher),
+        m_task(new Task(*this)),
+        m_delay(std::chrono::milliseconds(0))
+        {
+            if (!args.empty())
+            {
+                m_delay = std::chrono::milliseconds(args[0].getInt());
+            }
+        }
+        
+        Delay::~Delay()
+        {
+            m_task->disable();
+        }
+        
+        void Delay::receive(size_t index, std::vector<Atom> const& args)
+        {
+            if (!args.empty())
+            {
+                if (index == 0)
+                {
+                    if(args[0].isString() && args[0].getString() == "bang")
+                    {
+                        Scheduler<>::getInstance().schedule(m_task.get(), m_delay);
+                    }
+                    else if(args[0].isString() && args[0].getString() == "stop")
+                    {
+                        Scheduler<>::getInstance().unschedule(m_task.get());
+                    }
+                }
+                else if(index == 1)
+                {
+                    if (args[0].isNumber())
+                    {
+                        m_delay = std::chrono::milliseconds(args[0].getInt());
+                    }
+                }
+            }
+        }
+        
+        // ================================================================================ //
+        //                                  OBJECT PIPE                                     //
+        // ================================================================================ //
+        
+        class Pipe::Task final : public Scheduler<>::Task
+        {
+        public: // methods
+            
+            Task(Pipe & object, std::vector<Atom> const& atoms):
+            Scheduler<>::Task(Thread::Engine, Thread::Engine),
+            m_object(object),
+            m_atoms(atoms)
+            {
+                object.m_tasks.insert(this);
+            }
+            
+            ~Task()
+            {
+                m_object.m_tasks.erase(this);
+            }
+            
+            void execute()
+            {
+                m_object.send(0, m_atoms);
+                delete this;
+            }
+            
+        private: // members
+            
+            Pipe&               m_object;
+            std::vector<Atom>   m_atoms;
+            
+        };
+        
+        Pipe::Pipe(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        Object(model, patcher),
+        m_tasks(),
+        m_delay(std::chrono::milliseconds(0))
+        {
+            if (!args.empty())
+            {
+                m_delay = std::chrono::milliseconds(args[0].getInt());
+            }
+        }
+        
+        Pipe::~Pipe()
+        {
+            for(auto & task : m_tasks)
+            {
+                task->disable();
+                delete task;
+            }
+        }
+        
+        void Pipe::receive(size_t index, std::vector<Atom> const& args)
+        {
+            if (!args.empty())
+            {
+                if (index == 0)
+                {
+                    Scheduler<>::getInstance().schedule(new Task(*this, args), m_delay);
+                }
+                else if(index == 1)
+                {
+                    if (args[0].isNumber())
+                    {
+                        m_delay = std::chrono::milliseconds(args[0].getInt());
+                    }
+                }
+            }
+        }
+        
+        // ================================================================================ //
+        //                                  OBJECT METRO                                    //
+        // ================================================================================ //
+        
+        Metro::Metro(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        engine::Object(model, patcher),
+        Scheduler<>::Timer(Thread::Engine, Thread::Engine),
+        m_period(std::chrono::milliseconds(5))
+        {
+            if(!args.empty())
+            {
+                m_period = std::chrono::milliseconds(args[0].getInt());
+            }
+        }
+        
+        Metro::~Metro()
+        {
+        }
+        
+        void Metro::receive(size_t index, std::vector<Atom> const& args)
+        {
+            if (!args.empty())
+            {
+                if (index == 0)
+                {
+                    if (args[0].isString() && args[0].getString() == "start")
+                    {
+                        startTimer(m_period);
+                    }
+                    else if(args[0].isString() && args[0].getString() == "stop")
+                    {
+                        stopTimer();
+                    }
+                }
+                else if(index == 1)
+                {
+                    if (args[0].isNumber())
+                    {
+                        m_period = std::chrono::milliseconds(args[0].getInt());
+                    }
+                }
+            }
+        }
+        
+        void Metro::timerCallBack()
+        {
+            send(0, {"bang"});
+        }
+        
+        // ================================================================================ //
         //                                       ROUTER                                     //
         // ================================================================================ //
         

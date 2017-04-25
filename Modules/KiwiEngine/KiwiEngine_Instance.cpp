@@ -85,6 +85,9 @@ namespace kiwi
             engine::Factory::add<Print>("print");
             engine::Factory::add<Receive>("receive");
             engine::Factory::add<Loadmess>("loadmess");
+            engine::Factory::add<Delay>("delay");
+            engine::Factory::add<Pipe>("pipe");
+            engine::Factory::add<Metro>("metro");
             engine::Factory::add<OscTilde>("osc~");
             engine::Factory::add<AdcTilde>("adc~");
             engine::Factory::add<DacTilde>("dac~");

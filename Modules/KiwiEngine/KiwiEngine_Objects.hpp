@@ -166,6 +166,76 @@ namespace kiwi
         };
         
         // ================================================================================ //
+        //                                  OBJECT DELAY                                    //
+        // ================================================================================ //
+        
+        class Delay final : public engine::Object
+        {
+        public: // classes
+            
+            class Task;
+            
+        public: // methods
+            
+            Delay(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            ~Delay();
+            
+            void receive(size_t index, std::vector<Atom> const& args) override;
+            
+        private: // members
+            
+            std::unique_ptr<Task>           m_task;
+            Scheduler<>::clock_t::duration  m_delay;
+        };
+        
+        // ================================================================================ //
+        //                                  OBJECT PIPE                                     //
+        // ================================================================================ //
+        
+        class Pipe final : public engine::Object
+        {
+        public: // classes
+            
+            class Task;
+            
+        public: // methods
+            
+            Pipe(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            ~Pipe();
+            
+            void receive(size_t index, std::vector<Atom> const& args) override;
+            
+        private: // members
+            
+            std::set<Task*>                     m_tasks;
+            Scheduler<>::clock_t::duration      m_delay;
+        };
+        
+        // ================================================================================ //
+        //                                  OBJECT METRO                                    //
+        // ================================================================================ //
+        
+        class Metro final : public engine::Object, Scheduler<>::Timer
+        {
+        public: // methods
+            
+            Metro(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            ~Metro();
+            
+            void receive(size_t index, std::vector<Atom> const& oargs) override;
+            
+            void timerCallBack() override;
+            
+        private: // members
+            
+            Scheduler<>::duration_t m_period;
+        };
+        
+        
+        // ================================================================================ //
         //                                       ROUTER                                     //
         // ================================================================================ //
         

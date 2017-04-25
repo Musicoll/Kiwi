@@ -67,6 +67,9 @@ namespace kiwi
             Print::declare();
             Receive::declare();
             Loadmess::declare();
+            Delay::declare();
+            Pipe::declare();
+            Metro::declare();
             DacTilde::declare();
             AdcTilde::declare();
             OscTilde::declare();

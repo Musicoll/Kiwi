@@ -243,6 +243,74 @@ namespace kiwi
         }
         
         // ==================================================================================== //
+        //                                       TIMER                                          //
+        // ==================================================================================== //
+        
+        template<class Clock>
+        class Scheduler<Clock>::Timer::Task final : public Scheduler<Clock>::Task
+        {
+        public: // methods
+            
+            Task(Timer& timer, thread_token producer, thread_token consumer):
+            Scheduler<Clock>::Task(producer, consumer),
+            m_timer(timer)
+            {
+            }
+            
+            ~Task()
+            {
+            }
+            
+            void execute() override
+            {
+                m_timer.callBackInternal();
+            }
+            
+        private: // members
+            
+            Timer&          m_timer;
+            duration_t      m_period;
+            
+        };
+        
+        template<class Clock>
+        Scheduler<Clock>::Timer::Timer(thread_token producer, thread_token consumer):
+        m_task(new Task(*this, producer, consumer))
+        {
+        }
+        
+        template<class Clock>
+        Scheduler<Clock>::Timer::~Timer()
+        {
+        }
+        
+        template<class Clock>
+        void Scheduler<Clock>::Timer::startTimer(duration_t period)
+        {
+            stopTimer();
+            
+            if (period > std::chrono::microseconds(1))
+            {
+                m_period = period;
+                Scheduler::getInstance().schedule(m_task.get(), m_period);
+            }
+        }
+        
+        template<class Clock>
+        void Scheduler<Clock>::Timer::callBackInternal()
+        {
+            timerCallBack();
+            
+            Scheduler::getInstance().schedule(m_task.get(), m_period);
+        }
+        
+        template<class Clock>
+        void Scheduler<Clock>::Timer::stopTimer()
+        {
+            Scheduler::getInstance().unschedule(m_task.get());
+        }
+        
+        // ==================================================================================== //
         //                                       CALLBACK                                       //
         // ==================================================================================== //
         

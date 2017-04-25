@@ -106,6 +106,7 @@ namespace kiwi
         
         scheduler.registerConsumer(Thread::Engine);
         scheduler.registerProducer(Thread::Gui, Thread::Engine);
+        scheduler.registerProducer(Thread::Engine, Thread::Engine);
         
         m_quit_requested.store(false);
         m_engine_thread = std::thread(std::bind(&KiwiApp::processEngine, this));
