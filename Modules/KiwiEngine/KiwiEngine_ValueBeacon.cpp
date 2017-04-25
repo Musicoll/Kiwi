@@ -36,12 +36,12 @@ namespace kiwi
         
         void ValueBeacon::bind(Castaway& castaway)
         {
-            m_castaways.insert(&castaway);
+            m_castaways.add(castaway);
         }
         
         void ValueBeacon::unbind(Castaway& castaway)
         {
-            m_castaways.erase(&castaway);
+            m_castaways.remove(castaway);
         }
         
         bool ValueBeacon::hasValue()
@@ -57,6 +57,7 @@ namespace kiwi
         void ValueBeacon::setValue(std::unique_ptr<Value> new_value)
         {
             m_value = std::move(new_value);
+            m_castaways.call(&Castaway::valueChanged, *this);
         }
         
         // ================================================================================ //
@@ -65,17 +66,18 @@ namespace kiwi
         
         ValueBeacon& ValueBeacon::Factory::useValueBeacon(std::string const& name)
         {
+            ValueBeacon* beacon = nullptr;
+            
             auto it = m_beacons.find(name);
             if(it != m_beacons.end())
             {
-                return *it->second.get();
+                beacon = it->second.get();
             }
-            
-            ValueBeacon* beacon = new ValueBeacon(name);
-            if(beacon)
+            else if((beacon = new ValueBeacon(name)))
             {
                 m_beacons[name] = std::unique_ptr<ValueBeacon>(beacon);
             }
+            
             return *beacon;
         }
     };

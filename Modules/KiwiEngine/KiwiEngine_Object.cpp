@@ -146,9 +146,11 @@ namespace kiwi
         //                                    AUDIOOBJECT                                   //
         // ================================================================================ //
         
-        AudioObject::AudioObject(model::Object const& model, Patcher& patcher) noexcept:
+        AudioObject::AudioObject(model::Object const& model,
+                                 Patcher& patcher,
+                                 Processor::GraphOrder order) noexcept:
         Object(model, patcher),
-        dsp::Processor(model.getNumberOfInlets(), model.getNumberOfOutlets())
+        dsp::Processor(model.getNumberOfInlets(), model.getNumberOfOutlets(), order)
         {
         }
         

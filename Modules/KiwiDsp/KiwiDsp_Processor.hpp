@@ -103,14 +103,26 @@ namespace kiwi
                 const std::vector<bool> &inputs;
             };
             
+            enum GraphOrder
+            {
+                Unordered = 0,
+                PutFirst,
+                PutLast
+            };
+            
         public: // methods
             
             //! @brief The constructor.
             //! @details Allocates and initializes a default Processor object.
             //! @param ninputs The number of inputs.
             //! @param noutputs The number of outputs.
-            Processor(const size_t ninputs, const size_t noutputs) noexcept :
-            m_ninputs(ninputs), m_noutputs(noutputs) {}
+            Processor(const size_t ninputs, const size_t noutputs, GraphOrder order = Unordered) noexcept :
+            m_ninputs(ninputs),
+            m_noutputs(noutputs),
+            m_order(order)
+            {
+                ;
+            }
             
             //! @brief The destructor.
             virtual ~Processor() = default;
@@ -124,6 +136,9 @@ namespace kiwi
             //! @return The number of outputs of the Processor object.
             //! @see getNumberOfInputs()
             inline size_t getNumberOfOutputs() const noexcept {return m_noutputs;}
+            
+            //! @brief Returns the graph order.
+            inline GraphOrder getGraphOrder() const noexcept {return m_order;}
             
             //! @brief Returns true if the processor shall be performed by the chain.
             //! @details Checks it the perform callback is well set by the processor.
@@ -176,6 +191,7 @@ namespace kiwi
             
             const size_t                        m_ninputs;
             const size_t                        m_noutputs;
+            const GraphOrder                    m_order;
             
             std::unique_ptr<IPerformCallBack>   m_call_back;
             

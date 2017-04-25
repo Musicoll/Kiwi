@@ -542,6 +542,26 @@ namespace kiwi
         
         void Chain::indexNodes()
         {
+            /*
+            // sort nodes depending on their graph order 
+            std::sort(m_nodes.begin(), m_nodes.end(), [](auto const& lhs_node, auto const& rhs_node){
+                auto lhs_order = lhs_node->m_processor->getGraphOrder();
+                auto rhs_order = rhs_node->m_processor->getGraphOrder();
+                bool smaller = false;
+                
+                if(lhs_order == Processor::GraphOrder::PutFirst)
+                {
+                    smaller = (rhs_order != Processor::GraphOrder::PutFirst);
+                }
+                else if(lhs_order == Processor::GraphOrder::Unordered)
+                {
+                    smaller = (rhs_order == Processor::GraphOrder::PutLast);
+                }
+                
+                return smaller;
+            });
+            */
+            
             for_each(m_nodes.begin(), m_nodes.end(), index_node());
         }
         

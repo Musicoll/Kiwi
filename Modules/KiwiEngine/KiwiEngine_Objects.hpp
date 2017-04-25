@@ -345,7 +345,7 @@ namespace kiwi
             
         private: // members
             
-            std::atomic<float>   m_value{0.f};
+            std::atomic<float> m_value{0.f};
         };
         
         // ================================================================================ //
@@ -365,6 +365,8 @@ namespace kiwi
             void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
             
             void prepare(dsp::Processor::PrepareInfo const& infos) override final;
+            
+            void valueChanged(ValueBeacon& beacon) override;
             
             size_t getBufferSize() const;
             
@@ -399,12 +401,14 @@ namespace kiwi
             
             void prepare(dsp::Processor::PrepareInfo const& infos) override final;
             
+            void valueChanged(ValueBeacon& beacon) override;
+            
         private:
             
             std::string                 m_name = "";
             size_t                      m_delay_ms = 0;
             double                      m_delay_samps = 0;
-            ObjectValue<DelWriteTilde>* m_delwrite_object = nullptr;
+            ObjectValue<DelWriteTilde>* m_delwrite_object_value = nullptr;
         };
     }
 }

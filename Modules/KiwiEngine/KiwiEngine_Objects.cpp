@@ -711,7 +711,7 @@ namespace kiwi
         
         DelWriteTilde::DelWriteTilde(model::Object const& model,
                                      Patcher& patcher, std::vector<Atom> const& args)
-        : AudioObject(model, patcher)
+        : AudioObject(model, patcher, Processor::GraphOrder::PutFirst)
         {
             if(!args.empty())
             {
@@ -751,6 +751,18 @@ namespace kiwi
                 if(value && value->get() == this)
                 {
                     beacon.setValue(nullptr);
+                }
+            }
+        }
+        
+        void DelWriteTilde::valueChanged(ValueBeacon& beacon)
+        {
+            if(beacon.getName() == m_name)
+            {
+                auto* value = beacon.getValue();
+                if(value == nullptr)
+                {
+                    beacon.setValue(std::make_unique<ObjectValue<DelWriteTilde>>(this));
                 }
             }
         }
@@ -802,6 +814,7 @@ namespace kiwi
         
         void DelWriteTilde::prepare(dsp::Processor::PrepareInfo const& infos)
         {
+            std::cout << "DelWriteTilde prepare" << std::endl;
             ValueBeacon& beacon = useValueBeacon(m_name);
             auto* value = beacon.getValue();
             
@@ -832,7 +845,7 @@ namespace kiwi
         
         DelReadTilde::DelReadTilde(model::Object const& model,
                                    Patcher& patcher, std::vector<Atom> const& args)
-        : AudioObject(model, patcher)
+        : AudioObject(model, patcher, Processor::GraphOrder::PutLast)
         {
             m_name = !args.empty() ? args[0].getString() : "";
             
@@ -850,8 +863,7 @@ namespace kiwi
         {
             if(!m_name.empty())
             {
-                ValueBeacon& beacon = useValueBeacon(m_name);
-                beacon.unbind(*this);
+                useValueBeacon(m_name).unbind(*this);
             }
         }
         
@@ -878,7 +890,13 @@ namespace kiwi
         
         void DelReadTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
         {
-            if(DelWriteTilde* delwrite = m_delwrite_object->get())
+            if(m_delwrite_object_value == nullptr)
+            {
+                output[0].fill(0.);
+                return;
+            }
+            
+            if(DelWriteTilde* delwrite = m_delwrite_object_value->get())
             {
                 auto* buffer_ptr = delwrite->getBufferData();
                 if(buffer_ptr)
@@ -927,17 +945,22 @@ namespace kiwi
         
         void DelReadTilde::prepare(dsp::Processor::PrepareInfo const& infos)
         {
+            std::cout << "DelReadTilde prepare" << std::endl;
             m_delay_samps = msToSamples(m_delay_ms, infos.sample_rate);
             
-            m_delwrite_object = nullptr;
+            m_delwrite_object_value = nullptr;
             
             ValueBeacon& beacon = useValueBeacon(m_name);
+            m_delwrite_object_value = dynamic_cast<ObjectValue<DelWriteTilde>*>(beacon.getValue());
             
-            m_delwrite_object = dynamic_cast<ObjectValue<DelWriteTilde>*>(beacon.getValue());
-            
-            if(m_delwrite_object)
+            setPerformCallBack(this, &DelReadTilde::perform);
+        }
+        
+        void DelReadTilde::valueChanged(ValueBeacon& beacon)
+        {
+            if(beacon.getName() == m_name)
             {
-                setPerformCallBack(this, &DelReadTilde::perform);
+                m_delwrite_object_value = dynamic_cast<ObjectValue<DelWriteTilde>*>(beacon.getValue());
             }
         }
     }

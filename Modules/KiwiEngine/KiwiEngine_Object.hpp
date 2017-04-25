@@ -137,7 +137,7 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            AudioObject(model::Object const& model, Patcher& patcher) noexcept;
+            AudioObject(model::Object const& model, Patcher& patcher, Processor::GraphOrder order = Unordered) noexcept;
             
             //! @brief Destructor.
             virtual ~AudioObject() = default;

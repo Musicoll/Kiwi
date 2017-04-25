@@ -22,10 +22,10 @@
 #ifndef KIWI_ENGINE_VALUE_BEACON_HPP_INCLUDED
 #define KIWI_ENGINE_VALUE_BEACON_HPP_INCLUDED
 
+#include "KiwiEngine_Listeners.hpp"
+
 #include <string>
 #include <map>
-#include <set>
-#include <memory>
 
 namespace kiwi
 {
@@ -82,7 +82,7 @@ namespace kiwi
         private: // members
             
             const std::string       m_name;
-            std::set<Castaway*>     m_castaways;
+            Listeners<Castaway>     m_castaways;
             std::unique_ptr<Value>  m_value;
             
         private: // deleted methods
@@ -117,6 +117,11 @@ namespace kiwi
             
             virtual ~ObjectValue() = default;
             
+            operator bool()
+            {
+                return (m_object != nullptr);
+            }
+            
             TObjectClass* get()
             {
                 return m_object;
@@ -135,7 +140,10 @@ namespace kiwi
         class ValueBeacon::Castaway
         {
         public:
-            virtual ~Castaway() {}
+            virtual ~Castaway() = default;
+            
+            //! @brief Called when the value has changed.
+            virtual void valueChanged(ValueBeacon& beacon) = 0;
         };
         
         // ================================================================================ //
