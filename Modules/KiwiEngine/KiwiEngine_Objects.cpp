@@ -23,6 +23,7 @@
 #define KIWI_ENGINE_OBJECTS_HPP_INCLUDED
 
 #include <cmath>
+#include <algorithm>
 
 #include "KiwiEngine_Console.hpp"
 #include "KiwiEngine_Objects.hpp"
@@ -915,6 +916,120 @@ namespace kiwi
         void SigTilde::prepare(dsp::Processor::PrepareInfo const& infos)
         {
             setPerformCallBack(this, &SigTilde::perform);
+        }
+        
+        // ================================================================================ //
+        //                                       DELAYTILDE                                 //
+        // ================================================================================ //
+        
+        DelayTilde::DelayTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        AudioObject(model, patcher),
+        m_circular_buffer(),
+        m_reinject_signal(),
+        m_max_delay(60.),
+        m_delay(1.),
+        m_reinject_level(0.),
+        m_sr(0.)
+        {
+        }
+        
+        void DelayTilde::receive(size_t index, std::vector<Atom> const& args)
+        {
+            if (index == 1 && args[0].isNumber())
+            {
+                m_delay.store(args[0].getFloat() / 1000.);
+            }
+            else if(index == 2 && args[0].isNumber())
+            {
+                m_reinject_level.store(std::max(0., std::min(1., args[0].getFloat())));
+            }
+        }
+        
+        dsp::sample_t DelayTilde::cubicInterpolate(float const& x,
+                                                   float const& y0,
+                                                   float const& y1,
+                                                   float const& y2,
+                                                   float const& y3)
+        {
+            return y1 + 0.5 * x * (y2 - y0 + x * (2.0 * y0 - 5.0 * y1 + 4.0 * y2 - y3
+                                                  + x * (3.0 * (y1 - y2) + y3 - y0)));
+        }
+        
+        void DelayTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        {
+            size_t buffer_size = input[0].size();
+            
+            for (int i = 0; i < buffer_size; ++i)
+            {
+                m_circular_buffer->push_back(input[0][i] + m_reinject_signal->operator[](i));
+            }
+            
+            float delay = std::max<float>(1. / m_sr, std::min<float>(m_delay.load(), m_max_delay));
+            float offset = m_circular_buffer->size() - (delay * m_sr) - (buffer_size - 1);
+            size_t offset_floor = std::floor(offset);
+            float decimal_part = offset - offset_floor;
+            
+            for(int i = 0; i < buffer_size; ++i)
+            {
+                output[0][i] = cubicInterpolate(decimal_part,
+                                                m_circular_buffer->operator[](offset_floor - 1),
+                                                m_circular_buffer->operator[](offset_floor),
+                                                m_circular_buffer->operator[](offset_floor + 1),
+                                                m_circular_buffer->operator[](offset_floor + 2));
+                
+                m_reinject_signal->operator[](i) = m_reinject_level.load() * output[0][i];
+                ++offset_floor;
+            }
+        }
+        
+        void DelayTilde::performDelay(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        {
+            size_t buffer_size = input[0].size();
+            
+            for (int i = 0; i < buffer_size; ++i)
+            {
+                m_circular_buffer->push_back(input[0][i] + m_reinject_signal->operator[](i));
+            }
+            
+            for(int i = 0; i < buffer_size; ++i)
+            {
+                float delay = std::max<float>(1. / m_sr, std::min<float>(input[1][i] / 1000., m_max_delay));
+                float offset = m_circular_buffer->size() - (delay * m_sr) - (buffer_size - 1) + i;
+                size_t offset_floor = std::floor(offset);
+                
+                output[0][i] = cubicInterpolate(offset - offset_floor,
+                                                m_circular_buffer->operator[](offset_floor - 1),
+                                                m_circular_buffer->operator[](offset_floor),
+                                                m_circular_buffer->operator[](offset_floor + 1),
+                                                m_circular_buffer->operator[](offset_floor + 2));
+                
+                m_reinject_signal->operator[](i) = m_reinject_level.load() * output[0][i];
+            }
+        }
+        
+        void DelayTilde::prepare(dsp::Processor::PrepareInfo const& infos)
+        {
+            m_sr = infos.sample_rate;
+            
+            size_t buffer_size = std::ceil(m_max_delay * infos.sample_rate) + 1 + infos.vector_size;
+            
+            m_circular_buffer.reset(new CircularBuffer<dsp::sample_t>(buffer_size, buffer_size, 0.));
+            m_reinject_signal.reset(new dsp::Signal(buffer_size));
+            
+            if (infos.inputs.size() > 1 && infos.inputs[1])
+            {
+                setPerformCallBack(this, &DelayTilde::performDelay);
+            }
+            else
+            {
+                setPerformCallBack(this, &DelayTilde::perform);
+            }
+        }
+        
+        void DelayTilde::release()
+        {
+            m_circular_buffer.release();
+            m_reinject_signal.release();
         }
     }
 }

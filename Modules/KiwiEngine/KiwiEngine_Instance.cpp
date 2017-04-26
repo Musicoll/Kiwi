@@ -94,6 +94,7 @@ namespace kiwi
             engine::Factory::add<TimesTilde>("times~");
             engine::Factory::add<PlusTilde>("plus~");
             engine::Factory::add<SigTilde>("sig~");
+            engine::Factory::add<DelayTilde>("delaysimple~");
         }
         
         // ================================================================================ //
