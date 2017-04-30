@@ -315,3 +315,106 @@ private:
         }
     }
 };
+
+// ==================================================================================== //
+//                                     PASSTHROUGH PROCESSOR                            //
+// ==================================================================================== //
+
+template <size_t TIolets, Processor::GraphOrder TOrder>
+class PassThrough : public Processor
+{
+public:
+    PassThrough() noexcept : Processor(TIolets, TIolets, TOrder) {}
+    
+    ~PassThrough() = default;
+    
+private:
+    
+    void prepare(PrepareInfo const& info) override final
+    {
+        setPerformCallBack(this, &PassThrough::perform);
+    };
+    
+    void perform(Buffer const& input, Buffer& output) noexcept
+    {
+        for(size_t i = 0; i < output.getNumberOfChannels(); i++)
+        {
+            output[i].copy(input[i]);
+        }
+    }
+};
+
+// ==================================================================================== //
+//                                        SEND PROCESSOR                                //
+// ==================================================================================== //
+
+class Send : public Processor
+{
+public:
+    
+    Send(Signal::sPtr buffer, bool ordered = true) noexcept :
+    Processor(1, 0, ordered ? GraphOrder::PutFirst : GraphOrder::Unordered),
+    m_buffer(buffer)
+    {
+        
+    }
+    
+    ~Send() = default;
+    
+private:
+    
+    void prepare(PrepareInfo const& info) override final
+    {
+        if(info.vector_size != m_buffer->size())
+        {
+            throw Error(std::string("Different vector sizes"));
+        }
+        
+        setPerformCallBack(this, &Send::perform);
+    };
+    
+    void perform(Buffer const& input, Buffer& output) noexcept
+    {
+        m_buffer->copy(input[0]);
+    }
+    
+    Signal::sPtr m_buffer;
+};
+
+// ==================================================================================== //
+//                                        SEND PROCESSOR                                //
+// ==================================================================================== //
+
+class Receive : public Processor
+{
+public:
+    
+    Receive(Signal::sPtr buffer, bool ordered = true) noexcept :
+    Processor(0, 1, ordered ? GraphOrder::PutLast : GraphOrder::Unordered),
+    m_buffer(buffer)
+    {
+        
+    }
+    
+    ~Receive() = default;
+    
+private:
+    
+    void prepare(PrepareInfo const& info) override final
+    {
+        if(info.vector_size != m_buffer->size())
+        {
+            throw Error(std::string("Different vector sizes"));
+        }
+        
+        setPerformCallBack(this, &Receive::perform);
+    };
+    
+    void perform(Buffer const& input, Buffer& output) noexcept
+    {
+        output[0].copy(*m_buffer);
+    }
+    
+    Signal::sPtr m_buffer;
+};
+

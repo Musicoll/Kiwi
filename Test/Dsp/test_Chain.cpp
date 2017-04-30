@@ -444,3 +444,254 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
         chain.release();
     }
 }
+
+
+TEST_CASE("Dsp - Chain ordering", "[Dsp, Chain]")
+{
+    using PutFirstProcessor = PassThrough<1, Processor::GraphOrder::PutFirst>;
+    using PutLastProcessor = PassThrough<1, Processor::GraphOrder::PutLast>;
+    using UnorderedProcessor = PassThrough<1, Processor::GraphOrder::Unordered>;
+    
+    const size_t samplerate = 2ul;
+    const size_t vectorsize = 4ul;
+    
+    auto putfirst_1 = std::make_shared<PutFirstProcessor>();
+    auto unordered_1 = std::make_shared<UnorderedProcessor>();
+    auto putlast_1 = std::make_shared<PutLastProcessor>();
+    
+    Chain chain;
+    
+    SECTION("Chain - Get node index with a processor that does not exist returns 0")
+    {
+        chain.addProcessor(unordered_1);
+        
+        REQUIRE_NOTHROW(chain.prepare(samplerate, vectorsize));
+        
+        CHECK(chain.getNodeIndex(*unordered_1)  == 1);
+        CHECK(chain.getNodeIndex(*putlast_1)    == 0);
+        CHECK(chain.getNodeIndex(*putfirst_1)   == 0);
+    }
+    
+    SECTION("Chain - Adding Unordered nodes sort them in adding order")
+    {
+        auto unordered_2 = std::make_shared<UnorderedProcessor>();
+        auto unordered_3 = std::make_shared<UnorderedProcessor>();
+        
+        chain.addProcessor(unordered_1);
+        chain.addProcessor(unordered_2);
+        chain.addProcessor(unordered_3);
+        
+        REQUIRE_NOTHROW(chain.prepare(samplerate, vectorsize));
+        
+        CHECK(chain.getNodeIndex(*unordered_1) == 1);
+        CHECK(chain.getNodeIndex(*unordered_2) == 2);
+        CHECK(chain.getNodeIndex(*unordered_3) == 3);
+    }
+    
+    SECTION("Chain - PutFirst nodes are always first")
+    {
+        chain.addProcessor(unordered_1);
+        chain.addProcessor(putlast_1);
+        chain.addProcessor(putfirst_1);
+        
+        REQUIRE_NOTHROW(chain.prepare(samplerate, vectorsize));
+        
+        CHECK(chain.getNodeIndex(*putfirst_1)   == 1);
+        CHECK(chain.getNodeIndex(*putlast_1)    == 2);
+        CHECK(chain.getNodeIndex(*unordered_1)  == 3);
+    }
+    
+    SECTION("Chain - PutLast Nodes chaining")
+    {
+        auto putlast_2 = std::make_shared<PutLastProcessor>();
+        auto putlast_3 = std::make_shared<PutLastProcessor>();
+        
+        chain.addProcessor(putlast_1);
+        chain.addProcessor(putlast_2);
+        chain.addProcessor(putlast_3);
+        
+        chain.connect(*putlast_1, 0, *putlast_2, 0);
+        chain.connect(*putlast_2, 0, *putlast_3, 0);
+        
+        REQUIRE_NOTHROW(chain.prepare(samplerate, vectorsize));
+        
+        CHECK(chain.getNodeIndex(*putlast_1)    == 1);
+        CHECK(chain.getNodeIndex(*putlast_2)    == 2);
+        CHECK(chain.getNodeIndex(*putlast_3)    == 3);
+    }
+    
+    SECTION("Chain - PutFirst Nodes chaining")
+    {
+        auto putfirst_2 = std::make_shared<PutFirstProcessor>();
+        auto putfirst_3 = std::make_shared<PutFirstProcessor>();
+        
+        chain.addProcessor(putfirst_1);
+        chain.addProcessor(putfirst_2);
+        chain.addProcessor(putfirst_3);
+        
+        chain.connect(*putfirst_1, 0, *putfirst_2, 0);
+        chain.connect(*putfirst_2, 0, *putfirst_3, 0);
+        
+        REQUIRE_NOTHROW(chain.prepare(samplerate, vectorsize));
+        
+        CHECK(chain.getNodeIndex(*putfirst_1)    == 1);
+        CHECK(chain.getNodeIndex(*putfirst_2)    == 2);
+        CHECK(chain.getNodeIndex(*putfirst_3)    == 3);
+    }
+    
+    SECTION("Chain - PutFirst are indexed after upstream connected nodes")
+    {
+        chain.addProcessor(unordered_1);
+        chain.addProcessor(putlast_1);
+        chain.addProcessor(putfirst_1);
+        
+        chain.connect(*unordered_1, 0, *putfirst_1, 0);
+        
+        REQUIRE_NOTHROW(chain.prepare(samplerate, vectorsize));
+        
+        CHECK(chain.getNodeIndex(*unordered_1)  == 1);
+        CHECK(chain.getNodeIndex(*putfirst_1)   == 2);
+        CHECK(chain.getNodeIndex(*putlast_1)    == 3);
+    }
+    
+    SECTION("Chain - PutLast are indexed before downstream connected nodes")
+    {
+        chain.addProcessor(unordered_1);
+        chain.addProcessor(putlast_1);
+        chain.addProcessor(putfirst_1);
+        
+        chain.connect(*putlast_1, 0, *unordered_1, 0);
+        
+        REQUIRE_NOTHROW(chain.prepare(samplerate, vectorsize));
+        
+        CHECK(chain.getNodeIndex(*putfirst_1)   == 1);
+        CHECK(chain.getNodeIndex(*putlast_1)    == 2);
+        CHECK(chain.getNodeIndex(*unordered_1)  == 3);
+    }
+    
+    SECTION("Chain - PutFirst with PutFirst and Unordered Node example 1")
+    {
+        auto sig = std::make_shared<Sig>(1);
+        
+        chain.addProcessor(putlast_1);
+        chain.addProcessor(putfirst_1);
+        chain.addProcessor(sig);
+        
+        chain.connect(*sig, 0, *putfirst_1, 0);
+        chain.connect(*putlast_1, 0, *putfirst_1, 0);
+        
+        REQUIRE_NOTHROW(chain.prepare(samplerate, vectorsize));
+        
+        CHECK(chain.getNodeIndex(*sig)          == 1);
+        CHECK(chain.getNodeIndex(*putfirst_1)   == 2);
+        CHECK(chain.getNodeIndex(*putlast_1)    == 3);
+    }
+    
+    SECTION("Chain - PutFirst with PutFirst and Unordered Node example 2")
+    {
+        auto sig = std::make_shared<Sig>(1);
+        
+        chain.addProcessor(putlast_1);
+        chain.addProcessor(unordered_1);
+        chain.addProcessor(putfirst_1);
+        chain.addProcessor(sig);
+        
+        chain.connect(*sig, 0, *putfirst_1, 0);
+        chain.connect(*putlast_1, 0, *unordered_1, 0);
+        chain.connect(*unordered_1, 0, *putfirst_1, 0);
+        
+        REQUIRE_NOTHROW(chain.prepare(samplerate, vectorsize));
+        
+        CHECK(chain.getNodeIndex(*sig)          == 1);
+        CHECK(chain.getNodeIndex(*putfirst_1)   == 2);
+        CHECK(chain.getNodeIndex(*putlast_1)    == 3);
+        CHECK(chain.getNodeIndex(*unordered_1)  == 4);
+    }
+    
+    SECTION("Chain - PutLast PutFirst Loop")
+    {
+        chain.addProcessor(putlast_1);
+        chain.addProcessor(putfirst_1);
+        
+        chain.connect(*putlast_1, 0, *putfirst_1, 0);
+        chain.connect(*putfirst_1, 0, *putlast_1, 0);
+        
+        REQUIRE_THROWS_AS(chain.prepare(samplerate, vectorsize), Error);
+        
+        CHECK(chain.getNodeIndex(*putfirst_1)   == 0);
+        CHECK(chain.getNodeIndex(*putlast_1)    == 0);
+    }
+    
+    SECTION("Chain - Send Receive performing WITHOUT ordering")
+    {
+        const auto vs = 4ul;
+        const auto signal_sptr = std::make_shared<Signal>(vs);
+        
+        // Unordered send and receive
+        auto send = std::make_shared<Send>(signal_sptr, false);
+        auto receive = std::make_shared<Receive>(signal_sptr, false);
+        auto sig = std::make_shared<Sig>(1);
+        
+        std::string result;
+        auto print = std::make_shared<Print>(result);
+        
+        // Adding unordered processors in a bad order
+        chain.addProcessor(receive);
+        chain.addProcessor(print);
+        chain.addProcessor(sig);
+        chain.addProcessor(send);
+        
+        chain.connect(*sig, 0, *send, 0);
+        chain.connect(*receive, 0, *print, 0);
+        
+        REQUIRE_NOTHROW(chain.prepare(samplerate, vs));
+        
+        REQUIRE(chain.getNodeIndex(*receive)    == 1);
+        REQUIRE(chain.getNodeIndex(*print)      == 2);
+        REQUIRE(chain.getNodeIndex(*sig)        == 3);
+        REQUIRE(chain.getNodeIndex(*send)       == 4);
+        
+        // introduce a block size of delay
+        chain.tick();
+        CHECK(result == "[0.000000, 0.000000, 0.000000, 0.000000]");
+        
+        chain.tick();
+        CHECK(result == "[1.000000, 1.000000, 1.000000, 1.000000]");
+    }
+    
+    SECTION("Chain - Send Receive performing WITH ordering")
+    {
+        const auto vs = 4ul;
+        const auto signal_sptr = std::make_shared<Signal>(vs);
+        
+        // PutFirst Send and PutLast Receive
+        auto send = std::make_shared<Send>(signal_sptr, true);
+        auto receive = std::make_shared<Receive>(signal_sptr, true);
+        auto sig = std::make_shared<Sig>(1);
+        
+        std::string result;
+        auto print = std::make_shared<Print>(result);
+        
+        chain.addProcessor(receive);
+        chain.addProcessor(print);
+        chain.addProcessor(sig);
+        chain.addProcessor(send);
+        
+        chain.connect(*sig, 0, *send, 0);
+        chain.connect(*receive, 0, *print, 0);
+        
+        REQUIRE_NOTHROW(chain.prepare(samplerate, vs));
+        
+        REQUIRE(chain.getNodeIndex(*sig)        == 1);
+        REQUIRE(chain.getNodeIndex(*send)       == 2);
+        REQUIRE(chain.getNodeIndex(*receive)    == 3);
+        REQUIRE(chain.getNodeIndex(*print)      == 4);
+        
+        chain.tick();
+        
+        // compute without introducing additionnal delay
+        CHECK(result == "[1.000000, 1.000000, 1.000000, 1.000000]");
+    }
+    
+    chain.release();
+}
