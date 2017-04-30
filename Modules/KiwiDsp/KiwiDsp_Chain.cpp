@@ -106,6 +106,23 @@ namespace kiwi
             //                    PREPARES INLETS, INPUT BUFFER                         //
             // ======================================================================== //
             
+            const auto getOrCreateOutletSignal = [&chain, &vectorsize](Pin& outlet) -> Signal::sPtr
+            {
+                if(!outlet.m_signal)
+                {
+                    if(outlet.m_ties.size() == 0)
+                    {
+                        outlet.m_signal = chain.getSignalOutlet(outlet.m_index);
+                    }
+                    else
+                    {
+                        outlet.m_signal = std::make_shared<Signal>(vectorsize);
+                    }
+                }
+                
+                return outlet.m_signal;
+            };
+            
             std::vector<Signal::sPtr> inputs;
             inputs.reserve(m_inlets.size());
             
@@ -117,7 +134,7 @@ namespace kiwi
                 }
                 else if(inlet.m_ties.size() == 1)
                 {
-                    inlet.m_signal = inlet.m_ties.begin()->m_pin.m_signal;
+                    inlet.m_signal = getOrCreateOutletSignal(inlet.m_ties.begin()->m_pin);
                 }
                 else
                 {
@@ -129,10 +146,10 @@ namespace kiwi
                     
                     for(Tie const& tie : ties)
                     {
-                        tie_signals.emplace_back(tie.m_pin.m_signal);
+                        tie_signals.emplace_back(getOrCreateOutletSignal(tie.m_pin));
                     }
                     
-                    m_buffer_copy[inlet.m_index].setChannels(std::move(tie_signals));
+                    m_buffer_copy[inlet.m_index].setChannels(tie_signals);
                 }
                 
                 inputs.emplace_back(inlet.m_signal);
@@ -149,16 +166,7 @@ namespace kiwi
             
             for(Pin& outlet : m_outlets)
             {
-                if(outlet.m_ties.size() == 0)
-                {
-                    outlet.m_signal = chain.getSignalOutlet(outlet.m_index);
-                }
-                else
-                {
-                    outlet.m_signal = std::make_shared<Signal>(vectorsize);
-                }
-                
-                outputs.emplace_back(outlet.m_signal);
+                outputs.emplace_back(getOrCreateOutletSignal(outlet));
             }
             
             m_outputs.setChannels(std::move(outputs));
@@ -463,6 +471,17 @@ namespace kiwi
             return m_vector_size;
         }
         
+        size_t Chain::getNodeIndex(Processor const& proc) const
+        {
+            const auto node_it = findNode(proc);
+            if(node_it != m_nodes.cend())
+            {
+                return node_it->get()->m_index;
+            }
+            
+            return 0;
+        }
+        
         void Chain::tick() noexcept
         {
             std::unique_lock<std::mutex> lock(m_tick_mutex, std::defer_lock);
@@ -482,87 +501,102 @@ namespace kiwi
         //                                NODE MANGEMENT                                //
         // ============================================================================ //
         
-        std::vector<Chain::Node::uPtr>::iterator Chain::findNode(Processor& proc)
+        std::vector<Chain::Node::uPtr>::iterator Chain::findNode(Processor const& proc)
         {
             return std::find_if(m_nodes.begin(), m_nodes.end(), [&proc](auto const& proc_uptr){
                 return &proc == &(*proc_uptr->m_processor);
             });
         }
         
-        std::vector<Chain::Node::uPtr>::const_iterator Chain::findNode(Processor& proc) const
+        std::vector<Chain::Node::uPtr>::const_iterator Chain::findNode(Processor const& proc) const
         {
             return std::find_if(m_nodes.begin(), m_nodes.end(), [&proc](auto const& proc_uptr){
                 return &proc == &(*proc_uptr->m_processor);
             });
         }
-        
-        struct Chain::index_node
-        {
-            index_node() : m_next_index(1ul){};
-            
-            void computeIndex(Node& node)
-            {
-                if(node.m_index == 0)
-                {
-                    m_loop_nodes.insert(&node);
-                    
-                    for(Node::Pin& inlet : node.m_inlets)
-                    {
-                        for(Node::Tie tie : inlet.m_ties)
-                        {
-                            Node& parent_node = tie.m_pin.m_owner;
-                            
-                            if(!parent_node.m_index)
-                            {
-                                if(m_loop_nodes.find(&parent_node) != m_loop_nodes.end())
-                                {
-                                    throw LoopError("A loop is detected");
-                                }
-                                else
-                                {
-                                    this->computeIndex(parent_node);
-                                }
-                            }
-                        }
-                    }
-                    
-                    m_loop_nodes.erase(&node);
-                    node.m_index = m_next_index++;
-                }
-            }
-            
-            void operator()(Node::uPtr const& node)
-            {
-                computeIndex(*node.get());
-            };
-            
-            size_t          m_next_index;
-            std::set<Node*> m_loop_nodes;
-        };
         
         void Chain::indexNodes()
         {
-            /*
-            // sort nodes depending on their graph order 
-            std::sort(m_nodes.begin(), m_nodes.end(), [](auto const& lhs_node, auto const& rhs_node){
-                auto lhs_order = lhs_node->m_processor->getGraphOrder();
-                auto rhs_order = rhs_node->m_processor->getGraphOrder();
-                bool smaller = false;
+            struct NodeIndexer
+            {
+                NodeIndexer() : m_next_index(1ul) {};
                 
-                if(lhs_order == Processor::GraphOrder::PutFirst)
+                //! @brief Returns false if the node cant be indexed, true
+                bool computeUpStreamNodesIndex(Node& node)
                 {
-                    smaller = (rhs_order != Processor::GraphOrder::PutFirst);
-                }
-                else if(lhs_order == Processor::GraphOrder::Unordered)
-                {
-                    smaller = (rhs_order == Processor::GraphOrder::PutLast);
+                    bool indexed = isIndexed(node);
+                    if(!indexed)
+                    {
+                        bool upstream_indexed = true;
+                        
+                        m_loop_nodes.insert(&node);
+                        
+                        for(Node::Pin& inlet : node.m_inlets)
+                        {
+                            for(Node::Tie tie : inlet.m_ties)
+                            {
+                                Node& upper_node = tie.m_pin.m_owner;
+                                
+                                if(!isIndexed(upper_node))
+                                {
+                                    if(m_loop_nodes.find(&upper_node) != m_loop_nodes.end())
+                                    {
+                                        throw LoopError("A loop is detected");
+                                    }
+                                    else if(!computeUpStreamNodesIndex(upper_node))
+                                    {
+                                        upstream_indexed = false;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        const Processor::GraphOrder order = node.m_processor->getGraphOrder();
+                        
+                        indexed = (upstream_indexed && order != Processor::GraphOrder::PutLast)
+                        || (!upstream_indexed
+                            && m_sorted_node_order == Processor::GraphOrder::PutFirst
+                            && order == m_sorted_node_order)
+                        || (upstream_indexed
+                            && m_sorted_node_order == Processor::GraphOrder::PutLast
+                            && order == m_sorted_node_order);
+                        
+                        if(indexed)
+                        {
+                            node.m_index = m_next_index++;
+                        }
+                        
+                        m_loop_nodes.erase(&node);
+                    }
+                    
+                    return indexed;
                 }
                 
-                return smaller;
-            });
-            */
+                void operator()(Node::uPtr const& node_uptr)
+                {
+                    Node& node = *node_uptr.get();
+                    m_sorted_node_order = node.m_processor->getGraphOrder();
+                    computeUpStreamNodesIndex(node);
+                };
+                
+                bool isIndexed(Node& node) { return (node.m_index != 0); }
+                
+                size_t                  m_next_index;
+                std::set<Node*>         m_loop_nodes;
+                Processor::GraphOrder   m_sorted_node_order;
+            };
             
-            for_each(m_nodes.begin(), m_nodes.end(), index_node());
+            // node indexing order : PutFirst > PutLast > Unordered
+            std::sort(m_nodes.begin(), m_nodes.end(), [](auto const& lhs_node, auto const& rhs_node){
+                const auto lhs_order = lhs_node->m_processor->getGraphOrder();
+                const auto rhs_order = rhs_node->m_processor->getGraphOrder();
+                
+                return (lhs_order == Processor::GraphOrder::PutFirst
+                        || (lhs_order == Processor::GraphOrder::PutLast
+                            && rhs_order == Processor::GraphOrder::Unordered));
+            });
+            
+            for_each(m_nodes.begin(), m_nodes.end(), NodeIndexer());
         }
         
         void Chain::sortNodes()
@@ -667,11 +701,11 @@ namespace kiwi
         
         void Chain::execRemoveProcessor(Processor* proc)
         {
-            auto node = findNode(*proc);
+            auto node_it = findNode(*proc);
             
-            if (node != m_nodes.end())
+            if (node_it != m_nodes.end())
             {
-                m_nodes.erase(node);
+                m_nodes.erase(node_it);
             }
             else
             {
@@ -682,12 +716,12 @@ namespace kiwi
         void Chain::execConnect(Processor* source, size_t outlet_index,
                                 Processor* dest, size_t inlet_index)
         {
-            auto source_node = findNode(*source);
-            auto dest_node = findNode(*dest);
+            auto source_node_it = findNode(*source);
+            auto dest_node_it = findNode(*dest);
             
-            if (source_node != m_nodes.end() && dest_node != m_nodes.end())
+            if (source_node_it != m_nodes.end() && dest_node_it != m_nodes.end())
             {
-                (*dest_node)->connectInput(inlet_index, **source_node, outlet_index);
+                (*dest_node_it)->connectInput(inlet_index, **source_node_it, outlet_index);
             }
             else
             {
@@ -698,12 +732,12 @@ namespace kiwi
         void Chain::execDisconnect(Processor* source, size_t outlet_index,
                                    Processor* dest, size_t inlet_index)
         {
-            auto source_node = findNode(*source);
-            auto dest_node = findNode(*dest);
+            auto source_node_it = findNode(*source);
+            auto dest_node_it = findNode(*dest);
             
-            if (source_node != m_nodes.end() && dest_node != m_nodes.end())
+            if (source_node_it != m_nodes.end() && dest_node_it != m_nodes.end())
             {
-                (*dest_node)->disconnectInput(inlet_index, **source_node, outlet_index);
+                (*dest_node_it)->disconnectInput(inlet_index, **source_node_it, outlet_index);
             }
             else
             {

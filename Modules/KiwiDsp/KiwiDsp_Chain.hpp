@@ -92,6 +92,10 @@ namespace kiwi
             //! @see getSampleRate
             size_t getVectorSize() const noexcept;
             
+            //! @brief Returns the corresponding node index for a given processor,
+            //! or 0 if the processor does not exist.
+            size_t getNodeIndex(Processor const& proc) const;
+            
             //! @brief Adds a processor to the chain.
             //! @details Ownership is shared between caller and chain.
             //! The caller might keep a reference to the processor and update it.
@@ -146,10 +150,10 @@ namespace kiwi
             struct index_node;
             
             //! @brief Returns an iterator to the object having processor proc.
-            std::vector<std::unique_ptr<Node>>::iterator findNode(Processor& proc);
+            std::vector<std::unique_ptr<Node>>::iterator findNode(Processor const& proc);
             
             //! @brief Returns an const iterator to the object having node_id.
-            std::vector<std::unique_ptr<Node>>::const_iterator findNode(Processor& proc) const;
+            std::vector<std::unique_ptr<Node>>::const_iterator findNode(Processor const& proc) const;
             
             //! @brief Attributes an index to the node before sorting by index.
             //! @details Indexing guarantees that every node will have a greater index than
@@ -158,7 +162,7 @@ namespace kiwi
             
             //! @brief Sorts all node by index before computing.
             //! @details Sorting node will guarantee that all parent node will be executed
-            //! before a chil node execution.
+            //! before a child node execution.
             void sortNodes();
             
         private: // commands
