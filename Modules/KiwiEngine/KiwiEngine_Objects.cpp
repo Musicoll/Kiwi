@@ -890,15 +890,9 @@ namespace kiwi
         
         void DelReadTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
         {
-            if(m_delwrite_object_value == nullptr)
+            if(m_delwrite)
             {
-                output[0].fill(0.);
-                return;
-            }
-            
-            if(DelWriteTilde* delwrite = m_delwrite_object_value->get())
-            {
-                auto* buffer_ptr = delwrite->getBufferData();
+                auto* buffer_ptr = m_delwrite->getBufferData();
                 if(buffer_ptr)
                 {
                     auto& buffer_signal = *buffer_ptr;
@@ -910,7 +904,7 @@ namespace kiwi
                     size_t read_head = 0ul;
                     double y1, y2, delta;
                     
-                    long write_head = delwrite->getWriteHeadPosition();
+                    long write_head = m_delwrite->getWriteHeadPosition();
                     
                     while(vs--)
                     {
@@ -948,10 +942,9 @@ namespace kiwi
             std::cout << "DelReadTilde prepare" << std::endl;
             m_delay_samps = msToSamples(m_delay_ms, infos.sample_rate);
             
-            m_delwrite_object_value = nullptr;
-            
             ValueBeacon& beacon = useValueBeacon(m_name);
-            m_delwrite_object_value = dynamic_cast<ObjectValue<DelWriteTilde>*>(beacon.getValue());
+            auto* delwrite_value = dynamic_cast<ObjectValue<DelWriteTilde>*>(beacon.getValue());
+            m_delwrite = delwrite_value ? delwrite_value->get() : nullptr;
             
             setPerformCallBack(this, &DelReadTilde::perform);
         }
@@ -960,11 +953,11 @@ namespace kiwi
         {
             if(beacon.getName() == m_name)
             {
-                m_delwrite_object_value = dynamic_cast<ObjectValue<DelWriteTilde>*>(beacon.getValue());
+                auto* delwrite_value = dynamic_cast<ObjectValue<DelWriteTilde>*>(beacon.getValue());
+                m_delwrite = delwrite_value ? delwrite_value->get() : nullptr;
             }
         }
     }
 }
-
 
 #endif // KIWI_ENGINE_OBJECTS_CPP_INCLUDED

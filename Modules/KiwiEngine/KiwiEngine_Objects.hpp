@@ -405,10 +405,10 @@ namespace kiwi
             
         private:
             
-            std::string                 m_name = "";
-            size_t                      m_delay_ms = 0;
-            double                      m_delay_samps = 0;
-            ObjectValue<DelWriteTilde>* m_delwrite_object_value = nullptr;
+            std::string     m_name = "";
+            size_t          m_delay_ms = 0;
+            double          m_delay_samps = 0;
+            DelWriteTilde*  m_delwrite = nullptr;
         };
     }
 }
