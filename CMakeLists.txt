@@ -185,7 +185,8 @@ elseif(LINUX)
 endif()
 
 set(JUCE_MACRO_DEFINITIONS JUCE_STANDALONE_APPLICATION=1
-                           JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1)
+                           JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1
+                           JUCE_DISPLAY_SPLASH_SCREEN=0)
 
 file (GLOB_RECURSE JUCE_SRC ${ROOT_DIR}/ThirdParty/Juce/modules/*.[h|c]pp
                             ${ROOT_DIR}/ThirdParty/Juce/modules/*.h
@@ -246,21 +247,21 @@ else()
         set(FLIP_DEP ${FlipLib})
 
     elseif(WIN32)
-	
-		if (CMAKE_CL_64)  
-			if(DEBUG) 
+
+		if (CMAKE_CL_64)
+			if(DEBUG)
 				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/x64/Debug")
 			else()
 				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/x64/Release")
-			endif() 
-		else() 
-			if(DEBUG) 
+			endif()
+		else()
+			if(DEBUG)
 				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/Win32/Debug")
 			else()
 				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/Win32/Release")
-			endif() 
+			endif()
 		endif()
-		
+
        find_library(WS2_32 ws2_32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
 	   set(FLIP_DEP ${WS2_32} ${FlipLib})
 
