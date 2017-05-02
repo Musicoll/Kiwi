@@ -26,6 +26,7 @@ matrix:
     - sudo apt-get install libxinerama-dev
     - sudo apt-get install libxcursor-dev
     - sudo apt-get install libasound2-dev
+    - sudo apt-get install libgtk-3-dev
 
     addons:
       apt:
