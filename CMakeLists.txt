@@ -131,9 +131,6 @@ if (WIN32)
 else()
     set(CMAKE_FIND_LIBRARY_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES} "" "lib")
     set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} ".a" ".so")
-    if (LINUX)
-      include_directories(/usr/include/freetype2)
-    endif()
 endif()
 
 #--------------------------------------
@@ -146,6 +143,8 @@ include(./Config/dependency.cmake)
 #----------------------------------
 # Juce
 #----------------------------------
+
+set(JUCE_INCLUDE_DIRS ${ROOT_DIR}/ThirdParty/Juce/modules)
 
 if (APPLE)
     find_library(COCOA Cocoa)
@@ -183,6 +182,7 @@ elseif(LINUX)
     find_library(ASOUND asound)
     find_package(PkgConfig)
     pkg_check_modules(GTK3_X11 REQUIRED gtk+-x11-3.0)
+    set(JUCE_INCLUDE_DIRS ${JUCE_INCLUDE_DIRS} /usr/include/freetype2 ${GTK3_X11_INCLUDE_DIRS})
     set(JUCE_DEP ${RT} ${DL} ${PTHREAD} ${FREETYPE} ${X11} ${XEXT} ${ASOUND} ${GTK3_X11_LIBRARIES})
 endif()
 
@@ -219,7 +219,7 @@ endif()
 add_library(Juce STATIC ${JUCE_SRC})
 target_link_libraries(Juce ${JUCE_DEP})
 target_compile_definitions(Juce PUBLIC ${JUCE_MACRO_DEFINITIONS})
-target_include_directories(Juce PUBLIC ${ROOT_DIR}/ThirdParty/Juce/modules)
+target_include_directories(Juce PUBLIC ${JUCE_INCLUDE_DIRS})
 set_target_properties(Juce PROPERTIES FOLDER ThirdParty)
 source_group_rec("${JUCE_SRC}" ${ROOT_DIR}/ThirdParty/Juce/modules)
 
