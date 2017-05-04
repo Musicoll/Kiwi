@@ -155,6 +155,8 @@ namespace kiwi
                 
                 m_instance.reset();
                 
+                engine::Scheduler<>::deleteInstance();
+                
                 quit();
             }
         }

@@ -173,27 +173,31 @@ namespace kiwi
         //                                  OBJECT RECEIVE                                  //
         // ================================================================================ //
         
-        class Receive::CallBack final : public Scheduler<>::Task
+        class Receive::Task final : public Scheduler<>::Task
         {
         public: // methods
             
-            CallBack(Receive& object, std::vector<Atom> const& atoms):
-            Task(Thread::Gui, Thread::Engine),
+            Task(Receive& object, std::vector<Atom> const& atoms):
+            Scheduler<>::Task(Thread::Gui, Thread::Engine),
             m_object(object),
             m_atoms(atoms)
             {
-                m_object.m_tasks.insert(this);
             }
             
-            ~CallBack()
+            ~Task()
             {
-                m_object.m_tasks.erase(this);
             }
             
             void execute() override
             {
                 m_object.send(0, m_atoms);
-                delete this;
+                
+                m_object.m_tasks.erase(std::find_if(m_object.m_tasks.begin(),
+                                                    m_object.m_tasks.end(),
+                                                    [this](std::unique_ptr<Task> const& task)
+                                                    {
+                                                        return task.get() == this;
+                                                    }));
             }
             
         private: // members
@@ -218,12 +222,6 @@ namespace kiwi
         
         Receive::~Receive()
         {
-            for (auto & task : m_tasks)
-            {
-                task->disable();
-                delete task;
-            }
-            
             if(!m_name.empty())
             {
                 Beacon& beacon = getBeacon(m_name);
@@ -240,7 +238,9 @@ namespace kiwi
         {
             if (!args.empty())
             {
-                Scheduler<>::getInstance().schedule(new CallBack(*this, args));
+                Task* task = new Task(*this, args);
+                Scheduler<>::getInstance().schedule(task, std::chrono::milliseconds(0));
+                m_tasks.insert(std::unique_ptr<Task>(task));
             }
         }
         
@@ -304,7 +304,6 @@ namespace kiwi
         
         Delay::~Delay()
         {
-            m_task->disable();
         }
         
         void Delay::receive(size_t index, std::vector<Atom> const& args)
@@ -345,25 +344,28 @@ namespace kiwi
             m_object(object),
             m_atoms(atoms)
             {
-                object.m_tasks.insert(this);
             }
             
             ~Task()
             {
-                m_object.m_tasks.erase(this);
             }
             
             void execute()
             {
                 m_object.send(0, m_atoms);
-                delete this;
+                
+                m_object.m_tasks.erase(std::find_if(m_object.m_tasks.begin(),
+                                                    m_object.m_tasks.end(),
+                                                    [this](std::unique_ptr<Task> const& task)
+                {
+                    return task.get() == this;
+                }));
             }
             
         private: // members
             
             Pipe&               m_object;
             std::vector<Atom>   m_atoms;
-            
         };
         
         Pipe::Pipe(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
@@ -379,11 +381,6 @@ namespace kiwi
         
         Pipe::~Pipe()
         {
-            for(auto & task : m_tasks)
-            {
-                task->disable();
-                delete task;
-            }
         }
         
         void Pipe::receive(size_t index, std::vector<Atom> const& args)
@@ -392,7 +389,9 @@ namespace kiwi
             {
                 if (index == 0)
                 {
-                    Scheduler<>::getInstance().schedule(new Task(*this, args), m_delay);
+                    Task* task = new Task(*this, args);
+                    Scheduler<>::getInstance().schedule(task, m_delay);
+                    m_tasks.insert(std::unique_ptr<Task>(task));
                 }
                 else if(index == 1)
                 {
@@ -411,7 +410,7 @@ namespace kiwi
         Metro::Metro(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
         engine::Object(model, patcher),
         Scheduler<>::Timer(Thread::Engine, Thread::Engine),
-        m_period(std::chrono::milliseconds(5))
+        m_period(std::chrono::milliseconds(0))
         {
             if(!args.empty())
             {

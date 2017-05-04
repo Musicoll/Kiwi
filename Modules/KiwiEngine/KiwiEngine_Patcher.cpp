@@ -39,7 +39,6 @@ namespace kiwi
         Patcher::Patcher(Instance& instance) noexcept :
         m_instance(instance),
         m_objects(),
-        m_callbacks(),
         m_mutex(),
         m_so_links(1),
         m_chain()
@@ -164,16 +163,6 @@ namespace kiwi
                 object.second->loadbang();
             }
         }
-        
-        void Patcher::disableCommands()
-        {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            
-            for(auto & callback : m_callbacks)
-            {
-                callback->disable();
-            }
-        }
     
         // ================================================================================ //
         //                                      CONSOLE                                     //
@@ -257,8 +246,7 @@ namespace kiwi
                     }
                 }
                 
-                Scheduler<>::getInstance().schedule(new Patcher::CallBack(*this,
-                                                                          std::bind(&Patcher::updateChain, this)));
+                updateChain();
             }
         }
 
@@ -266,62 +254,30 @@ namespace kiwi
         {
             std::shared_ptr<Object> object = Factory::create(*this, object_m);
             
-            Scheduler<>::CallBack* callback =
-                new Patcher::CallBack(*this, std::bind(&Patcher::addObject, this, object_m.ref().obj(), object));
-            
-            Scheduler<>::getInstance().schedule(callback);
+            addObject(object_m.ref().obj(), object);
         }
 
         void Patcher::objectRemoved(model::Object& object_m)
         {
-            Scheduler<>::CallBack* callback =
-                new Patcher::CallBack(*this, std::bind(&Patcher::removeObject, this, object_m.ref().obj()));
-            
-            Scheduler<>::getInstance().schedule(callback);
+            removeObject(object_m.ref().obj());
         }
 
         void Patcher::linkAdded(model::Link& link_m)
         {
-            Scheduler<>::CallBack* callback =
-                new Patcher::CallBack(*this, std::bind(&Patcher::addLink, this,
-                                                       link_m.getSenderObject().ref().obj(),
-                                                       link_m.getSenderIndex(),
-                                                       link_m.getReceiverObject().ref().obj(),
-                                                       link_m.getReceiverIndex(),
-                                                       link_m.isSignal()));
-            
-            Scheduler<>::getInstance().schedule(callback);
+            addLink(link_m.getSenderObject().ref().obj(),
+                    link_m.getSenderIndex(),
+                    link_m.getReceiverObject().ref().obj(),
+                    link_m.getReceiverIndex(),
+                    link_m.isSignal());
         }
         
         void Patcher::linkRemoved(model::Link& link_m)
         {
-            Scheduler<>::CallBack* callback =
-                new Patcher::CallBack(*this, std::bind(&Patcher::removeLink, this,
-                                                       link_m.getSenderObject().ref().obj(),
-                                                       link_m.getSenderIndex(),
-                                                       link_m.getReceiverObject().ref().obj(),
-                                                       link_m.getReceiverIndex(),
-                                                       link_m.isSignal()));
-            
-            Scheduler<>::getInstance().schedule(callback);
-        }
-        
-        // ================================================================================ //
-        //                                PATCHER CALLBACK                                  //
-        // ================================================================================ //
-        
-        Patcher::CallBack::CallBack(Patcher& patcher, std::function<void(void)> callback):
-        Scheduler<>::CallBack(Thread::Gui, Thread::Engine, callback),
-        m_patcher(patcher)
-        {
-            std::lock_guard<std::mutex> lock(m_patcher.m_mutex);
-            m_patcher.m_callbacks.insert(this);
-        }
-        
-        Patcher::CallBack::~CallBack()
-        {
-            std::lock_guard<std::mutex> lock(m_patcher.m_mutex);
-            m_patcher.m_callbacks.erase(this);
+            removeLink(link_m.getSenderObject().ref().obj(),
+                       link_m.getSenderIndex(),
+                       link_m.getReceiverObject().ref().obj(),
+                       link_m.getReceiverIndex(),
+                       link_m.isSignal());
         }
     }
 }

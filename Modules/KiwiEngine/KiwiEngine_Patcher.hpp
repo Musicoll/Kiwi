@@ -92,11 +92,6 @@ namespace kiwi
             //! @internal Call the loadbang method of all objects.
             void sendLoadbang();
             
-            //! @brief Disable all commands previously scheduled for this patcher.
-            //! @details This method shall be called before erasing patcher in order to prevent callbacks
-            //! to be later called on a deleted patcher.
-            void disableCommands();
-            
             // ================================================================================ //
             //                                      CONSOLE                                     //
             // ================================================================================ //
@@ -146,7 +141,6 @@ namespace kiwi
             
             Instance&                                       m_instance;
             std::map<uint64_t, std::shared_ptr<Object>>     m_objects;
-            std::set<CallBack*>                             m_callbacks;
             mutable std::mutex                              m_mutex;
             std::vector<SoLinks>                            m_so_links;
             dsp::Chain                                      m_chain;
@@ -157,27 +151,6 @@ namespace kiwi
             Patcher(Patcher&&) = delete;
             Patcher& operator=(Patcher const&) = delete;
             Patcher& operator=(Patcher&&) = delete;
-        };
-        
-        // ================================================================================ //
-        //                                PATCHER CALLBACK                                  //
-        // ================================================================================ //
-        
-        class Patcher::CallBack final : public Scheduler<>::CallBack
-        {
-        public: // methods
-            
-            CallBack(Patcher& patcher, std::function<void(void)> callback);
-            
-            ~CallBack();
-            
-        private: // members
-            
-            Patcher&                  m_patcher;
-            
-        private: // friends
-            
-            friend class Patcher;
         };
     }
 }

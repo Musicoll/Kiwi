@@ -23,6 +23,7 @@
 #include <atomic>
 #include <vector>
 #include <iostream>
+#include <thread>
 
 #include "../catch.hpp"
 
@@ -144,7 +145,7 @@ TEST_CASE("Scheduler", "[Scheduler]")
         sch.schedule(cancel);
         
         sch.schedule(reschedule, std::chrono::milliseconds(1000 * 60 * 60));
-        sch.deleteTask(cancel);
+        delete cancel;
         
         while(i_standard < 1){sch.process(Thread::Engine);};
         
@@ -185,7 +186,7 @@ TEST_CASE("Scheduler", "[Scheduler]")
                                 std::chrono::milliseconds(2));
         
         tick_scheduler.schedule(task_0, std::chrono::milliseconds(3));
-        tick_scheduler.deleteTask(task_1);
+        delete task_1;
         
         while(order.size() < 3)
         {
@@ -193,7 +194,7 @@ TEST_CASE("Scheduler", "[Scheduler]")
             tick_scheduler.process(Thread::Engine);
         }
         
-        tick_scheduler.deleteTask(task_0);
+        delete task_0;
         
         CHECK(order[0] == 2);
         CHECK(order[1] == 3);

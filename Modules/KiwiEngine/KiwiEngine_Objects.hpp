@@ -122,7 +122,7 @@ namespace kiwi
         {
         private: // classes
             
-            class CallBack;
+            class Task;
             
         public: // methods
             
@@ -134,14 +134,10 @@ namespace kiwi
             
             void receive(std::vector<Atom> const& args) override;
             
-        private: // friends
-            
-            friend class CallBack;
-            
         private: // members
             
-            std::string                         m_name;
-            std::set<CallBack*>                 m_tasks;
+            std::string                     m_name;
+            std::set<std::unique_ptr<Task>> m_tasks;
         };
         
         // ================================================================================ //
@@ -209,7 +205,7 @@ namespace kiwi
             
         private: // members
             
-            std::set<Task*>                     m_tasks;
+            std::set<std::unique_ptr<Task>>     m_tasks;
             Scheduler<>::clock_t::duration      m_delay;
         };
         

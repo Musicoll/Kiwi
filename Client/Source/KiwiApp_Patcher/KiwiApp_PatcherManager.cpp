@@ -370,6 +370,8 @@ namespace kiwi
     
     void PatcherManager::document_changed(model::Patcher& patcher)
     {
+        engine::Scheduler<>::Lock lock(Thread::Engine);
+        
         if(patcher.added())
         {
             patcher.entity().emplace<DocumentManager>(patcher.document());
@@ -382,7 +384,6 @@ namespace kiwi
         
         if(patcher.removed())
         {
-            patcher.entity().use<engine::Patcher>().disableCommands();
             patcher.entity().erase<engine::Patcher>();
             patcher.entity().erase<DocumentManager>();
         }

@@ -30,7 +30,7 @@ namespace kiwi
         // ==================================================================================== //
         
         template <class Clock>
-        std::unique_ptr<Scheduler<Clock>> Scheduler<Clock>::m_instance = nullptr;
+        Scheduler<Clock>* Scheduler<Clock>::m_instance = nullptr;
         
         template<class Clock>
         Scheduler<Clock>::Scheduler():
@@ -48,7 +48,7 @@ namespace kiwi
         {
             if (m_instance == nullptr)
             {
-                m_instance.reset(new Scheduler());
+                m_instance = new Scheduler();
             }
             
             return *m_instance;
@@ -62,6 +62,13 @@ namespace kiwi
         }
         
         template<class Clock>
+        void Scheduler<Clock>::deleteInstance()
+        {
+            assert(m_instance != nullptr);
+            delete m_instance;
+        }
+        
+        template<class Clock>
         void Scheduler<Clock>::registerConsumer(thread_token consumer)
         {
             m_queues[consumer];
@@ -70,7 +77,6 @@ namespace kiwi
         template<class Clock>
         void Scheduler<Clock>::registerProducer(thread_token producer, thread_token consumer)
         {
-            assert(m_queues.find(consumer) != m_queues.end());
             m_queues[consumer][producer];
         }
 
@@ -132,13 +138,6 @@ namespace kiwi
         }
         
         template<class Clock>
-        void Scheduler<Clock>::deleteTask(Task * task)
-        {
-            task->disable();
-            delete task;
-        }
-        
-        template<class Clock>
         void Scheduler<Clock>::Queue::remove(std::shared_ptr<Event> const& event)
         {
             typename std::vector<std::shared_ptr<Event>>::iterator event_it = m_events.begin();
@@ -179,6 +178,8 @@ namespace kiwi
         template<class Clock>
         void Scheduler<Clock>::Queue::process(time_point_t process_time)
         {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            
             size_t command_size = m_commands.load_size();
             
             for (size_t i = 0; i < command_size; ++i)
@@ -234,12 +235,7 @@ namespace kiwi
         template<class Clock>
         Scheduler<Clock>::Task::~Task()
         {
-        }
-        
-        template<class Clock>
-        void Scheduler<Clock>::Task::disable()
-        {
-            m_event->disable();
+            m_event->m_task = nullptr;
         }
         
         // ==================================================================================== //
@@ -282,6 +278,7 @@ namespace kiwi
         template<class Clock>
         Scheduler<Clock>::Timer::~Timer()
         {
+            stopTimer();
         }
         
         template<class Clock>
@@ -289,11 +286,8 @@ namespace kiwi
         {
             stopTimer();
             
-            if (period > std::chrono::microseconds(1))
-            {
-                m_period = period;
-                Scheduler::getInstance().schedule(m_task.get(), m_period);
-            }
+            m_period = period;
+            Scheduler::getInstance().schedule(m_task.get(), m_period);
         }
         
         template<class Clock>
@@ -311,28 +305,30 @@ namespace kiwi
         }
         
         // ==================================================================================== //
-        //                                       CALLBACK                                       //
+        //                                       LOCK                                           //
         // ==================================================================================== //
         
         template<class Clock>
-        Scheduler<Clock>::CallBack::CallBack(thread_token producer,
-                                             thread_token consumer,
-                                             std::function<void(void)> callback):
-        Task(producer, consumer),
-        m_callback(callback)
+        Scheduler<Clock>::Lock::Lock(thread_token consumer):
+        m_consumer(consumer)
         {
+            Scheduler& scheduler = Scheduler::getInstance();
+            
+            for (auto & queue : scheduler.m_queues[m_consumer])
+            {
+                queue.second.m_mutex.lock();
+            }
         }
         
         template<class Clock>
-        Scheduler<Clock>::CallBack::~CallBack()
+        Scheduler<Clock>::Lock::~Lock()
         {
-        }
-        
-        template<class Clock>
-        void Scheduler<Clock>::CallBack::execute()
-        {
-            m_callback();
-            delete this;
+            Scheduler& scheduler = Scheduler::getInstance();
+            
+            for (auto & queue : scheduler.m_queues[m_consumer])
+            {
+                queue.second.m_mutex.unlock();
+            }
         }
         
         // ==================================================================================== //
@@ -347,13 +343,6 @@ namespace kiwi
         }
         
         template<class Clock>
-        void Scheduler<Clock>::Event::disable()
-        {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            m_task = nullptr;
-        }
-        
-        template<class Clock>
         Scheduler<Clock>::Event::~Event()
         {
         }
@@ -363,8 +352,6 @@ namespace kiwi
         {
             if (this != &other)
             {
-                std::lock_guard<std::mutex> lock(m_mutex);
-                std::lock_guard<std::mutex> other_lock(other.m_mutex);
                 return m_task == other.m_task;
             }
             else
@@ -376,8 +363,6 @@ namespace kiwi
         template<class Clock>
         void Scheduler<Clock>::Event::execute()
         {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            
             if (m_task){m_task->execute();}
         }
     }
