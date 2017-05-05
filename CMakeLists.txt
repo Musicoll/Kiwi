@@ -189,7 +189,8 @@ endif()
 
 set(JUCE_MACRO_DEFINITIONS JUCE_STANDALONE_APPLICATION=1
                            JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1
-                           JUCE_DISPLAY_SPLASH_SCREEN=0)
+                           JUCE_DISPLAY_SPLASH_SCREEN=0
+                           JUCE_REPORT_APP_USAGE=0)
 
 file (GLOB_RECURSE JUCE_SRC ${ROOT_DIR}/ThirdParty/Juce/modules/*.[h|c]pp
                             ${ROOT_DIR}/ThirdParty/Juce/modules/*.h
