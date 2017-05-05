@@ -201,4 +201,21 @@ namespace kiwi
             g.strokePath(outline, juce::PathStrokeType(1.0f));
         }
     }
+    
+    void LookAndFeel::paintToolbarBackground(juce::Graphics& g, int w, int h, juce::Toolbar& toolbar)
+    {
+        g.fillAll(toolbar.findColour(juce::Toolbar::backgroundColourId));
+    }
+    
+    void LookAndFeel::paintToolbarButtonBackground(juce::Graphics& g, int /*width*/, int /*height*/,
+                                                   bool isMouseOver, bool isMouseDown,
+                                                   juce::ToolbarItemComponent& component)
+    {
+        /*
+        if (isMouseDown)
+            g.fillAll(component.findColour (Toolbar::buttonMouseDownBackgroundColourId, true));
+        else if (isMouseOver)
+            g.fillAll(component.findColour (Toolbar::buttonMouseOverBackgroundColourId, true));
+        */
+    }
 }

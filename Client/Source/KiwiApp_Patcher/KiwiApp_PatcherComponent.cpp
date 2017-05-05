@@ -26,6 +26,8 @@
 #include "../KiwiApp.hpp"
 #include "../KiwiApp_CommandIDs.hpp"
 
+#include "../KiwiApp_Components/KiwiApp_CustomToolbarButton.hpp"
+
 namespace kiwi
 {
     // ================================================================================ //
@@ -39,7 +41,9 @@ namespace kiwi
     {
         m_toolbar.setVertical(false);
         m_toolbar.setStyle(juce::Toolbar::ToolbarItemStyle::iconsOnly);
-        m_toolbar.setColour(juce::Toolbar::ColourIds::backgroundColourId, juce::Colours::whitesmoke);
+        auto& lf = KiwiApp::useLookAndFeel();
+        m_toolbar.setColour(juce::Toolbar::ColourIds::backgroundColourId, lf.getCurrentColourScheme()
+                            .getUIColour(juce::LookAndFeel_V4::ColourScheme::UIColour::windowBackground));
         m_toolbar.setColour(juce::Toolbar::ColourIds::labelTextColourId, juce::Colours::black);
         m_toolbar.setColour(juce::Toolbar::ColourIds::buttonMouseOverBackgroundColourId, juce::Colours::whitesmoke.contrasting(0.1));
         m_toolbar.setColour(juce::Toolbar::ColourIds::buttonMouseDownBackgroundColourId, juce::Colours::whitesmoke.contrasting(0.2));
@@ -53,7 +57,7 @@ namespace kiwi
     
     void PatcherToolbar::resized()
     {
-        m_toolbar.setBounds(getLocalBounds().reduced(0, 2));
+        m_toolbar.setBounds(getLocalBounds());
     }
     
     void PatcherToolbar::paint(juce::Graphics& g)
@@ -101,22 +105,26 @@ namespace kiwi
         
         if(itemId == ItemIds::lock_unlock)
         {
-            btn = new juce::ToolbarButton(itemId, "lock/unlock", IMG(locked_png), IMG(unlocked_png));
+            btn = new CustomToolbarButton(itemId, "lock/unlock", juce::Colours::whitesmoke,
+                                          IMG(locked_png), IMG(unlocked_png));
             btn->setCommandToTrigger(&KiwiApp::getCommandManager(), CommandIDs::editModeSwitch, true);
         }
         else if(itemId == ItemIds::zoom_in)
         {
-            btn = new juce::ToolbarButton(itemId, "zoom in", IMG(zoom_in_png), nullptr);
+            btn = new CustomToolbarButton(itemId, "zoom in", juce::Colours::whitesmoke,
+                                          IMG(zoom_in_png), nullptr);
             btn->setCommandToTrigger(&KiwiApp::getCommandManager(), CommandIDs::zoomIn, true);
         }
         else if(itemId == ItemIds::zoom_out)
         {
-            btn = new juce::ToolbarButton(itemId, "zoom out", IMG(zoom_out_png), nullptr);
+            btn = new CustomToolbarButton(itemId, "zoom out", juce::Colours::whitesmoke,
+                                          IMG(zoom_out_png), nullptr);
             btn->setCommandToTrigger(&KiwiApp::getCommandManager(), CommandIDs::zoomOut, true);
         }
         else if(itemId == ItemIds::dsp_on_off)
         {
-            btn = new juce::ToolbarButton(itemId, "DSP on/off", IMG(dsp_off_png), IMG(dsp_on_png));
+            btn = new CustomToolbarButton(itemId, "DSP on/off", juce::Colours::whitesmoke,
+                                          IMG(dsp_off_png), IMG(dsp_on_png));
             btn->setCommandToTrigger(&KiwiApp::getCommandManager(), CommandIDs::switchDsp, true);
         }
         /*
@@ -246,7 +254,7 @@ namespace kiwi
     
     void PatcherComponent::resized()
     {
-        const int toolbar_size = 40;
+        const int toolbar_size = 36;
         m_toolbar.setBounds(getLocalBounds().withBottom(toolbar_size));
         m_patcherview.getViewport().setBounds(getLocalBounds().withTop(toolbar_size));
     }

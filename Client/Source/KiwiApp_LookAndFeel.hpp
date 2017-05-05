@@ -60,6 +60,14 @@ namespace kiwi
                                   juce::Colour const& bgcolor,
                                   bool mouse_over, bool mouse_down) override;
         
+        //! @brief Custom Toolbar background drawing
+        void paintToolbarBackground(juce::Graphics& g, int w, int h, juce::Toolbar& toolbar) override;
+        
+        //! @brief Custom Toolbar Button background drawing
+        void paintToolbarButtonBackground(juce::Graphics& g, int /*width*/, int /*height*/,
+                                          bool isMouseOver, bool isMouseDown,
+                                          juce::ToolbarItemComponent& component) override;
+        
     private: // deleted methods
         
         LookAndFeel(LookAndFeel const& other) = delete;
