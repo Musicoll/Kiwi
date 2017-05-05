@@ -37,8 +37,7 @@ namespace kiwi
     DocumentManager::DocumentManager(flip::DocumentBase& document) :
     m_document(document),
     m_history(document),
-    m_file_handler(m_document),
-    m_loaded(false)
+    m_file_handler(m_document)
     {
         ;
     }
@@ -183,9 +182,7 @@ namespace kiwi
         
         m_socket.reset(new CarrierSocket(m_document, host, port, session_id));
         
-        m_socket->listenConnected(std::bind(&DocumentManager::onConnected, this));
         m_socket->listenDisconnected(std::bind(&DocumentManager::onDisconnected, this));
-        m_socket->listenLoaded(std::bind(&DocumentManager::onLoaded, this));
         
         const auto init_time = std::chrono::steady_clock::now();
         const std::chrono::duration<int> time_out(2);
@@ -197,14 +194,20 @@ namespace kiwi
         
         if (m_socket->isConnected())
         {
-            while(!m_loaded.load())
+            bool loaded = false;
+            
+            m_socket->listenLoaded([&loaded](){loaded = true;});
+            
+            while(!loaded)
             {
                 m_socket->process();
             }
             
+            m_socket->listenLoaded(std::function<void(void)>());
+            
             pull();
             
-            m_socket->startProcess();
+            startTimer(20);
         }
         else
         {
@@ -214,7 +217,6 @@ namespace kiwi
     
     void DocumentManager::disconnect()
     {
-        m_loaded.store(false);
         m_socket.reset();
     }
     
@@ -223,38 +225,16 @@ namespace kiwi
         return (m_socket && m_socket->isConnected());
     }
     
-    void DocumentManager::startPulling()
-    {
-        startTimer(20);
-    }
-    
     void DocumentManager::timerCallback()
     {
+        m_socket->process();
         pull();
-    }
-    
-    void DocumentManager::stopPulling()
-    {
-        stopTimer();
-    }
-    
-    void DocumentManager::onConnected()
-    {
-        //KiwiApp::post("Connected"); -> To check issue with multiThreading
-        startPulling();
     }
     
     void DocumentManager::onDisconnected()
     {
-        //KiwiApp::post("Disconnected"); -> To check Issue with multiThreading
-        stopPulling();
+        stopTimer();
     }
-    
-    void DocumentManager::onLoaded()
-    {
-        m_loaded.store(true);
-    }
-    
     void DocumentManager::startCommitGesture()
     {
         assert(!m_gesture_flag);
