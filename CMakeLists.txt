@@ -313,7 +313,8 @@ set(JSON_INCLUDE_DIRS ${ROOT_DIR}/ThirdParty/json)
 # Model
 #----------------------------------
 
-file(GLOB_RECURSE KIWI_MODEL_SRC ${ROOT_DIR}/Modules/KiwiModel/*.[c|h]pp)
+file(GLOB_RECURSE KIWI_MODEL_SRC ${ROOT_DIR}/Modules/KiwiModel/*.[c|h]pp
+                                 ${ROOT_DIR}/Modules/KiwiModel/*.h)
 add_library(KiwiModel STATIC ${KIWI_MODEL_SRC})
 target_include_directories(KiwiModel PUBLIC ${ROOT_DIR}/Modules)
 target_add_dependency(KiwiModel Flip)
@@ -324,7 +325,8 @@ source_group_rec("${KIWI_MODEL_SRC}" ${ROOT_DIR}/Modules/KiwiModel)
 # Dsp
 #----------------------------------
 
-file(GLOB_RECURSE KIWI_DSP_SRC ${ROOT_DIR}/Modules/KiwiDsp/*.[c|h]pp)
+file(GLOB_RECURSE KIWI_DSP_SRC ${ROOT_DIR}/Modules/KiwiDsp/*.[c|h]pp
+                               ${ROOT_DIR}/Modules/KiwiDsp/*.h)
 add_library(KiwiDsp STATIC ${KIWI_DSP_SRC})
 target_compile_definitions(KiwiDsp PUBLIC -DKIWI_DSP_FLOAT=1)
 target_include_directories(KiwiDsp PUBLIC ${ROOT_DIR}/Modules)
@@ -335,8 +337,10 @@ source_group_rec("${KIWI_DSP_SRC}" ${ROOT_DIR}/Modules/KiwiDsp)
 # Engine
 #----------------------------------
 
-file(GLOB_RECURSE KIWI_ENGINE_SRC ${ROOT_DIR}/Modules/KiwiEngine/*.[c|h]pp)
+file(GLOB_RECURSE KIWI_ENGINE_SRC ${ROOT_DIR}/Modules/KiwiEngine/*.[c|h]pp
+                                  ${ROOT_DIR}/Modules/KiwiEngine/*.h)
 add_library(KiwiEngine STATIC ${KIWI_ENGINE_SRC})
+target_include_directories(KiwiEngine PUBLIC ${ROOT_DIR}/ThirdParty/readerwriterqueue)
 target_include_directories(KiwiEngine PUBLIC ${ROOT_DIR}/Modules)
 target_add_dependency(KiwiEngine Flip)
 target_add_dependency(KiwiEngine KiwiModel)
@@ -348,7 +352,8 @@ source_group_rec("${KIWI_ENGINE_SRC}" ${ROOT_DIR}/Modules/KiwiEngine)
 # Server
 #----------------------------------
 
-file(GLOB_RECURSE SERVER_SRC ${ROOT_DIR}/Server/Source/*.[c|h]pp)
+file(GLOB_RECURSE SERVER_SRC ${ROOT_DIR}/Server/Source/*.[c|h]pp
+                             ${ROOT_DIR}/Server/Source/*.h)
 add_executable(Server ${SERVER_SRC})
 target_include_directories(Server PUBLIC ${JSON_INCLUDE_DIRS})
 target_add_dependency(Server KiwiModel)
@@ -359,7 +364,8 @@ source_group_rec("${SERVER_SRC}" ${ROOT_DIR}/Server/Source)
 # Client
 #----------------------------------
 
-file(GLOB_RECURSE KIWI_CLIENT_SRC ${ROOT_DIR}/Client/Source/*.[c|h]pp)
+file(GLOB_RECURSE KIWI_CLIENT_SRC ${ROOT_DIR}/Client/Source/*.[c|h]pp
+                                  ${ROOT_DIR}/Client/Source/*.h)
 add_executable(Kiwi ${KIWI_CLIENT_SRC} "${KIWI_CLIENT_RESSOURCES}")
 target_add_dependency(Kiwi KiwiEngine)
 target_add_dependency(Kiwi KiwiModel)
@@ -387,7 +393,8 @@ source_group_rec("${KIWI_CLIENT_SRC}" ${ROOT_DIR}/Client/Source)
 
 # Test Dsp
 
-file(GLOB TEST_DSP_SRC ${ROOT_DIR}/Test/Dsp/*.[c|h]pp)
+file(GLOB TEST_DSP_SRC ${ROOT_DIR}/Test/Dsp/*.[c|h]pp
+                       ${ROOT_DIR}/Test/Dsp/*.h)
 add_executable(test_dsp ${TEST_DSP_SRC})
 target_add_dependency(test_dsp KiwiDsp)
 set_target_properties(test_dsp PROPERTIES FOLDER Test)
@@ -396,7 +403,8 @@ set_target_properties(test_dsp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT
 
 # Test Model
 
-file(GLOB TEST_MODEL_SRC ${ROOT_DIR}/Test/Model/*.[c|h]pp)
+file(GLOB TEST_MODEL_SRC ${ROOT_DIR}/Test/Model/*.[c|h]pp
+                         ${ROOT_DIR}/Test/Model/*.h)
 add_executable(test_model ${TEST_MODEL_SRC})
 target_add_dependency(test_model KiwiModel)
 set_target_properties(test_model PROPERTIES FOLDER Test)
@@ -405,9 +413,13 @@ set_target_properties(test_model PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTP
 
 # Test Engine
 
-file(GLOB TEST_ENGINE_SRC ${ROOT_DIR}/Test/Engine/*.[c|h]pp)
+file(GLOB TEST_ENGINE_SRC ${ROOT_DIR}/Test/Engine/*.[c|h]pp
+                          ${ROOT_DIR}/Test/Engine/*.h)
 add_executable(test_engine ${TEST_ENGINE_SRC})
 target_add_dependency(test_engine KiwiEngine)
+if (LINUX)
+  target_link_libraries(test_engine PUBLIC ${PTHREAD})
+endif()
 set_target_properties(test_engine PROPERTIES FOLDER Test)
 source_group_rec("${TEST_ENGINE_SRC}" ${ROOT_DIR}/Test/Engine)
 set_target_properties(test_engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})

@@ -164,6 +164,60 @@ namespace kiwi
         };
         
         // ================================================================================ //
+        //                                      OBJECT DELAY                                //
+        // ================================================================================ //
+        
+        class Delay : public model::Object
+        {
+        public: // methods
+            
+            //! @brief flip Default Constructor
+            Delay(flip::Default& d) : model::Object(d) {};
+            
+            //! @brief Constructor
+            Delay(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @internal flip static declare method
+            static void declare();
+        };
+        
+        // ================================================================================ //
+        //                                      OBJECT PIPE                                 //
+        // ================================================================================ //
+        
+        class Pipe : public model::Object
+        {
+        public: // methods
+            
+            //! @brief flip Default Constructor
+            Pipe(flip::Default& d) : model::Object(d) {};
+            
+            //! @brief Constructor
+            Pipe(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @internal flip static declare method
+            static void declare();
+        };
+        
+        // ================================================================================ //
+        //                                   OBJECT METRO                                   //
+        // ================================================================================ //
+        
+        class Metro : public model::Object
+        {
+        public: // methods
+            
+            //! @brief flip Default Constructor
+            Metro(flip::Default& d) : model::Object(d) {};
+            
+            //! @brief Constructor
+            Metro(std::string const& name, std::vector<Atom> const& args);
+            
+            //! @internal flip static declare method
+            static void declare();
+        };
+        
+        // ================================================================================ //
         //                                    OBJECT OSC~                                   //
         // ================================================================================ //
         

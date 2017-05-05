@@ -149,6 +149,84 @@ namespace kiwi
         }
         
         // ================================================================================ //
+        //                                  OBJECT DELAY                                    //
+        // ================================================================================ //
+        
+        Delay::Delay(std::string const& name, std::vector<Atom> const& args)
+        {
+            if (args.size() > 1 || (args.size() == 1 && !args[0].isNumber()))
+            {
+                throw std::runtime_error("wrong argument for object Delay");
+            }
+            
+            pushInlet({PinType::IType::Control});
+            
+            if (args.empty())
+            {
+                pushInlet({PinType::IType::Control});
+            }
+            
+            pushOutlet(PinType::IType::Control);
+        }
+        
+        void Delay::declare()
+        {
+            Factory::add<Delay>("delay");
+        }
+        
+        // ================================================================================ //
+        //                                      OBJECT PIPE                                 //
+        // ================================================================================ //
+        
+        Pipe::Pipe(std::string const& name, std::vector<Atom> const& args)
+        {
+            if (args.size() > 1 || (args.size() == 1 && !args[0].isNumber()))
+            {
+                throw std::runtime_error("wrong argument for object Pipe");
+            }
+            
+            pushInlet({PinType::IType::Control});
+            
+            if (args.empty())
+            {
+                pushInlet({PinType::IType::Control});
+            }
+            
+            pushOutlet(PinType::IType::Control);
+        }
+        
+        void Pipe::declare()
+        {
+            Factory::add<Pipe>("pipe");
+        }
+        
+        // ================================================================================ //
+        //                                   OBJECT METRO                                   //
+        // ================================================================================ //
+        
+        Metro::Metro(std::string const& name, std::vector<Atom> const& args)
+        {
+            if (args.size() < 1 || (args.size() == 1 && !args[0].isNumber()))
+            {
+                throw std::runtime_error("wrong argument for object Metro");
+            }
+            
+            pushInlet({PinType::IType::Control});
+            
+            if (args.empty())
+            {
+                pushInlet({PinType::IType::Control});
+            }
+            
+            pushOutlet(PinType::IType::Control);
+        }
+        
+        void Metro::declare()
+        {
+            Factory::add<Metro>("metro");
+        }
+        
+        // ================================================================================ //
         //                                  OBJECT ADC~                                     //
         // ================================================================================ //
         

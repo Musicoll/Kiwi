@@ -20,10 +20,6 @@
  */
 
 #include "KiwiEngine_Link.hpp"
-#include "KiwiEngine_Object.hpp"
-
-#include <KiwiModel/KiwiModel_Link.hpp>
-#include <KiwiModel/KiwiModel_Object.hpp>
 
 namespace kiwi
 {
@@ -33,32 +29,27 @@ namespace kiwi
         //                                      LINK                                        //
         // ================================================================================ //
         
-        Link::Link(model::Link const& model) :
-        m_model(model)
+        Link::Link(Object & receiver, size_t index) :
+        m_receiver(receiver),
+        m_index(index)
         {
             ;
         }
         
-        Object& Link::getSenderObject() const
+        bool Link::operator<(Link const& other) const
         {
-            return *m_model.getSenderObject().entity().use<std::shared_ptr<engine::Object>>().get();
+            return (&m_receiver < &other.m_receiver
+                    || (&m_receiver == &other.m_receiver && m_index < other.m_index));
         }
  
-        Object& Link::getReceiverObject() const
+        Object & Link::getReceiver() const
         {
-            return *m_model.getReceiverObject().entity().use<std::shared_ptr<engine::Object>>().get();
-        }
-        
-        size_t Link::getSenderIndex() const
-        {
-            //return m_model.getSenderIndex(model::PinType::IType::Control);
-            return m_model.getSenderIndex();
+            return m_receiver;
         }
         
         size_t Link::getReceiverIndex() const
         {
-            //return m_model.getReceiverIndex(model::PinType::IType::Control);
-            return m_model.getReceiverIndex();
+            return m_index;
         }
     }
 }

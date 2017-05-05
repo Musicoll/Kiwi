@@ -22,6 +22,9 @@
 #ifndef KIWI_ENGINE_PATCHER_HPP_INCLUDED
 #define KIWI_ENGINE_PATCHER_HPP_INCLUDED
 
+#include <map>
+#include <set>
+
 #include "KiwiEngine_Def.hpp"
 #include "KiwiEngine_Beacon.hpp"
 #include "KiwiEngine_AudioControler.hpp"
@@ -39,25 +42,35 @@ namespace kiwi
         //! @brief The Patcher manages a set of Object and Link.
         class Patcher
         {
+        private: // classes
+            
+            class CallBack;
+            
         public: // methods
             
             //! @brief Constructor.
-            Patcher(model::Patcher const& model, Instance& instance) noexcept;
+            Patcher(Instance& instance) noexcept;
             
             //! @brief Destructor.
             ~Patcher();
             
-            //! @brief Returns the objects.
-            std::vector<Object const*> getObjects() const;
+            //! @brief Adds an object to the patcher.
+            void addObject(uint64_t object_id, std::shared_ptr<Object> object);
             
-            //! @brief Returns the objects.
-            std::vector<Object*> getObjects();
+            //! @brief Removes an object from the patcher.
+            void removeObject(uint64_t object_id);
             
-            //! @brief Returns the links.
-            std::vector<Link const*> getLinks() const;
+            //! @brief Adds a link between to object of the patcher.
+            void addLink(uint64_t from_id, size_t outlet, uint64_t to_id, size_t inlet, bool is_signal);
+            
+            //! @brief Removes a link between two objects.
+            void removeLink(uint64_t from_id, size_t outlet, uint64_t to_id, size_t inlet, bool is_signal);
+            
+            //! @brief Updates the dsp chain held by the engine patcher
+            void updateChain();
             
             //! @internal The model changed.
-            void modelChanged();
+            void modelChanged(model::Patcher const& model);
             
             //! @brief Adds a link to the current stack overflow list (or create a new list if there is no).
             //! @internal Only the Object should use this method.
@@ -117,19 +130,20 @@ namespace kiwi
             void linkAdded(model::Link& link);
             
             //! @internal Link model has changed.
-            void linkChanged(model::Link& link);
+            void linkChanged(model::Link& link_m);
             
             //! @internal Link model will be removed from the document.
-            void linkRemoved(model::Link& link);
+            void linkRemoved(model::Link& link_m);
         
         private: // members
             
             using SoLinks = std::queue<Link const*>;
             
-            model::Patcher const&   m_model;
-            Instance&               m_instance;
-            std::vector<SoLinks>    m_so_links;
-            dsp::Chain              m_chain;
+            Instance&                                       m_instance;
+            std::map<uint64_t, std::shared_ptr<Object>>     m_objects;
+            mutable std::mutex                              m_mutex;
+            std::vector<SoLinks>                            m_so_links;
+            dsp::Chain                                      m_chain;
             
         private: // deleted methods
             

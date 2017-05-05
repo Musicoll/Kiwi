@@ -23,11 +23,12 @@
 #define KIWI_ENGINE_TYPED_OBJECTS_HPP_INCLUDED
 
 #include <vector>
+#include <set>
 
 #include "KiwiEngine_Object.hpp"
 #include "KiwiEngine_Beacon.hpp"
-
 #include "KiwiEngine_AudioControler.hpp"
+#include "KiwiEngine_Scheduler.h"
 
 namespace kiwi
 {
@@ -119,7 +120,11 @@ namespace kiwi
         
         class Receive : public engine::Object, public Beacon::Castaway
         {
-        public:
+        private: // classes
+            
+            class Task;
+            
+        public: // methods
             
             Receive(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
@@ -129,8 +134,10 @@ namespace kiwi
             
             void receive(std::vector<Atom> const& args) override;
             
-        private:
-            std::string m_name;
+        private: // members
+            
+            std::string                     m_name;
+            std::set<std::unique_ptr<Task>> m_tasks;
         };
         
         // ================================================================================ //
@@ -153,6 +160,76 @@ namespace kiwi
             
             const std::vector<Atom> m_args;
         };
+        
+        // ================================================================================ //
+        //                                  OBJECT DELAY                                    //
+        // ================================================================================ //
+        
+        class Delay final : public engine::Object
+        {
+        public: // classes
+            
+            class Task;
+            
+        public: // methods
+            
+            Delay(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            ~Delay();
+            
+            void receive(size_t index, std::vector<Atom> const& args) override;
+            
+        private: // members
+            
+            std::unique_ptr<Task>           m_task;
+            Scheduler<>::clock_t::duration  m_delay;
+        };
+        
+        // ================================================================================ //
+        //                                  OBJECT PIPE                                     //
+        // ================================================================================ //
+        
+        class Pipe final : public engine::Object
+        {
+        public: // classes
+            
+            class Task;
+            
+        public: // methods
+            
+            Pipe(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            ~Pipe();
+            
+            void receive(size_t index, std::vector<Atom> const& args) override;
+            
+        private: // members
+            
+            std::set<std::unique_ptr<Task>>     m_tasks;
+            Scheduler<>::clock_t::duration      m_delay;
+        };
+        
+        // ================================================================================ //
+        //                                  OBJECT METRO                                    //
+        // ================================================================================ //
+        
+        class Metro final : public engine::Object, Scheduler<>::Timer
+        {
+        public: // methods
+            
+            Metro(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            ~Metro();
+            
+            void receive(size_t index, std::vector<Atom> const& oargs) override;
+            
+            void timerCallBack() override;
+            
+        private: // members
+            
+            Scheduler<>::duration_t m_period;
+        };
+        
         
         // ================================================================================ //
         //                                       ROUTER                                     //

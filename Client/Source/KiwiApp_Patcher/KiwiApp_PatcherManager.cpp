@@ -370,13 +370,15 @@ namespace kiwi
     
     void PatcherManager::document_changed(model::Patcher& patcher)
     {
+        engine::Scheduler<>::Lock lock(Thread::Engine);
+        
         if(patcher.added())
         {
             patcher.entity().emplace<DocumentManager>(patcher.document());
-            patcher.entity().emplace<engine::Patcher>(patcher, m_instance.useEngineInstance());
+            patcher.entity().emplace<engine::Patcher>(m_instance.useEngineInstance());
         }
         
-        patcher.entity().use<engine::Patcher>().modelChanged();
+        patcher.entity().use<engine::Patcher>().modelChanged(patcher);
         
         notifyPatcherViews(patcher);
         

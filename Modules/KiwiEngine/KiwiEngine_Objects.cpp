@@ -173,8 +173,43 @@ namespace kiwi
         //                                  OBJECT RECEIVE                                  //
         // ================================================================================ //
         
-        Receive::Receive(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
-        : Object(model, patcher)
+        class Receive::Task final : public Scheduler<>::Task
+        {
+        public: // methods
+            
+            Task(Receive& object, std::vector<Atom> const& atoms):
+            Scheduler<>::Task(Thread::Gui, Thread::Engine),
+            m_object(object),
+            m_atoms(atoms)
+            {
+            }
+            
+            ~Task()
+            {
+            }
+            
+            void execute() override
+            {
+                m_object.send(0, m_atoms);
+                
+                m_object.m_tasks.erase(std::find_if(m_object.m_tasks.begin(),
+                                                    m_object.m_tasks.end(),
+                                                    [this](std::unique_ptr<Task> const& task)
+                                                    {
+                                                        return task.get() == this;
+                                                    }));
+            }
+            
+        private: // members
+            
+            Receive&            m_object;
+            std::vector<Atom>   m_atoms;
+        };
+        
+        Receive::Receive(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        Object(model, patcher),
+        m_name(),
+        m_tasks()
         {
             m_name = !args.empty() ? args[0].getString() : "";
             
@@ -201,9 +236,11 @@ namespace kiwi
         
         void Receive::receive(std::vector<Atom> const& args)
         {
-            if(!args.empty())
+            if (!args.empty())
             {
-                send(0, args);
+                Task* task = new Task(*this, args);
+                Scheduler<>::getInstance().schedule(task, std::chrono::milliseconds(0));
+                m_tasks.insert(std::unique_ptr<Task>(task));
             }
         }
         
@@ -226,6 +263,193 @@ namespace kiwi
         void Loadmess::loadbang()
         {
             send(0ul, m_args);
+        }
+        
+        // ================================================================================ //
+        //                                     OBJECT DELAY                                 //
+        // ================================================================================ //
+        
+        class Delay::Task final : public Scheduler<>::Task
+        {
+        public:
+            
+            Task(Delay & object):
+            Scheduler<>::Task(Thread::Engine, Thread::Engine),
+            m_object(object)
+            {
+            }
+            
+            ~Task() =  default;
+            
+            void execute()
+            {
+                m_object.send(0, {"bang"});
+            }
+            
+        private:
+            
+            Delay& m_object;
+        };
+        
+        Delay::Delay(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        Object(model, patcher),
+        m_task(new Task(*this)),
+        m_delay(std::chrono::milliseconds(0))
+        {
+            if (!args.empty())
+            {
+                m_delay = std::chrono::milliseconds(args[0].getInt());
+            }
+        }
+        
+        Delay::~Delay()
+        {
+        }
+        
+        void Delay::receive(size_t index, std::vector<Atom> const& args)
+        {
+            if (!args.empty())
+            {
+                if (index == 0)
+                {
+                    if(args[0].isString() && args[0].getString() == "bang")
+                    {
+                        Scheduler<>::getInstance().schedule(m_task.get(), m_delay);
+                    }
+                    else if(args[0].isString() && args[0].getString() == "stop")
+                    {
+                        Scheduler<>::getInstance().unschedule(m_task.get());
+                    }
+                }
+                else if(index == 1)
+                {
+                    if (args[0].isNumber())
+                    {
+                        m_delay = std::chrono::milliseconds(args[0].getInt());
+                    }
+                }
+            }
+        }
+        
+        // ================================================================================ //
+        //                                  OBJECT PIPE                                     //
+        // ================================================================================ //
+        
+        class Pipe::Task final : public Scheduler<>::Task
+        {
+        public: // methods
+            
+            Task(Pipe & object, std::vector<Atom> const& atoms):
+            Scheduler<>::Task(Thread::Engine, Thread::Engine),
+            m_object(object),
+            m_atoms(atoms)
+            {
+            }
+            
+            ~Task()
+            {
+            }
+            
+            void execute()
+            {
+                m_object.send(0, m_atoms);
+                
+                m_object.m_tasks.erase(std::find_if(m_object.m_tasks.begin(),
+                                                    m_object.m_tasks.end(),
+                                                    [this](std::unique_ptr<Task> const& task)
+                {
+                    return task.get() == this;
+                }));
+            }
+            
+        private: // members
+            
+            Pipe&               m_object;
+            std::vector<Atom>   m_atoms;
+        };
+        
+        Pipe::Pipe(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        Object(model, patcher),
+        m_tasks(),
+        m_delay(std::chrono::milliseconds(0))
+        {
+            if (!args.empty())
+            {
+                m_delay = std::chrono::milliseconds(args[0].getInt());
+            }
+        }
+        
+        Pipe::~Pipe()
+        {
+        }
+        
+        void Pipe::receive(size_t index, std::vector<Atom> const& args)
+        {
+            if (!args.empty())
+            {
+                if (index == 0)
+                {
+                    Task* task = new Task(*this, args);
+                    Scheduler<>::getInstance().schedule(task, m_delay);
+                    m_tasks.insert(std::unique_ptr<Task>(task));
+                }
+                else if(index == 1)
+                {
+                    if (args[0].isNumber())
+                    {
+                        m_delay = std::chrono::milliseconds(args[0].getInt());
+                    }
+                }
+            }
+        }
+        
+        // ================================================================================ //
+        //                                  OBJECT METRO                                    //
+        // ================================================================================ //
+        
+        Metro::Metro(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        engine::Object(model, patcher),
+        Scheduler<>::Timer(Thread::Engine, Thread::Engine),
+        m_period(std::chrono::milliseconds(0))
+        {
+            if(!args.empty())
+            {
+                m_period = std::chrono::milliseconds(args[0].getInt());
+            }
+        }
+        
+        Metro::~Metro()
+        {
+        }
+        
+        void Metro::receive(size_t index, std::vector<Atom> const& args)
+        {
+            if (!args.empty())
+            {
+                if (index == 0)
+                {
+                    if (args[0].isString() && args[0].getString() == "start")
+                    {
+                        startTimer(m_period);
+                    }
+                    else if(args[0].isString() && args[0].getString() == "stop")
+                    {
+                        stopTimer();
+                    }
+                }
+                else if(index == 1)
+                {
+                    if (args[0].isNumber())
+                    {
+                        m_period = std::chrono::milliseconds(args[0].getInt());
+                    }
+                }
+            }
+        }
+        
+        void Metro::timerCallBack()
+        {
+            send(0, {"bang"});
         }
         
         // ================================================================================ //

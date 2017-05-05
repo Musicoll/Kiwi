@@ -24,6 +24,7 @@
 #include "KiwiEngine_Link.hpp"
 #include "KiwiEngine_Factory.hpp"
 #include "KiwiEngine_Instance.hpp"
+#include "KiwiEngine_Scheduler.h"
 
 #include <KiwiModel/KiwiModel_PatcherUser.hpp>
 
@@ -35,9 +36,10 @@ namespace kiwi
         //                                      PATCHER                                     //
         // ================================================================================ //
         
-        Patcher::Patcher(model::Patcher const& model, Instance& instance) noexcept :
-        m_model(model),
+        Patcher::Patcher(Instance& instance) noexcept :
         m_instance(instance),
+        m_objects(),
+        m_mutex(),
         m_so_links(1),
         m_chain()
         {
@@ -49,49 +51,82 @@ namespace kiwi
             m_instance.getAudioControler().remove(m_chain);
         }
         
-        std::vector<Object const*> Patcher::getObjects() const
+        void Patcher::addObject(uint64_t object_id, std::shared_ptr<Object> object)
         {
-            std::vector<Object const*> objects;
-            for(auto& obj : m_model.getObjects())
-            {
-                if(obj.resident())
-                {
-                    auto object_engine = obj.entity().use<std::shared_ptr<Object>>();
-                    objects.push_back(object_engine.get());
-                }
-            }
+            m_objects[object_id] = object;
             
-            return objects;
+            std::shared_ptr<dsp::Processor> processor = std::dynamic_pointer_cast<AudioObject>(object);
+            
+            if (processor)
+            {
+                m_chain.addProcessor(processor);
+            }
         }
         
-        std::vector<Object*> Patcher::getObjects()
+        void Patcher::removeObject(uint64_t object_id)
         {
-            std::vector<Object*> objects;
-            for(auto& obj : m_model.getObjects())
+            std::shared_ptr<dsp::Processor> processor =
+                std::dynamic_pointer_cast<AudioObject>(m_objects[object_id]);
+            
+            if (processor)
             {
-                if(obj.resident())
-                {
-                    auto object_engine = obj.entity().use<std::shared_ptr<Object>>();
-                    objects.push_back(object_engine.get());
-                }
+                m_chain.removeProcessor(*processor);
             }
             
-            return objects;
+            m_objects.erase(object_id);
         }
         
-        std::vector<Link const*> Patcher::getLinks() const
+        void Patcher::addLink(uint64_t from_id, size_t outlet, uint64_t to_id, size_t inlet, bool is_signal)
         {
-            std::vector<Link const*> links;
-            for(auto& link : m_model.getLinks())
+            std::shared_ptr<Object> from = m_objects[from_id];
+            std::shared_ptr<Object> to = m_objects[to_id];
+            
+            if(from && to)
             {
-                if(link.resident())
+                if (!is_signal)
                 {
-                    Link const* link_engine = link.entity().get<Link>();
-                    links.push_back(link_engine);
+                    from->addOutputLink(outlet, *to, inlet);
+                }
+                else
+                {
+                    std::shared_ptr<dsp::Processor> proc_from = std::dynamic_pointer_cast<AudioObject>(from);
+                    std::shared_ptr<dsp::Processor> proc_to = std::dynamic_pointer_cast<AudioObject>(to);
+                    
+                    m_chain.connect(*proc_from, outlet,
+                                    *proc_to, inlet);
                 }
             }
+        }
+        
+        void Patcher::removeLink(uint64_t from_id, size_t outlet, uint64_t to_id, size_t inlet, bool is_signal)
+        {
+            std::shared_ptr<Object> from = m_objects[from_id];
+            std::shared_ptr<Object> to = m_objects[to_id];
             
-            return links;
+            if (!is_signal)
+            {
+                from->removeOutputLink(outlet, *to, inlet);
+            }
+            else
+            {
+                std::shared_ptr<dsp::Processor> proc_from = std::dynamic_pointer_cast<AudioObject>(from);
+                std::shared_ptr<dsp::Processor> proc_to = std::dynamic_pointer_cast<AudioObject>(to);
+                
+                m_chain.disconnect(*proc_from, outlet,
+                                   *proc_to, inlet);
+            }
+        }
+        
+        void Patcher::updateChain()
+        {
+            try
+            {
+                m_chain.update();
+            }
+            catch (dsp::LoopError & e)
+            {
+                error(e.what());
+            }
         }
         
         AudioControler& Patcher::getAudioControler() const
@@ -123,12 +158,12 @@ namespace kiwi
         
         void Patcher::sendLoadbang()
         {
-            for(auto& obj : m_model.getObjects())
+            for(auto& object : m_objects)
             {
-                obj.entity().use<std::shared_ptr<Object>>()->loadbang();
+                object.second->loadbang();
             }
         }
-        
+    
         // ================================================================================ //
         //                                      CONSOLE                                     //
         // ================================================================================ //
@@ -166,16 +201,16 @@ namespace kiwi
         //                                    MODEL CHANGED                                 //
         // ================================================================================ //
         
-        void Patcher::modelChanged()
+        void Patcher::modelChanged(model::Patcher const& model)
         {
-            if(m_model.changed())
+            if(model.changed())
             {
-                const bool link_changed = m_model.linksChanged();
+                const bool link_changed = model.linksChanged();
                 
                 // check links before objects
                 if(link_changed)
                 {
-                    for(auto& link : m_model.getLinks())
+                    for(auto& link : model.getLinks())
                     {
                         if(link.removed())
                         {
@@ -184,9 +219,9 @@ namespace kiwi
                     }
                 }
 
-                if(m_model.objectsChanged())
+                if(model.objectsChanged())
                 {
-                    for(auto& object : m_model.getObjects())
+                    for(auto& object : model.getObjects())
                     {
                         if(object.added())
                         {
@@ -202,7 +237,7 @@ namespace kiwi
                 // check links before objects
                 if(link_changed)
                 {
-                    for(auto& link : m_model.getLinks())
+                    for(auto& link : model.getLinks())
                     {
                         if(link.added())
                         {
@@ -211,101 +246,38 @@ namespace kiwi
                     }
                 }
                 
-                try
-                {
-                    m_chain.update();
-                }
-                catch (dsp::LoopError & e)
-                {
-                    error(e.what());
-                }
+                updateChain();
             }
         }
 
         void Patcher::objectAdded(model::Object& object_m)
         {
-            std::shared_ptr<Object> obj_sptr = Factory::create(*this, object_m);
-            object_m.entity().emplace<std::shared_ptr<Object>>(obj_sptr);
+            std::shared_ptr<Object> object = Factory::create(*this, object_m);
             
-            std::shared_ptr<dsp::Processor> processor = std::dynamic_pointer_cast<AudioObject>(obj_sptr);
-            
-            if (processor)
-            {
-                m_chain.addProcessor(processor);
-            }
+            addObject(object_m.ref().obj(), object);
         }
 
         void Patcher::objectRemoved(model::Object& object_m)
-        {   
-            std::shared_ptr<dsp::Processor> processor =
-            std::dynamic_pointer_cast<AudioObject>(object_m.entity().use<std::shared_ptr<Object>>());
-            
-            if (processor)
-            {
-                m_chain.removeProcessor(*processor);
-            }
-            
-            object_m.entity().erase<std::shared_ptr<Object>>();
+        {
+            removeObject(object_m.ref().obj());
         }
 
         void Patcher::linkAdded(model::Link& link_m)
         {
-            auto& sender_entity = link_m.getSenderObject().entity();
-            auto& receiver_entity = link_m.getReceiverObject().entity();
-            
-            assert(sender_entity.has<std::shared_ptr<Object>>());
-            assert(receiver_entity.has<std::shared_ptr<Object>>());
-            
-            auto from = sender_entity.use<std::shared_ptr<Object>>();
-            auto to = receiver_entity.use<std::shared_ptr<Object>>();
-            
-            if(from && to)
-            {
-                if (!link_m.isSignal())
-                {
-                    auto& link_e = link_m.entity().emplace<Link>(link_m);
-                    from->addOutputLink(link_e);
-                }
-                else
-                {
-                    if (link_m.isSignal())
-                    {
-                        std::shared_ptr<dsp::Processor> proc_from = std::dynamic_pointer_cast<AudioObject>(from);
-                        std::shared_ptr<dsp::Processor> proc_to = std::dynamic_pointer_cast<AudioObject>(to);
-                        
-                        m_chain.connect(*proc_from, link_m.getSenderIndex(),
-                                        *proc_to, link_m.getReceiverIndex());
-                    }
-                }
-            }
+            addLink(link_m.getSenderObject().ref().obj(),
+                    link_m.getSenderIndex(),
+                    link_m.getReceiverObject().ref().obj(),
+                    link_m.getReceiverIndex(),
+                    link_m.isSignal());
         }
         
-        void Patcher::linkRemoved(model::Link& link)
+        void Patcher::linkRemoved(model::Link& link_m)
         {
-            auto& sender_entity = link.getSenderObject().entity();
-            auto& receiver_entity = link.getReceiverObject().entity();
-            
-            assert(sender_entity.has<std::shared_ptr<Object>>());
-            assert(receiver_entity.has<std::shared_ptr<Object>>());
-            
-            auto from = sender_entity.use<std::shared_ptr<Object>>();
-            auto to = receiver_entity.use<std::shared_ptr<Object>>();
-            
-            if (!link.isSignal())
-            {
-                auto& link_engine = link.entity().use<Link>();
-                auto from = sender_entity.use<std::shared_ptr<Object>>();
-                from->removeOutputLink(link_engine);
-                link.entity().erase<Link>();
-            }
-            else
-            {
-                std::shared_ptr<dsp::Processor> proc_from = std::dynamic_pointer_cast<AudioObject>(from);
-                std::shared_ptr<dsp::Processor> proc_to = std::dynamic_pointer_cast<AudioObject>(to);
-                
-                m_chain.disconnect(*proc_from, link.getSenderIndex(),
-                                   *proc_to, link.getReceiverIndex());
-            }
+            removeLink(link_m.getSenderObject().ref().obj(),
+                       link_m.getSenderIndex(),
+                       link_m.getReceiverObject().ref().obj(),
+                       link_m.getReceiverIndex(),
+                       link_m.isSignal());
         }
     }
 }

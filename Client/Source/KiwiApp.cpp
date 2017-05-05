@@ -96,10 +96,21 @@ namespace kiwi
         
         m_command_manager = std::make_unique<juce::ApplicationCommandManager>();
         
+        engine::Scheduler<>::createInstance();
+        
         m_settings = std::make_unique<StoredSettings>();
         
         m_menu_model.reset(new MainMenuModel());
 
+        engine::Scheduler<>& scheduler = engine::Scheduler<>::createInstance();
+        
+        scheduler.registerConsumer(Thread::Engine);
+        scheduler.registerProducer(Thread::Gui, Thread::Engine);
+        scheduler.registerProducer(Thread::Engine, Thread::Engine);
+        
+        m_quit_requested.store(false);
+        m_engine_thread = std::thread(std::bind(&KiwiApp::processEngine, this));
+        
         m_instance = std::make_unique<Instance>();
         m_command_manager->registerAllCommandsForTarget(this);
         
@@ -139,7 +150,12 @@ namespace kiwi
         {
             if(m_instance->closeAllPatcherWindows())
             {
+                m_quit_requested.store(true);
+                m_engine_thread.join();
+                
                 m_instance.reset();
+                
+                engine::Scheduler<>::deleteInstance();
                 
                 quit();
             }
@@ -176,6 +192,15 @@ namespace kiwi
     {
         return (juce::SystemStats::getOperatingSystemType()
                 & juce::SystemStats::Windows) != 0;
+    }
+    
+    void KiwiApp::processEngine()
+    {
+        while(!m_quit_requested.load())
+        {
+            engine::Scheduler<>::getInstance().process(Thread::Engine);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
     }
     
     // ================================================================================ //
