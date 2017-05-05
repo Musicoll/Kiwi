@@ -37,7 +37,7 @@ namespace kiwi
         m_magnifier.setSize(600, 400);
         m_magnifier.addAndMakeVisible(m_patcher);
         setViewedComponent(&m_magnifier, false);
-        setScrollBarThickness(12);
+        setScrollBarThickness(8);
         
         setSize(600, 400);
     }

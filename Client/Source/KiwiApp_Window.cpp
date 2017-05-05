@@ -36,7 +36,10 @@ namespace kiwi
                    bool is_main_window,
                    juce::String settings_name,
                    bool add_menubar) :
-    DocumentWindow(name, juce::Colours::lightgrey, allButtons, true),
+    DocumentWindow(name,
+                   KiwiApp::useLookAndFeel().getCurrentColourScheme()
+                   .getUIColour(juce::LookAndFeel_V4::ColourScheme::windowBackground),
+                   allButtons, true),
     m_settings_name(settings_name),
     m_is_main_window(is_main_window)
     {

@@ -124,16 +124,13 @@ if (WIN32)
 	set(CMAKE_FIND_LIBRARY_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES} "")
 	set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} ".lib" ".dll")
 	if (CMAKE_CL_64)
-        set(WINDOWS_SDK_PATH "C:/Program Files (x86)/Microsoft SDKs/Windows/v7.1A/Lib/x64")
+    set(WINDOWS_SDK_PATH "C:/Program Files (x86)/Microsoft SDKs/Windows/v7.1A/Lib/x64")
 	else()
 		set(WINDOWS_SDK_PATH "C:/Program Files (x86)/Microsoft SDKs/Windows/v7.1A/Lib")
 	endif()
 else()
     set(CMAKE_FIND_LIBRARY_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES} "" "lib")
-	set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} ".a" ".so")
-    if (LINUX)
-        include_directories(/usr/include/freetype2)
-    endif()
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} ".a" ".so")
 endif()
 
 #--------------------------------------
@@ -146,6 +143,8 @@ include(./Config/dependency.cmake)
 #----------------------------------
 # Juce
 #----------------------------------
+
+set(JUCE_INCLUDE_DIRS ${ROOT_DIR}/ThirdParty/Juce/modules)
 
 if (APPLE)
     find_library(COCOA Cocoa)
@@ -181,11 +180,17 @@ elseif(LINUX)
     find_library(XEXT Xext)
     find_library(FREETYPE freetype)
     find_library(ASOUND asound)
-    set(JUCE_DEP ${RT} ${DL} ${PTHREAD} ${FREETYPE} ${X11} ${XEXT} ${ASOUND})
+    find_package(PkgConfig)
+    pkg_check_modules(GTK3_X11 REQUIRED gtk+-x11-3.0)
+    pkg_check_modules(WEBKIT_TO_GTK4 REQUIRED webkit2gtk-4.0)
+    set(JUCE_INCLUDE_DIRS ${JUCE_INCLUDE_DIRS} /usr/include/freetype2 ${GTK3_X11_INCLUDE_DIRS} ${WEBKIT_TO_GTK4_INCLUDE_DIRS})
+    set(JUCE_DEP ${RT} ${DL} ${PTHREAD} ${FREETYPE} ${X11} ${XEXT} ${ASOUND} ${GTK3_X11_LIBRARIES} ${WEBKIT_TO_GTK4_LIBRARIES})
 endif()
 
 set(JUCE_MACRO_DEFINITIONS JUCE_STANDALONE_APPLICATION=1
-                           JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1)
+                           JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1
+                           JUCE_DISPLAY_SPLASH_SCREEN=0
+                           JUCE_REPORT_APP_USAGE=0)
 
 file (GLOB_RECURSE JUCE_SRC ${ROOT_DIR}/ThirdParty/Juce/modules/*.[h|c]pp
                             ${ROOT_DIR}/ThirdParty/Juce/modules/*.h
@@ -216,7 +221,7 @@ endif()
 add_library(Juce STATIC ${JUCE_SRC})
 target_link_libraries(Juce ${JUCE_DEP})
 target_compile_definitions(Juce PUBLIC ${JUCE_MACRO_DEFINITIONS})
-target_include_directories(Juce PUBLIC ${ROOT_DIR}/ThirdParty/Juce/modules)
+target_include_directories(Juce PUBLIC ${JUCE_INCLUDE_DIRS})
 set_target_properties(Juce PROPERTIES FOLDER ThirdParty)
 source_group_rec("${JUCE_SRC}" ${ROOT_DIR}/ThirdParty/Juce/modules)
 
@@ -246,21 +251,21 @@ else()
         set(FLIP_DEP ${FlipLib})
 
     elseif(WIN32)
-	
-		if (CMAKE_CL_64)  
-			if(DEBUG) 
+
+		if (CMAKE_CL_64)
+			if(DEBUG)
 				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/x64/Debug")
 			else()
 				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/x64/Release")
-			endif() 
-		else() 
-			if(DEBUG) 
+			endif()
+		else()
+			if(DEBUG)
 				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/Win32/Debug")
 			else()
 				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/Win32/Release")
-			endif() 
+			endif()
 		endif()
-		
+
        find_library(WS2_32 ws2_32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
 	   set(FLIP_DEP ${WS2_32} ${FlipLib})
 

@@ -26,7 +26,7 @@
 
 namespace kiwi
 {   
-    class LookAndFeel final : public juce::LookAndFeel_V3
+    class LookAndFeel final : public juce::LookAndFeel_V4
     {
     public: // methods
         
@@ -59,6 +59,14 @@ namespace kiwi
         void drawButtonBackground(juce::Graphics& g, juce::Button& b,
                                   juce::Colour const& bgcolor,
                                   bool mouse_over, bool mouse_down) override;
+        
+        //! @brief Custom Toolbar background drawing
+        void paintToolbarBackground(juce::Graphics& g, int w, int h, juce::Toolbar& toolbar) override;
+        
+        //! @brief Custom Toolbar Button background drawing
+        void paintToolbarButtonBackground(juce::Graphics& g, int /*width*/, int /*height*/,
+                                          bool isMouseOver, bool isMouseDown,
+                                          juce::ToolbarItemComponent& component) override;
         
     private: // deleted methods
         

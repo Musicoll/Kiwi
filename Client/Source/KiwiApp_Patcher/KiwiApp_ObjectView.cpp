@@ -465,6 +465,9 @@ namespace kiwi
         
         m_editor->setColour(juce::TextEditor::backgroundColourId,
                             juce::Colours::transparentWhite);
+        
+        m_editor->setColour(juce::TextEditor::textColourId,
+                            juce::Colours::black);
 
         m_editor->setScrollbarsShown(false);
         m_editor->setScrollToShowCursor(true);
