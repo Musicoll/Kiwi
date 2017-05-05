@@ -20,7 +20,6 @@
  */
 
 #include <cassert>
-#include <mutex>
 
 #include "KiwiApp_CarrierSocket.hpp"
 
@@ -33,9 +32,7 @@ namespace kiwi
     // ================================================================================ //
     
     CarrierSocket::CarrierSocket(flip::DocumentBase& document, std::string const& host, uint16_t port, uint64_t session_id):
-    m_transport_socket(document, session_id, host, port),
-    m_transport_loop(),
-    m_transport_running(false)
+    m_transport_socket(document, session_id, host, port)
     {
         bindCallBacks();
     }
@@ -46,11 +43,7 @@ namespace kiwi
         {
             case flip::CarrierBase::Transition::Disconnected:
             {
-                if (m_transport_socket.is_connected())
-                {
-                    stopProcess();
-                    m_func_disonnected();
-                }
+                if (m_func_disonnected) {m_func_disonnected();}
                 break;
             }
             case flip::CarrierBase::Transition::Connecting:
@@ -59,7 +52,7 @@ namespace kiwi
             }
             case flip::CarrierBase::Transition::Connected:
             {
-                m_func_connected();
+                if (m_func_connected){m_func_connected();}
                 break;
             }
         }
@@ -69,7 +62,7 @@ namespace kiwi
     {
         if (cur == total)
         {
-            m_func_loaded();
+            if (m_func_loaded){m_func_loaded();}
         }
     }
     
@@ -113,44 +106,13 @@ namespace kiwi
         m_func_loaded = func;
     }
     
-    void CarrierSocket::startProcess()
-    {
-        if (!m_transport_running.load())
-        {
-            m_transport_running.store(true);
-            m_transport_loop = std::move(std::thread(&CarrierSocket::runProcess, this));
-            m_transport_loop.detach();
-        }
-    }
-    
     void CarrierSocket::process()
     {
-        if (!m_transport_running.load())
-        {
-            m_transport_socket.process();
-        }
-    }
-    
-    void CarrierSocket::runProcess()
-    {
-        while(m_transport_running.load())
-        {
-            m_transport_socket.process();
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
-    }
-    
-    void CarrierSocket::stopProcess()
-    {
-        if (m_transport_running.load())
-        {
-            m_transport_running.store(false);
-        }
+        m_transport_socket.process();
     }
     
     void CarrierSocket::disconnect()
     {
-        stopProcess();
         m_transport_socket.rebind("", 0);
     }
     
@@ -161,7 +123,6 @@ namespace kiwi
     
     void CarrierSocket::connect(std::string const& host, uint16_t port)
     {
-        stopProcess();
         m_transport_socket.rebind(host, port);
     }
     

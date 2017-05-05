@@ -22,9 +22,7 @@
 #ifndef KIWI_APP_CARRIER_SOCKET_HPP_INCLUDED
 #define KIWI_APP_CARRIER_SOCKET_HPP_INCLUDED
 
-#include <thread>
 #include <functional>
-#include <atomic>
 
 #include "flip/contrib/transport_tcp/CarrierTransportSocketTcp.h"
 
@@ -51,14 +49,8 @@ namespace kiwi
         //! @brief Returns true if the socket is connected, false otherwise
         bool isConnected() const;
         
-        //! @brief Starts a thread that continuously process the socket
-        void startProcess();
-        
         //! @brief Process the socket once
         void process();
-        
-        //! @brief Stops the thread that processes the socket
-        void stopProcess();
         
         //! @brief Add a callback to be called once disconnected
         void listenDisconnected(std::function<void ()> func);
@@ -73,9 +65,6 @@ namespace kiwi
         ~CarrierSocket();
         
     private: // methods
-        
-        //! @brief Function called on the processing thread
-        void runProcess();
         
         //! @brief Binds the encapsulated socket callbacks
         void bindCallBacks();
@@ -95,8 +84,6 @@ namespace kiwi
     private: // members
         
         flip::CarrierTransportSocketTcp m_transport_socket;
-        std::thread                     m_transport_loop;
-        std::atomic_bool                m_transport_running;
         
         std::function<void(void)> m_func_disonnected;
         std::function<void(void)> m_func_connected;

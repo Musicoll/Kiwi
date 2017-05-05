@@ -173,15 +173,6 @@ namespace kiwi
         //! @brief Disconnects the document manager from the server
         void disconnect();
         
-        //! @brief Starts a timer callback on the message thread that that pulls
-        void startPulling();
-        
-        //! @brief Stops the pulling callback
-        void stopPulling();
-        
-        //! @brief Called once document manager is connected and starts pulling
-        void onConnected();
-        
         //! @brief Called once document manager is disconnected and stops pulling
         void onDisconnected();
         
@@ -205,7 +196,6 @@ namespace kiwi
         FileHandler                             m_file_handler;
         
         std::unique_ptr<CarrierSocket>          m_socket = nullptr;
-        std::atomic_bool                        m_loaded;
         
         bool                                    m_gesture_flag = false;
         size_t                                  m_gesture_cnt = 0;
