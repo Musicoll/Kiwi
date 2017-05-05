@@ -26,17 +26,10 @@ namespace bfonts = kiwi::binary_data::fonts;
 
 namespace kiwi
 {
-    LookAndFeel::LookAndFeel()
+    LookAndFeel::LookAndFeel() : juce::LookAndFeel_V4(getGreyColourScheme())
     {
-        setColour(juce::TooltipWindow::backgroundColourId, juce::Colours::lightgrey);
-        setColour(juce::TooltipWindow::textColourId, juce::Colour(0xff444444));
-        
-        // text editors
-        setColour(juce::TextEditor::highlightColourId, juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
-        setColour(juce::TextEditor::focusedOutlineColourId, juce::Colour::fromFloatRGBA(0.4, 0.4, 0.4, 0.6));
-        setColour(juce::TextEditor::outlineColourId, juce::Colour::fromFloatRGBA(0.6, 0.6, 0.6, 0.6));
-        
-        setColour(juce::TextButton::buttonColourId, juce::Colour(0xffdedede));
+        setColour(juce::ScrollBar::ColourIds::thumbColourId, juce::Colours::grey.withAlpha(0.7f));
+        setUsingNativeAlertWindows(true);
     }
     
     juce::Typeface::Ptr LookAndFeel::getTypefaceForFont(juce::Font const& font)
@@ -142,7 +135,10 @@ namespace kiwi
             g.fillPath(sortArrow, sortArrow.getTransformToScaleToFit(area.removeFromRight(height / 2).reduced (2).toFloat(), true));
         }
         
-        g.setColour(juce::Colours::whitesmoke);
+        g.setColour(getCurrentColourScheme()
+                    .getUIColour(juce::LookAndFeel_V4::ColourScheme::UIColour::windowBackground)
+                    .contrasting(0.9));
+        
         g.setFont(juce::Font(height * 0.5f, juce::Font::bold));
         g.drawFittedText(columnName, area, juce::Justification::centredLeft, 1);
     }
@@ -153,7 +149,9 @@ namespace kiwi
         
         const auto bdcolor = juce::Colours::black.withAlpha(0.5f);
         
-        g.setColour(juce::Colour(0xFF4E4E4E));
+        g.setColour(getCurrentColourScheme()
+                    .getUIColour(juce::LookAndFeel_V4::ColourScheme::UIColour::windowBackground));
+        
         g.fillRect(r);
         
         g.setColour(bdcolor);

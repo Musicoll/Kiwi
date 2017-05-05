@@ -221,7 +221,6 @@ namespace kiwi
         
         addAndMakeVisible(&patcherview.getViewport(), true);
         patcherview.updateWindowTitle();
-        patcherview.grabKeyboardFocus();
         
         KiwiApp::bindToCommandManager(this);
         KiwiApp::bindToKeyMapping(this);

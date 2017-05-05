@@ -26,7 +26,7 @@
 
 namespace kiwi
 {   
-    class LookAndFeel final : public juce::LookAndFeel_V3
+    class LookAndFeel final : public juce::LookAndFeel_V4
     {
     public: // methods
         

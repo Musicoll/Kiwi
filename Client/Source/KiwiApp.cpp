@@ -92,10 +92,7 @@ namespace kiwi
         
         juce::Desktop::getInstance().setGlobalScaleFactor(1.);
         
-        m_look = std::make_unique<LookAndFeel>();
-        
-        juce::LookAndFeel::setDefaultLookAndFeel(m_look.get());
-        juce::LookAndFeel::getDefaultLookAndFeel().setUsingNativeAlertWindows(true);
+        juce::LookAndFeel::setDefaultLookAndFeel(&m_looknfeel);
         
         m_command_manager = std::make_unique<juce::ApplicationCommandManager>();
         
@@ -220,6 +217,11 @@ namespace kiwi
     juce::MenuBarModel* KiwiApp::getMenuBarModel()
     {
         return KiwiApp::use().m_menu_model.get();
+    }
+    
+    LookAndFeel& KiwiApp::useLookAndFeel()
+    {
+        return KiwiApp::use().m_looknfeel;
     }
     
     // ================================================================================ //

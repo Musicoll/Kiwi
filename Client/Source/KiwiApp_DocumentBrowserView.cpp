@@ -25,6 +25,7 @@
 #include "KiwiApp_Instance.hpp"
 
 #include "KiwiApp_BinaryData.hpp"
+#include "KiwiApp.hpp"
 
 namespace kiwi
 {
@@ -118,6 +119,7 @@ namespace kiwi
         m_name_label.setSize(1, 1);
         m_name_label.setEditable(false, true, true);
         m_name_label.addListener(this);
+        m_name_label.setColour(juce::Label::textColourId, juce::Colours::black);
         m_name_label.setInterceptsMouseClicks(false, false);
         addAndMakeVisible(m_name_label);
     }
@@ -265,7 +267,9 @@ namespace kiwi
     
     void DocumentBrowserView::DriveView::Header::paint(juce::Graphics& g)
     {
-        const juce::Colour color(0xFF4E4E4E);
+        auto& lf = KiwiApp::useLookAndFeel();
+        const juce::Colour color = lf.getCurrentColourScheme().getUIColour(juce::LookAndFeel_V4::ColourScheme::UIColour::windowBackground);
+        
         g.fillAll(color);
         
         const auto bounds = getLocalBounds();

@@ -103,6 +103,9 @@ namespace kiwi
         //! @brief Returns the MenuBarModel.
         static juce::MenuBarModel* getMenuBarModel();
         
+        //! @brief Returns the application look and feel.
+        static LookAndFeel& useLookAndFeel();
+        
         // ================================================================================ //
         //                                      CONSOLE                                     //
         // ================================================================================ //
@@ -202,7 +205,7 @@ namespace kiwi
         std::unique_ptr<juce::ApplicationCommandManager>	m_command_manager;
         std::unique_ptr<MainMenuModel>                      m_menu_model;
         
-        std::unique_ptr<LookAndFeel>                        m_look;
+        LookAndFeel                                         m_looknfeel;
         juce::TooltipWindow                                 m_tooltip_window;
         std::unique_ptr<StoredSettings>                     m_settings;
     };

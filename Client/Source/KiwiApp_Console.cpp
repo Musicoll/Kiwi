@@ -72,7 +72,6 @@ namespace kiwi
         m_table.setRowHeight(m_font.getHeight() + 5);
         m_table.setColour(juce::ListBox::ColourIds::backgroundColourId, juce::Colours::transparentWhite);
         m_table.getViewport()->setScrollBarsShown(true, false, true, false);
-        m_table.getViewport()->setScrollBarThickness(10);
         m_table.setModel(this);
         m_table.setHeader(header);
         addAndMakeVisible(m_table);
@@ -460,10 +459,6 @@ namespace kiwi
         m_toolbar.setVertical(false);
         m_toolbar.setStyle(juce::Toolbar::ToolbarItemStyle::iconsOnly);
         m_toolbar.setColour(juce::Toolbar::ColourIds::backgroundColourId, juce::Colours::transparentBlack);
-        m_toolbar.setColour(juce::Toolbar::ColourIds::labelTextColourId, juce::Colours::whitesmoke);
-        m_toolbar.setColour(juce::Toolbar::ColourIds::buttonMouseOverBackgroundColourId, juce::Colour(0xff4a4a4a).contrasting(0.1));
-        m_toolbar.setColour(juce::Toolbar::ColourIds::buttonMouseDownBackgroundColourId, juce::Colour(0xff4a4a4a).contrasting(0.2));
-        
         addAndMakeVisible(m_toolbar);
         
         // And use our item factory to add a set of default icons to it...
@@ -483,7 +478,9 @@ namespace kiwi
         const int toolbar_size = 40;
         const auto header_bounds = getLocalBounds().withTop(getHeight() - toolbar_size);
         
-        g.setColour(juce::Colour(0xff4a4a4a));
+        auto& lf = KiwiApp::useLookAndFeel();
+        g.setColour(lf.getCurrentColourScheme()
+                    .getUIColour(juce::LookAndFeel_V4::ColourScheme::UIColour::windowBackground));
         g.fillRect(header_bounds);
     }
     
