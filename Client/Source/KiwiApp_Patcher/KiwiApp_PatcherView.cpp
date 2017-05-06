@@ -1918,9 +1918,19 @@ namespace kiwi
             model::Object& new_object_m = createObjectModel(new_object_text);
 
             const std::string new_object_name = new_object_m.getName();
-            const std::string new_object_text = new_object_m.getText();
-            
-            int text_width = juce::Font().getStringWidth(new_object_text);
+
+            const std::string new_object_text = [&new_object_name](std::string text){
+                
+                if(new_object_name == "errorbox")
+                {
+                    text.erase(text.begin(), text.begin()+9);
+                }
+                
+                return text;
+                
+            }(new_object_m.getText());
+
+            const int text_width = juce::Font().getStringWidth(new_object_text);
             
             const juce::Point<int> origin = getOriginPosition();
             juce::Rectangle<int> box_bounds = box.getBoxBounds();
