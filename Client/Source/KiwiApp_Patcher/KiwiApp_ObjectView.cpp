@@ -85,7 +85,7 @@ namespace kiwi
         const auto box_bounds = m_local_box_bounds;
         
         const juce::Colour selection_color = juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.8);
-        const juce::Colour other_view_selected_color = juce::Colour::fromFloatRGBA(0.8, 0.3, 0.3, 0.3);
+        const juce::Colour other_view_selected_color(0xAA9BFF71);
         const juce::Colour distant_selected_color(0xAAFF9B71);
         
         const juce::Colour errorbox_overlay_color = juce::Colour::fromFloatRGBA(0.6, 0.1, 0.1, 0.4);
@@ -373,7 +373,7 @@ namespace kiwi
     }
     
     juce::Rectangle<int> ObjectView::getOutletLocalBounds(const size_t index,
-                                                       juce::Rectangle<int> const& object_bounds) const
+                                                          juce::Rectangle<int> const& object_bounds) const
     {
         juce::Rectangle<int> rect;
         
@@ -401,10 +401,7 @@ namespace kiwi
     void ObjectView::lockStatusChanged(bool locked)
     {
         m_is_locked = locked;
-        
         setInterceptsMouseClicks(locked, locked);
-        //setWantsKeyboardFocus(locked);
-        //setMouseClickGrabsKeyboardFocus(locked);
     }
     
     void ObjectView::patcherViewOriginPositionChanged()
