@@ -55,7 +55,7 @@ namespace kiwi
         }
         
         template<class Clock>
-        Scheduler<Clock>& Scheduler<Clock>::getInstance()
+        Scheduler<Clock>& Scheduler<Clock>::use()
         {
             assert(m_instance != nullptr);
             return *m_instance;
@@ -100,11 +100,9 @@ namespace kiwi
             
             time_point_t process_time = clock_t::now();
             
-            for(typename std::map<thread_token, Queue>::iterator queue = m_queues[consumer].begin();
-                queue != m_queues[consumer].end();
-                ++queue)
+            for(auto& queue : m_queues[consumer])
             {
-                queue->second.process(process_time);
+                queue.second.process(process_time);
             }
         }
         
@@ -126,32 +124,23 @@ namespace kiwi
         template<class Clock>
         void Scheduler<Clock>::Queue::schedule(Task * task, duration_t delay)
         {
-            Command command {task->m_event, clock_t::now() + delay };
-            m_commands.push(command);
+            m_commands.push({task->m_event, clock_t::now() + delay });
         }
         
         template<class Clock>
         void Scheduler<Clock>::Queue::unschedule(Task * task)
         {
-            Command command {task->m_event, clock_t::time_point::max()};
-            m_commands.push(command);
+            m_commands.push({task->m_event, clock_t::time_point::max()});
         }
         
         template<class Clock>
         void Scheduler<Clock>::Queue::remove(std::shared_ptr<Event> const& event)
         {
-            typename std::vector<std::shared_ptr<Event>>::iterator event_it = m_events.begin();
-            
-            while(event_it != m_events.end())
-            {
-                if ((*event_it) == event)
-                {
-                    m_events.erase(event_it);
-                    break;
-                }
+            m_events.erase(std::remove_if(m_events.begin(), m_events.end(), [&event](auto& e) {
                 
-                ++event_it;
-            }
+                return e == event;
+                
+            }), m_events.end());
         }
     
         template<class Clock>
@@ -200,20 +189,17 @@ namespace kiwi
                 }
             }
             
-            typename std::vector<std::shared_ptr<Event>>::iterator event = m_events.begin();
-            
-            while(event != m_events.end())
-            {
-                if ((*event)->m_time <= process_time)
+            m_events.erase(std::remove_if(m_events.begin(), m_events.end(), [&process_time](auto& event) {
+                
+                if (event->m_time <= process_time)
                 {
-                    (*event)->execute();
-                    m_events.erase(event);
+                    event->execute();
+                    return true;
                 }
-                else
-                {
-                    break;
-                }
-            }
+                
+                return false;
+                
+            }), m_events.end());
         }
         
         // ==================================================================================== //
@@ -226,7 +212,7 @@ namespace kiwi
         m_consumer(consumer),
         m_event(new Event(this, time_point_t::max()))
         {
-            Scheduler& scheduler = Scheduler::getInstance();
+            Scheduler& scheduler = Scheduler::use();
             
             assert(scheduler.m_queues.find(consumer) != scheduler.m_queues.end() &&
                    scheduler.m_queues[consumer].find(producer) != scheduler.m_queues[consumer].end());
@@ -287,7 +273,7 @@ namespace kiwi
             stopTimer();
             
             m_period = period;
-            Scheduler::getInstance().schedule(m_task.get(), m_period);
+            Scheduler::use().schedule(m_task.get(), m_period);
         }
         
         template<class Clock>
@@ -295,13 +281,13 @@ namespace kiwi
         {
             timerCallBack();
             
-            Scheduler::getInstance().schedule(m_task.get(), m_period);
+            Scheduler::use().schedule(m_task.get(), m_period);
         }
         
         template<class Clock>
         void Scheduler<Clock>::Timer::stopTimer()
         {
-            Scheduler::getInstance().unschedule(m_task.get());
+            Scheduler::use().unschedule(m_task.get());
         }
         
         // ==================================================================================== //
@@ -312,7 +298,7 @@ namespace kiwi
         Scheduler<Clock>::Lock::Lock(thread_token consumer):
         m_consumer(consumer)
         {
-            Scheduler& scheduler = Scheduler::getInstance();
+            Scheduler& scheduler = Scheduler::use();
             
             for (auto & queue : scheduler.m_queues[m_consumer])
             {
@@ -323,7 +309,7 @@ namespace kiwi
         template<class Clock>
         Scheduler<Clock>::Lock::~Lock()
         {
-            Scheduler& scheduler = Scheduler::getInstance();
+            Scheduler& scheduler = Scheduler::use();
             
             for (auto & queue : scheduler.m_queues[m_consumer])
             {

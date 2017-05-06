@@ -77,7 +77,7 @@ namespace kiwi
             
             //! @brief Retrieves the instance created with createInstance.
             //! @details Fails if createInstance was not called previously.
-            static Scheduler& getInstance();
+            static Scheduler& use();
             
             //! @brief Destroys the instance previously created.
             //! @details Call this method once caller is done using the scheduler.
@@ -204,7 +204,7 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            //! @details A certain task is designed to be scheduled on only one pair of prodcuer/consumer.
+            //! @details A certain task is designed to be scheduled on only one pair of producer/consumer.
             Task(thread_token producer, thread_token consumer);
             
             //! @brief Destructor.

@@ -239,7 +239,7 @@ namespace kiwi
             if (!args.empty())
             {
                 Task* task = new Task(*this, args);
-                Scheduler<>::getInstance().schedule(task, std::chrono::milliseconds(0));
+                Scheduler<>::use().schedule(task, std::chrono::milliseconds(0));
                 m_tasks.insert(std::unique_ptr<Task>(task));
             }
         }
@@ -269,31 +269,20 @@ namespace kiwi
         //                                     OBJECT DELAY                                 //
         // ================================================================================ //
         
-        class Delay::Task final : public Scheduler<>::Task
+        Delay::Task::Task(Delay& object):
+        Scheduler<>::Task(Thread::Engine, Thread::Engine),
+        m_object(object)
         {
-        public:
-            
-            Task(Delay & object):
-            Scheduler<>::Task(Thread::Engine, Thread::Engine),
-            m_object(object)
-            {
-            }
-            
-            ~Task() =  default;
-            
-            void execute()
-            {
-                m_object.send(0, {"bang"});
-            }
-            
-        private:
-            
-            Delay& m_object;
-        };
+        }
+        
+        void Delay::Task::execute()
+        {
+            m_object.send(0, {"bang"});
+        }
         
         Delay::Delay(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
         Object(model, patcher),
-        m_task(new Task(*this)),
+        m_task(*this),
         m_delay(std::chrono::milliseconds(0))
         {
             if (!args.empty())
@@ -314,11 +303,11 @@ namespace kiwi
                 {
                     if(args[0].isString() && args[0].getString() == "bang")
                     {
-                        Scheduler<>::getInstance().schedule(m_task.get(), m_delay);
+                        Scheduler<>::use().schedule(&m_task, m_delay);
                     }
                     else if(args[0].isString() && args[0].getString() == "stop")
                     {
-                        Scheduler<>::getInstance().unschedule(m_task.get());
+                        Scheduler<>::use().unschedule(&m_task);
                     }
                 }
                 else if(index == 1)
@@ -390,15 +379,12 @@ namespace kiwi
                 if (index == 0)
                 {
                     Task* task = new Task(*this, args);
-                    Scheduler<>::getInstance().schedule(task, m_delay);
+                    Scheduler<>::use().schedule(task, m_delay);
                     m_tasks.insert(std::unique_ptr<Task>(task));
                 }
-                else if(index == 1)
+                else if(index == 1 && args[0].isNumber())
                 {
-                    if (args[0].isNumber())
-                    {
-                        m_delay = std::chrono::milliseconds(args[0].getInt());
-                    }
+                    m_delay = std::chrono::milliseconds(args[0].getInt());
                 }
             }
         }
@@ -428,11 +414,13 @@ namespace kiwi
             {
                 if (index == 0)
                 {
-                    if (args[0].isString() && args[0].getString() == "start")
+                    if((args[0].isString() && args[0].getString() == "start")
+                       || (args[0].isNumber() && static_cast<bool>(args[0].getInt())))
                     {
                         startTimer(m_period);
                     }
-                    else if(args[0].isString() && args[0].getString() == "stop")
+                    else if((args[0].isString() && args[0].getString() == "stop")
+                            || (args[0].isNumber() && !static_cast<bool>(args[0].getInt())))
                     {
                         stopTimer();
                     }

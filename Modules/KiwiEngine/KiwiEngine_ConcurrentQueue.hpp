@@ -56,12 +56,22 @@ namespace kiwi
             //! @brief Destructor.
             ~ConcurrentQueue() = default;
             
-            //! @brief Pushes element at end of queue.
+            //! @brief Pushes element at end of queue (by copy).
             //! @details If number of elements exceeds capacity allocation will occur.
             //! Increments element counter.
             void push(T const& value)
             {
                 m_queue.enqueue(value);
+                
+                std::atomic_fetch_add(&m_size, 1);
+            }
+            
+            //! @brief Pushes element at end of queue (by move).
+            //! @details If number of elements exceeds capacity allocation will occur.
+            //! Increments element counter.
+            void push(T&& value)
+            {
+                m_queue.enqueue(std::forward<T>(value));
                 
                 std::atomic_fetch_add(&m_size, 1);
             }

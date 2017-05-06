@@ -198,7 +198,7 @@ namespace kiwi
     {
         while(!m_quit_requested.load())
         {
-            engine::Scheduler<>::getInstance().process(Thread::Engine);
+            engine::Scheduler<>::use().process(Thread::Engine);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }

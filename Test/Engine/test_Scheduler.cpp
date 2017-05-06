@@ -101,7 +101,7 @@ TEST_CASE("Scheduler", "[Scheduler]")
 {
     Scheduler::createInstance();
     
-    Scheduler& sch = Scheduler::getInstance();
+    Scheduler& sch = Scheduler::use();
     
     sch.registerConsumer(Thread::Engine);
     
@@ -165,7 +165,7 @@ TEST_CASE("Scheduler", "[Scheduler]")
         TickClock::start();
         
         engine::Scheduler<TickClock>::createInstance();
-        engine::Scheduler<TickClock>& tick_scheduler = engine::Scheduler<TickClock>::getInstance();
+        engine::Scheduler<TickClock>& tick_scheduler = engine::Scheduler<TickClock>::use();
         
         tick_scheduler.registerConsumer(Thread::Engine);
         tick_scheduler.registerProducer(Thread::Engine, Thread::Engine);
@@ -291,7 +291,7 @@ void construct_delay_list(std::vector<size_t> &delay_list, size_t size)
 
 TEST_CASE("Scheduler Benchmark", "[Scheduler]")
 {
-    Scheduler& sch = Scheduler::getInstance();
+    Scheduler& sch = Scheduler::use();
     
     SECTION("Benchmark no delay MonoProducer")
     {

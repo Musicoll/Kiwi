@@ -57,16 +57,15 @@ namespace kiwi
             
             std::shared_ptr<dsp::Processor> processor = std::dynamic_pointer_cast<AudioObject>(object);
             
-            if (processor)
+            if(processor)
             {
-                m_chain.addProcessor(processor);
+                m_chain.addProcessor(std::move(processor));
             }
         }
         
         void Patcher::removeObject(uint64_t object_id)
         {
-            std::shared_ptr<dsp::Processor> processor =
-                std::dynamic_pointer_cast<AudioObject>(m_objects[object_id]);
+            auto processor = std::dynamic_pointer_cast<AudioObject>(m_objects[object_id]);
             
             if (processor)
             {
@@ -252,9 +251,7 @@ namespace kiwi
 
         void Patcher::objectAdded(model::Object& object_m)
         {
-            std::shared_ptr<Object> object = Factory::create(*this, object_m);
-            
-            addObject(object_m.ref().obj(), object);
+            addObject(object_m.ref().obj(), Factory::create(*this, object_m));
         }
 
         void Patcher::objectRemoved(model::Object& object_m)

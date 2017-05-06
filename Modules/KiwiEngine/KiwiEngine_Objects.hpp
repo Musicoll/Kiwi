@@ -167,10 +167,6 @@ namespace kiwi
         
         class Delay final : public engine::Object
         {
-        public: // classes
-            
-            class Task;
-            
         public: // methods
             
             Delay(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
@@ -181,7 +177,17 @@ namespace kiwi
             
         private: // members
             
-            std::unique_ptr<Task>           m_task;
+            struct Task final : public Scheduler<>::Task
+            {
+                Task(Delay & object);
+                ~Task() = default;
+                void execute() override;
+                
+            private:
+                Delay& m_object;
+            };
+            
+            Task                            m_task;
             Scheduler<>::clock_t::duration  m_delay;
         };
         
