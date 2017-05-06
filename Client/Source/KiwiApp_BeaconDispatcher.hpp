@@ -28,14 +28,107 @@
 
 namespace kiwi
 {
+    class BeaconDispatcher;
+    
     // ================================================================================ //
     //                                  BEACON DISPATCHER                               //
     // ================================================================================ //
     
     //! @brief A Component that allows to dispatch messages to Beacon::Castaway objects.
-    class BeaconDispatcher : public juce::Component, public juce::Button::Listener, juce::Slider::Listener
+    class BeaconDispatcherElem : public juce::Component, public juce::Button::Listener, juce::Slider::Listener
     {
-    public:
+    public: // methods
+        
+        //! @brief Constructor.
+        BeaconDispatcherElem(engine::Instance& instance);
+        
+        //! @brief Destructor.
+        ~BeaconDispatcherElem();
+        
+        //! @brief Called when resized.
+        void resized() override;
+        
+        //! @brief juce::Component.
+        void paint(juce::Graphics& g) override;
+        
+        //! @brief Called when the button is clicked.
+        void buttonClicked(juce::Button*) override;
+        
+        //! @brief Set the background colour.
+        void setBackgroundColor(juce::Colour const& color);
+        
+        void restoreState(juce::XmlElement* saved_state);
+        
+        void saveState(juce::XmlElement* saved_state);
+    
+    private: // methods
+        
+        class TextValueComponent : public juce::Component, public juce::Button::Listener
+        {
+        public:
+            TextValueComponent(BeaconDispatcherElem& owner);
+            ~TextValueComponent();
+            
+            void buttonClicked(juce::Button*) override;
+            void resized() override;
+            
+        private:
+            BeaconDispatcherElem& m_owner;
+            juce::TextEditor m_message_editor;
+            juce::TextButton m_send_button;
+        };
+        
+        //! @brief dispatch message to castaways
+        void sendValue(std::vector<Atom> const& args) const;
+        
+        //! @brief dispatch message to castaways
+        void send(std::string const& name, std::vector<Atom> const& args) const;
+        
+        //! @brief Called when a slider value changed.
+        void sliderValueChanged(juce::Slider* slider) override;
+        
+    private: // members
+        
+        engine::Instance&       m_instance;
+        juce::TextEditor        m_beacon_name_editor;
+        TextValueComponent      m_text_value;
+        juce::Slider            m_message_slider;
+        juce::ToggleButton      m_toggle_value;
+        juce::TabbedComponent   m_message_tab;
+        
+        juce::Colour            m_bgcolor;
+    };
+    
+    // ================================================================================ //
+    //                                   CONSOLE TOOLBAR                                //
+    // ================================================================================ //
+    
+    class BeaconDispatcherToolbarFactory : public juce::ToolbarItemFactory
+    {
+    public: // methods
+        
+        //! @brief Constructor.
+        BeaconDispatcherToolbarFactory();
+        
+        enum ItemIds
+        {
+            addItem     = 1,
+            removeItem  = 2,
+        };
+        
+        void getAllToolbarItemIds(juce::Array<int>& ids) override;
+        void getDefaultItemSet(juce::Array<int>& ids) override;
+        
+        juce::ToolbarItemComponent* createItem(int itemId) override;
+    };
+    
+    // ================================================================================ //
+    //                                  BEACON DISPATCHER                               //
+    // ================================================================================ //
+    
+    class BeaconDispatcher : public juce::Component, public juce::ApplicationCommandTarget
+    {
+    public: // methods
         
         //! @brief Constructor.
         BeaconDispatcher(engine::Instance& instance);
@@ -46,28 +139,33 @@ namespace kiwi
         //! @brief Called when resized.
         void resized() override;
         
-        //! @brief Called when the button is clicked.
-        void buttonClicked(juce::Button*) override;
-    
-    private: // methods
+        void addElem();
         
-        //! @brief dispatch message to castaways
-        void send(std::string const& name, std::vector<Atom> const& args) const;
+        void removeElem();
         
-        //! @brief Called when a slider value changed.
-        void sliderValueChanged(juce::Slider* slider) override;
+        bool restoreState();
         
-    private: // members
+        void saveState();
         
-        engine::Instance&   m_instance;
-        juce::TextEditor    m_beacon_name_editor, m_message_editor;
-        juce::Label         m_beacon_name_label, m_message_label;
+        // ================================================================================ //
+        //                              APPLICATION COMMAND TARGET                          //
+        // ================================================================================ //
         
-        juce::Slider        m_message_slider;
+        juce::ApplicationCommandTarget* getNextCommandTarget() override;
+        void getAllCommands(juce::Array<juce::CommandID>& commands) override;
+        void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
+        bool perform(const InvocationInfo& info) override;
         
-        juce::TextButton    m_send_button;
+    private: // variables
+        
+        void updateLayout();
+        
+        engine::Instance&                                   m_instance;
+        std::vector<std::unique_ptr<BeaconDispatcherElem>>  m_components;
+        juce::Toolbar                                       m_toolbar;
+        BeaconDispatcherToolbarFactory                      m_toolbar_factory;
+        int                                                 m_elem_height = 100;
     };
 }
-
 
 #endif // KIWI_APP_BEACON_DISPATCHER_HPP_INCLUDED

@@ -92,6 +92,9 @@ namespace kiwi
             extern char const* locked_png;
             const int locked_png_size = 6215;
 
+            extern char const* minus_png;
+            const int minus_png_size = 5162;
+
             extern char const* open_png;
             const int open_png_size = 1100;
 

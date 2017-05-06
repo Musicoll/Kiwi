@@ -47,6 +47,8 @@ namespace kiwi
         showAppSettingsWindow       = 0x202030,        ///< Make visible the "application settings" window.
         showDocumentBrowserWindow   = 0x202040,        ///< Make visible the "document browser" window.
         showBeaconDispatcherWindow  = 0x202050,        ///< Make visible the "beacon dispatcher" window.
+        addBeaconDispatcher         = 0x202051,        ///< Add a new "beacon dispatcher" element.
+        removeBeaconDispatcher      = 0x202052,        ///< Add a new "beacon dispatcher" element.
         
         undo                        = 0xf1000a,        ///< Undo last action.
         redo                        = 0xf1000b,        ///< Redo last action.
