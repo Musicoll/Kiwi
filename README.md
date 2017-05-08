@@ -60,16 +60,21 @@ $ ./Server -f ./config/dev.json
 
 #### (Re)generate binary data
 
-You can generate binary data for ressources with the `Config/ressource.py` script.  
-This script takes 2 required arguments:
- - `-i / --input` : The ressources input directory
- - `-o / --output` : The output directory in which the binary data files will be generated.
+You can generate binary data for ressources with the `Config/ressource.py` script.
+This script takes 2 optional arguments:
+ - `-i / --input` : The ressources input directory ("./Ressources/BinaryRes" by default).
+ - `-o / --output` : The output directory in which the binary data files will be generated ("./Client/Source/KiwiApp_Ressources" by default).
 
  ex:
 
  ```sh
  $ cd {kiwi_directory_path}
- $ python ./Config/ressource.py -i ./Ressources/BinaryRes -o ./Client/Source
+
+ # with default paths:
+ $ python ./Config/ressource.py
+
+ # or with custom paths
+ $ python ./Config/ressource.py -i input/ressources/path -o output/binary/path
  ```
 
 ### Credits:

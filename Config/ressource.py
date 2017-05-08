@@ -18,6 +18,8 @@ if sys.version_info[0] != 2 or sys.version_info[1] < 7:
 #==============================================================================
 
 tab_count = 0
+DEFAULT_INPUT_PATH = "./Ressources/BinaryRes"
+DEFAULT_OUTPUT_PATH = "./Client/Source/KiwiApp_Ressources"
 
 #==============================================================================
 # Name : parse_args
@@ -25,13 +27,17 @@ tab_count = 0
 
 def parse_args ():
 
-    arg_parser = argparse.ArgumentParser ()
+    arg_parser = argparse.ArgumentParser()
 
-    arg_parser.add_argument('-o', '--output', required=True, help="output directory for generated files")
+    arg_parser.add_argument('-i', '--input',
+                            nargs='?', const=DEFAULT_INPUT_PATH, default=DEFAULT_INPUT_PATH, type=str,
+                            help="input directory in which to search ressources")
 
-    arg_parser.add_argument('-i', '--input', required=True, help="input directory in which to search ressources")
+    arg_parser.add_argument('-o', '--output',
+                            nargs='?', const=DEFAULT_OUTPUT_PATH, default=DEFAULT_OUTPUT_PATH, type=str,
+                            help="output directory for generated files")
 
-    return arg_parser.parse_args (sys.argv[1:])
+    return arg_parser.parse_args(sys.argv[1:])
 
 #==============================================================================
 # Name : tabulate
