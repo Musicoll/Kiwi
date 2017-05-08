@@ -19,11 +19,12 @@
  ==============================================================================
  */
 
-#include "KiwiApp_DspDeviceManager.hpp"
-#include "KiwiApp_StoredSettings.hpp"
-#include "KiwiApp.hpp"
-
 #include <juce_audio_utils/juce_audio_utils.h>
+
+#include "KiwiApp_DspDeviceManager.hpp"
+
+#include "../KiwiApp_General/KiwiApp_StoredSettings.hpp"
+#include "../KiwiApp.hpp"
 
 namespace kiwi
 {

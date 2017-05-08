@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "../KiwiApp_Window.hpp"
+#include "../KiwiApp_Components/KiwiApp_Window.hpp"
 #include "KiwiApp_PatcherManager.hpp"
 
 namespace kiwi

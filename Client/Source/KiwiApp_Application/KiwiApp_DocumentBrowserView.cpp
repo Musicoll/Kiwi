@@ -24,8 +24,8 @@
 #include "KiwiApp_DocumentBrowserView.hpp"
 #include "KiwiApp_Instance.hpp"
 
-#include "KiwiApp_BinaryData.hpp"
-#include "KiwiApp.hpp"
+#include "../KiwiApp_Ressources/KiwiApp_BinaryData.hpp"
+#include "../KiwiApp.hpp"
 
 namespace kiwi
 {

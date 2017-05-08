@@ -28,7 +28,7 @@
 
 #include "KiwiApp_Api.hpp"
 
-#include "../KiwiApp_StoredSettings.hpp"
+#include "../KiwiApp_General/KiwiApp_StoredSettings.hpp"
 
 namespace kiwi
 {

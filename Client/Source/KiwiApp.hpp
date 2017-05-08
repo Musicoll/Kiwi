@@ -27,10 +27,9 @@
 
 #include <KiwiEngine/KiwiEngine_Scheduler.h>
 
-#include "KiwiApp_Instance.hpp"
-#include "KiwiApp_StoredSettings.hpp"
-
-#include "KiwiApp_LookAndFeel.hpp"
+#include "KiwiApp_Application/KiwiApp_Instance.hpp"
+#include "KiwiApp_General/KiwiApp_StoredSettings.hpp"
+#include "KiwiApp_General/KiwiApp_LookAndFeel.hpp"
 
 namespace ProjectInfo
 {

@@ -23,8 +23,8 @@
 
 #include <KiwiEngine/KiwiEngine_Listeners.hpp>
 
-#include "KiwiApp_Network/KiwiApp_DocumentBrowser.hpp"
-#include "KiwiApp_Components/KiwiApp_ImageButton.hpp"
+#include "../KiwiApp_Network/KiwiApp_DocumentBrowser.hpp"
+#include "../KiwiApp_Components/KiwiApp_ImageButton.hpp"
 
 namespace kiwi
 {

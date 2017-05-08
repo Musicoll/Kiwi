@@ -21,19 +21,17 @@
 
 #include <juce_audio_utils/juce_audio_utils.h>
 
-#include "KiwiApp.hpp"
 #include "KiwiApp_Instance.hpp"
-#include "KiwiApp_Patcher/KiwiApp_PatcherView.hpp"
+#include "KiwiApp_AboutWindow.hpp"
 
-#include "KiwiApp_Network/KiwiApp_DocumentManager.hpp"
+#include "../KiwiApp.hpp"
+#include "../KiwiApp_Network/KiwiApp_DocumentManager.hpp"
+#include "../KiwiApp_Components/KiwiApp_Window.hpp"
+#include "../KiwiApp_Patcher/KiwiApp_PatcherView.hpp"
+#include "../KiwiApp_Patcher/KiwiApp_PatcherComponent.hpp"
 
 #include <cstdlib>
 #include <ctime>
-
-#include "KiwiApp_Window.hpp"
-#include "KiwiApp_AboutWindow.hpp"
-
-#include "KiwiApp_Patcher/KiwiApp_PatcherComponent.hpp"
 
 namespace kiwi
 {

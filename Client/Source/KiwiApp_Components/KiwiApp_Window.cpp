@@ -21,9 +21,9 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include "KiwiApp.hpp"
+#include "../KiwiApp.hpp"
 #include "KiwiApp_Window.hpp"
-#include "KiwiApp_CommandIDs.hpp"
+#include "../KiwiApp_General/KiwiApp_CommandIDs.hpp"
 
 namespace kiwi
 {

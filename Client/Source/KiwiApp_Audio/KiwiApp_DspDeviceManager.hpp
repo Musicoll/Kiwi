@@ -21,13 +21,13 @@
 
 #pragma once
 
-#include "KiwiApp_Window.hpp"
-
 #include <KiwiDsp/KiwiDsp_Signal.hpp>
 #include <KiwiDsp/KiwiDsp_Chain.hpp>
 #include <KiwiEngine/KiwiEngine_AudioControler.hpp>
 
 #include <juce_audio_devices/juce_audio_devices.h>
+
+#include "../KiwiApp_Components/KiwiApp_Window.hpp"
 
 namespace kiwi
 {

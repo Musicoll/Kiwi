@@ -21,10 +21,10 @@
 
 #include "KiwiApp_BeaconDispatcher.hpp"
 
-#include "KiwiApp.hpp"
-#include "KiwiApp_BinaryData.hpp"
-#include "KiwiApp_CommandIDs.hpp"
-#include "KiwiApp_StoredSettings.hpp"
+#include "../KiwiApp.hpp"
+#include "../KiwiApp_Ressources/KiwiApp_BinaryData.hpp"
+#include "../KiwiApp_General/KiwiApp_CommandIDs.hpp"
+#include "../KiwiApp_General/KiwiApp_StoredSettings.hpp"
 
 namespace kiwi
 {

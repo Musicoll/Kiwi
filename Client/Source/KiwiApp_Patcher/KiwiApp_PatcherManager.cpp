@@ -27,7 +27,7 @@
 #include "KiwiApp_PatcherManager.hpp"
 
 #include "../KiwiApp.hpp"
-#include "../KiwiApp_Instance.hpp"
+#include "../KiwiApp_Application/KiwiApp_Instance.hpp"
 #include "../KiwiApp_Network/KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_PatcherView.hpp"
 #include "KiwiApp_PatcherComponent.hpp"

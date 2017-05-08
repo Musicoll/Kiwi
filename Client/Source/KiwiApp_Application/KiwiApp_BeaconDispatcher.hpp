@@ -23,7 +23,7 @@
 
 #include <KiwiEngine/KiwiEngine_Instance.hpp>
 
-#include "KiwiApp_Window.hpp"
+#include "../KiwiApp_Components/KiwiApp_Window.hpp"
 
 namespace kiwi
 {

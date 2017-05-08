@@ -22,10 +22,9 @@
 #include "KiwiApp_PatcherComponent.hpp"
 #include "KiwiApp_PatcherView.hpp"
 
-#include "../KiwiApp_BinaryData.hpp"
+#include "../KiwiApp_Ressources/KiwiApp_BinaryData.hpp"
 #include "../KiwiApp.hpp"
-#include "../KiwiApp_CommandIDs.hpp"
-
+#include "../KiwiApp_General/KiwiApp_CommandIDs.hpp"
 #include "../KiwiApp_Components/KiwiApp_CustomToolbarButton.hpp"
 
 namespace kiwi

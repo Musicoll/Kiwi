@@ -24,12 +24,11 @@
 #include "KiwiApp_PatcherView.hpp"
 
 #include "../KiwiApp.hpp"
-#include "../KiwiApp_CommandIDs.hpp"
+#include "../KiwiApp_General/KiwiApp_CommandIDs.hpp"
 #include "../KiwiApp_Network/KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_PatcherViewHelper.hpp"
 #include "KiwiApp_ObjectView.hpp"
 #include "KiwiApp_LinkView.hpp"
-
 #include "KiwiApp_PatcherComponent.hpp"
 
 namespace kiwi

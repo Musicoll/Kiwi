@@ -23,7 +23,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include "KiwiApp_Window.hpp"
+#include "../KiwiApp_Components/KiwiApp_Window.hpp"
 #include "KiwiApp_ConsoleHistory.hpp"
 
 namespace kiwi

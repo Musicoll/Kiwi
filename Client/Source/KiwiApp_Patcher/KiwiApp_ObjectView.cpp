@@ -27,7 +27,7 @@
 #include "KiwiApp_ObjectView.hpp"
 #include "KiwiApp_PatcherViewHelper.hpp"
 #include "KiwiApp_PatcherView.hpp"
-#include "../KiwiApp_BinaryData.hpp"
+#include "../KiwiApp_Ressources/KiwiApp_BinaryData.hpp"
 
 namespace kiwi
 {
