@@ -20,6 +20,7 @@
  */
 
 #include <KiwiModel/KiwiModel_PatcherView.hpp>
+#include <KiwiModel/KiwiModel_Objects.hpp>
 
 #include "../KiwiApp.hpp"
 #include "../KiwiApp_Network/KiwiApp_DocumentManager.hpp"

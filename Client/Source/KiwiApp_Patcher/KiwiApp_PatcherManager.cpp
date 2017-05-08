@@ -19,16 +19,17 @@
  ==============================================================================
  */
 
-#include "KiwiApp_PatcherManager.hpp"
+#include <KiwiModel/KiwiModel_DataModel.hpp>
 
 #include <KiwiEngine/KiwiEngine_Patcher.hpp>
 #include <KiwiEngine/KiwiEngine_Instance.hpp>
+
+#include "KiwiApp_PatcherManager.hpp"
 
 #include "../KiwiApp.hpp"
 #include "../KiwiApp_Instance.hpp"
 #include "../KiwiApp_Network/KiwiApp_DocumentManager.hpp"
 #include "KiwiApp_PatcherView.hpp"
-
 #include "KiwiApp_PatcherComponent.hpp"
 
 namespace kiwi

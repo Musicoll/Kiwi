@@ -19,6 +19,8 @@
  ==============================================================================
  */
 
+#include <KiwiModel/KiwiModel_Objects.hpp>
+
 #include "KiwiApp_PatcherView.hpp"
 
 #include "../KiwiApp.hpp"

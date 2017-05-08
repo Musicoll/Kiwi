@@ -20,7 +20,6 @@
  */
 
 #include "KiwiModel_Factory.hpp"
-#include "KiwiModel_Objects.hpp"
 
 namespace kiwi
 {

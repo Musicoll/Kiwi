@@ -22,6 +22,7 @@
 #include "KiwiModel_DataModel.hpp"
 #include "KiwiModel_PatcherUser.hpp"
 #include "KiwiModel_PatcherUser.hpp"
+#include "KiwiModel_Factory.hpp"
 
 namespace kiwi
 {
