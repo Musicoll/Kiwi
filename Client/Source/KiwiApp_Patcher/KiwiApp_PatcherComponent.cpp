@@ -3,9 +3,9 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of the GPL v2
+ Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -34,9 +34,8 @@ namespace kiwi
     //                            PATCHER COMPONENT TOOLBAR                             //
     // ================================================================================ //
     
-    PatcherToolbar::PatcherToolbar(PatcherManager& patcher_manager, PatcherView& patcher_view) :
+    PatcherToolbar::PatcherToolbar(PatcherManager& patcher_manager) :
     m_patcher_manager(patcher_manager),
-    m_patcher_view(patcher_view),
     m_factory(m_patcher_manager)
     {
         m_toolbar.setVertical(false);
@@ -223,7 +222,7 @@ namespace kiwi
     PatcherComponent::PatcherComponent(PatcherView& patcherview) :
     m_patcher_manager(patcherview.usePatcherManager()),
     m_patcherview(patcherview),
-    m_toolbar(m_patcher_manager, m_patcherview)
+    m_toolbar(m_patcher_manager)
     {
         setSize(600, 400);
         

@@ -3,9 +3,9 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of the GPL v2
+ Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -19,8 +19,7 @@
  ==============================================================================
  */
 
-#ifndef KIWI_APP_PATCHER_COMPONENT_HPP_INCLUDED
-#define KIWI_APP_PATCHER_COMPONENT_HPP_INCLUDED
+#pragma once
 
 #include "../KiwiApp_Window.hpp"
 #include "KiwiApp_PatcherManager.hpp"
@@ -36,7 +35,7 @@ namespace kiwi
     public: // methods
         
         //! @brief Constructor.
-        PatcherToolbar(PatcherManager& patcher_manager, PatcherView& patcher_view);
+        PatcherToolbar(PatcherManager& patcher_manager);
         
         //! @brief juce::Component::resized
         void resized() override;
@@ -74,7 +73,6 @@ namespace kiwi
     private: // variables
         
         PatcherManager& m_patcher_manager;
-        PatcherView&    m_patcher_view;
         
         juce::Toolbar   m_toolbar;
         Factory         m_factory;
@@ -184,5 +182,3 @@ namespace kiwi
         PatcherComponent m_patcher_component;
     };
 }
-
-#endif // KIWI_APP_PATCHER_COMPONENT_HPP_INCLUDED

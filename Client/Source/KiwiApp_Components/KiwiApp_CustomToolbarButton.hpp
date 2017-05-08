@@ -2,10 +2,10 @@
  ==============================================================================
  
  This file is part of the KIWI library.
- - Copyright(c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright(c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
+ - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of the GPL v2
+ Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -19,8 +19,7 @@
  ==============================================================================
  */
 
-#ifndef KIWI_APP_CUSTOM_TOOLBAR_BUTTON_HPP_INCLUDED
-#define KIWI_APP_CUSTOM_TOOLBAR_BUTTON_HPP_INCLUDED
+#pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
 
@@ -32,7 +31,7 @@ namespace kiwi
     class CustomToolbarButton : public juce::ToolbarItemComponent
     {
     public: // methods
-        
+
         //! @brief Constructor.
         //! @param itemId the ID for this toolbar item type. This is passed through to the
         //! ToolbarItemComponent constructor
@@ -53,10 +52,10 @@ namespace kiwi
                             const juce::Colour bgcolor,
                             juce::Drawable* normalImage,
                             juce::Drawable* toggledOnImage);
-        
+
         //! @brief Destructor.
         ~CustomToolbarButton();
-        
+
         //! @internal
         bool getToolbarItemSizes(int toolbarDepth, bool isToolbarVertical, int& preferredSize,
                                  int& minSize, int& maxSize) override;
@@ -70,19 +69,17 @@ namespace kiwi
         void resized() override;
         //! @internal
         void enablementChanged() override;
-        
+
     private: // variables
-        
+
         juce::ScopedPointer<juce::Drawable> normalImage, toggledOnImage;
         juce::Drawable* currentImage;
         const juce::Colour m_bgcolor;
-        
+
         void updateDrawable();
         juce::Drawable* getImageToUse() const;
         void setCurrentImage(juce::Drawable*);
-        
+
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CustomToolbarButton)
     };
 }
-
-#endif // KIWI_APP_CUSTOM_TOOLBAR_BUTTON_HPP_INCLUDED

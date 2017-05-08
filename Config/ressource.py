@@ -150,7 +150,7 @@ header_txt += "// ==============================================================
 output_cpp_file.write(header_txt)
 output_hpp_file.write(header_txt)
 
-output_hpp_file.write("#ifndef KIWI_APP_BINARY_DATA_HPP_INCLUDED\n#define KIWI_APP_BINARY_DATA_HPP_INCLUDED\n\n")
+output_hpp_file.write("#pragma once\n\n")
 
 write_with_tab(output_hpp_file, "namespace kiwi\n{\n")
 write_with_tab(output_cpp_file, "namespace kiwi\n{\n")
@@ -170,10 +170,8 @@ write_with_tab(output_hpp_file, "}\n")
 write_with_tab(output_cpp_file, "}\n")
 
 dec_tab()
-write_with_tab(output_hpp_file, "}\n\n")
-write_with_tab(output_cpp_file, "}\n\n")
-
-output_hpp_file.write("#endif // KIWI_APP_BINARY_DATA_HPP_INCLUDED\n")
+write_with_tab(output_hpp_file, "}\n")
+write_with_tab(output_cpp_file, "}\n")
 
 output_cpp_file.close()
 output_hpp_file.close()
