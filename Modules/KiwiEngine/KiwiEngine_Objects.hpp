@@ -22,10 +22,12 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include <set>
 
 #include "KiwiEngine_Object.hpp"
 #include "KiwiEngine_Beacon.hpp"
+#include "KiwiEngine_CircularBuffer.hpp"
 #include "KiwiEngine_AudioControler.hpp"
 #include "KiwiEngine_Scheduler.h"
 
@@ -428,6 +430,44 @@ namespace kiwi
         private: // members
             
             std::atomic<float>   m_value{0.f};
+        };
+        
+        // ================================================================================ //
+        //                                       DELAYTILDE                                 //
+        // ================================================================================ //
+        
+        class DelayTilde : public AudioObject
+        {
+        public: // methods
+            
+            DelayTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            void receive(size_t index, std::vector<Atom> const& args) override final;
+            
+            void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void performDelay(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
+            
+            void prepare(dsp::Processor::PrepareInfo const& infos) override final;
+            
+            void release() override final;
+            
+        private: // methods
+            
+            dsp::sample_t cubicInterpolate(float const& x,
+                                           float const& y0,
+                                           float const& y1,
+                                           float const& y2,
+                                           float const& y3);
+            
+        private: // members
+            
+            std::unique_ptr<CircularBuffer<dsp::sample_t>>   m_circular_buffer;
+            std::unique_ptr<dsp::Signal>                     m_reinject_signal;
+            float                                            m_max_delay;
+            std::atomic<float>                               m_delay;
+            std::atomic<float>                               m_reinject_level;
+            dsp::sample_t                                    m_sr;
         };
     }
 }

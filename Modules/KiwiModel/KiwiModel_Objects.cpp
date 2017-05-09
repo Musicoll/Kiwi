@@ -389,5 +389,28 @@ namespace kiwi
         {
             Factory::add<SigTilde>("sig~");
         }
+        
+        // ================================================================================ //
+        //                                      OBJECT DELAYTILDE~                          //
+        // ================================================================================ //
+        
+        DelayTilde::DelayTilde(std::string const& name, std::vector<Atom> const& args)
+        {
+            if (args.size() > 0)
+            {
+                throw ("wrong argument for object delay~");
+            }
+            
+            pushInlet({PinType::IType::Signal});
+            pushInlet({PinType::IType::Control, PinType::IType::Signal});
+            pushInlet({PinType::IType::Control});
+            
+            pushOutlet(PinType::IType::Signal);
+        }
+        
+        void DelayTilde::declare()
+        {
+            Factory::add<DelayTilde>("delaysimple~");
+        }
     }
 }
