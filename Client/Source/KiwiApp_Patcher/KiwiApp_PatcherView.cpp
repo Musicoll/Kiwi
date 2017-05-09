@@ -1789,6 +1789,11 @@ namespace kiwi
         {
             ObjectView* object_view = it->get();
             
+            if(auto classic_box = dynamic_cast<ClassicBox*>(object_view))
+            {
+                classic_box->removeTextEditor();
+            }
+            
             juce::ComponentAnimator& animator = juce::Desktop::getInstance().getAnimator();
             animator.animateComponent(object_view, object_view->getBounds(), 0., 200., true, 0.8, 1.);
             
