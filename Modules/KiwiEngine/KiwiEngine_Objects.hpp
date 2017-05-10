@@ -450,8 +450,6 @@ namespace kiwi
             
             void prepare(dsp::Processor::PrepareInfo const& infos) override final;
             
-            void release() override final;
-            
         private: // methods
             
             dsp::sample_t cubicInterpolate(float const& x,
@@ -468,6 +466,8 @@ namespace kiwi
             std::atomic<float>                               m_delay;
             std::atomic<float>                               m_reinject_level;
             dsp::sample_t                                    m_sr;
+            size_t                                           m_vector_size;
+            mutable std::mutex                               m_mutex;
         };
     }
 }

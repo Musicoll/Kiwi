@@ -401,7 +401,7 @@ namespace kiwi
                 throw ("wrong argument for object delay~");
             }
             
-            pushInlet({PinType::IType::Signal});
+            pushInlet({PinType::IType::Control, PinType::IType::Signal});
             pushInlet({PinType::IType::Control, PinType::IType::Signal});
             pushInlet({PinType::IType::Control});
             

@@ -929,12 +929,20 @@ namespace kiwi
         m_max_delay(60.),
         m_delay(1.),
         m_reinject_level(0.),
-        m_sr(0.)
+        m_sr(0.),
+        m_vector_size(0),
+        m_mutex()
         {
         }
         
         void DelayTilde::receive(size_t index, std::vector<Atom> const& args)
         {
+            if (index == 0 && args[0].isString())
+            {
+                std::lock_guard<std::mutex> lock(m_mutex);
+                
+                m_circular_buffer->assign(m_circular_buffer->size(), 0);
+            }
             if (index == 1 && args[0].isNumber())
             {
                 m_delay.store(args[0].getFloat() / 1000.);
@@ -957,6 +965,8 @@ namespace kiwi
         
         void DelayTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
         {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            
             size_t buffer_size = input[0].size();
             
             for (int i = 0; i < buffer_size; ++i)
@@ -984,6 +994,11 @@ namespace kiwi
         
         void DelayTilde::performDelay(dsp::Buffer const& input, dsp::Buffer& output) noexcept
         {
+            //! Durty solution to synchronize circular buffer.
+            //! Should be implemented as an atomic shared pointer and a release pool
+            //! https://www.youtube.com/watch?v=boPEO2auJj4 48'
+            std::lock_guard<std::mutex> lock(m_mutex);
+            
             size_t buffer_size = input[0].size();
             
             for (int i = 0; i < buffer_size; ++i)
@@ -1009,12 +1024,16 @@ namespace kiwi
         
         void DelayTilde::prepare(dsp::Processor::PrepareInfo const& infos)
         {
-            m_sr = infos.sample_rate;
-            
-            size_t buffer_size = std::ceil(m_max_delay * infos.sample_rate) + 1 + infos.vector_size;
-            
-            m_circular_buffer.reset(new CircularBuffer<dsp::sample_t>(buffer_size, buffer_size, 0.));
-            m_reinject_signal.reset(new dsp::Signal(buffer_size));
+            if (infos.sample_rate != m_sr || infos.vector_size != m_vector_size)
+            {
+                m_sr = infos.sample_rate;
+                m_vector_size = infos.vector_size;
+                
+                size_t buffer_size = std::ceil(m_max_delay * m_sr) + 1 + m_vector_size;
+                
+                m_circular_buffer.reset(new CircularBuffer<dsp::sample_t>(buffer_size, buffer_size, 0.));
+                m_reinject_signal.reset(new dsp::Signal(m_vector_size));
+            }
             
             if (infos.inputs.size() > 1 && infos.inputs[1])
             {
@@ -1024,12 +1043,6 @@ namespace kiwi
             {
                 setPerformCallBack(this, &DelayTilde::perform);
             }
-        }
-        
-        void DelayTilde::release()
-        {
-            m_circular_buffer.release();
-            m_reinject_signal.release();
         }
     }
 }

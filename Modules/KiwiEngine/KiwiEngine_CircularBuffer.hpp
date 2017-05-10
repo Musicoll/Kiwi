@@ -72,6 +72,26 @@ namespace kiwi
                 std::free(m_buffer);
             }
             
+            void assign(size_t nb_elements, const T& value)
+            {
+                clear();
+                
+                for(int i = 0; i < nb_elements; ++i)
+                {
+                    push_back(value);
+                }
+            }
+            
+            void clear()
+            {
+                size_t init_size = m_size;
+                
+                for (int i = 0; i < init_size; ++i)
+                {
+                    pop_front();
+                }
+            }
+            
             size_t size() const
             {
                 return m_size;
