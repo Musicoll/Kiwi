@@ -74,7 +74,7 @@ namespace kiwi
                 flip::RunLoopTimer run_loop ([this](){
                     process();
                     return m_running.load();
-                }, 0.1);
+                }, 0.02);
                 
                 std::cout << "[server] - running on port " << getPort() << std::endl;;
                 
