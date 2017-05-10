@@ -43,36 +43,34 @@ namespace kiwi
     
     void ConsoleHistory::newConsoleMessage(engine::Console::Message const& message)
     {
+        if(!message.text.empty())
         {
-            if(!message.text.empty())
+            bool changed = false;
             {
-                bool changed = false;
+                std::lock_guard<std::mutex> guard(m_message_mutex);
+                
+                if(!m_messages.empty())
                 {
-                    std::lock_guard<std::mutex> guard(m_message_mutex);
-                    
-                    if(!m_messages.empty())
+                    auto& last = m_messages.back();
+                    auto& last_message = last.m_message;
+                    if(last_message.text == message.text
+                       && last_message.type == message.type)
                     {
-                        auto& last = m_messages.back();
-                        auto& last_message = last.m_message;
-                        if(last_message.text == message.text
-                           && last_message.type == message.type)
-                        {
-                            last.m_repeat_times++;
-                            changed = true;
-                        }
-                    }
-                    
-                    if(!changed)
-                    {
-                        m_messages.push_back({message, m_messages.size() + 1});
+                        last.m_repeat_times++;
                         changed = true;
                     }
                 }
                 
-                if(changed)
+                if(!changed)
                 {
-                    m_listeners.call(&Listener::consoleHistoryChanged, *this);
+                    m_messages.push_back({message, m_messages.size() + 1});
+                    changed = true;
                 }
+            }
+            
+            if(changed)
+            {
+                m_listeners.call(&Listener::consoleHistoryChanged, *this);
             }
         }
     }

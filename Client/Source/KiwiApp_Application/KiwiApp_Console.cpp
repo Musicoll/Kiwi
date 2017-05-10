@@ -140,10 +140,12 @@ namespace kiwi
     
     void ConsoleContent::consoleHistoryChanged(ConsoleHistory const&)
     {
-        juce::MessageManagerLock mml (juce::Thread::getCurrentThread());
-        
-        m_table.updateContent();
-        m_table.repaint();
+        juce::MessageManager::callAsync([this]() {
+            
+            m_table.updateContent();
+            m_table.repaint();
+            
+        });
     }
     
     // ================================================================================ //
