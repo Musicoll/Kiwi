@@ -146,24 +146,27 @@ namespace kiwi
         }
     
         template<class Clock>
-        void Scheduler<Clock>::Queue::insert(std::shared_ptr<Event> const& event)
+        void Scheduler<Clock>::Queue::insert(std::shared_ptr<Event> event)
         {
             remove(event);
             
-            typename std::vector<std::shared_ptr<Event>>::iterator event_it = m_events.begin();
+            auto event_it = m_events.begin();
             
             while(event_it != m_events.end())
             {
                 if (event->m_time < (*event_it)->m_time)
                 {
-                    m_events.insert(event_it, event);
+                    m_events.insert(event_it, std::move(event));
                     break;
                 }
                 
                 ++event_it;
             }
             
-            if (event_it == m_events.end()){m_events.insert(m_events.end(), event);}
+            if (event_it == m_events.end())
+            {
+                m_events.emplace_back(std::move(event));
+            }
         }
     
         template<class Clock>
@@ -182,7 +185,7 @@ namespace kiwi
                     if (command.m_time != clock_t::time_point::max())
                     {
                         command.m_event->m_time = command.m_time;
-                        insert(command.m_event);
+                        insert(std::move(command.m_event));
                     }
                     else
                     {

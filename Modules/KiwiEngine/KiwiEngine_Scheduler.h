@@ -169,9 +169,11 @@ namespace kiwi
             
         private: // methods
             
-            void remove(std::shared_ptr<Event> const& event);
+            //! @internal
+            void insert(std::shared_ptr<Event> event);
             
-            void insert(std::shared_ptr<Event> const& event);
+            //! @internal
+            void remove(std::shared_ptr<Event> const& event);
             
         private: // members
             

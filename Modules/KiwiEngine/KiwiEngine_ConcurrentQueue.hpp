@@ -60,9 +60,10 @@ namespace kiwi
             //! Increments element counter.
             void push(T const& value)
             {
-                m_queue.enqueue(value);
-                
-                std::atomic_fetch_add(&m_size, 1);
+                if(m_queue.enqueue(value))
+                {
+                    m_size++;
+                }
             }
             
             //! @brief Pushes element at end of queue (by move).
@@ -70,20 +71,23 @@ namespace kiwi
             //! Increments element counter.
             void push(T&& value)
             {
-                m_queue.enqueue(std::forward<T>(value));
-                
-                std::atomic_fetch_add(&m_size, 1);
+                if(m_queue.enqueue(std::forward<T>(value)))
+                {
+                    m_size++;
+                }
             }
             
             //! @brief Pops first element in the queue.
             //! @details Returns false if the queue was empty and pop failed, true otherwise.
             bool pop(T & value)
             {
-                bool success = m_queue.try_dequeue(value);
+                if(m_queue.try_dequeue(value))
+                {
+                    m_size--;
+                    return true;
+                }
                 
-                if (success) { std::atomic_fetch_add(&m_size, -1);}
-                
-                return success;
+                return false;
             }
             
             //! @brief Returns an approximative size for the queue.
