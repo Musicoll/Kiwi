@@ -635,6 +635,8 @@ namespace kiwi
     void PatcherView::startMoveOrResizeObjects()
     {
         m_is_in_move_or_resize_gesture = true;
+        KiwiApp::commandStatusChanged(); // to disable command like delete selection etc...
+        
         DocumentManager::startCommitGesture(m_patcher_model);
     }
 
@@ -642,6 +644,8 @@ namespace kiwi
     {
         DocumentManager::endCommitGesture(m_patcher_model);
         m_is_in_move_or_resize_gesture = false;
+        KiwiApp::commandStatusChanged();
+        
         m_viewport.updatePatcherArea(true);
 
         HitTester& hit = m_hittester;
@@ -1046,6 +1050,11 @@ namespace kiwi
     
     bool PatcherView::keyPressed(const juce::KeyPress& key)
     {
+        if(m_is_in_move_or_resize_gesture)
+        {
+            return false; // abort
+        }
+        
         if(key.isKeyCode(juce::KeyPress::deleteKey) || key.isKeyCode(juce::KeyPress::backspaceKey))
         {
             deleteSelection();
@@ -2368,7 +2377,7 @@ namespace kiwi
                                CommandCategories::editing, 0);
                 
                 result.addDefaultKeypress(juce::KeyPress::backspaceKey, juce::ModifierKeys::noModifiers);
-                result.setActive(!isLocked() && isAnythingSelected());
+                result.setActive(!isLocked() && isAnythingSelected() && !m_is_in_move_or_resize_gesture);
                 break;
             }
             case juce::StandardApplicationCommandIDs::selectAll:
