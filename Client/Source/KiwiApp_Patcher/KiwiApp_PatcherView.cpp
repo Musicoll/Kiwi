@@ -1790,6 +1790,12 @@ namespace kiwi
         {
             ObjectView* object_view = it->get();
             
+            if(m_hittester.getObject() == object_view)
+            {
+                // reset hittester to prevent functions like mouseUp() to get an invalid ptr.
+                m_hittester.reset();
+            }
+            
             if(object_view->isEditing() && m_box_being_edited == object_view)
             {
                 if(auto classic_box = dynamic_cast<ClassicBox*>(object_view))
