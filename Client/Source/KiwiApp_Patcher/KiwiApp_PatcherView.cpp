@@ -422,11 +422,7 @@ namespace kiwi
                     }
                     else if(m_select_on_mouse_down_status && !m_is_in_move_or_resize_gesture)
                     {
-                        ClassicBox* box = dynamic_cast<ClassicBox*>(object_view);
-                        if(box)
-                        {
-                            box->edit();
-                        }
+                        startEditBox(dynamic_cast<ClassicBox*>(object_view));
                     }
                 }
             }
@@ -1051,9 +1047,7 @@ namespace kiwi
     bool PatcherView::keyPressed(const juce::KeyPress& key)
     {
         if(m_is_in_move_or_resize_gesture)
-        {
             return false; // abort
-        }
         
         if(key.isKeyCode(juce::KeyPress::deleteKey) || key.isKeyCode(juce::KeyPress::backspaceKey))
         {
@@ -1072,10 +1066,8 @@ namespace kiwi
                     const auto it = findObject(*object_m);
                     if(it != m_objects.cend())
                     {
-                        ClassicBox* box = dynamic_cast<ClassicBox*>(it->get());
-                        if(box)
+                        if(startEditBox(dynamic_cast<ClassicBox*>(it->get())))
                         {
-                            box->edit();
                             return true;
                         }
                     }
@@ -1798,9 +1790,14 @@ namespace kiwi
         {
             ObjectView* object_view = it->get();
             
-            if(auto classic_box = dynamic_cast<ClassicBox*>(object_view))
+            if(object_view->isEditing() && m_box_being_edited == object_view)
             {
-                classic_box->removeTextEditor();
+                if(auto classic_box = dynamic_cast<ClassicBox*>(object_view))
+                {
+                    classic_box->removeTextEditor();
+                }
+                
+                m_box_being_edited = nullptr;
             }
             
             juce::ComponentAnimator& animator = juce::Desktop::getInstance().getAnimator();
@@ -1918,8 +1915,27 @@ namespace kiwi
         return m_patcher_model.addObject("errorbox", std::vector<Atom>(atoms.begin(), atoms.end()));
     }
     
-    void PatcherView::boxHasBeenEdited(ClassicBox& box, std::string new_object_text)
+    bool PatcherView::startEditBox(ClassicBox* box)
     {
+        assert(m_box_being_edited == nullptr);
+        
+        if(box)
+        {
+            box->edit();
+            m_box_being_edited = box;
+            KiwiApp::commandStatusChanged(); // to disable some command while editing...
+            return true;
+        }
+        
+        return false;
+    }
+    
+    void PatcherView::endEditBox(ClassicBox& box, std::string new_object_text)
+    {
+        assert(m_box_being_edited != nullptr);
+        assert(m_box_being_edited == &box);
+        
+        m_box_being_edited = nullptr;
         model::Object& old_object_m = box.getModel();
         const std::string old_object_text = old_object_m.getText();
         
@@ -1933,7 +1949,6 @@ namespace kiwi
             model::Object& new_object_m = createObjectModel(new_object_text);
 
             const std::string new_object_name = new_object_m.getName();
-
             const std::string new_object_text = [&new_object_name](std::string text){
                 
                 if(new_object_name == "errorbox")
@@ -2010,9 +2025,9 @@ namespace kiwi
                 m_view_model.selectObject(new_object_m);
                 DocumentManager::commit(m_patcher_model);
             }
-            
-            KiwiApp::commandStatusChanged();
         }
+        
+        KiwiApp::commandStatusChanged();
     }
     
     void PatcherView::createNewBoxModel(bool give_focus)
@@ -2059,11 +2074,7 @@ namespace kiwi
                     const auto it = findObject(*object_m);
                     if(it != m_objects.cend())
                     {
-                        ClassicBox* box = dynamic_cast<ClassicBox*>(it->get());
-                        if(box)
-                        {
-                            box->edit();
-                        }
+                        startEditBox(dynamic_cast<ClassicBox*>(it->get()));
                     }
                 }
             }
@@ -2289,6 +2300,9 @@ namespace kiwi
     
     void PatcherView::getCommandInfo(const juce::CommandID commandID, juce::ApplicationCommandInfo& result)
     {
+        const bool is_not_in_gesture = !DocumentManager::isInCommitGesture(m_patcher_model);
+        const bool box_is_not_being_edited = (m_box_being_edited == nullptr);
+        
         switch(commandID)
         {
             case CommandIDs::save:
@@ -2368,7 +2382,8 @@ namespace kiwi
                                CommandCategories::editing, 0);
                 
                 result.addDefaultKeypress('d', juce::ModifierKeys::commandModifier);
-                result.setActive(!isLocked() && isAnyObjectSelected());
+                result.setActive(!isLocked()
+                                 && isAnyObjectSelected());
                 break;
             }
             case juce::StandardApplicationCommandIDs::del:
@@ -2377,7 +2392,8 @@ namespace kiwi
                                CommandCategories::editing, 0);
                 
                 result.addDefaultKeypress(juce::KeyPress::backspaceKey, juce::ModifierKeys::noModifiers);
-                result.setActive(!isLocked() && isAnythingSelected() && !m_is_in_move_or_resize_gesture);
+                result.setActive(!isLocked()
+                                 && isAnythingSelected());
                 break;
             }
             case juce::StandardApplicationCommandIDs::selectAll:
@@ -2428,10 +2444,22 @@ namespace kiwi
                 break;
             }
         }
+        
+        result.setActive(!(result.flags & juce::ApplicationCommandInfo::isDisabled)
+                         && is_not_in_gesture
+                         && box_is_not_being_edited);
     }
     
     bool PatcherView::perform(const InvocationInfo& info)
     {
+        // most of the commands below generate conflicts when they are being executed
+        // in a commit gesture or when a box is being edited, so simply not execute them.
+        if(DocumentManager::isInCommitGesture(m_patcher_model)
+           || (m_box_being_edited != nullptr))
+        {
+            return true;
+        }
+            
         switch (info.commandID)
         {
             case CommandIDs::save:                              { m_manager.saveDocument(); break; }

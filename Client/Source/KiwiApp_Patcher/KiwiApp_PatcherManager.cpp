@@ -134,8 +134,11 @@ namespace kiwi
     void PatcherManager::newView()
     {
         auto& patcher = getPatcher();
-        patcher.useSelfUser().addView();
-        DocumentManager::commit(patcher);
+        if(!DocumentManager::isInCommitGesture(patcher))
+        {
+            patcher.useSelfUser().addView();
+            DocumentManager::commit(patcher);
+        }
     }
     
     size_t PatcherManager::getNumberOfUsers()
@@ -208,12 +211,12 @@ namespace kiwi
         const std::string document_name = patcher.getName();
         
         const int r = juce::AlertWindow::showYesNoCancelBox(juce::AlertWindow::QuestionIcon,
-                                                      TRANS("Closing document..."),
-                                                      TRANS("Do you want to save the changes to \"")
-                                                      + document_name + "\"?",
-                                                      TRANS("Save"),
-                                                      TRANS("Discard changes"),
-                                                      TRANS("Cancel"));
+                                                            TRANS("Closing document..."),
+                                                            TRANS("Do you want to save the changes to \"")
+                                                            + document_name + "\"?",
+                                                            TRANS("Save"),
+                                                            TRANS("Discard changes"),
+                                                            TRANS("Cancel"));
         
         // save changes
         if(r == 1)
@@ -371,20 +374,23 @@ namespace kiwi
     
     void PatcherManager::document_changed(model::Patcher& patcher)
     {
-        engine::Scheduler<>::Lock lock(Thread::Engine);
-        
         if(patcher.added())
         {
+            engine::Scheduler<>::Lock lock(Thread::Engine);
             patcher.entity().emplace<DocumentManager>(patcher.document());
             patcher.entity().emplace<engine::Patcher>(m_instance.useEngineInstance());
         }
         
-        patcher.entity().use<engine::Patcher>().modelChanged(patcher);
+        {
+            engine::Scheduler<>::Lock lock(Thread::Engine);
+            patcher.entity().use<engine::Patcher>().modelChanged(patcher);
+        }
         
         notifyPatcherViews(patcher);
         
         if(patcher.removed())
         {
+            engine::Scheduler<>::Lock lock(Thread::Engine);
             patcher.entity().erase<engine::Patcher>();
             patcher.entity().erase<DocumentManager>();
         }

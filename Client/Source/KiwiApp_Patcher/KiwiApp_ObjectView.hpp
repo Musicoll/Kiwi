@@ -77,8 +77,11 @@ namespace kiwi
         //! @brief internal kiwi PatcherView HitTesting (overlaps a rectangle).
         bool hitTest(juce::Rectangle<int> const& rect);
         
-        //! Returns true if the object is selected.
+        //! @brief Returns true if the object is selected.
         bool isSelected();
+        
+        //! @brief Returns true if the object is currently being editing.
+        bool isEditing();
         
     private:
         

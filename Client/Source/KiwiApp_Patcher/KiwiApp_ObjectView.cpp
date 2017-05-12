@@ -286,6 +286,11 @@ namespace kiwi
         return m_is_selected;
     }
     
+    bool ObjectView::isEditing()
+    {
+        return m_is_editing;
+    }
+    
     void ObjectView::objectChanged(model::Patcher::View& view, model::Object& object)
     {
         bool need_redraw = false;
@@ -529,7 +534,7 @@ namespace kiwi
         
         removeTextEditor();
         
-        m_patcher_view.boxHasBeenEdited(*this, new_text);
+        m_patcher_view.endEditBox(*this, new_text);
     }
     
     void ClassicBox::suggestEditorEscapeKeyPressed(SuggestEditor& e)
@@ -549,6 +554,6 @@ namespace kiwi
         
         removeTextEditor();
         
-        m_patcher_view.boxHasBeenEdited(*this, new_text);
+        m_patcher_view.endEditBox(*this, new_text);
     }
 }

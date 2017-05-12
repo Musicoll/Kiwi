@@ -274,7 +274,10 @@ namespace kiwi
         assert(m_gesture_flag);
         m_gesture_flag = false;
         
-        m_document.push();
+        if(m_gesture_cnt > 0)
+        {
+            m_document.push();
+        }
     }
     
     void DocumentManager::save(juce::File const& file)

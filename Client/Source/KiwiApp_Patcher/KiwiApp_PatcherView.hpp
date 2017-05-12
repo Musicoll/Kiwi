@@ -102,8 +102,13 @@ namespace kiwi
         //! @brief Create an object model. 
         model::Object& createObjectModel(std::string const& text);
         
+        //! @brief Call this to switch the box to edit mode
+        //! @details You will need to call endEditBox() function after calling this.
+        bool startEditBox(ClassicBox* box);
+        
         //! @brief called by ClassicBox when hmmm.. the text has been edited.
-        void boxHasBeenEdited(ClassicBox& box, std::string new_text);
+        //! @details You will need to call startEditBox() function before calling this.
+        void endEditBox(ClassicBox& box, std::string new_text);
         
         //! @internal Update the patcher window title.
         void updateWindowTitle() const;
@@ -171,7 +176,7 @@ namespace kiwi
         //! @internal Link model will be removed from the document.
         void removeLinkView(model::Link& link);
         
-        //! @brief Add a newbox Object at current mouse position and give it focus.
+        //! @brief Add a newbox Object at current mouse position and optionally give it focus.
         void createNewBoxModel(bool give_focus);
         
         // ================================================================================ //
@@ -389,6 +394,7 @@ namespace kiwi
         bool m_select_on_mouse_down_status = false;
         bool m_link_downstatus = false;
         bool m_is_in_move_or_resize_gesture = false;
+        ObjectView* m_box_being_edited = nullptr;
         long m_object_border_down_status;
         
         friend PatcherViewport;
