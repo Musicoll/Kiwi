@@ -8,9 +8,6 @@ notifications:
 git:
   submodules: false
 
-install:
-    - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr ThirdParty/readerwriterqueue
-
 matrix:
   include:
   - os: linux
@@ -38,9 +35,13 @@ matrix:
     install:
       # make sure CXX is correctly set
       - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
-
       - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr ThirdParty/readerwriterqueue
       - pip install --user cpp-coveralls
+      - wget --no-check-certificate -O ../curl-7.52.1.tar.gz https://github.com/Musicoll/Kiwi/files/999838/curl-7.52.1-linux.tar.gz
+      - cd ..
+      - tar xvzf curl-7.52.1.tar.gz
+      - export KIWI_CURL_LIB=$(pwd)/curl-7.52.1/lib && export KIWI_CURL_INCLUDE=$(pwd)/curl-7.52.1/include
+      - cd ${TRAVIS_BUILD_DIR}
 
     script:
       - python ./Config/configure.py -coverage
@@ -58,13 +59,24 @@ matrix:
   - os: osx
     compiler: clang++
     env: COMPILER=clang++
+
+    install:
+      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr ThirdParty/readerwriterqueue
+      - curl -o ../curl-7.52.1.zip -L  https://github.com/Musicoll/Kiwi/files/997532/curl-7.52.1-macos.zip
+      - cd ..
+      - unzip curl-7.52.1.zip
+      - export KIWI_CURL_LIB=$(pwd)/curl-7.52.1/lib && KIWI_CURL_LIB=$(pwd)/curl-7.52.1/include
+      - cd ${TRAVIS_BUILD_DIR}
+
     script:
     - python ./Config/configure.py -c Release
     - python ./Config/build.py -c Release | xcpretty
+
     before_deploy:
     - mkdir Kiwi
     - mv Build/Release/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
     - zip -r Kiwi_macos.zip Kiwi
+
     deploy:
       provider: releases
       api_key:

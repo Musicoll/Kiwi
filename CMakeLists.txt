@@ -120,7 +120,7 @@ endif()
 #--------------------------------------
 
 if (WIN32)
-	set(CMAKE_FIND_LIBRARY_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES} "")
+	set(CMAKE_FIND_LIBRARY_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES} "" "lib")
 	set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} ".lib" ".dll")
 	if (CMAKE_CL_64)
     set(WINDOWS_SDK_PATH "C:/Program Files (x86)/Microsoft SDKs/Windows/v7.1A/Lib/x64")
@@ -290,17 +290,38 @@ source_group_rec("${FLIP_SRC}" ${FLIP_DIR})
 #----------------------------------
 
 # Cpr settings
+
 set(CMAKE_USE_OPENSSL OFF CACHE BOOL "Don't use openssl")
 set(BUILD_CPR_TESTS OFF CACHE BOOL "Don't build cpr tests")
-message("Use system curl " ${USE_SYSTEM_CURL})
 
-# Curl settings
-set(CURL_STATICLIB OFF CACHE BOOL "Build static library for curl")
-set(BUILD_TESTING OFF CACHE BOOL "Don't build curl tests")
+if(WIN32)
+    if (CMAKE_CL_64)
+        find_library(CURL_LIBRARIES NAMES curl PATHS $ENV{KIWI_CURL_LIB_x64} NO_DEFAULT_PATH)
+        find_path(CURL_INCLUDE_DIRS NAMES curl PATHS $ENV{KIWI_CURL_INCLUDE_x64} NO_DEFAULT_PATH)
+    else()
+        find_library(CURL_LIBRARIES NAMES curl PATHS $ENV{KIWI_CURL_LIB_WIN32} NO_DEFAULT_PATH)
+        find_path(CURL_INCLUDE_DIRS NAMES curl PATHS $ENV{KIWI_CURL_INCLUDE_WIN32} NO_DEFAULT_PATH)
+    endif()
+else()
+    find_library(CURL_LIBRARIES NAMES curl PATHS $ENV{KIWI_CURL_LIB} NO_DEFAULT_PATH)
+    find_path(CURL_INCLUDE_DIRS NAMES curl PATHS $ENV{KIWI_CURL_INCLUDE} NO_DEFAULT_PATH)
+endif()
+
+if (CURL_LIBRARIES AND CURL_INCLUDE_DIRS)
+    set(USE_SYSTEM_CURL ON CACHE BOOL "Use system curl")
+    set(CURL_FOUND TRUE CACHE BOOL "Curl found")
+    set(CMAKE_DISABLE_FIND_PACKAGE_CURL TRUE CACHE BOOL "Disactivate find package curl")
+    message(STATUS "libcurl found on system")
+    message(STATUS "CURL_LIBRARIES : " ${CURL_LIBRARIES})
+    message(STATUS "CURL_INCLUDE_DIRS : " ${CURL_INCLUDE_DIRS})
+else()
+    message(FATAL_ERROR "Curl was not found on system, please check kiwi developper guide")
+endif()
 
 add_subdirectory(ThirdParty/cpr)
 set_target_properties(${CPR_LIBRARIES} PROPERTIES FOLDER ThirdParty)
 set_target_properties(${CPR_LIBRARIES} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+target_compile_definitions(${CPR_LIBRARIES} PUBLIC -DCURL_STATICLIB=1)
 
 #----------------------------------
 # Json

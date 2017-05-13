@@ -17,14 +17,24 @@ install:
     - git submodule update --init --recursive "ThirdParty/cpr"
     - git submodule update --init --recursive "ThirdParty/readerwriterqueue"
     - set PATH=C:\Python27;%PATH%
+    - curl -o ..\curl-7.52.1-win32.zip -L -k  https://github.com/Musicoll/Kiwi/files/998123/curl-7.52.1-win32.zip
+    - curl -o ..\curl-7.52.1-x64.zip -L -k  https://github.com/Musicoll/Kiwi/files/997546/curl-7.52.1-x64.zip
+    - cd ..
+    - 7z x curl-7.52.1-x64.zip
+    - 7z x curl-7.52.1-win32.zip
+    - set KIWI_CURL_LIB_x64=%cd%/curl-7.52.1-x64/lib/Release
+    - set KIWI_CURL_INCLUDE_x64=%cd%/curl-7.52.1-x64/include
+    - set KIWI_CURL_LIB_WIN32=%cd%/curl-7.52.1-win32/lib/Release
+    - set KIWI_CURL_INCLUDE_WIN32=%cd%/curl-7.52.1-win32/include
+    - cd %APPVEYOR_BUILD_FOLDER%
 
 build_script:
-    - python .\Config\configure.py -c %CONFIGURATION% -p %PLATFORM% -curlsystem=Off
+    - python .\Config\configure.py -c %CONFIGURATION% -p %PLATFORM%
     - python .\Config\build.py -c %CONFIGURATION% -p %PLATFORM%
 
 after_build:
     - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\%CONFIGURATION%
-    - 7z a Kiwi_%PLATFORM%.zip %BUILD_DIR%\Kiwi.exe %BUILD_DIR%\libcurl.dll
+    - 7z a Kiwi_%PLATFORM%.zip %BUILD_DIR%\Kiwi.exe
 
 artifacts:
   - path: '*.zip'
