@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <KiwiModel/KiwiModel_Factory.hpp>
 #include <KiwiEngine/KiwiEngine_Listeners.hpp>
 
 #include <juce_gui_basics/juce_gui_basics.h>
