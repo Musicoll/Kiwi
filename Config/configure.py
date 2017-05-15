@@ -29,10 +29,6 @@ def parse_args ():
     arg_parser.add_argument('-c', '--configuration', default = 'All', choices = ['Debug', 'Release' ,'All'],
                             help="the chosen configuration  to initialize either Release or Debug")
 
-    if platform.system () == 'Darwin':
-        arg_parser.add_argument('-flip', default = 'public', choices = ['public', 'private'],
-                                help="on Mac platforms use flip private to use flip private repository")
-
     if platform.system () == 'Linux':
         arg_parser.add_argument('-coverage', required=False, action='store_true', help='activate coverage')
 
@@ -62,13 +58,6 @@ def build_flip_private():
     subprocess.check_call("python " + configure_path, shell= True);
     subprocess.check_call("python " + build_path + " -c Debug -t flip", shell= True);
     subprocess.check_call("python " + build_path + " -c Release -t flip", shell= True);
-
-#==============================================================================
-# Name : retrieve_flip_public
-#==============================================================================
-
-def retrieve_flip_public():
-    subprocess.check_call("python " + os.path.join(project_dir, "Config", "flip-public.py"), shell= True);
 
 #==============================================================================
 # Name : mac_release
@@ -106,9 +95,6 @@ def mac_debug():
 def configure_mac(args):
     global cmd;
     cmd += " -G Xcode";
-    if (args.flip == "private"):
-        build_flip_private()
-        cmd += " -DFLIP_PRIVATE=1"
 
     if (args.configuration == "Debug" or args.configuration == "All"):
         mac_debug();
@@ -251,8 +237,6 @@ def configure_linux(args):
 #==============================================================================
 # Name : main
 #==============================================================================
-
-retrieve_flip_public();
 
 root_build_dir = os.path.join(project_dir, "Build")
 
