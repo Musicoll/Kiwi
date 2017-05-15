@@ -35,8 +35,8 @@ install:
     - cd %APPVEYOR_BUILD_FOLDER%
 
 build_script:
-    - python .\Config\configure.py -c %CONFIGURATION% -p %PLATFORM%
-    - python .\Config\build.py -c %CONFIGURATION% -p %PLATFORM%
+    - python .\Scripts\configure.py -c %CONFIGURATION% -p %PLATFORM%
+    - python .\Scripts\build.py -c %CONFIGURATION% -p %PLATFORM%
 
 after_build:
     - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\%CONFIGURATION%

@@ -47,9 +47,9 @@ matrix:
       - cd ${TRAVIS_BUILD_DIR}
 
     script:
-      - python ./Config/configure.py -coverage
-      - python ./Config/build.py -c Release
-      - python ./Config/build.py -c Debug -t Tests
+      - python ./Scripts/configure.py -coverage
+      - python ./Scripts/build.py -c Release
+      - python ./Scripts/build.py -c Debug -t Tests
 
     after_success:
       - coveralls -i Modules --gcov-options '\-lp' > /dev/null
@@ -70,8 +70,8 @@ matrix:
       - cd ${TRAVIS_BUILD_DIR}
 
     script:
-    - python ./Config/configure.py -c Release
-    - python ./Config/build.py -c Release | xcpretty
+    - python ./Scripts/configure.py -c Release
+    - python ./Scripts/build.py -c Release | xcpretty
 
     before_deploy:
     - mkdir Kiwi

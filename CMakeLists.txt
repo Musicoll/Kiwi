@@ -161,8 +161,8 @@ endif()
 # Macros
 #--------------------------------------
 
-include(./Config/group.cmake)
-include(./Config/dependency.cmake)
+include(./Scripts/group.cmake)
+include(./Scripts/dependency.cmake)
 
 #----------------------------------
 # Juce
@@ -412,9 +412,9 @@ elseif(WIN32)
 	else()
 		set(CRT_LIB "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/redist/x86/Microsoft.VC140.CRT")
 	endif()
-	
+
 	add_custom_command(TARGET Kiwi POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CRT_LIB} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}" USES_TERMINAL)
-	
+
 	if (DEBUG)
 		set_target_properties(Kiwi PROPERTIES LINK_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:CONSOLE")
 	else()
