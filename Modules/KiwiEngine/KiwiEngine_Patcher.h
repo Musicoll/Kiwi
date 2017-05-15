@@ -117,22 +117,22 @@ namespace kiwi
         private: // methods
             
             //! @internal Object model has just been added to the document.
-            void objectAdded(model::Object& object);
+            void objectAdded(model::Object const& object);
             
             //! @internal Object model has changed.
-            void objectChanged(model::Object& object);
+            void objectChanged(model::Object const& object);
             
             //! @internal Object model will be removed from the document.
-            void objectRemoved(model::Object& object);
+            void objectRemoved(model::Object const& object);
             
             //! @internal Link model has just been added to the document.
-            void linkAdded(model::Link& link);
+            void linkAdded(model::Link const& link);
             
             //! @internal Link model has changed.
-            void linkChanged(model::Link& link_m);
+            void linkChanged(model::Link const& link_m);
             
             //! @internal Link model will be removed from the document.
-            void linkRemoved(model::Link& link_m);
+            void linkRemoved(model::Link const& link_m);
         
         private: // members
             

@@ -209,7 +209,7 @@ namespace kiwi
                 // check links before objects
                 if(link_changed)
                 {
-                    for(auto& link : model.getLinks())
+                    for(auto const& link : model.getLinks())
                     {
                         if(link.removed())
                         {
@@ -249,17 +249,17 @@ namespace kiwi
             }
         }
 
-        void Patcher::objectAdded(model::Object& object_m)
+        void Patcher::objectAdded(model::Object const& object_m)
         {
             addObject(object_m.ref().obj(), Factory::create(*this, object_m));
         }
 
-        void Patcher::objectRemoved(model::Object& object_m)
+        void Patcher::objectRemoved(model::Object const& object_m)
         {
             removeObject(object_m.ref().obj());
         }
 
-        void Patcher::linkAdded(model::Link& link_m)
+        void Patcher::linkAdded(model::Link const& link_m)
         {
             addLink(link_m.getSenderObject().ref().obj(),
                     link_m.getSenderIndex(),
@@ -268,7 +268,7 @@ namespace kiwi
                     link_m.isSignal());
         }
         
-        void Patcher::linkRemoved(model::Link& link_m)
+        void Patcher::linkRemoved(model::Link const& link_m)
         {
             removeLink(link_m.getSenderObject().ref().obj(),
                        link_m.getSenderIndex(),

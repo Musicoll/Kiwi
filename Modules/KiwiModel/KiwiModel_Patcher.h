@@ -103,11 +103,20 @@ namespace kiwi
             //! @brief Gets the objects.
             Objects const& getObjects() const noexcept;
             
+            //! @brief Gets the objects.
+            Objects& getObjects() noexcept;
+            
             //! @brief Gets the links.
             Links const& getLinks() const noexcept;
             
+            //! @brief Gets the links.
+            Links& getLinks() noexcept;
+            
             //! @brief Gets the users.
             Users const& getUsers() const noexcept;
+            
+            //! @brief Gets the users.
+            Users& getUsers() noexcept;
             
             //! @brief Returns the current User.
             //! @details The function will look for a User that match
