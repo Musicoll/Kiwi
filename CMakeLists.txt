@@ -3,6 +3,24 @@ cmake_minimum_required (VERSION 3.0.2)
 project (Kiwi CXX)
 
 #--------------------------------------
+# Check Compiler Version
+#--------------------------------------
+
+if (WIN32)
+    if((CMAKE_CXX_COMPILER_ID NOT STREQUAL "MSVC") OR (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19))
+        message(WARNING "Using untested compiler, tested compiler is MSVC 19.0 or later")
+    endif()
+elseif(UNIX AND NOT APPLE)
+    if ((CMAKE_CXX_COMPILER_ID NOT STREQUAL "GNU") OR (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9))
+        message(WARNING "Using untested compiler, tested compiler is gcc 4.9 or later")
+    endif()
+else()
+    if ((CMAKE_CXX_COMPILER_ID NOT STREQUAL "AppleClang") OR (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.3))
+        message(WARNING "Using untested compiler, tested compiler is AppleClang 7.3 or later")
+    endif()
+endif()
+
+#--------------------------------------
 # Global Settings
 #--------------------------------------
 
