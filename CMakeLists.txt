@@ -90,7 +90,9 @@ if (WIN32)
 	set(CMAKE_EXE_LINKER_FLAGS "")
 
 	if (DEBUG)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zi")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zi /Od")
+    else()
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2")
 	endif()
 
     if (CMAKE_CL_64)
@@ -100,17 +102,22 @@ if (WIN32)
     endif()
 
 elseif(APPLE)
+
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-warning-option -Wno-pessimizing-move -Wno-overloaded-virtual -Wnounused-function")
 
     if (DEBUG)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
+    else()
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
     endif()
 
 elseif(LINUX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-multichar")
 
   if (DEBUG)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
+  else()
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
   endif()
 
 endif()
