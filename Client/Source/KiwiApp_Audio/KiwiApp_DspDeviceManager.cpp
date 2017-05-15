@@ -21,10 +21,10 @@
 
 #include <juce_audio_utils/juce_audio_utils.h>
 
-#include "KiwiApp_DspDeviceManager.hpp"
+#include "KiwiApp_DspDeviceManager.h"
 
-#include "../KiwiApp_General/KiwiApp_StoredSettings.hpp"
-#include "../KiwiApp.hpp"
+#include "../KiwiApp_General/KiwiApp_StoredSettings.h"
+#include "../KiwiApp.h"
 
 namespace kiwi
 {

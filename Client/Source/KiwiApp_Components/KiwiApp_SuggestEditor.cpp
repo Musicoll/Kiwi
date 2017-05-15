@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#include "KiwiApp_SuggestEditor.hpp"
-#include "../KiwiApp.hpp"
+#include "KiwiApp_SuggestEditor.h"
+#include "../KiwiApp.h"
 
 namespace kiwi
 {

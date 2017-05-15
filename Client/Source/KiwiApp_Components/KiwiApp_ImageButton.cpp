@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include "KiwiApp_ImageButton.hpp"
+#include "KiwiApp_ImageButton.h"
 
 namespace kiwi
 {

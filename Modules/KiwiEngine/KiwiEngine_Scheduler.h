@@ -29,7 +29,7 @@
 #include <mutex>
 #include <set>
 
-#include "KiwiEngine_ConcurrentQueue.hpp"
+#include "KiwiEngine_ConcurrentQueue.h"
 
 namespace kiwi
 {

@@ -63,7 +63,7 @@ def dec_tab():
 # Name : Extract binary data
 #==============================================================================
 
-def extract_binary_data(output_hpp_file, output_cpp_file, input_file_path):
+def extract_binary_data(output_h_file, output_cpp_file, input_file_path):
 
     file = open(input_file_path, "rb")
 
@@ -73,9 +73,9 @@ def extract_binary_data(output_hpp_file, output_cpp_file, input_file_path):
     bytes = file.read()
     size = len(bytes)
 
-    # Write hpp file info
-    write_with_tab(output_hpp_file, "extern char const* " + filename + ";\n")
-    write_with_tab(output_hpp_file, "const int " + filename + "_size = " + str(size) + ";\n\n")
+    # Write header file info
+    write_with_tab(output_h_file, "extern char const* " + filename + ";\n")
+    write_with_tab(output_h_file, "const int " + filename + "_size = " + str(size) + ";\n\n")
 
     # Write cpp file info
     write_with_tab(output_cpp_file, "static const unsigned char " + filename + "_array[] = \n")
@@ -103,7 +103,7 @@ def extract_binary_data(output_hpp_file, output_cpp_file, input_file_path):
 # Name : Traverse
 #==============================================================================
 
-def traverse(directory, output_hpp_file, output_cpp_file):
+def traverse(directory, output_h_file, output_cpp_file):
 
     for file in os.listdir(directory):
 
@@ -111,17 +111,17 @@ def traverse(directory, output_hpp_file, output_cpp_file):
 
         if (os.path.isfile(file_path) and not file.startswith('.')):
             print("Extracting binary data for file " + file_path)
-            extract_binary_data(output_hpp_file, output_cpp_file, file_path)
+            extract_binary_data(output_h_file, output_cpp_file, file_path)
         elif(os.path.isdir(file_path) and not file.startswith('.')):
-            write_with_tab(output_hpp_file, "namespace " + file.lower() + "\n")
-            write_with_tab(output_hpp_file, "{\n")
+            write_with_tab(output_h_file, "namespace " + file.lower() + "\n")
+            write_with_tab(output_h_file, "{\n")
             write_with_tab(output_cpp_file, "namespace " + file.lower() + "\n")
             write_with_tab(output_cpp_file, "{\n")
             inc_tab()
-            traverse(file_path, output_hpp_file, output_cpp_file)
+            traverse(file_path, output_h_file, output_cpp_file)
             dec_tab()
             write_with_tab(output_cpp_file, "}\n")
-            write_with_tab(output_hpp_file, "}\n")
+            write_with_tab(output_h_file, "}\n")
 
     return
 
@@ -139,9 +139,9 @@ if os.path.exists(os.path.join(args.output, "KiwiApp_BinaryData.cpp")):
     os.remove(os.path.join(args.output, "KiwiApp_BinaryData.cpp"))
 output_cpp_file = open(os.path.join(args.output, "KiwiApp_BinaryData.cpp"), "a")
 
-if os.path.exists(os.path.join(args.output, "KiwiApp_BinaryData.hpp")):
-    os.remove(os.path.join(args.output, "KiwiApp_BinaryData.hpp"))
-output_hpp_file = open(os.path.join(args.output, "KiwiApp_BinaryData.hpp"), "a")
+if os.path.exists(os.path.join(args.output, "KiwiApp_BinaryData.h")):
+    os.remove(os.path.join(args.output, "KiwiApp_BinaryData.h"))
+output_h_file = open(os.path.join(args.output, "KiwiApp_BinaryData.h"), "a")
 
 # Append license header info
 
@@ -154,32 +154,32 @@ header_txt += "// ==============================================================
 header_txt += "// This is an auto-generated file: Any edits you make may be overwritten!\n"
 header_txt += "// ============================================================================\n\n"
 output_cpp_file.write(header_txt)
-output_hpp_file.write(header_txt)
+output_h_file.write(header_txt)
 
-output_hpp_file.write("#pragma once\n\n")
+output_h_file.write("#pragma once\n\n")
 
-write_with_tab(output_hpp_file, "namespace kiwi\n{\n")
+write_with_tab(output_h_file, "namespace kiwi\n{\n")
 write_with_tab(output_cpp_file, "namespace kiwi\n{\n")
 
 inc_tab()
 write_with_tab(output_cpp_file, "namespace binary_data\n")
 write_with_tab(output_cpp_file, "{\n")
-write_with_tab(output_hpp_file, "namespace binary_data\n")
-write_with_tab(output_hpp_file, "{\n")
+write_with_tab(output_h_file, "namespace binary_data\n")
+write_with_tab(output_h_file, "{\n")
 
 inc_tab()
 
-traverse(args.input, output_hpp_file, output_cpp_file)
+traverse(args.input, output_h_file, output_cpp_file)
 
 dec_tab()
-write_with_tab(output_hpp_file, "}\n")
+write_with_tab(output_h_file, "}\n")
 write_with_tab(output_cpp_file, "}\n")
 
 dec_tab()
-write_with_tab(output_hpp_file, "}\n")
+write_with_tab(output_h_file, "}\n")
 write_with_tab(output_cpp_file, "}\n")
 
 output_cpp_file.close()
-output_hpp_file.close()
+output_h_file.close()
 
 sys.exit(0)

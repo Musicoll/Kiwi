@@ -19,13 +19,13 @@
  ==============================================================================
  */
 
-#include <KiwiEngine/KiwiEngine_Console.hpp>
+#include <KiwiEngine/KiwiEngine_Console.h>
 
-#include "KiwiApp_DocumentBrowserView.hpp"
-#include "KiwiApp_Instance.hpp"
+#include "KiwiApp_DocumentBrowserView.h"
+#include "KiwiApp_Instance.h"
 
-#include "../KiwiApp_Ressources/KiwiApp_BinaryData.hpp"
-#include "../KiwiApp.hpp"
+#include "../KiwiApp_Ressources/KiwiApp_BinaryData.h"
+#include "../KiwiApp.h"
 
 namespace kiwi
 {

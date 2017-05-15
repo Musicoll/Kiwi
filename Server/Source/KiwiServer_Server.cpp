@@ -22,11 +22,11 @@
 #include <flip/contrib/DataProviderFile.h>
 #include <flip/contrib/DataConsumerFile.h>
 
-#include <KiwiModel/KiwiModel_DataModel.hpp>
-#include <KiwiModel/KiwiModel_PatcherUser.hpp>
-#include <KiwiModel/KiwiModel_PatcherValidator.hpp>
+#include <KiwiModel/KiwiModel_DataModel.h>
+#include <KiwiModel/KiwiModel_PatcherUser.h>
+#include <KiwiModel/KiwiModel_PatcherValidator.h>
 
-#include "KiwiServer_Server.hpp"
+#include "KiwiServer_Server.h"
 
 namespace kiwi
 {

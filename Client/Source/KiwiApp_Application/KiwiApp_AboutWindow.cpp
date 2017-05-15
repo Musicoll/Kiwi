@@ -19,13 +19,13 @@
  ==============================================================================
  */
 
-#include "KiwiApp_AboutWindow.hpp"
+#include "KiwiApp_AboutWindow.h"
 
-#include <KiwiModel/KiwiModel_DataModel.hpp>
+#include <KiwiModel/KiwiModel_DataModel.h>
 
-#include "../KiwiApp.hpp"
+#include "../KiwiApp.h"
 
-#include "../KiwiApp_Ressources/KiwiApp_BinaryData.hpp"
+#include "../KiwiApp_Ressources/KiwiApp_BinaryData.h"
 
 namespace kiwi
 {

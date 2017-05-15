@@ -23,10 +23,10 @@
 
 #include "../catch.hpp"
 
-#include <KiwiDsp/KiwiDsp_Chain.hpp>
-#include <KiwiDsp/KiwiDsp_Misc.hpp>
+#include <KiwiDsp/KiwiDsp_Chain.h>
+#include <KiwiDsp/KiwiDsp_Misc.h>
 
-#include "Processors.hpp"
+#include "Processors.h"
 
 using namespace kiwi;
 using namespace dsp;

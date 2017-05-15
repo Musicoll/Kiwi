@@ -19,15 +19,15 @@
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiModel_PatcherView.hpp>
-#include <KiwiModel/KiwiModel_Objects.hpp>
+#include <KiwiModel/KiwiModel_PatcherView.h>
+#include <KiwiModel/KiwiModel_Objects.h>
 
-#include "../KiwiApp.hpp"
-#include "../KiwiApp_Network/KiwiApp_DocumentManager.hpp"
-#include "KiwiApp_ObjectView.hpp"
-#include "KiwiApp_PatcherViewHelper.hpp"
-#include "KiwiApp_PatcherView.hpp"
-#include "../KiwiApp_Ressources/KiwiApp_BinaryData.hpp"
+#include "../KiwiApp.h"
+#include "../KiwiApp_Network/KiwiApp_DocumentManager.h"
+#include "KiwiApp_ObjectView.h"
+#include "KiwiApp_PatcherViewHelper.h"
+#include "KiwiApp_PatcherView.h"
+#include "../KiwiApp_Ressources/KiwiApp_BinaryData.h"
 
 namespace kiwi
 {

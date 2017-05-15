@@ -19,10 +19,10 @@
  ==============================================================================
  */
 
-#include "KiwiApp_PatcherViewHitTester.hpp"
-#include "KiwiApp_PatcherView.hpp"
-#include "KiwiApp_ObjectView.hpp"
-#include "KiwiApp_LinkView.hpp"
+#include "KiwiApp_PatcherViewHitTester.h"
+#include "KiwiApp_PatcherView.h"
+#include "KiwiApp_ObjectView.h"
+#include "KiwiApp_LinkView.h"
 
 namespace kiwi
 {

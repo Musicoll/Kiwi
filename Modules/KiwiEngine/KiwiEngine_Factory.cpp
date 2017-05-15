@@ -19,10 +19,10 @@
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiModel_Factory.hpp>
+#include <KiwiModel/KiwiModel_Factory.h>
 
-#include "KiwiEngine_Factory.hpp"
-#include "KiwiEngine_Objects.hpp"
+#include "KiwiEngine_Factory.h"
+#include "KiwiEngine_Objects.h"
 
 namespace kiwi
 {

@@ -26,10 +26,10 @@
 #include <flip/PortDirect.h>
 #include <flip/CarrierDirect.h>
 
-#include <KiwiModel/KiwiModel_DataModel.hpp>
-#include <KiwiModel/KiwiModel_PatcherUser.hpp>
-#include <KiwiModel/KiwiModel_Atom.hpp>
-#include <KiwiModel/KiwiModel_PatcherValidator.hpp>
+#include <KiwiModel/KiwiModel_DataModel.h>
+#include <KiwiModel/KiwiModel_PatcherUser.h>
+#include <KiwiModel/KiwiModel_Atom.h>
+#include <KiwiModel/KiwiModel_PatcherValidator.h>
 
 using namespace kiwi;
 

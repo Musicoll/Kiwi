@@ -19,12 +19,12 @@
  ==============================================================================
  */
 
-#include "KiwiApp_Console.hpp"
+#include "KiwiApp_Console.h"
 
-#include "../KiwiApp.hpp"
-#include "../KiwiApp_General/KiwiApp_StoredSettings.hpp"
-#include "../KiwiApp_Ressources/KiwiApp_BinaryData.hpp"
-#include "../KiwiApp_General/KiwiApp_CommandIDs.hpp"
+#include "../KiwiApp.h"
+#include "../KiwiApp_General/KiwiApp_StoredSettings.h"
+#include "../KiwiApp_Ressources/KiwiApp_BinaryData.h"
+#include "../KiwiApp_General/KiwiApp_CommandIDs.h"
 
 namespace kiwi
 {

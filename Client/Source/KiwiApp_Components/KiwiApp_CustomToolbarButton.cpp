@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include "KiwiApp_CustomToolbarButton.hpp"
+#include "KiwiApp_CustomToolbarButton.h"
 
 namespace kiwi
 {

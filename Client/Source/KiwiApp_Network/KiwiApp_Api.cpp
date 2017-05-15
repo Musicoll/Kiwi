@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include "KiwiApp_Api.hpp"
+#include "KiwiApp_Api.h"
 
 namespace kiwi
 {

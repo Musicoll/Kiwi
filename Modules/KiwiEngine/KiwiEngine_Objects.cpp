@@ -25,9 +25,9 @@
 #include <cmath>
 #include <algorithm>
 
-#include "KiwiEngine_Console.hpp"
-#include "KiwiEngine_Objects.hpp"
-#include "KiwiEngine_Patcher.hpp"
+#include "KiwiEngine_Console.h"
+#include "KiwiEngine_Objects.h"
+#include "KiwiEngine_Patcher.h"
 
 namespace kiwi
 {

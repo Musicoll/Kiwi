@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include "KiwiModel_Factory.hpp"
+#include "KiwiModel_Factory.h"
 
 namespace kiwi
 {

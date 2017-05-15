@@ -21,7 +21,7 @@
 
 #include "../catch.hpp"
 
-#include <KiwiDsp/KiwiDsp_Signal.hpp>
+#include <KiwiDsp/KiwiDsp_Signal.h>
 
 using namespace kiwi;
 using namespace dsp;

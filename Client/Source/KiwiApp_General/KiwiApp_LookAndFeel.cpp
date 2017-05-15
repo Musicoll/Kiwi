@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#include "../KiwiApp_General/KiwiApp_LookAndFeel.hpp"
-#include "../KiwiApp_Ressources/KiwiApp_BinaryData.hpp"
+#include "../KiwiApp_General/KiwiApp_LookAndFeel.h"
+#include "../KiwiApp_Ressources/KiwiApp_BinaryData.h"
 
 namespace bfonts = kiwi::binary_data::fonts;
 

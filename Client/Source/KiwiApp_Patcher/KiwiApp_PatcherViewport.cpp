@@ -19,9 +19,9 @@
  ==============================================================================
  */
 
-#include "KiwiApp_PatcherViewport.hpp"
-#include "KiwiApp_PatcherView.hpp"
-#include "KiwiApp_ObjectView.hpp"
+#include "KiwiApp_PatcherViewport.h"
+#include "KiwiApp_PatcherView.h"
+#include "KiwiApp_ObjectView.h"
 
 namespace kiwi
 {

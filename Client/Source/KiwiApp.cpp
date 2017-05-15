@@ -19,10 +19,10 @@
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiModel_DataModel.hpp>
+#include <KiwiModel/KiwiModel_DataModel.h>
 
-#include "KiwiApp.hpp"
-#include "KiwiApp_General/KiwiApp_CommandIDs.hpp"
+#include "KiwiApp.h"
+#include "KiwiApp_General/KiwiApp_CommandIDs.h"
 
 namespace kiwi
 {

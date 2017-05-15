@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#include "KiwiApp_SettingsPanel.hpp"
-#include "../KiwiApp.hpp"
+#include "KiwiApp_SettingsPanel.h"
+#include "../KiwiApp.h"
 
 namespace kiwi
 {

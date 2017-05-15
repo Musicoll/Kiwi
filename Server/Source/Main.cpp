@@ -19,9 +19,9 @@
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiModel_DataModel.hpp>
-#include "KiwiServer_Server.hpp"
-#include "KiwiServer_CommandLineParser.hpp"
+#include <KiwiModel/KiwiModel_DataModel.h>
+#include "KiwiServer_Server.h"
+#include "KiwiServer_CommandLineParser.h"
 
 #include <json.hpp>
 

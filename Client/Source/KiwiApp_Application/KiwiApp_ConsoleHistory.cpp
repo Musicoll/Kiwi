@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#include "../KiwiApp.hpp"
-#include "KiwiApp_ConsoleHistory.hpp"
+#include "../KiwiApp.h"
+#include "KiwiApp_ConsoleHistory.h"
 
 namespace kiwi
 {

@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include "KiwiEngine_Link.hpp"
+#include "KiwiEngine_Link.h"
 
 namespace kiwi
 {

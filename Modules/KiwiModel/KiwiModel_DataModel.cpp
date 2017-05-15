@@ -21,10 +21,10 @@
 
 #include "flip/DataModel.h"
 
-#include "KiwiModel_Def.hpp"
-#include "KiwiModel_DataModel.hpp"
-#include "KiwiModel_PatcherUser.hpp"
-#include "KiwiModel_Objects.hpp"
+#include "KiwiModel_Def.h"
+#include "KiwiModel_DataModel.h"
+#include "KiwiModel_PatcherUser.h"
+#include "KiwiModel_Objects.h"
 
 namespace kiwi
 {

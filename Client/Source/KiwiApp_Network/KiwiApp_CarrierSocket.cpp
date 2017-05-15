@@ -21,9 +21,9 @@
 
 #include <cassert>
 
-#include "KiwiApp_CarrierSocket.hpp"
+#include "KiwiApp_CarrierSocket.h"
 
-#include <KiwiModel/KiwiModel_PatcherUser.hpp>
+#include <KiwiModel/KiwiModel_PatcherUser.h>
 
 namespace kiwi
 {

@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#include "KiwiDsp_Signal.hpp"
-#include "KiwiDsp_Misc.hpp"
+#include "KiwiDsp_Signal.h"
+#include "KiwiDsp_Misc.h"
 
 namespace kiwi
 {

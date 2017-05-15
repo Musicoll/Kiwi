@@ -21,14 +21,14 @@
 
 #include <juce_audio_utils/juce_audio_utils.h>
 
-#include "KiwiApp_Instance.hpp"
-#include "KiwiApp_AboutWindow.hpp"
+#include "KiwiApp_Instance.h"
+#include "KiwiApp_AboutWindow.h"
 
-#include "../KiwiApp.hpp"
-#include "../KiwiApp_Network/KiwiApp_DocumentManager.hpp"
-#include "../KiwiApp_Components/KiwiApp_Window.hpp"
-#include "../KiwiApp_Patcher/KiwiApp_PatcherView.hpp"
-#include "../KiwiApp_Patcher/KiwiApp_PatcherComponent.hpp"
+#include "../KiwiApp.h"
+#include "../KiwiApp_Network/KiwiApp_DocumentManager.h"
+#include "../KiwiApp_Components/KiwiApp_Window.h"
+#include "../KiwiApp_Patcher/KiwiApp_PatcherView.h"
+#include "../KiwiApp_Patcher/KiwiApp_PatcherComponent.h"
 
 #include <cstdlib>
 #include <ctime>

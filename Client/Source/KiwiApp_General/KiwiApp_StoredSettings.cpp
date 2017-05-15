@@ -19,10 +19,10 @@
  ==============================================================================
  */
 
-#include "KiwiApp_StoredSettings.hpp"
-#include "../KiwiApp.hpp"
-#include "../KiwiApp_Ressources/KiwiApp_BinaryData.hpp"
-#include "KiwiApp_IDs.hpp"
+#include "KiwiApp_StoredSettings.h"
+#include "../KiwiApp.h"
+#include "../KiwiApp_Ressources/KiwiApp_BinaryData.h"
+#include "KiwiApp_IDs.h"
 
 namespace kiwi
 {

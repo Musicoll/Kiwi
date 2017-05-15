@@ -19,16 +19,16 @@
  ==============================================================================
  */
 
-#include "KiwiApp_DocumentBrowser.hpp"
-#include "../KiwiApp.hpp"
+#include "KiwiApp_DocumentBrowser.h"
+#include "../KiwiApp.h"
 
-#include "../KiwiApp_Network/KiwiApp_Api.hpp"
+#include "../KiwiApp_Network/KiwiApp_Api.h"
 
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 
-#include "../KiwiApp_General/KiwiApp_IDs.hpp"
+#include "../KiwiApp_General/KiwiApp_IDs.h"
 
 namespace kiwi
 {
