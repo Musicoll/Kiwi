@@ -40,7 +40,7 @@ build_script:
 
 after_build:
     - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\%CONFIGURATION%
-    - 7z a Kiwi_%PLATFORM%.zip %BUILD_DIR%\Kiwi.exe
+    - 7z a Kiwi_%PLATFORM%.zip %BUILD_DIR%\Kiwi.exe %BUILD_DIR%\*.dll
 
 artifacts:
   - path: '*.zip'
