@@ -28,8 +28,9 @@
 
 #include <juce_core/juce_core.h>
 
-#include <map>
 #include <atomic>
+
+#include "KiwiServer_ServerBase.h"
 
 namespace kiwi
 {
@@ -40,7 +41,7 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief The Server class.
-        class Server
+        class Server : public ServerBase
         {
         public: // methods
             
@@ -50,13 +51,13 @@ namespace kiwi
             //! @brief Destructor.
             ~Server();
             
-            //! @brief Server process
-            void process();
-            
-            //! @brief Loop that retrieves user input to manager server.
+            //! @brief Run the server.
+            //! @details This will run a loop that call ServerBase::process regularly.
+            //! @see stop
             void run();
             
             //! @brief Stops the server.
+            //! @see Run, isRunning
             void stop();
             
             //! @brief Returns true if the server is running.
@@ -65,25 +66,22 @@ namespace kiwi
             //! @brief Get the server running port
             uint16_t getPort() const noexcept;
             
-            //! @brief Get the number of sessions currently running.
-            uint16_t getNumberOfActiveSessions() const noexcept;
-            
         private: // methods
             
             //! @brief Initialise a new empty patcher
-            std::unique_ptr<flip::DocumentValidatorBase> createValidator(uint64_t session_id);
+            std::unique_ptr<flip::DocumentValidatorBase> createValidator(uint64_t session_id) override;
             
             //! @brief Initialise a new empty patcher
-            void initEmptyDocument(uint64_t session_id, flip::DocumentBase & document);
+            void initEmptyDocument(uint64_t session_id, flip::DocumentBase & document) override;
             
             //! @brief read a session backend.
-            flip::BackEndIR readSessionBackend(uint64_t session_id);
+            flip::BackEndIR readSessionBackend(uint64_t session_id) override;
             
             //! @brief write a session backend.
-            void writeSessionBackend(uint64_t session_id, flip::BackEndIR const& backend);
+            void writeSessionBackend(uint64_t session_id, flip::BackEndIR const& backend) override;
             
             //! @brief Authenticate a user.
-            bool authenticateUser(uint64_t user_id, uint64_t session_id, std::string metadata);
+            bool authenticateUser(uint64_t user_id, uint64_t session_id, std::string metadata) override;
             
             //! @brief Get the path for a given session.
             juce::File getSessionFile(uint64_t session_id);
@@ -96,9 +94,7 @@ namespace kiwi
         private: // variables
             
             const uint16_t                      m_port;
-            flip::ServerSimple                  m_server;
             std::atomic_bool                    m_running;
-            
             juce::File                          m_backend_directory;
             
             static const char*  kiwi_file_extension;
