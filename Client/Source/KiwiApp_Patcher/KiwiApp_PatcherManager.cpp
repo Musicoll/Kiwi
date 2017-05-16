@@ -243,9 +243,7 @@ namespace kiwi
         
         for(auto it = views.begin(); it != views.end();)
         {
-            model::Patcher::View& view = *it;
-            it = user.removeView(view);
-            
+            it = user.removeView(*it);
             view_has_been_removed = view_has_been_removed || (it != views.end());
         }
         
@@ -269,12 +267,11 @@ namespace kiwi
         
         for(auto it = views.begin(); it != views.end();)
         {
-            model::Patcher::View& view = *it;
             bool need_saving = m_need_saving_flag && (number_of_views <= 1);
             
             if(!need_saving || (need_saving && saveIfNeededAndUserAgrees() == juce::FileBasedDocument::savedOk))
             {
-                it = user.removeView(view);
+                it = user.removeView(*it);
                 DocumentManager::commit(patcher);
             }
             else
@@ -325,9 +322,9 @@ namespace kiwi
             
         auto& views = user.getViews();
         
-        const auto view_it = views.begin();
+        auto view_it = views.begin();
         
-        if(view_it != views.cend())
+        if(view_it != views.end())
         {
             model::Patcher::View& view = *view_it;
             if(view.entity().has<PatcherViewWindow>())
@@ -436,7 +433,7 @@ namespace kiwi
     }
 
     void PatcherManager::createPatcherWindow(model::Patcher& patcher,
-                                             model::Patcher::User& user,
+                                             model::Patcher::User const& user,
                                              model::Patcher::View& view)
     {
         if(user.getId() == m_instance.getUserId())
@@ -448,7 +445,7 @@ namespace kiwi
     }
 
     void PatcherManager::notifyPatcherView(model::Patcher& patcher,
-                                           model::Patcher::User& user,
+                                           model::Patcher::User const& user,
                                            model::Patcher::View& view)
     {
         if(user.getId() == m_instance.getUserId())
@@ -460,7 +457,7 @@ namespace kiwi
     }
 
     void PatcherManager::removePatcherWindow(model::Patcher& patcher,
-                                             model::Patcher::User& user,
+                                             model::Patcher::User const& user,
                                              model::Patcher::View& view)
     {
         if(user.getId() == m_instance.getUserId())

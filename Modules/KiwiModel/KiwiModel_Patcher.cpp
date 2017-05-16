@@ -210,12 +210,27 @@ namespace kiwi
             return m_objects;
         }
         
+        Patcher::Objects& Patcher::getObjects() noexcept
+        {
+            return m_objects;
+        }
+        
         Patcher::Links const& Patcher::getLinks() const noexcept
         {
             return m_links;
         }
         
+        Patcher::Links& Patcher::getLinks() noexcept
+        {
+            return m_links;
+        }
+        
         Patcher::Users const& Patcher::getUsers() const noexcept
+        {
+            return m_users;
+        }
+        
+        Patcher::Users& Patcher::getUsers() noexcept
         {
             return m_users;
         }
