@@ -35,7 +35,7 @@ $ echo export KIWI_CURL_LIB=[curl-dir]/lib >> ~/.bash_profile
 $ echo export KIWI_CURL_INCLUDE=[curl-dir]/include >>~/.bash_profile
 ```
 
-Kiwi also requires collborative library flip. Same process is used to retrieve <a href=https://irisate.com/developer-irisate/>flip precompiled libraries</a> and points to them using environment variables.
+Kiwi also requires collborative library flip. Same process is used to retrieve flip precompiled libraries and points to them using environment variables. To download current flip-public version for mac please folow this<a href=http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files/flip-demo-macos-c47e41da05.tar.gz> link </a>.
 
 ```shell
 # Download precomiled libraries from iristate website.
@@ -68,7 +68,7 @@ $ echo export KIWI_CURL_LIB=[curl-dir]/lib >> ~/.bashrc
 $ echo export KIWI_CURL_INCLUDE=[curl-dir]/include >>~/.bashrc
 ```
 
-Kiwi also requires collborative library flip. Same process is used to retrieve <a href=https://irisate.com/developer-irisate/>flip precompiled libraries</a> and points to them using environment variables.
+Kiwi also requires collborative library flip. Same process is used to retrieve flip precompiled libraries and points to them using environment variables. To download current flip-public version for linux please folow this<a href=http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files/flip-demo-linux-c47e41da05.tar.gz> link </a>.
 
 ```shell
 # Download precomiled libraries from irisate website.
@@ -117,7 +117,7 @@ $ set KIWI_CURL_LIB_x64=[curl-dir-x64]/lib/Release
 $ set KIWI_CURL_INCLUDE_x64=[curl-dir-x64]/include
 ```
 
-Install flip. Kiwi build system requires flip libraries being installed. You can install flip in a desired location and refere to it using environment variables. We recommend using precompiled <a href=https://irisate.com/developer-irisate/>flip precompiled libraries</a>.
+Install flip. Kiwi build system requires flip libraries being installed. You can install flip in a desired location and refere to it using environment variables. We recommend using precompiled flip precompiled libraries. To download current flip-public version for windows please folow this<a href=http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files/flip-demo-windows-c47e41da05.zip> link </a>.
 
 ```shell
 # Download precomiled libraries from irisate website.
