@@ -137,14 +137,18 @@ namespace kiwi
                 auto it_next = it;
                 ++it_next;
                 
-                auto session_id = it->first;
-                auto& document_server = it->second.document();
+                auto& session = it->second;
+                auto session_id = session.identifier();
+                auto& document_server = session.document();
                 const auto& ports = document_server.ports();
                 
                 if(ports.find(&port) != ports.end())
                 {
                     was_attached_flag = true;
                     document_server.port_factory_remove(port);
+                    
+                    // notify
+                    onDisconnected(session, port.user());
                     
                     if(ports.empty())
                     {
@@ -182,7 +186,8 @@ namespace kiwi
             
             assert(it != m_sessions.end());
             
-            auto& document_server = it->second.document();
+            auto& session = it->second;
+            auto& document_server = session.document();
             
             // rebind
             from.impl_unbind(*this);
@@ -190,6 +195,9 @@ namespace kiwi
             
             // forward
             document_server.port_greet(from);
+            
+            // notify
+            onConnected(session, from.user());
         }
         
         void ServerBase::port_commit(flip::PortBase& /* from */, const flip::Transaction& /* tx */)

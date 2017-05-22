@@ -83,6 +83,12 @@ namespace kiwi
             //! @brief Authenticate a user.
             bool authenticateUser(uint64_t user_id, uint64_t session_id, std::string metadata) override;
             
+            //! @brief Called when a user connects to a document
+            void onConnected(Session& session, uint64_t user_id) override;
+            
+            //! @brief Called when a user has been disconnected from a document
+            void onDisconnected(Session& session, uint64_t user_id) override;
+            
             //! @brief Get the path for a given session.
             juce::File getSessionFile(uint64_t session_id);
             

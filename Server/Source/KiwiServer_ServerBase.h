@@ -79,6 +79,12 @@ namespace kiwi
             //! @brief Authenticate a user.
             virtual bool authenticateUser(uint64_t user_id, uint64_t session_id, std::string metadata) = 0;
             
+            //! @brief Called when a user connects to a document
+            virtual void onConnected(Session& session, uint64_t user_id) {};
+            
+            //! @brief Called when a user has been disconnected from a document
+            virtual void onDisconnected(Session& session, uint64_t user_id) {};
+            
         private: // methods
             
             // PortFactoryListener

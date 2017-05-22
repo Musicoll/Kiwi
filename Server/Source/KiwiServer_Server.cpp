@@ -171,5 +171,18 @@ namespace kiwi
             return converter.str();
         }
         
+        void Server::onConnected(Session& session, uint64_t user_id)
+        {
+            std::cout
+            << "- User " << std::to_string(user_id)
+            << " connected to session: " << hexadecimal_convert(session.identifier()) << '\n';
+        }
+        
+        void Server::onDisconnected(Session& session, uint64_t user_id)
+        {
+            std::cout
+            << "- User " << std::to_string(user_id)
+            << " disconnected from session: " << hexadecimal_convert(session.identifier()) << '\n';
+        }
     }
 }
