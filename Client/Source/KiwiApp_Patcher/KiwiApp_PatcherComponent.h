@@ -56,7 +56,7 @@ namespace kiwi
                 zoom_in             = 2,
                 zoom_out            = 3,
                 dsp_on_off          = 4,
-                //users               = 5,
+                users               = 5,
             };
             
             void getAllToolbarItemIds(juce::Array<int>& ids) override;

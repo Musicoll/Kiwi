@@ -77,13 +77,13 @@ namespace kiwi
         ids.add(spacerId);
         ids.add(flexibleSpacerId);
         ids.add(ItemIds::dsp_on_off);
-        //ids.add(ItemIds::users);
+        ids.add(ItemIds::users);
     }
     
     void PatcherToolbar::Factory::getDefaultItemSet(juce::Array<int>& ids)
     {
-        //ids.add(ItemIds::users);
-        //ids.add(separatorBarId);
+        ids.add(ItemIds::users);
+        ids.add(separatorBarId);
         ids.add(ItemIds::dsp_on_off);
         ids.add(separatorBarId);
         ids.add(ItemIds::lock_unlock);
@@ -125,12 +125,10 @@ namespace kiwi
                                           IMG(dsp_off_png), IMG(dsp_on_png));
             btn->setCommandToTrigger(&KiwiApp::getCommandManager(), CommandIDs::switchDsp, true);
         }
-        /*
         else if(itemId == ItemIds::users)
         {
             btn = new UsersItemComponent(itemId, m_patcher_manager);
         }
-        */
         
         return btn;
     }
@@ -193,9 +191,7 @@ namespace kiwi
         if (isVertical)
             return false;
         
-        preferredSize = toolbarDepth * 2;
-        minSize = preferredSize;
-        maxSize = 300;
+        maxSize = minSize = preferredSize = 50;
         return true;
     }
     
