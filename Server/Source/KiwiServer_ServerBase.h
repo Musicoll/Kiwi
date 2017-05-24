@@ -27,6 +27,7 @@
 
 #include "flip/detail/DocumentValidatorBase.h"
 #include "flip/detail/BackEndBase.h"
+#include "flip/Signal.h"
 
 #include <map>
 #include <memory>
@@ -79,13 +80,19 @@ namespace kiwi
             //! @brief Authenticate a user.
             virtual bool authenticateUser(uint64_t user_id, uint64_t session_id, std::string metadata) = 0;
             
-            //! @brief Called when a user connects to a document
+            //! @brief Called when a new Session has been created.
+            virtual void sessionCreated(Session& session) {};
+            
+            //! @brief Called when a user connects to a document.
             virtual void onConnected(Session& session, uint64_t user_id) {};
             
-            //! @brief Called when a user has been disconnected from a document
+            //! @brief Called when a user has been disconnected from a document.
             virtual void onDisconnected(Session& session, uint64_t user_id) {};
             
         private: // methods
+            
+            SessionMap::iterator create_session(uint64_t session_id);
+            void load_session(flip::DocumentServer & server, uint64_t session_id);
             
             // PortFactoryListener
             virtual void port_factory_add(flip::PortBase & port) override;
@@ -108,9 +115,6 @@ namespace kiwi
                                      const flip::SignalData & data) override;
             
         private: // variables
-            
-            SessionMap::iterator create_session(uint64_t session_id);
-            void load_session(flip::DocumentServer & server, uint64_t session_id);
             
             const flip::DataModelBase&      m_data_model;
             flip::PortTransportServerTcp    m_port;
@@ -157,12 +161,20 @@ namespace kiwi
             //! @brief Write the session.
             void write();
             
+            //! @brief Returns a list of connected users.
+            std::vector<uint64_t> getConnectedUsers();
+            
+            //! @brief Store the signal connection in the session.
+            void storeSignalConnection(flip::SignalConnection && cnx);
+            
         private: // variables
             
             ServerBase&                                     m_parent;
             const uint64_t                                  m_identifier;
             std::unique_ptr<flip::DocumentValidatorBase>    m_validator_uptr;
             std::unique_ptr<flip::DocumentServer>           m_document_uptr;
+            
+            std::vector<flip::SignalConnection>             m_signal_connections;
             
         private: // variables
             

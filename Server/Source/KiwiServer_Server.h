@@ -83,6 +83,9 @@ namespace kiwi
             //! @brief Authenticate a user.
             bool authenticateUser(uint64_t user_id, uint64_t session_id, std::string metadata) override;
             
+            //! @brief Called when a new session has been created.
+            void sessionCreated(Session& session) override;
+            
             //! @brief Called when a user connects to a document
             void onConnected(Session& session, uint64_t user_id) override;
             
@@ -99,9 +102,9 @@ namespace kiwi
             
         private: // variables
             
-            const uint16_t                      m_port;
-            std::atomic_bool                    m_running;
-            juce::File                          m_backend_directory;
+            const uint16_t      m_port;
+            std::atomic_bool    m_running;
+            juce::File          m_backend_directory;
             
             static const char*  kiwi_file_extension;
             

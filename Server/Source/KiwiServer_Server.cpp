@@ -63,7 +63,7 @@ namespace kiwi
         {
             if(!m_running)
             {
-                flip::RunLoopTimer run_loop ([this](){
+                flip::RunLoopTimer run_loop ([this] {
                     process();
                     return m_running.load();
                 }, 0.02);
@@ -171,18 +171,47 @@ namespace kiwi
             return converter.str();
         }
         
+        void Server::sessionCreated(Session& session)
+        {
+            auto& document = session.document();
+            auto& patcher = document.root<model::Patcher>();
+            
+            auto cnx = patcher.signal_get_connected_users.connect([&patcher, &document, &session] {
+                
+                document.reply_signal(patcher.signal_receive_connected_users.make(session.getConnectedUsers()));
+                
+            });
+            
+            session.storeSignalConnection(std::move(cnx));
+        }
+        
         void Server::onConnected(Session& session, uint64_t user_id)
         {
-            std::cout
-            << "- User " << std::to_string(user_id)
-            << " connected to session: " << hexadecimal_convert(session.identifier()) << '\n';
+            auto& document = session.document();
+            auto& patcher = document.root<model::Patcher>();
+            
+            // send a list of connected users to the user that is connecting.
+            document.send_signal_if(patcher.signal_receive_connected_users.make(session.getConnectedUsers()),
+                                    [user_id](flip::PortBase& port){return port.user() == user_id;});
+            
+            // Notify other users that this one is connected.
+            document.send_signal_if(patcher.signal_user_connect.make(user_id),
+                                    [user_id](flip::PortBase& port){return port.user() != user_id;});
+            
+            DBG("[server] - User " << std::to_string(user_id)
+                << " connected to session: " << hexadecimal_convert(session.identifier()));
         }
         
         void Server::onDisconnected(Session& session, uint64_t user_id)
         {
-            std::cout
-            << "- User " << std::to_string(user_id)
-            << " disconnected from session: " << hexadecimal_convert(session.identifier()) << '\n';
+            auto& document = session.document();
+            auto& patcher = document.root<model::Patcher>();
+            
+            document.send_signal_if(patcher.signal_user_disconnect.make(user_id),
+                                    [](flip::PortBase& port){return true;});
+            
+            DBG("[server] - User " << std::to_string(user_id)
+                << " disconnected from session: " << hexadecimal_convert(session.identifier()));
         }
     }
 }

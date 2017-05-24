@@ -71,6 +71,24 @@ namespace kiwi
             m_parent.writeSession(document(), identifier());
         }
         
+        std::vector<uint64_t> ServerBase::Session::getConnectedUsers()
+        {
+            std::vector<uint64_t> users;
+            auto const& ports = m_document_uptr->ports();
+            
+            for(auto const& port : ports)
+            {
+                users.emplace_back(port->user());
+            }
+            
+            return users;
+        }
+        
+        void ServerBase::Session::storeSignalConnection(flip::SignalConnection && cnx)
+        {
+            m_signal_connections.emplace_back(std::forward<flip::SignalConnection>(cnx));
+        }
+        
         // ================================================================================ //
         //                                      SERVER                                      //
         // ================================================================================ //
@@ -178,8 +196,9 @@ namespace kiwi
             
             auto session_id = from.session();
             auto it = m_sessions.find(session_id);
+            const bool is_new_session = (it == m_sessions.end());
             
-            if(it == m_sessions.end())
+            if(is_new_session)
             {
                 it = create_session(session_id);
             }
@@ -188,6 +207,11 @@ namespace kiwi
             
             auto& session = it->second;
             auto& document_server = session.document();
+            
+            if(is_new_session)
+            {
+                sessionCreated(session);
+            }
             
             // rebind
             from.impl_unbind(*this);
