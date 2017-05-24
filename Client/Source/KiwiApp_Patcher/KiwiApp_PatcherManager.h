@@ -31,6 +31,8 @@
 
 #include "../KiwiApp_Network/KiwiApp_DocumentBrowser.h"
 
+#include <unordered_set>
+
 namespace kiwi
 {
     class Instance;
@@ -161,6 +163,12 @@ namespace kiwi
         bool                                        m_need_saving_flag;
         bool                                        m_is_remote;
         DocumentBrowser::Drive::DocumentSession*    m_session {nullptr};
+        
+        flip::SignalConnection                      m_user_connected_signal_cnx;
+        flip::SignalConnection                      m_user_disconnected_signal_cnx;
+        flip::SignalConnection                      m_receive_connected_users_signal_cnx;
+        
+        std::unordered_set<uint64_t>                m_connected_users;
         
         engine::Listeners<Listener>                 m_listeners;
     };
