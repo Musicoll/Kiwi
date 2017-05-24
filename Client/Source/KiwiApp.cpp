@@ -81,12 +81,14 @@ namespace kiwi
     
     void KiwiApp::initialise(juce::String const& commandLine)
     {
+        #if ! JUCE_MAC
         if(sendCommandLineToPreexistingInstance())
         {
             DBG ("Another instance is running - quitting...");
             quit();
             return;
         }
+        #endif
    
         model::DataModel::init();
         
