@@ -77,13 +77,21 @@ namespace kiwi
         ids.add(spacerId);
         ids.add(flexibleSpacerId);
         ids.add(ItemIds::dsp_on_off);
-        ids.add(ItemIds::users);
+        
+        if(m_patcher_manager.isRemote())
+        {
+            ids.add(ItemIds::users);
+        }
     }
     
     void PatcherToolbar::Factory::getDefaultItemSet(juce::Array<int>& ids)
     {
-        ids.add(ItemIds::users);
-        ids.add(separatorBarId);
+        if(m_patcher_manager.isRemote())
+        {
+            ids.add(ItemIds::users);
+            ids.add(separatorBarId);
+        }
+        
         ids.add(ItemIds::dsp_on_off);
         ids.add(separatorBarId);
         ids.add(ItemIds::lock_unlock);
