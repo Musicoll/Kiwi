@@ -52,6 +52,10 @@ namespace kiwi
         // ================================================================================ //
         
         Patcher::Patcher()
+        : signal_user_connect(Signal_USER_CONNECT, *this)
+        , signal_user_disconnect(Signal_USER_DISCONNECT, *this)
+        , signal_get_connected_users(Signal_GET_CONNECTED_USERS, *this)
+        , signal_receive_connected_users(Signal_RECEIVE_CONNECTED_USERS, *this)
         {
             // user changes doesn't need to be stored in an history.
             m_users.disable_in_undo();

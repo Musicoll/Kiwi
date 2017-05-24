@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "flip/Signal.h"
 #include "KiwiModel_Link.h"
 
 namespace kiwi
@@ -124,6 +125,28 @@ namespace kiwi
             //! therefore, do not use this method while observing the model.
             //! @return The current User.
             User& useSelfUser();
+            
+        public: // signals
+            
+            enum
+            {
+                Signal_USER_CONNECT     = 0,
+                Signal_USER_DISCONNECT,
+                Signal_GET_CONNECTED_USERS,
+                Signal_RECEIVE_CONNECTED_USERS,
+            };
+            
+            // from server to client
+            flip::Signal<uint64_t>              signal_user_connect;
+            
+            // from server to client
+            flip::Signal<uint64_t>              signal_user_disconnect;
+            
+            // from client to server
+            flip::Signal<>                      signal_get_connected_users;
+            
+            // from server to client
+            flip::Signal<std::vector<uint64_t>> signal_receive_connected_users;
             
         public: // internal methods
             
