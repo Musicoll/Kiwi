@@ -21,12 +21,6 @@
 
 #pragma once
 
-#include <KiwiModel/KiwiModel_Atom.h>
-#include <mutex>
-#include <algorithm>
-#include <exception>
-#include <set>
-
 // ---- Flip headers ---- //
 #include "flip/Bool.h"
 #include "flip/Int.h"
@@ -37,6 +31,14 @@
 #include "flip/Object.h"
 #include "flip/ObjectRef.h"
 #include "flip/Enum.h"
+#include "flip/Signal.h"
+
+#include "KiwiModel_Atom.h"
+
+#include <mutex>
+#include <algorithm>
+#include <exception>
+#include <set>
 
 namespace kiwi
 {

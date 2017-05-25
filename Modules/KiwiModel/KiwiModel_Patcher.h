@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "flip/Signal.h"
 #include "KiwiModel_Link.h"
 
 namespace kiwi
