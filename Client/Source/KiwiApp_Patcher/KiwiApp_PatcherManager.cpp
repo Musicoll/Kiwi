@@ -172,6 +172,11 @@ namespace kiwi
         return m_connected_users.size();
     }
     
+    std::unordered_set<uint64_t> PatcherManager::getConnectedUsers()
+    {
+        return m_connected_users;
+    }
+    
     size_t PatcherManager::getNumberOfView()
     {
         auto& patcher = getPatcher();

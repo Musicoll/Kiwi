@@ -87,6 +87,9 @@ namespace kiwi
         //! @brief Returns the number of users connected to the patcher document.
         size_t getNumberOfUsers();
         
+        //! @brief Returns the list of users connected to the patcher document.
+        std::unordered_set<uint64_t> getConnectedUsers();
+        
         //! @brief Returns the number of patcher views.
         size_t getNumberOfView();
         
@@ -180,9 +183,6 @@ namespace kiwi
     struct PatcherManager::Listener
     {
         virtual ~Listener() {};
-        
-        //! @brief Called when the document state changed.
-        virtual void documentStateChanged() {};
         
         //! @brief Called when one or more users are connecting or disconnecting to the Patcher Document.
         virtual void connectedUserChanged(PatcherManager& manager) {};
