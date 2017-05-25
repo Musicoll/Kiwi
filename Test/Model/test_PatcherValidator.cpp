@@ -21,10 +21,10 @@
 
 #include "../catch.hpp"
 
-#include <flip/Document.h>
-#include <flip/DocumentServer.h>
-#include <flip/PortDirect.h>
-#include <flip/CarrierDirect.h>
+#include "flip/Document.h"
+#include "flip/DocumentServer.h"
+#include "flip/PortDirect.h"
+#include "flip/CarrierDirect.h"
 
 #include <KiwiModel/KiwiModel_DataModel.h>
 #include <KiwiModel/KiwiModel_PatcherUser.h>

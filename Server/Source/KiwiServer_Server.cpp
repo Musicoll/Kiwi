@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#include <flip/contrib/DataProviderFile.h>
-#include <flip/contrib/DataConsumerFile.h>
+#include "flip/contrib/DataProviderFile.h"
+#include "flip/contrib/DataConsumerFile.h"
 
 #include <KiwiModel/KiwiModel_DataModel.h>
 #include <KiwiModel/KiwiModel_PatcherUser.h>
