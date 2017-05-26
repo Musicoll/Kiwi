@@ -83,42 +83,57 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief A toolbar component that displays informations about the users of the patch
-    class PatcherToolbar::UsersItemComponent :
-    public juce::ToolbarItemComponent,
-    public PatcherManager::Listener
+    class PatcherToolbar::UsersItemComponent
+    : public juce::ToolbarItemComponent
+    , public PatcherManager::Listener
+    , private juce::Timer
     {
     public: // methods
         
+        //! @brief Constructor.
         UsersItemComponent(const int toolbarItemId, PatcherManager& patcher_manager);
         
+        //! @brief Destructor.
         ~UsersItemComponent();
         
         //! @brief Called when one or more users are connecting or disconnecting to the Patcher Document.
         void connectedUserChanged(PatcherManager& manager) override;
         
+        //! @brief Provides prefered size for this item.
         bool getToolbarItemSizes(int toolbarDepth, bool isVertical,
                                  int& preferredSize, int& minSize, int& maxSize) override;
         
+        //! @brief Paint the button area.
         void paintButtonArea(juce::Graphics&, int width, int height,
                              bool isMouseOver, bool isMouseDown) override;
         
+        //! @brief Called when content area changed.
         void contentAreaChanged(const juce::Rectangle<int>& newArea) override;
         
-        void mouseEnter(juce::MouseEvent const& e) override;
-        void mouseExit(juce::MouseEvent const& e) override;
+        //! @brief Starts this component flashing.
+        void startFlashing();
+        
+        //! @brief Stops this component flashing.
+        void stopFlashing();
+        
+    private: // methods
+        
+        //! @internal juce::Timer callback.
+        void timerCallback() override;
         
     private: // variables
         
         PatcherManager&     m_patcher_manager;
         size_t              m_users;
         const juce::Image   m_users_img;
+        float               m_flash_alpha = 0.f;
     };
     
     // ================================================================================ //
     //                                PATCHER COMPONENT                                 //
     // ================================================================================ //
     
-    //! @brief The PatcherView Viewport
+    //! @brief The PatcherComponent holds a patcher view and a patcher toolbar.
     class PatcherComponent :
     public juce::Component,
     public juce::ApplicationCommandTarget
