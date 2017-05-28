@@ -41,6 +41,8 @@ namespace kiwi
             
             //! @brief Constructor
             NewBox(std::string const& name, std::vector<Atom> const& args);
+            
+            std::string getIODescription(bool is_inlet, size_t index) const override;
 
             //! @internal flip static declare method
             static void declare();
@@ -68,6 +70,8 @@ namespace kiwi
             //! @param inlets The number of inlets.
             void setOutlets(flip::Array<Outlet> const& outlets);
             
+            std::string getIODescription(bool is_inlet, size_t index) const override;
+            
             //! @internal flip static declare method
             static void declare();
         };
@@ -85,6 +89,8 @@ namespace kiwi
             
             //! @brief Constructor
             Plus(std::string const& name, std::vector<Atom> const& args);
+            
+            std::string getIODescription(bool is_inlet, size_t index) const override;
             
             //! @internal flip static declare method
             static void declare();
@@ -104,6 +110,8 @@ namespace kiwi
             //! @brief Constructor
             Times(std::string const& name, std::vector<Atom> const& args);
             
+            std::string getIODescription(bool is_inlet, size_t index) const override;
+            
             //! @internal flip static declare method
             static void declare();
         };
@@ -121,6 +129,8 @@ namespace kiwi
             
             //! @brief Constructor
             Print(std::string const& name, std::vector<Atom> const& args);
+            
+            std::string getIODescription(bool is_inlet, size_t index) const override;
             
             //! @internal flip static declare method
             static void declare();
@@ -140,6 +150,8 @@ namespace kiwi
             //! @brief Constructor
             Receive(std::string const& name, std::vector<Atom> const& args);
             
+            std::string getIODescription(bool is_inlet, size_t index) const override;
+            
             //! @internal flip static declare method
             static void declare();
         };
@@ -157,6 +169,8 @@ namespace kiwi
             
             //! @brief Constructor
             Loadmess(std::string const& name, std::vector<Atom> const& args);
+            
+            std::string getIODescription(bool is_inlet, size_t index) const override;
             
             //! @internal flip static declare method
             static void declare();
@@ -176,6 +190,8 @@ namespace kiwi
             //! @brief Constructor
             Delay(std::string const& name, std::vector<Atom> const& args);
             
+            std::string getIODescription(bool is_inlet, size_t index) const override;
+            
             //! @internal flip static declare method
             static void declare();
         };
@@ -193,6 +209,8 @@ namespace kiwi
             
             //! @brief Constructor
             Pipe(std::string const& name, std::vector<Atom> const& args);
+            
+            std::string getIODescription(bool is_inlet, size_t index) const override;
             
             //! @internal flip static declare method
             static void declare();
@@ -212,6 +230,8 @@ namespace kiwi
             //! @brief Constructor
             Metro(std::string const& name, std::vector<Atom> const& args);
             
+            std::string getIODescription(bool is_inlet, size_t index) const override;
+            
             //! @internal flip static declare method
             static void declare();
         };
@@ -228,6 +248,8 @@ namespace kiwi
 
             //! @brief Constructor
             OscTilde(std::string const& name, std::vector<Atom> const& args);
+            
+            std::string getIODescription(bool is_inlet, size_t index) const override;
 
             //! @internal flip static declare method
             static void declare();
@@ -247,8 +269,14 @@ namespace kiwi
             //! @brief Constructor
             AdcTilde(std::string const& name, std::vector<Atom> const& args);
             
+            std::string getIODescription(bool is_inlet, size_t index) const override;
+            
             //! @internal flip static declare method
             static void declare();
+            
+        private: // members
+            
+            std::vector<size_t> m_routes;
         };
         
         // ================================================================================ //
@@ -266,8 +294,14 @@ namespace kiwi
             //! @brief Constructor
             DacTilde(std::string const& name, std::vector<Atom> const& args);
             
+            std::string getIODescription(bool is_inlet, size_t index) const override;
+            
             //! @internal flip static declare method
             static void declare();
+            
+        private: // members
+            
+            std::vector<size_t> m_routes;
         };
         
         // ================================================================================ //
@@ -283,6 +317,8 @@ namespace kiwi
             
             //! @brief Constructor
             TimesTilde(std::string const& name, std::vector<Atom> const& args);
+            
+            std::string getIODescription(bool is_inlet, size_t index) const override;
             
             //! @internal flip static declare method
             static void declare();
@@ -302,6 +338,8 @@ namespace kiwi
             //! @brief Constructor
             PlusTilde(std::string const& name, std::vector<Atom> const& args);
             
+            std::string getIODescription(bool is_inlet, size_t index) const override;
+            
             //! @internal flip static declare method
             static void declare();
         };
@@ -320,6 +358,8 @@ namespace kiwi
             //! @brief Constructor
             SigTilde(std::string const& name, std::vector<Atom> const& args);
             
+            std::string getIODescription(bool is_inlet, size_t index) const override;
+            
             //! @internal flip static declare method
             static void declare();
         };
@@ -337,6 +377,8 @@ namespace kiwi
             
             //! @brief Constructor
             DelayTilde(std::string const& name, std::vector<Atom> const& args);
+            
+            std::string getIODescription(bool is_inlet, size_t index) const override;
             
             //! @internal flip static declare method
             static void declare();
