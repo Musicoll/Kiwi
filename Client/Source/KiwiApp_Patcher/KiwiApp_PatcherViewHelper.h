@@ -25,6 +25,8 @@
 #include <flip/Ref.h>
 #include <set>
 
+#include "../KiwiApp_Components/KiwiApp_TooltipWindow.h"
+
 namespace kiwi
 {
     class PatcherView;
@@ -34,7 +36,9 @@ namespace kiwi
     //                                   IOLET HILIGHTER                                //
     // ================================================================================ //
     
-    class IoletHighlighter : public juce::Component
+    class IoletHighlighter
+    : public juce::Component
+    , public CustomTooltipClient
     {
     public:
         
@@ -56,10 +60,26 @@ namespace kiwi
         //! @brief Highlight outlet
         void highlightOutlet(ObjectView const& object, const size_t index);
         
+        //! @brief Returns the string that this object wants to show as its tooltip.
+        juce::String getTooltip() override;
+        
+        //! @brief Returns the bounds of the tooltip to show.
+        juce::Rectangle<int> getTooltipBounds(juce::String const& tip,
+                                              juce::Point<int>,
+                                              juce::Rectangle<int> parent_area,
+                                              int width,
+                                              int height) override;
+        
+    private: // methods
+        
+        void highlight(ObjectView const& object, const size_t index);
+        
     private: // members
         
-        bool            m_is_inlet;
-        std::string     m_text;
+        bool                    m_is_inlet;
+        std::string             m_text;
+        std::string             m_object_name;
+        bool                    m_show_tooltip_on_left;
     };
     
     // ================================================================================ //

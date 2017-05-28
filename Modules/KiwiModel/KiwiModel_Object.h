@@ -217,7 +217,10 @@ namespace kiwi
             //! @brief Returns the object's height.
             double getHeight() const noexcept;
             
-        protected:
+            //! @brief Returns inlet or outlet description.
+            virtual std::string getIODescription(bool is_inlet, size_t index) const;
+            
+        protected: // methods
             
             //! @brief Clear and replace all the object's inlets.
             void setInlets(flip::Array<Inlet> const& inlets);

@@ -23,6 +23,7 @@
 #include "KiwiApp_PatcherView.h"
 #include "KiwiApp_ObjectView.h"
 #include "KiwiApp_LinkView.h"
+#include "../KiwiApp.h"
 
 namespace kiwi
 {
@@ -41,6 +42,8 @@ namespace kiwi
     
     void IoletHighlighter::hide()
     {
+        KiwiApp::useTooltipWindow().unsetCustomTooltipClient(*this);
+        m_text.clear();
         setVisible(false);
     }
     
@@ -60,24 +63,68 @@ namespace kiwi
     
     void IoletHighlighter::highlightInlet(ObjectView const& object, const size_t index)
     {
-        const juce::Point<int> io_center = object.getInletPatcherPosition(index);
-        juce::Rectangle<int> new_bounds = juce::Rectangle<int>(io_center, io_center).expanded(5);
-        
         m_is_inlet = true;
-        
-        setBounds(new_bounds);
-        setVisible(true);
+        highlight(object, index);
     }
     
     void IoletHighlighter::highlightOutlet(ObjectView const& object, const size_t index)
     {
-        const juce::Point<int> io_center = object.getOutletPatcherPosition(index);
-        juce::Rectangle<int> new_bounds = juce::Rectangle<int>(io_center, io_center).expanded(5);
-        
         m_is_inlet = false;
+        highlight(object, index);
+    }
+    
+    void IoletHighlighter::highlight(ObjectView const& object, const size_t index)
+    {
+        const auto& object_model = object.getModel();
+        auto new_name = object_model.getName();
+        auto new_text = object_model.getIODescription(m_is_inlet, index);
         
-        setBounds(new_bounds);
-        setVisible(true);
+        if(m_text != new_text || m_object_name != new_name)
+        {
+            auto pos = m_is_inlet
+            ? object.getInletPatcherPosition(index) : object.getOutletPatcherPosition(index);
+            
+            m_text = std::move(new_text);
+            m_object_name = std::move(new_name);
+            
+            setBounds(juce::Rectangle<int>(pos, pos).expanded(5));
+            setVisible(true);
+            
+            m_show_tooltip_on_left = m_is_inlet ? index < object_model.getNumberOfInlets() * 0.5 : index < object_model.getNumberOfOutlets() * 0.5;
+            
+            KiwiApp::useTooltipWindow().setCustomTooltipClient(*this);
+        }
+    }
+    
+    juce::String IoletHighlighter::getTooltip()
+    {
+        return m_object_name + ": " + m_text;
+    }
+    
+    juce::Rectangle<int> IoletHighlighter::getTooltipBounds(juce::String const& tip,
+                                                            juce::Point<int> /*pos*/,
+                                                            juce::Rectangle<int> parent_area, int w, int h)
+    {
+        h += 5;
+        w += 5;
+        const int margin = 10;
+        const auto pos = getScreenBounds().getCentre();
+        
+        const int on_left_pos = pos.x - w - margin;
+        int x_pos = on_left_pos;
+        
+        if(!m_show_tooltip_on_left || (m_show_tooltip_on_left && on_left_pos < parent_area.getX()))
+        {
+            x_pos = pos.x + margin;
+        }
+        
+        if(x_pos + w > parent_area.getRight())
+        {
+            x_pos = on_left_pos;
+        }
+        
+        return juce::Rectangle<int>(x_pos, m_is_inlet ? pos.y - h - margin : pos.y + margin, w, h)
+        .constrainedWithin(parent_area);
     }
     
     // ================================================================================ //
@@ -94,7 +141,7 @@ namespace kiwi
     
     Lasso::~Lasso()
     {
-        
+        ;
     }
     
     bool Lasso::isPerforming() const noexcept

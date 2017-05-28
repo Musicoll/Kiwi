@@ -249,6 +249,11 @@ namespace kiwi
         return KiwiApp::use().m_looknfeel;
     }
     
+    TooltipWindow& KiwiApp::useTooltipWindow()
+    {
+        return KiwiApp::use().m_tooltip_window;
+    }
+    
     // ================================================================================ //
     //                                      CONSOLE                                     //
     // ================================================================================ //
