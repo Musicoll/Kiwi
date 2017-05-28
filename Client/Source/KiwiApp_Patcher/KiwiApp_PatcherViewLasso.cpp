@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include "KiwiApp_PatcherViewHelper.h"
+#include "KiwiApp_PatcherViewLasso.h"
 #include "KiwiApp_PatcherView.h"
 #include "KiwiApp_ObjectView.h"
 #include "KiwiApp_LinkView.h"
@@ -28,108 +28,9 @@
 namespace kiwi
 {
     // ================================================================================ //
-    //                                   IOLET HILIGHTER                                //
+    //										LASSO                                       //
     // ================================================================================ //
     
-    IoletHighlighter::IoletHighlighter()
-    {
-        setInterceptsMouseClicks(false, false);
-        setAlwaysOnTop(true);
-        
-        setVisible(false);
-        setBounds(0, 0, 1, 1);
-    }
-    
-    void IoletHighlighter::hide()
-    {
-        KiwiApp::useTooltipWindow().unsetCustomTooltipClient(*this);
-        m_text.clear();
-        setVisible(false);
-    }
-    
-    void IoletHighlighter::paint(juce::Graphics& g)
-    {
-        const juce::Colour bgcolor = m_is_inlet ? juce::Colour(0xFF17BEBB) : juce::Colour(0xFFCD5334);
-        const juce::Colour bd_color(0xFF2E282A);
-        
-        const juce::Rectangle<float> bounds = getLocalBounds().reduced(1).toFloat();
-        
-        g.setColour(bgcolor);
-        g.fillRect(bounds);
-        
-        g.setColour(bd_color);
-        g.drawRect(bounds);
-    }
-    
-    void IoletHighlighter::highlightInlet(ObjectView const& object, const size_t index)
-    {
-        m_is_inlet = true;
-        highlight(object, index);
-    }
-    
-    void IoletHighlighter::highlightOutlet(ObjectView const& object, const size_t index)
-    {
-        m_is_inlet = false;
-        highlight(object, index);
-    }
-    
-    void IoletHighlighter::highlight(ObjectView const& object, const size_t index)
-    {
-        const auto& object_model = object.getModel();
-        auto new_name = object_model.getName();
-        auto new_text = object_model.getIODescription(m_is_inlet, index);
-        
-        if(m_text != new_text || m_object_name != new_name)
-        {
-            auto pos = m_is_inlet
-            ? object.getInletPatcherPosition(index) : object.getOutletPatcherPosition(index);
-            
-            m_text = std::move(new_text);
-            m_object_name = std::move(new_name);
-            
-            setBounds(juce::Rectangle<int>(pos, pos).expanded(5));
-            setVisible(true);
-            
-            m_show_tooltip_on_left = m_is_inlet ? index < object_model.getNumberOfInlets() * 0.5 : index < object_model.getNumberOfOutlets() * 0.5;
-            
-            KiwiApp::useTooltipWindow().setCustomTooltipClient(*this);
-        }
-    }
-    
-    juce::String IoletHighlighter::getTooltip()
-    {
-        return m_object_name + ": " + m_text;
-    }
-    
-    juce::Rectangle<int> IoletHighlighter::getTooltipBounds(juce::String const& tip,
-                                                            juce::Point<int> /*pos*/,
-                                                            juce::Rectangle<int> parent_area, int w, int h)
-    {
-        h += 5;
-        w += 5;
-        const int margin = 10;
-        const auto pos = getScreenBounds().getCentre();
-        
-        const int on_left_pos = pos.x - w - margin;
-        int x_pos = on_left_pos;
-        
-        if(!m_show_tooltip_on_left || (m_show_tooltip_on_left && on_left_pos < parent_area.getX()))
-        {
-            x_pos = pos.x + margin;
-        }
-        
-        if(x_pos + w > parent_area.getRight())
-        {
-            x_pos = on_left_pos;
-        }
-        
-        return juce::Rectangle<int>(x_pos, m_is_inlet ? pos.y - h - margin : pos.y + margin, w, h)
-        .constrainedWithin(parent_area);
-    }
-    
-    // ================================================================================ //
-    //										JLASSO                                      //
-    // ================================================================================ //
     Lasso::Lasso(PatcherView& patcher) : m_patcher(patcher), m_dragging(false)
     {
         setInterceptsMouseClicks(false, false);
