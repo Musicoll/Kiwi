@@ -106,7 +106,7 @@ namespace kiwi
     {
         h += 5;
         w += 5;
-        const int margin = 10;
+        const int margin = 12;
         const auto pos = getScreenBounds().getCentre();
         
         const int on_left_pos = pos.x - w - margin;
@@ -124,5 +124,27 @@ namespace kiwi
         
         return juce::Rectangle<int>(x_pos, m_is_inlet ? pos.y - h - margin : pos.y + margin, w, h)
         .constrainedWithin(parent_area);
+    }
+    
+    bool IoletHighlighter::drawTooltip(juce::Graphics& g, juce::String const& text, int width, int height)
+    {
+        juce::Rectangle<int> bounds(width, height);
+        const auto corner_size = 0.f;
+        
+        const juce::Colour bgcolor = m_is_inlet ? juce::Colour(0xFF17BEBB) : juce::Colour(0xFFCD5334);
+        
+        g.setColour(bgcolor);
+        g.fillRoundedRectangle(bounds.toFloat(), 0);
+        
+        g.setColour(juce::Colours::whitesmoke);
+        g.fillRoundedRectangle(bounds.toFloat().reduced(0.5f, 0.5f), corner_size);
+        
+        g.setColour(bgcolor);
+        g.drawRoundedRectangle(bounds.toFloat().reduced(0.5f, 0.5f), corner_size, 1.f);
+        
+        LookAndFeel::layoutTooltipText(text, juce::Colours::black)
+        .draw(g, juce::Rectangle<float>((float) width, (float) height));
+        
+        return true;
     }
 }

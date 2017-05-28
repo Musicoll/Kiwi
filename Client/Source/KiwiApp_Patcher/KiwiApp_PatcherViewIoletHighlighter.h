@@ -66,6 +66,11 @@ namespace kiwi
                                               int width,
                                               int height) override;
         
+        //! @brief Overriden to provide a custom drawing method.
+        bool drawTooltip(juce::Graphics& g,
+                         juce::String const& text,
+                         int width, int height) override;
+        
     private: // methods
         
         void highlight(ObjectView const& object, const size_t index);

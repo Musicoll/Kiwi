@@ -20,9 +20,21 @@
  */
 
 #include "KiwiApp_TooltipWindow.h"
+#include "../KiwiApp_General/KiwiApp_LookAndFeel.h"
 
 namespace kiwi
 {
+    // ================================================================================ //
+    //                              CUSTOM TOOLTIP CLIENT                               //
+    // ================================================================================ //
+    
+    bool CustomTooltipClient::drawTooltip(juce::Graphics& g,
+                                          juce::String const& text,
+                                          int width, int height)
+    {
+        return false;
+    }
+    
     // ================================================================================ //
     //                              CUSTOM TOOLTIP WINDOW                               //
     // ================================================================================ //
@@ -60,7 +72,12 @@ namespace kiwi
     
     void TooltipWindow::paint(juce::Graphics& g)
     {
-        getLookAndFeel().drawTooltip(g, m_tip_showing, getWidth(), getHeight());
+        if(!m_custom_client
+           || (m_custom_client
+               && !m_custom_client->drawTooltip(g, m_tip_showing, getWidth(), getHeight())))
+        {
+            getLookAndFeel().drawTooltip(g, m_tip_showing, getWidth(), getHeight());
+        }
     }
     
     void TooltipWindow::mouseEnter(juce::MouseEvent const&)
@@ -68,28 +85,11 @@ namespace kiwi
         hideTip();
     }
     
-    namespace Helpers
-    {
-        static juce::TextLayout layoutTooltipText(juce::String const& text) noexcept
-        {
-            const float font_size = 13.0f;
-            const int max_width = 400;
-            
-            juce::AttributedString s;
-            s.setJustification(juce::Justification::centred);
-            s.append(text, juce::Font(font_size, juce::Font::bold), juce::Colours::black);
-            
-            juce::TextLayout tl;
-            tl.createLayoutWithBalancedLineLengths(s,(float) max_width);
-            return tl;
-        }
-    }
-    
     void TooltipWindow::updatePosition(juce::String const& tip,
                                        juce::Point<int> pos,
                                        juce::Rectangle<int> parentArea)
     {
-        const juce::TextLayout tl(Helpers::layoutTooltipText(tip));
+        const juce::TextLayout tl(LookAndFeel::layoutTooltipText(tip));
         
         const int w = (int)(tl.getWidth() + 14.0f);
         const int h = (int)(tl.getHeight() + 6.0f);
@@ -100,8 +100,8 @@ namespace kiwi
         }
         else
         {
-            setBounds(juce::Rectangle<int>(pos.x > parentArea.getCentreX() ? pos.x -(w + 12) : pos.x + 24,
-                                           pos.y > parentArea.getCentreY() ? pos.y -(h + 6) : pos.y + 6,
+            setBounds(juce::Rectangle<int>(pos.x > parentArea.getCentreX() ? pos.x - (w + 12) : pos.x + 24,
+                                           pos.y > parentArea.getCentreY() ? pos.y - (h + 6) : pos.y + 6,
                                            w, h).constrainedWithin(parentArea));
         }
         

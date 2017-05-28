@@ -42,6 +42,11 @@ namespace kiwi
                                                       juce::Rectangle<int> parent_area,
                                                       int width,
                                                       int height) = 0;
+        
+        //! @brief Can be overriden to provide a custom drawing method.
+        virtual bool drawTooltip(juce::Graphics& g,
+                                 juce::String const& text,
+                                 int width, int height);
     };
     
     // ================================================================================ //

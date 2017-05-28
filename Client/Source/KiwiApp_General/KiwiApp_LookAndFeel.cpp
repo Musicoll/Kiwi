@@ -26,6 +26,20 @@ namespace bfonts = kiwi::binary_data::fonts;
 
 namespace kiwi
 {
+    juce::TextLayout LookAndFeel::layoutTooltipText(juce::String const& text, juce::Colour colour) noexcept
+    {
+        const float font_size = 13.0f;
+        const int max_width = 400;
+        
+        juce::AttributedString s;
+        s.setJustification(juce::Justification::centred);
+        s.append(text, juce::Font(font_size, juce::Font::bold), colour);
+        
+        juce::TextLayout tl;
+        tl.createLayoutWithBalancedLineLengths(s, (float) max_width);
+        return tl;
+    }
+    
     LookAndFeel::LookAndFeel() : juce::LookAndFeel_V4(getGreyColourScheme())
     {
         setColour(juce::ScrollBar::ColourIds::thumbColourId, juce::Colours::grey.withAlpha(0.7f));
