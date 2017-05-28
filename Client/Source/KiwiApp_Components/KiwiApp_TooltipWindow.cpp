@@ -155,18 +155,6 @@ namespace kiwi
         }
     }
     
-    juce::String TooltipWindow::getTipFor(Component* const c)
-    {
-        if(c != nullptr)
-        {
-            if(juce::TooltipClient* const ttc = dynamic_cast<juce::TooltipClient*>(c))
-                if(! c->isCurrentlyBlockedByAnotherModalComponent())
-                    return ttc->getTooltip();
-        }
-        
-        return {};
-    }
-    
     void TooltipWindow::hideTip()
     {
         if(! m_reentrant)
@@ -190,14 +178,14 @@ namespace kiwi
         
         juce::String new_tip;
         
-        if(juce::Process::isForegroundProcess()
-           && ! juce::ModifierKeys::getCurrentModifiers().isAnyMouseButtonDown())
+        if(juce::Process::isForegroundProcess())
         {
             if(has_custom_tooltip)
             {
                 new_tip = m_custom_client->getTooltip();
             }
-            else if(new_comp)
+            else if(new_comp
+                    && !juce::ModifierKeys::getCurrentModifiers().isAnyMouseButtonDown())
             {
                 if(juce::TooltipClient* const ttc = dynamic_cast<juce::TooltipClient*>(new_comp))
                     if(! new_comp->isCurrentlyBlockedByAnotherModalComponent())
@@ -206,7 +194,7 @@ namespace kiwi
         }
         
         const bool tip_changed = (new_tip != m_last_tip_under_mouse
-                                  ||(m_custom_client != m_last_custom_client)
+                                  || m_custom_client != m_last_custom_client
                                   || new_comp != m_last_component_under_mouse);
         
         m_last_custom_client = m_custom_client;

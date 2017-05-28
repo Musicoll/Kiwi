@@ -94,8 +94,6 @@ namespace kiwi
         void timerCallback() override;
         void updatePosition(juce::String const&, juce::Point<int>, juce::Rectangle<int>);
         
-        static juce::String getTipFor(juce::Component*);
-        
     private: // members
         
         juce::Point<float>      m_last_mouse_pos;

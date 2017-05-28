@@ -77,13 +77,14 @@ namespace kiwi
         auto new_name = object_model.getName();
         auto new_text = object_model.getIODescription(m_is_inlet, index);
         
-        if(m_text != new_text || m_object_name != new_name)
+        if(!isVisible() || m_text != new_text || m_object_name != new_name || m_last_index != index)
         {
             auto pos = m_is_inlet
             ? object.getInletPatcherPosition(index) : object.getOutletPatcherPosition(index);
             
             m_text = std::move(new_text);
             m_object_name = std::move(new_name);
+            m_last_index = index;
             
             setBounds(juce::Rectangle<int>(pos, pos).expanded(5));
             setVisible(true);

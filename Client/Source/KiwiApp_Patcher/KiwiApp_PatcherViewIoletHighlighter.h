@@ -26,7 +26,6 @@
 
 namespace kiwi
 {
-    class PatcherView;
     class ObjectView;
     
     // ================================================================================ //
@@ -77,5 +76,6 @@ namespace kiwi
         std::string             m_text;
         std::string             m_object_name;
         bool                    m_show_tooltip_on_left;
+        size_t                  m_last_index;
     };
 }
