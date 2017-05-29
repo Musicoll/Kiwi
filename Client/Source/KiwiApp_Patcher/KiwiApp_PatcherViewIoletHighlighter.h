@@ -21,22 +21,20 @@
 
 #pragma once
 
-#include "flip/Ref.h"
-
 #include <juce_gui_extra/juce_gui_extra.h>
-
-#include <set>
+#include "../KiwiApp_Components/KiwiApp_TooltipWindow.h"
 
 namespace kiwi
 {
-    class PatcherView;
     class ObjectView;
     
     // ================================================================================ //
     //                                   IOLET HILIGHTER                                //
     // ================================================================================ //
     
-    class IoletHighlighter : public juce::Component
+    class IoletHighlighter
+    : public juce::Component
+    , public CustomTooltipClient
     {
     public:
         
@@ -58,56 +56,31 @@ namespace kiwi
         //! @brief Highlight outlet
         void highlightOutlet(ObjectView const& object, const size_t index);
         
-    private: // members
+        //! @brief Returns the string that this object wants to show as its tooltip.
+        juce::String getTooltip() override;
         
-        bool            m_is_inlet;
-        std::string     m_text;
-    };
-    
-    // ================================================================================ //
-    //										JLASSO                                      //
-    // ================================================================================ //
-    
-    class Lasso : public juce::Component
-    {
-    public:
+        //! @brief Returns the bounds of the tooltip to show.
+        juce::Rectangle<int> getTooltipBounds(juce::String const& tip,
+                                              juce::Point<int>,
+                                              juce::Rectangle<int> parent_area,
+                                              int width,
+                                              int height) override;
         
-        //! @brief Contructor.
-        Lasso(PatcherView& patcher);
+        //! @brief Overriden to provide a custom drawing method.
+        bool drawTooltip(juce::Graphics& g,
+                         juce::String const& text,
+                         int width, int height) override;
         
-        //! @grief Destructor.
-        ~Lasso();
+    private: // methods
         
-        //! @brief The paint method.
-        void paint(juce::Graphics& g) override;
-        
-        //! @brief Begins the selection of the links and the boxes.
-        //! @param point The starting point.
-        //! @param preserve_selection The lasso should preserve the current selection.
-        void begin(juce::Point<int> const& point, const bool preserve_selection);
-        
-        //! @brief Perform the selection of the links and the boxes.
-        //! @param point The draging point.
-        //! @param objects The lasso should add objects to the selection.
-        //! @param links The lasso should add links to the selection.
-        //! @param preserve The lasso should preserve the last selection.
-        void perform(juce::Point<int> const& point, bool objects, bool links, const bool preserve);
-        
-        //! @brief Ends the selection of the links and the boxes.
-        void end();
-
-        //! Retrieve Returns true if the Lasso is performing the selection.
-        bool isPerforming() const noexcept;
+        void highlight(ObjectView const& object, const size_t index);
         
     private: // members
         
-        PatcherView&        m_patcher;
-        
-        std::set<flip::Ref> m_objects;
-        std::set<flip::Ref> m_links;
-        
-        juce::Point<int>    m_start;
-        bool				m_dragging;
+        bool                    m_is_inlet;
+        std::string             m_text;
+        std::string             m_object_name;
+        bool                    m_show_tooltip_on_left;
+        size_t                  m_last_index;
     };
-    
 }

@@ -26,7 +26,6 @@
 #include "../KiwiApp.h"
 #include "../KiwiApp_General/KiwiApp_CommandIDs.h"
 #include "../KiwiApp_Network/KiwiApp_DocumentManager.h"
-#include "KiwiApp_PatcherViewHelper.h"
 #include "KiwiApp_ObjectView.h"
 #include "KiwiApp_LinkView.h"
 #include "KiwiApp_PatcherComponent.h"

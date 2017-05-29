@@ -31,6 +31,8 @@
 #include "KiwiApp_General/KiwiApp_StoredSettings.h"
 #include "KiwiApp_General/KiwiApp_LookAndFeel.h"
 
+#include "KiwiApp_Components/KiwiApp_TooltipWindow.h"
+
 namespace ProjectInfo
 {
     const char* const  projectName    = "Kiwi";
@@ -110,6 +112,9 @@ namespace kiwi
         
         //! @brief Returns the application look and feel.
         static LookAndFeel& useLookAndFeel();
+        
+        //! @brief Returns the Tooltip Window component.
+        static TooltipWindow& useTooltipWindow();
         
         // ================================================================================ //
         //                                      CONSOLE                                     //
@@ -213,7 +218,7 @@ namespace kiwi
         std::atomic<bool>                                   m_quit_requested;
         
         LookAndFeel                                         m_looknfeel;
-        juce::TooltipWindow                                 m_tooltip_window;
+        TooltipWindow                                       m_tooltip_window;
         std::unique_ptr<StoredSettings>                     m_settings;
     };
 }

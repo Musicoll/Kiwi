@@ -293,5 +293,10 @@ namespace kiwi
         {
             m_outlets.emplace(m_outlets.end(), type);
         }
+        
+        std::string Object::getIODescription(bool is_inlet, size_t index) const
+        {
+            return (is_inlet ? "inlet " : "outlet ") + std::to_string(index);
+        }
     }
 }
