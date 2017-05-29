@@ -61,10 +61,14 @@ namespace kiwi
 
         loadPatcher();
         m_viewport.updatePatcherArea(true);
+        
+        m_manager.addListener(*this);
     }
     
     PatcherView::~PatcherView()
     {
+        m_manager.removeListener(*this);
+        
         removeChildComponent(&m_io_highlighter);
         removeChildComponent(&m_lasso);
         
@@ -1356,6 +1360,16 @@ namespace kiwi
         }
     }
     
+    void PatcherView::connectedUserChanged(PatcherManager& manager)
+    {
+        if(&m_manager == &manager)
+        {
+            auto& patcher = manager.getPatcher();
+            checkObjectsSelectionChanges(patcher);
+            checkLinksSelectionChanges(patcher);
+        }
+    }
+    
     // ================================================================================ //
     //                                     OBSERVER                                     //
     // ================================================================================ //
@@ -1537,7 +1551,7 @@ namespace kiwi
     
     void PatcherView::checkObjectsSelectionChanges(model::Patcher& patcher)
     {
-        if(! patcher.changed()) return; // abort
+        const auto connected_users = m_manager.getConnectedUsers();
         
         std::set<flip::Ref>                     new_local_objects_selection;
         std::map<flip::Ref, std::set<uint64_t>> new_distant_objects_selection;
@@ -1555,11 +1569,16 @@ namespace kiwi
                     
                     const uint64_t user_id = user.getId();
                     const bool is_distant_user = user_id != m_instance.getUserId();
+                    const bool is_connected = (connected_users.find(user_id) != connected_users.end());
+                    
+                    if(is_distant_user && !is_connected)
+                    {
+                        continue;
+                    }
                     
                     for(auto& view : user.getViews())
                     {
-                        const bool is_local_view = ( &m_view_model == &view );
-                        
+                        const bool is_local_view = (&m_view_model == &view);
                         const bool is_selected = view.isSelected(object_m);
                         
                         if(is_selected)
@@ -1643,7 +1662,7 @@ namespace kiwi
     
     void PatcherView::checkLinksSelectionChanges(model::Patcher& patcher)
     {
-        if(! patcher.changed()) return; // abort
+        const auto connected_users = m_manager.getConnectedUsers();
         
         std::set<flip::Ref>                     new_local_links_selection;
         std::map<flip::Ref, std::set<uint64_t>> new_distant_links_selection;
@@ -1661,11 +1680,16 @@ namespace kiwi
                 
                 const uint64_t user_id = user.getId();
                 const bool is_distant_user = user_id != m_instance.getUserId();
+                const bool is_connected = (connected_users.find(user_id) != connected_users.end());
+                
+                if(is_distant_user && !is_connected)
+                {
+                    continue;
+                }
                 
                 for(auto& view : user.getViews())
                 {
-                    const bool is_local_view = ( &m_view_model == &view );
-                    
+                    const bool is_local_view = (&m_view_model == &view);
                     const bool is_selected = view.isSelected(link_m);
                     
                     if(is_selected)

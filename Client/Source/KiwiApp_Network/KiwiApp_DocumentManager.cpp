@@ -19,10 +19,10 @@
  ==============================================================================
  */
 
-#include <flip/BackEndIR.h>
-#include <flip/BackEndBinary.h>
-#include <flip/contrib/DataConsumerFile.h>
-#include <flip/contrib/DataProviderFile.h>
+#include "flip/BackEndIR.h"
+#include "flip/BackEndBinary.h"
+#include "flip/contrib/DataConsumerFile.h"
+#include "flip/contrib/DataProviderFile.h"
 
 #include <KiwiModel/KiwiModel_PatcherUser.h>
 

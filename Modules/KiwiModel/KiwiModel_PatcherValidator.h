@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <flip/DocumentValidator.h>
+#include "flip/DocumentValidator.h"
 
 #include "KiwiModel_PatcherUser.h"
 

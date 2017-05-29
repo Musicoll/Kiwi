@@ -28,6 +28,7 @@
 #include "KiwiApp_PatcherViewport.h"
 #include "KiwiApp_PatcherViewHitTester.h"
 #include "KiwiApp_PatcherViewHelper.h"
+#include "KiwiApp_PatcherManager.h"
 
 namespace kiwi
 {
@@ -43,7 +44,10 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The juce Patcher Component.
-    class PatcherView : public juce::Component, public juce::ApplicationCommandTarget
+    class PatcherView
+    : public juce::Component
+    , public juce::ApplicationCommandTarget
+    , public PatcherManager::Listener
     {
     public:
         
@@ -138,6 +142,13 @@ namespace kiwi
         
         //! @brief Called internally when the origin of the patcher view changed.
         void originPositionChanged();
+        
+        // ================================================================================ //
+        //                             PATCHER MANAGER LISTENER                             //
+        // ================================================================================ //
+        
+        //! @brief Called when one or more users are connecting or disconnecting to the Patcher Document.
+        void connectedUserChanged(PatcherManager& manager) override;
         
         // ================================================================================ //
         //                                  MODEL OBSERVER                                  //

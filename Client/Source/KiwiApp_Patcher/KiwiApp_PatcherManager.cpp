@@ -82,6 +82,32 @@ namespace kiwi
         
         model::Patcher& patcher = getPatcher();
         
+        m_user_connected_signal_cnx = patcher.signal_user_connect.connect([this](uint64_t user_id){
+            
+            if(m_connected_users.insert(user_id).second)
+            {
+                m_listeners.call(&Listener::connectedUserChanged, *this);
+            }
+        });
+        
+        m_user_disconnected_signal_cnx = patcher.signal_user_disconnect.connect([this](uint64_t user_id){
+            
+            const auto user_to_erase = m_connected_users.find(user_id);
+            if(user_to_erase != m_connected_users.cend())
+            {
+                m_connected_users.erase(user_id);
+                m_listeners.call(&Listener::connectedUserChanged, *this);
+            }
+        });
+        
+        m_receive_connected_users_signal_cnx = patcher.signal_receive_connected_users.connect([this](std::vector<uint64_t> users){
+            
+            // Todo : make a diff of the changes and notify listeners only if the list really changed.
+            m_connected_users.clear();
+            m_connected_users.insert(users.begin(), users.end());
+            m_listeners.call(&Listener::connectedUserChanged, *this);
+        });
+        
         DocumentManager::connect(patcher,
                                  session.getHost(),
                                  session.getSessionPort(),
@@ -143,12 +169,12 @@ namespace kiwi
     
     size_t PatcherManager::getNumberOfUsers()
     {
-        auto& patcher = getPatcher();
-        auto& user = patcher.getUsers();
-        
-        return std::count_if(user.begin(), user.end(), [](model::Patcher::User const& user){
-            return (!user.removed() && user.getNumberOfViews() > 0);
-        });
+        return m_connected_users.size();
+    }
+    
+    std::unordered_set<uint64_t> PatcherManager::getConnectedUsers()
+    {
+        return m_connected_users;
     }
     
     size_t PatcherManager::getNumberOfView()

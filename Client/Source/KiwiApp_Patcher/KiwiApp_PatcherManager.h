@@ -31,6 +31,8 @@
 
 #include "../KiwiApp_Network/KiwiApp_DocumentBrowser.h"
 
+#include <unordered_set>
+
 namespace kiwi
 {
     class Instance;
@@ -84,6 +86,9 @@ namespace kiwi
         
         //! @brief Returns the number of users connected to the patcher document.
         size_t getNumberOfUsers();
+        
+        //! @brief Returns the list of users connected to the patcher document.
+        std::unordered_set<uint64_t> getConnectedUsers();
         
         //! @brief Returns the number of patcher views.
         size_t getNumberOfView();
@@ -162,6 +167,12 @@ namespace kiwi
         bool                                        m_is_remote;
         DocumentBrowser::Drive::DocumentSession*    m_session {nullptr};
         
+        flip::SignalConnection                      m_user_connected_signal_cnx;
+        flip::SignalConnection                      m_user_disconnected_signal_cnx;
+        flip::SignalConnection                      m_receive_connected_users_signal_cnx;
+        
+        std::unordered_set<uint64_t>                m_connected_users;
+        
         engine::Listeners<Listener>                 m_listeners;
     };
     
@@ -172,9 +183,6 @@ namespace kiwi
     struct PatcherManager::Listener
     {
         virtual ~Listener() {};
-        
-        //! @brief Called when the document state changed.
-        virtual void documentStateChanged() {};
         
         //! @brief Called when one or more users are connecting or disconnecting to the Patcher Document.
         virtual void connectedUserChanged(PatcherManager& manager) {};

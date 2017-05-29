@@ -81,12 +81,14 @@ namespace kiwi
     
     void KiwiApp::initialise(juce::String const& commandLine)
     {
+        #if ! JUCE_MAC
         if(sendCommandLineToPreexistingInstance())
         {
             DBG ("Another instance is running - quitting...");
             quit();
             return;
         }
+        #endif
    
         model::DataModel::init();
         
@@ -412,7 +414,13 @@ namespace kiwi
     {
         menu.addCommandItem(m_command_manager.get(), CommandIDs::startDsp);
         menu.addCommandItem(m_command_manager.get(), CommandIDs::stopDsp);
+        
+        menu.addSeparator();
         menu.addCommandItem(m_command_manager.get(), CommandIDs::showAudioStatusWindow);
+        
+        #if ! JUCE_MAC
+        menu.addCommandItem(&getCommandManager(), CommandIDs::showAppSettingsWindow);
+        #endif
     }
     
     void KiwiApp::createWindowMenu(juce::PopupMenu& menu)

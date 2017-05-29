@@ -21,8 +21,10 @@
 
 #pragma once
 
+#include "flip/Ref.h"
+
 #include <juce_gui_extra/juce_gui_extra.h>
-#include <flip/Ref.h>
+
 #include <set>
 
 namespace kiwi

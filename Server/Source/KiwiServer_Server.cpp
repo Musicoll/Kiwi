@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#include <flip/contrib/DataProviderFile.h>
-#include <flip/contrib/DataConsumerFile.h>
+#include "flip/contrib/DataProviderFile.h"
+#include "flip/contrib/DataConsumerFile.h"
 
 #include <KiwiModel/KiwiModel_DataModel.h>
 #include <KiwiModel/KiwiModel_PatcherUser.h>
@@ -39,19 +39,11 @@ namespace kiwi
         const char* Server::kiwi_file_extension = "kiwi";
         
         Server::Server(uint16_t port, std::string const& backend_directory) :
+        ServerBase(model::DataModel::use(), port),
         m_port(port),
-        m_server(model::DataModel::use(), m_port),
         m_running(false),
         m_backend_directory(backend_directory)
         {
-            using namespace std::placeholders; // for _1, _2 etc.
-            
-            m_server.bind_validator_factory(std::bind(&Server::createValidator, this, _1));
-            m_server.bind_init(std::bind(&Server::initEmptyDocument, this, _1, _2));
-            m_server.bind_read(std::bind(&Server::readSessionBackend, this, _1));
-            m_server.bind_write(std::bind(&Server::writeSessionBackend, this, _1, _2));
-            m_server.bind_authenticate(std::bind(&Server::authenticateUser, this, _1, _2, _3));
-            
             if (m_backend_directory.exists() && !m_backend_directory.isDirectory())
             {
                 throw std::runtime_error("Specified backend directory is a file");
@@ -71,7 +63,7 @@ namespace kiwi
         {
             if(!m_running)
             {
-                flip::RunLoopTimer run_loop ([this](){
+                flip::RunLoopTimer run_loop ([this] {
                     process();
                     return m_running.load();
                 }, 0.02);
@@ -103,16 +95,6 @@ namespace kiwi
         uint16_t Server::getPort() const noexcept
         {
             return m_port;
-        }
-        
-        uint16_t Server::getNumberOfActiveSessions() const noexcept
-        {
-            return m_server.nbr_sessions();
-        }
-        
-        void Server::process()
-        {
-            m_server.process();
         }
         
         std::unique_ptr<flip::DocumentValidatorBase> Server::createValidator(uint64_t session_id)
@@ -189,5 +171,47 @@ namespace kiwi
             return converter.str();
         }
         
+        void Server::sessionCreated(Session& session)
+        {
+            auto& document = session.document();
+            auto& patcher = document.root<model::Patcher>();
+            
+            auto cnx = patcher.signal_get_connected_users.connect([&patcher, &document, &session] {
+                
+                document.reply_signal(patcher.signal_receive_connected_users.make(session.getConnectedUsers()));
+                
+            });
+            
+            session.storeSignalConnection(std::move(cnx));
+        }
+        
+        void Server::onConnected(Session& session, uint64_t user_id)
+        {
+            auto& document = session.document();
+            auto& patcher = document.root<model::Patcher>();
+            
+            // send a list of connected users to the user that is connecting.
+            document.send_signal_if(patcher.signal_receive_connected_users.make(session.getConnectedUsers()),
+                                    [user_id](flip::PortBase& port){return port.user() == user_id;});
+            
+            // Notify other users that this one is connected.
+            document.send_signal_if(patcher.signal_user_connect.make(user_id),
+                                    [user_id](flip::PortBase& port){return port.user() != user_id;});
+            
+            DBG("[server] - User " << std::to_string(user_id)
+                << " connected to session: " << hexadecimal_convert(session.identifier()));
+        }
+        
+        void Server::onDisconnected(Session& session, uint64_t user_id)
+        {
+            auto& document = session.document();
+            auto& patcher = document.root<model::Patcher>();
+            
+            document.send_signal_if(patcher.signal_user_disconnect.make(user_id),
+                                    [](flip::PortBase& port){return true;});
+            
+            DBG("[server] - User " << std::to_string(user_id)
+                << " disconnected from session: " << hexadecimal_convert(session.identifier()));
+        }
     }
 }

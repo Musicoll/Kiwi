@@ -77,13 +77,21 @@ namespace kiwi
         ids.add(spacerId);
         ids.add(flexibleSpacerId);
         ids.add(ItemIds::dsp_on_off);
-        //ids.add(ItemIds::users);
+        
+        if(m_patcher_manager.isRemote())
+        {
+            ids.add(ItemIds::users);
+        }
     }
     
     void PatcherToolbar::Factory::getDefaultItemSet(juce::Array<int>& ids)
     {
-        //ids.add(ItemIds::users);
-        //ids.add(separatorBarId);
+        if(m_patcher_manager.isRemote())
+        {
+            ids.add(ItemIds::users);
+            ids.add(separatorBarId);
+        }
+        
         ids.add(ItemIds::dsp_on_off);
         ids.add(separatorBarId);
         ids.add(ItemIds::lock_unlock);
@@ -125,12 +133,10 @@ namespace kiwi
                                           IMG(dsp_off_png), IMG(dsp_on_png));
             btn->setCommandToTrigger(&KiwiApp::getCommandManager(), CommandIDs::switchDsp, true);
         }
-        /*
         else if(itemId == ItemIds::users)
         {
             btn = new UsersItemComponent(itemId, m_patcher_manager);
         }
-        */
         
         return btn;
     }
@@ -143,12 +149,14 @@ namespace kiwi
     //                             TOOLBAR USER COMPONENT                               //
     // ================================================================================ //
     
-    PatcherToolbar::UsersItemComponent::UsersItemComponent(const int toolbarItemId, PatcherManager& patcher_manager)
-    : ToolbarItemComponent (toolbarItemId, "Custom Toolbar Item", false),
-    m_patcher_manager(patcher_manager),
-    m_users(m_patcher_manager.getNumberOfUsers()),
-    m_users_img(juce::ImageCache::getFromMemory(binary_data::images::users_png,
-                                                binary_data::images::users_png_size))
+    PatcherToolbar::UsersItemComponent::UsersItemComponent(const int toolbarItemId,
+                                                           PatcherManager& patcher_manager)
+    : ToolbarItemComponent (toolbarItemId, "Custom Toolbar Item", false)
+    , m_patcher_manager(patcher_manager)
+    , m_users(m_patcher_manager.getNumberOfUsers())
+    , m_users_img(juce::ImageCache::getFromMemory(binary_data::images::users_png,
+                                                  binary_data::images::users_png_size))
+    , m_flash_alpha(0.f)
     {
         m_patcher_manager.addListener(*this);
     }
@@ -163,7 +171,7 @@ namespace kiwi
         if(&manager == &m_patcher_manager)
         {
             m_users = m_patcher_manager.getNumberOfUsers();
-            repaint();
+            startFlashing();
         }
     }
     
@@ -181,9 +189,12 @@ namespace kiwi
                                           center_y - count_size / 2,
                                           count_size, count_size);
         
-        g.setColour(juce::Colours::grey);
-        g.drawEllipse(label_bounds.expanded(2).toFloat(), 1.5f);
+        const juce::Colour badge_color(juce::Colours::grey.withAlpha(0.5f));
+        g.setColour(badge_color.overlaidWith(juce::Colours::white.withAlpha(m_flash_alpha)));
+        g.drawEllipse(label_bounds.expanded(2).toFloat(), 0.5f);
+        g.fillEllipse(label_bounds.expanded(2).toFloat());
         
+        g.setColour(juce::Colours::whitesmoke);
         g.drawText(std::to_string(m_users), label_bounds, juce::Justification::centred);
     }
     
@@ -193,9 +204,7 @@ namespace kiwi
         if (isVertical)
             return false;
         
-        preferredSize = toolbarDepth * 2;
-        minSize = preferredSize;
-        maxSize = 300;
+        maxSize = minSize = preferredSize = 50;
         return true;
     }
     
@@ -204,14 +213,30 @@ namespace kiwi
         repaint();
     }
     
-    void PatcherToolbar::UsersItemComponent::mouseEnter(juce::MouseEvent const& e)
+    void PatcherToolbar::UsersItemComponent::startFlashing()
     {
-        ;
+        m_flash_alpha = 1.0f;
+        startTimerHz (25);
     }
     
-    void PatcherToolbar::UsersItemComponent::mouseExit(juce::MouseEvent const& e)
+    void PatcherToolbar::UsersItemComponent::stopFlashing()
     {
-        ;
+        m_flash_alpha = 0.0f;
+        stopTimer();
+        repaint();
+    }
+    
+    void PatcherToolbar::UsersItemComponent::timerCallback()
+    {
+        // Reduce the alpha level of the flash slightly so it fades out
+        m_flash_alpha -= 0.075f;
+        
+        if(m_flash_alpha < 0.05f)
+        {
+            stopFlashing();
+        }
+        
+        repaint();
     }
     
     // ================================================================================ //
