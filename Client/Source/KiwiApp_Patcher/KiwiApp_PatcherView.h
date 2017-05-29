@@ -27,8 +27,9 @@
 
 #include "KiwiApp_PatcherViewport.h"
 #include "KiwiApp_PatcherViewHitTester.h"
-#include "KiwiApp_PatcherViewHelper.h"
 #include "KiwiApp_PatcherManager.h"
+#include "KiwiApp_PatcherViewLasso.h"
+#include "KiwiApp_PatcherViewIoletHighlighter.h"
 
 namespace kiwi
 {

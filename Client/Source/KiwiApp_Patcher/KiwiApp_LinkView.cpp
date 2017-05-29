@@ -22,7 +22,6 @@
 #include "../KiwiApp.h"
 #include "KiwiApp_LinkView.h"
 #include "KiwiApp_PatcherView.h"
-#include "KiwiApp_PatcherViewHelper.h"
 
 namespace kiwi
 {

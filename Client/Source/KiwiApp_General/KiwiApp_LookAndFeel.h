@@ -67,6 +67,10 @@ namespace kiwi
                                           bool isMouseOver, bool isMouseDown,
                                           juce::ToolbarItemComponent& component) override;
         
+        //! @brief Make a textLayout for tootips
+        static juce::TextLayout layoutTooltipText(juce::String const& text,
+                                                  juce::Colour colour = juce::Colours::black) noexcept;
+        
     private: // deleted methods
         
         LookAndFeel(LookAndFeel const& other) = delete;
