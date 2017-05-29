@@ -414,7 +414,13 @@ namespace kiwi
     {
         menu.addCommandItem(m_command_manager.get(), CommandIDs::startDsp);
         menu.addCommandItem(m_command_manager.get(), CommandIDs::stopDsp);
+        
+        menu.addSeparator();
         menu.addCommandItem(m_command_manager.get(), CommandIDs::showAudioStatusWindow);
+        
+        #if ! JUCE_MAC
+        menu.addCommandItem(&getCommandManager(), CommandIDs::showAppSettingsWindow);
+        #endif
     }
     
     void KiwiApp::createWindowMenu(juce::PopupMenu& menu)
