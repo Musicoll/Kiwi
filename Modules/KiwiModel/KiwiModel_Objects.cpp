@@ -392,9 +392,8 @@ namespace kiwi
         }
         
         AdcTilde::AdcTilde(std::string const& name, std::vector<Atom> const& args)
-        : m_routes(parseArgsAsChannelRoutes(args))
         {
-            size_t channels = m_routes.size();
+            size_t channels = parseArgsAsChannelRoutes(args).size();
             
             pushInlet({PinType::IType::Control});
             
@@ -418,7 +417,13 @@ namespace kiwi
             else
             {
                 if(index < getNumberOfOutlets())
-                    return "Channel " + std::to_string(m_routes[index] + 1);
+                {
+                    auto text_atoms = AtomHelper::parse(getText());
+                    text_atoms.erase(text_atoms.cbegin());
+                    const auto routes = parseArgsAsChannelRoutes(text_atoms);
+                    
+                    return "(signal) Audio In Channel " + std::to_string(routes[index] + 1);
+                }
             }
             
             return {};
@@ -429,9 +434,8 @@ namespace kiwi
         // ================================================================================ //
         
         DacTilde::DacTilde(std::string const& name, std::vector<Atom> const& args)
-        : m_routes(parseArgsAsChannelRoutes(args))
         {
-            size_t channels = m_routes.size();
+            size_t channels = parseArgsAsChannelRoutes(args).size();
             
             pushInlet({PinType::IType::Signal, PinType::IType::Control});
             
@@ -452,13 +456,17 @@ namespace kiwi
             {
                 if(index < getNumberOfInlets())
                 {
+                    auto text_atoms = AtomHelper::parse(getText());
+                    text_atoms.erase(text_atoms.cbegin());
+                    const auto routes = parseArgsAsChannelRoutes(text_atoms);
+                    
                     if(index == 0)
                     {
-                        return "Start/Stop dsp, Channel " + std::to_string(m_routes[0] + 1);
+                        return "Start/Stop dsp, (signal) Audio Out Channel " + std::to_string(routes[0] + 1);
                     }
                     else
                     {
-                        return "Channel " + std::to_string(m_routes[index] + 1);
+                        return "(signal) Audio Out Channel " + std::to_string(routes[index] + 1);
                     }
                 }
             }

@@ -273,10 +273,6 @@ namespace kiwi
             
             //! @internal flip static declare method
             static void declare();
-            
-        private: // members
-            
-            std::vector<size_t> m_routes;
         };
         
         // ================================================================================ //
@@ -298,10 +294,6 @@ namespace kiwi
             
             //! @internal flip static declare method
             static void declare();
-            
-        private: // members
-            
-            std::vector<size_t> m_routes;
         };
         
         // ================================================================================ //
