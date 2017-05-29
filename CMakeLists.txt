@@ -3,6 +3,24 @@ cmake_minimum_required (VERSION 3.0.2)
 project (Kiwi CXX)
 
 #--------------------------------------
+# Check Compiler Version
+#--------------------------------------
+
+if (WIN32)
+    if((CMAKE_CXX_COMPILER_ID NOT STREQUAL "MSVC") OR (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19))
+        message(WARNING "Using untested compiler, tested compiler is MSVC 19.0 or later")
+    endif()
+elseif(UNIX AND NOT APPLE)
+    if ((CMAKE_CXX_COMPILER_ID NOT STREQUAL "GNU") OR (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9))
+        message(WARNING "Using untested compiler, tested compiler is gcc 4.9 or later")
+    endif()
+else()
+    if ((CMAKE_CXX_COMPILER_ID NOT STREQUAL "AppleClang") OR (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.3))
+        message(WARNING "Using untested compiler, tested compiler is AppleClang 7.3 or later")
+    endif()
+endif()
+
+#--------------------------------------
 # Global Settings
 #--------------------------------------
 
@@ -12,9 +30,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(ROOT_DIR ${PROJECT_SOURCE_DIR})
 
-set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/KiwiBuild/Bin")
-set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/KiwiBuild/Lib")
-set(TEST_OUTPUT_PATH "${CMAKE_BINARY_DIR}/KiwiBuild/Test")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/KiwiBuild")
+set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/KiwiBuild")
 
 if(CMAKE_CONFIGURATION_TYPES)
    set(CMAKE_CONFIGURATION_TYPES ${CMAKE_BUILD_TYPE})
@@ -73,7 +90,9 @@ if (WIN32)
 	set(CMAKE_EXE_LINKER_FLAGS "")
 
 	if (DEBUG)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zi")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zi /Od")
+    else()
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2")
 	endif()
 
     if (CMAKE_CL_64)
@@ -83,17 +102,22 @@ if (WIN32)
     endif()
 
 elseif(APPLE)
+
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-warning-option -Wno-pessimizing-move -Wno-overloaded-virtual -Wnounused-function")
 
     if (DEBUG)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
+    else()
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
     endif()
 
 elseif(LINUX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-multichar")
 
   if (DEBUG)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
+  else()
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
   endif()
 
 endif()
@@ -121,7 +145,7 @@ endif()
 #--------------------------------------
 
 if (WIN32)
-	set(CMAKE_FIND_LIBRARY_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES} "")
+	set(CMAKE_FIND_LIBRARY_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES} "" "lib")
 	set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} ".lib" ".dll")
 	if (CMAKE_CL_64)
     set(WINDOWS_SDK_PATH "C:/Program Files (x86)/Microsoft SDKs/Windows/v7.1A/Lib/x64")
@@ -137,8 +161,8 @@ endif()
 # Macros
 #--------------------------------------
 
-include(./Config/group.cmake)
-include(./Config/dependency.cmake)
+include(./Scripts/group.cmake)
+include(./Scripts/dependency.cmake)
 
 #----------------------------------
 # Juce
@@ -229,79 +253,84 @@ source_group_rec("${JUCE_SRC}" ${ROOT_DIR}/ThirdParty/Juce/modules)
 # Flip
 #----------------------------------
 
-if (${FLIP_PRIVATE})
-    if(APPLE)
-
-        if(DEBUG)
-            find_library(FlipLib NAMES flip PATHS ${ROOT_DIR}/ThirdParty/flip/projects/build/Debug)
-        else()
-            find_library(FlipLib NAMES flip PATHS ${ROOT_DIR}/ThirdParty/flip/projects/build/Release)
-        endif()
-
-        set(FLIP_DEP ${FlipLib})
-        set(FLIP_DIR "${ROOT_DIR}/ThirdParty/flip")
-        file (GLOB_RECURSE FLIP_SRC ${ROOT_DIR}/ThirdParty/flip/inlude/*.hpp
-                                ${ROOT_DIR}/ThirdParty/flip/include/*.h
-                                ${ROOT_DIR}/ThirdParty/flip/src/*.cpp)
+if(WIN32)
+    if (CMAKE_CL_64)
+        set(KIWI_FLIP_LIB $ENV{KIWI_FLIP_LIB_x64})
+        set(KIWI_FLIP_INCLUDE $ENV{KIWI_FLIP_INCLUDE_x64})
+    else()
+        set(KIWI_FLIP_LIB $ENV{KIWI_FLIP_LIB_WIN32})
+        set(KIWI_FLIP_INCLUDE $ENV{KIWI_FLIP_INCLUDE_WIN32})
     endif()
 else()
-
-    if(APPLE)
-        find_library(FlipLib NAMES flip PATHS ${ROOT_DIR}/ThirdParty/flip-public/lib/mac)
-        set(FLIP_DEP ${FlipLib})
-
-    elseif(WIN32)
-
-		if (CMAKE_CL_64)
-			if(DEBUG)
-				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/x64/Debug")
-			else()
-				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/x64/Release")
-			endif()
-		else()
-			if(DEBUG)
-				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/Win32/Debug")
-			else()
-				find_library(FlipLib NAMES flip PATHS "${ROOT_DIR}/ThirdParty/flip-public/lib/windows/VS2015/Win32/Release")
-			endif()
-		endif()
-
-       find_library(WS2_32 ws2_32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
-	   set(FLIP_DEP ${WS2_32} ${FlipLib})
-
-    elseif(LINUX)
-        find_library(FlipLib NAMES flip PATHS ${ROOT_DIR}/ThirdParty/flip-public/lib/linux/gcc)
-        set(FLIP_DEP ${FlipLib})
-    endif()
-
-    set(FLIP_DIR "${ROOT_DIR}/ThirdParty/flip-public")
-    file (GLOB_RECURSE FLIP_SRC ${FLIP_DIR}/include/*.hpp
-                                ${FLIP_DIR}/include/*.h)
+    set(KIWI_FLIP_LIB $ENV{KIWI_FLIP_LIB})
+    set(KIWI_FLIP_INCLUDE $ENV{KIWI_FLIP_INCLUDE})
 endif()
 
-add_custom_target(Flip SOURCES ${FLIP_SRC})
-set_target_properties (Flip PROPERTIES FOLDER ThirdParty
-                                       INTERFACE_INCLUDE_DIRECTORIES ${FLIP_DIR}/include
-                                       COMPILE_DEFINITIONS "flip_NOTHING=flip_NOTHING_FATAL"
-                                       INTERFACE_LINK_LIBRARIES "${FLIP_DEP}")
-source_group_rec("${FLIP_SRC}" ${FLIP_DIR})
+message(STATUS "Searching flip library")
+message(STATUS "Library search path is : " ${KIWI_FLIP_LIB})
+message(STATUS "Include search path is : " ${KIWI_FLIP_INCLUDE})
+
+find_library(FLIP_LIBRARIES NAMES flip PATHS ${KIWI_FLIP_LIB} NO_DEFAULT_PATH)
+find_path(FLIP_INCLUDE_DIRS NAMES flip PATHS ${KIWI_FLIP_INCLUDE} NO_DEFAULT_PATH)
+
+if (WIN32)
+    set(FLIP_LIBRARIES ${FLIP_LIBRARIES} ${WS2_32})
+endif()
+
+if (FLIP_LIBRARIES AND FLIP_INCLUDE_DIRS)
+    message(STATUS "Flip found on system")
+    message(STATUS "FLIP_LIBRARIES : " ${FLIP_LIBRARIES})
+    message(STATUS "FLIP_INCLUDE_DIRS : " ${FLIP_INCLUDE_DIRS})
+else()
+    message(FATAL_ERROR "Flip was not found on system, check Readme.md for instructions on how to set searh path")
+endif()
+
+set(FLIP_COMPILE_DEFINITIONS "flip_NOTHING=flip_NOTHING_FATAL")
 
 #----------------------------------
 # Cpr
 #----------------------------------
 
 # Cpr settings
+
 set(CMAKE_USE_OPENSSL OFF CACHE BOOL "Don't use openssl")
 set(BUILD_CPR_TESTS OFF CACHE BOOL "Don't build cpr tests")
-message("Use system curl " ${USE_SYSTEM_CURL})
 
-# Curl settings
-set(CURL_STATICLIB OFF CACHE BOOL "Build static library for curl")
-set(BUILD_TESTING OFF CACHE BOOL "Don't build curl tests")
+if(WIN32)
+    if (CMAKE_CL_64)
+        set(KIWI_CURL_LIB $ENV{KIWI_CURL_LIB_x64})
+        set(KIWI_CURL_INCLUDE $ENV{KIWI_CURL_INCLUDE_x64})
+    else()
+        set(KIWI_CURL_LIB $ENV{KIWI_CURL_LIB_WIN32})
+        set(KIWI_CURL_INCLUDE $ENV{KIWI_CURL_INCLUDE_WIN32})
+    endif()
+else()
+    set(KIWI_CURL_LIB $ENV{KIWI_CURL_LIB})
+    set(KIWI_CURL_INCLUDE $ENV{KIWI_CURL_INCLUDE})
+endif()
+
+message(STATUS "Searching curl library")
+message(STATUS "Library search path is : " ${KIWI_CURL_LIB})
+message(STATUS "Include search path is : " ${KIWI_CURL_INCLUDE})
+
+find_library(CURL_LIBRARIES NAMES curl PATHS ${KIWI_CURL_LIB} NO_DEFAULT_PATH)
+find_path(CURL_INCLUDE_DIRS NAMES curl PATHS ${KIWI_CURL_INCLUDE} NO_DEFAULT_PATH)
+
+if (CURL_LIBRARIES AND CURL_INCLUDE_DIRS)
+    set(USE_SYSTEM_CURL ON CACHE BOOL "Use system curl")
+    set(CURL_FOUND TRUE CACHE BOOL "Curl found")
+    set(CMAKE_DISABLE_FIND_PACKAGE_CURL TRUE CACHE BOOL "Disactivate find package curl")
+    message(STATUS "Libcurl found on system")
+    message(STATUS "CURL_LIBRARIES : " ${CURL_LIBRARIES})
+    message(STATUS "CURL_INCLUDE_DIRS : " ${CURL_INCLUDE_DIRS})
+else()
+    message(FATAL_ERROR "Curl was not found on system, check Readme.md for instructions on how to set searh path")
+endif()
 
 add_subdirectory(ThirdParty/cpr)
 set_target_properties(${CPR_LIBRARIES} PROPERTIES FOLDER ThirdParty)
-
+set_target_properties(${CPR_LIBRARIES} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+target_compile_definitions(${CPR_LIBRARIES} PUBLIC -DCURL_STATICLIB=1)
 
 #----------------------------------
 # Json
@@ -316,8 +345,9 @@ set(JSON_INCLUDE_DIRS ${ROOT_DIR}/ThirdParty/json)
 file(GLOB_RECURSE KIWI_MODEL_SRC ${ROOT_DIR}/Modules/KiwiModel/*.[c|h]pp
                                  ${ROOT_DIR}/Modules/KiwiModel/*.h)
 add_library(KiwiModel STATIC ${KIWI_MODEL_SRC})
-target_include_directories(KiwiModel PUBLIC ${ROOT_DIR}/Modules)
-target_add_dependency(KiwiModel Flip)
+target_include_directories(KiwiModel PUBLIC ${ROOT_DIR}/Modules ${FLIP_INCLUDE_DIRS})
+target_link_libraries(KiwiModel ${FLIP_LIBRARIES})
+target_compile_definitions(KiwiModel PUBLIC ${FLIP_COMPILE_DEFINITIONS})
 set_target_properties(KiwiModel PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_MODEL_SRC}" ${ROOT_DIR}/Modules/KiwiModel)
 
@@ -342,7 +372,6 @@ file(GLOB_RECURSE KIWI_ENGINE_SRC ${ROOT_DIR}/Modules/KiwiEngine/*.[c|h]pp
 add_library(KiwiEngine STATIC ${KIWI_ENGINE_SRC})
 target_include_directories(KiwiEngine PUBLIC ${ROOT_DIR}/ThirdParty/readerwriterqueue)
 target_include_directories(KiwiEngine PUBLIC ${ROOT_DIR}/Modules)
-target_add_dependency(KiwiEngine Flip)
 target_add_dependency(KiwiEngine KiwiModel)
 target_add_dependency(KiwiEngine KiwiDsp)
 set_target_properties(KiwiEngine PROPERTIES FOLDER Modules)
@@ -378,6 +407,14 @@ if (APPLE)
 	set_target_properties(Kiwi PROPERTIES MACOSX_BUNDLE TRUE
 									      MACOSX_BUNDLE_INFO_PLIST ${KIWI_PLIST})
 elseif(WIN32)
+	if (CMAKE_CL_64)
+		set(CRT_LIB "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/redist/x64/Microsoft.VC140.CRT")
+	else()
+		set(CRT_LIB "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/redist/x86/Microsoft.VC140.CRT")
+	endif()
+
+	add_custom_command(TARGET Kiwi POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CRT_LIB} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}" USES_TERMINAL)
+
 	if (DEBUG)
 		set_target_properties(Kiwi PROPERTIES LINK_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:CONSOLE")
 	else()
@@ -399,7 +436,6 @@ add_executable(test_dsp ${TEST_DSP_SRC})
 target_add_dependency(test_dsp KiwiDsp)
 set_target_properties(test_dsp PROPERTIES FOLDER Test)
 source_group_rec("${TEST_DSP_SRC}" ${ROOT_DIR}/Test/Dsp)
-set_target_properties(test_dsp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
 
 # Test Model
 
@@ -409,7 +445,6 @@ add_executable(test_model ${TEST_MODEL_SRC})
 target_add_dependency(test_model KiwiModel)
 set_target_properties(test_model PROPERTIES FOLDER Test)
 source_group_rec("${TEST_MODEL_SRC}" ${ROOT_DIR}/Test/Model)
-set_target_properties(test_model PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
 
 # Test Engine
 
@@ -422,7 +457,6 @@ if (LINUX)
 endif()
 set_target_properties(test_engine PROPERTIES FOLDER Test)
 source_group_rec("${TEST_ENGINE_SRC}" ${ROOT_DIR}/Test/Engine)
-set_target_properties(test_engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
 
 # Coverage setting
 if(${GCOV_SUPPORT} STREQUAL "On" AND DEBUG)
