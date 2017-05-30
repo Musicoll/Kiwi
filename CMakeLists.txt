@@ -91,8 +91,10 @@ if (WIN32)
 
 	if (DEBUG)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zi /Od")
+		set(CMAKE_CXX_FLAGS_DEBUG "/MD")
     else()
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2")
+		set(CMAKE_CXX_FLAGS_RELEASE "/MD")
 	endif()
 
     if (CMAKE_CL_64)
