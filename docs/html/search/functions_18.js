@@ -18,6 +18,7 @@ var searchData=
   ['_7econsolehistory',['~ConsoleHistory',['../classkiwi_1_1_console_history.html#a142d5b60d8c75aa3393b1857929c90b6',1,'kiwi::ConsoleHistory']]],
   ['_7econtent',['~Content',['../classkiwi_1_1_about_window_1_1_content.html#ad9c32445f6da4d4ed38930c1f84b1c33',1,'kiwi::AboutWindow::Content']]],
   ['_7ecustomtoolbarbutton',['~CustomToolbarButton',['../classkiwi_1_1_custom_toolbar_button.html#a137ee075e9e3dd293fad47b1fbcded55',1,'kiwi::CustomToolbarButton']]],
+  ['_7ecustomtooltipclient',['~CustomTooltipClient',['../classkiwi_1_1_custom_tooltip_client.html#a373221bb30b1ea90235436006f996338',1,'kiwi::CustomTooltipClient']]],
   ['_7edocumentbrowser',['~DocumentBrowser',['../classkiwi_1_1_document_browser.html#a626afedb92971c65a73f082d0c1866c0',1,'kiwi::DocumentBrowser']]],
   ['_7edocumentbrowserview',['~DocumentBrowserView',['../classkiwi_1_1_document_browser_view.html#a5f13de292d3e0a2e7ea290951dae58fd',1,'kiwi::DocumentBrowserView']]],
   ['_7edocumentmanager',['~DocumentManager',['../classkiwi_1_1_document_manager.html#abdaa98e160fdfacc89e581cbd0eddae1',1,'kiwi::DocumentManager']]],
@@ -65,7 +66,9 @@ var searchData=
   ['_7esuggestlist',['~SuggestList',['../classkiwi_1_1_suggest_list.html#a84ed56cc17bb31e11032f7ef9ecc216f',1,'kiwi::SuggestList']]],
   ['_7etask',['~Task',['../classkiwi_1_1engine_1_1_receive_1_1_task.html#adb035a03c30b9576b36932ca0dcaaa65',1,'kiwi::engine::Receive::Task::~Task()'],['../classkiwi_1_1engine_1_1_pipe_1_1_task.html#a15c6c6f570e35d29bc8a094701689d6a',1,'kiwi::engine::Pipe::Task::~Task()'],['../classkiwi_1_1engine_1_1_scheduler_1_1_task.html#a4aee87c4f306f0d0ef96d4730829d6f1',1,'kiwi::engine::Scheduler::Task::~Task()'],['../classkiwi_1_1engine_1_1_scheduler_1_1_timer_1_1_task.html#abb54aa1ff5a90628bcb653a11dcba681',1,'kiwi::engine::Scheduler::Timer::Task::~Task()']]],
   ['_7etimer',['~Timer',['../classkiwi_1_1dsp_1_1_timer.html#ab6b275eabd6675c533d81b10738a9c68',1,'kiwi::dsp::Timer::~Timer()'],['../classkiwi_1_1engine_1_1_scheduler_1_1_timer.html#ad9429bb409dbac79829a0080efa1dd13',1,'kiwi::engine::Scheduler::Timer::~Timer()']]],
+  ['_7etooltipwindow',['~TooltipWindow',['../classkiwi_1_1_tooltip_window.html#a5ca2b87ce9097d286c47691b2ff1e81c',1,'kiwi::TooltipWindow']]],
   ['_7euser',['~User',['../classkiwi_1_1model_1_1_patcher_1_1_user.html#a02f52a170914e8ac32291a952c495af4',1,'kiwi::model::Patcher::User']]],
+  ['_7eusersitemcomponent',['~UsersItemComponent',['../classkiwi_1_1_patcher_toolbar_1_1_users_item_component.html#a84c4672d58321879f38a87f234c177cc',1,'kiwi::PatcherToolbar::UsersItemComponent']]],
   ['_7eview',['~View',['../classkiwi_1_1model_1_1_patcher_1_1_view.html#a840da0c31440c207c6d8e300e4b60c89',1,'kiwi::model::Patcher::View']]],
   ['_7ewindow',['~Window',['../classkiwi_1_1_window.html#aca15d1f25b0bf6b87845292fdaf67fb6',1,'kiwi::Window']]]
 ];

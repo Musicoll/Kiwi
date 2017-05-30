@@ -100,6 +100,7 @@ Inheritance diagram for kiwi::IoletHighlighter:</div>
  <div class="center">
   <img src="classkiwi_1_1_iolet_highlighter.png" usemap="#kiwi::IoletHighlighter_map" alt=""/>
   <map id="kiwi::IoletHighlighter_map" name="kiwi::IoletHighlighter_map">
+<area href="classkiwi_1_1_custom_tooltip_client.html" title="A custom tooltip client that provides the bounds of the tooltip to show. " alt="kiwi::CustomTooltipClient" shape="rect" coords="159,56,308,80"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -129,10 +130,27 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1_iolet_highlighter.html#aa71a3a02813a3c1741d942130ed6fca2">highlightOutlet</a> (<a class="el" href="classkiwi_1_1_object_view.html">ObjectView</a> const &amp;object, const size_t index)</td></tr>
 <tr class="memdesc:aa71a3a02813a3c1741d942130ed6fca2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Highlight outlet. <br /></td></tr>
 <tr class="separator:aa71a3a02813a3c1741d942130ed6fca2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a57e82ae3cf098ca360d6a0a2242f617d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a57e82ae3cf098ca360d6a0a2242f617d"></a>
+juce::String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1_iolet_highlighter.html#a57e82ae3cf098ca360d6a0a2242f617d">getTooltip</a> () override</td></tr>
+<tr class="memdesc:a57e82ae3cf098ca360d6a0a2242f617d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the string that this object wants to show as its tooltip. <br /></td></tr>
+<tr class="separator:a57e82ae3cf098ca360d6a0a2242f617d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb61ec97299d2b656562b6e083cc5396"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adb61ec97299d2b656562b6e083cc5396"></a>
+juce::Rectangle&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1_iolet_highlighter.html#adb61ec97299d2b656562b6e083cc5396">getTooltipBounds</a> (juce::String const &amp;tip, juce::Point&lt; int &gt;, juce::Rectangle&lt; int &gt; parent_area, int width, int height) override</td></tr>
+<tr class="memdesc:adb61ec97299d2b656562b6e083cc5396"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the bounds of the tooltip to show. <br /></td></tr>
+<tr class="separator:adb61ec97299d2b656562b6e083cc5396"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6c9aa456190161b79fd7cc62ac1d8a9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa6c9aa456190161b79fd7cc62ac1d8a9"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1_iolet_highlighter.html#aa6c9aa456190161b79fd7cc62ac1d8a9">drawTooltip</a> (juce::Graphics &amp;g, juce::String const &amp;text, int width, int height) override</td></tr>
+<tr class="memdesc:aa6c9aa456190161b79fd7cc62ac1d8a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overriden to provide a custom drawing method. <br /></td></tr>
+<tr class="separator:aa6c9aa456190161b79fd7cc62ac1d8a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classkiwi_1_1_custom_tooltip_client"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classkiwi_1_1_custom_tooltip_client')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classkiwi_1_1_custom_tooltip_client.html">kiwi::CustomTooltipClient</a></td></tr>
+<tr class="memitem:a373221bb30b1ea90235436006f996338 inherit pub_methods_classkiwi_1_1_custom_tooltip_client"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a373221bb30b1ea90235436006f996338"></a>
+virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1_custom_tooltip_client.html#a373221bb30b1ea90235436006f996338">~CustomTooltipClient</a> ()=default</td></tr>
+<tr class="memdesc:a373221bb30b1ea90235436006f996338 inherit pub_methods_classkiwi_1_1_custom_tooltip_client"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br /></td></tr>
+<tr class="separator:a373221bb30b1ea90235436006f996338 inherit pub_methods_classkiwi_1_1_custom_tooltip_client"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>Client/Source/KiwiApp_Patcher/<a class="el" href="_kiwi_app___patcher_view_helper_8hpp_source.html">KiwiApp_PatcherViewHelper.hpp</a></li>
-<li>Client/Source/KiwiApp_Patcher/KiwiApp_PatcherViewHelper.cpp</li>
+<li>Client/Source/KiwiApp_Patcher/<a class="el" href="_kiwi_app___patcher_view_iolet_highlighter_8h_source.html">KiwiApp_PatcherViewIoletHighlighter.h</a></li>
+<li>Client/Source/KiwiApp_Patcher/KiwiApp_PatcherViewIoletHighlighter.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -92,6 +92,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="classkiwi_1_1model_1_1_patcher-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">kiwi::model::Patcher Class Reference</div>  </div>
@@ -101,7 +102,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>The <a class="el" href="classkiwi_1_1model_1_1_patcher.html" title="The Patcher manages a set of Object and Link. ">Patcher</a> manages a set of <a class="el" href="classkiwi_1_1model_1_1_object.html" title="The Object is a base class for kiwi objects. ">Object</a> and <a class="el" href="classkiwi_1_1model_1_1_link.html" title="The Link is used to create a connection between two objects. ">Link</a>.  
  <a href="classkiwi_1_1model_1_1_patcher.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="_kiwi_model___patcher_8hpp_source.html">KiwiModel_Patcher.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_kiwi_model___patcher_8h_source.html">KiwiModel_Patcher.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for kiwi::model::Patcher:</div>
 <div class="dyncontent">
@@ -122,6 +123,12 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
+<tr class="memitem:a654a7ddf61c22ae5e765ad9b10d41054"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a654a7ddf61c22ae5e765ad9b10d41054"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <b>Signal_USER_CONNECT</b> = 0, 
+<b>Signal_USER_DISCONNECT</b>, 
+<b>Signal_GET_CONNECTED_USERS</b>, 
+<b>Signal_RECEIVE_CONNECTED_USERS</b>
+ }</td></tr>
+<tr class="separator:a654a7ddf61c22ae5e765ad9b10d41054"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa80fdb5ca9e417682cd545df36bb7f27"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa80fdb5ca9e417682cd545df36bb7f27"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>Objects</b> = flip::Array&lt; <a class="el" href="classkiwi_1_1model_1_1_object.html">model::Object</a> &gt;</td></tr>
 <tr class="separator:aa80fdb5ca9e417682cd545df36bb7f27"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -186,14 +193,26 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 Objects const &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1model_1_1_patcher.html#ae66bd8f0b2cc3e3edf5207008b8d8430">getObjects</a> () const  noexcept</td></tr>
 <tr class="memdesc:ae66bd8f0b2cc3e3edf5207008b8d8430"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the objects. <br /></td></tr>
 <tr class="separator:ae66bd8f0b2cc3e3edf5207008b8d8430"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e0b371fa1fb993b4bf5bd7297bd4b99"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9e0b371fa1fb993b4bf5bd7297bd4b99"></a>
+Objects &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1model_1_1_patcher.html#a9e0b371fa1fb993b4bf5bd7297bd4b99">getObjects</a> () noexcept</td></tr>
+<tr class="memdesc:a9e0b371fa1fb993b4bf5bd7297bd4b99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the objects. <br /></td></tr>
+<tr class="separator:a9e0b371fa1fb993b4bf5bd7297bd4b99"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a47a4cd8ef365b4d5b30b6a522b8e5c8b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a47a4cd8ef365b4d5b30b6a522b8e5c8b"></a>
 Links const &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1model_1_1_patcher.html#a47a4cd8ef365b4d5b30b6a522b8e5c8b">getLinks</a> () const  noexcept</td></tr>
 <tr class="memdesc:a47a4cd8ef365b4d5b30b6a522b8e5c8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the links. <br /></td></tr>
 <tr class="separator:a47a4cd8ef365b4d5b30b6a522b8e5c8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeeafbd9ffa9c2e4c00ff972b6f87ab1f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeeafbd9ffa9c2e4c00ff972b6f87ab1f"></a>
+Links &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1model_1_1_patcher.html#aeeafbd9ffa9c2e4c00ff972b6f87ab1f">getLinks</a> () noexcept</td></tr>
+<tr class="memdesc:aeeafbd9ffa9c2e4c00ff972b6f87ab1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the links. <br /></td></tr>
+<tr class="separator:aeeafbd9ffa9c2e4c00ff972b6f87ab1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a679566a0c9aef0c6ac3cc4a84cba91b6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a679566a0c9aef0c6ac3cc4a84cba91b6"></a>
 Users const &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1model_1_1_patcher.html#a679566a0c9aef0c6ac3cc4a84cba91b6">getUsers</a> () const  noexcept</td></tr>
 <tr class="memdesc:a679566a0c9aef0c6ac3cc4a84cba91b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the users. <br /></td></tr>
 <tr class="separator:a679566a0c9aef0c6ac3cc4a84cba91b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4be008fbc4577d0b2930fe9eb0ea3496"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4be008fbc4577d0b2930fe9eb0ea3496"></a>
+Users &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1model_1_1_patcher.html#a4be008fbc4577d0b2930fe9eb0ea3496">getUsers</a> () noexcept</td></tr>
+<tr class="memdesc:a4be008fbc4577d0b2930fe9eb0ea3496"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the users. <br /></td></tr>
+<tr class="separator:a4be008fbc4577d0b2930fe9eb0ea3496"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab8e743a1d56671ca7d9bba17822f555"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classkiwi_1_1model_1_1_patcher_1_1_user.html">User</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1model_1_1_patcher.html#aab8e743a1d56671ca7d9bba17822f555">useSelfUser</a> ()</td></tr>
 <tr class="memdesc:aab8e743a1d56671ca7d9bba17822f555"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current <a class="el" href="classkiwi_1_1model_1_1_patcher_1_1_user.html" title="Represents and stores informations about a user of a patcher document. ">User</a>.  <a href="#aab8e743a1d56671ca7d9bba17822f555">More...</a><br /></td></tr>
 <tr class="separator:aab8e743a1d56671ca7d9bba17822f555"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -203,6 +222,21 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a7527ed143a436e9fb1e72b14fd9de08a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7527ed143a436e9fb1e72b14fd9de08a"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>declare</b> ()</td></tr>
 <tr class="separator:a7527ed143a436e9fb1e72b14fd9de08a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a0e2989749203335964a47ccce99b65e5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0e2989749203335964a47ccce99b65e5"></a>
+flip::Signal&lt; uint64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>signal_user_connect</b></td></tr>
+<tr class="separator:a0e2989749203335964a47ccce99b65e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8eecebb70e7d712d0e72a0e8f347667"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac8eecebb70e7d712d0e72a0e8f347667"></a>
+flip::Signal&lt; uint64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>signal_user_disconnect</b></td></tr>
+<tr class="separator:ac8eecebb70e7d712d0e72a0e8f347667"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3867df96673d5befa313c77d06eb2dd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad3867df96673d5befa313c77d06eb2dd"></a>
+flip::Signal&#160;</td><td class="memItemRight" valign="bottom"><b>signal_get_connected_users</b></td></tr>
+<tr class="separator:ad3867df96673d5befa313c77d06eb2dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0059af826b278a6e15c04a5885bebcb4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0059af826b278a6e15c04a5885bebcb4"></a>
+flip::Signal&lt; std::vector&lt; uint64_t &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>signal_receive_connected_users</b></td></tr>
+<tr class="separator:a0059af826b278a6e15c04a5885bebcb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The <a class="el" href="classkiwi_1_1model_1_1_patcher.html" title="The Patcher manages a set of Object and Link. ">Patcher</a> manages a set of <a class="el" href="classkiwi_1_1model_1_1_object.html" title="The Object is a base class for kiwi objects. ">Object</a> and <a class="el" href="classkiwi_1_1model_1_1_link.html" title="The Link is used to create a connection between two objects. ">Link</a>. </p>
@@ -379,7 +413,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>declare</b> ()
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>Modules/KiwiModel/<a class="el" href="_kiwi_model___patcher_8hpp_source.html">KiwiModel_Patcher.hpp</a></li>
+<li>Modules/KiwiModel/<a class="el" href="_kiwi_model___patcher_8h_source.html">KiwiModel_Patcher.h</a></li>
 <li>Modules/KiwiModel/KiwiModel_Patcher.cpp</li>
 </ul>
 </div><!-- contents -->

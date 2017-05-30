@@ -3,6 +3,7 @@ var searchData=
   ['labeltextchanged',['labelTextChanged',['../classkiwi_1_1_document_browser_view_1_1_drive_view_1_1_row_elem.html#a04e70a7c600e583d05b38ddf5743b7d8',1,'kiwi::DocumentBrowserView::DriveView::RowElem']]],
   ['lasso',['Lasso',['../classkiwi_1_1_lasso.html',1,'kiwi']]],
   ['lasso',['Lasso',['../classkiwi_1_1_lasso.html#a5c7e6e8154286f829bd9d5e276dbfa25',1,'kiwi::Lasso']]],
+  ['layouttooltiptext',['layoutTooltipText',['../classkiwi_1_1_look_and_feel.html#af49a544b70a1399c6030539ecb590a4a',1,'kiwi::LookAndFeel']]],
   ['leading_5fletter_5fpenalty',['leading_letter_penalty',['../structkiwi_1_1_suggest_list_1_1_options.html#a0ed9448e499dd16a87775b9d4f30443c',1,'kiwi::SuggestList::Options']]],
   ['link',['Link',['../classkiwi_1_1model_1_1_link.html',1,'kiwi::model']]],
   ['link',['Link',['../classkiwi_1_1engine_1_1_link.html',1,'kiwi::engine']]],
@@ -47,6 +48,6 @@ var searchData=
   ['log',['log',['../classkiwi_1_1engine_1_1_instance.html#a79cc6baf886897f3403b17785f01c067',1,'kiwi::engine::Instance::log()'],['../classkiwi_1_1engine_1_1_object.html#afafce4da1bcf3ca4d6340205ebd19bea',1,'kiwi::engine::Object::log()'],['../classkiwi_1_1engine_1_1_patcher.html#a046062799bcad7829f7cd6df2116b0a7',1,'kiwi::engine::Patcher::log()'],['../classkiwi_1_1_kiwi_app.html#a8f0f0b9f707df13a82ce5bbece390f59',1,'kiwi::KiwiApp::log()']]],
   ['lookandfeel',['LookAndFeel',['../classkiwi_1_1_look_and_feel.html#a164b60dfaa5a89dd7a6ef8c70ef485da',1,'kiwi::LookAndFeel']]],
   ['lookandfeel',['LookAndFeel',['../classkiwi_1_1_look_and_feel.html',1,'kiwi']]],
-  ['looperror',['LoopError',['../classkiwi_1_1dsp_1_1_loop_error.html#a0823b2e63e79df8317f8ee6c80aac93f',1,'kiwi::dsp::LoopError::LoopError(const std::string &amp;message)'],['../classkiwi_1_1dsp_1_1_loop_error.html#a1edc0ecb2031e34d2d6d37da6df17048',1,'kiwi::dsp::LoopError::LoopError(const char *message)']]],
-  ['looperror',['LoopError',['../classkiwi_1_1dsp_1_1_loop_error.html',1,'kiwi::dsp']]]
+  ['looperror',['LoopError',['../classkiwi_1_1dsp_1_1_loop_error.html',1,'kiwi::dsp']]],
+  ['looperror',['LoopError',['../classkiwi_1_1dsp_1_1_loop_error.html#a0823b2e63e79df8317f8ee6c80aac93f',1,'kiwi::dsp::LoopError::LoopError(const std::string &amp;message)'],['../classkiwi_1_1dsp_1_1_loop_error.html#a1edc0ecb2031e34d2d6d37da6df17048',1,'kiwi::dsp::LoopError::LoopError(const char *message)']]]
 ];

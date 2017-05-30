@@ -20,6 +20,7 @@ var searchData=
   ['isaudioon',['isAudioOn',['../classkiwi_1_1engine_1_1_audio_controler.html#a48f30650ae00a1985215207875dd9b5e',1,'kiwi::engine::AudioControler::isAudioOn()'],['../classkiwi_1_1_dsp_device_manager.html#ad8ca13438a4e6ddcd20b1c8570e21281',1,'kiwi::DspDeviceManager::isAudioOn()']]],
   ['isbindedtosender',['isBindedToSender',['../classkiwi_1_1_link_view_creator.html#ab8fdbcfdd69eb25228dfd36f362ad1fd',1,'kiwi::LinkViewCreator']]],
   ['isconnected',['isConnected',['../classkiwi_1_1_carrier_socket.html#ab6b1ce54dafc479c4a2e8f2154509cb2',1,'kiwi::CarrierSocket']]],
+  ['isediting',['isEditing',['../classkiwi_1_1_object_view.html#a3ff08af8670d1f230708b58586fba95e',1,'kiwi::ObjectView']]],
   ['isfloat',['isFloat',['../classkiwi_1_1_atom.html#a3fcdcd74d1863d5d72d885796765376b',1,'kiwi::Atom']]],
   ['isincommitgesture',['isInCommitGesture',['../classkiwi_1_1_document_manager.html#a0d9465365da82b0916cc0c404863f831',1,'kiwi::DocumentManager']]],
   ['isint',['isInt',['../classkiwi_1_1_atom.html#a6b1621d0a38f2b3a9694c7f69a610a72',1,'kiwi::Atom']]],

@@ -16,5 +16,6 @@ var searchData=
   ['consolehistory',['ConsoleHistory',['../classkiwi_1_1_console_history.html',1,'kiwi']]],
   ['consoletoolbarfactory',['ConsoleToolbarFactory',['../classkiwi_1_1_console_toolbar_factory.html',1,'kiwi']]],
   ['content',['Content',['../classkiwi_1_1_about_window_1_1_content.html',1,'kiwi::AboutWindow']]],
-  ['customtoolbarbutton',['CustomToolbarButton',['../classkiwi_1_1_custom_toolbar_button.html',1,'kiwi']]]
+  ['customtoolbarbutton',['CustomToolbarButton',['../classkiwi_1_1_custom_toolbar_button.html',1,'kiwi']]],
+  ['customtooltipclient',['CustomTooltipClient',['../classkiwi_1_1_custom_tooltip_client.html',1,'kiwi']]]
 ];

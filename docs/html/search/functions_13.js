@@ -15,5 +15,6 @@ var searchData=
   ['times',['Times',['../classkiwi_1_1model_1_1_times.html#a5ad6af267fe2b4d57c83a02f23df078e',1,'kiwi::model::Times::Times(flip::Default &amp;d)'],['../classkiwi_1_1model_1_1_times.html#afcb17c0f0c212347530991ca67148778',1,'kiwi::model::Times::Times(std::string const &amp;name, std::vector&lt; Atom &gt; const &amp;args)']]],
   ['timestilde',['TimesTilde',['../classkiwi_1_1model_1_1_times_tilde.html#aa631906ed9f9c302559d3bacaf3d2e7d',1,'kiwi::model::TimesTilde::TimesTilde(flip::Default &amp;d)'],['../classkiwi_1_1model_1_1_times_tilde.html#aa2de87999c189297d5fe2867207ccd26',1,'kiwi::model::TimesTilde::TimesTilde(std::string const &amp;name, std::vector&lt; Atom &gt; const &amp;args)']]],
   ['tojsonstring',['toJsonString',['../structkiwi_1_1_atom_helper.html#a39bf164fc84ba78a27a003f53a577b9d',1,'kiwi::AtomHelper']]],
+  ['tooltipwindow',['TooltipWindow',['../classkiwi_1_1_tooltip_window.html#aac12a9c3ee77f68b0e9a478ce8b48d20',1,'kiwi::TooltipWindow']]],
   ['tostring',['toString',['../structkiwi_1_1_atom_helper.html#aa03a09e9185228536ebee989fb30ec76',1,'kiwi::AtomHelper::toString(Atom const &amp;atom)'],['../structkiwi_1_1_atom_helper.html#a938484e6ec0062e4e1ca0d2adcb78262',1,'kiwi::AtomHelper::toString(std::vector&lt; Atom &gt; const &amp;atoms, const char delimiter= &apos; &apos;)']]]
 ];

@@ -99,13 +99,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>The juce Patcher Component.  
  <a href="classkiwi_1_1_patcher_view.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="_kiwi_app___patcher_view_8hpp_source.html">KiwiApp_PatcherView.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_kiwi_app___patcher_view_8h_source.html">KiwiApp_PatcherView.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for kiwi::PatcherView:</div>
 <div class="dyncontent">
  <div class="center">
   <img src="classkiwi_1_1_patcher_view.png" usemap="#kiwi::PatcherView_map" alt=""/>
   <map id="kiwi::PatcherView_map" name="kiwi::PatcherView_map">
+<area href="structkiwi_1_1_patcher_manager_1_1_listener.html" alt="kiwi::PatcherManager::Listener" shape="rect" coords="390,0,575,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -182,10 +183,12 @@ juce::Point&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a c
 <a class="el" href="classkiwi_1_1model_1_1_object.html">model::Object</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1_patcher_view.html#a72d6cd6c74e9e33b040e5db7ad1ff058">createObjectModel</a> (std::string const &amp;text)</td></tr>
 <tr class="memdesc:a72d6cd6c74e9e33b040e5db7ad1ff058"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an object model. <br /></td></tr>
 <tr class="separator:a72d6cd6c74e9e33b040e5db7ad1ff058"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a72825b9af6c5a4ead16e25433fb64842"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a72825b9af6c5a4ead16e25433fb64842"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1_patcher_view.html#a72825b9af6c5a4ead16e25433fb64842">boxHasBeenEdited</a> (<a class="el" href="classkiwi_1_1_classic_box.html">ClassicBox</a> &amp;box, std::string new_text)</td></tr>
-<tr class="memdesc:a72825b9af6c5a4ead16e25433fb64842"><td class="mdescLeft">&#160;</td><td class="mdescRight">called by <a class="el" href="classkiwi_1_1_classic_box.html" title="The ClassicBox let the user change the text of the box. ">ClassicBox</a> when hmmm.. the text has been edited. <br /></td></tr>
-<tr class="separator:a72825b9af6c5a4ead16e25433fb64842"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c3b31c5bbcbe32f0e0c09fb87d84da1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1_patcher_view.html#a1c3b31c5bbcbe32f0e0c09fb87d84da1">startEditBox</a> (<a class="el" href="classkiwi_1_1_classic_box.html">ClassicBox</a> *box)</td></tr>
+<tr class="memdesc:a1c3b31c5bbcbe32f0e0c09fb87d84da1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Call this to switch the box to edit mode.  <a href="#a1c3b31c5bbcbe32f0e0c09fb87d84da1">More...</a><br /></td></tr>
+<tr class="separator:a1c3b31c5bbcbe32f0e0c09fb87d84da1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d933bd8f045c45bbecd6fc7a4c58acd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classkiwi_1_1_patcher_view.html#a5d933bd8f045c45bbecd6fc7a4c58acd">endEditBox</a> (<a class="el" href="classkiwi_1_1_classic_box.html">ClassicBox</a> &amp;box, std::string new_text)</td></tr>
+<tr class="memdesc:a5d933bd8f045c45bbecd6fc7a4c58acd"><td class="mdescLeft">&#160;</td><td class="mdescRight">called by <a class="el" href="classkiwi_1_1_classic_box.html" title="The ClassicBox let the user change the text of the box. ">ClassicBox</a> when hmmm.. the text has been edited.  <a href="#a5d933bd8f045c45bbecd6fc7a4c58acd">More...</a><br /></td></tr>
+<tr class="separator:a5d933bd8f045c45bbecd6fc7a4c58acd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20f2286103de45501b605113a8a85f20"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a20f2286103de45501b605113a8a85f20"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>updateWindowTitle</b> () const </td></tr>
 <tr class="separator:a20f2286103de45501b605113a8a85f20"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -226,6 +229,35 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>perform</b> (const In
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The juce Patcher Component. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a5d933bd8f045c45bbecd6fc7a4c58acd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void kiwi::PatcherView::endEditBox </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classkiwi_1_1_classic_box.html">ClassicBox</a> &amp;&#160;</td>
+          <td class="paramname"><em>box</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>new_text</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>called by <a class="el" href="classkiwi_1_1_classic_box.html" title="The ClassicBox let the user change the text of the box. ">ClassicBox</a> when hmmm.. the text has been edited. </p>
+<p>You will need to call <a class="el" href="classkiwi_1_1_patcher_view.html#a1c3b31c5bbcbe32f0e0c09fb87d84da1" title="Call this to switch the box to edit mode. ">startEditBox()</a> function before calling this. </p>
+
+</div>
+</div>
 <a class="anchor" id="a6522570b3ad6591130fa8ef69c11d68b"></a>
 <div class="memitem">
 <div class="memproto">
@@ -252,8 +284,27 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>perform</b> (const In
 
 </div>
 </div>
+<a class="anchor" id="a1c3b31c5bbcbe32f0e0c09fb87d84da1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool kiwi::PatcherView::startEditBox </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classkiwi_1_1_classic_box.html">ClassicBox</a> *&#160;</td>
+          <td class="paramname"><em>box</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Call this to switch the box to edit mode. </p>
+<p>You will need to call <a class="el" href="classkiwi_1_1_patcher_view.html#a5d933bd8f045c45bbecd6fc7a4c58acd" title="called by ClassicBox when hmmm.. the text has been edited. ">endEditBox()</a> function after calling this. </p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>Client/Source/KiwiApp_Patcher/<a class="el" href="_kiwi_app___patcher_view_8hpp_source.html">KiwiApp_PatcherView.hpp</a></li>
+<li>Client/Source/KiwiApp_Patcher/<a class="el" href="_kiwi_app___patcher_view_8h_source.html">KiwiApp_PatcherView.h</a></li>
 <li>Client/Source/KiwiApp_Patcher/KiwiApp_PatcherView.cpp</li>
 </ul>
 </div><!-- contents -->

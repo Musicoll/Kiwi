@@ -9,7 +9,6 @@ var searchData=
   ['bindtocommandmanager',['bindToCommandManager',['../classkiwi_1_1_kiwi_app.html#af9d57feefea361bede673cf3dc855f50',1,'kiwi::KiwiApp']]],
   ['bindtokeymapping',['bindToKeyMapping',['../classkiwi_1_1_kiwi_app.html#a6e3bf3f04eb9cf265038d94c48ca7f1b',1,'kiwi::KiwiApp']]],
   ['boundschanged',['boundsChanged',['../classkiwi_1_1model_1_1_object.html#abed13682546d437600d7e00acec755f6',1,'kiwi::model::Object']]],
-  ['boxhasbeenedited',['boxHasBeenEdited',['../classkiwi_1_1_patcher_view.html#a72825b9af6c5a4ead16e25433fb64842',1,'kiwi::PatcherView']]],
   ['bringrecttocentre',['bringRectToCentre',['../classkiwi_1_1_patcher_viewport.html#a35953732e9cc1c247ce8afc43b806e02',1,'kiwi::PatcherViewport']]],
   ['bringsfirstviewtofront',['bringsFirstViewToFront',['../classkiwi_1_1_patcher_manager.html#a8c7044401afedcc741eaaf3d9bb19279',1,'kiwi::PatcherManager']]],
   ['buffer',['Buffer',['../classkiwi_1_1dsp_1_1_buffer.html#a9aa4e90eae25f25bbf72ba21697d0e94',1,'kiwi::dsp::Buffer::Buffer()'],['../classkiwi_1_1dsp_1_1_buffer.html#a9cd4e9dcc062f671dfb6dd30b2da2197',1,'kiwi::dsp::Buffer::Buffer(std::vector&lt; Signal::sPtr &gt; signals)'],['../classkiwi_1_1dsp_1_1_buffer.html#ae96bfa259dcbb28df901d29100f5f43c',1,'kiwi::dsp::Buffer::Buffer(const size_t nchannels, const size_t nsamples, const sample_t val=0.)'],['../classkiwi_1_1dsp_1_1_buffer.html#aa6366b068a655c82a4927ce0cdd80fbd',1,'kiwi::dsp::Buffer::Buffer(Buffer &amp;&amp;other) noexcept']]],
