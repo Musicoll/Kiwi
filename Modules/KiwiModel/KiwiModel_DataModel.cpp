@@ -3,9 +3,9 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of the GPL v2
+ Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -21,9 +21,10 @@
 
 #include "flip/DataModel.h"
 
-#include "KiwiModel_Def.hpp"
-#include "KiwiModel_DataModel.hpp"
-#include "KiwiModel_PatcherUser.hpp"
+#include "KiwiModel_Def.h"
+#include "KiwiModel_DataModel.h"
+#include "KiwiModel_PatcherUser.h"
+#include "KiwiModel_Objects.h"
 
 namespace kiwi
 {
@@ -67,11 +68,16 @@ namespace kiwi
             Print::declare();
             Receive::declare();
             Loadmess::declare();
+            Delay::declare();
+            Pipe::declare();
+            Metro::declare();
             DacTilde::declare();
+            AdcTilde::declare();
             OscTilde::declare();
             TimesTilde::declare();
             PlusTilde::declare();
             SigTilde::declare();
+            DelaySimpleTilde::declare();
         }
     }
 }

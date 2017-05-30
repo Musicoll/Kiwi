@@ -3,9 +3,9 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of the GPL v2
+ Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -19,11 +19,11 @@
  ==============================================================================
  */
 
-#include "KiwiModel_DataModel.hpp"
+#include "KiwiModel_DataModel.h"
 
-#include "KiwiModel_Object.hpp"
-#include "KiwiModel_Link.hpp"
-#include "KiwiModel_PatcherUser.hpp"
+#include "KiwiModel_Object.h"
+#include "KiwiModel_Link.h"
+#include "KiwiModel_PatcherUser.h"
 
 namespace kiwi
 {
@@ -66,6 +66,16 @@ namespace kiwi
         model::Object const& Link::getReceiverObject() const
         {
             return !removed() ? *m_receiver.value() : *m_receiver.before();
+        }
+        
+        bool Link::isSenderValid() const
+        {
+            return m_sender.value() != nullptr;
+        }
+        
+        bool Link::isReceiverValid() const
+        {
+            return m_receiver.value() != nullptr;
         }
         
         size_t Link::getSenderIndex() const

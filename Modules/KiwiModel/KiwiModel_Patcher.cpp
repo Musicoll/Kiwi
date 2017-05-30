@@ -3,9 +3,9 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of the GPL v2
+ Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -19,9 +19,10 @@
  ==============================================================================
  */
 
-#include "KiwiModel_DataModel.hpp"
-#include "KiwiModel_PatcherUser.hpp"
-#include "KiwiModel_PatcherUser.hpp"
+#include "KiwiModel_DataModel.h"
+#include "KiwiModel_PatcherUser.h"
+#include "KiwiModel_PatcherUser.h"
+#include "KiwiModel_Factory.h"
 
 namespace kiwi
 {
@@ -40,9 +41,9 @@ namespace kiwi
             
             DataModel::declare<Patcher>()
             .name("cicm.kiwi.Patcher")
-            .member<flip::Array<model::Object>, &Patcher::m_objects>("objects")
-            .member<flip::Array<model::Link>, &Patcher::m_links>("links")
-            .member<flip::Collection<Patcher::User>, &Patcher::m_users>("users")
+            .member<Objects, &Patcher::m_objects>("objects")
+            .member<Links, &Patcher::m_links>("links")
+            .member<Users, &Patcher::m_users>("users")
             .member<flip::String, &Patcher::m_patcher_name>("patcher_name");
         }
         
@@ -51,6 +52,10 @@ namespace kiwi
         // ================================================================================ //
         
         Patcher::Patcher()
+        : signal_user_connect(Signal_USER_CONNECT, *this)
+        , signal_user_disconnect(Signal_USER_DISCONNECT, *this)
+        , signal_get_connected_users(Signal_GET_CONNECTED_USERS, *this)
+        , signal_receive_connected_users(Signal_RECEIVE_CONNECTED_USERS, *this)
         {
             // user changes doesn't need to be stored in an history.
             m_users.disable_in_undo();
@@ -77,9 +82,7 @@ namespace kiwi
         {
             if(canConnect(from, outlet, to, inlet))
             {
-                auto link_uptr = std::unique_ptr<model::Link>(new model::Link(from, outlet, to, inlet));
-                const auto it = m_links.insert(m_links.end(), std::move(link_uptr));
-                
+                const auto it = m_links.emplace(m_links.end(), from, outlet, to, inlet);
                 return it.operator->();
             }
             
@@ -206,51 +209,48 @@ namespace kiwi
             m_patcher_name = new_name;
         }
         
-        Patcher::User* Patcher::getUser(uint32_t user_id)
-        {
-            const auto has_same_id = [user_id] (User const& user)
-            {
-                return user_id == user.m_user_id;
-            };
-            
-            const auto it = std::find_if(m_users.begin(), m_users.end(), has_same_id);
-            
-            if(it != m_users.end() && !it->removed())
-            {
-                return it.operator->();
-            }
-            
-            return nullptr;
-        }
-        
-        flip::Array<model::Object> const& Patcher::getObjects() const noexcept
+        Patcher::Objects const& Patcher::getObjects() const noexcept
         {
             return m_objects;
         }
         
-        flip::Array<model::Link> const& Patcher::getLinks() const noexcept
+        Patcher::Objects& Patcher::getObjects() noexcept
+        {
+            return m_objects;
+        }
+        
+        Patcher::Links const& Patcher::getLinks() const noexcept
         {
             return m_links;
         }
         
-        flip::Collection<Patcher::User> const& Patcher::getUsers() const noexcept
+        Patcher::Links& Patcher::getLinks() noexcept
+        {
+            return m_links;
+        }
+        
+        Patcher::Users const& Patcher::getUsers() const noexcept
         {
             return m_users;
         }
         
-        Patcher::User& Patcher::createUserIfNotAlreadyThere(uint32_t user_id)
+        Patcher::Users& Patcher::getUsers() noexcept
         {
-            auto* user = getUser(user_id);
-            
-            if(user == nullptr)
-            {
-                return *m_users.emplace(user_id);
-            }
-            
-            return *user;
+            return m_users;
         }
         
-        flip::Array<model::Object>::const_iterator Patcher::findObject(model::Object const& object) const
+        Patcher::User& Patcher::useSelfUser()
+        {
+            auto it = std::find_if(m_users.begin(), m_users.end(),
+                                   [self_id = document().user()](User const& user) {
+                return (user.getId() == self_id);
+            });
+            
+            // creates and returns a new user if it didn't exist.
+            return (it != m_users.end()) ? *it : *m_users.emplace();
+        }
+        
+        Patcher::Objects::const_iterator Patcher::findObject(model::Object const& object) const
         {
             const auto find_it = [&object](model::Object const& object_model)
             {
@@ -260,7 +260,7 @@ namespace kiwi
             return std::find_if(m_objects.begin(), m_objects.end(), find_it);
         }
         
-        flip::Array<model::Link>::const_iterator Patcher::findLink(model::Link const& link) const
+        Patcher::Links::const_iterator Patcher::findLink(model::Link const& link) const
         {
             const auto find_it = [&link](model::Link const& link_model)
             {
@@ -270,7 +270,7 @@ namespace kiwi
             return std::find_if(m_links.begin(), m_links.end(), find_it);
         }
         
-        flip::Array<model::Object>::iterator Patcher::findObject(model::Object const& object)
+        Patcher::Objects::iterator Patcher::findObject(model::Object const& object)
         {
             const auto find_it = [&object](model::Object const& object_model)
             {
@@ -280,7 +280,7 @@ namespace kiwi
             return std::find_if(m_objects.begin(), m_objects.end(), find_it);
         }
         
-        flip::Array<model::Link>::iterator Patcher::findLink(model::Link const& link)
+        Patcher::Links::iterator Patcher::findLink(model::Link const& link)
         {
             const auto find_it = [&link](model::Link const& link_model)
             {

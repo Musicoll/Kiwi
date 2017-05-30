@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<NETWORK_CONFIG host="localhost" api_port="8080" session_port="9090" refresh_interval="0"/>

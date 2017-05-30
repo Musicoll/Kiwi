@@ -8,15 +8,14 @@ notifications:
 git:
   submodules: false
 
-install:
-    - git submodule update --init --recursive ThirdParty/Juce
-
 matrix:
   include:
   - os: linux
-    compiler: g++
+    compiler: gcc
     env: COMPILER=g++-4.9
+
     before_install:
+    - sudo add-apt-repository ppa:webkit-team/ppa -y
     - sudo apt-get update
     - sudo apt-get install libfreetype6-dev
     - sudo apt-get install libx11-dev
@@ -25,30 +24,60 @@ matrix:
     - sudo apt-get install libxinerama-dev
     - sudo apt-get install libxcursor-dev
     - sudo apt-get install libasound2-dev
+    - sudo apt-get install libgtk-3-dev
+    - sudo apt-get install libwebkit2gtk-4.0-dev
+
+    addons:
+      apt:
+        sources: ['ubuntu-toolchain-r-test']
+        packages: [g++-4.9, 'python-pip', 'python-yaml']
+
+    install:
+      # make sure CXX is correctly set
+      - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
+      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr ThirdParty/readerwriterqueue
+      - pip install --user cpp-coveralls
+      - wget --no-check-certificate -O ../curl-7.52.1.tar.gz https://github.com/Musicoll/Kiwi/files/999838/curl-7.52.1-linux.tar.gz
+      - wget --no-check-certificate -O ../flip-demo.tar.gz http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files/flip-demo-linux-c47e41da05.tar.gz
+      - cd ..
+      - tar xvzf curl-7.52.1.tar.gz
+      - tar xvzf flip-demo.tar.gz &> /dev/null
+      - export KIWI_CURL_LIB=$(pwd)/curl-7.52.1/lib && export KIWI_CURL_INCLUDE=$(pwd)/curl-7.52.1/include
+      - export KIWI_FLIP_LIB=$(pwd)/flip-demo/lib/gcc && export KIWI_FLIP_INCLUDE=$(pwd)/flip-demo/include
+      - cd ${TRAVIS_BUILD_DIR}
+
     script:
-    - python ./Config/configure.py
-    - python ./Config/build.py -c Release
-    - python ./Config/run_test.py -c Release
+      - python ./Scripts/configure.py -coverage
+      - python ./Scripts/build.py -c Release
+      - python ./Scripts/build.py -c Debug -t Tests
+
     after_success:
-    - openssl aes-256-cbc -K $encrypted_5a43ff9033eb_key -iv $encrypted_5a43ff9033eb_iv -in Config/travisci_rsa.enc -out Config/travisci_rsa -d
-    - chmod 0600 Config/travisci_rsa
-    - cp Config/travisci_rsa ~/.ssh/id_rsa
-    - sudo apt-get install --yes doxygen graphviz
-    - ./Config/publish-doxygen.sh
+      - coveralls -i Modules --gcov-options '\-lp' > /dev/null
 
   - os: osx
     compiler: clang++
     env: COMPILER=clang++
-    before_install:
-      - brew install portaudio
+
+    install:
+      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr ThirdParty/readerwriterqueue
+      - curl -o ../curl-7.52.1.zip -L  https://github.com/Musicoll/Kiwi/files/997532/curl-7.52.1-macos.zip
+      - curl -o ../flip-demo.tar.gz -L http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files/flip-demo-macos-c47e41da05.tar.gz
+      - cd ..
+      - unzip curl-7.52.1.zip
+      - tar xvzf flip-demo.tar.gz &> /dev/null
+      - export KIWI_CURL_LIB=$(pwd)/curl-7.52.1/lib && export KIWI_CURL_INCLUDE=$(pwd)/curl-7.52.1/include
+      - export KIWI_FLIP_LIB=$(pwd)/flip-demo/lib && export KIWI_FLIP_INCLUDE=$(pwd)/flip-demo/include
+      - cd ${TRAVIS_BUILD_DIR}
+
     script:
-    - python ./Config/configure.py
-    - python ./Config/build.py -c Release
-    - python ./Config/run_test.py -c Release
+    - python ./Scripts/configure.py -c Release
+    - python ./Scripts/build.py -c Release | xcpretty
+
     before_deploy:
     - mkdir Kiwi
-    - mv Build/Release/KiwiBuild/Bin/Release/Kiwi.app Kiwi/Kiwi.app
+    - mv Build/Release/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
     - zip -r Kiwi_macos.zip Kiwi
+
     deploy:
       provider: releases
       api_key:

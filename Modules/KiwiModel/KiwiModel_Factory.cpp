@@ -3,9 +3,9 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of the GPL v2
+ Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -19,8 +19,7 @@
  ==============================================================================
  */
 
-#include "KiwiModel_Factory.hpp"
-#include "KiwiModel_Objects.hpp"
+#include "KiwiModel_Factory.h"
 
 namespace kiwi
 {
@@ -30,15 +29,14 @@ namespace kiwi
         //                                      FACTORY                                     //
         // ================================================================================ //
         
-        std::unique_ptr<model::Object> Factory::create(std::string const& name, std::vector<Atom> const& args)
+        std::unique_ptr<model::Object> Factory::create(std::string const& name,
+                                                       std::vector<Atom> const& args)
         {
-            const auto& creators = getCreators();
-            const auto it = creators.find(name);
-            if(it != creators.end())
+            auto const* class_ptr = getClassByName(name);
+            if(class_ptr != nullptr)
             {
-                const ctor_fn_t& model_ctor = it->second->ctor;
-                auto object_uptr = std::unique_ptr<model::Object>(model_ctor(args));
-                object_uptr->m_name = it->second->class_name;
+                auto object_uptr = class_ptr->create(args);
+                object_uptr->m_name = class_ptr->getName();
                 object_uptr->m_text = args.empty() ? name : name + " " + AtomHelper::toString(args);
                 return object_uptr;
             }
@@ -48,61 +46,105 @@ namespace kiwi
             }
         }
         
-        void Factory::copy(model::Object const& object, flip::Mold& mold)
+        std::unique_ptr<model::Object> Factory::create(std::string const& name, flip::Mold const& mold)
         {
-            const auto& creators = getCreators();
-            const auto object_name = object.getName();
-            const auto it = creators.find(object_name);
-            
-            if(it != creators.cend())
+            auto const* class_ptr = getClassByName(name);
+            if(class_ptr != nullptr)
             {
-                it->second->mold_maker(object, mold);
+                return class_ptr->moldCast(mold);
             }
             else
             {
-                throw std::runtime_error("can't copy object " + object_name);
+                throw std::runtime_error("Factory can't create object " + name);
             }
         }
         
-        std::unique_ptr<model::Object> Factory::create(std::string const& name, flip::Mold const& mold)
+        void Factory::copy(model::Object const& object, flip::Mold& mold)
         {
-            const auto& creators = getCreators();
-            const auto it = creators.find(name);
-            if(it != creators.end())
+            const auto name = object.getName();
+            auto const* class_ptr = getClassByName(name);
+            if(class_ptr != nullptr)
             {
-                const mold_caster_fn_t& mold_caster = it->second->mold_caster;
-                return mold_caster(mold);
+                class_ptr->moldMake(object, mold);
             }
             else
             {
-                throw std::runtime_error("Factory can't create object");
+                throw std::runtime_error("can't copy object " + name);
             }
         }
         
         bool Factory::has(std::string const& name)
         {
-            const auto& creators = getCreators();
-            return (creators.find(name) != creators.cend());
+            const auto& object_classes = getClasses();
+            for(const auto& object_class : object_classes)
+            {
+                if(object_class->getName() == name || object_class->hasAlias(name))
+                    return true;
+            }
+            
+            return false;
         }
         
-        std::vector<std::string> Factory::getNames()
+        Factory::ObjectClassBase* Factory::getClassByName(std::string const& name,
+                                                          const bool ignore_aliases)
         {
-            const auto& creators = getCreators();
-            std::vector<std::string> names;
-            names.reserve(creators.size());
-            
-            for(const auto& creator : creators)
+            const auto& object_classes = getClasses();
+            for(const auto& object_class : object_classes)
             {
-                names.emplace_back(creator.first);
+                if(object_class->getName() == name || (!ignore_aliases && object_class->hasAlias(name)))
+                    return object_class.get();
+            }
+            
+            return nullptr;
+        }
+        
+        std::vector<std::string> Factory::getNames(const bool ignore_aliases, const bool ignore_internals)
+        {
+            auto const& object_classes = getClasses();
+            std::vector<std::string> names;
+            names.reserve(object_classes.size());
+            
+            for(const auto& object_class : object_classes)
+            {
+                if(!object_class->isInternal() || !ignore_internals)
+                {
+                    names.emplace_back(object_class->getName());
+                    
+                    if(!ignore_aliases && object_class->hasAlias())
+                    {
+                        const auto aliases = object_class->getAliases();
+                        names.insert(names.end(), aliases.begin(), aliases.end());
+                    }
+                }
             }
             
             return names;
         }
         
-        auto Factory::getCreators() -> creator_map_t&
+        std::string Factory::sanitizeName(std::string const& name)
         {
-            static creator_map_t static_creators;
-            return static_creators;
+            std::string model_name = "cicm.kiwi.object.";
+            
+            static const std::string valid_chars("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.");
+            
+            for(auto const& c : name)
+            {
+                if(c == '~')
+                {
+                    model_name.append("_tilde");
+                    continue;
+                }
+                
+                model_name += (valid_chars.find(c) != std::string::npos) ? c : '_';
+            }
+            
+            return model_name;
+        }
+        
+        auto Factory::getClasses() -> object_classes_t&
+        {
+            static object_classes_t static_object_classes;
+            return static_object_classes;
         }
     }
 }

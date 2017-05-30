@@ -3,9 +3,9 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of the GPL v2
+ Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -19,10 +19,10 @@
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiModel_DataModel.hpp>
+#include <KiwiModel/KiwiModel_DataModel.h>
 
-#include "KiwiApp.hpp"
-#include "KiwiApp_CommandIDs.hpp"
+#include "KiwiApp.h"
+#include "KiwiApp_General/KiwiApp_CommandIDs.h"
 
 namespace kiwi
 {
@@ -81,26 +81,48 @@ namespace kiwi
     
     void KiwiApp::initialise(juce::String const& commandLine)
     {
+        #if ! JUCE_MAC
+        if(sendCommandLineToPreexistingInstance())
+        {
+            DBG ("Another instance is running - quitting...");
+            quit();
+            return;
+        }
+        #endif
+   
         model::DataModel::init();
+        
+        juce::Desktop::getInstance().setGlobalScaleFactor(1.);
+        
+        juce::LookAndFeel::setDefaultLookAndFeel(&m_looknfeel);
         
         m_command_manager = std::make_unique<juce::ApplicationCommandManager>();
         
-        m_settings = std::make_unique<StoredSettings>();
-        m_instance = std::make_unique<Instance>();
+        engine::Scheduler<>::createInstance();
         
-        m_command_manager->registerAllCommandsForTarget(this);
+        m_settings = std::make_unique<StoredSettings>();
         
         m_menu_model.reset(new MainMenuModel());
+
+        engine::Scheduler<>& scheduler = engine::Scheduler<>::createInstance();
+        
+        scheduler.registerConsumer(Thread::Engine);
+        scheduler.registerProducer(Thread::Gui, Thread::Engine);
+        scheduler.registerProducer(Thread::Engine, Thread::Engine);
+        
+        m_quit_requested.store(false);
+        m_engine_thread = std::thread(std::bind(&KiwiApp::processEngine, this));
+        
+        m_instance = std::make_unique<Instance>();
+        m_command_manager->registerAllCommandsForTarget(this);
         
         #if JUCE_MAC
         juce::PopupMenu macMainMenuPopup;
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAboutAppWindow);
         macMainMenuPopup.addSeparator();
-        macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAudioStatusWindow);
+        macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAppSettingsWindow);
         juce::MenuBarModel::setMacMainMenu(m_menu_model.get(), &macMainMenuPopup, TRANS("Open Recent"));
         #endif
-        
-        juce::LookAndFeel::getDefaultLookAndFeel().setUsingNativeAlertWindows(true);
     }
     
     void KiwiApp::anotherInstanceStarted(juce::String const& command_line)
@@ -128,9 +150,14 @@ namespace kiwi
         }
         else
         {
-            if(m_instance->closeAllWindows())
+            if(m_instance->closeAllPatcherWindows())
             {
+                m_quit_requested.store(true);
+                m_engine_thread.join();
+                
                 m_instance.reset();
+                
+                engine::Scheduler<>::deleteInstance();
                 
                 quit();
             }
@@ -150,6 +177,32 @@ namespace kiwi
     bool KiwiApp::moreThanOneInstanceAllowed()
     {
         return true;
+    }
+    
+    bool KiwiApp::isMacOSX()
+    {
+        return (juce::SystemStats::getOperatingSystemType()
+                & juce::SystemStats::MacOSX) != 0;
+    }
+    
+    bool KiwiApp::isLinux()
+    {
+        return juce::SystemStats::getOperatingSystemType() == juce::SystemStats::Linux;
+    }
+    
+    bool KiwiApp::isWindows()
+    {
+        return (juce::SystemStats::getOperatingSystemType()
+                & juce::SystemStats::Windows) != 0;
+    }
+    
+    void KiwiApp::processEngine()
+    {
+        while(!m_quit_requested.load())
+        {
+            engine::Scheduler<>::use().process(Thread::Engine);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
     }
     
     // ================================================================================ //
@@ -193,6 +246,16 @@ namespace kiwi
         return KiwiApp::use().m_menu_model.get();
     }
     
+    LookAndFeel& KiwiApp::useLookAndFeel()
+    {
+        return KiwiApp::use().m_looknfeel;
+    }
+    
+    TooltipWindow& KiwiApp::useTooltipWindow()
+    {
+        return KiwiApp::use().m_tooltip_window;
+    }
+    
     // ================================================================================ //
     //                                      CONSOLE                                     //
     // ================================================================================ //
@@ -217,14 +280,12 @@ namespace kiwi
         useEngineInstance().error(text);
     }
     
-    bool KiwiApp::closeWindow(Window& window)
+    void KiwiApp::closeWindow(Window& window)
     {
         if(m_instance)
         {
-            return m_instance->closeWindow(window);
+            m_instance->closeWindow(window);
         }
-        
-        return false;
     }
     
     // ================================================================================ //
@@ -319,7 +380,11 @@ namespace kiwi
         
         menu.addCommandItem(m_command_manager.get(), CommandIDs::save);
         menu.addCommandItem(m_command_manager.get(), CommandIDs::saveAs);
+        
+        #if ! JUCE_MAC
         menu.addSeparator();
+        menu.addCommandItem(m_command_manager.get(), juce::StandardApplicationCommandIDs::quit);
+        #endif
     }
     
     void KiwiApp::createEditMenu(juce::PopupMenu& menu)
@@ -354,7 +419,13 @@ namespace kiwi
     {
         menu.addCommandItem(m_command_manager.get(), CommandIDs::startDsp);
         menu.addCommandItem(m_command_manager.get(), CommandIDs::stopDsp);
+        
+        menu.addSeparator();
         menu.addCommandItem(m_command_manager.get(), CommandIDs::showAudioStatusWindow);
+        
+        #if ! JUCE_MAC
+        menu.addCommandItem(&getCommandManager(), CommandIDs::showAppSettingsWindow);
+        #endif
     }
     
     void KiwiApp::createWindowMenu(juce::PopupMenu& menu)
@@ -372,7 +443,9 @@ namespace kiwi
     
     void KiwiApp::createHelpMenu(juce::PopupMenu& menu)
     {
-        ;
+        #if ! JUCE_MAC
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::showAboutAppWindow);
+        #endif
     }
     
     void KiwiApp::handleMainMenuCommand(int menuItemID)
@@ -391,9 +464,12 @@ namespace kiwi
             CommandIDs::newPatcher,
             CommandIDs::openFile,
             CommandIDs::showConsoleWindow,
+            CommandIDs::showAboutAppWindow,
             CommandIDs::showAudioStatusWindow,
+            CommandIDs::showAppSettingsWindow,
             CommandIDs::showDocumentBrowserWindow,
             CommandIDs::showBeaconDispatcherWindow,
+            CommandIDs::switchDsp,
             CommandIDs::startDsp,
             CommandIDs::stopDsp
         };
@@ -429,6 +505,20 @@ namespace kiwi
                 result.addDefaultKeypress('k', juce::ModifierKeys::commandModifier);
                 break;
             }
+            case CommandIDs::showAboutAppWindow:
+            {
+                result.setInfo(TRANS("About Kiwi"), TRANS("Show the \"About Kiwi\" Window"),
+                               CommandCategories::windows, 0);
+                break;
+            }
+            case CommandIDs::showAppSettingsWindow:
+            {
+                result.setInfo(TRANS("Preferences..."), TRANS("Show kiwi application settings"),
+                               CommandCategories::windows, 0);
+                
+                result.addDefaultKeypress(',', juce::ModifierKeys::commandModifier);
+                break;
+            }
             case CommandIDs::showAudioStatusWindow:
             {
                 result.setInfo(TRANS("Audio Settings"), TRANS("Show kiwi settings"),
@@ -447,6 +537,15 @@ namespace kiwi
             {
                 result.setInfo(TRANS("Show Beacon dispatcher window"), TRANS("Show Beacon dispatcher window"),
                                CommandCategories::windows, 0);
+                
+                break;
+            }
+            case CommandIDs::switchDsp:
+            {
+                result.setInfo(TRANS("Switch global DSP state"), TRANS("Switch global DSP state"),
+                               CommandCategories::general, 0);
+                
+                result.setTicked(m_instance->getEngineInstance().getAudioControler().isAudioOn());
                 
                 break;
             }
@@ -470,7 +569,13 @@ namespace kiwi
             }
             default:
             {
-                JUCEApplication::getCommandInfo(commandID, result); break;
+                if(commandID == juce::StandardApplicationCommandIDs::quit)
+                {
+                    result.setInfo(TRANS("Quit Kiwi"), TRANS("Quits the application"),
+                                   CommandCategories::general, 0);
+                    
+                    result.addDefaultKeypress('q', juce::ModifierKeys::commandModifier);
+                }
             }
         }
     }
@@ -494,6 +599,16 @@ namespace kiwi
                 m_instance->showConsoleWindow();
                 break;
             }
+            case CommandIDs::showAboutAppWindow :
+            {
+                m_instance->showAboutKiwiWindow();
+                break;
+            }
+            case CommandIDs::showAppSettingsWindow :
+            {
+                m_instance->showAppSettingsWindow();
+                break;
+            }
             case CommandIDs::showAudioStatusWindow :
             {
                 m_instance->showAudioSettingsWindow();
@@ -506,6 +621,20 @@ namespace kiwi
             case CommandIDs::showBeaconDispatcherWindow :
             {
                 m_instance->showBeaconDispatcherWindow();
+                break;
+            }
+            case CommandIDs::switchDsp :
+            {
+                auto& audio_controler = m_instance->useEngineInstance().getAudioControler();
+                if(audio_controler.isAudioOn())
+                {
+                    audio_controler.stopAudio();
+                }
+                else
+                {
+                    audio_controler.startAudio();
+                }
+                
                 break;
             }
             case CommandIDs::startDsp :

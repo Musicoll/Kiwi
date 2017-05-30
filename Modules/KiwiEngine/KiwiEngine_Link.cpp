@@ -3,9 +3,9 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of the GPL v2
+ Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -19,11 +19,7 @@
  ==============================================================================
  */
 
-#include "KiwiEngine_Link.hpp"
-#include "KiwiEngine_Object.hpp"
-
-#include <KiwiModel/KiwiModel_Link.hpp>
-#include <KiwiModel/KiwiModel_Object.hpp>
+#include "KiwiEngine_Link.h"
 
 namespace kiwi
 {
@@ -33,32 +29,27 @@ namespace kiwi
         //                                      LINK                                        //
         // ================================================================================ //
         
-        Link::Link(model::Link const& model) :
-        m_model(model)
+        Link::Link(Object & receiver, size_t index) :
+        m_receiver(receiver),
+        m_index(index)
         {
             ;
         }
         
-        Object& Link::getSenderObject() const
+        bool Link::operator<(Link const& other) const
         {
-            return *m_model.getSenderObject().entity().use<std::shared_ptr<engine::Object>>().get();
+            return (&m_receiver < &other.m_receiver
+                    || (&m_receiver == &other.m_receiver && m_index < other.m_index));
         }
  
-        Object& Link::getReceiverObject() const
+        Object & Link::getReceiver() const
         {
-            return *m_model.getReceiverObject().entity().use<std::shared_ptr<engine::Object>>().get();
-        }
-        
-        size_t Link::getSenderIndex() const
-        {
-            //return m_model.getSenderIndex(model::PinType::IType::Control);
-            return m_model.getSenderIndex();
+            return m_receiver;
         }
         
         size_t Link::getReceiverIndex() const
         {
-            //return m_model.getReceiverIndex(model::PinType::IType::Control);
-            return m_model.getReceiverIndex();
+            return m_index;
         }
     }
 }

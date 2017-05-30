@@ -3,9 +3,9 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of the GPL v2
+ Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -19,9 +19,9 @@
  ==============================================================================
  */
 
-#include "KiwiModel_Object.hpp"
+#include "KiwiModel_Object.h"
 
-#include "KiwiModel_DataModel.hpp"
+#include "KiwiModel_DataModel.h"
 
 namespace kiwi
 {
@@ -292,6 +292,11 @@ namespace kiwi
         void Object::pushOutlet(PinType type)
         {
             m_outlets.emplace(m_outlets.end(), type);
+        }
+        
+        std::string Object::getIODescription(bool is_inlet, size_t index) const
+        {
+            return (is_inlet ? "inlet " : "outlet ") + std::to_string(index);
         }
     }
 }

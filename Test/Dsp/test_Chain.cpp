@@ -3,9 +3,9 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of the GPL v2
+ Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -23,10 +23,10 @@
 
 #include "../catch.hpp"
 
-#include <KiwiDsp/KiwiDsp_Chain.hpp>
-#include <KiwiDsp/KiwiDsp_Misc.hpp>
+#include <KiwiDsp/KiwiDsp_Chain.h>
+#include <KiwiDsp/KiwiDsp_Misc.h>
 
-#include "Processors.hpp"
+#include "Processors.h"
 
 using namespace kiwi;
 using namespace dsp;
@@ -440,134 +440,6 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
         chain.tick();
         
         CHECK(result == "[16.000000, 18.000000, 20.000000, 22.000000]");
-        
-        chain.release();
-    }
-    
-    SECTION("Chain tick - performance")
-    {
-        Chain chain;
-        
-        std::shared_ptr<Processor> nul1(new NullProcessor(1, 1));
-        std::shared_ptr<Processor> nul2(new NullProcessor(1, 1));
-        
-        chain.addProcessor(nul1);
-        chain.addProcessor(nul2);
-        
-        chain.connect(*nul1, 0, *nul2, 0);
-        
-        chain.prepare(44100, 64);
-        
-        std::chrono::time_point<std::chrono::system_clock> start, end;
-        start = std::chrono::system_clock::now();
-        
-        for (int i = 0; i < 10000000; ++i)
-        {
-            chain.tick();
-        }
-        
-        end = std::chrono::system_clock::now();
-        
-        int elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
-        
-        std::cout << "Duration for 10000000 tick " << elapsed_time << "ms" << std::endl;
-        
-        chain.release();
-    }
-    
-    SECTION("Chain tick - performance fanning")
-    {
-        Chain chain;
-        
-        std::shared_ptr<Processor> nul1(new NullProcessor(1, 1));
-        std::shared_ptr<Processor> nul2(new NullProcessor(1, 1));
-        std::shared_ptr<Processor> nul3(new NullProcessor(1, 1));
-        
-        chain.addProcessor(nul1);
-        chain.addProcessor(nul2);
-        chain.addProcessor(nul3);
-        
-        chain.connect(*nul1, 0, *nul3, 0);
-        chain.connect(*nul2, 0, *nul3, 0);
-        
-        chain.prepare(44100, 64);
-        
-        std::chrono::time_point<std::chrono::system_clock> start, end;
-        start = std::chrono::system_clock::now();
-        
-        for (int i = 0; i < 10000000; ++i)
-        {
-            chain.tick();
-        }
-        
-        end = std::chrono::system_clock::now();
-        
-        int elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
-        
-        std::cout << "Duration fanning for 10000000 tick " << elapsed_time << "ms" << std::endl;
-        
-        chain.release();
-    }
-    
-    SECTION("Chain tick - performance conditional perform")
-    {
-        Chain chain;
-        
-        std::shared_ptr<Processor> cond(new CondPerform());
-        std::string result;
-        std::shared_ptr<Processor> print(new Print(result));
-        
-        chain.addProcessor(cond);
-        chain.addProcessor(print);
-        
-        chain.connect(*cond, 0, *print, 0);
-        
-        chain.prepare(1, 1);
-        
-        std::chrono::time_point<std::chrono::system_clock> start, end;
-        start = std::chrono::system_clock::now();
-        
-        for (int i = 0; i < 10000000; ++i)
-        {
-            chain.tick();
-        }
-        
-        end = std::chrono::system_clock::now();
-        
-        int elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
-        
-        std::cout << "Duration conditional perform " << elapsed_time << "ms" << std::endl;
-        
-        chain.release();
-    }
-    
-    SECTION("Chain prepare - performance node line")
-    {
-        Chain chain;
-        
-        std::shared_ptr<Processor> previous_proc(new NullProcessor(1, 1));
-        chain.addProcessor(previous_proc);
-        
-        for(int i = 0; i < 10000; ++i)
-        {
-            std::shared_ptr<Processor> new_proc(new NullProcessor(1, 1));
-            
-            chain.addProcessor(new_proc);
-            chain.connect(*previous_proc, 0, *new_proc, 0);
-            
-            previous_proc = new_proc;
-        }
-        
-        std::chrono::time_point<std::chrono::system_clock> start, end;
-        start = std::chrono::system_clock::now();
-        
-        chain.prepare(44100, 64);
-        
-        end = std::chrono::system_clock::now();
-        
-        int elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
-        
-        std::cout << "Duration prepare line " << elapsed_time << "ms" << std::endl;
         
         chain.release();
     }

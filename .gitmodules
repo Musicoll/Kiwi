@@ -1,6 +1,9 @@
 [submodule "ThirdParty/Juce"]
 	path = ThirdParty/Juce
 	url = https://github.com/julianstorer/JUCE.git
-[submodule "ThirdParty/flip"]
-	path = ThirdParty/flip
-	url = git@github.com:ohmtech/flip.git
+[submodule "ThirdParty/cpr"]
+	path = ThirdParty/cpr
+	url = https://github.com/whoshuu/cpr.git
+[submodule "ThirdParty/readerwriterqueue"]
+	path = ThirdParty/readerwriterqueue
+	url = https://github.com/cameron314/readerwriterqueue.git

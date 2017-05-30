@@ -1,25 +1,46 @@
 
-environment:
-   matrix:
-      - CONFIGURATION: Release
-        PLATFORM: Win32
-      - CONFIGURATION: Release
-        PLATFORM: x64
-
 os: Visual Studio 2015
 
+environment:
+   matrix:
+      - MSVS: 2015
+        MSBUILD: 14.0
+        CONFIGURATION: Release
+        PLATFORM: Win32
+      - MSVS: 2015
+        MSBUILD: 14.0
+        CONFIGURATION: Release
+        PLATFORM: x64
+
 install:
-    - git submodule update --init --recursive ThirdParty/Juce
+    - git submodule update --init --recursive "ThirdParty/Juce"
+    - git submodule update --init --recursive "ThirdParty/cpr"
+    - git submodule update --init --recursive "ThirdParty/readerwriterqueue"
     - set PATH=C:\Python27;%PATH%
+    - curl -o ..\curl-7.52.1-win32.zip -L -k  https://github.com/Musicoll/Kiwi/files/998123/curl-7.52.1-win32.zip
+    - curl -o ..\curl-7.52.1-x64.zip -L -k  https://github.com/Musicoll/Kiwi/files/997546/curl-7.52.1-x64.zip
+    - curl -o ..\flip-demo.zip -L -k  http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files/flip-demo-windows-c47e41da05.zip
+    - cd ..
+    - 7z x curl-7.52.1-x64.zip
+    - 7z x curl-7.52.1-win32.zip
+    - 7z x flip-demo.zip -o./flip-demo
+    - set KIWI_CURL_LIB_x64=%cd%/curl-7.52.1-x64/lib/Release
+    - set KIWI_CURL_INCLUDE_x64=%cd%/curl-7.52.1-x64/include
+    - set KIWI_CURL_LIB_WIN32=%cd%/curl-7.52.1-win32/lib/Release
+    - set KIWI_CURL_INCLUDE_WIN32=%cd%/curl-7.52.1-win32/include
+    - set KIWI_FLIP_LIB_x64=%cd%/flip-demo/lib/VS2015/x64/Release
+    - set KIWI_FLIP_INCLUDE_x64=%cd%/flip-demo/include
+    - set KIWI_FLIP_LIB_WIN32=%cd%/flip-demo/lib/VS2015/Win32/Release
+    - set KIWI_FLIP_INCLUDE_WIN32=%cd%/flip-demo/include
+    - cd %APPVEYOR_BUILD_FOLDER%
 
 build_script:
-    - python .\Config\configure.py
-    - python .\Config\build.py -c %CONFIGURATION% -p %PLATFORM%
-    - python .\Config\run_test.py -c %CONFIGURATION% -p %PLATFORM%
+    - python .\Scripts\configure.py -c %CONFIGURATION% -p %PLATFORM%
+    - python .\Scripts\build.py -c %CONFIGURATION% -p %PLATFORM%
 
 after_build:
-    - del /F /S /Q /A %APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\Bin\%CONFIGURATION%\*.ilk
-    - 7z a Kiwi_%PLATFORM%.zip %APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\Bin\%CONFIGURATION%\Kiwi.exe
+    - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\%CONFIGURATION%
+    - 7z a Kiwi_%PLATFORM%.zip %BUILD_DIR%\Kiwi.exe %BUILD_DIR%\*.dll
 
 artifacts:
   - path: '*.zip'

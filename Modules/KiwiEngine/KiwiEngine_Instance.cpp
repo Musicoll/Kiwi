@@ -3,9 +3,9 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
- Permission is granted to use this software under the terms of the GPL v2
+ Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
  
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -19,9 +19,9 @@
  ==============================================================================
  */
 
-#include "KiwiEngine_Factory.hpp"
-#include "KiwiEngine_Objects.hpp"
-#include "KiwiEngine_Instance.hpp"
+#include "KiwiEngine_Factory.h"
+#include "KiwiEngine_Objects.h"
+#include "KiwiEngine_Instance.h"
 
 namespace kiwi
 {
@@ -85,11 +85,16 @@ namespace kiwi
             engine::Factory::add<Print>("print");
             engine::Factory::add<Receive>("receive");
             engine::Factory::add<Loadmess>("loadmess");
+            engine::Factory::add<Delay>("delay");
+            engine::Factory::add<Pipe>("pipe");
+            engine::Factory::add<Metro>("metro");
             engine::Factory::add<OscTilde>("osc~");
+            engine::Factory::add<AdcTilde>("adc~");
             engine::Factory::add<DacTilde>("dac~");
             engine::Factory::add<TimesTilde>("times~");
             engine::Factory::add<PlusTilde>("plus~");
             engine::Factory::add<SigTilde>("sig~");
+            engine::Factory::add<DelaySimpleTilde>("delaysimple~");
         }
         
         // ================================================================================ //
