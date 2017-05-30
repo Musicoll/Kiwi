@@ -26,6 +26,10 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "KiwiApp_Utils/KiwiApp_SuggestList.hpp"
+
+#include "KiwiApp_SuggestEditor.hpp"
+
 namespace kiwi
 {
     class HitTester;
@@ -81,7 +85,7 @@ namespace kiwi
         
     private:
         
-        void updateBounds();
+        void updateBounds(const bool animate);
         void drawInletsOutlets(juce::Graphics & g);
         
         //! @brief Returns the inlet local bounds for a given index.
@@ -94,7 +98,7 @@ namespace kiwi
         
     private: // members
         
-        PatcherView&               m_patcher_view;
+        PatcherView&            m_patcher_view;
         model::Object*          m_model = nullptr;
         const unsigned int      m_io_width = 6;
         const unsigned int      m_io_height = 3;
@@ -119,7 +123,7 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The ClassicBox let the user change the text of the box
-    class ClassicBox : public ObjectView, public juce::TextEditor::Listener
+    class ClassicBox : public ObjectView, public SuggestEditor::Listener
     {
     public:
         
@@ -129,29 +133,23 @@ namespace kiwi
         //! @brief Destructor.
         ~ClassicBox();
         
-        //! @brief Give focus to the text editor.
-        void grabKeyboardFocus();
+        //! @brief Let the user edit the text of the box.
+        void edit();
         
         //! @brief Remove the text editor and give focus back to the PatcherView.
         void removeTextEditor();
         
-        //! @brief Called when this component has just gained the keyboard focus.
-        void focusGained(FocusChangeType cause) override;
-        
-        //! @brief Called when this component has just lost the keyboard focus.
-        void focusLost(FocusChangeType cause) override;
-        
         //! @brief called when the object is resized.
         void resized() override;
         
-        void textEditorTextChanged(juce::TextEditor&) override;
-        void textEditorReturnKeyPressed(juce::TextEditor&) override;
-        void textEditorEscapeKeyPressed(juce::TextEditor&) override;
-        void textEditorFocusLost(juce::TextEditor&) override;
+        void suggestEditorTextChanged(SuggestEditor& ed) override;
+        void suggestEditorReturnKeyPressed(SuggestEditor& ed) override;
+        void suggestEditorEscapeKeyPressed(SuggestEditor& ed) override;
+        void suggestEditorFocusLost(SuggestEditor& ed) override;
         
     private: // members
         
-        std::unique_ptr<juce::TextEditor> m_editor;
+        std::unique_ptr<SuggestEditor> m_editor;
     };
 }
 

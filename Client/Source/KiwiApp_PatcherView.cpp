@@ -159,7 +159,7 @@ namespace kiwi
         
         if(!isLocked())
         {
-            HitTester& hit = *m_hittester.get();
+            HitTester& hit = *m_hittester;
             hit.test(e.getPosition());
 
             if(hit.objectTouched())
@@ -293,7 +293,7 @@ namespace kiwi
                 }
             }
             
-            HitTester& hit = *m_hittester.get();
+            HitTester& hit = *m_hittester;
             
             if(hit.objectTouched())
             {
@@ -414,7 +414,7 @@ namespace kiwi
                 m_link_creator.reset();
             }
             
-            HitTester& hit = *m_hittester.get();
+            HitTester& hit = *m_hittester;
             
             if(hit.objectTouched() && hit.getZone() == HitTester::Zone::Inside)
             {
@@ -431,7 +431,7 @@ namespace kiwi
                         ClassicBox* box = dynamic_cast<ClassicBox*>(object_view);
                         if(box)
                         {
-                            box->grabKeyboardFocus();
+                            box->edit();
                         }
                     }
                 }
@@ -444,7 +444,8 @@ namespace kiwi
                 ObjectView* object_view = hit.getObject();
                 if(object_view)
                 {
-                    selectOnMouseUp(*object_view, !e.mods.isShiftDown(), m_is_dragging, m_select_on_mouse_down_status);
+                    selectOnMouseUp(*object_view, !e.mods.isShiftDown(), m_is_dragging,
+                                    m_select_on_mouse_down_status);
                 }
             }
             else if(hit.linkTouched())
@@ -452,7 +453,8 @@ namespace kiwi
                 LinkView* link_view = hit.getLink();
                 if(link_view)
                 {
-                    selectOnMouseUp(*link_view, !e.mods.isShiftDown(), m_is_dragging, m_select_on_mouse_down_status);
+                    selectOnMouseUp(*link_view, !e.mods.isShiftDown(), m_is_dragging,
+                                    m_select_on_mouse_down_status);
                 }
             }
             else if(e.mods.isCommandDown())
@@ -588,29 +590,9 @@ namespace kiwi
             
             m.addCommandItem(cm, juce::StandardApplicationCommandIDs::selectAll);
             m.addSeparator();
-            
-            juce::PopupMenu object_menu;
-            
-            const auto names = model::Factory::getNames();
-            
-            for(int i = 0; i < names.size(); i++)
-            {
-                object_menu.addItem(i+1, names[i]);
-            }
-            
-            m.addSubMenu("Objects", object_menu);
-            
-            const int result = m.show();
-            
-            if(result > 0 && result <= names.size())
-            {
-                createObjectModel(names[result-1], position.getX(), position.getY());
-            }
         }
-        else
-        {
-            m.show();
-        }
+        
+        m.show();
     }
     
     void PatcherView::showObjectPopupMenu(ObjectView const& object, juce::Point<int> const& position)
@@ -665,7 +647,7 @@ namespace kiwi
         m_is_in_move_or_resize_gesture = false;
         m_viewport->updatePatcherArea(true);
 
-        HitTester& hit = *m_hittester.get();
+        HitTester& hit = *m_hittester;
         
         if(hit.objectTouched())
         {
@@ -1087,7 +1069,7 @@ namespace kiwi
                         ClassicBox* box = dynamic_cast<ClassicBox*>(it->get());
                         if(box)
                         {
-                            box->grabKeyboardFocus();
+                            box->edit();
                             return true;
                         }
                     }
@@ -1144,6 +1126,7 @@ namespace kiwi
         if(locked)
         {
             m_view_model.unselectAll();
+            grabKeyboardFocus();
         }
         
         m_view_model.setLock(locked);
@@ -1992,8 +1975,12 @@ namespace kiwi
             m_patcher_model.removeObject(old_object_m);
             DocumentManager::commit(m_patcher_model, "Edit Object");
             
-            m_view_model.selectObject(new_object_m);
-            DocumentManager::commit(m_patcher_model);
+            if(!isLocked())
+            {
+                m_view_model.selectObject(new_object_m);
+                DocumentManager::commit(m_patcher_model);
+            }
+            
             KiwiApp::commandStatusChanged();
         }
     }
@@ -2065,7 +2052,7 @@ namespace kiwi
                         ClassicBox* box = dynamic_cast<ClassicBox*>(it->get());
                         if(box)
                         {
-                            box->grabKeyboardFocus();
+                            box->edit();
                         }
                     }
                 }

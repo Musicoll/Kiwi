@@ -27,6 +27,7 @@
 #include "flip/Document.h"
 
 #include <KiwiModel/KiwiModel_PatcherUser.hpp>
+#include <KiwiModel/KiwiModel_PatcherValidator.hpp>
 #include <KiwiEngine/KiwiEngine_Instance.hpp>
 
 #include "KiwiApp_Window.hpp"
@@ -150,10 +151,11 @@ namespace kiwi
 
     private: // members
         
-        Instance&       m_instance;
-        flip::Document  m_document;
-        bool            m_need_saving_flag;
-        bool            m_is_remote;
+        Instance&                   m_instance;
+        model::PatcherValidator     m_validator;
+        flip::Document              m_document;
+        bool                        m_need_saving_flag;
+        bool                        m_is_remote;
         engine::Listeners<Listener> m_listeners;
     };
     

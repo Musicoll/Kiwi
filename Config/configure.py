@@ -22,6 +22,9 @@ def parse_args ():
     
     if platform.system () == 'Darwin':
         arg_parser.add_argument('-flip', default = 'public', choices = ['public', 'private'])
+    
+    if platform.system () == 'Linux':
+        arg_parser.add_argument('-coverage', required=False, action='store_true', help='activate coverage')
 
     return arg_parser.parse_args (sys.argv[1:])
 
@@ -204,6 +207,10 @@ def linux_release():
 #==============================================================================
 
 def configure_linux(args):
+    global cmd;
+    if (args.coverage):
+        cmd += " -DGCOV_SUPPORT=On"
+        
     linux_debug()
     linux_release()
     return

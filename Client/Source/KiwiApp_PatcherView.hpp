@@ -341,10 +341,12 @@ namespace kiwi
         //! @internal Show Patcher contextual Popup menu
         void showPatcherPopupMenu(juce::Point<int> const& position);
         
-        //! @internal Show Object contextual Popup menu
+        //! @internal Show Object contextual popup menu
+        //! @details Will only show up when the patcher view is unlocked.
         void showObjectPopupMenu(ObjectView const& object_view, juce::Point<int> const& position);
         
         //! @internal Show Link contextual Popup menu
+        //! @details Will only show up when the patcher view is unlocked.
         void showLinkPopupMenu(LinkView const& link_view, juce::Point<int> const& position);
         
         //! @brief Bring all link components in front of object ones.

@@ -19,56 +19,47 @@
  ==============================================================================
  */
 
-#ifndef KIWI_MODEL_PATCHER_USER_HPP_INCLUDED
-#define KIWI_MODEL_PATCHER_USER_HPP_INCLUDED
+#ifndef KIWI_MODEL_PATCHER_VALIDATOR_HPP_INCLUDED
+#define KIWI_MODEL_PATCHER_VALIDATOR_HPP_INCLUDED
 
-#include "KiwiModel_Patcher.hpp"
-#include "KiwiModel_PatcherView.hpp"
+#include <flip/DocumentValidator.h>
+
+#include "KiwiModel_PatcherUser.hpp"
 
 namespace kiwi
 {
     namespace model
     {
         // ================================================================================ //
-        //                                 PATCHER USER                                   //
+        //                                      PATCHERVALIDATOR                            //
         // ================================================================================ //
         
-        //! @brief Represents and stores informations about a user of a patcher document.
-        class Patcher::User : public flip::Object
+        class PatcherValidator : public flip::DocumentValidator<Patcher>
         {
         public: // methods
             
-            //! @brief Constructor.
-            User();
+            PatcherValidator() = default;
+            ~PatcherValidator() = default;
             
-            //! @brief Destructor.
-            ~User() = default;
+            // @brief Validate the model before a transaction can be executed.
+            virtual void validate (Patcher& patcher) override;
             
-            //! @brief Add a new View.
-            View& addView();
+        private: // methods
             
-            //! @brief Remove a View.
-            flip::Collection<Patcher::View>::iterator removeView(View const& view);
+            //! @brief Carry out checks once a object is removed.
+            void objectRemoved(Object const& object, Patcher const& patcher) const;
             
-            //! @brief Get views.
-            flip::Collection<Patcher::View> const& getViews() const noexcept;
+            //! @brief Carry out checks once a link is created.
+            void linkAdded(Link const& link) const;
             
-            //! @brief Get the User id
-            uint64_t getId() const;
-            
-        public: // internal methods
-            
-            //! @brief flip declare method
-            static void declare();
-            
-        private: // members
-            
-            flip::Collection<Patcher::View> m_views;
-            
-            friend Patcher;
+        private: // deleted methods
+            PatcherValidator(PatcherValidator const& other) = delete;
+            PatcherValidator(PatcherValidator && other) = delete;
+            PatcherValidator& operator=(PatcherValidator const& other) = delete;
+            PatcherValidator& operator=(PatcherValidator && other) = delete;
         };
     }
 }
 
 
-#endif // KIWI_MODEL_PATCHER_USER_HPP_INCLUDED
+#endif // KIWI_MODEL_PATCHER_VALIDATOR_HPP_INCLUDED

@@ -1,12 +1,16 @@
 
+os: Visual Studio 2015
+
 environment:
    matrix:
-      - CONFIGURATION: Release
+      - MSVS: 2015
+        MSBUILD: 14.0
+        CONFIGURATION: Release
         PLATFORM: Win32
-      - CONFIGURATION: Release
+      - MSVS: 2015
+        MSBUILD: 14.0
+        CONFIGURATION: Release
         PLATFORM: x64
-
-os: Visual Studio 2015
 
 install:
     - git submodule update --init --recursive ThirdParty/Juce
@@ -15,7 +19,6 @@ install:
 build_script:
     - python .\Config\configure.py
     - python .\Config\build.py -c %CONFIGURATION% -p %PLATFORM%
-    - python .\Config\run_test.py -c %CONFIGURATION% -p %PLATFORM%
 
 after_build:
     - del /F /S /Q /A %APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\Bin\%CONFIGURATION%\*.ilk

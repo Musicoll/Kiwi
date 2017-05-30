@@ -40,6 +40,10 @@ namespace kiwi
             
             class User;
             class View;
+
+            using Objects = flip::Array<model::Object>;
+            using Links = flip::Array<model::Link>;
+            using Users = flip::Collection<User>;
             
             //! @brief Default constructor.
             Patcher();
@@ -98,25 +102,22 @@ namespace kiwi
             //! @brief Sets the Patcher name.
             void setName(std::string const& new_name);
             
-            //! @brief Set the User.
-            //! @param user_id The user unique id.
-            //! @return The user.
-            User& createUserIfNotAlreadyThere(uint32_t user_id);
-            
-            //! @brief Get a User by id.
-            //! @param user_id The user unique id.
-            //! @return The User pointer if found or nullptr.
-            User* getUser(uint32_t user_id);
-            
             //! @brief Gets the objects.
-            flip::Array<model::Object> const& getObjects() const noexcept;
+            Objects const& getObjects() const noexcept;
             
             //! @brief Gets the links.
-            flip::Array<model::Link> const& getLinks() const noexcept;
+            Links const& getLinks() const noexcept;
             
             //! @brief Gets the users.
-            flip::Collection<User> const& getUsers() const noexcept;
-        
+            Users const& getUsers() const noexcept;
+            
+            //! @brief Returns the current User.
+            //! @details The function will look for a User that match
+            //! the current user id of the document, if it's not found, the User will be created,
+            //! therefore, do not use this method while observing the model.
+            //! @return The current User.
+            User& useSelfUser();
+            
         public: // internal methods
             
             //! @internal flip static declare method
@@ -124,14 +125,11 @@ namespace kiwi
             
         private: // methods
             
-            using object_array_t = flip::Array<model::Object>;
-            using link_array_t = flip::Array<model::Link>;
+            Objects::const_iterator  findObject(model::Object const& object) const;
+            Objects::iterator        findObject(model::Object const& object);
             
-            object_array_t::const_iterator findObject(model::Object const& object) const;
-            object_array_t::iterator findObject(model::Object const& object);
-            
-            link_array_t::const_iterator findLink(model::Link const& object) const;
-            link_array_t::iterator findLink(model::Link const& object);
+            Links::const_iterator    findLink(model::Link const& object) const;
+            Links::iterator          findLink(model::Link const& object);
             
             //! @internal Returns true if the link can be created.
             bool canConnect(model::Object const& from, const size_t outlet,
@@ -139,13 +137,12 @@ namespace kiwi
             
         private: // members
             
-            //! objects and links are stored in a flip::Array to maintain a graphical z-order.
-            flip::Array<model::Object>  m_objects;
-            flip::Array<model::Link>    m_links;
+            Objects         m_objects;
+            Links           m_links;
             
-            flip::Collection<User>      m_users;
+            Users           m_users;
             
-            flip::String                m_patcher_name;
+            flip::String    m_patcher_name;
             
         private: // deleted methods
             

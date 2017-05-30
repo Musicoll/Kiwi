@@ -6,6 +6,8 @@ project (Kiwi CXX)
 # Global Settings
 #--------------------------------------
 
+option(GCOV_SUPPORT "Build for gcov" Off)
+
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(ROOT_DIR ${PROJECT_SOURCE_DIR})
@@ -29,7 +31,7 @@ if(CMAKE_CONFIGURATION_TYPES)
 # Compiler Check
 #--------------------------------------
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #--------------------------------------
@@ -37,7 +39,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #--------------------------------------
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
-set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
+set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++14")
 set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
 set(CMAKE_OSX_ARCHITECTURES "i386;x86_64")
 set(CMAKE_SUPPRESS_REGENERATION true)
@@ -81,10 +83,11 @@ elseif(APPLE)
     endif()
 
 elseif(LINUX)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-multichar")
 
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-    endif()
+  if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+  endif()
 
 endif()
 
@@ -334,15 +337,6 @@ source_group_rec("${KIWI_CLIENT_SRC}" ${ROOT_DIR}/Client/Source)
 # Tests
 #----------------------------------
 
-# Test Atom
-
-file(GLOB TEST_ATOM_SRC ${ROOT_DIR}/Test/Atom/*.[c|h]pp)
-add_executable(test_atom ${TEST_ATOM_SRC})
-target_add_dependency(test_atom KiwiModel)
-set_target_properties(test_atom PROPERTIES FOLDER Test)
-source_group_rec("${TEST_ATOM_SRC}" ${ROOT_DIR}/Test/Atom)
-set_target_properties(test_atom PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
-
 # Test Dsp
 
 file(GLOB TEST_DSP_SRC ${ROOT_DIR}/Test/Dsp/*.[c|h]pp)
@@ -352,21 +346,52 @@ set_target_properties(test_dsp PROPERTIES FOLDER Test)
 source_group_rec("${TEST_DSP_SRC}" ${ROOT_DIR}/Test/Dsp)
 set_target_properties(test_dsp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
 
-#----------------------------------
-# Examples
-#----------------------------------
+# Test Model
 
-# Dsp - PortAudio
+file(GLOB TEST_MODEL_SRC ${ROOT_DIR}/Test/Model/*.[c|h]pp)
+add_executable(test_model ${TEST_MODEL_SRC})
+target_add_dependency(test_model KiwiModel)
+set_target_properties(test_model PROPERTIES FOLDER Test)
+source_group_rec("${TEST_MODEL_SRC}" ${ROOT_DIR}/Test/Model)
+set_target_properties(test_model PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
 
-if(APPLE)
-  find_path(PORTAUDIO_INCLUDES "portaudio.h")
-  include_directories("${PORTAUDIO_INCLUDES}")
-  file(GLOB TEST_DSP_PORTAUDIO_SRC ${ROOT_DIR}/Test/DspPortAudio/*.[c|h]pp)
-  find_library(PORTAUDIO_LIB "portaudio")
-  add_executable(dsp_portaudio ${TEST_DSP_PORTAUDIO_SRC})
-  target_link_libraries(dsp_portaudio KiwiDsp ${PORTAUDIO_LIB} ${SUPPORT_LIBS})
-  set_target_properties(dsp_portaudio PROPERTIES FOLDER Test)
-  # PortAudio configured for x86_64 archs
-  set_target_properties(dsp_portaudio PROPERTIES XCODE_ATTRIBUTE_ARCHS "x86_64")
-  source_group_rec("${TEST_DSP_PORTAUDIO_SRC}" ${ROOT_DIR}/Test/DspPortAudio)
+# Test Engine
+
+file(GLOB TEST_ENGINE_SRC ${ROOT_DIR}/Test/Engine/*.[c|h]pp)
+add_executable(test_engine ${TEST_ENGINE_SRC})
+target_add_dependency(test_engine KiwiEngine)
+set_target_properties(test_engine PROPERTIES FOLDER Test)
+source_group_rec("${TEST_ENGINE_SRC}" ${ROOT_DIR}/Test/Engine)
+set_target_properties(test_engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
+
+# Test Server
+
+file(GLOB TEST_SERVER_SRC ${ROOT_DIR}/Test/Server/*.[c|h]pp)
+add_executable(test_server ${TEST_SERVER_SRC})
+target_add_dependency(test_server KiwiServer)
+set_target_properties(test_server PROPERTIES FOLDER Test)
+source_group_rec("${TEST_SERVER_SRC}" ${ROOT_DIR}/Test/Server)
+set_target_properties(test_server PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEST_OUTPUT_PATH})
+
+# Coverage setting
+if(${GCOV_SUPPORT} STREQUAL "On" AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+  set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
+  target_link_libraries(test_dsp PUBLIC gcov)
+  target_link_libraries(test_model PUBLIC gcov)
+  target_link_libraries(test_engine PUBLIC gcov)
+  target_link_libraries(test_server PUBLIC gcov)
 endif()
+
+# Tests Target
+
+add_custom_target(Tests ALL DEPENDS test_dsp test_model test_engine test_server)
+set_target_properties(Tests PROPERTIES FOLDER Test)
+
+add_custom_command(TARGET Tests
+                   POST_BUILD COMMAND test_dsp
+                              COMMAND test_model
+                              COMMAND test_engine
+                              COMMAND test_server
+                   USES_TERMINAL)

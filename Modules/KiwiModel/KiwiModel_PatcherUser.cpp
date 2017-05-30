@@ -36,7 +36,6 @@ namespace kiwi
             
             DataModel::declare<Patcher::User>()
             .name("cicm.kiwi.Patcher.User")
-            .member<flip::Int, &Patcher::User::m_user_id>("user_id")
             .member<flip::Collection<Patcher::View>, &Patcher::User::m_views>("views");
         }
         
@@ -44,7 +43,7 @@ namespace kiwi
         //                                   PATCHER USER                                   //
         // ================================================================================ //
         
-        Patcher::User::User(uint32_t user_id) : m_user_id(user_id)
+        Patcher::User::User()
         {
             
         }
@@ -68,9 +67,9 @@ namespace kiwi
             return m_views.end();
         }
         
-        uint32_t Patcher::User::getId() const
+        uint64_t Patcher::User::getId() const
         {
-            return !removed() ? static_cast<uint32_t>(m_user_id) : static_cast<uint32_t>(m_user_id.before());
+            return ref().user();
         }
         
         flip::Collection<Patcher::View> const& Patcher::User::getViews() const noexcept
