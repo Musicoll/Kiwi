@@ -1,7 +1,7 @@
 var searchData=
 [
   ['dactilde',['DacTilde',['../classkiwi_1_1model_1_1_dac_tilde.html#a0b36e13d0b54cbab2ece10aa6ab37756',1,'kiwi::model::DacTilde::DacTilde(flip::Default &amp;d)'],['../classkiwi_1_1model_1_1_dac_tilde.html#a6aef9c678ddb4ca89d21a3858837c4a8',1,'kiwi::model::DacTilde::DacTilde(std::string const &amp;name, std::vector&lt; Atom &gt; const &amp;args)']]],
-  ['data',['data',['../classkiwi_1_1dsp_1_1_signal.html#aa44751728a4102b332fd991c28c51bb1',1,'kiwi::dsp::Signal::data() const  noexcept'],['../classkiwi_1_1dsp_1_1_signal.html#aa9dee6567c74fb0db9c347c8e1667787',1,'kiwi::dsp::Signal::data() noexcept']]],
+  ['data',['data',['../classkiwi_1_1dsp_1_1_signal.html#a0f70527be62f41330b08490dff17d31e',1,'kiwi::dsp::Signal::data() const noexcept'],['../classkiwi_1_1dsp_1_1_signal.html#aa9dee6567c74fb0db9c347c8e1667787',1,'kiwi::dsp::Signal::data() noexcept']]],
   ['declare',['declare',['../classkiwi_1_1model_1_1_patcher_1_1_user.html#a7d45e6d43051b43e7eeb240a508cfb51',1,'kiwi::model::Patcher::User']]],
   ['delay',['Delay',['../classkiwi_1_1model_1_1_delay.html#a45b93d61e05a1a21a8c9c71821c76a30',1,'kiwi::model::Delay::Delay(flip::Default &amp;d)'],['../classkiwi_1_1model_1_1_delay.html#a8d4605801615cd58f02b007e68efa1aa',1,'kiwi::model::Delay::Delay(std::string const &amp;name, std::vector&lt; Atom &gt; const &amp;args)']]],
   ['delaysimpletilde',['DelaySimpleTilde',['../classkiwi_1_1model_1_1_delay_simple_tilde.html#abd607ad122439aae2ba9c709e30b3e0a',1,'kiwi::model::DelaySimpleTilde::DelaySimpleTilde(flip::Default &amp;d)'],['../classkiwi_1_1model_1_1_delay_simple_tilde.html#a70a930dd282d50dc89d1c0f64beaa324',1,'kiwi::model::DelaySimpleTilde::DelaySimpleTilde(std::string const &amp;name, std::vector&lt; Atom &gt; const &amp;args)']]],

@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['patcher',['Patcher',['../classkiwi_1_1engine_1_1_patcher.html',1,'kiwi::engine']]],
-  ['patcher',['Patcher',['../classkiwi_1_1model_1_1_patcher.html',1,'kiwi::model']]],
+  ['patcher',['Patcher',['../classkiwi_1_1engine_1_1_patcher.html',1,'kiwi::engine::Patcher'],['../classkiwi_1_1model_1_1_patcher.html',1,'kiwi::model::Patcher']]],
   ['patchercomponent',['PatcherComponent',['../classkiwi_1_1_patcher_component.html',1,'kiwi']]],
   ['patchermanager',['PatcherManager',['../classkiwi_1_1_patcher_manager.html',1,'kiwi']]],
   ['patchertoolbar',['PatcherToolbar',['../classkiwi_1_1_patcher_toolbar.html',1,'kiwi']]],
@@ -12,14 +11,10 @@ var searchData=
   ['performcallback',['PerformCallBack',['../classkiwi_1_1dsp_1_1_perform_call_back.html',1,'kiwi::dsp']]],
   ['pin',['Pin',['../classkiwi_1_1dsp_1_1_chain_1_1_node_1_1_pin.html',1,'kiwi::dsp::Chain::Node']]],
   ['pintype',['PinType',['../classkiwi_1_1model_1_1_pin_type.html',1,'kiwi::model']]],
-  ['pipe',['Pipe',['../classkiwi_1_1model_1_1_pipe.html',1,'kiwi::model']]],
-  ['pipe',['Pipe',['../classkiwi_1_1engine_1_1_pipe.html',1,'kiwi::engine']]],
-  ['plus',['Plus',['../classkiwi_1_1engine_1_1_plus.html',1,'kiwi::engine']]],
-  ['plus',['Plus',['../classkiwi_1_1model_1_1_plus.html',1,'kiwi::model']]],
-  ['plustilde',['PlusTilde',['../classkiwi_1_1model_1_1_plus_tilde.html',1,'kiwi::model']]],
-  ['plustilde',['PlusTilde',['../classkiwi_1_1engine_1_1_plus_tilde.html',1,'kiwi::engine']]],
+  ['pipe',['Pipe',['../classkiwi_1_1model_1_1_pipe.html',1,'kiwi::model::Pipe'],['../classkiwi_1_1engine_1_1_pipe.html',1,'kiwi::engine::Pipe']]],
+  ['plus',['Plus',['../classkiwi_1_1model_1_1_plus.html',1,'kiwi::model::Plus'],['../classkiwi_1_1engine_1_1_plus.html',1,'kiwi::engine::Plus']]],
+  ['plustilde',['PlusTilde',['../classkiwi_1_1model_1_1_plus_tilde.html',1,'kiwi::model::PlusTilde'],['../classkiwi_1_1engine_1_1_plus_tilde.html',1,'kiwi::engine::PlusTilde']]],
   ['prepareinfo',['PrepareInfo',['../structkiwi_1_1dsp_1_1_processor_1_1_prepare_info.html',1,'kiwi::dsp::Processor']]],
-  ['print',['Print',['../classkiwi_1_1engine_1_1_print.html',1,'kiwi::engine']]],
-  ['print',['Print',['../classkiwi_1_1model_1_1_print.html',1,'kiwi::model']]],
+  ['print',['Print',['../classkiwi_1_1model_1_1_print.html',1,'kiwi::model::Print'],['../classkiwi_1_1engine_1_1_print.html',1,'kiwi::engine::Print']]],
   ['processor',['Processor',['../classkiwi_1_1dsp_1_1_processor.html',1,'kiwi::dsp']]]
 ];
