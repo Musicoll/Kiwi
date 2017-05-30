@@ -919,10 +919,10 @@ namespace kiwi
         }
         
         // ================================================================================ //
-        //                                       DELAYTILDE                                 //
+        //                                  DELAYSIMPLETILDE                                //
         // ================================================================================ //
         
-        DelayTilde::DelayTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        DelaySimpleTilde::DelaySimpleTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
         AudioObject(model, patcher),
         m_circular_buffer(),
         m_reinject_signal(),
@@ -935,7 +935,7 @@ namespace kiwi
         {
         }
         
-        void DelayTilde::receive(size_t index, std::vector<Atom> const& args)
+        void DelaySimpleTilde::receive(size_t index, std::vector<Atom> const& args)
         {
             if (index == 0 && args[0].isString())
             {
@@ -953,7 +953,7 @@ namespace kiwi
             }
         }
         
-        dsp::sample_t DelayTilde::cubicInterpolate(float const& x,
+        dsp::sample_t DelaySimpleTilde::cubicInterpolate(float const& x,
                                                    float const& y0,
                                                    float const& y1,
                                                    float const& y2,
@@ -963,7 +963,7 @@ namespace kiwi
                                                   + x * (3.0 * (y1 - y2) + y3 - y0)));
         }
         
-        void DelayTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        void DelaySimpleTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
         {
             std::lock_guard<std::mutex> lock(m_mutex);
             
@@ -992,7 +992,7 @@ namespace kiwi
             }
         }
         
-        void DelayTilde::performDelay(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        void DelaySimpleTilde::performDelay(dsp::Buffer const& input, dsp::Buffer& output) noexcept
         {
             //! Durty solution to synchronize circular buffer.
             //! Should be implemented as an atomic shared pointer and a release pool
@@ -1022,7 +1022,7 @@ namespace kiwi
             }
         }
         
-        void DelayTilde::prepare(dsp::Processor::PrepareInfo const& infos)
+        void DelaySimpleTilde::prepare(dsp::Processor::PrepareInfo const& infos)
         {
             if (infos.sample_rate != m_sr || infos.vector_size != m_vector_size)
             {
@@ -1037,11 +1037,11 @@ namespace kiwi
             
             if (infos.inputs.size() > 1 && infos.inputs[1])
             {
-                setPerformCallBack(this, &DelayTilde::performDelay);
+                setPerformCallBack(this, &DelaySimpleTilde::performDelay);
             }
             else
             {
-                setPerformCallBack(this, &DelayTilde::perform);
+                setPerformCallBack(this, &DelaySimpleTilde::perform);
             }
         }
     }

@@ -433,14 +433,14 @@ namespace kiwi
         };
         
         // ================================================================================ //
-        //                                       DELAYTILDE                                 //
+        //                                DELAYSIMPLETILDE                                  //
         // ================================================================================ //
         
-        class DelayTilde : public AudioObject
+        class DelaySimpleTilde : public AudioObject
         {
         public: // methods
             
-            DelayTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            DelaySimpleTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
             
             void receive(size_t index, std::vector<Atom> const& args) override final;
             

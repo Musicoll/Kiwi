@@ -77,7 +77,7 @@ namespace kiwi
             TimesTilde::declare();
             PlusTilde::declare();
             SigTilde::declare();
-            DelayTilde::declare();
+            DelaySimpleTilde::declare();
         }
     }
 }

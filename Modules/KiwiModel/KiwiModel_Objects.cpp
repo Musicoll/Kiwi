@@ -589,10 +589,10 @@ namespace kiwi
         }
         
         // ================================================================================ //
-        //                                      OBJECT DELAYTILDE~                          //
+        //                                      OBJECT DELAYSIMPLE~                         //
         // ================================================================================ //
         
-        DelayTilde::DelayTilde(std::string const& name, std::vector<Atom> const& args)
+        DelaySimpleTilde::DelaySimpleTilde(std::string const& name, std::vector<Atom> const& args)
         {
             if (args.size() > 0)
             {
@@ -606,12 +606,12 @@ namespace kiwi
             pushOutlet(PinType::IType::Signal);
         }
         
-        void DelayTilde::declare()
+        void DelaySimpleTilde::declare()
         {
-            Factory::add<DelayTilde>("delaysimple~");
+            Factory::add<DelaySimpleTilde>("delaysimple~");
         }
         
-        std::string DelayTilde::getIODescription(bool is_inlet, size_t index) const
+        std::string DelaySimpleTilde::getIODescription(bool is_inlet, size_t index) const
         {
             if(is_inlet)
             {
