@@ -56,7 +56,7 @@ matrix:
 
     before_deploy:
     - mkdir Kiwi
-    - mv Build/Release/KiwiBuild/Release/Kiwi Kiwi/Kiwi
+    - mv Build/Release/KiwiBuild/Kiwi Kiwi/Kiwi
     - tar zcvf Kiwi_linux.tar.gz Kiwi/
 
     deploy:
