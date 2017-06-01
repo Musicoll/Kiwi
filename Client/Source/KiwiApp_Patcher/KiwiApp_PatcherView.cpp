@@ -2390,7 +2390,7 @@ namespace kiwi
                 result.setInfo(TRANS("Paste"), TRANS("Paste"), CommandCategories::editing, 0);
                 result.addDefaultKeypress('v', juce::ModifierKeys::commandModifier);
                 result.setActive(!isLocked()
-                                 && juce::SystemClipboard::getTextFromClipboard().isNotEmpty());
+                                 && !m_instance.getPatcherClipboardData().empty());
                 break;
             }
             case CommandIDs::pasteReplace:
@@ -2402,7 +2402,7 @@ namespace kiwi
                 result.addDefaultKeypress('v', juce::ModifierKeys::commandModifier | juce::ModifierKeys::altModifier);
                 result.setActive(!isLocked()
                                  && isAnyObjectSelected()
-                                 && juce::SystemClipboard::getTextFromClipboard().isNotEmpty());
+                                 && !m_instance.getPatcherClipboardData().empty());
                 break;
             }
             case CommandIDs::duplicate:
