@@ -475,7 +475,7 @@ add_executable(test_server ${TEST_SERVER_SRC})
 target_add_dependency(test_server KiwiServer)
 set_target_properties(test_server PROPERTIES FOLDER Test)
 if (LINUX)
-  target_link_libraries(test_engine PUBLIC ${PTHREAD})
+  target_link_libraries(test_server PUBLIC ${PTHREAD})
 endif()
 source_group_rec("${TEST_SERVER_SRC}" ${ROOT_DIR}/Test/Server)
 

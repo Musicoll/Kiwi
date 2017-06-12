@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <flip/BackEndBinary.h>
 #include <flip/detail/PortFactoryListener.h>
 #include <flip/detail/PortListener.h>
 #include <flip/contrib/transport_tcp/PortTransportServerTcp.h>
@@ -56,17 +55,18 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
+            //! @details Initializes socket and creates backend directory if not there.
             Server(uint16_t port, std::string const& backend_directory);
             
             //! @brief Destructor.
-            //! @details Disconnect all users and clean sessions.
+            //! @details Disconnect all users and clean sessions. onDisconnected will be called for all port.
             ~Server();
             
             //! @brief Process the socket hence process all sessions.
             void process();
             
             //! @brief Run the server.
-            //! @details This will run a loop that call ServerBase::process regularly.
+            //! @details This will run a loop that call process regularly.
             //! @see stop
             void run();
             
@@ -80,16 +80,17 @@ namespace kiwi
         private: // methods
             
             //! @brief Creates a new session for server.
+            //! @details Will load the document if there's a corresponding file in backend directory.
             void createSession(uint64_t session_id);
             
-            //! @brief Called when a user connects to a document
+            //! @brief Called when a user connects to a document.
             void onConnected(flip::PortBase & port);
             
-            //! @brief Called when a user has been disconnected from a document
+            //! @brief Called when a user has been disconnected from a document.
             void onDisconnected(flip::PortBase & port);
             
             //! @brief Get the path for a given session.
-            juce::File getSessionFile(uint64_t session_id);
+            juce::File getSessionFile(uint64_t session_id) const;
             
         private: // methods
             
@@ -123,6 +124,7 @@ namespace kiwi
             
         private: // deleted methods
             
+            Server() = delete;
             Server(Server const& other) = delete;
             Server(Server &&other) = delete;
             Server &operator=(Server const& other) = delete;
@@ -142,28 +144,31 @@ namespace kiwi
             Session(Session && rhs);
             
             //! @brief Constructor
-            //! @detailss Initialized with an empty document.
+            //! @details Constructor will load the document if file exists. backend_file is
+            //! the file in which the session will save and load document.
             Session(uint64_t identifier, juce::File const& backend_file);
             
             //! @brief Destructor.
             //! @details Unbinds all documents and ports.
             ~Session();
             
+            //! @brief Returns the id of the session.
             uint64_t getId() const;
             
-            //! @brief Returns a backend holding full presentation of the document hold by this session.
+            //! @brief Saves the document into designated backend file.
             void save() const;
             
-            //! @brief Loads the session's document from the designated Backend entity.
+            //! @brief Loads the document from designated backend file.
             void load();
             
             //! @brief Binds user to session.
             void bind(flip::PortBase & port);
             
-            //! @brief Unbind user to session.
+            //! @brief Unbinds user from session.
+            //! @details If user that disconnect is the last one, the session will be saved.
             void unbind(flip::PortBase & port);
             
-            //! @brief Returns wether a certain user is connected to session.
+            //! @brief Returns wether or not a certain user is connected to session.
             bool hasUser(uint64_t user_id) const;
             
             //! @brief Returns a list of connected users.
@@ -177,7 +182,7 @@ namespace kiwi
             //! @brief Replies to a client with a list of connected users.
             void sendConnectedUsers() const;
             
-        private: // variables
+        private: // members
             
             const uint64_t                              m_identifier;
             std::unique_ptr<model::PatcherValidator>    m_validator;
@@ -185,7 +190,7 @@ namespace kiwi
             std::vector<flip::SignalConnection>         m_signal_connections;
             juce::File                                  m_backend_file;
             
-        private: // variables
+        private: // deleted methods
             
             Session() = delete;
             Session(const Session & rhs) = delete;

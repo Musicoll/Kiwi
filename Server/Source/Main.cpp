@@ -56,15 +56,11 @@ int main(int argc, char const* argv[])
     
     model::DataModel::init();
     
+    json config;
+    
     try
     {
-        json config = json::parse(configuration_file.loadFileAsString().toStdString());
-        
-        std::unique_ptr<server::Server> server(new server::Server(config["port"], config["backend_directory"]));
-        
-        std::cout << "[server] - running on port " << config["port"] << std::endl;
-        
-        server->run();
+         config = json::parse(configuration_file.loadFileAsString().toStdString());
     }
     catch(nlohmann::detail::parse_error const& e)
     {
@@ -75,6 +71,15 @@ int main(int argc, char const* argv[])
     {
         std::cerr << "Accessing element json element failed : " << e.what() << "\n";
         return 0;
+    }
+    
+    try
+    {
+        server::Server server(config["port"], config["backend_directory"]);
+        
+        std::cout << "[server] - running on port " << config["port"] << std::endl;
+        
+        server.run();
     }
     catch(std::runtime_error const& e)
     {

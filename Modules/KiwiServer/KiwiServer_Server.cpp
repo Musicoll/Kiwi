@@ -21,13 +21,13 @@
 
 #include "KiwiServer_Server.h"
 
+#include <flip/BackEndBinary.h>
+
 #include <flip/contrib/DataProviderFile.h>
 #include <flip/contrib/DataConsumerFile.h>
 #include <flip/contrib/RunLoopTimer.h>
 
 #include <KiwiModel/KiwiModel_DataModel.h>
-#include <KiwiModel/KiwiModel_PatcherUser.h>
-#include <KiwiModel/KiwiModel_PatcherValidator.h>
 
 namespace kiwi
 {
@@ -101,7 +101,7 @@ namespace kiwi
             return m_running;
         }
         
-        juce::File Server::getSessionFile(uint64_t session_id)
+        juce::File Server::getSessionFile(uint64_t session_id) const
         {
             return m_backend_directory.getChildFile(juce::String(hexadecimal_convert(session_id)))
             .withFileExtension(kiwi_file_extension);
@@ -111,7 +111,7 @@ namespace kiwi
         {
             const auto session_file = getSessionFile(session_id);
             
-            m_sessions.insert(std::move(std::make_pair(session_id, Session(session_id, session_file))));
+            m_sessions.insert(std::make_pair(session_id, Session(session_id, session_file)));
         }
         
         void Server::onConnected(flip::PortBase & port)
@@ -204,7 +204,7 @@ namespace kiwi
         , m_validator(std::move(other.m_validator))
         , m_document(std::move(other.m_document))
         , m_signal_connections(std::move(other.m_signal_connections))
-        , m_backend_file(other.m_backend_file)
+        , m_backend_file(std::move(other.m_backend_file))
         {
             ;
         }
