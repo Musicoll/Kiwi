@@ -23,9 +23,13 @@
 
 #include "../catch.hpp"
 
+#include <KiwiModel/KiwiModel_DataModel.h>
+
 int main( int argc, char* const argv[] )
 {
     std::cout << "running Unit-Tests - KiwiServer ..." << '\n' << '\n';
+    
+    kiwi::model::DataModel::init();
     
     int result = Catch::Session().run( argc, argv );
     

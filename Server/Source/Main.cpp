@@ -20,7 +20,7 @@
  */
 
 #include <KiwiModel/KiwiModel_DataModel.h>
-#include "KiwiServer_Server.h"
+#include <KiwiServer/KiwiServer_Server.h>
 #include "KiwiServer_CommandLineParser.h"
 
 #include <json.hpp>
@@ -55,12 +55,12 @@ int main(int argc, char const* argv[])
     }
     
     model::DataModel::init();
-    std::unique_ptr<server::Server> server(nullptr);
+    
+    json config;
     
     try
     {
-        json config = json::parse(configuration_file.loadFileAsString().toStdString());
-        server.reset(new server::Server(config["port"], config["backend_directory"]));
+         config = json::parse(configuration_file.loadFileAsString().toStdString());
     }
     catch(nlohmann::detail::parse_error const& e)
     {
@@ -72,15 +72,19 @@ int main(int argc, char const* argv[])
         std::cerr << "Accessing element json element failed : " << e.what() << "\n";
         return 0;
     }
+    
+    try
+    {
+        server::Server server(config["port"], config["backend_directory"]);
+        
+        std::cout << "[server] - running on port " << config["port"] << std::endl;
+        
+        server.run();
+    }
     catch(std::runtime_error const& e)
     {
         std::cerr << "Launching server failed: \nerr : " << e.what() << "\n";
         return 0;
-    }
-    
-    if(server)
-    {
-        server->run();
     }
     
     return 0;

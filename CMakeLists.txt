@@ -383,12 +383,19 @@ source_group_rec("${KIWI_ENGINE_SRC}" ${ROOT_DIR}/Modules/KiwiEngine)
 # Server
 #----------------------------------
 
+file(GLOB_RECURSE KIWI_SERVER_SRC ${ROOT_DIR}/Modules/KiwiServer/*.[c|h]pp
+                                  ${ROOT_DIR}/Modules/KiwiServer/*.h)
+add_library(KiwiServer ${KIWI_SERVER_SRC})
+target_include_directories(KiwiServer PUBLIC ${JSON_INCLUDE_DIRS})
+target_add_dependency(KiwiServer KiwiModel)
+target_add_dependency(KiwiServer Juce)
+set_target_properties(KiwiServer PROPERTIES FOLDER Modules)
+source_group_rec("${KIWI_SERVER_SRC}" ${ROOT_DIR}/Modules/KiwiServer)
+
 file(GLOB_RECURSE SERVER_SRC ${ROOT_DIR}/Server/Source/*.[c|h]pp
                              ${ROOT_DIR}/Server/Source/*.h)
 add_executable(Server ${SERVER_SRC})
-target_include_directories(Server PUBLIC ${JSON_INCLUDE_DIRS})
-target_add_dependency(Server KiwiModel)
-target_add_dependency(Server Juce)
+target_add_dependency(Server KiwiServer)
 source_group_rec("${SERVER_SRC}" ${ROOT_DIR}/Server/Source)
 
 #----------------------------------
@@ -460,6 +467,18 @@ endif()
 set_target_properties(test_engine PROPERTIES FOLDER Test)
 source_group_rec("${TEST_ENGINE_SRC}" ${ROOT_DIR}/Test/Engine)
 
+# Test Server
+
+file(GLOB TEST_SERVER_SRC ${ROOT_DIR}/Test/Server/*.[c|h]pp
+                          ${ROOT_DIR}/Test/Server/*.h)
+add_executable(test_server ${TEST_SERVER_SRC})
+target_add_dependency(test_server KiwiServer)
+set_target_properties(test_server PROPERTIES FOLDER Test)
+if (LINUX)
+  target_link_libraries(test_server PUBLIC ${PTHREAD})
+endif()
+source_group_rec("${TEST_SERVER_SRC}" ${ROOT_DIR}/Test/Server)
+
 # Coverage setting
 if(${GCOV_SUPPORT} STREQUAL "On" AND DEBUG)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
@@ -468,6 +487,7 @@ if(${GCOV_SUPPORT} STREQUAL "On" AND DEBUG)
   target_link_libraries(test_dsp PUBLIC gcov)
   target_link_libraries(test_model PUBLIC gcov)
   target_link_libraries(test_engine PUBLIC gcov)
+  target_link_libraries(test_server PUBLIC gcov)
 endif()
 
 # Tests Target
@@ -479,4 +499,5 @@ add_custom_command(TARGET Tests
                    POST_BUILD COMMAND test_dsp
                               COMMAND test_model
                               COMMAND test_engine
+                              COMMAND test_server
                    USES_TERMINAL)
