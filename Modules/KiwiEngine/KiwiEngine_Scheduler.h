@@ -28,6 +28,7 @@
 #include <stdexcept>
 #include <mutex>
 #include <set>
+#include <memory>
 
 #include "KiwiEngine_ConcurrentQueue.h"
 
@@ -94,16 +95,16 @@ namespace kiwi
             //! during initialization before launching threads.
             void registerProducer(thread_token producer, thread_token consumer);
             
-            //! @brief Delays execution of a task.
+            //! @brief Delays execution of a task. Shared ownership.
             //! @details Calling twice this method with same task will cancel the previous scheduled execution
-            //! and add a new one at specified time. Ownership of task is not transfer to the scheduler.
-            //! One can either delete task at execution time or delete the task once done using it.
-            void schedule(Task * task, duration_t delay = std::chrono::milliseconds(0));
+            //! and add a new one at specified time. If you move ownership of the task here the task will be
+            //! deleted at execution time.
+            void schedule(std::shared_ptr<Task> const& task, duration_t delay = std::chrono::milliseconds(0));
             
             //! @brief Used to cancel the execution of a previously scheduled task.
             //! @details If the task is currently being processed by the scheduler, this method does't
             //! wait for the execution to finish but only guarantee that further execution  will no occur.
-            void unschedule(Task * task);
+            void unschedule(std::shared_ptr<Task> const& task);
             
             //! @brief Processes events of the consumer that have reached exeuction time.
             void process(thread_token consumer);
@@ -146,7 +147,7 @@ namespace kiwi
             
             struct Command
             {
-                std::shared_ptr<Event>  m_event;
+                std::shared_ptr<Task>   m_task;
                 time_point_t            m_time;
             };
             
@@ -158,11 +159,11 @@ namespace kiwi
             //! @brief Destructor
             ~Queue();
             
-            //! @brief Delays the execution of a task.
-            void schedule(Task * task, duration_t delay);
+            //! @brief Delays the execution of a task. Shared ownership.
+            void schedule(std::shared_ptr<Task> const& task, duration_t delay);
             
             //! @brief Cancels the execution of a task.
-            void unschedule(Task * task);
+            void unschedule(std::shared_ptr<Task> const& task);
             
             //! @brief Processes all events that have reached execution time.
             void process(time_point_t process_time);
@@ -170,16 +171,16 @@ namespace kiwi
         private: // methods
             
             //! @internal
-            void insert(std::shared_ptr<Event> event);
+            void emplace(Event && event);
             
             //! @internal
-            void remove(std::shared_ptr<Event> const& event);
+            void remove(Event const& event);
             
         private: // members
             
-            std::vector<std::shared_ptr<Event>> m_events;
-            ConcurrentQueue<Command>            m_commands;
-            mutable std::mutex                  m_mutex;
+            std::vector<Event>          m_events;
+            ConcurrentQueue<Command>    m_commands;
+            mutable std::mutex          m_mutex;
             
         private: // friend classes
             
@@ -224,8 +225,6 @@ namespace kiwi
             
             thread_token            m_producer;
             thread_token            m_consumer;
-            std::shared_ptr<Event>  m_event;
-            
         private: // friends
             
             friend class Scheduler;
@@ -281,7 +280,7 @@ namespace kiwi
             
         private: // members
             
-            std::unique_ptr<Task>   m_task;
+            std::shared_ptr<Task>   m_task;
             duration_t              m_period;
             
         private: // deleted methods
@@ -335,13 +334,22 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            Event(Task * task, time_point_t time);
+            Event(std::shared_ptr<Task> const& task, time_point_t time);
+            
+            //! @brief Copy Constructor.
+            Event(Event const& other);
+            
+            //! @brief Assignement operator
+            Event& operator=(Event const& other);
+            
+            //! @brief Moove constructor
+            Event(Event && other);
+            
+            //! @brief Moove assignment operator.
+            Event& operator=(Event && other);
             
             //! @brief Destructor.
             ~Event();
-            
-            //! @brief Equality operator.
-            bool operator==(Event const& other) const;
             
             //! @brief Called by the scheduler to execute a the task.
             void execute();
@@ -352,16 +360,12 @@ namespace kiwi
             
         private: // members
             
-            Task *                      m_task;
+            std::shared_ptr<Task>       m_task;
             time_point_t                m_time;
             
         private: // deleted methods
             
             Event() = delete;
-            Event(Event const& other) = delete;
-            Event(Event && other) = delete;;
-            Event& operator=(Event && other);
-            Event& operator=(Event const& other) = delete;
         };
     }
 }
