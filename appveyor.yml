@@ -15,7 +15,7 @@ environment:
 install:
     - git submodule update --init --recursive "ThirdParty/Juce"
     - git submodule update --init --recursive "ThirdParty/cpr"
-    - git submodule update --init --recursive "ThirdParty/readerwriterqueue"
+    - git submodule update --init --recursive "ThirdParty/concurrentqueue"
     - set PATH=C:\Python27;%PATH%
     - curl -o ..\curl-7.52.1-win32.zip -L -k  https://github.com/Musicoll/Kiwi/files/998123/curl-7.52.1-win32.zip
     - curl -o ..\curl-7.52.1-x64.zip -L -k  https://github.com/Musicoll/Kiwi/files/997546/curl-7.52.1-x64.zip
