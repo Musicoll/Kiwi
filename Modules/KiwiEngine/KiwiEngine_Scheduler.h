@@ -88,13 +88,6 @@ namespace kiwi
             //! is not thread safe and shall be done during initialization before launching threads.
             void registerConsumer(thread_token consumer);
             
-            //! @brief Adds a producer to the scheduler.
-            //! @details Does nothing if the pair consumer/producer already existed. Will register consumer
-            //! if not already registered. Creates a monoproducer, monoconsumer queue for the designated
-            //! pair of thread. Registering consumers is not thread safe and shall be done
-            //! during initialization before launching threads.
-            void registerProducer(thread_token producer, thread_token consumer);
-            
             //! @brief Delays execution of a task. Shared ownership.
             //! @details Calling twice this method with same task will cancel the previous scheduled execution
             //! and add a new one at specified time. If you move ownership of the task here the task will be
@@ -119,7 +112,7 @@ namespace kiwi
             
         private: // members
             
-            std::map<thread_token, std::map<thread_token, Queue>>   m_queues;
+            std::map<thread_token, Queue>   m_queues;
             
         private: // static members
             
@@ -139,7 +132,7 @@ namespace kiwi
         
         //! @brief A class that holds a list of scheduled events.
         //! @details Implementation countains a list of events sorted by execution time that is updated
-        //! before processing using commands. A queue is created for each pair of producer/consumer.
+        //! before processing using commands. A queue is created for each consumer.
         template <class Clock>
         class Scheduler<Clock>::Queue final
         {
@@ -206,8 +199,8 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            //! @details A certain task is designed to be scheduled on only one pair of producer/consumer.
-            Task(thread_token producer, thread_token consumer);
+            //! @details A certain task is designed to be scheduled on only one consumer.
+            Task(thread_token consumer);
             
             //! @brief Destructor.
             //! @details It is not safe to destroy a task from another thread than the consumer because it can be
@@ -223,8 +216,8 @@ namespace kiwi
             
         private: // methods
             
-            thread_token            m_producer;
             thread_token            m_consumer;
+            
         private: // friends
             
             friend class Scheduler;
@@ -253,8 +246,8 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            //! @details A timer can only be created for a certain pair of producer/consumer.
-            Timer(thread_token producer_token, thread_token consumer_token);
+            //! @details A timer can only be created for a certain consumer.
+            Timer(thread_token consumer_token);
             
             //! @brief Destructor.
             //! @details It is not safe to destroy a timer in another thread than the consumer. If intended
