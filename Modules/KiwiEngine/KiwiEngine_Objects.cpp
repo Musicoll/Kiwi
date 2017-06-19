@@ -179,7 +179,7 @@ namespace kiwi
         public: // methods
             
             Task(Receive& object, std::vector<Atom> const& atoms):
-            Scheduler<>::Task(Thread::Gui, Thread::Engine),
+            Scheduler<>::Task(Thread::Engine),
             m_object(object),
             m_atoms(atoms)
             {
@@ -276,7 +276,7 @@ namespace kiwi
         // ================================================================================ //
         
         Delay::Task::Task(Delay& object):
-        Scheduler<>::Task(Thread::Engine, Thread::Engine),
+        Scheduler<>::Task(Thread::Engine),
         m_object(object)
         {
         }
@@ -336,7 +336,7 @@ namespace kiwi
         public: // methods
             
             Task(Pipe & object, std::vector<Atom> const& atoms):
-            Scheduler<>::Task(Thread::Engine, Thread::Engine),
+            Scheduler<>::Task(Thread::Engine),
             m_object(object),
             m_atoms(atoms)
             {
@@ -406,7 +406,7 @@ namespace kiwi
         
         Metro::Metro(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
         engine::Object(model, patcher),
-        Scheduler<>::Timer(Thread::Engine, Thread::Engine),
+        Scheduler<>::Timer(Thread::Engine),
         m_period(std::chrono::milliseconds(0))
         {
             if(!args.empty())

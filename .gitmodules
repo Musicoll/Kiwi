@@ -4,6 +4,6 @@
 [submodule "ThirdParty/cpr"]
 	path = ThirdParty/cpr
 	url = https://github.com/whoshuu/cpr.git
-[submodule "ThirdParty/readerwriterqueue"]
-	path = ThirdParty/readerwriterqueue
-	url = https://github.com/cameron314/readerwriterqueue.git
+[submodule "ThirdParty/concurrentqueue"]
+	path = ThirdParty/concurrentqueue
+	url = https://github.com/cameron314/concurrentqueue.git
