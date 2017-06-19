@@ -81,6 +81,11 @@ namespace kiwi
             m_patcher.error(text);
         }
         
+        Scheduler<> & Object::getScheduler() const
+        {
+            return m_patcher.getScheduler();
+        }
+        
         // ================================================================================ //
         //                                      BEACON                                      //
         // ================================================================================ //

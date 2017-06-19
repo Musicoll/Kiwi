@@ -21,6 +21,9 @@
 
 #pragma once
 
+#include <thread>
+#include <atomic>
+
 #include "flip/Document.h"
 
 #include "KiwiEngine_Console.h"
@@ -77,16 +80,29 @@ namespace kiwi
             
             AudioControler& getAudioControler() const;
             
+            // ================================================================================ //
+            //                              SCHEDULER                                           //
+            // ================================================================================ //
+            
+            //! @brief Returns the engine's scheduler.
+            Scheduler<> & getScheduler();
+            
         private: // methods
             
             //! @internal Adds the engine objects to the engine::Factory
             void addObjectsToFactory();
+            
+            //! @internal Processes the scheduler to check if new messages have been added.
+            void processScheduler();
             
         private: // members
             
             Console m_console;
             
             std::unique_ptr<AudioControler> m_audio_controler;
+            Scheduler<>                     m_scheduler;
+            std::atomic<bool>               m_quit;
+            std::thread                     m_engine_thread;
             
         private: // deleted methods
             

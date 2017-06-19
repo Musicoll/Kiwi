@@ -37,9 +37,8 @@ class TTask final : public engine::Scheduler<T>::Task
 {
 public: // methods
     
-    TTask(engine::thread_token consumer_token,
-          std::function<void()> func):
-    engine::Scheduler<T>::Task(consumer_token),
+    TTask(std::function<void()> func):
+    engine::Scheduler<T>::Task(),
     m_func(func)
     {
     }
@@ -79,15 +78,6 @@ struct TickClock
     static time_point now(){return current_time;};
 };
 
-enum Thread : engine::thread_token
-{
-    Gui     = 0,
-    Engine  = 1,
-    Dsp     = 2,
-    Network = 3
-};
-
-
 
 // ==================================================================================== //
 //                                          SCHEDULER                                   //
@@ -95,11 +85,7 @@ enum Thread : engine::thread_token
 
 TEST_CASE("Scheduler", "[Scheduler]")
 {
-    Scheduler::createInstance();
-    
-    Scheduler& sch = Scheduler::use();
-    
-    sch.registerConsumer(Thread::Engine);
+    Scheduler sch;
     
     SECTION("Simple add and process")
     {   
@@ -109,11 +95,11 @@ TEST_CASE("Scheduler", "[Scheduler]")
         
         for(int i = 0 ; i < 10; ++i)
         {
-            sch.schedule(std::shared_ptr<Task>(new Task(Thread::Engine, func)),
+            sch.schedule(std::shared_ptr<Task>(new Task(func)),
                                                std::chrono::milliseconds(10 * i));
         }
         
-        while(counter < 10){ sch.process(Thread::Engine);}
+        while(counter < 10){ sch.process();}
         
         CHECK(counter == 10);
     }
@@ -128,9 +114,9 @@ TEST_CASE("Scheduler", "[Scheduler]")
         std::function<void()> func_cancel = [&i_cancel](){++i_cancel;};
         std::function<void()> func_reschedule = [&i_reschedule](){++i_reschedule;};
         
-        std::shared_ptr<Task> standard(new Task(Thread::Engine, func_std));
-        std::shared_ptr<Task> reschedule(new Task(Thread::Engine, func_reschedule));
-        std::shared_ptr<Task> cancel(new Task(Thread::Engine, func_cancel));
+        std::shared_ptr<Task> standard(new Task(func_std));
+        std::shared_ptr<Task> reschedule(new Task(func_reschedule));
+        std::shared_ptr<Task> cancel(new Task(func_cancel));
         
         sch.schedule(std::move(standard));
         sch.schedule(reschedule);
@@ -139,7 +125,7 @@ TEST_CASE("Scheduler", "[Scheduler]")
         sch.schedule(reschedule, std::chrono::milliseconds(1000 * 60 * 60));
         sch.unschedule(cancel);
         
-        while(i_standard < 1){sch.process(Thread::Engine);};
+        while(i_standard < 1){sch.process();};
         
         CHECK(i_standard == 1);
         CHECK(i_reschedule == 0);
@@ -147,7 +133,7 @@ TEST_CASE("Scheduler", "[Scheduler]")
         
         sch.schedule(reschedule);
         
-        while(i_reschedule < 1){sch.process(Thread::Engine);};
+        while(i_reschedule < 1){sch.process();};
         
         CHECK(i_reschedule == 1);
     }
@@ -156,28 +142,21 @@ TEST_CASE("Scheduler", "[Scheduler]")
     {
         TickClock::start();
         
-        engine::Scheduler<TickClock>::createInstance();
-        engine::Scheduler<TickClock>& tick_scheduler = engine::Scheduler<TickClock>::use();
-        
-        tick_scheduler.registerConsumer(Thread::Engine);
+        engine::Scheduler<TickClock> tick_scheduler;
         
         std::vector<int> order;
         
         std::function<void(int)> func = [&order](int number){order.push_back(number);};
         
-        std::shared_ptr<TTask<TickClock>> task_0(new TTask<TickClock>(Thread::Engine,
-                                                                      std::bind(func, 0)));
-        std::shared_ptr<TTask<TickClock>> task_1(new TTask<TickClock>(Thread::Engine,
-                                                                      std::bind(func, 1)));
+        std::shared_ptr<TTask<TickClock>> task_0(new TTask<TickClock>(std::bind(func, 0)));
+        std::shared_ptr<TTask<TickClock>> task_1(new TTask<TickClock>(std::bind(func, 1)));
         
         tick_scheduler.schedule(task_0, std::chrono::milliseconds(1));
         tick_scheduler.schedule(task_1, std::chrono::milliseconds(3));
         
-        std::shared_ptr<TTask<TickClock>> task_2(new TTask<TickClock>(Thread::Engine,
-                                                                      std::bind(func, 2)));
+        std::shared_ptr<TTask<TickClock>> task_2(new TTask<TickClock>(std::bind(func, 2)));
         
-        std::shared_ptr<TTask<TickClock>> task_3(new TTask<TickClock>(Thread::Engine,
-                                                                      std::bind(func, 3)));
+        std::shared_ptr<TTask<TickClock>> task_3(new TTask<TickClock>(std::bind(func, 3)));
         
         tick_scheduler.schedule(std::move(task_2), std::chrono::milliseconds(2));
         tick_scheduler.schedule(std::move(task_3), std::chrono::milliseconds(2));
@@ -188,7 +167,7 @@ TEST_CASE("Scheduler", "[Scheduler]")
         while(order.size() < 3)
         {
             TickClock::tick();
-            tick_scheduler.process(Thread::Engine);
+            tick_scheduler.process();
         }
         
         tick_scheduler.unschedule(task_0);
@@ -198,7 +177,7 @@ TEST_CASE("Scheduler", "[Scheduler]")
         CHECK(order[2] == 0);
     }
     
-    SECTION("Multithreading multiproducern multiconsumer")
+    SECTION("Multithreading multiproducer multiconsumer")
     {
         std::atomic<size_t> count_producer_1(0);
         std::atomic<size_t> count_producer_2(0);
@@ -219,7 +198,7 @@ TEST_CASE("Scheduler", "[Scheduler]")
             
             while(count_event < 30)
             {
-                sch.schedule(std::shared_ptr<Task>(new Task(Thread::Engine, func_1)));
+                sch.schedule(std::shared_ptr<Task>(new Task(func_1)));
                 ++count_event;
             }
         });
@@ -230,14 +209,14 @@ TEST_CASE("Scheduler", "[Scheduler]")
             
             while(count_event < 20)
             {
-                sch.schedule(std::shared_ptr<Task>(new Task(Thread::Engine, func_2)));
+                sch.schedule(std::shared_ptr<Task>(new Task(func_2)));
                 ++count_event;
             }
         });
         
         while(count_producer_1 < 30 || count_producer_2 < 20)
         {
-            sch.process(Thread::Engine);
+            sch.process();
         }
         
         CHECK(count_producer_1 == 30);
@@ -251,36 +230,28 @@ TEST_CASE("Scheduler", "[Scheduler]")
     {
         std::vector<int> order;
         
-        std::function<void()> func_1 = [&order]()
-        {
-            order.push_back(1);
-        };
-        
-        std::function<void()> func_2 = [&order]()
-        {
-            order.push_back(2);
-        };
+        std::function<void(int)> func = [&order](int stamp){order.push_back(stamp);};
         
         // Pushing producer 1 before producer 2
         
         {
-            std::thread producer_1([&sch, &func_1]()
+            std::thread producer_1([&sch, &func]()
             {
-                sch.schedule(std::make_shared<Task>(Thread::Engine, func_1));
+                sch.schedule(std::make_shared<Task>(std::bind(func, 1)));
             });
         
             producer_1.join();
         
-            std::thread producer_2([&sch, &func_2]()
+            std::thread producer_2([&sch, &func]()
             {
-                sch.schedule(std::make_shared<Task>(Thread::Engine, func_2));
+                sch.schedule(std::make_shared<Task>(std::bind(func, 2)));
             });
         
             producer_2.join();
         
             while(order.size() < 2)
             {
-                sch.process(Thread::Engine);
+                sch.process();
             }
         
             // Check that producer 1's task is executed first.
@@ -293,23 +264,23 @@ TEST_CASE("Scheduler", "[Scheduler]")
         // Pushgin producer 2 before producer 1
         
         {
-            std::thread producer_2([&sch, &func_2]()
+            std::thread producer_2([&sch, &func]()
             {
-                sch.schedule(std::make_shared<Task>(Thread::Engine, func_2));
+                sch.schedule(std::make_shared<Task>(std::bind(func, 2)));
             });
             
             producer_2.join();
             
-            std::thread producer_1([&sch, &func_1]()
+            std::thread producer_1([&sch, &func]()
             {
-                sch.schedule(std::make_shared<Task>(Thread::Engine, func_1));
+                sch.schedule(std::make_shared<Task>(std::bind(func, 1)));
             });
             
             producer_1.join();
             
             while(order.size() < 4)
             {
-                sch.process(Thread::Engine);
+                sch.process();
             }
             
             // Check that producer 2's task is executed first.

@@ -29,6 +29,7 @@
 #include <mutex>
 #include <set>
 #include <memory>
+#include <mutex>
 
 #include "KiwiEngine_ConcurrentQueue.h"
 
@@ -39,8 +40,6 @@ namespace kiwi
         // ==================================================================================== //
         //                                       SCHEDULER                                      //
         // ==================================================================================== //
-        
-        using thread_token = uint64_t;
         
         //! @brief A class designed to delay tasks' execution between threads that where previously declared.
         //! @details The scheduler is designed as a singleton that uses multiple event lists.
@@ -61,8 +60,6 @@ namespace kiwi
             
             class Timer;
             
-            class Lock;
-            
         private: // classes
         
             class Queue;
@@ -71,22 +68,11 @@ namespace kiwi
             
         public: // methods
             
-            //! @brief Creates the instance of scheduler.
-            //! @details Shall be called before launching threads and processing the scheduler.
-            static Scheduler& createInstance();
+            //! @brief Constructor
+            Scheduler();
             
-            //! @brief Retrieves the instance created with createInstance.
-            //! @details Fails if createInstance was not called previously.
-            static Scheduler& use();
-            
-            //! @brief Destroys the instance previously created.
-            //! @details Call this method once caller is done using the scheduler.
-            static void deleteInstance();
-            
-            //! @brief Adds a consumer thread to the scheduler.
-            //! @details Does nothing if the consumer was already registered. Dynamicaly registering consumers
-            //! is not thread safe and shall be done during initialization before launching threads.
-            void registerConsumer(thread_token consumer);
+            //! @brief Desctructor.
+            ~Scheduler();
             
             //! @brief Delays execution of a task. Shared ownership.
             //! @details Calling twice this method with same task will cancel the previous scheduled execution
@@ -100,23 +86,15 @@ namespace kiwi
             void unschedule(std::shared_ptr<Task> const& task);
             
             //! @brief Processes events of the consumer that have reached exeuction time.
-            void process(thread_token consumer);
+            void process();
             
-        private: // methods
-            
-            //! @brief Constructor
-            Scheduler();
-            
-            //! @brief Desctructor.
-            ~Scheduler();
+            //! @brief Lock the process until the returned lock is out of scope.
+            std::unique_lock<std::mutex> lock() const;
             
         private: // members
             
-            std::map<thread_token, Queue>   m_queues;
-            
-        private: // static members
-            
-            static Scheduler* m_instance;
+            Queue               m_queue;
+            mutable std::mutex  m_mutex;
             
         private: // deleted methods
             
@@ -173,7 +151,6 @@ namespace kiwi
             
             std::vector<Event>          m_events;
             ConcurrentQueue<Command>    m_commands;
-            mutable std::mutex          m_mutex;
             
         private: // friend classes
             
@@ -200,7 +177,7 @@ namespace kiwi
             
             //! @brief Constructor.
             //! @details A certain task is designed to be scheduled on only one consumer.
-            Task(thread_token consumer);
+            Task();
             
             //! @brief Destructor.
             //! @details It is not safe to destroy a task from another thread than the consumer because it can be
@@ -213,10 +190,6 @@ namespace kiwi
             //! @brief The pure virtual execution method. Called by the scheduler when execution time
             //! is reached.
             virtual void execute() = 0;
-            
-        private: // methods
-            
-            thread_token            m_consumer;
             
         private: // friends
             
@@ -247,7 +220,7 @@ namespace kiwi
             
             //! @brief Constructor.
             //! @details A timer can only be created for a certain consumer.
-            Timer(thread_token consumer_token);
+            Timer(Scheduler & scheduler);
             
             //! @brief Destructor.
             //! @details It is not safe to destroy a timer in another thread than the consumer. If intended
@@ -273,6 +246,7 @@ namespace kiwi
             
         private: // members
             
+            Scheduler &             m_scheduler;
             std::shared_ptr<Task>   m_task;
             duration_t              m_period;
             
@@ -283,37 +257,6 @@ namespace kiwi
             Timer(Timer && other) = delete;
             Timer& operator=(Timer const& other) = delete;
             Timer& operator=(Timer && other) = delete;
-        };
-        
-        // ==================================================================================== //
-        //                                       LOCK                                           //
-        // ==================================================================================== //
-        
-        //! @brief This class is intended to lock the execution of a certain consumer.
-        //! @details Beware that critical sections shall not take long since it blocks a certain thread
-        //! from processing events.
-        template<class Clock>
-        class Scheduler<Clock>::Lock final
-        {
-        public: // methods
-            
-            //! @brief Constructor.
-            Lock(thread_token consumer);
-            
-            //! @brief Destructor.
-            ~Lock();
-            
-        private: // members
-            
-            thread_token m_consumer;
-            
-        private: // deleted methods
-            
-            Lock() = delete;
-            Lock(Lock const& other) = delete;
-            Lock(Lock && other) = delete;
-            Lock& operator=(Lock const& other) = delete;
-            Lock& operator=(Lock && other) = delete;
         };
         
         // ==================================================================================== //

@@ -50,11 +50,4 @@ namespace kiwi
         class Patcher;
         class Instance;
     }
-    
-    enum Thread : engine::thread_token
-    {
-        Gui     = 0,
-        Engine  = 1,
-        Dsp     = 2,
-    };
 }
