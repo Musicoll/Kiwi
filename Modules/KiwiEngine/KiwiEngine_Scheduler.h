@@ -30,6 +30,7 @@
 #include <set>
 #include <memory>
 #include <mutex>
+#include <thread>
 
 #include "KiwiEngine_ConcurrentQueue.h"
 
@@ -69,10 +70,21 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor
+            //! @details Sets current thread as the consumer thread.
             Scheduler();
             
             //! @brief Desctructor.
             ~Scheduler();
+            
+            //! @brief Sets the current thread as the consumer thread.
+            //! @details This method can be called for instance if the scheduler's constructor
+            //! is called on another thread than desired consumer.
+            void setThreadAsConsumer();
+            
+            //! @brief Check wehter or not this thread is the consumer.
+            //! @details This method can be usefull to help decide if a direct call can be made
+            //! or if the scheduler shall be used.
+            bool isThisConsumerThread();
             
             //! @brief Delays execution of a task. Shared ownership.
             //! @details Calling twice this method with same task will cancel the previous scheduled execution
@@ -95,6 +107,7 @@ namespace kiwi
             
             Queue               m_queue;
             mutable std::mutex  m_mutex;
+            std::thread::id     m_consumer_id;
             
         private: // deleted methods
             

@@ -244,9 +244,16 @@ namespace kiwi
         {
             if (!args.empty())
             {
-                std::shared_ptr<Task> task(new Task(*this, args));
-                getScheduler().schedule(task, std::chrono::milliseconds(0));
-                m_tasks.insert(std::move(task));
+                if (!getScheduler().isThisConsumerThread())
+                {
+                    std::shared_ptr<Task> task(new Task(*this, args));
+                    getScheduler().schedule(task, std::chrono::milliseconds(0));
+                    m_tasks.insert(std::move(task));
+                }
+                else
+                {
+                    send(0, args);
+                }
             }
         }
         

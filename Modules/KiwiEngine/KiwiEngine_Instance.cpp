@@ -121,6 +121,8 @@ namespace kiwi
         
         void Instance::processScheduler()
         {
+            m_scheduler.setThreadAsConsumer();
+            
             while(!m_quit.load())
             {
                 m_scheduler.process();

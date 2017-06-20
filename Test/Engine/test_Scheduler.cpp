@@ -288,6 +288,28 @@ TEST_CASE("Scheduler", "[Scheduler]")
             CHECK(order[2] == 2);
             CHECK(order[3] == 1);
         }
+        
+        SECTION("Thread ids")
+        {
+            CHECK(sch.isThisConsumerThread());
+            
+            // Transfer consumer ownership.
+            
+            std::thread consumer_thread([&sch]()
+            {
+                sch.setThreadAsConsumer();
+                CHECK(sch.isThisConsumerThread());
+            });
+            
+            consumer_thread.join();
+            
+            CHECK(!sch.isThisConsumerThread());
+            
+            // Transfer back the ownership, to enable further test execution.
+            
+            sch.setThreadAsConsumer();
+            
+        }
     }
 }
 
