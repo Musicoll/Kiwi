@@ -308,7 +308,42 @@ TEST_CASE("Scheduler", "[Scheduler]")
             // Transfer back the ownership, to enable further test execution.
             
             sch.setThreadAsConsumer();
+        }
+        
+        SECTION("Scheduler lock")
+        {
+            std::atomic<bool> quit_requested(false);
             
+            std::thread consumer([&sch, &quit_requested]()
+            {
+                sch.setThreadAsConsumer();
+                
+                while(!quit_requested.load())
+                {
+                    sch.process();
+                }
+            });
+            
+            {
+                std::unique_lock<std::mutex> lock(sch.lock());
+                
+                std::function<void(void)> func = [&quit_requested]()
+                {
+                    quit_requested.store(true);
+                };
+                
+                sch.schedule(std::shared_ptr<Task>(new Task(func)));
+                
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                
+                CHECK(!quit_requested);
+            }
+            
+            consumer.join();
+            
+            CHECK(quit_requested);
+            
+            sch.setThreadAsConsumer();
         }
     }
 }

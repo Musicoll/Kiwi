@@ -75,6 +75,8 @@ namespace kiwi
         {
             assert(std::this_thread::get_id() == m_consumer_id);
             
+            std::lock_guard<std::mutex> lock(m_mutex);
+            
             time_point_t process_time = clock_t::now();
             
             m_queue.process(process_time);
@@ -84,6 +86,7 @@ namespace kiwi
         std::unique_lock<std::mutex> Scheduler<Clock>::lock() const
         {
             std::unique_lock<std::mutex> head_lock(m_mutex);
+            
             return std::move(head_lock);
         }
         
