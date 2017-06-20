@@ -33,13 +33,27 @@ namespace kiwi
         
         template<class Clock>
         Scheduler<Clock>::Scheduler():
-        m_queue()
+        m_queue(),
+        m_mutex(),
+        m_consumer_id(std::this_thread::get_id())
         {
         }
         
         template<class Clock>
         Scheduler<Clock>::~Scheduler()
         {
+        }
+        
+        template<class Clock>
+        void Scheduler<Clock>::setThreadAsConsumer()
+        {
+            m_consumer_id = std::this_thread::get_id();
+        }
+        
+        template<class Clock>
+        bool Scheduler<Clock>::isThisConsumerThread()
+        {
+            return m_consumer_id == std::this_thread::get_id();
         }
 
         template<class Clock>
@@ -59,6 +73,8 @@ namespace kiwi
         template<class Clock>
         void Scheduler<Clock>::process()
         {
+            assert(std::this_thread::get_id() == m_consumer_id);
+            
             time_point_t process_time = clock_t::now();
             
             m_queue.process(process_time);
