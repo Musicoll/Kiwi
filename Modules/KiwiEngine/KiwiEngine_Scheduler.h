@@ -59,6 +59,8 @@ namespace kiwi
             
             class Task;
             
+            class CallBack;
+            
             class Timer;
             
         private: // classes
@@ -215,6 +217,40 @@ namespace kiwi
             Task& operator=(Task const& other) = delete;
             Task& operator=(Task && other) = delete;
         };
+        
+        // ==================================================================================== //
+        //                                       CALLBACK                                       //
+        // ==================================================================================== //
+        
+        //! @brief The scheduler's callback is a task that uses an std::function for
+        //! conveniency.
+        template<class Clock>
+        class Scheduler<Clock>::CallBack : public Scheduler<Clock>::Task
+        {
+        public: // methods
+            
+            //! @brief Constructor, initializes function.
+            CallBack(std::function<void(void)> func);
+            
+            //! @brief Destructor.
+            ~CallBack();
+            
+            //! @brief Executes the given functions.
+            void execute() override final;
+            
+        private: // members
+            
+            std::function<void(void)> m_func;
+            
+        private: // deleted methods
+            
+            CallBack() = delete;
+            CallBack(CallBack const& other) = delete;
+            CallBack(CallBack && other) = delete;
+            CallBack& operator=(CallBack const& other) = delete;
+            CallBack& operator=(CallBack && other) = delete;
+        };
+        
         
         // ==================================================================================== //
         //                                       TIMER                                          //
