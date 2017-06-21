@@ -32,34 +32,11 @@
 
 using namespace kiwi;
 
-template<class T>
-class TTask final : public engine::Scheduler<T>::Task
-{
-public: // methods
-    
-    TTask(std::function<void()> func):
-    engine::Scheduler<T>::Task(),
-    m_func(func)
-    {
-    }
-    
-    void execute() override
-    {
-        m_func.operator()();
-    }
-    
-    ~TTask()
-    {
-    };
-    
-private: // members
-    
-    std::function<void()>   m_func;
-};
-
 using Scheduler = engine::Scheduler<std::chrono::high_resolution_clock>;
 
-using Task = TTask<std::chrono::high_resolution_clock>;
+using Task = engine::Scheduler<>::Task;
+
+using CallBack = engine::Scheduler<>::CallBack;
 
 static std::chrono::high_resolution_clock::time_point current_time = std::chrono::high_resolution_clock::now();
 
@@ -95,7 +72,7 @@ TEST_CASE("Scheduler", "[Scheduler]")
         
         for(int i = 0 ; i < 10; ++i)
         {
-            sch.schedule(std::shared_ptr<Task>(new Task(func)),
+            sch.schedule(std::shared_ptr<Task>(new CallBack(func)),
                                                std::chrono::milliseconds(10 * i));
         }
         
@@ -114,9 +91,9 @@ TEST_CASE("Scheduler", "[Scheduler]")
         std::function<void()> func_cancel = [&i_cancel](){++i_cancel;};
         std::function<void()> func_reschedule = [&i_reschedule](){++i_reschedule;};
         
-        std::shared_ptr<Task> standard(new Task(func_std));
-        std::shared_ptr<Task> reschedule(new Task(func_reschedule));
-        std::shared_ptr<Task> cancel(new Task(func_cancel));
+        std::shared_ptr<Task> standard(new CallBack(func_std));
+        std::shared_ptr<Task> reschedule(new CallBack(func_reschedule));
+        std::shared_ptr<Task> cancel(new CallBack(func_cancel));
         
         sch.schedule(std::move(standard));
         sch.schedule(reschedule);
@@ -148,15 +125,20 @@ TEST_CASE("Scheduler", "[Scheduler]")
         
         std::function<void(int)> func = [&order](int number){order.push_back(number);};
         
-        std::shared_ptr<TTask<TickClock>> task_0(new TTask<TickClock>(std::bind(func, 0)));
-        std::shared_ptr<TTask<TickClock>> task_1(new TTask<TickClock>(std::bind(func, 1)));
+        std::shared_ptr<engine::Scheduler<TickClock>::Task>
+                    task_0(new engine::Scheduler<TickClock>::CallBack(std::bind(func, 0)));
+        
+        std::shared_ptr<engine::Scheduler<TickClock>::Task>
+                    task_1(new engine::Scheduler<TickClock>::CallBack(std::bind(func, 1)));
         
         tick_scheduler.schedule(task_0, std::chrono::milliseconds(1));
         tick_scheduler.schedule(task_1, std::chrono::milliseconds(3));
         
-        std::shared_ptr<TTask<TickClock>> task_2(new TTask<TickClock>(std::bind(func, 2)));
+        std::shared_ptr<engine::Scheduler<TickClock>::Task>
+                    task_2(new engine::Scheduler<TickClock>::CallBack(std::bind(func, 2)));
         
-        std::shared_ptr<TTask<TickClock>> task_3(new TTask<TickClock>(std::bind(func, 3)));
+        std::shared_ptr<engine::Scheduler<TickClock>::Task>
+                    task_3(new engine::Scheduler<TickClock>::CallBack(std::bind(func, 3)));
         
         tick_scheduler.schedule(std::move(task_2), std::chrono::milliseconds(2));
         tick_scheduler.schedule(std::move(task_3), std::chrono::milliseconds(2));
@@ -198,7 +180,7 @@ TEST_CASE("Scheduler", "[Scheduler]")
             
             while(count_event < 30)
             {
-                sch.schedule(std::shared_ptr<Task>(new Task(func_1)));
+                sch.schedule(std::shared_ptr<Task>(new CallBack(func_1)));
                 ++count_event;
             }
         });
@@ -209,7 +191,7 @@ TEST_CASE("Scheduler", "[Scheduler]")
             
             while(count_event < 20)
             {
-                sch.schedule(std::shared_ptr<Task>(new Task(func_2)));
+                sch.schedule(std::shared_ptr<Task>(new CallBack(func_2)));
                 ++count_event;
             }
         });
@@ -237,14 +219,14 @@ TEST_CASE("Scheduler", "[Scheduler]")
         {
             std::thread producer_1([&sch, &func]()
             {
-                sch.schedule(std::make_shared<Task>(std::bind(func, 1)));
+                sch.schedule(std::make_shared<CallBack>(std::bind(func, 1)));
             });
         
             producer_1.join();
         
             std::thread producer_2([&sch, &func]()
             {
-                sch.schedule(std::make_shared<Task>(std::bind(func, 2)));
+                sch.schedule(std::make_shared<CallBack>(std::bind(func, 2)));
             });
         
             producer_2.join();
@@ -266,14 +248,14 @@ TEST_CASE("Scheduler", "[Scheduler]")
         {
             std::thread producer_2([&sch, &func]()
             {
-                sch.schedule(std::make_shared<Task>(std::bind(func, 2)));
+                sch.schedule(std::make_shared<CallBack>(std::bind(func, 2)));
             });
             
             producer_2.join();
             
             std::thread producer_1([&sch, &func]()
             {
-                sch.schedule(std::make_shared<Task>(std::bind(func, 1)));
+                sch.schedule(std::make_shared<CallBack>(std::bind(func, 1)));
             });
             
             producer_1.join();
@@ -332,7 +314,7 @@ TEST_CASE("Scheduler", "[Scheduler]")
                     quit_requested.store(true);
                 };
                 
-                sch.schedule(std::shared_ptr<Task>(new Task(func)));
+                sch.schedule(std::shared_ptr<Task>(new CallBack(func)));
                 
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 

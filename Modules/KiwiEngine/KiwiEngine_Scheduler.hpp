@@ -206,6 +206,28 @@ namespace kiwi
         }
         
         // ==================================================================================== //
+        //                                      CALLBACK                                        //
+        // ==================================================================================== //
+        
+        template<class Clock>
+        Scheduler<Clock>::CallBack::CallBack(std::function<void(void)> func):
+        Task(),
+        m_func(func)
+        {
+        }
+        
+        template<class Clock>
+        Scheduler<Clock>::CallBack::~CallBack()
+        {
+        }
+        
+        template<class Clock>
+        void Scheduler<Clock>::CallBack::execute()
+        {
+            m_func();
+        }
+        
+        // ==================================================================================== //
         //                                       TIMER                                          //
         // ==================================================================================== //
         
