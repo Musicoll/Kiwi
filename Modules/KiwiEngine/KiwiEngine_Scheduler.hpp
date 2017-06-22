@@ -62,6 +62,12 @@ namespace kiwi
             assert(task);
             m_queue.schedule(task, delay);
         }
+        
+        template<class Clock>
+        void Scheduler<Clock>::schedule(std::function<void(void)> && func, duration_t delay)
+        {
+            schedule(std::shared_ptr<Task>(new CallBack(func)));
+        }
 
         template<class Clock>
         void Scheduler<Clock>::unschedule(std::shared_ptr<Task> const& task)

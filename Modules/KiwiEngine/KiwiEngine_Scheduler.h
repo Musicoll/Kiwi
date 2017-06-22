@@ -94,6 +94,10 @@ namespace kiwi
             //! deleted at execution time.
             void schedule(std::shared_ptr<Task> const& task, duration_t delay = std::chrono::milliseconds(0));
             
+            //! @brief Delays execution of a function by the sceduler.
+            //! @details Internally create a callback that will be executed and destroyed by the scheduler.
+            void schedule(std::function<void(void)> && func, duration_t delay = std::chrono::milliseconds(0));
+            
             //! @brief Used to cancel the execution of a previously scheduled task.
             //! @details If the task is currently being processed by the scheduler, this method does't
             //! wait for the execution to finish but only guarantee that further execution  will no occur.
