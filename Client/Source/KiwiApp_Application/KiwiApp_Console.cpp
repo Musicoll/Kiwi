@@ -149,12 +149,11 @@ namespace kiwi
         }
         else
         {
-            std::shared_ptr<engine::Scheduler<>::Task> task(new engine::Scheduler<>::CallBack([this]()
+            scheduler.schedule([this]()
             {
                 m_table.updateContent();
                 m_table.repaint();
-            }));
-            scheduler.schedule(std::move(task));
+            });
         }
     }
     
