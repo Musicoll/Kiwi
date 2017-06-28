@@ -42,11 +42,13 @@ namespace kiwi
     size_t Instance::m_untitled_patcher_index(0);
     
     Instance::Instance() :
+    m_scheduler(),
     m_instance(std::make_unique<DspDeviceManager>()),
     m_browser(),
     m_console_history(std::make_shared<ConsoleHistory>(m_instance)),
     m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
     {
+        startTimer(10);
         std::srand(std::time(0));
         m_user_id = std::rand();
         
@@ -62,6 +64,12 @@ namespace kiwi
     Instance::~Instance()
     {
         closeAllPatcherWindows();
+        stopTimer();
+    }
+    
+    void Instance::timerCallback()
+    {
+        m_scheduler.process();
     }
     
     uint64_t Instance::getUserId() const noexcept
@@ -77,6 +85,11 @@ namespace kiwi
     engine::Instance const& Instance::getEngineInstance() const
     {
         return m_instance;
+    }
+    
+    engine::Scheduler<> & Instance::useScheduler()
+    {
+        return m_scheduler;
     }
     
     void Instance::newPatcher()

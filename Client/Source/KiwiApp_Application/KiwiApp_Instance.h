@@ -22,6 +22,9 @@
 #pragma once
 
 #include <KiwiEngine/KiwiEngine_Instance.h>
+#include <KiwiEngine/KiwiEngine_Scheduler.h>
+
+#include <juce_events/timers/juce_Timer.h>
 
 #include "flip/Document.h"
 
@@ -43,7 +46,7 @@ namespace kiwi
     // ================================================================================ //
 
     //! @brief The Application Instance
-    class Instance
+    class Instance : public juce::Timer
     {
     public:
         
@@ -52,6 +55,9 @@ namespace kiwi
         
         //! @brief Destructor
         ~Instance();
+        
+        //! @brief Timer call back, processes the scheduler events list.
+        void timerCallback() override final;
         
         //! @brief Get the user ID of the Instance.
         uint64_t getUserId() const noexcept;
@@ -64,6 +70,9 @@ namespace kiwi
         
         //! @brief Returns the engine::Instance
         engine::Instance const& getEngineInstance() const;
+        
+        //! @brief Returns the instance's scheduler
+        engine::Scheduler<> & useScheduler();
         
         //! @brief Open a File.
         bool openFile(juce::File const& file);
@@ -126,6 +135,8 @@ namespace kiwi
         void showWindowWithId(WindowId id, std::function<std::unique_ptr<Window>()> create_fn);
         
     private: // variables
+        
+        engine::Scheduler<>                         m_scheduler;
         
         engine::Instance                            m_instance;
         
