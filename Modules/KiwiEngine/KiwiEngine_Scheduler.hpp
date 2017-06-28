@@ -51,7 +51,7 @@ namespace kiwi
         }
         
         template<class Clock>
-        bool Scheduler<Clock>::isThisConsumerThread()
+        bool Scheduler<Clock>::isThisConsumerThread() const
         {
             return m_consumer_id == std::this_thread::get_id();
         }
@@ -61,6 +61,13 @@ namespace kiwi
         {
             assert(task);
             m_queue.schedule(task, delay);
+        }
+        
+        template<class Clock>
+        void Scheduler<Clock>::schedule(std::shared_ptr<Task> && task, duration_t delay)
+        {
+            assert(task);
+            m_queue.schedule(std::move(task), delay);
         }
         
         template<class Clock>
@@ -116,8 +123,14 @@ namespace kiwi
         void Scheduler<Clock>::Queue::schedule(std::shared_ptr<Task> const& task, duration_t delay)
         {
             assert(task);
-            
             m_commands.push({task, clock_t::now() + delay });
+        }
+        
+        template<class Clock>
+        void Scheduler<Clock>::Queue::schedule(std::shared_ptr<Task> && task, duration_t delay)
+        {
+            assert(task);
+            m_commands.push({std::move(task), clock_t::now() + delay});
         }
         
         template<class Clock>
@@ -147,7 +160,7 @@ namespace kiwi
             {
                 if (event.m_time < event_it->m_time)
                 {
-                    m_events.insert(event_it, event);
+                    m_events.insert(event_it, std::move(event));
                     break;
                 }
                 
@@ -156,7 +169,7 @@ namespace kiwi
             
             if (event_it == m_events.end())
             {
-                m_events.emplace_back(event);
+                m_events.emplace_back(std::move(event));
             }
         }
     
@@ -307,26 +320,10 @@ namespace kiwi
         // ==================================================================================== //
         
         template<class Clock>
-        Scheduler<Clock>::Event::Event(std::shared_ptr<Task> const& task, time_point_t time):
-        m_task(task),
+        Scheduler<Clock>::Event::Event(std::shared_ptr<Task> && task, time_point_t time):
+        m_task(std::move(task)),
         m_time(time)
         {
-        }
-        
-        template<class Clock>
-        Scheduler<Clock>::Event::Event(Event const& other):
-        m_task(other.m_task),
-        m_time(other.m_time)
-        {
-        }
-        
-        template<class Clock>
-        typename Scheduler<Clock>::Event& Scheduler<Clock>::Event::operator=(Event const& other)
-        {
-            m_task = other.m_task;
-            m_time = other.m_time;
-            
-            return *this;
         }
         
         template<class Clock>
