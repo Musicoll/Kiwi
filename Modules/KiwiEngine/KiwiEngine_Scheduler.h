@@ -86,13 +86,17 @@ namespace kiwi
             //! @brief Check wehter or not this thread is the consumer.
             //! @details This method can be usefull to help decide if a direct call can be made
             //! or if the scheduler shall be used.
-            bool isThisConsumerThread();
+            bool isThisConsumerThread() const;
             
             //! @brief Delays execution of a task. Shared ownership.
             //! @details Calling twice this method with same task will cancel the previous scheduled execution
-            //! and add a new one at specified time. If you move ownership of the task here the task will be
-            //! deleted at execution time.
+            //! and add a new one at specified time.
             void schedule(std::shared_ptr<Task> const& task, duration_t delay = std::chrono::milliseconds(0));
+            
+            //! @brief Delays execution of a task. Transfer ownership.
+            //! @details Calling twice this method with same task will cancel the previous scheduled execution
+            //! and add a new one at specified time.
+            void schedule(std::shared_ptr<Task> && task, duration_t delay = std::chrono::milliseconds(0));
             
             //! @brief Delays execution of a function by the sceduler.
             //! @details Internally create a callback that will be executed and destroyed by the scheduler.
@@ -151,6 +155,9 @@ namespace kiwi
             
             //! @brief Delays the execution of a task. Shared ownership.
             void schedule(std::shared_ptr<Task> const& task, duration_t delay);
+            
+            //! @brief Delays the execution of a task. Transfer ownership.
+            void schedule(std::shared_ptr<Task> && task, duration_t delay);
             
             //! @brief Cancels the execution of a task.
             void unschedule(std::shared_ptr<Task> const& task);
@@ -323,13 +330,7 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            Event(std::shared_ptr<Task> const& task, time_point_t time);
-            
-            //! @brief Copy Constructor.
-            Event(Event const& other);
-            
-            //! @brief Assignement operator
-            Event& operator=(Event const& other);
+            Event(std::shared_ptr<Task> && task, time_point_t time);
             
             //! @brief Moove constructor
             Event(Event && other);
@@ -355,6 +356,8 @@ namespace kiwi
         private: // deleted methods
             
             Event() = delete;
+            Event(Event const& other) = delete;
+            Event& operator=(Event const& other) = delete;
         };
     }
 }

@@ -81,6 +81,37 @@ TEST_CASE("Scheduler", "[Scheduler]")
         CHECK(counter == 10);
     }
     
+    SECTION("Ownership")
+    {
+        struct TestDestructor : public Task
+        {
+            TestDestructor(int &counter):m_counter(counter){};
+            
+            ~TestDestructor(){++m_counter;};
+            
+            void execute() override final{};
+            
+            int& m_counter;
+        };
+
+        int shared_count = 0;
+        int transfered_count = 0;
+        
+        std::shared_ptr<Task> shared(new TestDestructor(shared_count));
+        std::shared_ptr<Task> transfered(new TestDestructor(transfered_count));
+        
+        sch.schedule(shared);
+        CHECK(shared.use_count() == 2);
+        
+        sch.schedule(std::move(transfered));
+        CHECK(transfered.use_count() == 0);
+        
+        sch.process();
+        
+        CHECK(transfered_count == 1); // Check that transfered was destroyed.
+        CHECK(shared_count == 0); // Check that shared was not destroyed.
+    }
+    
     SECTION("Cancel/Reschedule mono thread")
     {
         int i_standard = 0;
