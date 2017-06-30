@@ -32,6 +32,7 @@
 #include <juce_core/juce_core.h>
 
 #include <atomic>
+#include <set>
 
 
 namespace kiwi
@@ -76,6 +77,12 @@ namespace kiwi
             
             //! @brief Returns true if the server is running.
             bool isRunning() const noexcept;
+            
+            //! @brief Returns a list of sessions currenty opened.
+            std::set<uint64_t> getSessions() const;
+            
+            //! @brief Returns a list of users connected to session
+            std::set<uint64_t> getConnectedUsers(uint64_t session_id) const;
             
         private: // methods
             
@@ -172,7 +179,7 @@ namespace kiwi
             bool hasUser(uint64_t user_id) const;
             
             //! @brief Returns a list of connected users.
-            std::vector<uint64_t> getConnectedUsers() const;
+            std::set<uint64_t> getConnectedUsers() const;
             
         private: // methods
             
