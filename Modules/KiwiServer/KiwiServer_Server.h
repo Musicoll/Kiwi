@@ -175,9 +175,6 @@ namespace kiwi
             //! @details If user that disconnect is the last one, the session will be saved.
             void unbind(flip::PortBase & port);
             
-            //! @brief Returns wether or not a certain user is connected to session.
-            bool hasUser(uint64_t user_id) const;
-            
             //! @brief Returns a list of connected users.
             std::set<uint64_t> getConnectedUsers() const;
             

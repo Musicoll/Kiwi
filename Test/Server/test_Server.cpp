@@ -115,6 +115,51 @@ TEST_CASE("Server - Server", "[Server, Server]")
         }
     }
     
+    SECTION("One user connecting to multiple document")
+    {
+        kiwi::server::Server server(9191, "./server_backend_test");
+        
+        // Initializing documents.
+        flip::Document document_1 (kiwi::model::DataModel::use (), 123456789, 'appl', 'gui ');
+        flip::CarrierTransportSocketTcp carrier_1 (document_1, 987654, "localhost", 9191);
+        
+        flip::Document document_2 (kiwi::model::DataModel::use (), 123456789, 'appl', 'gui ');
+        flip::CarrierTransportSocketTcp carrier_2 (document_2, 987655, "localhost", 9191);
+        
+        // Client/Document connecting to server.
+        while(!carrier_1.is_connected() || !carrier_2.is_connected() || server.getSessions().size() != 2)
+        {
+            carrier_1.process();
+            carrier_2.process();
+            server.process();
+        }
+        
+        CHECK(carrier_1.is_connected());
+        CHECK(carrier_2.is_connected());
+        CHECK(server.getSessions().count(987654));
+        CHECK(server.getSessions().count(987655));
+        
+        carrier_1.rebind("", 0);
+        carrier_2.rebind("", 0);
+        
+        while(carrier_1.is_connected() || carrier_2.is_connected() || !server.getSessions().empty())
+        {
+            carrier_1.process();
+            carrier_2.process();
+            server.process();
+        }
+        
+        CHECK(!carrier_1.is_connected());
+        CHECK(!carrier_2.is_connected());
+        
+        juce::File backend ("./server_backend_test");
+        
+        if (backend.exists())
+        {
+            backend.deleteRecursively();
+        }
+    }
+    
     SECTION("Multiple connections")
     {
         kiwi::server::Server server(9191, "./server_backend_test");

@@ -146,27 +146,13 @@ namespace kiwi
         {
             port.impl_activate(false);
             
-            for(auto session_it = m_sessions.begin(); session_it != m_sessions.end();)
+            auto session = m_sessions.find(port.session());
+            
+            session->second.unbind(port);
+            
+            if (session->second.getConnectedUsers().empty())
             {
-                Session & session = session_it->second;
-                
-                if (session.hasUser(port.user()))
-                {
-                    session.unbind(port);
-                    
-                    if (session.getConnectedUsers().empty())
-                    {
-                        session_it = m_sessions.erase(session_it);
-                    }
-                    else
-                    {
-                        ++session_it;
-                    }
-                }
-                else
-                {
-                    ++session_it;
-                }
+                m_sessions.erase(session);
             }
         }
         
@@ -366,16 +352,6 @@ namespace kiwi
                 
                 save();
             }
-        }
-        
-        bool Server::Session::hasUser(uint64_t user_id) const
-        {
-            auto const& ports = m_document->ports();
-            
-            return std::find_if(ports.begin(), ports.end(), [user_id](flip::PortBase * port)
-                                {
-                                    return port->user() == user_id;
-                                }) != ports.end();
         }
         
         std::set<uint64_t> Server::Session::getConnectedUsers() const
