@@ -256,8 +256,7 @@ namespace kiwi
         public: // methods
             
             Task(Timer& timer):
-            m_timer(timer),
-            m_period()
+            m_timer(timer)
             {
             }
             
@@ -273,7 +272,6 @@ namespace kiwi
         private: // members
             
             Timer&          m_timer;
-            duration_t      m_period;
             
         };
         
