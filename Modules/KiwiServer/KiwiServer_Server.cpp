@@ -101,6 +101,24 @@ namespace kiwi
             return m_running;
         }
         
+        std::set<uint64_t> Server::getSessions() const
+        {
+            std::set<uint64_t> sessions;
+            
+            for(auto & session : m_sessions)
+            {
+                sessions.insert(session.first);
+            }
+            
+            return sessions;
+        }
+        
+        std::set<uint64_t> Server::getConnectedUsers(uint64_t session_id) const
+        {
+            auto session = m_sessions.find(session_id);
+            return session != m_sessions.end() ? session->second.getConnectedUsers() : std::set<uint64_t>();
+        }
+        
         juce::File Server::getSessionFile(uint64_t session_id) const
         {
             return m_backend_directory.getChildFile(juce::String(hexadecimal_convert(session_id)))
@@ -128,27 +146,13 @@ namespace kiwi
         {
             port.impl_activate(false);
             
-            for(auto session_it = m_sessions.begin(); session_it != m_sessions.end();)
+            auto session = m_sessions.find(port.session());
+            
+            session->second.unbind(port);
+            
+            if (session->second.getConnectedUsers().empty())
             {
-                Session & session = session_it->second;
-                
-                if (session.hasUser(port.user()))
-                {
-                    session.unbind(port);
-                    
-                    if (session.getConnectedUsers().empty())
-                    {
-                        session_it = m_sessions.erase(session_it);
-                    }
-                    else
-                    {
-                        ++session_it;
-                    }
-                }
-                else
-                {
-                    ++session_it;
-                }
+                m_sessions.erase(session);
             }
         }
         
@@ -297,8 +301,11 @@ namespace kiwi
                 
                 model::Patcher& patcher = m_document->root<model::Patcher>();
                 
+                std::set<uint64_t> user_lit = getConnectedUsers();
+                std::vector<uint64_t> users(user_lit.begin(), user_lit.end());
+                
                 // send a list of connected users to the user that is connecting.
-                m_document->send_signal_if(patcher.signal_receive_connected_users.make(getConnectedUsers()),
+                m_document->send_signal_if(patcher.signal_receive_connected_users.make(users),
                                            [&port](flip::PortBase& current_port)
                                            {
                                                return port.user() == current_port.user();
@@ -347,25 +354,15 @@ namespace kiwi
             }
         }
         
-        bool Server::Session::hasUser(uint64_t user_id) const
+        std::set<uint64_t> Server::Session::getConnectedUsers() const
         {
-            auto const& ports = m_document->ports();
-            
-            return std::find_if(ports.begin(), ports.end(), [user_id](flip::PortBase * port)
-                                {
-                                    return port->user() == user_id;
-                                }) != ports.end();
-        }
-        
-        std::vector<uint64_t> Server::Session::getConnectedUsers() const
-        {
-            std::vector<uint64_t> users;
+            std::set<uint64_t> users;
             
             auto const& ports = m_document->ports();
             
             for(auto const& port : ports)
             {
-                users.emplace_back(port->user());
+                users.emplace(port->user());
             }
             
             return users;
@@ -375,7 +372,10 @@ namespace kiwi
         {
             model::Patcher& patcher = m_document->root<model::Patcher>();
             
-            m_document->reply_signal(patcher.signal_receive_connected_users.make(getConnectedUsers()));
+            std::set<uint64_t> user_list = getConnectedUsers();
+            std::vector<uint64_t> users(user_list.begin(), user_list.end());
+
+            m_document->reply_signal(patcher.signal_receive_connected_users.make(users));
         }
     }
 }

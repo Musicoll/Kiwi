@@ -40,28 +40,34 @@ TEST_CASE("Server - Server", "[Server, Server]")
     SECTION("Simple Connection - Deconnection")
     {
         kiwi::server::Server server(9191, "./server_backend_test");
-    
-        std::thread server_thread([&server](){server.run();});
         
         // Initializing document
-        flip::Document document (kiwi::model::DataModel::use (), 123456789ULL, 'appl', 'gui ');
-        flip::CarrierTransportSocketTcp carrier (document, 987654ULL, "localhost", 9191);
+        flip::Document document (kiwi::model::DataModel::use (), 123456789, 'appl', 'gui ');
+        flip::CarrierTransportSocketTcp carrier (document, 987654, "localhost", 9191);
         
         // Client/Document connecting to server.
-        while(!carrier.is_connected())
+        while(!carrier.is_connected() || server.getSessions().empty())
         {
             carrier.process();
+            server.process();
         }
         
         CHECK(carrier.is_connected());
+        CHECK(server.getSessions().count(987654));
+        CHECK(server.getConnectedUsers(987654).count(123456789));
         
         // Client/Document disconnects from server.
         carrier.rebind("", 0);
         
-        CHECK(!carrier.is_connected());
+        // Client/Document connecting to server.
+        while(carrier.is_connected() || !server.getSessions().empty())
+        {
+            carrier.process();
+            server.process();
+        }
         
-        server.stop();
-        server_thread.join();
+        CHECK(!carrier.is_connected());
+        CHECK(server.getSessions().empty());
         
         juce::File backend ("./server_backend_test");
         
@@ -75,23 +81,22 @@ TEST_CASE("Server - Server", "[Server, Server]")
     {
         std::unique_ptr<kiwi::server::Server> server(new kiwi::server::Server(9191, "./server_backend_test"));
         
-        std::thread server_thread([&server](){server->run();});
-        
         // Initializing document.
-        flip::Document document (kiwi::model::DataModel::use (), 123456789ULL, 'appl', 'gui ');
-        flip::CarrierTransportSocketTcp carrier (document, 987654ULL, "localhost", 9191);
+        flip::Document document (kiwi::model::DataModel::use (), 123456789, 'appl', 'gui ');
+        flip::CarrierTransportSocketTcp carrier (document, 987654, "localhost", 9191);
         
         // Client/Document connecting to server.
-        while(!carrier.is_connected())
+        while(!carrier.is_connected() || server->getSessions().empty())
         {
             carrier.process();
+            server->process();
         }
         
         CHECK(carrier.is_connected());
+        CHECK(server->getSessions().count(987654));
         
         // Killing server before client is disconnected.
         server->stop();
-        server_thread.join();
         server.reset(nullptr);
         
         // Client automatically disconnected from server.
@@ -110,15 +115,58 @@ TEST_CASE("Server - Server", "[Server, Server]")
         }
     }
     
+    SECTION("One user connecting to multiple document")
+    {
+        kiwi::server::Server server(9191, "./server_backend_test");
+        
+        // Initializing documents.
+        flip::Document document_1 (kiwi::model::DataModel::use (), 123456789, 'appl', 'gui ');
+        flip::CarrierTransportSocketTcp carrier_1 (document_1, 987654, "localhost", 9191);
+        
+        flip::Document document_2 (kiwi::model::DataModel::use (), 123456789, 'appl', 'gui ');
+        flip::CarrierTransportSocketTcp carrier_2 (document_2, 987655, "localhost", 9191);
+        
+        // Client/Document connecting to server.
+        while(!carrier_1.is_connected() || !carrier_2.is_connected() || server.getSessions().size() != 2)
+        {
+            carrier_1.process();
+            carrier_2.process();
+            server.process();
+        }
+        
+        CHECK(carrier_1.is_connected());
+        CHECK(carrier_2.is_connected());
+        CHECK(server.getSessions().count(987654));
+        CHECK(server.getSessions().count(987655));
+        
+        carrier_1.rebind("", 0);
+        carrier_2.rebind("", 0);
+        
+        while(carrier_1.is_connected() || carrier_2.is_connected() || !server.getSessions().empty())
+        {
+            carrier_1.process();
+            carrier_2.process();
+            server.process();
+        }
+        
+        CHECK(!carrier_1.is_connected());
+        CHECK(!carrier_2.is_connected());
+        
+        juce::File backend ("./server_backend_test");
+        
+        if (backend.exists())
+        {
+            backend.deleteRecursively();
+        }
+    }
+    
     SECTION("Multiple connections")
     {
         kiwi::server::Server server(9191, "./server_backend_test");
         
-        std::thread server_thread([&server](){server.run();});
-        
         // Initializing client 1
-        flip::Document document_1 (kiwi::model::DataModel::use (), 1UL, 'appl', 'gui ');
-        flip::CarrierTransportSocketTcp carrier_1 (document_1, 1234UL, "localhost", 9191);
+        flip::Document document_1 (kiwi::model::DataModel::use (), 1, 'appl', 'gui ');
+        flip::CarrierTransportSocketTcp carrier_1 (document_1, 1234, "localhost", 9191);
         
         kiwi::model::Patcher& patcher_1 = document_1.root<kiwi::model::Patcher>();
         
@@ -137,8 +185,8 @@ TEST_CASE("Server - Server", "[Server, Server]")
         });
         
         // Initializing client 2
-        flip::Document document_2 (kiwi::model::DataModel::use (), 2UL, 'appl', 'gui ');
-        flip::CarrierTransportSocketTcp carrier_2 (document_2, 1234ULL, "localhost", 9191);
+        flip::Document document_2 (kiwi::model::DataModel::use (), 2, 'appl', 'gui ');
+        flip::CarrierTransportSocketTcp carrier_2 (document_2, 1234, "localhost", 9191);
         
         kiwi::model::Patcher& patcher_2 = document_2.root<kiwi::model::Patcher>();
         
@@ -150,37 +198,46 @@ TEST_CASE("Server - Server", "[Server, Server]")
         });
         
         // Client 1 connects to server.
-        while(!carrier_1.is_connected()){carrier_1.process();}
+        while(!carrier_1.is_connected() || server.getSessions().empty()){carrier_1.process(); server.process();}
         
         CHECK(carrier_1.is_connected());
+        CHECK(server.getConnectedUsers(1234).count(1));
         
         // Client 2 connects to server. Client 2 receives all connected users, client 1 is notified.
-        while(connected_users_2.empty()){carrier_2.process(); document_2.pull();}
+        while(connected_users_2.empty() || !server.getConnectedUsers(1234).count(2))
+        {
+            carrier_2.process();
+            document_2.pull();
+            server.process();
+        }
         
         auto it = std::find_if(connected_users_2.begin(), connected_users_2.end(), [](uint64_t id){return id == 1;});
         
         CHECK(it != connected_users_2.end());
         
-        while(other_connect_1 == 0) {carrier_1.process(); document_1.pull();}
+        while(other_connect_1 == 0)
+        {
+            carrier_1.process();
+            document_1.pull();
+            server.process();
+        }
         
         CHECK(other_connect_1 == 2);
         
         // Client 2 disconnects from server. Client 1 is notified.
         carrier_2.rebind("", 0);
         
-        while(carrier_2.is_connected()){carrier_2.process();}
-        while(other_disonnect_1 == 0){carrier_1.process(); document_1.pull();}
+        while(carrier_2.is_connected() || server.getConnectedUsers(1234).count(2)){carrier_2.process(); server.process();}
+        while(other_disonnect_1 == 0){carrier_1.process(); document_1.pull(); server.process();}
         
         CHECK(other_disonnect_1 == 2);
         
         // Client 1 disconnects from server. Client 1 is notified.
         carrier_1.rebind("", 0);
         
-        while(carrier_1.is_connected()){carrier_1.process();}
+        while(carrier_1.is_connected() || !server.getSessions().empty()){carrier_1.process(); server.process();}
         
         server.stop();
-        
-        server_thread.join();
         
         juce::File backend ("./server_backend_test");
         
