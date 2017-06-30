@@ -24,6 +24,7 @@
 #include <vector>
 #include <iostream>
 #include <thread>
+#include <memory>
 
 #include "../catch.hpp"
 
@@ -31,40 +32,11 @@
 
 using namespace kiwi;
 
-template<class T>
-class TTask final : public engine::Scheduler<T>::Task
-{
-public: // methods
-    
-    TTask(engine::thread_token producer_token,
-          engine::thread_token consumer_token,
-          std::function<void()> func,
-          bool process_delete = true):
-    engine::Scheduler<T>::Task(producer_token, consumer_token),
-    m_func(func),
-    m_process_delete(process_delete){};
-    
-    void execute() override
-    {
-        m_func.operator()();
-        
-        if (m_process_delete)
-        {
-            delete this;
-        }
-    }
-    
-    ~TTask() = default;
-    
-private: // members
-    
-    std::function<void()>   m_func;
-    bool                    m_process_delete;
-};
-
 using Scheduler = engine::Scheduler<std::chrono::high_resolution_clock>;
 
-using Task = TTask<std::chrono::high_resolution_clock>;
+using Task = engine::Scheduler<>::Task;
+
+using CallBack = engine::Scheduler<>::CallBack;
 
 static std::chrono::high_resolution_clock::time_point current_time = std::chrono::high_resolution_clock::now();
 
@@ -83,15 +55,6 @@ struct TickClock
     static time_point now(){return current_time;};
 };
 
-enum Thread : engine::thread_token
-{
-    Gui     = 0,
-    Engine  = 1,
-    Dsp     = 2,
-    Network = 3
-};
-
-
 
 // ==================================================================================== //
 //                                          SCHEDULER                                   //
@@ -99,16 +62,7 @@ enum Thread : engine::thread_token
 
 TEST_CASE("Scheduler", "[Scheduler]")
 {
-    Scheduler::createInstance();
-    
-    Scheduler& sch = Scheduler::use();
-    
-    sch.registerConsumer(Thread::Engine);
-    
-    sch.registerProducer(Thread::Gui, Thread::Engine);
-    sch.registerProducer(Thread::Dsp, Thread::Engine);
-    sch.registerProducer(Thread::Engine, Thread::Engine);
-    
+    Scheduler sch;
     
     SECTION("Simple add and process")
     {   
@@ -118,12 +72,44 @@ TEST_CASE("Scheduler", "[Scheduler]")
         
         for(int i = 0 ; i < 10; ++i)
         {
-            sch.schedule(new Task(Thread::Engine, Thread::Engine, func), std::chrono::milliseconds(10 * i));
+            sch.schedule(std::shared_ptr<Task>(new CallBack(func)),
+                                               std::chrono::milliseconds(10 * i));
         }
         
-        while(counter < 10){ sch.process(Thread::Engine);}
+        while(counter < 10){ sch.process();}
         
         CHECK(counter == 10);
+    }
+    
+    SECTION("Ownership")
+    {
+        struct TestDestructor : public Task
+        {
+            TestDestructor(int &counter):m_counter(counter){};
+            
+            ~TestDestructor(){++m_counter;};
+            
+            void execute() override final{};
+            
+            int& m_counter;
+        };
+
+        int shared_count = 0;
+        int transfered_count = 0;
+        
+        std::shared_ptr<Task> shared(new TestDestructor(shared_count));
+        std::shared_ptr<Task> transfered(new TestDestructor(transfered_count));
+        
+        sch.schedule(shared);
+        CHECK(shared.use_count() == 2);
+        
+        sch.schedule(std::move(transfered));
+        CHECK(transfered.use_count() == 0);
+        
+        sch.process();
+        
+        CHECK(transfered_count == 1); // Check that transfered was destroyed.
+        CHECK(shared_count == 0); // Check that shared was not destroyed.
     }
     
     SECTION("Cancel/Reschedule mono thread")
@@ -136,18 +122,18 @@ TEST_CASE("Scheduler", "[Scheduler]")
         std::function<void()> func_cancel = [&i_cancel](){++i_cancel;};
         std::function<void()> func_reschedule = [&i_reschedule](){++i_reschedule;};
         
-        Scheduler::Task* standard = new Task(Thread::Engine, Thread::Engine, func_std);
-        Scheduler::Task* reschedule = new Task(Thread::Engine, Thread::Engine, func_reschedule);
-        Scheduler::Task* cancel = new Task(Thread::Engine, Thread::Engine, func_cancel, false);
+        std::shared_ptr<Task> standard(new CallBack(func_std));
+        std::shared_ptr<Task> reschedule(new CallBack(func_reschedule));
+        std::shared_ptr<Task> cancel(new CallBack(func_cancel));
         
-        sch.schedule(standard);
+        sch.schedule(std::move(standard));
         sch.schedule(reschedule);
         sch.schedule(cancel);
         
         sch.schedule(reschedule, std::chrono::milliseconds(1000 * 60 * 60));
-        delete cancel;
+        sch.unschedule(cancel);
         
-        while(i_standard < 1){sch.process(Thread::Engine);};
+        while(i_standard < 1){sch.process();};
         
         CHECK(i_standard == 1);
         CHECK(i_reschedule == 0);
@@ -155,7 +141,7 @@ TEST_CASE("Scheduler", "[Scheduler]")
         
         sch.schedule(reschedule);
         
-        while(i_reschedule < 1){sch.process(Thread::Engine);};
+        while(i_reschedule < 1){sch.process();};
         
         CHECK(i_reschedule == 1);
     }
@@ -164,44 +150,47 @@ TEST_CASE("Scheduler", "[Scheduler]")
     {
         TickClock::start();
         
-        engine::Scheduler<TickClock>::createInstance();
-        engine::Scheduler<TickClock>& tick_scheduler = engine::Scheduler<TickClock>::use();
-        
-        tick_scheduler.registerConsumer(Thread::Engine);
-        tick_scheduler.registerProducer(Thread::Engine, Thread::Engine);
+        engine::Scheduler<TickClock> tick_scheduler;
         
         std::vector<int> order;
         
         std::function<void(int)> func = [&order](int number){order.push_back(number);};
         
-        TTask<TickClock> * task_0 = new TTask<TickClock>(Thread::Engine, Thread::Engine, std::bind(func, 0), false);
-        TTask<TickClock> * task_1 = new TTask<TickClock>(Thread::Engine, Thread::Engine, std::bind(func, 1), false);
+        std::shared_ptr<engine::Scheduler<TickClock>::Task>
+                    task_0(new engine::Scheduler<TickClock>::CallBack(std::bind(func, 0)));
+        
+        std::shared_ptr<engine::Scheduler<TickClock>::Task>
+                    task_1(new engine::Scheduler<TickClock>::CallBack(std::bind(func, 1)));
         
         tick_scheduler.schedule(task_0, std::chrono::milliseconds(1));
         tick_scheduler.schedule(task_1, std::chrono::milliseconds(3));
         
-        tick_scheduler.schedule(new TTask<TickClock>(Thread::Engine, Thread::Engine, std::bind(func, 2)),
-                                std::chrono::milliseconds(2));
-        tick_scheduler.schedule(new TTask<TickClock>(Thread::Engine, Thread::Engine, std::bind(func, 3)),
-                                std::chrono::milliseconds(2));
+        std::shared_ptr<engine::Scheduler<TickClock>::Task>
+                    task_2(new engine::Scheduler<TickClock>::CallBack(std::bind(func, 2)));
+        
+        std::shared_ptr<engine::Scheduler<TickClock>::Task>
+                    task_3(new engine::Scheduler<TickClock>::CallBack(std::bind(func, 3)));
+        
+        tick_scheduler.schedule(std::move(task_2), std::chrono::milliseconds(2));
+        tick_scheduler.schedule(std::move(task_3), std::chrono::milliseconds(2));
         
         tick_scheduler.schedule(task_0, std::chrono::milliseconds(3));
-        delete task_1;
+        tick_scheduler.unschedule(task_1);
         
         while(order.size() < 3)
         {
             TickClock::tick();
-            tick_scheduler.process(Thread::Engine);
+            tick_scheduler.process();
         }
         
-        delete task_0;
+        tick_scheduler.unschedule(task_0);
         
         CHECK(order[0] == 2);
         CHECK(order[1] == 3);
         CHECK(order[2] == 0);
     }
     
-    SECTION("Multithreading multiproducern multiconsumer")
+    SECTION("Multithreading multiproducer multiconsumer")
     {
         std::atomic<size_t> count_producer_1(0);
         std::atomic<size_t> count_producer_2(0);
@@ -222,7 +211,7 @@ TEST_CASE("Scheduler", "[Scheduler]")
             
             while(count_event < 30)
             {
-                sch.schedule(new Task(Thread::Gui, Thread::Engine, func_1));
+                sch.schedule(std::shared_ptr<Task>(new CallBack(func_1)));
                 ++count_event;
             }
         });
@@ -233,14 +222,14 @@ TEST_CASE("Scheduler", "[Scheduler]")
             
             while(count_event < 20)
             {
-                sch.schedule(new Task(Thread::Dsp, Thread::Engine, func_2));
+                sch.schedule(std::shared_ptr<Task>(new CallBack(func_2)));
                 ++count_event;
             }
         });
         
         while(count_producer_1 < 30 || count_producer_2 < 20)
         {
-            sch.process(Thread::Engine);
+            sch.process();
         }
         
         CHECK(count_producer_1 == 30);
@@ -249,159 +238,126 @@ TEST_CASE("Scheduler", "[Scheduler]")
         producer_1.join();
         producer_2.join();
     }
-}
-
-// ==================================================================================== //
-//                                          SCHEDULER BENCHMARK                         //
-// ==================================================================================== //
-
-void check_precision(std::vector<Scheduler::duration_t> * precision, Scheduler::time_point_t expected_time)
-{
-    precision->push_back(Scheduler::clock_t::now() - expected_time);
-}
-
-size_t mean(std::vector<Scheduler::duration_t> &duration_list)
-{
-    size_t mean = 0;
     
-    for (int i = 0; i < duration_list.size(); ++i)
+    SECTION("Multithreading execution order")
     {
-        mean = mean + std::chrono::duration_cast<std::chrono::nanoseconds>(duration_list[i]).count();
-    }
-    
-    return mean / duration_list.size();
-}
-
-void construct_delay_list(std::vector<size_t> &delay_list, size_t size)
-{
-    std::vector<size_t> increment_list = {11, 56, 12, 70, 2, 92, 32, 66, 3, 102};
-    
-    size_t cursor = 0;
-    size_t delay = 0;
-    
-    for (int i = 0; i < size; ++i)
-    {
-        delay_list.push_back(delay);
+        std::vector<int> order;
         
-        delay  = (delay + increment_list[cursor])  % 100;
+        std::function<void(int)> func = [&order](int stamp){order.push_back(stamp);};
         
-        cursor = cursor = increment_list.size() ? 0 : cursor + 1;
-    }
-}
-
-TEST_CASE("Scheduler Benchmark", "[Scheduler]")
-{
-    Scheduler& sch = Scheduler::use();
-    
-    SECTION("Benchmark no delay MonoProducer")
-    {
-        // vector to check the mean of insertion time
-        std::vector<Scheduler::duration_t> insert;
-        insert.reserve(2048);
+        // Pushing producer 1 before producer 2
         
-        // vector to check the execution precision of the callback
-        std::vector<Scheduler::duration_t> precision;
-        precision.reserve(2048);
-        
-        Scheduler::time_point_t before_launch = Scheduler::clock_t::now();
-        
-        std::thread producer([&sch, &insert, &precision]()
         {
-            size_t counter = 0;
+            std::thread producer_1([&sch, &func]()
+            {
+                sch.schedule(std::make_shared<CallBack>(std::bind(func, 1)));
+            });
+        
+            producer_1.join();
+        
+            std::thread producer_2([&sch, &func]()
+            {
+                sch.schedule(std::make_shared<CallBack>(std::bind(func, 2)));
+            });
+        
+            producer_2.join();
+        
+            while(order.size() < 2)
+            {
+                sch.process();
+            }
+        
+            // Check that producer 1's task is executed first.
+        
+            CHECK(order[0] == 1);
+            CHECK(order[1] == 2);
             
-            while(counter < 2048)
-            {
-                Scheduler::duration_t delay = std::chrono::milliseconds(0);
-                
-                Scheduler::Task* task = new Task(Thread::Gui,
-                                                 Thread::Engine,
-                                                 std::bind(check_precision, &precision, Scheduler::clock_t::now()));
-                                     
-                                     
-                Scheduler::time_point_t before = Scheduler::clock_t::now();
-                
-                sch.schedule(task, delay);
-                
-                insert.push_back(Scheduler::clock_t::now() - before);
-                ++counter;
-            }
-        });
+        }
         
-        std::thread consumer([&sch, &precision]()
+        // Pushgin producer 2 before producer 1
+        
         {
-            while(precision.size() < 2048)
+            std::thread producer_2([&sch, &func]()
             {
-                sch.process(Thread::Engine);
-            }
-        });
-        
-        producer.join();
-        consumer.join();
-        
-        size_t exec_time = std::chrono::duration_cast<std::chrono::microseconds>(Scheduler::clock_t::now() - before_launch).count();
-        
-        std::cout << "Benchmark no delay results ------------" << std::endl;
-        std::cout << "Global Time : " << exec_time << " microseconds" << std::endl;
-        std::cout << "Mean insert time : " << mean(insert) << " nanoseconds" << std::endl;
-        std::cout << "Mean precision : " << mean(precision) << " nanoseconds" << std::endl << std::endl;
-    }
-    
-    SECTION("Benchmark random delay MonoProducer")
-    {
-        // vector to check the mean of insertion time
-        std::vector<Scheduler::duration_t> insert;
-        insert.reserve(2048);
-        
-        // vector to check the execution precision of the callback
-        std::vector<Scheduler::duration_t> precision;
-        precision.reserve(2048);
-        
-        // vector of pseudo random delay time between 0 and 100
-        std::vector<size_t> delay_list;
-        construct_delay_list(delay_list, 2048);
-        
-        Scheduler::time_point_t before_launch = Scheduler::clock_t::now();
-        
-        std::thread producer([&sch, &insert, &precision, &delay_list]()
-        {
-            size_t counter = 0;
+                sch.schedule(std::make_shared<CallBack>(std::bind(func, 2)));
+            });
             
-            while(counter < 2048)
+            producer_2.join();
+            
+            std::thread producer_1([&sch, &func]()
             {
-                Scheduler::duration_t delay = std::chrono::milliseconds(delay_list[counter]);
-                
-                std::function<void(void)> func =
-                    std::bind(check_precision, &precision, Scheduler::clock_t::now() + delay);
-                
-                Task* task = new Task(Thread::Gui, Thread::Engine, func);
-                
-                Scheduler::time_point_t before = Scheduler::clock_t::now();
-                
-                sch.schedule(task, delay);
-                
-                insert.push_back(Scheduler::clock_t::now() - before);
-                ++counter;
+                sch.schedule(std::make_shared<CallBack>(std::bind(func, 1)));
+            });
+            
+            producer_1.join();
+            
+            while(order.size() < 4)
+            {
+                sch.process();
             }
-        });
+            
+            // Check that producer 2's task is executed first.
+            
+            CHECK(order[2] == 2);
+            CHECK(order[3] == 1);
+        }
         
-        std::thread consumer([&sch, &precision]()
+        SECTION("Thread ids")
         {
-            while(precision.size() < 2048)
+            CHECK(sch.isThisConsumerThread());
+            
+            // Transfer consumer ownership.
+            
+            std::thread consumer_thread([&sch]()
             {
-                sch.process(Thread::Engine);
+                sch.setThreadAsConsumer();
+                CHECK(sch.isThisConsumerThread());
+            });
+            
+            consumer_thread.join();
+            
+            CHECK(!sch.isThisConsumerThread());
+            
+            // Transfer back the ownership, to enable further test execution.
+            
+            sch.setThreadAsConsumer();
+        }
+        
+        SECTION("Scheduler lock")
+        {
+            std::atomic<bool> quit_requested(false);
+            
+            std::thread consumer([&sch, &quit_requested]()
+            {
+                sch.setThreadAsConsumer();
+                
+                while(!quit_requested.load())
+                {
+                    sch.process();
+                }
+            });
+            
+            {
+                std::unique_lock<std::mutex> lock(sch.lock());
+                
+                std::function<void(void)> func = [&quit_requested]()
+                {
+                    quit_requested.store(true);
+                };
+                
+                sch.schedule(std::shared_ptr<Task>(new CallBack(func)));
+                
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                
+                CHECK(!quit_requested);
             }
-        });
-        
-        consumer.join();
-        producer.join();
-        
-        size_t exec_time =
-        std::chrono::duration_cast<std::chrono::microseconds>(Scheduler::clock_t::now() - before_launch).count();
-        
-        std::cout << "Benchmark delay results -------------------" << std::endl;
-        std::cout << "Global Time : " << exec_time << " microseconds" << std::endl;
-        std::cout << "Mean insert time : " << mean(insert) << " nanoseconds" << std::endl;
-        std::cout << "Mean precision nanoseconds: " << mean(precision) << " nanoseconds" << std::endl << std::endl;
+            
+            consumer.join();
+            
+            CHECK(quit_requested);
+            
+            sch.setThreadAsConsumer();
+        }
     }
 }
 

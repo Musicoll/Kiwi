@@ -399,13 +399,15 @@ namespace kiwi
     {
         if(patcher.added())
         {
-            engine::Scheduler<>::Lock lock(Thread::Engine);
+            std::unique_lock<std::mutex> lock(m_instance.useEngineInstance().getScheduler().lock());
+            
             patcher.entity().emplace<DocumentManager>(patcher.document());
             patcher.entity().emplace<engine::Patcher>(m_instance.useEngineInstance());
         }
         
         {
-            engine::Scheduler<>::Lock lock(Thread::Engine);
+            std::unique_lock<std::mutex> lock(m_instance.useEngineInstance().getScheduler().lock());
+            
             patcher.entity().use<engine::Patcher>().modelChanged(patcher);
         }
         
@@ -413,7 +415,8 @@ namespace kiwi
         
         if(patcher.removed())
         {
-            engine::Scheduler<>::Lock lock(Thread::Engine);
+            std::unique_lock<std::mutex> lock(m_instance.useEngineInstance().getScheduler().lock());
+            
             patcher.entity().erase<engine::Patcher>();
             patcher.entity().erase<DocumentManager>();
         }

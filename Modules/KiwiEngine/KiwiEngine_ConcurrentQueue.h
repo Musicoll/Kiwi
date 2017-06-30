@@ -24,7 +24,7 @@
 #include <cstddef>
 #include <atomic>
 
-#include <readerwriterqueue.h>
+#include <concurrentqueue.h>
 
 namespace kiwi
 {
@@ -100,10 +100,17 @@ namespace kiwi
                 return m_size.load();
             }
             
+        private: // classes
+            
+            struct Trait : public moodycamel::ConcurrentQueueDefaultTraits
+            {
+                static const size_t BLOCK_SIZE = 1024;
+            };
+            
         private: // members
             
-            mc::ReaderWriterQueue<T, 1024>      m_queue;
-            std::atomic<int>                    m_size;
+            mc::ConcurrentQueue<T, Trait>   m_queue;
+            std::atomic<int>                m_size;
             
         private: // deleted methods
             

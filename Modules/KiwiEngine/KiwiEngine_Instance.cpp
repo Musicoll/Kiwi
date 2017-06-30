@@ -32,14 +32,18 @@ namespace kiwi
         // ================================================================================ //
         
         Instance::Instance(std::unique_ptr<AudioControler> audio_controler):
-        m_audio_controler(std::move(audio_controler))
+        m_audio_controler(std::move(audio_controler)),
+        m_scheduler(),
+        m_quit(false),
+        m_engine_thread(std::bind(&Instance::processScheduler, this))
         {
             addObjectsToFactory();
         }
         
         Instance::~Instance()
         {
-            ;
+            m_quit.store(true);
+            m_engine_thread.join();
         }
         
         // ================================================================================ //
@@ -104,6 +108,27 @@ namespace kiwi
         AudioControler& Instance::getAudioControler() const
         {
             return *m_audio_controler.get();
+        }
+        
+        // ================================================================================ //
+        //                                  SCHEDULER                                       //
+        // ================================================================================ //
+        
+        Scheduler<> & Instance::getScheduler()
+        {
+            return m_scheduler;
+        }
+        
+        void Instance::processScheduler()
+        {
+            m_scheduler.setThreadAsConsumer();
+            
+            while(!m_quit.load())
+            {
+                m_scheduler.process();
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+            }
         }
     }
 }
