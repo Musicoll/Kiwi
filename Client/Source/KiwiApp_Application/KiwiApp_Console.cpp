@@ -140,12 +140,21 @@ namespace kiwi
     
     void ConsoleContent::consoleHistoryChanged(ConsoleHistory const&)
     {
-        juce::MessageManager::callAsync([this]() {
-            
+        engine::Scheduler<> &scheduler = KiwiApp::useInstance().useScheduler();
+        
+        if (scheduler.isThisConsumerThread())
+        {
             m_table.updateContent();
             m_table.repaint();
-            
-        });
+        }
+        else
+        {
+            scheduler.schedule([this]()
+            {
+                m_table.updateContent();
+                m_table.repaint();
+            });
+        }
     }
     
     // ================================================================================ //

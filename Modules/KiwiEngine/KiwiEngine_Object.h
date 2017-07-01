@@ -22,6 +22,7 @@
 #pragma once
 
 #include "KiwiEngine_Def.h"
+#include "KiwiEngine_Scheduler.h"
 
 #include <KiwiDsp/KiwiDsp_Processor.h>
 
@@ -75,6 +76,13 @@ namespace kiwi
             
             //! @brief post an error message in the Console.
             void error(std::string const& text) const;
+            
+            // ================================================================================ //
+            //                                      SCHEDULER                                   //
+            // ================================================================================ //
+            
+            //! @biref Returns the engine's scheduler.
+            Scheduler<> & getScheduler() const;
             
             // ================================================================================ //
             //                                      BEACON                                      //

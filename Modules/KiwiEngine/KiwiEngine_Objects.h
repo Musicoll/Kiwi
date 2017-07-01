@@ -138,7 +138,7 @@ namespace kiwi
         private: // members
             
             std::string                     m_name;
-            std::set<std::unique_ptr<Task>> m_tasks;
+            std::set<std::shared_ptr<Task>> m_tasks;
         };
         
         // ================================================================================ //
@@ -188,7 +188,7 @@ namespace kiwi
                 Delay& m_object;
             };
             
-            Task                            m_task;
+            std::shared_ptr<Task>           m_task;
             Scheduler<>::clock_t::duration  m_delay;
         };
         
@@ -212,7 +212,7 @@ namespace kiwi
             
         private: // members
             
-            std::set<std::unique_ptr<Task>>     m_tasks;
+            std::set<std::shared_ptr<Task>>     m_tasks;
             Scheduler<>::clock_t::duration      m_delay;
         };
         
@@ -228,7 +228,7 @@ namespace kiwi
             
             ~Metro();
             
-            void receive(size_t index, std::vector<Atom> const& oargs) override;
+            void receive(size_t index, std::vector<Atom> const& args) override;
             
             void timerCallBack() override;
             

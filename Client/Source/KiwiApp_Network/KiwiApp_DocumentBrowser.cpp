@@ -315,16 +315,15 @@ namespace kiwi
             
             if(res.error)
             {
-                juce::MessageManager::callAsync([message = res.error.message](){
-                    KiwiApp::error("Kiwi API error: can't get documents => " + message);
-                });
-                
-                return;
+                 KiwiApp::error("Kiwi API error: can't get documents => " + res.error.message);
             }
-            
-            juce::MessageManager::callAsync([this, docs](){
-                updateDocumentList(docs);
-            });
+            else
+            {
+                KiwiApp::useInstance().useScheduler().schedule([this, docs]()
+                {
+                    updateDocumentList(docs);
+                });
+            }
         });
     }
     

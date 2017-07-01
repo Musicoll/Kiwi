@@ -35,7 +35,7 @@ matrix:
     install:
       # make sure CXX is correctly set
       - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
-      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr ThirdParty/readerwriterqueue
+      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr ThirdParty/concurrentqueue
       - pip install --user cpp-coveralls
       - wget --no-check-certificate -O ../curl-7.52.1.tar.gz https://github.com/Musicoll/Kiwi/files/999838/curl-7.52.1-linux.tar.gz
       - wget --no-check-certificate -O ../flip-demo.tar.gz http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files/flip-demo-linux-c47e41da05.tar.gz
@@ -74,7 +74,7 @@ matrix:
     env: COMPILER=clang++
 
     install:
-      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr ThirdParty/readerwriterqueue
+      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr ThirdParty/concurrentqueue
       - curl -o ../curl-7.52.1.zip -L  https://github.com/Musicoll/Kiwi/files/997532/curl-7.52.1-macos.zip
       - curl -o ../flip-demo.tar.gz -L http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files/flip-demo-macos-c47e41da05.tar.gz
       - cd ..

@@ -81,6 +81,11 @@ namespace kiwi
             m_patcher.error(text);
         }
         
+        Scheduler<> & Object::getScheduler() const
+        {
+            return m_patcher.getScheduler();
+        }
+        
         // ================================================================================ //
         //                                      BEACON                                      //
         // ================================================================================ //
@@ -94,6 +99,8 @@ namespace kiwi
         
         void Object::send(const size_t index, std::vector<Atom> const& args)
         {
+            assert(getScheduler().isThisConsumerThread());
+            
             const auto idx = static_cast<std::vector<Outlet>::size_type>(index);
             
             if(idx < m_outlets.size())

@@ -28,6 +28,9 @@
 #include <stdexcept>
 #include <mutex>
 #include <set>
+#include <memory>
+#include <mutex>
+#include <thread>
 
 #include "KiwiEngine_ConcurrentQueue.h"
 
@@ -38,8 +41,6 @@ namespace kiwi
         // ==================================================================================== //
         //                                       SCHEDULER                                      //
         // ==================================================================================== //
-        
-        using thread_token = uint64_t;
         
         //! @brief A class designed to delay tasks' execution between threads that where previously declared.
         //! @details The scheduler is designed as a singleton that uses multiple event lists.
@@ -58,9 +59,9 @@ namespace kiwi
             
             class Task;
             
-            class Timer;
+            class CallBack;
             
-            class Lock;
+            class Timer;
             
         private: // classes
         
@@ -70,59 +71,53 @@ namespace kiwi
             
         public: // methods
             
-            //! @brief Creates the instance of scheduler.
-            //! @details Shall be called before launching threads and processing the scheduler.
-            static Scheduler& createInstance();
-            
-            //! @brief Retrieves the instance created with createInstance.
-            //! @details Fails if createInstance was not called previously.
-            static Scheduler& use();
-            
-            //! @brief Destroys the instance previously created.
-            //! @details Call this method once caller is done using the scheduler.
-            static void deleteInstance();
-            
-            //! @brief Adds a consumer thread to the scheduler.
-            //! @details Does nothing if the consumer was already registered. Dynamicaly registering consumers
-            //! is not thread safe and shall be done during initialization before launching threads.
-            void registerConsumer(thread_token consumer);
-            
-            //! @brief Adds a producer to the scheduler.
-            //! @details Does nothing if the pair consumer/producer already existed. Will register consumer
-            //! if not already registered. Creates a monoproducer, monoconsumer queue for the designated
-            //! pair of thread. Registering consumers is not thread safe and shall be done
-            //! during initialization before launching threads.
-            void registerProducer(thread_token producer, thread_token consumer);
-            
-            //! @brief Delays execution of a task.
-            //! @details Calling twice this method with same task will cancel the previous scheduled execution
-            //! and add a new one at specified time. Ownership of task is not transfer to the scheduler.
-            //! One can either delete task at execution time or delete the task once done using it.
-            void schedule(Task * task, duration_t delay = std::chrono::milliseconds(0));
-            
-            //! @brief Used to cancel the execution of a previously scheduled task.
-            //! @details If the task is currently being processed by the scheduler, this method does't
-            //! wait for the execution to finish but only guarantee that further execution  will no occur.
-            void unschedule(Task * task);
-            
-            //! @brief Processes events of the consumer that have reached exeuction time.
-            void process(thread_token consumer);
-            
-        private: // methods
-            
             //! @brief Constructor
+            //! @details Sets current thread as the consumer thread.
             Scheduler();
             
             //! @brief Desctructor.
             ~Scheduler();
             
+            //! @brief Sets the current thread as the consumer thread.
+            //! @details This method can be called for instance if the scheduler's constructor
+            //! is called on another thread than desired consumer.
+            void setThreadAsConsumer();
+            
+            //! @brief Check wehter or not this thread is the consumer.
+            //! @details This method can be usefull to help decide if a direct call can be made
+            //! or if the scheduler shall be used.
+            bool isThisConsumerThread() const;
+            
+            //! @brief Delays execution of a task. Shared ownership.
+            //! @details Calling twice this method with same task will cancel the previous scheduled execution
+            //! and add a new one at specified time.
+            void schedule(std::shared_ptr<Task> const& task, duration_t delay = std::chrono::milliseconds(0));
+            
+            //! @brief Delays execution of a task. Transfer ownership.
+            //! @details Calling twice this method with same task will cancel the previous scheduled execution
+            //! and add a new one at specified time.
+            void schedule(std::shared_ptr<Task> && task, duration_t delay = std::chrono::milliseconds(0));
+            
+            //! @brief Delays execution of a function by the sceduler.
+            //! @details Internally create a callback that will be executed and destroyed by the scheduler.
+            void schedule(std::function<void(void)> && func, duration_t delay = std::chrono::milliseconds(0));
+            
+            //! @brief Used to cancel the execution of a previously scheduled task.
+            //! @details If the task is currently being processed by the scheduler, this method does't
+            //! wait for the execution to finish but only guarantee that further execution  will no occur.
+            void unschedule(std::shared_ptr<Task> const& task);
+            
+            //! @brief Processes events of the consumer that have reached exeuction time.
+            void process();
+            
+            //! @brief Lock the process until the returned lock is out of scope.
+            std::unique_lock<std::mutex> lock() const;
+            
         private: // members
             
-            std::map<thread_token, std::map<thread_token, Queue>>   m_queues;
-            
-        private: // static members
-            
-            static Scheduler* m_instance;
+            Queue               m_queue;
+            mutable std::mutex  m_mutex;
+            std::thread::id     m_consumer_id;
             
         private: // deleted methods
             
@@ -138,7 +133,7 @@ namespace kiwi
         
         //! @brief A class that holds a list of scheduled events.
         //! @details Implementation countains a list of events sorted by execution time that is updated
-        //! before processing using commands. A queue is created for each pair of producer/consumer.
+        //! before processing using commands. A queue is created for each consumer.
         template <class Clock>
         class Scheduler<Clock>::Queue final
         {
@@ -146,7 +141,7 @@ namespace kiwi
             
             struct Command
             {
-                std::shared_ptr<Event>  m_event;
+                std::shared_ptr<Task>   m_task;
                 time_point_t            m_time;
             };
             
@@ -158,11 +153,14 @@ namespace kiwi
             //! @brief Destructor
             ~Queue();
             
-            //! @brief Delays the execution of a task.
-            void schedule(Task * task, duration_t delay);
+            //! @brief Delays the execution of a task. Shared ownership.
+            void schedule(std::shared_ptr<Task> const& task, duration_t delay);
+            
+            //! @brief Delays the execution of a task. Transfer ownership.
+            void schedule(std::shared_ptr<Task> && task, duration_t delay);
             
             //! @brief Cancels the execution of a task.
-            void unschedule(Task * task);
+            void unschedule(std::shared_ptr<Task> const& task);
             
             //! @brief Processes all events that have reached execution time.
             void process(time_point_t process_time);
@@ -170,16 +168,15 @@ namespace kiwi
         private: // methods
             
             //! @internal
-            void insert(std::shared_ptr<Event> event);
+            void emplace(Event && event);
             
             //! @internal
-            void remove(std::shared_ptr<Event> const& event);
+            void remove(Event const& event);
             
         private: // members
             
-            std::vector<std::shared_ptr<Event>> m_events;
-            ConcurrentQueue<Command>            m_commands;
-            mutable std::mutex                  m_mutex;
+            std::vector<Event>          m_events;
+            ConcurrentQueue<Command>    m_commands;
             
         private: // friend classes
             
@@ -205,8 +202,8 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            //! @details A certain task is designed to be scheduled on only one pair of producer/consumer.
-            Task(thread_token producer, thread_token consumer);
+            //! @details A certain task is designed to be scheduled on only one consumer.
+            Task();
             
             //! @brief Destructor.
             //! @details It is not safe to destroy a task from another thread than the consumer because it can be
@@ -220,12 +217,6 @@ namespace kiwi
             //! is reached.
             virtual void execute() = 0;
             
-        private: // methods
-            
-            thread_token            m_producer;
-            thread_token            m_consumer;
-            std::shared_ptr<Event>  m_event;
-            
         private: // friends
             
             friend class Scheduler;
@@ -237,6 +228,40 @@ namespace kiwi
             Task& operator=(Task const& other) = delete;
             Task& operator=(Task && other) = delete;
         };
+        
+        // ==================================================================================== //
+        //                                       CALLBACK                                       //
+        // ==================================================================================== //
+        
+        //! @brief The scheduler's callback is a task that uses an std::function for
+        //! conveniency.
+        template<class Clock>
+        class Scheduler<Clock>::CallBack : public Scheduler<Clock>::Task
+        {
+        public: // methods
+            
+            //! @brief Constructor, initializes function.
+            CallBack(std::function<void(void)> func);
+            
+            //! @brief Destructor.
+            ~CallBack();
+            
+            //! @brief Executes the given functions.
+            void execute() override final;
+            
+        private: // members
+            
+            std::function<void(void)> m_func;
+            
+        private: // deleted methods
+            
+            CallBack() = delete;
+            CallBack(CallBack const& other) = delete;
+            CallBack(CallBack && other) = delete;
+            CallBack& operator=(CallBack const& other) = delete;
+            CallBack& operator=(CallBack && other) = delete;
+        };
+        
         
         // ==================================================================================== //
         //                                       TIMER                                          //
@@ -254,8 +279,8 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            //! @details A timer can only be created for a certain pair of producer/consumer.
-            Timer(thread_token producer_token, thread_token consumer_token);
+            //! @details A timer can only be created for a certain consumer.
+            Timer(Scheduler & scheduler);
             
             //! @brief Destructor.
             //! @details It is not safe to destroy a timer in another thread than the consumer. If intended
@@ -281,7 +306,8 @@ namespace kiwi
             
         private: // members
             
-            std::unique_ptr<Task>   m_task;
+            Scheduler &             m_scheduler;
+            std::shared_ptr<Task>   m_task;
             duration_t              m_period;
             
         private: // deleted methods
@@ -291,37 +317,6 @@ namespace kiwi
             Timer(Timer && other) = delete;
             Timer& operator=(Timer const& other) = delete;
             Timer& operator=(Timer && other) = delete;
-        };
-        
-        // ==================================================================================== //
-        //                                       LOCK                                           //
-        // ==================================================================================== //
-        
-        //! @brief This class is intended to lock the execution of a certain consumer.
-        //! @details Beware that critical sections shall not take long since it blocks a certain thread
-        //! from processing events.
-        template<class Clock>
-        class Scheduler<Clock>::Lock final
-        {
-        public: // methods
-            
-            //! @brief Constructor.
-            Lock(thread_token consumer);
-            
-            //! @brief Destructor.
-            ~Lock();
-            
-        private: // members
-            
-            thread_token m_consumer;
-            
-        private: // deleted methods
-            
-            Lock() = delete;
-            Lock(Lock const& other) = delete;
-            Lock(Lock && other) = delete;
-            Lock& operator=(Lock const& other) = delete;
-            Lock& operator=(Lock && other) = delete;
         };
         
         // ==================================================================================== //
@@ -335,13 +330,16 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            Event(Task * task, time_point_t time);
+            Event(std::shared_ptr<Task> && task, time_point_t time);
+            
+            //! @brief Moove constructor
+            Event(Event && other);
+            
+            //! @brief Moove assignment operator.
+            Event& operator=(Event && other);
             
             //! @brief Destructor.
             ~Event();
-            
-            //! @brief Equality operator.
-            bool operator==(Event const& other) const;
             
             //! @brief Called by the scheduler to execute a the task.
             void execute();
@@ -352,15 +350,13 @@ namespace kiwi
             
         private: // members
             
-            Task *                      m_task;
+            std::shared_ptr<Task>       m_task;
             time_point_t                m_time;
             
         private: // deleted methods
             
             Event() = delete;
             Event(Event const& other) = delete;
-            Event(Event && other) = delete;;
-            Event& operator=(Event && other);
             Event& operator=(Event const& other) = delete;
         };
     }

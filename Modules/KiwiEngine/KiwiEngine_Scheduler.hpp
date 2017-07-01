@@ -31,12 +31,11 @@ namespace kiwi
         //                                       SCHEDULER                                      //
         // ==================================================================================== //
         
-        template <class Clock>
-        Scheduler<Clock>* Scheduler<Clock>::m_instance = nullptr;
-        
         template<class Clock>
         Scheduler<Clock>::Scheduler():
-        m_queues()
+        m_queue(),
+        m_mutex(),
+        m_consumer_id(std::this_thread::get_id())
         {
         }
         
@@ -46,74 +45,71 @@ namespace kiwi
         }
         
         template<class Clock>
-        Scheduler<Clock>& Scheduler<Clock>::createInstance()
+        void Scheduler<Clock>::setThreadAsConsumer()
         {
-            if (m_instance == nullptr)
-            {
-                m_instance = new Scheduler();
-            }
-            
-            return *m_instance;
+            m_consumer_id = std::this_thread::get_id();
         }
         
         template<class Clock>
-        Scheduler<Clock>& Scheduler<Clock>::use()
+        bool Scheduler<Clock>::isThisConsumerThread() const
         {
-            assert(m_instance != nullptr);
-            return *m_instance;
-        }
-        
-        template<class Clock>
-        void Scheduler<Clock>::deleteInstance()
-        {
-            assert(m_instance != nullptr);
-            delete m_instance;
-        }
-        
-        template<class Clock>
-        void Scheduler<Clock>::registerConsumer(thread_token consumer)
-        {
-            m_queues[consumer];
-        }
-        
-        template<class Clock>
-        void Scheduler<Clock>::registerProducer(thread_token producer, thread_token consumer)
-        {
-            m_queues[consumer][producer];
+            return m_consumer_id == std::this_thread::get_id();
         }
 
         template<class Clock>
-        void Scheduler<Clock>::schedule(Task * task, duration_t delay)
-        {
-            m_queues[task->m_consumer][task->m_producer].schedule(task, delay);
-        }
-
-        template<class Clock>
-        void Scheduler<Clock>::unschedule(Task * task)
+        void Scheduler<Clock>::schedule(std::shared_ptr<Task> const& task, duration_t delay)
         {
             assert(task);
-            m_queues[task->m_consumer][task->m_producer].unschedule(task);
+            m_queue.schedule(task, delay);
         }
         
         template<class Clock>
-        void Scheduler<Clock>::process(thread_token consumer)
+        void Scheduler<Clock>::schedule(std::shared_ptr<Task> && task, duration_t delay)
         {
-            assert(m_queues.find(consumer) != m_queues.end());
+            assert(task);
+            m_queue.schedule(std::move(task), delay);
+        }
+        
+        template<class Clock>
+        void Scheduler<Clock>::schedule(std::function<void(void)> && func, duration_t delay)
+        {
+            schedule(std::shared_ptr<Task>(new CallBack(func)));
+        }
+
+        template<class Clock>
+        void Scheduler<Clock>::unschedule(std::shared_ptr<Task> const& task)
+        {
+            assert(task);
+            m_queue.unschedule(task);
+        }
+        
+        template<class Clock>
+        void Scheduler<Clock>::process()
+        {
+            assert(std::this_thread::get_id() == m_consumer_id);
+            
+            std::lock_guard<std::mutex> lock(m_mutex);
             
             time_point_t process_time = clock_t::now();
             
-            for(auto& queue : m_queues[consumer])
-            {
-                queue.second.process(process_time);
-            }
+            m_queue.process(process_time);
+        }
+        
+        template<class Clock>
+        std::unique_lock<std::mutex> Scheduler<Clock>::lock() const
+        {
+            std::unique_lock<std::mutex> head_lock(m_mutex);
+            
+            return std::move(head_lock);
         }
         
         // ==================================================================================== //
-        //                                       Queue                                          //
+        //                                       QUEUE                                          //
         // ==================================================================================== //
         
         template<class Clock>
         Scheduler<Clock>::Queue::Queue():
+        m_events(),
         m_commands(1024)
         {
         }
@@ -124,29 +120,37 @@ namespace kiwi
         }
         
         template<class Clock>
-        void Scheduler<Clock>::Queue::schedule(Task * task, duration_t delay)
+        void Scheduler<Clock>::Queue::schedule(std::shared_ptr<Task> const& task, duration_t delay)
         {
-            m_commands.push({task->m_event, clock_t::now() + delay });
+            assert(task);
+            m_commands.push({task, clock_t::now() + delay });
         }
         
         template<class Clock>
-        void Scheduler<Clock>::Queue::unschedule(Task * task)
+        void Scheduler<Clock>::Queue::schedule(std::shared_ptr<Task> && task, duration_t delay)
         {
-            m_commands.push({task->m_event, clock_t::time_point::max()});
+            assert(task);
+            m_commands.push({std::move(task), clock_t::now() + delay});
         }
         
         template<class Clock>
-        void Scheduler<Clock>::Queue::remove(std::shared_ptr<Event> const& event)
+        void Scheduler<Clock>::Queue::unschedule(std::shared_ptr<Task> const& task)
         {
-            m_events.erase(std::remove_if(m_events.begin(), m_events.end(), [&event](auto& e) {
+            m_commands.push({task, clock_t::time_point::max()});
+        }
+        
+        template<class Clock>
+        void Scheduler<Clock>::Queue::remove(Event const& event)
+        {
+            m_events.erase(std::remove_if(m_events.begin(), m_events.end(), [&event](Event const& e) {
                 
-                return e == event;
+                return e.m_task == event.m_task;
                 
             }), m_events.end());
         }
     
         template<class Clock>
-        void Scheduler<Clock>::Queue::insert(std::shared_ptr<Event> event)
+        void Scheduler<Clock>::Queue::emplace(Event && event)
         {
             remove(event);
             
@@ -154,7 +158,7 @@ namespace kiwi
             
             while(event_it != m_events.end())
             {
-                if (event->m_time < (*event_it)->m_time)
+                if (event.m_time < event_it->m_time)
                 {
                     m_events.insert(event_it, std::move(event));
                     break;
@@ -172,8 +176,6 @@ namespace kiwi
         template<class Clock>
         void Scheduler<Clock>::Queue::process(time_point_t process_time)
         {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            
             size_t command_size = m_commands.load_size();
             
             for (size_t i = 0; i < command_size; ++i)
@@ -182,23 +184,24 @@ namespace kiwi
                 
                 if (m_commands.pop(command))
                 {
-                    if (command.m_time != clock_t::time_point::max())
+                    Event event(std::move(command.m_task), command.m_time);
+                    
+                    if (event.m_time != clock_t::time_point::max())
                     {
-                        command.m_event->m_time = command.m_time;
-                        insert(std::move(command.m_event));
+                        emplace(std::move(event));
                     }
                     else
                     {
-                        remove(command.m_event);
+                        remove(event);
                     }
                 }
             }
             
             m_events.erase(std::remove_if(m_events.begin(), m_events.end(), [&process_time](auto& event) {
                 
-                if (event->m_time <= process_time)
+                if (event.m_time <= process_time)
                 {
-                    event->execute();
+                    event.execute();
                     return true;
                 }
                 
@@ -212,21 +215,35 @@ namespace kiwi
         // ==================================================================================== //
         
         template<class Clock>
-        Scheduler<Clock>::Task::Task(thread_token producer, thread_token consumer):
-        m_producer(producer),
-        m_consumer(consumer),
-        m_event(new Event(this, time_point_t::max()))
+        Scheduler<Clock>::Task::Task()
         {
-            Scheduler& scheduler = Scheduler::use();
-            
-            assert(scheduler.m_queues.find(consumer) != scheduler.m_queues.end() &&
-                   scheduler.m_queues[consumer].find(producer) != scheduler.m_queues[consumer].end());
         }
         
         template<class Clock>
         Scheduler<Clock>::Task::~Task()
         {
-            m_event->m_task = nullptr;
+        }
+        
+        // ==================================================================================== //
+        //                                      CALLBACK                                        //
+        // ==================================================================================== //
+        
+        template<class Clock>
+        Scheduler<Clock>::CallBack::CallBack(std::function<void(void)> func):
+        Task(),
+        m_func(func)
+        {
+        }
+        
+        template<class Clock>
+        Scheduler<Clock>::CallBack::~CallBack()
+        {
+        }
+        
+        template<class Clock>
+        void Scheduler<Clock>::CallBack::execute()
+        {
+            m_func();
         }
         
         // ==================================================================================== //
@@ -238,8 +255,7 @@ namespace kiwi
         {
         public: // methods
             
-            Task(Timer& timer, thread_token producer, thread_token consumer):
-            Scheduler<Clock>::Task(producer, consumer),
+            Task(Timer& timer):
             m_timer(timer)
             {
             }
@@ -256,13 +272,14 @@ namespace kiwi
         private: // members
             
             Timer&          m_timer;
-            duration_t      m_period;
             
         };
         
         template<class Clock>
-        Scheduler<Clock>::Timer::Timer(thread_token producer, thread_token consumer):
-        m_task(new Task(*this, producer, consumer))
+        Scheduler<Clock>::Timer::Timer(Scheduler & scheduler):
+        m_scheduler(scheduler),
+        m_task(new Task(*this)),
+        m_period()
         {
         }
         
@@ -278,7 +295,8 @@ namespace kiwi
             stopTimer();
             
             m_period = period;
-            Scheduler::use().schedule(m_task.get(), m_period);
+            
+            m_scheduler.schedule(m_task, m_period);
         }
         
         template<class Clock>
@@ -286,40 +304,13 @@ namespace kiwi
         {
             timerCallBack();
             
-            Scheduler::use().schedule(m_task.get(), m_period);
+            m_scheduler.schedule(m_task, m_period);
         }
         
         template<class Clock>
         void Scheduler<Clock>::Timer::stopTimer()
         {
-            Scheduler::use().unschedule(m_task.get());
-        }
-        
-        // ==================================================================================== //
-        //                                       LOCK                                           //
-        // ==================================================================================== //
-        
-        template<class Clock>
-        Scheduler<Clock>::Lock::Lock(thread_token consumer):
-        m_consumer(consumer)
-        {
-            Scheduler& scheduler = Scheduler::use();
-            
-            for (auto & queue : scheduler.m_queues[m_consumer])
-            {
-                queue.second.m_mutex.lock();
-            }
-        }
-        
-        template<class Clock>
-        Scheduler<Clock>::Lock::~Lock()
-        {
-            Scheduler& scheduler = Scheduler::use();
-            
-            for (auto & queue : scheduler.m_queues[m_consumer])
-            {
-                queue.second.m_mutex.unlock();
-            }
+            m_scheduler.unschedule(m_task);
         }
         
         // ==================================================================================== //
@@ -327,28 +318,32 @@ namespace kiwi
         // ==================================================================================== //
         
         template<class Clock>
-        Scheduler<Clock>::Event::Event(Task * task, time_point_t time):
-        m_task(task),
+        Scheduler<Clock>::Event::Event(std::shared_ptr<Task> && task, time_point_t time):
+        m_task(std::move(task)),
         m_time(time)
         {
         }
         
         template<class Clock>
-        Scheduler<Clock>::Event::~Event()
+        Scheduler<Clock>::Event::Event(Event && other):
+        m_task(std::move(other.m_task)),
+        m_time(std::move(other.m_time))
         {
         }
         
         template<class Clock>
-        bool Scheduler<Clock>::Event::operator==(Event const& other) const
+        typename Scheduler<Clock>::Event& Scheduler<Clock>::Event::operator=(Event && other)
         {
-            if (this != &other)
-            {
-                return m_task == other.m_task;
-            }
-            else
-            {
-                return true;
-            }
+            m_task = std::move(other.m_task);
+            m_time = std::move(other.m_time);
+            
+            return *this;
+        }
+        
+        
+        template<class Clock>
+        Scheduler<Clock>::Event::~Event()
+        {
         }
         
         template<class Clock>
