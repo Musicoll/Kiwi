@@ -105,7 +105,8 @@ if (WIN32)
 
 elseif(APPLE)
 
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-warning-option -Wno-pessimizing-move -Wno-overloaded-virtual -Wnounused-function")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-warning-option -Wno-pessimizing-move
+                                            -Wno-overloaded-virtual -Wnounused-function -Wno-unused-local-typedefs")
 
     if (DEBUG)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
@@ -290,6 +291,35 @@ endif()
 set(FLIP_COMPILE_DEFINITIONS "flip_NOTHING=flip_NOTHING_FATAL")
 
 #----------------------------------
+# Beast
+#----------------------------------
+
+set(Boost_INCLUDE_DIR $ENV{KIWI_BOOST_INCLUDE})
+
+if (WIN32)
+    if (CMAKE_CL_64)
+        set(Boost_LIBRARY_DIR $ENV{KIWI_BOOST_LIB_x64})
+    else()
+        set(Boost_LIBRARY_DIR $ENV{KIWI_BOOST_LIB_WIN32})
+    endif()
+else()
+    set(Boost_LIBRARY_DIR $ENV{KIWI_BOOST_LIB})
+    set(Boost_NO_BOOST_CMAKE true)
+    set(Boost_NO_SYSTEM_PATHS true)
+endif()
+
+option (Boost_USE_STATIC_LIBS "Use static libraries for boost" ON)
+find_package (Boost 1.63.0 REQUIRED COMPONENTS system)
+
+if (Boost_FOUND)
+    message(STATUS "Boost found on system")
+    message(STATUS "Boost_LIBRARIES : " ${Boost_LIBRARIES})
+    message(STATUS "BOOST_INCLUDE_DIRECTORES : " ${Boost_INCLUDE_DIRS})
+else()
+    message(FATAL_ERROR "Boost not found on system")
+endif()
+
+#----------------------------------
 # Cpr
 #----------------------------------
 
@@ -364,6 +394,28 @@ target_compile_definitions(KiwiDsp PUBLIC -DKIWI_DSP_FLOAT=1)
 target_include_directories(KiwiDsp PUBLIC ${ROOT_DIR}/Modules)
 set_target_properties(KiwiDsp PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_DSP_SRC}" ${ROOT_DIR}/Modules/KiwiDsp)
+
+#----------------------------------
+# Network
+#----------------------------------
+
+file(GLOB_RECURSE KIWI_NETWORK_SRC ${ROOT_DIR}/Modules/KiwiNetwork/*.[c|h]pp
+                                   ${ROOT_DIR}/Modules/KiwiNetwork/*.h)
+add_library(KiwiNetwork STATIC ${KIWI_NETWORK_SRC})
+target_include_directories(KiwiNetwork PUBLIC ${ROOT_DIR}/Modules
+                                              ${ROOT_DIR}/ThirdParty/Beast/include
+                                              ${Boost_INCLUDE_DIRS})
+target_compile_definitions(KiwiNetwork PUBLIC "-DBOOST_ALL_NO_LIB=1")
+set(NETWORK_DEP ${Boost_LIBRARIES})
+if (WIN32)
+    set(NETWORK_DEP ${NETWORK_DEP} ${WS2_32})
+elseif(LINUX)
+    set(NETWORK_DEP ${NETWORK_DEP} ${PTHREAD})
+endif()
+target_link_libraries(KiwiNetwork PUBLIC ${NETWORK_DEP})
+set_target_properties(KiwiNetwork PROPERTIES FOLDER Modules)
+source_group_rec("${KIWI_NETWORK_SRC}" ${ROOT_DIR}/Modules/KiwiNetwork)
+
 
 #----------------------------------
 # Engine
@@ -455,6 +507,15 @@ target_add_dependency(test_model KiwiModel)
 set_target_properties(test_model PROPERTIES FOLDER Test)
 source_group_rec("${TEST_MODEL_SRC}" ${ROOT_DIR}/Test/Model)
 
+# Test Network
+
+file(GLOB TEST_NETWORK_SRC ${ROOT_DIR}/Test/Network/*.[c|h]pp
+                           ${ROOT_DIR}/Test/Network/*.h)
+add_executable(test_network ${TEST_NETWORK_SRC})
+target_add_dependency(test_network KiwiNetwork)
+set_target_properties(test_network PROPERTIES FOLDER Test)
+source_group_rec("${TEST_NETWORK_SRC}" ${ROOT_DIR}/Test/Network)
+
 # Test Engine
 
 file(GLOB TEST_ENGINE_SRC ${ROOT_DIR}/Test/Engine/*.[c|h]pp
@@ -488,11 +549,12 @@ if(${GCOV_SUPPORT} STREQUAL "On" AND DEBUG)
   target_link_libraries(test_model PUBLIC gcov)
   target_link_libraries(test_engine PUBLIC gcov)
   target_link_libraries(test_server PUBLIC gcov)
+  target_link_libraries(test_network PUBLIC gcov)
 endif()
 
 # Tests Target
 
-add_custom_target(Tests ALL DEPENDS test_dsp test_model test_engine)
+add_custom_target(Tests ALL DEPENDS test_dsp test_model test_engine test_network)
 set_target_properties(Tests PROPERTIES FOLDER Test)
 
 add_custom_command(TARGET Tests
@@ -500,4 +562,5 @@ add_custom_command(TARGET Tests
                               COMMAND test_model
                               COMMAND test_engine
                               COMMAND test_server
+                              COMMAND test_network
                    USES_TERMINAL)
