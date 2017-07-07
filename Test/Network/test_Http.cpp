@@ -43,11 +43,38 @@ TEST_CASE("Network - Http", "[Network, Http]")
         request.set(beast::http::field::host, "httpbin.org");
         request.set(beast::http::field::user_agent, "test");
         
-        beast::http::response<beast::http::dynamic_body> response;
+        beast::http::response<beast::http::string_body> response;
+        
+        beast::error_code error;
         
         // Send request and waits for response.
-        kiwi::network::httpWrite(request, response);
+        kiwi::network::httpWrite(request, response, "80", error);
         
         CHECK(response.result() == beast::http::status::ok);
+        CHECK(!error);
+    }
+    
+    SECTION("Client asynchronous get request to echo server")
+    {
+        // Construct request and response.
+        beast::http::request<beast::http::string_body> request;
+        request.method(beast::http::verb::get);
+        request.target("/get");
+        request.version = 11;
+        request.set(beast::http::field::host, "httpbin.org");
+        request.set(beast::http::field::user_agent, "test");
+        
+        std::function<void(beast::http::response<beast::http::dynamic_body> const& response,
+                           beast::error_code const& error)>
+        callback = [](beast::http::response<beast::http::dynamic_body> const& response,
+                           beast::error_code const& error)
+        {
+            CHECK(response.result() == beast::http::status::ok);
+            CHECK(!error);
+        };
+        
+        std::future<void> future = kiwi::network::httpWriteAsync(std::move(request), "80", callback);
+        
+        future.get();
     }
 }

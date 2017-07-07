@@ -320,51 +320,6 @@ else()
 endif()
 
 #----------------------------------
-# Cpr
-#----------------------------------
-
-# Cpr settings
-
-set(CMAKE_USE_OPENSSL OFF CACHE BOOL "Don't use openssl")
-set(BUILD_CPR_TESTS OFF CACHE BOOL "Don't build cpr tests")
-
-if(WIN32)
-    if (CMAKE_CL_64)
-        set(KIWI_CURL_LIB $ENV{KIWI_CURL_LIB_x64})
-        set(KIWI_CURL_INCLUDE $ENV{KIWI_CURL_INCLUDE_x64})
-    else()
-        set(KIWI_CURL_LIB $ENV{KIWI_CURL_LIB_WIN32})
-        set(KIWI_CURL_INCLUDE $ENV{KIWI_CURL_INCLUDE_WIN32})
-    endif()
-else()
-    set(KIWI_CURL_LIB $ENV{KIWI_CURL_LIB})
-    set(KIWI_CURL_INCLUDE $ENV{KIWI_CURL_INCLUDE})
-endif()
-
-message(STATUS "Searching curl library")
-message(STATUS "Library search path is : " ${KIWI_CURL_LIB})
-message(STATUS "Include search path is : " ${KIWI_CURL_INCLUDE})
-
-find_library(CURL_LIBRARIES NAMES curl PATHS ${KIWI_CURL_LIB} NO_DEFAULT_PATH)
-find_path(CURL_INCLUDE_DIRS NAMES curl PATHS ${KIWI_CURL_INCLUDE} NO_DEFAULT_PATH)
-
-if (CURL_LIBRARIES AND CURL_INCLUDE_DIRS)
-    set(USE_SYSTEM_CURL ON CACHE BOOL "Use system curl")
-    set(CURL_FOUND TRUE CACHE BOOL "Curl found")
-    set(CMAKE_DISABLE_FIND_PACKAGE_CURL TRUE CACHE BOOL "Disactivate find package curl")
-    message(STATUS "Libcurl found on system")
-    message(STATUS "CURL_LIBRARIES : " ${CURL_LIBRARIES})
-    message(STATUS "CURL_INCLUDE_DIRS : " ${CURL_INCLUDE_DIRS})
-else()
-    message(FATAL_ERROR "Curl was not found on system, check Readme.md for instructions on how to set searh path")
-endif()
-
-add_subdirectory(ThirdParty/cpr)
-set_target_properties(${CPR_LIBRARIES} PROPERTIES FOLDER ThirdParty)
-set_target_properties(${CPR_LIBRARIES} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-target_compile_definitions(${CPR_LIBRARIES} PUBLIC -DCURL_STATICLIB=1)
-
-#----------------------------------
 # Json
 #----------------------------------
 
@@ -457,11 +412,11 @@ source_group_rec("${SERVER_SRC}" ${ROOT_DIR}/Server/Source)
 file(GLOB_RECURSE KIWI_CLIENT_SRC ${ROOT_DIR}/Client/Source/*.[c|h]pp
                                   ${ROOT_DIR}/Client/Source/*.h)
 add_executable(Kiwi ${KIWI_CLIENT_SRC} "${KIWI_CLIENT_RESSOURCES}")
+target_add_dependency(Kiwi KiwiNetwork)
 target_add_dependency(Kiwi KiwiEngine)
 target_add_dependency(Kiwi KiwiModel)
 target_add_dependency(Kiwi KiwiDsp)
 target_add_dependency(Kiwi Juce)
-target_add_dependency(Kiwi ${CPR_LIBRARIES})
 target_include_directories(Kiwi PUBLIC ${JSON_INCLUDE_DIRS} ${CPR_INCLUDE_DIRS})
 
 if (APPLE)

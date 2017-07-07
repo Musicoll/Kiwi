@@ -197,11 +197,11 @@ namespace kiwi
     
     void DocumentBrowser::Drive::createNewDocument()
     {
-        m_api.createDocument([this](Api::Response res, Api::Document document) {
+        m_api.createDocument([this](Api::Response const& res, Api::Error const& error, Api::Document document) {
             
-            if(res.error)
+            if(error)
             {
-                juce::MessageManager::callAsync([message = res.error.message](){
+                juce::MessageManager::callAsync([message = error.message()](){
                     KiwiApp::error("Error: can't create document");
                     KiwiApp::error("=> " + message);
                 });
@@ -311,11 +311,11 @@ namespace kiwi
     
     void DocumentBrowser::Drive::refresh()
     {
-        m_api.getDocuments([this](Api::Response res, Api::Documents docs) {
+        m_api.getDocuments([this](Api::Response const& res, Api::Error const& error, Api::Documents docs) {
             
-            if(res.error)
+            if(error)
             {
-                 KiwiApp::error("Kiwi API error: can't get documents => " + res.error.message);
+                 KiwiApp::error("Kiwi API error: can't get documents => " + error.message());
             }
             else
             {
@@ -376,15 +376,15 @@ namespace kiwi
             return;
         }
         
-        m_drive.useApi().renameDocument([](Api::Response res) {
+        m_drive.useApi().renameDocument([](Api::Response const& res, Api::Error const& error) {
             
-            if(!res.error)
+            if(!error)
             {
                 std::cout << "document successfully updated" << '\n';
             }
             else
             {
-                std::cout << "document update failed, err: " + res.error.message << '\n';
+                std::cout << "document update failed, err: " + error.message() << '\n';
             }
             
         }, m_document._id, new_name);

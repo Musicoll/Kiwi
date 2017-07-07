@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <cpr/cpr.h>
+#include <KiwiNetwork/KiwiNetwork_Http.h>
 
 #include <json.hpp>
 using nlohmann::json;
@@ -53,19 +53,17 @@ namespace kiwi
         
         class User;
         
-        using Response = cpr::Response;
+        using Response = beast::http::response<beast::http::string_body>;
+        
+        using Request = beast::http::request<beast::http::string_body>;
+        
+        using Error = beast::error_code;
         
         //! @brief Constructor
         Api(std::string const& host, uint16_t port = 80, Protocol protocol = Api::Protocol::HTTP);
         
         //! @brief Destructor
         ~Api();
-        
-        //! @brief Get the API protocol as a string.
-        std::string getProtocolStr() const;
-        
-        //! @brief Get the API root URL
-        std::string getApiRootUrl() const;
         
         //! @brief Set the API host.
         void setHost(std::string const& host);
@@ -80,16 +78,16 @@ namespace kiwi
         uint16_t getPort() const noexcept;
         
         //! @brief Make an async API request to get a list of documents
-        void getDocuments(std::function<void(Api::Response res, Api::Documents)> callback);
+        void getDocuments(std::function<void(Api::Response const&, Api::Error const&, Api::Documents)> callback);
         
         //! @brief Make an async API request to create a new document
         //! @param callback
-        void createDocument(std::function<void(Api::Response res, Api::Document)> callback,
+        void createDocument(std::function<void(Api::Response const&, Api::Error const&, Api::Document)> callback,
                             std::string const& document_name = "");
         
         //! @brief Rename a document asynchronously.
         //! @param callback The callback method that will be called when the request is completed.
-        void renameDocument(std::function<void(Api::Response res)> callback,
+        void renameDocument(std::function<void(Api::Response const& res, Api::Error const& error)> callback,
                             std::string document_id, std::string const& new_name);
     
     private: // methods
