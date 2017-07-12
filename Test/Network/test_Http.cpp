@@ -36,19 +36,21 @@ TEST_CASE("Network - Http", "[Network, Http]")
     SECTION("Client get request to echo server")
     {
         // Construct request and response.
-        beast::http::request<beast::http::string_body> request;
-        request.method(beast::http::verb::get);
-        request.target("/get");
-        request.version = 11;
-        request.set(beast::http::field::host, "httpbin.org");
-        request.set(beast::http::field::user_agent, "test");
+        std::unique_ptr<beast::http::request<beast::http::string_body>>
+                request(new beast::http::request<beast::http::string_body>());
+        request->method(beast::http::verb::get);
+        request->target("/get");
+        request->version = 11;
+        request->set(beast::http::field::host, "httpbin.org");
+        request->set(beast::http::field::user_agent, "test");
         
-        beast::http::response<beast::http::string_body> response;
+        request->prepare_payload();
         
         beast::error_code error;
         
         // Send request and waits for response.
-        kiwi::network::httpWrite(request, response, "80", error);
+        beast::http::response<beast::http::string_body> response =
+        kiwi::network::httpWrite<beast::http::string_body, beast::http::string_body>(std::move(request), "80", error);
         
         CHECK(response.result() == beast::http::status::ok);
         CHECK(!error);
@@ -57,12 +59,16 @@ TEST_CASE("Network - Http", "[Network, Http]")
     SECTION("Client asynchronous get request to echo server")
     {
         // Construct request and response.
-        beast::http::request<beast::http::string_body> request;
-        request.method(beast::http::verb::get);
-        request.target("/get");
-        request.version = 11;
-        request.set(beast::http::field::host, "httpbin.org");
-        request.set(beast::http::field::user_agent, "test");
+        std::unique_ptr<beast::http::request<beast::http::string_body>>
+        request(new beast::http::request<beast::http::string_body>());
+        
+        request->method(beast::http::verb::get);
+        request->target("/get");
+        request->version = 11;
+        request->set(beast::http::field::host, "httpbin.org");
+        request->set(beast::http::field::user_agent, "test");
+        
+        request->prepare_payload();
         
         std::function<void(beast::http::response<beast::http::dynamic_body> const& response,
                            beast::error_code const& error)>

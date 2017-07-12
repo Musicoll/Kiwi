@@ -116,29 +116,33 @@ namespace kiwi
             callback(res, error, {});
         };
         
-        Api::Request request;
-        request.set(beast::http::field::host, m_host);
-        request.method(beast::http::verb::get);
-        request.target("/api/documents");
-        request.version = 11;
+        std::unique_ptr<Api::Request> request(new Api::Request());
+        request->set(beast::http::field::host, m_host);
+        request->method(beast::http::verb::get);
+        request->target("/api/documents");
+        request->version = 11;
         
-        Api::Response response;
-        Api::Error error;
+        request->prepare_payload();
         
-        storeRequest(network::httpWriteAsync(request, std::to_string(m_port), res_callback, std::chrono::milliseconds(3000)));
+        storeRequest(network::httpWriteAsync(std::move(request),
+                                             std::to_string(m_port),
+                                             res_callback,
+                                             std::chrono::milliseconds(3000)));
     }
     
     void Api::createDocument(std::function<void(Api::Response const&, Api::Error const&, Document)> callback,
                              std::string const& document_name)
     {
-        Api::Request request;
-        request.set(beast::http::field::host, m_host);
-        request.set(beast::http::field::content_type, "application/x-www-form-urlencoded");
-        request.method(beast::http::verb::post);
-        request.target("/api/documents");
-        request.version = 11;
+        std::unique_ptr<Api::Request> request(new Api::Request());
+        request->set(beast::http::field::host, m_host);
+        request->set(beast::http::field::content_type, "application/x-www-form-urlencoded");
+        request->method(beast::http::verb::post);
+        request->target("/api/documents");
+        request->version = 11;
         
-        request.body = "name=" + document_name;
+        request->body = "name=" + document_name;
+        
+        request->prepare_payload();
         
         std::function<void(Api::Response const&, Api::Error const&)> res_callback =
         [callback = std::move(callback)](Api::Response const& res, Api::Error const& error)
@@ -160,7 +164,10 @@ namespace kiwi
             callback(std::move(res), error, {});
         };
         
-        storeRequest(network::httpWriteAsync(request, std::to_string(m_port), res_callback, std::chrono::milliseconds(3000)));
+        storeRequest(network::httpWriteAsync(std::move(request),
+                                             std::to_string(m_port),
+                                             res_callback,
+                                             std::chrono::milliseconds(3000)));
     }
     
     void Api::renameDocument(std::function<void(Api::Response const& res, Api::Error const& error)> callback,
@@ -168,16 +175,21 @@ namespace kiwi
     {
         assert(!new_name.empty() && "name should not be empty!");
         
-        Api::Request request;
-        request.set(beast::http::field::host, m_host);
-        request.set(beast::http::field::content_type, "application/x-www-form-urlencoded");
-        request.method(beast::http::verb::put);
-        request.target("/api/documents/" + document_id);
-        request.version = 11;
+        std::unique_ptr<Api::Request> request(new Api::Request());
+        request->set(beast::http::field::host, m_host);
+        request->set(beast::http::field::content_type, "application/x-www-form-urlencoded");
+        request->method(beast::http::verb::put);
+        request->target("/api/documents/" + document_id);
+        request->version = 11;
         
-        request.body = "name=" + new_name;
+        request->body = "name=" + new_name;
         
-        storeRequest(network::httpWriteAsync(request, std::to_string(m_port), callback, std::chrono::milliseconds(3000)));
+        request->prepare_payload();
+        
+        storeRequest(network::httpWriteAsync(std::move(request),
+                                             std::to_string(m_port),
+                                             callback,
+                                             std::chrono::milliseconds(3000)));
     }
     
     void Api::storeRequest(std::future<void> && future)
