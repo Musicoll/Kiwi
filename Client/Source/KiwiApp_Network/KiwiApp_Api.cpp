@@ -21,6 +21,8 @@
 
 #include "KiwiApp_Api.h"
 
+#include <KiwiNetwork/KiwiNetwork_Http.h>
+
 namespace kiwi
 {
     void to_json(json& j, Api::Document const& doc)
@@ -91,105 +93,103 @@ namespace kiwi
         return m_port;
     }
     
-    std::string Api::getProtocolStr() const
+    void Api::getDocuments(std::function<void(Api::Response const&, Api::Error const&, Api::Documents)> callback)
     {
-        return (m_protocol == Protocol::HTTP) ? "http" : "https";
-    }
-    
-    std::string Api::getApiRootUrl() const
-    {
-        std::string url{getProtocolStr() + "://" + m_host};
-        
-        if(m_port != 80)
+        std::function<void(Api::Response const&, Api::Error const&)> res_callback =
+        [callback = std::move(callback)](Api::Response const& res, Api::Error const& error)
         {
-            url += ':' + std::to_string(m_port);
-        }
-        
-        url += "/api";
-        
-        return url;
-    }
-    
-    void Api::getDocuments(std::function<void(Api::Response res, Api::Documents)> callback)
-    {
-        auto res_callback = [callback = std::move(callback)](Api::Response res) {
-
-            if(res.status_code == 200)
+            if (res.result() == beast::http::status::ok)
             {
                 if(hasJsonHeader(res))
                 {
-                    auto j = json::parse(res.text);
+                    auto j = json::parse(res.body);
                     
                     if(j.is_array())
                     {
                         // parse each json objects as document and store them in a vector.
-                        callback(std::move(res), j);
+                        callback(res, error, j);
                         return;
                     }
                 }
-                
-                res.error.code = cpr::ErrorCode::UNKNOWN_ERROR;
-                res.error.message = "Unable to parse response";
             }
             
-            callback(std::move(res), {});
+            callback(res, error, {});
         };
         
+        std::unique_ptr<Api::Request> request(new Api::Request());
+        request->set(beast::http::field::host, m_host);
+        request->method(beast::http::verb::get);
+        request->target("/api/documents");
+        request->version = 11;
         
-        storeRequest(cpr::GetCallback(std::move(res_callback),
-                                      getApiRootUrl() + "/documents",
-                                      cpr::Timeout{3000}));
+        request->prepare_payload();
+        
+        storeRequest(network::httpWriteAsync(std::move(request),
+                                             std::to_string(m_port),
+                                             res_callback,
+                                             std::chrono::milliseconds(3000)));
     }
     
-    void Api::createDocument(std::function<void(Api::Response, Document)> callback,
+    void Api::createDocument(std::function<void(Api::Response const&, Api::Error const&, Document)> callback,
                              std::string const& document_name)
     {
+        std::unique_ptr<Api::Request> request(new Api::Request());
+        request->set(beast::http::field::host, m_host);
+        request->set(beast::http::field::content_type, "application/x-www-form-urlencoded");
+        request->method(beast::http::verb::post);
+        request->target("/api/documents");
+        request->version = 11;
         
-        cpr::Payload payload{{}};
+        request->body = "name=" + document_name;
         
-        if(!document_name.empty())
+        request->prepare_payload();
+        
+        std::function<void(Api::Response const&, Api::Error const&)> res_callback =
+        [callback = std::move(callback)](Api::Response const& res, Api::Error const& error)
         {
-            payload.AddPair({"name", document_name});
-        }
-        
-        auto res_callback = [callback = std::move(callback)](cpr::Response res) {
-            
-            if(res.status_code == 200)
+            if (res.result() == beast::http::status::ok)
             {
                 if(hasJsonHeader(res))
                 {
-                    auto j = json::parse(res.text);
+                    auto j = json::parse(res.body);
                     
                     if(j.is_object())
                     {
                         // parse object as a document
-                        callback(std::move(res), j);
-                        return;
+                        callback(std::move(res), error, j);
                     }
                 }
-                
-                res.error.code = cpr::ErrorCode::UNKNOWN_ERROR;
-                res.error.message = "Unable to parse response";
             }
             
-            callback(std::move(res), {});
+            callback(std::move(res), error, {});
         };
         
-        storeRequest(cpr::PostCallback(std::move(res_callback),
-                                       getApiRootUrl() + "/documents",
-                                       std::move(payload),
-                                       cpr::Timeout{3000}));
+        storeRequest(network::httpWriteAsync(std::move(request),
+                                             std::to_string(m_port),
+                                             res_callback,
+                                             std::chrono::milliseconds(3000)));
     }
     
-    void Api::renameDocument(std::function<void(Api::Response res)> callback,
+    void Api::renameDocument(std::function<void(Api::Response const& res, Api::Error const& error)> callback,
                              std::string document_id, std::string const& new_name)
     {
         assert(!new_name.empty() && "name should not be empty!");
         
-        storeRequest(cpr::PutCallback(callback,
-                                      getApiRootUrl() + "/documents/" + document_id,
-                                      cpr::Payload{{"name", new_name}},
-                                      cpr::Timeout{3000}));
+        std::unique_ptr<Api::Request> request(new Api::Request());
+        request->set(beast::http::field::host, m_host);
+        request->set(beast::http::field::content_type, "application/x-www-form-urlencoded");
+        request->method(beast::http::verb::put);
+        request->target("/api/documents/" + document_id);
+        request->version = 11;
+        
+        request->body = "name=" + new_name;
+        
+        request->prepare_payload();
+        
+        storeRequest(network::httpWriteAsync(std::move(request),
+                                             std::to_string(m_port),
+                                             callback,
+                                             std::chrono::milliseconds(3000)));
     }
     
     void Api::storeRequest(std::future<void> && future)
@@ -208,6 +208,6 @@ namespace kiwi
     
     bool Api::hasJsonHeader(Api::Response const& res)
     {
-        return (res.header.at("content-type") == "application/json; charset=utf-8");
+        return (res[beast::http::field::content_type] == "application/json; charset=utf-8");
     }
 }
