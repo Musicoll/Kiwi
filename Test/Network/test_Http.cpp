@@ -36,8 +36,7 @@ TEST_CASE("Network - Http", "[Network, Http]")
     SECTION("Client get request to echo server")
     {
         // Construct request and response.
-        std::unique_ptr<beast::http::request<beast::http::string_body>>
-                request(new beast::http::request<beast::http::string_body>());
+        auto request = std::make_unique<beast::http::request<beast::http::string_body>>();
         request->method(beast::http::verb::get);
         request->target("/get");
         request->version = 11;
@@ -59,9 +58,7 @@ TEST_CASE("Network - Http", "[Network, Http]")
     SECTION("Client asynchronous get request to echo server")
     {
         // Construct request and response.
-        std::unique_ptr<beast::http::request<beast::http::string_body>>
-        request(new beast::http::request<beast::http::string_body>());
-        
+        auto request = std::make_unique<beast::http::request<beast::http::string_body>>();
         request->method(beast::http::verb::get);
         request->target("/get");
         request->version = 11;
@@ -73,7 +70,7 @@ TEST_CASE("Network - Http", "[Network, Http]")
         std::function<void(beast::http::response<beast::http::dynamic_body> const& response,
                            beast::error_code const& error)>
         callback = [](beast::http::response<beast::http::dynamic_body> const& response,
-                           beast::error_code const& error)
+                      beast::error_code const& error)
         {
             CHECK(response.result() == beast::http::status::ok);
             CHECK(!error);

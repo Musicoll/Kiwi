@@ -359,7 +359,8 @@ file(GLOB_RECURSE KIWI_NETWORK_SRC ${ROOT_DIR}/Modules/KiwiNetwork/*.[c|h]pp
 add_library(KiwiNetwork STATIC ${KIWI_NETWORK_SRC})
 target_include_directories(KiwiNetwork PUBLIC ${ROOT_DIR}/Modules
                                               ${ROOT_DIR}/ThirdParty/Beast/include
-                                              ${Boost_INCLUDE_DIRS})
+                                              ${Boost_INCLUDE_DIRS}
+                                              ${JSON_INCLUDE_DIRS})
 target_compile_definitions(KiwiNetwork PUBLIC "-DBOOST_ALL_NO_LIB=1")
 set(NETWORK_DEP ${Boost_LIBRARIES})
 if (WIN32)
@@ -417,7 +418,6 @@ target_add_dependency(Kiwi KiwiEngine)
 target_add_dependency(Kiwi KiwiModel)
 target_add_dependency(Kiwi KiwiDsp)
 target_add_dependency(Kiwi Juce)
-target_include_directories(Kiwi PUBLIC ${JSON_INCLUDE_DIRS} ${CPR_INCLUDE_DIRS})
 
 if (APPLE)
 	set_target_properties(Kiwi PROPERTIES MACOSX_BUNDLE TRUE

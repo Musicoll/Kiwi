@@ -22,8 +22,6 @@
 #include "KiwiApp_DocumentBrowser.h"
 #include "../KiwiApp.h"
 
-#include "../KiwiApp_Network/KiwiApp_Api.h"
-
 #include <iostream>
 #include <sstream>
 #include <iomanip>
