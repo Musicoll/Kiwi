@@ -40,11 +40,11 @@ namespace kiwi
     namespace network
     {
         template<class ReqType, class ResType>
-        class HttpQuerry
+        class HttpQuery
         {
         public: // methods
             
-            HttpQuerry(std::unique_ptr<beast::http::request<ReqType>> request,
+            HttpQuery(std::unique_ptr<beast::http::request<ReqType>> request,
                        std::string port,
                        std::chrono::milliseconds time_out = std::chrono::milliseconds(0)):
             m_request(std::move(request)),
@@ -59,7 +59,7 @@ namespace kiwi
             {
             }
             
-            ~HttpQuerry()
+            ~HttpQuery()
             {
             }
             
@@ -183,11 +183,11 @@ namespace kiwi
             
         private: // deleted methods
             
-            HttpQuerry() = delete;
-            HttpQuerry(HttpQuerry const& other) = delete;
-            HttpQuerry(HttpQuerry && other) = delete;
-            HttpQuerry& operator=(HttpQuerry const& other) = delete;
-            HttpQuerry& operator=(HttpQuerry && other) = delete;
+            HttpQuery() = delete;
+            HttpQuery(HttpQuery const& other) = delete;
+            HttpQuery(HttpQuery && other) = delete;
+            HttpQuery& operator=(HttpQuery const& other) = delete;
+            HttpQuery& operator=(HttpQuery && other) = delete;
         };
         
         //! @brief Sends an http request.
@@ -199,7 +199,7 @@ namespace kiwi
                                                  beast::error_code& error,
                                                  std::chrono::milliseconds time_out = std::chrono::milliseconds(0))
         {
-            return HttpQuerry<ReqType, ResType>(std::move(request), port).writeRequest(error);
+            return HttpQuery<ReqType, ResType>(std::move(request), port).writeRequest(error);
         }
         
         //! @brief Sends an http request asynchronously.
@@ -212,13 +212,13 @@ namespace kiwi
                                                             beast::error_code const& error)> callback,
                                           std::chrono::milliseconds time_out = std::chrono::milliseconds(0))
         {
-            std::unique_ptr<HttpQuerry<ReqType, ResType>> querry(new HttpQuerry<ReqType, ResType>(std::move(request), port, time_out));
+            std::unique_ptr<HttpQuery<ReqType, ResType>> query(new HttpQuery<ReqType, ResType>(std::move(request), port, time_out));
             
-            return std::async(std::launch::async, [querry = std::move(querry), callback]()
+            return std::async(std::launch::async, [query = std::move(query), callback]()
             {
                 beast::error_code error;
                 
-                beast::http::response<ResType> response = querry->writeRequest(error);
+                beast::http::response<ResType> response = query->writeRequest(error);
                 
                 return callback(response, error);
             });
