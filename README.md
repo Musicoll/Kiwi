@@ -68,8 +68,9 @@ Kiwi uses the following ThirdParty libraries:
 
 - [Flip](http://developer.irisate.com/)
 - [Juce](https://github.com/WeAreROLI/JUCE)
-- [cpr](https://github.com/whoshuu/cpr)
-- [readerwriterqueue](https://github.com/cameron314/readerwriterqueue)
+- [Beast](https://github.com/vinniefalco/Beast/)
+- [concurrentqueue](https://github.com/cameron314/concurrentqueue)
+- [json](https://github.com/nlohmann/json)
 
 > Most of the application icons are *designed by Freepik and distributed by Flaticon*.
 
