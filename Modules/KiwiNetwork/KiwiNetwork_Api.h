@@ -40,8 +40,6 @@ namespace kiwi
         {
         public: // methods
             
-            enum class Protocol : uint8_t { HTTP = 0, HTTPS = 1 };
-            
             struct Document
             {
                 std::string _id = "0";
@@ -54,8 +52,6 @@ namespace kiwi
             
             using Documents = std::vector<Api::Document>;
             
-            class User;
-            
             using Response = beast::http::response<beast::http::string_body>;
             
             using Request = beast::http::request<beast::http::string_body>;
@@ -63,7 +59,7 @@ namespace kiwi
             using Error = beast::error_code;
             
             //! @brief Constructor
-            Api(std::string const& host, uint16_t port = 80, Protocol protocol = Api::Protocol::HTTP);
+            Api(std::string const& host, uint16_t port = 80);
             
             //! @brief Destructor
             ~Api();
@@ -103,7 +99,6 @@ namespace kiwi
             
         private: // variables
             
-            Protocol        m_protocol;
             std::string     m_host;
             uint16_t        m_port;
             

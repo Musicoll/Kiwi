@@ -60,8 +60,7 @@ namespace kiwi
         //                                    API REQUEST                                   //
         // ================================================================================ //
         
-        Api::Api(std::string const& host, uint16_t port, Protocol protocol) :
-        m_protocol(protocol),
+        Api::Api(std::string const& host, uint16_t port) :
         m_host(host),
         m_port(port)
         {
@@ -117,7 +116,7 @@ namespace kiwi
                 callback(res, error, {});
             };
             
-            std::unique_ptr<Api::Request> request(new Api::Request());
+            auto request = std::make_unique<Api::Request>();
             request->set(beast::http::field::host, m_host);
             request->method(beast::http::verb::get);
             request->target("/api/documents");
@@ -134,7 +133,7 @@ namespace kiwi
         void Api::createDocument(std::function<void(Api::Response const&, Api::Error const&, Document)> callback,
                                  std::string const& document_name)
         {
-            std::unique_ptr<Api::Request> request(new Api::Request());
+            auto request = std::make_unique<Api::Request>();
             request->set(beast::http::field::host, m_host);
             request->set(beast::http::field::content_type, "application/x-www-form-urlencoded");
             request->method(beast::http::verb::post);
@@ -176,12 +175,12 @@ namespace kiwi
         {
             assert(!new_name.empty() && "name should not be empty!");
             
-            std::unique_ptr<Api::Request> request(new Api::Request());
+            auto request = std::make_unique<Api::Request>();
             request->set(beast::http::field::host, m_host);
             request->set(beast::http::field::content_type, "application/x-www-form-urlencoded");
             request->method(beast::http::verb::put);
-            request->target("/api/documents/" + document_id);
             request->version = 11;
+            request->target("/api/documents/" + document_id);
             
             request->body = "name=" + new_name;
             
