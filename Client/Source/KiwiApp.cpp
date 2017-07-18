@@ -109,6 +109,9 @@ namespace kiwi
         juce::PopupMenu macMainMenuPopup;
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAboutAppWindow);
         macMainMenuPopup.addSeparator();
+        macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::login);
+        macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::logout);
+        macMainMenuPopup.addSeparator();
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAppSettingsWindow);
         juce::MenuBarModel::setMacMainMenu(m_menu_model.get(), &macMainMenuPopup, TRANS("Open Recent"));
         #endif
@@ -204,6 +207,11 @@ namespace kiwi
     Instance& KiwiApp::useInstance()
     {
         return *KiwiApp::use().m_instance.get();
+    }
+    
+    Api& KiwiApp::useApi()
+    {
+        return KiwiApp::use().m_instance->useApi();
     }
     
     uint64_t KiwiApp::userID()
@@ -420,6 +428,7 @@ namespace kiwi
     {
         #if ! JUCE_MAC
         menu.addCommandItem(m_command_manager.get(), CommandIDs::showAboutAppWindow);
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::login);
         #endif
     }
     
@@ -446,7 +455,9 @@ namespace kiwi
             CommandIDs::showBeaconDispatcherWindow,
             CommandIDs::switchDsp,
             CommandIDs::startDsp,
-            CommandIDs::stopDsp
+            CommandIDs::stopDsp,
+            CommandIDs::login,
+            CommandIDs::logout,
         };
         
         commands.addArray(ids, juce::numElementsInArray(ids));
@@ -478,6 +489,18 @@ namespace kiwi
                                CommandCategories::windows, 0);
                 
                 result.addDefaultKeypress('k', juce::ModifierKeys::commandModifier);
+                break;
+            }
+            case CommandIDs::login:
+            {
+                result.setInfo(TRANS("Login"), TRANS("Show the \"Login form\" Window"),
+                               CommandCategories::windows, 0);
+                break;
+            }
+            case CommandIDs::logout:
+            {
+                result.setInfo(TRANS("Logout"), TRANS("Log out current user"),
+                               CommandCategories::windows, 0);
                 break;
             }
             case CommandIDs::showAboutAppWindow:
@@ -567,6 +590,17 @@ namespace kiwi
             case CommandIDs::openFile :
             {
                 m_instance->askUserToOpenPatcherDocument();
+                break;
+            }
+            case CommandIDs::login:
+            {
+                m_instance->showLoginWindow();
+                break;
+            }
+            case CommandIDs::logout:
+            {
+                //m_instance->showConsoleWindow();
+                std::cout << "CommandIDs::logout: todo ! \n";
                 break;
             }
             case CommandIDs::showConsoleWindow :

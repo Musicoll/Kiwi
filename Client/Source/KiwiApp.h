@@ -91,6 +91,9 @@ namespace kiwi
         //! @brief Get the current running kiwi instance.
         static Instance& useInstance();
         
+        //! @brief Get the Api object.
+        static Api& useApi();
+        
         //! @brief Get the current running engine instance.
         static engine::Instance& useEngineInstance();
         

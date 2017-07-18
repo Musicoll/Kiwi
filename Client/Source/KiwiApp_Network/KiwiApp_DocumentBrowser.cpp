@@ -39,10 +39,7 @@ namespace kiwi
     {
         auto& settings = getAppSettings().network();
         
-        m_distant_drive.reset(new Drive("Remote patchers",
-                                        settings.getHost(),
-                                        settings.getApiPort(),
-                                        settings.getSessionPort()));
+        m_distant_drive.reset(new Drive("Remote patchers", settings.getSessionPort()));
         
         int time = settings.getRefreshInterval();
         if(time > 0)
@@ -76,15 +73,7 @@ namespace kiwi
     
     void DocumentBrowser::networkSettingsChanged(NetworkSettings const& settings, const juce::Identifier& id)
     {
-        if(id == Ids::host)
-        {
-            m_distant_drive->setHost(settings.getHost());
-        }
-        else if(id == Ids::api_port)
-        {
-            m_distant_drive->setApiPort(settings.getApiPort());
-        }
-        else if(id == Ids::session_port)
+        if(id == Ids::session_port)
         {
             m_distant_drive->setSessionPort(settings.getSessionPort());
         }
@@ -128,10 +117,7 @@ namespace kiwi
     // ================================================================================ //
     
     DocumentBrowser::Drive::Drive(std::string const& name,
-                                  std::string const& host,
-                                  uint16_t api_port,
                                   uint16_t session_port) :
-    m_api(host, api_port),
     m_session_port(session_port),
     m_name(name)
     {
@@ -148,21 +134,6 @@ namespace kiwi
         m_listeners.remove(listener);
     }
     
-    Api& DocumentBrowser::Drive::useApi()
-    {
-        return m_api;
-    }
-    
-    uint16_t DocumentBrowser::Drive::getApiPort() const
-    {
-        return m_api.getPort();
-    }
-    
-    void DocumentBrowser::Drive::setApiPort(uint16_t port)
-    {
-        m_api.setPort(port);
-    }
-    
     void DocumentBrowser::Drive::setSessionPort(uint16_t port)
     {
         m_session_port = port;
@@ -171,16 +142,6 @@ namespace kiwi
     uint16_t DocumentBrowser::Drive::getSessionPort() const
     {
         return m_session_port;
-    }
-    
-    void DocumentBrowser::Drive::setHost(std::string const& host)
-    {
-        m_api.setHost(host);
-    }
-    
-    std::string const& DocumentBrowser::Drive::getHost() const
-    {
-        return m_api.getHost();
     }
     
     void DocumentBrowser::Drive::setName(std::string const& name)
@@ -195,7 +156,9 @@ namespace kiwi
     
     void DocumentBrowser::Drive::createNewDocument()
     {
-        m_api.createDocument([this](Api::Response const& res, Api::Error const& error, Api::Document document) {
+        KiwiApp::useApi().createDocument([this](Api::Response const& res,
+                                                Api::Error const& error,
+                                                Api::Document document) {
             
             if(error)
             {
@@ -233,10 +196,7 @@ namespace kiwi
     
     bool DocumentBrowser::Drive::operator==(Drive const& drive) const
     {
-        return (getHost() == drive.getHost())
-        && (getApiPort() == drive.getApiPort())
-        && (getSessionPort() == drive.getSessionPort())
-        && (m_name == drive.getName());
+        return (getSessionPort() == drive.getSessionPort()) && (m_name == drive.getName());
     }
     
     void DocumentBrowser::Drive::updateDocumentList(Api::Documents docs)
@@ -309,7 +269,7 @@ namespace kiwi
     
     void DocumentBrowser::Drive::refresh()
     {
-        m_api.getDocuments([this](Api::Response const& res, Api::Error const& error, Api::Documents docs) {
+        KiwiApp::useApi().getDocuments([this](Api::Response const& res, Api::Error const& error, Api::Documents docs) {
             
             if(error)
             {
@@ -349,7 +309,7 @@ namespace kiwi
     
     std::string DocumentBrowser::Drive::DocumentSession::getHost() const
     {
-        return m_drive.getHost();
+        return KiwiApp::useApi().getHost();
     }
     
     uint64_t DocumentBrowser::Drive::DocumentSession::getSessionId() const
@@ -374,7 +334,7 @@ namespace kiwi
             return;
         }
         
-        m_drive.useApi().renameDocument([](Api::Response const& res, Api::Error const& error) {
+        KiwiApp::useApi().renameDocument([](Api::Response const& res, Api::Error const& error) {
             
             if(!error)
             {

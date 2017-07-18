@@ -59,7 +59,7 @@ namespace kiwi
             using Error = beast::error_code;
             
             //! @brief Constructor
-            Api(std::string const& host, uint16_t port = 80);
+            Api(std::string const& host = "127.0.0.1", uint16_t port = 80);
             
             //! @brief Destructor
             ~Api();

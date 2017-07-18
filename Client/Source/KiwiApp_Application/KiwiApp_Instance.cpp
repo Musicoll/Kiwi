@@ -29,6 +29,9 @@
 #include "../KiwiApp_Components/KiwiApp_Window.h"
 #include "../KiwiApp_Patcher/KiwiApp_PatcherView.h"
 #include "../KiwiApp_Patcher/KiwiApp_PatcherComponent.h"
+#include "../KiwiApp_General/KiwiApp_IDs.h"
+
+#include "../KiwiApp_Auth/KiwiApp_LoginForm.h"
 
 #include <cstdlib>
 #include <ctime>
@@ -42,12 +45,17 @@ namespace kiwi
     size_t Instance::m_untitled_patcher_index(0);
     
     Instance::Instance() :
+    m_api(nullptr),
     m_scheduler(),
     m_instance(std::make_unique<DspDeviceManager>()),
     m_browser(),
     m_console_history(std::make_shared<ConsoleHistory>(m_instance)),
     m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
     {
+        auto& settings = getAppSettings().network();
+        m_api.reset(new Api(settings.getHost(), settings.getApiPort()));
+        settings.addListener(*this);
+        
         startTimer(10);
         std::srand(std::time(0));
         m_user_id = std::rand();
@@ -65,6 +73,24 @@ namespace kiwi
     {
         closeAllPatcherWindows();
         stopTimer();
+    }
+    
+    void Instance::networkSettingsChanged(NetworkSettings const& settings,
+                                          const juce::Identifier& id)
+    {
+        if(id == Ids::host)
+        {
+            m_api->setHost(settings.getHost());
+        }
+        else if(id == Ids::api_port)
+        {
+            m_api->setPort(settings.getApiPort());
+        }
+    }
+    
+    Api& Instance::useApi()
+    {
+        return *m_api;
     }
     
     void Instance::timerCallback()
@@ -312,6 +338,16 @@ namespace kiwi
                                             std::make_unique<Console>(history),
                                             true, true, "console_window",
                                             !KiwiApp::isMacOSX());
+        });
+    }
+    
+    void Instance::showLoginWindow()
+    {
+        showWindowWithId(WindowId::Login, []() {
+            
+            return std::make_unique<Window>("Log-in to Kiwi",
+                                            std::make_unique<LoginForm>(),
+                                            true, false, "login_window");
         });
     }
     

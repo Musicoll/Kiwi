@@ -47,7 +47,7 @@ namespace kiwi
         showDocumentBrowserWindow   = 0x202040,        ///< Make visible the "document browser" window.
         showBeaconDispatcherWindow  = 0x202050,        ///< Make visible the "beacon dispatcher" window.
         addBeaconDispatcher         = 0x202051,        ///< Add a new "beacon dispatcher" element.
-        removeBeaconDispatcher      = 0x202052,        ///< Add a new "beacon dispatcher" element.
+        removeBeaconDispatcher      = 0x202052,        ///< Remove a "beacon dispatcher" element.
         
         undo                        = 0xf1000a,        ///< Undo last action.
         redo                        = 0xf1000b,        ///< Redo last action.
@@ -86,7 +86,10 @@ namespace kiwi
         scrollToTop                 = 0xf30001,        ///< Scroll to the top
         scrollToBottom              = 0xf30002,        ///< Scroll to the bottom
         
-        clearAll                    = 0xf40001         ///< Clear all content
+        clearAll                    = 0xf40001,        ///< Clear all content
+        
+        login                       = 0xf50000,        ///< Log-in the user.
+        logout                      = 0xf50010,        ///< Log-out the user.
     };
     
     // ================================================================================ //
