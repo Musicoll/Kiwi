@@ -46,7 +46,7 @@ namespace kiwi
     // ================================================================================ //
 
     //! @brief The Application Instance
-    class Instance : public juce::Timer
+    class Instance : public juce::Timer, public NetworkSettings::Listener
     {
     public:
         
@@ -64,6 +64,9 @@ namespace kiwi
         
         //! @brief create a new patcher window.
         void newPatcher();
+        
+        //! @brief Returns the Api object.
+        Api& useApi();
         
         //! @brief Returns the engine::Instance
         engine::Instance& useEngineInstance();
@@ -105,6 +108,9 @@ namespace kiwi
         //! @brief Brings the Console to front.
         void showConsoleWindow();
         
+        //! @brief Brings the Login form window to front.
+        void showLoginWindow();
+        
         //! @brief Brings the "About Kiwi" window to front.
         void showAboutKiwiWindow();
         
@@ -121,6 +127,8 @@ namespace kiwi
         
         using PatcherManagers = std::vector<std::unique_ptr<PatcherManager>>;
         
+        void networkSettingsChanged(NetworkSettings const&, const juce::Identifier& id) override;
+        
         //! @internal get the given patcher manager iterator.
         PatcherManagers::iterator getPatcherManager(PatcherManager const& manager);
         
@@ -135,6 +143,8 @@ namespace kiwi
         void showWindowWithId(WindowId id, std::function<std::unique_ptr<Window>()> create_fn);
         
     private: // variables
+        
+        std::unique_ptr<Api>                        m_api;
         
         engine::Scheduler<>                         m_scheduler;
         

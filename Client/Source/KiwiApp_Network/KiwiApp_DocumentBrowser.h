@@ -120,10 +120,7 @@ namespace kiwi
         
     public: // methods
         
-        Drive(std::string const& name,
-              std::string const& host,
-              uint16_t api_port,
-              uint16_t session_port);
+        Drive(std::string const& name, uint16_t session_port);
         
         ~Drive() = default;
         
@@ -133,26 +130,11 @@ namespace kiwi
         //! @brief remove a listener.
         void removeListener(Listener& listener);
         
-        //! @brief Returns the API object reference.
-        Api& useApi();
-        
-        //! @brief Set the kiwi api port.
-        void setApiPort(uint16_t port);
-        
-        //! @brief Returns the kiwi api port.
-        uint16_t getApiPort() const;
-        
         //! @brief Set the kiwi document session port.
         void setSessionPort(uint16_t port);
         
         //! @brief Returns the kiwi document session port.
         uint16_t getSessionPort() const;
-        
-        //! @brief Set both the api's and session's host.
-        void setHost(std::string const& host);
-        
-        //! @brief Returns the session host.
-        std::string const& getHost() const;
         
         //! @brief Set the name of this drive.
         void setName(std::string const& host);
@@ -181,7 +163,6 @@ namespace kiwi
         //! @internal Update the document list (need to be called in the juce Message thread)
         void updateDocumentList(Api::Documents docs);
         
-        Api                         m_api;
         uint16_t                    m_session_port = 9090;
         std::string                 m_name = "Drive";
         DocumentSessions            m_documents;

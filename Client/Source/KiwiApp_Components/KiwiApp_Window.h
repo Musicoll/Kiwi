@@ -94,6 +94,7 @@ namespace kiwi
     enum class WindowId : std::size_t
     {
         Console = 0,
+        Login,
         AboutKiwi,
         DocumentBrowser,
         ApplicationSettings,
