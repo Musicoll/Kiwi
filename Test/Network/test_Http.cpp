@@ -49,7 +49,7 @@ TEST_CASE("Network - Http", "[Network, Http]")
         
         // Send request and waits for response.
         beast::http::response<beast::http::string_body> response =
-        kiwi::network::httpWrite<beast::http::string_body, beast::http::string_body>(std::move(request), "80", error);
+        kiwi::network::Http::write<beast::http::string_body, beast::http::string_body>(std::move(request), "80", error);
         
         CHECK(response.result() == beast::http::status::ok);
         CHECK(!error);
@@ -76,7 +76,7 @@ TEST_CASE("Network - Http", "[Network, Http]")
             CHECK(!error);
         };
         
-        std::future<void> future = kiwi::network::httpWriteAsync(std::move(request), "80", callback);
+        std::future<void> future = kiwi::network::Http::writeAsync(std::move(request), "80", callback);
         
         future.get();
     }

@@ -93,7 +93,9 @@ namespace kiwi
             return m_port;
         }
         
-        void Api::getDocuments(std::function<void(Api::Response const&, Api::Error const&, Api::Documents)> callback)
+        void Api::getDocuments(std::function<void(Api::Response const&,
+                                                  Api::Error const&,
+                                                  Api::Documents)> callback)
         {
             std::function<void(Api::Response const&, Api::Error const&)> res_callback =
             [callback = std::move(callback)](Api::Response const& res, Api::Error const& error)
@@ -124,10 +126,10 @@ namespace kiwi
             
             request->prepare_payload();
             
-            storeRequest(network::httpWriteAsync(std::move(request),
-                                                 std::to_string(m_port),
-                                                 res_callback,
-                                                 std::chrono::milliseconds(3000)));
+            storeRequest(Http::writeAsync(std::move(request),
+                                          std::to_string(m_port),
+                                          res_callback,
+                                          std::chrono::milliseconds(3000)));
         }
         
         void Api::createDocument(std::function<void(Api::Response const&, Api::Error const&, Document)> callback,
@@ -164,10 +166,10 @@ namespace kiwi
                 callback(std::move(res), error, {});
             };
             
-            storeRequest(network::httpWriteAsync(std::move(request),
-                                                 std::to_string(m_port),
-                                                 res_callback,
-                                                 std::chrono::milliseconds(3000)));
+            storeRequest(Http::writeAsync(std::move(request),
+                                          std::to_string(m_port),
+                                          res_callback,
+                                          std::chrono::milliseconds(3000)));
         }
         
         void Api::renameDocument(std::function<void(Api::Response const& res, Api::Error const& error)> callback,
@@ -186,10 +188,10 @@ namespace kiwi
             
             request->prepare_payload();
             
-            storeRequest(network::httpWriteAsync(std::move(request),
-                                                 std::to_string(m_port),
-                                                 callback,
-                                                 std::chrono::milliseconds(3000)));
+            storeRequest(Http::writeAsync(std::move(request),
+                                          std::to_string(m_port),
+                                          callback,
+                                          std::chrono::milliseconds(3000)));
         }
         
         void Api::storeRequest(std::future<void> && future)
