@@ -81,6 +81,42 @@ TEST_CASE("Scheduler", "[Scheduler]")
         CHECK(counter == 10);
     }
     
+    SECTION("Schedule lambda")
+    {
+        bool success = false;
+        
+        sch.schedule([&success]() {
+            success = true;
+        }, std::chrono::milliseconds(0));
+        
+        REQUIRE_FALSE(success);
+        sch.process();
+        REQUIRE(success);
+    }
+    
+    SECTION("Schedule lambda with delay")
+    {
+        bool success = false;
+        
+        sch.schedule([&success]() {
+            success = true;
+        }, std::chrono::milliseconds(1000));
+        
+        REQUIRE_FALSE(success);
+        sch.process();
+        REQUIRE_FALSE(success);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        sch.process();
+        REQUIRE_FALSE(success);
+        
+        // check with 5ms precision.
+        std::this_thread::sleep_for(std::chrono::milliseconds(505));
+        sch.process();
+        
+        REQUIRE(success);
+    }
+    
     SECTION("Ownership")
     {
         struct TestDestructor : public Task

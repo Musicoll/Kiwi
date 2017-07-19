@@ -26,14 +26,12 @@
 #include <juce_data_structures/juce_data_structures.h>
 #include <juce_events/juce_events.h>
 
-#include <KiwiNetwork/KiwiNetwork_Api.h>
+#include "../KiwiApp_Network/KiwiApp_Api.h"
 
 #include "../KiwiApp_General/KiwiApp_StoredSettings.h"
 
 namespace kiwi
 {
-    using network::Api;
-    
     // ================================================================================ //
     //                                 DOCUMENT BROWSER                                 //
     // ================================================================================ //

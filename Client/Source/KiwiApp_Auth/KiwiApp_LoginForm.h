@@ -25,6 +25,45 @@
 
 namespace kiwi
 {
+    class AlertBox : public juce::Component, private juce::ButtonListener
+    {
+    public: // methods
+        
+        enum class Type : uint8_t
+        {
+            Info = 0,
+            Success = 1,
+            Error = 2
+        };
+        
+        //! @brief Constructor.
+        AlertBox(std::string const& message,
+                 Type type = Type::Info,
+                 bool can_cancel = true,
+                 std::function<void(void)> on_close = nullptr);
+        
+        //! @brief Destructor.
+        ~AlertBox();
+        
+    private: // methods
+        
+        //! @internal paint method
+        void paint(juce::Graphics&) override;
+        
+        //! @internal resized method
+        void resized() override;
+        
+        //! @internal juce::ButtonListener
+        void buttonClicked(juce::Button*) override;
+        
+    private: // variables
+        
+        std::string m_message;
+        Type m_type = Type::Info;
+        std::unique_ptr<juce::TextButton> m_close_btn;
+        std::function<void(void)> m_close_fn;
+    };
+    
     class LoginForm : public juce::Component, private juce::ButtonListener
     {
     public: // methods
@@ -36,11 +75,10 @@ namespace kiwi
         //! @brief Destructor.
         ~LoginForm();
         
-        /** This is called when the form is dismissed (either cancelled or when registration
-         succeeds).
-         By default it will delete this, but you can override it to do other things.
-         */
-        virtual void dismiss();
+        //! @brief This is called when the form is dismissed (either cancelled or when registration
+        // succeeds).
+        //! @details By default it will delete this, but you can override it to do other things.
+        void dismiss();
         
     private: // methods
         
@@ -53,21 +91,23 @@ namespace kiwi
         //! @internal lookAndFeelChanged method
         void lookAndFeelChanged() override;
         
+        void showAlert(std::string const& message, AlertBox::Type type = AlertBox::Type::Error);
+        
+        void buttonClicked(juce::Button*) override;
+        void attemptRegistration();
+        
     private: // variables
         
-        juce::Label message;
-        juce::TextEditor emailBox, passwordBox;
-        juce::TextButton registerButton, cancelButton;
+        juce::TextEditor m_email_box, m_password_box;
+        juce::TextButton m_submit_btn, m_cancel_btn;
         
-        juce::ScopedPointer<juce::BubbleMessageComponent> bubble;
+        std::unique_ptr<AlertBox> m_alert_box;
+        
+        juce::Image m_kiwi_app_image;
         
         struct OverlayComp;
         friend struct OverlayComp;
         Component::SafePointer<Component> m_overlay;
-        
-        void buttonClicked(juce::Button*) override;
-        void attemptRegistration();
-        void showBubbleMessage(juce::String const&, juce::Component&);
         
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LoginForm)
     };

@@ -37,6 +37,8 @@
 #include "../KiwiApp_General/KiwiApp_StoredSettings.h"
 #include "../KiwiApp_Audio/KiwiApp_DspDeviceManager.h"
 
+#include "../KiwiApp_Network/KiwiApp_Api.h"
+
 namespace kiwi
 {
     class PatcherViewWindow;

@@ -156,9 +156,9 @@ namespace kiwi
     
     void DocumentBrowser::Drive::createNewDocument()
     {
-        KiwiApp::useApi().createDocument([this](Api::Response const& res,
-                                                Api::Error const& error,
-                                                Api::Document document) {
+        KiwiApp::useApi().createDocument("", [this](Api::Response res,
+                                                    Api::Error error,
+                                                    Api::Document document) {
             
             if(error)
             {
@@ -269,16 +269,15 @@ namespace kiwi
     
     void DocumentBrowser::Drive::refresh()
     {
-        KiwiApp::useApi().getDocuments([this](Api::Response const& res, Api::Error const& error, Api::Documents docs) {
+        KiwiApp::useApi().getDocuments([this](Api::Response res, Api::Error error, Api::Documents docs) {
             
             if(error)
             {
-                 KiwiApp::error("Kiwi API error: can't get documents => " + error.message());
+                KiwiApp::error("Kiwi API error: can't get documents => " + error.message());
             }
             else
             {
-                KiwiApp::useInstance().useScheduler().schedule([this, docs]()
-                {
+                KiwiApp::useInstance().useScheduler().schedule([this, docs]() {
                     updateDocumentList(docs);
                 });
             }
@@ -334,7 +333,8 @@ namespace kiwi
             return;
         }
         
-        KiwiApp::useApi().renameDocument([](Api::Response const& res, Api::Error const& error) {
+        KiwiApp::useApi().renameDocument(m_document._id, new_name,
+                                         [](Api::Response res, Api::Error error) {
             
             if(!error)
             {
@@ -345,7 +345,7 @@ namespace kiwi
                 std::cout << "document update failed, err: " + error.message() << '\n';
             }
             
-        }, m_document._id, new_name);
+        });
     }
     
     bool DocumentBrowser::Drive::DocumentSession::operator==(DocumentSession const& other_doc) const

@@ -73,7 +73,7 @@ namespace kiwi
         template<class Clock>
         void Scheduler<Clock>::schedule(std::function<void(void)> && func, duration_t delay)
         {
-            schedule(std::shared_ptr<Task>(new CallBack(func)));
+            schedule(std::make_shared<CallBack>(func), delay);
         }
 
         template<class Clock>

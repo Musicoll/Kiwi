@@ -98,7 +98,7 @@ namespace kiwi
             //! and add a new one at specified time.
             void schedule(std::shared_ptr<Task> && task, duration_t delay = std::chrono::milliseconds(0));
             
-            //! @brief Delays execution of a function by the sceduler.
+            //! @brief Delays execution of a function by the scheduler.
             //! @details Internally create a callback that will be executed and destroyed by the scheduler.
             void schedule(std::function<void(void)> && func, duration_t delay = std::chrono::milliseconds(0));
             
