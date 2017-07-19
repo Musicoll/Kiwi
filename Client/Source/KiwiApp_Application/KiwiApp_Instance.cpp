@@ -71,6 +71,7 @@ namespace kiwi
     
     Instance::~Instance()
     {
+        getAppSettings().network().removeListener(*this);
         closeAllPatcherWindows();
         stopTimer();
     }
