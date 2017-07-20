@@ -67,10 +67,8 @@ TEST_CASE("Network - Http", "[Network, Http]")
         
         request->prepare_payload();
         
-        std::function<void(beast::http::response<beast::http::dynamic_body> const& response,
-                           beast::error_code const& error)>
-        callback = [](beast::http::response<beast::http::dynamic_body> const& response,
-                      beast::error_code const& error)
+        std::function<void(beast::http::response<beast::http::dynamic_body>, beast::error_code)>
+        callback = [](beast::http::response<beast::http::dynamic_body> response, beast::error_code error)
         {
             CHECK(response.result() == beast::http::status::ok);
             CHECK(!error);
