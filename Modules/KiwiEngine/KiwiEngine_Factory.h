@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "KiwiEngine_Def.h"
+#include <KiwiEngine/KiwiEngine_Object.h>
 
 namespace kiwi
 {

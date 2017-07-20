@@ -22,7 +22,7 @@
 #include <KiwiModel/KiwiModel_Factory.h>
 
 #include "KiwiEngine_Factory.h"
-#include "KiwiEngine_Objects.h"
+
 
 namespace kiwi
 {
