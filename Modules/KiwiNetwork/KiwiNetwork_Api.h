@@ -56,6 +56,8 @@ namespace kiwi
             
             using Request = beast::http::request<beast::http::string_body>;
             
+            //class Request;
+            
             using Error = beast::error_code;
             
             //! @brief Constructor
@@ -76,17 +78,23 @@ namespace kiwi
             //! @brief Get the API port.
             uint16_t getPort() const noexcept;
             
+            //! @brief Get the authentication token
+            //! @param username Username or usermail
+            //! @param password password
+            void getAuthToken(std::string const& username, std::string const& password,
+                              std::function<void(Api::Response, Api::Error)> callback);
+            
             //! @brief Make an async API request to get a list of documents
-            void getDocuments(std::function<void(Api::Response const&, Api::Error const&, Api::Documents)> callback);
+            void getDocuments(std::function<void(Api::Response, Api::Error, Api::Documents)> callback);
             
             //! @brief Make an async API request to create a new document
             //! @param callback
-            void createDocument(std::function<void(Api::Response const&, Api::Error const&, Api::Document)> callback,
+            void createDocument(std::function<void(Api::Response, Api::Error, Api::Document)> callback,
                                 std::string const& document_name = "");
             
             //! @brief Rename a document asynchronously.
             //! @param callback The callback method that will be called when the request is completed.
-            void renameDocument(std::function<void(Api::Response const& res, Api::Error const& error)> callback,
+            void renameDocument(std::function<void(Api::Response, Api::Error)> callback,
                                 std::string document_id, std::string const& new_name);
             
         private: // methods
@@ -102,8 +110,29 @@ namespace kiwi
             std::string     m_host;
             uint16_t        m_port;
             
+            std::string     m_api_access_token;
+            
             std::vector<std::future<void>> m_pending_requests;
         };
+        
+        // ================================================================================ //
+        //                                    API REQUEST                                   //
+        // ================================================================================ //
+        
+        /*
+        class Api::Request : public beast::http::request<beast::http::string_body>
+        {
+        public: // methods
+            
+            Request();
+            
+            ~Request();
+            
+        private: // members
+            
+            
+        };
+        */
         
         //! @brief Helper function to convert an Api::Document into a json object
         void to_json(json& j, Api::Document const& doc);

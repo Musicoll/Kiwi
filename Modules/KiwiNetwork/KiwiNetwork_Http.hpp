@@ -41,8 +41,8 @@ namespace kiwi { namespace network {
     std::future<void>
     Http::writeAsync(std::unique_ptr<beast::http::request<ReqType>> request,
                      std::string port,
-                     std::function<void(beast::http::response<ResType> const& response,
-                                        beast::error_code const& error)> callback,
+                     std::function<void(beast::http::response<ResType> response,
+                                        beast::error_code error)> callback,
                      std::chrono::milliseconds timeout)
     {
         auto query = std::make_unique<Query<ReqType, ResType>>(std::move(request), port, timeout);
@@ -51,7 +51,7 @@ namespace kiwi { namespace network {
             
             beast::error_code error;
             beast::http::response<ResType> response = query->writeRequest(error);
-            return cb(response, error);
+            return cb(std::move(response), error);
             
         });
     }

@@ -93,12 +93,30 @@ namespace kiwi
             return m_port;
         }
         
-        void Api::getDocuments(std::function<void(Api::Response const&,
-                                                  Api::Error const&,
-                                                  Api::Documents)> callback)
+        void Api::getAuthToken(std::string const& username, std::string const& password,
+                               std::function<void(Api::Response res, Api::Error error)> callback)
         {
-            std::function<void(Api::Response const&, Api::Error const&)> res_callback =
-            [callback = std::move(callback)](Api::Response const& res, Api::Error const& error)
+            auto request = std::make_unique<Api::Request>();
+            request->set(beast::http::field::host, m_host);
+            request->set(beast::http::field::content_type, "application/x-www-form-urlencoded");
+            request->method(beast::http::verb::post);
+            request->target("/api/login");
+            request->version = 11;
+            
+            request->body = "username=" + username + "&password=" + password;
+            
+            request->prepare_payload();
+            
+            storeRequest(Http::writeAsync(std::move(request),
+                                          std::to_string(m_port),
+                                          std::move(callback),
+                                          std::chrono::milliseconds(3000)));
+        }
+        
+        void Api::getDocuments(std::function<void(Api::Response, Api::Error, Api::Documents)> callback)
+        {
+            std::function<void(Api::Response, Api::Error)> res_callback =
+            [callback = std::move(callback)](Api::Response res, Api::Error error)
             {
                 if (res.result() == beast::http::status::ok)
                 {
@@ -132,7 +150,7 @@ namespace kiwi
                                           std::chrono::milliseconds(3000)));
         }
         
-        void Api::createDocument(std::function<void(Api::Response const&, Api::Error const&, Document)> callback,
+        void Api::createDocument(std::function<void(Api::Response, Api::Error, Document)> callback,
                                  std::string const& document_name)
         {
             auto request = std::make_unique<Api::Request>();
@@ -146,8 +164,8 @@ namespace kiwi
             
             request->prepare_payload();
             
-            std::function<void(Api::Response const&, Api::Error const&)> res_callback =
-            [callback = std::move(callback)](Api::Response const& res, Api::Error const& error)
+            std::function<void(Api::Response, Api::Error)> res_callback =
+            [callback = std::move(callback)](Api::Response res, Api::Error error)
             {
                 if (res.result() == beast::http::status::ok)
                 {
@@ -172,7 +190,7 @@ namespace kiwi
                                           std::chrono::milliseconds(3000)));
         }
         
-        void Api::renameDocument(std::function<void(Api::Response const& res, Api::Error const& error)> callback,
+        void Api::renameDocument(std::function<void(Api::Response res, Api::Error error)> callback,
                                  std::string document_id, std::string const& new_name)
         {
             assert(!new_name.empty() && "name should not be empty!");
@@ -212,5 +230,21 @@ namespace kiwi
         {
             return (res[beast::http::field::content_type] == "application/json; charset=utf-8");
         }
+        
+        // ================================================================================ //
+        //                                    API REQUEST                                   //
+        // ================================================================================ //
+        
+        /*
+         Api::Request::Request()
+         {
+         ;
+         }
+         
+         Api::Request::~Request()
+         {
+         ;
+         }
+         */
     }
 }

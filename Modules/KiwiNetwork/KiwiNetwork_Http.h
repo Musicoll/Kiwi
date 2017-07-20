@@ -62,8 +62,7 @@ namespace kiwi { namespace network {
         static std::future<void>
         writeAsync(std::unique_ptr<beast::http::request<ReqType>> request,
                    std::string port,
-                   std::function<void(beast::http::response<ResType> const& response,
-                                      beast::error_code const& error)> callback,
+                   std::function<void(beast::http::response<ResType>, beast::error_code)> callback,
                    std::chrono::milliseconds timeout = std::chrono::milliseconds(0));
         
     private: // nested classes
