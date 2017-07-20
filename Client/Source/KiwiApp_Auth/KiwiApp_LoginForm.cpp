@@ -38,7 +38,6 @@ namespace kiwi
         {
             m_close_btn.reset(new juce::TextButton("X", "Close"));
             m_close_btn->setColour(juce::TextButton::buttonColourId, juce::Colours::transparentBlack);
-            m_close_btn->setColour(juce::TextButton::, juce::Colours::transparentBlack);
             addAndMakeVisible(*m_close_btn);
             m_close_btn->addListener(this);
         }
