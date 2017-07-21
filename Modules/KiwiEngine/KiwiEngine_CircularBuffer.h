@@ -21,7 +21,9 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstdlib>
+#include <cassert>
 
 namespace kiwi
 {
