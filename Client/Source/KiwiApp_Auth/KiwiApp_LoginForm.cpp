@@ -138,7 +138,7 @@ namespace kiwi
         
         Spinner spinner;
         
-        JUCE_LEAK_DETECTOR(LoginForm::OverlayComp)
+        JUCE_LEAK_DETECTOR(LoginForm::OverlayComp);
     };
     
     static juce::juce_wchar getDefaultPasswordChar() noexcept
@@ -171,7 +171,7 @@ namespace kiwi
         m_cancel_btn.addListener(this);
         
         lookAndFeelChanged();
-        setSize(500, 250);
+        setSize(400, 300);
     }
     
     LoginForm::~LoginForm()
@@ -318,7 +318,7 @@ namespace kiwi
                     
                     if(err)
                     {
-                        std::string message = "An error occured, please try later...";
+                        std::string message = "Error:" + err.message();
                         std::cout << message << "\n";
                         showAlert(message, AlertBox::Type::Error);
                         return;
@@ -333,6 +333,7 @@ namespace kiwi
                             {
                                 std::cout << "Authenticated !\n";
                                 std::cout << "token: " << j["token"] << "\n";
+                                showAlert("Login success!", AlertBox::Type::Success);
                             }
                             else
                             {

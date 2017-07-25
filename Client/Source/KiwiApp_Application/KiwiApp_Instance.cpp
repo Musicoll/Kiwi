@@ -346,9 +346,14 @@ namespace kiwi
     {
         showWindowWithId(WindowId::Login, []() {
             
-            return std::make_unique<Window>("Log-in to Kiwi",
+            auto login_window = std::make_unique<Window>("Log-in to Kiwi",
                                             std::make_unique<LoginForm>(),
-                                            true, false, "login_window");
+                                            false, false);
+            
+            login_window->centreWithSize(400, 300);
+            login_window->enterModalState(true);
+            
+            return login_window;
         });
     }
     
