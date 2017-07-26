@@ -178,23 +178,8 @@ namespace kiwi { namespace network {
     
     template<class ReqType, class ResType>
     void
-    Http::Query<ReqType, ResType>::shutdown(beast::error_code const& error)
-    {
-        m_io_service.stop();
-        
-        if (error)
-        {
-            m_error = error;
-        }
-        else
-        {
-            m_socket.shutdown(tcp::socket::shutdown_both, m_error);
-        }
-    }
-    
-    template<class ReqType, class ResType>
-    void
-    Http::Query<ReqType, ResType>::read(beast::error_code const& error)
+    Http::Query<ReqType, ResType>::connect(beast::error_code const& error,
+                                           tcp::resolver::iterator iterator)
     {
         if (error)
         {
@@ -202,8 +187,9 @@ namespace kiwi { namespace network {
         }
         else
         {
-            beast::http::async_read(m_socket, m_buffer, m_response, [this](beast::error_code const& error) {
-                shutdown(error);
+            boost::asio::async_connect(m_socket, iterator, [this](beast::error_code const& error,
+                                                                  tcp::resolver::iterator i) {
+                this->write(error);
             });
         }
     }
@@ -227,8 +213,7 @@ namespace kiwi { namespace network {
     
     template<class ReqType, class ResType>
     void
-    Http::Query<ReqType, ResType>::connect(beast::error_code const& error,
-                                           tcp::resolver::iterator iterator)
+    Http::Query<ReqType, ResType>::read(beast::error_code const& error)
     {
         if (error)
         {
@@ -236,10 +221,25 @@ namespace kiwi { namespace network {
         }
         else
         {
-            boost::asio::async_connect(m_socket, iterator, [this](beast::error_code const& error,
-                                                                  tcp::resolver::iterator i) {
-                this->write(error);
+            beast::http::async_read(m_socket, m_buffer, m_response, [this](beast::error_code const& error) {
+                shutdown(error);
             });
+        }
+    }
+    
+    template<class ReqType, class ResType>
+    void
+    Http::Query<ReqType, ResType>::shutdown(beast::error_code const& error)
+    {
+        m_io_service.stop();
+        
+        if (error)
+        {
+            m_error = error;
+        }
+        else
+        {
+            m_socket.shutdown(tcp::socket::shutdown_both, m_error);
         }
     }
     

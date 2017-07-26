@@ -30,8 +30,8 @@
 #include <boost/asio.hpp>
 #include <boost/asio/steady_timer.hpp>
 
-#include <beast/http.hpp>
 #include <beast/core.hpp>
+#include <beast/http.hpp>
 
 namespace kiwi { namespace network {
     
@@ -169,7 +169,7 @@ namespace kiwi { namespace network {
         ~Query();
         
         //! @brief Write the request and get the response.
-        Http::Response<ResType> writeRequest(beast::error_code& error);
+        Http::Response<ResType> writeRequest(Http::Error& error);
         
     private: // methods
         

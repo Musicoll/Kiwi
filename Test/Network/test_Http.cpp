@@ -33,6 +33,8 @@
 
 TEST_CASE("Network - Http", "[Network, Http]")
 {
+    using namespace kiwi::network;
+    
     SECTION("Client get request to echo server")
     {
         // Construct request and response.
@@ -49,7 +51,7 @@ TEST_CASE("Network - Http", "[Network, Http]")
         
         // Send request and waits for response.
         beast::http::response<beast::http::string_body> response =
-        kiwi::network::Http::write<beast::http::string_body, beast::http::string_body>(std::move(request), "80", error);
+        Http::write<beast::http::string_body, beast::http::string_body>(std::move(request), "80", error);
         
         CHECK(response.result() == beast::http::status::ok);
         CHECK(!error);
@@ -58,7 +60,7 @@ TEST_CASE("Network - Http", "[Network, Http]")
     SECTION("Client asynchronous get request to echo server")
     {
         // Construct request and response.
-        auto request = std::make_unique<beast::http::request<beast::http::string_body>>();
+        auto request = std::make_unique<Http::Request<beast::http::string_body>>();
         request->method(beast::http::verb::get);
         request->target("/get");
         request->version = 11;
@@ -67,14 +69,38 @@ TEST_CASE("Network - Http", "[Network, Http]")
         
         request->prepare_payload();
         
-        std::function<void(beast::http::response<beast::http::dynamic_body>, beast::error_code)>
-        callback = [](beast::http::response<beast::http::dynamic_body> response, beast::error_code error)
+        std::function<void(Http::Response<beast::http::dynamic_body>, Http::Error)>
+        callback = [](Http::Response<beast::http::dynamic_body> response, Http::Error error)
         {
             CHECK(response.result() == beast::http::status::ok);
             CHECK(!error);
         };
         
-        std::future<void> future = kiwi::network::Http::writeAsync(std::move(request), "80", callback);
+        auto future = Http::writeAsync(std::move(request), "80", callback);
+        
+        future.get();
+    }
+    
+    SECTION("Deferred request body")
+    {
+        beast::http::header<true, beast::http::fields> header;
+        
+        header.version = 11;
+        header.method(beast::http::verb::get);
+        header.set(beast::http::field::host, "httpbin.org");
+        header.target("/get");
+        header.set(beast::http::field::user_agent, "KiwiApp - Tests");
+        
+        std::function<void(Http::Response<beast::http::string_body>, Http::Error)>
+        callback = [](Http::Response<beast::http::string_body> response, Http::Error error)
+        {
+            REQUIRE_FALSE(error);
+            CHECK(response.result() == beast::http::status::ok);
+        };
+        
+        auto future = Http::writeAsync(std::make_unique<Http::Request<beast::http::empty_body>>(std::move(header)),
+                                       "80",
+                                       callback);
         
         future.get();
     }

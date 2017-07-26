@@ -220,30 +220,6 @@ namespace kiwi
                                       timeout));
     }
     
-    /*
-    // ================================================================================ //
-    //                                      PAYLOAD                                     //
-    // ================================================================================ //
-    
-    Api::Payload::Payload(const std::initializer_list<Pair>& pairs)
-    : Payload(begin(pairs), end(pairs))
-    {
-        ;
-    }
-    
-    void Api::Payload::AddPair(const Pair& pair)
-    {
-        if(!content.empty())
-        {
-            content += "&";
-        }
-        
-        //auto escaped = cpr::util::urlEncode(pair.value);
-        //content += pair.key + "=" + escaped;
-        content += pair.key + "=" + pair.value;
-    }
-    */
-    
     // ================================================================================ //
     //                                    API DOCUMENT                                  //
     // ================================================================================ //
