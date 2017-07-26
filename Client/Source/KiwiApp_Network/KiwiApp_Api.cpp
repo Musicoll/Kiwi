@@ -24,92 +24,7 @@
 namespace kiwi
 {
     // ================================================================================ //
-    //                                         API                                      //
-    // ================================================================================ //
-    
-    void Api::getAuthToken(std::string const& username,
-                           std::string const& password,
-                           Callback callback)
-    {
-        Post("/api/login", {
-            {"username", username},
-            {"password", password}
-        }, std::move(callback), Timeout(3000));
-    }
-    
-    void Api::getDocuments(std::function<void(Response, Error, Api::Documents)> callback)
-    
-    {
-        auto cb = [callback = std::move(callback)](Response res, Error error)
-        {
-            if (res.result() == beast::http::status::ok)
-            {
-                if(hasJsonHeader(res))
-                {
-                    auto j = json::parse(res.body);
-                    
-                    if(j.is_array())
-                    {
-                        // parse each json objects as document and store them in a vector.
-                        callback(res, error, j);
-                        return;
-                    }
-                }
-            }
-            
-            callback(res, error, {});
-        };
-        
-        Get("/api/documents", cb, Timeout(3000));
-    }
-    
-    void Api::createDocument(std::string const& document_name,
-                             std::function<void(Response,
-                                                Error,
-                                                Api::Document)> callback)
-    {
-        auto cb = [callback = std::move(callback)](Response res, Error error)
-        {
-            if (res.result() == beast::http::status::ok)
-            {
-                if(hasJsonHeader(res))
-                {
-                    auto j = json::parse(res.body);
-                    
-                    if(j.is_object())
-                    {
-                        // parse object as a document
-                        callback(std::move(res), error, j);
-                    }
-                }
-            }
-            
-            callback(std::move(res), error, {});
-        };
-        
-        Post("/api/documents", {
-            {"name", document_name}
-        }, std::move(cb), Timeout(3000));
-        
-    }
-    
-    void Api::renameDocument(std::string document_id, std::string const& new_name,
-                             Callback callback)
-    {
-        assert(!new_name.empty() && "name should not be empty!");
-        
-        Put("/api/documents/" + document_id, {
-            {"name", new_name}
-        }, std::move(callback), Timeout(3000));
-    }
-    
-    bool Api::hasJsonHeader(Response const& res)
-    {
-        return (res[beast::http::field::content_type] == "application/json; charset=utf-8");
-    }
-    
-    // ================================================================================ //
-    //                                      SESSION                                     //
+    //                                       API                                        //
     // ================================================================================ //
     
     Api::Api(std::string const& host, uint16_t port) :
@@ -144,7 +59,111 @@ namespace kiwi
         return m_port;
     }
     
-    void Api::storeRequest(std::future<void> && future)
+    // ================================================================================ //
+    //                                   API REQUESTS                                   //
+    // ================================================================================ //
+    
+    void Api::getAuthToken(std::string const& username,
+                           std::string const& password,
+                           Callback callback)
+    {
+        auto session = makeSession("/api/login");
+        session->setPayload({
+            {"username", username},
+            {"password", password}
+        });
+        
+        storeFuture(session->GetAsync(std::move(callback)));
+    }
+    
+    void Api::getDocuments(std::function<void(Response, Api::Documents)> callback)
+    {
+        auto cb = [callback = std::move(callback)](Response res)
+        {
+            if (!res.error && res.result() == beast::http::status::ok)
+            {
+                if(hasJsonHeader(res))
+                {
+                    auto j = json::parse(res.body);
+                    
+                    if(j.is_array())
+                    {
+                        // parse each json objects as document and store them in a vector.
+                        callback(std::move(res), j);
+                        return;
+                    }
+                }
+            }
+            
+            callback(std::move(res), {});
+        };
+        
+        auto session = makeSession("/api/documents");
+        storeFuture(session->GetAsync(std::move(cb)));
+    }
+    
+    void Api::createDocument(std::string const& document_name,
+                             std::function<void(Response, Api::Document)> callback)
+    {
+        auto cb = [callback = std::move(callback)](Response res)
+        {
+            if (!res.error && res.result() == beast::http::status::ok)
+            {
+                if(hasJsonHeader(res))
+                {
+                    auto j = json::parse(res.body);
+                    
+                    if(j.is_object())
+                    {
+                        // parse object as a document
+                        callback(std::move(res), j);
+                    }
+                }
+            }
+            
+            callback(std::move(res), {});
+        };
+        
+        auto session = makeSession("/api/documents");
+        if(!document_name.empty())
+        {
+            session->setPayload({
+                {"name", document_name}
+            });
+        }
+        
+        storeFuture(session->PostAsync(std::move(cb)));
+    }
+    
+    void Api::renameDocument(std::string document_id, std::string const& new_name,
+                             Callback callback)
+    {
+        assert(!new_name.empty() && "name should not be empty!");
+        
+        auto session = makeSession("/api/documents" + document_id);
+        session->setPayload({
+            {"name", new_name}
+        });
+        
+        storeFuture(session->PutAsync(std::move(callback)));
+    }
+    
+    bool Api::hasJsonHeader(Response const& res)
+    {
+        return (res[beast::http::field::content_type] == "application/json; charset=utf-8");
+    }
+    
+    std::unique_ptr<Api::Session> Api::makeSession(std::string const& endpoint)
+    {
+        auto session = std::make_unique<Session>();
+        session->setHost(m_host);
+        session->setPort(std::to_string(m_port));
+        session->setTarget(endpoint);
+        session->setTimeout(http::Timeout(3000));
+        return std::move(session);
+    }
+    
+    void Api::storeFuture(std::future<void> && future)
     {
         for(std::future<void>& f : m_pending_requests)
         {
@@ -156,68 +175,6 @@ namespace kiwi
         }
         
         m_pending_requests.emplace_back(std::move(future));
-    }
-    
-    void Api::Get(std::string const& endpoint,
-                  Callback callback,
-                  Timeout timeout)
-    {
-        auto request = std::make_unique<Request>();
-        request->version = 11;
-        
-        request->set(beast::http::field::host, getHost());
-        request->method(beast::http::verb::get);
-        request->target(endpoint);
-        request->prepare_payload();
-        
-        storeRequest(Http::writeAsync(std::move(request),
-                                      std::to_string(m_port),
-                                      std::move(callback),
-                                      timeout));
-    }
-    
-    void Api::Post(std::string const& endpoint,
-                   Payload payload,
-                   Callback callback,
-                   Timeout timeout)
-    {
-        auto request = std::make_unique<Request>();
-        request->version = 11;
-        
-        request->set(beast::http::field::host, getHost());
-        request->set(beast::http::field::content_type, "application/x-www-form-urlencoded");
-        request->method(beast::http::verb::post);
-        request->target(endpoint);
-        
-        request->body = payload.content;
-        request->prepare_payload();
-        
-        storeRequest(Http::writeAsync(std::move(request),
-                                      std::to_string(m_port),
-                                      std::move(callback),
-                                      timeout));
-    }
-    
-    void Api::Put(std::string const& endpoint,
-                  Payload payload,
-                  Callback callback,
-                  Timeout timeout)
-    {
-        auto request = std::make_unique<Request>();
-        request->version = 11;
-        
-        request->set(beast::http::field::host, getHost());
-        request->set(beast::http::field::content_type, "application/x-www-form-urlencoded");
-        request->method(beast::http::verb::put);
-        request->target(endpoint);
-        
-        request->body = payload.content;
-        request->prepare_payload();
-        
-        storeRequest(Http::writeAsync(std::move(request),
-                                      std::to_string(m_port),
-                                      std::move(callback),
-                                      timeout));
     }
     
     // ================================================================================ //

@@ -23,8 +23,8 @@
 
 #include <string>
 
-namespace kiwi { namespace network { namespace util {
+namespace kiwi { namespace network { namespace http { namespace util {
     
     std::string urlEncode(std::string const& response);
 
-}}} // namespace kiwi::network::util
+}}}} // namespace kiwi::network::http::util

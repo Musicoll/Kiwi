@@ -28,7 +28,7 @@
 namespace kiwi
 {
     using nlohmann::json;
-    using network::Http;
+    using namespace network;
     
     // ================================================================================ //
     //                                         API                                      //
@@ -39,19 +39,14 @@ namespace kiwi
     {
     public: // methods
         
-        using BodyType = beast::http::string_body;
-        using Response = Http::Response<BodyType>;
-        using Request = beast::http::request<BodyType>;
-        using Error = Http::Error;
-        using Callback = std::function<void(Response, Error)>;
-        using Timeout = Http::Timeout;
+        using Session = network::http::Session;
+        using Response = Session::Response;
+        using Callback = Session::Callback;
         
         class Document;
         class User;
         
         using Documents = std::vector<Api::Document>;
-        
-        using Payload = Http::Payload;
         
         //! @brief Constructor
         Api(std::string const& host = "127.0.0.1", uint16_t port = 80);
@@ -79,12 +74,12 @@ namespace kiwi
                           Callback callback);
         
         //! @brief Make an async API request to get a list of documents
-        void getDocuments(std::function<void(Response, Error, Api::Documents)> callback);
+        void getDocuments(std::function<void(Response, Api::Documents)> callback);
         
         //! @brief Make an async API request to create a new document
         //! @param callback
         void createDocument(std::string const& document_name,
-                            std::function<void(Response, Error, Api::Document)> callback);
+                            std::function<void(Response, Api::Document)> callback);
         
         //! @brief Rename a document asynchronously.
         //! @param callback The callback method that will be called when the request is completed.
@@ -93,25 +88,11 @@ namespace kiwi
         
     private: // methods
         
-        //! @brief Make a Post request.
-        void Post(std::string const& endpoint,
-                  Payload payload,
-                  Callback callback,
-                  Timeout timeout = Timeout(0));
-        
-        //! @brief Make a Get request.
-        void Get(std::string const& endpoint,
-                 Callback callback,
-                 Timeout timeout = Timeout(0));
-        
-        //! @brief Make a Put request.
-        void Put(std::string const& endpoint,
-                 Payload payload,
-                 Callback callback,
-                 Timeout timeout = Timeout(0));
+        //! @internal Make a new session with pre-filled data.
+        std::unique_ptr<Session> makeSession(std::string const& endpoint);
         
         //! @internal Store the async future request in a vector
-        void storeRequest(std::future<void> && future);
+        void storeFuture(std::future<void> && future);
         
         //! @internal Check if the response header has a JSON content-type
         static bool hasJsonHeader(Response const& res);
