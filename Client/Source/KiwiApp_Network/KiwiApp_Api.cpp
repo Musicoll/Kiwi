@@ -170,7 +170,7 @@ namespace kiwi
         request->target(endpoint);
         request->prepare_payload();
         
-        storeRequest(Http::writeAsync(std::move(request),
+        storeRequest(http::writeAsync(std::move(request),
                                       std::to_string(m_port),
                                       std::move(callback),
                                       timeout));
@@ -192,7 +192,7 @@ namespace kiwi
         request->body = payload.content;
         request->prepare_payload();
         
-        storeRequest(Http::writeAsync(std::move(request),
+        storeRequest(http::writeAsync(std::move(request),
                                       std::to_string(m_port),
                                       std::move(callback),
                                       timeout));
@@ -214,7 +214,7 @@ namespace kiwi
         request->body = payload.content;
         request->prepare_payload();
         
-        storeRequest(Http::writeAsync(std::move(request),
+        storeRequest(http::writeAsync(std::move(request),
                                       std::to_string(m_port),
                                       std::move(callback),
                                       timeout));

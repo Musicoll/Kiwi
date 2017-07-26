@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include "KiwiNetwork_Util.h"
+#include "KiwiHttp_Util.h"
 
 #include <cstdint>
 #include <iomanip>
@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 
-namespace kiwi { namespace network { namespace util {
+namespace kiwi { namespace network { namespace http { namespace util {
     
     std::string urlEncode(const std::string& value) {
         std::ostringstream escaped;
@@ -49,4 +49,4 @@ namespace kiwi { namespace network { namespace util {
     }
     
     
-}}} // namespace kiwi::network::util
+}}}} // namespace kiwi::network::http::util

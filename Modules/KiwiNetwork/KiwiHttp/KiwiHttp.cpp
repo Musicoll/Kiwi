@@ -19,22 +19,22 @@
  ==============================================================================
  */
 
-#include "KiwiNetwork_Http.h"
-#include "KiwiNetwork_Util.h"
+#include "KiwiHttp.h"
+#include "KiwiHttp_Util.h"
 
-namespace kiwi { namespace network {
+namespace kiwi { namespace network { namespace http {
     
     // ================================================================================ //
     //                                  HTTP PAYLOAD                                    //
     // ================================================================================ //
     
-    Http::Payload::Payload(const std::initializer_list<Pair>& pairs)
+    Payload::Payload(const std::initializer_list<Pair>& pairs)
     : Payload(begin(pairs), end(pairs))
     {
         ;
     }
     
-    void Http::Payload::AddPair(const Pair& pair)
+    void Payload::AddPair(const Pair& pair)
     {
         if(!content.empty())
         {
@@ -49,7 +49,7 @@ namespace kiwi { namespace network {
     //                                 HTTP PARAMETERS                                  //
     // ================================================================================ //
     
-    Http::Parameters::Parameters(std::initializer_list<Parameter> const& parameters)
+    Parameters::Parameters(std::initializer_list<Parameter> const& parameters)
     {
         for(auto const& parameter : parameters)
         {
@@ -57,7 +57,7 @@ namespace kiwi { namespace network {
         }
     }
     
-    void Http::Parameters::AddParameter(Parameter const& parameter)
+    void Parameters::AddParameter(Parameter const& parameter)
     {
         if (!content.empty())
         {
@@ -76,4 +76,4 @@ namespace kiwi { namespace network {
         }
     }
     
-}}
+}}} // namespace kiwi::network::http

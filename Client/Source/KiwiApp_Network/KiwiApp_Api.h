@@ -28,7 +28,7 @@
 namespace kiwi
 {
     using nlohmann::json;
-    using network::Http;
+    using namespace network;
     
     // ================================================================================ //
     //                                         API                                      //
@@ -40,18 +40,18 @@ namespace kiwi
     public: // methods
         
         using BodyType = beast::http::string_body;
-        using Response = Http::Response<BodyType>;
+        using Response = http::Response<BodyType>;
         using Request = beast::http::request<BodyType>;
-        using Error = Http::Error;
+        using Error = http::Error;
         using Callback = std::function<void(Response, Error)>;
-        using Timeout = Http::Timeout;
+        using Timeout = http::Timeout;
         
         class Document;
         class User;
         
         using Documents = std::vector<Api::Document>;
         
-        using Payload = Http::Payload;
+        using Payload = http::Payload;
         
         //! @brief Constructor
         Api(std::string const& host = "127.0.0.1", uint16_t port = 80);

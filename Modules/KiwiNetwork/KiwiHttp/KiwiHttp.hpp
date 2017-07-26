@@ -21,29 +21,29 @@
 
 #pragma once
 
-namespace kiwi { namespace network {
+namespace kiwi { namespace network { namespace http {
     
     // ================================================================================ //
     //                                        HTTP                                      //
     // ================================================================================ //
     
     template<class ReqType, class ResType>
-    Http::Response<ResType>
-    Http::write(std::unique_ptr<Http::Request<ReqType>> request,
-                std::string port,
-                beast::error_code& error,
-                Timeout timeout)
+    Response<ResType>
+    write(std::unique_ptr<Request<ReqType>> request,
+          std::string port,
+          beast::error_code& error,
+          Timeout timeout)
     {
         return Query<ReqType, ResType>(std::move(request), port, timeout).writeRequest(error);
     }
     
     template <class ReqType, class ResType>
     std::future<void>
-    Http::writeAsync(std::unique_ptr<Request<ReqType>> request,
-                     std::string port,
-                     std::function<void(Response<ResType> response,
-                                        Error error)> callback,
-                     Timeout timeout)
+    writeAsync(std::unique_ptr<Request<ReqType>> request,
+               std::string port,
+               std::function<void(Response<ResType> response,
+                                  Error error)> callback,
+               Timeout timeout)
     {
         auto query = std::make_unique<Query<ReqType, ResType>>(std::move(request), port, timeout);
         
@@ -61,7 +61,7 @@ namespace kiwi { namespace network {
     // ================================================================================ //
     
     template <class It>
-    Http::Payload::Payload(const It begin, const It end)
+    Payload::Payload(const It begin, const It end)
     {
         for (It pair = begin; pair != end; ++pair)
         {
@@ -69,7 +69,7 @@ namespace kiwi { namespace network {
         }
     }
     
-    struct Http::Payload::Pair
+    struct Payload::Pair
     {
         template <typename KeyType, typename ValueType,
         typename std::enable_if<!std::is_integral<ValueType>::value, bool>::type = true>
@@ -97,7 +97,7 @@ namespace kiwi { namespace network {
     // ================================================================================ //
     
     template <typename KeyType, typename ValueType>
-    Http::Parameters::Parameter::Parameter(KeyType&& key, ValueType&& value)
+    Parameters::Parameter::Parameter(KeyType&& key, ValueType&& value)
     : key{std::forward<KeyType>(key)}
     , value{std::forward<ValueType>(value)}
     {
@@ -109,9 +109,9 @@ namespace kiwi { namespace network {
     // ================================================================================ //
     
     template<class ReqType, class ResType>
-    Http::Query<ReqType, ResType>::Query(std::unique_ptr<beast::http::request<ReqType>> request,
-                                         std::string port,
-                                         Http::Timeout timeout)
+    Query<ReqType, ResType>::Query(std::unique_ptr<beast::http::request<ReqType>> request,
+                                   std::string port,
+                                   Timeout timeout)
     : m_request(std::move(request))
     , m_response()
     , m_error()
@@ -126,16 +126,16 @@ namespace kiwi { namespace network {
     }
     
     template<class ReqType, class ResType>
-    Http::Query<ReqType, ResType>::~Query()
+    Query<ReqType, ResType>::~Query()
     {
         ;
     }
     
     template<class ReqType, class ResType>
-    Http::Response<ResType>
-    Http::Query<ReqType, ResType>::writeRequest(Http::Error& error)
+    Response<ResType>
+    Query<ReqType, ResType>::writeRequest(Error& error)
     {
-        if (m_timeout > Http::Timeout(0))
+        if (m_timeout > Timeout(0))
         {
             m_timer.expires_from_now(m_timeout);
             
@@ -168,7 +168,7 @@ namespace kiwi { namespace network {
     
     template<class ReqType, class ResType>
     void
-    Http::Query<ReqType, ResType>::handleTimeout(beast::error_code const& error)
+    Query<ReqType, ResType>::handleTimeout(beast::error_code const& error)
     {
         m_io_service.stop();
         
@@ -178,8 +178,8 @@ namespace kiwi { namespace network {
     
     template<class ReqType, class ResType>
     void
-    Http::Query<ReqType, ResType>::connect(beast::error_code const& error,
-                                           tcp::resolver::iterator iterator)
+    Query<ReqType, ResType>::connect(beast::error_code const& error,
+                                     tcp::resolver::iterator iterator)
     {
         if (error)
         {
@@ -196,7 +196,7 @@ namespace kiwi { namespace network {
     
     template<class ReqType, class ResType>
     void
-    Http::Query<ReqType, ResType>::write(beast::error_code const& error)
+    Query<ReqType, ResType>::write(beast::error_code const& error)
     {
         if (error)
         {
@@ -213,7 +213,7 @@ namespace kiwi { namespace network {
     
     template<class ReqType, class ResType>
     void
-    Http::Query<ReqType, ResType>::read(beast::error_code const& error)
+    Query<ReqType, ResType>::read(beast::error_code const& error)
     {
         if (error)
         {
@@ -229,7 +229,7 @@ namespace kiwi { namespace network {
     
     template<class ReqType, class ResType>
     void
-    Http::Query<ReqType, ResType>::shutdown(beast::error_code const& error)
+    Query<ReqType, ResType>::shutdown(beast::error_code const& error)
     {
         m_io_service.stop();
         
@@ -243,4 +243,4 @@ namespace kiwi { namespace network {
         }
     }
     
-}} // namespace kiwi::network
+}}} // namespace kiwi::network::http

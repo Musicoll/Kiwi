@@ -51,7 +51,7 @@ TEST_CASE("Network - Http", "[Network, Http]")
         
         // Send request and waits for response.
         beast::http::response<beast::http::string_body> response =
-        Http::write<beast::http::string_body, beast::http::string_body>(std::move(request), "80", error);
+        http::write<beast::http::string_body, beast::http::string_body>(std::move(request), "80", error);
         
         CHECK(response.result() == beast::http::status::ok);
         CHECK(!error);
@@ -60,7 +60,7 @@ TEST_CASE("Network - Http", "[Network, Http]")
     SECTION("Client asynchronous get request to echo server")
     {
         // Construct request and response.
-        auto request = std::make_unique<Http::Request<beast::http::string_body>>();
+        auto request = std::make_unique<http::Request<beast::http::string_body>>();
         request->method(beast::http::verb::get);
         request->target("/get");
         request->version = 11;
@@ -69,14 +69,14 @@ TEST_CASE("Network - Http", "[Network, Http]")
         
         request->prepare_payload();
         
-        std::function<void(Http::Response<beast::http::dynamic_body>, Http::Error)>
-        callback = [](Http::Response<beast::http::dynamic_body> response, Http::Error error)
+        std::function<void(http::Response<beast::http::dynamic_body>, http::Error)>
+        callback = [](http::Response<beast::http::dynamic_body> response, http::Error error)
         {
             CHECK(response.result() == beast::http::status::ok);
             CHECK(!error);
         };
         
-        auto future = Http::writeAsync(std::move(request), "80", callback);
+        auto future = http::writeAsync(std::move(request), "80", callback);
         
         future.get();
     }
@@ -91,14 +91,14 @@ TEST_CASE("Network - Http", "[Network, Http]")
         header.target("/get");
         header.set(beast::http::field::user_agent, "KiwiApp - Tests");
         
-        std::function<void(Http::Response<beast::http::string_body>, Http::Error)>
-        callback = [](Http::Response<beast::http::string_body> response, Http::Error error)
+        std::function<void(http::Response<beast::http::string_body>, http::Error)>
+        callback = [](http::Response<beast::http::string_body> response, http::Error error)
         {
             REQUIRE_FALSE(error);
             CHECK(response.result() == beast::http::status::ok);
         };
         
-        auto future = Http::writeAsync(std::make_unique<Http::Request<beast::http::empty_body>>(std::move(header)),
+        auto future = http::writeAsync(std::make_unique<http::Request<beast::http::empty_body>>(std::move(header)),
                                        "80",
                                        callback);
         
