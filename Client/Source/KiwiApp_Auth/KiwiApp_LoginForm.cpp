@@ -309,7 +309,7 @@ namespace kiwi
             
             auto callback = [this](Api::Response res)
             {
-                KiwiApp::useInstance().useScheduler().schedule([this, res{std::move(res)}]()
+                KiwiApp::useInstance().useScheduler().schedule([this, res = std::move(res)]()
                 {
                     removeChildComponent(m_overlay);
                     m_overlay.deleteAndZero();

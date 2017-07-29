@@ -78,7 +78,7 @@ namespace kiwi
     
     void Api::getDocuments(std::function<void(Response, Api::Documents)> callback)
     {
-        auto cb = [callback{std::move(callback)}](Response res)
+        auto cb = [callback = std::move(callback)](Response res)
         {
             if (!res.error && res.result() == beast::http::status::ok)
             {
