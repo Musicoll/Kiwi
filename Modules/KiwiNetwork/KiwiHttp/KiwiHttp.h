@@ -35,16 +35,11 @@
 
 namespace kiwi { namespace network { namespace http {
     
-    using tcp = boost::asio::ip::tcp;
-    
-    //template<class ResponseType>
-    //using Response = beast::http::response<ResponseType>;
-    
-    template<class ResponseType>
+    template<class BodyType>
     class Response;
     
-    template<class RequestType>
-    using Request = beast::http::request<RequestType>;
+    template<class BodyType>
+    using Request = beast::http::request<BodyType>;
     
     using Timeout = std::chrono::milliseconds;
     using Error = beast::error_code;
@@ -56,7 +51,6 @@ namespace kiwi { namespace network { namespace http {
     static Response<ResType>
     write(std::unique_ptr<Request<ReqType>> request,
           std::string port,
-          Error& error,
           Timeout timeout = Timeout(0));
     
     //! @brief Sends an http request asynchronously.
@@ -66,55 +60,8 @@ namespace kiwi { namespace network { namespace http {
     static std::future<void>
     writeAsync(std::unique_ptr<Request<ReqType>> request,
                std::string port,
-               std::function<void(Response<ResType>, Error)> callback,
+               std::function<void(Response<ResType>)> callback,
                Timeout timeout = Timeout(0));
-    
-    // ================================================================================ //
-    //                                     PAYLOAD                                      //
-    // ================================================================================ //
-    
-    class Payload
-    {
-    public:
-        
-        struct Pair;
-        
-        template <class It>
-        Payload(const It begin, const It end);
-        
-        Payload(std::initializer_list<Pair> const& pairs);
-        
-        void AddPair(Pair const& pair);
-        
-        std::string content;
-    };
-    
-    // ================================================================================ //
-    //                                     PARAMETERS                                   //
-    // ================================================================================ //
-    
-    class Parameters
-    {
-    public:
-        
-        struct Parameter;
-        
-        Parameters() = default;
-        Parameters(const std::initializer_list<Parameter>& parameters);
-        
-        void AddParameter(Parameter const& parameter);
-        
-        std::string content;
-    };
-    
-    struct Parameters::Parameter
-    {
-        template <typename KeyType, typename ValueType>
-        Parameter(KeyType&& key, ValueType&& value);
-        
-        std::string key;
-        std::string value;
-    };
     
     // ================================================================================ //
     //                                      RESPONSE                                    //
@@ -124,13 +71,15 @@ namespace kiwi { namespace network { namespace http {
     class Response : public beast::http::response<ResponseType>
     {
     public:
+        
+        Error error;
     };
     
     // ================================================================================ //
     //                                       QUERY                                      //
     // ================================================================================ //
     
-    template<class ReqType, class ResType>
+    template<class ReqType>
     class Query
     {
     public: // methods
@@ -144,22 +93,31 @@ namespace kiwi { namespace network { namespace http {
         ~Query();
         
         //! @brief Write the request and get the response.
-        Response<ResType> writeRequest(Error& error);
+        template<class ResType>
+        Response<ResType> writeRequest();
         
     private: // methods
+        
+        using tcp = boost::asio::ip::tcp;
         
         //! @internal
         void handleTimeout(beast::error_code const& error);
         
         //! @internal
-        void connect(beast::error_code const& error,
+        template<class ResType>
+        void connect(Response<ResType>& response,
+                     beast::error_code const& error,
                      tcp::resolver::iterator iterator);
         
         //! @internal
-        void write(beast::error_code const& error);
+        template<class ResType>
+        void write(Response<ResType>& response,
+                   beast::error_code const& error);
         
         //! @internal
-        void read(beast::error_code const& error);
+        template<class ResType>
+        void read(Response<ResType>& response,
+                  beast::error_code const& error);
         
         //! @internal
         void shutdown(beast::error_code const& error);
@@ -167,7 +125,6 @@ namespace kiwi { namespace network { namespace http {
     private: // members
         
         std::unique_ptr<Request<ReqType>>   m_request;
-        Response<ResType>                   m_response;
         Error                               m_error;
         Timeout                             m_timeout;
         

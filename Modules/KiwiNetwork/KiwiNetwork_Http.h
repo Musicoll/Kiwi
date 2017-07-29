@@ -22,3 +22,4 @@
 #pragma once
 
 #include "KiwiHttp/KiwiHttp.h"
+#include "KiwiHttp/KiwiHttp_Session.h"

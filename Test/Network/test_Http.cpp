@@ -50,11 +50,11 @@ TEST_CASE("Network - Http", "[Network, Http]")
         beast::error_code error;
         
         // Send request and waits for response.
-        beast::http::response<beast::http::string_body> response =
-        http::write<beast::http::string_body, beast::http::string_body>(std::move(request), "80", error);
+        http::Response<beast::http::string_body> response =
+        http::write<beast::http::string_body, beast::http::string_body>(std::move(request), "80");
         
+        REQUIRE(!response.error);
         CHECK(response.result() == beast::http::status::ok);
-        CHECK(!error);
     }
     
     SECTION("Client asynchronous get request to echo server")
@@ -69,39 +69,49 @@ TEST_CASE("Network - Http", "[Network, Http]")
         
         request->prepare_payload();
         
-        std::function<void(http::Response<beast::http::dynamic_body>, http::Error)>
-        callback = [](http::Response<beast::http::dynamic_body> response, http::Error error)
+        std::function<void(http::Response<beast::http::string_body>)>
+        callback = [](http::Response<beast::http::string_body> response)
         {
+            REQUIRE(!response.error);
             CHECK(response.result() == beast::http::status::ok);
-            CHECK(!error);
         };
         
         auto future = http::writeAsync(std::move(request), "80", callback);
+        future.get();
+    }
+}
+
+TEST_CASE("Network - Http Session", "[Network, Http]")
+{
+    using namespace kiwi::network;
+    
+    SECTION("Session GetAsync")
+    {
+        http::Session session;
+        session.setHost("httpbin.org");
+        session.setTarget("/get");
+        
+        auto future = session.GetAsync([](http::Session::Response response) {
+            REQUIRE(!response.error);
+            CHECK(response.result() == beast::http::status::ok);
+        });
         
         future.get();
     }
     
-    SECTION("Deferred request body")
+    SECTION("Session GetAsync with Parameters")
     {
-        beast::http::header<true, beast::http::fields> header;
+        http::Session session;
+        session.setHost("httpbin.org");
+        session.setTarget("/get");
+        session.setParameters({
+            {"foo", "bar bar"},
+            {"value", "42"}
+        });
         
-        header.version = 11;
-        header.method(beast::http::verb::get);
-        header.set(beast::http::field::host, "httpbin.org");
-        header.target("/get");
-        header.set(beast::http::field::user_agent, "KiwiApp - Tests");
-        
-        std::function<void(http::Response<beast::http::string_body>, http::Error)>
-        callback = [](http::Response<beast::http::string_body> response, http::Error error)
-        {
-            REQUIRE_FALSE(error);
+        session.GetAsync([](http::Session::Response response) {
+            REQUIRE(!response.error);
             CHECK(response.result() == beast::http::status::ok);
-        };
-        
-        auto future = http::writeAsync(std::make_unique<http::Request<beast::http::empty_body>>(std::move(header)),
-                                       "80",
-                                       callback);
-        
-        future.get();
+        });
     }
 }

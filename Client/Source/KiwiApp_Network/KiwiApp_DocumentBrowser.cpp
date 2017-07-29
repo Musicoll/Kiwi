@@ -156,32 +156,30 @@ namespace kiwi
     
     void DocumentBrowser::Drive::createNewDocument()
     {
-        KiwiApp::useApi().createDocument("", [this](Api::Response res,
-                                                    Api::Error error,
-                                                    Api::Document document) {
+        KiwiApp::useApi().createDocument("", [this](Api::Response res, Api::Document document) {
             
-            if(error)
+            if(res.error)
             {
-                juce::MessageManager::callAsync([message = error.message()](){
+                juce::MessageManager::callAsync([message = res.error.message()](){
                     KiwiApp::error("Error: can't create document");
                     KiwiApp::error("=> " + message);
                 });
-                
-                return;
             }
-            
-            juce::MessageManager::callAsync([this, document]() {
-                
-                auto it = m_documents.emplace(m_documents.end(), std::make_unique<DocumentSession>(*this, std::move(document)));
-                
-                m_listeners.call(&Listener::documentAdded, *(it->get()));
-                m_listeners.call(&Listener::driveChanged);
-                
-                (*it)->open();
-            });
-            
+            else
+            {
+                juce::MessageManager::callAsync([this, document]() {
+                    
+                    auto it = m_documents.emplace(m_documents.end(),
+                                                  std::make_unique<DocumentSession>(*this,
+                                                                                    std::move(document)));
+                    
+                    m_listeners.call(&Listener::documentAdded, *(it->get()));
+                    m_listeners.call(&Listener::driveChanged);
+                    
+                    (*it)->open();
+                });
+            }
         });
-        
     }
     
     DocumentBrowser::Drive::DocumentSessions const& DocumentBrowser::Drive::getDocuments() const
@@ -269,11 +267,11 @@ namespace kiwi
     
     void DocumentBrowser::Drive::refresh()
     {
-        KiwiApp::useApi().getDocuments([this](Api::Response res, Api::Error error, Api::Documents docs) {
+        KiwiApp::useApi().getDocuments([this](Api::Response res, Api::Documents docs) {
             
-            if(error)
+            if(res.error)
             {
-                KiwiApp::error("Kiwi API error: can't get documents => " + error.message());
+                KiwiApp::error("Kiwi API error: can't get documents => " + res.error.message());
             }
             else
             {
@@ -333,16 +331,15 @@ namespace kiwi
             return;
         }
         
-        KiwiApp::useApi().renameDocument(m_document._id, new_name,
-                                         [](Api::Response res, Api::Error error) {
+        KiwiApp::useApi().renameDocument(m_document._id, new_name, [](Api::Response res) {
             
-            if(!error)
+            if(!res.error)
             {
-                std::cout << "document successfully updated" << '\n';
+                std::cout << "document update failed, err: " + res.error.message() << '\n';
             }
             else
             {
-                std::cout << "document update failed, err: " + error.message() << '\n';
+                std::cout << "document successfully updated\n";
             }
             
         });

@@ -307,18 +307,16 @@ namespace kiwi
             addAndMakeVisible(m_overlay = new OverlayComp());
             resized();
             
-            auto callback = [this](Api::Response res, Api::Error err)
+            auto callback = [this](Api::Response res)
             {
-                KiwiApp::useInstance().useScheduler().schedule([this,
-                                                                res=std::move(res),
-                                                                err=std::move(err)]()
+                KiwiApp::useInstance().useScheduler().schedule([this, res{std::move(res)}]()
                 {
                     removeChildComponent(m_overlay);
                     m_overlay.deleteAndZero();
                     
-                    if(err)
+                    if(res.error)
                     {
-                        std::string message = "Error:" + err.message();
+                        std::string message = "Error:" + res.error.message();
                         std::cout << message << "\n";
                         showAlert(message, AlertBox::Type::Error);
                         return;

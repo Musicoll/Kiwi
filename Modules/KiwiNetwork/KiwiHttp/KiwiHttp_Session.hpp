@@ -19,61 +19,56 @@
  ==============================================================================
  */
 
-#include "KiwiHttp.h"
-#include "KiwiHttp_Util.h"
+#pragma once
 
 namespace kiwi { namespace network { namespace http {
     
     // ================================================================================ //
-    //                                  HTTP PAYLOAD                                    //
+    //                                    HTTP PAYLOAD                                  //
     // ================================================================================ //
     
-    Payload::Payload(const std::initializer_list<Pair>& pairs)
-    : Payload(begin(pairs), end(pairs))
+    template <class It>
+    Payload::Payload(const It begin, const It end)
+    {
+        for (It pair = begin; pair != end; ++pair)
+        {
+            AddPair(*pair);
+        }
+    }
+    
+    struct Payload::Pair
+    {
+        template <typename KeyType, typename ValueType,
+        typename std::enable_if<!std::is_integral<ValueType>::value, bool>::type = true>
+        Pair(KeyType&& p_key, ValueType&& p_value)
+        : key{std::forward<KeyType>(p_key)}
+        , value{std::forward<ValueType>(p_value)}
+        {
+            ;
+        }
+        
+        template <typename KeyType>
+        Pair(KeyType&& p_key, const std::int32_t& p_value)
+        : key{std::forward<KeyType>(p_key)}
+        , value{std::to_string(p_value)}
+        {
+            ;
+        }
+        
+        std::string key;
+        std::string value;
+    };
+    
+    // ================================================================================ //
+    //                                  HTTP PARAMETERS                                 //
+    // ================================================================================ //
+    
+    template <typename KeyType, typename ValueType>
+    Parameters::Parameter::Parameter(KeyType&& key, ValueType&& value)
+    : key{std::forward<KeyType>(key)}
+    , value{std::forward<ValueType>(value)}
     {
         ;
-    }
-    
-    void Payload::AddPair(const Pair& pair)
-    {
-        if(!content.empty())
-        {
-            content += "&";
-        }
-        
-        auto escaped = util::urlEncode(pair.value);
-        content += pair.key + "=" + escaped;
-    }
-    
-    // ================================================================================ //
-    //                                 HTTP PARAMETERS                                  //
-    // ================================================================================ //
-    
-    Parameters::Parameters(std::initializer_list<Parameter> const& parameters)
-    {
-        for(auto const& parameter : parameters)
-        {
-            AddParameter(parameter);
-        }
-    }
-    
-    void Parameters::AddParameter(Parameter const& parameter)
-    {
-        if (!content.empty())
-        {
-            content += "&";
-        }
-        
-        auto escapedKey = util::urlEncode(parameter.key);
-        if (parameter.value.empty())
-        {
-            content += escapedKey;
-        }
-        else
-        {
-            auto escapedValue = util::urlEncode(parameter.value);
-            content += escapedKey + "=" + escapedValue;
-        }
     }
     
 }}} // namespace kiwi::network::http
