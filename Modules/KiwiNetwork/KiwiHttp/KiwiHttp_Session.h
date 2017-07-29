@@ -96,7 +96,7 @@ namespace kiwi { namespace network { namespace http {
     {
     public: // methods
         
-        using Response = Response<beast::http::string_body>;
+        using Response = http::Response<beast::http::string_body>;
         using AsyncResponse = std::future<void>;
         using Callback = std::function<void(Response)>;
         

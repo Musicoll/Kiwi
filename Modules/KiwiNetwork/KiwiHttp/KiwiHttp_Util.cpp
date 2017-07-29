@@ -25,7 +25,7 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
-#include <vector>
+#include <cctype>
 
 namespace kiwi { namespace network { namespace http { namespace util {
     

@@ -222,7 +222,7 @@ namespace kiwi { namespace network { namespace http {
     Session::AsyncResponse Session::makeResponse(beast::http::verb verb, Session::Callback && callback)
     {
         m_req_header.method(verb);
-        return std::async(std::launch::async, [query{makeQuery()}, cb{std::move(callback)}]() {
+        return std::async(std::launch::async, [query = makeQuery(), cb = std::move(callback)]() {
             return cb(std::move(query->writeRequest<Response::body_type>()));
         });
     }
