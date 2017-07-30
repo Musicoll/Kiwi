@@ -19,8 +19,8 @@
  ==============================================================================
  */
 
-#include "KiwiApp_SuggestEditor.h"
-#include "../KiwiApp.h"
+#include <KiwiApp_Components/KiwiApp_SuggestEditor.h>
+#include <KiwiApp.h>
 
 namespace kiwi
 {
@@ -30,7 +30,11 @@ namespace kiwi
 
     SuggestEditor::Menu::Menu(SuggestList& list) :
     m_suggest_list(list),
-    m_resizable_corner(this, &m_constrainer)
+    m_suggest_list_box(),
+    m_constrainer(),
+    m_resizable_corner(this, &m_constrainer),
+    m_validated_action(),
+    m_selected_action()
     {
         setAlwaysOnTop(true);
         setOpaque(true);
@@ -120,14 +124,9 @@ namespace kiwi
         m_suggest_list_box.updateContent();
     }
     
-    void SuggestEditor::Menu::setItemClickedAction(action_method_t function)
+    void SuggestEditor::Menu::setItemValidatedAction(action_method_t function)
     {
-        m_clicked_action = function;
-    }
-    
-    void SuggestEditor::Menu::setItemDoubleClickedAction(action_method_t function)
-    {
-        m_double_clicked_action = function;
+        m_validated_action = function;
     }
     
     void SuggestEditor::Menu::setSelectedItemAction(action_method_t function)
@@ -159,19 +158,30 @@ namespace kiwi
     
     void SuggestEditor::Menu::listBoxItemClicked(int row, juce::MouseEvent const& e)
     {
-        if(m_clicked_action && (row < m_suggest_list.size()))
+        if(m_selected_action && (row < m_suggest_list.size()))
         {
             std::string const& str = *(m_suggest_list.begin() + row);
-            m_clicked_action(str);
+            m_selected_action(str);
+        }
+    }
+    
+    void SuggestEditor::Menu::validateSelectedRow()
+    {
+        int selected_row = m_suggest_list_box.getSelectedRow();
+        
+        if (selected_row != -1 && m_validated_action)
+        {
+            std::string const& str = *(m_suggest_list.begin() + selected_row);
+            m_validated_action(str);
         }
     }
     
     void SuggestEditor::Menu::listBoxItemDoubleClicked(int row, juce::MouseEvent const& e)
     {
-        if(m_double_clicked_action && (row < m_suggest_list.size()))
+        if (row < m_suggest_list.size())
         {
-            std::string const& str = *(m_suggest_list.begin() + row);
-            m_double_clicked_action(str);
+            selectRow(row);
+            validateSelectedRow();
         }
     }
     
@@ -188,8 +198,10 @@ namespace kiwi
     //                                  SUGGEST EDITOR                                  //
     // ================================================================================ //
     
-    SuggestEditor::SuggestEditor(SuggestList::entries_t entries)
-    : m_suggest_list(std::move(entries))
+    SuggestEditor::SuggestEditor(SuggestList::entries_t entries) :
+    m_suggest_list(std::move(entries)),
+    m_splited_text(),
+    m_menu()
     {
         setReturnKeyStartsNewLine(false);
         setTabKeyUsedAsCharacter(false);
@@ -203,24 +215,13 @@ namespace kiwi
         closeMenu();
     }
     
-    void SuggestEditor::addListener(SuggestEditor::Listener& listener)
-    {
-        m_listeners.add(listener);
-    }
-    
-    void SuggestEditor::removeListener(SuggestEditor::Listener& listener)
-    {
-        m_listeners.remove(listener);
-    }
-    
     void SuggestEditor::showMenu()
     {        
         m_menu.reset(new Menu(m_suggest_list));
         
         using namespace std::placeholders; // for _1, _2 etc.
-        m_menu->setSelectedItemAction(std::bind(&SuggestEditor::menuSelectionChanged, this, _1));
-        m_menu->setItemClickedAction(std::bind(&SuggestEditor::menuItemClicked, this, _1));
-        m_menu->setItemDoubleClickedAction(std::bind(&SuggestEditor::menuItemDoubleClicked, this, _1));
+        m_menu->setSelectedItemAction(std::bind(&SuggestEditor::menuItemSelected, this, _1));
+        m_menu->setItemValidatedAction(std::bind(&SuggestEditor::menuItemValidated, this, _1));
         
         m_menu->addToDesktop(juce::ComponentPeer::windowIsTemporary
                               | juce::ComponentPeer::windowHasDropShadow
@@ -229,8 +230,6 @@ namespace kiwi
         const auto sb = getScreenBounds();
         m_menu->setTopLeftPosition(sb.getX() - 2, sb.getBottom() + 2);
         m_menu->setVisible(true);
-        
-        m_need_complete = true;
         
         startTimer(200);
     }
@@ -249,84 +248,72 @@ namespace kiwi
         }
     }
     
+    std::vector<juce::String> split(juce::String const& text, juce::String divider)
+    {
+        std::vector<juce::String> split;
+        
+        int current_index = 0;
+        
+        while(current_index < text.length())
+        {
+            if (text[current_index] != ' ')
+            {
+                int next_space_index = text.indexOfAnyOf(divider, current_index);
+                int next_index = next_space_index != -1 ? next_space_index : text.length();
+                
+                split.push_back(text.substring(current_index, next_index));
+                
+                current_index = next_index;
+            }
+            else
+            {
+                ++current_index;
+            }
+        }
+        
+        return split;
+    }
+    
     void SuggestEditor::textEditorTextChanged(juce::TextEditor&)
     {
-        m_typed_text = getText();
-        m_suggest_list.applyFilter(m_typed_text.toStdString());
+        m_splited_text = split(getText(), " ");
         
-        setCaretVisible(true);
-        
-        if(isMenuOpened() && m_suggest_list.empty())
+        if (m_splited_text.size() == 1)
         {
-            closeMenu();
-        }
-        else if(!m_suggest_list.empty())
-        {
-            if(isMenuOpened())
-                m_menu->update();
-            else if(!m_typed_text.isEmpty())
-                showMenu();
+            m_suggest_list.applyFilter(m_splited_text[0].toStdString());
             
-            if(!m_typed_text.isEmpty() && m_need_complete)
+            setCaretVisible(true);
+            
+            if(isMenuOpened() && m_suggest_list.empty())
             {
-                const juce::String best_suggestion = *m_suggest_list.begin();
-                const auto caret_pos = getCaretPosition();
-                const int suggest_length = static_cast<int>(best_suggestion.length());
-                if(caret_pos < suggest_length && best_suggestion.startsWith(m_typed_text))
+                closeMenu();
+            }
+            else if(!m_suggest_list.empty())
+            {
+                if(isMenuOpened())
                 {
-                    setText(best_suggestion, juce::dontSendNotification);
-                    setHighlightedRegion({caret_pos, suggest_length});
-                    setCaretVisible(false);
+                    m_menu->update();
+                }
+                else
+                {
+                    showMenu();
                     m_menu->selectFirstRow();
                 }
             }
         }
-        
-        m_need_complete = true;
-        m_listeners.call(&Listener::suggestEditorTextChanged, *this);
+        else if (isMenuOpened())
+        {
+            closeMenu();
+        }
     }
     
-    void SuggestEditor::returnPressed()
+    void SuggestEditor::menuItemSelected(juce::String const& text)
     {
-        TextEditor::returnPressed();
-        m_listeners.call(&Listener::suggestEditorReturnKeyPressed, *this);
     }
     
-    void SuggestEditor::escapePressed()
+    void SuggestEditor::menuItemValidated(juce::String const& text)
     {
-        m_listeners.call(&Listener::suggestEditorEscapeKeyPressed, *this);
-    }
-    
-    void SuggestEditor::focusLost(juce::Component::FocusChangeType focus_change)
-    {
-        juce::TextEditor::focusLost(focus_change);
-        m_listeners.call(&Listener::suggestEditorFocusLost, *this);
-    }
-    
-    void SuggestEditor::menuSelectionChanged(juce::String const& text)
-    {
-        setText(text, juce::dontSendNotification);
-        const auto caret_pos = getCaretPosition();
-        const auto typed_text_lenght = m_typed_text.length();
-        const auto startpos = typed_text_lenght >= caret_pos ? caret_pos : typed_text_lenght;
-        setHighlightedRegion({startpos, text.length()});
-        setCaretVisible(text.isEmpty());
-        m_listeners.call(&Listener::suggestEditorTextChanged, *this);
-    }
-    
-    void SuggestEditor::menuItemClicked(juce::String const& text)
-    {
-        setText(text, juce::dontSendNotification);
-        const auto caret_pos = getCaretPosition();
-        const auto typed_text_lenght = m_typed_text.length();
-        const auto startpos = typed_text_lenght >= caret_pos ? caret_pos : typed_text_lenght;
-        setHighlightedRegion({startpos, text.length()});
-        setCaretVisible(text.isEmpty());
-    }
-    
-    void SuggestEditor::menuItemDoubleClicked(juce::String const& text)
-    {
-        setText(text, juce::dontSendNotification);
+        setText(text);
         setCaretPosition(text.length());
         setCaretVisible(true);
         closeMenu();
@@ -359,19 +346,30 @@ namespace kiwi
     {
         setCaretVisible(true);
         
-        m_need_complete = !(key == juce::KeyPress::deleteKey || key == juce::KeyPress::backspaceKey);
-        
         bool result = false;
         
-        if(isMenuOpened() && key == juce::KeyPress::downKey)
+        if (isMenuOpened())
         {
-            m_menu->selectNextRow();
-            result = true;
-        }
-        else if(isMenuOpened() && key == juce::KeyPress::upKey)
-        {
-            m_menu->selectPreviousRow();
-            result = true;
+            if(key == juce::KeyPress::downKey)
+            {
+                m_menu->selectNextRow();
+                result = true;
+            }
+            else if(key == juce::KeyPress::upKey)
+            {
+                m_menu->selectPreviousRow();
+                result = true;
+            }
+            else if(key == juce::KeyPress::returnKey)
+            {
+                m_menu->validateSelectedRow();
+                result = true;
+            }
+            else if(key == juce::KeyPress::escapeKey)
+            {
+                closeMenu();
+                result = true;
+            }
         }
         
         if(!result)

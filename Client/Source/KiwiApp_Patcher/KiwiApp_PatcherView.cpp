@@ -25,10 +25,12 @@
 
 #include "KiwiApp_PatcherView.h"
 
+#include <KiwiApp_Patcher/KiwiApp_ObjectView.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Objects.h>
+
 #include "../KiwiApp.h"
 #include "../KiwiApp_General/KiwiApp_CommandIDs.h"
 #include "../KiwiApp_Network/KiwiApp_DocumentManager.h"
-#include "KiwiApp_ObjectView.h"
 #include "KiwiApp_LinkView.h"
 #include "KiwiApp_PatcherComponent.h"
 
@@ -163,7 +165,7 @@ namespace kiwi
 
             if(hit.objectTouched())
             {
-                ObjectView* object_view = hit.getObject();
+                ObjectFrame* object_view = hit.getObject();
                 if(object_view)
                 {
                     if(hit.getZone() == HitTester::Zone::Inside)
@@ -273,7 +275,7 @@ namespace kiwi
                 {
                     const bool sender = m_link_creator->isBindedToSender();
                     
-                    ObjectView* object_view = end_pair.first;
+                    ObjectFrame* object_view = end_pair.first;
                     if(object_view != nullptr)
                     {
                         if(sender)
@@ -296,7 +298,7 @@ namespace kiwi
             
             if(hit.objectTouched())
             {
-                ObjectView* object_view = hit.getObject();
+                ObjectFrame* object_view = hit.getObject();
                 if(object_view)
                 {
                     if(m_object_received_down_event && hit.getZone() == HitTester::Zone::Inside)
@@ -417,7 +419,8 @@ namespace kiwi
             
             if(hit.objectTouched() && hit.getZone() == HitTester::Zone::Inside)
             {
-                ObjectView* object_view = hit.getObject();
+                ObjectFrame* object_view = hit.getObject();
+                
                 if(object_view)
                 {
                     if(e.mods.isCommandDown())
@@ -427,7 +430,7 @@ namespace kiwi
                     }
                     else if(m_select_on_mouse_down_status && !m_is_in_move_or_resize_gesture)
                     {
-                        startEditBox(dynamic_cast<ClassicBox*>(object_view));
+                        editObject(*object_view);
                     }
                 }
             }
@@ -436,7 +439,7 @@ namespace kiwi
             
             if(hit.objectTouched())
             {
-                ObjectView* object_view = hit.getObject();
+                ObjectFrame* object_view = hit.getObject();
                 if(object_view)
                 {
                     selectOnMouseUp(*object_view, !e.mods.isShiftDown(), m_is_dragging,
@@ -524,7 +527,7 @@ namespace kiwi
             
             if(e.mods.isCommandDown() && hit.objectTouched())
             {
-                ObjectView* object_view = hit.getObject();
+                ObjectFrame* object_view = hit.getObject();
                 if(object_view)
                 {
                     object_view->mouseDoubleClick(e.getEventRelativeTo(object_view));
@@ -593,7 +596,7 @@ namespace kiwi
         m.show();
     }
     
-    void PatcherView::showObjectPopupMenu(ObjectView const& object, juce::Point<int> const& position)
+    void PatcherView::showObjectPopupMenu(ObjectFrame const& object, juce::Point<int> const& position)
     {
         if(!isLocked())
         {
@@ -653,7 +656,7 @@ namespace kiwi
         
         if(hit.objectTouched())
         {
-            ObjectView* object_view = hit.getObject();
+            ObjectFrame* object_view = hit.getObject();
             if(object_view)
             {
                 m_viewport.jumpViewToObject(*object_view);
@@ -950,9 +953,21 @@ namespace kiwi
         }
     }
     
-    bool PatcherView::isSelected(ObjectView const& object) const
+    bool PatcherView::isSelected(ObjectFrame const& object) const
     {
         return m_view_model.isSelected(object.getModel());
+    }
+    
+    std::set<uint64_t> PatcherView::getDistantSelection(ObjectFrame const& object) const
+    {
+        std::set<uint64_t> distant_selection;
+        
+        if (m_distant_objects_selection.find(object.getModel().ref()) != m_distant_objects_selection.end())
+        {
+            distant_selection = m_distant_objects_selection.at(object.getModel().ref());
+        }
+        
+        return distant_selection;
     }
     
     bool PatcherView::isSelected(LinkView const& link) const
@@ -960,7 +975,7 @@ namespace kiwi
         return m_view_model.isSelected(link.getModel());
     }
     
-    void PatcherView::addToSelectionBasedOnModifiers(ObjectView& object, bool select_only)
+    void PatcherView::addToSelectionBasedOnModifiers(ObjectFrame& object, bool select_only)
     {
         if(select_only)
         {
@@ -992,7 +1007,7 @@ namespace kiwi
         }
     }
     
-    bool PatcherView::selectOnMouseDown(ObjectView& object, bool select_only)
+    bool PatcherView::selectOnMouseDown(ObjectFrame& object, bool select_only)
     {
         if(isSelected(object))
         {
@@ -1014,7 +1029,7 @@ namespace kiwi
         return false;
     }
     
-    void PatcherView::selectOnMouseUp(ObjectView& object, bool select_only,
+    void PatcherView::selectOnMouseUp(ObjectFrame& object, bool select_only,
                                    const bool box_was_dragged, const bool result_of_mouse_down_select_method)
     {
         if(result_of_mouse_down_select_method && ! box_was_dragged)
@@ -1071,10 +1086,8 @@ namespace kiwi
                     const auto it = findObject(*object_m);
                     if(it != m_objects.cend())
                     {
-                        if(startEditBox(dynamic_cast<ClassicBox*>(it->get())))
-                        {
-                            return true;
-                        }
+                        editObject(**it);
+                        return true;
                     }
                 }
             }
@@ -1168,14 +1181,14 @@ namespace kiwi
         return false;
     }
     
-    std::pair<ObjectView*, size_t> PatcherView::getLinkCreatorNearestEndingIolet()
+    std::pair<ObjectFrame*, size_t> PatcherView::getLinkCreatorNearestEndingIolet()
     {
-        ObjectView* result_object = nullptr;
+        ObjectFrame* result_object = nullptr;
         size_t result_index = 0;
         
         if(m_link_creator)
         {
-            const ObjectView& binded_object = m_link_creator->getBindedObject();
+            const ObjectFrame& binded_object = m_link_creator->getBindedObject();
             const juce::Point<int> end_pos = m_link_creator->getEndPosition();
             
             const int max_distance = 50;
@@ -1528,7 +1541,7 @@ namespace kiwi
                 
                 for(auto& object : m_objects)
                 {
-                    object->lockStatusChanged(m_is_locked);
+                    object->lockStatusChanged();
                 }
                 
                 if(m_is_locked)
@@ -1631,7 +1644,7 @@ namespace kiwi
             
             if(old_local_selected_state != new_local_selected_state)
             {
-                local_object_uptr->localSelectionChanged(new_local_selected_state);
+                local_object_uptr->localSelectionChanged();
                 selectionChanged();
             }
             
@@ -1649,7 +1662,7 @@ namespace kiwi
                     // notify object
                     if(distant_selection_changed_for_object)
                     {
-                        local_object_uptr->distantSelectionChanged(distant_it.second);
+                        local_object_uptr->distantSelectionChanged();
                         selectionChanged();
                     }
                 }
@@ -1783,13 +1796,14 @@ namespace kiwi
         if(it == m_objects.cend())
         {
             const auto it = (zorder > 0) ? m_objects.begin() + zorder : m_objects.end();
-            auto new_object_it = m_objects.emplace(it, new ClassicBox(*this, object));
             
-            ObjectView& jobj = *new_object_it->get();
+            std::unique_ptr<ObjectView> object_view = std::make_unique<ClassicView>(object);
+            
+            ObjectFrame& object_frame = **(m_objects.emplace(it, new ObjectFrame(*this, std::move(object_view))));
             
             //jobj.setAlpha(0.);
             //addChildComponent(jobj);
-            addAndMakeVisible(jobj, zorder);
+            addAndMakeVisible(object_frame, zorder);
             
             //juce::ComponentAnimator& animator = juce::Desktop::getInstance().getAnimator();
             //animator.animateComponent(&jobj, jobj.getBounds(), 1., 200., true, 0.8, 1.);
@@ -1802,7 +1816,7 @@ namespace kiwi
         
         if(it != m_objects.cend())
         {
-            ObjectView& object_view = *it->get();
+            ObjectFrame& object_view = *it->get();
             object_view.objectChanged(view, object);
         }
     }
@@ -1813,22 +1827,12 @@ namespace kiwi
         
         if(it != m_objects.cend())
         {
-            ObjectView* object_view = it->get();
+            ObjectFrame* object_view = it->get();
             
             if(m_hittester.getObject() == object_view)
             {
                 // reset hittester to prevent functions like mouseUp() to get an invalid ptr.
                 m_hittester.reset();
-            }
-            
-            if(object_view->isEditing() && m_box_being_edited == object_view)
-            {
-                if(auto classic_box = dynamic_cast<ClassicBox*>(object_view))
-                {
-                    classic_box->removeTextEditor();
-                }
-                
-                m_box_being_edited = nullptr;
             }
             
             juce::ComponentAnimator& animator = juce::Desktop::getInstance().getAnimator();
@@ -1874,9 +1878,9 @@ namespace kiwi
         }
     }
     
-    PatcherView::ObjectViews::iterator PatcherView::findObject(model::Object const& object)
+    PatcherView::ObjectFrames::iterator PatcherView::findObject(model::Object const& object)
     {
-        const auto find_jobj = [&object](std::unique_ptr<ObjectView> const& jobj)
+        const auto find_jobj = [&object](std::unique_ptr<ObjectFrame> const& jobj)
         {
             return (&object == &jobj->getModel());
         };
@@ -1899,7 +1903,7 @@ namespace kiwi
         return m_view_model;
     }
     
-    PatcherView::ObjectViews const& PatcherView::getObjects() const
+    PatcherView::ObjectFrames const& PatcherView::getObjects() const
     {
         return m_objects;
     }
@@ -1909,7 +1913,7 @@ namespace kiwi
         return m_links;
     }
     
-    ObjectView* PatcherView::getObject(model::Object const& object)
+    ObjectFrame* PatcherView::getObject(model::Object const& object)
     {
         const auto it = findObject(object);
         return (it != m_objects.cend()) ? it->get() : nullptr;
@@ -1945,35 +1949,28 @@ namespace kiwi
         }
         return m_patcher_model.addObject("errorbox", std::vector<Atom>(atoms.begin(), atoms.end()));
     }
-    
-    bool PatcherView::startEditBox(ClassicBox* box)
+
+    void PatcherView::editObject(ObjectFrame & object_frame)
     {
         assert(m_box_being_edited == nullptr);
         
-        if(box)
-        {
-            box->edit();
-            m_box_being_edited = box;
-            KiwiApp::commandStatusChanged(); // to disable some command while editing...
-            return true;
-        }
-        
-        return false;
+        object_frame.editObject();
+        m_box_being_edited = &object_frame;
+        KiwiApp::commandStatusChanged(); // to disable some command while editing...
     }
     
-    void PatcherView::endEditBox(ClassicBox& box, std::string new_object_text)
+    void PatcherView::objectEdited(ObjectFrame const& object_frame, std::string const& new_text)
     {
+        grabKeyboardFocus();
+        
+        std::string new_object_text = new_text.empty() ? "newbox" : new_text;
+        
         assert(m_box_being_edited != nullptr);
-        assert(m_box_being_edited == &box);
+        assert(m_box_being_edited == &object_frame);
         
         m_box_being_edited = nullptr;
-        model::Object& old_object_m = box.getModel();
+        model::Object& old_object_m = object_frame.getModel();
         const std::string old_object_text = old_object_m.getText();
-        
-        if(new_object_text.empty())
-        {
-           new_object_text = "newbox";
-        }
         
         if(old_object_text != new_object_text)
         {
@@ -1994,7 +1991,7 @@ namespace kiwi
             const int text_width = juce::Font().getStringWidth(new_object_text);
             
             const juce::Point<int> origin = getOriginPosition();
-            juce::Rectangle<int> box_bounds = box.getBoxBounds();
+            juce::Rectangle<int> box_bounds = object_frame.getObjectBounds();
             new_object_m.setPosition(box_bounds.getX() - origin.x, box_bounds.getY() - origin.y);
             
             new_object_m.setWidth(text_width + 12);
@@ -2096,7 +2093,7 @@ namespace kiwi
             m_view_model.selectObject(new_object);
             
             DocumentManager::commit(m_patcher_model, "Insert New Empty Box");
-            
+
             if(give_focus && m_local_objects_selection.size() == 1)
             {
                 model::Object* object_m = doc.get<model::Object>(*m_local_objects_selection.begin());
@@ -2105,7 +2102,7 @@ namespace kiwi
                     const auto it = findObject(*object_m);
                     if(it != m_objects.cend())
                     {
-                        startEditBox(dynamic_cast<ClassicBox*>(it->get()));
+                        editObject(**it);
                     }
                 }
             }
@@ -2177,17 +2174,17 @@ namespace kiwi
         return !m_local_links_selection.empty();
     }
     
-    void PatcherView::selectObject(ObjectView& object)
+    void PatcherView::selectObject(ObjectFrame& object)
     {
         m_view_model.selectObject(object.getModel());
         DocumentManager::commit(m_patcher_model);
     }
     
-    void PatcherView::selectObjects(std::vector<ObjectView*> const& objects)
+    void PatcherView::selectObjects(std::vector<ObjectFrame*> const& objects)
     {
         bool should_commit = false;
         
-        for(ObjectView* object : objects)
+        for(ObjectFrame* object : objects)
         {
             if(object != nullptr)
             {
@@ -2227,7 +2224,7 @@ namespace kiwi
         }
     }
     
-    void PatcherView::unselectObject(ObjectView& object)
+    void PatcherView::unselectObject(ObjectFrame& object)
     {
         m_view_model.unselectObject(object.getModel());
         DocumentManager::commit(m_patcher_model);
@@ -2239,7 +2236,7 @@ namespace kiwi
         DocumentManager::commit(m_patcher_model);
     }
     
-    void PatcherView::selectObjectOnly(ObjectView& object)
+    void PatcherView::selectObjectOnly(ObjectFrame& object)
     {
         unselectAll();
         selectObject(object);

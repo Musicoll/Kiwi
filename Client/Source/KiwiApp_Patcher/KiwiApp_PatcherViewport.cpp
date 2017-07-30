@@ -19,9 +19,10 @@
  ==============================================================================
  */
 
+#include <KiwiApp_Patcher/KiwiApp_ObjectFrame.h>
+
 #include "KiwiApp_PatcherViewport.h"
 #include "KiwiApp_PatcherView.h"
-#include "KiwiApp_ObjectView.h"
 
 namespace kiwi
 {
@@ -110,10 +111,10 @@ namespace kiwi
         setViewPosition((position + getOriginPosition()) * m_zoom_factor);
     }
     
-    void PatcherViewport::jumpViewToObject(ObjectView const& object_view)
+    void PatcherViewport::jumpViewToObject(ObjectFrame const& object_view)
     {
         const auto view_area = getRelativeViewArea();
-        auto object_bounds = object_view.getBoxBounds();
+        auto object_bounds = object_view.getObjectBounds();
         object_bounds.setPosition(((object_bounds.getPosition() - getOriginPosition())));
         
         if(! view_area.contains(object_bounds))
