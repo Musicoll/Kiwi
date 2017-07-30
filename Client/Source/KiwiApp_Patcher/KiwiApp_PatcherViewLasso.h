@@ -32,7 +32,7 @@
 namespace kiwi
 {
     class PatcherView;
-    class ObjectView;
+    class ObjectFrame;
     
     // ================================================================================ //
     //										LASSO                                       //

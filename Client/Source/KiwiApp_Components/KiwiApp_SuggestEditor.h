@@ -25,7 +25,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include "../KiwiApp_Utils/KiwiApp_SuggestList.h"
+#include <KiwiApp_Utils/KiwiApp_SuggestList.h>
 
 namespace kiwi
 {
@@ -40,10 +40,6 @@ namespace kiwi
     public juce::TextEditor::Listener,
     public juce::Timer
     {
-    public: // classes
-        
-        struct Listener;
-        
     public: // methods
         
         //! @brief Constructor.
@@ -53,11 +49,7 @@ namespace kiwi
         //! @brief Destructor.
         ~SuggestEditor();
         
-        //! @brief Adds a SuggestEditor::Listener.
-        void addListener(SuggestEditor::Listener& listener);
-        
-        //! @brief Removes a SuggestEditor::Listener.
-        void removeListener(SuggestEditor::Listener& listener);
+    private: // methods
         
         //! @brief Shows the menu.
         void showMenu();
@@ -68,36 +60,22 @@ namespace kiwi
         //! @brief Close the menu.
         void closeMenu();
         
-        //! @brief juce::TextEditor::Listener
-        void textEditorTextChanged(juce::TextEditor& ed) override;
-        
-        //! @brief Called when the user presses the return key.
-        void returnPressed() override;
-        
-        //! @brief Called when the user presses the escape key.
-        void escapePressed() override;
-        
-        //! @brief Called when the text editor loses focus.
-        void focusLost(juce::Component::FocusChangeType focus_change) override;
-        
         //! @brief juce::TextEditor.
         bool keyPressed(juce::KeyPress const& key) override;
-        
-    private: // methods
         
         //! @internal Called every 200ms by a juce::Timer.
         //! @details This method will close the menu if its relative position changed
         //! or if editor lost the keyboard focus.
         void timerCallback() override;
         
-        //! @brief Called when the menu selection has changed.
-        void menuSelectionChanged(juce::String const& text);
+        //! @brief juce::TextEditor::Listener
+        void textEditorTextChanged(juce::TextEditor& ed) override;
         
         //! @brief Called when a menu item has been clicked.
-        void menuItemClicked(juce::String const& text);
+        void menuItemSelected(juce::String const& text);
         
         //! @brief Called when a menu item has been double-clicked.
-        void menuItemDoubleClicked(juce::String const& text);
+        void menuItemValidated(juce::String const& text);
         
     private: // classes
         
@@ -106,35 +84,8 @@ namespace kiwi
     private: // members
         
         SuggestList                     m_suggest_list;
+        std::vector<juce::String>       m_splited_text;
         std::unique_ptr<Menu>           m_menu = nullptr;
-        juce::String                    m_typed_text;
-        engine::Listeners<Listener>     m_listeners;
-        
-        bool                            m_need_complete = true;
-    };
-    
-    // ================================================================================ //
-    //                              SUGGEST EDITOR LISTENER                             //
-    // ================================================================================ //
-    
-    //! @brief Receives callbacks from a SuggestEditor component.
-    //! @see SuggestEditor::addListener
-    struct SuggestEditor::Listener
-    {
-        //! @brief Destructor.
-        virtual ~Listener() {}
-        
-        //! @brief Called when the user changes the text in some way.
-        virtual void suggestEditorTextChanged(SuggestEditor& editor) {}
-        
-        //! @brief Called when the user presses the return key.
-        virtual void suggestEditorReturnKeyPressed(SuggestEditor& editor) {}
-        
-        //! @brief Called when the user presses the escape key.
-        virtual void suggestEditorEscapeKeyPressed(SuggestEditor& editor) {}
-        
-        //! @brief Called when the text editor loses focus.
-        virtual void suggestEditorFocusLost(SuggestEditor& editor) {}
     };
     
     // ================================================================================ //
@@ -154,11 +105,8 @@ namespace kiwi
         //! @brief Destructor.
         ~Menu();
         
-        //! @brief Set the action to execute when an item has been clicked.
-        void setItemClickedAction(action_method_t function);
-        
         //! @brief Set the action to execute when an item has been double-clicked.
-        void setItemDoubleClickedAction(action_method_t function);
+        void setItemValidatedAction(action_method_t function);
         
         //! @brief Set the action to execute when an item has been selected.
         void setSelectedItemAction(action_method_t function);
@@ -174,6 +122,9 @@ namespace kiwi
         
         //! @brief Select the next item of the list.
         void selectNextRow();
+        
+        //! @brief Called to validate the current selected row.
+        void validateSelectedRow();
         
         //! @brief Update the list.
         void update();
@@ -210,11 +161,13 @@ namespace kiwi
         
         SuggestList&                        m_suggest_list;
         juce::ListBox                       m_suggest_list_box;
-        juce::ResizableCornerComponent      m_resizable_corner;
         juce::ComponentBoundsConstrainer    m_constrainer;
+        juce::ResizableCornerComponent      m_resizable_corner;
         
-        action_method_t                     m_clicked_action;
-        action_method_t                     m_double_clicked_action;
+        action_method_t                     m_validated_action;
         action_method_t                     m_selected_action;
     };
+    
+    //! @brief Returns text splited using a specified divider.
+    std::vector<juce::String> split(juce::String const& text, juce::String divider);
 }

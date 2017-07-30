@@ -19,9 +19,10 @@
  ==============================================================================
  */
 
+#include <KiwiApp_Patcher/KiwiApp_ObjectFrame.h>
+
 #include "KiwiApp_PatcherViewHitTester.h"
 #include "KiwiApp_PatcherView.h"
-#include "KiwiApp_ObjectView.h"
 #include "KiwiApp_LinkView.h"
 
 namespace kiwi
@@ -132,13 +133,13 @@ namespace kiwi
     }
     
     void HitTester::test(juce::Rectangle<int> const& rect,
-                         std::vector<ObjectView*>& objects, std::vector<LinkView*>& links)
+                         std::vector<ObjectFrame*>& objects, std::vector<LinkView*>& links)
     {
         testObjects(rect, objects);
         testLinks(rect, links);
     }
     
-    void HitTester::testObjects(juce::Rectangle<int> const& rect, std::vector<ObjectView*>& objects)
+    void HitTester::testObjects(juce::Rectangle<int> const& rect, std::vector<ObjectFrame*>& objects)
     {
         objects.clear();
         
@@ -169,7 +170,7 @@ namespace kiwi
         return m_patcher;
     }
     
-    ObjectView* HitTester::getObject() const noexcept
+    ObjectFrame* HitTester::getObject() const noexcept
     {
         if(m_target == Target::Box)
         {

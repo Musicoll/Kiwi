@@ -26,7 +26,7 @@
 namespace kiwi
 {
     class PatcherView;
-    class ObjectView;
+    class ObjectFrame;
     
     // ================================================================================ //
     //                                  PATCHER VIEWPORT                                //
@@ -50,7 +50,7 @@ namespace kiwi
         void resized() override;
         
         //! @brief Make the object visible in the viewport area.
-        void jumpViewToObject(ObjectView const&);
+        void jumpViewToObject(ObjectFrame const&);
         
         //! @brief Attempts to brings the center of the given bounds to the center of the viewport view area
         void bringRectToCentre(juce::Rectangle<int> bounds);

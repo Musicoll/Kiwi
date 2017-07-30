@@ -19,8 +19,9 @@
  ==============================================================================
  */
 
+#include <KiwiApp_Patcher/KiwiApp_ObjectFrame.h>
+
 #include "KiwiApp_PatcherViewIoletHighlighter.h"
-#include "KiwiApp_ObjectView.h"
 #include "../KiwiApp.h"
 
 namespace kiwi
@@ -59,19 +60,19 @@ namespace kiwi
         g.drawRect(bounds);
     }
     
-    void IoletHighlighter::highlightInlet(ObjectView const& object, const size_t index)
+    void IoletHighlighter::highlightInlet(ObjectFrame const& object, const size_t index)
     {
         m_is_inlet = true;
         highlight(object, index);
     }
     
-    void IoletHighlighter::highlightOutlet(ObjectView const& object, const size_t index)
+    void IoletHighlighter::highlightOutlet(ObjectFrame const& object, const size_t index)
     {
         m_is_inlet = false;
         highlight(object, index);
     }
     
-    void IoletHighlighter::highlight(ObjectView const& object, const size_t index)
+    void IoletHighlighter::highlight(ObjectFrame const& object, const size_t index)
     {
         const auto& object_model = object.getModel();
         auto new_name = object_model.getName();

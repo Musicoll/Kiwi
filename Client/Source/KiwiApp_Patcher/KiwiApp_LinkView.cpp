@@ -66,8 +66,8 @@ namespace kiwi
         auto& sender_object_m = m_model->getSenderObject();
         auto& receiver_object_m = m_model->getReceiverObject();
         
-        ObjectView* jbox_sender = m_patcherview.getObject(sender_object_m);
-        ObjectView* jbox_receiver = m_patcherview.getObject(receiver_object_m);
+        ObjectFrame* jbox_sender = m_patcherview.getObject(sender_object_m);
+        ObjectFrame* jbox_receiver = m_patcherview.getObject(receiver_object_m);
         
         if(jbox_sender && jbox_receiver)
         {
@@ -85,14 +85,14 @@ namespace kiwi
     LinkView::~LinkView()
     {
         auto& sender_object_m = m_model->getSenderObject();
-        ObjectView* jbox_sender = m_patcherview.getObject(sender_object_m);
+        ObjectFrame* jbox_sender = m_patcherview.getObject(sender_object_m);
         if(jbox_sender)
         {
             jbox_sender->removeComponentListener(this);
         }
         
         auto& receiver_object_m = m_model->getReceiverObject();
-        ObjectView* jbox_receiver = m_patcherview.getObject(receiver_object_m);
+        ObjectFrame* jbox_receiver = m_patcherview.getObject(receiver_object_m);
         if(jbox_receiver)
         {
             jbox_receiver->removeComponentListener(this);
@@ -131,7 +131,7 @@ namespace kiwi
     
     void LinkView::componentMovedOrResized(Component& component, bool /*was_moved*/, bool /*was_resized*/)
     {
-        ObjectView* jbox = dynamic_cast<ObjectView*>(&component);
+        ObjectFrame* jbox = dynamic_cast<ObjectFrame*>(&component);
         if(jbox)
         {
             if(&jbox->getModel() == &m_model->getSenderObject())
@@ -218,7 +218,7 @@ namespace kiwi
     //                                 LINK VIEW CREATOR                                //
     // ================================================================================ //
     
-    LinkViewCreator::LinkViewCreator(ObjectView& binded_object,
+    LinkViewCreator::LinkViewCreator(ObjectFrame& binded_object,
                                const size_t index,
                                bool is_sender,
                                juce::Point<int> dragged_pos) :
