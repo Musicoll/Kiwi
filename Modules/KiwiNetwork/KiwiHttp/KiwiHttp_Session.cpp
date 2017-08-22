@@ -122,6 +122,11 @@ namespace kiwi { namespace network { namespace http {
         m_timeout = timeout;
     }
     
+    void Session::setAuthorization(std::string const& auth)
+    {
+        m_req_header.set(beast::http::field::authorization, auth);
+    }
+    
     void Session::setParameters(Parameters && parameters)
     {
         m_parameters = std::move(parameters);

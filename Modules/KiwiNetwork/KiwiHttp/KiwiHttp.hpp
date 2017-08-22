@@ -87,7 +87,7 @@ namespace kiwi { namespace network { namespace http {
         {
             m_timer.expires_from_now(m_timeout);
             
-            m_timer.async_wait([this](boost::system::error_code const& error) {
+            m_timer.async_wait([this](Error const& error) {
                 handleTimeout(error);
             });
         }

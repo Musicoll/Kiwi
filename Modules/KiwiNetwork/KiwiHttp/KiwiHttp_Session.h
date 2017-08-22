@@ -107,6 +107,8 @@ namespace kiwi { namespace network { namespace http {
         void setPort(std::string const& port);
         void setTarget(std::string const& endpoint);
         void setTimeout(Timeout timeout);
+        void setAuthorization(std::string const& auth);
+        
         void setParameters(Parameters && parameters);
         void setPayload(Payload && payload);
         void setBody(Body && body);
