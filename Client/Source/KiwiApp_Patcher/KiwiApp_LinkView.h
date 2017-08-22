@@ -23,7 +23,7 @@
 
 #include <KiwiModel/KiwiModel_Link.h>
 
-#include <KiwiApp_Patcher/KiwiApp_ObjectFrame.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectFrame.h>
 
 namespace kiwi
 {

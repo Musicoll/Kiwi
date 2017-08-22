@@ -21,8 +21,8 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include <KiwiApp_Patcher/KiwiApp_ObjectFrame.h>
-#include <KiwiApp_Patcher/KiwiApp_ObjectView.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectFrame.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectView.h>
 
 namespace kiwi
 {

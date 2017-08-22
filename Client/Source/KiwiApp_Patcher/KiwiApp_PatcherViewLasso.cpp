@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include <KiwiApp_Patcher/KiwiApp_ObjectFrame.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectFrame.h>
 
 #include "KiwiApp_PatcherViewLasso.h"
 #include "KiwiApp_PatcherView.h"

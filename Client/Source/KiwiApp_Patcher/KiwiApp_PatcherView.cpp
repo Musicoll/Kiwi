@@ -25,7 +25,7 @@
 
 #include "KiwiApp_PatcherView.h"
 
-#include <KiwiApp_Patcher/KiwiApp_ObjectView.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectView.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Objects.h>
 
 #include "../KiwiApp.h"
