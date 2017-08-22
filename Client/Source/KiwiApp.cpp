@@ -102,6 +102,9 @@ namespace kiwi
         
         m_menu_model.reset(new MainMenuModel());
         
+        m_api_controller.reset(new ApiController());
+        m_api.reset(new Api(*m_api_controller));
+        
         m_instance = std::make_unique<Instance>();
         m_command_manager->registerAllCommandsForTarget(this);
         
@@ -131,6 +134,8 @@ namespace kiwi
         juce::MenuBarModel::setMacMainMenu(nullptr);
         #endif
         
+        m_api.reset();
+        m_api_controller.reset();
         m_settings.reset();
     }
     
@@ -206,12 +211,17 @@ namespace kiwi
     
     Instance& KiwiApp::useInstance()
     {
-        return *KiwiApp::use().m_instance.get();
+        return *KiwiApp::use().m_instance;
     }
     
     Api& KiwiApp::useApi()
     {
-        return KiwiApp::use().m_instance->useApi();
+        return *KiwiApp::use().m_api;
+    }
+    
+    ApiController& KiwiApp::useApiController()
+    {
+        return *KiwiApp::use().m_api_controller;
     }
     
     uint64_t KiwiApp::userID()

@@ -78,7 +78,7 @@ namespace kiwi
             //! @brief Destructor.
             virtual ~Listener() = default;
             
-            //! @brief Called when a document session has been added.
+            //! @brief Called when the network settings has changed.
             virtual void networkSettingsChanged(NetworkSettings const&, juce::Identifier const&) = 0;
         };
                                         

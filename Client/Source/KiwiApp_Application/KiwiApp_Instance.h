@@ -34,10 +34,7 @@
 #include "KiwiApp_BeaconDispatcher.h"
 
 #include "../KiwiApp_Patcher/KiwiApp_PatcherManager.h"
-#include "../KiwiApp_General/KiwiApp_StoredSettings.h"
 #include "../KiwiApp_Audio/KiwiApp_DspDeviceManager.h"
-
-#include "../KiwiApp_Network/KiwiApp_Api.h"
 
 namespace kiwi
 {
@@ -48,7 +45,7 @@ namespace kiwi
     // ================================================================================ //
 
     //! @brief The Application Instance
-    class Instance : public juce::Timer, public NetworkSettings::Listener
+    class Instance : public juce::Timer
     {
     public:
         
@@ -66,9 +63,6 @@ namespace kiwi
         
         //! @brief create a new patcher window.
         void newPatcher();
-        
-        //! @brief Returns the Api object.
-        Api& useApi();
         
         //! @brief Returns the engine::Instance
         engine::Instance& useEngineInstance();
@@ -129,8 +123,6 @@ namespace kiwi
         
         using PatcherManagers = std::vector<std::unique_ptr<PatcherManager>>;
         
-        void networkSettingsChanged(NetworkSettings const&, const juce::Identifier& id) override;
-        
         //! @internal get the given patcher manager iterator.
         PatcherManagers::iterator getPatcherManager(PatcherManager const& manager);
         
@@ -145,8 +137,6 @@ namespace kiwi
         void showWindowWithId(WindowId id, std::function<std::unique_ptr<Window>()> create_fn);
         
     private: // variables
-        
-        std::unique_ptr<Api>                        m_api;
         
         engine::Scheduler<>                         m_scheduler;
         
