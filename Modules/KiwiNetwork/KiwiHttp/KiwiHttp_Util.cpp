@@ -29,18 +29,23 @@
 
 namespace kiwi { namespace network { namespace http { namespace util {
     
-    std::string urlEncode(const std::string& value) {
+    std::string urlEncode(const std::string& value)
+    {
         std::ostringstream escaped;
         escaped.fill('0');
         escaped << std::hex;
         
-        for (auto i = value.cbegin(), n = value.cend(); i != n; ++i) {
+        for (auto i = value.cbegin(), n = value.cend(); i != n; ++i)
+        {
             std::string::value_type c = (*i);
+            
             // Keep alphanumeric and other accepted characters intact
-            if (std::isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+            if (std::isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~')
+            {
                 escaped << c;
                 continue;
             }
+            
             // Any other characters are percent-encoded
             escaped << '%' << std::setw(2) << std::int32_t((unsigned char) c);
         }
