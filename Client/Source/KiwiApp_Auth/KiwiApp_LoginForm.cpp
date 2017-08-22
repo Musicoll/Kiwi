@@ -106,9 +106,12 @@ namespace kiwi
         }
     };
     
-    struct LoginForm::OverlayComp : public juce::Component
+    class LoginForm::OverlayComp : public juce::Component
     {
-        OverlayComp()
+    public: // methods
+        
+        OverlayComp(juce::String message)
+        : m_message(message)
         {
             addAndMakeVisible(spinner);
         }
@@ -125,7 +128,7 @@ namespace kiwi
             g.setColour(juce::Colours::whitesmoke);
             g.setFont(22.0f);
             
-            g.drawFittedText(TRANS("login..."), getLocalBounds().reduced(20, 0).removeFromTop(proportionOfHeight(0.6f)), juce::Justification::centred, 5);
+            g.drawFittedText(m_message, getLocalBounds().reduced(20, 0).removeFromTop(proportionOfHeight(0.6f)), juce::Justification::centred, 5);
         }
         
         void resized() override
@@ -136,7 +139,10 @@ namespace kiwi
                               spinnerSize, spinnerSize);
         }
         
+    private: // variables
+        
         Spinner spinner;
+        juce::String m_message;
         
         JUCE_LEAK_DETECTOR(LoginForm::OverlayComp);
     };
@@ -258,6 +264,24 @@ namespace kiwi
         m_password_box.setTextToShowWhenEmpty(TRANS("Password"), labelCol);
     }
     
+    void LoginForm::showOverlay()
+    {
+        if(m_overlay == nullptr)
+        {
+            addAndMakeVisible(m_overlay = new OverlayComp("login..."));
+            resized();
+        }
+    }
+    
+    void LoginForm::hideOverlay()
+    {
+        if(m_overlay)
+        {
+            removeChildComponent(m_overlay);
+            m_overlay.deleteAndZero();
+        }
+    }
+    
     void LoginForm::showAlert(std::string const& message, AlertBox::Type type)
     {
         const bool was_showing = (m_alert_box != nullptr);
@@ -288,6 +312,7 @@ namespace kiwi
             dismiss();
     }
     
+    
     void LoginForm::attemptRegistration()
     {
         if(m_overlay == nullptr)
@@ -304,56 +329,41 @@ namespace kiwi
                 return;
             }
             
-            addAndMakeVisible(m_overlay = new OverlayComp());
-            resized();
+            showOverlay();
             
-            auto callback = [this](Api::Response res)
+            auto success_callback = [this](Api::AuthUser user)
             {
-                KiwiApp::useInstance().useScheduler().schedule([this, res = std::move(res)]()
-                {
-                    removeChildComponent(m_overlay);
-                    m_overlay.deleteAndZero();
+                KiwiApp::useInstance().useScheduler().schedule([this, user = std::move(user)]() {
                     
-                    if(res.error)
-                    {
-                        std::string message = "Error:" + res.error.message();
-                        std::cout << message << "\n";
-                        showAlert(message, AlertBox::Type::Error);
-                        return;
-                    }
-                    else
-                    {
-                        auto j = json::parse(res.body);
-                        
-                        if(j.is_object())
-                        {
-                            if(res.result() == beast::http::status::ok)
-                            {
-                                std::cout << "Authenticated !\n";
-                                std::cout << "token: " << j["token"] << "\n";
-                                showAlert("Login success!", AlertBox::Type::Success);
-                            }
-                            else
-                            {
-                                std::cout << "Failed...\n";
-                                std::string message = "Unknown Error !";
-                                if(j.count("message"))
-                                {
-                                    message = j["message"];
-                                }
-                                
-                                std::cout << "Error: " << message << "\n";
-                                showAlert(message, AlertBox::Type::Error);
-                            }
-                        }
-                    }
+                    std::cout << "Authenticated !\n";
+                    std::cout << "User ID: " << user.api_id << "\n";
+                    
+                    hideOverlay();
+                    showAlert("Login success, welcome " + user.name + "!", AlertBox::Type::Success);
+                    
+                    //auto& api_controller = KiwiApp::useApiController();
+                    //api_controller.setAuthUser(user);
                     
                 }, std::chrono::milliseconds(500));
             };
             
-            KiwiApp::useApi().getAuthToken(m_email_box.getText().toStdString(),
-                                           m_password_box.getText().toStdString(),
-                                           callback);
+            auto error_callback = [this](Api::Error error)
+            {
+                KiwiApp::useInstance().useScheduler().schedule([this, message = error.getMessage()]() {
+                    
+                    std::cout << "Error: " << message << "\n";
+                    
+                    hideOverlay();
+                    showAlert(message, AlertBox::Type::Error);
+                    
+                }, std::chrono::milliseconds(500));
+            };
+            
+            auto& api = KiwiApp::useApi();
+            api.login(m_email_box.getText().toStdString(),
+                      m_password_box.getText().toStdString(),
+                      success_callback,
+                      error_callback);
         }
     }
     

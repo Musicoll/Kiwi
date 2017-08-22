@@ -34,44 +34,48 @@ namespace kiwi
     //                                         API                                      //
     // ================================================================================ //
     
-    //! @brief An API request handler class.
+    //! @brief A remote API request handler.
+    //! @details This class provide helper methods to work with the remote Kiwi REST API.
+    //! All operations are done asynchronously.
     class Api
     {
     public: // methods
         
+        class Controller;
+        
         using Session = network::http::Session;
         using Response = Session::Response;
-        using Callback = Session::Callback;
+        class Error;
         
-        class Document;
+        template<class Type>
+        using CallbackFn = std::function<void(Type)>;
+        
+        using Callback = CallbackFn<Session::Response>;
+        using ErrorCallback = CallbackFn<Api::Error>;
+        
         class User;
+        class AuthUser;
+        class Folder;
+        class Document;
         
         using Documents = std::vector<Api::Document>;
+        using Users = std::vector<Api::User>;
+        
+    public: // requests
         
         //! @brief Constructor
-        Api(std::string const& host = "127.0.0.1", uint16_t port = 80);
+        Api(Api::Controller& controller);
         
         //! @brief Destructor
         ~Api();
         
-        //! @brief Set the host.
-        void setHost(std::string const& host);
-        
-        //! @brief Get the host.
-        std::string const& getHost() const;
-        
-        //! @brief Set the port.
-        void setPort(uint16_t port) noexcept;
-        
-        //! @brief Get the port.
-        uint16_t getPort() const noexcept;
-        
-        //! @brief Get the authentication token
-        //! @param username_or_email user name or email adress
+        //! @brief Attempt to log the user in.
+        //! @param username_or_email user name or email address
         //! @param password password
-        void getAuthToken(std::string const& username_or_email,
-                          std::string const& password,
-                          Callback callback);
+        void login(std::string const& username_or_email,
+                   std::string const& password,
+                   CallbackFn<AuthUser> success_cb,
+                   ErrorCallback error_cb);
         
         //! @brief Make an async API request to get a list of documents
         void getDocuments(std::function<void(Response, Api::Documents)> callback);
@@ -88,10 +92,22 @@ namespace kiwi
         
     private: // methods
         
-        //! @internal Make a new session with pre-filled data.
-        std::unique_ptr<Session> makeSession(std::string const& endpoint);
+        //! @brief Kiwi API Endpoints
+        struct Endpoint
+        {
+            static const std::string root;
+            static const std::string login;
+            static const std::string documents;
+            static const std::string users;
+            
+            static std::string document(std::string const& document_id);
+            static std::string user(std::string const& user_id);
+        };
         
-        //! @internal Store the async future request in a vector
+        //! @internal Make a new session with pre-filled data.
+        std::unique_ptr<Session> makeSession(std::string const& endpoint, bool add_auth = true);
+        
+        //! @internal Store the async future response in a vector
         void storeFuture(std::future<void> && future);
         
         //! @internal Check if the response header has a JSON content-type
@@ -99,11 +115,8 @@ namespace kiwi
         
     private: // variables
         
-        std::string     m_host;
-        uint16_t        m_port;
-        std::string     m_auth_token;
-        
-        std::vector<std::future<void>> m_pending_requests;
+        Api::Controller&                m_controller;
+        std::vector<std::future<void>>  m_pending_requests;
         
     private: // deleted methods
         
@@ -115,12 +128,80 @@ namespace kiwi
     };
     
     // ================================================================================ //
+    //                                     API ERROR                                    //
+    // ================================================================================ //
+    
+    class Api::Error
+    {
+    public: // methods
+        
+        Error();
+        
+        Error(Api::Response const& response);
+        
+        ~Error() = default;
+        
+        unsigned getStatusCode() const;
+        
+        std::string const& getMessage() const;
+        
+    private: // members
+        
+        unsigned m_status_code;
+        std::string m_message {};
+    };
+    
+    // ================================================================================ //
+    //                                      API USER                                    //
+    // ================================================================================ //
+    
+    class Api::User
+    {
+    public: // methods
+        
+        User() = default;
+        virtual ~User() = default;
+        
+        std::string     api_id {};
+        uint64_t        flip_id = 0;
+        std::string     name {};
+        std::string     email {};
+    };
+    
+    //! @brief Helper function to convert an Api::User into a json object
+    void to_json(json& j, Api::User const& user);
+    
+    //! @brief Helper function to convert a json object into an Api::User
+    void from_json(json const& j, Api::User& user);
+    
+    // ================================================================================ //
+    //                                    API AUTH USER                                 //
+    // ================================================================================ //
+    
+    class Api::AuthUser : public Api::User
+    {
+    public: // methods
+        
+        AuthUser() = default;
+        
+        AuthUser(User const& user, std::string const& token);
+        
+        ~AuthUser() = default;
+        
+        bool isValid() const noexcept;
+        
+        std::string token;
+    };
+    
+    // ================================================================================ //
     //                                    API DOCUMENT                                  //
     // ================================================================================ //
     
     class Api::Document
     {
     public:
+        
+        Document() = default;
         
         std::string _id = "0";
         std::string name = "";
@@ -135,4 +216,54 @@ namespace kiwi
     
     //! @brief Helper function to convert a json object into an Api::Document
     void from_json(json const& j, Api::Document& doc);
+    
+    // ================================================================================ //
+    //                                   API CONTROLLER                                 //
+    // ================================================================================ //
+    
+    class Api::Controller
+    {
+    public: // methods
+        
+        //! @brief Constructor
+        Controller();
+        
+        //! @brief Constructor
+        //! @param remote_host The remote host to connect the client to.
+        //! @param remote_port The remote port to connect the client to.
+        Controller(std::string const& remote_host, uint16_t remote_port);
+        
+        virtual ~Controller() = default;
+        
+        //! @brief Set the host.
+        void setHost(std::string const& host);
+        
+        //! @brief Get the host.
+        std::string const& getHost() const;
+        
+        //! @brief Set the port.
+        void setPort(uint16_t port) noexcept;
+        
+        //! @brief Get the port.
+        uint16_t getPort() const noexcept;
+        
+        //! @brief Returns true if the current client api user is logged in.
+        //! @see logout
+        bool isUserLoggedIn();
+        
+        //! @brief Returns the authenticated user
+        Api::AuthUser const& getAuthUser() const;
+        
+        //! @brief Log-out the authenticated user.
+        //! @details This will clear the stored token.
+        //! The client will need to login again after this function call to perform authenticated request.
+        //! @see login, isUserLoggedIn
+        virtual void logout();
+        
+    private: // variables
+        
+        std::string     m_host;
+        uint16_t        m_port;
+        Api::AuthUser   m_auth_user;
+    };
 }

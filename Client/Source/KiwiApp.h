@@ -29,6 +29,8 @@
 
 #include "KiwiApp_Components/KiwiApp_TooltipWindow.h"
 
+#include "KiwiApp_Network/KiwiApp_ApiController.h"
+
 namespace ProjectInfo
 {
     const char* const  projectName    = "Kiwi";
@@ -93,6 +95,9 @@ namespace kiwi
         
         //! @brief Get the Api object.
         static Api& useApi();
+        
+        //! @brief Get the Api controller.
+        static ApiController& useApiController();
         
         //! @brief Get the current running engine instance.
         static engine::Instance& useEngineInstance();
@@ -206,6 +211,9 @@ namespace kiwi
         class AsyncQuitRetrier;
         
     private: // members
+        
+        std::unique_ptr<ApiController>                      m_api_controller;
+        std::unique_ptr<Api>                                m_api;
         
         std::unique_ptr<Instance>                           m_instance;
         std::unique_ptr<juce::ApplicationCommandManager>	m_command_manager;

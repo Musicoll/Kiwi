@@ -75,9 +75,8 @@ namespace kiwi
         //! @brief Destructor.
         ~LoginForm();
         
-        //! @brief This is called when the form is dismissed (either cancelled or when registration
-        // succeeds).
-        //! @details By default it will delete this, but you can override it to do other things.
+        //! @brief This is called when the form is dismissed
+        //! @details (either cancelled or when registration succeeds).
         void dismiss();
         
     private: // methods
@@ -90,6 +89,12 @@ namespace kiwi
         
         //! @internal lookAndFeelChanged method
         void lookAndFeelChanged() override;
+        
+        //! @internal Show overlay
+        void showOverlay();
+        
+        //! @internal Hide overlay
+        void hideOverlay();
         
         void showAlert(std::string const& message, AlertBox::Type type = AlertBox::Type::Error);
         
@@ -105,8 +110,8 @@ namespace kiwi
         
         juce::Image m_kiwi_app_image;
         
-        struct OverlayComp;
-        friend struct OverlayComp;
+        class OverlayComp;
+        friend class OverlayComp;
         Component::SafePointer<Component> m_overlay;
         
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LoginForm)
