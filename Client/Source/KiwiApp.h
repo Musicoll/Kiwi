@@ -159,6 +159,7 @@ namespace kiwi
         
         //! @brief Called by createMenu to create each menu
         void createOpenRecentPatchersMenu(juce::PopupMenu& menu);
+        void createAccountMenu(juce::PopupMenu& menu);
         void createFileMenu(juce::PopupMenu& menu);
         void createEditMenu(juce::PopupMenu& menu);
         void createViewMenu(juce::PopupMenu& menu);

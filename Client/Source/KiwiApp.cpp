@@ -112,9 +112,6 @@ namespace kiwi
         juce::PopupMenu macMainMenuPopup;
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAboutAppWindow);
         macMainMenuPopup.addSeparator();
-        macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::login);
-        macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::logout);
-        macMainMenuPopup.addSeparator();
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAppSettingsWindow);
         juce::MenuBarModel::setMacMainMenu(m_menu_model.get(), &macMainMenuPopup, TRANS("Open Recent"));
         #endif
@@ -338,7 +335,7 @@ namespace kiwi
     {
         const char* const names[] =
         {
-            "File", "Edit", "View", "Options", "Window", "Help", nullptr
+            "Account", "File", "Edit", "View", "Options", "Window", "Help", nullptr
         };
         
         return juce::StringArray(names);
@@ -346,12 +343,13 @@ namespace kiwi
     
     void KiwiApp::createMenu(juce::PopupMenu& menu, const juce::String& menuName)
     {
-        if		(menuName == "File")        createFileMenu		(menu);
-        else if (menuName == "Edit")        createEditMenu		(menu);
-        else if (menuName == "View")        createViewMenu		(menu);
-        else if (menuName == "Options")     createOptionsMenu	(menu);
-        else if (menuName == "Window")      createWindowMenu	(menu);
-        else if (menuName == "Help")		createHelpMenu		(menu);
+        if      (menuName == "Account") createAccountMenu   (menu);
+        else if (menuName == "File")    createFileMenu      (menu);
+        else if (menuName == "Edit")    createEditMenu      (menu);
+        else if (menuName == "View")    createViewMenu      (menu);
+        else if (menuName == "Options") createOptionsMenu   (menu);
+        else if (menuName == "Window")  createWindowMenu    (menu);
+        else if (menuName == "Help")    createHelpMenu      (menu);
         
         else assert(false); // names have changed?
     }
@@ -359,6 +357,14 @@ namespace kiwi
     void KiwiApp::createOpenRecentPatchersMenu(juce::PopupMenu& menu)
     {
         
+    }
+    
+    void KiwiApp::createAccountMenu(juce::PopupMenu& menu)
+    {
+        menu.addCommandItem(&getCommandManager(), CommandIDs::login);
+        menu.addCommandItem(&getCommandManager(), CommandIDs::signin);
+        menu.addSeparator();
+        menu.addCommandItem(&getCommandManager(), CommandIDs::logout);
     }
     
     void KiwiApp::createFileMenu(juce::PopupMenu& menu)
@@ -438,7 +444,6 @@ namespace kiwi
     {
         #if ! JUCE_MAC
         menu.addCommandItem(m_command_manager.get(), CommandIDs::showAboutAppWindow);
-        menu.addCommandItem(m_command_manager.get(), CommandIDs::login);
         #endif
     }
     
@@ -467,6 +472,7 @@ namespace kiwi
             CommandIDs::startDsp,
             CommandIDs::stopDsp,
             CommandIDs::login,
+            CommandIDs::signin,
             CommandIDs::logout,
         };
         
@@ -503,14 +509,30 @@ namespace kiwi
             }
             case CommandIDs::login:
             {
-                result.setInfo(TRANS("Login"), TRANS("Show the \"Login form\" Window"),
+                const bool logged = m_api_controller->isUserLoggedIn();
+                result.setInfo(logged
+                               ? juce::String(TRANS("Logged-in as ") + m_api_controller->getAuthUser().name)
+                               : TRANS("Login"),
+                               TRANS("Show the \"Login form\" Window"),
                                CommandCategories::windows, 0);
+                
+                result.setActive(!logged);
+                break;
+            }
+            case CommandIDs::signin:
+            {
+                result.setInfo(TRANS("Register"), TRANS("Show the \"Register form\" Window"),
+                               CommandCategories::windows, 0);
+                
+                result.setActive(!m_api_controller->isUserLoggedIn());
                 break;
             }
             case CommandIDs::logout:
             {
                 result.setInfo(TRANS("Logout"), TRANS("Log out current user"),
                                CommandCategories::windows, 0);
+                
+                result.setActive(m_api_controller->isUserLoggedIn());
                 break;
             }
             case CommandIDs::showAboutAppWindow:
@@ -575,15 +597,17 @@ namespace kiwi
                 
                 break;
             }
+            case juce::StandardApplicationCommandIDs::quit:
+            {
+                result.setInfo(TRANS("Quit Kiwi"), TRANS("Quits the application"),
+                               CommandCategories::general, 0);
+                
+                result.addDefaultKeypress('q', juce::ModifierKeys::commandModifier);
+                break;
+            }
             default:
             {
-                if(commandID == juce::StandardApplicationCommandIDs::quit)
-                {
-                    result.setInfo(TRANS("Quit Kiwi"), TRANS("Quits the application"),
-                                   CommandCategories::general, 0);
-                    
-                    result.addDefaultKeypress('q', juce::ModifierKeys::commandModifier);
-                }
+                break;
             }
         }
     }
@@ -607,10 +631,14 @@ namespace kiwi
                 m_instance->showLoginWindow();
                 break;
             }
+            case CommandIDs::signin:
+            {
+                m_instance->showLoginWindow();
+                break;
+            }
             case CommandIDs::logout:
             {
-                //m_instance->showConsoleWindow();
-                std::cout << "CommandIDs::logout: todo ! \n";
+                m_api_controller->logout();
                 break;
             }
             case CommandIDs::showConsoleWindow :

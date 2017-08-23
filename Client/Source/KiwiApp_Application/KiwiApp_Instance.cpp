@@ -221,6 +221,15 @@ namespace kiwi
         #endif
     }
     
+    void Instance::closeWindowWithId(WindowId window_id)
+    {
+        auto& window_uptr = m_windows[std::size_t(window_id)];
+        if(!window_uptr)
+        {
+            closeWindow(*window_uptr);
+        }
+    }
+    
     bool Instance::closeAllPatcherWindows()
     {
         bool success = true;
@@ -319,7 +328,7 @@ namespace kiwi
     
     void Instance::showLoginWindow()
     {
-        showWindowWithId(WindowId::Login, []() {
+        showWindowWithId(WindowId::AuthForm, []() {
             
             auto login_window = std::make_unique<Window>("Log-in to Kiwi",
                                             std::make_unique<LoginForm>(),
