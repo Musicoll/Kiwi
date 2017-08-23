@@ -112,11 +112,11 @@ namespace kiwi
                 std::vector<ObjectFrame*> lasso_objects;
                 hit.testObjects(bounds, lasso_objects);
                 
-                for(auto& object_view_uptr : objects)
+                for(auto& object_frame_uptr : objects)
                 {
-                    if(object_view_uptr)
+                    if(object_frame_uptr)
                     {
-                        ObjectFrame& object = *object_view_uptr.get();
+                        ObjectFrame& object = *object_frame_uptr.get();
                         
                         const bool is_selected = object.isSelected();
                         const bool was_selected = m_objects.find(object.getModel().ref()) != m_objects.end();

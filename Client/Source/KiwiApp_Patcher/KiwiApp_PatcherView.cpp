@@ -165,37 +165,38 @@ namespace kiwi
 
             if(hit.objectTouched())
             {
-                ObjectFrame* object_view = hit.getObject();
-                if(object_view)
+                ObjectFrame* object_frame = hit.getObject();
+                
+                if(object_frame)
                 {
                     if(hit.getZone() == HitTester::Zone::Inside)
                     {
                         if(e.mods.isAltDown())
                         {
                             m_copy_on_drag = true;
-                            m_select_on_mouse_down_status = selectOnMouseDown(*object_view, true);
+                            m_select_on_mouse_down_status = selectOnMouseDown(*object_frame, true);
                         }
                         else if (e.mods.isCommandDown())
                         {
-                            object_view->mouseDown(e.getEventRelativeTo(object_view));
+                            object_frame->mouseDown(e.getEventRelativeTo(object_frame));
                             m_object_received_down_event = true;
                         }
                         else
                         {
                             if(e.mods.isPopupMenu())
                             {
-                                if (!isSelected(*object_view))
+                                if (!isSelected(*object_frame))
                                 {
-                                    m_select_on_mouse_down_status = selectOnMouseDown(*object_view, true);
+                                    m_select_on_mouse_down_status = selectOnMouseDown(*object_frame, true);
                                 }
                                 
                                 const auto pos = e.getPosition() - m_viewport.getOriginPosition();
-                                showObjectPopupMenu(*object_view, pos);
+                                showObjectPopupMenu(*object_frame, pos);
                                                     
                             }
                             else
                             {
-                                m_select_on_mouse_down_status = selectOnMouseDown(*object_view, !e.mods.isShiftDown());
+                                m_select_on_mouse_down_status = selectOnMouseDown(*object_frame, !e.mods.isShiftDown());
                             }
                         }
                     }
@@ -204,7 +205,7 @@ namespace kiwi
                         const size_t index = hit.getIndex();
                         const bool is_sender = hit.getZone() == HitTester::Zone::Outlet;
                         
-                        m_link_creator.reset(new LinkViewCreator(*object_view, index, is_sender, e.getPosition()));
+                        m_link_creator.reset(new LinkViewCreator(*object_frame, index, is_sender, e.getPosition()));
                         addAndMakeVisible(*m_link_creator);
                     }
                 }
@@ -1194,11 +1195,11 @@ namespace kiwi
             const int max_distance = 50;
             int min_distance = max_distance;
             
-            for(auto& object_view_uptr : m_objects)
+            for(auto& object_frame_uptr : m_objects)
             {
-                if(object_view_uptr.get() != &binded_object)
+                if(object_frame_uptr.get() != &binded_object)
                 {
-                    model::Object const& object_m = object_view_uptr->getModel();
+                    model::Object const& object_m = object_frame_uptr->getModel();
                     
                     const bool sender = m_link_creator->isBindedToSender();
                     
@@ -1206,7 +1207,7 @@ namespace kiwi
                     
                     for(size_t i = 0; i < io_size; ++i)
                     {
-                        const juce::Point<int> io_pos = sender ? object_view_uptr->getInletPatcherPosition(i) : object_view_uptr->getOutletPatcherPosition(i);
+                        const juce::Point<int> io_pos = sender ? object_frame_uptr->getInletPatcherPosition(i) : object_frame_uptr->getOutletPatcherPosition(i);
                         
                         const int distance = end_pos.getDistanceFrom(io_pos);
                         
@@ -1225,7 +1226,7 @@ namespace kiwi
                             if(canConnect(from, outlet, to, inlet))
                             {
                                 min_distance = distance;
-                                result_object = object_view_uptr.get();
+                                result_object = object_frame_uptr.get();
                                 result_index = i;
                             }
                         }

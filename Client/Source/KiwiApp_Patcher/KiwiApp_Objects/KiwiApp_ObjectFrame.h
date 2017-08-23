@@ -61,15 +61,12 @@ namespace kiwi
         //! @brief Destructor.
         ~ObjectFrame();
         
-        //! @brief Called whenever an object has changed.
+        //! @brief Called whenever an object's model has changed.
         void objectChanged(model::Patcher::View& view, model::Object& object);
         
         //! @brief Called whenever the client wants to edit an object.
         //! @details Will only edit the object if its a textual object.
         void editObject();
-        
-        //! @brief Called when the object has been edited.
-        void objectEdited(std::string const& new_text) const;
         
         //! @brief Called by the patcher every time the selection status of this object has changed.
         void localSelectionChanged();
@@ -80,17 +77,8 @@ namespace kiwi
         //! @brief Called every time a patcher is locked or unlocked.
         void lockStatusChanged();
         
-        //! @brief Called the patcher's origin changes.
+        //! @brief Called when the patcher's origin changes.
         void patcherViewOriginPositionChanged();
-        
-        //! @brief Component's graphical rendering method.
-        void paint(juce::Graphics& g) override final;
-        
-        //! @brief Paints outlets, inlets over child component.
-        void paintOverChildren (juce::Graphics& g) override final;
-        
-        //! @brief Called whenever the object's size changes.
-        void resized() override final;
         
         //! @brief Returns The object's bounds relative to the patcher position.
         juce::Rectangle<int> getObjectBounds() const;
@@ -104,29 +92,28 @@ namespace kiwi
         //! @brief Returns the object's model.
         model::Object& getModel() const;
         
-        //! @brief Overloaded from Component to exclude border size.
+        //! @brief Overloaded from juce::Component to exclude border size.
         bool hitTest(int x, int y) override;
         
         //! @brief Internal kiwi PatcherView HitTesting.
         bool hitTest(juce::Point<int> const& pt, HitTester& result) const;
         
         //! @brief Internal kiwi PatcherView HitTesting (overlaps a rectangle).
-        //! @details Used for lasso selection.
         bool hitTest(juce::Rectangle<int> const& rect) const;
         
         //! @brief Returns true if the object is selected.
         bool isSelected() const;
         
-        //! @brief Returns true if the object is locked.
-        bool isLocked() const;
-        
-        //! @brief Returns the width of any outlet/inlet represented in the object's frame.
-        size_t getPinWidth() const;
-        
-        //! @brief Returns the height of any outlet/inlet represented in the object's frame.
-        size_t getPinHeight() const;
-        
     private: // methods
+        
+        //! @brief Component's graphical rendering method.
+        void paint(juce::Graphics& g) override final;
+        
+        //! @brief Paints outlets, inlets over child component.
+        void paintOverChildren (juce::Graphics& g) override final;
+        
+        //! @brief Called whenever the object's size changes.
+        void resized() override final;
         
         //! @brief Called once a ClassicView's text has changed.
         void textEdited(std::string const& new_text) override final;
@@ -152,12 +139,19 @@ namespace kiwi
         void drawInletsOutlets(juce::Graphics & g);
         
         //! @brief Returns the inlet local bounds for a given index.
-        juce::Rectangle<int> getInletLocalBounds(const size_t index,
-                                                 juce::Rectangle<int> const& object_bounds) const;
+        juce::Rectangle<int> getInletLocalBounds(const size_t index) const;
         
         //! @brief Returns the outlet local bounds for a given index.
-        juce::Rectangle<int> getOutletLocalBounds(const size_t index,
-                                                  juce::Rectangle<int> const& object_bounds) const;
+        juce::Rectangle<int> getOutletLocalBounds(const size_t index) const;
+        
+        //! @brief Returns the width of any outlet/inlet represented in the object's frame.
+        size_t getPinWidth() const;
+        
+        //! @brief Returns the height of any outlet/inlet represented in the object's frame.
+        size_t getPinHeight() const;
+        
+        //! @brief Returns true if the object is locked.
+        bool isLocked() const;
         
     private: // members
         

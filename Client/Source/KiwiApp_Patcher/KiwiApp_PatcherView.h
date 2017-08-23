@@ -324,10 +324,10 @@ namespace kiwi
         //                                      MISC                                        //
         // ================================================================================ //
         
-        //! @internal Find a ObjectFrame with a given Object model.
+        //! @internal Finds an ObjectFrame with a given Object model.
         ObjectFrames::iterator findObject(model::Object const& object);
         
-        //! @internal Find a LinkView with a given Link model.
+        //! @internal Finds a LinkView with a given Link model.
         LinkViews::iterator findLink(model::Link const& link);
         
         //! @internal Returns true if a link can be created between two objects.

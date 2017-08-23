@@ -150,12 +150,12 @@ namespace kiwi
         
         for(unsigned int i = 0; i < m_inlets; ++i)
         {
-            g.fillRect(getInletLocalBounds(i, bounds));
+            g.fillRect(getInletLocalBounds(i));
         }
         
         for(unsigned int i = 0; i < m_outlets; ++i)
         {
-            g.fillRect(getOutletLocalBounds(i, bounds));
+            g.fillRect(getOutletLocalBounds(i));
         }
     }
     
@@ -190,7 +190,7 @@ namespace kiwi
                 {
                     for(size_t i = 0; i < m_inlets; ++i)
                     {
-                        if(getInletLocalBounds(i, box_bounds).contains(pt))
+                        if(getInletLocalBounds(i).contains(pt))
                         {
                             hit.m_zone    = HitTester::Zone::Inlet;
                             hit.m_index   = i;
@@ -204,7 +204,7 @@ namespace kiwi
                 {
                     for(size_t i = 0; i < m_outlets; ++i)
                     {
-                        if(getOutletLocalBounds(i, box_bounds).contains(pt))
+                        if(getOutletLocalBounds(i).contains(pt))
                         {
                             hit.m_zone    = HitTester::Zone::Outlet;
                             hit.m_index   = i;
@@ -358,12 +358,12 @@ namespace kiwi
     
     juce::Point<int> ObjectFrame::getInletPatcherPosition(const size_t index) const
     {
-        return getPosition() + getInletLocalBounds(index, m_object_view->getBounds()).getCentre();
+        return getPosition() + getInletLocalBounds(index).getCentre();
     }
     
     juce::Point<int> ObjectFrame::getOutletPatcherPosition(const size_t index) const
     {
-        return getPosition() + getOutletLocalBounds(index, m_object_view->getBounds()).getCentre();
+        return getPosition() + getOutletLocalBounds(index).getCentre();
     }
     
     model::Object& ObjectFrame::getModel() const
@@ -381,9 +381,10 @@ namespace kiwi
         return m_io_height;
     }
     
-    juce::Rectangle<int> ObjectFrame::getInletLocalBounds(const size_t index,
-                                                      juce::Rectangle<int> const& object_bounds) const
+    juce::Rectangle<int> ObjectFrame::getInletLocalBounds(const size_t index) const
     {
+        juce::Rectangle<int> object_bounds = m_object_view->getBounds();
+        
         juce::Rectangle<int> rect;
         
         if(m_inlets > 0 && index < m_inlets)
@@ -404,9 +405,10 @@ namespace kiwi
         return rect;
     }
     
-    juce::Rectangle<int> ObjectFrame::getOutletLocalBounds(const size_t index,
-                                                          juce::Rectangle<int> const& object_bounds) const
+    juce::Rectangle<int> ObjectFrame::getOutletLocalBounds(const size_t index) const
     {
+        juce::Rectangle<int> object_bounds = m_object_view->getBounds();
+        
         juce::Rectangle<int> rect;
         
         if(m_outlets > 0 && index < m_outlets)

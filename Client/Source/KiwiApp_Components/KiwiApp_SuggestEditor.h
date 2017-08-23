@@ -64,7 +64,7 @@ namespace kiwi
         //! @brief juce::TextEditor.
         bool keyPressed(juce::KeyPress const& key) override;
         
-        //! @brief Called when a key status changed
+        //! @brief Called when a key status changed.
         bool keyStateChanged(bool isKeyDown) override;
         
         //! @internal Called every 200ms by a juce::Timer.

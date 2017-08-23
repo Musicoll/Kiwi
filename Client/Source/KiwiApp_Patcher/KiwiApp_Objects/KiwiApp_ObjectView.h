@@ -58,17 +58,7 @@ namespace kiwi
         //! @brief Returns the model represented by the graphical object.
         model::Object& getModel() const;
         
-    protected: // methods
-        
-        //! @brief Returns the width of any outlet/inlet represented in the object's frame.
-        int getPinWidth() const;
-        
-        //! @brief Returns the height of any outlet/inlet represented in the object's frame.
-        int getPinHeight() const;
-        
-    private: // methods
-        
-        ObjectFrame const& getObjectFrame() const;
+    private: // members
         
         model::Object&          m_model;
         

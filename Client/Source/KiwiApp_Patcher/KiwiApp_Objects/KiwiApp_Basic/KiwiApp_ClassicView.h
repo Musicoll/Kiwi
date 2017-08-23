@@ -66,16 +66,16 @@ namespace kiwi
         //! @brief Remove a listener.
         void removeListener(Listener& listener);
         
+        //! @brief Lets the user edit the text of the box.
+        void edit();
+        
+    private: // methods
+        
         //! @brief The component's graphical rendering method.
         void paint(juce::Graphics& g) override final;
         
         //! @brief Called when the object is resized.
         void resized() override final;
-        
-        //! @brief Lets the user edit the text of the box.
-        void edit();
-        
-    private: // methods
         
         //! @brief Called when the text is being typed.
         //! @details Used to resize in order to keep text visible.
@@ -111,5 +111,13 @@ namespace kiwi
         size_t                              m_indent;
         juce::BorderSize<int>               m_border;
         engine::Listeners<Listener>         m_listeners;
+        
+    private: // deleted methods
+        
+        ClassicView() = delete;
+        ClassicView(ClassicView const& other) = delete;
+        ClassicView(ClassicView && other) = delete;
+        ClassicView& operator=(ClassicView const& other) = delete;
+        ClassicView& operator=(ClassicView && other) = delete;
     };
 }

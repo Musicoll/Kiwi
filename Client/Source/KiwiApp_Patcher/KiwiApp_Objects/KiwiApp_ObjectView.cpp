@@ -48,19 +48,4 @@ namespace kiwi
     {
         return m_model;
     }
-    
-    ObjectFrame const& ObjectView::getObjectFrame() const
-    {
-        return dynamic_cast<ObjectFrame&>(*getParentComponent());
-    }
-    
-    int ObjectView::getPinWidth() const
-    {
-        return getObjectFrame().getPinWidth();
-    }
-    
-    int ObjectView::getPinHeight() const
-    {
-        return getObjectFrame().getPinHeight();
-    }
 }
