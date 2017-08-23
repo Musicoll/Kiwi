@@ -21,16 +21,13 @@
 
 #pragma once
 
-#include <juce_gui_extra/juce_gui_extra.h>
+#include <KiwiEngine/KiwiEngine_Listeners.h>
 
-#include <vector>
+#include <juce_gui_extra/juce_gui_extra.h>
 
 #include "../KiwiApp_Network/KiwiApp_Api.h"
 #include "../KiwiApp_General/KiwiApp_StoredSettings.h"
-
 #include "../KiwiApp_Auth/KiwiApp_LoginForm.h"
-
-#include <KiwiEngine/KiwiEngine_Listeners.h>
 
 namespace kiwi
 {
@@ -54,25 +51,29 @@ namespace kiwi
         //! @brief Destructor
         ~ApiController();
         
+        //! @brief Adds a listener.
         void addListener(Listener& listener);
+        
+        //! @brief Removes a listener.
         void removeListener(Listener& listener);
-        
-        void askUserToLogin(std::string const& message = "");
-        
-        void closeLoginForm();
         
         //! @brief Attempt to log the client api user in (Async).
         //! @param name_or_email The name or email of the user.
         //! @param password The user password.
         //! @see logout, isUserLoggedIn
         void login(std::string const& name_or_email,
-                   std::string const& password);
+                   std::string const& password,
+                   std::function<void()> success_callback,
+                   Api::ErrorCallback error_callback);
         
         //! @brief Log the client api user out.
         //! @see login, isUserLoggedIn
         void logout() override;
         
+        //! @brief Restore the controller state.
         void restoreFromXml();
+        
+        //! @brief Save the controller state.
         void saveToXml();
         
     private: // methods

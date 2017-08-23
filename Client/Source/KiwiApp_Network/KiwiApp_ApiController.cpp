@@ -20,7 +20,10 @@
  */
 
 #include "KiwiApp_ApiController.h"
+
 #include "../KiwiApp_General/KiwiApp_IDs.h"
+
+#include "../KiwiApp.h"
 
 namespace kiwi
 {
@@ -62,20 +65,33 @@ namespace kiwi
         m_listeners.remove(listener);
     }
     
-    void ApiController::askUserToLogin(std::string const& message)
-    {
-        ; // todo
-    }
-    
-    void ApiController::closeLoginForm()
-    {
-        ; // todo
-    }
-    
     void ApiController::login(std::string const& name_or_email,
-                              std::string const& password)
+                              std::string const& password,
+                              std::function<void()> success_cb,
+                              Api::ErrorCallback error_callback)
     {
-        m_listeners.call(&ApiController::Listener::AuthUserChanged, getAuthUser());
+        auto success_callback = [this, success_cb = std::move(success_cb)](Api::AuthUser user)
+        {
+            std::cout << "User " << user._id << " Authenticated !\n";
+            
+            KiwiApp::useInstance().useScheduler().schedule([this, success_cb = std::move(success_cb), user = std::move(user)]() {
+                
+                m_auth_user = std::move(user);
+                m_listeners.call(&ApiController::Listener::AuthUserChanged, getAuthUser());
+                
+                std::cout << "is logged in : " << m_auth_user.isValid() << std::endl;
+                
+                KiwiApp::commandStatusChanged();
+                
+                success_cb();
+                
+            });
+        };
+        
+        auto& api = KiwiApp::useApi();
+        api.login(name_or_email, password,
+                  success_callback,
+                  std::move(error_callback));
     }
     
     void ApiController::logout()
