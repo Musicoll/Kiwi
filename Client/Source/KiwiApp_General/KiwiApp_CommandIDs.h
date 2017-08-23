@@ -89,7 +89,8 @@ namespace kiwi
         clearAll                    = 0xf40001,        ///< Clear all content
         
         login                       = 0xf50000,        ///< Log-in the user.
-        logout                      = 0xf50010,        ///< Log-out the user.
+        signin                      = 0xf50010,        ///< Sign-in the user.
+        logout                      = 0xf50020,        ///< Log-out the user.
     };
     
     // ================================================================================ //
