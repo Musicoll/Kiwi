@@ -85,6 +85,9 @@ namespace kiwi
         //! @brief Attempt to close the given window asking user to save file if needed.
         void closeWindow(Window& window);
         
+        //! @brief Attempt to close the window with the given id, asking user to save file if needed.
+        void closeWindowWithId(WindowId window_id);
+        
         //! @brief Attempt to close all document, after asking user to save them if needed.
         //! @return True if all document have been closed, false if the user cancel the action.
         bool closeAllPatcherWindows();
