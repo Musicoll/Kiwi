@@ -23,6 +23,7 @@
 
 #include <KiwiEngine/KiwiEngine_Listeners.h>
 
+#include <juce_core/juce_core.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include <KiwiApp_Utils/KiwiApp_SuggestList.h>
@@ -63,6 +64,9 @@ namespace kiwi
         //! @brief juce::TextEditor.
         bool keyPressed(juce::KeyPress const& key) override;
         
+        //! @brief Called when a key status changed
+        bool keyStateChanged(bool isKeyDown) override;
+        
         //! @internal Called every 200ms by a juce::Timer.
         //! @details This method will close the menu if its relative position changed
         //! or if editor lost the keyboard focus.
@@ -74,8 +78,18 @@ namespace kiwi
         //! @brief Called when a menu item has been clicked.
         void menuItemSelected(juce::String const& text);
         
-        //! @brief Called when a menu item has been double-clicked.
+        //! @brief Called whenever a selected item is validated.
         void menuItemValidated(juce::String const& text);
+        
+        //! @brief Called whenever the selected item is unselected.
+        //! @details Replace suggestion with what was fomerly typed.
+        void menuItemUnselected();
+        
+        //! @brief Causes the sugesst list to stop updating.
+        void disableUpdate();
+        
+        //! @brief Causes the suggest list to start updating.
+        void enableUpdate();
         
     private: // classes
         
@@ -84,8 +98,9 @@ namespace kiwi
     private: // members
         
         SuggestList                     m_suggest_list;
-        std::vector<juce::String>       m_splited_text;
+        juce::StringArray               m_split_text;
         std::unique_ptr<Menu>           m_menu = nullptr;
+        bool                            m_update_enabled;
     };
     
     // ================================================================================ //
@@ -111,6 +126,12 @@ namespace kiwi
         //! @brief Set the action to execute when an item has been selected.
         void setSelectedItemAction(action_method_t function);
         
+        //! @brief Set the action to execute when item are unselected.
+        void setUnselectedItemAction(std::function<void(void)> function);
+        
+        //! @brief Unselect the currently selected row
+        void unselectRow();
+        
         //! @brief Select an item of the list.
         void selectRow(int idx);
         
@@ -134,6 +155,9 @@ namespace kiwi
         
         // juce::Component
         void resized() override;
+        
+        //! @brief Returns the curretly selected row
+        int getSelectedRow() const;
         
     private: // methods
         
@@ -166,8 +190,6 @@ namespace kiwi
         
         action_method_t                     m_validated_action;
         action_method_t                     m_selected_action;
+        std::function<void(void)>           m_unselected_action;
     };
-    
-    //! @brief Returns text splited using a specified divider.
-    std::vector<juce::String> split(juce::String const& text, juce::String divider);
 }

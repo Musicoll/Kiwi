@@ -163,15 +163,11 @@ namespace kiwi
     
     void ClassicView::textEditorTextChanged(juce::TextEditor& editor)
     {
-        const juce::String new_text = editor.getText();
-        const juce::Font font = editor.getFont();
-        const int text_width = font.getStringWidth(new_text);
-        const int ed_width = editor.getWidth();
+        const int text_width = editor.getFont().getStringWidth(editor.getText());
         
-        if(ed_width < text_width + 16)
+        if(editor.getWidth() < text_width + 16)
         {
-            const int new_width = text_width + 24;
-            setSize(new_width, getHeight());
+            setSize(text_width + 16, getHeight());
         }
     }
     
@@ -182,11 +178,6 @@ namespace kiwi
         removeTextEditor();
         
         m_listeners.call(&Listener::textEdited, m_text);
-    }
-    
-    void ClassicView::textEditorEscapeKeyPressed(juce::TextEditor& editor)
-    {
-        textEdited(editor);
     }
     
     void ClassicView::textEditorReturnKeyPressed(juce::TextEditor& editor)

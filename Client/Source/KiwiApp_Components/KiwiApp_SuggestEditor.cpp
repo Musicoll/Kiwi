@@ -103,11 +103,16 @@ namespace kiwi
         m_suggest_list_box.selectRow(0);
     }
     
+    void SuggestEditor::Menu::unselectRow()
+    {
+        m_suggest_list_box.selectRow(-1);
+    }
+    
     void SuggestEditor::Menu::selectPreviousRow()
     {
         const auto rows = getNumRows();
         const auto row_sel = m_suggest_list_box.getSelectedRow();
-        const auto new_row_sel = (row_sel == -1) ? rows - 1 : ((row_sel <= 0) ? rows - 1 : row_sel - 1);
+        const auto new_row_sel = (row_sel == -1) ? rows - 1 : ((row_sel <= 0) ? - 1 : row_sel - 1);
         m_suggest_list_box.selectRow(new_row_sel);
     }
     
@@ -115,7 +120,7 @@ namespace kiwi
     {
         const auto rows = getNumRows();
         const auto row_sel = m_suggest_list_box.getSelectedRow();
-        const auto new_row_sel = (row_sel == -1) ? 0 : ((row_sel >= rows) ? 0 : row_sel + 1);
+        const auto new_row_sel = (row_sel == -1) ? 0 : ((row_sel >= rows) ? -1 : row_sel + 1);
         m_suggest_list_box.selectRow(new_row_sel);
     }
     
@@ -132,6 +137,16 @@ namespace kiwi
     void SuggestEditor::Menu::setSelectedItemAction(action_method_t function)
     {
         m_selected_action = function;
+    }
+    
+    void SuggestEditor::Menu::setUnselectedItemAction(std::function<void(void)> function)
+    {
+        m_unselected_action = function;
+    }
+    
+    int SuggestEditor::Menu::getSelectedRow() const
+    {
+        return m_suggest_list_box.getSelectedRow();
     }
     
     // ================================================================================ //
@@ -187,10 +202,14 @@ namespace kiwi
     
     void SuggestEditor::Menu::selectedRowsChanged(int last_row_selected)
     {
-        if(m_selected_action && (last_row_selected < m_suggest_list.size()))
+        if (last_row_selected == -1 && m_unselected_action)
         {
-            std::string const& str = *(m_suggest_list.begin() + last_row_selected);
-            m_selected_action(str);
+            m_unselected_action();
+        }
+        else if((last_row_selected < m_suggest_list.size()) && m_selected_action)
+        {
+            std::string const& suggestion = *(m_suggest_list.begin() + last_row_selected);;
+            m_selected_action(suggestion);
         }
     }
     
@@ -200,8 +219,9 @@ namespace kiwi
     
     SuggestEditor::SuggestEditor(SuggestList::entries_t entries) :
     m_suggest_list(std::move(entries)),
-    m_splited_text(),
-    m_menu()
+    m_split_text(),
+    m_menu(),
+    m_update_enabled(true)
     {
         setReturnKeyStartsNewLine(false);
         setTabKeyUsedAsCharacter(false);
@@ -222,6 +242,7 @@ namespace kiwi
         using namespace std::placeholders; // for _1, _2 etc.
         m_menu->setSelectedItemAction(std::bind(&SuggestEditor::menuItemSelected, this, _1));
         m_menu->setItemValidatedAction(std::bind(&SuggestEditor::menuItemValidated, this, _1));
+        m_menu->setUnselectedItemAction(std::bind(&SuggestEditor::menuItemUnselected, this));
         
         m_menu->addToDesktop(juce::ComponentPeer::windowIsTemporary
                               | juce::ComponentPeer::windowHasDropShadow
@@ -248,75 +269,101 @@ namespace kiwi
         }
     }
     
-    std::vector<juce::String> split(juce::String const& text, juce::String divider)
+    void SuggestEditor::disableUpdate()
     {
-        std::vector<juce::String> split;
-        
-        int current_index = 0;
-        
-        while(current_index < text.length())
-        {
-            if (text[current_index] != ' ')
-            {
-                int next_space_index = text.indexOfAnyOf(divider, current_index);
-                int next_index = next_space_index != -1 ? next_space_index : text.length();
-                
-                split.push_back(text.substring(current_index, next_index));
-                
-                current_index = next_index;
-            }
-            else
-            {
-                ++current_index;
-            }
-        }
-        
-        return split;
+        m_update_enabled = false;
+    }
+    
+    void SuggestEditor::enableUpdate()
+    {
+        m_update_enabled = true;
     }
     
     void SuggestEditor::textEditorTextChanged(juce::TextEditor&)
     {
-        m_splited_text = split(getText(), " ");
-        
-        if (m_splited_text.size() == 1)
+        if (m_update_enabled)
         {
-            m_suggest_list.applyFilter(m_splited_text[0].toStdString());
+            m_split_text.clear();
+            m_split_text.addTokens(getText(), " ");
             
-            setCaretVisible(true);
-            
-            if(isMenuOpened() && m_suggest_list.empty())
+            if (m_split_text.size() == 1)
+            {
+                m_suggest_list.applyFilter(m_split_text[0].toStdString());
+                
+                if(isMenuOpened() && m_suggest_list.empty())
+                {
+                    closeMenu();
+                }
+                else if(!m_suggest_list.empty())
+                {
+                    if(isMenuOpened())
+                    {
+                        m_menu->update();
+                    }
+                    else
+                    {
+                        showMenu();
+                    }
+                }
+            }
+            else if (isMenuOpened())
             {
                 closeMenu();
             }
-            else if(!m_suggest_list.empty())
-            {
-                if(isMenuOpened())
-                {
-                    m_menu->update();
-                }
-                else
-                {
-                    showMenu();
-                    m_menu->selectFirstRow();
-                }
-            }
-        }
-        else if (isMenuOpened())
-        {
-            closeMenu();
         }
     }
     
     void SuggestEditor::menuItemSelected(juce::String const& text)
     {
+        juce::String editor_text = getText();
+        
+        int last_word_pos = editor_text.lastIndexOf(" ") + 1;
+        
+        juce::String replace_text = editor_text.replaceSection(last_word_pos,
+                                                               editor_text.length() - last_word_pos,
+                                                               text);
+        
+        disableUpdate();
+        
+        setText(replace_text);
+        
+        int highlight_start = std::min(last_word_pos + m_split_text[m_split_text.size() - 1].length(),
+                                       replace_text.length());
+        
+        int highlight_end = replace_text.length();
+        
+        setHighlightedRegion({highlight_start, highlight_end});
+        
+        setCaretVisible(false);
+    }
+    
+    void SuggestEditor::menuItemUnselected()
+    {
+        juce::String editor_text = getText();
+        
+        juce::String replace_text = editor_text.replaceSection(editor_text.lastIndexOf(" ") + 1,
+                                                               editor_text.length() - editor_text.lastIndexOf(" ") - 1,
+                                                               m_split_text[m_split_text.size() - 1]);
+        
+        disableUpdate();
+        
+        setText(replace_text);
     }
     
     void SuggestEditor::menuItemValidated(juce::String const& text)
     {
-        setText(text);
-        setCaretPosition(text.length());
-        setCaretVisible(true);
+        juce::String editor_text = getText();
+        
+        juce::String replace_text = editor_text.replaceSection(editor_text.lastIndexOf(" ") + 1,
+                                                               editor_text.length() - editor_text.lastIndexOf(" ") - 1,
+                                                               text);
+        
+        setText(replace_text);
+        
         closeMenu();
+        
+        moveCaretToEnd();
+        setCaretVisible(true);
     }
     
     void SuggestEditor::timerCallback()
@@ -342,34 +389,57 @@ namespace kiwi
         }
     }
     
+    bool SuggestEditor::keyStateChanged(bool isKeyDown)
+    {
+        enableUpdate();
+        
+        return TextEditor::keyStateChanged(isKeyDown);
+    }
+    
     bool SuggestEditor::keyPressed(juce::KeyPress const& key)
     {
         setCaretVisible(true);
         
         bool result = false;
         
-        if (isMenuOpened())
+        if(key == juce::KeyPress::downKey && isMenuOpened())
         {
-            if(key == juce::KeyPress::downKey)
+            m_menu->selectNextRow();
+            result = true;
+        }
+        else if(key == juce::KeyPress::upKey && isMenuOpened())
+        {
+            m_menu->selectPreviousRow();
+            result = true;
+        }
+        else if(key == juce::KeyPress::escapeKey)
+        {
+            if (isMenuOpened())
             {
-                m_menu->selectNextRow();
-                result = true;
-            }
-            else if(key == juce::KeyPress::upKey)
-            {
-                m_menu->selectPreviousRow();
-                result = true;
-            }
-            else if(key == juce::KeyPress::returnKey)
-            {
-                m_menu->validateSelectedRow();
-                result = true;
-            }
-            else if(key == juce::KeyPress::escapeKey)
-            {
+                if (m_menu->getSelectedRow()  != -1)
+                {
+                    m_menu->unselectRow();
+                }
+                
                 closeMenu();
-                result = true;
             }
+            else
+            {
+                m_split_text.clear();
+                m_split_text.addTokens(getText(), " ");
+                
+                if (m_split_text.size() <= 1)
+                {
+                    m_suggest_list.applyFilter(m_split_text[0].toStdString());
+                    
+                    if (m_suggest_list.size() > 0)
+                    {
+                        showMenu();
+                    }
+                }
+            }
+            
+            result = true;
         }
         
         if(!result)

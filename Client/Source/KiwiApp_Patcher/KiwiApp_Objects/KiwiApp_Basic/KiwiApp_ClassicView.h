@@ -81,10 +81,6 @@ namespace kiwi
         //! @details Used to resize in order to keep text visible.
         void textEditorTextChanged(juce::TextEditor& editor) override final;
         
-        //! @brief Called when escape key is pressed.
-        //! @details Exits edit mode without keeping typed text.
-        void textEditorEscapeKeyPressed(juce::TextEditor& editor) override final;
-        
         //! @brief Called when return key is pressed.
         //! @brief Exits edit mode keeping edited text as is.
         void textEditorReturnKeyPressed(juce::TextEditor& editor) override final;
