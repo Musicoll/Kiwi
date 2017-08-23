@@ -69,6 +69,9 @@ namespace kiwi
         //! @see restoreWindowState
         void saveWindowState();
         
+        //! @brief Close the window.
+        void close();
+        
         // ================================================================================ //
         //                              APPLICATION COMMAND TARGET                          //
         // ================================================================================ //
@@ -94,7 +97,7 @@ namespace kiwi
     enum class WindowId : std::size_t
     {
         Console = 0,
-        Login,
+        AuthForm,
         AboutKiwi,
         DocumentBrowser,
         ApplicationSettings,

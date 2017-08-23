@@ -61,13 +61,15 @@ namespace kiwi
         using Documents = std::vector<Api::Document>;
         using Users = std::vector<Api::User>;
         
-    public: // requests
+    public: // methods
         
         //! @brief Constructor
         Api(Api::Controller& controller);
         
         //! @brief Destructor
         ~Api();
+        
+    public: // requests
         
         //! @brief Attempt to log the user in.
         //! @param username_or_email user name or email address
@@ -87,7 +89,8 @@ namespace kiwi
         
         //! @brief Rename a document asynchronously.
         //! @param callback The callback method that will be called when the request is completed.
-        void renameDocument(std::string document_id, std::string const& new_name,
+        void renameDocument(std::string document_id,
+                            std::string const& new_name,
                             Callback callback);
         
     private: // methods
@@ -162,8 +165,8 @@ namespace kiwi
         User() = default;
         virtual ~User() = default;
         
-        std::string     api_id {};
-        uint64_t        flip_id = 0;
+        int             api_version = 0;
+        std::string     _id {};
         std::string     name {};
         std::string     email {};
     };
@@ -260,7 +263,7 @@ namespace kiwi
         //! @see login, isUserLoggedIn
         virtual void logout();
         
-    private: // variables
+    protected: // variables
         
         std::string     m_host;
         uint16_t        m_port;

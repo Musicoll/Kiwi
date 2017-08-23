@@ -246,12 +246,9 @@ namespace kiwi
     
     void to_json(json& j, Api::User const& user)
     {
-        std::stringstream converter;
-        converter << std::hex << user.flip_id;
-        
         j = json{
-            {"_id", user.api_id},
-            {"flip_id", converter.str()},
+            {"__v", user.api_version},
+            {"_id", user._id},
             {"username", user.name},
             {"email", user.email}
         };
@@ -259,16 +256,10 @@ namespace kiwi
     
     void from_json(json const& j, Api::User& user)
     {
-        user.api_id = j.count("_id") ? j["_id"].get<std::string>() : "";
+        user.api_version = j.count("__v") ? j["__v"].get<int>() : 0;
+        user._id = j.count("_id") ? j["_id"].get<std::string>() : "";
         user.name = j.count("username") ? j["username"].get<std::string>() : "";
         user.email = j.count("email") ? j["email"].get<std::string>() : "";
-        user.flip_id = 0ul;
-        
-        if(j.count("flip_id"))
-        {
-            std::stringstream converter(j["flip_id"].get<std::string>());
-            converter >> std::hex >> user.flip_id;
-        }
     }
     
     // ================================================================================ //
@@ -284,7 +275,7 @@ namespace kiwi
     
     bool Api::AuthUser::isValid() const noexcept
     {
-        return (!api_id.empty() && flip_id != 0 && !token.empty());
+        return (!_id.empty() && !token.empty());
     }
     
     // ================================================================================ //

@@ -128,7 +128,10 @@ namespace kiwi
             g.setColour(juce::Colours::whitesmoke);
             g.setFont(22.0f);
             
-            g.drawFittedText(m_message, getLocalBounds().reduced(20, 0).removeFromTop(proportionOfHeight(0.6f)), juce::Justification::centred, 5);
+            g.drawFittedText(m_message,
+                             getLocalBounds().reduced(20, 0)
+                             .removeFromTop(proportionOfHeight(0.6f)),
+                             juce::Justification::centred, 5);
         }
         
         void resized() override
@@ -299,17 +302,25 @@ namespace kiwi
         addAndMakeVisible(*m_alert_box);
         
         if(!was_showing)
+        {
             setBounds(getBounds().withHeight(getHeight() + 50));
+        }
         else
+        {
             resized();
+        }
     }
     
     void LoginForm::buttonClicked(juce::Button* b)
     {
         if(b == &m_submit_btn)
+        {
             attemptRegistration();
+        }
         else if(b == &m_cancel_btn)
+        {
             dismiss();
+        }
     }
     
     
@@ -331,19 +342,10 @@ namespace kiwi
             
             showOverlay();
             
-            auto success_callback = [this](Api::AuthUser user)
+            auto success_callback = [this]()
             {
-                KiwiApp::useInstance().useScheduler().schedule([this, user = std::move(user)]() {
-                    
-                    std::cout << "Authenticated !\n";
-                    std::cout << "User ID: " << user.api_id << "\n";
-                    
-                    hideOverlay();
-                    showAlert("Login success, welcome " + user.name + "!", AlertBox::Type::Success);
-                    
-                    //auto& api_controller = KiwiApp::useApiController();
-                    //api_controller.setAuthUser(user);
-                    
+                KiwiApp::useInstance().useScheduler().schedule([this]() {
+                    dismiss();
                 }, std::chrono::milliseconds(500));
             };
             
@@ -359,16 +361,19 @@ namespace kiwi
                 }, std::chrono::milliseconds(500));
             };
             
-            auto& api = KiwiApp::useApi();
-            api.login(m_email_box.getText().toStdString(),
-                      m_password_box.getText().toStdString(),
-                      success_callback,
-                      error_callback);
+            auto& api_controller = KiwiApp::useApiController();
+            api_controller.login(m_email_box.getText().toStdString(),
+                                 m_password_box.getText().toStdString(),
+                                 success_callback,
+                                 error_callback);
         }
     }
     
     void LoginForm::dismiss()
     {
-        delete this;
+        if(Window* parent_window = findParentComponentOfClass<Window>())
+        {
+            parent_window->close();
+        }
     }
 }
