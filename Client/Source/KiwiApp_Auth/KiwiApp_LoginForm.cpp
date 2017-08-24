@@ -361,11 +361,10 @@ namespace kiwi
                 }, std::chrono::milliseconds(500));
             };
             
-            auto& api_controller = KiwiApp::useApiController();
-            api_controller.login(m_email_box.getText().toStdString(),
-                                 m_password_box.getText().toStdString(),
-                                 success_callback,
-                                 error_callback);
+            KiwiApp::login(m_email_box.getText().toStdString(),
+                           m_password_box.getText().toStdString(),
+                           std::move(success_callback),
+                           std::move(error_callback));
         }
     }
     

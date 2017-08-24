@@ -61,6 +61,9 @@ namespace kiwi
         //! @brief Get the user ID of the Instance.
         uint64_t getUserId() const noexcept;
         
+        //! @brief Close all remote patchers.
+        bool logout();
+        
         //! @brief create a new patcher window.
         void newPatcher();
         
@@ -68,7 +71,7 @@ namespace kiwi
         engine::Instance& useEngineInstance();
         
         //! @brief Returns the engine::Instance
-        engine::Instance const& getEngineInstance() const;
+        engine::Instance const& useEngineInstance() const;
         
         //! @brief Returns the instance's scheduler
         engine::Scheduler<> & useScheduler();
@@ -144,8 +147,6 @@ namespace kiwi
         engine::Scheduler<>                         m_scheduler;
         
         engine::Instance                            m_instance;
-        
-        uint64_t                                    m_user_id;
         
         DocumentBrowser                             m_browser;
         
