@@ -72,10 +72,11 @@ namespace kiwi
     {
         auto success_cb = [this, success_callback = std::move(success_callback)](Api::AuthUser user)
         {
-            std::cout << "User " << user._id << " Authenticated !\n";
-            
             auto& scheduler = KiwiApp::useInstance().useScheduler();
             scheduler.schedule([this, success_callback = std::move(success_callback), user = std::move(user)](){
+                
+                /*
+                std::cout << "User " << user._id << " Authenticated !\n";
                 
                 m_auth_user = std::move(user);
                 m_listeners.call(&ApiController::Listener::AuthUserChanged, m_auth_user);
@@ -83,8 +84,9 @@ namespace kiwi
                 KiwiApp::commandStatusChanged();
                 
                 success_callback();
+                */
                 
-            }, std::chrono::milliseconds(0));
+            });
         };
         
         auto& api = KiwiApp::useApi();
