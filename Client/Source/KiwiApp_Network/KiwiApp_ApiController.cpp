@@ -67,29 +67,28 @@ namespace kiwi
     
     void ApiController::login(std::string const& name_or_email,
                               std::string const& password,
-                              std::function<void()> success_cb,
+                              std::function<void()> success_callback,
                               Api::ErrorCallback error_callback)
     {
-        auto success_callback = [this, success_cb = std::move(success_cb)](Api::AuthUser user)
+        auto success_cb = [this, success_callback = std::move(success_callback)](Api::AuthUser user)
         {
             std::cout << "User " << user._id << " Authenticated !\n";
             
             auto& scheduler = KiwiApp::useInstance().useScheduler();
-            scheduler.schedule([this, success_cb = std::move(success_cb), user = std::move(user)]() {
+            scheduler.schedule([this, success_callback = std::move(success_callback), user = std::move(user)]() {
                 
                 m_auth_user = std::move(user);
-                m_listeners.call(&ApiController::Listener::AuthUserChanged, getAuthUser());
+                m_listeners.call(&ApiController::Listener::AuthUserChanged, m_auth_user);
                 
                 KiwiApp::commandStatusChanged();
                 
-                success_cb();
-                
+                success_callback();
             });
         };
         
         auto& api = KiwiApp::useApi();
         api.login(name_or_email, password,
-                  std::move(success_callback),
+                  std::move(success_cb),
                   std::move(error_callback));
     }
     
