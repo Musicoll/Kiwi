@@ -304,19 +304,9 @@ namespace kiwi
         return m_document.name;
     }
     
-    std::string DocumentBrowser::Drive::DocumentSession::getHost() const
-    {
-        return KiwiApp::useApiController().getHost();
-    }
-    
     uint64_t DocumentBrowser::Drive::DocumentSession::getSessionId() const
     {
         return m_document.session_id;
-    }
-    
-    uint16_t DocumentBrowser::Drive::DocumentSession::getSessionPort() const
-    {
-        return m_drive.getSessionPort();
     }
     
     DocumentBrowser::Drive const& DocumentBrowser::Drive::DocumentSession::useDrive() const

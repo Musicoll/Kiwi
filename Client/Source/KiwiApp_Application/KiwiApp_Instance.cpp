@@ -32,9 +32,6 @@
 
 #include "../KiwiApp_Auth/KiwiApp_LoginForm.h"
 
-#include <cstdlib>
-#include <ctime>
-
 namespace kiwi
 {
     // ================================================================================ //
@@ -51,8 +48,6 @@ namespace kiwi
     m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
     {
         startTimer(10);
-        std::srand(std::time(0));
-        m_user_id = std::rand();
         
         // reserve space for singleton windows.
         m_windows.resize(std::size_t(WindowId::count));
@@ -76,7 +71,39 @@ namespace kiwi
     
     uint64_t Instance::getUserId() const noexcept
     {
-        return m_user_id;
+        const auto& user = KiwiApp::getCurrentUser();
+        return user.isLoggedIn() ? user.getIdAsInt() : flip::Ref::User::Offline;
+    }
+    
+    bool Instance::logout()
+    {
+        bool user_agreed = false;
+        
+        for(auto it = m_patcher_managers.begin(); it != m_patcher_managers.end();)
+        {
+            auto& manager = *it->get();
+            if(manager.isRemote())
+            {
+                if(!user_agreed)
+                {
+                    user_agreed = juce::AlertWindow::showOkCancelBox(juce::AlertWindow::WarningIcon,
+                                                                     TRANS("Are you about to logout."),
+                                                                     TRANS("All patchers connected to this account will be closed..."));
+                    
+                    if(!user_agreed)
+                        return false;
+                }
+                
+                manager.forceCloseAllWindows();
+                it = m_patcher_managers.erase(it);
+            }
+            else
+            {
+                it++;
+            }
+        }
+        
+        return true;
     }
     
     engine::Instance& Instance::useEngineInstance()
@@ -84,7 +111,7 @@ namespace kiwi
         return m_instance;
     }
     
-    engine::Instance const& Instance::getEngineInstance() const
+    engine::Instance const& Instance::useEngineInstance() const
     {
         return m_instance;
     }

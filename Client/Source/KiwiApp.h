@@ -96,8 +96,20 @@ namespace kiwi
         //! @brief Get the Api object.
         static Api& useApi();
         
-        //! @brief Get the Api controller.
-        static ApiController& useApiController();
+        //! @brief Attempt to log the client api user in (Async).
+        //! @param name_or_email The name or email of the user.
+        //! @param password The user password.
+        //! @see logout, getCurrentUser
+        static void login(std::string const& name_or_email,
+                          std::string const& password,
+                          std::function<void()> success_callback,
+                          Api::ErrorCallback error_callback);
+        
+        //! @brief Returns the current user
+        static Api::AuthUser const& getCurrentUser();
+        
+        //! @brief Log-out the user
+        static void logout();
         
         //! @brief Get the current running engine instance.
         static engine::Instance& useEngineInstance();

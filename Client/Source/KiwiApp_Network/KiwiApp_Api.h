@@ -165,6 +165,8 @@ namespace kiwi
         User() = default;
         virtual ~User() = default;
         
+        uint64_t getIdAsInt() const;
+        
         int             api_version = 0;
         std::string     _id {};
         std::string     name {};
@@ -187,13 +189,15 @@ namespace kiwi
         
         AuthUser() = default;
         
-        AuthUser(User const& user, std::string const& token);
+        AuthUser(User user, std::string token);
         
         ~AuthUser() = default;
         
+        bool isLoggedIn() const;
+        
         bool isValid() const noexcept;
         
-        std::string token;
+        std::string token {};
     };
     
     // ================================================================================ //
@@ -252,16 +256,18 @@ namespace kiwi
         
         //! @brief Returns true if the current client api user is logged in.
         //! @see logout
-        bool isUserLoggedIn();
+        bool isUserLoggedIn() const;
         
         //! @brief Returns the authenticated user
         Api::AuthUser const& getAuthUser() const;
         
-        //! @brief Log-out the authenticated user.
+    protected: // methods
+        
+        //! @brief Clears the token.
         //! @details This will clear the stored token.
         //! The client will need to login again after this function call to perform authenticated request.
         //! @see login, isUserLoggedIn
-        virtual void logout();
+        virtual void clearToken();
         
     protected: // variables
         

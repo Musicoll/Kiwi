@@ -244,6 +244,15 @@ namespace kiwi
     //                                      API USER                                    //
     // ================================================================================ //
     
+    uint64_t Api::User::getIdAsInt() const
+    {
+        uint64_t result = 0ull;
+        std::stringstream converter(_id);
+        converter >> std::hex >> result;
+        
+        return result;
+    }
+    
     void to_json(json& j, Api::User const& user)
     {
         j = json{
@@ -266,11 +275,16 @@ namespace kiwi
     //                                    API AUTH USER                                 //
     // ================================================================================ //
     
-    Api::AuthUser::AuthUser(User const& user, std::string const& _token)
-    : Api::User(user)
-    , token(_token)
+    Api::AuthUser::AuthUser(User user, std::string _token)
+    : Api::User(std::move(user))
+    , token(std::move(_token))
     {
         ;
+    }
+    
+    bool Api::AuthUser::isLoggedIn() const
+    {
+        return !token.empty();
     }
     
     bool Api::AuthUser::isValid() const noexcept
@@ -350,7 +364,7 @@ namespace kiwi
         return m_port;
     }
     
-    bool Api::Controller::isUserLoggedIn()
+    bool Api::Controller::isUserLoggedIn() const
     {
         return m_auth_user.isValid();
     }
@@ -360,7 +374,7 @@ namespace kiwi
         return m_auth_user;
     }
     
-    void Api::Controller::logout()
+    void Api::Controller::clearToken()
     {
         m_auth_user.token.clear();
     }

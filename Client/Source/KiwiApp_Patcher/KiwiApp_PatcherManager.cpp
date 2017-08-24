@@ -108,9 +108,11 @@ namespace kiwi
             m_listeners.call(&Listener::connectedUserChanged, *this);
         });
         
+        const auto& network_settings = getAppSettings().network();
+        
         DocumentManager::connect(patcher,
-                                 session.getHost(),
-                                 session.getSessionPort(),
+                                 network_settings.getHost(),
+                                 network_settings.getSessionPort(),
                                  session.getSessionId());
         
         patcher.useSelfUser();
@@ -265,18 +267,12 @@ namespace kiwi
         auto& user = patcher.useSelfUser();
         auto& views = user.getViews();
         
-        bool view_has_been_removed = false;
-        
         for(auto it = views.begin(); it != views.end();)
         {
             it = user.removeView(*it);
-            view_has_been_removed = view_has_been_removed || (it != views.end());
         }
         
-        if(view_has_been_removed)
-        {
-            DocumentManager::commit(patcher);
-        }
+        DocumentManager::commit(patcher);
     }
     
     bool PatcherManager::askAllWindowsToClose()
@@ -434,7 +430,7 @@ namespace kiwi
         {
             changed = (changed || user.added() || user.removed());
             
-            if(user.getId() == m_instance.getUserId())
+            if(user.getId() == m_document.user())
             {
                 for(auto& view : user.getViews())
                 {
@@ -452,20 +448,13 @@ namespace kiwi
                 }
             }
         }
-        
-        /*
-        if(!patcher.removed() && changed)
-        {
-            m_listeners.call(&Listener::connectedUserChanged, *this);
-        }
-        */
     }
 
     void PatcherManager::createPatcherWindow(model::Patcher& patcher,
                                              model::Patcher::User const& user,
                                              model::Patcher::View& view)
     {
-        if(user.getId() == m_instance.getUserId())
+        if(user.getId() == m_document.user())
         {
             auto& patcherview = view.entity().emplace<PatcherView>(*this, m_instance, patcher, view);
             view.entity().emplace<PatcherViewWindow>(*this, patcherview);
@@ -477,7 +466,7 @@ namespace kiwi
                                            model::Patcher::User const& user,
                                            model::Patcher::View& view)
     {
-        if(user.getId() == m_instance.getUserId())
+        if(user.getId() == m_document.user())
         {
             // Notify PatcherView
             auto& patcherview = view.entity().use<PatcherView>();
@@ -489,7 +478,7 @@ namespace kiwi
                                              model::Patcher::User const& user,
                                              model::Patcher::View& view)
     {
-        if(user.getId() == m_instance.getUserId())
+        if(user.getId() == m_document.user())
         {
             view.entity().erase<PatcherView>();
             view.entity().erase<PatcherViewWindow>();
