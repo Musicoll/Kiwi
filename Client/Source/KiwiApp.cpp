@@ -216,13 +216,31 @@ namespace kiwi
         return *KiwiApp::use().m_api;
     }
     
-    ApiController& KiwiApp::useApiController()
+    void KiwiApp::login(std::string const& name_or_email,
+                        std::string const& password,
+                        std::function<void()> success_callback,
+                        Api::ErrorCallback error_callback)
     {
-        return *KiwiApp::use().m_api_controller;
+        auto& api_controller = *KiwiApp::use().m_api_controller;
+        api_controller.login(name_or_email, password, std::move(success_callback), std::move(error_callback));
+    }
+    
+    Api::AuthUser const& KiwiApp::getCurrentUser()
+    {
+        return KiwiApp::use().m_api_controller->getAuthUser();
+    }
+    
+    void KiwiApp::logout()
+    {
+        if(useInstance().logout())
+        {
+            KiwiApp::use().m_api_controller->logout();
+        }
     }
     
     uint64_t KiwiApp::userID()
     {
+        // refactor this (maybe a useless method)
         return KiwiApp::use().m_instance->getUserId();
     }
     
@@ -575,7 +593,7 @@ namespace kiwi
                 result.setInfo(TRANS("Switch global DSP state"), TRANS("Switch global DSP state"),
                                CommandCategories::general, 0);
                 
-                result.setTicked(m_instance->getEngineInstance().getAudioControler().isAudioOn());
+                result.setTicked(m_instance->useEngineInstance().getAudioControler().isAudioOn());
                 
                 break;
             }
@@ -584,7 +602,7 @@ namespace kiwi
                 result.setInfo(TRANS("Start dsp"), TRANS("Start dsp"),
                                CommandCategories::general, 0);
 
-                result.setActive(!m_instance->getEngineInstance().getAudioControler().isAudioOn());
+                result.setActive(!m_instance->useEngineInstance().getAudioControler().isAudioOn());
                 
                 break;
             }
@@ -593,7 +611,7 @@ namespace kiwi
                 result.setInfo(TRANS("Stop dsp"), TRANS("Stop dsp"),
                                CommandCategories::general, 0);
                 
-                result.setActive(m_instance->getEngineInstance().getAudioControler().isAudioOn());
+                result.setActive(m_instance->useEngineInstance().getAudioControler().isAudioOn());
                 
                 break;
             }
@@ -638,7 +656,7 @@ namespace kiwi
             }
             case CommandIDs::logout:
             {
-                m_api_controller->logout();
+                logout();
                 break;
             }
             case CommandIDs::showConsoleWindow :

@@ -40,6 +40,7 @@ namespace kiwi
         struct Listener
         {
             virtual ~Listener() {}
+            virtual void userConnectedCallback(Api::AuthUser const&) = 0;
             virtual void AuthUserChanged(Api::AuthUser const&) = 0;
         };
     
@@ -66,9 +67,9 @@ namespace kiwi
                    std::function<void()> success_callback,
                    Api::ErrorCallback error_callback);
         
-        //! @brief Log the client api user out.
+        //! @brief Log-out the user.
         //! @see login, isUserLoggedIn
-        void logout() override;
+        void logout();
         
         //! @brief Restore the controller state.
         void restoreFromXml();

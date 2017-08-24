@@ -74,12 +74,11 @@ namespace kiwi
         {
             std::cout << "User " << user._id << " Authenticated !\n";
             
-            KiwiApp::useInstance().useScheduler().schedule([this, success_cb = std::move(success_cb), user = std::move(user)]() {
+            auto& scheduler = KiwiApp::useInstance().useScheduler();
+            scheduler.schedule([this, success_cb = std::move(success_cb), user = std::move(user)]() {
                 
                 m_auth_user = std::move(user);
                 m_listeners.call(&ApiController::Listener::AuthUserChanged, getAuthUser());
-                
-                std::cout << "is logged in : " << m_auth_user.isValid() << std::endl;
                 
                 KiwiApp::commandStatusChanged();
                 
@@ -90,13 +89,13 @@ namespace kiwi
         
         auto& api = KiwiApp::useApi();
         api.login(name_or_email, password,
-                  success_callback,
+                  std::move(success_callback),
                   std::move(error_callback));
     }
     
     void ApiController::logout()
     {
-        Api::Controller::logout();
+        Api::Controller::clearToken();
         m_listeners.call(&ApiController::Listener::AuthUserChanged, getAuthUser());
     }
     

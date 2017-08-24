@@ -215,14 +215,8 @@ namespace kiwi
         //! @brief Returns the document name
         std::string getName() const;
         
-        //! @brief Returns the document session host
-        std::string getHost() const;
-        
         //! @brief Returns the session id of the document.
         uint64_t getSessionId() const;
-        
-        //! @brief Returns the document session port.
-        uint16_t getSessionPort() const;
         
         //! @brief Returns the drive that holds this document.
         DocumentBrowser::Drive const& useDrive() const;
