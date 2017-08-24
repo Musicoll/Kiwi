@@ -83,7 +83,7 @@ namespace kiwi
                 
                 if(j.is_object() && j.count("user") && j.count("token"))
                 {
-                    success(AuthUser(j["user"], j["token"]));
+                    success({j["user"], j["token"]});
                     return;
                 }
             }

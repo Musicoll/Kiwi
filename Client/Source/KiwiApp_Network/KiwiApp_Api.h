@@ -197,7 +197,7 @@ namespace kiwi
         
         bool isValid() const noexcept;
         
-        std::string token;
+        std::string token {};
     };
     
     // ================================================================================ //
