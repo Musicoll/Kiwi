@@ -351,7 +351,7 @@ namespace kiwi
             
             auto error_callback = [this](Api::Error error)
             {
-                KiwiApp::useInstance().useScheduler().schedule([this, message = error.getMessage()]() {
+                KiwiApp::useInstance().useScheduler().schedule([this, message = error.getMessage()](){
                     
                     std::cout << "Error: " << message << "\n";
                     
