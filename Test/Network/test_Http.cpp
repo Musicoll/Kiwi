@@ -27,7 +27,9 @@
 
 #include "../catch.hpp"
 
-#include <beast/http.hpp>
+#include <boost/beast/http.hpp>
+
+namespace beast = boost::beast;
 
 #include <KiwiNetwork/KiwiNetwork_Http.h>
 

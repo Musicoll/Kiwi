@@ -6,4 +6,4 @@
 	url = https://github.com/cameron314/concurrentqueue.git
 [submodule "ThirdParty/Beast"]
 	path = ThirdParty/Beast
-	url = https://github.com/vinniefalco/Beast.git
+	url = https://github.com/boostorg/beast.git

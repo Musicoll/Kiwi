@@ -68,7 +68,7 @@ Kiwi uses the following ThirdParty libraries:
 
 - [Flip](http://developer.irisate.com/)
 - [Juce](https://github.com/WeAreROLI/JUCE)
-- [Beast](https://github.com/vinniefalco/Beast/)
+- [Beast](https://github.com/boostorg/Beast/)
 - [concurrentqueue](https://github.com/cameron314/concurrentqueue)
 - [json](https://github.com/nlohmann/json)
 
