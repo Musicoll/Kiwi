@@ -30,8 +30,10 @@
 #include <boost/asio.hpp>
 #include <boost/asio/steady_timer.hpp>
 
-#include <beast/core.hpp>
-#include <beast/http.hpp>
+#include <boost/beast/core.hpp>
+#include <boost/beast/http.hpp>
+
+namespace beast = boost::beast;
 
 namespace kiwi { namespace network { namespace http {
     
