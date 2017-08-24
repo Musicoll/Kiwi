@@ -170,9 +170,9 @@ namespace kiwi
     {
         assert(&editor == m_editor.get());
         
-        removeTextEditor();
-        
         m_listeners.call(&Listener::textEdited, m_text);
+        
+        removeTextEditor();
     }
     
     void ClassicView::textEditorReturnKeyPressed(juce::TextEditor& editor)

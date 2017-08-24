@@ -279,6 +279,20 @@ namespace kiwi
         return getPatcherView().isSelected(*this);
     }
     
+    bool ObjectFrame::isEditing() const
+    {
+        bool is_editing = false;
+        
+        ClassicView * classic_view = dynamic_cast<ClassicView*>(m_object_view.get());
+        
+        if (classic_view != nullptr)
+        {
+            is_editing = classic_view->isEditing();
+        }
+        
+        return is_editing;
+    }
+    
     std::set<uint64_t> ObjectFrame::getDistantSelection() const
     {
         return getPatcherView().getDistantSelection(*this);

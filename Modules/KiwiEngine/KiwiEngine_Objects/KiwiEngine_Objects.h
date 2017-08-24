@@ -62,3 +62,9 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Time/KiwiEngine_Pipe.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Time/KiwiEngine_Delay.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Time/KiwiEngine_Metro.h>
+
+// ================================================================================ //
+//                               CONTROLLER OBJECTS                                 //
+// ================================================================================ //
+
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Controller/KiwiEngine_Bang.h>

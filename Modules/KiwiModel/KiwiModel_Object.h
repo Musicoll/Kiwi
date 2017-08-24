@@ -21,6 +21,8 @@
 
 #pragma once
 
+//! @todo Clean flip headers below, use only needed one in this file
+
 // ---- Flip headers ---- //
 #include "flip/Bool.h"
 #include "flip/Int.h"
@@ -151,6 +153,15 @@ namespace kiwi
         //! @details objects can be instantiated in a Patcher.
         class Object : public flip::Object
         {
+        public: // classes
+            
+            using SignalKey = uint32_t;
+            
+            enum class Flag : unsigned int
+            {
+                DefinedSize = 1 << 0 // Initial object's Size defined by the model.
+            };
+            
         public: // methods
  
             //! @brief Constructor.
@@ -222,7 +233,30 @@ namespace kiwi
             //! @brief Returns inlet or outlet description.
             virtual std::string getIODescription(bool is_inlet, size_t index) const;
             
-        protected: // methods
+            //! @brief Returns the object's signal referenced by this key.
+            //! @details Throws an exception if no signal is referenced for key.
+            template <class... Args>
+            auto& getSignal(SignalKey key) const
+            {
+                flip::SignalBase& signal_base = *m_signals.at(key);
+                return dynamic_cast<flip::Signal<Args...>&>(signal_base);
+            }
+            
+            //! @brief Checks if the object has this flag set.
+            bool hasFlag(Flag flag) const;
+            
+        protected:
+            
+            //! @brief Adds a signal having singal key.
+            template <class... Args>
+            void addSignal(SignalKey key, model::Object& object)
+            {
+                m_signals.emplace(key, std::make_unique<flip::Signal<Args...>>(key, object));
+            }
+            
+            //! @brief Sets one of the flag for the object.
+            //! @details It is a modification of the model and requires commit.
+            void setFlag(Flag flag);
             
             //! @brief Clear and replace all the object's inlets.
             void setInlets(flip::Array<Inlet> const& inlets);
@@ -246,10 +280,13 @@ namespace kiwi
             
         private: // members
             
+            std::map<SignalKey, std::unique_ptr<flip::SignalBase>> m_signals;
+            
             flip::String        m_name;
             flip::String        m_text;
             flip::Array<Inlet>  m_inlets;
             flip::Array<Outlet> m_outlets;
+            flip::Enum<Flag>    m_flags;
             
             flip::Float         m_position_x;
             flip::Float         m_position_y;
