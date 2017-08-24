@@ -99,6 +99,7 @@ namespace kiwi
             engine::Factory::add<PlusTilde>("plus~");
             engine::Factory::add<SigTilde>("sig~");
             engine::Factory::add<DelaySimpleTilde>("delaysimple~");
+            engine::Factory::add<Bang>("bang");
         }
         
         // ================================================================================ //

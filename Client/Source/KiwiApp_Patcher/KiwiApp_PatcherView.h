@@ -113,6 +113,9 @@ namespace kiwi
         //! @brief Called once an object has been edited.
         void objectEdited(ObjectFrame const& object_frame, std::string const& new_text);
         
+        //! @brief Returns true if an object if being edited.
+        bool isEditingObject() const;
+        
         //! @internal Update the patcher window title.
         void updateWindowTitle() const;
         
@@ -404,7 +407,6 @@ namespace kiwi
         bool m_select_on_mouse_down_status = false;
         bool m_link_downstatus = false;
         bool m_is_in_move_or_resize_gesture = false;
-        ObjectFrame* m_box_being_edited = nullptr;
         long m_object_border_down_status;
         
         friend PatcherViewport;

@@ -104,6 +104,9 @@ namespace kiwi
         //! @brief Returns true if the object is selected.
         bool isSelected() const;
         
+        //! @brief Returns true if the underlying object is currently being edited.
+        bool isEditing() const;
+        
     private: // methods
         
         //! @brief Component's graphical rendering method.

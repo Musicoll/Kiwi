@@ -27,6 +27,7 @@
 
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectView.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Objects.h>
+#include <KiwiApp_Patcher/KiwiApp_Factory.h>
 
 #include "../KiwiApp.h"
 #include "../KiwiApp_General/KiwiApp_CommandIDs.h"
@@ -1798,7 +1799,7 @@ namespace kiwi
         {
             const auto it = (zorder > 0) ? m_objects.begin() + zorder : m_objects.end();
             
-            std::unique_ptr<ObjectView> object_view = std::make_unique<ClassicView>(object);
+            std::unique_ptr<ObjectView> object_view = Factory::createObjectView(object);
             
             ObjectFrame& object_frame = **(m_objects.emplace(it, new ObjectFrame(*this, std::move(object_view))));
             
@@ -1929,22 +1930,29 @@ namespace kiwi
     // ================================================================================ //
     //                                  COMMANDS ACTIONS                                //
     // ================================================================================ //
+    
+    bool PatcherView::isEditingObject() const
+    {
+        auto func = [](std::unique_ptr<ObjectFrame> const& object)
+        {
+            return object->isEditing();
+        };
+        
+        return std::find_if(m_objects.begin(), m_objects.end(), func) != m_objects.end();
+    }
 
     void PatcherView::editObject(ObjectFrame & object_frame)
     {
-        assert(m_box_being_edited == nullptr);
+        assert(!isEditingObject() && "Editing two objects simultaneously");
         
         object_frame.editObject();
-        m_box_being_edited = &object_frame;
+        
         KiwiApp::commandStatusChanged(); // to disable some command while editing...
     }
     
     void PatcherView::objectEdited(ObjectFrame const& object_frame, std::string const& new_text)
     {
-        assert(m_box_being_edited != nullptr);
-        assert(m_box_being_edited == &object_frame);
-        
-        m_box_being_edited = nullptr;
+        assert(isEditingObject() && "Calling object edited without editing object first");
         
         grabKeyboardFocus();
         
@@ -1961,12 +1969,7 @@ namespace kiwi
             
             object_model->setPosition(box_bounds.getX() - origin.x, box_bounds.getY() - origin.y);
             
-            if (object_model->getName() == "newbox")
-            {
-                object_model->setWidth(80);
-                object_model->setHeight(box_bounds.getHeight());
-            }
-            else
+            if (!object_model->hasFlag(model::Object::Flag::DefinedSize))
             {
                 object_model->setWidth(juce::Font().getStringWidth(new_text) + 12);
                 object_model->setHeight(box_bounds.getHeight());
@@ -2025,7 +2028,6 @@ namespace kiwi
             }
             
             new_object->setPosition(pos.x, pos.y);
-            new_object->setWidth(80);
             
             m_view_model.unselectAll();
             
@@ -2268,7 +2270,6 @@ namespace kiwi
     void PatcherView::getCommandInfo(const juce::CommandID commandID, juce::ApplicationCommandInfo& result)
     {
         const bool is_not_in_gesture = !DocumentManager::isInCommitGesture(m_patcher_model);
-        const bool box_is_not_being_edited = (m_box_being_edited == nullptr);
         
         switch(commandID)
         {
@@ -2414,15 +2415,14 @@ namespace kiwi
         
         result.setActive(!(result.flags & juce::ApplicationCommandInfo::isDisabled)
                          && is_not_in_gesture
-                         && box_is_not_being_edited);
+                         && !isEditingObject());
     }
     
     bool PatcherView::perform(const InvocationInfo& info)
     {
         // most of the commands below generate conflicts when they are being executed
         // in a commit gesture or when a box is being edited, so simply not execute them.
-        if(DocumentManager::isInCommitGesture(m_patcher_model)
-           || (m_box_being_edited != nullptr))
+        if(DocumentManager::isInCommitGesture(m_patcher_model) || isEditingObject())
         {
             return true;
         }

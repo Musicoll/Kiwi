@@ -19,56 +19,48 @@
  ==============================================================================
  */
 
-#pragma once
-
-#include <juce_gui_basics/juce_gui_basics.h>
+#include <functional>
+#include <memory>
+#include <map>
 
 #include <KiwiModel/KiwiModel_Object.h>
 
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectView.h>
+
+#pragma once
+
 namespace kiwi
 {
-    class ObjectFrame;
-    
     // ================================================================================ //
-    //                                   OBJECT VIEW                                    //
+    //                                      FACTORY                                     //
     // ================================================================================ //
-    
-    //! @brief Abstract for objects graphical representation.
-    class ObjectView : public juce::Component
+
+    class Factory
     {
-    public: // classes
+    public: // definitions
         
-        enum ColourIds
-        {
-            Background =    0x1100004,
-            Error =         0x1100005,
-            Text =          0x1100006,
-            Outline =       0x1100007,
-            Highlight =     0x1100008,
-            Active =        0x1100009
-        };
+        using factory_func = std::function<std::unique_ptr<ObjectView>(model::Object & model)>;
         
     public: // methods
+
+        //! @brief The construction methods.
+        //! @details Returns an object corresponding to a certain object's model.
+        static std::unique_ptr<ObjectView> createObjectView(model::Object & object_model);
         
-        //! @brief Constructor.
-        ObjectView(model::Object& object_model);
-        
-        //! @brief Destructor.
-        virtual ~ObjectView();
-        
-        //! @brief Returns the model represented by the graphical object.
-        model::Object& getModel() const;
+        //! @brief Initializes the list of creators adding a function for each type of objects.
+        static void initialise();
         
     private: // members
         
-        model::Object&          m_model;
-        
+        static std::map<std::string, factory_func> m_creator_map;
+
     private: // deleted methods
         
-        ObjectView() = delete;
-        ObjectView(ObjectView const& other) = delete;
-        ObjectView(ObjectView && other) = delete;
-        ObjectView& operator=(ObjectView const& other) = delete;
-        ObjectView& operator=(ObjectView && other) = delete;
+        Factory() = delete;
+        ~Factory() = delete;
+        Factory(Factory const& other) = delete;
+        Factory(Factory && other) = delete;
+        Factory& operator=(Factory const& other) = delete;
+        Factory& operator=(Factory && other) = delete;
     };
 }
