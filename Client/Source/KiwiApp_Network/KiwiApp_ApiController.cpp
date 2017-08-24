@@ -74,9 +74,8 @@ namespace kiwi
             
             auto& scheduler = KiwiApp::useInstance().useScheduler();
             //scheduler.schedule([this, success_callback = std::move(success_callback), user = std::move(user)](){
-            scheduler.schedule([this](){
+            scheduler.schedule([this, success_callback, user](){
                 
-                /*
                 std::cout << "User " << user._id << " Authenticated !\n";
                 
                 m_auth_user = std::move(user);
@@ -85,7 +84,6 @@ namespace kiwi
                 KiwiApp::commandStatusChanged();
                 
                 success_callback();
-                */
             });
         };
         
