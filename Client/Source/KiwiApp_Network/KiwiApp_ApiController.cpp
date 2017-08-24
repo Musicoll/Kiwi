@@ -70,12 +70,11 @@ namespace kiwi
                               std::function<void()> success_callback,
                               Api::ErrorCallback error_callback)
     {
-        auto success_cb = [this, success_callback = std::move(success_callback)](Api::AuthUser user)
-        {
+        auto success_cb = [this, success_callback = std::move(success_callback)](Api::AuthUser user){
+            
             auto& scheduler = KiwiApp::useInstance().useScheduler();
             scheduler.schedule([this, success_callback = std::move(success_callback), user = std::move(user)](){
                 
-                /*
                 std::cout << "User " << user._id << " Authenticated !\n";
                 
                 m_auth_user = std::move(user);
@@ -84,7 +83,6 @@ namespace kiwi
                 KiwiApp::commandStatusChanged();
                 
                 success_callback();
-                */
                 
             });
         };
