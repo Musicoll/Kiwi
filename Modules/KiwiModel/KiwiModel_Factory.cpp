@@ -19,6 +19,8 @@
  ==============================================================================
  */
 
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Basic/KiwiModel_ErrorBox.h>
+
 #include "KiwiModel_Factory.h"
 
 namespace kiwi
@@ -29,21 +31,39 @@ namespace kiwi
         //                                      FACTORY                                     //
         // ================================================================================ //
         
-        std::unique_ptr<model::Object> Factory::create(std::string const& name,
-                                                       std::vector<Atom> const& args)
+        std::unique_ptr<model::Object> Factory::create(std::vector<Atom> const& atoms)
         {
-            auto const* class_ptr = getClassByName(name);
-            if(class_ptr != nullptr)
+            std::unique_ptr<model::Object> object;
+            
+            auto * object_class = !atoms.empty() ? getClassByName(atoms[0].getString()) : getClassByName("newbox");
+            
+            if (object_class == nullptr)
             {
-                auto object_uptr = class_ptr->create(args);
-                object_uptr->m_name = class_ptr->getName();
-                object_uptr->m_text = args.empty() ? name : name + " " + AtomHelper::toString(args);
-                return object_uptr;
+                object_class = getClassByName("errorbox");
+                
+                object = object_class->create(std::vector<Atom>());
+                dynamic_cast<ErrorBox*>(object.get())->setError("object \"" + atoms[0].getString() + "\" not found");
             }
             else
             {
-                throw std::runtime_error("Factory can't create object");
+                try
+                {
+                    std::vector<Atom> args(atoms.empty() ? atoms.begin() : atoms.begin() + 1, atoms.end());
+                    object = object_class->create(args);
+                }
+                catch(std::runtime_error & e)
+                {
+                    object_class = getClassByName("errorbox");
+                    
+                    object = object_class->create(std::vector<Atom>());
+                    dynamic_cast<ErrorBox*>(object.get())->setError(e.what());
+                }
             }
+            
+            object->m_name = object_class->getName();
+            object->m_text = AtomHelper::toString(atoms);
+            
+            return object;
         }
         
         std::unique_ptr<model::Object> Factory::create(std::string const& name, flip::Mold const& mold)

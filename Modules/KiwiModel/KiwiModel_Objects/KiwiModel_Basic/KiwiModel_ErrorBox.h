@@ -49,10 +49,20 @@ namespace kiwi
             //! @param inlets The number of inlets.
             void setOutlets(flip::Array<Outlet> const& outlets);
             
+            //! @brief Sets the message error that caused the errorbox construction.
+            void setError(std::string const& error);
+            
+            //! @brief Returns the error that caused the errorbox construction.
+            std::string getError() const;
+
             std::string getIODescription(bool is_inlet, size_t index) const override;
             
             //! @internal flip static declare method
             static void declare();
+            
+        private: // members
+            
+            std::string m_error;
         };
     }
 }

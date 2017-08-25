@@ -34,6 +34,7 @@ namespace kiwi
         void NewBox::declare()
         {
             Factory::add<NewBox>("newbox").setInternal(true);
+            
         }
         
         NewBox::NewBox(std::string const& name, std::vector<Atom> const& args)

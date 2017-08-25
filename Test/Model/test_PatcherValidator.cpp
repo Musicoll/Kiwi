@@ -30,6 +30,7 @@
 #include <KiwiModel/KiwiModel_PatcherUser.h>
 #include <KiwiModel/KiwiModel_Atom.h>
 #include <KiwiModel/KiwiModel_PatcherValidator.h>
+#include <KiwiModel/KiwiModel_Factory.h>
 
 using namespace kiwi;
 
@@ -44,8 +45,8 @@ TEST_CASE("Model Validator", "[Validator]")
         model::PatcherValidator validator;
         flip::DocumentServer server (model::DataModel::use(), validator, 123456789ULL);
         
-        model::Object& plus_up = server.root<model::Patcher>().addObject("+", std::vector<Atom>());
-        model::Object& plus_down = server.root<model::Patcher>().addObject("+", std::vector<Atom>());
+        server.root<model::Patcher>().addObject(model::Factory::create(AtomHelper::parse("+")));
+        server.root<model::Patcher>().addObject(model::Factory::create(AtomHelper::parse("+")));
         
         server.commit();
         
@@ -107,8 +108,8 @@ TEST_CASE("Model Validator", "[Validator]")
         model::PatcherValidator validator;
         flip::DocumentServer server (model::DataModel::use(), validator, 123456789ULL);
         
-        model::Object& plus_up = server.root<model::Patcher>().addObject("+", std::vector<Atom>());
-        model::Object& plus_down = server.root<model::Patcher>().addObject("+", std::vector<Atom>());
+        server.root<model::Patcher>().addObject(model::Factory::create(AtomHelper::parse("+")));
+        server.root<model::Patcher>().addObject(model::Factory::create(AtomHelper::parse("+")));
         
         server.commit();
         
