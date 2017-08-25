@@ -1929,27 +1929,6 @@ namespace kiwi
     // ================================================================================ //
     //                                  COMMANDS ACTIONS                                //
     // ================================================================================ //
-    
-    model::Object& PatcherView::createObjectModel(std::string const& text)
-    {
-        // to clean
-        std::vector<Atom> atoms = AtomHelper::parse(text);
-        const std::string name = atoms[0].getString();
-        if(model::Factory::has(name))
-        {
-            model::Object* model;
-            try
-            {
-                model = &m_patcher_model.addObject(name, std::vector<Atom>(atoms.begin()+1, atoms.end()));
-            }
-            catch(...)
-            {
-                return m_patcher_model.addObject("errorbox", std::vector<Atom>(atoms.begin(), atoms.end()));
-            }
-            return *model;
-        }
-        return m_patcher_model.addObject("errorbox", std::vector<Atom>(atoms.begin(), atoms.end()));
-    }
 
     void PatcherView::editObject(ObjectFrame & object_frame)
     {
@@ -1962,98 +1941,56 @@ namespace kiwi
     
     void PatcherView::objectEdited(ObjectFrame const& object_frame, std::string const& new_text)
     {
-        grabKeyboardFocus();
-        
-        std::string new_object_text = new_text.empty() ? "newbox" : new_text;
-        
         assert(m_box_being_edited != nullptr);
         assert(m_box_being_edited == &object_frame);
         
         m_box_being_edited = nullptr;
-        model::Object& old_object_m = object_frame.getModel();
-        const std::string old_object_text = old_object_m.getText();
         
-        if(old_object_text != new_object_text)
+        grabKeyboardFocus();
+        
+        model::Object & old_model = object_frame.getModel();
+        
+        if(new_text != old_model.getText())
         {
-            model::Object& new_object_m = createObjectModel(new_object_text);
-
-            const std::string new_object_name = new_object_m.getName();
-            const std::string new_object_text = [&new_object_name](std::string text){
-                
-                if(new_object_name == "errorbox")
-                {
-                    text.erase(text.begin(), text.begin()+9);
-                }
-                
-                return text;
-                
-            }(new_object_m.getText());
-
-            const int text_width = juce::Font().getStringWidth(new_object_text);
+            std::vector<Atom> atoms = AtomHelper::parse(new_text);
             
-            const juce::Point<int> origin = getOriginPosition();
+            std::unique_ptr<model::Object> object_model = model::Factory::create(atoms);
+            
+            juce::Point<int> origin = getOriginPosition();
             juce::Rectangle<int> box_bounds = object_frame.getObjectBounds();
-            new_object_m.setPosition(box_bounds.getX() - origin.x, box_bounds.getY() - origin.y);
             
-            new_object_m.setWidth(text_width + 12);
-            new_object_m.setHeight(box_bounds.getHeight());
+            object_model->setPosition(box_bounds.getX() - origin.x, box_bounds.getY() - origin.y);
             
+            if (object_model->getName() == "newbox")
+            {
+                object_model->setWidth(80);
+                object_model->setHeight(box_bounds.getHeight());
+            }
+            else
+            {
+                object_model->setWidth(juce::Font().getStringWidth(new_text) + 12);
+                object_model->setHeight(box_bounds.getHeight());
+            }
+
             // handle error box case
-            if(new_object_name == "errorbox")
+            if(object_model->getName() == "errorbox")
             {
-                model::ErrorBox& error_box = dynamic_cast<model::ErrorBox&>(new_object_m);
-                error_box.setInlets(old_object_m.getInlets());
-                error_box.setOutlets(old_object_m.getOutlets());
+                model::ErrorBox& error_box = dynamic_cast<model::ErrorBox&>(*object_model);
+                error_box.setInlets(old_model.getInlets());
+                error_box.setOutlets(old_model.getOutlets());
+                KiwiApp::error(error_box.getError());
             }
             
-            // re-link object
-            const size_t new_inlets = new_object_m.getNumberOfInlets();
-            const size_t new_outlets = new_object_m.getNumberOfOutlets();
+            model::Object & new_object = m_patcher_model.replaceObject(old_model, std::move(object_model));
             
-            for(model::Link& link : m_patcher_model.getLinks())
-            {
-                if(!link.removed())
-                {
-                    const model::Object& from = link.getSenderObject();
-                    const size_t outlet_index = link.getSenderIndex();
-                    const model::Object& to = link.getReceiverObject();
-                    const size_t inlet_index = link.getReceiverIndex();
-                    
-                    if(&from == &old_object_m)
-                    {
-                        if(outlet_index < new_outlets)
-                        {
-                            m_patcher_model.addLink(new_object_m, outlet_index, to, inlet_index);
-                        }
-                        else
-                        {
-                            KiwiApp::error("Link removed (outlet out of range)");
-                        }
-                    }
-                    
-                    if(&to == &old_object_m)
-                    {
-                        if(inlet_index < new_inlets)
-                        {
-                            m_patcher_model.addLink(from, outlet_index, new_object_m, inlet_index);
-                        }
-                        else
-                        {
-                            KiwiApp::error("Link removed (inlet out of range)");
-                        }
-                    }
-                }
-            }
-            
-            m_view_model.unselectObject(old_object_m);
-            m_patcher_model.removeObject(old_object_m);
-            DocumentManager::commit(m_patcher_model, "Edit Object");
+            m_view_model.unselectObject(old_model);
             
             if(!isLocked())
             {
-                m_view_model.selectObject(new_object_m);
-                DocumentManager::commit(m_patcher_model);
+                m_view_model.selectObject(new_object);
             }
+            
+            DocumentManager::commit(m_patcher_model, "Edit Object");
         }
         
         KiwiApp::commandStatusChanged();
@@ -2065,7 +2002,7 @@ namespace kiwi
         {
             bool linked_newbox = m_local_objects_selection.size() == 1;
             
-            auto& new_object = createObjectModel("newbox");
+            std::unique_ptr<model::Object> new_object = model::Factory::create(AtomHelper::parse(""));
             
             juce::Point<int> pos = getMouseXYRelative() - getOriginPosition();
             
@@ -2082,16 +2019,17 @@ namespace kiwi
                     
                     if(obj->getNumberOfInlets() >= 1)
                     {
-                        m_patcher_model.addLink(*obj, 0, new_object, 0);
+                        m_patcher_model.addLink(*obj, 0, *new_object, 0);
                     }
                 }
             }
             
-            new_object.setPosition(pos.x, pos.y);
-            new_object.setWidth(80);
+            new_object->setPosition(pos.x, pos.y);
+            new_object->setWidth(80);
             
             m_view_model.unselectAll();
-            m_view_model.selectObject(new_object);
+            
+            m_view_model.selectObject(m_patcher_model.addObject(std::move(new_object)));
             
             DocumentManager::commit(m_patcher_model, "Insert New Empty Box");
 

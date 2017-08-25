@@ -39,12 +39,7 @@ namespace kiwi
     {
         if(object_model.getName() == "errorbox")
         {
-            m_text.erase(m_text.begin(), m_text.begin() + m_text.find(" ") + 1);
             setColour(ObjectView::ColourIds::Background, findColour(ObjectView::ColourIds::Error).withAlpha(0.4f));
-        }
-        else if(object_model.getName() == "newbox")
-        {
-            m_text.clear();
         }
     }
 

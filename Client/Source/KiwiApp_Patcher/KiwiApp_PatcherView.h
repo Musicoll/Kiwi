@@ -106,9 +106,6 @@ namespace kiwi
         //! @brief Returns the position of the patcher origin relative to the component position.
         juce::Point<int> getOriginPosition() const;
         
-        //! @brief Create an object model. 
-        model::Object& createObjectModel(std::string const& text);
-        
         //! @brief Call this to switch the box to edit mode
         //! @details Will result in objectEdited being called in case of success.
         void editObject(ObjectFrame & object_frame);

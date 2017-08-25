@@ -34,12 +34,17 @@ namespace kiwi
         
         std::unique_ptr<Object> Factory::create(Patcher& patcher, model::Object const& model)
         {
-            std::vector<Atom> atoms = AtomHelper::parse(model.getText());
-            assert(!atoms.empty() && "The model object isn't valid.");
+            std::vector<Atom> args;
+            
+            if (!model.getText().empty())
+            {
+                std::vector<Atom> parsed_text = AtomHelper::parse(model.getText());
+                args.insert(args.begin(), parsed_text.begin() + 1, parsed_text.end());
+            }
             
             auto& creators = getCreators();
             assert(creators.count(model.getName()) != 0 && "The object has not been registered.");
-            return std::unique_ptr<Object>(creators[model.getName()](model, patcher, std::vector<Atom>(atoms.begin() + 1, atoms.end())));
+            return std::unique_ptr<Object>(creators[model.getName()](model, patcher, args));
         }
         
         bool Factory::has(std::string const& name)
