@@ -50,6 +50,8 @@ namespace kiwi
         ApiController();
         
         //! @brief Destructor
+        //! @details If the "remember me" flag is true, the user profile will be saved when the object is destroyed.
+        //! If false, the user profile will be saved whithout the token.
         ~ApiController();
         
         //! @brief Adds a listener.
@@ -71,13 +73,10 @@ namespace kiwi
         //! @see login, isUserLoggedIn
         void logout();
         
-        //! @brief Restore the controller state.
-        void restoreFromXml();
-        
-        //! @brief Save the controller state.
-        void saveToXml();
-        
     private: // methods
+        
+        bool saveAuthUserProfile();
+        bool restoreAuthUserProfile();
         
         //! @brief Called when the network settings has changed.
         void networkSettingsChanged(NetworkSettings const&, juce::Identifier const&) override;

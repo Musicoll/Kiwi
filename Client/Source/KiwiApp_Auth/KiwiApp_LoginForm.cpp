@@ -163,13 +163,31 @@ namespace kiwi
     : m_password_box(juce::String(), getDefaultPasswordChar())
     , m_submit_btn(TRANS("Login"))
     , m_cancel_btn(TRANS("Cancel"))
+    , m_remember_me_checkbox("Remember me")
     , m_kiwi_app_image(juce::ImageCache::getFromMemory(binary_data::images::kiwi_icon_png,
                                                        binary_data::images::kiwi_icon_png_size))
     {
+        //(force use of a default system font to make sure it has the password blob character)
+        juce::Font font(juce::Font::getDefaultTypefaceForFont(juce::Font(juce::Font::getDefaultSansSerifFontName(),
+                                                                         juce::Font::getDefaultStyle(), 5.0f)));
+        
+        font.setHeight(22);
+        
+        m_email_box.setInputRestrictions(512);
+        m_email_box.setFont(font);
+        m_email_box.setText(KiwiApp::getCurrentUser().getName(), false);
+        
+        m_password_box.setInputRestrictions(64);
+        m_password_box.setFont(font);
+        
         addAndMakeVisible(m_email_box);
         addAndMakeVisible(m_password_box);
+        addAndMakeVisible(m_remember_me_checkbox);
         addAndMakeVisible(m_submit_btn);
         addAndMakeVisible(m_cancel_btn);
+        
+        m_remember_me_checkbox.setToggleState(getAppSettings().network().getRememberUserFlag(),
+                                              juce::NotificationType::dontSendNotification);
         
         m_email_box.setEscapeAndReturnKeysConsumed(false);
         m_password_box.setEscapeAndReturnKeysConsumed(false);
@@ -180,7 +198,8 @@ namespace kiwi
         m_cancel_btn.addListener(this);
         
         lookAndFeelChanged();
-        setSize(400, 300);
+        setSize(400, 330);
+        resized();
     }
     
     LoginForm::~LoginForm()
@@ -223,23 +242,17 @@ namespace kiwi
         
         r.reduce(10, 10);
         
-        //(force use of a default system font to make sure it has the password blob character)
-        juce::Font font(juce::Font::getDefaultTypefaceForFont(juce::Font(juce::Font::getDefaultSansSerifFontName(), juce::Font::getDefaultStyle(), 5.0f)));
-        
-        font.setHeight(22);
-        
         const int boxHeight = 32;
         
         m_email_box.setBounds(r.removeFromTop(boxHeight));
-        m_email_box.setInputRestrictions(512);
-        m_email_box.setFont(font);
         
         r.removeFromTop(20);
         m_password_box.setBounds(r.removeFromTop(boxHeight));
-        m_password_box.setInputRestrictions(64);
-        m_password_box.setFont(font);
         
-        r.removeFromTop(20);
+        r.removeFromTop(10);
+        m_remember_me_checkbox.setBounds(r.removeFromTop(boxHeight));
+        
+        r.removeFromTop(10);
         juce::Rectangle<int> buttonArea(r.removeFromTop(button_height));
         m_submit_btn.changeWidthToFitText(button_height);
         m_cancel_btn.changeWidthToFitText(button_height);
@@ -345,6 +358,7 @@ namespace kiwi
             auto success_callback = [this]()
             {
                 KiwiApp::useInstance().useScheduler().schedule([this]() {
+                    getAppSettings().network().setRememberUserFlag(m_remember_me_checkbox.getToggleState());
                     dismiss();
                 }, std::chrono::milliseconds(500));
             };

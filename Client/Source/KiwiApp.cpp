@@ -235,6 +235,7 @@ namespace kiwi
         if(useInstance().logout())
         {
             KiwiApp::use().m_api_controller->logout();
+            KiwiApp::commandStatusChanged();
         }
     }
     
@@ -379,6 +380,8 @@ namespace kiwi
     
     void KiwiApp::createAccountMenu(juce::PopupMenu& menu)
     {
+        menu.addCommandItem(&getCommandManager(), CommandIDs::remember_me);
+        menu.addSeparator();
         menu.addCommandItem(&getCommandManager(), CommandIDs::login);
         menu.addCommandItem(&getCommandManager(), CommandIDs::signin);
         menu.addSeparator();
@@ -492,6 +495,7 @@ namespace kiwi
             CommandIDs::login,
             CommandIDs::signin,
             CommandIDs::logout,
+            CommandIDs::remember_me,
         };
         
         commands.addArray(ids, juce::numElementsInArray(ids));
@@ -527,9 +531,10 @@ namespace kiwi
             }
             case CommandIDs::login:
             {
-                const bool logged = m_api_controller->isUserLoggedIn();
+                auto const& user = getCurrentUser();
+                const bool logged = user.isLoggedIn();
                 result.setInfo(logged
-                               ? juce::String(TRANS("Logged-in as ") + m_api_controller->getAuthUser().name)
+                               ? juce::String(TRANS("Logged-in as ") + user.getName())
                                : TRANS("Login"),
                                TRANS("Show the \"Login form\" Window"),
                                CommandCategories::windows, 0);
@@ -542,7 +547,7 @@ namespace kiwi
                 result.setInfo(TRANS("Register"), TRANS("Show the \"Register form\" Window"),
                                CommandCategories::windows, 0);
                 
-                result.setActive(!m_api_controller->isUserLoggedIn());
+                result.setActive(!getCurrentUser().isLoggedIn());
                 break;
             }
             case CommandIDs::logout:
@@ -550,7 +555,18 @@ namespace kiwi
                 result.setInfo(TRANS("Logout"), TRANS("Log out current user"),
                                CommandCategories::windows, 0);
                 
-                result.setActive(m_api_controller->isUserLoggedIn());
+                result.setActive(getCurrentUser().isLoggedIn());
+                break;
+            }
+            case CommandIDs::remember_me:
+            {
+                result.setInfo(TRANS("Remember me"), TRANS("Remember current user"),
+                               CommandCategories::windows, 0);
+                
+                auto const& user = getCurrentUser();
+                
+                result.setActive(user.isLoggedIn());
+                result.setTicked(getAppSettings().network().getRememberUserFlag());
                 break;
             }
             case CommandIDs::showAboutAppWindow:
@@ -657,6 +673,13 @@ namespace kiwi
             case CommandIDs::logout:
             {
                 logout();
+                break;
+            }
+            case CommandIDs::remember_me:
+            {
+                auto& settings = getAppSettings().network();
+                settings.setRememberUserFlag(!settings.getRememberUserFlag());
+                commandStatusChanged();
                 break;
             }
             case CommandIDs::showConsoleWindow :

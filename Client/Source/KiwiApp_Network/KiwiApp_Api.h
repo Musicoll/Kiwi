@@ -93,6 +93,14 @@ namespace kiwi
                             std::string const& new_name,
                             Callback callback);
         
+    public: // helper methods
+        
+        template<class Type>
+        static Type getJsonValue(json const& json, std::string const& key, Type default_value = {})
+        {
+            return json.count(key) ? json.at(key).get<Type>() : default_value;
+        }
+        
     private: // methods
         
         //! @brief Kiwi API Endpoints
@@ -140,6 +148,8 @@ namespace kiwi
         
         Error();
         
+        Error(unsigned status_code, std::string const& message);
+        
         Error(Api::Response const& response);
         
         ~Error() = default;
@@ -162,15 +172,47 @@ namespace kiwi
     {
     public: // methods
         
+        //! @brief Constructor.
         User() = default;
+        
         virtual ~User() = default;
         
+        //! @brief Constructor.
+        //User& operator = (User && user);
+        
+        //! @brief Get the user name.
+        std::string const& getName() const;
+        
+        //! @brief Get the user email.
+        std::string const& getEmail() const;
+        
+        //! @brief Get the user id as a string.
+        std::string const& getIdAsString() const;
+        
+        //! @brief Get the user id as an integer.
         uint64_t getIdAsInt() const;
         
-        int             api_version = 0;
-        std::string     _id {};
-        std::string     name {};
-        std::string     email {};
+        //! @brief Get the user api version.
+        int getApiVersion() const;
+        
+        //! @brief Returns true if the user has a valid id and email.
+        bool isValid() const noexcept;
+        
+    private: // deleted methods
+        
+        //User(User const&) = delete;
+        
+    private: // variables
+        
+        friend void from_json(json const&, Api::User&);
+        
+        int             m_api_version = 0;
+        std::string     m_id {};
+        std::string     m_name {};
+        std::string     m_email {};
+        
+        //uint64_t        m_int_id = 0ull;
+        //bool            m_int_id_need_update_flag = true;
     };
     
     //! @brief Helper function to convert an Api::User into a json object
@@ -189,16 +231,34 @@ namespace kiwi
         
         AuthUser() = default;
         
-        AuthUser(User user, std::string token);
+        //AuthUser(AuthUser&& other);
         
         ~AuthUser() = default;
         
+        //! @brief Returns true if the user has a token.
+        //! @see getToken
         bool isLoggedIn() const;
         
-        bool isValid() const noexcept;
+        //! @brief Returns the user token.
+        //! @see isLoggedIn()
+        std::string const& getToken() const;
         
-        std::string token {};
+    private: // variables
+        
+        //AuthUser(AuthUser&& other) = default;
+        
+        friend void from_json(json const&, Api::AuthUser&);
+        
+        friend Api::Controller;
+        
+        std::string m_token {};
     };
+    
+    //! @brief Helper function to convert an Api::AuthUser into a json object
+    void to_json(json& j, Api::AuthUser const& user);
+    
+    //! @brief Helper function to convert a json object into an Api::AuthUser
+    void from_json(json const& j, Api::AuthUser& user);
     
     // ================================================================================ //
     //                                    API DOCUMENT                                  //

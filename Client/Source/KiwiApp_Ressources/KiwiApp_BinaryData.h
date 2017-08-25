@@ -122,7 +122,7 @@ namespace kiwi
         namespace settings
         {
             extern char const* network_settings;
-            const int network_settings_size = 135;
+            const int network_settings_size = 151;
 
         }
     }
