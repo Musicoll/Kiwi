@@ -96,7 +96,7 @@ namespace kiwi
         //! @brief Get the Api object.
         static Api& useApi();
         
-        //! @brief Attempt to log the client api user in (Async).
+        //! @brief Attempt to log-in the user (Async).
         //! @param name_or_email The name or email of the user.
         //! @param password The user password.
         //! @see logout, getCurrentUser

@@ -361,7 +361,7 @@ namespace kiwi
                                             std::make_unique<LoginForm>(),
                                             false, false);
             
-            login_window->centreWithSize(400, 300);
+            login_window->centreWithSize(400, 330);
             login_window->enterModalState(true);
             
             return login_window;

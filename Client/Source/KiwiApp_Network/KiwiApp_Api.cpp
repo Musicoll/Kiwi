@@ -81,9 +81,19 @@ namespace kiwi
             {
                 const auto j = json::parse(res.body);
                 
-                if(j.is_object() && j.count("user") && j.count("token"))
+                if(j.is_object() && j.count("user"))
                 {
-                    success({j["user"], j["token"]});
+                    AuthUser user(j["user"]);
+                    
+                    if(user.isLoggedIn())
+                    {
+                        success(std::move(user));
+                    }
+                    else
+                    {
+                        fail({res.result_int(), "Failed to parse result"});
+                    }
+                    
                     return;
                 }
             }
@@ -182,9 +192,9 @@ namespace kiwi
         
         const AuthUser& user = m_controller.getAuthUser();
         
-        if(add_auth && !user.token.empty())
+        if(add_auth && !user.isLoggedIn())
         {
-            session->setAuthorization("JWT " + user.token);
+            session->setAuthorization("JWT " + user.getToken());
         }
         
         return std::move(session);
@@ -211,6 +221,13 @@ namespace kiwi
     Api::Error::Error()
     : m_status_code(0)
     , m_message("Unknown Error")
+    {
+        ;
+    }
+    
+    Api::Error::Error(unsigned status_code, std::string const& message)
+    : m_status_code(status_code)
+    , m_message(message)
     {
         
     }
@@ -244,52 +261,92 @@ namespace kiwi
     //                                      API USER                                    //
     // ================================================================================ //
     
+    std::string const& Api::User::getName() const
+    {
+        return m_name;
+    }
+    
+    std::string const& Api::User::getEmail() const
+    {
+        return m_email;
+    }
+    
+    std::string const& Api::User::getIdAsString() const
+    {
+        return m_id;
+    }
+
     uint64_t Api::User::getIdAsInt() const
     {
         uint64_t result = 0ull;
-        std::stringstream converter(_id);
+        std::stringstream converter(m_id);
         converter >> std::hex >> result;
         
         return result;
     }
     
+    bool Api::User::isValid() const noexcept
+    {
+        return (!m_id.empty() && !m_email.empty());
+    }
+    
+    int Api::User::getApiVersion() const
+    {
+        return m_api_version;
+    }
+    
     void to_json(json& j, Api::User const& user)
     {
         j = json{
-            {"__v", user.api_version},
-            {"_id", user._id},
-            {"username", user.name},
-            {"email", user.email}
+            {"__v", user.getApiVersion()},
+            {"_id", user.getIdAsString()},
+            {"username", user.getName()},
+            {"email", user.getEmail()}
         };
     }
     
     void from_json(json const& j, Api::User& user)
     {
-        user.api_version = j.count("__v") ? j["__v"].get<int>() : 0;
-        user._id = j.count("_id") ? j["_id"].get<std::string>() : "";
-        user.name = j.count("username") ? j["username"].get<std::string>() : "";
-        user.email = j.count("email") ? j["email"].get<std::string>() : "";
+        user.m_api_version = Api::getJsonValue<int>(j, "__v");
+        user.m_id = Api::getJsonValue<std::string>(j, "_id");
+        user.m_name = Api::getJsonValue<std::string>(j, "username");
+        user.m_email = Api::getJsonValue<std::string>(j, "email");
     }
     
     // ================================================================================ //
     //                                    API AUTH USER                                 //
     // ================================================================================ //
     
-    Api::AuthUser::AuthUser(User user, std::string _token)
-    : Api::User(std::move(user))
-    , token(std::move(_token))
+    /*
+    Api::AuthUser::AuthUser(AuthUser&& other)
+    : Api::User(other)
+    , m_token(std::move(other.m_token))
     {
-        ;
+        
     }
+    */
     
     bool Api::AuthUser::isLoggedIn() const
     {
-        return !token.empty();
+        return isValid() && !m_token.empty();
     }
     
-    bool Api::AuthUser::isValid() const noexcept
+    std::string const& Api::AuthUser::getToken() const
     {
-        return (!_id.empty() && !token.empty());
+        return m_token;
+    }
+    
+    //! @brief Helper function to convert an Api::AuthUser into a json object
+    void to_json(json& j, Api::AuthUser const& user)
+    {
+        to_json(j, static_cast<Api::User const&>(user));
+        j["token"] = user.getToken();
+    }
+    
+    void from_json(json const& j, Api::AuthUser& user)
+    {
+        from_json(j, static_cast<Api::User&>(user));
+        user.m_token = Api::getJsonValue<std::string>(j, "token");
     }
     
     // ================================================================================ //
@@ -310,8 +367,8 @@ namespace kiwi
     
     void from_json(json const& j, Api::Document& doc)
     {
-        doc._id = j.count("_id") ? j["_id"].get<std::string>() : "";
-        doc.name = j.count("name") ? j["name"].get<std::string>() : "";
+        doc._id = Api::getJsonValue<std::string>(j, "_id");
+        doc.name = Api::getJsonValue<std::string>(j, "name");
         doc.session_id = 0ul;
         
         if(j.count("session_id"))
@@ -366,7 +423,7 @@ namespace kiwi
     
     bool Api::Controller::isUserLoggedIn() const
     {
-        return m_auth_user.isValid();
+        return m_auth_user.isLoggedIn();
     }
     
     Api::AuthUser const& Api::Controller::getAuthUser() const
@@ -376,6 +433,6 @@ namespace kiwi
     
     void Api::Controller::clearToken()
     {
-        m_auth_user.token.clear();
+        m_auth_user.m_token.clear();
     }
 }

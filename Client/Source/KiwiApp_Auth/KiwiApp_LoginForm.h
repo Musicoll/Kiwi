@@ -106,6 +106,8 @@ namespace kiwi
         juce::TextEditor m_email_box, m_password_box;
         juce::TextButton m_submit_btn, m_cancel_btn;
         
+        juce::ToggleButton m_remember_me_checkbox;
+        
         std::unique_ptr<AlertBox> m_alert_box;
         
         juce::Image m_kiwi_app_image;
