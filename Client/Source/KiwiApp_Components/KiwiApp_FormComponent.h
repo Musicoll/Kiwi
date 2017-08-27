@@ -199,7 +199,7 @@ namespace kiwi
         
         SingleLineText(std::string name, std::string text, std::string placeholder_text);
         
-        ~SingleLineText() = default;
+        virtual ~SingleLineText() = default;
         
         juce::Value& getValue() override;
         

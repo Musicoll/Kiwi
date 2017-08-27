@@ -431,7 +431,7 @@ namespace kiwi
         
         const int alert_height = 50;
         
-        m_alert_box.reset(new AlertBox(message, type, true, [this](){
+        m_alert_box.reset(new AlertBox(message, type, true, [this, alert_height](){
             removeChildComponent(m_alert_box.get());
             m_alert_box.reset();
             setBounds(getBounds().withHeight(getHeight() - alert_height));
