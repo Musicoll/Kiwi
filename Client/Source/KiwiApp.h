@@ -121,6 +121,14 @@ namespace kiwi
         //! @brief Log-out the user
         static void logout();
         
+        //! @brief Adds an api connect status listener.
+        //! @see ApiConnectStatusListener
+        static void addApiConnectStatusListener(ApiConnectStatusListener& listener);
+        
+        //! @brief Removes an api connect status listener.
+        //! @see ApiConnectStatusListener
+        static void removeApiConnectStatusListener(ApiConnectStatusListener& listener);
+        
         //! @brief Get the current running engine instance.
         static engine::Instance& useEngineInstance();
         

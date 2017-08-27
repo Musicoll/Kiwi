@@ -249,6 +249,16 @@ namespace kiwi
         }
     }
     
+    void KiwiApp::addApiConnectStatusListener(ApiConnectStatusListener& listener)
+    {
+        KiwiApp::use().m_api_controller->addListener(listener);
+    }
+    
+    void KiwiApp::removeApiConnectStatusListener(ApiConnectStatusListener& listener)
+    {
+        KiwiApp::use().m_api_controller->removeListener(listener);
+    }
+    
     uint64_t KiwiApp::userID()
     {
         // refactor this (maybe a useless method)

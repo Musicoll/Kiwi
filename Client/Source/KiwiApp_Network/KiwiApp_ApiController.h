@@ -23,26 +23,24 @@
 
 #include <KiwiEngine/KiwiEngine_Listeners.h>
 
-#include <juce_gui_extra/juce_gui_extra.h>
-
 #include "../KiwiApp_Network/KiwiApp_Api.h"
 #include "../KiwiApp_General/KiwiApp_StoredSettings.h"
 
 namespace kiwi
 {
+    struct ApiConnectStatusListener
+    {
+        virtual ~ApiConnectStatusListener() {}
+        
+        virtual void userLoggedIn(Api::AuthUser const&) = 0;
+        virtual void userLoggedOut(Api::AuthUser const&) = 0;
+        virtual void authUserChanged(Api::AuthUser const&) = 0;
+    };
+    
     class ApiController
     : public Api::Controller
     , private NetworkSettings::Listener
     {
-    public: // nested classes
-        
-        struct Listener
-        {
-            virtual ~Listener() {}
-            virtual void userConnectedCallback(Api::AuthUser const&) = 0;
-            virtual void AuthUserChanged(Api::AuthUser const&) = 0;
-        };
-    
     public: // methods
         
         //! @brief Constructor
@@ -54,10 +52,10 @@ namespace kiwi
         ~ApiController();
         
         //! @brief Adds a listener.
-        void addListener(Listener& listener);
+        void addListener(ApiConnectStatusListener& listener);
         
         //! @brief Removes a listener.
-        void removeListener(Listener& listener);
+        void removeListener(ApiConnectStatusListener& listener);
         
         //! @brief Attempt to log the client api user in (Async).
         //! @param name_or_email The name or email of the user.
@@ -84,7 +82,7 @@ namespace kiwi
         
     private: // methods
         
-        bool saveAuthUserProfile();
+        bool saveAuthUserProfile() const;
         bool restoreAuthUserProfile();
         
         //! @brief Called when the network settings has changed.
@@ -92,6 +90,6 @@ namespace kiwi
         
     private: // variables
         
-        engine::Listeners<Listener> m_listeners;
+        engine::Listeners<ApiConnectStatusListener> m_listeners;
     };
 }
