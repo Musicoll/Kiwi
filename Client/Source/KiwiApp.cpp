@@ -225,6 +225,16 @@ namespace kiwi
         api_controller.login(name_or_email, password, std::move(success_callback), std::move(error_callback));
     }
     
+    void KiwiApp::signup(std::string const& username,
+                         std::string const& email,
+                         std::string const& password,
+                         std::function<void()> success_callback,
+                         Api::ErrorCallback error_callback)
+    {
+        auto& api_controller = *KiwiApp::use().m_api_controller;
+        api_controller.signup(username, email, password, std::move(success_callback), std::move(error_callback));
+    }
+    
     Api::AuthUser const& KiwiApp::getCurrentUser()
     {
         return KiwiApp::use().m_api_controller->getAuthUser();
@@ -383,7 +393,7 @@ namespace kiwi
         menu.addCommandItem(&getCommandManager(), CommandIDs::remember_me);
         menu.addSeparator();
         menu.addCommandItem(&getCommandManager(), CommandIDs::login);
-        menu.addCommandItem(&getCommandManager(), CommandIDs::signin);
+        menu.addCommandItem(&getCommandManager(), CommandIDs::signup);
         menu.addSeparator();
         menu.addCommandItem(&getCommandManager(), CommandIDs::logout);
     }
@@ -493,7 +503,7 @@ namespace kiwi
             CommandIDs::startDsp,
             CommandIDs::stopDsp,
             CommandIDs::login,
-            CommandIDs::signin,
+            CommandIDs::signup,
             CommandIDs::logout,
             CommandIDs::remember_me,
         };
@@ -542,7 +552,7 @@ namespace kiwi
                 result.setActive(!logged);
                 break;
             }
-            case CommandIDs::signin:
+            case CommandIDs::signup:
             {
                 result.setInfo(TRANS("Register"), TRANS("Show the \"Register form\" Window"),
                                CommandCategories::windows, 0);
@@ -662,17 +672,17 @@ namespace kiwi
             }
             case CommandIDs::login:
             {
-                m_instance->showLoginWindow();
+                m_instance->showAuthWindow(AuthPanel::FormType::Login);
                 break;
             }
-            case CommandIDs::signin:
+            case CommandIDs::signup:
             {
-                m_instance->showLoginWindow();
+                m_instance->showAuthWindow(AuthPanel::FormType::SignUp);
                 break;
             }
             case CommandIDs::logout:
             {
-                logout();
+                KiwiApp::logout();
                 break;
             }
             case CommandIDs::remember_me:

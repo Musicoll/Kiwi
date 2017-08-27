@@ -27,7 +27,6 @@
 
 #include "../KiwiApp_Network/KiwiApp_Api.h"
 #include "../KiwiApp_General/KiwiApp_StoredSettings.h"
-#include "../KiwiApp_Auth/KiwiApp_LoginForm.h"
 
 namespace kiwi
 {
@@ -68,6 +67,16 @@ namespace kiwi
                    std::string const& password,
                    std::function<void()> success_callback,
                    Api::ErrorCallback error_callback);
+        
+        //! @brief Attempt to register/signup the user.
+        //! @param username user name
+        //! @param email email address
+        //! @param password password
+        void signup(std::string const& username,
+                    std::string const& email,
+                    std::string const& password,
+                    std::function<void()> success_cb,
+                    Api::ErrorCallback error_cb);
         
         //! @brief Log-out the user.
         //! @see login, isUserLoggedIn

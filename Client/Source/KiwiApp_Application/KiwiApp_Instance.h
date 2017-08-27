@@ -36,6 +36,8 @@
 #include "../KiwiApp_Patcher/KiwiApp_PatcherManager.h"
 #include "../KiwiApp_Audio/KiwiApp_DspDeviceManager.h"
 
+#include "../KiwiApp_Auth/KiwiApp_AuthPanel.h"
+
 namespace kiwi
 {
     class PatcherViewWindow;
@@ -110,8 +112,8 @@ namespace kiwi
         //! @brief Brings the Console to front.
         void showConsoleWindow();
         
-        //! @brief Brings the Login form window to front.
-        void showLoginWindow();
+        //! @brief Brings the Auth form window to front.
+        void showAuthWindow(AuthPanel::FormType type);
         
         //! @brief Brings the "About Kiwi" window to front.
         void showAboutKiwiWindow();

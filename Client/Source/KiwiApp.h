@@ -105,6 +105,16 @@ namespace kiwi
                           std::function<void()> success_callback,
                           Api::ErrorCallback error_callback);
         
+        //! @brief Attempt to register/signup the user.
+        //! @param username user name
+        //! @param email email address
+        //! @param password password
+        static void signup(std::string const& username,
+                           std::string const& email,
+                           std::string const& password,
+                           std::function<void()> success_callback,
+                           Api::ErrorCallback error_callback);
+        
         //! @brief Returns the current user
         static Api::AuthUser const& getCurrentUser();
         

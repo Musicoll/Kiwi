@@ -30,7 +30,7 @@
 #include "../KiwiApp_Patcher/KiwiApp_PatcherView.h"
 #include "../KiwiApp_Patcher/KiwiApp_PatcherComponent.h"
 
-#include "../KiwiApp_Auth/KiwiApp_LoginForm.h"
+#include "../KiwiApp_General/KiwiApp_CommandIDs.h"
 
 namespace kiwi
 {
@@ -353,18 +353,17 @@ namespace kiwi
         });
     }
     
-    void Instance::showLoginWindow()
+    void Instance::showAuthWindow(AuthPanel::FormType type)
     {
-        showWindowWithId(WindowId::AuthForm, []() {
+        showWindowWithId(WindowId::FormComponent, [type]() {
             
-            auto login_window = std::make_unique<Window>("Log-in to Kiwi",
-                                            std::make_unique<LoginForm>(),
-                                            false, false);
+            auto window = std::make_unique<Window>("Kiwi",
+                                                   std::make_unique<AuthPanel>(type),
+                                                   false, false);
+            window->centreWithSize(window->getWidth(), window->getHeight());
+            window->enterModalState(true);
             
-            login_window->centreWithSize(400, 330);
-            login_window->enterModalState(true);
-            
-            return login_window;
+            return window;
         });
     }
     
