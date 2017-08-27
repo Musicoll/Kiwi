@@ -89,7 +89,7 @@ namespace kiwi
         clearAll                    = 0xf40001,        ///< Clear all content
         
         login                       = 0xf50000,        ///< Log-in the user.
-        signin                      = 0xf50010,        ///< Sign-in the user.
+        signup                      = 0xf50010,        ///< Register the user.
         logout                      = 0xf50020,        ///< Log-out the user.
         remember_me                 = 0xf50030,        ///< Toggle the "remember me" option to save user profile.
     };

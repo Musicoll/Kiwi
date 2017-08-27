@@ -88,9 +88,15 @@ namespace kiwi
     
     json getJsonFromFile(juce::String const& filename)
     {
-        juce::File file = getPropertyFileOptionsFor(filename, "json").getDefaultFile();
-        std::string json_user_str = file.loadFileAsString().toStdString();
-        return json::parse(json_user_str);
+        const juce::File file = getPropertyFileOptionsFor(filename, "json").getDefaultFile();
+        
+        if (file.exists())
+        {
+            std::string json_user_str = file.loadFileAsString().toStdString();
+            return json::parse(json_user_str);
+        }
+        
+        return {};
     }
     
     // ================================================================================ //

@@ -83,9 +83,59 @@ namespace kiwi
                 
                 if(j.is_object() && j.count("user"))
                 {
-                    AuthUser user(j["user"]);
+                    AuthUser user(j["user"].get<AuthUser>());
                     
                     if(user.isLoggedIn())
+                    {
+                        success(std::move(user));
+                    }
+                    else
+                    {
+                        fail({res.result_int(), "Failed to parse result"});
+                    }
+                    
+                    return;
+                }
+            }
+            
+            fail(res);
+        };
+        
+        storeFuture(session->PostAsync(std::move(cb)));
+    }
+    
+    void Api::signup(std::string const& username,
+                     std::string const& email,
+                     std::string const& password,
+                     CallbackFn<User> success_cb,
+                     ErrorCallback error_cb)
+    {
+        assert(!username.empty());
+        assert(!email.empty());
+        assert(!password.empty());
+        
+        auto session = makeSession(Endpoint::users, false);
+        
+        session->setPayload({
+            {"username", username},
+            {"email", email},
+            {"password", password}
+        });
+        
+        auto cb = [success = std::move(success_cb),
+                   fail = std::move(error_cb)](Response res)
+        {
+            if (!res.error
+                && hasJsonHeader(res)
+                && res.result() == beast::http::status::ok)
+            {
+                const auto j = json::parse(res.body);
+                
+                if(j.is_object() && j.count("user"))
+                {
+                    User user(j["user"]);
+                    
+                    if(user.isValid())
                     {
                         success(std::move(user));
                     }
@@ -295,6 +345,14 @@ namespace kiwi
         return m_api_version;
     }
     
+    void Api::User::resetWith(User const& other)
+    {
+        m_api_version = other.m_api_version;
+        m_id = other.m_id;
+        m_name = other.m_name;
+        m_email = other.m_email;
+    }
+    
     void to_json(json& j, Api::User const& user)
     {
         j = json{
@@ -317,14 +375,32 @@ namespace kiwi
     //                                    API AUTH USER                                 //
     // ================================================================================ //
     
-    /*
-    Api::AuthUser::AuthUser(AuthUser&& other)
+    Api::AuthUser::AuthUser(User const& other)
     : Api::User(other)
+    , m_token()
+    {
+        
+    }
+    
+    Api::AuthUser::AuthUser(AuthUser const& other)
+    : Api::User(other)
+    , m_token(other.getToken())
+    {
+        
+    }
+    
+    Api::AuthUser::AuthUser(AuthUser&& other)
+    : Api::User(std::forward<User>(other))
     , m_token(std::move(other.m_token))
     {
         
     }
-    */
+    
+    void Api::AuthUser::resetWith(AuthUser const& other)
+    {
+        User::resetWith(static_cast<User const&>(other));
+        m_token = other.m_token;
+    }
     
     bool Api::AuthUser::isLoggedIn() const
     {

@@ -71,13 +71,23 @@ namespace kiwi
         
     public: // requests
         
-        //! @brief Attempt to log the user in.
+        //! @brief Attempt to log-in the user.
         //! @param username_or_email user name or email address
         //! @param password password
         void login(std::string const& username_or_email,
                    std::string const& password,
                    CallbackFn<AuthUser> success_cb,
                    ErrorCallback error_cb);
+        
+        //! @brief Attempt to register/signup the user.
+        //! @param username user name
+        //! @param email email address
+        //! @param password password
+        void signup(std::string const& username,
+                    std::string const& email,
+                    std::string const& password,
+                    CallbackFn<User> success_cb,
+                    ErrorCallback error_cb);
         
         //! @brief Make an async API request to get a list of documents
         void getDocuments(std::function<void(Response, Api::Documents)> callback);
@@ -198,9 +208,7 @@ namespace kiwi
         //! @brief Returns true if the user has a valid id and email.
         bool isValid() const noexcept;
         
-    private: // deleted methods
-        
-        //User(User const&) = delete;
+        void resetWith(User const& other);
         
     private: // variables
         
@@ -231,9 +239,15 @@ namespace kiwi
         
         AuthUser() = default;
         
-        //AuthUser(AuthUser&& other);
+        AuthUser(User const& other);
+        
+        AuthUser(AuthUser const& other);
+        
+        AuthUser(AuthUser && other);
         
         ~AuthUser() = default;
+        
+        void resetWith(AuthUser const& other);
         
         //! @brief Returns true if the user has a token.
         //! @see getToken
@@ -244,8 +258,6 @@ namespace kiwi
         std::string const& getToken() const;
         
     private: // variables
-        
-        //AuthUser(AuthUser&& other) = default;
         
         friend void from_json(json const&, Api::AuthUser&);
         
