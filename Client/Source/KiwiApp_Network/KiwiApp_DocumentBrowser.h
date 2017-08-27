@@ -30,6 +30,8 @@
 
 #include "../KiwiApp_General/KiwiApp_StoredSettings.h"
 
+#include "KiwiApp_ApiController.h"
+
 namespace kiwi
 {
     // ================================================================================ //
@@ -37,7 +39,10 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief Request Patcher document informations through a Kiwi API.
-    class DocumentBrowser : public juce::Timer, public NetworkSettings::Listener
+    class DocumentBrowser
+    : public juce::Timer
+    , public NetworkSettings::Listener
+    , public ApiConnectStatusListener
     {
     public: // nested classes
         
@@ -76,6 +81,10 @@ namespace kiwi
     private: // methods
         
         void networkSettingsChanged(NetworkSettings const&, const juce::Identifier& id) override;
+        
+        void userLoggedIn(Api::AuthUser const&) override;
+        void userLoggedOut(Api::AuthUser const&) override;
+        void authUserChanged(Api::AuthUser const&) override;
         
     private: // variables
         

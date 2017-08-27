@@ -52,7 +52,7 @@ namespace kiwi
         saveAuthUserProfile();
     }
     
-    bool ApiController::saveAuthUserProfile()
+    bool ApiController::saveAuthUserProfile() const
     {
         return saveJsonToFile("UserProfile", {{"user", getAuthUser()}});
     }
@@ -82,12 +82,12 @@ namespace kiwi
         }
     }
     
-    void ApiController::addListener(Listener& listener)
+    void ApiController::addListener(ApiConnectStatusListener& listener)
     {
         m_listeners.add(listener);
     }
     
-    void ApiController::removeListener(Listener& listener)
+    void ApiController::removeListener(ApiConnectStatusListener& listener)
     {
         m_listeners.remove(listener);
     }
@@ -103,9 +103,7 @@ namespace kiwi
             scheduler.schedule([this, success_callback, user](){
                 
                 m_auth_user.resetWith(user);
-                m_listeners.call(&ApiController::Listener::AuthUserChanged, m_auth_user);
-                
-                KiwiApp::commandStatusChanged();
+                m_listeners.call(&ApiConnectStatusListener::userLoggedIn, m_auth_user);
                 
                 success_callback();
             });
@@ -126,9 +124,7 @@ namespace kiwi
             scheduler.schedule([this, success_callback, user](){
                 
                 m_auth_user.resetWith(user);
-                m_listeners.call(&ApiController::Listener::AuthUserChanged, m_auth_user);
-                
-                KiwiApp::commandStatusChanged();
+                m_listeners.call(&ApiConnectStatusListener::userLoggedOut, m_auth_user);
                 
                 success_callback();
             });
@@ -141,6 +137,6 @@ namespace kiwi
     void ApiController::logout()
     {
         Api::Controller::clearToken();
-        m_listeners.call(&ApiController::Listener::AuthUserChanged, getAuthUser());
+        m_listeners.call(&ApiConnectStatusListener::authUserChanged, getAuthUser());
     }
 }

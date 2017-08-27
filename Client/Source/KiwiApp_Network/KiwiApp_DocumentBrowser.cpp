@@ -38,8 +38,9 @@ namespace kiwi
     m_distant_drive(nullptr)
     {
         auto& settings = getAppSettings().network();
+        settings.addListener(*this);
         
-        m_distant_drive.reset(new Drive("Remote patchers", settings.getSessionPort()));
+        m_distant_drive.reset(new Drive("Remote Drive", settings.getSessionPort()));
         
         int time = settings.getRefreshInterval();
         if(time > 0)
@@ -47,11 +48,13 @@ namespace kiwi
             start(time);
         }
         
-        settings.addListener(*this);
+        authUserChanged(KiwiApp::getCurrentUser());
+        KiwiApp::addApiConnectStatusListener(*this);
     }
     
     DocumentBrowser::~DocumentBrowser()
     {
+        KiwiApp::removeApiConnectStatusListener(*this);
         getAppSettings().network().removeListener(*this);
         stop();
     }
@@ -112,6 +115,21 @@ namespace kiwi
         m_distant_drive->refresh();
     }
     
+    void DocumentBrowser::userLoggedIn(Api::AuthUser const& user)
+    {
+        m_distant_drive->setName(user.getName());
+    }
+    
+    void DocumentBrowser::userLoggedOut(Api::AuthUser const&)
+    {
+        m_distant_drive->setName("logged out...");
+    }
+    
+    void DocumentBrowser::authUserChanged(Api::AuthUser const& user)
+    {
+        m_distant_drive->setName(user.isLoggedIn() ? user.getName() : "logged out...");
+    }
+    
     // ================================================================================ //
     //                              DOCUMENT BROWSER DRIVE                              //
     // ================================================================================ //
@@ -147,6 +165,7 @@ namespace kiwi
     void DocumentBrowser::Drive::setName(std::string const& name)
     {
         m_name = name;
+        m_listeners.call(&Listener::driveChanged);
     }
     
     std::string const& DocumentBrowser::Drive::getName() const
