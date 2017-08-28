@@ -14,24 +14,19 @@ environment:
 
 install:
     - git submodule update --init --recursive "ThirdParty/Juce"
-    - git submodule update --init --recursive "ThirdParty/cpr"
     - git submodule update --init --recursive "ThirdParty/concurrentqueue"
+    - git submodule update --init --recursive "ThirdParty/Beast"
     - set PATH=C:\Python27;%PATH%
-    - curl -o ..\curl-7.52.1-win32.zip -L -k  https://github.com/Musicoll/Kiwi/files/998123/curl-7.52.1-win32.zip
-    - curl -o ..\curl-7.52.1-x64.zip -L -k  https://github.com/Musicoll/Kiwi/files/997546/curl-7.52.1-x64.zip
     - curl -o ..\flip-demo.zip -L -k  http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files/flip-demo-windows-c47e41da05.zip
     - cd ..
-    - 7z x curl-7.52.1-x64.zip
-    - 7z x curl-7.52.1-win32.zip
     - 7z x flip-demo.zip -o./flip-demo
-    - set KIWI_CURL_LIB_x64=%cd%/curl-7.52.1-x64/lib/Release
-    - set KIWI_CURL_INCLUDE_x64=%cd%/curl-7.52.1-x64/include
-    - set KIWI_CURL_LIB_WIN32=%cd%/curl-7.52.1-win32/lib/Release
-    - set KIWI_CURL_INCLUDE_WIN32=%cd%/curl-7.52.1-win32/include
     - set KIWI_FLIP_LIB_x64=%cd%/flip-demo/lib/VS2015/x64/Release
     - set KIWI_FLIP_INCLUDE_x64=%cd%/flip-demo/include
     - set KIWI_FLIP_LIB_WIN32=%cd%/flip-demo/lib/VS2015/Win32/Release
     - set KIWI_FLIP_INCLUDE_WIN32=%cd%/flip-demo/include
+    - set KIWI_BOOST_INCLUDE=C:\Libraries\boost_1_63_0
+    - set KIWI_BOOST_LIB_x64=C:\Libraries\boost_1_63_0\lib64-msvc-14.0
+    - set KIWI_BOOST_LIB_WIN32=C:\Libraries\boost_1_63_0\lib32-msvc-14.0
     - cd %APPVEYOR_BUILD_FOLDER%
 
 build_script:

@@ -34,8 +34,9 @@
 #include "KiwiApp_BeaconDispatcher.h"
 
 #include "../KiwiApp_Patcher/KiwiApp_PatcherManager.h"
-#include "../KiwiApp_General/KiwiApp_StoredSettings.h"
 #include "../KiwiApp_Audio/KiwiApp_DspDeviceManager.h"
+
+#include "../KiwiApp_Auth/KiwiApp_AuthPanel.h"
 
 namespace kiwi
 {
@@ -62,6 +63,9 @@ namespace kiwi
         //! @brief Get the user ID of the Instance.
         uint64_t getUserId() const noexcept;
         
+        //! @brief Close all remote patchers.
+        bool logout();
+        
         //! @brief create a new patcher window.
         void newPatcher();
         
@@ -69,7 +73,7 @@ namespace kiwi
         engine::Instance& useEngineInstance();
         
         //! @brief Returns the engine::Instance
-        engine::Instance const& getEngineInstance() const;
+        engine::Instance const& useEngineInstance() const;
         
         //! @brief Returns the instance's scheduler
         engine::Scheduler<> & useScheduler();
@@ -85,6 +89,9 @@ namespace kiwi
         
         //! @brief Attempt to close the given window asking user to save file if needed.
         void closeWindow(Window& window);
+        
+        //! @brief Attempt to close the window with the given id, asking user to save file if needed.
+        void closeWindowWithId(WindowId window_id);
         
         //! @brief Attempt to close all document, after asking user to save them if needed.
         //! @return True if all document have been closed, false if the user cancel the action.
@@ -104,6 +111,9 @@ namespace kiwi
         
         //! @brief Brings the Console to front.
         void showConsoleWindow();
+        
+        //! @brief Brings the Auth form window to front.
+        void showAuthWindow(AuthPanel::FormType type);
         
         //! @brief Brings the "About Kiwi" window to front.
         void showAboutKiwiWindow();
@@ -139,8 +149,6 @@ namespace kiwi
         engine::Scheduler<>                         m_scheduler;
         
         engine::Instance                            m_instance;
-        
-        uint64_t                                    m_user_id;
         
         DocumentBrowser                             m_browser;
         

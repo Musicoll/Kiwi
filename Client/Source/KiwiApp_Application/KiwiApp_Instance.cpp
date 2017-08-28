@@ -30,8 +30,7 @@
 #include "../KiwiApp_Patcher/KiwiApp_PatcherView.h"
 #include "../KiwiApp_Patcher/KiwiApp_PatcherComponent.h"
 
-#include <cstdlib>
-#include <ctime>
+#include "../KiwiApp_General/KiwiApp_CommandIDs.h"
 
 namespace kiwi
 {
@@ -49,8 +48,6 @@ namespace kiwi
     m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
     {
         startTimer(10);
-        std::srand(std::time(0));
-        m_user_id = std::rand();
         
         // reserve space for singleton windows.
         m_windows.resize(std::size_t(WindowId::count));
@@ -74,7 +71,39 @@ namespace kiwi
     
     uint64_t Instance::getUserId() const noexcept
     {
-        return m_user_id;
+        const auto& user = KiwiApp::getCurrentUser();
+        return user.isLoggedIn() ? user.getIdAsInt() : flip::Ref::User::Offline;
+    }
+    
+    bool Instance::logout()
+    {
+        bool user_agreed = false;
+        
+        for(auto it = m_patcher_managers.begin(); it != m_patcher_managers.end();)
+        {
+            auto& manager = *it->get();
+            if(manager.isRemote())
+            {
+                if(!user_agreed)
+                {
+                    user_agreed = juce::AlertWindow::showOkCancelBox(juce::AlertWindow::WarningIcon,
+                                                                     TRANS("Are you about to logout."),
+                                                                     TRANS("All patchers connected to this account will be closed..."));
+                    
+                    if(!user_agreed)
+                        return false;
+                }
+                
+                manager.forceCloseAllWindows();
+                it = m_patcher_managers.erase(it);
+            }
+            else
+            {
+                it++;
+            }
+        }
+        
+        return true;
     }
     
     engine::Instance& Instance::useEngineInstance()
@@ -82,7 +111,7 @@ namespace kiwi
         return m_instance;
     }
     
-    engine::Instance const& Instance::getEngineInstance() const
+    engine::Instance const& Instance::useEngineInstance() const
     {
         return m_instance;
     }
@@ -219,6 +248,15 @@ namespace kiwi
         #endif
     }
     
+    void Instance::closeWindowWithId(WindowId window_id)
+    {
+        auto& window_uptr = m_windows[std::size_t(window_id)];
+        if(!window_uptr)
+        {
+            closeWindow(*window_uptr);
+        }
+    }
+    
     bool Instance::closeAllPatcherWindows()
     {
         bool success = true;
@@ -312,6 +350,20 @@ namespace kiwi
                                             std::make_unique<Console>(history),
                                             true, true, "console_window",
                                             !KiwiApp::isMacOSX());
+        });
+    }
+    
+    void Instance::showAuthWindow(AuthPanel::FormType type)
+    {
+        showWindowWithId(WindowId::FormComponent, [type]() {
+            
+            auto window = std::make_unique<Window>("Kiwi",
+                                                   std::make_unique<AuthPanel>(type),
+                                                   false, false);
+            window->centreWithSize(window->getWidth(), window->getHeight());
+            window->enterModalState(true);
+            
+            return window;
         });
     }
     

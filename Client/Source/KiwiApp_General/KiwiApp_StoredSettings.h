@@ -23,9 +23,12 @@
 
 #include <juce_data_structures/juce_data_structures.h>
 #include <KiwiEngine/KiwiEngine_Listeners.h>
+#include <json.hpp>
 
 namespace kiwi
 {
+    using nlohmann::json;
+    
     // ================================================================================ //
     //                                  NETWORK SETTINGS                                //
     // ================================================================================ //
@@ -72,13 +75,17 @@ namespace kiwi
         //! @brief Returns the session port as a juce::Value
         juce::Value getRefreshIntervalValue();
         
+        void setRememberUserFlag(bool remember_me);
+        
+        bool getRememberUserFlag() const;
+        
         //! @brief NetworkSettings Listener
         struct Listener
         {
             //! @brief Destructor.
             virtual ~Listener() = default;
             
-            //! @brief Called when a document session has been added.
+            //! @brief Called when the network settings has changed.
             virtual void networkSettingsChanged(NetworkSettings const&, juce::Identifier const&) = 0;
         };
                                         
@@ -157,4 +164,9 @@ namespace kiwi
     
     StoredSettings& getAppSettings();
     juce::PropertiesFile& getGlobalProperties();
+    juce::PropertiesFile::Options getPropertyFileOptionsFor(juce::String const& filename,
+                                                            juce::String const& suffix = "settings");
+    
+    bool saveJsonToFile(juce::String const& filename, json const& j);
+    json getJsonFromFile(juce::String const& filename);
 };

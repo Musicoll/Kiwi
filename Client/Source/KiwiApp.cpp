@@ -102,6 +102,9 @@ namespace kiwi
         
         m_menu_model.reset(new MainMenuModel());
         
+        m_api_controller.reset(new ApiController());
+        m_api.reset(new Api(*m_api_controller));
+        
         m_instance = std::make_unique<Instance>();
         m_command_manager->registerAllCommandsForTarget(this);
         
@@ -128,6 +131,8 @@ namespace kiwi
         juce::MenuBarModel::setMacMainMenu(nullptr);
         #endif
         
+        m_api.reset();
+        m_api_controller.reset();
         m_settings.reset();
     }
     
@@ -203,11 +208,60 @@ namespace kiwi
     
     Instance& KiwiApp::useInstance()
     {
-        return *KiwiApp::use().m_instance.get();
+        return *KiwiApp::use().m_instance;
+    }
+    
+    Api& KiwiApp::useApi()
+    {
+        return *KiwiApp::use().m_api;
+    }
+    
+    void KiwiApp::login(std::string const& name_or_email,
+                        std::string const& password,
+                        std::function<void()> success_callback,
+                        Api::ErrorCallback error_callback)
+    {
+        auto& api_controller = *KiwiApp::use().m_api_controller;
+        api_controller.login(name_or_email, password, std::move(success_callback), std::move(error_callback));
+    }
+    
+    void KiwiApp::signup(std::string const& username,
+                         std::string const& email,
+                         std::string const& password,
+                         std::function<void()> success_callback,
+                         Api::ErrorCallback error_callback)
+    {
+        auto& api_controller = *KiwiApp::use().m_api_controller;
+        api_controller.signup(username, email, password, std::move(success_callback), std::move(error_callback));
+    }
+    
+    Api::AuthUser const& KiwiApp::getCurrentUser()
+    {
+        return KiwiApp::use().m_api_controller->getAuthUser();
+    }
+    
+    void KiwiApp::logout()
+    {
+        if(useInstance().logout())
+        {
+            KiwiApp::use().m_api_controller->logout();
+            KiwiApp::commandStatusChanged();
+        }
+    }
+    
+    void KiwiApp::addApiConnectStatusListener(ApiConnectStatusListener& listener)
+    {
+        KiwiApp::use().m_api_controller->addListener(listener);
+    }
+    
+    void KiwiApp::removeApiConnectStatusListener(ApiConnectStatusListener& listener)
+    {
+        KiwiApp::use().m_api_controller->removeListener(listener);
     }
     
     uint64_t KiwiApp::userID()
     {
+        // refactor this (maybe a useless method)
         return KiwiApp::use().m_instance->getUserId();
     }
     
@@ -320,7 +374,7 @@ namespace kiwi
     {
         const char* const names[] =
         {
-            "File", "Edit", "View", "Options", "Window", "Help", nullptr
+            "Account", "File", "Edit", "View", "Options", "Window", "Help", nullptr
         };
         
         return juce::StringArray(names);
@@ -328,12 +382,13 @@ namespace kiwi
     
     void KiwiApp::createMenu(juce::PopupMenu& menu, const juce::String& menuName)
     {
-        if		(menuName == "File")        createFileMenu		(menu);
-        else if (menuName == "Edit")        createEditMenu		(menu);
-        else if (menuName == "View")        createViewMenu		(menu);
-        else if (menuName == "Options")     createOptionsMenu	(menu);
-        else if (menuName == "Window")      createWindowMenu	(menu);
-        else if (menuName == "Help")		createHelpMenu		(menu);
+        if      (menuName == "Account") createAccountMenu   (menu);
+        else if (menuName == "File")    createFileMenu      (menu);
+        else if (menuName == "Edit")    createEditMenu      (menu);
+        else if (menuName == "View")    createViewMenu      (menu);
+        else if (menuName == "Options") createOptionsMenu   (menu);
+        else if (menuName == "Window")  createWindowMenu    (menu);
+        else if (menuName == "Help")    createHelpMenu      (menu);
         
         else assert(false); // names have changed?
     }
@@ -341,6 +396,16 @@ namespace kiwi
     void KiwiApp::createOpenRecentPatchersMenu(juce::PopupMenu& menu)
     {
         
+    }
+    
+    void KiwiApp::createAccountMenu(juce::PopupMenu& menu)
+    {
+        menu.addCommandItem(&getCommandManager(), CommandIDs::remember_me);
+        menu.addSeparator();
+        menu.addCommandItem(&getCommandManager(), CommandIDs::login);
+        menu.addCommandItem(&getCommandManager(), CommandIDs::signup);
+        menu.addSeparator();
+        menu.addCommandItem(&getCommandManager(), CommandIDs::logout);
     }
     
     void KiwiApp::createFileMenu(juce::PopupMenu& menu)
@@ -446,7 +511,11 @@ namespace kiwi
             CommandIDs::showBeaconDispatcherWindow,
             CommandIDs::switchDsp,
             CommandIDs::startDsp,
-            CommandIDs::stopDsp
+            CommandIDs::stopDsp,
+            CommandIDs::login,
+            CommandIDs::signup,
+            CommandIDs::logout,
+            CommandIDs::remember_me,
         };
         
         commands.addArray(ids, juce::numElementsInArray(ids));
@@ -478,6 +547,46 @@ namespace kiwi
                                CommandCategories::windows, 0);
                 
                 result.addDefaultKeypress('k', juce::ModifierKeys::commandModifier);
+                break;
+            }
+            case CommandIDs::login:
+            {
+                auto const& user = getCurrentUser();
+                const bool logged = user.isLoggedIn();
+                result.setInfo(logged
+                               ? juce::String(TRANS("Logged-in as ") + user.getName())
+                               : TRANS("Login"),
+                               TRANS("Show the \"Login form\" Window"),
+                               CommandCategories::windows, 0);
+                
+                result.setActive(!logged);
+                break;
+            }
+            case CommandIDs::signup:
+            {
+                result.setInfo(TRANS("Register"), TRANS("Show the \"Register form\" Window"),
+                               CommandCategories::windows, 0);
+                
+                result.setActive(!getCurrentUser().isLoggedIn());
+                break;
+            }
+            case CommandIDs::logout:
+            {
+                result.setInfo(TRANS("Logout"), TRANS("Log out current user"),
+                               CommandCategories::windows, 0);
+                
+                result.setActive(getCurrentUser().isLoggedIn());
+                break;
+            }
+            case CommandIDs::remember_me:
+            {
+                result.setInfo(TRANS("Remember me"), TRANS("Remember current user"),
+                               CommandCategories::windows, 0);
+                
+                auto const& user = getCurrentUser();
+                
+                result.setActive(user.isLoggedIn());
+                result.setTicked(getAppSettings().network().getRememberUserFlag());
                 break;
             }
             case CommandIDs::showAboutAppWindow:
@@ -520,7 +629,7 @@ namespace kiwi
                 result.setInfo(TRANS("Switch global DSP state"), TRANS("Switch global DSP state"),
                                CommandCategories::general, 0);
                 
-                result.setTicked(m_instance->getEngineInstance().getAudioControler().isAudioOn());
+                result.setTicked(m_instance->useEngineInstance().getAudioControler().isAudioOn());
                 
                 break;
             }
@@ -529,7 +638,7 @@ namespace kiwi
                 result.setInfo(TRANS("Start dsp"), TRANS("Start dsp"),
                                CommandCategories::general, 0);
 
-                result.setActive(!m_instance->getEngineInstance().getAudioControler().isAudioOn());
+                result.setActive(!m_instance->useEngineInstance().getAudioControler().isAudioOn());
                 
                 break;
             }
@@ -538,19 +647,21 @@ namespace kiwi
                 result.setInfo(TRANS("Stop dsp"), TRANS("Stop dsp"),
                                CommandCategories::general, 0);
                 
-                result.setActive(m_instance->getEngineInstance().getAudioControler().isAudioOn());
+                result.setActive(m_instance->useEngineInstance().getAudioControler().isAudioOn());
                 
+                break;
+            }
+            case juce::StandardApplicationCommandIDs::quit:
+            {
+                result.setInfo(TRANS("Quit Kiwi"), TRANS("Quits the application"),
+                               CommandCategories::general, 0);
+                
+                result.addDefaultKeypress('q', juce::ModifierKeys::commandModifier);
                 break;
             }
             default:
             {
-                if(commandID == juce::StandardApplicationCommandIDs::quit)
-                {
-                    result.setInfo(TRANS("Quit Kiwi"), TRANS("Quits the application"),
-                                   CommandCategories::general, 0);
-                    
-                    result.addDefaultKeypress('q', juce::ModifierKeys::commandModifier);
-                }
+                break;
             }
         }
     }
@@ -567,6 +678,28 @@ namespace kiwi
             case CommandIDs::openFile :
             {
                 m_instance->askUserToOpenPatcherDocument();
+                break;
+            }
+            case CommandIDs::login:
+            {
+                m_instance->showAuthWindow(AuthPanel::FormType::Login);
+                break;
+            }
+            case CommandIDs::signup:
+            {
+                m_instance->showAuthWindow(AuthPanel::FormType::SignUp);
+                break;
+            }
+            case CommandIDs::logout:
+            {
+                KiwiApp::logout();
+                break;
+            }
+            case CommandIDs::remember_me:
+            {
+                auto& settings = getAppSettings().network();
+                settings.setRememberUserFlag(!settings.getRememberUserFlag());
+                commandStatusChanged();
                 break;
             }
             case CommandIDs::showConsoleWindow :

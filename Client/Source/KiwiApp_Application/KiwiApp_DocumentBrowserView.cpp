@@ -280,6 +280,7 @@ namespace kiwi
                     juce::RectanglePlacement::yMid, false);
         
         g.setColour(juce::Colours::whitesmoke);
+        g.setFont(18);
         g.drawFittedText(m_drive.getName(),
                          bounds
                          .withLeft(folder_img_bounds.getRight() + 10)
@@ -327,6 +328,7 @@ namespace kiwi
     void DocumentBrowserView::DriveView::driveChanged()
     {
         updateContent();
+        repaint();
     }
     
     int DocumentBrowserView::DriveView::getNumRows()

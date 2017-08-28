@@ -29,6 +29,8 @@
 
 #include "KiwiApp_Components/KiwiApp_TooltipWindow.h"
 
+#include "KiwiApp_Network/KiwiApp_ApiController.h"
+
 namespace ProjectInfo
 {
     const char* const  projectName    = "Kiwi";
@@ -91,6 +93,42 @@ namespace kiwi
         //! @brief Get the current running kiwi instance.
         static Instance& useInstance();
         
+        //! @brief Get the Api object.
+        static Api& useApi();
+        
+        //! @brief Attempt to log-in the user (Async).
+        //! @param name_or_email The name or email of the user.
+        //! @param password The user password.
+        //! @see logout, getCurrentUser
+        static void login(std::string const& name_or_email,
+                          std::string const& password,
+                          std::function<void()> success_callback,
+                          Api::ErrorCallback error_callback);
+        
+        //! @brief Attempt to register/signup the user.
+        //! @param username user name
+        //! @param email email address
+        //! @param password password
+        static void signup(std::string const& username,
+                           std::string const& email,
+                           std::string const& password,
+                           std::function<void()> success_callback,
+                           Api::ErrorCallback error_callback);
+        
+        //! @brief Returns the current user
+        static Api::AuthUser const& getCurrentUser();
+        
+        //! @brief Log-out the user
+        static void logout();
+        
+        //! @brief Adds an api connect status listener.
+        //! @see ApiConnectStatusListener
+        static void addApiConnectStatusListener(ApiConnectStatusListener& listener);
+        
+        //! @brief Removes an api connect status listener.
+        //! @see ApiConnectStatusListener
+        static void removeApiConnectStatusListener(ApiConnectStatusListener& listener);
+        
         //! @brief Get the current running engine instance.
         static engine::Instance& useEngineInstance();
         
@@ -151,6 +189,7 @@ namespace kiwi
         
         //! @brief Called by createMenu to create each menu
         void createOpenRecentPatchersMenu(juce::PopupMenu& menu);
+        void createAccountMenu(juce::PopupMenu& menu);
         void createFileMenu(juce::PopupMenu& menu);
         void createEditMenu(juce::PopupMenu& menu);
         void createViewMenu(juce::PopupMenu& menu);
@@ -203,6 +242,9 @@ namespace kiwi
         class AsyncQuitRetrier;
         
     private: // members
+        
+        std::unique_ptr<ApiController>                      m_api_controller;
+        std::unique_ptr<Api>                                m_api;
         
         std::unique_ptr<Instance>                           m_instance;
         std::unique_ptr<juce::ApplicationCommandManager>	m_command_manager;

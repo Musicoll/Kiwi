@@ -112,9 +112,14 @@ namespace kiwi
         return m_is_main_window;
     }
     
-    void Window::closeButtonPressed()
+    void Window::close()
     {
         KiwiApp::use().closeWindow(*this);
+    }
+    
+    void Window::closeButtonPressed()
+    {
+        close();
     }
     
     // ================================================================================ //

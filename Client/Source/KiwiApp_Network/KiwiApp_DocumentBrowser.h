@@ -26,9 +26,11 @@
 #include <juce_data_structures/juce_data_structures.h>
 #include <juce_events/juce_events.h>
 
-#include "KiwiApp_Api.h"
+#include "../KiwiApp_Network/KiwiApp_Api.h"
 
 #include "../KiwiApp_General/KiwiApp_StoredSettings.h"
+
+#include "KiwiApp_ApiController.h"
 
 namespace kiwi
 {
@@ -37,7 +39,10 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief Request Patcher document informations through a Kiwi API.
-    class DocumentBrowser : public juce::Timer, public NetworkSettings::Listener
+    class DocumentBrowser
+    : public juce::Timer
+    , public NetworkSettings::Listener
+    , public ApiConnectStatusListener
     {
     public: // nested classes
         
@@ -76,6 +81,10 @@ namespace kiwi
     private: // methods
         
         void networkSettingsChanged(NetworkSettings const&, const juce::Identifier& id) override;
+        
+        void userLoggedIn(Api::AuthUser const&) override;
+        void userLoggedOut(Api::AuthUser const&) override;
+        void authUserChanged(Api::AuthUser const&) override;
         
     private: // variables
         
@@ -118,10 +127,7 @@ namespace kiwi
         
     public: // methods
         
-        Drive(std::string const& name,
-              std::string const& host,
-              uint16_t api_port,
-              uint16_t session_port);
+        Drive(std::string const& name, uint16_t session_port);
         
         ~Drive() = default;
         
@@ -131,26 +137,11 @@ namespace kiwi
         //! @brief remove a listener.
         void removeListener(Listener& listener);
         
-        //! @brief Returns the API object reference.
-        Api& useApi();
-        
-        //! @brief Set the kiwi api port.
-        void setApiPort(uint16_t port);
-        
-        //! @brief Returns the kiwi api port.
-        uint16_t getApiPort() const;
-        
         //! @brief Set the kiwi document session port.
         void setSessionPort(uint16_t port);
         
         //! @brief Returns the kiwi document session port.
         uint16_t getSessionPort() const;
-        
-        //! @brief Set both the api's and session's host.
-        void setHost(std::string const& host);
-        
-        //! @brief Returns the session host.
-        std::string const& getHost() const;
         
         //! @brief Set the name of this drive.
         void setName(std::string const& host);
@@ -179,7 +170,6 @@ namespace kiwi
         //! @internal Update the document list (need to be called in the juce Message thread)
         void updateDocumentList(Api::Documents docs);
         
-        Api                         m_api;
         uint16_t                    m_session_port = 9090;
         std::string                 m_name = "Drive";
         DocumentSessions            m_documents;
@@ -234,14 +224,8 @@ namespace kiwi
         //! @brief Returns the document name
         std::string getName() const;
         
-        //! @brief Returns the document session host
-        std::string getHost() const;
-        
         //! @brief Returns the session id of the document.
         uint64_t getSessionId() const;
-        
-        //! @brief Returns the document session port.
-        uint16_t getSessionPort() const;
         
         //! @brief Returns the drive that holds this document.
         DocumentBrowser::Drive const& useDrive() const;

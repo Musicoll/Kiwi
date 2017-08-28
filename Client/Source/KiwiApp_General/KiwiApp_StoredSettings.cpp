@@ -40,11 +40,13 @@ namespace kiwi
         return getAppSettings().getGlobalProperties();
     }
     
-    static juce::PropertiesFile::Options getPropertyFileOptionsFor(const juce::String& filename)
+    juce::PropertiesFile::Options getPropertyFileOptionsFor(juce::String const& filename, juce::String const& suffix)
     {
+        assert(suffix.isNotEmpty() && "need an extension");
+        
         juce::PropertiesFile::Options options;
         options.applicationName     = filename;
-        options.filenameSuffix      = "settings";
+        options.filenameSuffix      = suffix;
         options.osxLibrarySubFolder = "Application Support";
         
         #if JUCE_LINUX
@@ -59,6 +61,42 @@ namespace kiwi
     static std::unique_ptr<juce::PropertiesFile> createPropsFile(const juce::String& filename)
     {
         return std::make_unique<juce::PropertiesFile>(getPropertyFileOptionsFor(filename));
+    }
+    
+    bool saveJsonToFile(juce::String const& filename, json const& j)
+    {
+        juce::File file = getPropertyFileOptionsFor(filename, "json").getDefaultFile();
+        juce::TemporaryFile tempFile(file);
+        
+        {
+            juce::FileOutputStream out(tempFile.getFile());
+            
+            if (!out.openedOk())
+                return false;
+            
+            std::string json_str = j.dump(4);
+            out.write(json_str.data(), json_str.size());
+            
+            out.flush(); // (called explicitly to force an fsync on posix)
+            
+            if (out.getStatus().failed())
+                return false;
+        }
+        
+        return tempFile.overwriteTargetFileWithTemporary();
+    }
+    
+    json getJsonFromFile(juce::String const& filename)
+    {
+        const juce::File file = getPropertyFileOptionsFor(filename, "json").getDefaultFile();
+        
+        if (file.exists())
+        {
+            std::string json_user_str = file.loadFileAsString().toStdString();
+            return json::parse(json_user_str);
+        }
+        
+        return {};
     }
     
     // ================================================================================ //
@@ -162,6 +200,16 @@ namespace kiwi
         return m_settings.getPropertyAsValue(Ids::refresh_interval, nullptr);
     }
     
+    void NetworkSettings::setRememberUserFlag(bool remember_me)
+    {
+        m_settings.setProperty(Ids::remember_me, remember_me, nullptr);
+    }
+    
+    bool NetworkSettings::getRememberUserFlag() const
+    {
+        return m_settings.getProperty(Ids::remember_me);
+    }
+    
     void NetworkSettings::addListener(Listener& listener)
     {
         m_listeners.add(listener);
@@ -209,6 +257,7 @@ namespace kiwi
     void StoredSettings::reload()
     {
         m_property_files.clear();
+        
         m_property_files.emplace_back(createPropsFile("kiwi_settings"));
    
         // Try to reload User settings
