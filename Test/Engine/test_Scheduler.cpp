@@ -394,6 +394,133 @@ TEST_CASE("Scheduler", "[Scheduler]")
             
             sch.setThreadAsConsumer();
         }
+        
+        SECTION("defering tasks")
+        {
+            class DeferTask : public engine::Scheduler<>::Task
+            {
+            public:
+                
+                DeferTask(std::atomic<std::thread::id> & thread):
+                m_thread(thread)
+                {
+                }
+                
+                void execute() override final
+                {
+                    m_thread.store(std::this_thread::get_id());
+                }
+                
+            private:
+                
+                std::atomic<std::thread::id> & m_thread;
+                
+            };
+            
+            {
+                // copy
+                {
+                    std::atomic<std::thread::id> exec_thread;
+                    
+                    std::shared_ptr<engine::Scheduler<>::Task> task(new DeferTask(exec_thread));
+                    
+                    sch.defer(task);
+                    
+                    CHECK(task.use_count() == 1);
+                    CHECK(exec_thread == std::this_thread::get_id());
+                }
+                
+                // move
+                {
+                    std::atomic<std::thread::id> exec_thread;
+                    
+                    std::shared_ptr<engine::Scheduler<>::Task> task(new DeferTask(exec_thread));
+                    
+                    sch.defer(std::move(task));
+                    
+                    CHECK(task.use_count() == 0);
+                    CHECK(exec_thread == std::this_thread::get_id());
+                }
+                
+                // function
+                {
+                    std::atomic<std::thread::id> exec_thread;
+                    
+                    std::shared_ptr<engine::Scheduler<>::Task> task(new DeferTask(exec_thread));
+                    
+                    sch.defer([&exec_thread]()
+                    {
+                        exec_thread.store(std::this_thread::get_id());
+                    });
+                    
+                    CHECK(exec_thread == std::this_thread::get_id());
+                }
+            }
+            
+            {
+                std::atomic<bool> quit_requested(false);
+                
+                std::thread consumer([&sch, &quit_requested]()
+                {
+                    sch.setThreadAsConsumer();
+                    
+                    while(!quit_requested.load())
+                    {   
+                        sch.process();
+                    }
+                });
+                
+                while(sch.isThisConsumerThread()){}
+                
+                // copy
+                {
+                    std::atomic<std::thread::id> exec_thread;
+                    
+                    std::shared_ptr<engine::Scheduler<>::Task> task(new DeferTask(exec_thread));
+                    
+                    sch.schedule(task);
+                    
+                    while(exec_thread != consumer.get_id()){}
+                    
+                    CHECK(task.use_count() == 1);
+                    CHECK(exec_thread == consumer.get_id());
+                }
+                
+                // move
+                {
+                    std::atomic<std::thread::id> exec_thread;
+                    
+                    std::shared_ptr<engine::Scheduler<>::Task> task(new DeferTask(exec_thread));
+                    
+                    sch.defer(std::move(task));
+                    
+                    while(exec_thread == consumer.get_id()){}
+                    
+                    CHECK(task.use_count() == 0);
+                    CHECK(exec_thread == consumer.get_id());
+                }
+                
+                // function
+                {
+                    std::atomic<std::thread::id> exec_thread;
+                    
+                    std::shared_ptr<engine::Scheduler<>::Task> task(new DeferTask(exec_thread));
+                    
+                    sch.defer([&exec_thread]()
+                    {
+                        exec_thread.store(std::this_thread::get_id());
+                    });
+                    
+                    while(exec_thread != consumer.get_id()){}
+                    
+                    CHECK(exec_thread == consumer.get_id());
+                }
+                
+                quit_requested.store(true);
+                
+                consumer.join();
+            }
+        }
     }
 }
 
