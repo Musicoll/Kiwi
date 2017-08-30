@@ -142,19 +142,11 @@ namespace kiwi
     {
         engine::Scheduler<> &scheduler = KiwiApp::useInstance().useScheduler();
         
-        if (scheduler.isThisConsumerThread())
+        scheduler.defer([this]()
         {
             m_table.updateContent();
             m_table.repaint();
-        }
-        else
-        {
-            scheduler.schedule([this]()
-            {
-                m_table.updateContent();
-                m_table.repaint();
-            });
-        }
+        });
     }
     
     // ================================================================================ //
