@@ -103,6 +103,7 @@ namespace kiwi
             else
             {
                 task->execute();
+                task.reset();
             }
         }
         
