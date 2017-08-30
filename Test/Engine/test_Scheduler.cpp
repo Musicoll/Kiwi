@@ -394,6 +394,99 @@ TEST_CASE("Scheduler", "[Scheduler]")
             
             sch.setThreadAsConsumer();
         }
+        
+        SECTION("defering tasks")
+        {
+            class Task : public engine::Scheduler<>::Task
+            {
+            public:
+                
+                Task(std::vector<std::thread::id> & threads):
+                m_threads(threads)
+                {
+                }
+                
+                void execute() override final
+                {
+                    m_threads.push_back(std::this_thread::get_id());
+                }
+                
+            private:
+                
+                std::vector<std::thread::id> & m_threads;
+                
+            };
+            
+            {
+                std::vector<std::thread::id> exec_threads;
+                
+                std::shared_ptr<Task> task(new Task(exec_threads));
+                
+                sch.defer(task);
+                
+                CHECK(task.use_count() == 1);
+                CHECK(exec_threads[0] == std::this_thread::get_id());
+                
+                sch.defer(std::move(task));
+                
+                CHECK(task.use_count() == 0);
+                CHECK(exec_threads[1] == std::this_thread::get_id());
+                
+                sch.defer([&exec_threads]()
+                {
+                    exec_threads.push_back(std::this_thread::get_id());
+                });
+                
+                CHECK(exec_threads[2] == std::this_thread::get_id());
+            }
+            
+            {
+                std::atomic<bool> quit_requested(false);
+                
+                std::thread consumer([&sch, &quit_requested]()
+                {
+                    sch.setThreadAsConsumer();
+                    
+                    while(!quit_requested.load())
+                    {
+                        sch.process();
+                    }
+                });
+                
+                while(sch.isThisConsumerThread()){}
+                
+                std::vector<std::thread::id> exec_threads;
+                
+                std::shared_ptr<Task> task(new Task(exec_threads));
+                
+                sch.defer(task);
+                
+                while(exec_threads.size() < 1){}
+                
+                CHECK(task.use_count() == 1);
+                CHECK(exec_threads[0] == consumer.get_id());
+                
+                sch.defer(std::move(task));
+                
+                while(exec_threads.size() < 2){}
+                
+                CHECK(task.use_count() == 0);
+                CHECK(exec_threads[1] == consumer.get_id());
+                
+                sch.defer([&exec_threads]()
+                {
+                    exec_threads.push_back(std::this_thread::get_id());
+                });
+                
+                while(exec_threads.size() < 3){}
+                
+                CHECK(exec_threads[2] == consumer.get_id());
+                
+                quit_requested.store(true);
+                
+                consumer.join();
+            }
+        }
     }
 }
 

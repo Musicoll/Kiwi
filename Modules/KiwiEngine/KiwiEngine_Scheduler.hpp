@@ -75,6 +75,49 @@ namespace kiwi
         {
             schedule(std::make_shared<CallBack>(func), delay);
         }
+        
+        template<class Clock>
+        void Scheduler<Clock>::defer(std::shared_ptr<Task> const& task)
+        {
+            assert(task);
+            
+            if (!isThisConsumerThread())
+            {
+                schedule(task);
+            }
+            else
+            {
+                task->execute();
+            }
+        }
+        
+        template<class Clock>
+        void Scheduler<Clock>::defer(std::shared_ptr<Task> && task)
+        {
+            assert(task);
+            
+            if (!isThisConsumerThread())
+            {
+                schedule(std::move(task));
+            }
+            else
+            {
+                task->execute();
+            }
+        }
+        
+        template<class Clock>
+        void Scheduler<Clock>::defer(std::function<void(void)> && func)
+        {
+            if (!isThisConsumerThread())
+            {
+                schedule(std::move(func));
+            }
+            else
+            {
+                func();
+            }
+        }
 
         template<class Clock>
         void Scheduler<Clock>::unschedule(std::shared_ptr<Task> const& task)
