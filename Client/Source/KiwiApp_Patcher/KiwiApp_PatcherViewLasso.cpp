@@ -19,9 +19,10 @@
  ==============================================================================
  */
 
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectFrame.h>
+
 #include "KiwiApp_PatcherViewLasso.h"
 #include "KiwiApp_PatcherView.h"
-#include "KiwiApp_ObjectView.h"
 #include "KiwiApp_LinkView.h"
 #include "../KiwiApp.h"
 
@@ -105,17 +106,17 @@ namespace kiwi
         {
             if(include_objects)
             {
-                PatcherView::ObjectViews const& objects = m_patcher.getObjects();
+                PatcherView::ObjectFrames const& objects = m_patcher.getObjects();
                 
                 HitTester hit(m_patcher);
-                std::vector<ObjectView*> lasso_objects;
+                std::vector<ObjectFrame*> lasso_objects;
                 hit.testObjects(bounds, lasso_objects);
                 
-                for(auto& object_view_uptr : objects)
+                for(auto& object_frame_uptr : objects)
                 {
-                    if(object_view_uptr)
+                    if(object_frame_uptr)
                     {
-                        ObjectView& object = *object_view_uptr.get();
+                        ObjectFrame& object = *object_frame_uptr.get();
                         
                         const bool is_selected = object.isSelected();
                         const bool was_selected = m_objects.find(object.getModel().ref()) != m_objects.end();
@@ -181,7 +182,7 @@ namespace kiwi
             
             if(include_objects)
             {
-                std::vector<ObjectView*> objects;
+                std::vector<ObjectFrame*> objects;
                 hit.testObjects(bounds, objects);
                 m_patcher.selectObjects(objects);
             }

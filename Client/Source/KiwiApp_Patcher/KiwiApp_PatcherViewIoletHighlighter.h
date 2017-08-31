@@ -26,7 +26,7 @@
 
 namespace kiwi
 {
-    class ObjectView;
+    class ObjectFrame;
     
     // ================================================================================ //
     //                                   IOLET HILIGHTER                                //
@@ -51,10 +51,10 @@ namespace kiwi
         void hide();
         
         //! @brief Highlight inlet
-        void highlightInlet(ObjectView const& object, const size_t index);
+        void highlightInlet(ObjectFrame const& object, const size_t index);
         
         //! @brief Highlight outlet
-        void highlightOutlet(ObjectView const& object, const size_t index);
+        void highlightOutlet(ObjectFrame const& object, const size_t index);
         
         //! @brief Returns the string that this object wants to show as its tooltip.
         juce::String getTooltip() override;
@@ -73,7 +73,7 @@ namespace kiwi
         
     private: // methods
         
-        void highlight(ObjectView const& object, const size_t index);
+        void highlight(ObjectFrame const& object, const size_t index);
         
     private: // members
         

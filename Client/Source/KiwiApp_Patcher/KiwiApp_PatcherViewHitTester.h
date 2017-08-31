@@ -26,7 +26,7 @@
 namespace kiwi
 {
     class PatcherView;
-    class ObjectView;
+    class ObjectFrame;
     class LinkView;
     
     // ================================================================================ //
@@ -101,14 +101,14 @@ namespace kiwi
         //! @param objects The vector of objects that will be filled.
         //! @param links The vector of links that will be filled.
         void test(juce::Rectangle<int> const& rect,
-                  std::vector<ObjectView*>& objects,
+                  std::vector<ObjectFrame*>& objects,
                   std::vector<LinkView*>& links);
         
         //! @brief Test a rectangle.
         //! @details Try to find the objects that overlaps the given rectangle.
         //! @param rect The rectangle.
         //! @param objects The vector of objects that will be filled.
-        void testObjects(juce::Rectangle<int> const& rect, std::vector<ObjectView*>& objects);
+        void testObjects(juce::Rectangle<int> const& rect, std::vector<ObjectFrame*>& objects);
         
         //! @brief Test a rectangle.
         //! @details Try to find the links that overlaps the given rectangle.
@@ -135,7 +135,7 @@ namespace kiwi
         PatcherView const& getPatcher() const noexcept;
         
         //! @brief Get the object box that has been touched by the last hit-test.
-        ObjectView* getObject() const noexcept;
+        ObjectFrame* getObject() const noexcept;
         
         //! @brief Get the link that has been touched by the last hit-test.
         LinkView* getLink() const noexcept;
@@ -162,7 +162,7 @@ namespace kiwi
     private: // members
         
         PatcherView const&  m_patcher;
-        ObjectView*         m_object    = nullptr;
+        ObjectFrame*        m_object    = nullptr;
         LinkView*           m_link      = nullptr;
         Target              m_target	= Target::Nothing;
         Zone                m_zone		= Zone::Outside;
@@ -170,6 +170,6 @@ namespace kiwi
         size_t              m_index     = 0;
         
         friend class LinkView;
-        friend class ObjectView;
+        friend class ObjectFrame;
     };
 }

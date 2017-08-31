@@ -418,7 +418,7 @@ target_add_dependency(Kiwi KiwiEngine)
 target_add_dependency(Kiwi KiwiModel)
 target_add_dependency(Kiwi KiwiDsp)
 target_add_dependency(Kiwi Juce)
-target_include_directories(Kiwi PUBLIC ${JSON_INCLUDE_DIRS})
+target_include_directories(Kiwi PUBLIC ${JSON_INCLUDE_DIRS} ${ROOT_DIR}/Client/Source)
 
 if (APPLE)
 	set_target_properties(Kiwi PROPERTIES MACOSX_BUNDLE TRUE
