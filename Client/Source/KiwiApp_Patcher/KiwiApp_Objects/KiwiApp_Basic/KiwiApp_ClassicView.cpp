@@ -35,7 +35,8 @@ namespace kiwi
     m_editor(nullptr),
     m_indent(4),
     m_border(1.5),
-    m_listeners()
+    m_listeners(),
+    m_deleted(false)
     {
         if(object_model.getName() == "errorbox")
         {
@@ -46,6 +47,7 @@ namespace kiwi
     ClassicView::~ClassicView()
     {
         removeTextEditor();
+        m_deleted = true;
     }
     
     void ClassicView::addListener(Listener& listener)
@@ -103,7 +105,7 @@ namespace kiwi
     
     void ClassicView::removeTextEditor()
     {
-        if(m_editor)
+        if(m_editor != nullptr)
         {
             m_editor->removeListener(this);
             removeChildComponent(m_editor.get());
@@ -172,7 +174,10 @@ namespace kiwi
         
         m_listeners.call(&Listener::textEdited, m_text);
         
-        removeTextEditor();
+        if (!m_deleted)
+        {
+            removeTextEditor();
+        }
     }
     
     void ClassicView::textEditorReturnKeyPressed(juce::TextEditor& editor)

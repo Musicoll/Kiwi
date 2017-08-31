@@ -164,6 +164,16 @@ namespace kiwi
         return m_object_view->getBounds().withPosition(getPosition() + m_object_view->getBounds().getPosition());
     }
     
+    void ObjectFrame::mouseDown(juce::MouseEvent const& e)
+    {
+        m_object_view->mouseDown(e);
+    }
+    
+    void ObjectFrame::mouseUp(juce::MouseEvent const& e)
+    {
+        m_object_view->mouseUp(e);
+    }
+    
     bool ObjectFrame::hitTest(int x, int y)
     {
         bool allow_click;

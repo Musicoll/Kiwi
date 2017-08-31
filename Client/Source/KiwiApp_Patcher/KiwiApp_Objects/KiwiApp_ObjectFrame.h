@@ -107,6 +107,12 @@ namespace kiwi
         //! @brief Returns true if the underlying object is currently being edited.
         bool isEditing() const;
         
+        //! @brief Called when object's frame is clicked.
+        void mouseDown(juce::MouseEvent const& e) override final;
+        
+        //! @brief Called when object's frame is clicked.
+        void mouseUp(juce::MouseEvent const& e) override final;
+        
     private: // methods
         
         //! @brief Component's graphical rendering method.

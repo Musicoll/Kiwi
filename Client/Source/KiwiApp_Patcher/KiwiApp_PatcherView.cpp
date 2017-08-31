@@ -537,7 +537,7 @@ namespace kiwi
             }
             else if(hit.patcherTouched())
             {
-                createNewBoxModel(true);
+                createObjectModel("", true);
             }
         }
     }
@@ -1999,13 +1999,13 @@ namespace kiwi
         KiwiApp::commandStatusChanged();
     }
     
-    void PatcherView::createNewBoxModel(bool give_focus)
+    void PatcherView::createObjectModel(std::string const& text, bool give_focus)
     {
         if(! DocumentManager::isInCommitGesture(m_patcher_model))
         {
             bool linked_newbox = m_local_objects_selection.size() == 1;
             
-            std::unique_ptr<model::Object> new_object = model::Factory::create(AtomHelper::parse(""));
+            std::unique_ptr<model::Object> new_object = model::Factory::create(AtomHelper::parse(text));
             
             juce::Point<int> pos = getMouseXYRelative() - getOriginPosition();
             
@@ -2255,6 +2255,7 @@ namespace kiwi
         commands.add(juce::StandardApplicationCommandIDs::selectAll);
         
         commands.add(CommandIDs::newBox);
+        commands.add(CommandIDs::newBang);
         
         commands.add(CommandIDs::zoomIn);
         commands.add(CommandIDs::zoomOut);
@@ -2378,6 +2379,13 @@ namespace kiwi
                 result.setActive(!isLocked());
                 break;
             }
+            case CommandIDs::newBang:
+            {
+                result.setInfo(TRANS("New Bang Box"), TRANS("Add a new bang"), CommandCategories::editing, 0);
+                result.addDefaultKeypress('b', juce::ModifierKeys::noModifiers);
+                result.setActive(!isLocked());
+                break;
+            }
             case CommandIDs::zoomIn:
             {
                 result.setInfo(TRANS("Zoom in"), TRANS("Zoom in"), CommandCategories::view, 0);
@@ -2445,7 +2453,8 @@ namespace kiwi
             case juce::StandardApplicationCommandIDs::del:      { deleteSelection(); break; }
             case juce::StandardApplicationCommandIDs::selectAll:{ selectAllObjects(); break; }
             
-            case CommandIDs::newBox:                            { createNewBoxModel(true); break; }
+            case CommandIDs::newBox:                            { createObjectModel("", true); break; }
+            case CommandIDs::newBang:                           { createObjectModel("bang", true); break; }
                 
             case CommandIDs::zoomIn:                            { zoomIn(); break; }
             case CommandIDs::zoomOut:                           { zoomOut(); break; }

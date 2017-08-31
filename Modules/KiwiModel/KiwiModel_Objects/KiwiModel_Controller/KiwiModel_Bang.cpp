@@ -48,7 +48,7 @@ namespace kiwi
         }
         
         Bang::Bang(flip::Default& d):
-        Object()
+        Object(d)
         {
             addSignal<>(Signal::TriggerBang, *this);
         }
