@@ -20,7 +20,7 @@
  */
 
 #include "KiwiEngine_Factory.h"
-#include "KiwiEngine_Objects.h"
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Objects.h>
 #include "KiwiEngine_Instance.h"
 
 namespace kiwi

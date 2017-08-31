@@ -20,7 +20,8 @@
  */
 
 #include <KiwiModel/KiwiModel_PatcherView.h>
-#include <KiwiModel/KiwiModel_Objects.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Objects.h>
+#include <KiwiModel/KiwiModel_Factory.h>
 
 #include "../KiwiApp.h"
 #include "../KiwiApp_Network/KiwiApp_DocumentManager.h"

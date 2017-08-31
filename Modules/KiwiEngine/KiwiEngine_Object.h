@@ -24,6 +24,8 @@
 #include "KiwiEngine_Def.h"
 #include "KiwiEngine_Scheduler.h"
 
+#include <KiwiEngine/KiwiEngine_Patcher.h>
+
 #include <KiwiDsp/KiwiDsp_Processor.h>
 
 namespace kiwi
