@@ -31,7 +31,8 @@ namespace kiwi
     // ================================================================================ //
     
     ObjectView::ObjectView(model::Object & object_model):
-    m_model(object_model)
+    m_model(object_model),
+    m_border_size(1.5)
     {
         setColour(ObjectView::ColourIds::Error, juce::Colour::fromFloatRGBA(0.6, 0.1, 0.1, 0.));
         setColour(ObjectView::ColourIds::Background, juce::Colours::white);
@@ -48,5 +49,17 @@ namespace kiwi
     model::Object& ObjectView::getModel() const
     {
         return m_model;
+    }
+    
+    juce::Rectangle<int> ObjectView::getOutline() const
+    {
+        return getLocalBounds();
+    }
+    
+    void ObjectView::drawOutline(juce::Graphics & g)
+    {
+        juce::Rectangle<int> outline = getOutline();
+        
+        g.drawRect(getOutline(), m_border_size);
     }
 }

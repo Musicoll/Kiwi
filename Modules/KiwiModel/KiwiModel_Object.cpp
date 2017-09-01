@@ -161,6 +161,7 @@ namespace kiwi
         m_name("noobj"),
         m_inlets(),
         m_outlets(),
+        m_flags(),
         m_position_x(0.),
         m_position_y(0.),
         m_width(60.),

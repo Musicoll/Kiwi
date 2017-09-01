@@ -79,6 +79,7 @@ namespace kiwi
             SigTilde::declare();
             DelaySimpleTilde::declare();
             Bang::declare();
+            Toggle::declare();
         }
     }
 }
