@@ -65,18 +65,12 @@ namespace kiwi
         
         Bang::~Bang()
         {
+            getScheduler().unschedule(m_task);
         }
         
         void Bang::signalTriggered()
         {
-            if (!getScheduler().isThisConsumerThread())
-            {
-                getScheduler().schedule(m_task);
-            }
-            else
-            {
-                send(0, {"bang"});
-            }
+            getScheduler().defer(m_task);
         }
         
         void Bang::receive(size_t index, std::vector<Atom> const& args)
