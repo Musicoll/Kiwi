@@ -32,7 +32,6 @@ namespace kiwi
 {
     BangView::BangView(model::Object & model):
     ObjectView(model),
-    m_border(1.5),
     m_signal(model.getSignal<>(model::Bang::Signal::TriggerBang)),
     m_connection(m_signal.connect(std::bind(&BangView::signalTriggered, this))),
     m_active(false),
@@ -49,19 +48,12 @@ namespace kiwi
     void BangView::paint(juce::Graphics & g)
     {
         g.fillAll(findColour(ObjectView::ColourIds::Background));
+        
         g.setColour(findColour(ObjectView::ColourIds::Outline));
         
         g.drawEllipse(getLocalBounds().reduced(3.1).toFloat(), 2);
         
-        int x = getLocalBounds().getX();
-        int y = getLocalBounds().getY();
-        int height = getHeight();
-        int width = getWidth();
-        
-        g.fillRect(x, y, width, m_border.getTop());
-        g.fillRect(x, y, m_border.getLeft(), height);
-        g.fillRect(x, y + height - m_border.getBottom(), width, m_border.getBottom());
-        g.fillRect(x + width - m_border.getRight(), y, m_border.getRight(), height);
+        drawOutline(g);
         
         if (m_mouse_down || m_active)
         {

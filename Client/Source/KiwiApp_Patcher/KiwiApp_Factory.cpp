@@ -27,11 +27,6 @@
 namespace kiwi
 {
     std::map<std::string, Factory::factory_func> Factory::m_creator_map;
-
-    std::unique_ptr<ObjectView> createBangView(model::Object & object_model)
-    {
-        return std::make_unique<BangView>(object_model);
-    }
     
     std::unique_ptr<ObjectView> Factory::createObjectView(model::Object & object_model)
     {
@@ -53,6 +48,7 @@ namespace kiwi
     
     void Factory::initialise()
     {
-        m_creator_map["bang"] = std::bind(createBangView, std::placeholders::_1);
+        add<BangView>("bang");
+        add<ToggleView>("toggle");
     }
 }

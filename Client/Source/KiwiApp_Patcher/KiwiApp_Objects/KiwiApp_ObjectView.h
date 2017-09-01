@@ -59,9 +59,22 @@ namespace kiwi
         //! @brief Returns the model represented by the graphical object.
         model::Object& getModel() const;
         
+    protected: // methods
+        
+        //! @brief Draws the outlines of the object.
+        void drawOutline(juce::Graphics & g);
+        
+    private: // methods
+        
+        //! @brief Override this function if you want it to have a customied outline.
+        //! @details Used to draw the object's outline. Returns the object's bounds by default.
+        //! @todo May make it return path instead.
+        virtual juce::Rectangle<int> getOutline() const;
+        
     private: // members
         
         model::Object&          m_model;
+        int                     m_border_size;
         
     private: // deleted methods
         

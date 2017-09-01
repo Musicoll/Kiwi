@@ -25,6 +25,8 @@
 
 #include <KiwiModel/KiwiModel_Object.h>
 
+#include <KiwiModel/KiwiModel_Factory.h>
+
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectView.h>
 
 #pragma once
@@ -51,6 +53,18 @@ namespace kiwi
         static void initialise();
         
     private: // members
+        
+        //! @brief Adds a object to the factory.
+        template<class TObject>
+        static void add(std::string const& name)
+        {
+            assert(model::Factory::has(name) && "Adding an engine object that has no corresponding model");
+            
+            m_creator_map[name] = [](model::Object & object_model)
+            {
+                return std::make_unique<TObject>(object_model);
+            };
+        };
         
         static std::map<std::string, factory_func> m_creator_map;
 

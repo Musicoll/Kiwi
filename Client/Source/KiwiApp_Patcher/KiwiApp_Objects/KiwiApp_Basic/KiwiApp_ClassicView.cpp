@@ -29,12 +29,11 @@ namespace kiwi
     //                                   CLASSIC VIEW                                   //
     // ================================================================================ //
     
-    ClassicView::ClassicView(model::Object& object_model) :
+    ClassicView::ClassicView(model::Object & object_model) :
     ObjectView(object_model),
     m_text(object_model.getText()),
     m_editor(nullptr),
     m_indent(4),
-    m_border(1.5),
     m_listeners(),
     m_deleted(false)
     {
@@ -117,15 +116,7 @@ namespace kiwi
     {
         g.setColour (findColour (ObjectView::ColourIds::Outline));
         
-        int x = getLocalBounds().getX();
-        int y = getLocalBounds().getY();
-        int height = getHeight();
-        int width = getWidth();
-        
-        g.fillRect(x, y, width, m_border.getTop());
-        g.fillRect(x, y, m_border.getLeft(), height);
-        g.fillRect(x, y + height - m_border.getBottom(), width, m_border.getBottom());
-        g.fillRect(x + width - m_border.getRight(), y, m_border.getRight(), height);
+        drawOutline(g);
     }
     
     juce::Rectangle<int> ClassicView::getTextArea() const

@@ -55,7 +55,7 @@ namespace kiwi
     public: // methods
         
         //! @brief Constructor.
-        ClassicView(model::Object& object_model);
+        ClassicView(model::Object & object_model);
         
         //! @brief Destructor.
         ~ClassicView();
@@ -109,7 +109,6 @@ namespace kiwi
         std::string                         m_text;
         std::unique_ptr<juce::TextEditor>   m_editor;
         size_t                              m_indent;
-        juce::BorderSize<int>               m_border;
         engine::Listeners<Listener>         m_listeners;
         bool                                m_deleted;
         

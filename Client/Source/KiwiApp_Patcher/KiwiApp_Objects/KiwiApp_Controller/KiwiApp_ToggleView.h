@@ -22,32 +22,37 @@
 #pragma once
 
 #include <memory>
+#include <set>
 
 #include <flip/Signal.h>
 
-#include <juce_graphics/juce_graphics.h>
-
 #include <KiwiEngine/KiwiEngine_Scheduler.h>
+#include <KiwiEngine/KiwiEngine_ConcurrentQueue.h>
 
 #include <KiwiModel/KiwiModel_Object.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Controller/KiwiModel_Toggle.h>
 
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectView.h>
 
 namespace kiwi
 {
     // ================================================================================ //
-    //                                   BANG VIEW                                      //
+    //                                   TOGGLE VIEW                                    //
     // ================================================================================ //
     
-    class BangView : public ObjectView
+    class ToggleView : public ObjectView
     {
+    private: // classes
+        
+        class Task;
+        
     public: // methods
         
         //! @brief Constructor.
-        BangView(model::Object & object_model);
+        ToggleView(model::Object & object_model);
         
         //! @brief Destructor.
-        ~BangView();
+        ~ToggleView();
         
     private: // methods
         
@@ -57,33 +62,23 @@ namespace kiwi
         //! @brief Called when the bang is clicked.
         void mouseDown(juce::MouseEvent const& e) override final;
         
-        //! @brief Called when the bang is unclicked.
-        void mouseUp(juce::MouseEvent const& e) override final;
-        
-        //! @brief Switches the bang view on and schedules to switch it off.
-        void flash();
-        
-        //! @brief Switches the bang view off.
-        void switchOff();
-        
-        //! @brief Called whenever bang is trigerred.
-        void signalTriggered();
+        //! @brief Called whenever the toggle is switched on or off.
+        //! @details Can ba called on the engine thread or the gui thread.
+        void toggleSwitched(model::Toggle::Request request, bool shall_ouptut);
         
     private: // members
         
-        //! @todo Put border into ObjectView.
-        flip::Signal<>&                                 m_signal;
+        flip::Signal<model::Toggle::Request, bool> &    m_signal;
         flip::SignalConnection                          m_connection;
-        bool                                            m_active;
-        bool                                            m_mouse_down;
-        std::shared_ptr<engine::Scheduler<>::CallBack>  m_switch_off;
+        bool                                            m_is_on;
+        engine::ConcurrentQueue<std::shared_ptr<Task>>  m_tasks;
         
     private: // deleted methods
         
-        BangView() = delete;
-        BangView(BangView const& other) = delete;
-        BangView(BangView && other) = delete;
-        BangView& operator=(BangView const& other) = delete;
-        BangView& operator=(BangView && other) = delete;
+        ToggleView() = delete;
+        ToggleView(ToggleView const& other) = delete;
+        ToggleView(ToggleView && other) = delete;
+        ToggleView& operator=(ToggleView const& other) = delete;
+        ToggleView& operator=(ToggleView && other) = delete;
     };
 }
