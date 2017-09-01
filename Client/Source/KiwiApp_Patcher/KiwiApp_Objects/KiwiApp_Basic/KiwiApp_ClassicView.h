@@ -111,6 +111,7 @@ namespace kiwi
         size_t                              m_indent;
         juce::BorderSize<int>               m_border;
         engine::Listeners<Listener>         m_listeners;
+        bool                                m_deleted;
         
     private: // deleted methods
         

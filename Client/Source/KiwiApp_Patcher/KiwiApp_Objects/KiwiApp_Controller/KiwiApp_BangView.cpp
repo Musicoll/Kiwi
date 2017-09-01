@@ -43,6 +43,7 @@ namespace kiwi
     
     BangView::~BangView()
     {
+        KiwiApp::useInstance().useScheduler().unschedule(m_switch_off);
     }
     
     void BangView::paint(juce::Graphics & g)
