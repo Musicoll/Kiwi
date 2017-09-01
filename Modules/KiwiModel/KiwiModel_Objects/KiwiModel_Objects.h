@@ -62,3 +62,10 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Time/KiwiModel_Metro.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Time/KiwiModel_Pipe.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Time/KiwiModel_Delay.h>
+
+// ================================================================================ //
+//                                 CONTROLLER OBJECTS                               //
+// ================================================================================ //
+
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Controller/KiwiModel_Bang.h>
+

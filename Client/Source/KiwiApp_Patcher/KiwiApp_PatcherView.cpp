@@ -27,6 +27,7 @@
 
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectView.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Objects.h>
+#include <KiwiApp_Patcher/KiwiApp_Factory.h>
 
 #include "../KiwiApp.h"
 #include "../KiwiApp_General/KiwiApp_CommandIDs.h"
@@ -536,7 +537,7 @@ namespace kiwi
             }
             else if(hit.patcherTouched())
             {
-                createNewBoxModel(true);
+                createObjectModel("", true);
             }
         }
     }
@@ -1798,7 +1799,7 @@ namespace kiwi
         {
             const auto it = (zorder > 0) ? m_objects.begin() + zorder : m_objects.end();
             
-            std::unique_ptr<ObjectView> object_view = std::make_unique<ClassicView>(object);
+            std::unique_ptr<ObjectView> object_view = Factory::createObjectView(object);
             
             ObjectFrame& object_frame = **(m_objects.emplace(it, new ObjectFrame(*this, std::move(object_view))));
             
@@ -1930,142 +1931,81 @@ namespace kiwi
     //                                  COMMANDS ACTIONS                                //
     // ================================================================================ //
     
-    model::Object& PatcherView::createObjectModel(std::string const& text)
+    bool PatcherView::isEditingObject() const
     {
-        // to clean
-        std::vector<Atom> atoms = AtomHelper::parse(text);
-        const std::string name = atoms[0].getString();
-        if(model::Factory::has(name))
+        auto func = [](std::unique_ptr<ObjectFrame> const& object)
         {
-            model::Object* model;
-            try
-            {
-                model = &m_patcher_model.addObject(name, std::vector<Atom>(atoms.begin()+1, atoms.end()));
-            }
-            catch(...)
-            {
-                return m_patcher_model.addObject("errorbox", std::vector<Atom>(atoms.begin(), atoms.end()));
-            }
-            return *model;
-        }
-        return m_patcher_model.addObject("errorbox", std::vector<Atom>(atoms.begin(), atoms.end()));
+            return object->isEditing();
+        };
+        
+        return std::find_if(m_objects.begin(), m_objects.end(), func) != m_objects.end();
     }
 
     void PatcherView::editObject(ObjectFrame & object_frame)
     {
-        assert(m_box_being_edited == nullptr);
+        assert(!isEditingObject() && "Editing two objects simultaneously");
         
         object_frame.editObject();
-        m_box_being_edited = &object_frame;
+        
         KiwiApp::commandStatusChanged(); // to disable some command while editing...
     }
     
     void PatcherView::objectEdited(ObjectFrame const& object_frame, std::string const& new_text)
     {
+        assert(isEditingObject() && "Calling object edited without editing object first");
+        
         grabKeyboardFocus();
         
-        std::string new_object_text = new_text.empty() ? "newbox" : new_text;
+        model::Object & old_model = object_frame.getModel();
         
-        assert(m_box_being_edited != nullptr);
-        assert(m_box_being_edited == &object_frame);
-        
-        m_box_being_edited = nullptr;
-        model::Object& old_object_m = object_frame.getModel();
-        const std::string old_object_text = old_object_m.getText();
-        
-        if(old_object_text != new_object_text)
+        if(new_text != old_model.getText())
         {
-            model::Object& new_object_m = createObjectModel(new_object_text);
-
-            const std::string new_object_name = new_object_m.getName();
-            const std::string new_object_text = [&new_object_name](std::string text){
-                
-                if(new_object_name == "errorbox")
-                {
-                    text.erase(text.begin(), text.begin()+9);
-                }
-                
-                return text;
-                
-            }(new_object_m.getText());
-
-            const int text_width = juce::Font().getStringWidth(new_object_text);
+            std::vector<Atom> atoms = AtomHelper::parse(new_text);
             
-            const juce::Point<int> origin = getOriginPosition();
+            std::unique_ptr<model::Object> object_model = model::Factory::create(atoms);
+            
+            juce::Point<int> origin = getOriginPosition();
             juce::Rectangle<int> box_bounds = object_frame.getObjectBounds();
-            new_object_m.setPosition(box_bounds.getX() - origin.x, box_bounds.getY() - origin.y);
             
-            new_object_m.setWidth(text_width + 12);
-            new_object_m.setHeight(box_bounds.getHeight());
+            object_model->setPosition(box_bounds.getX() - origin.x, box_bounds.getY() - origin.y);
             
+            if (!object_model->hasFlag(model::Object::Flag::DefinedSize))
+            {
+                object_model->setWidth(juce::Font().getStringWidth(new_text) + 12);
+                object_model->setHeight(box_bounds.getHeight());
+            }
+
             // handle error box case
-            if(new_object_name == "errorbox")
+            if(object_model->getName() == "errorbox")
             {
-                model::ErrorBox& error_box = dynamic_cast<model::ErrorBox&>(new_object_m);
-                error_box.setInlets(old_object_m.getInlets());
-                error_box.setOutlets(old_object_m.getOutlets());
+                model::ErrorBox& error_box = dynamic_cast<model::ErrorBox&>(*object_model);
+                error_box.setInlets(old_model.getInlets());
+                error_box.setOutlets(old_model.getOutlets());
+                KiwiApp::error(error_box.getError());
             }
             
-            // re-link object
-            const size_t new_inlets = new_object_m.getNumberOfInlets();
-            const size_t new_outlets = new_object_m.getNumberOfOutlets();
+            model::Object & new_object = m_patcher_model.replaceObject(old_model, std::move(object_model));
             
-            for(model::Link& link : m_patcher_model.getLinks())
-            {
-                if(!link.removed())
-                {
-                    const model::Object& from = link.getSenderObject();
-                    const size_t outlet_index = link.getSenderIndex();
-                    const model::Object& to = link.getReceiverObject();
-                    const size_t inlet_index = link.getReceiverIndex();
-                    
-                    if(&from == &old_object_m)
-                    {
-                        if(outlet_index < new_outlets)
-                        {
-                            m_patcher_model.addLink(new_object_m, outlet_index, to, inlet_index);
-                        }
-                        else
-                        {
-                            KiwiApp::error("Link removed (outlet out of range)");
-                        }
-                    }
-                    
-                    if(&to == &old_object_m)
-                    {
-                        if(inlet_index < new_inlets)
-                        {
-                            m_patcher_model.addLink(from, outlet_index, new_object_m, inlet_index);
-                        }
-                        else
-                        {
-                            KiwiApp::error("Link removed (inlet out of range)");
-                        }
-                    }
-                }
-            }
-            
-            m_view_model.unselectObject(old_object_m);
-            m_patcher_model.removeObject(old_object_m);
-            DocumentManager::commit(m_patcher_model, "Edit Object");
+            m_view_model.unselectObject(old_model);
             
             if(!isLocked())
             {
-                m_view_model.selectObject(new_object_m);
-                DocumentManager::commit(m_patcher_model);
+                m_view_model.selectObject(new_object);
             }
+            
+            DocumentManager::commit(m_patcher_model, "Edit Object");
         }
         
         KiwiApp::commandStatusChanged();
     }
     
-    void PatcherView::createNewBoxModel(bool give_focus)
+    void PatcherView::createObjectModel(std::string const& text, bool give_focus)
     {
         if(! DocumentManager::isInCommitGesture(m_patcher_model))
         {
             bool linked_newbox = m_local_objects_selection.size() == 1;
             
-            auto& new_object = createObjectModel("newbox");
+            std::unique_ptr<model::Object> new_object = model::Factory::create(AtomHelper::parse(text));
             
             juce::Point<int> pos = getMouseXYRelative() - getOriginPosition();
             
@@ -2082,16 +2022,16 @@ namespace kiwi
                     
                     if(obj->getNumberOfInlets() >= 1)
                     {
-                        m_patcher_model.addLink(*obj, 0, new_object, 0);
+                        m_patcher_model.addLink(*obj, 0, *new_object, 0);
                     }
                 }
             }
             
-            new_object.setPosition(pos.x, pos.y);
-            new_object.setWidth(80);
+            new_object->setPosition(pos.x, pos.y);
             
             m_view_model.unselectAll();
-            m_view_model.selectObject(new_object);
+            
+            m_view_model.selectObject(m_patcher_model.addObject(std::move(new_object)));
             
             DocumentManager::commit(m_patcher_model, "Insert New Empty Box");
 
@@ -2315,6 +2255,7 @@ namespace kiwi
         commands.add(juce::StandardApplicationCommandIDs::selectAll);
         
         commands.add(CommandIDs::newBox);
+        commands.add(CommandIDs::newBang);
         
         commands.add(CommandIDs::zoomIn);
         commands.add(CommandIDs::zoomOut);
@@ -2330,7 +2271,6 @@ namespace kiwi
     void PatcherView::getCommandInfo(const juce::CommandID commandID, juce::ApplicationCommandInfo& result)
     {
         const bool is_not_in_gesture = !DocumentManager::isInCommitGesture(m_patcher_model);
-        const bool box_is_not_being_edited = (m_box_being_edited == nullptr);
         
         switch(commandID)
         {
@@ -2439,6 +2379,13 @@ namespace kiwi
                 result.setActive(!isLocked());
                 break;
             }
+            case CommandIDs::newBang:
+            {
+                result.setInfo(TRANS("New Bang Box"), TRANS("Add a new bang"), CommandCategories::editing, 0);
+                result.addDefaultKeypress('b', juce::ModifierKeys::noModifiers);
+                result.setActive(!isLocked());
+                break;
+            }
             case CommandIDs::zoomIn:
             {
                 result.setInfo(TRANS("Zoom in"), TRANS("Zoom in"), CommandCategories::view, 0);
@@ -2476,15 +2423,14 @@ namespace kiwi
         
         result.setActive(!(result.flags & juce::ApplicationCommandInfo::isDisabled)
                          && is_not_in_gesture
-                         && box_is_not_being_edited);
+                         && !isEditingObject());
     }
     
     bool PatcherView::perform(const InvocationInfo& info)
     {
         // most of the commands below generate conflicts when they are being executed
         // in a commit gesture or when a box is being edited, so simply not execute them.
-        if(DocumentManager::isInCommitGesture(m_patcher_model)
-           || (m_box_being_edited != nullptr))
+        if(DocumentManager::isInCommitGesture(m_patcher_model) || isEditingObject())
         {
             return true;
         }
@@ -2507,7 +2453,8 @@ namespace kiwi
             case juce::StandardApplicationCommandIDs::del:      { deleteSelection(); break; }
             case juce::StandardApplicationCommandIDs::selectAll:{ selectAllObjects(); break; }
             
-            case CommandIDs::newBox:                            { createNewBoxModel(true); break; }
+            case CommandIDs::newBox:                            { createObjectModel("", true); break; }
+            case CommandIDs::newBang:                           { createObjectModel("bang", true); break; }
                 
             case CommandIDs::zoomIn:                            { zoomIn(); break; }
             case CommandIDs::zoomOut:                           { zoomOut(); break; }

@@ -67,9 +67,52 @@ namespace kiwi
             m_objects.clear();
         }
         
-        model::Object& Patcher::addObject(std::string const& name, std::vector<Atom> const& args)
+        model::Object & Patcher::addObject(std::unique_ptr<model::Object> && object)
         {
-            return *m_objects.insert(m_objects.end(), Factory::create(name, args));
+            assert(object != nullptr);
+            return *m_objects.insert(m_objects.end(), std::move(object));
+        }
+        
+        model::Object & Patcher::replaceObject(model::Object const& old_object,
+                                               std::unique_ptr<model::Object> && new_object)
+        {
+            assert(new_object != nullptr);
+            model::Object & object_ref = addObject(std::move(new_object));
+            
+            // re-link object
+            const size_t new_inlets = object_ref.getNumberOfInlets();
+            const size_t new_outlets = object_ref.getNumberOfOutlets();
+            
+            for(model::Link& link : getLinks())
+            {
+                if(!link.removed())
+                {
+                    const model::Object& from = link.getSenderObject();
+                    const size_t outlet_index = link.getSenderIndex();
+                    const model::Object& to = link.getReceiverObject();
+                    const size_t inlet_index = link.getReceiverIndex();
+                    
+                    if(&from == &old_object)
+                    {
+                        if(outlet_index < new_outlets)
+                        {
+                            addLink(object_ref, outlet_index, to, inlet_index);
+                        }
+                    }
+                    
+                    if(&to == &old_object)
+                    {
+                        if(inlet_index < new_inlets)
+                        {
+                            addLink(from, outlet_index, object_ref, inlet_index);
+                        }
+                    }
+                }
+            }
+            
+            removeObject(old_object);
+            
+            return object_ref;
         }
         
         model::Object& Patcher::addObject(std::string const& name, flip::Mold const& mold)

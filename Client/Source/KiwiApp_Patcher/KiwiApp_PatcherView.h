@@ -106,15 +106,15 @@ namespace kiwi
         //! @brief Returns the position of the patcher origin relative to the component position.
         juce::Point<int> getOriginPosition() const;
         
-        //! @brief Create an object model. 
-        model::Object& createObjectModel(std::string const& text);
-        
         //! @brief Call this to switch the box to edit mode
         //! @details Will result in objectEdited being called in case of success.
         void editObject(ObjectFrame & object_frame);
         
         //! @brief Called once an object has been edited.
         void objectEdited(ObjectFrame const& object_frame, std::string const& new_text);
+        
+        //! @brief Returns true if an object if being edited.
+        bool isEditingObject() const;
         
         //! @internal Update the patcher window title.
         void updateWindowTitle() const;
@@ -189,8 +189,8 @@ namespace kiwi
         //! @internal Link model will be removed from the document.
         void removeLinkView(model::Link& link);
         
-        //! @brief Add a newbox Object at current mouse position and optionally give it focus.
-        void createNewBoxModel(bool give_focus);
+        //! @brief Add a new object's model at current mouse position and optionally give it focus.
+        void createObjectModel(std::string const& text, bool give_focus);
         
         // ================================================================================ //
         //                                     UNDO/REDO                                    //
@@ -407,7 +407,6 @@ namespace kiwi
         bool m_select_on_mouse_down_status = false;
         bool m_link_downstatus = false;
         bool m_is_in_move_or_resize_gesture = false;
-        ObjectFrame* m_box_being_edited = nullptr;
         long m_object_border_down_status;
         
         friend PatcherViewport;

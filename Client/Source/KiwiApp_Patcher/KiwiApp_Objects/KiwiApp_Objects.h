@@ -26,3 +26,9 @@
 // ================================================================================ //
 
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Basic/KiwiApp_ClassicView.h>
+
+// ================================================================================ //
+//                                CONTROLLER OBJECTS                                //
+// ================================================================================ //
+
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Controller/KiwiApp_BangView.h>

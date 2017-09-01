@@ -21,6 +21,7 @@
 
 #include <KiwiModel/KiwiModel_DataModel.h>
 
+#include <KiwiApp_Patcher/KiwiApp_Factory.h>
 #include "KiwiApp.h"
 #include "KiwiApp_General/KiwiApp_CommandIDs.h"
 
@@ -91,6 +92,8 @@ namespace kiwi
         #endif
    
         model::DataModel::init();
+        
+        Factory::initialise();
         
         juce::Desktop::getInstance().setGlobalScaleFactor(1.);
         

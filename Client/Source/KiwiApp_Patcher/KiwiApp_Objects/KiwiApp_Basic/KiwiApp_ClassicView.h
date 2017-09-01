@@ -69,6 +69,9 @@ namespace kiwi
         //! @brief Lets the user edit the text of the box.
         void edit();
         
+        //! @brief Returns true if the classic view is currently in edition mode.
+        bool isEditing() const;
+        
     private: // methods
         
         //! @brief The component's graphical rendering method.
@@ -100,9 +103,6 @@ namespace kiwi
         
         ///! @brief Calls this to end edition and supress the text editor.
         void removeTextEditor();
-        
-        //! @brief Returns true if the classic view is currently in edition mode.
-        bool isEditing() const;
         
     private: // members
         

@@ -19,35 +19,59 @@
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiModel_Objects/KiwiModel_Basic/KiwiModel_NewBox.h>
-
 #include <KiwiModel/KiwiModel_Factory.h>
+
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Controller/KiwiModel_Bang.h>
 
 namespace kiwi
 {
     namespace model
     {
         // ================================================================================ //
-        //                                       NEWBOX                                     //
+        //                                  OBJECT BANG                                     //
         // ================================================================================ //
         
-        void NewBox::declare()
+        Bang::Bang(std::string const& name, std::vector<Atom> const& args):
+        Object()
         {
-            Factory::add<NewBox>("newbox").setInternal(true);
+            if (!args.empty())
+            {
+                throw std::runtime_error("wrong arguments for object bang");
+            }
             
-        }
-        
-        NewBox::NewBox(std::string const& name, std::vector<Atom> const& args)
-        {
             setFlag(Flag::DefinedSize);
-            setWidth(80);
+            addSignal<>(Signal::TriggerBang, *this);
+            setWidth(20);
             setHeight(20);
             pushInlet({PinType::IType::Control});
+            pushOutlet(PinType::IType::Control);
         }
         
-        std::string NewBox::getIODescription(bool is_inlet, size_t index) const
+        Bang::Bang(flip::Default& d):
+        Object()
         {
-            return "(nothing here)";
+            addSignal<>(Signal::TriggerBang, *this);
+        }
+        
+        void Bang::declare()
+        {
+            Factory::add<Bang>("bang");
+        }
+        
+        std::string Bang::getIODescription(bool is_inlet, size_t index) const
+        {
+            if (is_inlet && index == 0)
+            {
+                return "Makes the object flash and sends bang through first outlet";
+            }
+            else if(!is_inlet && index == 0)
+            {
+                return "Sends bang";
+            }
+            else
+            {
+                return "";
+            }
         }
     }
 }

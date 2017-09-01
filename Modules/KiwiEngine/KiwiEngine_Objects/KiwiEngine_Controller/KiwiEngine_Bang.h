@@ -19,35 +19,45 @@
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiModel_Objects/KiwiModel_Basic/KiwiModel_NewBox.h>
+#pragma once
 
-#include <KiwiModel/KiwiModel_Factory.h>
+#include <memory>
+#include <vector>
+
+#include <KiwiModel/KiwiModel_Object.h>
+#include <KiwiModel/KiwiModel_Atom.h>
+
+#include <KiwiEngine/KiwiEngine_Object.h>
 
 namespace kiwi
 {
-    namespace model
+    namespace engine
     {
         // ================================================================================ //
-        //                                       NEWBOX                                     //
+        //                                  OBJECT BANG                                     //
         // ================================================================================ //
         
-        void NewBox::declare()
+        class Bang : public engine::Object
         {
-            Factory::add<NewBox>("newbox").setInternal(true);
+        private: // classes
             
-        }
-        
-        NewBox::NewBox(std::string const& name, std::vector<Atom> const& args)
-        {
-            setFlag(Flag::DefinedSize);
-            setWidth(80);
-            setHeight(20);
-            pushInlet({PinType::IType::Control});
-        }
-        
-        std::string NewBox::getIODescription(bool is_inlet, size_t index) const
-        {
-            return "(nothing here)";
-        }
+            class Task;
+            
+        public: // methods
+            
+            Bang(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            
+            ~Bang();
+            
+            void signalTriggered();
+            
+            void receive(size_t index, std::vector<Atom> const& args) override final;
+            
+        private: // members
+            
+            std::shared_ptr<Task>   m_task;
+            flip::Signal<> &        m_signal;
+            flip::SignalConnection  m_connection;
+        };
     }
 }

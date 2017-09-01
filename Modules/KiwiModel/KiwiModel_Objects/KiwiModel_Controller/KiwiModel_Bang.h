@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <string>
+
 #include <KiwiModel/KiwiModel_Object.h>
 
 namespace kiwi
@@ -28,41 +30,28 @@ namespace kiwi
     namespace model
     {
         // ================================================================================ //
-        //                                      ERRORBOX                                    //
+        //                                  OBJECT BANG                                     //
         // ================================================================================ //
         
-        class ErrorBox : public model::Object
+        
+        class Bang : public model::Object
         {
-        public:
-            
-            //! @brief flip Default Constructor
-            ErrorBox(flip::Default& d) : model::Object(d) {}
-            
-            //! @brief Constructor
-            ErrorBox(std::string const& name, std::vector<Atom> const& args);
-            
-            //! @brief Set the number of inlets.
-            //! @param inlets The number of inlets.
-            void setInlets(flip::Array<Inlet> const& inlets);
-            
-            //! @brief Set the number of inlets.
-            //! @param inlets The number of inlets.
-            void setOutlets(flip::Array<Outlet> const& outlets);
-            
-            //! @brief Sets the message error that caused the errorbox construction.
-            void setError(std::string const& error);
-            
-            //! @brief Returns the error that caused the errorbox construction.
-            std::string getError() const;
+        public: // enum
 
+            enum Signal : SignalKey
+            {
+                TriggerBang
+            };
+            
+        public: // methods
+            
+            Bang(flip::Default& d);
+
+            Bang(std::string const& name, std::vector<Atom> const& args);
+            
             std::string getIODescription(bool is_inlet, size_t index) const override;
             
-            //! @internal flip static declare method
             static void declare();
-            
-        private: // members
-            
-            std::string m_error;
         };
     }
 }

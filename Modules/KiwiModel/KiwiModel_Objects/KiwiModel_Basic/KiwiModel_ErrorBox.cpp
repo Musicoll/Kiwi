@@ -54,5 +54,15 @@ namespace kiwi
         {
             return "(nothing here)";
         }
+        
+        void ErrorBox::setError(std::string const& error_message)
+        {
+            m_error = error_message;
+        }
+        
+        std::string ErrorBox::getError() const
+        {
+            return m_error;
+        }
     }
 }
