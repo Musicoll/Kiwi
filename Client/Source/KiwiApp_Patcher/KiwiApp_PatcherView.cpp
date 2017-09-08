@@ -51,10 +51,10 @@ namespace kiwi
     m_view_model(view),
     m_viewport(*this),
     m_hittester(*this),
+    m_mouse_handler(*this),
     m_io_highlighter(),
     m_lasso(*this),
-    m_grid_size(20),
-    m_object_border_down_status(HitTester::Border::None)
+    m_grid_size(20)
     {
         KiwiApp::bindToCommandManager(this);
         KiwiApp::bindToKeyMapping(this);
@@ -152,107 +152,7 @@ namespace kiwi
     
     void PatcherView::mouseDown(juce::MouseEvent const& e)
     {
-        m_mouse_has_just_been_clicked   = true;
-        
-        m_object_received_down_event    = false;
-        m_copy_on_drag                  = false;
-        m_is_dragging                   = false;
-        m_is_dragging_links             = false;
-        
-        if(!isLocked())
-        {
-            HitTester& hit = m_hittester;
-            hit.test(e.getPosition());
-
-            if(hit.objectTouched())
-            {
-                ObjectFrame* object_frame = hit.getObject();
-                
-                if(object_frame)
-                {
-                    if(hit.getZone() == HitTester::Zone::Inside)
-                    {
-                        if(e.mods.isAltDown())
-                        {
-                            m_copy_on_drag = true;
-                            m_select_on_mouse_down_status = selectOnMouseDown(*object_frame, true);
-                        }
-                        else if (e.mods.isCommandDown())
-                        {
-                            object_frame->mouseDown(e.getEventRelativeTo(object_frame));
-                            m_object_received_down_event = true;
-                        }
-                        else
-                        {
-                            if(e.mods.isPopupMenu())
-                            {
-                                if (!isSelected(*object_frame))
-                                {
-                                    m_select_on_mouse_down_status = selectOnMouseDown(*object_frame, true);
-                                }
-                                
-                                const auto pos = e.getPosition() - m_viewport.getOriginPosition();
-                                showObjectPopupMenu(*object_frame, pos);
-                                                    
-                            }
-                            else
-                            {
-                                m_select_on_mouse_down_status = selectOnMouseDown(*object_frame, !e.mods.isShiftDown());
-                            }
-                        }
-                    }
-                    else if(hit.getZone() == HitTester::Zone::Outlet || hit.getZone() == HitTester::Zone::Inlet)
-                    {
-                        const size_t index = hit.getIndex();
-                        const bool is_sender = hit.getZone() == HitTester::Zone::Outlet;
-                        
-                        m_link_creator.reset(new LinkViewCreator(*object_frame, index, is_sender, e.getPosition()));
-                        addAndMakeVisible(*m_link_creator);
-                    }
-                }
-            }
-            else if(hit.linkTouched())
-            {
-                LinkView* link_view = hit.getLink();
-                if(link_view)
-                {
-                    if(hit.getZone() == HitTester::Zone::Inside)
-                    {
-                        if(e.mods.isPopupMenu())
-                        {
-                            if (!isSelected(*link_view))
-                            {
-                                m_select_on_mouse_down_status = selectOnMouseDown(*link_view, true);
-                            }
-  
-                            const auto pos = e.getPosition() - m_viewport.getOriginPosition();
-                            showLinkPopupMenu(*link_view, pos);
-                        }
-                        else
-                        {
-                            m_select_on_mouse_down_status = selectOnMouseDown(*link_view, !e.mods.isShiftDown());
-                        }
-                    }
-                }
-            }
-            else if(hit.patcherTouched())
-            {
-                if(e.mods.isRightButtonDown())
-                {
-                    showPatcherPopupMenu(e.getPosition() - m_viewport.getOriginPosition());
-                }
-                else
-                {
-                    m_lasso.begin(e.getPosition(), e.mods.isShiftDown());
-                }
-            }
-        }
-        else if(e.mods.isRightButtonDown())
-        {
-            showPatcherPopupMenu(e.getPosition() - m_viewport.getOriginPosition());
-        }
-        
-        m_last_drag = e.getPosition();
+        m_mouse_handler.handleMouseDown(e);
     }
     
     // ================================================================================ //
@@ -261,114 +161,7 @@ namespace kiwi
     
     void PatcherView::mouseDrag(juce::MouseEvent const& e)
     {
-        juce::MouseCursor::StandardCursorType mc = juce::MouseCursor::NormalCursor;
-        
-        if(!isLocked())
-        {
-            if(m_lasso.isPerforming())
-            {
-                m_lasso.perform(e.getPosition(), true, e.mods.isAltDown(), e.mods.isShiftDown());
-            }
-    
-            if(m_link_creator)
-            {
-                auto end_pair = getLinkCreatorNearestEndingIolet();
-                if(end_pair.first != nullptr)
-                {
-                    const bool sender = m_link_creator->isBindedToSender();
-                    
-                    ObjectFrame* object_view = end_pair.first;
-                    if(object_view != nullptr)
-                    {
-                        if(sender)
-                        {
-                            m_io_highlighter.highlightInlet(*object_view, end_pair.second);
-                        }
-                        else
-                        {
-                            m_io_highlighter.highlightOutlet(*object_view, end_pair.second);
-                        }
-                    }
-                }
-                else
-                {
-                    m_io_highlighter.hide();
-                }
-            }
-            
-            HitTester& hit = m_hittester;
-            
-            if(hit.objectTouched())
-            {
-                ObjectFrame* object_view = hit.getObject();
-                if(object_view)
-                {
-                    if(m_object_received_down_event && hit.getZone() == HitTester::Zone::Inside)
-                    {
-                        if(m_object_received_down_event)
-                        {
-                            object_view->mouseDrag(e.getEventRelativeTo(object_view));
-                        }
-                    }
-                    else if((hit.getZone() == HitTester::Zone::Outlet
-                            || hit.getZone() == HitTester::Zone::Inlet) && m_link_creator)
-                    {
-                        m_link_creator->setEndPosition(e.getPosition());
-                    }
-                    else if(m_object_border_down_status != HitTester::Border::None)
-                    {
-                        if(m_mouse_has_just_been_clicked)
-                        {
-                            //startMoveOrResizeObjects();
-                        }
-
-                        //resizeSelectedBoxes(e.getOffsetFromDragStart(),
-                          //                  m_object_border_down_status, e.mods.isShiftDown());
-                        
-                        m_last_drag = e.getPosition();
-                        
-                        mc = getMouseCursorForBorder(m_object_border_down_status);
-                    }
-                    else if(isAnyObjectSelected())
-                    {
-                        if(! m_is_dragging && (e.getMouseDownPosition() != e.getPosition()))
-                        {
-                            if(m_copy_on_drag)
-                            {
-                                copySelectionToClipboard();
-                                pasteFromClipboard({0, 0});
-                            }
-                            
-                            startMoveOrResizeObjects();
-                            m_is_dragging = true;
-                        }
-                        
-                        if(m_is_dragging)
-                        {
-                            const juce::Point<int> pos = e.getPosition();
-                            auto delta = pos - m_last_drag;
-                            moveSelectedObjects(delta, true, true);
-                            m_last_drag = pos;
-                            
-                            if(! m_viewport.getRelativeViewArea().contains(pos))
-                            {
-                                // scroll viewport
-                                beginDragAutoRepeat(50);
-                                const juce::MouseEvent e2(e.getEventRelativeTo(&m_viewport));
-                                m_viewport.autoScroll(e2.x, e2.y, 5, 5);
-                            }
-                        }
-                        else
-                        {
-                            m_viewport.updatePatcherArea(true);
-                        }
-                    }
-                }
-            }
-        }
-        
-        setMouseCursor(mc);
-        m_mouse_has_just_been_clicked = false;
+        m_mouse_handler.handleMouseDrag(e);
     }
     
     // ================================================================================ //
@@ -377,103 +170,7 @@ namespace kiwi
     
     void PatcherView::mouseUp(juce::MouseEvent const& e)
     {
-        m_object_border_down_status = HitTester::Border::None;
-        
-        if(!isLocked())
-        {
-            if(m_lasso.isPerforming())
-            {
-                m_lasso.end();
-                return;
-            }
-   
-            if(m_link_creator)
-            {
-                m_io_highlighter.hide();
-                
-                auto end_pair = getLinkCreatorNearestEndingIolet();
-                if(end_pair.first != nullptr)
-                {
-                    const bool sender = m_link_creator->isBindedToSender();
-                    
-                    model::Object const& binded_object = m_link_creator->getBindedObject().getModel();
-                    model::Object const& ending_object = end_pair.first->getModel();
-                    
-                    model::Object const& from = sender ? binded_object : ending_object;
-                    model::Object const& to = sender ? ending_object : binded_object;
-                    
-                    const size_t outlet = sender ? m_link_creator->getBindedIndex() : end_pair.second;
-                    const size_t inlet = sender ? end_pair.second : m_link_creator->getBindedIndex();
-                    
-                    model::Link* link = m_patcher_model.addLink(from, outlet, to, inlet);
-                    if(link != nullptr)
-                    {
-                        m_view_model.selectLink(*link);
-                        DocumentManager::commit(m_patcher_model, "Add link");
-                    }
-                }
-
-                removeChildComponent(m_link_creator.get());
-                m_link_creator.reset();
-            }
-            
-            HitTester& hit = m_hittester;
-            
-            if(hit.objectTouched() && hit.getZone() == HitTester::Zone::Inside)
-            {
-                ObjectFrame* object_view = hit.getObject();
-                
-                if(object_view)
-                {
-                    if(e.mods.isCommandDown())
-                    {
-                        object_view->mouseUp(e.getEventRelativeTo(object_view));
-                        return;
-                    }
-                    else if(m_select_on_mouse_down_status && !m_is_in_move_or_resize_gesture)
-                    {
-                        editObject(*object_view);
-                    }
-                }
-            }
-            
-            hit.test(e.getPosition());
-            
-            if(hit.objectTouched())
-            {
-                ObjectFrame* object_view = hit.getObject();
-                if(object_view)
-                {
-                    selectOnMouseUp(*object_view, !e.mods.isShiftDown(), m_is_dragging,
-                                    m_select_on_mouse_down_status);
-                }
-            }
-            else if(hit.linkTouched())
-            {
-                LinkView* link_view = hit.getLink();
-                if(link_view)
-                {
-                    selectOnMouseUp(*link_view, !e.mods.isShiftDown(), m_is_dragging,
-                                    m_select_on_mouse_down_status);
-                }
-            }
-            else if(e.mods.isCommandDown())
-            {
-                setLock(true);
-            }
-            
-        }
-        else if(e.mods.isCommandDown())
-        {
-            setLock(false);
-        }
-        
-        if(m_is_in_move_or_resize_gesture)
-        {
-            endMoveOrResizeObjects();
-        }
-        
-        m_mouse_has_just_been_clicked = false;
+        m_mouse_handler.handleMouseUp(e);
     }
     
     // ================================================================================ //
@@ -482,64 +179,16 @@ namespace kiwi
     
     void PatcherView::mouseMove(juce::MouseEvent const& event)
     {
-        juce::MouseCursor::StandardCursorType mc = juce::MouseCursor::NormalCursor;
-        
-        if(!isLocked())
-        {
-            HitTester hit(*this);
-            hit.test(event.getPosition());
-
-            if (hit.getZone() != HitTester::Zone::Outlet && hit.getZone() != HitTester::Zone::Inlet)
-            {
-                m_io_highlighter.hide();
-            }
-            
-            if(hit.objectTouched())
-            {
-                if(hit.getZone() == HitTester::Zone::Border)
-                {
-                    mc = getMouseCursorForBorder(hit.getBorder());
-                }
-                else if(hit.getZone() == HitTester::Zone::Outlet
-                        || hit.getZone() == HitTester::Zone::Inlet)
-                {
-                    if(hit.getZone() == HitTester::Zone::Inlet)
-                    {
-                        m_io_highlighter.highlightInlet(*hit.getObject(), hit.getIndex());
-                    }
-                    else
-                    {
-                        m_io_highlighter.highlightOutlet(*hit.getObject(), hit.getIndex());
-                    }
-                    
-                    mc = juce::MouseCursor::PointingHandCursor;
-                }
-            }
-        }
-        
-        setMouseCursor(mc);
+        m_mouse_handler.handleMouseMove(event);
     }
+    
+    // ================================================================================ //
+    //                                  MOUSE DOUBLE CLICK                              //
+    // ================================================================================ //
     
     void PatcherView::mouseDoubleClick(const juce::MouseEvent& e)
     {
-        if(!isLocked())
-        {
-            HitTester hit(*this);
-            hit.test(e.getPosition());
-            
-            if(e.mods.isCommandDown() && hit.objectTouched())
-            {
-                ObjectFrame* object_view = hit.getObject();
-                if(object_view)
-                {
-                    object_view->mouseDoubleClick(e.getEventRelativeTo(object_view));
-                }
-            }
-            else if(hit.patcherTouched())
-            {
-                createObjectModel("", true);
-            }
-        }
+        m_mouse_handler.handleMouseDoubleClick(e);
     }
     
     juce::MouseCursor::StandardCursorType PatcherView::getMouseCursorForBorder(int border_flag) const
@@ -637,34 +286,6 @@ namespace kiwi
     // ================================================================================ //
     //                                     SELECTION                                    //
     // ================================================================================ //
-    
-    void PatcherView::startMoveOrResizeObjects()
-    {
-        m_is_in_move_or_resize_gesture = true;
-        KiwiApp::commandStatusChanged(); // to disable command like delete selection etc...
-        
-        DocumentManager::startCommitGesture(m_patcher_model);
-    }
-
-    void PatcherView::endMoveOrResizeObjects()
-    {
-        DocumentManager::endCommitGesture(m_patcher_model);
-        m_is_in_move_or_resize_gesture = false;
-        KiwiApp::commandStatusChanged();
-        
-        m_viewport.updatePatcherArea(true);
-
-        HitTester& hit = m_hittester;
-        
-        if(hit.objectTouched())
-        {
-            ObjectFrame* object_view = hit.getObject();
-            if(object_view)
-            {
-                m_viewport.jumpViewToObject(*object_view);
-            }
-        }
-    }
     
     void PatcherView::resizeSelectedObjects(juce::Point<int> const& delta,
                                          const long border_flag, const bool preserve_ratio)
@@ -1068,7 +689,7 @@ namespace kiwi
     
     bool PatcherView::keyPressed(const juce::KeyPress& key)
     {
-        if(m_is_in_move_or_resize_gesture)
+        if(m_mouse_handler.getCurrentAction() == MouseHandler::Action::MoveObject)
             return false; // abort
         
         if(key.isKeyCode(juce::KeyPress::deleteKey) || key.isKeyCode(juce::KeyPress::backspaceKey))
@@ -1418,7 +1039,8 @@ namespace kiwi
         {
             if(object.changed())
             {
-                if(object.boundsChanged() && !patcher_area_uptodate && !view.removed() && !m_is_in_move_or_resize_gesture)
+                if(object.boundsChanged() && !patcher_area_uptodate && !view.removed() &&
+                   m_mouse_handler.getCurrentAction() != MouseHandler::Action::MoveObject)
                 {
                     m_viewport.updatePatcherArea(true);
                     patcher_area_uptodate = true;
