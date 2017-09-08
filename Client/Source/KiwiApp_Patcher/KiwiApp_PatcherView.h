@@ -25,6 +25,8 @@
 
 #include <KiwiModel/KiwiModel_Patcher.h>
 
+#include <KiwiApp_Patcher/KiwiApp_PatcherViewMouseHandler.h>
+
 #include "KiwiApp_PatcherViewport.h"
 #include "KiwiApp_PatcherViewHitTester.h"
 #include "KiwiApp_PatcherManager.h"
@@ -288,12 +290,6 @@ namespace kiwi
         //! @brief Unselect all objects.
         void deleteSelection();
         
-        //! @brief Begins a move or resize gesture.
-        void startMoveOrResizeObjects();
-        
-        //! @brief Ends a move or resize gesture.
-        void endMoveOrResizeObjects();
-        
         //! @brief Resize selected objects by a given amount of pixels.
         //! @param delta        The given amount of pixel.
         //! @param border_flag  The border flag (see HitTester::Border enum)
@@ -396,6 +392,7 @@ namespace kiwi
         
         PatcherViewport                             m_viewport;
         HitTester                                   m_hittester;
+        MouseHandler                                m_mouse_handler;
         IoletHighlighter                            m_io_highlighter;
         Lasso                                       m_lasso;
         std::unique_ptr<LinkViewCreator>            m_link_creator;
@@ -404,19 +401,8 @@ namespace kiwi
         
         bool    m_is_locked;
         int     m_grid_size;
-                
-        // mouse interactions flags
-        juce::Point<int> m_last_drag;
-        bool m_object_received_down_event = false;
-        bool m_copy_on_drag = false;
-        bool m_is_dragging = false;
-        bool m_is_dragging_links = false;
-        bool m_mouse_has_just_been_clicked = false;
-        bool m_select_on_mouse_down_status = false;
-        bool m_link_downstatus = false;
-        bool m_is_in_move_or_resize_gesture = false;
-        long m_object_border_down_status;
         
+        friend MouseHandler;
         friend PatcherViewport;
         friend Lasso;
     };
