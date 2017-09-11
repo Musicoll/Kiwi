@@ -51,14 +51,20 @@ namespace kiwi
         
         g.setColour(findColour(ObjectView::ColourIds::Outline));
         
-        g.drawEllipse(getLocalBounds().reduced(3.1).toFloat(), 2);
+        juce::Rectangle<int> bounds = getLocalBounds();
+        
+        double circle_outer = 80 * bounds.getWidth() / 100.;
+        
+        double circle_thickness = 10 * bounds.getWidth() / 100.;
+        
+        g.drawEllipse(bounds.reduced(bounds.getWidth() - circle_outer).toFloat(), circle_thickness);
         
         drawOutline(g);
         
         if (m_mouse_down || m_active)
         {
             g.setColour(findColour(ObjectView::ColourIds::Active));
-            g.fillEllipse(getLocalBounds().reduced(3.1 + 2).toFloat());
+            g.fillEllipse(bounds.reduced(bounds.getWidth() - circle_outer + circle_thickness).toFloat());
         }
     }
     

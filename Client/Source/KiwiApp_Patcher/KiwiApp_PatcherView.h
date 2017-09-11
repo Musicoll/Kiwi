@@ -290,13 +290,6 @@ namespace kiwi
         //! @brief Unselect all objects.
         void deleteSelection();
         
-        //! @brief Resize selected objects by a given amount of pixels.
-        //! @param delta        The given amount of pixel.
-        //! @param border_flag  The border flag (see HitTester::Border enum)
-        //! @param preserve_ratio Should preserve box ratio
-        void resizeSelectedObjects(juce::Point<int> const& delta,
-                                   const long border_flag, const bool preserve_ratio);
-        
         //! @brief Move selected objects by a given amount of pixels.
         //! @param delta The given amount of pixel.
         //! @param commit Pass false if you don't want to commit.
@@ -370,9 +363,6 @@ namespace kiwi
         
         //! @brief Bring all object components in front of link ones.
         void bringsObjectsToFront();
-        
-        //! Get the appropriate mouse cursor for a given border flag.
-        juce::MouseCursor::StandardCursorType getMouseCursorForBorder(int border_flag) const;
 
     private: // members
         

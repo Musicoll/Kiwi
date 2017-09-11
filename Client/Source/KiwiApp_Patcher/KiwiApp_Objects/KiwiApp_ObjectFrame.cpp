@@ -19,6 +19,9 @@
  ==============================================================================
  */
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include <KiwiApp.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectFrame.h>
 
@@ -33,15 +36,19 @@ namespace kiwi
     m_patcher_view(patcher_view),
     m_io_width(6),
     m_io_height(3),
-    m_selection_width(4),
     m_inlets(getModel().getNumberOfInlets()),
-    m_outlets(getModel().getNumberOfOutlets())
+    m_outlets(getModel().getNumberOfOutlets()),
+    m_outline(10, 4, 1)
     {
         initColours();
+        
+        addChildComponent(m_outline);
         
         addAndMakeVisible(m_object_view.get());
         
         updateBounds(false);
+        
+        updateOutline();
         
         setInterceptsMouseClicks(isLocked(), isLocked());
     }
@@ -55,12 +62,14 @@ namespace kiwi
     {
         juce::Rectangle<int> object_bounds = getObjectBounds();
         
-        setBounds(getObjectBounds().expanded(m_selection_width));
+        setBounds(getObjectBounds().expanded(m_outline.getBorderThickness()));
     }
     
     void ObjectFrame::resized()
     {
-        m_object_view->setBounds(getLocalBounds().reduced(m_selection_width));
+        m_object_view->setBounds(getLocalBounds().reduced(m_outline.getBorderThickness()));
+        
+        m_outline.setBounds(getLocalBounds());
     }
     
     void ObjectFrame::updateBounds(bool animate)
@@ -76,7 +85,7 @@ namespace kiwi
                                                      model.getWidth(),
                                                      model.getHeight());
             
-            const juce::Rectangle<int> frame_bounds = object_bounds.expanded(m_selection_width);
+            const juce::Rectangle<int> frame_bounds = object_bounds.expanded(m_outline.getBorderThickness());
             
             
             if (animate)
@@ -88,50 +97,6 @@ namespace kiwi
             {
                 setBounds(frame_bounds);
             }
-        }
-    }
-    
-    void ObjectFrame::paint(juce::Graphics & g)
-    {
-        const auto bounds = getLocalBounds();
-        
-        std::set<uint64_t> const& distant_selection = getDistantSelection();
-        
-        const bool selected = isSelected();
-        const bool other_selected = ! distant_selection.empty();
-        const bool other_view_selected = (other_selected &&
-                                          distant_selection.find(KiwiApp::userID())
-                                          != distant_selection.end());
-        
-        const bool distant_selected = ((other_selected && (other_view_selected && distant_selection.size() > 1))
-                                       || (other_selected && !other_view_selected));
-        
-        if(selected || other_view_selected || distant_selected)
-        {
-            juce::Colour selection_color;
-            
-            if (selected)
-            {
-                selection_color = findColour(ObjectFrame::ColourIds::Selection);
-            }
-            else if(other_view_selected)
-            {
-                selection_color = findColour(ObjectFrame::ColourIds::SelectionOtherView);
-            }
-            else
-            {
-                selection_color = findColour(ObjectFrame::ColourIds::SelectionDistant);
-            }
-        
-            g.setColour(selection_color.darker(0.4));
-            g.drawRect(bounds.reduced(m_selection_width*0.5 + 1), 1);
-            
-            g.setColour(selection_color);
-            g.drawRoundedRectangle(bounds.reduced(m_selection_width*0.5).toFloat(),
-                                   m_selection_width*0.5, m_selection_width*0.5);
-            
-            g.setColour(selection_color.darker(0.4));
-            g.drawRoundedRectangle(bounds.reduced(1).toFloat(), m_selection_width*0.5, 1);
         }
     }
     
@@ -193,33 +158,30 @@ namespace kiwi
         // test body and iolets
         if(box_bounds.contains(pt))
         {
-            if(!isSelected())
+            // test inlets
+            if(m_inlets > 0 && pt.getY() > m_io_height)
             {
-                // test inlets
-                if(m_inlets > 0 && pt.getY() > m_io_height)
+                for(size_t i = 0; i < m_inlets; ++i)
                 {
-                    for(size_t i = 0; i < m_inlets; ++i)
+                    if(getInletLocalBounds(i).contains(pt))
                     {
-                        if(getInletLocalBounds(i).contains(pt))
-                        {
-                            hit.m_zone    = HitTester::Zone::Inlet;
-                            hit.m_index   = i;
-                            return true;
-                        }
+                        hit.m_zone    = HitTester::Zone::Inlet;
+                        hit.m_index   = i;
+                        return true;
                     }
                 }
-                
-                // test outlets
-                if(m_outlets > 0 && pt.getY() > box_bounds.getHeight() - m_io_height)
+            }
+            
+            // test outlets
+            if(m_outlets > 0 && pt.getY() > box_bounds.getHeight() - m_io_height)
+            {
+                for(size_t i = 0; i < m_outlets; ++i)
                 {
-                    for(size_t i = 0; i < m_outlets; ++i)
+                    if(getOutletLocalBounds(i).contains(pt))
                     {
-                        if(getOutletLocalBounds(i).contains(pt))
-                        {
-                            hit.m_zone    = HitTester::Zone::Outlet;
-                            hit.m_index   = i;
-                            return true;
-                        }
+                        hit.m_zone    = HitTester::Zone::Outlet;
+                        hit.m_index   = i;
+                        return true;
                     }
                 }
             }
@@ -231,36 +193,8 @@ namespace kiwi
         }
         else if(isSelected()) // test borders
         {
-            const auto resizer_bounds = box_bounds.expanded(m_selection_width, m_selection_width);
-            
-            if(pt.getY() >= resizer_bounds.getY() && pt.getY() <= box_bounds.getY())
+            if (m_outline.hitTest(pt, hit))
             {
-                hit.m_zone = HitTester::Zone::Border;
-                hit.m_border |= HitTester::Border::Top;
-            }
-            
-            if(pt.getX() >= box_bounds.getRight() && pt.getX() <= resizer_bounds.getRight())
-            {
-                hit.m_zone = HitTester::Zone::Border;
-                hit.m_border |= HitTester::Border::Right;
-            }
-            
-            if(pt.getY() >= box_bounds.getBottom() && pt.getY() <= resizer_bounds.getBottom())
-            {
-                hit.m_zone = HitTester::Zone::Border;
-                hit.m_border |= HitTester::Border::Bottom;
-            }
-            
-            if(pt.getX() <= box_bounds.getX() && pt.getX() >= resizer_bounds.getX())
-            {
-                hit.m_zone = HitTester::Zone::Border;
-                hit.m_border |= HitTester::Border::Left;
-            }
-            
-            // remove Border::None flag if we hit a border.
-            if(hit.m_zone == HitTester::Zone::Border)
-            {
-                hit.m_border &= ~HitTester::Border::None;
                 return true;
             }
         }
@@ -370,14 +304,60 @@ namespace kiwi
             object_view->edit();
         }
     }
-
-    void ObjectFrame::localSelectionChanged()
-    {
-        repaint();
-    }
     
-    void ObjectFrame::distantSelectionChanged()
+    void ObjectFrame::updateOutline()
     {
+        std::set<uint64_t> const& distant_selection = getDistantSelection();
+        
+        const bool selected = isSelected();
+        const bool other_selected = ! distant_selection.empty();
+        const bool other_view_selected = (other_selected &&
+                                          distant_selection.find(KiwiApp::userID())
+                                          != distant_selection.end());
+        
+        const bool distant_selected = ((other_selected && (other_view_selected && distant_selection.size() > 1))
+                                       || (other_selected && !other_view_selected));
+        
+        if (selected)
+        {
+            m_outline.setVisible(true);
+            
+            m_outline.setResizeColour(findColour(ObjectFrame::ColourIds::Selection));
+            
+            if (distant_selected)
+            {
+                m_outline.setInnerColour(findColour(ObjectFrame::ColourIds::SelectionDistant));
+            }
+            else if (other_view_selected)
+            {
+                m_outline.setInnerColour(findColour(ObjectFrame::ColourIds::SelectionOtherView));
+            }
+            else
+            {
+                m_outline.setInnerColour(findColour(ObjectFrame::ColourIds::Selection));
+            }
+        }
+        else if(distant_selected)
+        {
+            m_outline.setVisible(true);
+            m_outline.setResizeColour(findColour(ObjectFrame::ColourIds::SelectionDistant));
+            m_outline.setInnerColour(findColour(ObjectFrame::ColourIds::SelectionDistant));
+        }
+        else if (other_view_selected)
+        {
+            m_outline.setVisible(true);
+            m_outline.setResizeColour(findColour(ObjectFrame::ColourIds::SelectionOtherView));
+            m_outline.setInnerColour(findColour(ObjectFrame::ColourIds::SelectionOtherView));
+        }
+        else
+        {
+            m_outline.setVisible(false);
+        }
+    }
+
+    void ObjectFrame::selectionChanged()
+    {
+        updateOutline();
         repaint();
     }
     
@@ -419,7 +399,10 @@ namespace kiwi
     
     juce::Rectangle<int> ObjectFrame::getInletLocalBounds(const size_t index) const
     {
-        juce::Rectangle<int> object_bounds = m_object_view->getBounds();
+        juce::Rectangle<int> inlet_bounds = m_object_view->getBounds();
+        
+        inlet_bounds.removeFromLeft(m_outline.getResizeLength() - m_outline.getBorderThickness());
+        inlet_bounds.removeFromRight(m_outline.getResizeLength() - m_outline.getBorderThickness());
         
         juce::Rectangle<int> rect;
         
@@ -427,13 +410,13 @@ namespace kiwi
         {
             if(m_inlets == 1 && index == 0)
             {
-                rect.setBounds(object_bounds.getX(), object_bounds.getY(), getPinWidth(), getPinHeight());
+                rect.setBounds(inlet_bounds.getX(), inlet_bounds.getY(), getPinWidth(), getPinHeight());
             }
             
             if(m_inlets > 1)
             {
-                const double ratio = (object_bounds.getWidth() - getPinWidth()) / (double)(m_inlets - 1);
-                rect.setBounds(object_bounds.getX() + ratio * index, object_bounds.getY(),
+                const double ratio = (inlet_bounds.getWidth() - getPinWidth()) / (double)(m_inlets - 1);
+                rect.setBounds(inlet_bounds.getX() + ratio * index, inlet_bounds.getY(),
                                getPinWidth(), getPinHeight());
             }
         }
@@ -443,7 +426,10 @@ namespace kiwi
     
     juce::Rectangle<int> ObjectFrame::getOutletLocalBounds(const size_t index) const
     {
-        juce::Rectangle<int> object_bounds = m_object_view->getBounds();
+        juce::Rectangle<int> outlet_bounds = m_object_view->getBounds();
+        
+        outlet_bounds.removeFromLeft(m_outline.getResizeLength() - m_outline.getBorderThickness());
+        outlet_bounds.removeFromRight(m_outline.getResizeLength() - m_outline.getBorderThickness());
         
         juce::Rectangle<int> rect;
         
@@ -451,16 +437,16 @@ namespace kiwi
         {
             if(m_outlets == 1 && index == 0)
             {
-                rect.setBounds(object_bounds.getX(),
-                               object_bounds.getY() + object_bounds.getHeight() - getPinHeight(),
+                rect.setBounds(outlet_bounds.getX(),
+                               outlet_bounds.getY() + outlet_bounds.getHeight() - getPinHeight(),
                                getPinWidth(), getPinHeight());
             }
             
             if(m_outlets > 1)
             {
-                const double ratio = (object_bounds.getWidth() - getPinWidth()) / (double)(m_outlets - 1);
-                rect.setBounds(object_bounds.getX() + ratio * index,
-                               object_bounds.getY() + object_bounds.getHeight() - getPinHeight(),
+                const double ratio = (outlet_bounds.getWidth() - getPinWidth()) / (double)(m_outlets - 1);
+                rect.setBounds(outlet_bounds.getX() + ratio * index,
+                               outlet_bounds.getY() + outlet_bounds.getHeight() - getPinHeight(),
                                getPinWidth(), getPinHeight());
             }
         }
@@ -471,5 +457,200 @@ namespace kiwi
     PatcherView& ObjectFrame::getPatcherView() const
     {
         return m_patcher_view;
+    }
+    
+    // ================================================================================ //
+    //                                     OUTLINE                                      //
+    // ================================================================================ //
+    
+    ObjectFrame::Outline::Border operator|(ObjectFrame::Outline::Border const& l_border,
+                                           ObjectFrame::Outline::Border const& r_border)
+    {
+        return static_cast<ObjectFrame::Outline::Border>(static_cast<int>(l_border) | static_cast<int>(r_border));
+    }
+    
+    ObjectFrame::Outline::Outline(int resize_length,
+                                  int resize_thickness,
+                                  int inner_thickness):
+    juce::Component(),
+    m_resize_length(resize_length),
+    m_resize_thickness(resize_thickness),
+    m_inner_thickness(inner_thickness),
+    m_corners(),
+    m_borders(),
+    m_resize_colour(),
+    m_inner_colour()
+    {
+    }
+    
+    ObjectFrame::Outline::~Outline()
+    {
+    }
+    
+    int ObjectFrame::Outline::getBorderThickness() const
+    {
+        return m_resize_thickness;
+    }
+    
+    int ObjectFrame::Outline::getResizeLength() const
+    {
+        return m_resize_length;
+    }
+    
+    void ObjectFrame::Outline::updateCorners()
+    {
+        juce::Rectangle<int> bounds = getLocalBounds();
+        
+        std::array<juce::Rectangle<int>, 3> corner;
+        
+        corner[0].setBounds(bounds.getX(),
+                            bounds.getY(),
+                            m_resize_thickness,
+                            m_resize_length);
+        
+        corner[1].setBounds(bounds.getX(),
+                            bounds.getY(),
+                            m_resize_length,
+                            m_resize_thickness);
+        
+        corner[2]  = corner[0];
+        corner[2].reduceIfPartlyContainedIn(corner[1]);
+        
+        m_corners[Border::Top | Border::Left] = corner;
+        
+        juce::AffineTransform transform = juce::AffineTransform::rotation(M_PI / 2, bounds.getX(), bounds.getY());
+        transform = transform.translated(bounds.getTopRight());
+        
+        m_corners[Border::Top | Border::Right][0] = corner[0].transformedBy(transform);
+        m_corners[Border::Top | Border::Right][1] = corner[1].transformedBy(transform);
+        m_corners[Border::Top | Border::Right][2] = corner[2].transformedBy(transform);
+        
+        transform = juce::AffineTransform::rotation(M_PI);
+        transform = transform.translated(bounds.getBottomRight());
+        
+        m_corners[Border::Bottom | Border::Right][0] = corner[0].transformedBy(transform);
+        m_corners[Border::Bottom | Border::Right][1] = corner[1].transformedBy(transform);
+        m_corners[Border::Bottom | Border::Right][2] = corner[2].transformedBy(transform);
+        
+        transform = juce::AffineTransform::rotation((3 * M_PI) / 2);
+        transform = transform.translated(bounds.getBottomLeft());
+        
+        m_corners[Border::Bottom | Border::Left][0] = corner[0].transformedBy(transform);
+        m_corners[Border::Bottom | Border::Left][1] = corner[1].transformedBy(transform);
+        m_corners[Border::Bottom | Border::Left][2] = corner[2].transformedBy(transform);
+    }
+    
+    void ObjectFrame::Outline::updateBorders()
+    {
+        juce::Rectangle<int> bounds = getLocalBounds();
+        
+        m_borders[Border::Top].setBounds(m_resize_length,
+                                         m_resize_thickness - m_inner_thickness,
+                                         bounds.getWidth() - 2 * m_resize_length,
+                                         m_inner_thickness);
+        
+        m_borders[Border::Right].setBounds(bounds.getRight() - m_resize_thickness,
+                                           m_resize_length,
+                                           m_inner_thickness,
+                                           bounds.getHeight() - 2 * m_resize_length);
+        
+        m_borders[Border::Bottom].setBounds(m_resize_length,
+                                            getBottom() - m_resize_thickness,
+                                            bounds.getWidth() - 2 * m_resize_length,
+                                            m_inner_thickness);
+        
+        m_borders[Border::Left].setBounds(m_resize_thickness - m_inner_thickness,
+                                            m_resize_length,
+                                            m_inner_thickness,
+                                            bounds.getHeight() - 2 * m_resize_length);
+    }
+    
+    void ObjectFrame::Outline::resized()
+    {
+        updateBorders();
+        updateCorners();
+    }
+    
+    bool ObjectFrame::Outline::hitTest(juce::Point<int> const& pt, HitTester& hit_tester) const
+    {
+        bool success = false;
+        
+        if (m_corners.at(Border::Left | Border::Top)[1].contains(pt)
+            || m_corners.at(Border::Top | Border::Right)[0].contains(pt))
+        {
+            hit_tester.m_zone = HitTester::Zone::Border;
+            hit_tester.m_border |= HitTester::Border::Top;
+            success = true;
+        }
+        
+        if(m_corners.at(Border::Top | Border::Right)[1].contains(pt)
+                || m_corners.at(Border::Right | Border::Bottom)[0].contains(pt))
+        {
+            hit_tester.m_zone = HitTester::Zone::Border;
+            hit_tester.m_border |= HitTester::Border::Right;
+            success = true;
+        }
+        
+        if(m_corners.at(Border::Right | Border::Bottom)[1].contains(pt)
+                || m_corners.at(Border::Bottom | Border::Left)[0].contains(pt))
+        {
+            hit_tester.m_zone = HitTester::Zone::Border;
+            hit_tester.m_border |= HitTester::Border::Bottom;
+            success = true;
+        }
+        
+        if(m_corners.at(Border::Bottom | Border::Left)[1].contains(pt)
+                || m_corners.at(Border::Left | Border::Top)[0].contains(pt))
+        {
+            hit_tester.m_zone = HitTester::Zone::Border;
+            hit_tester.m_border |= HitTester::Border::Left;
+            success = true;
+        }
+        
+        if(hit_tester.m_zone == HitTester::Zone::Border)
+        {
+            hit_tester.m_border &= ~HitTester::Border::None;
+        }
+        
+        
+        return success;
+    }
+    
+    void ObjectFrame::Outline::drawCorner(juce::Graphics & g, Border border)
+    {
+        g.setColour(m_resize_colour);
+        
+        g.fillRect(m_corners[border][2]);
+        g.fillRect(m_corners[border][1]);
+    }
+    
+    void ObjectFrame::Outline::drawBorder(juce::Graphics & g, Border border)
+    {
+        g.setColour(m_inner_colour);
+        
+        g.fillRect(m_borders[border]);
+    }
+    
+    void ObjectFrame::Outline::paint(juce::Graphics & g)
+    {
+        drawBorder(g, Border::Left);
+        drawBorder(g, Border::Top);
+        drawBorder(g, Border::Right);
+        drawBorder(g, Border::Bottom);
+
+        drawCorner(g, Border::Left | Border::Top);
+        drawCorner(g, Border::Top | Border::Right);
+        drawCorner(g, Border::Right | Border::Bottom);
+        drawCorner(g, Border::Bottom | Border::Left);
+    }
+    
+    void ObjectFrame::Outline::setResizeColour(juce::Colour colour)
+    {
+        m_resize_colour = colour;
+    }
+    
+    void ObjectFrame::Outline::setInnerColour(juce::Colour colour)
+    {
+        m_inner_colour = colour;
     }
 }

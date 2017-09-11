@@ -191,42 +191,6 @@ namespace kiwi
         m_mouse_handler.handleMouseDoubleClick(e);
     }
     
-    juce::MouseCursor::StandardCursorType PatcherView::getMouseCursorForBorder(int border_flag) const
-    {
-        juce::MouseCursor::StandardCursorType mc = juce::MouseCursor::NormalCursor;
-        
-        switch(border_flag)
-        {
-            case (HitTester::Border::Top) :
-            { mc = juce::MouseCursor::TopEdgeResizeCursor; break; }
-                
-            case (HitTester::Border::Left):
-            { mc = juce::MouseCursor::LeftEdgeResizeCursor; break; }
-                
-            case (HitTester::Border::Right):
-            { mc = juce::MouseCursor::RightEdgeResizeCursor; break; }
-                
-            case (HitTester::Border::Bottom):
-            { mc = juce::MouseCursor::BottomEdgeResizeCursor; break; }
-                
-            case (HitTester::Border::Top | HitTester::Border::Left):
-            { mc = juce::MouseCursor::TopLeftCornerResizeCursor; break; }
-                
-            case (HitTester::Border::Top | HitTester::Border::Right):
-            { mc = juce::MouseCursor::TopRightCornerResizeCursor; break;}
-                
-            case (HitTester::Border::Bottom | HitTester::Border::Left):
-            { mc = juce::MouseCursor::BottomLeftCornerResizeCursor; break; }
-                
-            case (HitTester::Border::Bottom | HitTester::Border::Right):
-            { mc = juce::MouseCursor::BottomRightCornerResizeCursor; break; }
-                
-            default: break;
-        }
-        
-        return mc;
-    }
-    
     void PatcherView::showPatcherPopupMenu(juce::Point<int> const& position)
     {
         juce::PopupMenu m;
@@ -286,12 +250,6 @@ namespace kiwi
     // ================================================================================ //
     //                                     SELECTION                                    //
     // ================================================================================ //
-    
-    void PatcherView::resizeSelectedObjects(juce::Point<int> const& delta,
-                                         const long border_flag, const bool preserve_ratio)
-    {
-        // todo
-    }
     
     void PatcherView::moveSelectedObjects(juce::Point<int> const& delta, bool commit, bool commit_gesture)
     {
@@ -689,7 +647,8 @@ namespace kiwi
     
     bool PatcherView::keyPressed(const juce::KeyPress& key)
     {
-        if(m_mouse_handler.getCurrentAction() == MouseHandler::Action::MoveObject)
+        if(m_mouse_handler.getCurrentAction() == MouseHandler::Action::MoveObject ||
+           m_mouse_handler.getCurrentAction() == MouseHandler::Action::ResizeObject)
             return false; // abort
         
         if(key.isKeyCode(juce::KeyPress::deleteKey) || key.isKeyCode(juce::KeyPress::backspaceKey))
@@ -1039,8 +998,11 @@ namespace kiwi
         {
             if(object.changed())
             {
-                if(object.boundsChanged() && !patcher_area_uptodate && !view.removed() &&
-                   m_mouse_handler.getCurrentAction() != MouseHandler::Action::MoveObject)
+                if(object.boundsChanged()
+                   && !patcher_area_uptodate
+                   && !view.removed()
+                   && m_mouse_handler.getCurrentAction() != MouseHandler::Action::MoveObject
+                   && m_mouse_handler.getCurrentAction() != MouseHandler::Action::ResizeObject)
                 {
                     m_viewport.updatePatcherArea(true);
                     patcher_area_uptodate = true;
@@ -1252,6 +1214,8 @@ namespace kiwi
             }
         }
         
+        std::set<ObjectFrame*> updated_objects;
+        
         // check diff between old and new distant selection
         // and notify objects if their selection state changed
         for(auto& local_object_uptr : m_objects)
@@ -1265,7 +1229,7 @@ namespace kiwi
             
             if(old_local_selected_state != new_local_selected_state)
             {
-                local_object_uptr->localSelectionChanged();
+                updated_objects.insert(local_object_uptr.get());
                 selectionChanged();
             }
             
@@ -1283,7 +1247,7 @@ namespace kiwi
                     // notify object
                     if(distant_selection_changed_for_object)
                     {
-                        local_object_uptr->distantSelectionChanged();
+                        updated_objects.insert(local_object_uptr.get());
                         selectionChanged();
                     }
                 }
@@ -1293,6 +1257,13 @@ namespace kiwi
         // cache new selection state
         std::swap(m_distant_objects_selection, new_distant_objects_selection);
         std::swap(m_local_objects_selection, new_local_objects_selection);
+        
+        // call objects reaction.
+        
+        for(auto object_frame : updated_objects)
+        {
+            object_frame->selectionChanged();
+        }
     }
     
     void PatcherView::checkLinksSelectionChanges(model::Patcher& patcher)
@@ -1595,7 +1566,7 @@ namespace kiwi
             KiwiApp::error(error_box.getError());
         }
         
-        if (!object_model->hasFlag(model::Object::Flag::DefinedSize))
+        if (!object_model->hasFlag(model::Flag::IFlag::DefinedSize))
         {
             const int text_width = juce::Font().getStringWidth(new_text) + 12;
             const int max_io = std::max(object_model->getNumberOfInlets(),

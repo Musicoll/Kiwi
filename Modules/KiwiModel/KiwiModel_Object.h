@@ -144,6 +144,42 @@ namespace kiwi
             PinType m_type;
         };
         
+        //! @brief Class that represents an object's property.
+        //! @details Adding, removing new flags is a data model change and needs migration.
+        class Flag : public flip::Object
+        {
+        public: // classes
+            
+            //! @brief The internal enum representation of the flag.
+            enum class IFlag
+            {
+                DefinedSize = 0,    // Initial object's Size defined by the model.
+                ResizeWidth,        // Object is resizable horizontally.
+                ResizeHeight        // Object is resizable vertically.
+            };
+            
+        public: // methods
+            
+            //! @brief Flag constructor.
+            Flag(Flag::IFlag flag);
+            
+            //! @brief Flip default constructor.
+            Flag(flip::Default& d);
+            
+            //! @brief Checks if flags are equals.
+            bool operator==(Flag const& other) const;
+            
+            //! @brief Checks if flags are differents.
+            bool operator!=(Flag const& other) const;
+            
+            //! @internal Flip declarator.
+            static void declare();
+            
+        private: // members
+            
+            flip::Enum<IFlag> m_flag;
+        };
+        
         
         // ================================================================================ //
         //                                      OBJECT                                      //
@@ -156,11 +192,6 @@ namespace kiwi
         public: // classes
             
             using SignalKey = uint32_t;
-            
-            enum class Flag : unsigned int
-            {
-                DefinedSize = 1 << 0 // Initial object's Size defined by the model.
-            };
             
         public: // methods
  
@@ -219,16 +250,29 @@ namespace kiwi
             double getY() const noexcept;
             
             //! @brief Sets the width of the object.
+            //! @details Width will not be lower than minimal width.
+            //! If ratio was previously set proportions will be kept intact by changing height.
             void setWidth(double new_width);
             
             //! @brief Sets the height of the object.
+            //! @details Height will not be lower than minimal height.
+            //! If ratio was previously set proportions will be kept intact by changing width.
             void setHeight(double new_height);
+                
+            //! @brief Returns the aspect ratio.
+            double getRatio() const;
             
             //! @brief Returns the object's width.
             double getWidth() const noexcept;
             
             //! @brief Returns the object's height.
             double getHeight() const noexcept;
+            
+            //! @brief Returns the minimal width for this object.
+            double getMinWidth() const noexcept;
+                
+            //! @brief Returns the minimal height for this object;
+            double getMinHeight() const noexcept;
             
             //! @brief Returns inlet or outlet description.
             virtual std::string getIODescription(bool is_inlet, size_t index) const;
@@ -269,7 +313,19 @@ namespace kiwi
             
             //! @brief Adds an outlet at end of current outlet list.
             void pushOutlet(PinType type);
-            
+                
+            //! @brief Sets the ratio height/width.
+            //! @details If width was previously set. Height will adapt to ratio.
+            void setRatio(double ratio);
+                
+            //! @brief Sets the minimal width that the object can have.
+            //! @details Will recompute height and width if needed.
+            void setMinWidth(double min_width);
+                
+            //! @brief Sets the minimal height that the object can have.
+            //! @details Will recompute height and width if needed.
+            void setMinHeight(double min_height);
+                
         public: // internal methods
             
             //! @internal flip Default constructor
@@ -282,16 +338,20 @@ namespace kiwi
             
             std::map<SignalKey, std::unique_ptr<flip::SignalBase>> m_signals;
             
-            flip::String        m_name;
-            flip::String        m_text;
-            flip::Array<Inlet>  m_inlets;
-            flip::Array<Outlet> m_outlets;
-            flip::Enum<Flag>    m_flags;
+            flip::String            m_name;
+            flip::String            m_text;
+            flip::Array<Inlet>      m_inlets;
+            flip::Array<Outlet>     m_outlets;
+            flip::Collection<Flag>  m_flags;
             
             flip::Float         m_position_x;
             flip::Float         m_position_y;
             flip::Float         m_width;
             flip::Float         m_height;
+            flip::Float         m_min_width;
+            flip::Float         m_min_height;
+            flip::Float         m_ratio;
+                
             
             friend class Factory;
         

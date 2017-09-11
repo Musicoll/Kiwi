@@ -21,9 +21,17 @@
 
 #pragma once
 
+#include <map>
+
 #include <memory>
 
 #include <juce_gui_basics/juce_gui_basics.h>
+
+#include <flip/Ref.h>
+
+#include <KiwiModel/KiwiModel_Object.h>
+
+
 
 namespace kiwi
 {
@@ -52,7 +60,17 @@ namespace kiwi
             ObjectEdition =     7,
             SwitchSelection =   8,
             Selection =         9,
-            SwitchLock =        10
+            SwitchLock =        10,
+            ResizeObject =      11
+        };
+        
+        enum Direction : int
+        {
+            None = 0,
+            Up = 1 << 0,
+            Down = 1 << 1,
+            Left = 1 << 2,
+            Right = 1 << 3
         };
         
     public: // methods
@@ -92,11 +110,23 @@ namespace kiwi
         //! @brief Ends an ongoing interaction with patch.
         void endAction(juce::MouseEvent const& e);
         
+        //! @brief Returns the resize direction according to the hit_tester.
+        int getResizeDirection(HitTester const& hit_tester) const;
+        
+        //! @brief Applies new bounds to a object model.
+        //! @details If ratio is set, the function will keep this ratio will resizing.
+        void applyNewBounds(model::Object & object_model, juce::Rectangle<int> new_bounds, double ratio = 0.) const;
+        
+        //! @brief Returns the right resize mouse cursor.
+        juce::MouseCursor::StandardCursorType getMouseCursorForBorder(HitTester const& hit_tester) const;
+        
     private: // members
         
         PatcherView &                               m_patcher_view;
         Action                                      m_current_action;
         juce::Point<int>                            m_last_drag;
+        std::map<flip::Ref, juce::Rectangle<int>>   m_mousedown_bounds;
+        int                                         m_direction;
         
     private: // deleted methods
         
