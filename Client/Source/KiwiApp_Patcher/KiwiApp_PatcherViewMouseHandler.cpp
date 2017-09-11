@@ -19,6 +19,10 @@
  ==============================================================================
  */
 
+#include <algorithm>
+
+#include <KiwiModel/KiwiModel_Object.h>
+
 #include <KiwiApp.h>
 #include <KiwiApp_Patcher/KiwiApp_PatcherView.h>
 #include <KiwiApp_Patcher/KiwiApp_LinkView.h>
@@ -35,7 +39,9 @@ namespace kiwi
     MouseHandler::MouseHandler(PatcherView & patcher_view):
     m_patcher_view(patcher_view),
     m_current_action(Action::None),
-    m_last_drag()
+    m_last_drag(),
+    m_mousedown_bounds(),
+    m_direction()
     {
     }
     
@@ -183,11 +189,84 @@ namespace kiwi
                 }
                 break;
             }
+            case Action::ResizeObject:
+            {
+                m_direction = getResizeDirection(hit_tester);
+                
+                auto& document = m_patcher_view.m_patcher_model.entity().use<DocumentManager>();
+                
+                for (flip::Ref const& ref : m_patcher_view.getSelectedObjects())
+                {
+                    m_mousedown_bounds[ref] =
+                        m_patcher_view.getObject(*document.get<model::Object>(ref))->getObjectBounds();
+                }
+                
+                DocumentManager::startCommitGesture(m_patcher_view.m_patcher_model);
+                
+                break;
+            }
             default:
             {
                 break;
             }
         }
+    }
+    
+    void MouseHandler::applyNewBounds(model::Object & object_model, juce::Rectangle<int> new_bounds, double ratio) const
+    {
+        juce::ComponentBoundsConstrainer bounds_constrainer;
+        
+        if (!object_model.hasFlag(model::Object::Flag::ResizeWidth))
+        {
+            bounds_constrainer.setMinimumWidth(object_model.getWidth());
+            bounds_constrainer.setMaximumWidth(object_model.getWidth());
+        }
+        else if (object_model.getMinWidth() != 0)
+        {
+            bounds_constrainer.setMinimumWidth(object_model.getMinWidth());
+        }
+        
+        if (!object_model.hasFlag(model::Object::Flag::ResizeHeight))
+        {
+            bounds_constrainer.setMinimumHeight(object_model.getHeight());
+            bounds_constrainer.setMinimumHeight(object_model.getHeight());
+        }
+        else if (object_model.getMinHeight() != 0)
+        {
+            bounds_constrainer.setMinimumHeight(object_model.getMinHeight());
+        }
+        
+        if (object_model.getRatio() != 0)
+        {
+            bounds_constrainer.setFixedAspectRatio(1 / object_model.getRatio());
+        }
+        else if (ratio != 0)
+        {
+            bounds_constrainer.setFixedAspectRatio(1 / ratio);
+        }
+        
+        juce::Rectangle<int> limits = m_patcher_view.getBounds();
+        
+        juce::Rectangle<int> previous_bounds(object_model.getX(),
+                                             object_model.getY(),
+                                             object_model.getWidth(),
+                                             object_model.getHeight());
+        
+        juce::Rectangle<int> target_bounds = new_bounds;
+        
+        bounds_constrainer.checkBounds(target_bounds,
+                                        previous_bounds,
+                                        limits,
+                                        m_direction & Direction::Up,
+                                        m_direction & Direction::Left,
+                                        m_direction & Direction::Down,
+                                        m_direction & Direction::Right);
+        
+        object_model.setPosition(target_bounds.getX(), target_bounds.getY());
+        
+        object_model.setWidth(target_bounds.getWidth());
+        
+        object_model.setHeight(target_bounds.getHeight());
     }
     
     void MouseHandler::continueAction(juce::MouseEvent const& e)
@@ -300,6 +379,50 @@ namespace kiwi
                 }
                 break;
             }
+            case Action::ResizeObject:
+            {
+                juce::Point<int> delta = e.getPosition() - e.getMouseDownPosition();
+                
+                for (auto bounds_it : m_mousedown_bounds)
+                {
+                    juce::Rectangle<int> new_bounds = bounds_it.second;
+                    
+                    double ratio = 0.;
+                    
+                    if (e.mods.isShiftDown() && new_bounds.getWidth() != 0)
+                    {
+                        ratio = static_cast<double>(new_bounds.getHeight()) / static_cast<double>(new_bounds.getWidth());
+                    }
+                    
+                    if (m_direction & Direction::Left)
+                    {
+                        new_bounds.setLeft(std::min(new_bounds.getX() + delta.getX(), new_bounds.getRight()));
+                    }
+                    
+                    if (m_direction & Direction::Up)
+                    {
+                        new_bounds.setTop(std::min(new_bounds.getY() + delta.getY(), new_bounds.getBottom()));
+                    }
+                    
+                    if (m_direction & Direction::Right)
+                    {
+                        new_bounds.setRight(std::max(new_bounds.getRight() + delta.getX(), new_bounds.getX()));
+                    }
+                    
+                    if (m_direction & Direction::Down)
+                    {
+                        new_bounds.setBottom(std::max(new_bounds.getBottom() + delta.getY(), new_bounds.getY()));
+                    }
+                    
+                    auto& document = m_patcher_view.m_patcher_model.entity().use<DocumentManager>();
+                    
+                    applyNewBounds(*document.get<model::Object>(bounds_it.first), new_bounds, ratio);
+                }
+                
+                DocumentManager::commitGesture(m_patcher_view.m_patcher_model, "Resize object");
+                
+                break;
+            }
             default:
             {
                 break;
@@ -379,6 +502,19 @@ namespace kiwi
                 m_patcher_view.editObject(object);
                 break;
             }
+            case Action::ResizeObject:
+            {
+                m_direction = Direction::None;
+                m_mousedown_bounds.clear();
+                
+                DocumentManager::endCommitGesture(m_patcher_view.m_patcher_model);
+                
+                m_patcher_view.m_viewport.updatePatcherArea(true);
+                
+                m_patcher_view.m_viewport.jumpViewToObject(*hit_tester.getObject());
+                
+                break;
+            }
             case Action::SwitchLock:
             {
                 m_patcher_view.setLock(!m_patcher_view.isLocked());
@@ -442,6 +578,10 @@ namespace kiwi
                         || hit_tester.getZone() == HitTester::Zone::Inlet)
                 {
                     startAction(Action::CreateLink, e);
+                }
+                else if (hit_tester.getZone() == HitTester::Zone::Border)
+                {
+                    startAction(Action::ResizeObject, e);
                 }
             }
             else if(hit_tester.linkTouched())
@@ -526,6 +666,91 @@ namespace kiwi
         }
     }
     
+    int MouseHandler::getResizeDirection(HitTester const& hit_tester) const
+    {
+        int border = hit_tester.getBorder();
+        
+        int direction = Direction::None;
+        
+        model::Object const& object_model = hit_tester.getObject()->getModel();
+        
+        if ((border & HitTester::Border::Top) && object_model.hasFlag(model::Object::Flag::ResizeHeight))
+        {
+            direction |= Direction::Up;
+        }
+        
+        if ((border & HitTester::Border::Right) && object_model.hasFlag(model::Object::Flag::ResizeWidth))
+        {
+            direction |= Direction::Right;
+        }
+        
+        if ((border & HitTester::Border::Bottom) && object_model.hasFlag(model::Object::Flag::ResizeHeight))
+        {
+            direction |= Direction::Down;
+        }
+        
+        if ((border & HitTester::Border::Left) && object_model.hasFlag(model::Object::Flag::ResizeWidth))
+        {
+            direction |= Direction::Left;
+        }
+        
+        return direction;
+    }
+    
+    juce::MouseCursor::StandardCursorType MouseHandler::getMouseCursorForBorder(HitTester const& hit_tester) const
+    {
+        juce::MouseCursor::StandardCursorType mc = juce::MouseCursor::NormalCursor;
+        
+        int direction = getResizeDirection(hit_tester);
+        
+        switch(direction)
+        {
+            case (Direction::Up) :
+            {
+                mc = juce::MouseCursor::TopEdgeResizeCursor;
+                break;
+            }
+            case (Direction::Left):
+            {
+                mc = juce::MouseCursor::LeftEdgeResizeCursor;
+                break;
+            }
+            case (Direction::Right):
+            {
+                mc = juce::MouseCursor::RightEdgeResizeCursor;
+                break;
+            }
+            case (Direction::Down):
+            {
+                mc = juce::MouseCursor::BottomEdgeResizeCursor;
+                break;
+            }
+            case (Direction::Up | Direction::Left):
+            {
+                mc = juce::MouseCursor::TopLeftCornerResizeCursor;
+                break;
+            }
+            case (Direction::Up | Direction::Right):
+            {
+                mc = juce::MouseCursor::TopRightCornerResizeCursor;
+                break;
+            }
+            case (Direction::Down | Direction::Left):
+            {
+                mc = juce::MouseCursor::BottomLeftCornerResizeCursor;
+                break;
+            }
+            case (Direction::Down | Direction::Right):
+            {
+                mc = juce::MouseCursor::BottomRightCornerResizeCursor;
+                break;
+            }
+            default: break;
+        }
+        
+        return mc;
+    }
+    
     void MouseHandler::handleMouseMove(juce::MouseEvent const& e)
     {
         juce::MouseCursor::StandardCursorType mc = juce::MouseCursor::NormalCursor;
@@ -546,7 +771,7 @@ namespace kiwi
             {
                 if(hit_tester.getZone() == HitTester::Zone::Border)
                 {
-                    mc = m_patcher_view.getMouseCursorForBorder(hit_tester.getBorder());
+                    mc = getMouseCursorForBorder(hit_tester);
                 }
                 else if(hit_tester.getZone() == HitTester::Zone::Outlet
                         || hit_tester.getZone() == HitTester::Zone::Inlet)

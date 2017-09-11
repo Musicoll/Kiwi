@@ -165,7 +165,10 @@ namespace kiwi
         m_position_x(0.),
         m_position_y(0.),
         m_width(60.),
-        m_height(20.)
+        m_height(20.),
+        m_min_width(0.),
+        m_min_height(0.),
+        m_ratio(0.)
         {
             ;
         }
@@ -255,14 +258,79 @@ namespace kiwi
             return !removed() ? m_position_y.value() : m_position_y.before();
         }
         
+        void Object::setRatio(double ratio)
+        {
+            if (ratio > 0.)
+            {
+                m_ratio = ratio;
+                m_height = m_width * m_ratio;
+                m_min_height = m_min_width * m_ratio;
+            }
+        }
+        
+        double Object::getRatio() const
+        {
+            return m_ratio;
+        }
+        
+        void Object::setMinWidth(double min_width)
+        {
+            if (min_width >= 0.)
+            {
+                m_min_width = min_width;
+                
+                if (m_ratio > 0.)
+                {
+                    m_min_height = m_min_width * m_ratio;
+                }
+                
+                setWidth(getWidth());
+            }
+        }
+        
+        void Object::setMinHeight(double min_height)
+        {
+            if (min_height >= 0.)
+            {
+                m_min_height = min_height;
+                
+                if (m_ratio > 0.)
+                {
+                    m_min_width = m_min_height / m_ratio;
+                }
+                
+                setWidth(getHeight());
+            }
+        }
+        
         void Object::setWidth(double new_width)
         {
-            m_width = std::max(0., new_width);
+            m_width = std::max(m_min_width.value(), new_width);
+            
+            if (m_ratio > 0.)
+            {
+                m_height = m_ratio * m_width;
+            }
         }
         
         void Object::setHeight(double new_height)
         {
-            m_height = std::max(0., new_height);
+            m_height = std::max(m_min_height.value(), new_height);
+            
+            if (m_ratio > 0.)
+            {
+                m_width = m_height / m_ratio;
+            }
+        }
+        
+        double Object::getMinWidth() const noexcept
+        {
+            return m_min_width.value();
+        }
+        
+        double Object::getMinHeight() const noexcept
+        {
+            return m_min_height.value();
         }
         
         double Object::getWidth() const noexcept

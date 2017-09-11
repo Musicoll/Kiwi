@@ -191,42 +191,6 @@ namespace kiwi
         m_mouse_handler.handleMouseDoubleClick(e);
     }
     
-    juce::MouseCursor::StandardCursorType PatcherView::getMouseCursorForBorder(int border_flag) const
-    {
-        juce::MouseCursor::StandardCursorType mc = juce::MouseCursor::NormalCursor;
-        
-        switch(border_flag)
-        {
-            case (HitTester::Border::Top) :
-            { mc = juce::MouseCursor::TopEdgeResizeCursor; break; }
-                
-            case (HitTester::Border::Left):
-            { mc = juce::MouseCursor::LeftEdgeResizeCursor; break; }
-                
-            case (HitTester::Border::Right):
-            { mc = juce::MouseCursor::RightEdgeResizeCursor; break; }
-                
-            case (HitTester::Border::Bottom):
-            { mc = juce::MouseCursor::BottomEdgeResizeCursor; break; }
-                
-            case (HitTester::Border::Top | HitTester::Border::Left):
-            { mc = juce::MouseCursor::TopLeftCornerResizeCursor; break; }
-                
-            case (HitTester::Border::Top | HitTester::Border::Right):
-            { mc = juce::MouseCursor::TopRightCornerResizeCursor; break;}
-                
-            case (HitTester::Border::Bottom | HitTester::Border::Left):
-            { mc = juce::MouseCursor::BottomLeftCornerResizeCursor; break; }
-                
-            case (HitTester::Border::Bottom | HitTester::Border::Right):
-            { mc = juce::MouseCursor::BottomRightCornerResizeCursor; break; }
-                
-            default: break;
-        }
-        
-        return mc;
-    }
-    
     void PatcherView::showPatcherPopupMenu(juce::Point<int> const& position)
     {
         juce::PopupMenu m;
@@ -286,12 +250,6 @@ namespace kiwi
     // ================================================================================ //
     //                                     SELECTION                                    //
     // ================================================================================ //
-    
-    void PatcherView::resizeSelectedObjects(juce::Point<int> const& delta,
-                                         const long border_flag, const bool preserve_ratio)
-    {
-        // todo
-    }
     
     void PatcherView::moveSelectedObjects(juce::Point<int> const& delta, bool commit, bool commit_gesture)
     {
@@ -689,7 +647,8 @@ namespace kiwi
     
     bool PatcherView::keyPressed(const juce::KeyPress& key)
     {
-        if(m_mouse_handler.getCurrentAction() == MouseHandler::Action::MoveObject)
+        if(m_mouse_handler.getCurrentAction() == MouseHandler::Action::MoveObject ||
+           m_mouse_handler.getCurrentAction() == MouseHandler::Action::ResizeObject)
             return false; // abort
         
         if(key.isKeyCode(juce::KeyPress::deleteKey) || key.isKeyCode(juce::KeyPress::backspaceKey))
@@ -1069,7 +1028,8 @@ namespace kiwi
         
         if(objects_bounds_changed
            && !view.removed()
-           && m_mouse_handler.getCurrentAction() != MouseHandler::Action::MoveObject)
+           && m_mouse_handler.getCurrentAction() != MouseHandler::Action::MoveObject
+           && m_mouse_handler.getCurrentAction() != MouseHandler::Action::ResizeObject)
         {
             m_viewport.updatePatcherArea(true);
         }
