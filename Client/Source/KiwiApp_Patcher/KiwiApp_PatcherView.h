@@ -110,8 +110,14 @@ namespace kiwi
         //! @details Will result in objectEdited being called in case of success.
         void editObject(ObjectFrame & object_frame);
         
-        //! @brief Called once an object has been edited.
-        void objectEdited(ObjectFrame const& object_frame, std::string const& new_text);
+        //! @brief Called when the object has entered edition mode.
+        void objectEditorShown(ObjectFrame const& object_frame);
+        
+        //! @brief Called once an object's text has changed.
+        void objectTextChanged(ObjectFrame const& object_frame, std::string const& new_text);
+        
+        //! @brief Called when the object is quitting edition mode.
+        void objectEditorHidden(ObjectFrame const& object_frame);
         
         //! @brief Returns true if an object if being edited.
         bool isEditingObject() const;
@@ -393,6 +399,8 @@ namespace kiwi
         IoletHighlighter                            m_io_highlighter;
         Lasso                                       m_lasso;
         std::unique_ptr<LinkViewCreator>            m_link_creator;
+        
+        ObjectFrame  const*                         m_box_being_edited = nullptr;
         
         bool    m_is_locked;
         int     m_grid_size;

@@ -339,13 +339,25 @@ namespace kiwi
         }
     }
     
-    void ObjectFrame::textEdited(std::string const& new_text)
+    void ObjectFrame::textChanged(std::string const& new_text)
     {
         dynamic_cast<ClassicView*>(m_object_view.get())->removeListener(*this);
         
+        getPatcherView().objectTextChanged(*this, new_text);
+    }
+    
+    void ObjectFrame::editorHidden()
+    {
         setInterceptsMouseClicks(isLocked(), isLocked());
         
-        getPatcherView().objectEdited(*this, new_text);
+        getPatcherView().objectEditorHidden(*this);
+    }
+    
+    void ObjectFrame::editorShown()
+    {
+        setInterceptsMouseClicks(true, true);
+        
+        getPatcherView().objectEditorShown(*this);
     }
     
     void ObjectFrame::editObject()

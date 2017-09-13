@@ -30,7 +30,6 @@
 #include <KiwiEngine/KiwiEngine_Listeners.h>
 
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectView.h>
-#include <KiwiApp_Components/KiwiApp_SuggestEditor.h>
 
 namespace kiwi
 {
@@ -39,9 +38,29 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The view of any textual kiwi object.
-    class ClassicView : public ObjectView, public juce::TextEditor::Listener
+    class ClassicView : public ObjectView,
+                        public juce::TextEditor::Listener,
+                        public juce::Label::Listener
     {
     public: // classes
+        
+        class Label : public juce::Label
+        {
+        public: // methods
+            
+            //! @brief Constructor.
+            Label(ClassicView & classic_view, std::string const& label);
+            
+            //! @brief Destructor.
+            ~Label();
+            
+            //! @brief Called to create the text editor once edit is called.
+            juce::TextEditor* createEditorComponent() override final;
+            
+        private: // members
+            
+            ClassicView & m_classic_view;
+        };
         
         struct Listener
         {
@@ -49,7 +68,13 @@ namespace kiwi
             virtual ~Listener() = default;
             
             //! @brief Called when the text has been edited and return key was pressed.
-            virtual void textEdited(std::string const& new_text) =  0;
+            virtual void textChanged(std::string const& new_text) =  0;
+            
+            //! @brief Called when the classic view ends its edition.
+            virtual void editorHidden() =  0;
+            
+            //! @brief Called when the classic view enters its edition mode.
+            virtual void editorShown() =  0;
         };
         
     public: // methods
@@ -74,9 +99,6 @@ namespace kiwi
         
     private: // methods
         
-        //! @brief The component's graphical rendering method.
-        void paint(juce::Graphics& g) override final;
-        
         //! @brief Called when the object is resized.
         void resized() override final;
         
@@ -84,33 +106,22 @@ namespace kiwi
         //! @details Used to resize in order to keep text visible.
         void textEditorTextChanged(juce::TextEditor& editor) override final;
         
-        //! @brief Called when return key is pressed.
-        //! @brief Exits edit mode keeping edited text as is.
-        void textEditorReturnKeyPressed(juce::TextEditor& editor) override final;
-        
-        //! @brief Called when the editor has lost focus.
-        //! @brief Exits edit mode keeping edited text as is.
-        void textEditorFocusLost(juce::TextEditor& editor) override final;
-        
-        //! @brief Returns the text area.
-        juce::Rectangle<int> getTextArea() const;
-        
         //! @brief Paints elements over the text editor.
         void paintOverChildren (juce::Graphics& g) override final;
         
-        //! @brief Called when the classic's view text has been edited.
-        void textEdited(juce::TextEditor& editor);
+        //! @brief Called when the label text has changed.
+        void labelTextChanged (juce::Label* label) override final;
         
-        ///! @brief Calls this to end edition and supress the text editor.
-        void removeTextEditor();
+        //! @brief Called when edition ends.
+        void editorHidden (juce::Label* label, juce::TextEditor& text_editor) override final;
+        
+        //! @brief Called when edition begins.
+        void editorShown(juce::Label* label, juce::TextEditor& text_editor) override final;
         
     private: // members
         
-        std::string                         m_text;
-        std::unique_ptr<juce::TextEditor>   m_editor;
-        size_t                              m_indent;
+        Label                               m_label;
         engine::Listeners<Listener>         m_listeners;
-        bool                                m_deleted;
         
     private: // deleted methods
         

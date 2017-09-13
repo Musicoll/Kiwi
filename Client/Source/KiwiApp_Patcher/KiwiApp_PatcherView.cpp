@@ -1933,12 +1933,7 @@ namespace kiwi
     
     bool PatcherView::isEditingObject() const
     {
-        auto func = [](std::unique_ptr<ObjectFrame> const& object)
-        {
-            return object->isEditing();
-        };
-        
-        return std::find_if(m_objects.begin(), m_objects.end(), func) != m_objects.end();
+        return m_box_being_edited != nullptr;
     }
 
     void PatcherView::editObject(ObjectFrame & object_frame)
@@ -1946,57 +1941,62 @@ namespace kiwi
         assert(!isEditingObject() && "Editing two objects simultaneously");
         
         object_frame.editObject();
-        
-        KiwiApp::commandStatusChanged(); // to disable some command while editing...
     }
     
-    void PatcherView::objectEdited(ObjectFrame const& object_frame, std::string const& new_text)
+    void PatcherView::objectEditorShown(ObjectFrame const& object_frame)
     {
-        assert(isEditingObject() && "Calling object edited without editing object first");
-        
-        grabKeyboardFocus();
-        
-        model::Object & old_model = object_frame.getModel();
-        
-        if(new_text != old_model.getText())
-        {
-            std::vector<Atom> atoms = AtomHelper::parse(new_text);
-            
-            std::unique_ptr<model::Object> object_model = model::Factory::create(atoms);
-            
-            juce::Point<int> origin = getOriginPosition();
-            juce::Rectangle<int> box_bounds = object_frame.getObjectBounds();
-            
-            object_model->setPosition(box_bounds.getX() - origin.x, box_bounds.getY() - origin.y);
-            
-            if (!object_model->hasFlag(model::Object::Flag::DefinedSize))
-            {
-                object_model->setWidth(juce::Font().getStringWidth(new_text) + 12);
-                object_model->setHeight(box_bounds.getHeight());
-            }
-
-            // handle error box case
-            if(object_model->getName() == "errorbox")
-            {
-                model::ErrorBox& error_box = dynamic_cast<model::ErrorBox&>(*object_model);
-                error_box.setInlets(old_model.getInlets());
-                error_box.setOutlets(old_model.getOutlets());
-                KiwiApp::error(error_box.getError());
-            }
-            
-            model::Object & new_object = m_patcher_model.replaceObject(old_model, std::move(object_model));
-            
-            m_view_model.unselectObject(old_model);
-            
-            if(!isLocked())
-            {
-                m_view_model.selectObject(new_object);
-            }
-            
-            DocumentManager::commit(m_patcher_model, "Edit Object");
-        }
+        m_box_being_edited = &object_frame;
         
         KiwiApp::commandStatusChanged();
+    }
+    
+    void PatcherView::objectEditorHidden(ObjectFrame const& object_frame)
+    {
+        assert(m_box_being_edited == &object_frame && "Calling object editor shown outside text edition");
+        
+        m_box_being_edited = nullptr;
+        
+        KiwiApp::commandStatusChanged();
+    }
+    
+    void PatcherView::objectTextChanged(ObjectFrame const& object_frame, std::string const& new_text)
+    {
+        model::Object & old_model = object_frame.getModel();
+        
+        std::vector<Atom> atoms = AtomHelper::parse(new_text);
+        
+        std::unique_ptr<model::Object> object_model = model::Factory::create(atoms);
+        
+        juce::Point<int> origin = getOriginPosition();
+        juce::Rectangle<int> box_bounds = object_frame.getObjectBounds();
+        
+        object_model->setPosition(box_bounds.getX() - origin.x, box_bounds.getY() - origin.y);
+        
+        if (!object_model->hasFlag(model::Object::Flag::DefinedSize))
+        {
+            object_model->setWidth(juce::Font().getStringWidth(new_text) + 12);
+            object_model->setHeight(box_bounds.getHeight());
+        }
+        
+        // handle error box case
+        if(object_model->getName() == "errorbox")
+        {
+            model::ErrorBox& error_box = dynamic_cast<model::ErrorBox&>(*object_model);
+            error_box.setInlets(old_model.getInlets());
+            error_box.setOutlets(old_model.getOutlets());
+            KiwiApp::error(error_box.getError());
+        }
+        
+        model::Object & new_object = m_patcher_model.replaceObject(old_model, std::move(object_model));
+        
+        m_view_model.unselectObject(old_model);
+        
+        if(!isLocked())
+        {
+            m_view_model.selectObject(new_object);
+        }
+        
+        DocumentManager::commit(m_patcher_model, "Edit Object");
     }
     
     void PatcherView::createObjectModel(std::string const& text, bool give_focus)

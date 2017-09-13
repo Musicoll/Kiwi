@@ -23,6 +23,8 @@
 
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Basic/KiwiApp_ClassicView.h>
 
+#include <KiwiApp_Components/KiwiApp_SuggestEditor.h>
+
 namespace kiwi
 {
     // ================================================================================ //
@@ -31,22 +33,24 @@ namespace kiwi
     
     ClassicView::ClassicView(model::Object & object_model) :
     ObjectView(object_model),
-    m_text(object_model.getText()),
-    m_editor(nullptr),
-    m_indent(4),
-    m_listeners(),
-    m_deleted(false)
+    m_label(*this, object_model.getText()),
+    m_listeners()
     {
-        if(object_model.getName() == "errorbox")
-        {
-            setColour(ObjectView::ColourIds::Background, findColour(ObjectView::ColourIds::Error).withAlpha(0.4f));
-        }
+        juce::Colour bg_colour = object_model.getName() == "errorbox" ?
+                                 findColour(ObjectView::ColourIds::Error).withAlpha(0.4f) :
+                                 findColour(ObjectView::ColourIds::Background);
+        
+        
+        m_label.setColour(juce::Label::backgroundColourId, bg_colour);
+        m_label.setColour(juce::Label::backgroundWhenEditingColourId, bg_colour);
+        m_label.setColour(juce::Label::textColourId, findColour(ObjectView::ColourIds::Text));
+        m_label.setColour(juce::Label::textWhenEditingColourId, findColour(ObjectView::ColourIds::Text));
+        
+        addAndMakeVisible(m_label);
     }
 
     ClassicView::~ClassicView()
     {
-        removeTextEditor();
-        m_deleted = true;
     }
     
     void ClassicView::addListener(Listener& listener)
@@ -61,55 +65,7 @@ namespace kiwi
     
     void ClassicView::edit()
     {
-        if(hasKeyboardFocus(true)) return; // abort
-        
-        m_editor.reset(new SuggestEditor(model::Factory::getNames()));
-        
-        m_editor->setBounds(getLocalBounds());
-        m_editor->setIndents(m_indent, m_indent);
-        m_editor->setBorder(juce::BorderSize<int>(0));
-        
-        m_editor->setColour(juce::TextEditor::ColourIds::textColourId,
-                            findColour(ObjectView::ColourIds::Text));
-        
-        m_editor->setColour(juce::TextEditor::backgroundColourId,
-                            findColour(ObjectView::ColourIds::Background));
-        
-        m_editor->setColour(juce::TextEditor::highlightColourId,
-                            findColour(ObjectView::ColourIds::Highlight).withAlpha(0.4f));
-        
-        m_editor->setColour(juce::TextEditor::highlightColourId,
-                            findColour(ObjectView::ColourIds::Highlight).withAlpha(0.4f));
-        
-        m_editor->setColour(juce::TextEditor::outlineColourId,
-                            juce::Colours::transparentWhite);
-        
-        m_editor->setColour(juce::TextEditor::focusedOutlineColourId,
-                            juce::Colours::transparentWhite);
-        
-        m_editor->setScrollbarsShown(false);
-        m_editor->setScrollToShowCursor(true);
-        m_editor->setReturnKeyStartsNewLine(false);
-        m_editor->setMultiLine(true, false);
-        
-        m_editor->setText(m_text, juce::dontSendNotification);
-        m_editor->setHighlightedRegion({0, static_cast<int>(m_text.length())});
-        m_editor->setCaretVisible(m_text.empty());
-        
-        m_editor->addListener(this);
-        addAndMakeVisible(*m_editor);
-        
-        m_editor->grabKeyboardFocus();
-    }
-    
-    void ClassicView::removeTextEditor()
-    {
-        if(m_editor != nullptr)
-        {
-            m_editor->removeListener(this);
-            removeChildComponent(m_editor.get());
-            m_editor.reset();
-        }
+        m_label.showEditor();
     }
     
     void ClassicView::paintOverChildren (juce::Graphics& g)
@@ -119,34 +75,14 @@ namespace kiwi
         drawOutline(g);
     }
     
-    juce::Rectangle<int> ClassicView::getTextArea() const
-    {
-        return getLocalBounds().reduced(m_indent);
-    }
-    
-    void ClassicView::paint(juce::Graphics& g)
-    {
-        g.fillAll (findColour (ObjectView::ColourIds::Background));
-        
-        if (!isEditing())
-        {
-            g.setColour (findColour (ObjectView::ColourIds::Text));
-            
-            g.drawText(m_text, getTextArea(), juce::Justification::centredLeft);
-        }
-    }
-    
     void ClassicView::resized()
     {
-        if (m_editor)
-        {
-            m_editor->setBounds(getLocalBounds());
-        }
+        m_label.setBounds(getLocalBounds());
     }
     
     bool ClassicView::isEditing() const
     {
-        return m_editor != nullptr;
+        return m_label.isBeingEdited();
     }
     
     void ClassicView::textEditorTextChanged(juce::TextEditor& editor)
@@ -159,29 +95,68 @@ namespace kiwi
         }
     }
     
-    void ClassicView::textEdited(juce::TextEditor& editor)
+    void ClassicView::labelTextChanged (juce::Label* labelThatHasChanged)
     {
-        assert(&editor == m_editor.get());
-        
-        m_listeners.call(&Listener::textEdited, m_text);
-        
-        if (!m_deleted)
-        {
-            removeTextEditor();
-        }
+        m_listeners.call(&ClassicView::Listener::textChanged, m_label.getText().toStdString());
     }
     
-    void ClassicView::textEditorReturnKeyPressed(juce::TextEditor& editor)
+    void ClassicView::editorHidden (juce::Label* label, juce::TextEditor& text_editor)
     {
-        m_text = editor.getText().toStdString();
-        
-        textEdited(editor);
+        m_listeners.call(&ClassicView::Listener::editorHidden);
     }
     
-    void ClassicView::textEditorFocusLost(juce::TextEditor& editor)
+    void ClassicView::editorShown (juce::Label* label, juce::TextEditor& text_editor)
     {
-        m_text = editor.getText().toStdString();
+        m_listeners.call(&ClassicView::Listener::editorShown);
+    }
+    
+    // ================================================================================ //
+    //                                   LABEL                                          //
+    // ================================================================================ //
+    
+    ClassicView::Label::Label(ClassicView & classic_view, std::string const& label):
+    juce::Label("object name", label),
+    m_classic_view(classic_view)
+    {
+        addListener(&classic_view);
+    }
+    
+    ClassicView::Label::~Label()
+    {
+        removeListener(&m_classic_view);
+    }
+    
+    juce::TextEditor* ClassicView::Label::createEditorComponent()
+    {
+        juce::TextEditor * editor = new SuggestEditor(model::Factory::getNames());
         
-        textEdited(editor);
+        editor->setBounds(getLocalBounds());
+        editor->setBorder(juce::BorderSize<int>(0));
+
+        
+        editor->setColour(juce::TextEditor::ColourIds::textColourId,
+                          findColour(juce::Label::textWhenEditingColourId));
+        
+        editor->setColour(juce::TextEditor::backgroundColourId,
+                            findColour(juce::Label::backgroundWhenEditingColourId));
+        
+        editor->setColour(juce::TextEditor::highlightColourId,
+                            findColour(ObjectView::ColourIds::Highlight, true).withAlpha(0.4f));
+        
+        
+        editor->setColour(juce::TextEditor::outlineColourId,
+                            juce::Colours::transparentWhite);
+        
+        editor->setColour(juce::TextEditor::focusedOutlineColourId,
+                            juce::Colours::transparentWhite);
+        
+        editor->setScrollbarsShown(false);
+        editor->setScrollToShowCursor(true);
+        editor->setReturnKeyStartsNewLine(false);
+        editor->setMultiLine(true, false);
+        
+        editor->addListener(&m_classic_view);
+        
+        return editor;
     }
 }

@@ -125,7 +125,13 @@ namespace kiwi
         void resized() override final;
         
         //! @brief Called once a ClassicView's text has changed.
-        void textEdited(std::string const& new_text) override final;
+        void textChanged(std::string const& new_text) override final;
+        
+        //! @brief Called when the classic view ends its edition.
+        void editorHidden() override final;
+        
+        //! @brief Called when the classic view enters its edition mode.
+        void editorShown() override final;
         
         //! @brief Initializes all colours with default values.
         //! @todo Set colours in look and feel instead.
