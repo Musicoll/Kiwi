@@ -31,52 +31,31 @@
 #include <KiwiEngine/KiwiEngine_Scheduler.h>
 
 using namespace kiwi;
-
 using Scheduler = engine::Scheduler<std::chrono::high_resolution_clock>;
-
-using Task = engine::Scheduler<>::Task;
-
-using CallBack = engine::Scheduler<>::CallBack;
-
-static std::chrono::high_resolution_clock::time_point current_time = std::chrono::high_resolution_clock::now();
-
-struct TickClock
-{
-    typedef std::chrono::high_resolution_clock::duration                 duration;
-    typedef duration::rep                                                rep;
-    typedef duration::period                                             period;
-    typedef std::chrono::time_point<std::chrono::high_resolution_clock>  time_point;
-    static const bool is_steady =                                        true;
-    
-    static void start() {current_time = std::chrono::high_resolution_clock::now();}
-    
-    static void tick(){current_time += std::chrono::milliseconds(1);};
-    
-    static time_point now(){return current_time;};
-};
-
+using Task = Scheduler::Task;
+using CallBack = Scheduler::CallBack;
 
 // ==================================================================================== //
-//                                          SCHEDULER                                   //
+//                                      SCHEDULER                                       //
 // ==================================================================================== //
 
-TEST_CASE("Scheduler", "[Scheduler]")
+TEST_CASE("Scheduler - mono thread", "[Scheduler]")
 {
     Scheduler sch;
     
     SECTION("Simple add and process")
-    {   
+    {
         int counter = 0;
         
-        std::function<void()> func = [&counter](){++counter;};
+        std::function<void()> func = [&counter]() { ++counter; };
         
         for(int i = 0 ; i < 10; ++i)
         {
-            sch.schedule(std::shared_ptr<Task>(new CallBack(func)),
-                                               std::chrono::milliseconds(10 * i));
+            sch.schedule(std::make_shared<CallBack>(func),
+                         std::chrono::milliseconds(10 * i));
         }
         
-        while(counter < 10){ sch.process();}
+        while(counter < 10) { sch.process(); }
         
         CHECK(counter == 10);
     }
@@ -121,20 +100,19 @@ TEST_CASE("Scheduler", "[Scheduler]")
     {
         struct TestDestructor : public Task
         {
-            TestDestructor(int &counter):m_counter(counter){};
+            TestDestructor(int &counter) : m_counter(counter) {}
+            ~TestDestructor() { ++m_counter; }
+            void execute() override final {}
             
-            ~TestDestructor(){++m_counter;};
-            
-            void execute() override final{};
-            
+        private:
             int& m_counter;
         };
-
+        
         int shared_count = 0;
         int transfered_count = 0;
         
-        std::shared_ptr<Task> shared(new TestDestructor(shared_count));
-        std::shared_ptr<Task> transfered(new TestDestructor(transfered_count));
+        auto shared = std::make_shared<TestDestructor>(shared_count);
+        auto transfered = std::make_shared<TestDestructor>(transfered_count);
         
         sch.schedule(shared);
         CHECK(shared.use_count() == 2);
@@ -158,9 +136,9 @@ TEST_CASE("Scheduler", "[Scheduler]")
         std::function<void()> func_cancel = [&i_cancel](){++i_cancel;};
         std::function<void()> func_reschedule = [&i_reschedule](){++i_reschedule;};
         
-        std::shared_ptr<Task> standard(new CallBack(func_std));
-        std::shared_ptr<Task> reschedule(new CallBack(func_reschedule));
-        std::shared_ptr<Task> cancel(new CallBack(func_cancel));
+        auto standard = std::make_shared<CallBack>(func_std);
+        auto reschedule = std::make_shared<CallBack>(func_reschedule);
+        auto cancel = std::make_shared<CallBack>(func_cancel);
         
         sch.schedule(std::move(standard));
         sch.schedule(reschedule);
@@ -169,7 +147,7 @@ TEST_CASE("Scheduler", "[Scheduler]")
         sch.schedule(reschedule, std::chrono::milliseconds(1000 * 60 * 60));
         sch.unschedule(cancel);
         
-        while(i_standard < 1){sch.process();};
+        while(i_standard < 1) { sch.process(); }
         
         CHECK(i_standard == 1);
         CHECK(i_reschedule == 0);
@@ -177,88 +155,50 @@ TEST_CASE("Scheduler", "[Scheduler]")
         
         sch.schedule(reschedule);
         
-        while(i_reschedule < 1){sch.process();};
+        while(i_reschedule < 1) { sch.process(); }
         
         CHECK(i_reschedule == 1);
     }
+}
+
+
+// ==================================================================================== //
+//                               SCHEDULER - MULTI THREAD                               //
+// ==================================================================================== //
+
+TEST_CASE("Scheduler - Multithread", "[Scheduler]")
+{
+    Scheduler sch;
     
-    SECTION("Execution order and custom clock")
-    {
-        TickClock::start();
-        
-        engine::Scheduler<TickClock> tick_scheduler;
-        
-        std::vector<int> order;
-        
-        std::function<void(int)> func = [&order](int number){order.push_back(number);};
-        
-        std::shared_ptr<engine::Scheduler<TickClock>::Task>
-                    task_0(new engine::Scheduler<TickClock>::CallBack(std::bind(func, 0)));
-        
-        std::shared_ptr<engine::Scheduler<TickClock>::Task>
-                    task_1(new engine::Scheduler<TickClock>::CallBack(std::bind(func, 1)));
-        
-        tick_scheduler.schedule(task_0, std::chrono::milliseconds(1));
-        tick_scheduler.schedule(task_1, std::chrono::milliseconds(3));
-        
-        std::shared_ptr<engine::Scheduler<TickClock>::Task>
-                    task_2(new engine::Scheduler<TickClock>::CallBack(std::bind(func, 2)));
-        
-        std::shared_ptr<engine::Scheduler<TickClock>::Task>
-                    task_3(new engine::Scheduler<TickClock>::CallBack(std::bind(func, 3)));
-        
-        tick_scheduler.schedule(std::move(task_2), std::chrono::milliseconds(2));
-        tick_scheduler.schedule(std::move(task_3), std::chrono::milliseconds(2));
-        
-        tick_scheduler.schedule(task_0, std::chrono::milliseconds(3));
-        tick_scheduler.unschedule(task_1);
-        
-        while(order.size() < 3)
-        {
-            TickClock::tick();
-            tick_scheduler.process();
-        }
-        
-        tick_scheduler.unschedule(task_0);
-        
-        CHECK(order[0] == 2);
-        CHECK(order[1] == 3);
-        CHECK(order[2] == 0);
-    }
-    
-    SECTION("Multithreading multiproducer multiconsumer")
+    SECTION("multiproducer - multiconsumer")
     {
         std::atomic<size_t> count_producer_1(0);
         std::atomic<size_t> count_producer_2(0);
         
-        std::function<void()> func_1 = [&count_producer_1]()
-        {
+        std::function<void()> func_1 = [&count_producer_1]() {
             ++count_producer_1;
         };
         
-        std::function<void()> func_2 = [&count_producer_2]()
-        {
+        std::function<void()> func_2 = [&count_producer_2]() {
             ++count_producer_2;
         };
         
-        std::thread producer_1([&count_producer_1, &sch, &func_1]()
-        {
+        std::thread producer_1([&count_producer_1, &sch, &func_1]() {
             size_t count_event = 0;
             
             while(count_event < 30)
             {
-                sch.schedule(std::shared_ptr<Task>(new CallBack(func_1)));
+                sch.schedule(std::make_shared<CallBack>(func_1));
                 ++count_event;
             }
         });
         
-        std::thread producer_2([&count_producer_2, &sch, &func_2]()
-        {
+        std::thread producer_2([&count_producer_2, &sch, &func_2]() {
             size_t count_event = 0;
             
             while(count_event < 20)
             {
-                sch.schedule(std::shared_ptr<Task>(new CallBack(func_2)));
+                sch.schedule(std::make_shared<CallBack>(func_2));
                 ++count_event;
             }
         });
@@ -275,252 +215,299 @@ TEST_CASE("Scheduler", "[Scheduler]")
         producer_2.join();
     }
     
-    SECTION("Multithreading execution order")
+    
+    SECTION("Execution Order")
     {
         std::vector<int> order;
+        std::function<void(int)> func = [&order](int stamp) {order.push_back(stamp);};
         
-        std::function<void(int)> func = [&order](int stamp){order.push_back(stamp);};
-        
-        // Pushing producer 1 before producer 2
-        
+        SECTION("Pushing producer 1 before producer 2")
         {
-            std::thread producer_1([&sch, &func]()
-            {
+            std::thread producer_1([&sch, &func]() {
                 sch.schedule(std::make_shared<CallBack>(std::bind(func, 1)));
             });
-        
+            
             producer_1.join();
-        
-            std::thread producer_2([&sch, &func]()
-            {
+            
+            std::thread producer_2([&sch, &func]() {
                 sch.schedule(std::make_shared<CallBack>(std::bind(func, 2)));
             });
-        
+            
             producer_2.join();
-        
-            while(order.size() < 2)
-            {
-                sch.process();
-            }
-        
+            
+            while(order.size() < 2) { sch.process(); }
+            
             // Check that producer 1's task is executed first.
-        
+            
             CHECK(order[0] == 1);
             CHECK(order[1] == 2);
-            
         }
         
-        // Pushgin producer 2 before producer 1
-        
+        SECTION("Pushing producer 2 before producer 1")
         {
-            std::thread producer_2([&sch, &func]()
-            {
+            std::thread producer_2([&sch, &func]() {
                 sch.schedule(std::make_shared<CallBack>(std::bind(func, 2)));
             });
             
             producer_2.join();
             
-            std::thread producer_1([&sch, &func]()
-            {
+            std::thread producer_1([&sch, &func]() {
                 sch.schedule(std::make_shared<CallBack>(std::bind(func, 1)));
             });
             
             producer_1.join();
             
-            while(order.size() < 4)
-            {
-                sch.process();
-            }
+            while(order.size() < 2) { sch.process(); }
             
             // Check that producer 2's task is executed first.
             
-            CHECK(order[2] == 2);
-            CHECK(order[3] == 1);
-        }
-        
-        SECTION("Thread ids")
-        {
-            CHECK(sch.isThisConsumerThread());
-            
-            // Transfer consumer ownership.
-            
-            std::thread consumer_thread([&sch]()
-            {
-                sch.setThreadAsConsumer();
-                CHECK(sch.isThisConsumerThread());
-            });
-            
-            consumer_thread.join();
-            
-            CHECK(!sch.isThisConsumerThread());
-            
-            // Transfer back the ownership, to enable further test execution.
-            
-            sch.setThreadAsConsumer();
-        }
-        
-        SECTION("Scheduler lock")
-        {
-            std::atomic<bool> quit_requested(false);
-            
-            std::thread consumer([&sch, &quit_requested]()
-            {
-                sch.setThreadAsConsumer();
-                
-                while(!quit_requested.load())
-                {
-                    sch.process();
-                }
-            });
-            
-            {
-                std::unique_lock<std::mutex> lock(sch.lock());
-                
-                std::function<void(void)> func = [&quit_requested]()
-                {
-                    quit_requested.store(true);
-                };
-                
-                sch.schedule(std::shared_ptr<Task>(new CallBack(func)));
-                
-                std::this_thread::sleep_for(std::chrono::seconds(1));
-                
-                CHECK(!quit_requested);
-            }
-            
-            consumer.join();
-            
-            CHECK(quit_requested);
-            
-            sch.setThreadAsConsumer();
-        }
-        
-        SECTION("defering tasks")
-        {
-            class DeferTask : public engine::Scheduler<>::Task
-            {
-            public:
-                
-                DeferTask(std::atomic<std::thread::id> & thread):
-                m_thread(thread)
-                {
-                }
-                
-                void execute() override final
-                {
-                    m_thread.store(std::this_thread::get_id());
-                }
-                
-            private:
-                
-                std::atomic<std::thread::id> & m_thread;
-                
-            };
-            
-            {
-                // copy
-                {
-                    std::atomic<std::thread::id> exec_thread;
-                    
-                    std::shared_ptr<engine::Scheduler<>::Task> task(new DeferTask(exec_thread));
-                    
-                    sch.defer(task);
-                    
-                    CHECK(task.use_count() == 1);
-                    CHECK(exec_thread == std::this_thread::get_id());
-                }
-                
-                // move
-                {
-                    std::atomic<std::thread::id> exec_thread;
-                    
-                    std::shared_ptr<engine::Scheduler<>::Task> task(new DeferTask(exec_thread));
-                    
-                    sch.defer(std::move(task));
-                    
-                    CHECK(task.use_count() == 0);
-                    CHECK(exec_thread == std::this_thread::get_id());
-                }
-                
-                // function
-                {
-                    std::atomic<std::thread::id> exec_thread;
-                    
-                    std::shared_ptr<engine::Scheduler<>::Task> task(new DeferTask(exec_thread));
-                    
-                    sch.defer([&exec_thread]()
-                    {
-                        exec_thread.store(std::this_thread::get_id());
-                    });
-                    
-                    CHECK(exec_thread == std::this_thread::get_id());
-                }
-            }
-            
-            {
-                std::atomic<bool> quit_requested(false);
-                
-                std::thread consumer([&sch, &quit_requested]()
-                {
-                    sch.setThreadAsConsumer();
-                    
-                    while(!quit_requested.load())
-                    {   
-                        sch.process();
-                    }
-                });
-                
-                while(sch.isThisConsumerThread()){}
-                
-                // copy
-                {
-                    std::atomic<std::thread::id> exec_thread;
-                    
-                    std::shared_ptr<engine::Scheduler<>::Task> task(new DeferTask(exec_thread));
-                    
-                    sch.schedule(task);
-                    
-                    while(exec_thread != consumer.get_id()){}
-                    
-                    CHECK(task.use_count() == 1);
-                    CHECK(exec_thread == consumer.get_id());
-                }
-                
-                // move
-                {
-                    std::atomic<std::thread::id> exec_thread;
-                    
-                    std::shared_ptr<engine::Scheduler<>::Task> task(new DeferTask(exec_thread));
-                    
-                    sch.defer(std::move(task));
-                    
-                    while(exec_thread != consumer.get_id()){}
-                    
-                    CHECK(task.use_count() == 0);
-                    CHECK(exec_thread == consumer.get_id());
-                }
-                
-                // function
-                {
-                    std::atomic<std::thread::id> exec_thread;
-                    
-                    std::shared_ptr<engine::Scheduler<>::Task> task(new DeferTask(exec_thread));
-                    
-                    sch.defer([&exec_thread]()
-                    {
-                        exec_thread.store(std::this_thread::get_id());
-                    });
-                    
-                    while(exec_thread != consumer.get_id()){}
-                    
-                    CHECK(exec_thread == consumer.get_id());
-                }
-                
-                quit_requested.store(true);
-                
-                consumer.join();
-            }
+            CHECK(order[0] == 2);
+            CHECK(order[1] == 1);
         }
     }
 }
 
+
+// ==================================================================================== //
+//                             SCHEDULER - OWNERSHIP TRANSFER                           //
+// ==================================================================================== //
+
+TEST_CASE("Scheduler - Thread ids", "[Scheduler]")
+{
+    Scheduler sch;
+
+    SECTION("Consumer ownership transfer")
+    {
+        REQUIRE(sch.isThisConsumerThread());
+        
+        // Transfer consumer ownership.
+        
+        std::thread consumer_thread([&sch]() {
+            sch.setThreadAsConsumer();
+            REQUIRE(sch.isThisConsumerThread());
+        });
+        
+        consumer_thread.join();
+        
+        CHECK(!sch.isThisConsumerThread());
+    }
+}
+
+
+// ==================================================================================== //
+//                                  SCHEDULER - LOCK                                    //
+// ==================================================================================== //
+
+TEST_CASE("Scheduler - Lock", "[Scheduler]")
+{
+    Scheduler sch;
+    
+    SECTION("Scheduler lock")
+    {
+        std::atomic<bool> quit_requested(false);
+        
+        std::thread consumer([&sch, &quit_requested]() {
+            sch.setThreadAsConsumer();
+            
+            while(!quit_requested.load())
+            {
+                sch.process();
+            }
+        });
+        
+        {
+            std::unique_lock<std::mutex> lock(sch.lock());
+            
+            sch.schedule(std::make_shared<CallBack>([&quit_requested]() {
+                quit_requested.store(true);
+            }));
+            
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            
+            REQUIRE(!quit_requested);
+        }
+        
+        consumer.join();
+        
+        CHECK(quit_requested);
+    }
+}
+
+
+// ==================================================================================== //
+//                               SCHEDULER - DEFERING TASKS                             //
+// ==================================================================================== //
+
+TEST_CASE("Scheduler - Defering tasks", "[Scheduler]")
+{
+    Scheduler sch;
+    
+    struct DeferTask : public Scheduler::Task
+    {
+        DeferTask(std::atomic<std::thread::id>& thread_id, std::atomic_bool& executed_flag)
+        : m_thread_id(thread_id)
+        , m_executed_flag(executed_flag) {}
+        
+        void execute() override
+        {
+            m_executed_flag.store(true);
+            m_thread_id.store(std::this_thread::get_id());
+        }
+        
+    private:
+        std::atomic<std::thread::id>&   m_thread_id;
+        std::atomic_bool&               m_executed_flag;
+    };
+    
+    SECTION("Defering task on the same thread execute task directly")
+    {
+        std::atomic<std::thread::id> exec_thread;
+        std::atomic_bool executed_flag(false);
+        auto task = std::make_shared<DeferTask>(exec_thread, executed_flag);
+        
+        REQUIRE(!executed_flag);
+        
+        SECTION("task copy")
+        {
+            sch.defer(task);
+            CHECK(task.use_count() == 1);
+        }
+        
+        SECTION("task move")
+        {
+            sch.defer(std::move(task));
+            CHECK(task.use_count() == 0);
+        }
+        
+        SECTION("task lambda")
+        {
+            sch.defer([&exec_thread, &executed_flag]() {
+                executed_flag.store(true);
+                exec_thread.store(std::this_thread::get_id());
+            });
+        }
+        
+        CHECK(executed_flag);
+        CHECK(exec_thread == std::this_thread::get_id());
+    }
+    
+    SECTION("Defering task on another thread schedule the task")
+    {
+        std::atomic_bool quit_requested(false);
+        
+        std::thread consumer([&sch, &quit_requested]() {
+            
+            sch.setThreadAsConsumer();
+            
+            while(!quit_requested.load())
+            {
+                sch.process();
+            }
+        });
+        
+        std::atomic<std::thread::id> exec_thread;
+        std::atomic_bool executed_flag(false);
+        auto task = std::make_shared<DeferTask>(exec_thread, executed_flag);
+        
+        while(sch.isThisConsumerThread()){}
+        
+        REQUIRE(!executed_flag);
+        
+        SECTION("task copy")
+        {
+            sch.defer(task);
+            
+            while(exec_thread != consumer.get_id()){}
+            
+            CHECK(task.use_count() == 1);
+        }
+        
+        SECTION("task move")
+        {
+            sch.defer(std::move(task));
+            
+            while(exec_thread != consumer.get_id()){}
+            
+            CHECK(task.use_count() == 0);
+        }
+        
+        SECTION("task lambda")
+        {
+            sch.defer([&exec_thread, &executed_flag]() {
+                executed_flag.store(true);
+                exec_thread.store(std::this_thread::get_id());
+            });
+            
+            while(exec_thread != consumer.get_id()){}
+        }
+        
+        CHECK(executed_flag);
+        CHECK(exec_thread == consumer.get_id());
+        
+        quit_requested.store(true);
+        consumer.join();
+    }
+}
+
+// ==================================================================================== //
+//                              SCHEDULER - CUSTOM CLOCK                                //
+// ==================================================================================== //
+
+struct TickClock
+{
+    using clock_t = std::chrono::high_resolution_clock;
+    using duration = clock_t::duration;
+    using time_point = clock_t::time_point;
+    
+    static void start() {current_time = clock_t::now();}
+    
+    static void tick() {current_time += std::chrono::milliseconds(1);};
+    
+    static time_point now() {return current_time;};
+    
+private:
+    static time_point current_time;
+};
+
+TickClock::time_point TickClock::current_time = TickClock::clock_t::now();
+
+TEST_CASE("Scheduler - custom clock", "[Scheduler]")
+{
+    using TickScheduler = engine::Scheduler<TickClock>;
+    
+    SECTION("Execution order and custom clock")
+    {
+        TickClock::start();
+        
+        TickScheduler scheduler;
+        
+        std::vector<int> order;
+        
+        std::function<void(int)> func = [&order](int number){order.push_back(number);};
+        
+        auto task_0 = std::make_shared<TickScheduler::CallBack>(std::bind(func, 0));
+        auto task_1 = std::make_shared<TickScheduler::CallBack>(std::bind(func, 1));
+        auto task_2 = std::make_shared<TickScheduler::CallBack>(std::bind(func, 2));
+        auto task_3 = std::make_shared<TickScheduler::CallBack>(std::bind(func, 3));
+        
+        scheduler.schedule(task_0, std::chrono::milliseconds(1));
+        scheduler.schedule(task_1, std::chrono::milliseconds(3));
+        scheduler.schedule(std::move(task_2), std::chrono::milliseconds(2));
+        scheduler.schedule(std::move(task_3), std::chrono::milliseconds(2));
+        
+        scheduler.schedule(task_0, std::chrono::milliseconds(3));
+        scheduler.unschedule(task_1);
+        
+        while(order.size() < 3)
+        {
+            TickClock::tick();
+            scheduler.process();
+        }
+        
+        scheduler.unschedule(task_0);
+        
+        CHECK(order[0] == 2);
+        CHECK(order[1] == 3);
+        CHECK(order[2] == 0);
+    }
+}
