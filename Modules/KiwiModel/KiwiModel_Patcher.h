@@ -49,13 +49,15 @@ namespace kiwi
             //! @brief Destructor.
             ~Patcher();
             
-            //! @brief Try to create an Object with a text.
-            //! @details This function will first parse the input string in a vector of atom
-            //! to find a registered name object as first atom.
-            //! the last atoms are passed to the created object as arguments.
-            //! @param text A string composed by the name of the object optionnally followed by a space and a list of argument values (ex : "plus 42")
-            //! @return An Object.
-            model::Object& addObject(std::string const& name, std::vector<Atom> const& args);
+            //! @brief Adds an object to the patcher model.
+            //! @param The object to add in the text.
+            //! @return A reference to the object added.
+            model::Object& addObject(std::unique_ptr<model::Object> && object);
+            
+            //! @brief Replaces an object by another one.
+            //! @details This function will rewire the new object.
+            //! @return A reference to the newly added object.
+            model::Object& replaceObject(model::Object const& old_object, std::unique_ptr<model::Object> && object);
             
             //! @brief create an Object from a flip::Mold.
             model::Object& addObject(std::string const& name, flip::Mold const& mold);

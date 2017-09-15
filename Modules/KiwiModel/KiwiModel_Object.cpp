@@ -161,6 +161,7 @@ namespace kiwi
         m_name("noobj"),
         m_inlets(),
         m_outlets(),
+        m_flags(),
         m_position_x(0.),
         m_position_y(0.),
         m_width(60.),
@@ -297,6 +298,16 @@ namespace kiwi
         std::string Object::getIODescription(bool is_inlet, size_t index) const
         {
             return (is_inlet ? "inlet " : "outlet ") + std::to_string(index);
+        }
+        
+        bool Object::hasFlag(Flag flag) const
+        {
+            return (static_cast<unsigned int>(flag) & static_cast<unsigned int>(m_flags.value())) != 0;
+        }
+        
+        void Object::setFlag(Flag flag)
+        {
+            m_flags = static_cast<Flag>(static_cast<unsigned int>(flag) | static_cast<unsigned int>(m_flags.value()));
         }
     }
 }

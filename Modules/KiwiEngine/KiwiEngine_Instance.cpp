@@ -20,7 +20,7 @@
  */
 
 #include "KiwiEngine_Factory.h"
-#include "KiwiEngine_Objects.h"
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Objects.h>
 #include "KiwiEngine_Instance.h"
 
 namespace kiwi
@@ -99,6 +99,8 @@ namespace kiwi
             engine::Factory::add<PlusTilde>("plus~");
             engine::Factory::add<SigTilde>("sig~");
             engine::Factory::add<DelaySimpleTilde>("delaysimple~");
+            engine::Factory::add<Bang>("bang");
+            engine::Factory::add<Toggle>("toggle");
         }
         
         // ================================================================================ //

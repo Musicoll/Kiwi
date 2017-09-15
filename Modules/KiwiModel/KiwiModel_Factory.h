@@ -90,8 +90,7 @@ namespace kiwi
             //! @param name The name of the Object.
             //! @param args A list of arguments as a vector of Atom.
             //! @return A ptr to a model::Object.
-            static std::unique_ptr<model::Object> create(std::string const& name,
-                                                         std::vector<Atom> const& args);
+            static std::unique_ptr<model::Object> create(std::vector<Atom> const& args);
             
             //! @brief Creates a new Object from a flip::Mold.
             //! @details This function will throw if the object name does not exist.

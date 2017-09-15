@@ -24,7 +24,7 @@
 #include "KiwiModel_Def.h"
 #include "KiwiModel_DataModel.h"
 #include "KiwiModel_PatcherUser.h"
-#include "KiwiModel_Objects.h"
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Objects.h>
 
 namespace kiwi
 {
@@ -78,6 +78,8 @@ namespace kiwi
             PlusTilde::declare();
             SigTilde::declare();
             DelaySimpleTilde::declare();
+            Bang::declare();
+            Toggle::declare();
         }
     }
 }
