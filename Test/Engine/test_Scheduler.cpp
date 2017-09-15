@@ -494,7 +494,7 @@ TEST_CASE("Scheduler", "[Scheduler]")
                     
                     sch.defer(std::move(task));
                     
-                    while(exec_thread == consumer.get_id()){}
+                    while(exec_thread != consumer.get_id()){}
                     
                     CHECK(task.use_count() == 0);
                     CHECK(exec_thread == consumer.get_id());
