@@ -131,12 +131,17 @@ namespace kiwi
     
     void ObjectFrame::mouseDown(juce::MouseEvent const& e)
     {
-        m_object_view->mouseDown(e);
+        m_object_view->mouseDown(e.getEventRelativeTo(m_object_view.get()));
     }
     
     void ObjectFrame::mouseUp(juce::MouseEvent const& e)
     {
-        m_object_view->mouseUp(e);
+        m_object_view->mouseUp(e.getEventRelativeTo(m_object_view.get()));
+    }
+    
+    void ObjectFrame::mouseDrag(juce::MouseEvent const& e)
+    {
+        m_object_view->mouseDrag(e.getEventRelativeTo(m_object_view.get()));
     }
     
     bool ObjectFrame::hitTest(int x, int y)
