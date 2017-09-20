@@ -39,7 +39,7 @@ namespace kiwi
     MouseHandler::MouseHandler(PatcherView & patcher_view):
     m_patcher_view(patcher_view),
     m_current_action(Action::None),
-    m_last_drag(),
+    m_last_drag(),  
     m_mousedown_bounds(),
     m_direction()
     {

@@ -73,6 +73,7 @@ namespace kiwi
         newComment                  = 0xf30304,        ///< Add a new "comment" object box to the patcher.
         newBang                     = 0xf30305,        ///< Add a new "button" object box to the patcher.
         newToggle                   = 0xf30306,        ///< Add a new "toggle" object box to the patcher.
+        newSlider                   = 0xf30307,        ///< Add a new "slider" object box to the patcher.
         
         showPatcherInspector        = 0xf20400,        ///< Shows the patcher properties inspector.
         

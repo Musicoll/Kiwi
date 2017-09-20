@@ -1846,6 +1846,7 @@ namespace kiwi
         commands.add(CommandIDs::newBox);
         commands.add(CommandIDs::newBang);
         commands.add(CommandIDs::newToggle);
+        commands.add(CommandIDs::newSlider);
         
         commands.add(CommandIDs::zoomIn);
         commands.add(CommandIDs::zoomOut);
@@ -1983,6 +1984,15 @@ namespace kiwi
                 result.setActive(!isLocked());
                 break;
             }
+            case CommandIDs::newSlider:
+            {
+                result.setInfo(TRANS("New Slider Box"),
+                               TRANS("Add a new slider"),
+                               CommandCategories::editing, 0);
+                result.addDefaultKeypress('s', juce::ModifierKeys::noModifiers);
+                result.setActive(!isLocked());
+                break;
+            }
             case CommandIDs::zoomIn:
             {
                 result.setInfo(TRANS("Zoom in"), TRANS("Zoom in"), CommandCategories::view, 0);
@@ -2053,6 +2063,7 @@ namespace kiwi
             case CommandIDs::newBox:                            { createObjectModel("", true); break; }
             case CommandIDs::newBang:                           { createObjectModel("bang", true); break; }
             case CommandIDs::newToggle:                         { createObjectModel("toggle", true); break; }
+            case CommandIDs::newSlider:                         { createObjectModel("slider", true); break; }
                 
             case CommandIDs::zoomIn:                            { zoomIn(); break; }
             case CommandIDs::zoomOut:                           { zoomOut(); break; }
