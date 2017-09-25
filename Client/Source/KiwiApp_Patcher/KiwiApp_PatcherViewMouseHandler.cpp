@@ -197,8 +197,12 @@ namespace kiwi
                 
                 for (flip::Ref const& ref : m_patcher_view.getSelectedObjects())
                 {
-                    m_mousedown_bounds[ref] =
-                        m_patcher_view.getObject(*document.get<model::Object>(ref))->getObjectBounds();
+                    model::Object const& object = *document.get<model::Object>(ref);
+                    
+                    m_mousedown_bounds[ref] = juce::Rectangle<int>(object.getX(),
+                                                                   object.getY(),
+                                                                   object.getWidth(),
+                                                                   object.getHeight());
                 }
                 
                 DocumentManager::startCommitGesture(m_patcher_view.m_patcher_model);
@@ -255,12 +259,12 @@ namespace kiwi
         juce::Rectangle<int> target_bounds = new_bounds;
         
         bounds_constrainer.checkBounds(target_bounds,
-                                        previous_bounds,
-                                        limits,
-                                        m_direction & Direction::Up,
-                                        m_direction & Direction::Left,
-                                        m_direction & Direction::Down,
-                                        m_direction & Direction::Right);
+                                       previous_bounds,
+                                       limits,
+                                       m_direction & Direction::Up,
+                                       m_direction & Direction::Left,
+                                       m_direction & Direction::Down,
+                                       m_direction & Direction::Right);
         
         object_model.setPosition(target_bounds.getX(), target_bounds.getY());
         
