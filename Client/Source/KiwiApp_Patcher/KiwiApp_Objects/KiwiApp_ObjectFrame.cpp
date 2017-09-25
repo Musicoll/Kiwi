@@ -355,13 +355,7 @@ namespace kiwi
         }
     }
 
-    void ObjectFrame::localSelectionChanged()
-    {
-        updateOutline();
-        repaint();
-    }
-    
-    void ObjectFrame::distantSelectionChanged()
+    void ObjectFrame::selectionChanged()
     {
         updateOutline();
         repaint();

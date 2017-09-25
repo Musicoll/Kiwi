@@ -1216,6 +1216,8 @@ namespace kiwi
             }
         }
         
+        std::set<ObjectFrame*> updated_objects;
+        
         // check diff between old and new distant selection
         // and notify objects if their selection state changed
         for(auto& local_object_uptr : m_objects)
@@ -1229,7 +1231,7 @@ namespace kiwi
             
             if(old_local_selected_state != new_local_selected_state)
             {
-                local_object_uptr->localSelectionChanged();
+                updated_objects.insert(local_object_uptr.get());
                 selectionChanged();
             }
             
@@ -1247,7 +1249,7 @@ namespace kiwi
                     // notify object
                     if(distant_selection_changed_for_object)
                     {
-                        local_object_uptr->distantSelectionChanged();
+                        updated_objects.insert(local_object_uptr.get());
                         selectionChanged();
                     }
                 }
@@ -1257,6 +1259,13 @@ namespace kiwi
         // cache new selection state
         std::swap(m_distant_objects_selection, new_distant_objects_selection);
         std::swap(m_local_objects_selection, new_local_objects_selection);
+        
+        // call objects reaction.
+        
+        for(auto object_frame : updated_objects)
+        {
+            object_frame->selectionChanged();
+        }
     }
     
     void PatcherView::checkLinksSelectionChanges(model::Patcher& patcher)

@@ -139,10 +139,8 @@ namespace kiwi
         void editObject();
         
         //! @brief Called by the patcher every time the selection status of this object has changed.
-        void localSelectionChanged();
-        
-        //! @brief Called by the patcher every time the distant selection status of this object has changed.
-        void distantSelectionChanged();
+        //! @details Function called when local selection or distant selection has changed.
+        void selectionChanged();
         
         //! @brief Called every time a patcher is locked or unlocked.
         void lockStatusChanged();
