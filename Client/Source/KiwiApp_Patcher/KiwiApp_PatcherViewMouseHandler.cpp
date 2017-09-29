@@ -233,7 +233,7 @@ namespace kiwi
         if (!object_model.hasFlag(model::Object::Flag::ResizeHeight))
         {
             bounds_constrainer.setMinimumHeight(object_model.getHeight());
-            bounds_constrainer.setMinimumHeight(object_model.getHeight());
+            bounds_constrainer.setMaximumHeight(object_model.getHeight());
         }
         else if (object_model.getMinHeight() != 0)
         {
