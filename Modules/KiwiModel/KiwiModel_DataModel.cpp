@@ -81,6 +81,7 @@ namespace kiwi
             Bang::declare();
             Toggle::declare();
             Slider::declare();
+            MeterTilde::declare();
         }
     }
 }
