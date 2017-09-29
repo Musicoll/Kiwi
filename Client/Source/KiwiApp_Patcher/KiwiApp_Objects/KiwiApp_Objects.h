@@ -33,3 +33,4 @@
 
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Controller/KiwiApp_BangView.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Controller/KiwiApp_ToggleView.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Controller/KiwiApp_SliderView.h>

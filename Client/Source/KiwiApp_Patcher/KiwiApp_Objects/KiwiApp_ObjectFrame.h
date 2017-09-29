@@ -180,6 +180,9 @@ namespace kiwi
         
         //! @brief Called when object's frame is clicked.
         void mouseUp(juce::MouseEvent const& e) override final;
+            
+        //! @brief Called when object's frame is clicked.
+        void mouseDrag(juce::MouseEvent const& e) override final;
         
     private: // methods
         

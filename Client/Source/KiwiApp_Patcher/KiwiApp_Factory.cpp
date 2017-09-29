@@ -50,5 +50,6 @@ namespace kiwi
     {
         add<BangView>("bang");
         add<ToggleView>("toggle");
+        add<SliderView>("slider");
     }
 }
