@@ -195,6 +195,7 @@ namespace kiwi
                     {
                         // parse object as a document
                         callback(std::move(res), j);
+                        return;
                     }
                 }
             }
