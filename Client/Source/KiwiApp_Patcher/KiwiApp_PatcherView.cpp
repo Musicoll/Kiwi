@@ -1972,12 +1972,6 @@ namespace kiwi
         
         object_model->setPosition(box_bounds.getX() - origin.x, box_bounds.getY() - origin.y);
         
-        if (!object_model->hasFlag(model::Object::Flag::DefinedSize))
-        {
-            object_model->setWidth(juce::Font().getStringWidth(new_text) + 12);
-            object_model->setHeight(box_bounds.getHeight());
-        }
-        
         // handle error box case
         if(object_model->getName() == "errorbox")
         {
@@ -1987,6 +1981,16 @@ namespace kiwi
             KiwiApp::error(error_box.getError());
         }
         
+        if (!object_model->hasFlag(model::Object::Flag::DefinedSize))
+        {
+            const int text_width = juce::Font().getStringWidth(new_text) + 12;
+            const int max_io = std::max(object_model->getNumberOfInlets(),
+                                        object_model->getNumberOfOutlets()) * 14;
+            
+            object_model->setWidth(std::max(text_width, max_io));
+            object_model->setHeight(box_bounds.getHeight());
+        }
+
         model::Object & new_object = m_patcher_model.replaceObject(old_model, std::move(object_model));
         
         m_view_model.unselectObject(old_model);
