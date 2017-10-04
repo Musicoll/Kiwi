@@ -96,7 +96,7 @@ matrix:
 
     script:
     - python ./Scripts/configure.py -c Release
-    - python ./Scripts/build.py -c Release | xcpretty
+    - python ./Scripts/build.py -c Release
 
     before_deploy:
     - mkdir Kiwi
