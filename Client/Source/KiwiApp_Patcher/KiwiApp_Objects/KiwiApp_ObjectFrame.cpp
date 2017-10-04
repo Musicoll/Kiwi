@@ -280,7 +280,7 @@ namespace kiwi
     {
         setColour(ObjectFrame::ColourIds::Selection, juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.8));
         setColour(ObjectFrame::ColourIds::SelectionOtherView, juce::Colour(0xAA9BFF71));
-        setColour(ObjectFrame::ColourIds::SelectionDistant, juce::Colour(0xAA9BFF71));
+        setColour(ObjectFrame::ColourIds::SelectionDistant, juce::Colour(0xAAFF9B71));
         setColour(ObjectFrame::ColourIds::Pin, juce::Colour(0.3, 0.3, 0.3));
     }
     
