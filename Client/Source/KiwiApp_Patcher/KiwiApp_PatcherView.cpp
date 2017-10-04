@@ -1804,12 +1804,7 @@ namespace kiwi
             
             ObjectFrame& object_frame = **(m_objects.emplace(it, new ObjectFrame(*this, std::move(object_view))));
             
-            //jobj.setAlpha(0.);
-            //addChildComponent(jobj);
             addAndMakeVisible(object_frame, zorder);
-            
-            //juce::ComponentAnimator& animator = juce::Desktop::getInstance().getAnimator();
-            //animator.animateComponent(&jobj, jobj.getBounds(), 1., 200., true, 0.8, 1.);
         }
     }
     
