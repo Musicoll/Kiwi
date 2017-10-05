@@ -35,7 +35,7 @@ namespace kiwi
         {
             if (args.size() > 0)
             {
-                throw ("wrong argument for object delay~");
+                throw std::runtime_error("wrong argument for object delay~");
             }
             
             pushInlet({PinType::IType::Control, PinType::IType::Signal});

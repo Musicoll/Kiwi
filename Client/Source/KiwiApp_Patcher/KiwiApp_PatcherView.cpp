@@ -1411,16 +1411,17 @@ namespace kiwi
             if(link.added()) { addLinkView(link); }
         }
         
-        bool objects_bounds_changed = false;
+        bool patcher_area_uptodate = false;
         
         // send ObjectView change notification
         for(auto& object : patcher.getObjects())
         {
             if(object.changed())
             {
-                if(object.boundsChanged())
+                if(object.boundsChanged() && !patcher_area_uptodate && !view.removed() && !m_is_in_move_or_resize_gesture)
                 {
-                    objects_bounds_changed = true;
+                    m_viewport.updatePatcherArea(true);
+                    patcher_area_uptodate = true;
                 }
                 
                 objectChanged(view, object);
@@ -1445,11 +1446,6 @@ namespace kiwi
                     }
                 }
             }
-        }
-        
-        if(objects_bounds_changed && !view.removed() && !m_is_in_move_or_resize_gesture)
-        {
-            m_viewport.updatePatcherArea(true);
         }
         
         if(!view.removed() && patcher.nameChanged())
@@ -1804,12 +1800,7 @@ namespace kiwi
             
             ObjectFrame& object_frame = **(m_objects.emplace(it, new ObjectFrame(*this, std::move(object_view))));
             
-            //jobj.setAlpha(0.);
-            //addChildComponent(jobj);
             addAndMakeVisible(object_frame, zorder);
-            
-            //juce::ComponentAnimator& animator = juce::Desktop::getInstance().getAnimator();
-            //animator.animateComponent(&jobj, jobj.getBounds(), 1., 200., true, 0.8, 1.);
         }
     }
     

@@ -405,7 +405,7 @@ TEST_CASE("Scheduler - Defering tasks", "[Scheduler]")
             }
         });
         
-        std::atomic<std::thread::id> exec_thread;
+        std::atomic<std::thread::id> exec_thread(std::this_thread::get_id());
         std::atomic_bool executed_flag(false);
         auto task = std::make_shared<DeferTask>(exec_thread, executed_flag);
         
