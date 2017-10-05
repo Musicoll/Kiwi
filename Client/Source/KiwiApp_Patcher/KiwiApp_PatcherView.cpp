@@ -1144,6 +1144,7 @@ namespace kiwi
         if(locked)
         {
             m_view_model.unselectAll();
+            m_io_highlighter.hide();
             grabKeyboardFocus();
         }
         
