@@ -1411,16 +1411,17 @@ namespace kiwi
             if(link.added()) { addLinkView(link); }
         }
         
-        bool objects_bounds_changed = false;
+        bool patcher_area_uptodate = false;
         
         // send ObjectView change notification
         for(auto& object : patcher.getObjects())
         {
             if(object.changed())
             {
-                if(object.boundsChanged())
+                if(object.boundsChanged() && !patcher_area_uptodate && !view.removed() && !m_is_in_move_or_resize_gesture)
                 {
-                    objects_bounds_changed = true;
+                    m_viewport.updatePatcherArea(true);
+                    patcher_area_uptodate = true;
                 }
                 
                 objectChanged(view, object);
@@ -1445,11 +1446,6 @@ namespace kiwi
                     }
                 }
             }
-        }
-        
-        if(objects_bounds_changed && !view.removed() && !m_is_in_move_or_resize_gesture)
-        {
-            m_viewport.updatePatcherArea(true);
         }
         
         if(!view.removed() && patcher.nameChanged())
