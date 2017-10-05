@@ -39,6 +39,7 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Dsp/KiwiModel_DelaySimpleTilde.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Dsp/KiwiModel_AdcTilde.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Dsp/KiwiModel_DacTilde.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Dsp/KiwiModel_MeterTilde.h>
 
 // ================================================================================ //
 //                                  MATH OBJECTS                                    //
