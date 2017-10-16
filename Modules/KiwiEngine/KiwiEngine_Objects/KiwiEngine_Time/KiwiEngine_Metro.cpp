@@ -53,6 +53,7 @@ namespace kiwi
                     if((args[0].isString() && args[0].getString() == "start")
                        || (args[0].isNumber() && static_cast<bool>(args[0].getInt())))
                     {
+                        timerCallBack();
                         startTimer(m_period);
                     }
                     else if((args[0].isString() && args[0].getString() == "stop")
