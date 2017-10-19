@@ -38,8 +38,7 @@ namespace kiwi
     //! @details This component shows a dropdown menu list below it.
     class SuggestEditor
     : public juce::TextEditor,
-    public juce::TextEditor::Listener,
-    public juce::Timer
+    public juce::TextEditor::Listener
     {
     public: // methods
         
@@ -67,13 +66,12 @@ namespace kiwi
         //! @brief Called when a key status changed.
         bool keyStateChanged(bool isKeyDown) override;
         
-        //! @internal Called every 200ms by a juce::Timer.
-        //! @details This method will close the menu if its relative position changed
-        //! or if editor lost the keyboard focus.
-        void timerCallback() override;
-        
         //! @brief juce::TextEditor::Listener
         void textEditorTextChanged(juce::TextEditor& ed) override;
+        
+        //! @brief juce::TextEditor::Listener.
+        //! @details Needs to hide menu when focus is lost on editor.
+        void textEditorFocusLost(juce::TextEditor & editor) override;
         
         //! @brief Called when a menu item has been clicked.
         void menuItemSelected(juce::String const& text);
@@ -115,7 +113,7 @@ namespace kiwi
         using action_method_t = std::function<void(juce::String)>;
         
         //! @brief Constructor.
-        Menu(SuggestList& list);
+        Menu(SuggestList& list, SuggestEditor & creator);
         
         //! @brief Destructor.
         ~Menu();
@@ -161,6 +159,15 @@ namespace kiwi
         
     private: // methods
         
+        //! @brief Returns true if suggest editor creator is target component.
+        //! @details Called only for keypressed events not for mouse events.
+        bool canModalEventBeSentToComponent(juce::Component const* target_component) override final;
+        
+        //! @brief Exists modal state if click happens.
+        //! @details If the creator is clicked it sets the caret visible enabling edition
+        //! otherwise it exits modal state. Called only on mouse clicks events.
+        void inputAttemptWhenModal() override final;
+        
         // ================================================================================ //
         //                               SUGGEST LISTBOX MODEL                              //
         // ================================================================================ //
@@ -185,6 +192,7 @@ namespace kiwi
         
         SuggestList&                        m_suggest_list;
         juce::ListBox                       m_suggest_list_box;
+        SuggestEditor &                     m_creator;
         juce::ComponentBoundsConstrainer    m_constrainer;
         juce::ResizableCornerComponent      m_resizable_corner;
         

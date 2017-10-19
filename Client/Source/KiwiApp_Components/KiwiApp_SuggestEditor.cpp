@@ -28,9 +28,10 @@ namespace kiwi
     //                                SUGGEST EDITOR MENU                               //
     // ================================================================================ //
 
-    SuggestEditor::Menu::Menu(SuggestList& list) :
+    SuggestEditor::Menu::Menu(SuggestList& list, SuggestEditor & creator) :
     m_suggest_list(list),
     m_suggest_list_box(),
+    m_creator(creator),
     m_constrainer(),
     m_resizable_corner(this, &m_constrainer),
     m_validated_action(),
@@ -149,6 +150,24 @@ namespace kiwi
         return m_suggest_list_box.getSelectedRow();
     }
     
+    bool SuggestEditor::Menu::canModalEventBeSentToComponent(juce::Component const* target_component)
+    {
+        return target_component == &m_creator;
+    }
+    
+    void SuggestEditor::Menu::inputAttemptWhenModal()
+    {
+        if (juce::Desktop::getInstance().getMainMouseSource().getComponentUnderMouse() != &m_creator)
+        {
+            exitModalState(0);
+            m_creator.closeMenu();
+        }
+        else
+        {
+            m_creator.setCaretVisible(true);
+        }
+    }
+    
     // ================================================================================ //
     //                               SUGGEST LISTBOX MODEL                              //
     // ================================================================================ //
@@ -237,7 +256,7 @@ namespace kiwi
     
     void SuggestEditor::showMenu()
     {        
-        m_menu.reset(new Menu(m_suggest_list));
+        m_menu.reset(new Menu(m_suggest_list, *this));
         
         using namespace std::placeholders; // for _1, _2 etc.
         m_menu->setSelectedItemAction(std::bind(&SuggestEditor::menuItemSelected, this, _1));
@@ -248,11 +267,11 @@ namespace kiwi
                               | juce::ComponentPeer::windowHasDropShadow
                               | juce::ComponentPeer::windowIgnoresKeyPresses);
         
+        m_menu->enterModalState(false);
+        
         const auto sb = getScreenBounds();
         m_menu->setTopLeftPosition(sb.getX() - 2, sb.getBottom() + 2);
         m_menu->setVisible(true);
-        
-        startTimer(200);
     }
     
     bool SuggestEditor::isMenuOpened() const noexcept
@@ -265,7 +284,6 @@ namespace kiwi
         if(isMenuOpened())
         {
             m_menu.reset();
-            stopTimer();
         }
     }
     
@@ -277,6 +295,15 @@ namespace kiwi
     void SuggestEditor::enableUpdate()
     {
         m_update_enabled = true;
+    }
+    
+    void SuggestEditor::textEditorFocusLost(juce::TextEditor & editor)
+    {
+        if(isMenuOpened())
+        {
+            m_menu->exitModalState(0);
+            closeMenu();
+        }
     }
     
     void SuggestEditor::textEditorTextChanged(juce::TextEditor&)
@@ -371,29 +398,6 @@ namespace kiwi
         
         moveCaretToEnd();
         setCaretVisible(true);
-    }
-    
-    void SuggestEditor::timerCallback()
-    {
-        if(!juce::Process::isForegroundProcess())
-            closeMenu();
-        
-        if(isMenuOpened())
-        {
-            const auto sb = getScreenBounds();
-            
-            // check focus lost or menu position change
-            if((!hasKeyboardFocus(true) && !m_menu->hasKeyboardFocus(true))
-               || m_menu->getPosition() != juce::Point<int>(sb.getX() - 2, sb.getBottom() + 2))
-            {
-                closeMenu();
-            }
-        }
-        else
-        {
-            if (!hasKeyboardFocus(true))
-                closeMenu();
-        }
     }
     
     bool SuggestEditor::keyStateChanged(bool isKeyDown)
