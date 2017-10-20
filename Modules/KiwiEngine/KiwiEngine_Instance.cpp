@@ -101,6 +101,8 @@ namespace kiwi
             engine::Factory::add<DelaySimpleTilde>("delaysimple~");
             engine::Factory::add<Bang>("bang");
             engine::Factory::add<Toggle>("toggle");
+            engine::Factory::add<Slider>("slider");
+            engine::Factory::add<MeterTilde>("meter~");
         }
         
         // ================================================================================ //

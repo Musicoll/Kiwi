@@ -39,7 +39,7 @@ namespace kiwi
         setColour(ObjectView::ColourIds::Text, juce::Colours::black);
         setColour(ObjectView::ColourIds::Outline, juce::Colours::black);
         setColour(ObjectView::ColourIds::Highlight, juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.));
-        setColour(ObjectView::ColourIds::Active, juce::Colour::fromFloatRGBA(0.2, 0.8, 0.2, 1.));
+        setColour(ObjectView::ColourIds::Active, juce::Colour(0xff21ba90));
     }
     
     ObjectView::~ObjectView()

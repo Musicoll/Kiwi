@@ -39,6 +39,7 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Dsp/KiwiEngine_DelaySimpleTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Dsp/KiwiEngine_AdcTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Dsp/KiwiEngine_DacTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Dsp/KiwiEngine_MeterTilde.h>
 
 // ================================================================================ //
 //                                  MATH OBJECTS                                    //
@@ -69,3 +70,4 @@
 
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Controller/KiwiEngine_Bang.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Controller/KiwiEngine_Toggle.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Controller/KiwiEngine_Slider.h>

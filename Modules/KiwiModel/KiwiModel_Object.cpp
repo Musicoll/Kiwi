@@ -126,6 +126,46 @@ namespace kiwi
         };
         
         // ================================================================================ //
+        //                                  FLAG                                            //
+        // ================================================================================ //
+        
+        Flag::Flag(Flag::IFlag flag):
+        flip::Object(),
+        m_flag(flag)
+        {
+        }
+        
+        Flag::Flag(flip::Default& d):
+        flip::Object()
+        {
+        }
+        
+        void Flag::declare()
+        {
+            if(DataModel::has<model::Flag>()) return;
+            
+            DataModel::declare<Flag::IFlag>()
+            .name("cicm.kiwi.iflag")
+            .enumerator<Flag::IFlag::DefinedSize>("DefinedSize")
+            .enumerator<Flag::IFlag::ResizeWidth>("ResizeWidth")
+            .enumerator<Flag::IFlag::ResizeHeight>("ResizeHeight");
+            
+            DataModel::declare<model::Flag>()
+            .name("cicm.kiwi.flag")
+            .member<flip::Enum<IFlag>, &Flag::m_flag>("flag");
+        }
+        
+        bool Flag::operator==(Flag const& other) const
+        {
+            return m_flag.value() == other.m_flag.value();
+        }
+        
+        bool Flag::operator!=(Flag const& other) const
+        {
+            return !this->operator==(other);
+        }
+        
+        // ================================================================================ //
         //                                  OBJECT::declare                                 //
         // ================================================================================ //
         
@@ -135,6 +175,7 @@ namespace kiwi
             
             Outlet::declare();
             Inlet::declare();
+            Flag::declare();
             
             DataModel::declare<model::Object>()
             .name("cicm.kiwi.Object")
@@ -142,10 +183,14 @@ namespace kiwi
             .member<flip::String, &Object::m_text>("text")
             .member<flip::Array<Inlet>, &Object::m_inlets>("inlets")
             .member<flip::Array<Outlet>, &Object::m_outlets>("outlets")
+            .member<flip::Collection<Flag>, &Object::m_flags>("flags")
             .member<flip::Float, &Object::m_position_x>("pos_x")
             .member<flip::Float, &Object::m_position_y>("pos_y")
             .member<flip::Float, &Object::m_width>("width")
-            .member<flip::Float, &Object::m_height>("height");
+            .member<flip::Float, &Object::m_height>("height")
+            .member<flip::Float, &Object::m_min_width>("min_width")
+            .member<flip::Float, &Object::m_min_height>("min_height")
+            .member<flip::Float, &Object::m_ratio>("ratio");
         }
         
         // ================================================================================ //
@@ -165,7 +210,10 @@ namespace kiwi
         m_position_x(0.),
         m_position_y(0.),
         m_width(60.),
-        m_height(20.)
+        m_height(20.),
+        m_min_width(0.),
+        m_min_height(0.),
+        m_ratio(0.)
         {
             ;
         }
@@ -255,14 +303,79 @@ namespace kiwi
             return !removed() ? m_position_y.value() : m_position_y.before();
         }
         
+        void Object::setRatio(double ratio)
+        {
+            if (ratio > 0.)
+            {
+                m_ratio = ratio;
+                m_height = m_width * m_ratio;
+                m_min_height = m_min_width * m_ratio;
+            }
+        }
+        
+        double Object::getRatio() const
+        {
+            return m_ratio;
+        }
+        
+        void Object::setMinWidth(double min_width)
+        {
+            if (min_width >= 0.)
+            {
+                m_min_width = min_width;
+                
+                if (m_ratio > 0.)
+                {
+                    m_min_height = m_min_width * m_ratio;
+                }
+                
+                setWidth(getWidth());
+            }
+        }
+        
+        void Object::setMinHeight(double min_height)
+        {
+            if (min_height >= 0.)
+            {
+                m_min_height = min_height;
+                
+                if (m_ratio > 0.)
+                {
+                    m_min_width = m_min_height / m_ratio;
+                }
+                
+                setHeight(getHeight());
+            }
+        }
+        
         void Object::setWidth(double new_width)
         {
-            m_width = std::max(0., new_width);
+            m_width = std::max(m_min_width.value(), new_width);
+            
+            if (m_ratio > 0.)
+            {
+                m_height = m_ratio * m_width;
+            }
         }
         
         void Object::setHeight(double new_height)
         {
-            m_height = std::max(0., new_height);
+            m_height = std::max(m_min_height.value(), new_height);
+            
+            if (m_ratio > 0.)
+            {
+                m_width = m_height / m_ratio;
+            }
+        }
+        
+        double Object::getMinWidth() const noexcept
+        {
+            return m_min_width.value();
+        }
+        
+        double Object::getMinHeight() const noexcept
+        {
+            return m_min_height.value();
         }
         
         double Object::getWidth() const noexcept
@@ -302,12 +415,15 @@ namespace kiwi
         
         bool Object::hasFlag(Flag flag) const
         {
-            return (static_cast<unsigned int>(flag) & static_cast<unsigned int>(m_flags.value())) != 0;
+            return m_flags.count_if([&flag](Flag const& internal_flag) { return internal_flag == flag;}) != 0;
         }
         
         void Object::setFlag(Flag flag)
         {
-            m_flags = static_cast<Flag>(static_cast<unsigned int>(flag) | static_cast<unsigned int>(m_flags.value()));
+            if (!hasFlag(flag))
+            {
+                m_flags.insert(flag);
+            }
         }
     }
 }

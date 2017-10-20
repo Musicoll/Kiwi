@@ -80,6 +80,8 @@ namespace kiwi
             DelaySimpleTilde::declare();
             Bang::declare();
             Toggle::declare();
+            Slider::declare();
+            MeterTilde::declare();
         }
     }
 }

@@ -39,7 +39,7 @@ namespace kiwi
         
         NewBox::NewBox(std::string const& name, std::vector<Atom> const& args)
         {
-            setFlag(Flag::DefinedSize);
+            setFlag(Flag::IFlag::DefinedSize);
             setWidth(80);
             setHeight(20);
             pushInlet({PinType::IType::Control});

@@ -39,10 +39,13 @@ namespace kiwi
                 throw std::runtime_error("wrong arguments for object bang");
             }
             
-            setFlag(Flag::DefinedSize);
+            setFlag(Flag::IFlag::DefinedSize);
+            setFlag(Flag::IFlag::ResizeWidth);
+            setFlag(Flag::IFlag::ResizeHeight);
             addSignal<Toggle::Request, bool>(Signal::Switch, *this);
+            setRatio(1.);
+            setMinWidth(20.);
             setWidth(20);
-            setHeight(20);
             pushInlet({PinType::IType::Control});
             pushOutlet(PinType::IType::Control);
         }
