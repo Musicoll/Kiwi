@@ -31,7 +31,7 @@
 
 #include "../KiwiApp.h"
 #include "../KiwiApp_General/KiwiApp_CommandIDs.h"
-#include "../KiwiApp_Network/KiwiApp_DocumentManager.h"
+#include <KiwiModel/KiwiModel_DocumentManager.h>
 #include "KiwiApp_LinkView.h"
 #include "KiwiApp_PatcherComponent.h"
 
@@ -265,11 +265,11 @@ namespace kiwi
         {
             if(commit_gesture)
             {
-                DocumentManager::commitGesture(m_patcher_model, "Move selected objects");
+                model::DocumentManager::commitGesture(m_patcher_model, "Move selected objects");
             }
             else
             {
-                DocumentManager::commit(m_patcher_model, "Move selected objects");
+                model::DocumentManager::commit(m_patcher_model, "Move selected objects");
             }
         }
     }
@@ -286,7 +286,7 @@ namespace kiwi
     
     void PatcherView::copySelectionToClipboard()
     {
-        auto& document = m_patcher_model.entity().use<DocumentManager>();
+        auto& document = m_patcher_model.entity().use<model::DocumentManager>();
         
         auto& clipboard = m_instance.getPatcherClipboardData();
         clipboard.clear();
@@ -424,7 +424,7 @@ namespace kiwi
                 }
             }
             
-            DocumentManager::commit(m_patcher_model, "paste objects");
+            model::DocumentManager::commit(m_patcher_model, "paste objects");
         }
     }
     
@@ -502,7 +502,7 @@ namespace kiwi
                 {
                     flip::Mold mold(model::DataModel::use(), sbi);
                     
-                    auto& document = m_patcher_model.entity().use<DocumentManager>();
+                    auto& document = m_patcher_model.entity().use<model::DocumentManager>();
                     
                     std::string new_object_name;
                     sbi >> new_object_name;
@@ -528,7 +528,7 @@ namespace kiwi
                         }
                     }
                     
-                    DocumentManager::commit(m_patcher_model, "paste-replace objects");
+                    model::DocumentManager::commit(m_patcher_model, "paste-replace objects");
                 }
             }
         }
@@ -660,7 +660,7 @@ namespace kiwi
         {
             if(m_local_objects_selection.size() == 1)
             {
-                auto& doc = m_patcher_model.entity().use<DocumentManager>();
+                auto& doc = m_patcher_model.entity().use<model::DocumentManager>();
                 
                 model::Object* object_m = doc.get<model::Object>(*m_local_objects_selection.begin());
                 if(object_m)
@@ -729,7 +729,7 @@ namespace kiwi
         }
         
         m_view_model.setLock(locked);
-        DocumentManager::commit(m_patcher_model, "Edit mode switch");
+        model::DocumentManager::commit(m_patcher_model, "Edit mode switch");
     }
     
     bool PatcherView::isLocked() const
@@ -923,7 +923,7 @@ namespace kiwi
     void PatcherView::zoomIn()
     {
         m_view_model.setZoomFactor(m_view_model.getZoomFactor() + 0.25);
-        DocumentManager::commit(m_patcher_model);
+        model::DocumentManager::commit(m_patcher_model);
         
         if(isAnyObjectSelected())
         {
@@ -934,7 +934,7 @@ namespace kiwi
     void PatcherView::zoomNormal()
     {
         m_view_model.setZoomFactor(1.);
-        DocumentManager::commit(m_patcher_model);
+        model::DocumentManager::commit(m_patcher_model);
         
         if(isAnyObjectSelected())
         {
@@ -948,7 +948,7 @@ namespace kiwi
         if(zoom > 0.25)
         {
             m_view_model.setZoomFactor(zoom - 0.25);
-            DocumentManager::commit(m_patcher_model);
+            model::DocumentManager::commit(m_patcher_model);
             
             if(isAnyObjectSelected())
             {
@@ -1091,7 +1091,7 @@ namespace kiwi
                 title = m_patcher_model.getName();
                 const bool edited = m_manager.needsSaving();
                 
-                juce::File kiwi_file = DocumentManager::getSelectedFile(m_patcher_model);
+                juce::File kiwi_file = m_manager.getSelectedFile();
                 
                 if(juce::ComponentPeer* peer = window->getPeer())
                 {
@@ -1585,12 +1585,12 @@ namespace kiwi
             m_view_model.selectObject(new_object);
         }
         
-        DocumentManager::commit(m_patcher_model, "Edit Object");
+        model::DocumentManager::commit(m_patcher_model, "Edit Object");
     }
     
     void PatcherView::createObjectModel(std::string const& text, bool give_focus)
     {
-        if(! DocumentManager::isInCommitGesture(m_patcher_model))
+        if(! model::DocumentManager::isInCommitGesture(m_patcher_model))
         {
             bool linked_newbox = m_local_objects_selection.size() == 1;
             
@@ -1598,7 +1598,7 @@ namespace kiwi
             
             juce::Point<int> pos = getMouseXYRelative() - getOriginPosition();
             
-            auto& doc = m_patcher_model.entity().use<DocumentManager>();
+            auto& doc = m_patcher_model.entity().use<model::DocumentManager>();
             
             if(linked_newbox)
             {
@@ -1622,7 +1622,7 @@ namespace kiwi
             
             m_view_model.selectObject(m_patcher_model.addObject(std::move(new_object)));
             
-            DocumentManager::commit(m_patcher_model, "Insert New Empty Box");
+            model::DocumentManager::commit(m_patcher_model, "Insert New Empty Box");
 
             if(give_focus && m_local_objects_selection.size() == 1)
             {
@@ -1645,7 +1645,7 @@ namespace kiwi
     
     void PatcherView::undo()
     {
-        auto& doc = m_patcher_model.entity().use<DocumentManager>();
+        auto& doc = m_patcher_model.entity().use<model::DocumentManager>();
         if(doc.canUndo())
         {
             doc.undo();
@@ -1655,18 +1655,18 @@ namespace kiwi
     
     bool PatcherView::canUndo()
     {
-        return m_patcher_model.entity().use<DocumentManager>().canUndo();
+        return m_patcher_model.entity().use<model::DocumentManager>().canUndo();
     }
     
     std::string PatcherView::getUndoLabel()
     {
-        auto& doc = m_patcher_model.entity().use<DocumentManager>();
+        auto& doc = m_patcher_model.entity().use<model::DocumentManager>();
         return doc.canUndo() ? doc.getUndoLabel() : "";
     }
 
     void PatcherView::redo()
     {
-        auto& doc = m_patcher_model.entity().use<DocumentManager>();
+        auto& doc = m_patcher_model.entity().use<model::DocumentManager>();
         if(doc.canRedo())
         {
             doc.redo();
@@ -1676,12 +1676,12 @@ namespace kiwi
     
     bool PatcherView::canRedo()
     {
-        return m_patcher_model.entity().use<DocumentManager>().canRedo();
+        return m_patcher_model.entity().use<model::DocumentManager>().canRedo();
     }
     
     std::string PatcherView::getRedoLabel()
     {
-        auto& doc = m_patcher_model.entity().use<DocumentManager>();
+        auto& doc = m_patcher_model.entity().use<model::DocumentManager>();
         return doc.canRedo() ? doc.getRedoLabel() : "";
     }
     
@@ -1707,7 +1707,7 @@ namespace kiwi
     void PatcherView::selectObject(ObjectFrame& object)
     {
         m_view_model.selectObject(object.getModel());
-        DocumentManager::commit(m_patcher_model);
+        model::DocumentManager::commit(m_patcher_model);
     }
     
     void PatcherView::selectObjects(std::vector<ObjectFrame*> const& objects)
@@ -1725,14 +1725,14 @@ namespace kiwi
         
         if(should_commit)
         {
-            DocumentManager::commit(m_patcher_model);
+            model::DocumentManager::commit(m_patcher_model);
         }
     }
     
     void PatcherView::selectLink(LinkView& link)
     {
         m_view_model.selectLink(link.getModel());
-        DocumentManager::commit(m_patcher_model);
+        model::DocumentManager::commit(m_patcher_model);
     }
     
     void PatcherView::selectLinks(std::vector<LinkView*> const& links)
@@ -1750,48 +1750,48 @@ namespace kiwi
         
         if(should_commit)
         {
-            DocumentManager::commit(m_patcher_model);
+            model::DocumentManager::commit(m_patcher_model);
         }
     }
     
     void PatcherView::unselectObject(ObjectFrame& object)
     {
         m_view_model.unselectObject(object.getModel());
-        DocumentManager::commit(m_patcher_model);
+        model::DocumentManager::commit(m_patcher_model);
     }
     
     void PatcherView::unselectLink(LinkView& link)
     {
         m_view_model.unselectLink(link.getModel());
-        DocumentManager::commit(m_patcher_model);
+        model::DocumentManager::commit(m_patcher_model);
     }
     
     void PatcherView::selectObjectOnly(ObjectFrame& object)
     {
         unselectAll();
         selectObject(object);
-        DocumentManager::commit(m_patcher_model);
+        model::DocumentManager::commit(m_patcher_model);
     }
 
     void PatcherView::selectLinkOnly(LinkView& link)
     {
         unselectAll();
         selectLink(link);
-        DocumentManager::commit(m_patcher_model);
+        model::DocumentManager::commit(m_patcher_model);
     }
     
     void PatcherView::selectAllObjects()
     {
         m_view_model.selectAll();
-        DocumentManager::commit(m_patcher_model);
+        model::DocumentManager::commit(m_patcher_model);
     }
     
     void PatcherView::unselectAll()
     {
-        if(!DocumentManager::isInCommitGesture(m_patcher_model))
+        if(!model::DocumentManager::isInCommitGesture(m_patcher_model))
         {
             m_view_model.unselectAll();
-            DocumentManager::commit(m_patcher_model);
+            model::DocumentManager::commit(m_patcher_model);
         }
     }
     
@@ -1813,7 +1813,7 @@ namespace kiwi
             }
         }
         
-        DocumentManager::commit(m_patcher_model, "Delete objects and links");
+        model::DocumentManager::commit(m_patcher_model, "Delete objects and links");
         
         m_viewport.updatePatcherArea(false);
     }
@@ -1861,7 +1861,7 @@ namespace kiwi
     
     void PatcherView::getCommandInfo(const juce::CommandID commandID, juce::ApplicationCommandInfo& result)
     {
-        const bool is_not_in_gesture = !DocumentManager::isInCommitGesture(m_patcher_model);
+        const bool is_not_in_gesture = !model::DocumentManager::isInCommitGesture(m_patcher_model);
         
         switch(commandID)
         {
@@ -2037,7 +2037,7 @@ namespace kiwi
     {
         // most of the commands below generate conflicts when they are being executed
         // in a commit gesture or when a box is being edited, so simply not execute them.
-        if(DocumentManager::isInCommitGesture(m_patcher_model) || isEditingObject())
+        if(model::DocumentManager::isInCommitGesture(m_patcher_model) || isEditingObject())
         {
             return true;
         }

@@ -21,17 +21,19 @@
 
 #pragma once
 
-#include "flip/Document.h"
-#include "flip/DocumentObserver.h"
+#include <unordered_set>
+#include <memory>
+
+#include <juce_gui_extra/juce_gui_extra.h>
+
+#include <flip/Document.h>
+#include <flip/DocumentObserver.h>
 
 #include <KiwiModel/KiwiModel_PatcherUser.h>
 #include <KiwiModel/KiwiModel_PatcherValidator.h>
 
-#include <juce_gui_extra/juce_gui_extra.h>
-
-#include "../KiwiApp_Network/KiwiApp_DocumentBrowser.h"
-
-#include <unordered_set>
+#include <KiwiApp_Network/KiwiApp_DocumentBrowser.h>
+#include <KiwiApp_Network/KiwiApp_CarrierSocket.h>
 
 namespace kiwi
 {
@@ -62,8 +64,21 @@ namespace kiwi
         //! @brief Try to connect this patcher to a remote server.
         void connect(DocumentBrowser::Drive::DocumentSession& session);
         
+        //! @brief Pull changes from server if it is remote.
+        void pull();
+        
         //! @brief Load patcher datas from file.
         void loadFromFile(juce::File const& file);
+        
+        //! @brief Save the document.
+        //! @details Returns true if saving document succeeded false otherwise.
+        bool saveDocument();
+        
+        //! @brief Returns true if the patcher needs to be saved.
+        bool needsSaving() const noexcept;
+        
+        //! @brief Returns the file currently used to save document.
+        juce::File const& getSelectedFile() const;
         
         //! @brief Returns the Patcher model
         model::Patcher& getPatcher();
@@ -110,12 +125,6 @@ namespace kiwi
         //! @details if it's the last patcher view, it will ask the user the save the document before closing if needed.
         bool closePatcherViewWindow(PatcherView& patcherview);
         
-        //! @brief Save the document.
-        bool saveDocument();
-        
-        //! @brief Returns true if the patcher needs to be saved.
-        bool needsSaving() const noexcept;
-        
         //! @brief Add a listener.
         void addListener(Listener& listener);
         
@@ -132,6 +141,15 @@ namespace kiwi
         void documentRemoved(DocumentBrowser::Drive::DocumentSession& doc) override;
         
     private:
+        
+        //! @internal Write data into file.
+        void writeDocument();
+        
+        //! @internal Reads data from file.
+        void readDocument();
+        
+        //! @internal If the patcher is remote, tries to disconnect it.
+        void disconnect();
         
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
         void document_changed(model::Patcher& patcher) override final;
@@ -163,9 +181,10 @@ namespace kiwi
         Instance&                                   m_instance;
         model::PatcherValidator                     m_validator;
         flip::Document                              m_document;
+        juce::File                                  m_file;
+        std::unique_ptr<CarrierSocket>              m_socket;
         bool                                        m_need_saving_flag;
-        bool                                        m_is_remote;
-        DocumentBrowser::Drive::DocumentSession*    m_session {nullptr};
+        DocumentBrowser::Drive::DocumentSession*    m_session;
         
         flip::SignalConnection                      m_user_connected_signal_cnx;
         flip::SignalConnection                      m_user_disconnected_signal_cnx;

@@ -21,68 +21,20 @@
 
 #pragma once
 
-#include <juce_core/juce_core.h>
-#include <juce_events/juce_events.h>
+#include <flip/History.h>
+#include <flip/HistoryStoreMemory.h>
 
-#include "flip/History.h"
-#include "flip/HistoryStoreMemory.h"
-
-#include "KiwiApp_CarrierSocket.h"
-
-namespace kiwi
-{
-    // ================================================================================ //
-    //                                    FILE HANDLER                                  //
-    // ================================================================================ //
- 
-    //! @brief Class that enable saving and loading the document from a kiwi file
-    class FileHandler final
-    {
-    public: // methods
-        
-        //! @brief Constructs the FileHandler referencing document and pointing to a non-existing file.
-        FileHandler(flip::DocumentBase & document);
-        
-        //! @brief Destructor.
-        ~FileHandler() = default;
-        
-        //! @brief Loads the document from file and sets the pointed file.
-        void load(juce::File const& file);
-        
-        //! @brief Saves the document from file and sets the pointed file.
-        void save(juce::File const& file);
-        
-        //! @brief Get the pointed file.
-        juce::File const& getFile() const;
-        
-    private: // internal methods
-        
-        void setFile(juce::File const& file);
-        void load();
-        void save();
-        bool hasValidExtension(juce::File const& file);
-        
-    private: // members
-        
-        flip::DocumentBase& m_document;
-        juce::File          m_file;
-        
-    private: // deleted methods
-        
-        FileHandler(FileHandler const& other) = delete;
-        FileHandler(FileHandler && other) = delete;
-        FileHandler& operator=(FileHandler const& other) = delete;
-        FileHandler& operator=(FileHandler && other) = delete;
-    };
+namespace kiwi { namespace model {
     
     // ================================================================================ //
     //                                   DOCUMENT MANAGER                               //
     // ================================================================================ //
     
-    class DocumentManager : public juce::Timer
+    class DocumentManager
     {
     public:
         
+        //! @brief Constructor.
         DocumentManager(flip::DocumentBase & document);
         
         //! @brief Destructor.
@@ -112,21 +64,9 @@ namespace kiwi
         //! @details Each call to this function must be preceded by a call to startCommitGesture.
         //! @see startCommitGesture.
         static void endCommitGesture(flip::Type& type);
-
+        
         //! @brief Returns true if the document is currently commiting a gesture.
         static bool isInCommitGesture(flip::Type& type);
-        
-        //! @brief Saves the patch into the designated file
-        //! @details Doesn't save if not kiwi file. Sets the currently pointed file.
-        static void save(flip::Type& type, juce::File const& file);
-        
-        //! @brief Loads the patch from the designated file
-        //! @details Doesn't load if not kiwi file. Sets the currently pointed file.
-        static void load(flip::Type& type, juce::File const& file);
-        
-        //! @brief Returns the file that is currently pointed to by the DocumentManager.
-        //! @details If neither save or load was called return a non existing file (file.exist() == false).
-        static juce::File const& getSelectedFile(flip::Type& type);
         
         //! @brief Returns true if there is an action to undo.
         bool canUndo();
@@ -163,41 +103,21 @@ namespace kiwi
         //! @brief Pushes a trasactions stacked by a socket's process
         void push();
         
-        //! @brief Connects the document manager and download the patcher's initial state
-        void connect(std::string const host, uint16_t port, uint64_t session_id);
-        
-        //! @brief Returns true if the document manager is connected false otherwise
-        bool isConnected();
-        
-        //! @brief Disconnects the document manager from the server
-        void disconnect();
-        
-        //! @brief Called once document manager is disconnected and stops pulling
-        void onDisconnected();
-        
-        //! @brief Called once the initial load happened
-        void onLoaded();
-        
-        //! @brief Called at a regular frequency to pull document
-        void timerCallback() override;
-        
+        //! @brief Starts a commit gesture.
         void startCommitGesture();
+        
+        //! @brief Commit a gesture.
         void commitGesture(std::string action);
+        
+        //! @brief Ends a commit gesture.
         void endCommitGesture();
-        void save(juce::File const& file);
-        void load(juce::File const& file);
-        juce::File const& getSelectedFile() const;
         
     private:
         
         flip::DocumentBase&                     m_document;
         flip::History<flip::HistoryStoreMemory> m_history;
-        FileHandler                             m_file_handler;
-        
-        std::unique_ptr<CarrierSocket>          m_socket = nullptr;
-        
-        bool                                    m_gesture_flag = false;
-        size_t                                  m_gesture_cnt = 0;
+        bool                                    m_gesture_flag;
+        size_t                                  m_gesture_cnt;
         
     private:
         
@@ -209,4 +129,4 @@ namespace kiwi
         bool operator ==(DocumentManager const& rhs) const = delete;
         bool operator !=(DocumentManager const& rhs) const = delete;
     };
-}
+}}
