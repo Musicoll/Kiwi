@@ -31,7 +31,7 @@ namespace kiwi
         //                                  OBJECT RECEIVE                                  //
         // ================================================================================ //
         
-        Receive::Receive(std::string const& name, std::vector<Atom> const& args)
+        Receive::Receive(std::string const& name, std::vector<tool::Atom> const& args)
         {
             pushOutlet(PinType::IType::Control);
         }

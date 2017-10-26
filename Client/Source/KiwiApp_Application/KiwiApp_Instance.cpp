@@ -124,7 +124,7 @@ namespace kiwi
         return m_instance;
     }
     
-    engine::Scheduler<> & Instance::useScheduler()
+    tool::Scheduler<> & Instance::useScheduler()
     {
         return m_scheduler;
     }

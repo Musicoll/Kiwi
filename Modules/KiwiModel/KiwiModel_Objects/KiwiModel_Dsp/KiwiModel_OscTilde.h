@@ -38,7 +38,7 @@ namespace kiwi
             OscTilde(flip::Default& d): model::Object(d){};
             
             //! @brief Constructor
-            OscTilde(std::string const& name, std::vector<Atom> const& args);
+            OscTilde(std::string const& name, std::vector<tool::Atom> const& args);
             
             std::string getIODescription(bool is_inlet, size_t index) const override;
             

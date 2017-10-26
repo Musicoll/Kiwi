@@ -35,9 +35,9 @@ namespace kiwi
         {
         public: // methods
             
-            SigTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            SigTilde(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args);
             
-            void receive(size_t index, std::vector<Atom> const& args) override final;
+            void receive(size_t index, std::vector<tool::Atom> const& args) override final;
             
             void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
             

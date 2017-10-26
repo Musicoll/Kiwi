@@ -327,14 +327,26 @@ endif()
 set(JSON_INCLUDE_DIRS ${ROOT_DIR}/ThirdParty/json)
 
 #----------------------------------
+# KiwiTool
+#----------------------------------
+
+file(GLOB_RECURSE KIWI_TOOL_SRC ${ROOT_DIR}/Modules/KiwiTool/*.[c|h]pp
+                                ${ROOT_DIR}/Modules/KiwiTool/*.h)
+add_library(KiwiTool STATIC ${KIWI_TOOL_SRC})
+target_include_directories(KiwiTool PUBLIC ${ROOT_DIR}/Modules ${ROOT_DIR}/ThirdParty/concurrentqueue)
+set_target_properties(KiwiTool PROPERTIES FOLDER Modules)
+source_group_rec("${KIWI_TOOL_SRC}" ${ROOT_DIR}/Modules/KiwiTool)
+
+#----------------------------------
 # Model
 #----------------------------------
 
 file(GLOB_RECURSE KIWI_MODEL_SRC ${ROOT_DIR}/Modules/KiwiModel/*.[c|h]pp
                                  ${ROOT_DIR}/Modules/KiwiModel/*.h)
 add_library(KiwiModel STATIC ${KIWI_MODEL_SRC})
+target_add_dependency(KiwiModel KiwiTool)
 target_include_directories(KiwiModel PUBLIC ${ROOT_DIR}/Modules ${FLIP_INCLUDE_DIRS})
-target_link_libraries(KiwiModel ${FLIP_LIBRARIES})
+target_link_libraries(KiwiModel PUBLIC ${FLIP_LIBRARIES})
 target_compile_definitions(KiwiModel PUBLIC ${FLIP_COMPILE_DEFINITIONS})
 set_target_properties(KiwiModel PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_MODEL_SRC}" ${ROOT_DIR}/Modules/KiwiModel)
@@ -380,7 +392,6 @@ source_group_rec("${KIWI_NETWORK_SRC}" ${ROOT_DIR}/Modules/KiwiNetwork)
 file(GLOB_RECURSE KIWI_ENGINE_SRC ${ROOT_DIR}/Modules/KiwiEngine/*.[c|h]pp
                                   ${ROOT_DIR}/Modules/KiwiEngine/*.h)
 add_library(KiwiEngine STATIC ${KIWI_ENGINE_SRC})
-target_include_directories(KiwiEngine PUBLIC ${ROOT_DIR}/ThirdParty/concurrentqueue)
 target_include_directories(KiwiEngine PUBLIC ${ROOT_DIR}/Modules)
 target_add_dependency(KiwiEngine KiwiModel)
 target_add_dependency(KiwiEngine KiwiDsp)
@@ -445,6 +456,18 @@ source_group_rec("${KIWI_CLIENT_SRC}" ${ROOT_DIR}/Client/Source)
 # Tests
 #----------------------------------
 
+# Test Tool
+
+file(GLOB TEST_TOOL_SRC ${ROOT_DIR}/Test/Tool/*.[c|h]pp
+                        ${ROOT_DIR}/Test/Tool/*.h)
+add_executable(test_tool ${TEST_TOOL_SRC})
+target_add_dependency(test_tool KiwiTool)
+set_target_properties(test_tool PROPERTIES FOLDER Test)
+if (LINUX)
+  target_link_libraries(test_tool PUBLIC ${PTHREAD})
+endif()
+source_group_rec("${TEST_TOOL_SRC}" ${ROOT_DIR}/Test/Tool)
+
 # Test Dsp
 
 file(GLOB TEST_DSP_SRC ${ROOT_DIR}/Test/Dsp/*.[c|h]pp
@@ -478,9 +501,6 @@ file(GLOB TEST_ENGINE_SRC ${ROOT_DIR}/Test/Engine/*.[c|h]pp
                           ${ROOT_DIR}/Test/Engine/*.h)
 add_executable(test_engine ${TEST_ENGINE_SRC})
 target_add_dependency(test_engine KiwiEngine)
-if (LINUX)
-  target_link_libraries(test_engine PUBLIC ${PTHREAD})
-endif()
 set_target_properties(test_engine PROPERTIES FOLDER Test)
 source_group_rec("${TEST_ENGINE_SRC}" ${ROOT_DIR}/Test/Engine)
 
@@ -506,17 +526,19 @@ if(${GCOV_SUPPORT} STREQUAL "On" AND DEBUG)
   target_link_libraries(test_engine PUBLIC gcov)
   target_link_libraries(test_server PUBLIC gcov)
   target_link_libraries(test_network PUBLIC gcov)
+  target_link_libraries(test_tool PUBLIC gcov)
 endif()
 
 # Tests Target
 
-add_custom_target(Tests ALL DEPENDS test_dsp test_model test_engine test_network)
+add_custom_target(Tests ALL DEPENDS test_dsp test_model test_engine test_network test_tool)
 set_target_properties(Tests PROPERTIES FOLDER Test)
 
 add_custom_command(TARGET Tests
                    POST_BUILD COMMAND test_dsp
                               COMMAND test_model
                               COMMAND test_engine
+                              COMMAND test_tool
                               COMMAND test_server
                               COMMAND test_network
                    USES_TERMINAL)

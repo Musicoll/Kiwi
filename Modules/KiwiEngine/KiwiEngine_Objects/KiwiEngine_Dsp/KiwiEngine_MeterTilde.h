@@ -24,7 +24,7 @@
 #include <atomic>
 #include <chrono>
 
-#include <KiwiModel/KiwiModel_Atom.h>
+#include <KiwiTool/KiwiTool_Atom.h>
 #include <KiwiModel/KiwiModel_Object.h>
 
 #include <KiwiEngine/KiwiEngine_Object.h>
@@ -35,7 +35,7 @@ namespace kiwi { namespace engine {
     //                                       METER~                                      //
     // ================================================================================  //
     
-    class MeterTilde : public engine::AudioObject, Scheduler<>::Timer
+    class MeterTilde : public engine::AudioObject, tool::Scheduler<>::Timer
     {
     public: // usings
         
@@ -44,11 +44,11 @@ namespace kiwi { namespace engine {
     public: // methods
         
         //! @brief Constructor
-        MeterTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& atom);
+        MeterTilde(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& atom);
         
         //! @brief The engine's receive method.
         //! @details Does nothing as no control inlets exists.
-        void receive(size_t index, std::vector<Atom> const& args) override final;
+        void receive(size_t index, std::vector<tool::Atom> const& args) override final;
         
         //! @brief The dsp perform method called.
         void perform(dsp::Buffer const& intput, dsp::Buffer& output);

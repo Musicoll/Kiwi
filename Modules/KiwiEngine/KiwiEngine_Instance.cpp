@@ -118,7 +118,7 @@ namespace kiwi
         //                                  SCHEDULER                                       //
         // ================================================================================ //
         
-        Scheduler<> & Instance::getScheduler()
+        tool::Scheduler<> & Instance::getScheduler()
         {
             return m_scheduler;
         }

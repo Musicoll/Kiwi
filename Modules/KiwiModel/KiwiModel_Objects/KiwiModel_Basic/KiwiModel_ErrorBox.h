@@ -39,7 +39,7 @@ namespace kiwi
             ErrorBox(flip::Default& d) : model::Object(d) {}
             
             //! @brief Constructor
-            ErrorBox(std::string const& name, std::vector<Atom> const& args);
+            ErrorBox(std::string const& name, std::vector<tool::Atom> const& args);
             
             //! @brief Set the number of inlets.
             //! @param inlets The number of inlets.

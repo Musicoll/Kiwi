@@ -35,17 +35,17 @@ namespace kiwi
         {
         public:
             
-            Loadmess(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            Loadmess(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args);
             
             ~Loadmess() = default;
             
-            void receive(size_t, std::vector<Atom> const& args) override;
+            void receive(size_t, std::vector<tool::Atom> const& args) override;
             
             void loadbang() override;
             
         private:
             
-            const std::vector<Atom> m_args;
+            const std::vector<tool::Atom> m_args;
         };
     }
 }

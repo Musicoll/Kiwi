@@ -52,7 +52,7 @@ namespace kiwi
             
             Toggle(flip::Default& d);
 
-            Toggle(std::string const& name, std::vector<Atom> const& args);
+            Toggle(std::string const& name, std::vector<tool::Atom> const& args);
             
             std::string getIODescription(bool is_inlet, size_t index) const override;
             

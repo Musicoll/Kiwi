@@ -34,11 +34,11 @@ namespace kiwi
         
         std::unique_ptr<Object> Factory::create(Patcher& patcher, model::Object const& model)
         {
-            std::vector<Atom> args;
+            std::vector<tool::Atom> args;
             
             if (!model.getText().empty())
             {
-                std::vector<Atom> parsed_text = AtomHelper::parse(model.getText());
+                std::vector<tool::Atom> parsed_text = tool::AtomHelper::parse(model.getText());
                 args.insert(args.begin(), parsed_text.begin() + 1, parsed_text.end());
             }
             

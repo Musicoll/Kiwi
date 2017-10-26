@@ -28,10 +28,11 @@
 
 #include "../catch.hpp"
 
-#include <KiwiEngine/KiwiEngine_Scheduler.h>
+#include <KiwiTool/KiwiTool_Scheduler.h>
 
 using namespace kiwi;
-using Scheduler = engine::Scheduler<std::chrono::high_resolution_clock>;
+;
+using Scheduler = tool::Scheduler<std::chrono::high_resolution_clock>;
 using Task = Scheduler::Task;
 using CallBack = Scheduler::CallBack;
 
@@ -473,7 +474,7 @@ TickClock::time_point TickClock::current_time = TickClock::clock_t::now();
 
 TEST_CASE("Scheduler - custom clock", "[Scheduler]")
 {
-    using TickScheduler = engine::Scheduler<TickClock>;
+    using TickScheduler = tool::Scheduler<TickClock>;
     
     SECTION("Execution order and custom clock")
     {

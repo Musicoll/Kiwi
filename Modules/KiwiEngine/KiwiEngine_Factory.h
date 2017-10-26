@@ -50,7 +50,7 @@ namespace kiwi
                               "The engine object must not be abstract.");
             
                 static_assert(std::is_constructible<TEngine,
-                              model::Object const&, Patcher&, std::vector<Atom> const&>::value,
+                              model::Object const&, Patcher&, std::vector<tool::Atom> const&>::value,
                               "The engine object must have a valid constructor.");
                 
                 assert(!name.empty());
@@ -61,7 +61,7 @@ namespace kiwi
                 
                 creators[name] = [](model::Object const& model,
                                     Patcher& patcher,
-                                    std::vector<Atom> const& args) -> TEngine*
+                                    std::vector<tool::Atom> const& args) -> TEngine*
                 {
                     return new TEngine(model, patcher, args);
                 };
@@ -83,7 +83,7 @@ namespace kiwi
             
             using ctor_fn_t = std::function<Object*(model::Object const& model,
                                                     Patcher& patcher,
-                                                    std::vector<Atom> const&)>;
+                                                    std::vector<tool::Atom> const&)>;
             
             using creator_map_t = std::map<std::string, ctor_fn_t>;
         

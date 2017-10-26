@@ -25,7 +25,7 @@
 #include <vector>
 
 #include <KiwiModel/KiwiModel_Object.h>
-#include <KiwiModel/KiwiModel_Atom.h>
+#include <KiwiTool/KiwiTool_Atom.h>
 
 #include <KiwiEngine/KiwiEngine_Object.h>
 
@@ -45,13 +45,13 @@ namespace kiwi
             
         public: // methods
             
-            Bang(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            Bang(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args);
             
             ~Bang();
             
             void signalTriggered();
             
-            void receive(size_t index, std::vector<Atom> const& args) override final;
+            void receive(size_t index, std::vector<tool::Atom> const& args) override final;
             
         private: // members
             

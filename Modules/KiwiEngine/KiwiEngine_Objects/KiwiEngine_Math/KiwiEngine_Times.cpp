@@ -29,7 +29,7 @@ namespace kiwi
         //                                    OBJECT TIMES                                  //
         // ================================================================================ //
         
-        Times::Times(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        Times::Times(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args)
         : Object(model, patcher)
         {
             m_lhs = 0.;
@@ -39,7 +39,7 @@ namespace kiwi
             }
         }
         
-        void Times::receive(size_t index, std::vector<Atom> const& args)
+        void Times::receive(size_t index, std::vector<tool::Atom> const& args)
         {
             if(!args.empty())
             {

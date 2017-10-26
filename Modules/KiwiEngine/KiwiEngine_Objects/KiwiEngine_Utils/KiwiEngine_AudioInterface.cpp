@@ -31,18 +31,18 @@ namespace kiwi
         
         AudioInterfaceObject::AudioInterfaceObject(model::Object const& model,
                                                    Patcher& patcher,
-                                                   std::vector<Atom> const& args):
+                                                   std::vector<tool::Atom> const& args):
         AudioObject(model, patcher),
         m_router(),
         m_audio_controler(patcher.getAudioControler())
         {
         }
         
-        std::vector<size_t> AudioInterfaceObject::parseArgs(std::vector<Atom> const& args) const
+        std::vector<size_t> AudioInterfaceObject::parseArgs(std::vector<tool::Atom> const& args) const
         {
             std::vector<size_t> routes;
             
-            for(Atom const& arg : args)
+            for(tool::Atom const& arg : args)
             {
                 if (arg.isNumber())
                 {
@@ -72,7 +72,7 @@ namespace kiwi
             return routes;
         }
         
-        void AudioInterfaceObject::receive(size_t index, std::vector<Atom> const & args)
+        void AudioInterfaceObject::receive(size_t index, std::vector<tool::Atom> const & args)
         {
             if(!args.empty())
             {

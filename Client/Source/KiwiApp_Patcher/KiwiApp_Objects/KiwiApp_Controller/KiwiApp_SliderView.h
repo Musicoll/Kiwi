@@ -23,7 +23,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include <KiwiEngine/KiwiEngine_Scheduler.h>
+#include <KiwiTool/KiwiTool_Scheduler.h>
 
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectView.h>
 
@@ -66,7 +66,7 @@ namespace kiwi
         juce::Slider                                    m_slider;
         flip::Signal<double> &                          m_signal;
         flip::SignalConnection                          m_connection;
-        engine::ConcurrentQueue<std::shared_ptr<Task>>  m_tasks;
+        tool::ConcurrentQueue<std::shared_ptr<Task>>    m_tasks;
         
     private: // delted methods
         

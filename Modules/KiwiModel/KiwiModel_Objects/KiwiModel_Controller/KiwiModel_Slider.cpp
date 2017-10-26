@@ -28,7 +28,7 @@ namespace kiwi { namespace model {
     //                                  OBJECT SLIDER                                   //
     // ================================================================================ //
     
-    Slider::Slider(std::string const& name, std::vector<Atom> const& args):
+    Slider::Slider(std::string const& name, std::vector<tool::Atom> const& args):
     Object()
     {
         if (!args.empty())

@@ -35,7 +35,7 @@ namespace kiwi
         {
         public: // methods
             
-            DacTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            DacTilde(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args);
             
             void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
             

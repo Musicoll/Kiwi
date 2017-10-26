@@ -23,9 +23,9 @@
 
 #include "../catch.hpp"
 
-#include <KiwiModel/KiwiModel_Atom.h>
+#include <KiwiTool/KiwiTool_Atom.h>
 
-using namespace kiwi;
+using namespace kiwi::tool;
 
 //! @brief kiwi::Atom unit test
 //! @todo :

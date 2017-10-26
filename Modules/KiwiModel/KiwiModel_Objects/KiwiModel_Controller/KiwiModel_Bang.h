@@ -47,7 +47,7 @@ namespace kiwi
             
             Bang(flip::Default& d);
 
-            Bang(std::string const& name, std::vector<Atom> const& args);
+            Bang(std::string const& name, std::vector<tool::Atom> const& args);
             
             std::string getIODescription(bool is_inlet, size_t index) const override;
             

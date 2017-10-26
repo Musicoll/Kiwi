@@ -26,9 +26,10 @@
 #include "flip/PortDirect.h"
 #include "flip/CarrierDirect.h"
 
+#include <KiwiTool/KiwiTool_Atom.h>
+
 #include <KiwiModel/KiwiModel_DataModel.h>
 #include <KiwiModel/KiwiModel_PatcherUser.h>
-#include <KiwiModel/KiwiModel_Atom.h>
 #include <KiwiModel/KiwiModel_PatcherValidator.h>
 #include <KiwiModel/KiwiModel_Factory.h>
 
@@ -45,8 +46,8 @@ TEST_CASE("Model Validator", "[Validator]")
         model::PatcherValidator validator;
         flip::DocumentServer server (model::DataModel::use(), validator, 123456789ULL);
         
-        server.root<model::Patcher>().addObject(model::Factory::create(AtomHelper::parse("+")));
-        server.root<model::Patcher>().addObject(model::Factory::create(AtomHelper::parse("+")));
+        server.root<model::Patcher>().addObject(model::Factory::create(tool::AtomHelper::parse("+")));
+        server.root<model::Patcher>().addObject(model::Factory::create(tool::AtomHelper::parse("+")));
         
         server.commit();
         
@@ -108,8 +109,8 @@ TEST_CASE("Model Validator", "[Validator]")
         model::PatcherValidator validator;
         flip::DocumentServer server (model::DataModel::use(), validator, 123456789ULL);
         
-        server.root<model::Patcher>().addObject(model::Factory::create(AtomHelper::parse("+")));
-        server.root<model::Patcher>().addObject(model::Factory::create(AtomHelper::parse("+")));
+        server.root<model::Patcher>().addObject(model::Factory::create(tool::AtomHelper::parse("+")));
+        server.root<model::Patcher>().addObject(model::Factory::create(tool::AtomHelper::parse("+")));
         
         server.commit();
         

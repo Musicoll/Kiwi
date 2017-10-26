@@ -29,17 +29,17 @@ namespace kiwi
         //                                    OBJECT PRINT                                  //
         // ================================================================================ //
         
-        Print::Print(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        Print::Print(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args)
         : Object(model, patcher)
         {
             m_name = !args.empty() ? args[0].getString() : "print";
         }
         
-        void Print::receive(size_t, std::vector<Atom> const& args)
+        void Print::receive(size_t, std::vector<tool::Atom> const& args)
         {
             if(!args.empty())
             {
-                post(m_name + " \xe2\x80\xa2 " + AtomHelper::toString(args));
+                post(m_name + " \xe2\x80\xa2 " + tool::AtomHelper::toString(args));
             }
         }
     }

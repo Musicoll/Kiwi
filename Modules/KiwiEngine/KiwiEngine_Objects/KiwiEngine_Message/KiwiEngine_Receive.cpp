@@ -29,12 +29,12 @@ namespace kiwi
         //                                  OBJECT RECEIVE                                  //
         // ================================================================================ //
         
-        class Receive::Task final : public Scheduler<>::Task
+        class Receive::Task final : public tool::Scheduler<>::Task
         {
         public: // methods
             
-            Task(Receive& object, std::vector<Atom> const& atoms):
-            Scheduler<>::Task(),
+            Task(Receive& object, std::vector<tool::Atom> const& atoms):
+            tool::Scheduler<>::Task(),
             m_object(object),
             m_atoms(atoms)
             {
@@ -59,10 +59,10 @@ namespace kiwi
         private: // members
             
             Receive&            m_object;
-            std::vector<Atom>   m_atoms;
+            std::vector<tool::Atom>   m_atoms;
         };
         
-        Receive::Receive(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        Receive::Receive(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args):
         Object(model, patcher),
         m_name(),
         m_tasks()
@@ -71,7 +71,7 @@ namespace kiwi
             
             if(!m_name.empty())
             {
-                Beacon& beacon = getBeacon(m_name);
+                tool::Beacon& beacon = getBeacon(m_name);
                 beacon.bind(*this);
             }
         }
@@ -85,17 +85,17 @@ namespace kiwi
             
             if(!m_name.empty())
             {
-                Beacon& beacon = getBeacon(m_name);
+                tool::Beacon& beacon = getBeacon(m_name);
                 beacon.unbind(*this);
             }
         }
         
-        void Receive::receive(size_t, std::vector<Atom> const& args)
+        void Receive::receive(size_t, std::vector<tool::Atom> const& args)
         {
             
         }
         
-        void Receive::receive(std::vector<Atom> const& args)
+        void Receive::receive(std::vector<tool::Atom> const& args)
         {
             if (!args.empty())
             {

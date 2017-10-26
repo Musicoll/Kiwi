@@ -31,7 +31,7 @@ namespace kiwi
         //                                  OBJECT TIMES~                                   //
         // ================================================================================ //
         
-        TimesTilde::TimesTilde(std::string const& name, std::vector<Atom> const& args)
+        TimesTilde::TimesTilde(std::string const& name, std::vector<tool::Atom> const& args)
         {
             pushInlet({PinType::IType::Signal});
             

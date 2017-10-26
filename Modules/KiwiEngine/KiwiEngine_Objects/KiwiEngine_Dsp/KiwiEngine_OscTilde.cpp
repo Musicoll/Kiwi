@@ -29,7 +29,7 @@ namespace kiwi
         //                                       OSC~                                       //
         // ================================================================================ //
         
-        OscTilde::OscTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        OscTilde::OscTilde(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args)
         : AudioObject(model, patcher)
         {
             if (!args.empty() && args[0].isNumber())
@@ -53,7 +53,7 @@ namespace kiwi
             m_offset = fmodf(offset, 1.f);
         }
         
-        void OscTilde::receive(size_t index, std::vector<Atom> const& args)
+        void OscTilde::receive(size_t index, std::vector<tool::Atom> const& args)
         {
             if (index == 0 && args[0].isNumber())
             {

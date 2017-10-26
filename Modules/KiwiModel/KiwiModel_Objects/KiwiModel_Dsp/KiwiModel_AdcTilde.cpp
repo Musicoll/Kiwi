@@ -31,7 +31,7 @@ namespace kiwi
         //                                  OBJECT ADC~                                     //
         // ================================================================================ //
         
-        AdcTilde::AdcTilde(std::string const& name, std::vector<Atom> const& args)
+        AdcTilde::AdcTilde(std::string const& name, std::vector<tool::Atom> const& args)
         {
             size_t channels = parseArgsAsChannelRoutes(args).size();
             
@@ -43,11 +43,11 @@ namespace kiwi
             }
         }
         
-        std::vector<size_t> AdcTilde::parseArgsAsChannelRoutes(std::vector<Atom> const& args) const
+        std::vector<size_t> AdcTilde::parseArgsAsChannelRoutes(std::vector<tool::Atom> const& args) const
         {
             std::vector<size_t> routes;
             
-            for(Atom const& arg : args)
+            for(tool::Atom const& arg : args)
             {
                 if (arg.isNumber())
                 {
@@ -111,7 +111,7 @@ namespace kiwi
             {
                 if(index < getNumberOfOutlets())
                 {
-                    auto text_atoms = AtomHelper::parse(getText());
+                    auto text_atoms = tool::AtomHelper::parse(getText());
                     text_atoms.erase(text_atoms.cbegin());
                     const auto routes = parseArgsAsChannelRoutes(text_atoms);
                     

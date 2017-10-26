@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <KiwiEngine/KiwiEngine_CircularBuffer.h>
+#include <KiwiTool/KiwiTool_CircularBuffer.h>
 
 #include <KiwiEngine/KiwiEngine_Object.h>
 
@@ -37,9 +37,9 @@ namespace kiwi
         {
         public: // methods
             
-            DelaySimpleTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            DelaySimpleTilde(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args);
             
-            void receive(size_t index, std::vector<Atom> const& args) override final;
+            void receive(size_t index, std::vector<tool::Atom> const& args) override final;
             
             void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
             
@@ -57,14 +57,14 @@ namespace kiwi
             
         private: // members
             
-            std::unique_ptr<CircularBuffer<dsp::sample_t>>   m_circular_buffer;
-            std::unique_ptr<dsp::Signal>                     m_reinject_signal;
-            float                                            m_max_delay;
-            std::atomic<float>                               m_delay;
-            std::atomic<float>                               m_reinject_level;
-            dsp::sample_t                                    m_sr;
-            size_t                                           m_vector_size;
-            mutable std::mutex                               m_mutex;
+            std::unique_ptr<tool::CircularBuffer<dsp::sample_t>>    m_circular_buffer;
+            std::unique_ptr<dsp::Signal>                            m_reinject_signal;
+            float                                                   m_max_delay;
+            std::atomic<float>                                      m_delay;
+            std::atomic<float>                                      m_reinject_level;
+            dsp::sample_t                                           m_sr;
+            size_t                                                  m_vector_size;
+            mutable std::mutex                                      m_mutex;
         };
     }
 }

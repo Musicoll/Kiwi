@@ -29,13 +29,13 @@ namespace kiwi
         //                                      ERRORBOX                                    //
         // ================================================================================ //
         
-        ErrorBox::ErrorBox(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        ErrorBox::ErrorBox(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args)
         : AudioObject(model, patcher)
         {
             ;
         }
         
-        void ErrorBox::receive(size_t index, std::vector<Atom> const& args)
+        void ErrorBox::receive(size_t index, std::vector<tool::Atom> const& args)
         {
             ;
         }

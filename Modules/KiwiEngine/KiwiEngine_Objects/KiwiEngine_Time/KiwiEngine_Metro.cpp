@@ -29,9 +29,9 @@ namespace kiwi
         //                                  OBJECT METRO                                    //
         // ================================================================================ //
         
-        Metro::Metro(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        Metro::Metro(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args):
         engine::Object(model, patcher),
-        Scheduler<>::Timer(patcher.getScheduler()),
+        tool::Scheduler<>::Timer(patcher.getScheduler()),
         m_period(std::chrono::milliseconds(0))
         {
             if(!args.empty())
@@ -44,7 +44,7 @@ namespace kiwi
         {
         }
         
-        void Metro::receive(size_t index, std::vector<Atom> const& args)
+        void Metro::receive(size_t index, std::vector<tool::Atom> const& args)
         {
             if (!args.empty())
             {

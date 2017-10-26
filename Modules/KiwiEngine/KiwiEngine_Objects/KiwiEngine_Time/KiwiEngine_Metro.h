@@ -31,21 +31,21 @@ namespace kiwi
         //                                  OBJECT METRO                                    //
         // ================================================================================ //
         
-        class Metro final : public engine::Object, Scheduler<>::Timer
+        class Metro final : public engine::Object, tool::Scheduler<>::Timer
         {
         public: // methods
             
-            Metro(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            Metro(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args);
             
             ~Metro();
             
-            void receive(size_t index, std::vector<Atom> const& args) override;
+            void receive(size_t index, std::vector<tool::Atom> const& args) override;
             
             void timerCallBack() override;
             
         private: // members
             
-            Scheduler<>::duration_t m_period;
+            tool::Scheduler<>::duration_t m_period;
         };
     }
 }

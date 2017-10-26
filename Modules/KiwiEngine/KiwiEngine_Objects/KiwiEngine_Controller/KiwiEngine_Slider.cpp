@@ -24,12 +24,12 @@
 
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Controller/KiwiModel_Slider.h>
 
-#include <KiwiEngine/KiwiEngine_Scheduler.h>
+#include <KiwiTool/KiwiTool_Scheduler.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Controller/KiwiEngine_Slider.h>
 
 namespace kiwi { namespace engine {
     
-    class Slider::Task final : public Scheduler<>::Task
+    class Slider::Task final : public tool::Scheduler<>::Task
     {
     public: // methods
         
@@ -59,7 +59,7 @@ namespace kiwi { namespace engine {
     //                                  OBJECT SLIDER                                   //
     // ================================================================================ //
     
-    Slider::Slider(model::Object const& object_model, Patcher& patcher, std::vector<Atom> const& args):
+    Slider::Slider(model::Object const& object_model, Patcher& patcher, std::vector<tool::Atom> const& args):
     Object(object_model, patcher),
     m_signal(object_model.getSignal<double>(model::Slider::Signal::ValueChanged)),
     m_connection(m_signal.connect(std::bind(&Slider::valueChanged, this, std::placeholders::_1))),
@@ -86,7 +86,7 @@ namespace kiwi { namespace engine {
         getScheduler().schedule(task);
     }
     
-    void Slider::receive(size_t index, std::vector<Atom> const& args)
+    void Slider::receive(size_t index, std::vector<tool::Atom> const& args)
     {
         if (index == 0 && !args.empty())
         {

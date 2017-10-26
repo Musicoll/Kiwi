@@ -31,7 +31,7 @@ namespace kiwi
         //                                  OBJECT TOGGLE                                   //
         // ================================================================================ //
         
-        Toggle::Toggle(std::string const& name, std::vector<Atom> const& args):
+        Toggle::Toggle(std::string const& name, std::vector<tool::Atom> const& args):
         Object()
         {
             if (!args.empty())

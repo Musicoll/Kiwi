@@ -31,7 +31,7 @@ namespace kiwi
         //                                  OBJECT DAC~                                     //
         // ================================================================================ //
         
-        DacTilde::DacTilde(std::string const& name, std::vector<Atom> const& args)
+        DacTilde::DacTilde(std::string const& name, std::vector<tool::Atom> const& args)
         {
             size_t channels = parseArgsAsChannelRoutes(args).size();
             
@@ -43,11 +43,11 @@ namespace kiwi
             }
         }
         
-        std::vector<size_t> DacTilde::parseArgsAsChannelRoutes(std::vector<Atom> const& args) const
+        std::vector<size_t> DacTilde::parseArgsAsChannelRoutes(std::vector<tool::Atom> const& args) const
         {
             std::vector<size_t> routes;
             
-            for(Atom const& arg : args)
+            for(tool::Atom const& arg : args)
             {
                 if (arg.isNumber())
                 {
@@ -107,7 +107,7 @@ namespace kiwi
             {
                 if(index < getNumberOfInlets())
                 {
-                    auto text_atoms = AtomHelper::parse(getText());
+                    auto text_atoms = tool::AtomHelper::parse(getText());
                     text_atoms.erase(text_atoms.cbegin());
                     const auto routes = parseArgsAsChannelRoutes(text_atoms);
                     

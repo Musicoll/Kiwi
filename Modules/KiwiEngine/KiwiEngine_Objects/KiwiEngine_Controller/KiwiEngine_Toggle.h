@@ -28,8 +28,8 @@
 
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Controller/KiwiModel_Toggle.h>
 
-#include <KiwiEngine/KiwiEngine_ConcurrentQueue.h>
-#include <KiwiEngine/KiwiEngine_Scheduler.h>
+#include <KiwiTool/KiwiTool_ConcurrentQueue.h>
+#include <KiwiTool/KiwiTool_Scheduler.h>
 
 #include <KiwiEngine/KiwiEngine_Object.h>
 
@@ -49,11 +49,11 @@ namespace kiwi
             
         public: // methods
             
-            Toggle(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            Toggle(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args);
             
             ~Toggle();
             
-            void receive(size_t index, std::vector<Atom> const& args) override final;
+            void receive(size_t index, std::vector<tool::Atom> const& args) override final;
             
         private: // methods
             
@@ -64,7 +64,7 @@ namespace kiwi
             flip::Signal<model::Toggle::Request, bool> &    m_signal;
             flip::SignalConnection                          m_connection;
             bool                                            m_is_on;
-            engine::ConcurrentQueue<std::shared_ptr<Task>>  m_tasks;
+            tool::ConcurrentQueue<std::shared_ptr<Task>>  m_tasks;
         };
     }
 }

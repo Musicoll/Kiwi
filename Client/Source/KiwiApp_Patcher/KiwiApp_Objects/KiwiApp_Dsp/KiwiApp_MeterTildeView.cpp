@@ -24,7 +24,7 @@
 
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Dsp/KiwiModel_MeterTilde.h>
 
-#include <KiwiEngine/KiwiEngine_Scheduler.h>
+#include <KiwiTool/KiwiTool_Scheduler.h>
 
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Dsp/KiwiApp_MeterTildeView.h>
 
@@ -36,7 +36,7 @@ namespace kiwi
     //                                  METER~ VIEW                                     //
     // ================================================================================ //
     
-    class MeterTildeView::Task : public engine::Scheduler<>::Task
+    class MeterTildeView::Task : public tool::Scheduler<>::Task
     {
     public: // methods
         

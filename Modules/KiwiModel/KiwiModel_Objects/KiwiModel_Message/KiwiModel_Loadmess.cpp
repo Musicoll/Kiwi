@@ -31,7 +31,7 @@ namespace kiwi
         //                                  OBJECT LOADMESS                                 //
         // ================================================================================ //
         
-        Loadmess::Loadmess(std::string const& name, std::vector<Atom> const& args)
+        Loadmess::Loadmess(std::string const& name, std::vector<tool::Atom> const& args)
         {
             pushOutlet(PinType::IType::Control);
         }

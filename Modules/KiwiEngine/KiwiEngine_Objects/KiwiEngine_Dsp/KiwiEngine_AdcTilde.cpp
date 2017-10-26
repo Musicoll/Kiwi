@@ -29,7 +29,7 @@ namespace kiwi
         //                                       ADC~                                       //
         // ================================================================================ //
         
-        AdcTilde::AdcTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        AdcTilde::AdcTilde(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args):
         AudioInterfaceObject(model, patcher, args)
         {
             std::vector<size_t> routes = parseArgs(args);

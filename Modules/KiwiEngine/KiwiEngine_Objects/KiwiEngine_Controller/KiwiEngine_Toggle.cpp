@@ -33,12 +33,12 @@ namespace kiwi
         //                                  OBJECT BANG                                     //
         // ================================================================================ //
         
-        class Toggle::Task final : public Scheduler<>::Task
+        class Toggle::Task final : public tool::Scheduler<>::Task
         {
         public: // methods
             
             Task(Toggle & object, model::Toggle::Request request, bool shall_output):
-            Scheduler<>::Task(),
+            tool::Scheduler<>::Task(),
             m_object(object),
             m_request(request),
             m_shall_output(shall_output)
@@ -93,7 +93,7 @@ namespace kiwi
             bool                    m_shall_output;
         };
         
-        Toggle::Toggle(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        Toggle::Toggle(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args):
         Object(model, patcher),
         m_signal(model.getSignal<model::Toggle::Request, bool>(model::Toggle::Signal::Switch)),
         m_connection(m_signal.connect(std::bind(&Toggle::toggleSwitched,
@@ -122,7 +122,7 @@ namespace kiwi
             getScheduler().schedule(task);
         }
         
-        void Toggle::receive(size_t index, std::vector<Atom> const& args)
+        void Toggle::receive(size_t index, std::vector<tool::Atom> const& args)
         {
             if (!args.empty())
             {

@@ -29,7 +29,7 @@ namespace kiwi
         //                                  DELAYSIMPLETILDE                                //
         // ================================================================================ //
         
-        DelaySimpleTilde::DelaySimpleTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        DelaySimpleTilde::DelaySimpleTilde(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args):
         AudioObject(model, patcher),
         m_circular_buffer(),
         m_reinject_signal(),
@@ -42,7 +42,7 @@ namespace kiwi
         {
         }
         
-        void DelaySimpleTilde::receive(size_t index, std::vector<Atom> const& args)
+        void DelaySimpleTilde::receive(size_t index, std::vector<tool::Atom> const& args)
         {
             if (index == 0 && args[0].isString())
             {
@@ -138,7 +138,7 @@ namespace kiwi
                 
                 size_t buffer_size = std::ceil(m_max_delay * m_sr) + 1 + m_vector_size;
                 
-                m_circular_buffer.reset(new CircularBuffer<dsp::sample_t>(buffer_size, buffer_size, 0.));
+                m_circular_buffer.reset(new tool::CircularBuffer<dsp::sample_t>(buffer_size, buffer_size, 0.));
                 m_reinject_signal.reset(new dsp::Signal(m_vector_size));
             }
             

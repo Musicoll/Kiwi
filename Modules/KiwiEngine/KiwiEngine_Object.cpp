@@ -81,7 +81,7 @@ namespace kiwi
             m_patcher.error(text);
         }
         
-        Scheduler<> & Object::getScheduler() const
+        tool::Scheduler<> & Object::getScheduler() const
         {
             return m_patcher.getScheduler();
         }
@@ -90,14 +90,14 @@ namespace kiwi
         //                                      BEACON                                      //
         // ================================================================================ //
         
-        Beacon& Object::getBeacon(std::string const& name) const
+        tool::Beacon& Object::getBeacon(std::string const& name) const
         {
             return m_patcher.getBeacon(name);
         }
         
 #define KIWI_ENGINE_STACKOVERFLOW_MAX 256
         
-        void Object::send(const size_t index, std::vector<Atom> const& args)
+        void Object::send(const size_t index, std::vector<tool::Atom> const& args)
         {
             assert(getScheduler().isThisConsumerThread());
             

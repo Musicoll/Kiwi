@@ -30,7 +30,7 @@ namespace kiwi
         // ================================================================================ //
         
         Delay::Task::Task(Delay& object):
-        Scheduler<>::Task(),
+        tool::Scheduler<>::Task(),
         m_object(object)
         {
         }
@@ -40,7 +40,7 @@ namespace kiwi
             m_object.send(0, {"bang"});
         }
         
-        Delay::Delay(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        Delay::Delay(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args):
         Object(model, patcher),
         m_task(new Task(*this)),
         m_delay(std::chrono::milliseconds(0))
@@ -56,7 +56,7 @@ namespace kiwi
             getScheduler().unschedule(m_task);
         }
         
-        void Delay::receive(size_t index, std::vector<Atom> const& args)
+        void Delay::receive(size_t index, std::vector<tool::Atom> const& args)
         {
             if (!args.empty())
             {

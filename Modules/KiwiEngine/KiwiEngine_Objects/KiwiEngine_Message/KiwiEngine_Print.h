@@ -35,9 +35,9 @@ namespace kiwi
         {
         public:
             
-            Print(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            Print(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args);
             
-            void receive(size_t, std::vector<Atom> const& args) override;
+            void receive(size_t, std::vector<tool::Atom> const& args) override;
             
         private:
             std::string m_name;

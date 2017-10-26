@@ -42,7 +42,7 @@ namespace kiwi { namespace model {
         MeterTilde(flip::Default& d);
         
         //! @brief Constructor
-        MeterTilde(std::string const& name, std::vector<Atom> const& args);
+        MeterTilde(std::string const& name, std::vector<tool::Atom> const& args);
         
         //! @brief Returns the descriptions of an inlet/outlet.
         std::string getIODescription(bool is_inlet, size_t index) const override final;

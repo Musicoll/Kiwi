@@ -38,11 +38,11 @@ namespace kiwi
         {
         public: // methods
             
-            AudioInterfaceObject(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            AudioInterfaceObject(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args);
             
-            void receive(size_t index, std::vector<Atom> const & args) override final;
+            void receive(size_t index, std::vector<tool::Atom> const & args) override final;
             
-            std::vector<size_t> parseArgs(std::vector<Atom> const& args) const;
+            std::vector<size_t> parseArgs(std::vector<tool::Atom> const& args) const;
             
             virtual ~AudioInterfaceObject() = default;
             

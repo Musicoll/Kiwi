@@ -31,7 +31,7 @@ namespace kiwi
         //                                      OBJECT DELAYSIMPLE~                         //
         // ================================================================================ //
         
-        DelaySimpleTilde::DelaySimpleTilde(std::string const& name, std::vector<Atom> const& args)
+        DelaySimpleTilde::DelaySimpleTilde(std::string const& name, std::vector<tool::Atom> const& args)
         {
             if (args.size() > 0)
             {

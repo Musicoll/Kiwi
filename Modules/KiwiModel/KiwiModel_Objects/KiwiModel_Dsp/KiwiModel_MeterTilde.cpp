@@ -35,7 +35,7 @@ namespace kiwi { namespace model {
         addSignal<float>(Signal::PeakChanged, *this);
     }
     
-    MeterTilde::MeterTilde(std::string const& name, std::vector<Atom> const& args):
+    MeterTilde::MeterTilde(std::string const& name, std::vector<tool::Atom> const& args):
     model::Object()
     {
         if (!args.empty())

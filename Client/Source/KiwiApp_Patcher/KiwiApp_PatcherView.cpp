@@ -1548,7 +1548,7 @@ namespace kiwi
     {
         model::Object & old_model = object_frame.getModel();
         
-        std::vector<Atom> atoms = AtomHelper::parse(new_text);
+        std::vector<tool::Atom> atoms = tool::AtomHelper::parse(new_text);
         
         std::unique_ptr<model::Object> object_model = model::Factory::create(atoms);
         
@@ -1594,7 +1594,7 @@ namespace kiwi
         {
             bool linked_newbox = m_local_objects_selection.size() == 1;
             
-            std::unique_ptr<model::Object> new_object = model::Factory::create(AtomHelper::parse(text));
+            std::unique_ptr<model::Object> new_object = model::Factory::create(tool::AtomHelper::parse(text));
             
             juce::Point<int> pos = getMouseXYRelative() - getOriginPosition();
             

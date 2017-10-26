@@ -25,7 +25,7 @@
 
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Controller/KiwiModel_Slider.h>
 
-#include <KiwiEngine/KiwiEngine_Scheduler.h>
+#include <KiwiTool/KiwiTool_Scheduler.h>
 
 #include <KiwiApp.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Controller/KiwiApp_SliderView.h>
@@ -36,12 +36,12 @@ namespace kiwi
     //                                   SLIDER VIEW                                    //
     // ================================================================================ //
     
-    class SliderView::Task final : public engine::Scheduler<>::Task
+    class SliderView::Task final : public tool::Scheduler<>::Task
     {
     public: // methods
         
         Task(SliderView & object, double new_value):
-        engine::Scheduler<>::Task(),
+        tool::Scheduler<>::Task(),
         m_object(object),
         m_new_value(new_value)
         {

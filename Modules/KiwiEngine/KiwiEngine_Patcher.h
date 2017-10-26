@@ -24,8 +24,9 @@
 #include <map>
 #include <set>
 
+#include <KiwiTool/KiwiTool_Beacon.h>
+
 #include "KiwiEngine_Def.h"
-#include "KiwiEngine_Beacon.h"
 #include "KiwiEngine_AudioControler.h"
 
 #include <KiwiDsp/KiwiDsp_Chain.h>
@@ -112,14 +113,14 @@ namespace kiwi
             // ================================================================================ //
             
             //! @brief Returns the engine's scheduler.
-            Scheduler<> & getScheduler() const;
+            tool::Scheduler<> & getScheduler() const;
             
             // ================================================================================ //
             //                                      BEACON                                      //
             // ================================================================================ //
             
             //! @brief Gets or creates a Beacon with a given name.
-            Beacon& getBeacon(std::string const& name) const;
+            tool::Beacon& getBeacon(std::string const& name) const;
             
         private: // methods
             

@@ -35,15 +35,15 @@ namespace kiwi
         {
         public: // methods
             
-            Delay(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            Delay(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args);
             
             ~Delay();
             
-            void receive(size_t index, std::vector<Atom> const& args) override;
+            void receive(size_t index, std::vector<tool::Atom> const& args) override;
             
         private: // members
             
-            struct Task final : public Scheduler<>::Task
+            struct Task final : public tool::Scheduler<>::Task
             {
                 Task(Delay & object);
                 ~Task() = default;
@@ -53,8 +53,8 @@ namespace kiwi
                 Delay& m_object;
             };
             
-            std::shared_ptr<Task>           m_task;
-            Scheduler<>::clock_t::duration  m_delay;
+            std::shared_ptr<Task>                   m_task;
+            tool::Scheduler<>::clock_t::duration    m_delay;
         };
     }
 }

@@ -40,10 +40,10 @@ namespace kiwi
             
             //! @brief Parses args to construct routes
             //! @todo Mutualize with adc tilde object.
-            std::vector<size_t> parseArgsAsChannelRoutes(std::vector<Atom> const& args) const;
+            std::vector<size_t> parseArgsAsChannelRoutes(std::vector<tool::Atom> const& args) const;
             
             //! @brief Constructor
-            AdcTilde(std::string const& name, std::vector<Atom> const& args);
+            AdcTilde(std::string const& name, std::vector<tool::Atom> const& args);
             
             std::string getIODescription(bool is_inlet, size_t index) const override;
             

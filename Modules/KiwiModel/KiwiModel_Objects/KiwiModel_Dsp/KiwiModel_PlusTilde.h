@@ -39,7 +39,7 @@ namespace kiwi
             PlusTilde(flip::Default& d): model::Object(d){};
             
             //! @brief Constructor
-            PlusTilde(std::string const& name, std::vector<Atom> const& args);
+            PlusTilde(std::string const& name, std::vector<tool::Atom> const& args);
             
             std::string getIODescription(bool is_inlet, size_t index) const override;
             

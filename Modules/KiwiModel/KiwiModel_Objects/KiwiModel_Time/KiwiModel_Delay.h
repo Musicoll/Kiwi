@@ -39,7 +39,7 @@ namespace kiwi
             Delay(flip::Default& d) : model::Object(d) {};
             
             //! @brief Constructor
-            Delay(std::string const& name, std::vector<Atom> const& args);
+            Delay(std::string const& name, std::vector<tool::Atom> const& args);
             
             std::string getIODescription(bool is_inlet, size_t index) const override;
             

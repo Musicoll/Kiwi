@@ -31,7 +31,7 @@ namespace kiwi
         //                                  OBJECT DELAY                                    //
         // ================================================================================ //
         
-        Delay::Delay(std::string const& name, std::vector<Atom> const& args)
+        Delay::Delay(std::string const& name, std::vector<tool::Atom> const& args)
         {
             if (args.size() > 1 || (args.size() == 1 && !args[0].isNumber()))
             {

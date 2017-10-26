@@ -23,7 +23,7 @@
 
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Controller/KiwiModel_Bang.h>
 
-#include <KiwiEngine/KiwiEngine_Scheduler.h>
+#include <KiwiTool/KiwiTool_Scheduler.h>
 
 #include <KiwiApp.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Controller/KiwiApp_BangView.h>
@@ -36,7 +36,7 @@ namespace kiwi
     m_connection(m_signal.connect(std::bind(&BangView::signalTriggered, this))),
     m_active(false),
     m_mouse_down(false),
-    m_switch_off(std::make_shared<engine::Scheduler<>::CallBack>(std::bind(&BangView::switchOff, this)))
+    m_switch_off(std::make_shared<tool::Scheduler<>::CallBack>(std::bind(&BangView::switchOff, this)))
     {
     }
     

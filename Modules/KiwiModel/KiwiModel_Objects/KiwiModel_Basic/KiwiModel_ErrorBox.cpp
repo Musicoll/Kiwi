@@ -36,7 +36,7 @@ namespace kiwi
             Factory::add<ErrorBox>("errorbox").setInternal(true);
         }
         
-        ErrorBox::ErrorBox(std::string const& name, std::vector<Atom> const& args)
+        ErrorBox::ErrorBox(std::string const& name, std::vector<tool::Atom> const& args)
         {
         }
         

@@ -31,7 +31,7 @@ namespace kiwi
         //                                  OBJECT BANG                                     //
         // ================================================================================ //
         
-        Bang::Bang(std::string const& name, std::vector<Atom> const& args):
+        Bang::Bang(std::string const& name, std::vector<tool::Atom> const& args):
         Object()
         {
             if (!args.empty())

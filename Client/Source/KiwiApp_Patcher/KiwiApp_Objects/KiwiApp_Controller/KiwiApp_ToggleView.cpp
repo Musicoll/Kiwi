@@ -34,12 +34,12 @@ namespace kiwi
     //                                   TOGGLE VIEW                                    //
     // ================================================================================ //
     
-    class ToggleView::Task final : public engine::Scheduler<>::Task
+    class ToggleView::Task final : public tool::Scheduler<>::Task
     {
     public: // methods
         
         Task(ToggleView & object, model::Toggle::Request request):
-        engine::Scheduler<>::Task(),
+        tool::Scheduler<>::Task(),
         m_object(object),
         m_request(request)
         {

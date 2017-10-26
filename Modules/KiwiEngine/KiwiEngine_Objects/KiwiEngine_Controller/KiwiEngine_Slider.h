@@ -26,7 +26,7 @@
 
 #include <flip/Signal.h>
 
-#include <KiwiModel/KiwiModel_Atom.h>
+#include <KiwiTool/KiwiTool_Atom.h>
 #include <KiwiModel/KiwiModel_Object.h>
 
 #include <KiwiEngine/KiwiEngine_Object.h>
@@ -45,19 +45,19 @@ namespace kiwi { namespace engine {
         
     public: // methods
         
-        Slider(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+        Slider(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args);
         
         ~Slider();
         
         void valueChanged(double new_value);
         
-        void receive(size_t index, std::vector<Atom> const& args) override final;
+        void receive(size_t index, std::vector<tool::Atom> const& args) override final;
         
     private: // members
         
         flip::Signal<double> &                          m_signal;
         flip::SignalConnection                          m_connection;
-        engine::ConcurrentQueue<std::shared_ptr<Task>>  m_tasks;
+        tool::ConcurrentQueue<std::shared_ptr<Task>>    m_tasks;
         double                                          m_value;
     };
     

@@ -31,9 +31,9 @@ namespace kiwi { namespace engine {
     //                                       METER~                                     //
     // ================================================================================ //
     
-    MeterTilde::MeterTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& atom):
+    MeterTilde::MeterTilde(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& atom):
     engine::AudioObject(model, patcher),
-    Scheduler<>::Timer(patcher.getScheduler()),
+    tool::Scheduler<>::Timer(patcher.getScheduler()),
     m_interval(50),
     m_current_peak(0),
     m_sample_index(0),
@@ -44,7 +44,7 @@ namespace kiwi { namespace engine {
     {
     }
     
-    void MeterTilde::receive(size_t index, std::vector<Atom> const& args)
+    void MeterTilde::receive(size_t index, std::vector<tool::Atom> const& args)
     {
     }
     

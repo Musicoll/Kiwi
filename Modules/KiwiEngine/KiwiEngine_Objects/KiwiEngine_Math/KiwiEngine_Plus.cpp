@@ -30,7 +30,7 @@ namespace kiwi
         //                                    OBJECT PLUS                                   //
         // ================================================================================ //
         
-        Plus::Plus(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        Plus::Plus(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args)
         : Object(model, patcher)
         {
             m_lhs = 0.;
@@ -40,7 +40,7 @@ namespace kiwi
             }
         }
         
-        void Plus::receive(size_t index, std::vector<Atom> const& args)
+        void Plus::receive(size_t index, std::vector<tool::Atom> const& args)
         {
             if(!args.empty())
             {

@@ -31,7 +31,7 @@ namespace kiwi
         //                                    OBJECT PRINT                                  //
         // ================================================================================ //
         
-        Print::Print(std::string const& name, std::vector<Atom> const& args)
+        Print::Print(std::string const& name, std::vector<tool::Atom> const& args)
         {
             pushInlet({PinType::IType::Control});
         }

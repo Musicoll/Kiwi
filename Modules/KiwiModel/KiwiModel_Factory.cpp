@@ -31,7 +31,7 @@ namespace kiwi
         //                                      FACTORY                                     //
         // ================================================================================ //
         
-        std::unique_ptr<model::Object> Factory::create(std::vector<Atom> const& atoms)
+        std::unique_ptr<model::Object> Factory::create(std::vector<tool::Atom> const& atoms)
         {
             std::unique_ptr<model::Object> object;
             
@@ -41,27 +41,27 @@ namespace kiwi
             {
                 object_class = getClassByName("errorbox");
                 
-                object = object_class->create(std::vector<Atom>());
+                object = object_class->create(std::vector<tool::Atom>());
                 dynamic_cast<ErrorBox*>(object.get())->setError("object \"" + atoms[0].getString() + "\" not found");
             }
             else
             {
                 try
                 {
-                    std::vector<Atom> args(atoms.empty() ? atoms.begin() : atoms.begin() + 1, atoms.end());
+                    std::vector<tool::Atom> args(atoms.empty() ? atoms.begin() : atoms.begin() + 1, atoms.end());
                     object = object_class->create(args);
                 }
                 catch(std::runtime_error & e)
                 {
                     object_class = getClassByName("errorbox");
                     
-                    object = object_class->create(std::vector<Atom>());
+                    object = object_class->create(std::vector<tool::Atom>());
                     dynamic_cast<ErrorBox*>(object.get())->setError(e.what());
                 }
             }
             
             object->m_name = object_class->getName();
-            object->m_text = AtomHelper::toString(atoms);
+            object->m_text = tool::AtomHelper::toString(atoms);
             
             return object;
         }

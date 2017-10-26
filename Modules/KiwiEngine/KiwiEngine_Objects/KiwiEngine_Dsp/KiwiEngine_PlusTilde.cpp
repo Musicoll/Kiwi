@@ -29,7 +29,7 @@ namespace kiwi
         //                                       PLUS~                                      //
         // ================================================================================ //
         
-        PlusTilde::PlusTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args)
+        PlusTilde::PlusTilde(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args)
         : AudioObject(model, patcher)
         {
             if (!args.empty() && args[0].isNumber())
@@ -38,7 +38,7 @@ namespace kiwi
             }
         }
         
-        void PlusTilde::receive(size_t index, std::vector<Atom> const& args)
+        void PlusTilde::receive(size_t index, std::vector<tool::Atom> const& args)
         {
             if(index == 1 && args[0].isNumber())
             {

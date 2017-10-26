@@ -36,7 +36,7 @@ namespace kiwi
             Factory::add<Plus>("plus").addAlias("+");
         }
         
-        Plus::Plus(std::string const& name, std::vector<Atom> const& args)
+        Plus::Plus(std::string const& name, std::vector<tool::Atom> const& args)
         {
             pushInlet({PinType::IType::Control});
             

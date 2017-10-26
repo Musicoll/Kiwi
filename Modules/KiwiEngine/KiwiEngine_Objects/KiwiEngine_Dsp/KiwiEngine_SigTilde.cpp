@@ -29,7 +29,7 @@ namespace kiwi
         //                                       SIG~                                       //
         // ================================================================================ //
         
-        SigTilde::SigTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        SigTilde::SigTilde(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args):
         AudioObject(model, patcher)
         {
             if (!args.empty() && args[0].isNumber())
@@ -38,7 +38,7 @@ namespace kiwi
             }
         }
         
-        void SigTilde::receive(size_t index, std::vector<Atom> const& args)
+        void SigTilde::receive(size_t index, std::vector<tool::Atom> const& args)
         {
             if (index == 0 && args[0].isNumber())
             {

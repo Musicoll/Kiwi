@@ -29,12 +29,12 @@ namespace kiwi
         //                                  OBJECT PIPE                                     //
         // ================================================================================ //
         
-        class Pipe::Task final : public Scheduler<>::Task
+        class Pipe::Task final : public tool::Scheduler<>::Task
         {
         public: // methods
             
-            Task(Pipe & object, std::vector<Atom> const& atoms):
-            Scheduler<>::Task(),
+            Task(Pipe & object, std::vector<tool::Atom> const& atoms):
+            tool::Scheduler<>::Task(),
             m_object(object),
             m_atoms(atoms)
             {
@@ -58,11 +58,11 @@ namespace kiwi
             
         private: // members
             
-            Pipe&               m_object;
-            std::vector<Atom>   m_atoms;
+            Pipe&                   m_object;
+            std::vector<tool::Atom> m_atoms;
         };
         
-        Pipe::Pipe(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        Pipe::Pipe(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args):
         Object(model, patcher),
         m_tasks(),
         m_delay(std::chrono::milliseconds(0))
@@ -81,7 +81,7 @@ namespace kiwi
             }
         }
         
-        void Pipe::receive(size_t index, std::vector<Atom> const& args)
+        void Pipe::receive(size_t index, std::vector<tool::Atom> const& args)
         {
             if (!args.empty())
             {

@@ -31,7 +31,7 @@ namespace kiwi
         //                                  OBJECT SIG~                                     //
         // ================================================================================ //
         
-        SigTilde::SigTilde(std::string const& name, std::vector<Atom> const& args)
+        SigTilde::SigTilde(std::string const& name, std::vector<tool::Atom> const& args)
         {
             if (args.empty() || !args[0].isNumber())
             {

@@ -39,7 +39,7 @@ namespace kiwi
             Loadmess(flip::Default& d) : model::Object(d) {}
             
             //! @brief Constructor
-            Loadmess(std::string const& name, std::vector<Atom> const& args);
+            Loadmess(std::string const& name, std::vector<tool::Atom> const& args);
             
             std::string getIODescription(bool is_inlet, size_t index) const override;
             

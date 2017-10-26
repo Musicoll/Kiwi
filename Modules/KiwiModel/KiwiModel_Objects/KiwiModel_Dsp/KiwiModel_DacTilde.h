@@ -39,10 +39,10 @@ namespace kiwi
             DacTilde(flip::Default& d): model::Object(d){}
             
             //! @brief Parses args to construct routes
-            std::vector<size_t> parseArgsAsChannelRoutes(std::vector<Atom> const& args) const;
+            std::vector<size_t> parseArgsAsChannelRoutes(std::vector<tool::Atom> const& args) const;
             
             //! @brief Constructor
-            DacTilde(std::string const& name, std::vector<Atom> const& args);
+            DacTilde(std::string const& name, std::vector<tool::Atom> const& args);
             
             std::string getIODescription(bool is_inlet, size_t index) const override;
             

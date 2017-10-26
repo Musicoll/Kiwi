@@ -27,7 +27,7 @@
 #include <flip/detail/Default.h>
 
 #include <KiwiModel/KiwiModel_Object.h>
-#include <KiwiModel/KiwiModel_Atom.h>
+#include <KiwiTool/KiwiTool_Atom.h>
 
 namespace kiwi { namespace model {
     
@@ -48,7 +48,7 @@ namespace kiwi { namespace model {
         
         Slider(flip::Default& d);
         
-        Slider(std::string const& name, std::vector<Atom> const& args);
+        Slider(std::string const& name, std::vector<tool::Atom> const& args);
         
         std::string getIODescription(bool is_inlet, size_t index) const override;
         

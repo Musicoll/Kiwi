@@ -29,9 +29,9 @@
 #include <exception>
 #include <functional>
 
-#include <KiwiModel/KiwiModel_Atom.h>
+#include <KiwiTool/KiwiTool_Atom.h>
 
-#include "KiwiEngine_Scheduler.h"
+#include <KiwiTool/KiwiTool_Scheduler.h>
 
 namespace kiwi
 {
@@ -44,7 +44,6 @@ namespace kiwi
     
     namespace engine
     {
-        class Beacon;
         class Link;
         class Object;
         class Patcher;

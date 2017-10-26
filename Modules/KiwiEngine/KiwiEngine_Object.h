@@ -22,7 +22,8 @@
 #pragma once
 
 #include "KiwiEngine_Def.h"
-#include "KiwiEngine_Scheduler.h"
+
+#include <KiwiTool/KiwiTool_Scheduler.h>
 
 #include <KiwiEngine/KiwiEngine_Patcher.h>
 
@@ -50,7 +51,7 @@ namespace kiwi
             //! @brief Receives a set of arguments via an inlet.
             //! @details This method must be overriden by object's subclasses.
             //! @todo see if the method must be noexcept.
-            virtual void receive(size_t index, std::vector<Atom> const& args) = 0;
+            virtual void receive(size_t index, std::vector<tool::Atom> const& args) = 0;
             
             //! @brief Called when the Patcher is loaded.
             virtual void loadbang() {};
@@ -84,14 +85,14 @@ namespace kiwi
             // ================================================================================ //
             
             //! @biref Returns the engine's scheduler.
-            Scheduler<> & getScheduler() const;
+            tool::Scheduler<> & getScheduler() const;
             
             // ================================================================================ //
             //                                      BEACON                                      //
             // ================================================================================ //
             
             //! @brief Gets or creates a Beacon with a given name.
-            Beacon& getBeacon(std::string const& name) const;
+            tool::Beacon& getBeacon(std::string const& name) const;
             
             // ================================================================================ //
             //                                       SEND                                       //
@@ -100,7 +101,7 @@ namespace kiwi
             //! @brief Sends a vector of Atom via an outlet.
             //! @todo Improve the stack overflow system.
             //! @todo See if the method must be noexcept.
-            void send(const size_t index, std::vector<Atom> const& args);
+            void send(const size_t index, std::vector<tool::Atom> const& args);
             
         private: // members
             

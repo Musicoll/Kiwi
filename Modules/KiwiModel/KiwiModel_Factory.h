@@ -54,7 +54,7 @@ namespace kiwi
                 {
                     value = std::is_base_of<model::Object, TModel>::value
                     && !std::is_abstract<TModel>::value
-                    && std::is_constructible<TModel, std::string, std::vector<Atom>>::value
+                    && std::is_constructible<TModel, std::string, std::vector<tool::Atom>>::value
                     && std::is_constructible<TModel, flip::Default &>::value
                 };
             };
@@ -90,7 +90,7 @@ namespace kiwi
             //! @param name The name of the Object.
             //! @param args A list of arguments as a vector of Atom.
             //! @return A ptr to a model::Object.
-            static std::unique_ptr<model::Object> create(std::vector<Atom> const& args);
+            static std::unique_ptr<model::Object> create(std::vector<tool::Atom> const& args);
             
             //! @brief Creates a new Object from a flip::Mold.
             //! @details This function will throw if the object name does not exist.
@@ -131,7 +131,7 @@ namespace kiwi
             
             using object_classes_t = std::vector<std::unique_ptr<ObjectClassBase>>;
             
-            using ctor_fn_t = std::function<std::unique_ptr<model::Object>(std::vector<Atom>)>;
+            using ctor_fn_t = std::function<std::unique_ptr<model::Object>(std::vector<tool::Atom>)>;
             using mold_maker_fn_t = std::function<void(model::Object const&, flip::Mold&)>;
             using mold_caster_fn_t = std::function<std::unique_ptr<model::Object>(flip::Mold const&)>;
             
@@ -139,7 +139,7 @@ namespace kiwi
             template<class TModel>
             static ctor_fn_t getCtor(std::string const& name)
             {
-                return [name](std::vector<Atom> const& args)
+                return [name](std::vector<tool::Atom> const& args)
                 {
                     return std::make_unique<TModel>(name, args);
                 };
@@ -239,7 +239,7 @@ namespace kiwi
             //! @brief Creates and returns a new Object with a vector of Atom as parameter.
             //! @param args A vector of Atom.
             //! @return A new model::Object.
-            std::unique_ptr<model::Object> create(std::vector<Atom> const& args) const
+            std::unique_ptr<model::Object> create(std::vector<tool::Atom> const& args) const
             { return m_ctor(args); }
             
             //! @brief Copy the content an object instance into a flip::Mold.

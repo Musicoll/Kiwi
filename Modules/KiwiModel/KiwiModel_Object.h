@@ -35,7 +35,7 @@
 #include "flip/Enum.h"
 #include "flip/Signal.h"
 
-#include "KiwiModel_Atom.h"
+#include <KiwiTool/KiwiTool_Atom.h>
 
 #include <mutex>
 #include <algorithm>

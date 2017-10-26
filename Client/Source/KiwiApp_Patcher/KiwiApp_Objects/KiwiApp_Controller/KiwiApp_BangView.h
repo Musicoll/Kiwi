@@ -27,7 +27,7 @@
 
 #include <juce_graphics/juce_graphics.h>
 
-#include <KiwiEngine/KiwiEngine_Scheduler.h>
+#include <KiwiTool/KiwiTool_Scheduler.h>
 
 #include <KiwiModel/KiwiModel_Object.h>
 
@@ -76,7 +76,7 @@ namespace kiwi
         flip::SignalConnection                          m_connection;
         bool                                            m_active;
         bool                                            m_mouse_down;
-        std::shared_ptr<engine::Scheduler<>::CallBack>  m_switch_off;
+        std::shared_ptr<tool::Scheduler<>::CallBack>  m_switch_off;
         
     private: // deleted methods
         

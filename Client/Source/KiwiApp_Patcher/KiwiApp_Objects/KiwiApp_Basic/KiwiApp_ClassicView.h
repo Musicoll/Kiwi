@@ -27,7 +27,7 @@
 
 #include <KiwiModel/KiwiModel_Object.h>
 
-#include <KiwiEngine/KiwiEngine_Listeners.h>
+#include <KiwiTool/KiwiTool_Listeners.h>
 
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectView.h>
 
@@ -121,7 +121,7 @@ namespace kiwi
     private: // members
         
         Label                               m_label;
-        engine::Listeners<Listener>         m_listeners;
+        tool::Listeners<Listener>         m_listeners;
         
     private: // deleted methods
         

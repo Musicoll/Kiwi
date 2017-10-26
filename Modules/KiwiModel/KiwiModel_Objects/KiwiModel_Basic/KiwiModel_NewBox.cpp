@@ -37,7 +37,7 @@ namespace kiwi
             
         }
         
-        NewBox::NewBox(std::string const& name, std::vector<Atom> const& args)
+        NewBox::NewBox(std::string const& name, std::vector<tool::Atom> const& args)
         {
             setFlag(Flag::IFlag::DefinedSize);
             setWidth(80);

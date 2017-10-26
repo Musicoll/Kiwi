@@ -31,7 +31,7 @@ namespace kiwi
         //                                  OBJECT RECEIVE                                  //
         // ================================================================================ //
         
-        class Receive : public engine::Object, public Beacon::Castaway
+        class Receive : public engine::Object, public tool::Beacon::Castaway
         {
         private: // classes
             
@@ -39,13 +39,13 @@ namespace kiwi
             
         public: // methods
             
-            Receive(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            Receive(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args);
             
             ~Receive();
             
-            void receive(size_t, std::vector<Atom> const& args) override;
+            void receive(size_t, std::vector<tool::Atom> const& args) override;
             
-            void receive(std::vector<Atom> const& args) override;
+            void receive(std::vector<tool::Atom> const& args) override;
             
         private: // members
             

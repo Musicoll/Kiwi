@@ -29,7 +29,7 @@
 
 #include <KiwiModel/KiwiModel_Object.h>
 
-#include <KiwiEngine/KiwiEngine_ConcurrentQueue.h>
+#include <KiwiTool/KiwiTool_ConcurrentQueue.h>
 
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectView.h>
 
@@ -89,7 +89,7 @@ namespace kiwi
         int                                             m_border;
         int                                             m_padding;
         flip::SignalConnection                          m_connection;
-        engine::ConcurrentQueue<std::shared_ptr<Task>>  m_tasks;
+        tool::ConcurrentQueue<std::shared_ptr<Task>>  m_tasks;
         
     private: // deleted methods
         

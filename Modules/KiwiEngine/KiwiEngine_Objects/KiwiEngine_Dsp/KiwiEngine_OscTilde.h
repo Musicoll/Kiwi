@@ -35,9 +35,9 @@ namespace kiwi
         {
         public: // methods
             
-            OscTilde(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            OscTilde(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args);
             
-            void receive(size_t index, std::vector<Atom> const& args) override;
+            void receive(size_t index, std::vector<tool::Atom> const& args) override;
             
             void performValue(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
             

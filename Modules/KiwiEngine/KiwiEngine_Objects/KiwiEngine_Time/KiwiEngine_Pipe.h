@@ -39,16 +39,16 @@ namespace kiwi
             
         public: // methods
             
-            Pipe(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args);
+            Pipe(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args);
             
             ~Pipe();
             
-            void receive(size_t index, std::vector<Atom> const& args) override;
+            void receive(size_t index, std::vector<tool::Atom> const& args) override;
             
         private: // members
             
-            std::set<std::shared_ptr<Task>>     m_tasks;
-            Scheduler<>::clock_t::duration      m_delay;
+            std::set<std::shared_ptr<Task>>         m_tasks;
+            tool::Scheduler<>::clock_t::duration    m_delay;
         };
     }
 }

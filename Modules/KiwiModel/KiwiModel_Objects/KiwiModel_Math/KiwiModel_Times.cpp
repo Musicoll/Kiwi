@@ -36,7 +36,7 @@ namespace kiwi
             Factory::add<Times>("times").addAlias("*");
         }
         
-        Times::Times(std::string const& name, std::vector<Atom> const& args)
+        Times::Times(std::string const& name, std::vector<tool::Atom> const& args)
         {
             pushInlet({PinType::IType::Control});
             

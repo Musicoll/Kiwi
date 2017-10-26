@@ -21,7 +21,7 @@
 
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Controller/KiwiModel_Bang.h>
 
-#include <KiwiEngine/KiwiEngine_Scheduler.h>
+#include <KiwiTool/KiwiTool_Scheduler.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Controller/KiwiEngine_Bang.h>
 
 namespace kiwi
@@ -32,7 +32,7 @@ namespace kiwi
         //                                  OBJECT BANG                                     //
         // ================================================================================ //
         
-        class Bang::Task : public Scheduler<>::Task
+        class Bang::Task : public tool::Scheduler<>::Task
         {
         public: // methods
             
@@ -55,7 +55,7 @@ namespace kiwi
             Bang & m_object;
         };
         
-        Bang::Bang(model::Object const& model, Patcher& patcher, std::vector<Atom> const& args):
+        Bang::Bang(model::Object const& model, Patcher& patcher, std::vector<tool::Atom> const& args):
         Object(model, patcher),
         m_task(new Task(*this)),
         m_signal(model.getSignal<>(model::Bang::Signal::TriggerBang)),
@@ -73,7 +73,7 @@ namespace kiwi
             getScheduler().defer(m_task);
         }
         
-        void Bang::receive(size_t index, std::vector<Atom> const& args)
+        void Bang::receive(size_t index, std::vector<tool::Atom> const& args)
         {
             if (index == 0)
             {
