@@ -43,3 +43,4 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_MeterTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_DelaySimpleTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Message.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_NoiseTilde.h>

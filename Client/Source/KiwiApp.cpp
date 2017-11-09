@@ -158,6 +158,7 @@ namespace kiwi
         engine::MeterTilde::declare();
         engine::DelaySimpleTilde::declare();
         engine::Message::declare();
+        engine::NoiseTilde::declare();
     }
     
     void KiwiApp::declareObjectViews()

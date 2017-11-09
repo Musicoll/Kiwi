@@ -55,6 +55,7 @@ namespace kiwi
             model::MeterTilde::declare();
             model::DelaySimpleTilde::declare();
             model::Message::declare();
+            model::NoiseTilde::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)
