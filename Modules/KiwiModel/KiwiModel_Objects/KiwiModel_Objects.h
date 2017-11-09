@@ -44,3 +44,4 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_DelaySimpleTilde.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Message.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_NoiseTilde.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_PhasorTilde.h>

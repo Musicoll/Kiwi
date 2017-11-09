@@ -159,6 +159,7 @@ namespace kiwi
         engine::DelaySimpleTilde::declare();
         engine::Message::declare();
         engine::NoiseTilde::declare();
+        engine::PhasorTilde::declare();
     }
     
     void KiwiApp::declareObjectViews()
