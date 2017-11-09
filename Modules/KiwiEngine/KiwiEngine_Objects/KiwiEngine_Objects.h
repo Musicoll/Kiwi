@@ -46,3 +46,4 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_NoiseTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_PhasorTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_SahTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_SnapshotTilde.h>

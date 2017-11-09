@@ -161,6 +161,7 @@ namespace kiwi
         engine::NoiseTilde::declare();
         engine::PhasorTilde::declare();
         engine::SahTilde::declare();
+        engine::SnapshotTilde::declare();
     }
     
     void KiwiApp::declareObjectViews()
