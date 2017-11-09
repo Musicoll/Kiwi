@@ -45,3 +45,4 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Message.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_NoiseTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_PhasorTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_SahTilde.h>

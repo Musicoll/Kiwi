@@ -57,6 +57,7 @@ namespace kiwi
             model::Message::declare();
             model::NoiseTilde::declare();
             model::PhasorTilde::declare();
+            model::SahTilde::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)

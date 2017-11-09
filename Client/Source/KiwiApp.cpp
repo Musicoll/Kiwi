@@ -160,6 +160,7 @@ namespace kiwi
         engine::Message::declare();
         engine::NoiseTilde::declare();
         engine::PhasorTilde::declare();
+        engine::SahTilde::declare();
     }
     
     void KiwiApp::declareObjectViews()
