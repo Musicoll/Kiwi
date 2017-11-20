@@ -42,3 +42,4 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_SigTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_MeterTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_DelaySimpleTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Message.h>

@@ -26,3 +26,4 @@
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_BangView.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ToggleView.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_MeterTildeView.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_MessageView.h>

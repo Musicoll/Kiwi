@@ -157,6 +157,7 @@ namespace kiwi
         engine::PlusTilde::declare();
         engine::MeterTilde::declare();
         engine::DelaySimpleTilde::declare();
+        engine::Message::declare();
     }
     
     void KiwiApp::declareObjectViews()
@@ -165,6 +166,7 @@ namespace kiwi
         BangView::declare();
         ToggleView::declare();
         MeterTildeView::declare();
+        MessageView::declare();
     }
     
     void KiwiApp::shutdown()

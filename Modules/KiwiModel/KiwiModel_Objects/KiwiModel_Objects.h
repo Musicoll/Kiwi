@@ -42,3 +42,4 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_PlusTilde.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_MeterTilde.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_DelaySimpleTilde.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Message.h>
