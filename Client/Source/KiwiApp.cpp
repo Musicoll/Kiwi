@@ -163,6 +163,7 @@ namespace kiwi
         engine::SahTilde::declare();
         engine::SnapshotTilde::declare();
         engine::Trigger::declare();
+        engine::LineTilde::declare();
     }
     
     void KiwiApp::declareObjectViews()
