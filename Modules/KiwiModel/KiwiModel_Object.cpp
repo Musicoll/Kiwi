@@ -19,9 +19,11 @@
  ==============================================================================
  */
 
-#include "KiwiModel_Object.h"
+#include <KiwiModel/KiwiModel_Factory.h>
 
-#include "KiwiModel_DataModel.h"
+#include <KiwiModel/KiwiModel_Object.h>
+
+#include <KiwiModel/KiwiModel_DataModel.h>
 
 namespace kiwi
 {
@@ -126,46 +128,6 @@ namespace kiwi
         };
         
         // ================================================================================ //
-        //                                  FLAG                                            //
-        // ================================================================================ //
-        
-        Flag::Flag(Flag::IFlag flag):
-        flip::Object(),
-        m_flag(flag)
-        {
-        }
-        
-        Flag::Flag(flip::Default& d):
-        flip::Object()
-        {
-        }
-        
-        void Flag::declare()
-        {
-            if(DataModel::has<model::Flag>()) return;
-            
-            DataModel::declare<Flag::IFlag>()
-            .name("cicm.kiwi.iflag")
-            .enumerator<Flag::IFlag::DefinedSize>("DefinedSize")
-            .enumerator<Flag::IFlag::ResizeWidth>("ResizeWidth")
-            .enumerator<Flag::IFlag::ResizeHeight>("ResizeHeight");
-            
-            DataModel::declare<model::Flag>()
-            .name("cicm.kiwi.flag")
-            .member<flip::Enum<IFlag>, &Flag::m_flag>("flag");
-        }
-        
-        bool Flag::operator==(Flag const& other) const
-        {
-            return m_flag.value() == other.m_flag.value();
-        }
-        
-        bool Flag::operator!=(Flag const& other) const
-        {
-            return !this->operator==(other);
-        }
-        
-        // ================================================================================ //
         //                                  OBJECT::declare                                 //
         // ================================================================================ //
         
@@ -175,15 +137,12 @@ namespace kiwi
             
             Outlet::declare();
             Inlet::declare();
-            Flag::declare();
             
             DataModel::declare<model::Object>()
             .name("cicm.kiwi.Object")
-            .member<flip::String, &Object::m_name>("name")
             .member<flip::String, &Object::m_text>("text")
             .member<flip::Array<Inlet>, &Object::m_inlets>("inlets")
             .member<flip::Array<Outlet>, &Object::m_outlets>("outlets")
-            .member<flip::Collection<Flag>, &Object::m_flags>("flags")
             .member<flip::Float, &Object::m_position_x>("pos_x")
             .member<flip::Float, &Object::m_position_y>("pos_y")
             .member<flip::Float, &Object::m_width>("width")
@@ -199,28 +158,156 @@ namespace kiwi
         
         Object::Object(flip::Default&)
         {
-            ;
         }
         
         Object::Object() :
-        m_name("noobj"),
+        m_text(),
         m_inlets(),
         m_outlets(),
-        m_flags(),
         m_position_x(0.),
         m_position_y(0.),
         m_width(60.),
         m_height(20.),
         m_min_width(0.),
         m_min_height(0.),
-        m_ratio(0.)
+        m_ratio(0.),
+        m_attributes(),
+        m_parameters(),
+        m_args(nullptr),
+        m_signals(),
+        m_listeners(),
+        m_class(nullptr)
         {
-            ;
+        }
+        
+        void Object::writeAttribute(std::string const& name, tool::Parameter const& parameter)
+        {
+        }
+        
+        void Object::readAttribute(std::string const& name, tool::Parameter & parameter) const
+        {
+        }
+        
+        bool Object::attributeChanged(std::string const& name) const
+        {
+            return false;
+        }
+        
+        void Object::addListener(Listener& listener) const
+        {
+            m_listeners.add(listener);
+        }
+        
+        void Object::removeListener(Listener& listener) const
+        {
+            m_listeners.remove(listener);
+        }
+        
+        std::vector<tool::Atom> const& Object::getArguments() const
+        {
+            if (m_args == nullptr)
+            {
+                m_args.reset(new std::vector<tool::Atom>());
+                
+                std::vector<tool::Atom> parsed_text = tool::AtomHelper::parse(getText());
+                
+                if (parsed_text.size() > 1)
+                {
+                    *m_args->insert(m_args->begin(), parsed_text.begin() + 1, parsed_text.end());
+                }
+            }
+            
+            return *m_args;
+        }
+        
+        tool::Parameter const& Object::getAttribute(std::string const& name) const
+        {
+            assert(getClass().hasAttribute(name) && "Atribute not declared");
+            
+            ParameterClass const& attribute_class = getClass().getAttribute(name);
+            
+            if (m_attributes.find(name) == m_attributes.end())
+            {
+                m_attributes.insert( make_pair(name, tool::Parameter(attribute_class.getDataType())));
+                readAttribute(name, m_attributes.at(name));
+            }
+            else if(attributeChanged(name))
+            {
+                readAttribute(name, m_attributes.at(name));
+            }
+            
+            return m_attributes.at(name);
+        }
+        
+        void Object::setAttribute(std::string const& name, tool::Parameter const& param)
+        {
+            assert(getClass().hasAttribute(name) && "Attribute not declare");
+            
+            ParameterClass const& attribute_class = getClass().getAttribute(name);
+            
+            assert(attribute_class.getDataType() == param.getType());
+            
+            writeAttribute(name, param);
+        }
+        
+        std::set<std::string> Object::getChangedAttributes() const
+        {
+            std::set<std::string> changed_parameters;
+            
+            for (auto & param_class : getClass().getParameters())
+            {
+                if (param_class.second->getType() == ParameterClass::Type::Attribute
+                    && attributeChanged(param_class.first))
+                {
+                    changed_parameters.insert(param_class.first);
+                }
+            }
+            
+            return changed_parameters;
+        }
+        
+        tool::Parameter const& Object::getParameter(std::string const& name) const
+        {
+            assert(getClass().hasParameter(name) && "Parameter not declare");
+            
+            ParameterClass const& param_class = getClass().getParameter(name);
+            
+            if (m_parameters.find(name) == m_parameters.end())
+            {
+                m_parameters.insert(make_pair(name, tool::Parameter(param_class.getDataType())));
+            }
+            
+            return m_parameters.at(name);
+        }
+        
+        void Object::setParameter(std::string const& name, tool::Parameter const& param)
+        {
+            assert(getClass().hasParameter(name) && "Parameter not declare");
+            
+            ParameterClass const& param_class = getClass().getParameter(name);
+            
+            assert(param_class.getDataType() == param.getType());
+            
+            if (m_parameters.find(name) == m_parameters.end())
+            {
+                m_parameters.insert(make_pair(name, param));
+            }
+            else
+            {
+                m_parameters.at(name) = param;
+            }
+            
+            m_listeners.call(&Listener::modelParameterChanged, name, m_parameters.at(name));
         }
         
         std::string Object::getName() const
         {
-            return m_name;
+            return getClass().getName();
+        }
+        
+        ObjectClass const& Object::getClass() const
+        {
+            return *Factory::getClassByTypeId(typeid(*this).hash_code());
         }
         
         std::string Object::getText() const
@@ -241,7 +328,7 @@ namespace kiwi
         }
         
         size_t Object::getNumberOfInlets() const
-        {
+        {   
             return m_inlets.count_if([](Inlet const&){return true;});
         }
         
@@ -413,17 +500,9 @@ namespace kiwi
             return (is_inlet ? "inlet " : "outlet ") + std::to_string(index);
         }
         
-        bool Object::hasFlag(Flag flag) const
+        bool Object::hasFlag(ObjectClass::Flag flag) const
         {
-            return m_flags.count_if([&flag](Flag const& internal_flag) { return internal_flag == flag;}) != 0;
-        }
-        
-        void Object::setFlag(Flag flag)
-        {
-            if (!hasFlag(flag))
-            {
-                m_flags.insert(flag);
-            }
+            return getClass().hasFlag(flag);
         }
     }
 }

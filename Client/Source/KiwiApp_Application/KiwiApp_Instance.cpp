@@ -43,7 +43,7 @@ namespace kiwi
     
     Instance::Instance() :
     m_scheduler(),
-    m_instance(std::make_unique<DspDeviceManager>()),
+    m_instance(std::make_unique<DspDeviceManager>(), m_scheduler),
     m_browser(),
     m_console_history(std::make_shared<ConsoleHistory>(m_instance)),
     m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))

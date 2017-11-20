@@ -48,7 +48,7 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructs an Instance and adds the engine objects to the engine::Factory.
-            Instance(std::unique_ptr<AudioControler> audio_controler);
+            Instance(std::unique_ptr<AudioControler> audio_controler, tool::Scheduler<> & main_scheduler);
             
             //! @brief Destructor.
             ~Instance();
@@ -88,10 +88,10 @@ namespace kiwi
             //! @brief Returns the engine's scheduler.
             tool::Scheduler<> & getScheduler();
             
-        private: // methods
+            //! @brief Returns the main's scheduler.
+            tool::Scheduler<> & getMainScheduler();
             
-            //! @internal Adds the engine objects to the engine::Factory
-            void addObjectsToFactory();
+        private: // methods
             
             //! @internal Processes the scheduler to check if new messages have been added.
             void processScheduler();
@@ -102,6 +102,7 @@ namespace kiwi
             
             std::unique_ptr<AudioControler> m_audio_controler;
             tool::Scheduler<>               m_scheduler;
+            tool::Scheduler<>&              m_main_scheduler;
             std::atomic<bool>               m_quit;
             std::thread                     m_engine_thread;
             

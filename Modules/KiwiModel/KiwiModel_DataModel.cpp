@@ -19,12 +19,11 @@
  ==============================================================================
  */
 
-#include "flip/DataModel.h"
+#include <flip/DataModel.h>
 
-#include "KiwiModel_Def.h"
-#include "KiwiModel_DataModel.h"
-#include "KiwiModel_PatcherUser.h"
-#include <KiwiModel/KiwiModel_Objects/KiwiModel_Objects.h>
+#include <KiwiModel/KiwiModel_Def.h>
+#include <KiwiModel/KiwiModel_DataModel.h>
+#include <KiwiModel/KiwiModel_PatcherUser.h>
 
 namespace kiwi
 {
@@ -32,11 +31,36 @@ namespace kiwi
     {
         bool DataModel::initialised = false;
         
-        void DataModel::init()
+        void DataModel::declareObjects()
+        {
+            model::NewBox::declare();
+            model::ErrorBox::declare();
+            model::Slider::declare();
+            model::Print::declare();
+            model::Receive::declare();
+            model::Plus::declare();
+            model::Times::declare();
+            model::Delay::declare();
+            model::Metro::declare();
+            model::Pipe::declare();
+            model::Bang::declare();
+            model::Toggle::declare();
+            model::AdcTilde::declare();
+            model::DacTilde::declare();
+            model::OscTilde::declare();
+            model::Loadmess::declare();
+            model::PlusTilde::declare();
+            model::TimesTilde::declare();
+            model::SigTilde::declare();
+            model::MeterTilde::declare();
+            model::DelaySimpleTilde::declare();
+        }
+        
+        void DataModel::init(std::function<void()> declare_object)
         {
             assert(!initialised);
             if(initialised) return; // abort
-                
+            
             const std::string model_version = KIWI_MODEL_VERSION_STRING;
             
             #ifdef DEBUG
@@ -48,7 +72,7 @@ namespace kiwi
             // patcher elements declaration :
             model::Object::declare();
             
-            declareObjects();
+            declare_object();
             
             // Links
             Link::declare();
@@ -57,31 +81,6 @@ namespace kiwi
             Patcher::declare();
             
             initialised = true;
-        }
-        
-        void DataModel::declareObjects()
-        {
-            NewBox::declare();
-            ErrorBox::declare();
-            Plus::declare();
-            Times::declare();
-            Print::declare();
-            Receive::declare();
-            Loadmess::declare();
-            Delay::declare();
-            Pipe::declare();
-            Metro::declare();
-            DacTilde::declare();
-            AdcTilde::declare();
-            OscTilde::declare();
-            TimesTilde::declare();
-            PlusTilde::declare();
-            SigTilde::declare();
-            DelaySimpleTilde::declare();
-            Bang::declare();
-            Toggle::declare();
-            Slider::declare();
-            MeterTilde::declare();
         }
     }
 }

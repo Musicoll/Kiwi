@@ -31,6 +31,8 @@
 
 #include <KiwiDsp/KiwiDsp_Chain.h>
 
+#include <KiwiModel/KiwiModel_PatcherUser.h>
+
 namespace kiwi
 {    
     namespace engine
@@ -49,7 +51,7 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            Patcher(Instance& instance) noexcept;
+            Patcher(Instance& instance, model::Patcher & patcher_model) noexcept;
             
             //! @brief Destructor.
             ~Patcher();
@@ -92,6 +94,9 @@ namespace kiwi
             //! @internal Call the loadbang method of all objects.
             void sendLoadbang();
             
+            //! @brief Returns the patcher's data model.
+            model::Patcher & getPatcherModel();
+            
             // ================================================================================ //
             //                                      CONSOLE                                     //
             // ================================================================================ //
@@ -115,6 +120,9 @@ namespace kiwi
             //! @brief Returns the engine's scheduler.
             tool::Scheduler<> & getScheduler() const;
             
+            //! @brief Returns the main scheduler
+            tool::Scheduler<> & getMainScheduler() const;
+            
             // ================================================================================ //
             //                                      BEACON                                      //
             // ================================================================================ //
@@ -123,6 +131,12 @@ namespace kiwi
             tool::Beacon& getBeacon(std::string const& name) const;
             
         private: // methods
+            
+            //! @internal Update the patcher's graph according to datamodel.
+            void updateGraph(model::Patcher const& patcher_model);
+            
+            //! @internal Updates obects' parameters according to there data model.
+            void updateAttributes(model::Patcher const& patcher_model);
             
             //! @internal Object model has just been added to the document.
             void objectAdded(model::Object const& object);
@@ -148,9 +162,9 @@ namespace kiwi
             
             Instance&                                       m_instance;
             std::map<uint64_t, std::shared_ptr<Object>>     m_objects;
-            mutable std::mutex                              m_mutex;
             std::vector<SoLinks>                            m_so_links;
             dsp::Chain                                      m_chain;
+            model::Patcher &                                m_patcher_model;
             
         private: // deleted methods
             

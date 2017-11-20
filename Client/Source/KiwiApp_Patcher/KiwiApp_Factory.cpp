@@ -21,12 +21,13 @@
 
 #include <functional>
 
-#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Objects.h>
 #include <KiwiApp_Patcher/KiwiApp_Factory.h>
+
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ClassicView.h>
 
 namespace kiwi
 {
-    std::map<std::string, Factory::factory_func> Factory::m_creator_map;
+    std::map<std::string, Factory::ctor_fn_t> Factory::m_creators;
     
     std::unique_ptr<ObjectView> Factory::createObjectView(model::Object & object_model)
     {
@@ -34,9 +35,9 @@ namespace kiwi
         
         std::string object_name = object_model.getName();
 
-        if (m_creator_map.find(object_name) != m_creator_map.end())
+        if (m_creators.find(object_name) != m_creators.end())
         {
-            object_view = std::move(m_creator_map[object_name](object_model));
+            object_view = std::move(m_creators[object_name](object_model));
         }
         else
         {
@@ -44,13 +45,5 @@ namespace kiwi
         }
 
         return object_view;
-    }
-    
-    void Factory::initialise()
-    {
-        add<BangView>("bang");
-        add<ToggleView>("toggle");
-        add<SliderView>("slider");
-        add<MeterTildeView>("meter~");
     }
 }

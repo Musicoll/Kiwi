@@ -21,22 +21,8 @@
 
 #pragma once
 
-// ================================================================================ //
-//                                  BASIC OBJECTS                                   //
-// ================================================================================ //
-
-#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Basic/KiwiApp_ClassicView.h>
-
-// ================================================================================ //
-//                                CONTROLLER OBJECTS                                //
-// ================================================================================ //
-
-#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Controller/KiwiApp_BangView.h>
-#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Controller/KiwiApp_ToggleView.h>
-#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Controller/KiwiApp_SliderView.h>
-
-// ================================================================================ //
-//                                      DSP OBJECTS                                 //
-// ================================================================================ //
-
-#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Dsp/KiwiApp_MeterTildeView.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ClassicView.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_SliderView.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_BangView.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ToggleView.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_MeterTildeView.h>

@@ -185,6 +185,9 @@ namespace kiwi
         //! @internal Object model is resident and internal value changed.
         void objectChanged(model::Patcher::View& view, model::Object& object);
         
+        //! @internal Updates the object's view parameters.
+        void updateParameters(model::Patcher const& patcher);
+        
         //! @internal Object model will be removed from the document.
         void removeObjectView(model::Object& object);
         

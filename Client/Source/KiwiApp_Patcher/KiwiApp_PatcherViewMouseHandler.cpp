@@ -220,7 +220,7 @@ namespace kiwi
     {
         juce::ComponentBoundsConstrainer bounds_constrainer;
         
-        if (!object_model.hasFlag(model::Flag::IFlag::ResizeWidth))
+        if (!object_model.hasFlag(model::ObjectClass::Flag::ResizeWidth))
         {
             bounds_constrainer.setMinimumWidth(object_model.getWidth());
             bounds_constrainer.setMaximumWidth(object_model.getWidth());
@@ -230,7 +230,7 @@ namespace kiwi
             bounds_constrainer.setMinimumWidth(object_model.getMinWidth());
         }
         
-        if (!object_model.hasFlag(model::Flag::IFlag::ResizeHeight))
+        if (!object_model.hasFlag(model::ObjectClass::Flag::ResizeHeight))
         {
             bounds_constrainer.setMinimumHeight(object_model.getHeight());
             bounds_constrainer.setMaximumHeight(object_model.getHeight());
@@ -678,22 +678,22 @@ namespace kiwi
         
         model::Object const& object_model = hit_tester.getObject()->getModel();
         
-        if ((border & HitTester::Border::Top) && object_model.hasFlag(model::Flag::IFlag::ResizeHeight))
+        if ((border & HitTester::Border::Top) && object_model.hasFlag(model::ObjectClass::Flag::ResizeHeight))
         {
             direction |= Direction::Up;
         }
         
-        if ((border & HitTester::Border::Right) && object_model.hasFlag(model::Flag::IFlag::ResizeWidth))
+        if ((border & HitTester::Border::Right) && object_model.hasFlag(model::ObjectClass::Flag::ResizeWidth))
         {
             direction |= Direction::Right;
         }
         
-        if ((border & HitTester::Border::Bottom) && object_model.hasFlag(model::Flag::IFlag::ResizeHeight))
+        if ((border & HitTester::Border::Bottom) && object_model.hasFlag(model::ObjectClass::Flag::ResizeHeight))
         {
             direction |= Direction::Down;
         }
         
-        if ((border & HitTester::Border::Left) && object_model.hasFlag(model::Flag::IFlag::ResizeWidth))
+        if ((border & HitTester::Border::Left) && object_model.hasFlag(model::ObjectClass::Flag::ResizeWidth))
         {
             direction |= Direction::Left;
         }

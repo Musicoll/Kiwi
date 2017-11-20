@@ -20,10 +20,14 @@
  */
 
 #include <KiwiModel/KiwiModel_DataModel.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Objects.h>
+
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Objects.h>
 
 #include <KiwiApp_Patcher/KiwiApp_Factory.h>
-#include "KiwiApp.h"
-#include "KiwiApp_General/KiwiApp_CommandIDs.h"
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Objects.h>
+#include <KiwiApp.h>
+#include <KiwiApp_General/KiwiApp_CommandIDs.h>
 
 namespace kiwi
 {
@@ -93,7 +97,9 @@ namespace kiwi
    
         model::DataModel::init();
         
-        Factory::initialise();
+        declareEngineObjects();
+        
+        declareObjectViews();
         
         juce::Desktop::getInstance().setGlobalScaleFactor(1.);
         
@@ -126,6 +132,39 @@ namespace kiwi
         {
             m_instance->openFile(juce::File(command_line.unquoted()));
         }
+    }
+    
+    void KiwiApp::declareEngineObjects()
+    {
+        engine::NewBox::declare();
+        engine::ErrorBox::declare();
+        engine::Slider::declare();
+        engine::Print::declare();
+        engine::Receive::declare();
+        engine::Plus::declare();
+        engine::Times::declare();
+        engine::Delay::declare();
+        engine::Metro::declare();
+        engine::Pipe::declare();
+        engine::Bang::declare();
+        engine::Toggle::declare();
+        engine::AdcTilde::declare();
+        engine::DacTilde::declare();
+        engine::OscTilde::declare();
+        engine::Loadmess::declare();
+        engine::SigTilde::declare();
+        engine::TimesTilde::declare();
+        engine::PlusTilde::declare();
+        engine::MeterTilde::declare();
+        engine::DelaySimpleTilde::declare();
+    }
+    
+    void KiwiApp::declareObjectViews()
+    {
+        SliderView::declare();
+        BangView::declare();
+        ToggleView::declare();
+        MeterTildeView::declare();
     }
     
     void KiwiApp::shutdown()

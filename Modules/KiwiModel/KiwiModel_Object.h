@@ -36,11 +36,17 @@
 #include "flip/Signal.h"
 
 #include <KiwiTool/KiwiTool_Atom.h>
+#include <KiwiTool/KiwiTool_Parameter.h>
+#include <KiwiTool/KiwiTool_Listeners.h>
+
+#include <KiwiModel/KiwiModel_ObjectClass.h>
+#include <KiwiModel/KiwiModel_Error.h>
 
 #include <mutex>
 #include <algorithm>
 #include <exception>
 #include <set>
+#include <map>
 
 namespace kiwi
 {
@@ -144,42 +150,6 @@ namespace kiwi
             PinType m_type;
         };
         
-        //! @brief Class that represents an object's property.
-        //! @details Adding, removing new flags is a data model change and needs migration.
-        class Flag : public flip::Object
-        {
-        public: // classes
-            
-            //! @brief The internal enum representation of the flag.
-            enum class IFlag
-            {
-                DefinedSize = 0,    // Initial object's Size defined by the model.
-                ResizeWidth,        // Object is resizable horizontally.
-                ResizeHeight        // Object is resizable vertically.
-            };
-            
-        public: // methods
-            
-            //! @brief Flag constructor.
-            Flag(Flag::IFlag flag);
-            
-            //! @brief Flip default constructor.
-            Flag(flip::Default& d);
-            
-            //! @brief Checks if flags are equals.
-            bool operator==(Flag const& other) const;
-            
-            //! @brief Checks if flags are differents.
-            bool operator!=(Flag const& other) const;
-            
-            //! @internal Flip declarator.
-            static void declare();
-            
-        private: // members
-            
-            flip::Enum<IFlag> m_flag;
-        };
-        
         
         // ================================================================================ //
         //                                      OBJECT                                      //
@@ -193,6 +163,33 @@ namespace kiwi
             
             using SignalKey = uint32_t;
             
+            class Listener
+            {
+            public:
+                
+                // @brief Destructor
+                virtual ~Listener() = default;
+                
+                //! @brief Called when a parameter has changed;
+                virtual void modelParameterChanged(std::string const& name, tool::Parameter const& param) =  0;
+                
+                //! @brief Called when an attribute has changed.
+                virtual void modelAttributeChanged(std::string const& name, tool::Parameter const& param) = 0;
+            };
+            
+            //! @brief an error that object can throw to notify a problem.
+            //! @todo Check if object's id shall be added to error.
+            class Error : public model::Error
+            {
+            public: // methods
+                
+                //! @brief Constructor.
+                Error(std::string const& message):model::Error(message) {}
+                
+                //! @brief Destructor.
+                ~Error() = default;
+            };
+            
         public: // methods
  
             //! @brief Constructor.
@@ -201,8 +198,50 @@ namespace kiwi
             //! @brief Destructor.
             virtual ~Object() = default;
             
+            //! @brief Returns the arguments of the object.
+            std::vector<tool::Atom> const& getArguments() const;
+            
+            //! @brief Returns a list of changed attributes.
+            //! @details Use this function in the observation to check which values shall
+            //! be updated.
+            std::set<std::string> getChangedAttributes() const;
+            
+            //! @brief Retrieve one of the object's attributes.
+            tool::Parameter const& getAttribute(std::string const& name) const;
+            
+            //! @brief Sets one of the object's attribute.
+            void setAttribute(std::string const& name, tool::Parameter const& param);
+            
+            //! @brief Returns one of the object's parameters.
+            tool::Parameter const& getParameter(std::string const& name) const;
+            
+            //! @brief Sets one of the object's parameter.
+            void setParameter(std::string const& name, tool::Parameter const& param);
+            
+            //! @brief Writes the parameter into data model.
+            //! @details If the parameter is saved this function will be called at every attempt to
+            //! modify the parameter. Never called for non saved parameters.
+            virtual void writeAttribute(std::string const& name, tool::Parameter const& paramter);
+            
+            //! @brief Reads the model to initialize a parameter.
+            //! @details Saved parameters may infos from the data model.
+            virtual void readAttribute(std::string const& name, tool::Parameter & parameter) const;
+            
+            //! @brief Checks the data model to see if a parameter has changed.
+            //! @details Only called for saved parameters. Default returns false.
+            virtual bool attributeChanged(std::string const& name) const;
+            
+            //! @brief Adds a listener of object's parameters.
+            void addListener(Listener& listener) const;
+            
+            //! @brief Removes listenere from list.
+            void removeListener(Listener& listener) const;
+            
             //! @brief Returns the name of the Object.
             std::string getName() const;
+            
+            //! @brief Returns the object's static definition.
+            ObjectClass const& getClass() const;
             
             //! @brief Returns the text of the Object.
             std::string getText() const;
@@ -277,6 +316,9 @@ namespace kiwi
             //! @brief Returns inlet or outlet description.
             virtual std::string getIODescription(bool is_inlet, size_t index) const;
             
+            //! @brief Checks if the object has this flag set.
+            bool hasFlag(ObjectClass::Flag flag) const;
+            
             //! @brief Returns the object's signal referenced by this key.
             //! @details Throws an exception if no signal is referenced for key.
             template <class... Args>
@@ -286,9 +328,6 @@ namespace kiwi
                 return dynamic_cast<flip::Signal<Args...>&>(signal_base);
             }
             
-            //! @brief Checks if the object has this flag set.
-            bool hasFlag(Flag flag) const;
-            
         protected:
             
             //! @brief Adds a signal having singal key.
@@ -297,10 +336,6 @@ namespace kiwi
             {
                 m_signals.emplace(key, std::make_unique<flip::Signal<Args...>>(key, object));
             }
-            
-            //! @brief Sets one of the flag for the object.
-            //! @details It is a modification of the model and requires commit.
-            void setFlag(Flag flag);
             
             //! @brief Clear and replace all the object's inlets.
             void setInlets(flip::Array<Inlet> const& inlets);
@@ -336,22 +371,22 @@ namespace kiwi
             
         private: // members
             
-            std::map<SignalKey, std::unique_ptr<flip::SignalBase>> m_signals;
-            
-            flip::String            m_name;
-            flip::String            m_text;
-            flip::Array<Inlet>      m_inlets;
-            flip::Array<Outlet>     m_outlets;
-            flip::Collection<Flag>  m_flags;
-            
-            flip::Float         m_position_x;
-            flip::Float         m_position_y;
-            flip::Float         m_width;
-            flip::Float         m_height;
-            flip::Float         m_min_width;
-            flip::Float         m_min_height;
-            flip::Float         m_ratio;
-                
+            flip::String                                            m_text;
+            flip::Array<Inlet>                                      m_inlets;
+            flip::Array<Outlet>                                     m_outlets;
+            flip::Float                                             m_position_x;
+            flip::Float                                             m_position_y;
+            flip::Float                                             m_width;
+            flip::Float                                             m_height;
+            flip::Float                                             m_min_width;
+            flip::Float                                             m_min_height;
+            flip::Float                                             m_ratio;
+            mutable std::map<std::string, tool::Parameter>          m_attributes;
+            mutable std::map<std::string, tool::Parameter>          m_parameters;
+            mutable std::unique_ptr<std::vector<tool::Atom>>        m_args;
+            std::map<SignalKey, std::unique_ptr<flip::SignalBase>>  m_signals;
+            mutable tool::Listeners<Listener>                       m_listeners;
+            ObjectClass *                                           m_class;
             
             friend class Factory;
         

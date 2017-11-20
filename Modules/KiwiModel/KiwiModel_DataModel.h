@@ -21,7 +21,11 @@
 
 #pragma once
 
-#include "flip/DataModel.h"
+#include <functional>
+
+#include <flip/DataModel.h>
+
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Objects.h>
 
 namespace kiwi
 {
@@ -32,14 +36,13 @@ namespace kiwi
         {
         public: // methods
             
-            //! @brief Initializes the model.
-            //! @details Declares all flip classes.
-            static void init();
-            
-        private: // methods
-            
-            //! @brief Declare all kiwi objects.
+            //! @brief Declare objects.
             static void declareObjects();
+            
+            //! @brief Initializes the model.
+            //! @details By default will declare all objects.
+            //! Can be overriden to declare custom objects or only a few objects.
+            static void init(std::function<void(void)> declare_object = &DataModel::declareObjects);
             
         public: // members
             

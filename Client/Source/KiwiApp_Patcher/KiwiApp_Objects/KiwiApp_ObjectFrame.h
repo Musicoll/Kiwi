@@ -28,7 +28,7 @@
 
 #include <KiwiModel/KiwiModel_Patcher.h>
 
-#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Basic/KiwiApp_ClassicView.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_EditableObjectView.h>
 #include <KiwiApp_Patcher/KiwiApp_PatcherView.h>
 
 namespace kiwi
@@ -41,7 +41,7 @@ namespace kiwi
     //! @details ObjectFrame is implemented as a wrapper around an object view that displays
     //! selections and outlet and handle certain interactions.
     class ObjectFrame : public juce::Component,
-                        public ClassicView::Listener
+                        public EditableObjectView::Listener
     {
     public: // classes
         
@@ -133,6 +133,9 @@ namespace kiwi
         
         //! @brief Called whenever an object's model has changed.
         void objectChanged(model::Patcher::View& view, model::Object& object);
+            
+        //! @brief Updates the inner object's view attributes.
+        void attributeChanged(std::string const& name, tool::Parameter const& parameter);
         
         //! @brief Called whenever the client wants to edit an object.
         //! @details Will only edit the object if its a textual object.
@@ -171,9 +174,6 @@ namespace kiwi
         
         //! @brief Returns true if the object is selected.
         bool isSelected() const;
-        
-        //! @brief Returns true if the underlying object is currently being edited.
-        bool isEditing() const;
         
         //! @brief Called when object's frame is clicked.
         void mouseDown(juce::MouseEvent const& e) override final;

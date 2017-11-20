@@ -19,7 +19,6 @@
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiModel_Objects/KiwiModel_Objects.h>
 #include <KiwiModel/KiwiModel_DataModel.h>
 #include <KiwiModel/KiwiModel_Factory.h>
 
@@ -1071,11 +1070,35 @@ namespace kiwi
             }
         }
         
+        updateParameters(patcher);
+        
         if(view.removed()) {}
         
         if(patcher.resident() && (patcher.objectsChanged() || patcher.linksChanged()))
         {
             updateWindowTitle();
+        }
+    }
+    
+    void PatcherView::updateParameters(model::Patcher const& patcher_model)
+    {
+        if (patcher_model.objectsChanged())
+        {
+            for(auto const & object : patcher_model.getObjects())
+            {
+                if (!object.removed() && !object.added())
+                {
+                    std::set<std::string> changed_params = object.getChangedAttributes();
+                    
+                    auto object_frame = findObject(object);
+                    
+                    for (std::string const& param_name : changed_params)
+                    {
+                        (*object_frame)->attributeChanged(param_name,
+                                                          object.getAttribute(param_name));
+                    }
+                }
+            }
         }
     }
     
@@ -1566,7 +1589,7 @@ namespace kiwi
             KiwiApp::error(error_box.getError());
         }
         
-        if (!object_model->hasFlag(model::Flag::IFlag::DefinedSize))
+        if (!object_model->hasFlag(model::ObjectClass::Flag::DefinedSize))
         {
             const int text_width = juce::Font().getStringWidth(new_text) + 12;
             const int max_io = std::max(object_model->getNumberOfInlets(),

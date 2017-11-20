@@ -21,6 +21,11 @@
 
 #pragma once
 
+#include <functional>
+#include <map>
+#include <string>
+#include <memory>
+
 #include <KiwiEngine/KiwiEngine_Object.h>
 
 namespace kiwi
@@ -34,6 +39,10 @@ namespace kiwi
         //! @brief The engine Object's factory
         class Factory
         {
+        public: // classes
+            
+            using ctor_fn_t = std::function<std::unique_ptr<Object>(model::Object const& model, Patcher& patcher)>;
+            
         public: // methods
             
             //! @brief Adds an object engine into the Factory.
@@ -44,27 +53,21 @@ namespace kiwi
             template <class TEngine,
             typename std::enable_if<std::is_base_of<Object, TEngine>::value,
             Object>::type* = nullptr>
-            static void add(std::string const& name)
+            static void add(std::string const& name, ctor_fn_t create_method)
             {
                 static_assert(!std::is_abstract<TEngine>::value,
                               "The engine object must not be abstract.");
             
                 static_assert(std::is_constructible<TEngine,
-                              model::Object const&, Patcher&, std::vector<tool::Atom> const&>::value,
+                              model::Object const&, Patcher&>::value,
                               "The engine object must have a valid constructor.");
                 
                 assert(!name.empty());
                 assert(modelHasObject(name) && "The model counterpart does not exist");
                 
-                auto& creators = getCreators();
-                assert(creators.count(name) == 0 && "The object already exists");
+                assert(m_creators.count(name) == 0 && "The object already exists");
                 
-                creators[name] = [](model::Object const& model,
-                                    Patcher& patcher,
-                                    std::vector<tool::Atom> const& args) -> TEngine*
-                {
-                    return new TEngine(model, patcher, args);
-                };
+                m_creators[name] = create_method;
             }
             
             //! @brief Creates a new engine Object.
@@ -80,15 +83,8 @@ namespace kiwi
         private: // methods
             
             static bool modelHasObject(std::string const& name);
-            
-            using ctor_fn_t = std::function<Object*(model::Object const& model,
-                                                    Patcher& patcher,
-                                                    std::vector<tool::Atom> const&)>;
-            
-            using creator_map_t = std::map<std::string, ctor_fn_t>;
         
-            //! @internal Returns the static map of creators.
-            static creator_map_t& getCreators();
+            static std::map<std::string, ctor_fn_t> m_creators;
             
         private: // deleted methods
             

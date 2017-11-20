@@ -21,53 +21,24 @@
 
 #pragma once
 
-// ================================================================================ //
-//                                  BASIC OBJECTS                                   //
-// ================================================================================ //
-
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Basic/KiwiEngine_NewBox.h>
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Basic/KiwiEngine_ErrorBox.h>
-
-// ================================================================================ //
-//                                  DSP OBJECTS                                     //
-// ================================================================================ //
-
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Dsp/KiwiEngine_SigTilde.h>
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Dsp/KiwiEngine_PlusTilde.h>
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Dsp/KiwiEngine_TimesTilde.h>
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Dsp/KiwiEngine_OscTilde.h>
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Dsp/KiwiEngine_DelaySimpleTilde.h>
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Dsp/KiwiEngine_AdcTilde.h>
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Dsp/KiwiEngine_DacTilde.h>
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Dsp/KiwiEngine_MeterTilde.h>
-
-// ================================================================================ //
-//                                  MATH OBJECTS                                    //
-// ================================================================================ //
-
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Math/KiwiEngine_Plus.h>
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Math/KiwiEngine_Times.h>
-
-// ================================================================================ //
-//                                  MESSAGE OBJECTS                                 //
-// ================================================================================ //
-
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Message/KiwiEngine_Receive.h>
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Message/KiwiEngine_Loadmess.h>
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Message/KiwiEngine_Print.h>
-
-// ================================================================================ //
-//                                  TIME OBJECTS                                    //
-// ================================================================================ //
-
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Time/KiwiEngine_Pipe.h>
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Time/KiwiEngine_Delay.h>
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Time/KiwiEngine_Metro.h>
-
-// ================================================================================ //
-//                               CONTROLLER OBJECTS                                 //
-// ================================================================================ //
-
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Controller/KiwiEngine_Bang.h>
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Controller/KiwiEngine_Toggle.h>
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Controller/KiwiEngine_Slider.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_NewBox.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_ErrorBox.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Print.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Receive.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Slider.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Plus.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Times.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Delay.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Metro.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Pipe.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Bang.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Toggle.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_AdcTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_DacTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_OscTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Loadmess.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_TimesTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_PlusTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_SigTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_MeterTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_DelaySimpleTilde.h>

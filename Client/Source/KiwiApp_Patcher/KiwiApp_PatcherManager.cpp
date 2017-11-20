@@ -475,12 +475,10 @@ namespace kiwi
             std::unique_lock<std::mutex> lock(m_instance.useEngineInstance().getScheduler().lock());
             
             patcher.entity().emplace<model::DocumentManager>(patcher.document());
-            patcher.entity().emplace<engine::Patcher>(m_instance.useEngineInstance());
+            patcher.entity().emplace<engine::Patcher>(m_instance.useEngineInstance(), patcher);
         }
         
-        {
-            std::unique_lock<std::mutex> lock(m_instance.useEngineInstance().getScheduler().lock());
-            
+        {   
             patcher.entity().use<engine::Patcher>().modelChanged(patcher);
         }
         

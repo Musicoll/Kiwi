@@ -241,6 +241,12 @@ namespace kiwi
         //! @internal Utility to quit the app asynchronously.
         class AsyncQuitRetrier;
         
+        //! @internal Initializes engine's factory declaring engine objects
+        void declareEngineObjects();
+        
+        //! @internal Initializes gui specific objects.
+        void declareObjectViews();
+        
     private: // members
         
         std::unique_ptr<ApiController>                      m_api_controller;

@@ -21,8 +21,11 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include <KiwiApp.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectFrame.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectView.h>
+
+#include <KiwiModel/KiwiModel_DocumentManager.h>
 
 namespace kiwi
 {
@@ -32,8 +35,11 @@ namespace kiwi
     
     ObjectView::ObjectView(model::Object & object_model):
     m_model(object_model),
-    m_border_size(1.5)
+    m_border_size(1.5),
+    m_tasks()
     {
+        object_model.addListener(*this);
+        
         setColour(ObjectView::ColourIds::Error, juce::Colour::fromFloatRGBA(0.6, 0.1, 0.1, 0.));
         setColour(ObjectView::ColourIds::Background, juce::Colours::white);
         setColour(ObjectView::ColourIds::Text, juce::Colours::black);
@@ -43,6 +49,44 @@ namespace kiwi
     }
     
     ObjectView::~ObjectView()
+    {
+        for (auto task : m_tasks)
+        {
+            getScheduler().unschedule(task);
+        }
+        
+        getModel().removeListener(*this);
+    }
+    
+    void ObjectView::setAttribute(std::string const& name, tool::Parameter const& parameter)
+    {
+        model::Object & object_model = getModel();
+        
+        object_model.setAttribute(name, parameter);
+        
+        model::DocumentManager::commit(object_model);
+    }
+    
+    void ObjectView::setParameter(std::string const& name, tool::Parameter const& parameter)
+    {
+        getModel().setParameter(name, parameter);
+    }
+    
+    void ObjectView::modelAttributeChanged(std::string const& name, tool::Parameter const& param)
+    {
+        attributeChanged(name, param);
+    }
+    
+    void ObjectView::modelParameterChanged(std::string const& name, tool::Parameter const& param)
+    {
+        parameterChanged(name, param);
+    }
+    
+    void ObjectView::attributeChanged(std::string const& name, tool::Parameter const& param)
+    {
+    }
+    
+    void ObjectView::parameterChanged(std::string const& name, tool::Parameter const& param)
     {
     }
     
@@ -61,5 +105,77 @@ namespace kiwi
         juce::Rectangle<int> outline = getOutline();
         
         g.drawRect(getOutline(), m_border_size);
+    }
+    
+    // ================================================================================ //
+    //                                      SCHEDULER                                   //
+    // ================================================================================ //
+    
+    tool::Scheduler<> & ObjectView::getScheduler() const
+    {
+        return KiwiApp::useInstance().useScheduler();
+    }
+    
+    void ObjectView::defer(std::function<void()> call_back)
+    {
+        removeTasks(m_tasks);
+        
+        std::shared_ptr<Task> task(new Task(call_back));
+        
+        m_tasks.insert(task);
+        
+        getScheduler().defer(task);
+    }
+    
+    void ObjectView::schedule(std::function<void()> call_back, tool::Scheduler<>::duration_t delay)
+    {
+        removeTasks(m_tasks);
+        
+        std::shared_ptr<Task> task(new Task(call_back));
+        
+        m_tasks.insert(task);
+        
+        getScheduler().schedule(task, delay);
+    }
+    
+    void ObjectView::removeTasks(std::set<std::shared_ptr<Task>> & tasks)
+    {
+        for (auto task_it = m_tasks.begin(); task_it != m_tasks.end(); )
+        {
+            if ((*task_it)->executed() == true)
+            {
+                task_it = m_tasks.erase(task_it);
+            }
+            else
+            {
+                ++task_it;
+            }
+        }
+    }
+    
+    // ================================================================================ //
+    //                                        TASK                                      //
+    // ================================================================================ //
+    
+    ObjectView::Task::Task(std::function<void()> callback):
+    m_callback(callback),
+    m_executed(false)
+    {
+    }
+    
+    ObjectView::Task::~Task()
+    {
+    }
+    
+    void ObjectView::Task::execute()
+    {
+        m_callback();
+        
+        m_executed.store(true);
+    }
+    
+    bool ObjectView::Task::executed() const
+    {
+        return m_executed.load();
     }
 }
