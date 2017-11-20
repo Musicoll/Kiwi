@@ -59,6 +59,7 @@ namespace kiwi
             model::PhasorTilde::declare();
             model::SahTilde::declare();
             model::SnapshotTilde::declare();
+            model::Trigger::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)

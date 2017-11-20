@@ -47,3 +47,4 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_PhasorTilde.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_SahTilde.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_SnapshotTilde.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Trigger.h>

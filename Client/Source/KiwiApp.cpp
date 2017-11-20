@@ -162,6 +162,7 @@ namespace kiwi
         engine::PhasorTilde::declare();
         engine::SahTilde::declare();
         engine::SnapshotTilde::declare();
+        engine::Trigger::declare();
     }
     
     void KiwiApp::declareObjectViews()
