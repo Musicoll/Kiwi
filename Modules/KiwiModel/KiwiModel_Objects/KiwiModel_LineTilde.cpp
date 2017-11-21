@@ -47,6 +47,16 @@ namespace kiwi { namespace model {
     
     LineTilde::LineTilde(std::vector<tool::Atom> const& args)
     {
+        if (args.size() > 1)
+        {
+            throw Error("line~ too many arguments");
+        }
+        
+        if (args.size() == 1 && !args[0].isNumber())
+        {
+            throw Error("line~ initial value shall be a number");
+        }
+        
         pushInlet({PinType::IType::Control});
         pushInlet({PinType::IType::Control});
         pushOutlet(PinType::IType::Signal);
