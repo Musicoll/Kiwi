@@ -54,7 +54,7 @@ namespace kiwi { namespace engine {
             }
             else
             {
-                warning("snapshot~ inlet 1 doesn't understanc [" + args[0].getString() + "]");
+                warning("snapshot~ inlet 1 doesn't understand args");
             }
         }
     }
