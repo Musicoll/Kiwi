@@ -63,6 +63,7 @@ namespace kiwi
             model::LineTilde::declare();
             model::Minus::declare();
             model::Divide::declare();
+            model::Equal::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)
