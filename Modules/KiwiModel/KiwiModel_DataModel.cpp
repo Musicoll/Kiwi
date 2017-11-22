@@ -71,6 +71,7 @@ namespace kiwi
             model::Modulo::declare();
             model::MinusTilde::declare();
             model::DivideTilde::declare();
+            model::LessTilde::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)

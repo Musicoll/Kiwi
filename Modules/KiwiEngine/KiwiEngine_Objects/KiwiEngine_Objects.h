@@ -59,3 +59,4 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Modulo.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_MinusTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_DivideTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_LessTilde.h>
