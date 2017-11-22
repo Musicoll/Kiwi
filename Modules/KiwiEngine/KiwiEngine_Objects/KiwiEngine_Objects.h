@@ -56,3 +56,4 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Greater.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Different.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Pow.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Modulo.h>
