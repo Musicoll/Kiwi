@@ -65,6 +65,7 @@ namespace kiwi
             model::Divide::declare();
             model::Equal::declare();
             model::Less::declare();
+            model::Greater::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)

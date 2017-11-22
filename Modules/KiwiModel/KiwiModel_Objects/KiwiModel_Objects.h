@@ -53,3 +53,4 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Divide.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Equal.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Less.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Greater.h>
