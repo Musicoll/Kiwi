@@ -21,30 +21,25 @@
 
 #pragma once
 
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Operator.h>
 #include <KiwiEngine/KiwiEngine_Object.h>
 
 namespace kiwi { namespace engine {
     
-        // ================================================================================ //
-        //                                    OBJECT OPERATOR                               //
-        // ================================================================================ //
-        
-        class Operator : public engine::Object
-        {
-        public:
-            
-            Operator(model::Object const& model, Patcher& patcher);
-            
-            void receive(size_t index, std::vector<tool::Atom> const& args) override final;
-            
-            void bang();
-            
-            virtual double compute(double lhs, double rhs) const = 0;
-        
-        protected:
-            
-            double m_lhs;
-            double m_rhs;
-        };
+    // ================================================================================ //
+    //                                    OBJECT DIVIDE                                 //
+    // ================================================================================ //
     
+    class Divide : public Operator
+    {
+    public:
+        
+        static void declare();
+        
+        static std::unique_ptr<Object> create(model::Object const& model, Patcher& patcher);
+        
+        Divide(model::Object const& model, Patcher& patcher);
+        
+        double compute(double lhs, double rhs) const override final;
+    };
 }}

@@ -50,3 +50,4 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Trigger.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_LineTilde.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Minus.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Divide.h>

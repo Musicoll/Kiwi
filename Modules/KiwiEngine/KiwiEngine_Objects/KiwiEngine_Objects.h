@@ -50,3 +50,4 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Trigger.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_LineTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Minus.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Divide.h>
