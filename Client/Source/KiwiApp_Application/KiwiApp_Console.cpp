@@ -140,7 +140,7 @@ namespace kiwi
     
     void ConsoleContent::consoleHistoryChanged(ConsoleHistory const&)
     {
-        engine::Scheduler<> &scheduler = KiwiApp::useInstance().useScheduler();
+        tool::Scheduler<> &scheduler = KiwiApp::useInstance().useScheduler();
         
         scheduler.defer([this]()
         {

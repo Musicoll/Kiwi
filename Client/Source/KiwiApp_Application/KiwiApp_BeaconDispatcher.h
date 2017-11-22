@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <KiwiTool/KiwiTool_Atom.h>
 #include <KiwiEngine/KiwiEngine_Instance.h>
 
 #include "../KiwiApp_Components/KiwiApp_Window.h"
@@ -78,10 +79,10 @@ namespace kiwi
         };
         
         //! @brief dispatch message to castaways
-        void sendValue(std::vector<Atom> const& args) const;
+        void sendValue(std::vector<tool::Atom> const& args) const;
         
         //! @brief dispatch message to castaways
-        void send(std::string const& name, std::vector<Atom> const& args) const;
+        void send(std::string const& name, std::vector<tool::Atom> const& args) const;
         
         //! @brief Called when a slider value changed.
         void sliderValueChanged(juce::Slider* slider) override;

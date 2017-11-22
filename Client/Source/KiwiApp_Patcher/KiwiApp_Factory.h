@@ -41,7 +41,7 @@ namespace kiwi
     {
     public: // definitions
         
-        using factory_func = std::function<std::unique_ptr<ObjectView>(model::Object & model)>;
+        using ctor_fn_t = std::function<std::unique_ptr<ObjectView>(model::Object & model)>;
         
     public: // methods
 
@@ -49,24 +49,23 @@ namespace kiwi
         //! @details Returns an object corresponding to a certain object's model.
         static std::unique_ptr<ObjectView> createObjectView(model::Object & object_model);
         
-        //! @brief Initializes the list of creators adding a function for each type of objects.
-        static void initialise();
-        
-    private: // members
-        
         //! @brief Adds a object to the factory.
         template<class TObject>
-        static void add(std::string const& name)
+        static void add(std::string const& name, ctor_fn_t create_method)
         {
-            assert(model::Factory::has(name) && "Adding an engine object that has no corresponding model");
+            static_assert(std::is_base_of<ObjectView, TObject>::value,
+                          "object's view doesn't inherit from class ObjectView");
             
-            m_creator_map[name] = [](model::Object & object_model)
-            {
-                return std::make_unique<TObject>(object_model);
-            };
+            static_assert(!std::is_abstract<TObject>::value,
+                          "The object's view must not be abstract.");
+            
+            assert(model::Factory::has(name) && "Adding an engine object that has no corresponding model");
+            assert(m_creators.count(name) == 0 && "The object already exists");
+            
+            m_creators[name] = create_method;
         };
         
-        static std::map<std::string, factory_func> m_creator_map;
+        static std::map<std::string, ctor_fn_t> m_creators;
 
     private: // deleted methods
         

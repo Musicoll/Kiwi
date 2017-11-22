@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <KiwiEngine/KiwiEngine_Listeners.h>
+#include <KiwiTool/KiwiTool_Listeners.h>
 
 #include "../KiwiApp_Network/KiwiApp_Api.h"
 #include "../KiwiApp_General/KiwiApp_StoredSettings.h"
@@ -90,6 +90,6 @@ namespace kiwi
         
     private: // variables
         
-        engine::Listeners<ApiConnectStatusListener> m_listeners;
+        tool::Listeners<ApiConnectStatusListener> m_listeners;
     };
 }

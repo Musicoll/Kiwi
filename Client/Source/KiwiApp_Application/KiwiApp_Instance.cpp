@@ -21,11 +21,12 @@
 
 #include <juce_audio_utils/juce_audio_utils.h>
 
+#include <KiwiModel/KiwiModel_DocumentManager.h>
+
 #include "KiwiApp_Instance.h"
 #include "KiwiApp_AboutWindow.h"
 
 #include "../KiwiApp.h"
-#include "../KiwiApp_Network/KiwiApp_DocumentManager.h"
 #include "../KiwiApp_Components/KiwiApp_Window.h"
 #include "../KiwiApp_Patcher/KiwiApp_PatcherView.h"
 #include "../KiwiApp_Patcher/KiwiApp_PatcherComponent.h"
@@ -42,7 +43,7 @@ namespace kiwi
     
     Instance::Instance() :
     m_scheduler(),
-    m_instance(std::make_unique<DspDeviceManager>()),
+    m_instance(std::make_unique<DspDeviceManager>(), m_scheduler),
     m_browser(),
     m_console_history(std::make_shared<ConsoleHistory>(m_instance)),
     m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
@@ -67,6 +68,13 @@ namespace kiwi
     void Instance::timerCallback()
     {
         m_scheduler.process();
+        
+        for(auto patcher_manager = m_patcher_managers.begin();
+            patcher_manager != m_patcher_managers.end();
+            ++patcher_manager)
+        {
+            (*patcher_manager)->pull();
+        }
     }
     
     uint64_t Instance::getUserId() const noexcept
@@ -116,7 +124,7 @@ namespace kiwi
         return m_instance;
     }
     
-    engine::Scheduler<> & Instance::useScheduler()
+    tool::Scheduler<> & Instance::useScheduler()
     {
         return m_scheduler;
     }
@@ -143,7 +151,7 @@ namespace kiwi
             manager.newView();
         }
         
-        DocumentManager::commit(patcher);
+        model::DocumentManager::commit(patcher);
     }
     
     bool Instance::openFile(juce::File const& file)

@@ -25,6 +25,8 @@
 
 #include <KiwiModel/KiwiModel_DataModel.h>
 
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Plus.h>
+
 using namespace kiwi;
 
 int main( int argc, char* const argv[] )

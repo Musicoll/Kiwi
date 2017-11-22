@@ -24,11 +24,14 @@
 #include <map>
 #include <set>
 
+#include <KiwiTool/KiwiTool_Beacon.h>
+
 #include "KiwiEngine_Def.h"
-#include "KiwiEngine_Beacon.h"
 #include "KiwiEngine_AudioControler.h"
 
 #include <KiwiDsp/KiwiDsp_Chain.h>
+
+#include <KiwiModel/KiwiModel_PatcherUser.h>
 
 namespace kiwi
 {    
@@ -48,7 +51,7 @@ namespace kiwi
         public: // methods
             
             //! @brief Constructor.
-            Patcher(Instance& instance) noexcept;
+            Patcher(Instance& instance, model::Patcher & patcher_model) noexcept;
             
             //! @brief Destructor.
             ~Patcher();
@@ -91,6 +94,9 @@ namespace kiwi
             //! @internal Call the loadbang method of all objects.
             void sendLoadbang();
             
+            //! @brief Returns the patcher's data model.
+            model::Patcher & getPatcherModel();
+            
             // ================================================================================ //
             //                                      CONSOLE                                     //
             // ================================================================================ //
@@ -112,16 +118,25 @@ namespace kiwi
             // ================================================================================ //
             
             //! @brief Returns the engine's scheduler.
-            Scheduler<> & getScheduler() const;
+            tool::Scheduler<> & getScheduler() const;
+            
+            //! @brief Returns the main scheduler
+            tool::Scheduler<> & getMainScheduler() const;
             
             // ================================================================================ //
             //                                      BEACON                                      //
             // ================================================================================ //
             
             //! @brief Gets or creates a Beacon with a given name.
-            Beacon& getBeacon(std::string const& name) const;
+            tool::Beacon& getBeacon(std::string const& name) const;
             
         private: // methods
+            
+            //! @internal Update the patcher's graph according to datamodel.
+            void updateGraph(model::Patcher const& patcher_model);
+            
+            //! @internal Updates obects' parameters according to there data model.
+            void updateAttributes(model::Patcher const& patcher_model);
             
             //! @internal Object model has just been added to the document.
             void objectAdded(model::Object const& object);
@@ -147,9 +162,9 @@ namespace kiwi
             
             Instance&                                       m_instance;
             std::map<uint64_t, std::shared_ptr<Object>>     m_objects;
-            mutable std::mutex                              m_mutex;
             std::vector<SoLinks>                            m_so_links;
             dsp::Chain                                      m_chain;
+            model::Patcher &                                m_patcher_model;
             
         private: // deleted methods
             

@@ -107,7 +107,7 @@ namespace kiwi
         std::mutex                  m_message_mutex;
         std::vector<MessageHolder>  m_messages;
         Sort                        m_sort;
-        engine::Listeners<Listener> m_listeners;
+        tool::Listeners<Listener>   m_listeners;
     };
     
     // ================================================================================ //

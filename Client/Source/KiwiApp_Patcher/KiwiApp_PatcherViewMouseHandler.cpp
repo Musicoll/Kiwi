@@ -22,13 +22,13 @@
 #include <algorithm>
 
 #include <KiwiModel/KiwiModel_Object.h>
+#include <KiwiModel/KiwiModel_DocumentManager.h>
 
 #include <KiwiApp.h>
 #include <KiwiApp_Patcher/KiwiApp_PatcherView.h>
 #include <KiwiApp_Patcher/KiwiApp_LinkView.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectFrame.h>
 #include <KiwiApp_Patcher/KiwiApp_PatcherViewHitTester.h>
-#include <KiwiApp_Network/KiwiApp_DocumentManager.h>
 
 namespace kiwi
 {
@@ -108,7 +108,7 @@ namespace kiwi
             {
                 KiwiApp::commandStatusChanged();
                 
-                DocumentManager::startCommitGesture(m_patcher_view.m_patcher_model);
+                model::DocumentManager::startCommitGesture(m_patcher_view.m_patcher_model);
                 
                 break;
             }
@@ -193,7 +193,7 @@ namespace kiwi
             {
                 m_direction = getResizeDirection(hit_tester);
                 
-                auto& document = m_patcher_view.m_patcher_model.entity().use<DocumentManager>();
+                auto& document = m_patcher_view.m_patcher_model.entity().use<model::DocumentManager>();
                 
                 for (flip::Ref const& ref : m_patcher_view.getSelectedObjects())
                 {
@@ -205,7 +205,7 @@ namespace kiwi
                                                                    object.getHeight());
                 }
                 
-                DocumentManager::startCommitGesture(m_patcher_view.m_patcher_model);
+                model::DocumentManager::startCommitGesture(m_patcher_view.m_patcher_model);
                 
                 break;
             }
@@ -220,7 +220,7 @@ namespace kiwi
     {
         juce::ComponentBoundsConstrainer bounds_constrainer;
         
-        if (!object_model.hasFlag(model::Flag::IFlag::ResizeWidth))
+        if (!object_model.hasFlag(model::ObjectClass::Flag::ResizeWidth))
         {
             bounds_constrainer.setMinimumWidth(object_model.getWidth());
             bounds_constrainer.setMaximumWidth(object_model.getWidth());
@@ -230,7 +230,7 @@ namespace kiwi
             bounds_constrainer.setMinimumWidth(object_model.getMinWidth());
         }
         
-        if (!object_model.hasFlag(model::Flag::IFlag::ResizeHeight))
+        if (!object_model.hasFlag(model::ObjectClass::Flag::ResizeHeight))
         {
             bounds_constrainer.setMinimumHeight(object_model.getHeight());
             bounds_constrainer.setMaximumHeight(object_model.getHeight());
@@ -418,12 +418,12 @@ namespace kiwi
                         new_bounds.setBottom(std::max(new_bounds.getBottom() + delta.getY(), new_bounds.getY()));
                     }
                     
-                    auto& document = m_patcher_view.m_patcher_model.entity().use<DocumentManager>();
+                    auto& document = m_patcher_view.m_patcher_model.entity().use<model::DocumentManager>();
                     
                     applyNewBounds(*document.get<model::Object>(bounds_it.first), new_bounds, ratio);
                 }
                 
-                DocumentManager::commitGesture(m_patcher_view.m_patcher_model, "Resize object");
+                model::DocumentManager::commitGesture(m_patcher_view.m_patcher_model, "Resize object");
                 
                 break;
             }
@@ -472,7 +472,7 @@ namespace kiwi
                     if(link != nullptr)
                     {
                         m_patcher_view.m_view_model.selectLink(*link);
-                        DocumentManager::commit(m_patcher_view.m_patcher_model, "Add link");
+                        model::DocumentManager::commit(m_patcher_view.m_patcher_model, "Add link");
                     }
                 }
                 
@@ -490,7 +490,7 @@ namespace kiwi
             }
             case Action::MoveObject:
             {
-                DocumentManager::endCommitGesture(m_patcher_view.m_patcher_model);
+                model::DocumentManager::endCommitGesture(m_patcher_view.m_patcher_model);
                 
                 KiwiApp::commandStatusChanged();
                 
@@ -511,7 +511,7 @@ namespace kiwi
                 m_direction = Direction::None;
                 m_mousedown_bounds.clear();
                 
-                DocumentManager::endCommitGesture(m_patcher_view.m_patcher_model);
+                model::DocumentManager::endCommitGesture(m_patcher_view.m_patcher_model);
                 
                 m_patcher_view.m_viewport.updatePatcherArea(true);
                 
@@ -678,22 +678,22 @@ namespace kiwi
         
         model::Object const& object_model = hit_tester.getObject()->getModel();
         
-        if ((border & HitTester::Border::Top) && object_model.hasFlag(model::Flag::IFlag::ResizeHeight))
+        if ((border & HitTester::Border::Top) && object_model.hasFlag(model::ObjectClass::Flag::ResizeHeight))
         {
             direction |= Direction::Up;
         }
         
-        if ((border & HitTester::Border::Right) && object_model.hasFlag(model::Flag::IFlag::ResizeWidth))
+        if ((border & HitTester::Border::Right) && object_model.hasFlag(model::ObjectClass::Flag::ResizeWidth))
         {
             direction |= Direction::Right;
         }
         
-        if ((border & HitTester::Border::Bottom) && object_model.hasFlag(model::Flag::IFlag::ResizeHeight))
+        if ((border & HitTester::Border::Bottom) && object_model.hasFlag(model::ObjectClass::Flag::ResizeHeight))
         {
             direction |= Direction::Down;
         }
         
-        if ((border & HitTester::Border::Left) && object_model.hasFlag(model::Flag::IFlag::ResizeWidth))
+        if ((border & HitTester::Border::Left) && object_model.hasFlag(model::ObjectClass::Flag::ResizeWidth))
         {
             direction |= Direction::Left;
         }

@@ -22,7 +22,7 @@
 #pragma once
 
 #include <juce_data_structures/juce_data_structures.h>
-#include <KiwiEngine/KiwiEngine_Listeners.h>
+#include <KiwiTool/KiwiTool_Listeners.h>
 #include <json.hpp>
 
 namespace kiwi
@@ -109,7 +109,7 @@ namespace kiwi
     private: // variables
         
         juce::ValueTree m_settings;
-        engine::Listeners<Listener> m_listeners;
+        tool::Listeners<Listener> m_listeners;
         
         friend StoredSettings;
     };

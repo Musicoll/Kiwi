@@ -57,7 +57,7 @@ namespace kiwi
         if(btn == &m_send_button)
         {
             std::string args = m_message_editor.getText().toStdString();
-            m_owner.sendValue(AtomHelper::parse(args));
+            m_owner.sendValue(tool::AtomHelper::parse(args));
         }
     }
     
@@ -195,16 +195,16 @@ namespace kiwi
         }
     }
     
-    void BeaconDispatcherElem::sendValue(std::vector<Atom> const& args) const
+    void BeaconDispatcherElem::sendValue(std::vector<tool::Atom> const& args) const
     {
         send(m_beacon_name_editor.getText().toStdString(), args);
     }
     
-    void BeaconDispatcherElem::send(std::string const& name, std::vector<Atom> const& args) const
+    void BeaconDispatcherElem::send(std::string const& name, std::vector<tool::Atom> const& args) const
     {
         if(!name.empty() && !args.empty())
         {
-            engine::Beacon& beacon = m_instance.getBeacon(name);
+            tool::Beacon& beacon = m_instance.getBeacon(name);
             beacon.dispatch(args);
         }
     }

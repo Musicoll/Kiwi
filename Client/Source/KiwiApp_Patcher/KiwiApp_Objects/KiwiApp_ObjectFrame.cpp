@@ -24,6 +24,7 @@
 
 #include <KiwiApp.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectFrame.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ClassicView.h>
 
 namespace kiwi
 {
@@ -228,20 +229,6 @@ namespace kiwi
         return getPatcherView().isSelected(*this);
     }
     
-    bool ObjectFrame::isEditing() const
-    {
-        bool is_editing = false;
-        
-        ClassicView * classic_view = dynamic_cast<ClassicView*>(m_object_view.get());
-        
-        if (classic_view != nullptr)
-        {
-            is_editing = classic_view->isEditing();
-        }
-        
-        return is_editing;
-    }
-    
     std::set<uint64_t> ObjectFrame::getDistantSelection() const
     {
         return getPatcherView().getDistantSelection(*this);
@@ -278,11 +265,21 @@ namespace kiwi
         }
     }
     
+    void ObjectFrame::attributeChanged(std::string const& name, tool::Parameter const& parameter)
+    {
+        m_object_view->modelAttributeChanged(name, parameter);
+    }
+    
     void ObjectFrame::textChanged(std::string const& new_text)
     {
-        dynamic_cast<ClassicView*>(m_object_view.get())->removeListener(*this);
+        dynamic_cast<EditableObjectView*>(m_object_view.get())->removeListener(*this);
         
-        getPatcherView().objectTextChanged(*this, new_text);
+        ClassicView * object_view = dynamic_cast<ClassicView*>(m_object_view.get());
+        
+        if (object_view)
+        {
+            getPatcherView().objectTextChanged(*this, new_text);
+        }
     }
     
     void ObjectFrame::editorHidden()
@@ -301,7 +298,7 @@ namespace kiwi
     
     void ObjectFrame::editObject()
     {
-        ClassicView * object_view = dynamic_cast<ClassicView*>(m_object_view.get());
+        EditableObjectView * object_view = dynamic_cast<EditableObjectView*>(m_object_view.get());
         
         if (object_view != nullptr)
         {

@@ -19,7 +19,7 @@
  ==============================================================================
  */
 
-#include <KiwiModel/KiwiModel_Objects/KiwiModel_Basic/KiwiModel_ErrorBox.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_ErrorBox.h>
 
 #include "KiwiModel_Factory.h"
 
@@ -31,7 +31,9 @@ namespace kiwi
         //                                      FACTORY                                     //
         // ================================================================================ //
         
-        std::unique_ptr<model::Object> Factory::create(std::vector<Atom> const& atoms)
+        std::vector<std::unique_ptr<ObjectClass>> Factory::m_object_classes;
+        
+        std::unique_ptr<model::Object> Factory::create(std::vector<tool::Atom> const& atoms)
         {
             std::unique_ptr<model::Object> object;
             
@@ -41,27 +43,26 @@ namespace kiwi
             {
                 object_class = getClassByName("errorbox");
                 
-                object = object_class->create(std::vector<Atom>());
+                object = object_class->create(std::vector<tool::Atom>());
                 dynamic_cast<ErrorBox*>(object.get())->setError("object \"" + atoms[0].getString() + "\" not found");
             }
             else
             {
                 try
                 {
-                    std::vector<Atom> args(atoms.empty() ? atoms.begin() : atoms.begin() + 1, atoms.end());
+                    std::vector<tool::Atom> args(atoms.empty() ? atoms.begin() : atoms.begin() + 1, atoms.end());
                     object = object_class->create(args);
                 }
-                catch(std::runtime_error & e)
+                catch(model::Object::Error & e)
                 {
                     object_class = getClassByName("errorbox");
                     
-                    object = object_class->create(std::vector<Atom>());
+                    object = object_class->create(std::vector<tool::Atom>());
                     dynamic_cast<ErrorBox*>(object.get())->setError(e.what());
                 }
             }
             
-            object->m_name = object_class->getName();
-            object->m_text = AtomHelper::toString(atoms);
+            object->m_text = tool::AtomHelper::toString(atoms);
             
             return object;
         }
@@ -69,6 +70,7 @@ namespace kiwi
         std::unique_ptr<model::Object> Factory::create(std::string const& name, flip::Mold const& mold)
         {
             auto const* class_ptr = getClassByName(name);
+            
             if(class_ptr != nullptr)
             {
                 return class_ptr->moldCast(mold);
@@ -95,8 +97,7 @@ namespace kiwi
         
         bool Factory::has(std::string const& name)
         {
-            const auto& object_classes = getClasses();
-            for(const auto& object_class : object_classes)
+            for(const auto& object_class : m_object_classes)
             {
                 if(object_class->getName() == name || object_class->hasAlias(name))
                     return true;
@@ -105,11 +106,10 @@ namespace kiwi
             return false;
         }
         
-        Factory::ObjectClassBase* Factory::getClassByName(std::string const& name,
-                                                          const bool ignore_aliases)
+        ObjectClass const* Factory::getClassByName(std::string const& name,
+                                             const bool ignore_aliases)
         {
-            const auto& object_classes = getClasses();
-            for(const auto& object_class : object_classes)
+            for(const auto& object_class : m_object_classes)
             {
                 if(object_class->getName() == name || (!ignore_aliases && object_class->hasAlias(name)))
                     return object_class.get();
@@ -118,15 +118,26 @@ namespace kiwi
             return nullptr;
         }
         
+        ObjectClass const* Factory::getClassByTypeId(size_t type_id)
+        {
+            auto found_class = std::find_if(m_object_classes.begin(),
+                                            m_object_classes.end(),
+                                            [type_id](std::unique_ptr<ObjectClass> const& object_class)
+            {
+                return object_class->m_type_id == type_id;
+            });
+            
+            return found_class != m_object_classes.end() ? found_class->get() : nullptr;
+        }
+        
         std::vector<std::string> Factory::getNames(const bool ignore_aliases, const bool ignore_internals)
         {
-            auto const& object_classes = getClasses();
             std::vector<std::string> names;
-            names.reserve(object_classes.size());
+            names.reserve(m_object_classes.size());
             
-            for(const auto& object_class : object_classes)
+            for(const auto& object_class : m_object_classes)
             {
-                if(!object_class->isInternal() || !ignore_internals)
+                if(!object_class->hasFlag(ObjectClass::Flag::Internal) || !ignore_internals)
                 {
                     names.emplace_back(object_class->getName());
                     
@@ -159,12 +170,6 @@ namespace kiwi
             }
             
             return model_name;
-        }
-        
-        auto Factory::getClasses() -> object_classes_t&
-        {
-            static object_classes_t static_object_classes;
-            return static_object_classes;
         }
     }
 }
