@@ -167,6 +167,7 @@ namespace kiwi
         engine::Minus::declare();
         engine::Divide::declare();
         engine::Equal::declare();
+        engine::Less::declare();
     }
     
     void KiwiApp::declareObjectViews()

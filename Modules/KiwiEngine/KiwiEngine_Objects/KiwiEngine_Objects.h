@@ -52,3 +52,4 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Minus.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Divide.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Equal.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Less.h>
