@@ -175,6 +175,7 @@ namespace kiwi
         engine::MinusTilde::declare();
         engine::DivideTilde::declare();
         engine::LessTilde::declare();
+        engine::GreaterTilde::declare();
     }
     
     void KiwiApp::declareObjectViews()
