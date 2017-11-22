@@ -67,6 +67,7 @@ namespace kiwi
             model::Less::declare();
             model::Greater::declare();
             model::Different::declare();
+            model::Pow::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)

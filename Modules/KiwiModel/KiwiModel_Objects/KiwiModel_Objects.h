@@ -55,3 +55,4 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Less.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Greater.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Different.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Pow.h>
