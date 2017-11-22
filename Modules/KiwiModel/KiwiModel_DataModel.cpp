@@ -70,6 +70,7 @@ namespace kiwi
             model::Pow::declare();
             model::Modulo::declare();
             model::MinusTilde::declare();
+            model::DivideTilde::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)

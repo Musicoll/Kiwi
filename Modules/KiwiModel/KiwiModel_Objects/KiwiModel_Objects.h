@@ -58,3 +58,4 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Pow.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Modulo.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_MinusTilde.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_DivideTilde.h>
