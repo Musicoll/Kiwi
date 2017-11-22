@@ -61,3 +61,4 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_DivideTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_LessTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_GreaterTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_EqualTilde.h>

@@ -61,3 +61,4 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_DivideTilde.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_LessTilde.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_GreaterTilde.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_EqualTilde.h>
