@@ -61,6 +61,7 @@ namespace kiwi
             model::SnapshotTilde::declare();
             model::Trigger::declare();
             model::LineTilde::declare();
+            model::Minus::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)

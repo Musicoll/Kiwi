@@ -49,3 +49,4 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_SnapshotTilde.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Trigger.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_LineTilde.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Minus.h>
