@@ -183,6 +183,8 @@ namespace kiwi
         engine::GreaterEqual::declare();
         engine::GreaterEqualTilde::declare();
         engine::Comment::declare();
+        engine::Pack::declare();
+        engine::Unpack::declare();
     }
     
     void KiwiApp::declareObjectViews()
