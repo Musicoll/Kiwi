@@ -186,6 +186,7 @@ namespace kiwi
         engine::Pack::declare();
         engine::Unpack::declare();
         engine::Random::declare();
+        engine::Scale::declare();
     }
     
     void KiwiApp::declareObjectViews()
