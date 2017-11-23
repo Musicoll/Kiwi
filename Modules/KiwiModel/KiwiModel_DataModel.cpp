@@ -82,6 +82,7 @@ namespace kiwi
             model::Comment::declare();
             model::Pack::declare();
             model::Unpack::declare();
+            model::Random::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)

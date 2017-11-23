@@ -70,3 +70,4 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Comment.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Pack.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Unpack.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Random.h>

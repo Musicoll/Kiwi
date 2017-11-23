@@ -70,3 +70,4 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Comment.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Pack.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Unpack.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Random.h>
