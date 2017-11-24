@@ -36,9 +36,7 @@ namespace kiwi { namespace model {
             OperatorTilde::declare();
         }
         
-        std::unique_ptr<ObjectClass> plustilde_class(new ObjectClass("plus~", &PlusTilde::create));
-        
-        plustilde_class->addAlias("+~");
+        std::unique_ptr<ObjectClass> plustilde_class(new ObjectClass("+~", &PlusTilde::create));
         
         flip::Class<PlusTilde> & plustilde_model = DataModel::declare<PlusTilde>()
                                                    .name(plustilde_class->getModelName().c_str())

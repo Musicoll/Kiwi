@@ -32,7 +32,7 @@ namespace kiwi { namespace engine {
     
     void Modulo::declare()
     {
-        Factory::add<Modulo>("modulo", &Modulo::create);
+        Factory::add<Modulo>("%", &Modulo::create);
     }
     
     std::unique_ptr<Object> Modulo::create(model::Object const& model, Patcher & patcher)

@@ -35,9 +35,7 @@ namespace kiwi { namespace model {
             OperatorTilde::declare();
         }
         
-        std::unique_ptr<ObjectClass> differenttilde_class(new ObjectClass("different~", &DifferentTilde::create));
-        
-        differenttilde_class->addAlias("!=~");
+        std::unique_ptr<ObjectClass> differenttilde_class(new ObjectClass("!=~", &DifferentTilde::create));
         
         flip::Class<DifferentTilde> & differenttilde_model = DataModel::declare<DifferentTilde>()
                                                                 .name(differenttilde_class->getModelName().c_str())

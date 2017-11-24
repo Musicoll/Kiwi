@@ -30,7 +30,7 @@ namespace kiwi { namespace engine {
     
     void DifferentTilde::declare()
     {
-        Factory::add<DifferentTilde>("different~", &DifferentTilde::create);
+        Factory::add<DifferentTilde>("!=~", &DifferentTilde::create);
     }
     
     std::unique_ptr<Object> DifferentTilde::create(model::Object const& model, Patcher & patcher)

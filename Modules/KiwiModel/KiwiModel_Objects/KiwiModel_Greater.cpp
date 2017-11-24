@@ -35,10 +35,8 @@ namespace kiwi { namespace model {
             Operator::declare();
         }
         
-        std::unique_ptr<ObjectClass> greater_class(new ObjectClass("greater",
+        std::unique_ptr<ObjectClass> greater_class(new ObjectClass(">",
                                                                    &Greater::create));
-        
-        greater_class->addAlias(">");
         
         flip::Class<Greater> & greater_model = DataModel::declare<Greater>()
                                                .name(greater_class->getModelName().c_str())

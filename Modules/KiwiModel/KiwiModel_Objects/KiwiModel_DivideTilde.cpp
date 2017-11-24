@@ -35,9 +35,7 @@ namespace kiwi { namespace model {
             OperatorTilde::declare();
         }
         
-        std::unique_ptr<ObjectClass> dividetilde_class(new ObjectClass("divide~", &DivideTilde::create));
-        
-        dividetilde_class->addAlias("/~");
+        std::unique_ptr<ObjectClass> dividetilde_class(new ObjectClass("/~", &DivideTilde::create));
         
         flip::Class<DivideTilde> & dividetilde_model = DataModel::declare<DivideTilde>()
                                                                 .name(dividetilde_class->getModelName().c_str())

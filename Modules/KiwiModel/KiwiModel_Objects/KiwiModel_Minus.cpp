@@ -35,10 +35,8 @@ namespace kiwi { namespace model {
             Operator::declare();
         }
         
-        std::unique_ptr<ObjectClass> minus_class(new ObjectClass("minus",
+        std::unique_ptr<ObjectClass> minus_class(new ObjectClass("-",
                                                                  &Minus::create));
-        
-        minus_class->addAlias("-");
         
         flip::Class<Minus> & minus_model = DataModel::declare<Minus>()
                                            .name(minus_class->getModelName().c_str())

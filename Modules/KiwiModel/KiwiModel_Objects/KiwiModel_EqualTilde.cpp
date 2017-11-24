@@ -35,9 +35,7 @@ namespace kiwi { namespace model {
             OperatorTilde::declare();
         }
         
-        std::unique_ptr<ObjectClass> equaltilde_class(new ObjectClass("equal~", &EqualTilde::create));
-        
-        equaltilde_class->addAlias("==~");
+        std::unique_ptr<ObjectClass> equaltilde_class(new ObjectClass("==~", &EqualTilde::create));
         
         flip::Class<EqualTilde> & equaltilde_model = DataModel::declare<EqualTilde>()
                                                                 .name(equaltilde_class->getModelName().c_str())

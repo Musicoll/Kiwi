@@ -30,7 +30,7 @@ namespace kiwi { namespace engine {
     
     void Divide::declare()
     {
-        Factory::add<Divide>("divide", &Divide::create);
+        Factory::add<Divide>("/", &Divide::create);
     }
     
     std::unique_ptr<Object> Divide::create(model::Object const& model, Patcher & patcher)

@@ -30,7 +30,7 @@ namespace kiwi { namespace engine {
     
     void Greater::declare()
     {
-        Factory::add<Greater>("greater", &Greater::create);
+        Factory::add<Greater>(">", &Greater::create);
     }
     
     std::unique_ptr<Object> Greater::create(model::Object const& model, Patcher & patcher)

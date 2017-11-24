@@ -35,10 +35,8 @@ namespace kiwi { namespace model {
             Operator::declare();
         }
         
-        std::unique_ptr<ObjectClass> modulo_class(new ObjectClass("modulo",
+        std::unique_ptr<ObjectClass> modulo_class(new ObjectClass("%",
                                                                   &Modulo::create));
-        
-        modulo_class->addAlias("%");
         
         flip::Class<Modulo> & modulo_model = DataModel::declare<Modulo>()
                                             .name(modulo_class->getModelName().c_str())

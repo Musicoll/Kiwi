@@ -30,7 +30,7 @@ namespace kiwi { namespace engine {
     
     void Less::declare()
     {
-        Factory::add<Less>("less", &Less::create);
+        Factory::add<Less>("<", &Less::create);
     }
     
     std::unique_ptr<Object> Less::create(model::Object const& model, Patcher & patcher)

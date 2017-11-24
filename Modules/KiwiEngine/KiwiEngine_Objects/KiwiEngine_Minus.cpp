@@ -30,7 +30,7 @@ namespace kiwi { namespace engine {
     
     void Minus::declare()
     {
-        Factory::add<Minus>("minus", &Minus::create);
+        Factory::add<Minus>("-", &Minus::create);
     }
     
     std::unique_ptr<Object> Minus::create(model::Object const& model, Patcher & patcher)

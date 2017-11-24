@@ -30,7 +30,7 @@ namespace kiwi { namespace engine {
     
     void LessTilde::declare()
     {
-        Factory::add<LessTilde>("less~", &LessTilde::create);
+        Factory::add<LessTilde>("<~", &LessTilde::create);
     }
     
     std::unique_ptr<Object> LessTilde::create(model::Object const& model, Patcher & patcher)

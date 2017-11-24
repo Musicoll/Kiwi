@@ -30,7 +30,7 @@ namespace kiwi { namespace engine {
     
     void GreaterTilde::declare()
     {
-        Factory::add<GreaterTilde>("greater~", &GreaterTilde::create);
+        Factory::add<GreaterTilde>(">~", &GreaterTilde::create);
     }
     
     std::unique_ptr<Object> GreaterTilde::create(model::Object const& model, Patcher & patcher)

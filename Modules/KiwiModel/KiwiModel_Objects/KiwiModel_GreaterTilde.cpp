@@ -35,9 +35,7 @@ namespace kiwi { namespace model {
             OperatorTilde::declare();
         }
         
-        std::unique_ptr<ObjectClass> greatertilde_class(new ObjectClass("greater~", &GreaterTilde::create));
-        
-        greatertilde_class->addAlias(">~");
+        std::unique_ptr<ObjectClass> greatertilde_class(new ObjectClass(">~", &GreaterTilde::create));
         
         flip::Class<GreaterTilde> & greatertilde_model = DataModel::declare<GreaterTilde>()
                                                                 .name(greatertilde_class->getModelName().c_str())

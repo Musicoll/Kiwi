@@ -30,7 +30,7 @@ namespace kiwi { namespace engine {
     
     void EqualTilde::declare()
     {
-        Factory::add<EqualTilde>("equal~", &EqualTilde::create);
+        Factory::add<EqualTilde>("==~", &EqualTilde::create);
     }
     
     std::unique_ptr<Object> EqualTilde::create(model::Object const& model, Patcher & patcher)

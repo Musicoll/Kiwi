@@ -36,10 +36,8 @@ namespace kiwi { namespace model {
             Operator::declare();
         }
         
-        std::unique_ptr<ObjectClass> plus_class(new ObjectClass("plus",
+        std::unique_ptr<ObjectClass> plus_class(new ObjectClass("+",
                                                                 &Plus::create));
-        
-        plus_class->addAlias("+");
         
         flip::Class<Plus> & plus_model = DataModel::declare<Plus>()
                                          .name(plus_class->getModelName().c_str())

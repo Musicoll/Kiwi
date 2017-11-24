@@ -35,9 +35,7 @@ namespace kiwi { namespace model {
             OperatorTilde::declare();
         }
         
-        std::unique_ptr<ObjectClass> lesstilde_class(new ObjectClass("less~", &LessTilde::create));
-        
-        lesstilde_class->addAlias("<~");
+        std::unique_ptr<ObjectClass> lesstilde_class(new ObjectClass("<~", &LessTilde::create));
         
         flip::Class<LessTilde> & lesstilde_model = DataModel::declare<LessTilde>()
                                                                 .name(lesstilde_class->getModelName().c_str())

@@ -36,10 +36,8 @@ namespace kiwi { namespace model {
             Operator::declare();
         }
         
-        std::unique_ptr<ObjectClass> time_class(new ObjectClass("times",
+        std::unique_ptr<ObjectClass> time_class(new ObjectClass("*",
                                                                 &Times::create));
-        
-        time_class->addAlias("*");
         
         flip::Class<Times> & time_model = DataModel::declare<Times>()
                                          .name(time_class->getModelName().c_str())

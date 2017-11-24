@@ -30,7 +30,7 @@ namespace kiwi { namespace engine {
     
     void Equal::declare()
     {
-        Factory::add<Equal>("equal", &Equal::create);
+        Factory::add<Equal>("==", &Equal::create);
     }
     
     std::unique_ptr<Object> Equal::create(model::Object const& model, Patcher & patcher)

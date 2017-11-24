@@ -35,10 +35,8 @@ namespace kiwi { namespace model {
             Operator::declare();
         }
         
-        std::unique_ptr<ObjectClass> different_class(new ObjectClass("different",
+        std::unique_ptr<ObjectClass> different_class(new ObjectClass("!=",
                                                                      &Different::create));
-        
-        different_class->addAlias("!=");
         
         flip::Class<Different> & different_model = DataModel::declare<Different>()
                                                    .name(different_class->getModelName().c_str())

@@ -36,9 +36,7 @@ namespace kiwi { namespace model {
             OperatorTilde::declare();
         }
         
-        std::unique_ptr<ObjectClass> timestilde_class(new ObjectClass("times~", &TimesTilde::create));
-        
-        timestilde_class->addAlias("*~");
+        std::unique_ptr<ObjectClass> timestilde_class(new ObjectClass("*~", &TimesTilde::create));
         
         flip::Class<TimesTilde> & plustilde_model = DataModel::declare<TimesTilde>()
                                                     .name(timestilde_class->getModelName().c_str())

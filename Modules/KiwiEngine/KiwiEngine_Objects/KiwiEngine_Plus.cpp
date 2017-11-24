@@ -31,7 +31,7 @@ namespace kiwi { namespace engine {
     
     void Plus::declare()
     {
-        Factory::add<Plus>("plus", &Plus::create);
+        Factory::add<Plus>("+", &Plus::create);
     }
     
     std::unique_ptr<Object> Plus::create(model::Object const& model, Patcher & patcher)

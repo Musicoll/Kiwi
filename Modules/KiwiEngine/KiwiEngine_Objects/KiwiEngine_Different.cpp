@@ -30,7 +30,7 @@ namespace kiwi { namespace engine {
     
     void Different::declare()
     {
-        Factory::add<Different>("different", &Different::create);
+        Factory::add<Different>("!=", &Different::create);
     }
     
     std::unique_ptr<Object> Different::create(model::Object const& model, Patcher & patcher)

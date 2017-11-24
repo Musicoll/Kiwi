@@ -35,10 +35,8 @@ namespace kiwi { namespace model {
             Operator::declare();
         }
         
-        std::unique_ptr<ObjectClass> less_class(new ObjectClass("less",
+        std::unique_ptr<ObjectClass> less_class(new ObjectClass("<",
                                                                  &Less::create));
-        
-        less_class->addAlias("<");
         
         flip::Class<Less> & less_model = DataModel::declare<Less>()
                                          .name(less_class->getModelName().c_str())

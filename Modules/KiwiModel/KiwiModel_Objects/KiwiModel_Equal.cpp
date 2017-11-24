@@ -35,10 +35,8 @@ namespace kiwi { namespace model {
             Operator::declare();
         }
         
-        std::unique_ptr<ObjectClass> equal_class(new ObjectClass("equal",
+        std::unique_ptr<ObjectClass> equal_class(new ObjectClass("==",
                                                                  &Equal::create));
-        
-        equal_class->addAlias("==");
         
         flip::Class<Equal> & equal_model = DataModel::declare<Equal>()
                                            .name(equal_class->getModelName().c_str())

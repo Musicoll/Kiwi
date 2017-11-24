@@ -35,10 +35,8 @@ namespace kiwi { namespace model {
             Operator::declare();
         }
         
-        std::unique_ptr<ObjectClass> divide_class(new ObjectClass("divide",
+        std::unique_ptr<ObjectClass> divide_class(new ObjectClass("/",
                                                                   &Divide::create));
-        
-        divide_class->addAlias("/");
         
         flip::Class<Divide> & divide_model = DataModel::declare<Divide>()
                                              .name(divide_class->getModelName().c_str())

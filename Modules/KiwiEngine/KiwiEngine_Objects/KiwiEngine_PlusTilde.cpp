@@ -30,7 +30,7 @@ namespace kiwi { namespace engine {
     
     void PlusTilde::declare()
     {
-        Factory::add<PlusTilde>("plus~", &PlusTilde::create);
+        Factory::add<PlusTilde>("+~", &PlusTilde::create);
     }
     
     std::unique_ptr<Object> PlusTilde::create(model::Object const& model, Patcher & patcher)
