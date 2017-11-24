@@ -41,7 +41,7 @@ namespace kiwi { namespace engine {
             
             virtual double compute(double lhs, double rhs) const = 0;
         
-        private:
+        protected:
             
             double m_lhs;
             double m_rhs;

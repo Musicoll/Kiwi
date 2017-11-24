@@ -61,7 +61,7 @@ namespace kiwi { namespace model {
     
     ObjectClass::ObjectClass(std::string const& name, ctor_t ctor):
     m_name(name),
-    m_model_name(Factory::sanitizeName(name)),
+    m_model_name(Factory::toModelName(name)),
     m_aliases(),
     m_params(),
     m_ctor(ctor),

@@ -164,8 +164,13 @@ namespace kiwi
             static std::vector<std::string> getNames(const bool ignore_aliases = false,
                                                      const bool ignore_internals = true);
             
-            //! @internal Returns a sanitized version of the string.
-            static std::string sanitizeName(std::string const& name);
+            //! @internal Returns the corresponding model name. Since flip only ascii-7 characters
+            //! can be used in the datamodel, we define a bijection between name and model name.
+            static std::string toModelName(std::string const& name);
+            
+            //! @internal Returns the corresponding model name. Since flip only ascii-7 characters
+            //! can be used in the datamodel, we define a bijection between name and model name.
+            static std::string toKiwiName(std::string const& name);
             
         private: // members
             

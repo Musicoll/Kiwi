@@ -164,6 +164,24 @@ namespace kiwi
         engine::SnapshotTilde::declare();
         engine::Trigger::declare();
         engine::LineTilde::declare();
+        engine::Minus::declare();
+        engine::Divide::declare();
+        engine::Equal::declare();
+        engine::Less::declare();
+        engine::Greater::declare();
+        engine::Different::declare();
+        engine::Pow::declare();
+        engine::Modulo::declare();
+        engine::MinusTilde::declare();
+        engine::DivideTilde::declare();
+        engine::LessTilde::declare();
+        engine::GreaterTilde::declare();
+        engine::EqualTilde::declare();
+        engine::DifferentTilde::declare();
+        engine::LessEqual::declare();
+        engine::LessEqualTilde::declare();
+        engine::GreaterEqual::declare();
+        engine::GreaterEqualTilde::declare();
     }
     
     void KiwiApp::declareObjectViews()

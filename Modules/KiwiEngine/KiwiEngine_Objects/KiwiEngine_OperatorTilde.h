@@ -45,7 +45,7 @@ namespace kiwi { namespace engine {
         
         virtual void compute(dsp::sample_t & result, dsp::sample_t const& lhs, dsp::sample_t const& rhs) = 0;
         
-    private:
+    protected:
         
         std::atomic<dsp::sample_t>   m_rhs{0.f};
     };

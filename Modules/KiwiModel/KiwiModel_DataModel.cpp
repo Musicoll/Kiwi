@@ -61,6 +61,24 @@ namespace kiwi
             model::SnapshotTilde::declare();
             model::Trigger::declare();
             model::LineTilde::declare();
+            model::Minus::declare();
+            model::Divide::declare();
+            model::Equal::declare();
+            model::Less::declare();
+            model::Greater::declare();
+            model::Different::declare();
+            model::Pow::declare();
+            model::Modulo::declare();
+            model::MinusTilde::declare();
+            model::DivideTilde::declare();
+            model::LessTilde::declare();
+            model::GreaterTilde::declare();
+            model::EqualTilde::declare();
+            model::DifferentTilde::declare();
+            model::LessEqual::declare();
+            model::LessEqualTilde::declare();
+            model::GreaterEqual::declare();
+            model::GreaterEqualTilde::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)

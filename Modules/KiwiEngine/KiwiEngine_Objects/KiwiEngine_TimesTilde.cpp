@@ -30,7 +30,7 @@ namespace kiwi { namespace engine {
     
     void TimesTilde::declare()
     {
-        Factory::add<TimesTilde>("times~", &TimesTilde::create);
+        Factory::add<TimesTilde>("*~", &TimesTilde::create);
     }
     
     std::unique_ptr<Object> TimesTilde::create(model::Object const& model, Patcher & patcher)
