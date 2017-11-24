@@ -77,6 +77,7 @@ namespace kiwi
             model::DifferentTilde::declare();
             model::LessEqual::declare();
             model::LessEqualTilde::declare();
+            model::GreaterEqual::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)
