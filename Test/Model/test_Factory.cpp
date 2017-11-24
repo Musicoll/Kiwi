@@ -42,7 +42,7 @@ TEST_CASE("Model Factory", "[Names]")
     
     SECTION("More complex character chain")
     {
-        std::string kiwi_name = "¨ç*$$sd$sdf$@#2342ééé\\";
+        std::string kiwi_name = "¨ç*$$sd$sdf$@#2342ééé";
         
         std::cout << kiwi_name.size() << std::endl;
         
