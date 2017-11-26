@@ -67,3 +67,8 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_LessEqualTilde.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_GreaterEqual.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_GreaterEqualTilde.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Comment.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Pack.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Unpack.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Random.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Scale.h>

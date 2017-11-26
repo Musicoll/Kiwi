@@ -182,6 +182,11 @@ namespace kiwi
         engine::LessEqualTilde::declare();
         engine::GreaterEqual::declare();
         engine::GreaterEqualTilde::declare();
+        engine::Comment::declare();
+        engine::Pack::declare();
+        engine::Unpack::declare();
+        engine::Random::declare();
+        engine::Scale::declare();
     }
     
     void KiwiApp::declareObjectViews()
@@ -191,6 +196,7 @@ namespace kiwi
         ToggleView::declare();
         MeterTildeView::declare();
         MessageView::declare();
+        CommentView::declare();
     }
     
     void KiwiApp::shutdown()
