@@ -1871,6 +1871,7 @@ namespace kiwi
         commands.add(CommandIDs::newToggle);
         commands.add(CommandIDs::newSlider);
         commands.add(CommandIDs::newMessage);
+        commands.add(CommandIDs::newComment);
         
         commands.add(CommandIDs::zoomIn);
         commands.add(CommandIDs::zoomOut);
@@ -2017,6 +2018,15 @@ namespace kiwi
                 result.setActive(!isLocked());
                 break;
             }
+            case CommandIDs::newComment:
+            {
+                result.setInfo(TRANS("New Comment Box"),
+                               TRANS("Add a new comment"),
+                               CommandCategories::editing, 0);
+                result.addDefaultKeypress('c', juce::ModifierKeys::noModifiers);
+                result.setActive(!isLocked());
+                break;
+            }
             case CommandIDs::newMessage:
             {
                 result.setInfo(TRANS("New Message Box"),
@@ -2097,6 +2107,7 @@ namespace kiwi
             case CommandIDs::newBang:                           { createObjectModel("bang", true); break; }
             case CommandIDs::newToggle:                         { createObjectModel("toggle", true); break; }
             case CommandIDs::newSlider:                         { createObjectModel("slider", true); break; }
+            case CommandIDs::newComment:                        { createObjectModel("comment", true); break; }
             case CommandIDs::newMessage:                        { createObjectModel("message", true); break; }
                 
             case CommandIDs::zoomIn:                            { zoomIn(); break; }
