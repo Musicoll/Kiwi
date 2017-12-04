@@ -72,3 +72,4 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Unpack.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Random.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Scale.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Select.h>
