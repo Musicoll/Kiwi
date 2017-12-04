@@ -72,3 +72,4 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Unpack.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Random.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Scale.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Select.h>
