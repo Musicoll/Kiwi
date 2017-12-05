@@ -360,7 +360,7 @@ namespace kiwi
             }
             case Action::ObjectEdition:
             {
-                if (e.getMouseDownPosition() != e.getPosition())
+                if (hit_tester.objectTouched() && e.getMouseDownPosition() != e.getPosition())
                 {
                     startAction(Action::MoveObject, e);
                 }
@@ -368,16 +368,15 @@ namespace kiwi
             }
             case Action::SwitchSelection:
             {
-                if (e.getMouseDownPosition() != e.getPosition())
+                if (hit_tester.objectTouched() && e.getMouseDownPosition() != e.getPosition())
                 {
                     startAction(Action::MoveObject, e);
                 }
-                
                 break;
             }
             case Action::Selection:
             {
-                if (e.getMouseDownPosition() != e.getPosition())
+                if (hit_tester.objectTouched() && e.getMouseDownPosition() != e.getPosition())
                 {
                     startAction(Action::MoveObject, e);
                 }
