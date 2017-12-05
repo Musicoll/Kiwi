@@ -148,11 +148,14 @@ namespace kiwi
             
             auto session = m_sessions.find(port.session());
             
-            session->second.unbind(port);
-            
-            if (session->second.getConnectedUsers().empty())
+            if (session != m_sessions.end())
             {
-                m_sessions.erase(session);
+                session->second.unbind(port);
+                
+                if (session->second.getConnectedUsers().empty())
+                {
+                    m_sessions.erase(session);
+                }
             }
         }
         
@@ -295,6 +298,22 @@ namespace kiwi
             
             if (authenticateUser(port.user(), port.metadata()))
             {
+                // disconnect client if already connected.
+                
+                std::set<flip::PortBase*> ports = m_document->ports();
+                
+                std::set<flip::PortBase*>::iterator port_user = std::find_if(ports.begin(),
+                                                                             ports.end(),
+                                                                             [&port](flip::PortBase * const document_port)
+                {
+                    return document_port->user() == port.user();
+                });
+                
+                if (port_user != ports.end())
+                {
+                    m_document->port_factory_remove(**port_user);
+                }
+                
                 m_document->port_factory_add(port);
                 
                 m_document->port_greet(port);
@@ -329,28 +348,33 @@ namespace kiwi
             DBG("[server] - User " << std::to_string(port.user())
                 << " disconnecting from session: " << hexadecimal_convert(m_identifier));
             
-            model::Patcher& patcher = m_document->root<model::Patcher>();
+            std::set<flip::PortBase*> ports = m_document->ports();
             
-            m_document->send_signal_if(patcher.signal_user_disconnect.make(port.user()),
-                                       [](flip::PortBase& port)
-                                       {
-                                           return true;
-                                       });
-            
-            m_document->port_factory_remove(port);
-            
-            if (m_document->ports().empty())
+            if (ports.find(&port) != ports.end())
             {
-                if(!m_backend_file.exists())
+                model::Patcher& patcher = m_document->root<model::Patcher>();
+                
+                m_document->send_signal_if(patcher.signal_user_disconnect.make(port.user()),
+                                           [](flip::PortBase& port)
+                                           {
+                                               return true;
+                                           });
+                
+                m_document->port_factory_remove(port);
+                
+                if (m_document->ports().empty())
                 {
-                    m_backend_file.create();
+                    if(!m_backend_file.exists())
+                    {
+                        m_backend_file.create();
+                    }
+                    
+                    DBG("[server] - Saving session : " << hexadecimal_convert(m_identifier)
+                        << " in file : "
+                        << m_backend_file.getFileName());
+                    
+                    save();
                 }
-                
-                DBG("[server] - Saving session : " << hexadecimal_convert(m_identifier)
-                    << " in file : "
-                    << m_backend_file.getFileName());
-                
-                save();
             }
         }
         
