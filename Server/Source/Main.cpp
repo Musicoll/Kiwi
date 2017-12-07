@@ -19,11 +19,18 @@
  ==============================================================================
  */
 
+#include <csignal>
+#include <atomic>
+
+#include <flip/contrib/RunLoopTimer.h>
+
 #include <KiwiModel/KiwiModel_DataModel.h>
 #include <KiwiServer/KiwiServer_Server.h>
 #include "KiwiServer_CommandLineParser.h"
 
 #include <json.hpp>
+
+std::atomic<bool> server_stopped(false);
 
 void showHelp()
 {
@@ -32,10 +39,24 @@ void showHelp()
     std::cout << " -f set the json configuration file to use (needed). \n";
 }
 
+void on_interupt(int signal)
+{
+    server_stopped.store(true);
+}
+
+void on_terminate(int signal)
+{
+    server_stopped.store(true);
+}
+
 int main(int argc, char const* argv[])
 {
     using namespace kiwi;
     using nlohmann::json;
+    
+    std::signal(SIGINT, on_interupt); // interupt, kill -2, Ctrl + C
+    
+    std::signal(SIGTERM, on_terminate); // terminate, kill (-15)
     
     CommandLineParser cl_parser(argc, argv);
     
@@ -75,11 +96,20 @@ int main(int argc, char const* argv[])
     
     try
     {
-        server::Server server(config["port"], config["backend_directory"]);
+        server::Server kiwi_server(config["port"], config["backend_directory"]);
         
         std::cout << "[server] - running on port " << config["port"] << std::endl;
         
-        server.run();
+        flip::RunLoopTimer run_loop ([&kiwi_server]
+        {
+            kiwi_server.process();
+            
+            return !server_stopped.load();
+        }, 0.02);
+        
+        run_loop.run();
+        
+        std::cout << "[server] - stopped" << std::endl;
     }
     catch(std::runtime_error const& e)
     {

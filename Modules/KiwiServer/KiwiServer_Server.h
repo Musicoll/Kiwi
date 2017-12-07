@@ -66,18 +66,6 @@ namespace kiwi
             //! @brief Process the socket hence process all sessions.
             void process();
             
-            //! @brief Run the server.
-            //! @details This will run a loop that call process regularly.
-            //! @see stop
-            void run();
-            
-            //! @brief Stops the server.
-            //! @see Run, isRunning
-            void stop();
-            
-            //! @brief Returns true if the server is running.
-            bool isRunning() const noexcept;
-            
             //! @brief Returns a list of sessions currenty opened.
             std::set<uint64_t> getSessions() const;
             
@@ -121,7 +109,6 @@ namespace kiwi
             
         private: // variables
             
-            std::atomic_bool                m_running;
             juce::File                      m_backend_directory;
             std::map <uint64_t, Session>    m_sessions;
             flip::PortTransportServerTcp    m_socket;

@@ -96,7 +96,6 @@ TEST_CASE("Server - Server", "[Server, Server]")
         CHECK(server->getSessions().count(987654));
         
         // Killing server before client is disconnected.
-        server->stop();
         server.reset(nullptr);
         
         // Client automatically disconnected from server.
@@ -236,8 +235,6 @@ TEST_CASE("Server - Server", "[Server, Server]")
         carrier_1.rebind("", 0);
         
         while(carrier_1.is_connected() || !server.getSessions().empty()){carrier_1.process(); server.process();}
-        
-        server.stop();
         
         juce::File backend ("./server_backend_test");
         

@@ -48,7 +48,6 @@ namespace kiwi
         const char* Server::kiwi_file_extension = "kiwi";
         
         Server::Server(uint16_t port, std::string const& backend_directory) :
-        m_running(false),
         m_backend_directory(backend_directory),
         m_sessions(),
         m_socket(*this, port),
@@ -72,33 +71,6 @@ namespace kiwi
         void Server::process()
         {
             m_socket.process();
-        }
-        
-        void Server::run()
-        {
-            if(!m_running)
-            {
-                flip::RunLoopTimer run_loop ([this]
-                {
-                    process();
-                    return m_running.load();
-                }, 0.02);
-                
-                m_running.store(true);
-                
-                run_loop.run();
-            }
-        }
-        
-        void Server::stop()
-        {
-            m_running.store(false);
-            std::cout << "[server] - stopped" << std::endl;
-        }
-        
-        bool Server::isRunning() const noexcept
-        {
-            return m_running;
         }
         
         std::set<uint64_t> Server::getSessions() const
