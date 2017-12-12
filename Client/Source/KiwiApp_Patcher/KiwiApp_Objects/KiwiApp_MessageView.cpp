@@ -55,6 +55,8 @@ namespace kiwi {
                           findColour(ObjectView::ColourIds::Background));
         label.setColour(juce::Label::textColourId, findColour(ObjectView::ColourIds::Text));
         label.setColour(juce::Label::textWhenEditingColourId, findColour(ObjectView::ColourIds::Text));
+        
+        label.setInterceptsMouseClicks(false, false);
 
         addAndMakeVisible(label);
     }
