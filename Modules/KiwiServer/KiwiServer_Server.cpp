@@ -28,6 +28,7 @@
 #include <flip/contrib/RunLoopTimer.h>
 
 #include <KiwiModel/KiwiModel_DataModel.h>
+#include <KiwiModel/KiwiModel_Def.h>
 
 namespace kiwi
 {
@@ -254,11 +255,9 @@ namespace kiwi
             m_document->commit();
         }
         
-        bool Server::Session::authenticateUser(uint64_t user, std::string metadate) const
+        bool Server::Session::authenticateUser(uint64_t user, std::string metadata) const
         {
-            // @todo check token received in port metadata
-            
-            return true;
+            return metadata == KIWI_MODEL_VERSION_STRING;
         }
         
         void Server::Session::bind(flip::PortBase & port)

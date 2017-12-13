@@ -55,7 +55,7 @@ namespace kiwi
         CarrierSocket(flip::DocumentBase& document);
         
         // @brief Connects the socket to a remote socket
-        void connect(std::string const& host, uint16_t port, uint64_t session_id);
+        void connect(std::string const& host, uint16_t port, uint64_t session_id, std::string & metadata);
         
         //! @brief Stop the socket from processing and disconnect
         void disconnect();

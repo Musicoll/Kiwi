@@ -100,9 +100,12 @@ namespace kiwi
         return m_transport_socket != nullptr && m_state == State::Connected;
     }
     
-    void CarrierSocket::connect(std::string const& host, uint16_t port, uint64_t session_id)
+    void CarrierSocket::connect(std::string const& host,
+                                uint16_t port,
+                                uint64_t session_id,
+                                std::string & metadata)
     {
-        m_transport_socket.reset(new flip::CarrierTransportSocketTcp(m_document, session_id, host, port));
+        m_transport_socket.reset(new flip::CarrierTransportSocketTcp(m_document, session_id, metadata, host, port));
         
         m_transport_socket->listen_state_transition(std::bind(&CarrierSocket::onStateTransition,
                                                               this,

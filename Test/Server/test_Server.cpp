@@ -25,6 +25,7 @@
 
 #include <KiwiServer/KiwiServer_Server.h>
 #include <KiwiModel/KiwiModel_DataModel.h>
+#include <KiwiModel/KiwiModel_Def.h>
 
 #include <flip/Document.h>
 #include <flip/contrib/transport_tcp/CarrierTransportSocketTcp.h>
@@ -43,7 +44,7 @@ TEST_CASE("Server - Server", "[Server, Server]")
         
         // Initializing document
         flip::Document document (kiwi::model::DataModel::use (), 123456789, 'appl', 'gui ');
-        flip::CarrierTransportSocketTcp carrier (document, 987654, "localhost", 9191);
+        flip::CarrierTransportSocketTcp carrier (document, 987654, KIWI_MODEL_VERSION_STRING, "localhost", 9191);
         
         // Client/Document connecting to server.
         while(!carrier.is_connected() || server.getSessions().empty())
@@ -83,7 +84,7 @@ TEST_CASE("Server - Server", "[Server, Server]")
         
         // Initializing document.
         flip::Document document (kiwi::model::DataModel::use (), 123456789, 'appl', 'gui ');
-        flip::CarrierTransportSocketTcp carrier (document, 987654, "localhost", 9191);
+        flip::CarrierTransportSocketTcp carrier (document, 987654, KIWI_MODEL_VERSION_STRING, "localhost", 9191);
         
         // Client/Document connecting to server.
         while(!carrier.is_connected() || server->getSessions().empty())
@@ -120,10 +121,10 @@ TEST_CASE("Server - Server", "[Server, Server]")
         
         // Initializing documents.
         flip::Document document_1 (kiwi::model::DataModel::use (), 123456789, 'appl', 'gui ');
-        flip::CarrierTransportSocketTcp carrier_1 (document_1, 987654, "localhost", 9191);
+        flip::CarrierTransportSocketTcp carrier_1 (document_1, 987654, KIWI_MODEL_VERSION_STRING, "localhost", 9191);
         
         flip::Document document_2 (kiwi::model::DataModel::use (), 123456789, 'appl', 'gui ');
-        flip::CarrierTransportSocketTcp carrier_2 (document_2, 987655, "localhost", 9191);
+        flip::CarrierTransportSocketTcp carrier_2 (document_2, 987655, KIWI_MODEL_VERSION_STRING, "localhost", 9191);
         
         // Client/Document connecting to server.
         while(!carrier_1.is_connected() || !carrier_2.is_connected() || server.getSessions().size() != 2)
@@ -165,7 +166,7 @@ TEST_CASE("Server - Server", "[Server, Server]")
         
         // Initializing client 1
         flip::Document document_1 (kiwi::model::DataModel::use (), 1, 'appl', 'gui ');
-        flip::CarrierTransportSocketTcp carrier_1 (document_1, 1234, "localhost", 9191);
+        flip::CarrierTransportSocketTcp carrier_1 (document_1, 1234, KIWI_MODEL_VERSION_STRING, "localhost", 9191);
         
         kiwi::model::Patcher& patcher_1 = document_1.root<kiwi::model::Patcher>();
         
@@ -185,7 +186,7 @@ TEST_CASE("Server - Server", "[Server, Server]")
         
         // Initializing client 2
         flip::Document document_2 (kiwi::model::DataModel::use (), 2, 'appl', 'gui ');
-        flip::CarrierTransportSocketTcp carrier_2 (document_2, 1234, "localhost", 9191);
+        flip::CarrierTransportSocketTcp carrier_2 (document_2, 1234, KIWI_MODEL_VERSION_STRING, "localhost", 9191);
         
         kiwi::model::Patcher& patcher_2 = document_2.root<kiwi::model::Patcher>();
         

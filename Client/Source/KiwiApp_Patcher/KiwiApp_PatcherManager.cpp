@@ -27,6 +27,7 @@
 #include <flip/contrib/DataConsumerFile.h>
 
 #include <KiwiModel/KiwiModel_DataModel.h>
+#include <KiwiModel/KiwiModel_Def.h>
 
 #include <KiwiEngine/KiwiEngine_Patcher.h>
 #include <KiwiEngine/KiwiEngine_Instance.h>
@@ -154,7 +155,9 @@ namespace kiwi
             m_listeners.call(&Listener::connectedUserChanged, *this);
         });
         
-        m_socket.connect(host, port, session.getSessionId());
+        std::string metadata = KIWI_MODEL_VERSION_STRING;
+        
+        m_socket.connect(host, port, session.getSessionId(), metadata);
         
         bool patcher_loaded = false;
         
