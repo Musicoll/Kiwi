@@ -27,6 +27,7 @@ namespace kiwi
     const std::string Api::Endpoint::login {Api::Endpoint::root + "/login"};
     const std::string Api::Endpoint::documents {Api::Endpoint::root + "/documents"};
     const std::string Api::Endpoint::users {Api::Endpoint::root + "/users"};
+    const std::string Api::Endpoint::releases {Api::Endpoint::root + "/releases"};
     
     std::string Api::Endpoint::document(std::string const& document_id)
     {
@@ -226,6 +227,34 @@ namespace kiwi
         });
         
         storeFuture(session->PutAsync(std::move(callback)));
+    }
+    
+    void Api::getLatestRelease(CallbackFn<std::string const&> success_cb, ErrorCallback error_cb)
+    {
+        auto session = makeSession(Endpoint::releases + "/latest");
+        
+        auto cb = [success = std::move(success_cb),
+                   fail = std::move(error_cb)](Response res)
+        {
+            if (!res.error
+                && hasJsonHeader(res)
+                && res.result() == beast::http::status::ok)
+            {
+                const auto j = json::parse(res.body);
+                
+                if(j.is_object() && j.count("tag_name"))
+                {
+                    std::string latest_release = j["tag_name"];
+                    success(latest_release);
+                }
+            }
+            else
+            {
+                fail(res);
+            }
+        };
+        
+        storeFuture(session->GetAsync(std::move(cb)));
     }
     
     bool Api::hasJsonHeader(Response const& res)
