@@ -28,6 +28,7 @@
 
 #include <KiwiModel/KiwiModel_DataModel.h>
 #include <KiwiModel/KiwiModel_Def.h>
+#include <KiwiModel/KiwiModel_Converters/KiwiModel_Converter.h>
 
 #include <KiwiEngine/KiwiEngine_Patcher.h>
 #include <KiwiEngine/KiwiEngine_Instance.h>
@@ -204,36 +205,66 @@ namespace kiwi
         return m_socket.isConnected() && patcher_loaded;
     }
     
-    void PatcherManager::readDocument()
+    bool PatcherManager::readDocument()
     {
+        bool loading_succeeded = false;
+        
         flip::DataProviderFile provider(m_file.getFullPathName().toStdString().c_str());
         flip::BackEndIR back_end;
         
         back_end.register_backend<flip::BackEndBinary>();
-        back_end.read(provider);
         
-        m_document.read(back_end);
+        if (back_end.read(provider))
+        {
+            if (model::Converter::process(back_end))
+            {
+                try
+                {
+                    m_document.read(back_end);
+                }
+                catch (...)
+                {
+                    return false;
+                }
+                
+                m_need_saving_flag = false;
+                loading_succeeded = true;
+            }
+        }
         
-        m_need_saving_flag = false;
+        return loading_succeeded;
     }
     
-    void PatcherManager::loadFromFile(juce::File const& file)
+    bool PatcherManager::loadFromFile(juce::File const& file)
     {
+        bool success = false;
+        
         if (file.hasFileExtension("kiwi"))
         {
             m_file = file;
             
-            readDocument();
-            
-            model::Patcher& patcher = getPatcher();
-            
-            patcher.useSelfUser();
-            patcher.setName(file.getFileNameWithoutExtension().toStdString());
-            
-            model::DocumentManager::commit(patcher);
-            
-            patcher.entity().use<engine::Patcher>().sendLoadbang();
+            if (readDocument())
+            {
+                model::Patcher& patcher = getPatcher();
+                
+                patcher.useSelfUser();
+                patcher.setName(file.getFileNameWithoutExtension().toStdString());
+                
+                try
+                {
+                    model::DocumentManager::commit(patcher);
+                }
+                catch (...)
+                {
+                    return false;
+                }
+                
+                patcher.entity().use<engine::Patcher>().sendLoadbang();
+                success = true;
+            }
         }
+        
+        return success;
     }
     
     model::Patcher& PatcherManager::getPatcher()

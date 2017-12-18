@@ -74,10 +74,6 @@ namespace kiwi
             
         private: // methods
             
-            //! @brief Creates a new session for server.
-            //! @details Will load the document if there's a corresponding file in backend directory.
-            void createSession(uint64_t session_id);
-            
             //! @brief Called when a user connects to a document.
             void onConnected(flip::PortBase & port);
             
@@ -153,7 +149,7 @@ namespace kiwi
             void save() const;
             
             //! @brief Loads the document from designated backend file.
-            void load();
+            bool load();
             
             //! @brief Binds user to session.
             void bind(flip::PortBase & port);

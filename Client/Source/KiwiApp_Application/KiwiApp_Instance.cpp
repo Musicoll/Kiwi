@@ -178,28 +178,35 @@ namespace kiwi
     
     bool Instance::openFile(juce::File const& file)
     {
+        bool open_succeeded = false;
+        
         if(file.hasFileExtension("kiwi"))
         {
-            auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(),
-                                                         new PatcherManager(*this));
+            std::unique_ptr<PatcherManager> patcher_manager(new PatcherManager(*this));
             
-            PatcherManager& manager = *(manager_it->get());
-            
-            manager.loadFromFile(file);
-            
-            if(manager.getNumberOfView() == 0)
+            if (patcher_manager->loadFromFile(file))
             {
-                manager.newView();
+                auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(),
+                                                             std::move(patcher_manager));
+                
+                open_succeeded = true;
+                
+                if((*manager_it)->getNumberOfView() == 0)
+                {
+                    (*manager_it)->newView();
+                }
             }
-            
-            return true;
+            else
+            {
+                KiwiApp::error("Can't open document. Version is not up to date. Please download latest Kiwi version.");
+            }
         }
         else
         {
             KiwiApp::error("can't open file (bad file extension)");
         }
         
-        return false;
+        return open_succeeded;
     }
     
     void Instance::askUserToOpenPatcherDocument()

@@ -69,7 +69,7 @@ namespace kiwi
         void pull();
         
         //! @brief Load patcher datas from file.
-        void loadFromFile(juce::File const& file);
+        bool loadFromFile(juce::File const& file);
         
         //! @brief Save the document.
         //! @details Returns true if saving document succeeded false otherwise.
@@ -153,7 +153,7 @@ namespace kiwi
         void writeDocument();
         
         //! @internal Reads data from file.
-        void readDocument();
+        bool readDocument();
         
         //! @internal If the patcher is remote, tries to disconnect it.
         void disconnect();

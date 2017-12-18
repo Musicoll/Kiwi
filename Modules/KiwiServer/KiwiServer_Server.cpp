@@ -29,6 +29,7 @@
 
 #include <KiwiModel/KiwiModel_DataModel.h>
 #include <KiwiModel/KiwiModel_Def.h>
+#include <KiwiModel/KiwiModel_Converters/KiwiModel_Converter.h>
 
 namespace kiwi
 {
@@ -98,21 +99,38 @@ namespace kiwi
             .withFileExtension(kiwi_file_extension);
         }
         
-        void Server::createSession(uint64_t session_id)
-        {
-            const auto session_file = getSessionFile(session_id);
-            
-            m_sessions.insert(std::make_pair(session_id, Session(session_id, session_file)));
-        }
-        
         void Server::onConnected(flip::PortBase & port)
         {
+            uint64_t session_id = port.session();
+            
             if(m_sessions.find(port.session()) == m_sessions.end())
             {
-                createSession(port.session());
+                juce::File session_file = getSessionFile(port.session());
+                
+                DBG("[server] - creating new session for session_id : " << hexadecimal_convert(session_id));
+                
+                auto session = m_sessions.insert(std::make_pair(session_id, Session(session_id, session_file)));
+                
+                if (session_file.exists())
+                {
+                    DBG("[server] - loading session file for session_id : " << hexadecimal_convert(session_id));
+                    
+                    if (!(*session.first).second.load())
+                    {
+                        DBG("[server] - opening document document session : " << hexadecimal_convert(session_id) << " failed");
+                        
+                        m_sessions.erase(session_id);
+                        
+                        throw std::runtime_error("loading session failed.");
+                    }
+                }
+                
+                (*session.first).second.bind(port);
             }
-            
-            m_sessions.find(port.session())->second.bind(port);
+            else
+            {
+                m_sessions.find(port.session())->second.bind(port);
+            }
         }
         
         void Server::onDisconnected(flip::PortBase & port)
@@ -196,24 +214,11 @@ namespace kiwi
         , m_signal_connections()
         , m_backend_file(backend_file)
         {
-            DBG("[server] - creating new session for session_id : " << hexadecimal_convert(m_identifier));
-            
             model::Patcher& patcher = m_document->root<model::Patcher>();
             
             auto cnx = patcher.signal_get_connected_users.connect(std::bind(&Server::Session::sendConnectedUsers, this));
             
             m_signal_connections.emplace_back(std::move(cnx));
-            
-            if (m_backend_file.exists())
-            {
-                DBG("[server] - loading session file for session_id : " << hexadecimal_convert(m_identifier));
-                
-                load();
-            }
-            else
-            {
-                DBG("[server] - initializing with empty document for session_id : " << hexadecimal_convert(m_identifier));
-            }
         }
         
         Server::Session::~Session()
@@ -243,16 +248,39 @@ namespace kiwi
             backend.write<flip::BackEndBinary>(consumer);
         }
         
-        void Server::Session::load()
+        bool Server::Session::load()
         {
+            bool success = false;
+            
             flip::BackEndIR backend;
             backend.register_backend<flip::BackEndBinary>();
             
             flip::DataProviderFile provider(m_backend_file.getFullPathName().toStdString().c_str());
-            backend.read(provider);
             
-            m_document->read(backend);
-            m_document->commit();
+            try
+            {
+                backend.read(provider);
+            }
+            catch (...)
+            {
+                return false;
+            }
+            
+            if (model::Converter::process(backend))
+            {
+                try
+                {
+                    m_document->read(backend);
+                    m_document->commit();
+                    success = true;
+                }
+                catch(...)
+                {
+                    return false;
+                }
+            }
+            
+            return success;
         }
         
         bool Server::Session::authenticateUser(uint64_t user, std::string metadata) const
