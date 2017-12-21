@@ -69,11 +69,34 @@ namespace kiwi
     {
         m_scheduler.process();
         
-        for(auto patcher_manager = m_patcher_managers.begin();
-            patcher_manager != m_patcher_managers.end();
-            ++patcher_manager)
+        for(auto manager = m_patcher_managers.begin(); manager != m_patcher_managers.end();)
         {
-            (*patcher_manager)->pull();
+            bool keep_patcher = true;
+            
+            if ((*manager)->isRemote())
+            {
+                (*manager)->pull();
+                
+                if (!(*manager)->isRemote())
+                {
+                    keep_patcher
+                    = (*manager)->getFirstWindow().showOkCancelBox(juce::AlertWindow::QuestionIcon,
+                                                                   "Connetion lost",
+                                                                   "Do you want to continue editing document \""
+                                                                   + (*manager)->getDocumentName() +"\" offline",
+                                                                   "Ok",
+                                                                   "Cancel");
+                }
+            }
+            
+            if (!keep_patcher)
+            {
+                manager = m_patcher_managers.erase(manager);
+            }
+            else
+            {
+                ++manager;
+            }
         }
     }
     
@@ -102,7 +125,6 @@ namespace kiwi
                         return false;
                 }
                 
-                manager.forceCloseAllWindows();
                 it = m_patcher_managers.erase(it);
             }
             else
@@ -284,37 +306,36 @@ namespace kiwi
         return success;
     }
     
-    PatcherManager* Instance::openRemotePatcher(DocumentBrowser::Drive::DocumentSession& session)
+    void Instance::openRemotePatcher(DocumentBrowser::Drive::DocumentSession& session)
     {
         auto mng_it = getPatcherManagerForSession(session);
+        
         if(mng_it != m_patcher_managers.end())
         {
             PatcherManager& manager = *(mng_it->get());
             manager.bringsFirstViewToFront();
-            return &manager;
         }
-        
-        auto manager_uptr = std::make_unique<PatcherManager>(*this);
-        
-        try
+        else
         {
-            manager_uptr->connect(session);
+            auto manager_uptr = std::make_unique<PatcherManager>(*this);
+            
+            NetworkSettings& network_settings = getAppSettings().network();
+            
+            if (manager_uptr->connect(network_settings.getHost(), network_settings.getSessionPort(), session))
+            {
+                auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), std::move(manager_uptr));
+                PatcherManager& manager = *(manager_it->get());
+                
+                if(manager.getNumberOfView() == 0)
+                {
+                    manager.newView();
+                }
+            }
+            else
+            {
+                KiwiApp::error("Failed to connect to the document [" + session.getName() + "]");
+            }
         }
-        catch(std::runtime_error &e)
-        {
-            KiwiApp::error(e.what());
-            return nullptr;
-        }
-        
-        auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), std::move(manager_uptr));
-        PatcherManager& manager = *(manager_it->get());
-        
-        if(manager.getNumberOfView() == 0)
-        {
-            manager.newView();
-        }
-        
-        return manager_it->get();
     }
     
     void Instance::removePatcher(PatcherManager const& patcher_manager)

@@ -34,13 +34,28 @@ namespace kiwi
     //! @brief Class that encapsulate a TCP socket
     class CarrierSocket
     {
+    public: // classes
+        
+        using state_func_t = std::function <void (flip::CarrierBase::Transition, flip::CarrierBase::Error error)>;
+        
+        using transfer_func_t = std::function <void (size_t, size_t)>;
+        
+    private: // classes
+        
+        enum class State
+        {
+            Disconnected,
+            Connecting,
+            Connected
+        };
+        
     public: // methods
         
         //! @brief Constructor
-        CarrierSocket(flip::DocumentBase& document, std::string const& host, uint16_t port, uint64_t session_id);
+        CarrierSocket(flip::DocumentBase& document);
         
         // @brief Connects the socket to a remote socket
-        void connect(std::string const& host, uint16_t port);
+        void connect(std::string const& host, uint16_t port, uint64_t session_id);
         
         //! @brief Stop the socket from processing and disconnect
         void disconnect();
@@ -51,42 +66,34 @@ namespace kiwi
         //! @brief Process the socket once
         void process();
         
-        //! @brief Add a callback to be called once disconnected
-        void listenDisconnected(std::function<void ()> func);
+        //! @brief Callback called when transition changes.
+        void listenStateTransition(state_func_t call_back);
         
-        //! @brief Add a callback to be called on connected
-        void listenConnected(std::function<void ()> func);
-        
-        //! @brief Add a callback to be called once first load terminated
-        void listenLoaded(std::function<void ()> func);
+        //! @brief Callback called receiving backend informations.
+        void listenTransferBackend(transfer_func_t call_back);
         
         //! @brief Stops processing
         ~CarrierSocket();
         
     private: // methods
         
-        //! @brief Binds the encapsulated socket callbacks
-        void bindCallBacks();
+        //! @brief Called when sockets state changed.
+        void onStateTransition(flip::CarrierBase::Transition transition,
+                               flip::CarrierBase::Error error);
         
-        //! @brief Called when connection transition happen
-        void listenStateTransition(flip::CarrierBase::Transition state, flip::CarrierBase::Error error);
-        
-        //! @brief Called during loading process
-        void listenTransferBackEnd(size_t cur, size_t total);
-        
-        //! @brief Called when receiving a transaction
-        void listenTransferTransaction(size_t cur, size_t total);
-        
-        //! @brief Called when receiving a signal
-        void listenTransferSignal(size_t cur, size_t total);
+        //! @brief Called when the socket receives the backend.
+        //! @details cur represent the portion that has been downloaded yet. total is the total
+        //! amount of data that needs to be received.
+        void onTransferBackend(size_t cur, size_t total);
         
     private: // members
         
-        flip::CarrierTransportSocketTcp m_transport_socket;
+        std::unique_ptr<flip::CarrierTransportSocketTcp>    m_transport_socket;
+        flip::DocumentBase &                                m_document;
+        State                                               m_state;
+        state_func_t                                        m_state_func;
+        transfer_func_t                                     m_transfer_func;
         
-        std::function<void(void)> m_func_disonnected;
-        std::function<void(void)> m_func_connected;
-        std::function<void(void)> m_func_loaded;
         
     private: // deleted methods
         

@@ -39,6 +39,7 @@ namespace kiwi
 {
     class Instance;
     class PatcherView;
+    class PatcherViewWindow;
     
     // ================================================================================ //
     //                                  PATCHER MANAGER                                 //
@@ -62,7 +63,7 @@ namespace kiwi
         ~PatcherManager();
         
         //! @brief Try to connect this patcher to a remote server.
-        void connect(DocumentBrowser::Drive::DocumentSession& session);
+        bool connect(std::string const& host, uint16_t port, DocumentBrowser::Drive::DocumentSession& session);
         
         //! @brief Pull changes from server if it is remote.
         void pull();
@@ -114,12 +115,12 @@ namespace kiwi
         //! @brief Brings the first patcher view to front.
         void bringsFirstViewToFront();
         
-        //! @brief Force all windows to close without asking user to save document.
-        void forceCloseAllWindows();
-        
         //! @brief Attempt to close all document windows, after asking user to save them if needed.
         //! @return True if all document have been closed, false if the user cancel the action.
         bool askAllWindowsToClose();
+        
+        //! @brief Returns the first window of the patcher manager.
+        PatcherViewWindow & getFirstWindow();
         
         //! @brief Close the window that contains a given patcherview.
         //! @details if it's the last patcher view, it will ask the user the save the document before closing if needed.
@@ -140,7 +141,13 @@ namespace kiwi
         //! @brief Called when a document session has been removed.
         void documentRemoved(DocumentBrowser::Drive::DocumentSession& doc) override;
         
+        //! @brief Force all windows to close without asking user to save document.
+        void forceCloseAllWindows();
+        
     private:
+        
+        //! @internal Called from socket process to notify changing state.
+        void onStateTransition(flip::CarrierBase::Transition transition, flip::CarrierBase::Error error);
         
         //! @internal Write data into file.
         void writeDocument();
@@ -182,7 +189,7 @@ namespace kiwi
         model::PatcherValidator                     m_validator;
         flip::Document                              m_document;
         juce::File                                  m_file;
-        std::unique_ptr<CarrierSocket>              m_socket;
+        CarrierSocket                               m_socket;
         bool                                        m_need_saving_flag;
         DocumentBrowser::Drive::DocumentSession*    m_session;
         
