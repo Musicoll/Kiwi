@@ -190,6 +190,8 @@ namespace kiwi
         engine::Random::declare();
         engine::Scale::declare();
         engine::Select::declare();
+        engine::Number::declare();
+        engine::NumberTilde::declare();
     }
     
     void KiwiApp::declareObjectViews()
@@ -200,6 +202,8 @@ namespace kiwi
         MeterTildeView::declare();
         MessageView::declare();
         CommentView::declare();
+        NumberView::declare();
+        NumberTildeView::declare();
     }
     
     void KiwiApp::shutdown()

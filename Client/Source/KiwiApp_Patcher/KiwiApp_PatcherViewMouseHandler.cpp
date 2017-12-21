@@ -544,13 +544,13 @@ namespace kiwi
             {
                 if(hit_tester.getZone() == HitTester::Zone::Inside)
                 {
-                    if(e.mods.isAltDown())
-                    {
-                        startAction(Action::CopyOnDrag, e);
-                    }
-                    else if (e.mods.isCommandDown())
+                    if (e.mods.isCommandDown())
                     {
                         startAction(Action::Object, e);
+                    }
+                    else if(e.mods.isAltDown())
+                    {
+                        startAction(Action::CopyOnDrag, e);
                     }
                     else
                     {

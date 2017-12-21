@@ -21,12 +21,27 @@
 
 #pragma once
 
-#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ClassicView.h>
-#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_SliderView.h>
-#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_BangView.h>
-#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ToggleView.h>
-#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_MeterTildeView.h>
-#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_MessageView.h>
-#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_CommentView.h>
-#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_NumberView.h>
-#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_NumberTildeView.h>
+#include <KiwiModel/KiwiModel_Object.h>
+#include <KiwiTool/KiwiTool_Atom.h>
+
+namespace kiwi { namespace model {
+    
+    // ================================================================================ //
+    //                                  OBJECT NUMBER TILDE                              //
+    // ================================================================================ //
+    
+    class NumberTilde : public model::Object
+    {
+    public: // methods
+        
+        NumberTilde(flip::Default& d);
+        
+        NumberTilde(std::vector<tool::Atom> const& args);
+        
+        std::string getIODescription(bool is_inlet, size_t index) const override;
+        
+        static void declare();
+        
+        static std::unique_ptr<Object> create(std::vector<tool::Atom> const& args);
+    };
+}}

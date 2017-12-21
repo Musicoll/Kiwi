@@ -30,6 +30,7 @@ namespace kiwi {
     EditableObjectView::EditableObjectView(model::Object & object_model) :
     ObjectView(object_model),
     m_label(*this),
+    m_editable(true),
     m_listeners()
     {
     }
@@ -37,10 +38,18 @@ namespace kiwi {
     EditableObjectView::~EditableObjectView()
     {
     }
+
+    void EditableObjectView::setEditable(bool editable)
+    {
+        m_editable = editable;
+    }
     
     void EditableObjectView::edit()
     {
-        m_label.showEditor();
+        if (m_editable)
+        {
+            m_label.showEditor();
+        }
     }
     
     void EditableObjectView::labelTextChanged (juce::Label* label)

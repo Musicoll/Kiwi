@@ -73,3 +73,5 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Random.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Scale.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Select.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Number.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_NumberTilde.h>
