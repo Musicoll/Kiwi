@@ -28,6 +28,7 @@ install:
     - set KIWI_BOOST_LIB_x64=C:\Libraries\boost_1_63_0\lib64-msvc-14.0
     - set KIWI_BOOST_LIB_WIN32=C:\Libraries\boost_1_63_0\lib32-msvc-14.0
     - cd %APPVEYOR_BUILD_FOLDER%
+    - if "%APPVEYOR_REPO_BRANCH%"=="master" (set KIWI_DEPLOY=release) else (set KIWI_DEPLOY=draft)
 
 build_script:
     - python .\Scripts\configure.py -c %CONFIGURATION% -p %PLATFORM%
@@ -36,19 +37,32 @@ build_script:
 after_build:
     - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\%CONFIGURATION%
     - 7z a Kiwi_%PLATFORM%.zip %BUILD_DIR%\Kiwi.exe %BUILD_DIR%\*.dll
+    - 7z a Kiwi_Server_%PLATFORM%.zip %BUILD_DIR%\Server.exe
 
 artifacts:
   - path: '*.zip'
 
 deploy:
-  provider: GitHub
-  auth_token:
-    secure: ZtKK8yOVkgIf+6Vm0jQLCbjCjuTiln3w2k/xMHI/kgardyCVtZ6plKI5O8lR3NNY
-  artifact: /.*\.zip/
-  draft: false
-  prerelease: false
-  on:
-    appveyor_repo_tag: true
+  - provider: GitHub
+    release: $(APPVEYOR_REPO_TAG_NAME)
+    auth_token:
+        secure: ZtKK8yOVkgIf+6Vm0jQLCbjCjuTiln3w2k/xMHI/kgardyCVtZ6plKI5O8lR3NNY
+    artifact: /.*\.zip/
+    draft: true
+    prerelease: false
+    on:
+      appveyor_repo_tag: true
+      KIWI_DEPLOY: 'draft'
+
+  - provider: GitHub
+    auth_token:
+        secure: ZtKK8yOVkgIf+6Vm0jQLCbjCjuTiln3w2k/xMHI/kgardyCVtZ6plKI5O8lR3NNY
+    artifact: /.*\.zip/
+    draft: false
+    prerelease: false
+    on:
+      appveyor_repo_tag: true
+      KIWI_DEPLOY: 'release'
 
 #---------------------------------#
 #         notifications           #
