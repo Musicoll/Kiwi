@@ -94,6 +94,10 @@ namespace kiwi
         //! @brief Returns the label created by the editable object.
         juce::Label & getLabel();
         
+        //! @brief Sets the editable object view as editable or not.
+        //! @details Editable object is editable by default.
+        void setEditable(bool editable);
+        
     private: // methods
         
         //! @brief Creates the text editor used by label when it's edited.
@@ -117,6 +121,7 @@ namespace kiwi
     private: // members
         
         Label                       m_label;
+        bool                        m_editable;
         tool::Listeners<Listener>   m_listeners;
         
     private: // deleted methods

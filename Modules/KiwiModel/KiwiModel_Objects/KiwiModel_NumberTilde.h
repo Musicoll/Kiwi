@@ -21,4 +21,27 @@
 
 #pragma once
 
-#define KIWI_MODEL_VERSION_STRING "v1"
+#include <KiwiModel/KiwiModel_Object.h>
+#include <KiwiTool/KiwiTool_Atom.h>
+
+namespace kiwi { namespace model {
+    
+    // ================================================================================ //
+    //                                  OBJECT NUMBER TILDE                              //
+    // ================================================================================ //
+    
+    class NumberTilde : public model::Object
+    {
+    public: // methods
+        
+        NumberTilde(flip::Default& d);
+        
+        NumberTilde(std::vector<tool::Atom> const& args);
+        
+        std::string getIODescription(bool is_inlet, size_t index) const override;
+        
+        static void declare();
+        
+        static std::unique_ptr<Object> create(std::vector<tool::Atom> const& args);
+    };
+}}

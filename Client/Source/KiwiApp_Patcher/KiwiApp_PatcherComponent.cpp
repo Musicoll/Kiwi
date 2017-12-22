@@ -63,6 +63,13 @@ namespace kiwi
         g.fillAll(juce::Colour(0xff444444));
     }
     
+    void PatcherToolbar::removeUsersIcon()
+    {
+        m_toolbar.removeToolbarItem(0);
+        m_toolbar.removeToolbarItem(0);
+        m_toolbar.repaint();
+    }
+    
     PatcherToolbar::Factory::Factory(PatcherManager& patcher_manager) : m_patcher_manager(patcher_manager)
     {
         
@@ -287,6 +294,11 @@ namespace kiwi
         ;
     }
     
+    void PatcherComponent::removeUsersIcon()
+    {
+        m_toolbar.removeUsersIcon();
+    }
+    
     // ================================================================================ //
     //                              APPLICATION COMMAND TARGET                          //
     // ================================================================================ //
@@ -327,6 +339,21 @@ namespace kiwi
         setContentNonOwned(&m_patcher_component, true);
         setVisible(true);
     }
+    
+    void PatcherViewWindow::removeUsersIcon()
+    {
+        m_patcher_component.removeUsersIcon();
+    }
+    
+    bool PatcherViewWindow::showOkCancelBox(juce::AlertWindow::AlertIconType icon_type,
+                                            std::string const& title,
+                                            std::string const& message,
+                                            std::string const& button_1,
+                                            std::string const& button_2)
+    {
+        return juce::AlertWindow::showOkCancelBox(icon_type, title, message, button_1, button_2, this);
+    }
+    
     
     PatcherManager& PatcherViewWindow::getPatcherManager()
     {

@@ -103,6 +103,9 @@ namespace kiwi
                             std::string const& new_name,
                             Callback callback);
         
+        //! @brief Retrieves Kiwi's latest release as a string. ex: v0.1.0
+        void getLatestRelease(CallbackFn<std::string const&> success_cb, ErrorCallback error_cb);
+        
     public: // helper methods
         
         template<class Type>
@@ -120,6 +123,7 @@ namespace kiwi
             static const std::string login;
             static const std::string documents;
             static const std::string users;
+            static const std::string releases;
             
             static std::string document(std::string const& document_id);
             static std::string user(std::string const& user_id);

@@ -66,18 +66,6 @@ namespace kiwi
             //! @brief Process the socket hence process all sessions.
             void process();
             
-            //! @brief Run the server.
-            //! @details This will run a loop that call process regularly.
-            //! @see stop
-            void run();
-            
-            //! @brief Stops the server.
-            //! @see Run, isRunning
-            void stop();
-            
-            //! @brief Returns true if the server is running.
-            bool isRunning() const noexcept;
-            
             //! @brief Returns a list of sessions currenty opened.
             std::set<uint64_t> getSessions() const;
             
@@ -85,10 +73,6 @@ namespace kiwi
             std::set<uint64_t> getConnectedUsers(uint64_t session_id) const;
             
         private: // methods
-            
-            //! @brief Creates a new session for server.
-            //! @details Will load the document if there's a corresponding file in backend directory.
-            void createSession(uint64_t session_id);
             
             //! @brief Called when a user connects to a document.
             void onConnected(flip::PortBase & port);
@@ -121,7 +105,6 @@ namespace kiwi
             
         private: // variables
             
-            std::atomic_bool                m_running;
             juce::File                      m_backend_directory;
             std::map <uint64_t, Session>    m_sessions;
             flip::PortTransportServerTcp    m_socket;
@@ -166,7 +149,7 @@ namespace kiwi
             void save() const;
             
             //! @brief Loads the document from designated backend file.
-            void load();
+            bool load();
             
             //! @brief Binds user to session.
             void bind(flip::PortBase & port);

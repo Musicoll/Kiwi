@@ -34,7 +34,7 @@
 namespace ProjectInfo
 {
     const char* const  projectName    = "Kiwi";
-    const char* const  versionString  = "0.1.0";
+    const char* const  versionString  = "v0.1.0";
     const int          versionNumber  = 0x010;
 }
 
@@ -246,6 +246,9 @@ namespace kiwi
         
         //! @internal Initializes gui specific objects.
         void declareObjectViews();
+        
+        //! @internal Checks if current Kiwi version is the latest. Show popup if version not up to date.
+        void checkLatestRelease();
         
     private: // members
         

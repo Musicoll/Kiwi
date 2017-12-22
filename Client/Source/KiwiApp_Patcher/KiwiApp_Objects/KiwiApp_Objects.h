@@ -28,3 +28,5 @@
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_MeterTildeView.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_MessageView.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_CommentView.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_NumberView.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_NumberTildeView.h>

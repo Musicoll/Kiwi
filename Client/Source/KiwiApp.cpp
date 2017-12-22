@@ -117,6 +117,8 @@ namespace kiwi
         m_instance = std::make_unique<Instance>();
         m_command_manager->registerAllCommandsForTarget(this);
         
+        checkLatestRelease();
+        
         #if JUCE_MAC
         juce::PopupMenu macMainMenuPopup;
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAboutAppWindow);
@@ -188,6 +190,8 @@ namespace kiwi
         engine::Random::declare();
         engine::Scale::declare();
         engine::Select::declare();
+        engine::Number::declare();
+        engine::NumberTilde::declare();
     }
     
     void KiwiApp::declareObjectViews()
@@ -198,6 +202,8 @@ namespace kiwi
         MeterTildeView::declare();
         MessageView::declare();
         CommentView::declare();
+        NumberView::declare();
+        NumberTildeView::declare();
     }
     
     void KiwiApp::shutdown()
@@ -322,6 +328,30 @@ namespace kiwi
             KiwiApp::use().m_api_controller->logout();
             KiwiApp::commandStatusChanged();
         }
+    }
+    
+    void KiwiApp::checkLatestRelease()
+    {
+        std::string current_version = getApplicationVersion().toStdString();
+        
+        Api::CallbackFn<std::string const&> on_success = [current_version](std::string const& latest_version)
+        {
+                KiwiApp::useInstance().useScheduler().schedule([current_version, latest_version]()
+                {
+                    if (current_version.compare(latest_version) < 0)
+                    {
+                        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::QuestionIcon,
+                                                               "New release available" ,
+                                                               "Upgrading required to access remote documents.\n\n Please visit:\n https://github.com/Musicoll/Kiwi/releases");
+                    }
+                });
+        };
+        
+        Api::ErrorCallback on_fail =[](Api::Error error)
+        {
+        };
+        
+        useApi().getLatestRelease(on_success, on_fail);
     }
     
     void KiwiApp::addApiConnectStatusListener(ApiConnectStatusListener& listener)

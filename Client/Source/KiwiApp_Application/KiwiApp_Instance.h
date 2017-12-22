@@ -98,7 +98,7 @@ namespace kiwi
         bool closeAllPatcherWindows();
         
         //! @brief Attempt to create a new patcher with document Session informations.
-        PatcherManager* openRemotePatcher(DocumentBrowser::Drive::DocumentSession& session);
+        void openRemotePatcher(DocumentBrowser::Drive::DocumentSession& session);
         
         //! @brief Brings the Application settings window to front.
         void showAppSettingsWindow();

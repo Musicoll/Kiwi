@@ -27,6 +27,8 @@
 #include <flip/contrib/DataConsumerFile.h>
 
 #include <KiwiModel/KiwiModel_DataModel.h>
+#include <KiwiModel/KiwiModel_Def.h>
+#include <KiwiModel/KiwiModel_Converters/KiwiModel_Converter.h>
 
 #include <KiwiEngine/KiwiEngine_Patcher.h>
 #include <KiwiEngine/KiwiEngine_Instance.h>
@@ -51,7 +53,7 @@ namespace kiwi
     m_document(model::DataModel::use(), *this, m_validator,
                m_instance.getUserId(), 'cicm', 'kpat'),
     m_file(),
-    m_socket(),
+    m_socket(m_document),
     m_need_saving_flag(false),
     m_session(nullptr)
     {
@@ -60,6 +62,7 @@ namespace kiwi
     
     PatcherManager::~PatcherManager()
     {
+        forceCloseAllWindows();
         disconnect();
     }
     
@@ -77,8 +80,36 @@ namespace kiwi
     {
         if (isRemote())
         {
-            m_socket->process();
+            m_socket.process();
             model::DocumentManager::pull(getPatcher());
+        }
+    }
+    
+    void PatcherManager::onStateTransition(flip::CarrierBase::Transition transition,
+                                           flip::CarrierBase::Error error)
+    {
+        if (transition == flip::CarrierBase::Transition::Disconnected)
+        {
+            model::Patcher & patcher = getPatcher();
+            
+            patcher.setName(m_session->getName());
+            model::DocumentManager::commit(patcher);
+            
+            m_session->useDrive().removeListener(*this);
+            m_session = nullptr;
+            
+            m_connected_users.clear();
+            
+            m_listeners.call(&Listener::connectedUserChanged, *this);
+            
+            flip::Collection<model::Patcher::View> & views = getPatcher().useSelfUser().getViews();
+            
+            for(auto & view : views)
+            {
+                view.entity().use<PatcherViewWindow>().removeUsersIcon();
+                
+                view.entity().use<PatcherView>().updateWindowTitle();
+            }
         }
     }
     
@@ -86,13 +117,14 @@ namespace kiwi
     {
         if (isRemote())
         {
-            m_socket.reset();
-            m_session->useDrive().removeListener(*this);
-            m_session = nullptr;
+            m_socket.disconnect();
         }
     }
     
-    void PatcherManager::connect(DocumentBrowser::Drive::DocumentSession& session)
+    
+    bool PatcherManager::connect(std::string const& host,
+                                 uint16_t port,
+                                 DocumentBrowser::Drive::DocumentSession& session)
     {
         disconnect();
         
@@ -124,84 +156,115 @@ namespace kiwi
             m_listeners.call(&Listener::connectedUserChanged, *this);
         });
         
-        const auto& network_settings = getAppSettings().network();
+        std::string metadata = KIWI_MODEL_VERSION_STRING;
         
-        std::unique_ptr<CarrierSocket> socket(new CarrierSocket(m_document,
-                                                                network_settings.getHost(),
-                                                                network_settings.getSessionPort(),
-                                                                session.getSessionId()));
+        m_socket.connect(host, port, session.getSessionId(), metadata);
+        
+        bool patcher_loaded = false;
+        
+        m_socket.listenTransferBackend([&patcher_loaded](size_t cur, size_t total)
+        {
+            patcher_loaded = cur == total;
+            
+        });
         
         const auto init_time = std::chrono::steady_clock::now();
         
         const std::chrono::duration<int> time_out(2);
         
-        while(!socket->isConnected() && std::chrono::steady_clock::now() - init_time < time_out)
+        while(!m_socket.isConnected() && std::chrono::steady_clock::now() - init_time < time_out)
         {
-            socket->process();
+            m_socket.process();
         }
         
-        if (socket->isConnected())
+        while(!patcher_loaded && m_socket.isConnected())
         {
-            bool loaded = false;
+            m_socket.process();
+        }
+        
+        if (m_socket.isConnected() && patcher_loaded)
+        {
+            m_session = &session;
             
-            socket->listenLoaded([&loaded](){loaded = true;});
+            m_session->useDrive().addListener(*this);
             
-            while(!loaded)
+            m_socket.listenStateTransition([this](flip::CarrierBase::Transition state,
+                                                  flip::CarrierBase::Error error)
             {
-                socket->process();
-            }
+                onStateTransition(state, error);
+            });
             
-            socket->listenLoaded(std::function<void(void)>());
-        }
-        else
-        {
-            throw std::runtime_error("Failed to connect to the document");
-        }
-        
-        m_socket = std::move(socket);
-        
-        m_session = &session;
-        
-        m_session->useDrive().addListener(*this);
-        
-        model::DocumentManager::pull(patcher);
-        
-        patcher.useSelfUser();
-        model::DocumentManager::commit(patcher);
-        
-        patcher.entity().use<engine::Patcher>().sendLoadbang();
-    }
-    
-    void PatcherManager::readDocument()
-    {
-        flip::DataProviderFile provider(m_file.getFullPathName().toStdString().c_str());
-        flip::BackEndIR back_end;
-        
-        back_end.register_backend<flip::BackEndBinary>();
-        back_end.read(provider);
-        
-        m_document.read(back_end);
-        
-        m_need_saving_flag = false;
-    }
-    
-    void PatcherManager::loadFromFile(juce::File const& file)
-    {
-        if (file.hasFileExtension("kiwi"))
-        {
-            m_file = file;
-            
-            readDocument();
-            
-            model::Patcher& patcher = getPatcher();
+            model::DocumentManager::pull(patcher);
             
             patcher.useSelfUser();
-            patcher.setName(file.getFileNameWithoutExtension().toStdString());
-            
             model::DocumentManager::commit(patcher);
             
             patcher.entity().use<engine::Patcher>().sendLoadbang();
         }
+        
+        return m_socket.isConnected() && patcher_loaded;
+    }
+    
+    bool PatcherManager::readDocument()
+    {
+        bool loading_succeeded = false;
+        
+        flip::DataProviderFile provider(m_file.getFullPathName().toStdString().c_str());
+        flip::BackEndIR back_end;
+        
+        back_end.register_backend<flip::BackEndBinary>();
+        
+        if (back_end.read(provider))
+        {
+            if (model::Converter::process(back_end))
+            {
+                try
+                {
+                    m_document.read(back_end);
+                }
+                catch (...)
+                {
+                    return false;
+                }
+                
+                m_need_saving_flag = false;
+                loading_succeeded = true;
+            }
+        }
+        
+        return loading_succeeded;
+    }
+    
+    bool PatcherManager::loadFromFile(juce::File const& file)
+    {
+        bool success = false;
+        
+        if (file.hasFileExtension("kiwi"))
+        {
+            m_file = file;
+            
+            if (readDocument())
+            {
+                model::Patcher& patcher = getPatcher();
+                
+                patcher.useSelfUser();
+                patcher.setName(file.getFileNameWithoutExtension().toStdString());
+                
+                try
+                {
+                    model::DocumentManager::commit(patcher);
+                }
+                catch (...)
+                {
+                    return false;
+                }
+                
+                patcher.entity().use<engine::Patcher>().sendLoadbang();
+                success = true;
+            }
+        }
+        
+        return success;
     }
     
     model::Patcher& PatcherManager::getPatcher()
@@ -216,7 +279,7 @@ namespace kiwi
     
     bool PatcherManager::isRemote() const noexcept
     {
-        return m_socket != nullptr;
+        return m_socket.isConnected();
     }
     
     uint64_t PatcherManager::getSessionId() const noexcept
@@ -226,7 +289,7 @@ namespace kiwi
     
     std::string PatcherManager::getDocumentName() const
     {
-        return m_session ? m_session->getName() : "";
+        return isRemote() ? m_session->getName() : getPatcher().getName();
     }
     
     void PatcherManager::newView()
@@ -416,6 +479,12 @@ namespace kiwi
         }
         
         return false;
+    }
+    
+    PatcherViewWindow & PatcherManager::getFirstWindow()
+    {
+        auto first_view = getPatcher().useSelfUser().getViews().begin();
+        return (*first_view).entity().use<PatcherViewWindow>();
     }
     
     void PatcherManager::bringsFirstViewToFront()
