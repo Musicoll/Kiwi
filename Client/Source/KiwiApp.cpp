@@ -192,6 +192,7 @@ namespace kiwi
         engine::Select::declare();
         engine::Number::declare();
         engine::NumberTilde::declare();
+        engine::Hub::declare();
     }
     
     void KiwiApp::declareObjectViews()
