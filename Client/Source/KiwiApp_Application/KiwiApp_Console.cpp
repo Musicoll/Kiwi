@@ -44,25 +44,12 @@ namespace kiwi
         
         juce::TableHeaderComponent* header = new juce::TableHeaderComponent();
         
-        header->addColumn(juce::String("ID"),
-                          Column::Id, 30, 20, 50,
-                          juce::TableHeaderComponent::defaultFlags, -1);
-        
-        header->addColumn(juce::String("Type"),
-                          Column::Type, 30, 20, 50,
-                          juce::TableHeaderComponent::defaultFlags, -1);
-        
-        header->addColumn(juce::String("Object"),
-                          Column::Object, 60, 20, 10000,
-                          juce::TableHeaderComponent::defaultFlags, -1);
-        
         header->addColumn(juce::String("Message"),
                           Column::Message, 100, 40, 10000,
                           juce::TableHeaderComponent::defaultFlags, -1);
         
         header->setStretchToFitActive(false);
-        header->setColumnVisible(1, false);
-        header->setColumnVisible(2, false);
+        header->setColumnVisible(1, true);
         header->addListener(this);
         
         m_table.setWantsKeyboardFocus(true);
@@ -291,12 +278,6 @@ namespace kiwi
             
             switch (columnId)
             {
-                case Column::Object:
-                {
-                    // todo
-                    break;
-                }
-                    
                 case Column::Message:
                 {
                     auto repeat_times = pair.second;
@@ -345,9 +326,6 @@ namespace kiwi
     // column.
     int ConsoleContent::getColumnAutoSizeWidth(int columnId)
     {
-        if(columnId == Column::Id)
-            return 30;
-        
         int widest = 32;
         
         sConsoleHistory history = getHistory();

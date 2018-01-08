@@ -146,10 +146,7 @@ namespace kiwi
         //! @internal Column type
         enum Column
         {
-            Id      = 1,
-            Type    = 2,
-            Object  = 3,
-            Message = 4
+            Message = 1
         };
         
         //! @internal copy selected rows content.
