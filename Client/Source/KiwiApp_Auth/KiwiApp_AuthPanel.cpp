@@ -147,11 +147,11 @@ namespace kiwi
         
         showOverlay();
         
-        auto success_callback = [this]()
+        auto success_callback = [this](std::string message)
         {
-            KiwiApp::useInstance().useScheduler().schedule([this]() {
+            KiwiApp::useInstance().useScheduler().schedule([this, message]() {
                 
-                showSuccessOverlay("Registering success !");
+                showSuccessOverlay(message);
                 
                 KiwiApp::useInstance().useScheduler().schedule([this]() {
                     

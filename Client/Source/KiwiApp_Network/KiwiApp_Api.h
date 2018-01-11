@@ -86,7 +86,7 @@ namespace kiwi
         void signup(std::string const& username,
                     std::string const& email,
                     std::string const& password,
-                    CallbackFn<User> success_cb,
+                    CallbackFn<std::string> success_cb,
                     ErrorCallback error_cb);
         
         //! @brief Make an async API request to get a list of documents

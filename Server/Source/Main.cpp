@@ -66,7 +66,7 @@ int main(int argc, char const* argv[])
         return 0;
     }
     
-    juce::File configuration_file(cl_parser.getOption("-f"));
+    juce::File configuration_file("./" + cl_parser.getOption("-f"));
     
     if(!configuration_file.exists())
     {
@@ -96,9 +96,9 @@ int main(int argc, char const* argv[])
     
     try
     {
-        server::Server kiwi_server(config["port"], config["backend_directory"]);
+        server::Server kiwi_server(config["session_port"], config["backend_directory"]);
         
-        std::cout << "[server] - running on port " << config["port"] << std::endl;
+        std::cout << "[server] - running on port " << config["session_port"] << std::endl;
         
         flip::RunLoopTimer run_loop ([&kiwi_server]
         {

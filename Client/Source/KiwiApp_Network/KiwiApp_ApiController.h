@@ -73,7 +73,7 @@ namespace kiwi
         void signup(std::string const& username,
                     std::string const& email,
                     std::string const& password,
-                    std::function<void()> success_cb,
+                    std::function<void(std::string)> success_cb,
                     Api::ErrorCallback error_cb);
         
         //! @brief Log-out the user.

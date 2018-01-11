@@ -108,7 +108,7 @@ namespace kiwi
     void Api::signup(std::string const& username,
                      std::string const& email,
                      std::string const& password,
-                     CallbackFn<User> success_cb,
+                     CallbackFn<std::string> success_cb,
                      ErrorCallback error_cb)
     {
         assert(!username.empty());
@@ -132,24 +132,19 @@ namespace kiwi
             {
                 const auto j = json::parse(res.body);
                 
-                if(j.is_object() && j.count("user"))
+                if(j.is_object() && j.count("message"))
                 {
-                    User user(j["user"]);
-                    
-                    if(user.isValid())
-                    {
-                        success(std::move(user));
-                    }
-                    else
-                    {
-                        fail({res.result_int(), "Failed to parse result"});
-                    }
-                    
-                    return;
+                    success(j["message"]);
+                }
+                else
+                {
+                    fail({res.result_int(), "Failed to parse result"});
                 }
             }
-            
-            fail(res);
+            else
+            {
+                fail(res);
+            }
         };
         
         storeFuture(session->PostAsync(std::move(cb)));
