@@ -252,6 +252,74 @@ namespace kiwi
         storeFuture(session->GetAsync(std::move(cb)));
     }
     
+    void Api::requestPasswordToken(std::string const& user_mail, CallbackFn<std::string const&> success_cb, ErrorCallback error_cb)
+    {
+        auto session = makeSession(Endpoint::users + "/passtoken");
+        
+        session->setPayload({
+            {"email", user_mail}
+        });
+        
+        auto cb = [success = std::move(success_cb),
+                   fail = std::move(error_cb)](Response res)
+        {
+            if (!res.error
+                && hasJsonHeader(res)
+                && res.result() == beast::http::status::ok)
+            {
+                const auto j = json::parse(res.body);
+                
+                if(j.is_object() && j.count("message"))
+                {
+                    std::string message = j["message"];
+                    success(message);
+                }
+            }
+            else
+            {
+                fail(res);
+            }
+        };
+        
+        storeFuture(session->PostAsync(std::move(cb)));
+    }
+    
+    void Api::resetPassword(std::string const& token,
+                            std::string const& newpass,
+                            CallbackFn<std::string const&> success_cb,
+                            ErrorCallback error_cb)
+    {
+        auto session = makeSession(Endpoint::users + "/passreset");
+        
+        session->setPayload({
+            {"token", token},
+            {"newpass", newpass}
+        });
+        
+        auto cb = [success = std::move(success_cb),
+                   fail = std::move(error_cb)](Response res)
+        {
+            if (!res.error
+                && hasJsonHeader(res)
+                && res.result() == beast::http::status::ok)
+            {
+                const auto j = json::parse(res.body);
+                
+                if(j.is_object() && j.count("message"))
+                {
+                    std::string message = j["message"];
+                    success(message);
+                }
+            }
+            else
+            {
+                fail(res);
+            }
+        };
+        
+        storeFuture(session->PostAsync(std::move(cb)));
+    }
+    
     bool Api::hasJsonHeader(Response const& res)
     {
         return (res[beast::http::field::content_type] == "application/json; charset=utf-8");
