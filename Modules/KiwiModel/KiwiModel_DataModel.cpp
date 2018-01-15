@@ -89,6 +89,7 @@ namespace kiwi
             model::NumberTilde::declare();
             model::Hub::declare();
             model::Mtof::declare();
+            model::Send::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)
