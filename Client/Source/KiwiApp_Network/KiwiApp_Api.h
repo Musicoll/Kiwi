@@ -86,7 +86,7 @@ namespace kiwi
         void signup(std::string const& username,
                     std::string const& email,
                     std::string const& password,
-                    CallbackFn<User> success_cb,
+                    CallbackFn<std::string> success_cb,
                     ErrorCallback error_cb);
         
         //! @brief Make an async API request to get a list of documents
@@ -105,6 +105,15 @@ namespace kiwi
         
         //! @brief Retrieves Kiwi's latest release as a string. ex: v0.1.0
         void getLatestRelease(CallbackFn<std::string const&> success_cb, ErrorCallback error_cb);
+        
+        //! @brief Requests a reset token to the server.
+        void requestPasswordToken(std::string const& user_mail, CallbackFn<std::string const&> success_cb, ErrorCallback error_cb);
+        
+        //! @brief Sends reset request token to the server.
+        void resetPassword(std::string const& token,
+                           std::string const& newpass,
+                           CallbackFn<std::string const&> success_cb,
+                           ErrorCallback error_cb);
         
     public: // helper methods
         

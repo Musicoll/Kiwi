@@ -108,7 +108,7 @@ namespace kiwi
     void Api::signup(std::string const& username,
                      std::string const& email,
                      std::string const& password,
-                     CallbackFn<User> success_cb,
+                     CallbackFn<std::string> success_cb,
                      ErrorCallback error_cb)
     {
         assert(!username.empty());
@@ -132,24 +132,19 @@ namespace kiwi
             {
                 const auto j = json::parse(res.body);
                 
-                if(j.is_object() && j.count("user"))
+                if(j.is_object() && j.count("message"))
                 {
-                    User user(j["user"]);
-                    
-                    if(user.isValid())
-                    {
-                        success(std::move(user));
-                    }
-                    else
-                    {
-                        fail({res.result_int(), "Failed to parse result"});
-                    }
-                    
-                    return;
+                    success(j["message"]);
+                }
+                else
+                {
+                    fail({res.result_int(), "Failed to parse result"});
                 }
             }
-            
-            fail(res);
+            else
+            {
+                fail(res);
+            }
         };
         
         storeFuture(session->PostAsync(std::move(cb)));
@@ -255,6 +250,74 @@ namespace kiwi
         };
         
         storeFuture(session->GetAsync(std::move(cb)));
+    }
+    
+    void Api::requestPasswordToken(std::string const& user_mail, CallbackFn<std::string const&> success_cb, ErrorCallback error_cb)
+    {
+        auto session = makeSession(Endpoint::users + "/passtoken");
+        
+        session->setPayload({
+            {"email", user_mail}
+        });
+        
+        auto cb = [success = std::move(success_cb),
+                   fail = std::move(error_cb)](Response res)
+        {
+            if (!res.error
+                && hasJsonHeader(res)
+                && res.result() == beast::http::status::ok)
+            {
+                const auto j = json::parse(res.body);
+                
+                if(j.is_object() && j.count("message"))
+                {
+                    std::string message = j["message"];
+                    success(message);
+                }
+            }
+            else
+            {
+                fail(res);
+            }
+        };
+        
+        storeFuture(session->PostAsync(std::move(cb)));
+    }
+    
+    void Api::resetPassword(std::string const& token,
+                            std::string const& newpass,
+                            CallbackFn<std::string const&> success_cb,
+                            ErrorCallback error_cb)
+    {
+        auto session = makeSession(Endpoint::users + "/passreset");
+        
+        session->setPayload({
+            {"token", token},
+            {"newpass", newpass}
+        });
+        
+        auto cb = [success = std::move(success_cb),
+                   fail = std::move(error_cb)](Response res)
+        {
+            if (!res.error
+                && hasJsonHeader(res)
+                && res.result() == beast::http::status::ok)
+            {
+                const auto j = json::parse(res.body);
+                
+                if(j.is_object() && j.count("message"))
+                {
+                    std::string message = j["message"];
+                    success(message);
+                }
+            }
+            else
+            {
+                fail(res);
+            }
+        };
+        
+        storeFuture(session->PostAsync(std::move(cb)));
     }
     
     bool Api::hasJsonHeader(Response const& res)

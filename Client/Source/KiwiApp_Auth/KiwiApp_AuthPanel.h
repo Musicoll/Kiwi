@@ -31,6 +31,15 @@ namespace kiwi
     
     class LoginForm : public FormComponent
     {
+    private: // classes
+        
+        enum class State
+        {
+            Login,
+            Request,
+            Reset
+        };
+        
     public: // methods
         
         //! @brief Constructor.
@@ -42,7 +51,27 @@ namespace kiwi
         
     private: // methods
         
+        //! @brief Sends login request to server.
+        void performLogin();
+        
+        //! @brief Sends password token request to server.
+        void performPassReset();
+        
+        //! @brief Sends password reset request to server.
+        void performPassRequest();
+        
+        //! @brief When submit button clicked. Reaction depends on current state.
         void onUserSubmit() override;
+        
+        //! @brief When cancel button is clicked depends on current state.
+        void onUserCancelled() override;
+        
+        //! @brief Change the form state.
+        void setState(State state);
+        
+    private: // members
+        
+        State m_state;
         
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LoginForm)
     };

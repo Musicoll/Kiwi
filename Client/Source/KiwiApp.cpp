@@ -310,7 +310,7 @@ namespace kiwi
     void KiwiApp::signup(std::string const& username,
                          std::string const& email,
                          std::string const& password,
-                         std::function<void()> success_callback,
+                         std::function<void(std::string)> success_callback,
                          Api::ErrorCallback error_callback)
     {
         auto& api_controller = *KiwiApp::use().m_api_controller;

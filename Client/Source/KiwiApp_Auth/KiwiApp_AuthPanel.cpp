@@ -31,22 +31,128 @@ namespace kiwi
     // ================================================================================ //
     
     LoginForm::LoginForm()
-    : FormComponent("login", "login...")
+    : FormComponent("Login", "login...")
     {
-        addField<Field::KiwiLogo>();
-        
-        addField<Field::SingleLineText>("username",
-                                        KiwiApp::getCurrentUser().getName(),
-                                        "Username or Email");
-        
-        addField<Field::Password>("password", "", "Password");
-        
-        addField<Field::ToggleButton>("remember_me",
-                                      "Remember me",
-                                      getAppSettings().network().getRememberUserFlag());
+        setState(State::Login);
     }
     
-    void LoginForm::onUserSubmit()
+    void LoginForm::setState(State state)
+    {
+        clearFields();
+        
+        m_state = state;
+        
+        switch (state)
+        {
+            case State::Login:
+            {
+                addField<Field::KiwiLogo>();
+                
+                addField<Field::SingleLineText>("username",
+                                                KiwiApp::getCurrentUser().getName(),
+                                                "Username or Email");
+                
+                addField<Field::Password>("password", "", "Password");
+                
+                addField<Field::ToggleButton>("remember_me",
+                                              "Remember me",
+                                              getAppSettings().network().getRememberUserFlag());
+                
+                addField<Field::TextButton>("forgot_pass",
+                                            "Forgot password ?",
+                                            [this]()
+                                            {
+                                                setState(State::Request);
+                                                showAlert("Enter email to request reset token", AlertBox::Type::Info);
+                                            });
+                
+                setSubmitText("Login");
+                
+                break;
+            }
+            case State::Request:
+            {
+                addField<Field::KiwiLogo>();
+                
+                addField<Field::SingleLineText>("email", "", "Email");
+                addField<Field::TextButton>("already_have",
+                                            "Already have token ?",
+                                            [this]()
+                                            {
+                                                setState(State::Reset);
+                                                showAlert("Enter reset token.", AlertBox::Type::Info);
+                                            });
+                
+                setSubmitText("Send");
+                
+                break;
+            }
+            case State::Reset:
+            {
+                addField<Field::KiwiLogo>();
+                
+                addField<Field::SingleLineText>("token", "", "Token");
+                addField<Field::SingleLineText>("newpass", "", "New Password");
+                
+                setSubmitText("Send");
+                
+                break;
+            }
+        }
+        
+        setSize(getWidth(), getBestHeight());
+    }
+    
+    void LoginForm::performPassReset()
+    {
+        auto success_callback = [this](std::string const& message)
+        {
+            KiwiApp::useInstance().useScheduler().schedule([this]() {
+                setState(State::Login);
+                showAlert("Password reset. Try login again.", AlertBox::Type::Info);
+            });
+        };
+        
+        auto error_callback = [this](Api::Error error)
+        {
+            std::string error_message = error.getMessage();
+            
+            KiwiApp::useInstance().useScheduler().schedule([this, error_message]() {
+                showAlert(error_message, AlertBox::Type::Error);
+            });
+        };
+        
+        const std::string token = getFieldValue("token").toString().toStdString();
+        const std::string newpass = getFieldValue("newpass").toString().toStdString();
+        
+        KiwiApp::useApi().resetPassword(token, newpass, success_callback, error_callback);
+    }
+    
+    void LoginForm::performPassRequest()
+    {
+        auto success_callback = [this](std::string const& message)
+        {
+            KiwiApp::useInstance().useScheduler().schedule([this]() {
+                setState(State::Reset);
+                showAlert("Reset token sent. Check your email.", AlertBox::Type::Info);
+            });
+        };
+        
+        auto error_callback = [this](Api::Error error)
+        {
+            std::string error_message = error.getMessage();
+            
+            KiwiApp::useInstance().useScheduler().schedule([this, error_message]() {
+                showAlert(error_message, AlertBox::Type::Error);
+            });
+        };
+        
+        const std::string email = getFieldValue("email").toString().toStdString();
+        
+        KiwiApp::useApi().requestPasswordToken(email, success_callback, error_callback);
+    }
+    
+    void LoginForm::performLogin()
     {
         const auto username = getFieldValue("username").toString();
         const auto password = getFieldValue("password").toString();
@@ -98,12 +204,56 @@ namespace kiwi
                        std::move(error_callback));
     }
     
+    void LoginForm::onUserSubmit()
+    {
+        switch (m_state)
+        {
+            case State::Login:
+            {
+                performLogin();
+                break;
+            }
+            case State::Request:
+            {
+                performPassRequest();
+                break;
+            }
+            case State::Reset:
+            {
+                performPassReset();
+                break;
+            }
+        }
+    }
+    
+    void LoginForm::onUserCancelled()
+    {
+        switch(m_state)
+        {
+            case State::Login:
+            {
+                dismiss();
+                break;
+            }
+            case State::Request:
+            {
+                setState(State::Login);
+                break;
+            }
+            case State::Reset:
+            {
+                setState(State::Login);
+                break;
+            }
+        }
+    }
+    
     // ================================================================================ //
     //                                  SIGNUP FORM                                     //
     // ================================================================================ //
     
     SignUpForm::SignUpForm()
-    : FormComponent("register", "register...")
+    : FormComponent("Register", "register...")
     {
         addField<Field::KiwiLogo>();
         addField<Field::SingleLineText>("username", "", "Username");
@@ -147,11 +297,11 @@ namespace kiwi
         
         showOverlay();
         
-        auto success_callback = [this]()
+        auto success_callback = [this](std::string message)
         {
-            KiwiApp::useInstance().useScheduler().schedule([this]() {
+            KiwiApp::useInstance().useScheduler().schedule([this, message]() {
                 
-                showSuccessOverlay("Registering success !");
+                showSuccessOverlay(message);
                 
                 KiwiApp::useInstance().useScheduler().schedule([this]() {
                     

@@ -115,18 +115,14 @@ namespace kiwi
     void ApiController::signup(std::string const& username,
                                std::string const& email,
                                std::string const& password,
-                               std::function<void()> success_callback,
+                               std::function<void(std::string)> success_callback,
                                Api::ErrorCallback error_callback)
     {
-        auto success_cb = [this, success_callback = std::move(success_callback)](Api::User user){
+        auto success_cb = [this, success_callback = std::move(success_callback)](std::string message){
             
             auto& scheduler = KiwiApp::useInstance().useScheduler();
-            scheduler.schedule([this, success_callback, user](){
-                
-                m_auth_user.resetWith(user);
-                m_listeners.call(&ApiConnectStatusListener::authUserChanged, m_auth_user);
-                
-                success_callback();
+            scheduler.schedule([this, success_callback, message](){
+                success_callback(message);
             });
         };
         

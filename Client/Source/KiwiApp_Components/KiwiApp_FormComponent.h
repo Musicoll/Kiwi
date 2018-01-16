@@ -103,6 +103,12 @@ namespace kiwi
         //! @brief Returns a field Value.
         juce::Value getFieldValue(std::string const& name);
         
+        //! @brief Remove fields by name.
+        void removeField(std::string const& name);
+        
+        //! @brief Remove all fields.
+        void clearFields();
+        
         //! @brief Show an Alert on the top of the form;
         void showAlert(std::string const& message,
                        AlertBox::Type type = AlertBox::Type::Error);
@@ -115,6 +121,9 @@ namespace kiwi
         
         //! @brief Hide overlay
         void hideOverlay();
+        
+        //! @brief Changes the submit button text
+        void setSubmitText(std::string const& submit_text);
         
         //! @brief Returns true if the overlay component is visible.
         bool hasOverlay();
@@ -145,7 +154,6 @@ namespace kiwi
         
     private: // variables
         
-        std::string m_submit_button_text;
         std::string m_overlay_text;
         
         juce::TextButton m_submit_btn, m_cancel_btn;
@@ -153,6 +161,8 @@ namespace kiwi
         std::unique_ptr<AlertBox> m_alert_box;
         
         std::vector<std::unique_ptr<Field>> m_fields;
+        
+        int m_alert_height;
         
         class OverlayComp;
         friend class OverlayComp;
@@ -173,6 +183,7 @@ namespace kiwi
         class Password;
         class ToggleButton;
         class KiwiLogo;
+        class TextButton;
         
         Field(std::string name);
         
@@ -246,6 +257,35 @@ namespace kiwi
     };
     
     // ================================================================================ //
+    //                                TEXT BUTTON FIELD                                 //
+    // ================================================================================ //
+    
+    class FormComponent::Field::TextButton : public Field, public juce::Button::Listener
+    {
+    public:
+        
+        TextButton(std::string const& name,
+                   std::string const& buton_text,
+                   std::function<void()> call_back);
+        
+        ~TextButton();
+        
+        juce::Value& getValue() override final;
+        
+        int getPreferedHeight() override final;
+        
+        void resized() override;
+        
+        void buttonClicked(juce::Button *) override final;
+        
+    private:
+        
+        juce::TextButton        m_button;
+        juce::Value             m_value;
+        std::function<void()>   m_call_back;
+    };
+    
+    // ================================================================================ //
     //                                KIWI LOGO FIELD                                   //
     // ================================================================================ //
     
@@ -268,6 +308,7 @@ namespace kiwi
         juce::Image m_kiwi_app_image;
         juce::Value m_useless_value;
     };
+    
     
     // ================================================================================ //
     //                        FORM COMPONENT - template definitions                     //

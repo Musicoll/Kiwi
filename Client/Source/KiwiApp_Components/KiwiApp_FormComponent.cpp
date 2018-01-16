@@ -281,6 +281,47 @@ namespace kiwi
     }
     
     // ================================================================================ //
+    //                               FIELD TEXT BUTTON                                  //
+    // ================================================================================ //
+    
+    FormComponent::Field::TextButton::TextButton(std::string const& name,
+                                                 std::string const& button_text,
+                                                 std::function<void()> call_back):
+    Field(name),
+    m_button(button_text),
+    m_value(),
+    m_call_back(call_back)
+    {
+        m_button.addListener(this);
+        addAndMakeVisible(m_button);
+    }
+    
+    FormComponent::Field::TextButton::~TextButton()
+    {
+        m_button.removeListener(this);
+    }
+    
+    void FormComponent::Field::TextButton::resized()
+    {
+        m_button.changeWidthToFitText(getHeight());
+    }
+    
+    juce::Value& FormComponent::Field::TextButton::getValue()
+    {
+        return m_value;
+    }
+    
+    int FormComponent::Field::TextButton::getPreferedHeight()
+    {
+        return 30;
+    }
+    
+    void FormComponent::Field::TextButton::buttonClicked(juce::Button *)
+    {
+        m_call_back();
+    }
+    
+    // ================================================================================ //
     //                                KIWI LOGO FIELD                                   //
     // ================================================================================ //
     
@@ -319,10 +360,10 @@ namespace kiwi
     
     FormComponent::FormComponent(std::string const& submit_button_text,
                                  std::string const& overlay_text)
-    : m_submit_button_text(submit_button_text)
-    , m_overlay_text(overlay_text)
-    , m_submit_btn(m_submit_button_text)
+    : m_overlay_text(overlay_text)
+    , m_submit_btn(submit_button_text)
     , m_cancel_btn(TRANS("Cancel"))
+    , m_alert_height(50)
     {
         addAndMakeVisible(m_submit_btn);
         addAndMakeVisible(m_cancel_btn);
@@ -357,8 +398,7 @@ namespace kiwi
         
         if(m_alert_box)
         {
-            const int alert_height = 50;
-            m_alert_box->setBounds(r.removeFromTop(alert_height));
+            m_alert_box->setBounds(r.removeFromTop(m_alert_height));
         }
         
         r.reduce(10, 10);
@@ -416,6 +456,12 @@ namespace kiwi
         }
     }
     
+    void FormComponent::setSubmitText(std::string const& submit_text)
+    {
+        m_submit_btn.setButtonText(submit_text);
+        repaint();
+    }
+    
     bool FormComponent::hasOverlay()
     {
         return (m_overlay != nullptr);
@@ -429,19 +475,17 @@ namespace kiwi
             removeChildComponent(m_alert_box.get());
         }
         
-        const int alert_height = 50;
-        
-        m_alert_box.reset(new AlertBox(message, type, true, [this, alert_height](){
+        m_alert_box.reset(new AlertBox(message, type, true, [this](){
             removeChildComponent(m_alert_box.get());
             m_alert_box.reset();
-            setBounds(getBounds().withHeight(getHeight() - alert_height));
+            setBounds(getBounds().withHeight(getHeight() - m_alert_height));
         }));
         
         addAndMakeVisible(*m_alert_box);
         
         if(!was_showing)
         {
-            setBounds(getBounds().withHeight(getHeight() + alert_height));
+            setBounds(getBounds().withHeight(getHeight() + m_alert_height));
         }
         else
         {
@@ -475,6 +519,33 @@ namespace kiwi
         {
             parent_window->close();
         }
+    }
+    
+    void FormComponent::clearFields()
+    {
+        for(auto field = m_fields.begin(); field != m_fields.end();)
+        {
+            removeChildComponent((*field).get());
+            field = m_fields.erase(field);
+        }
+        repaint();
+    }
+    
+    void FormComponent::removeField(std::string const& name)
+    {
+        for(auto field = m_fields.begin(); field != m_fields.end();)
+        {
+            if ((*field)->getName() == name)
+            {
+                removeChildComponent((*field).get());
+                field = m_fields.erase(field);
+            }
+            else
+            {
+                ++field;
+            }
+        }
+        repaint();
     }
     
     juce::Value FormComponent::getFieldValue(std::string const& name)
