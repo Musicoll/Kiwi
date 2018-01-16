@@ -54,6 +54,16 @@ namespace kiwi
         
     }
     
+    void Api::cancelPendingRequest()
+    {
+        for(auto & session : m_pending_requests)
+        {
+            session->cancel();
+        }
+        
+        m_pending_requests.clear();
+    }
+    
     // ================================================================================ //
     //                                   API REQUESTS                                   //
     // ================================================================================ //
@@ -102,7 +112,8 @@ namespace kiwi
             fail(res);
         };
         
-        storeFuture(session->PostAsync(std::move(cb)));
+        session->PostAsync(std::move(cb));
+        storeSession(std::move(session));
     }
     
     void Api::signup(std::string const& username,
@@ -147,7 +158,8 @@ namespace kiwi
             }
         };
         
-        storeFuture(session->PostAsync(std::move(cb)));
+        session->GetAsync(std::move(cb));
+        storeSession(std::move(session));
     }
     
     void Api::getDocuments(std::function<void(Response, Api::Documents)> callback)
@@ -173,7 +185,9 @@ namespace kiwi
         };
         
         auto session = makeSession(Endpoint::documents);
-        storeFuture(session->GetAsync(std::move(cb)));
+        
+        session->GetAsync(std::move(cb));
+        storeSession(std::move(session));
     }
     
     void Api::createDocument(std::string const& document_name,
@@ -208,7 +222,8 @@ namespace kiwi
             });
         }
         
-        storeFuture(session->PostAsync(std::move(cb)));
+        session->PostAsync(std::move(cb));
+        storeSession(std::move(session));
     }
     
     void Api::renameDocument(std::string document_id, std::string const& new_name,
@@ -221,7 +236,8 @@ namespace kiwi
             {"name", new_name}
         });
         
-        storeFuture(session->PutAsync(std::move(callback)));
+        session->PutAsync(std::move(callback));
+        storeSession(std::move(session));
     }
     
     void Api::getLatestRelease(CallbackFn<std::string const&> success_cb, ErrorCallback error_cb)
@@ -249,7 +265,8 @@ namespace kiwi
             }
         };
         
-        storeFuture(session->GetAsync(std::move(cb)));
+        session->GetAsync(std::move(cb));
+        storeSession(std::move(session));
     }
     
     void Api::requestPasswordToken(std::string const& user_mail, CallbackFn<std::string const&> success_cb, ErrorCallback error_cb)
@@ -281,7 +298,8 @@ namespace kiwi
             }
         };
         
-        storeFuture(session->PostAsync(std::move(cb)));
+        session->PostAsync(std::move(cb));
+        storeSession(std::move(session));
     }
     
     void Api::resetPassword(std::string const& token,
@@ -317,7 +335,8 @@ namespace kiwi
             }
         };
         
-        storeFuture(session->PostAsync(std::move(cb)));
+        session->PostAsync(std::move(cb));
+        storeSession(std::move(session));
     }
     
     bool Api::hasJsonHeader(Response const& res)
@@ -343,18 +362,21 @@ namespace kiwi
         return std::move(session);
     }
     
-    void Api::storeFuture(std::future<void> && future)
+    void Api::storeSession(std::unique_ptr<Session> session)
     {
-        for(std::future<void>& f : m_pending_requests)
+        for(auto it = m_pending_requests.begin(); it != m_pending_requests.end();)
         {
-            if(f.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+            if (!(*it)->isPending())
             {
-                f = std::move(future);
-                return;
+                it = m_pending_requests.erase(it);
+            }
+            else
+            {
+                ++it;
             }
         }
         
-        m_pending_requests.emplace_back(std::move(future));
+        m_pending_requests.emplace_back(std::move(session));
     }
     
     // ================================================================================ //

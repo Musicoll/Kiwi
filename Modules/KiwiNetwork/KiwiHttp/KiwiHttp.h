@@ -77,7 +77,7 @@ namespace kiwi { namespace network { namespace http {
     //                                       QUERY                                      //
     // ================================================================================ //
     
-    template<class ReqType>
+    template<class ReqType, class ResType>
     class Query
     {
     public: // methods
@@ -90,9 +90,12 @@ namespace kiwi { namespace network { namespace http {
         //! @brief Destructor.
         ~Query();
         
-        //! @brief Write the request and get the response.
-        template<class ResType>
-        Response<ResType> writeRequest();
+        //! @brief Process the underlying service.
+        //! @details Returns if the request terminated and response can be returned.
+        bool process();
+        
+        //! @brief Returns the reponse of the query.
+        Response<ResType> const& getResponse() const;
         
     private: // methods
         
@@ -102,18 +105,15 @@ namespace kiwi { namespace network { namespace http {
         void handleTimeout(beast::error_code const& error);
         
         //! @internal
-        template<class ResType>
         void connect(Response<ResType>& response,
                      beast::error_code const& error,
                      tcp::resolver::iterator iterator);
         
         //! @internal
-        template<class ResType>
         void write(Response<ResType>& response,
                    beast::error_code const& error);
         
         //! @internal
-        template<class ResType>
         void read(Response<ResType>& response,
                   beast::error_code const& error);
         
@@ -123,13 +123,14 @@ namespace kiwi { namespace network { namespace http {
     private: // members
         
         std::unique_ptr<Request<ReqType>>   m_request;
+        Response<ResType>                   m_response;
         Error                               m_error;
-        Timeout                             m_timeout;
         
         std::string                         m_port;
         boost::asio::io_service             m_io_service;
         tcp::socket                         m_socket;
         boost::asio::steady_timer           m_timer;
+        tcp::resolver                       m_resolver;
         beast::flat_buffer                  m_buffer;
         
     private: // deleted methods

@@ -113,31 +113,36 @@ namespace kiwi { namespace network { namespace http {
         void setPayload(Payload && payload);
         void setBody(Body && body);
         
+        bool isPending();
+        void cancel();
+        
         Response Get();
-        AsyncResponse GetAsync(Callback callback);
+        void GetAsync(Callback callback);
         
         Response Post();
-        AsyncResponse PostAsync(Callback callback);
+        void PostAsync(Callback callback);
         
         Response Put();
-        AsyncResponse PutAsync(Callback callback);
+        void PutAsync(Callback callback);
         
         Response Delete();
-        AsyncResponse DeleteAsync(Callback callback);
+        void DeleteAsync(Callback callback);
         
     private: // variables
         
-        std::unique_ptr<Query<beast::http::string_body>> makeQuery();
+        std::unique_ptr<Query<beast::http::string_body, Response::body_type>> makeQuery();
         
         Response makeResponse(beast::http::verb verb);
-        AsyncResponse makeResponse(beast::http::verb verb, Callback && callback);
+        void makeResponse(beast::http::verb verb, Callback && callback);
         
-        std::string     m_port;
-        std::string     m_target;
-        Parameters      m_parameters;
-        Payload         m_payload;
-        Body            m_body;
-        Timeout         m_timeout;
+        std::string         m_port;
+        std::string         m_target;
+        Parameters          m_parameters;
+        Payload             m_payload;
+        Body                m_body;
+        Timeout             m_timeout;
+        std::future<void>   m_future;
+        std::atomic<bool>   m_keep_processing;
         
         beast::http::request_header<> m_req_header;
     };

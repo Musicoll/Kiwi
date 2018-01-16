@@ -215,6 +215,7 @@ namespace kiwi
         juce::MenuBarModel::setMacMainMenu(nullptr);
         #endif
         
+        m_api->cancelPendingRequest();
         m_api.reset();
         m_api_controller.reset();
         m_settings.reset();
