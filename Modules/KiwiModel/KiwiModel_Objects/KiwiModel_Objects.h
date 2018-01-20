@@ -76,3 +76,5 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Number.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_NumberTilde.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Hub.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Mtof.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Send.h>

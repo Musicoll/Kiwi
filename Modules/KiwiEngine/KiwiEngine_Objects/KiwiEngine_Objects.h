@@ -76,3 +76,5 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Number.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_NumberTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Hub.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Mtof.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Send.h>

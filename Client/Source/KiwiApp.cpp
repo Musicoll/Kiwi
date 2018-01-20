@@ -193,6 +193,8 @@ namespace kiwi
         engine::Number::declare();
         engine::NumberTilde::declare();
         engine::Hub::declare();
+        engine::Mtof::declare();
+        engine::Send::declare();
     }
     
     void KiwiApp::declareObjectViews()
