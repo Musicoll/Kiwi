@@ -115,6 +115,19 @@ namespace kiwi
         m_distant_drive->refresh();
     }
     
+    void DocumentBrowser::handleDeniedRequest()
+    {
+        if (KiwiApp::getCurrentUser().isLoggedIn())
+        {
+            KiwiApp::logout();
+            KiwiApp::error("Session has expired. Please login.");
+        }
+        else
+        {
+            KiwiApp::error("Request denied. Please login.");
+        }
+    }
+    
     void DocumentBrowser::userLoggedIn(Api::AuthUser const& user)
     {
         m_distant_drive->setName(user.getName());
@@ -196,7 +209,11 @@ namespace kiwi
     {
         KiwiApp::useApi().createDocument("", [this](Api::Response res, Api::Document document) {
             
-            if(res.error)
+            if (res.result() == beast::http::status::forbidden)
+            {
+                DocumentBrowser::handleDeniedRequest();
+            }
+            else if(res.error)
             {
                 juce::MessageManager::callAsync([message = res.error.message()](){
                     KiwiApp::error("Error: can't create document");
@@ -311,7 +328,14 @@ namespace kiwi
     {
         KiwiApp::useApi().getDocuments([this](Api::Response res, Api::Documents docs) {
             
-            if(res.error)
+            if (res.result() == beast::http::status::forbidden)
+            {
+                KiwiApp::useInstance().useScheduler().schedule([]()
+                {
+                    DocumentBrowser::handleDeniedRequest();
+                });
+            }
+            else if(res.error)
             {
                 KiwiApp::error("Kiwi API error: can't get documents => " + res.error.message());
             }
@@ -396,7 +420,14 @@ namespace kiwi
     {
         KiwiApp::useApi().untrashDocument(m_document._id, [this](Api::Response res)
         {
-            if(res.error)
+            if (res.result() == beast::http::status::forbidden)
+            {
+                KiwiApp::useInstance().useScheduler().schedule([]()
+                {
+                    DocumentBrowser::handleDeniedRequest();
+                });
+            }
+            else if(res.error)
             {
                 KiwiApp::error(res.error.message());
             }
@@ -414,7 +445,15 @@ namespace kiwi
     {
         KiwiApp::useApi().trashDocument(m_document._id, [this](Api::Response res) {
             
-            if(res.error)
+            if (res.result() == beast::http::status::forbidden)
+            {
+                KiwiApp::useInstance().useScheduler().schedule([]()
+                {
+                    DocumentBrowser::handleDeniedRequest();
+                    
+                });
+            }
+            else if(res.error)
             {
                 KiwiApp::error(res.error.message());
             }
@@ -437,7 +476,14 @@ namespace kiwi
         
         KiwiApp::useApi().renameDocument(m_document._id, new_name, [this](Api::Response res) {
             
-            if(res.error)
+            if (res.result() == beast::http::status::forbidden)
+            {
+                KiwiApp::useInstance().useScheduler().schedule([]()
+                {
+                    DocumentBrowser::handleDeniedRequest();
+                });
+            }
+            else if(res.error)
             {
                 KiwiApp::error(res.error.message());
             }
@@ -476,7 +522,20 @@ namespace kiwi
         
         auto error = [this](Api::Error er)
         {
-            KiwiApp::error(er.getMessage());
+            if (er.getStatusCode() == static_cast<unsigned>(beast::http::status::forbidden))
+            {
+                KiwiApp::useInstance().useScheduler().schedule([]()
+                {
+                    DocumentBrowser::handleDeniedRequest();
+                });
+            }
+            else
+            {
+                KiwiApp::useInstance().useScheduler().schedule([er]()
+                {
+                    KiwiApp::error(er.getMessage());
+                });
+            }
         };
         
         KiwiApp::useApi().getOpenToken(m_document._id, success, error);

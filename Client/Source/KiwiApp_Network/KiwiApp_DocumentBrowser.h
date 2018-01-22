@@ -80,6 +80,9 @@ namespace kiwi
         
     private: // methods
         
+        //! @brief Handles request that denied by server.
+        static void handleDeniedRequest();
+        
         void networkSettingsChanged(NetworkSettings const&, const juce::Identifier& id) override;
         
         void userLoggedIn(Api::AuthUser const&) override;
