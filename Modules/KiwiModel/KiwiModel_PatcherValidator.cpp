@@ -75,6 +75,13 @@ namespace kiwi
             {
                 flip_VALIDATION_FAILED ("Creating link to non existing object");
             }
+            
+            PinType outlet_type = link.getSenderObject().getOutlet(link.getSenderIndex()).getType();
+            
+            if (!link.getReceiverObject().getInlet(link.getReceiverIndex()).hasType(outlet_type))
+            {
+                flip_VALIDATION_FAILED("Link creation type mismatch between outlet and inlet");
+            }
         }
     }
 }
