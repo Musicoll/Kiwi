@@ -97,6 +97,8 @@ namespace kiwi { namespace network { namespace http {
     , m_payload()
     , m_body()
     , m_timeout(0)
+    , m_future()
+    , m_keep_processing(false)
     , m_req_header()
     {
         ;
@@ -137,14 +139,24 @@ namespace kiwi { namespace network { namespace http {
         m_payload = std::move(payload);
     }
     
+    bool Session::isPending()
+    {
+        return m_future.valid() && m_future.wait_for(std::chrono::seconds(0)) != std::future_status::ready;
+    }
+    
+    void Session::cancel()
+    {
+        m_keep_processing = false;
+    }
+    
     Session::Response Session::Get()
     {
         return makeResponse(beast::http::verb::get);
     }
     
-    Session::AsyncResponse Session::GetAsync(Callback callback)
+    void Session::GetAsync(Callback callback)
     {
-        return makeResponse(beast::http::verb::get, std::move(callback));
+        makeResponse(beast::http::verb::get, std::move(callback));
     }
     
     Session::Response Session::Post()
@@ -152,9 +164,9 @@ namespace kiwi { namespace network { namespace http {
         return makeResponse(beast::http::verb::post);
     }
     
-    Session::AsyncResponse Session::PostAsync(Callback callback)
+    void Session::PostAsync(Callback callback)
     {
-        return makeResponse(beast::http::verb::post, std::move(callback));
+        makeResponse(beast::http::verb::post, std::move(callback));
     }
     
     Session::Response Session::Put()
@@ -162,9 +174,9 @@ namespace kiwi { namespace network { namespace http {
         return makeResponse(beast::http::verb::put);
     }
     
-    Session::AsyncResponse Session::PutAsync(Callback callback)
+    void Session::PutAsync(Callback callback)
     {
-        return makeResponse(beast::http::verb::put, std::move(callback));
+        makeResponse(beast::http::verb::put, std::move(callback));
     }
     
     Session::Response Session::Delete()
@@ -172,12 +184,12 @@ namespace kiwi { namespace network { namespace http {
         return makeResponse(beast::http::verb::delete_);
     }
     
-    Session::AsyncResponse Session::DeleteAsync(Callback callback)
+    void Session::DeleteAsync(Callback callback)
     {
-        return makeResponse(beast::http::verb::delete_, std::move(callback));
+        makeResponse(beast::http::verb::delete_, std::move(callback));
     }
     
-    std::unique_ptr<Query<beast::http::string_body>> Session::makeQuery()
+    std::unique_ptr<Query<beast::http::string_body, Session::Response::body_type>> Session::makeQuery()
     {
         const auto makeTarget = [this]() {
             
@@ -215,20 +227,33 @@ namespace kiwi { namespace network { namespace http {
         }
         
         request->prepare_payload();
-        return std::make_unique<Query<beast::http::string_body>>(std::move(request), m_port, m_timeout);
+        return std::make_unique<Query<beast::http::string_body, Response::body_type>>(std::move(request), m_port, m_timeout);
     }
     
     Session::Response Session::makeResponse(beast::http::verb verb)
     {
         m_req_header.method(verb);
-        return std::move(makeQuery()->writeRequest<Response::body_type>());
+        
+        auto query = makeQuery();
+        
+        while(!query->process()){}
+        
+        return query->getResponse();
     }
     
-    Session::AsyncResponse Session::makeResponse(beast::http::verb verb, Session::Callback && callback)
+    void Session::makeResponse(beast::http::verb verb, Session::Callback && callback)
     {
         m_req_header.method(verb);
-        return std::async(std::launch::async, [query = makeQuery(), cb = std::move(callback)]() {
-            return cb(std::move(query->writeRequest<Response::body_type>()));
+        
+        m_future = std::async(std::launch::async, [this, query = makeQuery(), cb = std::move(callback)]()
+        {
+            while(m_keep_processing)
+            {
+                if (query->process())
+                {
+                    cb(query->getResponse());
+                }
+            }
         });
     }
     

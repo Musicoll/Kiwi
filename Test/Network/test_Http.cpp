@@ -93,12 +93,10 @@ TEST_CASE("Network - Http Session", "[Network, Http]")
         session.setHost("httpbin.org");
         session.setTarget("/get");
         
-        auto future = session.GetAsync([](http::Session::Response response) {
+        session.GetAsync([](http::Session::Response response) {
             REQUIRE(!response.error);
             CHECK(response.result() == beast::http::status::ok);
         });
-        
-        future.get();
     }
     
     SECTION("Session GetAsync with Parameters")

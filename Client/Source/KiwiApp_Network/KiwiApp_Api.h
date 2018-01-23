@@ -69,6 +69,9 @@ namespace kiwi
         //! @brief Destructor
         ~Api();
         
+        //! @brief Cancel pending execution.
+        void cancelPendingRequest();
+        
     public: // requests
         
         //! @brief Attempt to log-in the user.
@@ -142,15 +145,15 @@ namespace kiwi
         std::unique_ptr<Session> makeSession(std::string const& endpoint, bool add_auth = true);
         
         //! @internal Store the async future response in a vector
-        void storeFuture(std::future<void> && future);
+        void storeSession(std::unique_ptr<Session> session);
         
         //! @internal Check if the response header has a JSON content-type
         static bool hasJsonHeader(Response const& res);
         
     private: // variables
         
-        Api::Controller&                m_controller;
-        std::vector<std::future<void>>  m_pending_requests;
+        Api::Controller&                        m_controller;
+        std::vector<std::unique_ptr<Session>>   m_pending_requests;
         
     private: // deleted methods
         
