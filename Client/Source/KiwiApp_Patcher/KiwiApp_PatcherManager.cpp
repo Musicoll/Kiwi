@@ -21,6 +21,8 @@
 
 #include <chrono>
 
+#include <json.hpp>
+
 #include <flip/contrib/DataProviderFile.h>
 #include <flip/BackEndIR.h>
 #include <flip/BackEndBinary.h>
@@ -43,6 +45,8 @@
 
 namespace kiwi
 {
+    using json = nlohmann::json;
+    
     // ================================================================================ //
     //                                  PATCHER MANAGER                                 //
     // ================================================================================ //
@@ -156,7 +160,10 @@ namespace kiwi
             m_listeners.call(&Listener::connectedUserChanged, *this);
         });
         
-        std::string metadata = KIWI_MODEL_VERSION_STRING;
+        json j;
+        j["model_version"] = KIWI_MODEL_VERSION_STRING;
+        j["open_token"] = session.getOpenToken();
+        std::string metadata = j.dump();
         
         m_socket.connect(host, port, session.getSessionId(), metadata);
         

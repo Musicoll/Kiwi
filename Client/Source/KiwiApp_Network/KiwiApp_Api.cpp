@@ -265,6 +265,32 @@ namespace kiwi
         storeSession(std::move(session));
     }
     
+    void Api::getOpenToken(std::string document_id,
+                           CallbackFn<std::string const&> success_cb,
+                           ErrorCallback error_cb)
+    {
+        auto session = makeSession(Endpoint::document(document_id) + "/opentoken");
+        
+        auto callback = [success = std::move(success_cb),
+                         fail = std::move(error_cb)](Response res)
+        {
+            if (!res.error
+                && hasJsonHeader(res)
+                && res.result() == beast::http::status::ok)
+            {
+                const auto j = json::parse(res.body);
+                success(j["token"]);
+            }
+            else
+            {
+                fail(res);
+            }
+        };
+        
+        session->GetAsync(std::move(callback));
+        storeSession(std::move(session));
+    }
+    
     void Api::getLatestRelease(CallbackFn<std::string const&> success_cb, ErrorCallback error_cb)
     {
         auto session = makeSession(Endpoint::releases + "/latest");
@@ -362,6 +388,17 @@ namespace kiwi
         
         session->PostAsync(std::move(cb));
         storeSession(std::move(session));
+    }
+    
+    std::string Api::convertDate(std::string const& date)
+    {
+        std::string result = date;
+        
+        result.replace(result.find_first_of("T"), 1 , " ");
+        result.replace(result.find_first_of("Z"), 1 , " ");
+        result.append("GMT");
+        
+        return result;
     }
     
     bool Api::hasJsonHeader(Response const& res)
@@ -580,6 +617,8 @@ namespace kiwi
             {"session_id", session_id_converter.str()},
             {"createdBy", doc.author_name},
             {"createdAt", doc.creation_date},
+            {"lastOpenedAt", doc.opened_date},
+            {"lastModdifyBy", doc.opened_user}
         };
         
         if (doc.trashed)
@@ -598,9 +637,11 @@ namespace kiwi
         doc._id = Api::getJsonValue<std::string>(j, "_id");
         doc.name = Api::getJsonValue<std::string>(j, "name");
         doc.author_name = Api::getJsonValue<std::string>(j.at("createdBy"), "username");
-        doc.creation_date = Api::getJsonValue<std::string>(j, "createdAt");
+        doc.creation_date = Api::convertDate(Api::getJsonValue<std::string>(j, "createdAt"));
+        doc.opened_date = Api::convertDate(Api::getJsonValue<std::string>(j, "lastOpenedAt"));
+        doc.opened_user = Api::getJsonValue<std::string>(j.at("lastOpenedBy"), "username");
         doc.trashed = Api::getJsonValue<bool>(j, "trashed");
-        doc.trashed_date = doc.trashed ? Api::getJsonValue<std::string>(j, "trashedDate") : "";
+        doc.trashed_date = doc.trashed ? Api::convertDate(Api::getJsonValue<std::string>(j, "trashedDate")) : "";
         doc.session_id = 0ul;
         
         if(j.count("session_id"))

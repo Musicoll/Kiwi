@@ -235,6 +235,9 @@ namespace kiwi
         //! @brief Returns the session id of the document.
         uint64_t getSessionId() const;
         
+        //! @brief Returns the open token of the document.
+        std::string const& getOpenToken() const;
+        
         //! @brief Returns the drive that holds this document.
         DocumentBrowser::Drive const& useDrive() const;
         
@@ -259,6 +262,12 @@ namespace kiwi
         //! @brief Returns trashed date as string.
         std::string const& getTrashedDate() const;
         
+        //! @brief Returns the last modification date.
+        std::string const& getOpenedDate() const;
+        
+        //! @brief Returns the user that modified document last.
+        std::string const& getOpenedUser() const;
+        
         //! @brief Returns true if the DocumentSession match another DocumentSession
         //! @details this operator uses the session_id field to compare.
         bool operator==(DocumentSession const& other_doc) const;
@@ -267,6 +276,7 @@ namespace kiwi
         
         DocumentBrowser::Drive&             m_drive;
         Api::Document                       m_document;
+        std::string                         m_open_token;
         
         friend class DocumentBrowser::Drive;
     };

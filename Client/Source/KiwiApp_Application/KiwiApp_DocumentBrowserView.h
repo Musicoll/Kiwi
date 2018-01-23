@@ -79,11 +79,13 @@ namespace kiwi
     {
     private: // classes
         
-        enum class SortType
+        enum class DataType
         {
             name,
             author,
-            creationDate
+            creationDate,
+            openedDate,
+            openedUser
         };
         
         struct Comp
@@ -91,7 +93,7 @@ namespace kiwi
             bool compare(DocumentBrowser::Drive::DocumentSession const& l_hs,
                          DocumentBrowser::Drive::DocumentSession const& r_hs) const;
             
-            SortType    m_type = SortType::creationDate;
+            DataType    m_type = DataType::creationDate;
             bool        m_trashed_first = false;
         };
         
@@ -161,10 +163,10 @@ namespace kiwi
         void createDocument();
         
         //! @brief Returns the current sorting parameter.
-        SortType getSortType() const;
+        DataType getSortType() const;
         
         //! @brief Changes the sort parameter and sorts.
-        void setSortType(SortType sort_type);
+        void setSortType(DataType sort_type);
         
         // @brief Set the trash mode.
         void setTrashMode(bool trash_mode);
@@ -191,8 +193,7 @@ namespace kiwi
     //                             BROWSER DRIVE VIEW HEADER                            //
     // ================================================================================ //
     
-    class DocumentBrowserView::DriveView::Header : public juce::Component,
-                                                   public juce::TextEditor::Listener
+    class DocumentBrowserView::DriveView::Header : public juce::Component
     {
     public: // methods
         
@@ -211,8 +212,8 @@ namespace kiwi
         //! @brief juce::Component::mouseDown
         void mouseDown(juce::MouseEvent const& event) override;
         
-        //! @brief overrides texteditor listener.
-        void textEditorReturnKeyPressed(juce::TextEditor & text_editor) override final;
+        //! @brief Sets the text diaplyed by the header bar.
+        void setText(std::string const& text);
         
     private: // members
         
@@ -220,7 +221,6 @@ namespace kiwi
         ImageButton                     m_refresh_btn;
         ImageButton                     m_create_document_btn;
         ImageButton                     m_trash_btn;
-        juce::TextEditor                m_search_bar;
         juce::Rectangle<int>            m_folder_bounds;
         juce::Label                     m_label;
         const juce::Image               m_folder_img;
@@ -288,6 +288,5 @@ namespace kiwi
         int                 m_row;
         bool                m_selected;
         bool                m_mouseover = false;
-        bool                m_select_row_on_mouse_up = false;
     };
 }

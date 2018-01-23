@@ -193,23 +193,38 @@ namespace kiwi
     {
         juce::PopupMenu m;
         
-        m.addItem(1, "Rename");
-        m.addItem(2, m_drive_view.getTrashMode() ? "Restore" : "Delete");
+        if (!m_drive_view.getTrashMode())
+        {
+            m.addItem(1, "Rename");
+            m.addItem(2, "Delete");
+        }
+        else
+        {
+            m.addItem(3, "Restore");
+        }
         
-        DriveView::SortType current_sort = m_drive_view.getSortType();
+        DriveView::DataType current_sort = m_drive_view.getSortType();
         
         juce::PopupMenu sort_menu;
-        sort_menu.addItem(3, "Name",
-                          current_sort != DriveView::SortType::name,
-                          current_sort == DriveView::SortType::name);
+        sort_menu.addItem(4, "Name",
+                          current_sort != DriveView::DataType::name,
+                          current_sort == DriveView::DataType::name);
         
-        sort_menu.addItem(4, "Created at",
-                          current_sort != DriveView::SortType::creationDate,
-                          current_sort == DriveView::SortType::creationDate);
+        sort_menu.addItem(5, "Created at",
+                          current_sort != DriveView::DataType::creationDate,
+                          current_sort == DriveView::DataType::creationDate);
         
-        sort_menu.addItem(5, "Created by",
-                          current_sort != DriveView::SortType::author,
-                          current_sort == DriveView::SortType::author);
+        sort_menu.addItem(6, "Created by",
+                          current_sort != DriveView::DataType::author,
+                          current_sort == DriveView::DataType::author);
+        
+        sort_menu.addItem(7, "Last opened at",
+                          current_sort != DriveView::DataType::openedDate,
+                          current_sort == DriveView::DataType::openedDate);
+        
+        sort_menu.addItem(8, "Last opened by",
+                          current_sort != DriveView::DataType::openedUser,
+                          current_sort == DriveView::DataType::openedUser);
         
         m.addSubMenu("Sort by", sort_menu);
         
@@ -222,31 +237,40 @@ namespace kiwi
                 m_name_label.showEditor();
                 break;
             }
-            case 2: // delete/Restore
+            case 2: // delete
             {
-                if (!m_drive_view.getTrashMode())
-                {
-                    m_drive_view.deleteDocumentForRow(m_row);
-                }
-                else
-                {
-                    m_drive_view.restoreDocumentForRow(m_row);
-                }
+                m_drive_view.deleteDocumentForRow(m_row);
                 break;
             }
-            case 3: // sort by name
+            case 3: // restore
             {
-                m_drive_view.setSortType(DriveView::SortType::name);
+                m_drive_view.restoreDocumentForRow(m_row);
                 break;
             }
-            case 4: // sort by creation date
+            case 4: // sort by name
             {
-                m_drive_view.setSortType(DriveView::SortType::creationDate);
+                m_drive_view.setSortType(DriveView::DataType::name);
                 break;
             }
-            case 5:
+            case 5: // sort by creation date
             {
-                m_drive_view.setSortType(DriveView::SortType::author);
+                m_drive_view.setSortType(DriveView::DataType::creationDate);
+                break;
+            }
+            case 6: // sort by author
+            {
+                m_drive_view.setSortType(DriveView::DataType::author);
+                break;
+            }
+            case 7:
+            {
+                m_drive_view.setSortType(DriveView::DataType::openedDate);
+                break;
+            }
+            case 8:
+            {
+                m_drive_view.setSortType(DriveView::DataType::openedUser);
+                break;
             }
         }
     }
@@ -303,7 +327,6 @@ namespace kiwi
                 std::unique_ptr<juce::Drawable>
                 (juce::Drawable::createFromImageData(binary_data::images::trash_png,
                                                      binary_data::images::trash_png_size))),
-    m_search_bar(),
     m_folder_bounds(),
     m_label("drive_name", m_drive_view.getDriveName()),
     m_folder_img(juce::ImageCache::getFromMemory(binary_data::images::folder_png,
@@ -314,10 +337,11 @@ namespace kiwi
         m_label.setColour(juce::Label::textColourId, juce::Colours::whitesmoke);
         addAndMakeVisible(m_label);
         
-        m_search_bar.setPopupMenuEnabled(false);
-        addAndMakeVisible(m_search_bar);
-        
-        m_create_document_btn.setCommand([this](){m_drive_view.createDocument();});
+        m_create_document_btn.setCommand([this]()
+        {
+            if (!m_drive_view.getTrashMode())
+                m_drive_view.createDocument();
+        });
         m_create_document_btn.setSize(40, 40);
         m_create_document_btn.setTooltip("Create a new patcher on this drive");
         m_create_document_btn.setColour(ImageButton::ColourIds::textColourId, juce::Colours::whitesmoke);
@@ -331,9 +355,10 @@ namespace kiwi
         
         m_trash_btn.setCommand([this]()
         {
-            m_trash_btn.setAlpha(!m_drive_view.getTrashMode() ? 1. : 0.5);
-            m_drive_view.setTrashMode(!m_drive_view.getTrashMode());
-            
+            bool new_trash_mode = !m_drive_view.getTrashMode();
+            m_drive_view.setTrashMode(new_trash_mode);
+            m_trash_btn.setAlpha(new_trash_mode ? 1. : 0.5);
+            m_create_document_btn.setAlpha(new_trash_mode ? 0.5 : 1.);
         });
         m_trash_btn.setAlpha(m_drive_view.getTrashMode() ? 1. : 0.5);
         m_trash_btn.setSize(40, 40);
@@ -352,15 +377,9 @@ namespace kiwi
         m_refresh_btn.setTopRightPosition(m_trash_btn.getX(), 5);
         m_create_document_btn.setTopRightPosition(m_refresh_btn.getX(), 5);
         
-        int text_width = m_label.getFont().getStringWidth(m_label.getText());
-        
         int remaining_width = std::max(0, m_create_document_btn.getX() - m_folder_bounds.getRight());
         
-        m_label.setBounds(bounds.withX(m_folder_bounds.getRight() + 5).withWidth(std::min(text_width, remaining_width / 2)));
-        
-        m_search_bar.setBounds(bounds.withX(m_label.getBounds().getRight())
-                               .withRight(m_create_document_btn.getX())
-                               .reduced(0, 13));
+        m_label.setBounds(bounds.withX(m_folder_bounds.getRight() + 5).withWidth(remaining_width));
     }
     
     void DocumentBrowserView::DriveView::Header::paint(juce::Graphics& g)
@@ -384,8 +403,10 @@ namespace kiwi
         m_drive_view.getModel()->backgroundClicked(e);
     }
     
-    void DocumentBrowserView::DriveView::Header::textEditorReturnKeyPressed(juce::TextEditor & text_editor)
+    void DocumentBrowserView::DriveView::Header::setText(std::string const& text)
     {
+        m_label.setText(text, juce::NotificationType::dontSendNotification);
+        repaint();
     }
     
     // ================================================================================ //
@@ -432,19 +453,29 @@ namespace kiwi
         
         switch(m_type)
         {
-            case SortType::name:
+            case DataType::name:
             {
                 type_ordered = l_hs.getName() < r_hs.getName();
                 break;
             }
-            case SortType::author:
+            case DataType::author:
             {
                 type_ordered = l_hs.getAuthor() < r_hs.getAuthor();
                 break;
             }
-            case SortType::creationDate:
+            case DataType::creationDate:
             {
-                type_ordered = l_hs.getCreationDate() < r_hs.getCreationDate();
+                type_ordered = l_hs.getCreationDate() > r_hs.getCreationDate();
+                break;
+            }
+            case DataType::openedDate:
+            {
+                type_ordered = l_hs.getOpenedDate() > r_hs.getOpenedDate();
+                break;
+            }
+            case DataType::openedUser:
+            {
+                type_ordered = l_hs.getOpenedUser() < r_hs.getOpenedUser();
                 break;
             }
         }
@@ -512,12 +543,12 @@ namespace kiwi
         });
     }
     
-    DocumentBrowserView::DriveView::SortType DocumentBrowserView::DriveView::getSortType() const
+    DocumentBrowserView::DriveView::DataType DocumentBrowserView::DriveView::getSortType() const
     {
         return m_sorter.m_type;
     }
     
-    void DocumentBrowserView::DriveView::setSortType(SortType sort_type)
+    void DocumentBrowserView::DriveView::setSortType(DataType sort_type)
     {
         m_sorter.m_type = sort_type;
         
@@ -536,6 +567,7 @@ namespace kiwi
     
     void DocumentBrowserView::DriveView::update()
     {
+        dynamic_cast<Header*>(getHeaderComponent())->setText(getDriveName());
         updateContent();
         repaint();
     }
@@ -543,12 +575,14 @@ namespace kiwi
     std::string DocumentBrowserView::DriveView::createDocumentToolTip(DocumentBrowser::Drive::DocumentSession const& doc)
     {
         std::string tooltip = "name: " + doc.getName() + "\n"
-        + "created by: " + doc.getAuthor() + "\n"
-        + "created at: " + doc.getCreationDate() + "\n";
+        + "created by : " + doc.getAuthor() + "\n"
+        + "created at : " + doc.getCreationDate() + "\n"
+        + "last opened at : " + doc.getOpenedDate() + "\n"
+        + "last opened by : " + doc.getOpenedUser();
         
         if (doc.isTrashed())
         {
-            tooltip += "trashed at: " + doc.getTrashedDate();
+            tooltip += "\ntrashed at : " + doc.getTrashedDate();
         }
         
         return tooltip;

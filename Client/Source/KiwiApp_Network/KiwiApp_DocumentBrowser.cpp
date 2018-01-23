@@ -280,7 +280,8 @@ namespace kiwi
             {
                 // name is currently the only document field that can change.
                 if(new_doc->getName() != (*it)->getName()
-                   || new_doc->isTrashed() != (*it)->isTrashed())
+                   || new_doc->isTrashed() != (*it)->isTrashed()
+                   || new_doc->getOpenedDate() != (*it)->getOpenedDate())
                 {
                     (*it)->m_document = new_doc->m_document;
                     
@@ -330,7 +331,8 @@ namespace kiwi
     DocumentBrowser::Drive::DocumentSession::DocumentSession(DocumentBrowser::Drive& parent,
                                                              Api::Document document) :
     m_drive(parent),
-    m_document(std::move(document))
+    m_document(std::move(document)),
+    m_open_token("")
     {
         
     }
@@ -373,6 +375,21 @@ namespace kiwi
     std::string const& DocumentBrowser::Drive::DocumentSession::getTrashedDate() const
     {
         return m_document.trashed_date;
+    }
+    
+    std::string const& DocumentBrowser::Drive::DocumentSession::getOpenedDate() const
+    {
+        return m_document.opened_date;
+    }
+    
+    std::string const& DocumentBrowser::Drive::DocumentSession::getOpenedUser() const
+    {
+        return m_document.opened_user;
+    }
+    
+    std::string const& DocumentBrowser::Drive::DocumentSession::getOpenToken() const
+    {
+        return m_open_token;
     }
     
     void DocumentBrowser::Drive::DocumentSession::untrash()
@@ -446,6 +463,22 @@ namespace kiwi
     
     void DocumentBrowser::Drive::DocumentSession::open()
     {
-        KiwiApp::useInstance().openRemotePatcher(*this);
+        auto success = [this](std::string const& token)
+        {
+            m_open_token = token;
+            
+            KiwiApp::useInstance().useScheduler().schedule([this]()
+            {
+                KiwiApp::useInstance().openRemotePatcher(*this);
+                m_drive.refresh();
+            });
+        };
+        
+        auto error = [this](Api::Error er)
+        {
+            KiwiApp::error(er.getMessage());
+        };
+        
+        KiwiApp::useApi().getOpenToken(m_document._id, success, error);
     }
 }
