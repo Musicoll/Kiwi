@@ -81,6 +81,7 @@ namespace kiwi { namespace network { namespace http {
             m_timer.async_wait([this](Error const& error)
             {
                 handleTimeout(error);
+                
             });
         }
         
@@ -89,7 +90,14 @@ namespace kiwi { namespace network { namespace http {
         m_resolver.async_resolve({host, m_port}, [this](Error const& error,
                                                         tcp::resolver::iterator iterator)
         {
-            connect(m_response, error, iterator);
+            if (error)
+            {
+                shutdown(error);
+            }
+            else
+            {
+                connect(iterator);
+            }
         });
         
         m_io_service.reset();
@@ -104,7 +112,7 @@ namespace kiwi { namespace network { namespace http {
     template<class ReqType, class ResType>
     bool Query<ReqType, ResType>::process()
     {
-        return !m_io_service.run_one() || !m_response.error;
+        return !m_io_service.run_one() || m_response.error;
     }
     
     template<class ReqType, class ResType>
@@ -116,60 +124,48 @@ namespace kiwi { namespace network { namespace http {
     template<class ReqType, class ResType>
     void Query<ReqType, ResType>::handleTimeout(Error const& error)
     {
-        m_io_service.stop();
-        
-        m_socket.shutdown(tcp::socket::shutdown_both, m_error);
-        m_response.error = boost::asio::error::basic_errors::timed_out;
+        shutdown(boost::asio::error::basic_errors::timed_out);
     }
     
     template<class ReqType, class ResType>
-    void Query<ReqType, ResType>::connect(Response<ResType>& response,
-                                          Error const& error,
-                                          tcp::resolver::iterator iterator)
+    void Query<ReqType, ResType>::connect(tcp::resolver::iterator iterator)
     {
-        if (error)
-        {
-            m_response.error = error;
-        }
-        else
-        {
-            boost::asio::async_connect(m_socket, iterator, [this, &response](Error const& error,
-                                                                             tcp::resolver::iterator i) {
-                this->write(response, error);
-            });
-        }
-    }
-    
-    template<class ReqType, class ResType>
-    void Query<ReqType, ResType>::write(Response<ResType>& response,
-                                        beast::error_code const& error)
-    {
-        if (error)
-        {
-            m_response.error = error;
-        }
-        else
-        {
-            beast::http::async_write(m_socket, *m_request, [this, &response](Error const& error) {
-                read(response, error);
-            });
-        }
-    }
-    
-    template<class ReqType, class ResType>
-    void Query<ReqType, ResType>::read(Response<ResType>& response,
-                                       Error const& error)
-    {
-        if (error)
-        {
-            m_error = error;
-        }
-        else
-        {
-            beast::http::async_read(m_socket, m_buffer, response, [this](Error const& error) {
+        boost::asio::async_connect(m_socket, iterator, [this](Error const& error,
+                                                              tcp::resolver::iterator i) {
+            if (error)
+            {
                 shutdown(error);
-            });
-        }
+            }
+            else
+            {
+                write();
+            }
+        });
+    }
+    
+    template<class ReqType, class ResType>
+    void Query<ReqType, ResType>::write()
+    {
+        beast::http::async_write(m_socket, *m_request, [this](Error const& error)
+        {
+            if (error)
+            {
+                shutdown(error);
+            }
+            else
+            {
+                read();
+            }
+        });
+    }
+    
+    template<class ReqType, class ResType>
+    void Query<ReqType, ResType>::read()
+    {
+        beast::http::async_read(m_socket, m_buffer, m_response, [this](Error const& error)
+        {
+            shutdown(error);
+        });
     }
     
     template<class ReqType, class ResType>
@@ -179,12 +175,11 @@ namespace kiwi { namespace network { namespace http {
         
         if (error)
         {
-            m_error = error;
+            m_response.error = error;
         }
-        else
-        {
-            m_socket.shutdown(tcp::socket::shutdown_both, m_error);
-        }
+        
+        boost::system::error_code ec;
+        m_socket.shutdown(tcp::socket::shutdown_both, ec);
     }
     
 }}} // namespace kiwi::network::http
