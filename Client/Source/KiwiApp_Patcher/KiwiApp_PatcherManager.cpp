@@ -161,6 +161,7 @@ namespace kiwi
         json j;
         j["model_version"] = KIWI_MODEL_VERSION_STRING;
         j["open_token"] = session.getOpenToken();
+        j["kiwi_version"] = KiwiApp::getApp()->getApplicationVersion().toStdString();
         std::string metadata = j.dump();
         
         m_socket.connect(host, port, session.getSessionId(), metadata);

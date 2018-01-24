@@ -27,7 +27,7 @@ namespace kiwi
     const std::string Api::Endpoint::login {Api::Endpoint::root + "/login"};
     const std::string Api::Endpoint::documents {Api::Endpoint::root + "/documents"};
     const std::string Api::Endpoint::users {Api::Endpoint::root + "/users"};
-    const std::string Api::Endpoint::releases {Api::Endpoint::root + "/releases"};
+    const std::string Api::Endpoint::release {Api::Endpoint::root + "/release"};
     
     std::string Api::Endpoint::document(std::string const& document_id)
     {
@@ -329,9 +329,9 @@ namespace kiwi
         storeSession(std::move(session));
     }
     
-    void Api::getLatestRelease(CallbackFn<std::string const&> success_cb, ErrorCallback error_cb)
+    void Api::getRelease(CallbackFn<std::string const&> success_cb, ErrorCallback error_cb)
     {
-        auto session = makeSession(Endpoint::releases + "/latest");
+        auto session = makeSession(Endpoint::release);
         
         auto cb = [success = std::move(success_cb),
                    fail = std::move(error_cb)](Response res)
@@ -342,9 +342,9 @@ namespace kiwi
             {
                 const auto j = json::parse(res.body);
                 
-                if(j.is_object() && j.count("tag_name"))
+                if(j.is_object() && j.count("release"))
                 {
-                    std::string latest_release = j["tag_name"];
+                    std::string latest_release = j["release"];
                     success(latest_release);
                 }
             }

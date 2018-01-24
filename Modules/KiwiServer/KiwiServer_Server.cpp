@@ -55,9 +55,11 @@ namespace kiwi
         
         Server::Server(uint16_t port,
                        std::string const& backend_directory,
-                       std::string const& open_token) :
+                       std::string const& open_token,
+                       std::string const& kiwi_version) :
         m_backend_directory(backend_directory),
         m_open_token(open_token),
+        m_kiwi_version(kiwi_version),
         m_sessions(),
         m_socket(*this, port),
         m_ports()
@@ -116,8 +118,9 @@ namespace kiwi
                 
                 DBG("[server] - creating new session for session_id : " << hexadecimal_convert(session_id));
                 
-                auto session = m_sessions.insert(std::make_pair(session_id,
-                                                                Session(session_id, session_file, m_open_token)));
+                auto session = m_sessions
+                .insert(std::make_pair(session_id,
+                                       Session(session_id, session_file, m_open_token, m_kiwi_version)));
                 
                 if (session_file.exists())
                 {
@@ -212,19 +215,22 @@ namespace kiwi
         , m_signal_connections(std::move(other.m_signal_connections))
         , m_backend_file(std::move(other.m_backend_file))
         , m_token(other.m_token)
+        , m_kiwi_version(other.m_kiwi_version)
         {
             ;
         }
         
         Server::Session::Session(uint64_t identifier,
                                  juce::File const& backend_file,
-                                 std::string const& token)
+                                 std::string const& token,
+                                 std::string const& kiwi_version)
         : m_identifier(identifier)
         , m_validator(new model::PatcherValidator())
         , m_document(new flip::DocumentServer(model::DataModel::use(), *m_validator, m_identifier))
         , m_signal_connections()
         , m_backend_file(backend_file)
         , m_token(token)
+        , m_kiwi_version(kiwi_version)
         {
             model::Patcher& patcher = m_document->root<model::Patcher>();
             
@@ -299,7 +305,8 @@ namespace kiwi
         {
             const auto j = json::parse(metadata);
             return j["model_version"] == KIWI_MODEL_VERSION_STRING
-                   && j["open_token"] == m_token;
+                   && j["open_token"] == m_token
+                   && j["kiwi_version"] == m_kiwi_version;
         }
         
         void Server::Session::bind(flip::PortBase & port)

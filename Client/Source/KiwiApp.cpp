@@ -342,7 +342,7 @@ namespace kiwi
         {
                 KiwiApp::useInstance().useScheduler().schedule([current_version, latest_version]()
                 {
-                    if (current_version.compare(latest_version) < 0)
+                    if (current_version.compare(latest_version) != 0)
                     {
                         juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::QuestionIcon,
                                                                "New release available" ,
@@ -355,7 +355,7 @@ namespace kiwi
         {
         };
         
-        useApi().getLatestRelease(on_success, on_fail);
+        useApi().getRelease(on_success, on_fail);
     }
     
     void KiwiApp::addApiConnectStatusListener(ApiConnectStatusListener& listener)

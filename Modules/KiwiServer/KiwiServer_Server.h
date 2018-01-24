@@ -59,7 +59,8 @@ namespace kiwi
             //! @details Initializes socket and creates backend directory if not there.
             Server(uint16_t port,
                    std::string const& backend_directory,
-                   std::string const& open_token);
+                   std::string const& open_token,
+                   std::string const& kiwi_version);
             
             //! @brief Destructor.
             //! @details Disconnect all users and clean sessions. onDisconnected will be called for all port.
@@ -109,6 +110,7 @@ namespace kiwi
             
             juce::File                      m_backend_directory;
             std::string                     m_open_token;
+            std::string                     m_kiwi_version;
             std::map <uint64_t, Session>    m_sessions;
             flip::PortTransportServerTcp    m_socket;
             std::set <flip::PortBase *>     m_ports;
@@ -139,7 +141,10 @@ namespace kiwi
             //! @brief Constructor
             //! @details Constructor will load the document if file exists. backend_file is
             //! the file in which the session will save and load document.
-            Session(uint64_t identifier, juce::File const& backend_file, std::string const& token);
+            Session(uint64_t identifier,
+                    juce::File const& backend_file,
+                    std::string const& token,
+                    std::string const& kiwi_version);
             
             //! @brief Destructor.
             //! @details Unbinds all documents and ports.
@@ -180,6 +185,7 @@ namespace kiwi
             std::vector<flip::SignalConnection>         m_signal_connections;
             juce::File                                  m_backend_file;
             std::string                                 m_token;
+            std::string                                 m_kiwi_version;
             
         private: // deleted methods
             
