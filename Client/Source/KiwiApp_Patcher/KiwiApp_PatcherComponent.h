@@ -119,6 +119,9 @@ namespace kiwi
         //! @brief Stops this component flashing.
         void stopFlashing();
         
+        //! @brief Displays the list of usernames.
+        void mouseDown(juce::MouseEvent const& e) override final;
+        
     private: // methods
         
         //! @internal juce::Timer callback.
@@ -126,10 +129,11 @@ namespace kiwi
         
     private: // variables
         
-        PatcherManager&     m_patcher_manager;
-        size_t              m_users;
-        const juce::Image   m_users_img;
-        float               m_flash_alpha = 0.f;
+        PatcherManager&             m_patcher_manager;
+        std::vector<std::string>    m_users;
+        size_t                      m_user_nb;
+        const juce::Image           m_users_img;
+        float                       m_flash_alpha = 0.f;
     };
     
     // ================================================================================ //

@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <unordered_set>
+
 #include <KiwiNetwork/KiwiNetwork_Http.h>
 
 #include <json.hpp>
@@ -91,6 +93,9 @@ namespace kiwi
                     std::string const& password,
                     CallbackFn<std::string> success_cb,
                     ErrorCallback error_cb);
+        
+        //! @brief Returns a list of users, retrieved with user ids.
+        void getUsers(std::unordered_set<uint64_t> const& user_ids, CallbackFn<Api::Users> sucess_cb, ErrorCallback error_cb);
         
         //! @brief Make an async API request to get a list of documents
         void getDocuments(std::function<void(Response, Api::Documents)> callback);

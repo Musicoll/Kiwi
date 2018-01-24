@@ -163,6 +163,44 @@ namespace kiwi
         storeSession(std::move(session));
     }
     
+    void Api::getUsers(std::unordered_set<uint64_t> const& user_ids,
+                       CallbackFn<Api::Users> success_cb,
+                       ErrorCallback error_cb)
+    {
+        auto cb =
+        [success = std::move(success_cb), fail = std::move(error_cb)]
+        (Response res)
+        {
+            if (!res.error
+                && hasJsonHeader(res)
+                && res.result() == beast::http::status::ok)
+            {
+                success(json::parse(res.body));
+            }
+            else
+            {
+                fail(res);
+            }
+        };
+        
+        auto session = makeSession(Endpoint::users);
+        
+        json j_users;
+        
+        for(uint64_t const& user_id : user_ids)
+        {
+            std::ostringstream result;
+            result << std::hex << std::uppercase << user_id;
+            
+            j_users.push_back(result.str());
+        }
+        
+        session->setParameters({{"ids", j_users.dump()}});
+        
+        session->GetAsync(std::move(cb));
+        storeSession(std::move(session));
+    }
+    
     void Api::getDocuments(std::function<void(Response, Api::Documents)> callback)
     {
         auto cb = [callback = std::move(callback)](Response res)
