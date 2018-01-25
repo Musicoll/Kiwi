@@ -77,7 +77,25 @@ namespace kiwi
     public juce::ListBoxModel,
     public DocumentBrowser::Drive::Listener
     {
-    public:
+    private: // classes
+        
+        enum class SortType
+        {
+            name,
+            author,
+            creationDate
+        };
+        
+        struct Comp
+        {
+            bool compare(DocumentBrowser::Drive::DocumentSession const& l_hs,
+                         DocumentBrowser::Drive::DocumentSession const& r_hs) const;
+            
+            SortType    m_type = SortType::creationDate;
+            bool        m_trashed_first = false;
+        };
+        
+    public: // methods
         
         //! @brief Constructor.
         DriveView(DocumentBrowser::Drive& drive);
@@ -122,6 +140,41 @@ namespace kiwi
         //! @brief Make an API call to rename the remote document
         void renameDocumentForRow(int row, std::string const& new_name);
         
+        //! @brief Moves a document to trash.
+        void deleteDocumentForRow(int row);
+        
+        //! @brief Restore a trashed document.
+        void restoreDocumentForRow(int row);
+        
+    private: // methods
+        
+        //! @brief Resort content and call update content.
+        void update();
+        
+        //! @brief Returns the drive name.
+        std::string const& getDriveName() const;
+        
+        //! @brief Refresh document list.
+        void refresh();
+        
+        //! @brief Creates a new document.
+        void createDocument();
+        
+        //! @brief Returns the current sorting parameter.
+        SortType getSortType() const;
+        
+        //! @brief Changes the sort parameter and sorts.
+        void setSortType(SortType sort_type);
+        
+        // @brief Set the trash mode.
+        void setTrashMode(bool trash_mode);
+        
+        //! @brief Get current mode trash or default.
+        bool getTrashMode() const;
+        
+        //! @brief Creates document info tooltip.
+        std::string createDocumentToolTip(DocumentBrowser::Drive::DocumentSession const& doc);
+        
     private: // classes
         
         class Header;
@@ -130,18 +183,21 @@ namespace kiwi
     private: // members
         
         DocumentBrowser::Drive& m_drive;
+        bool                    m_trash_mode;
+        Comp                    m_sorter;
     };
     
     // ================================================================================ //
     //                             BROWSER DRIVE VIEW HEADER                            //
     // ================================================================================ //
     
-    class DocumentBrowserView::DriveView::Header : public juce::Component
+    class DocumentBrowserView::DriveView::Header : public juce::Component,
+                                                   public juce::TextEditor::Listener
     {
     public: // methods
         
         //! @brief Constructor
-        Header(juce::ListBox& listbox, DocumentBrowser::Drive& drive);
+        Header(DocumentBrowserView::DriveView& drive_view);
         
         //! @brief Destructor
         ~Header() = default;
@@ -155,25 +211,33 @@ namespace kiwi
         //! @brief juce::Component::mouseDown
         void mouseDown(juce::MouseEvent const& event) override;
         
+        //! @brief overrides texteditor listener.
+        void textEditorReturnKeyPressed(juce::TextEditor & text_editor) override final;
+        
     private: // members
         
-        juce::ListBox&              m_listbox;
-        DocumentBrowser::Drive&     m_drive;
-        ImageButton                 m_refresh_btn;
-        ImageButton                 m_create_document_btn;
-        const juce::Image           m_folder_img;
+        DocumentBrowserView::DriveView& m_drive_view;
+        ImageButton                     m_refresh_btn;
+        ImageButton                     m_create_document_btn;
+        ImageButton                     m_trash_btn;
+        juce::TextEditor                m_search_bar;
+        juce::Rectangle<int>            m_folder_bounds;
+        juce::Label                     m_label;
+        const juce::Image               m_folder_img;
     };
     
     // ================================================================================ //
     //                            BROWSER DRIVE VIEW ROW ELEM                           //
     // ================================================================================ //
     
-    class DocumentBrowserView::DriveView::RowElem : public juce::Component, juce::Label::Listener
+    class DocumentBrowserView::DriveView::RowElem : public juce::Component,
+                                                    public juce::SettableTooltipClient,
+                                                    public juce::Label::Listener
     {
     public: // methods
         
         //! @brief Constructor.
-        RowElem(DriveView& drive_view, std::string const& name);
+        RowElem(DriveView& drive_view, std::string const& name, std::string const& tooltip);
         
         //! @brief Destructor.
         ~RowElem();
@@ -206,7 +270,11 @@ namespace kiwi
         void labelTextChanged(juce::Label* label_text_that_has_changed) override;
         
         //! @brief Update the document session
-        void update(std::string const& name, int row, bool now_selected);
+        void update(std::string const& name, std::string const& tooltip, int row, bool now_selected);
+        
+    private: // methods
+        
+        void showPopup();
         
     private: // variables
         

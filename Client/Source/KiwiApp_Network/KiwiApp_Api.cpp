@@ -241,6 +241,30 @@ namespace kiwi
         storeSession(std::move(session));
     }
     
+    void Api::untrashDocument(std::string document_id, Callback callback)
+    {
+        auto session = makeSession(Endpoint::document(document_id));
+        
+        session->setPayload({
+            {"trashed", false}
+        });
+        
+        session->PutAsync(std::move(callback));
+        storeSession(std::move(session));
+    }
+    
+    void Api::trashDocument(std::string document_id, Callback callback)
+    {
+        auto session = makeSession(Endpoint::document(document_id));
+        
+        session->setPayload({
+            {"trashed", true}
+        });
+        
+        session->PutAsync(std::move(callback));
+        storeSession(std::move(session));
+    }
+    
     void Api::getLatestRelease(CallbackFn<std::string const&> success_cb, ErrorCallback error_cb)
     {
         auto session = makeSession(Endpoint::releases + "/latest");
@@ -355,7 +379,7 @@ namespace kiwi
         
         const AuthUser& user = m_controller.getAuthUser();
         
-        if(add_auth && !user.isLoggedIn())
+        if(add_auth && user.isLoggedIn())
         {
             session->setAuthorization("JWT " + user.getToken());
         }
@@ -553,14 +577,30 @@ namespace kiwi
         j = json{
             {"_id", doc._id},
             {"name", doc.name},
-            {"session_id", session_id_converter.str()}
+            {"session_id", session_id_converter.str()},
+            {"createdBy", doc.author_name},
+            {"createdAt", doc.creation_date},
         };
+        
+        if (doc.trashed)
+        {
+            j.at("trashed") = true;
+            j.at("trash_date") = doc.trashed_date;
+        }
+        else
+        {
+            j.at("trashed") = false;
+        }
     }
     
     void from_json(json const& j, Api::Document& doc)
     {
         doc._id = Api::getJsonValue<std::string>(j, "_id");
         doc.name = Api::getJsonValue<std::string>(j, "name");
+        doc.author_name = Api::getJsonValue<std::string>(j.at("createdBy"), "username");
+        doc.creation_date = Api::getJsonValue<std::string>(j, "createdAt");
+        doc.trashed = Api::getJsonValue<bool>(j, "trashed");
+        doc.trashed_date = doc.trashed ? Api::getJsonValue<std::string>(j, "trashedDate") : "";
         doc.session_id = 0ul;
         
         if(j.count("session_id"))

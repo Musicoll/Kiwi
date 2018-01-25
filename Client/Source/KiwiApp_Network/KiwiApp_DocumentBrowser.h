@@ -125,6 +125,10 @@ namespace kiwi
         
         using DocumentSessions = std::vector<std::unique_ptr<DocumentSession>>;
         
+    private:
+        
+        using Comp = std::function<bool(DocumentSession const& l_hs, DocumentSession const& r_hs)>;
+        
     public: // methods
         
         Drive(std::string const& name, uint16_t session_port);
@@ -152,6 +156,9 @@ namespace kiwi
         //! @brief Creates and opens a new document on this drive.
         void createNewDocument();
         
+        //! @brief Changes the way documents are sorted.
+        void setSort(Comp comp);
+        
         //! @brief Returns the documents.
         DocumentSessions const& getDocuments() const;
         
@@ -174,6 +181,7 @@ namespace kiwi
         std::string                 m_name = "Drive";
         DocumentSessions            m_documents;
         tool::Listeners<Listener>   m_listeners;
+        Comp                        m_sort;
         
         friend class DocumentBrowser;
     };
@@ -232,6 +240,24 @@ namespace kiwi
         
         //! @brief Rename the document.
         void rename(std::string const& new_name);
+        
+        //! @brief Move the document to trash.
+        void trash();
+        
+        // @brief Moves document out of the trash.
+        void untrash();
+        
+        //! @brief Returns the date creation as a string.
+        std::string const& getCreationDate() const;
+        
+        //! @brief Returns the author's username.
+        std::string const& getAuthor() const;
+        
+        //! @brief Returns true if document is trashed
+        bool isTrashed() const;
+        
+        //! @brief Returns trashed date as string.
+        std::string const& getTrashedDate() const;
         
         //! @brief Returns true if the DocumentSession match another DocumentSession
         //! @details this operator uses the session_id field to compare.

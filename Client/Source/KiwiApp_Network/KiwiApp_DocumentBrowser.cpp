@@ -137,7 +137,11 @@ namespace kiwi
     DocumentBrowser::Drive::Drive(std::string const& name,
                                   uint16_t session_port) :
     m_session_port(session_port),
-    m_name(name)
+    m_name(name),
+    m_sort([](DocumentSession const& l_hs, DocumentSession const& r_hs)
+    {
+        return l_hs.getName() < r_hs.getName();
+    })
     {
         ;
     };
@@ -173,6 +177,21 @@ namespace kiwi
         return m_name;
     }
     
+    void DocumentBrowser::Drive::setSort(Comp comp)
+    {
+        m_sort = comp;
+        
+        std::sort(m_documents.begin(),
+                  m_documents.end(),
+                  [comp](std::unique_ptr<DocumentSession> const& l_hs,
+                         std::unique_ptr<DocumentSession> const& r_hs)
+        {
+            return comp(*l_hs, *r_hs);
+        });
+        
+        m_listeners.call(&Listener::driveChanged);
+    }
+    
     void DocumentBrowser::Drive::createNewDocument()
     {
         KiwiApp::useApi().createDocument("", [this](Api::Response res, Api::Document document) {
@@ -186,16 +205,9 @@ namespace kiwi
             }
             else
             {
-                juce::MessageManager::callAsync([this, document]() {
-                    
-                    auto it = m_documents.emplace(m_documents.end(),
-                                                  std::make_unique<DocumentSession>(*this,
-                                                                                    std::move(document)));
-                    
-                    m_listeners.call(&Listener::documentAdded, *(it->get()));
-                    m_listeners.call(&Listener::driveChanged);
-                    
-                    (*it)->open();
+                juce::MessageManager::callAsync([this]()
+                {
+                    refresh();
                 });
             }
         });
@@ -267,11 +279,12 @@ namespace kiwi
             else
             {
                 // name is currently the only document field that can change.
-                if(new_doc->getName() != (*it)->getName())
+                if(new_doc->getName() != (*it)->getName()
+                   || new_doc->isTrashed() != (*it)->isTrashed())
                 {
-                    (*it)->m_document.name = new_doc->getName();
-                    auto& doc = *(it->get());
+                    (*it)->m_document = new_doc->m_document;
                     
+                    auto& doc = *(it->get());
                     m_listeners.call(&Listener::documentChanged, doc);
                     changed = true;
                 }
@@ -280,6 +293,15 @@ namespace kiwi
         
         if(changed)
         {
+            std::sort(m_documents.begin(),
+                      m_documents.end(),
+                      [this](std::unique_ptr<DocumentSession> const& l_hs,
+                             std::unique_ptr<DocumentSession> const& r_hs)
+            {
+                return m_sort(*l_hs, *r_hs);
+                
+            });
+            
             m_listeners.call(&Listener::driveChanged);
         }
     }
@@ -333,6 +355,62 @@ namespace kiwi
         return m_drive;
     }
     
+    std::string const& DocumentBrowser::Drive::DocumentSession::getCreationDate() const
+    {
+        return m_document.creation_date;
+    }
+    
+    std::string const& DocumentBrowser::Drive::DocumentSession::getAuthor() const
+    {
+        return m_document.author_name;
+    }
+    
+    bool DocumentBrowser::Drive::DocumentSession::isTrashed() const
+    {
+        return m_document.trashed;
+    }
+    
+    std::string const& DocumentBrowser::Drive::DocumentSession::getTrashedDate() const
+    {
+        return m_document.trashed_date;
+    }
+    
+    void DocumentBrowser::Drive::DocumentSession::untrash()
+    {
+        KiwiApp::useApi().untrashDocument(m_document._id, [this](Api::Response res)
+        {
+            if(res.error)
+            {
+                KiwiApp::error(res.error.message());
+            }
+            else
+            {
+                KiwiApp::useInstance().useScheduler().schedule([this]()
+                                                               {
+                                                                   m_drive.refresh();
+                                                               });
+            }
+        });
+    }
+    
+    void DocumentBrowser::Drive::DocumentSession::trash()
+    {
+        KiwiApp::useApi().trashDocument(m_document._id, [this](Api::Response res) {
+            
+            if(res.error)
+            {
+                KiwiApp::error(res.error.message());
+            }
+            else
+            {
+                KiwiApp::useInstance().useScheduler().schedule([this]()
+                {
+                    m_drive.refresh();
+                });
+            }
+        });
+    }
+    
     void DocumentBrowser::Drive::DocumentSession::rename(std::string const& new_name)
     {
         if(new_name.empty())
@@ -340,17 +418,19 @@ namespace kiwi
             return;
         }
         
-        KiwiApp::useApi().renameDocument(m_document._id, new_name, [](Api::Response res) {
+        KiwiApp::useApi().renameDocument(m_document._id, new_name, [this](Api::Response res) {
             
-            if(!res.error)
+            if(res.error)
             {
-                std::cout << "document update failed, err: " + res.error.message() << '\n';
+                KiwiApp::error(res.error.message());
             }
             else
             {
-                std::cout << "document successfully updated\n";
+                KiwiApp::useInstance().useScheduler().schedule([this]()
+                {
+                    m_drive.refresh();
+                });
             }
-            
         });
     }
     
