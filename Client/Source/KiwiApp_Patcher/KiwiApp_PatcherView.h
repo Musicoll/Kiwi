@@ -124,9 +124,6 @@ namespace kiwi
         //! @brief Returns true if an object if being edited.
         bool isEditingObject() const;
         
-        //! @internal Update the patcher window title.
-        void updateWindowTitle() const;
-        
         // ================================================================================ //
         //                                    COMPONENT                                     //
         // ================================================================================ //

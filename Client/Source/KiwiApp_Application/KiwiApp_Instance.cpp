@@ -39,7 +39,7 @@ namespace kiwi
     //                                      INSTANCE                                    //
     // ================================================================================ //
 
-    size_t Instance::m_untitled_patcher_index(0);
+    size_t Instance::m_untitled_patcher_index(1);
     
     Instance::Instance() :
     m_scheduler(),
@@ -153,27 +153,18 @@ namespace kiwi
     
     void Instance::newPatcher()
     {
-        auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), new PatcherManager(*this));
+        std::string patcher_name = "Untitled "
+                                   + std::to_string(getNextUntitledNumberAndIncrement());
         
-        PatcherManager& manager = *(manager_it->get());
-        model::Patcher& patcher = manager.getPatcher();
-        
-        const size_t next_untitled = getNextUntitledNumberAndIncrement();
-        std::string patcher_name = "Untitled";
-        
-        if(next_untitled > 0)
-        {
-            patcher_name += " " + std::to_string(next_untitled);
-        }
-        
-        patcher.setName(patcher_name);
+        PatcherManager & manager = (*m_patcher_managers.emplace(m_patcher_managers.end(),
+                                                                new PatcherManager(*this, patcher_name))->get());
         
         if(manager.getNumberOfView() == 0)
         {
             manager.newView();
         }
         
-        model::DocumentManager::commit(patcher);
+        model::DocumentManager::commit(manager.getPatcher());
     }
     
     bool Instance::openFile(juce::File const& file)
@@ -182,23 +173,34 @@ namespace kiwi
         
         if(file.hasFileExtension("kiwi"))
         {
-            std::unique_ptr<PatcherManager> patcher_manager(new PatcherManager(*this));
+            auto manager_it = getPatcherManagerForFile(file);
             
-            if (patcher_manager->loadFromFile(file))
+            if (manager_it == m_patcher_managers.end())
             {
-                auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(),
-                                                             std::move(patcher_manager));
+                std::string patcher_name = file.getFileNameWithoutExtension().toStdString();
                 
-                open_succeeded = true;
+                std::unique_ptr<PatcherManager> patcher_manager (new PatcherManager(*this, patcher_name));
                 
-                if((*manager_it)->getNumberOfView() == 0)
+                if (patcher_manager->loadFromFile(file))
                 {
-                    (*manager_it)->newView();
+                    auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(),
+                                                                 std::move(patcher_manager));
+                    
+                    open_succeeded = true;
+                    
+                    if((*manager_it)->getNumberOfView() == 0)
+                    {
+                        (*manager_it)->newView();
+                    }
+                }
+                else
+                {
+                    KiwiApp::error("Can't open document. Version is not up to date. Please download latest Kiwi version.");
                 }
             }
             else
             {
-                KiwiApp::error("Can't open document. Version is not up to date. Please download latest Kiwi version.");
+                (*manager_it)->bringsFirstViewToFront();
             }
         }
         else
@@ -324,7 +326,7 @@ namespace kiwi
         }
         else
         {
-            auto manager_uptr = std::make_unique<PatcherManager>(*this);
+            auto manager_uptr = std::make_unique<PatcherManager>(*this, session.getName());
             
             NetworkSettings& network_settings = getAppSettings().network();
             
@@ -363,6 +365,16 @@ namespace kiwi
         };
         
         return std::find_if(m_patcher_managers.begin(), m_patcher_managers.end(), find_fn);
+    }
+    
+    Instance::PatcherManagers::iterator Instance::getPatcherManagerForFile(juce::File const& file)
+    {
+        const auto find_it = [&file](std::unique_ptr<PatcherManager> const& manager_uptr)
+        {
+            return (!manager_uptr->isRemote() && file == manager_uptr->getSelectedFile());
+        };
+        
+        return std::find_if(m_patcher_managers.begin(), m_patcher_managers.end(), find_it);
     }
     
     Instance::PatcherManagers::iterator Instance::getPatcherManagerForSession(DocumentBrowser::Drive::DocumentSession& session)

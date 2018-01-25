@@ -1,0 +1,6 @@
+Model changelog:
+v1 -> v2:
+- Added object hub
+- Added object mtof
+- Added object send
+- name removed from document.
