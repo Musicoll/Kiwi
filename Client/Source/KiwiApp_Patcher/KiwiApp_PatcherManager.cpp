@@ -21,6 +21,8 @@
 
 #include <chrono>
 
+#include <json.hpp>
+
 #include <flip/contrib/DataProviderFile.h>
 #include <flip/BackEndIR.h>
 #include <flip/BackEndBinary.h>
@@ -43,11 +45,14 @@
 
 namespace kiwi
 {
+    using json = nlohmann::json;
+    
     // ================================================================================ //
     //                                  PATCHER MANAGER                                 //
     // ================================================================================ //
     
-    PatcherManager::PatcherManager(Instance& instance) :
+    PatcherManager::PatcherManager(Instance& instance, std::string const& name) :
+    m_name(name),
     m_instance(instance),
     m_validator(),
     m_document(model::DataModel::use(), *this, m_validator,
@@ -90,11 +95,6 @@ namespace kiwi
     {
         if (transition == flip::CarrierBase::Transition::Disconnected)
         {
-            model::Patcher & patcher = getPatcher();
-            
-            patcher.setName(m_session->getName());
-            model::DocumentManager::commit(patcher);
-            
             m_session->useDrive().removeListener(*this);
             m_session = nullptr;
             
@@ -107,9 +107,11 @@ namespace kiwi
             for(auto & view : views)
             {
                 view.entity().use<PatcherViewWindow>().removeUsersIcon();
-                
-                view.entity().use<PatcherView>().updateWindowTitle();
             }
+            
+            setNeedSaving(true);
+            
+            updateTitleBars();
         }
     }
     
@@ -156,7 +158,10 @@ namespace kiwi
             m_listeners.call(&Listener::connectedUserChanged, *this);
         });
         
-        std::string metadata = KIWI_MODEL_VERSION_STRING;
+        json j;
+        j["model_version"] = KIWI_MODEL_VERSION_STRING;
+        j["open_token"] = session.getOpenToken();
+        std::string metadata = j.dump();
         
         m_socket.connect(host, port, session.getSessionId(), metadata);
         
@@ -199,6 +204,12 @@ namespace kiwi
             patcher.useSelfUser();
             model::DocumentManager::commit(patcher);
             
+            setName(session.getName());
+            
+            setNeedSaving(false);
+            
+            updateTitleBars();
+            
             patcher.entity().use<engine::Patcher>().sendLoadbang();
         }
         
@@ -227,7 +238,6 @@ namespace kiwi
                     return false;
                 }
                 
-                m_need_saving_flag = false;
                 loading_succeeded = true;
             }
         }
@@ -248,7 +258,6 @@ namespace kiwi
                 model::Patcher& patcher = getPatcher();
                 
                 patcher.useSelfUser();
-                patcher.setName(file.getFileNameWithoutExtension().toStdString());
                 
                 try
                 {
@@ -258,6 +267,12 @@ namespace kiwi
                 {
                     return false;
                 }
+                
+                setName(file.getFileNameWithoutExtension().toStdString());
+                
+                setNeedSaving(false);
+                
+                updateTitleBars();
                 
                 patcher.entity().use<engine::Patcher>().sendLoadbang();
                 success = true;
@@ -289,7 +304,7 @@ namespace kiwi
     
     std::string PatcherManager::getDocumentName() const
     {
-        return isRemote() ? m_session->getName() : getPatcher().getName();
+        return m_name;
     }
     
     void PatcherManager::newView()
@@ -330,7 +345,7 @@ namespace kiwi
     
     bool PatcherManager::needsSaving() const noexcept
     {
-        return !isRemote() && m_need_saving_flag;
+        return m_need_saving_flag && !isRemote();
     }
     
     void PatcherManager::writeDocument()
@@ -338,71 +353,73 @@ namespace kiwi
         flip::BackEndIR back_end =  m_document.write();
         flip::DataConsumerFile consumer(m_file.getFullPathName().toStdString().c_str());
         back_end.write<flip::BackEndBinary>(consumer);
-        m_need_saving_flag = false;
     }
     
     bool PatcherManager::saveDocument()
     {
+        bool saved = false;
+        
+        if (needsSaving() && m_file.existsAsFile())
+        {
+            saved = true;
+            
+            writeDocument();
+        }
+        else if(needsSaving() || (!needsSaving() && !m_file.existsAsFile()))
+        {
+            auto directory = juce::File::getSpecialLocation(juce::File::userHomeDirectory);
+            
+            juce::FileChooser saveFileChooser("Save file", directory, "*.kiwi");
+            
+            if ((saved = saveFileChooser.browseForFileToSave(true)))
+            {
+                m_file = saveFileChooser.getResult();
+                
+                writeDocument();
+                
+                setName(m_file.getFileNameWithoutExtension().toStdString());
+                
+                updateTitleBars();
+            }
+        }
+        
+        if (saved)
+        {
+            setNeedSaving(false);
+            updateTitleBars();
+        }
+        
+        return saved;
+    }
+    
+    bool PatcherManager::saveIfNeededAndUserAgrees()
+    {
+        bool user_cancelled = false;
+        
         if (needsSaving())
         {
-            if (m_file.existsAsFile())
+            const int r = juce::AlertWindow::showYesNoCancelBox(juce::AlertWindow::QuestionIcon,
+                                                                TRANS("Closing document..."),
+                                                                TRANS("Do you want to save the changes to \"")
+                                                                + m_name + "\"?",
+                                                                TRANS("Save"),
+                                                                TRANS("Discard changes"),
+                                                                TRANS("Cancel"));
+            
+            if (r == 0) // cancel button
             {
-                writeDocument();
+                user_cancelled = true;
             }
-            else
+            else if(r == 1) // save button
             {
-                auto directory = juce::File::getSpecialLocation(juce::File::userHomeDirectory);
-                
-                juce::FileChooser saveFileChooser("Save file", directory, "*.kiwi");
-                
-                if (saveFileChooser.browseForFileToSave(true))
+                if (!saveDocument())
                 {
-                    m_file = saveFileChooser.getResult();
-                    
-                    writeDocument();
-                    
-                    model::Patcher& patcher = getPatcher();
-                    patcher.setName(m_file.getFileNameWithoutExtension().toStdString());
-                    model::DocumentManager::commit(patcher);
+                    user_cancelled = true;
                 }
             }
         }
         
-        return !m_need_saving_flag;
-    }
-    
-    juce::FileBasedDocument::SaveResult PatcherManager::saveIfNeededAndUserAgrees()
-    {
-        if (! needsSaving())
-        {
-            return juce::FileBasedDocument::savedOk;
-        }
-        
-        auto& patcher = getPatcher();
-        
-        const std::string document_name = patcher.getName();
-        
-        const int r = juce::AlertWindow::showYesNoCancelBox(juce::AlertWindow::QuestionIcon,
-                                                            TRANS("Closing document..."),
-                                                            TRANS("Do you want to save the changes to \"")
-                                                            + document_name + "\"?",
-                                                            TRANS("Save"),
-                                                            TRANS("Discard changes"),
-                                                            TRANS("Cancel"));
-        
-        // save changes
-        if(r == 1)
-        {
-            return (saveDocument()) ? juce::FileBasedDocument::savedOk : juce::FileBasedDocument::failedToWriteToFile;
-        }
-        
-        // discard changes
-        if(r == 2)
-        {
-            return juce::FileBasedDocument::savedOk;
-        }
-        
-        return juce::FileBasedDocument::userCancelledSave;
+        return user_cancelled;
     }
     
     void PatcherManager::forceCloseAllWindows()
@@ -435,7 +452,7 @@ namespace kiwi
         {
             bool need_saving = m_need_saving_flag && (number_of_views <= 1);
             
-            if(!need_saving || (need_saving && saveIfNeededAndUserAgrees() == juce::FileBasedDocument::savedOk))
+            if(!need_saving || (need_saving && !saveIfNeededAndUserAgrees()))
             {
                 it = user.removeView(*it);
                 model::DocumentManager::commit(patcher);
@@ -451,7 +468,7 @@ namespace kiwi
         return success;
     }
     
-    bool PatcherManager::closePatcherViewWindow(PatcherView& patcher_view)
+    void PatcherManager::closePatcherViewWindow(PatcherView& patcher_view)
     {
         auto& patcher = getPatcher();
         auto& user = patcher.useSelfUser();
@@ -465,20 +482,11 @@ namespace kiwi
         
         bool need_saving = m_need_saving_flag && (number_of_views <= 1);
         
-        for(auto& view : views)
+        if (!need_saving || (need_saving && !saveIfNeededAndUserAgrees()))
         {
-            if(&view == &patcher_view_m)
-            {
-                if(!need_saving || saveIfNeededAndUserAgrees() == juce::FileBasedDocument::savedOk)
-                {
-                    user.removeView(patcher_view_m);
-                    model::DocumentManager::commit(patcher);
-                    return true;
-                }
-            }
+            user.removeView(patcher_view_m);
+            model::DocumentManager::commit(patcher);
         }
-        
-        return false;
     }
     
     PatcherViewWindow & PatcherManager::getFirstWindow()
@@ -515,25 +523,8 @@ namespace kiwi
     {
         if(m_session && (m_session == &doc))
         {
-            for(auto& view : getPatcher().useSelfUser().getViews())
-            {
-                auto& patcherview = view.entity().use<PatcherView>();
-                patcherview.updateWindowTitle();
-            }
-        }
-    }
-    
-    void PatcherManager::documentRemoved(DocumentBrowser::Drive::DocumentSession& doc)
-    {
-        if(m_session && (m_session == &doc))
-        {
-            disconnect();
-            
-            for(auto& view : getPatcher().useSelfUser().getViews())
-            {
-                auto& patcherview = view.entity().use<PatcherView>();
-                patcherview.updateWindowTitle();
-            }
+            setName(doc.getName());
+            updateTitleBars();
         }
     }
     
@@ -563,7 +554,9 @@ namespace kiwi
         
         if(patcher.resident() && (patcher.objectsChanged() || patcher.linksChanged()))
         {
-            m_need_saving_flag = true;
+            setNeedSaving(true);
+            
+            updateTitleBars();
         }
     }
     
@@ -583,6 +576,11 @@ namespace kiwi
                         createPatcherWindow(patcher, user, view);
                     }
                     
+                    if(view.lockChanged())
+                    {
+                        updateTitleBar(view);
+                    }
+                    
                     notifyPatcherView(patcher, user, view);
                     
                     if(view.removed())
@@ -593,6 +591,48 @@ namespace kiwi
             }
         }
     }
+    
+    void PatcherManager::updateTitleBar(model::Patcher::View & view)
+    {
+        PatcherViewWindow & patcher_window = view.entity().use<PatcherViewWindow>();
+        
+        bool is_locked = view.getLock();
+        
+        std::string title = (isRemote() ? "[Remote] " : "")
+        +  m_name
+        + (is_locked ? "" : " (edit)");
+        
+        if(juce::ComponentPeer* peer = patcher_window.getPeer())
+        {
+            if (!peer->setDocumentEditedStatus(needsSaving()))
+                if (needsSaving())
+                    title += " *";
+            
+            peer->setRepresentedFile(getSelectedFile());
+        }
+        
+        patcher_window.setName(title);
+    }
+    
+    void PatcherManager::updateTitleBars()
+    {
+        flip::Collection<model::Patcher::View> & views = getPatcher().useSelfUser().getViews();
+        
+        for(auto & view : views)
+        {
+            updateTitleBar(view);
+        }
+    }
+    
+    void PatcherManager::setNeedSaving(bool need_saving)
+    {
+        m_need_saving_flag = need_saving;
+    }
+    
+    void PatcherManager::setName(std::string const& name)
+    {
+        m_name = name;
+    }
 
     void PatcherManager::createPatcherWindow(model::Patcher& patcher,
                                              model::Patcher::User const& user,
@@ -602,7 +642,7 @@ namespace kiwi
         {
             auto& patcherview = view.entity().emplace<PatcherView>(*this, m_instance, patcher, view);
             view.entity().emplace<PatcherViewWindow>(*this, patcherview);
-            patcherview.updateWindowTitle();
+            updateTitleBar(view);
         }
     }
 

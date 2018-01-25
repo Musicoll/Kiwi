@@ -106,6 +106,17 @@ namespace kiwi
                             std::string const& new_name,
                             Callback callback);
         
+        //! @brief Moves a document to trash.
+        void trashDocument(std::string document_id, Callback callback);
+        
+        //! @brief Moves document out of the trash.
+        void untrashDocument(std::string document_id, Callback callback);
+        
+        //! @brief Returns the open token used to open document.
+        void getOpenToken(std::string document_id,
+                          CallbackFn<std::string const&> success_cb,
+                          ErrorCallback error_cb);
+        
         //! @brief Retrieves Kiwi's latest release as a string. ex: v0.1.0
         void getLatestRelease(CallbackFn<std::string const&> success_cb, ErrorCallback error_cb);
         
@@ -125,6 +136,10 @@ namespace kiwi
         {
             return json.count(key) ? json.at(key).get<Type>() : default_value;
         }
+        
+        //! @brief Converts an ISO 8601 received by server.
+        //! @details Output format is %Y-%m-%d %H:%M:%S
+        static std::string convertDate(std::string const& date);
         
     private: // methods
         
@@ -300,6 +315,12 @@ namespace kiwi
         
         std::string _id = "0";
         std::string name = "";
+        std::string author_name = "";
+        std::string creation_date = "";
+        bool        trashed = false;
+        std::string trashed_date = "";
+        std::string opened_date = "";
+        std::string opened_user = "";
         uint64_t    session_id = 0ul;
         
         //! @brief Returns true if the Document match another Document

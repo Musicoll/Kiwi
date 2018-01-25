@@ -80,6 +80,9 @@ namespace kiwi
         
     private: // methods
         
+        //! @brief Handles request that denied by server.
+        static void handleDeniedRequest();
+        
         void networkSettingsChanged(NetworkSettings const&, const juce::Identifier& id) override;
         
         void userLoggedIn(Api::AuthUser const&) override;
@@ -125,6 +128,10 @@ namespace kiwi
         
         using DocumentSessions = std::vector<std::unique_ptr<DocumentSession>>;
         
+    private:
+        
+        using Comp = std::function<bool(DocumentSession const& l_hs, DocumentSession const& r_hs)>;
+        
     public: // methods
         
         Drive(std::string const& name, uint16_t session_port);
@@ -152,6 +159,9 @@ namespace kiwi
         //! @brief Creates and opens a new document on this drive.
         void createNewDocument();
         
+        //! @brief Changes the way documents are sorted.
+        void setSort(Comp comp);
+        
         //! @brief Returns the documents.
         DocumentSessions const& getDocuments() const;
         
@@ -174,6 +184,7 @@ namespace kiwi
         std::string                 m_name = "Drive";
         DocumentSessions            m_documents;
         tool::Listeners<Listener>   m_listeners;
+        Comp                        m_sort;
         
         friend class DocumentBrowser;
     };
@@ -227,11 +238,38 @@ namespace kiwi
         //! @brief Returns the session id of the document.
         uint64_t getSessionId() const;
         
+        //! @brief Returns the open token of the document.
+        std::string const& getOpenToken() const;
+        
         //! @brief Returns the drive that holds this document.
         DocumentBrowser::Drive const& useDrive() const;
         
         //! @brief Rename the document.
         void rename(std::string const& new_name);
+        
+        //! @brief Move the document to trash.
+        void trash();
+        
+        // @brief Moves document out of the trash.
+        void untrash();
+        
+        //! @brief Returns the date creation as a string.
+        std::string const& getCreationDate() const;
+        
+        //! @brief Returns the author's username.
+        std::string const& getAuthor() const;
+        
+        //! @brief Returns true if document is trashed
+        bool isTrashed() const;
+        
+        //! @brief Returns trashed date as string.
+        std::string const& getTrashedDate() const;
+        
+        //! @brief Returns the last modification date.
+        std::string const& getOpenedDate() const;
+        
+        //! @brief Returns the user that modified document last.
+        std::string const& getOpenedUser() const;
         
         //! @brief Returns true if the DocumentSession match another DocumentSession
         //! @details this operator uses the session_id field to compare.
@@ -241,6 +279,7 @@ namespace kiwi
         
         DocumentBrowser::Drive&             m_drive;
         Api::Document                       m_document;
+        std::string                         m_open_token;
         
         friend class DocumentBrowser::Drive;
     };

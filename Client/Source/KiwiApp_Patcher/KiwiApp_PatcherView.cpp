@@ -1031,11 +1031,6 @@ namespace kiwi
             }
         }
         
-        if(!view.removed() && patcher.nameChanged())
-        {
-            updateWindowTitle();
-        }
-        
         if(!view.removed() && &view == &m_view_model)
         {
             checkViewInfos(view);
@@ -1073,11 +1068,6 @@ namespace kiwi
         updateParameters(patcher);
         
         if(view.removed()) {}
-        
-        if(patcher.resident() && (patcher.objectsChanged() || patcher.linksChanged()))
-        {
-            updateWindowTitle();
-        }
     }
     
     void PatcherView::updateParameters(model::Patcher const& patcher_model)
@@ -1102,39 +1092,6 @@ namespace kiwi
         }
     }
     
-    void PatcherView::updateWindowTitle() const
-    {
-        PatcherViewWindow* window = findParentComponentOfClass<PatcherViewWindow>();
-        if(window)
-        {
-            juce::String title;
-            
-            if(!m_manager.isRemote())
-            {
-                title = m_patcher_model.getName();
-                const bool edited = m_manager.needsSaving();
-                
-                juce::File kiwi_file = m_manager.getSelectedFile();
-                
-                if(juce::ComponentPeer* peer = window->getPeer())
-                {
-                    if (!peer->setDocumentEditedStatus(edited))
-                        if (edited)
-                            title << "*";
-                    
-                    peer->setRepresentedFile(kiwi_file);
-                }
-            }
-            else
-            {
-                title = "[Remote] " + m_manager.getDocumentName();
-            }
-            
-            std::string new_name = title.toStdString() + (isLocked() ? "" : " (edit) ");
-            window->setName(new_name);
-        }
-    }
-    
     void PatcherView::checkViewInfos(model::Patcher::View& view)
     {
         if(&view == &m_view_model && !view.removed())
@@ -1154,8 +1111,6 @@ namespace kiwi
                 {
                     m_viewport.resetObjectsArea();
                 }
-                
-                updateWindowTitle();
                 
                 repaint();
                 KiwiApp::commandStatusChanged();

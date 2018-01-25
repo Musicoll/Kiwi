@@ -43,8 +43,7 @@ namespace kiwi
             .name("cicm.kiwi.Patcher")
             .member<Objects, &Patcher::m_objects>("objects")
             .member<Links, &Patcher::m_links>("links")
-            .member<Users, &Patcher::m_users>("users")
-            .member<flip::String, &Patcher::m_patcher_name>("patcher_name");
+            .member<Users, &Patcher::m_users>("users");
         }
         
         // ================================================================================ //
@@ -235,21 +234,6 @@ namespace kiwi
         bool Patcher::usersChanged() const noexcept
         {
             return m_users.changed();
-        }
-        
-        bool Patcher::nameChanged() const noexcept
-        {
-            return m_patcher_name.changed();
-        }
-        
-        std::string Patcher::getName() const
-        {
-            return !m_patcher_name.removed() ? static_cast<std::string>(m_patcher_name) : "Untitled";
-        }
-        
-        void Patcher::setName(std::string const& new_name)
-        {
-            m_patcher_name = new_name;
         }
         
         Patcher::Objects const& Patcher::getObjects() const noexcept
