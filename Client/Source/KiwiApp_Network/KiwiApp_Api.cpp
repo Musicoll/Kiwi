@@ -141,6 +141,7 @@ namespace kiwi
                 && hasJsonHeader(res)
                 && res.result() == beast::http::status::ok)
             {
+                
                 const auto j = json::parse(res.body);
                 
                 if(j.is_object() && j.count("message"))
@@ -158,7 +159,7 @@ namespace kiwi
             }
         };
         
-        session->GetAsync(std::move(cb));
+        session->PostAsync(std::move(cb));
         storeSession(std::move(session));
     }
     

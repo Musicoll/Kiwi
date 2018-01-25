@@ -98,7 +98,7 @@ namespace kiwi { namespace network { namespace http {
     , m_body()
     , m_timeout(0)
     , m_future()
-    , m_keep_processing(false)
+    , m_keep_processing(true)
     , m_req_header()
     {
         ;
@@ -252,6 +252,7 @@ namespace kiwi { namespace network { namespace http {
                 if (query->process())
                 {
                     cb(query->getResponse());
+                    m_keep_processing = false;
                 }
             }
         });

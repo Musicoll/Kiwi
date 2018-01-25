@@ -105,17 +105,13 @@ namespace kiwi { namespace network { namespace http {
         void handleTimeout(beast::error_code const& error);
         
         //! @internal
-        void connect(Response<ResType>& response,
-                     beast::error_code const& error,
-                     tcp::resolver::iterator iterator);
+        void connect(tcp::resolver::iterator iterator);
         
         //! @internal
-        void write(Response<ResType>& response,
-                   beast::error_code const& error);
+        void write();
         
         //! @internal
-        void read(Response<ResType>& response,
-                  beast::error_code const& error);
+        void read();
         
         //! @internal
         void shutdown(beast::error_code const& error);
@@ -124,7 +120,6 @@ namespace kiwi { namespace network { namespace http {
         
         std::unique_ptr<Request<ReqType>>   m_request;
         Response<ResType>                   m_response;
-        Error                               m_error;
         
         std::string                         m_port;
         boost::asio::io_service             m_io_service;
