@@ -156,6 +156,10 @@ namespace kiwi
         //! @brief Returns the name of this drive.
         std::string const& getName() const;
         
+        //! @brief Uploads a document.
+        //! @detail data is represented as a string
+        void uploadDocument(std::string const& name, std::string const& data);
+        
         //! @brief Creates and opens a new document on this drive.
         void createNewDocument();
         
@@ -247,11 +251,19 @@ namespace kiwi
         //! @brief Rename the document.
         void rename(std::string const& new_name);
         
+        //! @brief Duplicates the document on server side.
+        void duplicate();
+        
         //! @brief Move the document to trash.
         void trash();
         
         // @brief Moves document out of the trash.
         void untrash();
+        
+        //! @brief Called to download the document.
+        //! @details download is asynchronous and callback is called on the main thread
+        //! if request succeed.
+        void download(std::function<void(std::string const&)> callback);
         
         //! @brief Returns the date creation as a string.
         std::string const& getCreationDate() const;

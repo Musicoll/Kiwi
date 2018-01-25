@@ -72,6 +72,11 @@ namespace kiwi
             {
                 m_backend_directory.createDirectory();
             }
+            
+            if(!createEmptyDocument())
+            {
+                throw std::runtime_error("Failed to create empty document");
+            }
         }
         
         Server::~Server()
@@ -100,6 +105,29 @@ namespace kiwi
         {
             auto session = m_sessions.find(session_id);
             return session != m_sessions.end() ? session->second.getConnectedUsers() : std::set<uint64_t>();
+        }
+        
+        bool Server::createEmptyDocument()
+        {
+            juce::File empty_file = m_backend_directory.getChildFile("empty").withFileExtension(".kiwi");
+            
+            if (!empty_file.exists())
+            {
+                if (empty_file.create().wasOk())
+                {
+                    model::PatcherValidator validator;
+                    flip::DocumentServer empty_document(model::DataModel::use(), validator, 0);
+                    
+                    empty_document.commit();
+                    
+                    flip::BackEndIR backend(empty_document.write());
+                    flip::DataConsumerFile consumer(empty_file.getFullPathName().toStdString().c_str());
+                    
+                    backend.write<flip::BackEndBinary>(consumer);
+                }
+            }
+            
+            return empty_file.exists();
         }
         
         juce::File Server::getSessionFile(uint64_t session_id) const

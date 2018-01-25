@@ -80,10 +80,9 @@ namespace kiwi { namespace network { namespace http {
     //                                       BODY                                       //
     // ================================================================================ //
     
-    Body::Body(std::string body)
-    : content(std::move(body))
+    Body::Body(std::string const& body)
+    : content(body)
     {
-        
     }
     
     // ================================================================================ //
@@ -137,6 +136,11 @@ namespace kiwi { namespace network { namespace http {
     void Session::setPayload(Payload && payload)
     {
         m_payload = std::move(payload);
+    }
+    
+    void Session::setBody(std::string const& content)
+    {
+        m_body.content = content;
     }
     
     bool Session::isPending()
@@ -219,7 +223,7 @@ namespace kiwi { namespace network { namespace http {
                 const auto content_type = req[beast::http::field::content_type];
                 if(content_type.empty())
                 {
-                    request->set(beast::http::field::content_type, "text/plain");
+                    request->set(beast::http::field::content_type, "application/octet-stream");
                 }
                 
                 request->body = std::move(m_body.content);

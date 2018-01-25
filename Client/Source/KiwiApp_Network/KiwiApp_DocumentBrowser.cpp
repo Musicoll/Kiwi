@@ -205,6 +205,34 @@ namespace kiwi
         m_listeners.call(&Listener::driveChanged);
     }
     
+    void DocumentBrowser::Drive::uploadDocument(std::string const& name, std::string const& data)
+    {
+        KiwiApp::useApi().uploadDocument(name,
+                                         data,
+                                         KiwiApp::use().getApplicationVersion().toStdString(),
+                                         [this](Api::Response res, Api::Document document)
+        {
+            if (res.result() == beast::http::status::forbidden)
+            {
+                DocumentBrowser::handleDeniedRequest();
+            }
+            else if(res.error)
+            {
+                juce::MessageManager::callAsync([message = res.error.message()](){
+                    KiwiApp::error("Error: can't create document");
+                    KiwiApp::error("=> " + message);
+                });
+            }
+            else
+            {
+                juce::MessageManager::callAsync([this]()
+                {
+                    refresh();
+                });
+            }
+        });
+    }
+    
     void DocumentBrowser::Drive::createNewDocument()
     {
         KiwiApp::useApi().createDocument("", [this](Api::Response res, Api::Document document) {
@@ -467,6 +495,31 @@ namespace kiwi
         });
     }
     
+    void DocumentBrowser::Drive::DocumentSession::duplicate()
+    {
+        KiwiApp::useApi().duplicateDocument(m_document._id, [this](Api::Response res) {
+            
+            if (res.result() == beast::http::status::forbidden)
+            {
+                KiwiApp::useInstance().useScheduler().schedule([]()
+                {
+                    DocumentBrowser::handleDeniedRequest();
+                });
+            }
+            else if(res.error)
+            {
+                KiwiApp::error(res.error.message());
+            }
+            else
+            {
+                KiwiApp::useInstance().useScheduler().schedule([this]()
+                {
+                    m_drive.refresh();
+                });
+            }
+        });
+    }
+    
     void DocumentBrowser::Drive::DocumentSession::rename(std::string const& new_name)
     {
         if(new_name.empty())
@@ -493,6 +546,31 @@ namespace kiwi
                 {
                     m_drive.refresh();
                 });
+            }
+        });
+    }
+    
+    void DocumentBrowser::Drive::DocumentSession::download(std::function<void(std::string const&)> callback)
+    {
+        KiwiApp::useApi().downloadDocument(m_document._id,
+                                           [this, cb = std::move(callback)](Api::Response res)
+        {
+            
+            if (res.result() == beast::http::status::forbidden)
+            {
+                KiwiApp::useInstance().useScheduler().schedule([]()
+                {
+                    DocumentBrowser::handleDeniedRequest();
+                    
+                });
+            }
+            else if(res.error)
+            {
+                KiwiApp::error(res.error.message());
+            }
+            else
+            {
+                KiwiApp::useInstance().useScheduler().schedule(std::bind(cb, res.body));
             }
         });
     }

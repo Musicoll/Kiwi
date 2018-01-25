@@ -19,6 +19,12 @@
  ==============================================================================
  */
 
+#include <flip/BackEndBinary.h>
+#include <flip/contrib/DataProviderFile.h>
+#include <flip/BackEndIR.h>
+
+#include <KiwiModel/KiwiModel_Def.h>
+
 #include <KiwiEngine/KiwiEngine_Console.h>
 
 #include "KiwiApp_DocumentBrowserView.h"
@@ -197,11 +203,15 @@ namespace kiwi
         {
             m.addItem(1, "Rename");
             m.addItem(2, "Delete");
+            m.addItem(10, "Upload");
+            m.addItem(11, "Duplicate");
         }
         else
         {
             m.addItem(3, "Restore");
         }
+        
+        m.addItem(9, "Download");
         
         DriveView::DataType current_sort = m_drive_view.getSortType();
         
@@ -270,6 +280,21 @@ namespace kiwi
             case 8:
             {
                 m_drive_view.setSortType(DriveView::DataType::openedUser);
+                break;
+            }
+            case 9: // download document
+            {
+                m_drive_view.downloadDocumentForRow(m_row);
+                break;
+            }
+            case 10: // upload document
+            {
+                m_drive_view.uploadDocument();
+                break;
+            }
+            case 11: // duplicate document
+            {
+                m_drive_view.duplicateDocumentForRow(m_row);
                 break;
             }
         }
@@ -669,6 +694,76 @@ namespace kiwi
         if(row < documents.size())
         {
             documents[row]->rename(new_name);
+        }
+    }
+    
+    void DocumentBrowserView::DriveView::duplicateDocumentForRow(int row)
+    {
+        auto& documents = m_drive.getDocuments();
+        
+        if(row < documents.size())
+        {
+            documents[row]->duplicate();
+        }
+    }
+    
+    void DocumentBrowserView::DriveView::uploadDocument()
+    {
+        auto directory = juce::File::getSpecialLocation(juce::File::userHomeDirectory);
+        
+        juce::FileChooser file_chooser("Upload file", directory, "*.kiwi");
+        
+        if(file_chooser.browseForFileToOpen())
+        {
+            juce::File result = file_chooser.getResult();
+            
+            // Test that document is a valid kiwi document.
+            flip::DataProviderFile provider(result.getFullPathName().toStdString().c_str());
+            flip::BackEndIR back_end;
+            
+            back_end.register_backend<flip::BackEndBinary>();
+            
+            std::string current_version(KIWI_MODEL_VERSION_STRING);
+            
+            if (back_end.read(provider) && current_version.compare(back_end.version) == 0)
+            {
+                juce::MemoryBlock buffer;
+                result.loadFileAsData(buffer);
+                
+                std::string data((char *) buffer.getData(), buffer.getSize() / sizeof(char));
+                
+                m_drive.uploadDocument(result.getFileNameWithoutExtension().toStdString(),
+                                       data);
+            }
+            else
+            {
+                KiwiApp::error("Not a valid Kiwi file");
+            }
+        }
+    }
+    
+    void DocumentBrowserView::DriveView::downloadDocumentForRow(int row)
+    {
+        auto& document = m_drive.getDocuments()[row];
+        
+        auto directory = juce::File::getSpecialLocation(juce::File::userHomeDirectory);
+        
+        juce::File suggest_file =
+        directory.getChildFile(juce::String(document->getName())).withFileExtension("kiwi");
+        
+        juce::FileChooser saveFileChooser("Download file", suggest_file, "*.kiwi");
+        
+        if (saveFileChooser.browseForFileToSave(true))
+        {
+            juce::File result = saveFileChooser.getResult();
+            
+            document->download([result](std::string const& content)
+            {   
+                if(result.create().wasOk())
+                {
+                    result.replaceWithData(content.data(), content.size() * sizeof(char));
+                }
+            });
         }
     }
     

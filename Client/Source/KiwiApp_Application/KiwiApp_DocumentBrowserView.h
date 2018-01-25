@@ -139,8 +139,17 @@ namespace kiwi
         //! @brief Opens document for the given row.
         void openDocument(int row);
         
+        //! @brief Make an API call to duplicate the document on server side.
+        void duplicateDocumentForRow(int row);
+        
         //! @brief Make an API call to rename the remote document
         void renameDocumentForRow(int row, std::string const& new_name);
+        
+        //! @brief Makes an API call to upload a document.
+        void uploadDocument();
+        
+        //! @brief Makes an API call to download the remote document.
+        void downloadDocumentForRow(int row);
         
         //! @brief Moves a document to trash.
         void deleteDocumentForRow(int row);

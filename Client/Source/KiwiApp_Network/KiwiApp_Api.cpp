@@ -265,6 +265,47 @@ namespace kiwi
         storeSession(std::move(session));
     }
     
+    void Api::uploadDocument(std::string const& name,
+                             std::string const& data,
+                             std::string const& kiwi_version,
+                             std::function<void(Response, Api::Document)> callback)
+    {
+        auto cb = [callback = std::move(callback)](Response res)
+        {
+            if (!res.error
+                && res.result() == beast::http::status::ok
+                && hasJsonHeader(res))
+            {
+                auto j = json::parse(res.body);
+                
+                if(j.is_object())
+                {
+                    // parse object as a document
+                    callback(std::move(res), j);
+                    return;
+                }
+            }
+            
+            callback(std::move(res), {});
+        };
+        
+        auto session = makeSession(Endpoint::documents + "/upload");
+        
+        session->setParameters({{"name", name}, {"kiwi_version", kiwi_version}});
+        session->setBody(data);
+        
+        session->PostAsync(std::move(cb));
+        storeSession(std::move(session));
+    }
+    
+    void Api::duplicateDocument(std::string const& document_id, Callback callback)
+    {
+        auto session = makeSession(Endpoint::document(document_id) + "/clone");
+        
+        session->PostAsync(std::move(callback));
+        storeSession(std::move(session));
+    }
+    
     void Api::renameDocument(std::string document_id, std::string const& new_name,
                              Callback callback)
     {
@@ -324,6 +365,16 @@ namespace kiwi
                 fail(res);
             }
         };
+        
+        session->GetAsync(std::move(callback));
+        storeSession(std::move(session));
+    }
+    
+    void Api::downloadDocument(std::string document_id, Callback callback)
+    {
+        auto session = makeSession(Endpoint::document(document_id) + "/download");
+        
+        session->setParameters({{"alt", "download"}});
         
         session->GetAsync(std::move(callback));
         storeSession(std::move(session));

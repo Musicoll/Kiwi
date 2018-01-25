@@ -105,6 +105,15 @@ namespace kiwi
         void createDocument(std::string const& document_name,
                             std::function<void(Response, Api::Document)> callback);
         
+        //! @brief Uploads a document to the server.
+        void uploadDocument(std::string const& name,
+                            std::string const& data,
+                            std::string const& kiwi_version,
+                            std::function<void(Response, Api::Document)> callback);
+        
+        //! @brief Duplicates a document on server side.
+        void duplicateDocument(std::string const& document_id, Callback callback);
+        
         //! @brief Rename a document asynchronously.
         //! @param callback The callback method that will be called when the request is completed.
         void renameDocument(std::string document_id,
@@ -121,6 +130,9 @@ namespace kiwi
         void getOpenToken(std::string document_id,
                           CallbackFn<std::string const&> success_cb,
                           ErrorCallback error_cb);
+        
+        //! @brief Make an async API request to download a document.
+        void downloadDocument(std::string document_id, Callback success_cb);
         
         //! @brief Retrieve version of kiwi compatible with the api server.
         void getRelease(CallbackFn<std::string const&> success_cb, ErrorCallback error_cb);

@@ -83,7 +83,7 @@ namespace kiwi { namespace network { namespace http {
     public:
         
         Body() = default;
-        Body(std::string body);
+        Body(std::string const& body);
         
         std::string content;
     };
@@ -111,7 +111,7 @@ namespace kiwi { namespace network { namespace http {
         
         void setParameters(Parameters && parameters);
         void setPayload(Payload && payload);
-        void setBody(Body && body);
+        void setBody(std::string const& content);
         
         bool isPending();
         void cancel();

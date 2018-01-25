@@ -86,6 +86,11 @@ namespace kiwi
             //! @brief Get the path for a given session.
             juce::File getSessionFile(uint64_t session_id) const;
             
+            //! @brief Creates and empy document.
+            //! @details Used by node to retrieve empty if document not yet opened.
+            //! Returns true if the empty document exists.
+            bool createEmptyDocument();
+            
         private: // methods
             
             // PortFactoryListener
