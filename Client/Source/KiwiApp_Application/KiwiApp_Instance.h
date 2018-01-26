@@ -137,6 +137,9 @@ namespace kiwi
         //! @internal get the given patcher manager iterator.
         PatcherManagers::iterator getPatcherManagerForSession(DocumentBrowser::Drive::DocumentSession& session);
         
+        //! @internal gets patcher manager currently associated to file.
+        Instance::PatcherManagers::iterator getPatcherManagerForFile(juce::File const& file);
+        
         //! @internal Returns the next untitled number based on current documents
         size_t getNextUntitledNumberAndIncrement();
         

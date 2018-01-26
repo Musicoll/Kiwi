@@ -258,7 +258,6 @@ namespace kiwi
         setSize(600, 400);
         
         addAndMakeVisible(&patcherview.getViewport(), true);
-        patcherview.updateWindowTitle();
         
         KiwiApp::bindToCommandManager(this);
         KiwiApp::bindToKeyMapping(this);

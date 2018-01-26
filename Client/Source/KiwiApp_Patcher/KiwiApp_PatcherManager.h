@@ -57,7 +57,7 @@ namespace kiwi
     public: // methods
         
         //! @brief Constructor.
-        PatcherManager(Instance& instance);
+        PatcherManager(Instance& instance, std::string const& name);
         
         //! @brief Destructor.
         ~PatcherManager();
@@ -124,7 +124,7 @@ namespace kiwi
         
         //! @brief Close the window that contains a given patcherview.
         //! @details if it's the last patcher view, it will ask the user the save the document before closing if needed.
-        bool closePatcherViewWindow(PatcherView& patcherview);
+        void closePatcherViewWindow(PatcherView& patcherview);
         
         //! @brief Add a listener.
         void addListener(Listener& listener);
@@ -137,9 +137,6 @@ namespace kiwi
         
         //! @brief Called when a document session changed.
         void documentChanged(DocumentBrowser::Drive::DocumentSession& doc) override;
-        
-        //! @brief Called when a document session has been removed.
-        void documentRemoved(DocumentBrowser::Drive::DocumentSession& doc) override;
         
         //! @brief Force all windows to close without asking user to save document.
         void forceCloseAllWindows();
@@ -181,10 +178,25 @@ namespace kiwi
                                  model::Patcher::View& view);
         
         //! @internal Save document if needed and if user agrees.
-        juce::FileBasedDocument::SaveResult saveIfNeededAndUserAgrees();
+        //! returns true if user wants to continue editing.
+        bool saveIfNeededAndUserAgrees();
+        
+        //! @internal Updates the title bar of specific view.
+        void updateTitleBar(model::Patcher::View & view);
+        
+        //! @internal Updates windows title bars according to remote state,
+        //! need saving flag, name and selected file.
+        void updateTitleBars();
+        
+        //! @internal Sets the need saving flags. Updates title bar if requested.
+        void setNeedSaving(bool need_saving);
+        
+        //! @internal Sets the patcher manager's name. Updates title bar if requested.
+        void setName(std::string const& name);
 
     private: // members
         
+        std::string                                 m_name;
         Instance&                                   m_instance;
         model::PatcherValidator                     m_validator;
         flip::Document                              m_document;

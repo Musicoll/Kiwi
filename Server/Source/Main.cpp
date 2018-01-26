@@ -96,7 +96,9 @@ int main(int argc, char const* argv[])
     
     try
     {
-        server::Server kiwi_server(config["session_port"], config["backend_directory"]);
+        server::Server kiwi_server(config["session_port"],
+                                   config["backend_directory"],
+                                   config["open_token"]);
         
         std::cout << "[server] - running on port " << config["session_port"] << std::endl;
         
