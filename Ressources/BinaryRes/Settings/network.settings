@@ -1,3 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<NETWORK_CONFIG host="localhost" api_port="8080" session_port="9090" refresh_interval="0" remember_me="1"/>
+<NETWORK_CONFIG remember_me="1">
+  <server_address host="kiwi.mshparisnord.fr" api_port="80" session_port="443"/>
+</NETWORK_CONFIG>

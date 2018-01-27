@@ -30,7 +30,8 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief A Panel Component that shows application's settings.
-    class SettingsPanel : public juce::PropertyPanel
+    class SettingsPanel : public juce::Component,
+                          public juce::Button::Listener
     {
     public: // classes
         
@@ -39,5 +40,20 @@ namespace kiwi
         
         //! @brief Destructor.
         ~SettingsPanel();
+        
+    private: // methods
+        
+        //! @brief Resized methods called when resized.
+        void resized() override final;
+        
+        //! @brief Called when apply or reset button is clicked.
+        void buttonClicked(juce::Button * button) override final;
+        
+    private: // members
+        
+        juce::ValueTree     m_settings;
+        juce::PropertyPanel m_pannel;
+        juce::TextButton    m_apply_button;
+        juce::TextButton    m_reset_button;
     };
 }

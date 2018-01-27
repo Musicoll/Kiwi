@@ -44,7 +44,8 @@ namespace kiwi
     Instance::Instance() :
     m_scheduler(),
     m_instance(std::make_unique<DspDeviceManager>(), m_scheduler),
-    m_browser(),
+    m_browser(KiwiApp::getCurrentUser().isLoggedIn() ? KiwiApp::getCurrentUser().getName(): "logged out",
+              1000),
     m_console_history(std::make_shared<ConsoleHistory>(m_instance)),
     m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
     {
@@ -106,34 +107,42 @@ namespace kiwi
         return user.isLoggedIn() ? user.getIdAsInt() : flip::Ref::User::Offline;
     }
     
-    bool Instance::logout()
+    void Instance::login()
     {
-        bool user_agreed = false;
+        m_browser.setDriveName(KiwiApp::getCurrentUser().getName());
         
-        for(auto it = m_patcher_managers.begin(); it != m_patcher_managers.end();)
+        m_windows[std::size_t(WindowId::DocumentBrowser)]->getContentComponent()->setEnabled(true);
+    }
+    
+    void Instance::logout()
+    {
+        m_browser.setDriveName("logged out");
+        
+        for(auto manager = m_patcher_managers.begin(); manager != m_patcher_managers.end();)
         {
-            auto& manager = *it->get();
-            if(manager.isRemote())
+            if ((*manager)->isRemote())
             {
-                if(!user_agreed)
-                {
-                    user_agreed = juce::AlertWindow::showOkCancelBox(juce::AlertWindow::WarningIcon,
-                                                                     TRANS("Are you about to logout."),
-                                                                     TRANS("All patchers connected to this account will be closed..."));
-                    
-                    if(!user_agreed)
-                        return false;
-                }
+                bool keep_patcher
+                = (*manager)->getFirstWindow().showOkCancelBox(juce::AlertWindow::QuestionIcon,
+                                                               "User logged out",
+                                                               "Do you want to continue editing document \""
+                                                               + (*manager)->getDocumentName() +"\" offline",
+                                                               "Ok",
+                                                               "Cancel");
                 
-                it = m_patcher_managers.erase(it);
-            }
-            else
-            {
-                it++;
+                if (!keep_patcher)
+                {
+                    manager = m_patcher_managers.erase(manager);
+                }
+                else
+                {
+                    (*manager)->disconnect();
+                    ++manager;
+                }
             }
         }
         
-        return true;
+        m_windows[std::size_t(WindowId::DocumentBrowser)]->getContentComponent()->setEnabled(false);
     }
     
     engine::Instance& Instance::useEngineInstance()
@@ -424,7 +433,8 @@ namespace kiwi
     {
         showWindowWithId(WindowId::DocumentBrowser, [&browser = m_browser](){
             return std::make_unique<Window>("Document Browser",
-                                            std::make_unique<DocumentBrowserView>(browser),
+                                            std::make_unique<DocumentBrowserView>(browser,
+                                                                                  KiwiApp::getCurrentUser().isLoggedIn()),
                                             true, false, "document_browser_window");
         });
     }
@@ -443,7 +453,7 @@ namespace kiwi
         showWindowWithId(WindowId::ApplicationSettings, [](){
             return std::make_unique<Window>("Application settings",
                                             std::make_unique<SettingsPanel>(),
-                                            true, true, "application_settings_window");
+                                            false, true, "application_settings_window");
         });
     }
     

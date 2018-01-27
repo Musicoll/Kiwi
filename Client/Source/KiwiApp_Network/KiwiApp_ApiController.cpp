@@ -34,15 +34,12 @@ namespace kiwi
         setHost(settings.getHost());
         setPort(settings.getApiPort());
         
-        settings.addListener(*this);
-        
         restoreAuthUserProfile();
     }
     
     ApiController::~ApiController()
     {
         auto& settings = getAppSettings().network();
-        settings.removeListener(*this);
         
         if(!settings.getRememberUserFlag())
         {
@@ -69,29 +66,6 @@ namespace kiwi
         return false;
     }
     
-    void ApiController::networkSettingsChanged(NetworkSettings const& settings,
-                                               juce::Identifier const& id)
-    {
-        if(id == Ids::host)
-        {
-            setHost(settings.getHost());
-        }
-        else if(id == Ids::api_port)
-        {
-            setPort(settings.getApiPort());
-        }
-    }
-    
-    void ApiController::addListener(ApiConnectStatusListener& listener)
-    {
-        m_listeners.add(listener);
-    }
-    
-    void ApiController::removeListener(ApiConnectStatusListener& listener)
-    {
-        m_listeners.remove(listener);
-    }
-    
     void ApiController::login(std::string const& name_or_email,
                               std::string const& password,
                               std::function<void()> success_callback,
@@ -103,7 +77,6 @@ namespace kiwi
             scheduler.schedule([this, success_callback, user](){
                 
                 m_auth_user.resetWith(user);
-                m_listeners.call(&ApiConnectStatusListener::userLoggedIn, m_auth_user);
                 
                 success_callback();
             });
@@ -133,6 +106,5 @@ namespace kiwi
     void ApiController::logout()
     {
         Api::Controller::clearToken();
-        m_listeners.call(&ApiConnectStatusListener::userLoggedOut, getAuthUser());
     }
 }

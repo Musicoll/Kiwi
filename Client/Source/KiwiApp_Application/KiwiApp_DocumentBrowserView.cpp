@@ -39,49 +39,27 @@ namespace kiwi
     //                                  DOCUMENT BROWSER                                //
     // ================================================================================ //
     
-    DocumentBrowserView::DocumentBrowserView(DocumentBrowser& browser) :
+    DocumentBrowserView::DocumentBrowserView(DocumentBrowser& browser, bool enabled) :
     m_browser(browser)
     {
         setSize(1, 1);
-        m_browser.addListener(*this);
-        for(auto* drive : m_browser.getDrives())
-        {
-            driveAdded(*drive);
-        }
         
-        setSize(200, 300);
-    }
-    
-    DocumentBrowserView::~DocumentBrowserView()
-    {
-        m_browser.removeListener(*this);
-    }
-    
-    void DocumentBrowserView::driveAdded(DocumentBrowser::Drive& drive)
-    {
+        DocumentBrowser::Drive & drive = *m_browser.getDrive();
+        
         auto drive_view = std::make_unique<DriveView>(drive);
         drive_view->setSize(getWidth(), drive_view->getHeight());
         addAndMakeVisible(drive_view.get());
         m_drives.emplace_back(std::move(drive_view));
-        resized();
-    }
-    
-    void DocumentBrowserView::driveRemoved(DocumentBrowser::Drive const& drive)
-    {
-        const auto drive_view_it = std::find_if(m_drives.begin(), m_drives.end(), [&drive](std::unique_ptr<DriveView> const& drive_view){
-            return (*drive_view.get() == drive);
-        });
         
-        if(drive_view_it != m_drives.end())
-        {
-            removeChildComponent((*drive_view_it).get());
-            m_drives.erase(drive_view_it);
-        }
+        resized();
+        
+        setSize(200, 300);
+        
+        setEnabled(enabled);
     }
     
-    void DocumentBrowserView::driveChanged(DocumentBrowser::Drive const& drive)
+    DocumentBrowserView::~DocumentBrowserView()
     {
-        resized();
     }
     
     void DocumentBrowserView::resized()
@@ -99,6 +77,14 @@ namespace kiwi
     void DocumentBrowserView::paint(juce::Graphics& g)
     {
         ;
+    }
+    
+    void DocumentBrowserView::enablementChanged()
+    {
+        for(auto & drive : m_drives)
+        {
+            drive->setEnabled(isEnabled());
+        }
     }
     
     // ================================================================================ //
@@ -355,8 +341,12 @@ namespace kiwi
     m_folder_bounds(),
     m_label("drive_name", m_drive_view.getDriveName()),
     m_folder_img(juce::ImageCache::getFromMemory(binary_data::images::folder_png,
-                                                 binary_data::images::folder_png_size))
+                                                 binary_data::images::folder_png_size)),
+    m_disable_folder_img(m_folder_img)
     {
+        m_folder_img.duplicateIfShared();
+        m_disable_folder_img.multiplyAllAlphas(0.5);
+        
         m_label.setFont(m_label.getFont().withHeight(20));
         m_label.setEditable(false);
         m_label.setColour(juce::Label::textColourId, juce::Colours::whitesmoke);
@@ -392,6 +382,30 @@ namespace kiwi
         
     }
     
+    void DocumentBrowserView::DriveView::Header::enablementChanged()
+    {
+        if (isEnabled())
+        {
+            m_refresh_btn.setCommand([this](){m_drive_view.refresh();});
+            m_refresh_btn.setAlpha(1);
+            
+            m_create_document_btn.setCommand([this]()
+                                             {
+                                                 if (!m_drive_view.getTrashMode())
+                                                     m_drive_view.createDocument();
+                                             });
+            m_create_document_btn.setAlpha(1);
+        }
+        else
+        {
+            m_refresh_btn.setCommand([](){});
+            m_refresh_btn.setAlpha(0.5);
+            
+            m_create_document_btn.setCommand([](){});
+            m_create_document_btn.setAlpha(0.5);
+        }
+    }
+    
     void DocumentBrowserView::DriveView::Header::resized()
     {
         const auto bounds = getLocalBounds();
@@ -414,8 +428,16 @@ namespace kiwi
         
         g.fillAll(color);
         
-        g.drawImage(m_folder_img, m_folder_bounds.toFloat(),
-                    juce::RectanglePlacement::yMid, false);
+        if (isEnabled())
+        {
+            g.drawImage(m_folder_img, m_folder_bounds.toFloat(),
+                        juce::RectanglePlacement::yMid, false);
+        }
+        else
+        {
+            g.drawImage(m_disable_folder_img, m_folder_bounds.toFloat(),
+                        juce::RectanglePlacement::yMid, false);
+        }
         
         const auto bounds = getLocalBounds();
         
@@ -442,6 +464,7 @@ namespace kiwi
     juce::ListBox("document list", this),
     m_drive(drive),
     m_trash_mode(false),
+    m_enabled(true),
     m_sorter()
     {
         m_drive.addListener(*this);
@@ -512,6 +535,12 @@ namespace kiwi
                || (l_hs.isTrashed() == r_hs.isTrashed() && type_ordered);
     }
     
+    void DocumentBrowserView::DriveView::enablementChanged()
+    {
+        getHeaderComponent()->setEnabled(isEnabled());
+        update();
+    }
+    
     void DocumentBrowserView::DriveView::driveChanged()
     {
         update();
@@ -521,15 +550,18 @@ namespace kiwi
     {
         int num_rows = 0;
         
-        auto const& documents = m_drive.getDocuments();
-        
-        num_rows = std::count_if(documents.begin(),
-                                documents.end(),
-                                [trash_mode = m_trash_mode]
-                                (std::unique_ptr<DocumentBrowser::Drive::DocumentSession> const& doc)
+        if (isEnabled())
         {
-            return trash_mode ? doc->isTrashed() : !doc->isTrashed();
-        });
+            auto const& documents = m_drive.getDocuments();
+            
+            num_rows = std::count_if(documents.begin(),
+                                     documents.end(),
+                                     [trash_mode = m_trash_mode]
+                                     (std::unique_ptr<DocumentBrowser::Drive::DocumentSession> const& doc)
+                                     {
+                                         return trash_mode ? doc->isTrashed() : !doc->isTrashed();
+                                     });
+        }
         
         return num_rows;
     }
@@ -770,10 +802,5 @@ namespace kiwi
     void DocumentBrowserView::DriveView::listBoxItemDoubleClicked(int row, juce::MouseEvent const& e)
     {
         openDocument(row);
-    }
-    
-    bool DocumentBrowserView::DriveView::operator==(DocumentBrowser::Drive const& other_drive) const
-    {
-        return (m_drive == other_drive);
     }
 }
