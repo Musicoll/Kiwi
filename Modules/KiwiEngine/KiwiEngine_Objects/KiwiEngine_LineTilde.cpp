@@ -246,9 +246,16 @@ namespace kiwi{ namespace engine {
                 }
                 else if(index == 1)
                 {
-                    m_next_ramp_time_ms = args[0].getFloat();
-                    m_next_ramp_time_consumed = false;
+                    if (args[0].isNumber())
+                    {
+                        m_next_ramp_time_ms = args[0].getFloat();
+                        m_next_ramp_time_consumed = false;
+                    }
                 }
+            }
+            else
+            {
+                warning("line~ inlet " + std::to_string(index + 1) + " parameter must be a number");
             }
             /* //! @todo
             else if(args[0].isString())

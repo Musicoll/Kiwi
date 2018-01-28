@@ -38,6 +38,13 @@ namespace kiwi { namespace model {
     
     class Slider : public model::Object
     {
+    public: // enum
+        
+        enum Signal : SignalKey
+        {
+            OutputValue
+        };
+        
     public: // methods
         
         Slider(flip::Default& d);

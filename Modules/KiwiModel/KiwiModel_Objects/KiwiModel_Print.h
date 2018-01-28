@@ -35,7 +35,7 @@ namespace kiwi { namespace model {
         
         Print(flip::Default& d) : model::Object(d) {}
         
-        Print();
+        Print(std::vector<tool::Atom> const& args);
         
         std::string getIODescription(bool is_inlet, size_t index) const override;
         

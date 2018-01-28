@@ -25,6 +25,8 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Slider.h>
 #include <KiwiEngine/KiwiEngine_Factory.h>
 
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Slider.h>
+
 namespace kiwi { namespace engine {
     
     // ================================================================================ //
@@ -43,7 +45,9 @@ namespace kiwi { namespace engine {
     
     Slider::Slider(model::Object const& object_model, Patcher& patcher):
     Object(object_model, patcher),
-    m_value(object_model.getParameter("value")[0].getFloat())
+    m_value(object_model.getParameter("value")[0].getFloat()),
+    m_connection(object_model.getSignal<>(model::Slider::Signal::OutputValue)
+                 .connect(std::bind(&Slider::outputValue, this)))
     {
     }
     
@@ -57,8 +61,15 @@ namespace kiwi { namespace engine {
         if (name == "value")
         {
             m_value = parameter[0].getFloat();
-            send(0, {m_value});
         }
+    }
+    
+    void Slider::outputValue()
+    {
+        defer([this]()
+        {
+            send(0, {m_value});
+        });
     }
     
     void Slider::receive(size_t index, std::vector<tool::Atom> const& args)
@@ -67,7 +78,15 @@ namespace kiwi { namespace engine {
         {
             if (args[0].isNumber())
             {
+                send(0, {args[0].getFloat()});
                 setParameter("value", tool::Parameter(tool::Parameter::Type::Float, {args[0].getFloat()}));
+            }
+            else if(args[0].isString() && args[0].getString() == "set")
+            {
+                if (args.size() >= 1 && args[1].isNumber())
+                {
+                    setParameter("value", tool::Parameter(tool::Parameter::Type::Float, {args[1].getFloat()}));
+                }
             }
             else if (args[0].isString() && args[0].getString() == "bang")
             {

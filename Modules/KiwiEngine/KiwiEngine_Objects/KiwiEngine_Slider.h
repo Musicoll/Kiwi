@@ -52,10 +52,15 @@ namespace kiwi { namespace engine {
         static void declare();
         
         static std::unique_ptr<Object> create(model::Object const& model, Patcher& patcher);
+        
+    private: // methods
+        
+        void outputValue();
 
     private: // members
 
-        double  m_value;
+        double                  m_value;
+        flip::SignalConnection  m_connection;
     };
     
 }}

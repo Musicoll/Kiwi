@@ -29,6 +29,8 @@
 #include <KiwiApp_Patcher/KiwiApp_Factory.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_SliderView.h>
 
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Slider.h>
+
 namespace kiwi
 {
     // ================================================================================ //
@@ -37,7 +39,8 @@ namespace kiwi
     
     SliderView::SliderView(model::Object & object_model):
     ObjectView(object_model),
-    m_slider(juce::Slider::SliderStyle::LinearVertical, juce::Slider::TextEntryBoxPosition::NoTextBox)
+    m_slider(juce::Slider::SliderStyle::LinearVertical, juce::Slider::TextEntryBoxPosition::NoTextBox),
+    m_output_value(object_model.getSignal<>(model::Slider::Signal::OutputValue))
     {
         m_slider.setColour(juce::Slider::ColourIds::backgroundColourId,
                            findColour(ObjectView::ColourIds::Outline));
@@ -99,6 +102,7 @@ namespace kiwi
     void SliderView::sliderValueChanged(juce::Slider * slider)
     {
         setParameter("value", tool::Parameter(tool::Parameter::Type::Float, {slider->getValue()}));
+        m_output_value();
     }
     
     void SliderView::resized()

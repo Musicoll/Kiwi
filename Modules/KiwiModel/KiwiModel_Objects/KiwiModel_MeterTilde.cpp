@@ -78,11 +78,11 @@ namespace kiwi { namespace model {
         
         if (is_inlet && index == 0)
         {
-            description = "input monitored signal";
+            description = "Input monitored signal";
         }
         else if (!is_inlet && index == 0)
         {
-            description = "sends peak value each metering intervall";
+            description = "Sends peak value each metering intervall";
         }
         
         return description;

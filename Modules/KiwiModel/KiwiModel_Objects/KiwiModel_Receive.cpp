@@ -48,12 +48,27 @@ namespace kiwi { namespace model {
     
     std::unique_ptr<Object> Receive::create(std::vector<tool::Atom> const& args)
     {
-        return std::make_unique<Receive>();
+        return std::make_unique<Receive>(args);
     }
     
-    Receive::Receive():
+    Receive::Receive(std::vector<tool::Atom> const& args):
     Object()
     {
+        if (args.empty())
+        {
+            throw Error("receive requires one argument");
+        }
+        
+        if (args.size() > 1)
+        {
+            throw Error("receive requires only one argument");
+        }
+        
+        if (args.size() ==  1 && args[0].isString())
+        {
+            throw Error("receive argument must be a symbol");
+        }
+        
         pushOutlet(PinType::IType::Control);
     }
     
