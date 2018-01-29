@@ -51,9 +51,16 @@ namespace kiwi { namespace engine {
     
     void SigTilde::receive(size_t index, std::vector<tool::Atom> const& args)
     {
-        if (index == 0 && args[0].isNumber())
+        if (index == 0)
         {
-            m_value = args[0].getFloat();
+            if (args[0].isNumber())
+            {
+                m_value = args[0].getFloat();
+            }
+            else
+            {
+                warning("sig~ inlet 1 must receive a number");
+            }
         }
     }
     

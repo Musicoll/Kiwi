@@ -77,7 +77,7 @@ namespace kiwi { namespace engine {
                 warning("osc~ inlet 1 doesn't understanc [" + args[0].getString() + "]");
             }
         }
-        else if(index == 1 && args[0].isNumber())
+        else if(index == 1)
         {
             if (args[0].isNumber())
             {

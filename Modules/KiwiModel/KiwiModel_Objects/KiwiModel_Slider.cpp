@@ -69,6 +69,8 @@ namespace kiwi { namespace model {
     Slider::Slider():
     Object()
     {
+        addSignal<>(Signal::OutputValue, *this);
+        
         setMinWidth(20.);
         setMinHeight(20.);
         setWidth(20);
@@ -80,6 +82,7 @@ namespace kiwi { namespace model {
     Slider::Slider(flip::Default& d):
     Object(d)
     {
+        addSignal<>(Signal::OutputValue, *this);
     }
     
     std::string Slider::getIODescription(bool is_inlet, size_t index) const

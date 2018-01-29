@@ -62,7 +62,7 @@ namespace kiwi { namespace engine {
             {
                 schedule([this, args](){send(0, args);}, m_delay);
             }
-            else if(index == 1 && args[0].isNumber())
+            else if(index == 1)
             {
                 if (args[0].isNumber())
                 {

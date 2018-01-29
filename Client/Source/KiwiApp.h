@@ -44,7 +44,8 @@ namespace kiwi
     //                                  KiWi APPLICATION                                //
     // ================================================================================ //
     
-    class KiwiApp : public juce::JUCEApplication
+    class KiwiApp : public juce::JUCEApplication,
+                    public NetworkSettings::Listener
     {
     public: // methods
         
@@ -120,14 +121,6 @@ namespace kiwi
         
         //! @brief Log-out the user
         static void logout();
-        
-        //! @brief Adds an api connect status listener.
-        //! @see ApiConnectStatusListener
-        static void addApiConnectStatusListener(ApiConnectStatusListener& listener);
-        
-        //! @brief Removes an api connect status listener.
-        //! @see ApiConnectStatusListener
-        static void removeApiConnectStatusListener(ApiConnectStatusListener& listener);
         
         //! @brief Get the current running engine instance.
         static engine::Instance& useEngineInstance();
@@ -249,6 +242,9 @@ namespace kiwi
         
         //! @internal Checks if current Kiwi version is the latest. Show popup if version not up to date.
         void checkLatestRelease();
+        
+        // @brief Handles changes of server address.
+        void networkSettingsChanged(NetworkSettings const& settings, juce::Identifier const& ids) override final;
         
     private: // members
         

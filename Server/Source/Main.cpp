@@ -98,7 +98,8 @@ int main(int argc, char const* argv[])
     {
         server::Server kiwi_server(config["session_port"],
                                    config["backend_directory"],
-                                   config["open_token"]);
+                                   config["open_token"],
+                                   config["kiwi_version"]);
         
         std::cout << "[server] - running on port " << config["session_port"] << std::endl;
         

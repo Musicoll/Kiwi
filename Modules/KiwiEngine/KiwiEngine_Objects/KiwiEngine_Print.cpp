@@ -46,7 +46,25 @@ namespace kiwi { namespace engine {
     {
         std::vector<tool::Atom> const& args = model.getArguments();
         
-        m_name = !args.empty() ? args[0].getString() : "print";
+        if (!args.empty())
+        {
+            if (args[0].isFloat())
+            {
+                m_name = std::to_string(args[0].getFloat());
+            }
+            else if(args[0].isInt())
+            {
+                m_name = std::to_string(args[0].getInt());
+            }
+            else
+            {
+                m_name = args[0].getString();
+            }
+        }
+        else
+        {
+            m_name = "print";
+        }
     }
     
     void Print::receive(size_t, std::vector<tool::Atom> const& args)

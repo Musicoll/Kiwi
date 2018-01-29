@@ -35,7 +35,7 @@ namespace kiwi { namespace model {
         
         Receive(flip::Default& d) : model::Object(d) {}
         
-        Receive();
+        Receive(std::vector<tool::Atom> const& args);
         
         std::string getIODescription(bool is_inlet, size_t index) const override;
         

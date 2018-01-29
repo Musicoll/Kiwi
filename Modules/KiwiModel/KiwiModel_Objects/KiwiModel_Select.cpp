@@ -46,6 +46,11 @@ namespace kiwi { namespace model {
     
     Select::Select(std::vector<tool::Atom> const& args)
     {
+        if (args.empty())
+        {
+            throw Error("select requires at least one argument");
+        }
+            
         pushInlet({PinType::IType::Control});
         
         for(size_t i = 0; i < args.size(); ++i)
@@ -65,22 +70,22 @@ namespace kiwi { namespace model {
         {
             if (index == 0)
             {
-                description = "value to be tested";
+                description = "Value to be tested";
             }
             else
             {
-                description = "sets value " + std::to_string(index) + " to be tested";
+                description = "Sets value " + std::to_string(index) + " to be tested";
             }
         }
         else
         {
             if (index == getArguments().size())
             {
-                description = "ouptuts bang if input doesn't match";
+                description = "Ouptuts bang if input doesn't match";
             }
             else
             {
-                description = "outputs bang if input matches " + getArguments()[index].getString();
+                description = "Outputs bang if input matches " + getArguments()[index].getString();
             }
         }
         

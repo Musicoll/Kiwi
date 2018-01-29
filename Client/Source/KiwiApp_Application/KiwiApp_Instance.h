@@ -63,9 +63,12 @@ namespace kiwi
         //! @brief Get the user ID of the Instance.
         uint64_t getUserId() const noexcept;
         
-        //! @brief Close all remote patchers.
-        bool logout();
+        //! @brief Enables the document browser view.
+        void login();
         
+        //! @brief Close all remote patchers and disable document browser view.
+        void logout();
+    
         //! @brief create a new patcher window.
         void newPatcher();
         

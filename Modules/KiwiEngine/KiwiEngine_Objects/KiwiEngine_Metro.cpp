@@ -75,6 +75,10 @@ namespace kiwi { namespace engine {
                         getScheduler().unschedule(m_task);
                     }
                 }
+                else
+                {
+                    warning("metro inlet 1 only take numbers");
+                }
             }
             else if(index == 1)
             {

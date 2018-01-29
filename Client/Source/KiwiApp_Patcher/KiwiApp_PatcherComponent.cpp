@@ -160,7 +160,8 @@ namespace kiwi
                                                            PatcherManager& patcher_manager)
     : ToolbarItemComponent (toolbarItemId, "Custom Toolbar Item", false)
     , m_patcher_manager(patcher_manager)
-    , m_users(m_patcher_manager.getNumberOfUsers())
+    , m_users()
+    , m_user_nb(m_patcher_manager.getNumberOfUsers())
     , m_users_img(juce::ImageCache::getFromMemory(binary_data::images::users_png,
                                                   binary_data::images::users_png_size))
     , m_flash_alpha(0.f)
@@ -177,8 +178,32 @@ namespace kiwi
     {
         if(&manager == &m_patcher_manager)
         {
-            m_users = m_patcher_manager.getNumberOfUsers();
+            m_user_nb = manager.getNumberOfUsers();
+            
             startFlashing();
+            
+            auto success = [this](Api::Users users)
+            {
+                KiwiApp::useInstance().useScheduler().schedule([this, users]()
+                {
+                    m_users.clear();
+                    
+                    for(Api::User const& user : users)
+                    {
+                        m_users.push_back(user.getName());
+                    }
+                });
+            };
+            
+            auto fail = [this](Api::Error error)
+            {
+                KiwiApp::useInstance().useScheduler().schedule([this, error]()
+                {
+                    m_users.clear();
+                });
+            };
+            
+            KiwiApp::useApi().getUsers(m_patcher_manager.getConnectedUsers(), success, fail);
         }
     }
     
@@ -202,7 +227,7 @@ namespace kiwi
         g.fillEllipse(label_bounds.expanded(2).toFloat());
         
         g.setColour(juce::Colours::whitesmoke);
-        g.drawText(std::to_string(m_users), label_bounds, juce::Justification::centred);
+        g.drawText(std::to_string(m_user_nb), label_bounds, juce::Justification::centred);
     }
     
     bool PatcherToolbar::UsersItemComponent::getToolbarItemSizes(int toolbarDepth, bool isVertical,
@@ -231,6 +256,21 @@ namespace kiwi
         m_flash_alpha = 0.0f;
         stopTimer();
         repaint();
+    }
+    
+    void PatcherToolbar::UsersItemComponent::mouseDown(juce::MouseEvent const& e)
+    {
+        if (m_users.size() > 0)
+        {
+            juce::PopupMenu m;
+            
+            for(std::string const& username : m_users)
+            {
+                m.addItem(1, username, false, false);
+            }
+            
+            m.showAt(this);
+        }
     }
     
     void PatcherToolbar::UsersItemComponent::timerCallback()

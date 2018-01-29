@@ -69,7 +69,8 @@ namespace kiwi
         
     private: // members
         
-        juce::Slider    m_slider;
+        juce::Slider        m_slider;
+        flip::Signal<> &    m_output_value;
         
     private: // delted methods
         

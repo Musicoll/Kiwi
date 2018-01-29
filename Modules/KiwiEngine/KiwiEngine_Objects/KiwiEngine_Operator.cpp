@@ -47,21 +47,32 @@ namespace kiwi { namespace engine {
     {
         if(!args.empty())
         {
-            if(args[0].isNumber())
+            if(index == 0)
             {
-                if(index == 0)
+                if (args[0].isNumber())
                 {
                     m_lhs = args[0].getFloat();
                     bang();
                 }
-                else if(index == 1)
+                else if(args[0].getString() == "bang")
+                {
+                    bang();
+                }
+                else
+                {
+                    warning("operator inlet 1 parameter must be a number or bang");
+                }
+            }
+            else if(index == 1)
+            {
+                if (args[0].isNumber())
                 {
                     m_rhs = args[0].getFloat();
                 }
-            }
-            else if(index == 0 && args[0].getString() == "bang")
-            {
-                bang();
+                else
+                {
+                    warning("operator inlet 2 parameter must be a number");
+                }
             }
         }
     }

@@ -39,12 +39,14 @@ using namespace kiwi;
 // ==================================================================================== //
 
 std::string token = "token";
+std::string kiwi_version = "v0.1.0";
 
 std::string getMetaData()
 {
     nlohmann::json j;
     j["model_version"] = KIWI_MODEL_VERSION_STRING;
     j["open_token"] = token;
+    j["kiwi_version"] = kiwi_version;
     return j.dump();
 }
 
@@ -52,7 +54,7 @@ TEST_CASE("Server - Server", "[Server, Server]")
 {
     SECTION("Simple Connection - Deconnection")
     {
-        kiwi::server::Server server(9191, "./server_backend_test", token);
+        kiwi::server::Server server(9191, "./server_backend_test", token, kiwi_version);
         
         // Initializing document
         flip::Document document (kiwi::model::DataModel::use (), 123456789, 'appl', 'gui ');
@@ -94,7 +96,8 @@ TEST_CASE("Server - Server", "[Server, Server]")
     {
         std::unique_ptr<kiwi::server::Server> server(new kiwi::server::Server(9191,
                                                                               "./server_backend_test",
-                                                                              token));
+                                                                              token,
+                                                                              kiwi_version));
         
         // Initializing document.
         flip::Document document (kiwi::model::DataModel::use (), 123456789, 'appl', 'gui ');
@@ -131,7 +134,7 @@ TEST_CASE("Server - Server", "[Server, Server]")
     
     SECTION("One user connecting to multiple document")
     {
-        kiwi::server::Server server(9191, "./server_backend_test", token);
+        kiwi::server::Server server(9191, "./server_backend_test", token, kiwi_version);
         
         // Initializing documents.
         flip::Document document_1 (kiwi::model::DataModel::use (), 123456789, 'appl', 'gui ');
@@ -176,7 +179,7 @@ TEST_CASE("Server - Server", "[Server, Server]")
     
     SECTION("Multiple connections")
     {
-        kiwi::server::Server server(9191, "./server_backend_test", token);
+        kiwi::server::Server server(9191, "./server_backend_test", token, kiwi_version);
         
         // Initializing client 1
         flip::Document document_1 (kiwi::model::DataModel::use (), 1, 'appl', 'gui ');

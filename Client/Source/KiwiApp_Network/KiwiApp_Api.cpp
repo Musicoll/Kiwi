@@ -27,7 +27,7 @@ namespace kiwi
     const std::string Api::Endpoint::login {Api::Endpoint::root + "/login"};
     const std::string Api::Endpoint::documents {Api::Endpoint::root + "/documents"};
     const std::string Api::Endpoint::users {Api::Endpoint::root + "/users"};
-    const std::string Api::Endpoint::releases {Api::Endpoint::root + "/releases"};
+    const std::string Api::Endpoint::release {Api::Endpoint::root + "/release"};
     
     std::string Api::Endpoint::document(std::string const& document_id)
     {
@@ -163,6 +163,44 @@ namespace kiwi
         storeSession(std::move(session));
     }
     
+    void Api::getUsers(std::unordered_set<uint64_t> const& user_ids,
+                       CallbackFn<Api::Users> success_cb,
+                       ErrorCallback error_cb)
+    {
+        auto cb =
+        [success = std::move(success_cb), fail = std::move(error_cb)]
+        (Response res)
+        {
+            if (!res.error
+                && hasJsonHeader(res)
+                && res.result() == beast::http::status::ok)
+            {
+                success(json::parse(res.body));
+            }
+            else
+            {
+                fail(res);
+            }
+        };
+        
+        auto session = makeSession(Endpoint::users);
+        
+        json j_users;
+        
+        for(uint64_t const& user_id : user_ids)
+        {
+            std::ostringstream result;
+            result << std::hex << std::uppercase << user_id;
+            
+            j_users.push_back(result.str());
+        }
+        
+        session->setParameters({{"ids", j_users.dump()}});
+        
+        session->GetAsync(std::move(cb));
+        storeSession(std::move(session));
+    }
+    
     void Api::getDocuments(std::function<void(Response, Api::Documents)> callback)
     {
         auto cb = [callback = std::move(callback)](Response res)
@@ -224,6 +262,47 @@ namespace kiwi
         }
         
         session->PostAsync(std::move(cb));
+        storeSession(std::move(session));
+    }
+    
+    void Api::uploadDocument(std::string const& name,
+                             std::string const& data,
+                             std::string const& kiwi_version,
+                             std::function<void(Response, Api::Document)> callback)
+    {
+        auto cb = [callback = std::move(callback)](Response res)
+        {
+            if (!res.error
+                && res.result() == beast::http::status::ok
+                && hasJsonHeader(res))
+            {
+                auto j = json::parse(res.body);
+                
+                if(j.is_object())
+                {
+                    // parse object as a document
+                    callback(std::move(res), j);
+                    return;
+                }
+            }
+            
+            callback(std::move(res), {});
+        };
+        
+        auto session = makeSession(Endpoint::documents + "/upload");
+        
+        session->setParameters({{"name", name}, {"kiwi_version", kiwi_version}});
+        session->setBody(data);
+        
+        session->PostAsync(std::move(cb));
+        storeSession(std::move(session));
+    }
+    
+    void Api::duplicateDocument(std::string const& document_id, Callback callback)
+    {
+        auto session = makeSession(Endpoint::document(document_id) + "/clone");
+        
+        session->PostAsync(std::move(callback));
         storeSession(std::move(session));
     }
     
@@ -291,9 +370,19 @@ namespace kiwi
         storeSession(std::move(session));
     }
     
-    void Api::getLatestRelease(CallbackFn<std::string const&> success_cb, ErrorCallback error_cb)
+    void Api::downloadDocument(std::string document_id, Callback callback)
     {
-        auto session = makeSession(Endpoint::releases + "/latest");
+        auto session = makeSession(Endpoint::document(document_id) + "/download");
+        
+        session->setParameters({{"alt", "download"}});
+        
+        session->GetAsync(std::move(callback));
+        storeSession(std::move(session));
+    }
+    
+    void Api::getRelease(CallbackFn<std::string const&> success_cb, ErrorCallback error_cb)
+    {
+        auto session = makeSession(Endpoint::release);
         
         auto cb = [success = std::move(success_cb),
                    fail = std::move(error_cb)](Response res)
@@ -304,9 +393,9 @@ namespace kiwi
             {
                 const auto j = json::parse(res.body);
                 
-                if(j.is_object() && j.count("tag_name"))
+                if(j.is_object() && j.count("release"))
                 {
-                    std::string latest_release = j["tag_name"];
+                    std::string latest_release = j["release"];
                     success(latest_release);
                 }
             }

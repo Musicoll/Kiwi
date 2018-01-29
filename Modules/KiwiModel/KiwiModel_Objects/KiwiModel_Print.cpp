@@ -47,12 +47,17 @@ namespace kiwi
         
         std::unique_ptr<Object> Print::create(std::vector<tool::Atom> const& args)
         {
-            return std::make_unique<Print>();
+            return std::make_unique<Print>(args);
         }
         
-        Print::Print():
+        Print::Print(std::vector<tool::Atom> const& args):
         Object()
         {
+            if (args.size() > 1)
+            {
+                throw Error("print takes 1 or 0 arguments");
+            }
+            
             pushInlet({PinType::IType::Control});
         }
         

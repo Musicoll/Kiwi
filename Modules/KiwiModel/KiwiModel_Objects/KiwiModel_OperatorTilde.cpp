@@ -39,9 +39,19 @@ namespace kiwi { namespace model {
     OperatorTilde::OperatorTilde(std::vector<tool::Atom> const& args):
     Object()
     {
+        if (args.size() > 1)
+        {
+            throw Error("operator~ too many arguments");
+        }
+        
+        if (args.size() == 1 && args[0].isNumber())
+        {
+            throw Error("operator~ argument must be a number");
+        }
+        
         pushInlet({PinType::IType::Signal});
         
-        if (args.empty() || !args[0].isNumber())
+        if (args.empty())
         {
             pushInlet({PinType::IType::Signal, PinType::IType::Control});
         }

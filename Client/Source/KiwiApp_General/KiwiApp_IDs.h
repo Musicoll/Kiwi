@@ -37,8 +37,8 @@ namespace kiwi
         DECLARE_ID(host);
         DECLARE_ID(api_port);
         DECLARE_ID(session_port);
-        DECLARE_ID(refresh_interval);
         DECLARE_ID(remember_me);
+        DECLARE_ID(server_address);
         
         DECLARE_ID(NETWORK_CONFIG);
         

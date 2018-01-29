@@ -48,6 +48,16 @@ namespace kiwi { namespace model {
     
     SigTilde::SigTilde(std::vector<tool::Atom> const& args)
     {
+        if (args.size() > 1)
+        {
+            throw Error("sig~ too many arguments");
+        }
+        
+        if (args.size() == 1 && !args[0].isNumber())
+        {
+            throw Error("sig~ argument must be a number");
+        }
+        
         if (args.empty() || !args[0].isNumber())
         {
             pushInlet({PinType::IType::Control});

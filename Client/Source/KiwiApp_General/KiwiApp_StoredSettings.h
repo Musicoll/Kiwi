@@ -48,32 +48,26 @@ namespace kiwi
         //! @brief Reset to default settings values
         void resetToDefault();
         
+        //! @brief Sets the server adress.
+        void setServerAddress(std::string const& host, uint16_t api_port, uint16_t session_port);
+        
+        //! @brief Retrieves a copy of the server adress info.
+        juce::ValueTree getServerAddress();
+        
         //! @brief Restore settings with an xml.
-        bool readFromXml(juce::XmlElement const& xml);
+        void readFromXml(juce::XmlElement const& xml);
         
         //! @brief Returns the Host as a string
         std::string getHost() const;
         
-        //! @brief Returns the Host as a juce::Value
-        juce::Value getHostValue();
-        
         //! @brief Returns the api port as an integer
         uint16_t getApiPort() const;
-        
-        //! @brief Returns the api port as a juce::Value
-        juce::Value getApiPortValue();
         
         //! @brief Returns the session port as an integer
         uint16_t getSessionPort() const;
         
-        //! @brief Returns the session port as a juce::Value
-        juce::Value getSessionPortValue();
-        
         //! @brief Returns the session port as an integer
         uint16_t getRefreshInterval() const;
-        
-        //! @brief Returns the session port as a juce::Value
-        juce::Value getRefreshIntervalValue();
         
         void setRememberUserFlag(bool remember_me);
         
@@ -101,7 +95,7 @@ namespace kiwi
         juce::ValueTree& use();
         
         void valueTreePropertyChanged(juce::ValueTree&, juce::Identifier const&) override;
-        void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override               {}
+        void valueTreeChildAdded(juce::ValueTree& parent, juce::ValueTree& child) override;
         void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override        {}
         void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override                {}
         void valueTreeParentChanged(juce::ValueTree&) override                              {}

@@ -30,6 +30,19 @@ namespace kiwi { namespace model {
     //                                   CONVERTER                                      //
     // ================================================================================ //
     
+    void Converter::convert_v1_v2(flip::BackEndIR & backend)
+    {
+        flip::BackEndIR::Type & patcher  = backend.root;
+        
+        // removing patcher name.
+        patcher.members.remove_if([](std::pair<std::string, flip::BackEndIR::Type> const& member)
+        {
+            return member.first == "patcher_name";
+        });
+        
+        backend.version = "v2";
+    }
+    
     bool Converter::process(flip::BackEndIR & backend)
     {
         bool success = false;
@@ -40,7 +53,12 @@ namespace kiwi { namespace model {
         
         if (current_version.compare(backend.version) >= 0)
         {
-            if (backend.version.compare("v1") >= 0)
+            if (backend.version.compare("v1") == 0)
+            {
+                convert_v1_v2(backend);
+            }
+            
+            if (backend.version.compare("v2") == 0)
             {
                 success = true;
             }

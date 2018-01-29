@@ -65,6 +65,9 @@ namespace kiwi
         //! @brief Try to connect this patcher to a remote server.
         bool connect(std::string const& host, uint16_t port, DocumentBrowser::Drive::DocumentSession& session);
         
+        //! @brief Disconnects the patcher manager.
+        void disconnect();
+        
         //! @brief Pull changes from server if it is remote.
         void pull();
         
@@ -151,9 +154,6 @@ namespace kiwi
         
         //! @internal Reads data from file.
         bool readDocument();
-        
-        //! @internal If the patcher is remote, tries to disconnect it.
-        void disconnect();
         
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
         void document_changed(model::Patcher& patcher) override final;

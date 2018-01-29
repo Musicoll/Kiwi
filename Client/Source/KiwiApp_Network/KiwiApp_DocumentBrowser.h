@@ -39,80 +39,38 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief Request Patcher document informations through a Kiwi API.
-    class DocumentBrowser
-    : public juce::Timer
-    , public NetworkSettings::Listener
-    , public ApiConnectStatusListener
+    class DocumentBrowser : public juce::Timer
     {
     public: // nested classes
         
-        struct Listener;
         class Drive;
         
     public: // methods
         
         //! @brief Constructor
-        DocumentBrowser();
+        DocumentBrowser(std::string const& drive_name, int refresh_time);
         
         //! @brief Destructor
         ~DocumentBrowser();
         
-        //! @brief start processing
-        void start(const int interval = 5000);
-        
-        //! @brief stop processing
-        void stop();
-        
-        //! @brief Scan the LAN to find a service provider.
-        void process();
+        //! @brief Sets the drive's name.
+        void setDriveName(std::string const& name);
         
         //! @brief juce::Timer callback.
         void timerCallback() override;
         
         //! @brief Returns a list of drives.
-        std::vector<Drive*> getDrives() const;
-        
-        //! @brief Add a listener.
-        void addListener(Listener& listener);
-        
-        //! @brief remove a listener.
-        void removeListener(Listener& listener);
+        Drive* getDrive() const;
         
     private: // methods
         
         //! @brief Handles request that denied by server.
         static void handleDeniedRequest();
         
-        void networkSettingsChanged(NetworkSettings const&, const juce::Identifier& id) override;
-        
-        void userLoggedIn(Api::AuthUser const&) override;
-        void userLoggedOut(Api::AuthUser const&) override;
-        void authUserChanged(Api::AuthUser const&) override;
-        
     private: // variables
         
-        std::unique_ptr<Drive>                          m_distant_drive;
-        tool::Listeners<Listener>                     m_listeners = {};
-    };
-    
-    // ================================================================================ //
-    //                              DOCUMENT BROWSER LISTENER                           //
-    // ================================================================================ //
-    
-    //! @brief Listen to document explorer changes.
-    struct DocumentBrowser::Listener
-    {
-        //! @brief Destructor.
-        virtual ~Listener() = default;
-        
-        //! @brief Called when the document list changed.
-        virtual void driveAdded(DocumentBrowser::Drive& drive) = 0;
-        
-        //! @brief Called when the document list changed.
-        virtual void driveChanged(DocumentBrowser::Drive const& drive) = 0;
-        
-        //! @brief Called when the document list changed.
-        virtual void driveRemoved(DocumentBrowser::Drive const& drive) = 0;
+        std::unique_ptr<Drive>      m_distant_drive;
+        int                         m_refresh_time;
     };
     
     // ================================================================================ //
@@ -134,7 +92,7 @@ namespace kiwi
         
     public: // methods
         
-        Drive(std::string const& name, uint16_t session_port);
+        Drive(std::string const& name);
         
         ~Drive() = default;
         
@@ -144,17 +102,15 @@ namespace kiwi
         //! @brief remove a listener.
         void removeListener(Listener& listener);
         
-        //! @brief Set the kiwi document session port.
-        void setSessionPort(uint16_t port);
-        
-        //! @brief Returns the kiwi document session port.
-        uint16_t getSessionPort() const;
-        
         //! @brief Set the name of this drive.
         void setName(std::string const& host);
         
         //! @brief Returns the name of this drive.
         std::string const& getName() const;
+        
+        //! @brief Uploads a document.
+        //! @detail data is represented as a string
+        void uploadDocument(std::string const& name, std::string const& data);
         
         //! @brief Creates and opens a new document on this drive.
         void createNewDocument();
@@ -168,20 +124,20 @@ namespace kiwi
         //! @brief Returns the documents.
         DocumentSessions& getDocuments();
         
-        //! @brief Returns true if the drive match the other drive
-        //! @details this operator only compares ip and port.
-        bool operator==(Drive const& drive) const;
-        
         //! @brief Refresh all the document list.
         void refresh();
+        
+    private: // methods
+        
+        //! @brief Refresh the document list without posting network erors.
+        void refresh_internal();
         
     private: // members
         
         //! @internal Update the document list (need to be called in the juce Message thread)
         void updateDocumentList(Api::Documents docs);
         
-        uint16_t                    m_session_port = 9090;
-        std::string                 m_name = "Drive";
+        std::string                 m_name;
         DocumentSessions            m_documents;
         tool::Listeners<Listener>   m_listeners;
         Comp                        m_sort;
@@ -247,11 +203,19 @@ namespace kiwi
         //! @brief Rename the document.
         void rename(std::string const& new_name);
         
+        //! @brief Duplicates the document on server side.
+        void duplicate();
+        
         //! @brief Move the document to trash.
         void trash();
         
         // @brief Moves document out of the trash.
         void untrash();
+        
+        //! @brief Called to download the document.
+        //! @details download is asynchronous and callback is called on the main thread
+        //! if request succeed.
+        void download(std::function<void(std::string const&)> callback);
         
         //! @brief Returns the date creation as a string.
         std::string const& getCreationDate() const;

@@ -32,30 +32,25 @@ namespace kiwi
     //                               DOCUMENT BROWSER VIEW                              //
     // ================================================================================ //
     
-    class DocumentBrowserView : public juce::Component, public DocumentBrowser::Listener
+    class DocumentBrowserView : public juce::Component
     {
     public: // methods
         
         //! @brief Constructor.
-        DocumentBrowserView(DocumentBrowser& browser);
+        DocumentBrowserView(DocumentBrowser& browser, bool enabled);
         
         //! @brief Destructor.
         ~DocumentBrowserView();
-        
-        //! @brief Called when the document list changed.
-        void driveAdded(DocumentBrowser::Drive& drive) override;
-        
-        //! @brief Called when a drive changed.
-        void driveChanged(DocumentBrowser::Drive const& drive) override;
-        
-        //! @brief Called when the document list changed.
-        void driveRemoved(DocumentBrowser::Drive const& drive) override;
         
         //! @brief Called when resized.
         void resized() override;
         
         //! @brief juce::Component::paint
         void paint(juce::Graphics& g) override;
+        
+    private: // methods
+        
+        void enablementChanged() override final;
         
     private: // nested classes
         
@@ -112,6 +107,12 @@ namespace kiwi
         //! @details Called when one or more document has been changed / removed or added.
         void driveChanged() override;
         
+        //! @brief Disable the display of document and their modification.
+        void disable();
+        
+        //! @brief Enable the display of documents and their modification.
+        void enable();
+        
         //! @brief Returns the number of items in the list.
         int getNumRows() override;
         
@@ -133,14 +134,20 @@ namespace kiwi
         //! @brief Called when the user double-clicking on a row.
         void listBoxItemDoubleClicked(int row, juce::MouseEvent const& e) override;
         
-        //! @brief Returns true if the two drive view refer to the same drive.
-        bool operator==(DocumentBrowser::Drive const& other_drive) const;
-        
         //! @brief Opens document for the given row.
         void openDocument(int row);
         
+        //! @brief Make an API call to duplicate the document on server side.
+        void duplicateDocumentForRow(int row);
+        
         //! @brief Make an API call to rename the remote document
         void renameDocumentForRow(int row, std::string const& new_name);
+        
+        //! @brief Makes an API call to upload a document.
+        void uploadDocument();
+        
+        //! @brief Makes an API call to download the remote document.
+        void downloadDocumentForRow(int row);
         
         //! @brief Moves a document to trash.
         void deleteDocumentForRow(int row);
@@ -149,6 +156,9 @@ namespace kiwi
         void restoreDocumentForRow(int row);
         
     private: // methods
+        
+        //! @brief Hides document liste and disable some interactions.
+        void enablementChanged() override final;
         
         //! @brief Resort content and call update content.
         void update();
@@ -185,7 +195,9 @@ namespace kiwi
     private: // members
         
         DocumentBrowser::Drive& m_drive;
+        std::string             m_name;
         bool                    m_trash_mode;
+        bool                    m_enabled;
         Comp                    m_sorter;
     };
     
@@ -215,6 +227,10 @@ namespace kiwi
         //! @brief Sets the text diaplyed by the header bar.
         void setText(std::string const& text);
         
+    private: // methods
+        
+        void enablementChanged() override final;
+        
     private: // members
         
         DocumentBrowserView::DriveView& m_drive_view;
@@ -223,7 +239,8 @@ namespace kiwi
         ImageButton                     m_trash_btn;
         juce::Rectangle<int>            m_folder_bounds;
         juce::Label                     m_label;
-        const juce::Image               m_folder_img;
+        juce::Image                     m_folder_img;
+        juce::Image                     m_disable_folder_img;
     };
     
     // ================================================================================ //

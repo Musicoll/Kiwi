@@ -28,18 +28,9 @@
 
 namespace kiwi
 {
-    struct ApiConnectStatusListener
-    {
-        virtual ~ApiConnectStatusListener() {}
-        
-        virtual void userLoggedIn(Api::AuthUser const&) = 0;
-        virtual void userLoggedOut(Api::AuthUser const&) = 0;
-        virtual void authUserChanged(Api::AuthUser const&) = 0;
-    };
     
     class ApiController
     : public Api::Controller
-    , private NetworkSettings::Listener
     {
     public: // methods
         
@@ -50,12 +41,6 @@ namespace kiwi
         //! @details If the "remember me" flag is true, the user profile will be saved when the object is destroyed.
         //! If false, the user profile will be saved whithout the token.
         ~ApiController();
-        
-        //! @brief Adds a listener.
-        void addListener(ApiConnectStatusListener& listener);
-        
-        //! @brief Removes a listener.
-        void removeListener(ApiConnectStatusListener& listener);
         
         //! @brief Attempt to log the client api user in (Async).
         //! @param name_or_email The name or email of the user.
@@ -84,12 +69,5 @@ namespace kiwi
         
         bool saveAuthUserProfile() const;
         bool restoreAuthUserProfile();
-        
-        //! @brief Called when the network settings has changed.
-        void networkSettingsChanged(NetworkSettings const&, juce::Identifier const&) override;
-        
-    private: // variables
-        
-        tool::Listeners<ApiConnectStatusListener> m_listeners;
     };
 }

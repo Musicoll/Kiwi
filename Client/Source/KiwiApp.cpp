@@ -28,6 +28,7 @@
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Objects.h>
 #include <KiwiApp.h>
 #include <KiwiApp_General/KiwiApp_CommandIDs.h>
+#include <KiwiApp_General/KiwiApp_IDs.h>
 
 namespace kiwi
 {
@@ -108,6 +109,8 @@ namespace kiwi
         m_command_manager = std::make_unique<juce::ApplicationCommandManager>();
         
         m_settings = std::make_unique<StoredSettings>();
+        
+        m_settings->network().addListener(*this);
         
         m_menu_model.reset(new MainMenuModel());
         
@@ -307,7 +310,14 @@ namespace kiwi
                         Api::ErrorCallback error_callback)
     {
         auto& api_controller = *KiwiApp::use().m_api_controller;
-        api_controller.login(name_or_email, password, std::move(success_callback), std::move(error_callback));
+        
+        auto success = [cb = std::move(success_callback)]()
+        {
+            KiwiApp::useInstance().login();
+            cb();
+        };
+        
+        api_controller.login(name_or_email, password, std::move(success), std::move(error_callback));
     }
     
     void KiwiApp::signup(std::string const& username,
@@ -327,11 +337,9 @@ namespace kiwi
     
     void KiwiApp::logout()
     {
-        if(useInstance().logout())
-        {
-            KiwiApp::use().m_api_controller->logout();
-            KiwiApp::commandStatusChanged();
-        }
+        useInstance().logout();
+        KiwiApp::use().m_api_controller->logout();
+        KiwiApp::commandStatusChanged();
     }
     
     void KiwiApp::checkLatestRelease()
@@ -342,7 +350,7 @@ namespace kiwi
         {
                 KiwiApp::useInstance().useScheduler().schedule([current_version, latest_version]()
                 {
-                    if (current_version.compare(latest_version) < 0)
+                    if (current_version.compare(latest_version) != 0)
                     {
                         juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::QuestionIcon,
                                                                "New release available" ,
@@ -355,17 +363,20 @@ namespace kiwi
         {
         };
         
-        useApi().getLatestRelease(on_success, on_fail);
+        useApi().getRelease(on_success, on_fail);
     }
     
-    void KiwiApp::addApiConnectStatusListener(ApiConnectStatusListener& listener)
+    void KiwiApp::networkSettingsChanged(NetworkSettings const& settings, juce::Identifier const& id)
     {
-        KiwiApp::use().m_api_controller->addListener(listener);
-    }
-    
-    void KiwiApp::removeApiConnectStatusListener(ApiConnectStatusListener& listener)
-    {
-        KiwiApp::use().m_api_controller->removeListener(listener);
+        if (id == Ids::server_address)
+        {
+            logout();
+            
+            m_api_controller->setHost(settings.getHost());
+            m_api_controller->setPort(settings.getApiPort());
+            
+            checkLatestRelease();
+        }
     }
     
     uint64_t KiwiApp::userID()

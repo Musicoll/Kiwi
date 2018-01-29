@@ -85,6 +85,14 @@ namespace kiwi { namespace engine {
                 {
                     m_audio_controler.stopAudio();
                 }
+                else
+                {
+                    warning("audio interface inlet 1 only understand start and stop");
+                }
+            }
+            else
+            {
+                warning("audio interface inlet 1 only understand start and stop");
             }
         }
     }

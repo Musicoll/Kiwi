@@ -118,6 +118,7 @@ namespace kiwi
     {
         m_settings.removeAllChildren(nullptr);
         m_settings.removeAllProperties(nullptr);
+        m_settings.removeAllChildren(nullptr);
         
         std::unique_ptr<juce::XmlElement> xml(nullptr);
         
@@ -127,29 +128,58 @@ namespace kiwi
         xml.reset(juce::XmlDocument::parse(str));
         assert(xml != nullptr);
         
-        // load default settings
-        m_settings = juce::ValueTree::fromXml(*xml);
+        juce::ValueTree tree = juce::ValueTree::fromXml(*xml);
+        
+        if (tree.hasProperty(Ids::remember_me))
+        {
+            m_settings.setProperty(Ids::remember_me, tree.getProperty(Ids::remember_me), nullptr);
+        }
+        
+        juce::ValueTree server_tree = tree.getChildWithName(Ids::server_address).createCopy();
+        
+        if (server_tree.isValid())
+        {
+            m_settings.addChild(server_tree, 0, nullptr);
+        }
     }
     
-    bool NetworkSettings::readFromXml(juce::XmlElement const& xml)
+    juce::ValueTree NetworkSettings::getServerAddress()
+    {
+        return m_settings.getChildWithName(Ids::server_address).createCopy();
+    }
+    
+    void NetworkSettings::setServerAddress(std::string const& host, uint16_t api_port, uint16_t session_port)
+    {
+        juce::ValueTree tree(Ids::server_address);
+        tree.setProperty(Ids::host, juce::String(host), nullptr);
+        tree.setProperty(Ids::api_port, api_port, nullptr);
+        tree.setProperty(Ids::session_port, session_port, nullptr);
+        
+        m_settings.removeChild(m_settings.getChildWithName(Ids::server_address), nullptr);
+        m_settings.addChild(tree, 0, nullptr);
+    }
+    
+    void NetworkSettings::readFromXml(juce::XmlElement const& xml)
     {
         if(xml.hasTagName(m_settings.getType().toString()))
         {
             const auto new_settings(juce::ValueTree::fromXml(xml));
             
-            for(int i = new_settings.getNumProperties(); --i >= 0;)
+            if (new_settings.hasProperty(Ids::remember_me))
             {
-                const auto key = new_settings.getPropertyName(i);
-                if(m_settings.hasProperty(key))
-                {
-                    m_settings.setProperty(key, new_settings.getProperty(key), nullptr);
-                }
+                m_settings.setProperty(Ids::remember_me,
+                                       new_settings.getProperty(Ids::remember_me),
+                                       nullptr);
             }
             
-            return true;
+            juce::ValueTree server_tree = new_settings.getChildWithName(Ids::server_address).createCopy();
+            
+            if (server_tree.isValid())
+            {
+                m_settings.removeChild(m_settings.getChildWithName(Ids::server_address), nullptr);
+                m_settings.addChild(server_tree, 0, nullptr);
+            }
         }
-        
-        return false;
     }
     
     juce::ValueTree& NetworkSettings::use()
@@ -159,45 +189,19 @@ namespace kiwi
     
     std::string NetworkSettings::getHost() const
     {
-        return m_settings.getProperty(Ids::host).toString().toStdString();
-    }
-    
-    juce::Value NetworkSettings::getHostValue()
-    {
-        return m_settings.getPropertyAsValue(Ids::host, nullptr);
+        return m_settings.getChildWithName(Ids::server_address).getProperty(Ids::host).toString().toStdString();
     }
     
     uint16_t NetworkSettings::getApiPort() const
     {
-        int port = m_settings.getProperty(Ids::api_port);
+        int port = m_settings.getChildWithName(Ids::server_address).getProperty(Ids::api_port);
         return static_cast<uint16_t>(port);
-    }
-    
-    juce::Value NetworkSettings::getApiPortValue()
-    {
-        return m_settings.getPropertyAsValue(Ids::api_port, nullptr);
     }
     
     uint16_t NetworkSettings::getSessionPort() const
     {
-        int port = m_settings.getProperty(Ids::session_port);
+        int port = m_settings.getChildWithName(Ids::server_address).getProperty(Ids::session_port);
         return static_cast<uint16_t>(port);
-    }
-    
-    juce::Value NetworkSettings::getSessionPortValue()
-    {
-        return m_settings.getPropertyAsValue(Ids::session_port, nullptr);
-    }
-    
-    uint16_t NetworkSettings::getRefreshInterval() const
-    {
-        int time = m_settings.getProperty(Ids::refresh_interval);
-        return static_cast<uint16_t>(time);
-    }
-    
-    juce::Value NetworkSettings::getRefreshIntervalValue()
-    {
-        return m_settings.getPropertyAsValue(Ids::refresh_interval, nullptr);
     }
     
     void NetworkSettings::setRememberUserFlag(bool remember_me)
@@ -223,6 +227,11 @@ namespace kiwi
     void NetworkSettings::valueTreePropertyChanged(juce::ValueTree&, juce::Identifier const& id)
     {
         m_listeners.call(&Listener::networkSettingsChanged, *this, id);
+    }
+    
+    void NetworkSettings::valueTreeChildAdded(juce::ValueTree& parent, juce::ValueTree& child)
+    {
+        m_listeners.call(&Listener::networkSettingsChanged, *this, child.getType());
     }
     
     // ================================================================================ //
@@ -262,7 +271,7 @@ namespace kiwi
    
         // Try to reload User settings
         std::unique_ptr<juce::XmlElement> xml(getGlobalProperties().getXmlValue("Network Settings"));
-        if(xml)
+        if (xml)
         {
             m_network.readFromXml(*xml);
         }
