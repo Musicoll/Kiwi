@@ -128,16 +128,23 @@ namespace kiwi {
     
     void MessageView::textChanged()
     {
-        juce::Label & label = getLabel();
+        juce::Label& label = getLabel();
         
-        const int text_width = label.getFont().getStringWidth(label.getText());
+        // Parse text and convert it back to string to display the formated version.
+        const auto atoms = tool::AtomHelper::parse(label.getText().toStdString(),
+                                                   tool::AtomHelper::ParsingFlags::Comma
+                                                   | tool::AtomHelper::ParsingFlags::Dollar);
         
+        auto formatted_text = tool::AtomHelper::toString(atoms);
+        const int text_width = label.getFont().getStringWidth(formatted_text);
         model::Object & model = getModel();
-        
         model.setWidth(text_width + 16);
         
+        // set the attribute and label text with formated text
+        getLabel().setText(formatted_text, juce::NotificationType::dontSendNotification);
+        
         setAttribute("text", tool::Parameter(tool::Parameter::Type::String,
-                                             {label.getText().toStdString()}));
+                                             {std::move(formatted_text)}));
     }
     
     juce::TextEditor* MessageView::createdTextEditor()

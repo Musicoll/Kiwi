@@ -23,6 +23,8 @@
 
 #include <KiwiEngine/KiwiEngine_Object.h>
 
+#include <array>
+
 namespace kiwi { namespace engine {
     
     // ================================================================================ //
@@ -48,10 +50,26 @@ namespace kiwi { namespace engine {
         static std::unique_ptr<Object> create(model::Object const& model, Patcher& patcher);
 
     private: // members
-
-        std::string             m_text;
-        flip::SignalConnection  m_connection;
         
+        void sendMessages();
+        void prepareMessagesForText(std::string const& text);
+
+        flip::SignalConnection      m_connection;
+        std::array<tool::Atom, 10>  m_input_args {};
+        
+        struct Sequence
+        {
+            Sequence(std::vector<tool::Atom>&& _atoms, bool _has_dollar)
+            : atoms(_atoms), has_dollar(_has_dollar)
+            {}
+            
+            ~Sequence() = default;
+            
+            const std::vector<tool::Atom> atoms {};
+            const bool has_dollar = false;
+        };
+        
+        std::vector<Sequence> m_messages {};
     };
     
 }}

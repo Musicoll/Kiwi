@@ -40,12 +40,12 @@ namespace kiwi { namespace engine {
         return std::make_unique<Message>(model, patcher);
     }
     
-    Message::Message(model::Object const& object_model, Patcher& patcher):
-    Object(object_model, patcher),
-    m_text(object_model.getAttribute("text")[0].getString()),
-    m_connection(object_model.getSignal<>(model::Message::Signal::outputMessage)
-                 .connect(std::bind(&Message::outputMessage, this)))
+    Message::Message(model::Object const& object_model, Patcher& patcher)
+    : Object(object_model, patcher)
+    , m_connection(object_model.getSignal<>(model::Message::Signal::outputMessage)
+                   .connect(std::bind(&Message::outputMessage, this)))
     {
+        attributeChanged("text", object_model.getAttribute("text"));
     }
     
     
@@ -57,7 +57,7 @@ namespace kiwi { namespace engine {
     {
         defer([this]()
         {
-            send(0, tool::AtomHelper::parse(m_text));
+            sendMessages();
         });
     }
     
@@ -65,7 +65,13 @@ namespace kiwi { namespace engine {
     {
         if (name == "text")
         {
-            m_text = parameter[0].getString();
+            tool::Atom null;
+            for(auto& input_args : m_input_args)
+            {
+                input_args = null;
+            }
+            
+            prepareMessagesForText(parameter[0].getString());
         }
     }
     
@@ -73,7 +79,90 @@ namespace kiwi { namespace engine {
     {
         if (index == 0 && !args.empty())
         {
-            send(0, tool::AtomHelper::parse(m_text));;
+            if(!args[0].isBang())
+            {
+                for(size_t i = 0; i <= 9; i++)
+                {
+                    if(i < args.size())
+                    {
+                        m_input_args[i] = args[i];
+                    }
+                }
+            }
+            
+            sendMessages();
+        }
+    }
+    
+    void Message::prepareMessagesForText(std::string const& text)
+    {
+        static const int flags = (0
+                                  | tool::AtomHelper::ParsingFlags::Comma
+                                  | tool::AtomHelper::ParsingFlags::Dollar);
+        
+        auto atoms = tool::AtomHelper::parse(text, flags);
+        
+        m_messages.clear();
+        if(!atoms.empty())
+        {
+            std::vector<tool::Atom> atom_sequence;
+            bool dollar_flag = false;
+            
+            for(auto&& atom : atoms)
+            {
+                if(atom.isComma())
+                {
+                    if(!atom_sequence.empty())
+                    {
+                        m_messages.emplace_back(std::move(atom_sequence),
+                                                dollar_flag);
+                        atom_sequence.clear();
+                        dollar_flag = false;
+                    }
+                }
+                else
+                {
+                    if(atom.isDollar())
+                    {
+                        dollar_flag = true;
+                    }
+                    
+                    atom_sequence.emplace_back(std::move(atom));
+                }
+            }
+            
+            if(!atom_sequence.empty())
+            {
+                m_messages.emplace_back(std::move(atom_sequence),
+                                        dollar_flag);
+            }
+        }
+    }
+    
+    void Message::sendMessages()
+    {
+        for(auto const& message : m_messages)
+        {
+            if(message.has_dollar)
+            {
+                std::vector<tool::Atom> atoms = message.atoms;
+                
+                for(auto& atom : atoms)
+                {
+                    if(atom.isDollar())
+                    {
+                        const size_t index = atom.getDollarIndex() - 1;
+                        auto& atom_arg = m_input_args[index];
+                        atom = !atom_arg.isNull() ? atom_arg : 0;
+                    }
+                }
+                
+                send(0, atoms);
+            }
+            else
+            {
+                send(0, message.atoms);
+            }
         }
     }
     
