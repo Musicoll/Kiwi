@@ -54,13 +54,18 @@ namespace kiwi { namespace tool {
         using string_t  = std::string;
         
         //! @brief Enum of Atom value types
-        //! @see getType(), isNull(), isInt(), isFloat(), isNumber(), isString()
+        //! @see getType(), isNull(), isInt(), isFloat(), isNumber(), isString(), isComma(), isDollar()
         enum class Type : uint8_t
         {
-            Null        = 0,
-            Int         = 1,
-            Float       = 2,
-            String      = 3
+            // basic types:
+            Null = 0,
+            Int,
+            Float,
+            String,
+            
+            // special types:
+            Comma,
+            Dollar,
         };
         
         // ================================================================================ //
@@ -69,182 +74,79 @@ namespace kiwi { namespace tool {
         
         //! @brief Default constructor.
         //! @details Constructs an Atom of type Null.
-        Atom() noexcept :
-        m_type(Type::Null),
-        m_value()
-        {
-            ;
-        }
+        Atom() noexcept;
         
         //! @brief Constructs an int_t Atom.
         //! @details The integer value will be 1 or 0 depending on the bool value.
         //! @param value The value.
-        Atom(const bool value) noexcept :
-        m_type(Type::Int),
-        m_value(value ? int_t(1) : int_t(0))
-        {
-            ;
-        }
+        Atom(const bool value) noexcept;
         
         //! @brief Constructs an int_t Atom.
         //! @param value The value.
-        Atom(const int value) noexcept :
-        m_type(Type::Int),
-        m_value(static_cast<int_t>(value))
-        {
-            ;
-        }
+        Atom(const int value) noexcept;
         
         //! @brief Constructs an int_t Atom.
         //! @param value The value.
-        Atom(const long value) noexcept :
-        m_type(Type::Int),
-        m_value(static_cast<int_t>(value))
-        {
-            ;
-        }
+        Atom(const long value) noexcept;
         
         //! @brief Constructs an int_t Atom.
         //! @param value The value.
-        Atom(const long long value) noexcept :
-        m_type(Type::Int),
-        m_value(static_cast<int_t>(value))
-        {
-            ;
-        }
+        Atom(const long long value) noexcept;
         
         //! @brief Constructs a float_t Atom.
         //! @details infinty and NaN value both produce a Null Atom type.
         //! @param value The value.
-        Atom(const float value) noexcept :
-        m_type(Type::Float),
-        m_value(static_cast<float_t>(value))
-        {
-            ;
-        }
+        Atom(const float value) noexcept;
         
         //! @brief Constructs a float_t Atom.
         //! @details infinty and NaN value both produce a Null Atom type.
         //! @param value The value.
-        Atom(const double value) noexcept :
-        m_type(Type::Float),
-        m_value(static_cast<float_t>(value))
-        {
-            ;
-        }
+        Atom(const double value) noexcept;
         
         //! @brief Constructs a string_t Atom.
         //! @param sym The value.
-        Atom(string_t const& sym) :
-        m_type(Type::String),
-        m_value(sym)
-        {
-            ;
-        }
+        Atom(string_t const& sym);
         
         //! @brief Constructs a string_t Atom.
         //! @param sym The value.
-        Atom(string_t&& sym) :
-        m_type(Type::String),
-        m_value(std::move(sym))
-        {
-            ;
-        }
+        Atom(string_t&& sym);
         
         //! @brief Constructs a string_t Atom.
         //! @param sym The value.
-        Atom(char const* sym) :
-        m_type(Type::String),
-        m_value(std::move(std::string(sym)))
-        {
-            ;
-        }
+        Atom(char const* sym);
+        
+        //! @brief Constructs a Comma Atom.
+        static Atom Comma();
+        
+        //! @brief Constructs a Dollar Atom.
+        //! @param index must be between 1 and 9
+        //! @return A Dollar Atom or a Null Atom if out of range.
+        static Atom Dollar(int_t index);
         
         //! @brief Copy constructor.
         //! @details Constructs an Atom by copying the contents of an other Atom.
         //! @param other The other Atom.
-        Atom(Atom const& other) : m_type(other.m_type)
-        {
-            switch(m_type)
-            {
-                case Type::Int:     { m_value = other.m_value.int_v; break; }
-                case Type::Float:   { m_value = other.m_value.float_v; break; }
-                case Type::String:
-                {
-                    assert(other.m_value.string_v != nullptr);
-                    m_value = *other.m_value.string_v;
-                }
-                    
-                default: break;
-            }
-        }
+        Atom(Atom const& other);
         
         //! @brief Move constructor.
         //! @details Constructs an Atom value by stealing the contents of an other Atom
         //! using move semantics, leaving the other as a Null value Atom.
         //! @param other The other Atom value.
-        Atom(Atom&& other) :
-        m_type(std::move(other.m_type)),
-        m_value(std::move(other.m_value))
-        {
-            // leave the other as a Null value Atom
-            other.m_type = Type::Null;
-            other.m_value = {};
-        }
+        Atom(Atom&& other);
         
         //! @brief Destructor.
-        inline ~Atom()
-        {
-            if(isString())
-            {
-                std::allocator<string_t> alloc;
-                alloc.destroy(m_value.string_v);
-                alloc.deallocate(m_value.string_v, 1);
-            }
-        }
+        ~Atom();
         
         //! @brief Copy assigment operator.
         //! @details Copies an Atom value.
         //! @param other The Atom object to copy.
-        Atom& operator=(Atom const& other)
-        {
-            if(!other.isString())
-            {
-                if(isString())
-                {
-                    std::allocator<string_t> alloc;
-                    alloc.destroy(m_value.string_v);
-                    alloc.deallocate(m_value.string_v, 1);
-                }
-                
-                m_value = other.m_value;
-            }
-            else
-            {
-                if(isString())
-                {
-                    *m_value.string_v = *other.m_value.string_v;
-                }
-                else
-                {
-                    m_value.string_v = create_string_pointer(*other.m_value.string_v);
-                }
-            }
-            
-            m_type = other.m_type;
-            
-            return *this;
-        }
+        Atom& operator=(Atom const& other);
         
         //! @brief Copy assigment operator.
         //! @details Copies an Atom value with the "copy and swap" method.
         //! @param other The Atom object to copy.
-        Atom& operator=(Atom&& other) noexcept
-        {
-            std::swap(m_type, other.m_type);
-            std::swap(m_value, other.m_value);
-            return *this;
-        }
+        Atom& operator=(Atom&& other) noexcept;
+        
         // ================================================================================ //
         //                                   Type Getters                                   //
         // ================================================================================ //
@@ -252,32 +154,47 @@ namespace kiwi { namespace tool {
         //! @brief Get the type of the Atom.
         //! @return The Type of the atom as a Type.
         //! @see isNull(), isInt(), isFloat(), isNumber(), isString()
-        inline Type getType() const noexcept    { return m_type; }
+        Type getType() const noexcept;
         
         //! @brief Returns true if the Atom is Null.
         //! @return true if the Atom is Null.
         //! @see getType(), isInt(), isFloat(), isNumber(), isString()
-        inline bool isNull() const noexcept     { return (m_type == Type::Null); }
+        bool isNull() const noexcept;
         
         //! @brief Returns true if the Atom is an int_t.
         //! @return true if the Atom is an int_t.
         //! @see getType(), isNull(), isFloat(), isNumber(), isString()
-        inline bool isInt() const noexcept      { return m_type == Type::Int; }
+        bool isInt() const noexcept;
         
         //! @brief Returns true if the Atom is a float_t.
         //! @return true if the Atom is an float_t.
         //! @see getType(), isNull(), isInt(), isNumber(), isString()
-        inline bool isFloat() const noexcept    { return m_type == Type::Float; }
+        bool isFloat() const noexcept;
         
         //! @brief Returns true if the Atom is a bool, an int_t, or a float_t.
         //! @return true if the Atom is a bool, an int_t, or a float_t.
         //! @see getType(), isNull(), isInt(), isFloat(), isString()
-        inline bool isNumber() const noexcept   { return (isInt() || isFloat()); }
+        bool isNumber() const noexcept;
         
         //! @brief Returns true if the Atom is a string_t.
         //! @return true if the Atom is a string_t.
         //! @see getType(), isNull(), isInt(), isFloat(), isNumber()
-        inline bool isString() const noexcept   { return m_type == Type::String; }
+        bool isString() const noexcept;
+        
+        //! @brief Returns true if the Atom is a string_t that contains the special "bang" keyword.
+        //! @return true if the Atom is a string_t that contains the special "bang" keyword.
+        //! @see getType(), isNull(), isInt(), isFloat(), isString()
+        bool isBang() const;
+        
+        //! @brief Returns true if the Atom is an comma_t.
+        //! @return true if the Atom is a comma_t.
+        //! @see getType(), isNull(), isInt(), isFloat(), isNumber(), isString()
+        bool isComma() const noexcept;
+        
+        //! @brief Returns true if the Atom is a dollar or a dollar typed.
+        //! @return true if the Atom is a dollar_t.
+        //! @see getType(), isNull(), isInt(), isFloat(), isNumber(), isString()
+        bool isDollar() const noexcept;
         
         // ================================================================================ //
         //                                   Value Getters                                  //
@@ -286,49 +203,22 @@ namespace kiwi { namespace tool {
         //! @brief Retrieves the Atom value as an int_t value.
         //! @return The current integer atom value if it is a number otherwise 0.
         //! @see getType(), isNumber(), isInt(), getFloat()
-        int_t getInt() const noexcept
-        {
-            if(isInt())
-            {
-                return m_value.int_v;
-            }
-            else if(isFloat())
-            {
-                return static_cast<int_t>(m_value.float_v);
-            }
-            
-            return int_t(0);
-        }
+        int_t getInt() const noexcept;
         
         //! @brief Retrieves the Atom value as a float_t value.
         //! @return The current floating-point atom value if it is a number otherwise 0.0.
         //! @see getType(), isNumber(), isFloat(), getInt()
-        float_t getFloat() const noexcept
-        {
-            if(isFloat())
-            {
-                return m_value.float_v;
-            }
-            else if(isInt())
-            {
-                return static_cast<float_t>(m_value.int_v);
-            }
-            
-            return float_t(0.0);
-        }
+        float_t getFloat() const noexcept;
         
         //! @brief Retrieves the Atom value as a string_t value.
         //! @return The current string atom value if it is a string otherwise an empty string.
         //! @see getType(), isString(), getInt(), getFloat()
-        string_t getString() const
-        {
-            if(isString())
-            {
-                return *m_value.string_v;
-            }
-            
-            return string_t();
-        }
+        string_t const& getString() const;
+        
+        //! @brief Retrieves the Dollar index value if the Atom is a dollar type.
+        //! @return The Dollar index if the Atom is a dollar, 0 otherwise.
+        //! @see getType(), isDollar(), isDollarTyped()
+        int_t getDollarIndex() const;
         
     private: // methods
         
@@ -337,23 +227,9 @@ namespace kiwi { namespace tool {
         // ================================================================================ //
         
         //! @internal Exception-safe object creation helper
-        static string_t* create_string_pointer(string_t const& v)
-        {
-            std::allocator<string_t> alloc;
-            auto deleter = [&alloc](string_t * object) { alloc.deallocate(object, 1); };
-            std::unique_ptr<string_t, decltype(deleter)> object(alloc.allocate(1), deleter);
-            alloc.construct(object.get(), v);
-            return object.release();
-        }
+        static string_t* create_string_pointer(string_t const& v);
         
-        static string_t* create_string_pointer(string_t&& v)
-        {
-            std::allocator<string_t> alloc;
-            auto deleter = [&alloc](string_t * object) { alloc.deallocate(object, 1); };
-            std::unique_ptr<string_t, decltype(deleter)> object(alloc.allocate(1), deleter);
-            alloc.construct(object.get(), std::move(v));
-            return object.release();
-        }
+        static string_t* create_string_pointer(string_t&& v);
         
         //! @internal The actual storage union for an Atom value.
         union atom_value
@@ -393,265 +269,41 @@ namespace kiwi { namespace tool {
     };
     
     // ================================================================================ //
-    //                                  STRING HELPER                                   //
-    // ================================================================================ //
-    
-    //! @brief An std::string helper class.
-    struct StringHelper
-    {
-        //! @brief unescape a string
-        static std::string unescape(std::string const& text)
-        {
-            bool state = false;
-            std::ostringstream ss;
-            for(const auto& iter : text)
-            {
-                if(state)
-                {
-                    switch(iter)
-                    {
-                        case '"': ss << '\"'; break;
-                        case '/': ss << '/'; break;
-                        case 'b': ss << '\b'; break;
-                        case 'f': ss << '\f'; break;
-                        case 'n': ss << '\n'; break;
-                        case 'r': ss << '\r'; break;
-                        case 't': ss << '\t'; break;
-                        case '\\': ss << '\\'; break;
-                        default: ss << iter; break;
-                    }
-                    state = false;
-                }
-                else
-                {
-                    switch(iter)
-                    {
-                        case '"':   { return ss.str(); }
-                        case '\\':  { state = true; break; }
-                        default:    { ss << iter; break; }
-                    }
-                }
-            }
-            return ss.str();
-        }
-    };
-    
-    // ================================================================================ //
     //                                    ATOM HELPER                                   //
     // ================================================================================ //
     
     //! @brief An Atom helper class.
     struct AtomHelper
     {
-        //! @brief Parse a string into a vector of atoms.
-        //! @details Parse a string into a vector of atoms.
-        //! @param text The string to parse.
-        //! @return The vector of atoms.
-        //! @remark For example, the string : "foo \"bar 42\" 1 2 3.14" will parsed into a vector of 5 atoms.
-        //! The atom types will be determined automatically as 2 #Atom::Type::TAG atoms, 2 #Atom::Type::LONG atoms, and 1 #Atom::Type::DOUBLE atom.
-        static std::vector<Atom> parse(std::string const& text)
-        {
-            std::vector<Atom> atoms;
-            const auto textlen = text.length();
-            auto pos = text.find_first_not_of(' ', 0);
-            
-            while(pos < textlen)
-            {
-                std::string word;
-                word.reserve(20);
-                bool is_tag      = false;
-                bool is_number   = false;
-                bool is_float    = false;
-                bool is_negative = false;
-                bool is_quoted   = false;
-                
-                while(pos < textlen)
-                {
-                    const char c = text[pos];
-                    
-                    if(c == ' ')
-                    {
-                        if(!is_quoted)
-                        {
-                            // preserve white space in quoted tags, otherwise skip them
-                            if(word.empty())
-                            {
-                                pos++;
-                                continue;
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    else if(c == '\"')
-                    {
-                        // closing quote
-                        if(is_quoted)
-                        {
-                            pos++;
-                            break;
-                        }
-                        
-                        // opening quote
-                        if(word.empty())
-                        {
-                            pos++;
-                            
-                            // ignore if it can not be closed
-                            if(text.find_first_of('\"', pos) != std::string::npos)
-                                is_quoted = is_tag = true;
-                            
-                            continue;
-                        }
-                    }
-                    else if(!is_tag)
-                    {
-                        if(word.empty() && c == '-')
-                        {
-                            is_negative = true;
-                        }
-                        else if(!is_float && (word.empty() || is_number || is_negative) && c == '.')
-                        {
-                            is_float = true;
-                        }
-                        else if(isdigit(c) && (is_number || (word.empty() || is_negative || is_float)))
-                        {
-                            is_number = true;
-                        }
-                        else
-                        {
-                            is_tag = true;
-                            is_number = is_negative = is_float = false;
-                        }
-                    }
-                    
-                    word += c;
-                    pos++;
-                }
-                
-                if(!word.empty())
-                {
-                    if(is_number)
-                    {
-                        if(is_float)
-                        {
-                            atoms.emplace_back(std::stod(word.c_str()));
-                        }
-                        else
-                        {
-                            long value = 0;
-                            try
-                            {
-                                value = std::stol(word.c_str());
-                            }
-                            catch(std::out_of_range const& err)
-                            {
-                                // print error here
-                            }
-                            catch(std::invalid_argument const& err)
-                            {
-                                // print error here
-                            }
-                            
-                            atoms.emplace_back(value);
-                        }
-                    }
-                    else
-                    {
-                        atoms.emplace_back(StringHelper::unescape(word));
-                    }
-                }
-            }
-            
-            return atoms;
-        }
+        struct ParsingFlags { enum Flags {
+            Comma = 0x01,
+            Dollar = 0x02,
+        }; };
         
-        static std::string trimDecimal(std::string& text)
-        {
-            std::string::size_type pos = text.find('.');
-            
-            if(pos != std::string::npos)
-            {
-                std::string::size_type size = text.size();
-                while(size > pos && text[size - 1] == '0')
-                {
-                    text.pop_back();
-                    size--;
-                }
-            }
-            
-            return text;
-        }
+        //! @brief Parse a string into a vector of atoms.
+        //! @param text The string to parse.
+        //! @param flags The flags as a set of #ParsingFlags.
+        //! @return The vector of atoms.
+        //! @details The parsing method can be altered by the #ParsingFlags \flags passed as parameter.
+        //! If the ParsingFlags::Comma flag is set, it will create a Comma atom type
+        //! for each ',' char of the string (except if the text is in double quotes)
+        //! If the ParsingFlags::Dollar flag is set, it will create a Dollar atom type
+        //! for each '$' char followed by a digit between 1 and 9.
+        //! @example The string : "foo \"bar 42\" 1 -2 3.14" will be parsed into a vector of 5 Atom.
+        //! The atom types will be determined automatically as :
+        //! 2 #Atom::Type::String, 2 #Atom::Type::Int, and 1 #Atom::Type::Float.
+        static std::vector<Atom> parse(std::string const& text, int flags = 0);
         
         //! @brief Convert an Atom into a string.
-        static std::string toString(Atom const& atom)
-        {
-            std::string output;
-            if(atom.isInt())
-            {
-                output += std::to_string(atom.getInt());
-            }
-            else if(atom.isFloat())
-            {
-                std::string str = std::to_string(atom.getFloat());
-                output += trimDecimal(str);
-            }
-            else if(atom.isString())
-            {
-                output += atom.getString();
-            }
-            
-            return output;
-        }
+        static std::string toString(Atom const& atom, const bool add_quotes = true);
         
         //! @brief Convert a vector of Atom into a string.
-        static std::string toString(std::vector<Atom> const& atoms, const char delimiter = ' ')
-        {
-            std::string output;
-            if(!atoms.empty())
-            {
-                for(std::vector<Atom>::size_type i = 0; i < atoms.size();)
-                {
-                    output += toString(atoms[i]);
-                    if(++i != atoms.size())
-                    {
-                        output += delimiter;
-                    }
-                }
-            }
-            
-            return output;
-        }
+        //! @details This method will call the toString static method for each atom
+        //! of the vector and output a whitespace between each one
+        //! (except for the special Atom::Type::Comma that is stuck to the previous Atom).
+        static std::string toString(std::vector<Atom> const& atoms, const bool add_quotes = true);
         
-        //! @brief Convert a vector of Atom into a string.
-        static std::string toJsonString(std::vector<Atom> const& atoms)
-        {
-            std::string output;
-            if(!atoms.empty())
-            {
-                if(atoms.size() == 1)
-                {
-                    output += toString(atoms[0]);
-                }
-                else
-                {
-                    output += '[';
-                    for(std::vector<Atom>::size_type i = 0; i < atoms.size();)
-                    {
-                        output += toString(atoms[i]);
-                        if(++i != atoms.size())
-                        {
-                            output += ", ";
-                        }
-                    }
-                    output += ']';
-                }
-            }
-            
-            return output;
-        }
+        static std::string trimDecimal(std::string const& text);
     };
     
 }}
