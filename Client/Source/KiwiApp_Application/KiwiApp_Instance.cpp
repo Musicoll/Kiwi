@@ -465,13 +465,13 @@ namespace kiwi
             auto device_selector =
             std::make_unique<juce::AudioDeviceSelectorComponent>(manager,
                                                                  1, 20, 1, 20,
-                                                                 false, false, false, true);
+                                                                 false, false, false, false);
             
             device_selector->setSize(300, 300);
             
             return std::make_unique<Window>("Audio Settings",
                                             std::move(device_selector),
-                                            false, false, "audio_settings_window");
+                                            true, false, "audio_settings_window");
         });
     }
     
