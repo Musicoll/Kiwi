@@ -102,8 +102,6 @@ namespace kiwi
     
     void ObjectView::drawOutline(juce::Graphics & g)
     {
-        juce::Rectangle<int> outline = getOutline();
-        
         g.drawRect(getOutline(), m_border_size);
     }
     

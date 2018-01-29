@@ -62,35 +62,19 @@ namespace kiwi { namespace model {
         }
         else if (is_inlet)
         {
-            std::vector<tool::Atom> const& args = getArguments();
+            auto const& args = getArguments();
             
-            std::string type = "";
-            
-            switch (args[index].getType())
-            {
-                case tool::Atom::Type::Float:
+            const std::string type_str = [atom = args[index]]() {
+                switch(atom.getType())
                 {
-                    type = "float";
-                    break;
+                    case tool::Atom::Type::Int: return "int";
+                    case tool::Atom::Type::Float: return "float";
+                    case tool::Atom::Type::String: return "symbol";
+                    default: return "null";
                 }
-                case tool::Atom::Type::Int:
-                {
-                    type = "int";
-                    break;
-                }
-                case tool::Atom::Type::String:
-                {
-                    type = "symbol";
-                    break;
-                }
-                case tool::Atom::Type::Null:
-                {
-                    type = "void";
-                    break;
-                }
-            }
-            
-            return type + "to be element" + std::to_string(index + 1) + " int list";
+            }();
+
+            return type_str + " atom " + std::to_string(index + 1) + " in list";
         }
         
         return {};

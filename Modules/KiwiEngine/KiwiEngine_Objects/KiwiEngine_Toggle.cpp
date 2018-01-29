@@ -76,7 +76,7 @@ namespace kiwi { namespace engine {
             {
                 if(args[0].isString())
                 {
-                    if (args[0].getString() == "bang")
+                    if (args[0].isBang())
                     {
                         send(0, {!m_is_on});
                         setParameter("value", tool::Parameter(tool::Parameter::Type::Int, {!m_is_on}));

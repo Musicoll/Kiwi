@@ -65,7 +65,7 @@ namespace kiwi { namespace engine {
     {
         if (index == 0)
         {
-            if (args[0].isString() && args[0].getString() == "bang")
+            if (args[0].isBang())
             {
                 send(0, {m_random_distribution(m_random_generator)});
             }

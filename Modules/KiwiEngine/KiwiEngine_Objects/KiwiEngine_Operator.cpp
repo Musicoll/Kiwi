@@ -54,7 +54,7 @@ namespace kiwi { namespace engine {
                     m_lhs = args[0].getFloat();
                     bang();
                 }
-                else if(args[0].getString() == "bang")
+                else if(args[0].isBang())
                 {
                     bang();
                 }

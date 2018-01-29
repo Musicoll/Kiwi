@@ -64,33 +64,17 @@ namespace kiwi { namespace model {
         {
             std::vector<tool::Atom> const& args = getArguments();
             
-            std::string type = "";
+            const std::string type_str = [atom = args[index]]() {
+                switch(atom.getType())
+                {
+                    case tool::Atom::Type::Int: return "int";
+                    case tool::Atom::Type::Float: return "float";
+                    case tool::Atom::Type::String: return "symbol";
+                    default: return "null";
+                }
+            }();
             
-            switch (args[index].getType())
-            {
-                case tool::Atom::Type::Float:
-                {
-                    type = "float";
-                    break;
-                }
-                case tool::Atom::Type::Int:
-                {
-                    type = "int";
-                    break;
-                }
-                case tool::Atom::Type::String:
-                {
-                    type = "symbol";
-                    break;
-                }
-                case tool::Atom::Type::Null:
-                {
-                    type = "void";
-                    break;
-                }
-            }
-            
-            return "element " + std::to_string(index + 1) + " in list of type " + type;
+            return "element " + std::to_string(index + 1) + " in list (" + type_str + ")";
         }
 
         

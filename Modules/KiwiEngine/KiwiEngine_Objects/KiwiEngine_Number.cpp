@@ -76,7 +76,7 @@ namespace kiwi { namespace engine {
             }
             else if (args[0].isString())
             {
-                if (args[0].getString() == "bang")
+                if (args[0].isBang())
                 {
                     outputValue();
                 }

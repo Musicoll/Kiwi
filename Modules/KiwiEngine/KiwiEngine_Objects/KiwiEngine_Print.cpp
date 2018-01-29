@@ -71,7 +71,8 @@ namespace kiwi { namespace engine {
     {
         if(!args.empty())
         {
-            post(m_name + " \xe2\x80\xa2 " + tool::AtomHelper::toString(args));
+            // do not include quotes in printed atoms
+            post(m_name + " \xe2\x80\xa2 " + tool::AtomHelper::toString(args, false));
         }
     }
     
