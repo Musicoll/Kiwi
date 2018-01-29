@@ -166,6 +166,7 @@ namespace kiwi
                                                   binary_data::images::users_png_size))
     , m_flash_alpha(0.f)
     {
+        updateUsers();
         m_patcher_manager.addListener(*this);
     }
     
@@ -174,36 +175,46 @@ namespace kiwi
         m_patcher_manager.removeListener(*this);
     }
     
+    void PatcherToolbar::UsersItemComponent::updateUsers()
+    {
+        m_user_nb = m_patcher_manager.getNumberOfUsers();
+        
+        startFlashing();
+        
+        auto success = [this](Api::Users users)
+        {
+            KiwiApp::useInstance().useScheduler().schedule([this, users]()
+            {
+                m_users.clear();
+                
+                for(Api::User const& user : users)
+                {
+                    m_users.push_back(user.getName());
+                    
+                }
+                
+            });
+        };
+        
+        auto fail = [this](Api::Error error)
+        {
+            KiwiApp::useInstance().useScheduler().schedule([this, error]()
+            {
+                m_users.clear();
+                
+            });
+        };
+        
+        KiwiApp::useApi().getUsers(m_patcher_manager.getConnectedUsers(), success, fail);
+    }
+    
     void PatcherToolbar::UsersItemComponent::connectedUserChanged(PatcherManager& manager)
     {
         if(&manager == &m_patcher_manager)
         {
-            m_user_nb = manager.getNumberOfUsers();
+            updateUsers();
             
             startFlashing();
-            
-            auto success = [this](Api::Users users)
-            {
-                KiwiApp::useInstance().useScheduler().schedule([this, users]()
-                {
-                    m_users.clear();
-                    
-                    for(Api::User const& user : users)
-                    {
-                        m_users.push_back(user.getName());
-                    }
-                });
-            };
-            
-            auto fail = [this](Api::Error error)
-            {
-                KiwiApp::useInstance().useScheduler().schedule([this, error]()
-                {
-                    m_users.clear();
-                });
-            };
-            
-            KiwiApp::useApi().getUsers(m_patcher_manager.getConnectedUsers(), success, fail);
         }
     }
     

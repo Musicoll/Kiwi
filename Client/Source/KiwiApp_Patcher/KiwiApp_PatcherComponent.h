@@ -102,6 +102,9 @@ namespace kiwi
         //! @brief Called when one or more users are connecting or disconnecting to the Patcher Document.
         void connectedUserChanged(PatcherManager& manager) override;
         
+        //! @brief Call to update the number of users displayed and user names.
+        void updateUsers();
+        
         //! @brief Provides prefered size for this item.
         bool getToolbarItemSizes(int toolbarDepth, bool isVertical,
                                  int& preferredSize, int& minSize, int& maxSize) override;
