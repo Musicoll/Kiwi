@@ -51,7 +51,8 @@ namespace kiwi { namespace engine {
     
     void Pack::receive(size_t index, std::vector<tool::Atom> const& args)
     {
-        if (args[0].getString() != "bang")
+        const bool is_bang = args[0].isBang();
+        if (!is_bang)
         {
             switch (m_list[index].getType())
             {
@@ -70,14 +71,11 @@ namespace kiwi { namespace engine {
                     m_list[index] = args[0].getString();
                     break;
                 }
-                case tool::Atom::Type::Null:
-                {
-                    break;
-                }
+                default: break;
             }
         }
         
-        if (index == 0 && args[0].isString() && args[0].getString() == "bang")
+        if (index == 0 && is_bang)
         {
             output_list();
         }

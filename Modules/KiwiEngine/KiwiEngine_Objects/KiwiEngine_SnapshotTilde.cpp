@@ -48,7 +48,7 @@ namespace kiwi { namespace engine {
     {
         if (index == 0 && !args.empty())
         {
-            if(args[0].getString() == "bang")
+            if(args[0].isBang())
             {
                 send(0, {m_value.load()});
             }

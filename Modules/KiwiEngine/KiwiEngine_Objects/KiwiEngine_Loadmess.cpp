@@ -46,7 +46,7 @@ namespace kiwi { namespace engine {
     
     void Loadmess::receive(size_t index, std::vector<tool::Atom> const& args)
     {
-        if (!args.empty() && args[0].isString() && args[0].getString() == "bang")
+        if (!args.empty() && args[0].isBang())
         {
             send(0ul, m_args);
         }

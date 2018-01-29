@@ -69,7 +69,7 @@ namespace kiwi
             {
                 if (index == 0)
                 {
-                    if(args[0].isString() && args[0].getString() == "bang")
+                    if(args[0].isBang())
                     {
                         getScheduler().schedule(m_task, m_delay);
                     }

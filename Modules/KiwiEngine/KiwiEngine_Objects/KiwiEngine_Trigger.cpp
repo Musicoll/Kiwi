@@ -103,56 +103,6 @@ namespace kiwi { namespace engine {
         }
         
         return triggers;
-            
-            /*
-            trigger_fn_t test = trigger_fn_factory(atom);
-            
-            triggers.emplace_back([atom](std::vector<Atom> const& args) {
-                
-                if(atom.isNumber())
-                {
-                    const auto value = atom.isInt() ? atom.getInt() : atom.getFloat();
-                    return std::vector<Atom>{{value}};
-                }
-                
-                const auto str = atom.getString();
-                
-                if(str.empty())
-                {
-                   return std::vector<Atom>();
-                }
-                
-                if(str == "b" || str == "bang")
-                {
-                    return std::vector<Atom>{{"bang"}};
-                }
-                
-                if(str == "i" || str == "int")
-                {
-                    return std::vector<Atom>{{args[0].getInt()}};
-                }
-                
-                if(str == "f" || str == "float")
-                {
-                    return std::vector<Atom>{{args[0].getFloat()}};
-                }
-                
-                if(str == "s" || str == "symbol")
-                {
-                    return args;
-                }
-                
-                if(str == "l" || str == "list")
-                {
-                    return args;
-                }
-                
-                return std::vector<Atom>{{str}};
-                
-            });
-         
-        }
-             */
     }
     
     void Trigger::receive(size_t, std::vector<tool::Atom> const& args)

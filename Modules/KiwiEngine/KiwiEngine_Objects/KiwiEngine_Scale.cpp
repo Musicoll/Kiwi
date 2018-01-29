@@ -73,7 +73,7 @@ namespace kiwi { namespace engine {
                 m_value = args[0].getFloat();
                 send(0, {scaleValue()});
             }
-            else if (args[0].isString() && args[0].getString() == "bang")
+            else if (args[0].isBang())
             {
                 send(0, {scaleValue()});
             }

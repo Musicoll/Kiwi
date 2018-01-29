@@ -88,7 +88,7 @@ namespace kiwi { namespace engine {
                     setParameter("value", tool::Parameter(tool::Parameter::Type::Float, {args[1].getFloat()}));
                 }
             }
-            else if (args[0].isString() && args[0].getString() == "bang")
+            else if (args[0].isBang())
             {
                 send(0, {m_value});
             }
