@@ -64,7 +64,7 @@ namespace kiwi { namespace model {
             throw Error("receive requires only one argument");
         }
         
-        if (args.size() ==  1 && args[0].isString())
+        if (args.size() ==  1 && !args[0].isString())
         {
             throw Error("receive argument must be a symbol");
         }
