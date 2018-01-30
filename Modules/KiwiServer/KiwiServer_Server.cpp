@@ -148,7 +148,7 @@ namespace kiwi
             {
                 juce::File session_file = getSessionFile(port.session());
                 
-                m_logger.log("[server] - creating new session for session_id : " + hexadecimal_convert(session_id));
+                m_logger.log("creating new session for session_id : " + hexadecimal_convert(session_id));
                 
                 auto session = m_sessions
                 .insert(std::make_pair(session_id,
@@ -156,11 +156,11 @@ namespace kiwi
                 
                 if (session_file.exists())
                 {
-                    m_logger.log("[server] - loading session file for session_id : " + hexadecimal_convert(session_id));
+                    m_logger.log("loading session file for session_id : " + hexadecimal_convert(session_id));
                     
                     if (!(*session.first).second.load())
                     {
-                        m_logger.log("[server] - opening document document session : "
+                        m_logger.log("opening document document session : "
                                             + hexadecimal_convert(session_id) + " failed");
                         
                         m_sessions.erase(session_id);
@@ -258,7 +258,15 @@ namespace kiwi
                 juce::FileLogger::trimFileSize(m_jlogger.getLogFile(), m_limit);
             }
             
-            m_jlogger.logMessage(message);
+            std::string timestamp(juce::Time::getCurrentTime().toISO8601(true).toStdString());
+            
+            std::string log = "[server] - ";
+            
+            log.append(timestamp);
+            log.append(" ");
+            log.append(message.toStdString());
+            
+            m_jlogger.logMessage(log);
         }
         
         // ================================================================================ //
@@ -380,7 +388,7 @@ namespace kiwi
         
         void Server::Session::bind(flip::PortBase & port)
         {
-            m_logger.log("[server] - User: " + std::to_string(port.user())
+            m_logger.log("User: " + std::to_string(port.user())
                                 + " connecting to session : " + hexadecimal_convert(m_identifier));
             
             if (authenticateUser(port.user(), port.metadata()))
@@ -426,7 +434,7 @@ namespace kiwi
             }
             else
             {
-                m_logger.log("[server] - User: " + std::to_string(port.user())
+                m_logger.log("User: " + std::to_string(port.user())
                                     + " failed to authenticate : "
                                     + "metadata : " + port.metadata());
                 
@@ -436,7 +444,7 @@ namespace kiwi
         
         void Server::Session::unbind(flip::PortBase & port)
         {
-            m_logger.log("[server] - User " + std::to_string(port.user())
+            m_logger.log("User " + std::to_string(port.user())
                                 + " disconnecting from session" + hexadecimal_convert(m_identifier));
             
             std::set<flip::PortBase*> ports = m_document->ports();
@@ -460,13 +468,13 @@ namespace kiwi
                         m_backend_file.create();
                     }
                     
-                    m_logger.log("[server] - Saving session : " + hexadecimal_convert(m_identifier)
+                    m_logger.log("saving session : " + hexadecimal_convert(m_identifier)
                                         + " in file : " + m_backend_file.getFileName());
                     
                     if (!save())
                     {
-                        m_logger.log("[server] - saving session to "
-                                            + m_backend_file.getFileName() + " failed");
+                        m_logger.log("saving session to "
+                                     + m_backend_file.getFileName() + " failed");
                     }
                 }
             }
