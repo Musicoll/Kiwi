@@ -55,7 +55,7 @@ namespace kiwi
         m_windows.resize(std::size_t(WindowId::count));
         
         //showAppSettingsWindow();
-        showBeaconDispatcherWindow();
+        //showBeaconDispatcherWindow();
         showDocumentBrowserWindow();
         showConsoleWindow();
     }
