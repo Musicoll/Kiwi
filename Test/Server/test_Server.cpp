@@ -260,5 +260,12 @@ TEST_CASE("Server - Server", "[Server, Server]")
         {
             backend.deleteRecursively();
         }
+        
+        SECTION("Hexadecimal convert")
+        {
+            std::string hex = server::hexadecimal_convert(139928974906665000);
+            
+            CHECK(hex == "01f120a94b18a828");
+        }
     }
 }

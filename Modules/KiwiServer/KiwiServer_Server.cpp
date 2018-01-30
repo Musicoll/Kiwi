@@ -33,6 +33,8 @@
 #include <KiwiModel/KiwiModel_Def.h>
 #include <KiwiModel/KiwiModel_Converters/KiwiModel_Converter.h>
 
+#include <iomanip>
+
 namespace kiwi
 {
     namespace server
@@ -46,7 +48,7 @@ namespace kiwi
         std::string hexadecimal_convert(uint64_t hexa_decimal)
         {
             std::stringstream converter;
-            converter << std::hex << hexa_decimal;
+            converter << std::setfill('0') << std::setw(16) << std::hex << hexa_decimal;
             
             return converter.str();
         }
