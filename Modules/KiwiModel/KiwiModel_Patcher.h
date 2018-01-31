@@ -111,6 +111,9 @@ namespace kiwi
             //! @brief Gets the users.
             Users& getUsers() noexcept;
             
+            //! @brief Returns true if current user is already in added to the document.
+            bool hasSelfUser() const;
+            
             //! @brief Returns the current User.
             //! @details The function will look for a User that match
             //! the current user id of the document, if it's not found, the User will be created,

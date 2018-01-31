@@ -44,7 +44,7 @@ namespace kiwi { namespace model {
             throw Error("operator~ too many arguments");
         }
         
-        if (args.size() == 1 && args[0].isNumber())
+        if (args.size() == 1 && !args[0].isNumber())
         {
             throw Error("operator~ argument must be a number");
         }

@@ -617,11 +617,14 @@ namespace kiwi
     
     void PatcherManager::updateTitleBars()
     {
-        flip::Collection<model::Patcher::View> & views = getPatcher().useSelfUser().getViews();
-        
-        for(auto & view : views)
+        if (getPatcher().hasSelfUser())
         {
-            updateTitleBar(view);
+            flip::Collection<model::Patcher::View> & views = getPatcher().useSelfUser().getViews();
+            
+            for(auto & view : views)
+            {
+                updateTitleBar(view);
+            }
         }
     }
     

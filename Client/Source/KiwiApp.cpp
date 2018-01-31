@@ -121,6 +121,10 @@ namespace kiwi
         m_command_manager->registerAllCommandsForTarget(this);
         
         checkLatestRelease();
+
+        #if JUCE_WINDOWS
+        m_instance->openFile(juce::File(commandLine.unquoted()));
+        #endif
         
         #if JUCE_MAC
         juce::PopupMenu macMainMenuPopup;

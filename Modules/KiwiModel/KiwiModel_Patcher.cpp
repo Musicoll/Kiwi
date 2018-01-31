@@ -266,6 +266,18 @@ namespace kiwi
             return m_users;
         }
         
+        bool Patcher::hasSelfUser() const
+        {
+            auto it = std::find_if(m_users.begin(), m_users.end(),
+                                   [self_id = document().user()](User const& user)
+            {
+                return (user.getId() == self_id);
+                
+            });
+            
+            return it != m_users.end();
+        }
+        
         Patcher::User& Patcher::useSelfUser()
         {
             auto it = std::find_if(m_users.begin(), m_users.end(),

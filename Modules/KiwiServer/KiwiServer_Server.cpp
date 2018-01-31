@@ -33,6 +33,8 @@
 #include <KiwiModel/KiwiModel_Def.h>
 #include <KiwiModel/KiwiModel_Converters/KiwiModel_Converter.h>
 
+#include <iomanip>
+
 namespace kiwi
 {
     namespace server
@@ -46,7 +48,7 @@ namespace kiwi
         std::string hexadecimal_convert(uint64_t hexa_decimal)
         {
             std::stringstream converter;
-            converter << std::hex << hexa_decimal;
+            converter << std::setfill('0') << std::setw(16) << std::hex << hexa_decimal;
             
             return converter.str();
         }
@@ -62,7 +64,11 @@ namespace kiwi
         m_kiwi_version(kiwi_version),
         m_sessions(),
         m_socket(*this, port),
-        m_ports()
+        m_ports(),
+        m_logger(m_backend_directory.getChildFile("log.txt"),
+                 "server port: " + std::to_string(port)
+                 + " server model version: " + KIWI_MODEL_VERSION_STRING
+                 + " server kiwi version: " + m_kiwi_version)
         {
             if (m_backend_directory.exists() && !m_backend_directory.isDirectory())
             {
@@ -144,19 +150,20 @@ namespace kiwi
             {
                 juce::File session_file = getSessionFile(port.session());
                 
-                DBG("[server] - creating new session for session_id : " << hexadecimal_convert(session_id));
+                m_logger.log("creating new session for session_id : " + hexadecimal_convert(session_id));
                 
                 auto session = m_sessions
                 .insert(std::make_pair(session_id,
-                                       Session(session_id, session_file, m_open_token, m_kiwi_version)));
+                                       Session(session_id, session_file, m_open_token, m_kiwi_version, m_logger)));
                 
                 if (session_file.exists())
                 {
-                    DBG("[server] - loading session file for session_id : " << hexadecimal_convert(session_id));
+                    m_logger.log("loading session file for session_id : " + hexadecimal_convert(session_id));
                     
                     if (!(*session.first).second.load())
                     {
-                        DBG("[server] - opening document document session : " << hexadecimal_convert(session_id) << " failed");
+                        m_logger.log("opening document document session : "
+                                            + hexadecimal_convert(session_id) + " failed");
                         
                         m_sessions.erase(session_id);
                         
@@ -233,6 +240,38 @@ namespace kiwi
         }
         
         // ================================================================================ //
+        //                                   SERVER LOGGER                                  //
+        // ================================================================================ //
+        
+        Server::Logger::Logger(juce::File const& file, juce::String const& welcome):
+        m_limit(10 * 1000 * 1000), // 10 Mo
+        m_jlogger(file, welcome, m_limit)
+        {
+        }
+        
+        Server::Logger::~Logger()
+        {
+        }
+        
+        void Server::Logger::log(juce::String const& message)
+        {
+            if (m_jlogger.getLogFile().getSize() > m_limit)
+            {
+                juce::FileLogger::trimFileSize(m_jlogger.getLogFile(), m_limit);
+            }
+            
+            std::string timestamp(juce::Time::getCurrentTime().toISO8601(true).toStdString());
+            
+            std::string log = "[server] - ";
+            
+            log.append(timestamp);
+            log.append(" ");
+            log.append(message.toStdString());
+            
+            m_jlogger.logMessage(log);
+        }
+        
+        // ================================================================================ //
         //                                   SERVER SESSION                                 //
         // ================================================================================ //
         
@@ -244,6 +283,7 @@ namespace kiwi
         , m_backend_file(std::move(other.m_backend_file))
         , m_token(other.m_token)
         , m_kiwi_version(other.m_kiwi_version)
+        , m_logger(other.m_logger)
         {
             ;
         }
@@ -251,7 +291,8 @@ namespace kiwi
         Server::Session::Session(uint64_t identifier,
                                  juce::File const& backend_file,
                                  std::string const& token,
-                                 std::string const& kiwi_version)
+                                 std::string const& kiwi_version,
+                                 Server::Logger & logger)
         : m_identifier(identifier)
         , m_validator(new model::PatcherValidator())
         , m_document(new flip::DocumentServer(model::DataModel::use(), *m_validator, m_identifier))
@@ -259,6 +300,7 @@ namespace kiwi
         , m_backend_file(backend_file)
         , m_token(token)
         , m_kiwi_version(kiwi_version)
+        , m_logger(logger)
         {
             model::Patcher& patcher = m_document->root<model::Patcher>();
             
@@ -285,13 +327,22 @@ namespace kiwi
             return m_identifier;
         }
         
-        void Server::Session::save() const
-        {
+        bool Server::Session::save() const
+        {   
             flip::BackEndIR backend(m_document->write());
             
             flip::DataConsumerFile consumer(m_backend_file.getFullPathName().toStdString().c_str());
             
-            backend.write<flip::BackEndBinary>(consumer);
+            try
+            {
+                backend.write<flip::BackEndBinary>(consumer);
+            }
+            catch(...)
+            {
+                return false;
+            }
+            
+            return true;
         }
         
         bool Server::Session::load()
@@ -339,10 +390,8 @@ namespace kiwi
         
         void Server::Session::bind(flip::PortBase & port)
         {
-            DBG("[server] - User: "
-                << std::to_string(port.user())
-                << " connecting to session : "
-                << hexadecimal_convert(m_identifier));
+            m_logger.log("User: " + std::to_string(port.user())
+                                + " connecting to session : " + hexadecimal_convert(m_identifier));
             
             if (authenticateUser(port.user(), port.metadata()))
             {
@@ -387,14 +436,18 @@ namespace kiwi
             }
             else
             {
+                m_logger.log("User: " + std::to_string(port.user())
+                                    + " failed to authenticate : "
+                                    + "metadata : " + port.metadata());
+                
                 throw std::runtime_error("authentication failed");
             }
         }
         
         void Server::Session::unbind(flip::PortBase & port)
         {
-            DBG("[server] - User " << std::to_string(port.user())
-                << " disconnecting from session: " << hexadecimal_convert(m_identifier));
+            m_logger.log("User " + std::to_string(port.user())
+                                + " disconnecting from session" + hexadecimal_convert(m_identifier));
             
             std::set<flip::PortBase*> ports = m_document->ports();
             
@@ -417,11 +470,14 @@ namespace kiwi
                         m_backend_file.create();
                     }
                     
-                    DBG("[server] - Saving session : " << hexadecimal_convert(m_identifier)
-                        << " in file : "
-                        << m_backend_file.getFileName());
+                    m_logger.log("saving session : " + hexadecimal_convert(m_identifier)
+                                        + " in file : " + m_backend_file.getFileName());
                     
-                    save();
+                    if (!save())
+                    {
+                        m_logger.log("saving session to "
+                                     + m_backend_file.getFileName() + " failed");
+                    }
                 }
             }
         }

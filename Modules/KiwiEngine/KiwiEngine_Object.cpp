@@ -261,7 +261,7 @@ namespace kiwi
             return m_patcher.getBeacon(name);
         }
         
-#define KIWI_ENGINE_STACKOVERFLOW_MAX 256
+#define KIWI_ENGINE_STACKOVERFLOW_MAX 128
         
         void Object::send(const size_t index, std::vector<tool::Atom> const& args)
         {
@@ -286,6 +286,7 @@ namespace kiwi
                     else
                     {
                         m_patcher.endStackOverflow();
+                        error("message loop detected");
                     }
                     --(receiver.m_stack_count);
                 }

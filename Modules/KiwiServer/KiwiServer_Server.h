@@ -53,6 +53,25 @@ namespace kiwi
             
             class Session;
             
+            class Logger final
+            {
+            public: // methods
+                
+                //! @brief Constructor
+                Logger(juce::File const& file, juce::String const& welcome_message);
+                
+                //! @brief Destructor.
+                ~Logger();
+                
+                //! @brief Logs a message
+                void log(juce::String const& message);
+                
+            private: // members
+                
+                uint64_t            m_limit;
+                juce::FileLogger    m_jlogger;
+            };
+            
         public: // methods
             
             //! @brief Constructor.
@@ -119,6 +138,7 @@ namespace kiwi
             std::map <uint64_t, Session>    m_sessions;
             flip::PortTransportServerTcp    m_socket;
             std::set <flip::PortBase *>     m_ports;
+            Logger                          m_logger;
             
             static const char*  kiwi_file_extension;
             
@@ -149,7 +169,8 @@ namespace kiwi
             Session(uint64_t identifier,
                     juce::File const& backend_file,
                     std::string const& token,
-                    std::string const& kiwi_version);
+                    std::string const& kiwi_version,
+                    Server::Logger & logger);
             
             //! @brief Destructor.
             //! @details Unbinds all documents and ports.
@@ -159,7 +180,8 @@ namespace kiwi
             uint64_t getId() const;
             
             //! @brief Saves the document into designated backend file.
-            void save() const;
+            //! @details Returns true if saving succeeded.
+            bool save() const;
             
             //! @brief Loads the document from designated backend file.
             bool load();
@@ -191,6 +213,7 @@ namespace kiwi
             juce::File                                  m_backend_file;
             std::string                                 m_token;
             std::string                                 m_kiwi_version;
+            Logger &                                    m_logger;
             
         private: // deleted methods
             
