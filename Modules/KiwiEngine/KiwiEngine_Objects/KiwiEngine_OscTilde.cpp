@@ -149,15 +149,11 @@ namespace kiwi { namespace engine {
         dsp::sample_t* output_sig = output[0ul].data();
         size_t sample_index = output[0ul].size();
         dsp::sample_t const* phase = input[1ul].data();
-        dsp::sample_t const time_inc = m_freq/m_sr;
         
         while(sample_index--)
         {
-            *output_sig++  = std::cos(2.f * dsp::pi * (m_time + fmodf(*phase++, 1.f)));
-            m_time += time_inc;
+            *output_sig++  = std::cos(2.f * dsp::pi * fmodf(*phase++, 1.f));
         }
-        
-        m_time = fmodf(m_time, 1.f);
     }
     
     void OscTilde::performPhaseAndFreq(dsp::Buffer const& input, dsp::Buffer& output) noexcept
