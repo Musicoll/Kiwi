@@ -21,17 +21,17 @@
 
 #include <juce_audio_utils/juce_audio_utils.h>
 
+#include <KiwiModel/KiwiModel_DocumentManager.h>
+
 #include "KiwiApp_Instance.h"
 #include "KiwiApp_AboutWindow.h"
 
 #include "../KiwiApp.h"
-#include "../KiwiApp_Network/KiwiApp_DocumentManager.h"
 #include "../KiwiApp_Components/KiwiApp_Window.h"
 #include "../KiwiApp_Patcher/KiwiApp_PatcherView.h"
 #include "../KiwiApp_Patcher/KiwiApp_PatcherComponent.h"
 
-#include <cstdlib>
-#include <ctime>
+#include "../KiwiApp_General/KiwiApp_CommandIDs.h"
 
 namespace kiwi
 {
@@ -39,22 +39,23 @@ namespace kiwi
     //                                      INSTANCE                                    //
     // ================================================================================ //
 
-    size_t Instance::m_untitled_patcher_index(0);
+    size_t Instance::m_untitled_patcher_index(1);
     
     Instance::Instance() :
-    m_instance(std::make_unique<DspDeviceManager>()),
-    m_browser(),
+    m_scheduler(),
+    m_instance(std::make_unique<DspDeviceManager>(), m_scheduler),
+    m_browser(KiwiApp::getCurrentUser().isLoggedIn() ? KiwiApp::getCurrentUser().getName(): "logged out",
+              1000),
     m_console_history(std::make_shared<ConsoleHistory>(m_instance)),
     m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
     {
-        std::srand(std::time(0));
-        m_user_id = std::rand();
+        startTimer(10);
         
         // reserve space for singleton windows.
         m_windows.resize(std::size_t(WindowId::count));
         
         //showAppSettingsWindow();
-        showBeaconDispatcherWindow();
+        //showBeaconDispatcherWindow();
         showDocumentBrowserWindow();
         showConsoleWindow();
     }
@@ -62,11 +63,86 @@ namespace kiwi
     Instance::~Instance()
     {
         closeAllPatcherWindows();
+        stopTimer();
+    }
+    
+    void Instance::timerCallback()
+    {
+        m_scheduler.process();
+        
+        for(auto manager = m_patcher_managers.begin(); manager != m_patcher_managers.end();)
+        {
+            bool keep_patcher = true;
+            
+            if ((*manager)->isRemote())
+            {
+                (*manager)->pull();
+                
+                if (!(*manager)->isRemote())
+                {
+                    keep_patcher
+                    = (*manager)->getFirstWindow().showOkCancelBox(juce::AlertWindow::QuestionIcon,
+                                                                   "Connetion lost",
+                                                                   "Do you want to continue editing document \""
+                                                                   + (*manager)->getDocumentName() +"\" offline",
+                                                                   "Ok",
+                                                                   "Cancel");
+                }
+            }
+            
+            if (!keep_patcher)
+            {
+                manager = m_patcher_managers.erase(manager);
+            }
+            else
+            {
+                ++manager;
+            }
+        }
     }
     
     uint64_t Instance::getUserId() const noexcept
     {
-        return m_user_id;
+        const auto& user = KiwiApp::getCurrentUser();
+        return user.isLoggedIn() ? user.getIdAsInt() : flip::Ref::User::Offline;
+    }
+    
+    void Instance::login()
+    {
+        m_browser.setDriveName(KiwiApp::getCurrentUser().getName());
+        
+        m_windows[std::size_t(WindowId::DocumentBrowser)]->getContentComponent()->setEnabled(true);
+    }
+    
+    void Instance::logout()
+    {
+        m_browser.setDriveName("logged out");
+        
+        for(auto manager = m_patcher_managers.begin(); manager != m_patcher_managers.end();)
+        {
+            if ((*manager)->isRemote())
+            {
+                bool keep_patcher
+                = (*manager)->getFirstWindow().showOkCancelBox(juce::AlertWindow::QuestionIcon,
+                                                               "User logged out",
+                                                               "Do you want to continue editing document \""
+                                                               + (*manager)->getDocumentName() +"\" offline",
+                                                               "Ok",
+                                                               "Cancel");
+                
+                if (!keep_patcher)
+                {
+                    manager = m_patcher_managers.erase(manager);
+                }
+                else
+                {
+                    (*manager)->disconnect();
+                    ++manager;
+                }
+            }
+        }
+        
+        m_windows[std::size_t(WindowId::DocumentBrowser)]->getContentComponent()->setEnabled(false);
     }
     
     engine::Instance& Instance::useEngineInstance()
@@ -74,60 +150,74 @@ namespace kiwi
         return m_instance;
     }
     
-    engine::Instance const& Instance::getEngineInstance() const
+    engine::Instance const& Instance::useEngineInstance() const
     {
         return m_instance;
     }
     
+    tool::Scheduler<> & Instance::useScheduler()
+    {
+        return m_scheduler;
+    }
+    
     void Instance::newPatcher()
     {
-        auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), new PatcherManager(*this));
+        std::string patcher_name = "Untitled "
+                                   + std::to_string(getNextUntitledNumberAndIncrement());
         
-        PatcherManager& manager = *(manager_it->get());
-        model::Patcher& patcher = manager.getPatcher();
-        
-        const size_t next_untitled = getNextUntitledNumberAndIncrement();
-        std::string patcher_name = "Untitled";
-        
-        if(next_untitled > 0)
-        {
-            patcher_name += " " + std::to_string(next_untitled);
-        }
-        
-        patcher.setName(patcher_name);
+        PatcherManager & manager = (*m_patcher_managers.emplace(m_patcher_managers.end(),
+                                                                new PatcherManager(*this, patcher_name))->get());
         
         if(manager.getNumberOfView() == 0)
         {
             manager.newView();
         }
         
-        DocumentManager::commit(patcher);
+        model::DocumentManager::commit(manager.getPatcher());
     }
     
     bool Instance::openFile(juce::File const& file)
     {
+        bool open_succeeded = false;
+        
         if(file.hasFileExtension("kiwi"))
         {
-            auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(),
-                                                         new PatcherManager(*this));
+            auto manager_it = getPatcherManagerForFile(file);
             
-            PatcherManager& manager = *(manager_it->get());
-            
-            manager.loadFromFile(file);
-            
-            if(manager.getNumberOfView() == 0)
+            if (manager_it == m_patcher_managers.end())
             {
-                manager.newView();
+                std::string patcher_name = file.getFileNameWithoutExtension().toStdString();
+                
+                std::unique_ptr<PatcherManager> patcher_manager (new PatcherManager(*this, patcher_name));
+                
+                if (patcher_manager->loadFromFile(file))
+                {
+                    auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(),
+                                                                 std::move(patcher_manager));
+                    
+                    open_succeeded = true;
+                    
+                    if((*manager_it)->getNumberOfView() == 0)
+                    {
+                        (*manager_it)->newView();
+                    }
+                }
+                else
+                {
+                    KiwiApp::error("Can't open document. Version is not up to date. Please download latest Kiwi version.");
+                }
             }
-            
-            return true;
+            else
+            {
+                (*manager_it)->bringsFirstViewToFront();
+            }
         }
         else
         {
             KiwiApp::error("can't open file (bad file extension)");
         }
         
-        return false;
+        return open_succeeded;
     }
     
     void Instance::askUserToOpenPatcherDocument()
@@ -206,6 +296,15 @@ namespace kiwi
         #endif
     }
     
+    void Instance::closeWindowWithId(WindowId window_id)
+    {
+        auto& window_uptr = m_windows[std::size_t(window_id)];
+        if(!window_uptr)
+        {
+            closeWindow(*window_uptr);
+        }
+    }
+    
     bool Instance::closeAllPatcherWindows()
     {
         bool success = true;
@@ -225,37 +324,36 @@ namespace kiwi
         return success;
     }
     
-    PatcherManager* Instance::openRemotePatcher(DocumentBrowser::Drive::DocumentSession& session)
+    void Instance::openRemotePatcher(DocumentBrowser::Drive::DocumentSession& session)
     {
         auto mng_it = getPatcherManagerForSession(session);
+        
         if(mng_it != m_patcher_managers.end())
         {
             PatcherManager& manager = *(mng_it->get());
             manager.bringsFirstViewToFront();
-            return &manager;
         }
-        
-        auto manager_uptr = std::make_unique<PatcherManager>(*this);
-        
-        try
+        else
         {
-            manager_uptr->connect(session);
+            auto manager_uptr = std::make_unique<PatcherManager>(*this, session.getName());
+            
+            NetworkSettings& network_settings = getAppSettings().network();
+            
+            if (manager_uptr->connect(network_settings.getHost(), network_settings.getSessionPort(), session))
+            {
+                auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), std::move(manager_uptr));
+                PatcherManager& manager = *(manager_it->get());
+                
+                if(manager.getNumberOfView() == 0)
+                {
+                    manager.newView();
+                }
+            }
+            else
+            {
+                KiwiApp::error("Failed to connect to the document [" + session.getName() + "]");
+            }
         }
-        catch(std::runtime_error &e)
-        {
-            KiwiApp::error(e.what());
-            return nullptr;
-        }
-        
-        auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(), std::move(manager_uptr));
-        PatcherManager& manager = *(manager_it->get());
-        
-        if(manager.getNumberOfView() == 0)
-        {
-            manager.newView();
-        }
-        
-        return manager_it->get();
     }
     
     void Instance::removePatcher(PatcherManager const& patcher_manager)
@@ -276,6 +374,16 @@ namespace kiwi
         };
         
         return std::find_if(m_patcher_managers.begin(), m_patcher_managers.end(), find_fn);
+    }
+    
+    Instance::PatcherManagers::iterator Instance::getPatcherManagerForFile(juce::File const& file)
+    {
+        const auto find_it = [&file](std::unique_ptr<PatcherManager> const& manager_uptr)
+        {
+            return (!manager_uptr->isRemote() && file == manager_uptr->getSelectedFile());
+        };
+        
+        return std::find_if(m_patcher_managers.begin(), m_patcher_managers.end(), find_it);
     }
     
     Instance::PatcherManagers::iterator Instance::getPatcherManagerForSession(DocumentBrowser::Drive::DocumentSession& session)
@@ -302,6 +410,20 @@ namespace kiwi
         });
     }
     
+    void Instance::showAuthWindow(AuthPanel::FormType type)
+    {
+        showWindowWithId(WindowId::FormComponent, [type]() {
+            
+            auto window = std::make_unique<Window>("Kiwi",
+                                                   std::make_unique<AuthPanel>(type),
+                                                   false, false);
+            window->centreWithSize(window->getWidth(), window->getHeight());
+            window->enterModalState(true);
+            
+            return window;
+        });
+    }
+    
     void Instance::showAboutKiwiWindow()
     {
         showWindowWithId(WindowId::AboutKiwi, [](){ return std::make_unique<AboutWindow>(); });
@@ -311,7 +433,8 @@ namespace kiwi
     {
         showWindowWithId(WindowId::DocumentBrowser, [&browser = m_browser](){
             return std::make_unique<Window>("Document Browser",
-                                            std::make_unique<DocumentBrowserView>(browser),
+                                            std::make_unique<DocumentBrowserView>(browser,
+                                                                                  KiwiApp::getCurrentUser().isLoggedIn()),
                                             true, false, "document_browser_window");
         });
     }
@@ -330,7 +453,7 @@ namespace kiwi
         showWindowWithId(WindowId::ApplicationSettings, [](){
             return std::make_unique<Window>("Application settings",
                                             std::make_unique<SettingsPanel>(),
-                                            true, true, "application_settings_window");
+                                            false, true, "application_settings_window");
         });
     }
     
@@ -342,13 +465,13 @@ namespace kiwi
             auto device_selector =
             std::make_unique<juce::AudioDeviceSelectorComponent>(manager,
                                                                  1, 20, 1, 20,
-                                                                 false, false, false, true);
+                                                                 false, false, false, false);
             
             device_selector->setSize(300, 300);
             
             return std::make_unique<Window>("Audio Settings",
                                             std::move(device_selector),
-                                            false, false, "audio_settings_window");
+                                            true, false, "audio_settings_window");
         });
     }
     

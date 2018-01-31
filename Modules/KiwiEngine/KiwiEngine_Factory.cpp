@@ -22,7 +22,7 @@
 #include <KiwiModel/KiwiModel_Factory.h>
 
 #include "KiwiEngine_Factory.h"
-#include "KiwiEngine_Objects.h"
+
 
 namespace kiwi
 {
@@ -32,25 +32,17 @@ namespace kiwi
         //                                      FACTORY                                     //
         // ================================================================================ //
         
+        std::map<std::string, Factory::ctor_fn_t> Factory::m_creators;
+        
         std::unique_ptr<Object> Factory::create(Patcher& patcher, model::Object const& model)
         {
-            std::vector<Atom> atoms = AtomHelper::parse(model.getText());
-            assert(!atoms.empty() && "The model object isn't valid.");
-            
-            auto& creators = getCreators();
-            assert(creators.count(model.getName()) != 0 && "The object has not been registered.");
-            return std::unique_ptr<Object>(creators[model.getName()](model, patcher, std::vector<Atom>(atoms.begin() + 1, atoms.end())));
+            assert(m_creators.count(model.getName()) != 0 && "The object has not been registered.");
+            return m_creators[model.getName()](model, patcher);
         }
         
         bool Factory::has(std::string const& name)
         {
-            return static_cast<bool>(getCreators().count(name));
-        }
-        
-        auto Factory::getCreators() -> creator_map_t&
-        {
-            static creator_map_t static_creators;
-            return static_creators;
+            return static_cast<bool>(m_creators.count(name));
         }
         
         bool Factory::modelHasObject(std::string const& name)

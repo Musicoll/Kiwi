@@ -59,7 +59,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # IDE Settings
 #--------------------------------------
 
-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.8)
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
 set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++14")
 set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
 set(CMAKE_OSX_ARCHITECTURES "i386;x86_64")
@@ -105,7 +105,8 @@ if (WIN32)
 
 elseif(APPLE)
 
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-warning-option -Wno-pessimizing-move -Wno-overloaded-virtual -Wnounused-function")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-warning-option -Wno-pessimizing-move
+                                            -Wno-overloaded-virtual -Wnounused-function -Wno-unused-local-typedefs")
 
     if (DEBUG)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
@@ -130,6 +131,7 @@ endif()
 
 if (WIN32)
     add_definitions("-D_CPPUNWIND")
+    add_definitions("-D_WIN32_WINNT=0x0501")
 
 	if (DEBUG)
 		add_definitions("-D_CONSOLE=1")
@@ -284,55 +286,39 @@ if (FLIP_LIBRARIES AND FLIP_INCLUDE_DIRS)
     message(STATUS "FLIP_LIBRARIES : " ${FLIP_LIBRARIES})
     message(STATUS "FLIP_INCLUDE_DIRS : " ${FLIP_INCLUDE_DIRS})
 else()
-    message(FATAL_ERROR "Flip was not found on system, check Readme.md for instructions on how to set searh path")
+    message(FATAL_ERROR "Flip was not found on system, check Readme.md for instructions on how to set search path")
 endif()
 
 set(FLIP_COMPILE_DEFINITIONS "flip_NOTHING=flip_NOTHING_FATAL")
 
 #----------------------------------
-# Cpr
+# Beast
 #----------------------------------
 
-# Cpr settings
+set(Boost_INCLUDE_DIR $ENV{KIWI_BOOST_INCLUDE})
 
-set(CMAKE_USE_OPENSSL OFF CACHE BOOL "Don't use openssl")
-set(BUILD_CPR_TESTS OFF CACHE BOOL "Don't build cpr tests")
-
-if(WIN32)
+if (WIN32)
     if (CMAKE_CL_64)
-        set(KIWI_CURL_LIB $ENV{KIWI_CURL_LIB_x64})
-        set(KIWI_CURL_INCLUDE $ENV{KIWI_CURL_INCLUDE_x64})
+        set(Boost_LIBRARY_DIR $ENV{KIWI_BOOST_LIB_x64})
     else()
-        set(KIWI_CURL_LIB $ENV{KIWI_CURL_LIB_WIN32})
-        set(KIWI_CURL_INCLUDE $ENV{KIWI_CURL_INCLUDE_WIN32})
+        set(Boost_LIBRARY_DIR $ENV{KIWI_BOOST_LIB_WIN32})
     endif()
 else()
-    set(KIWI_CURL_LIB $ENV{KIWI_CURL_LIB})
-    set(KIWI_CURL_INCLUDE $ENV{KIWI_CURL_INCLUDE})
+    set(Boost_LIBRARY_DIR $ENV{KIWI_BOOST_LIB})
+    set(Boost_NO_BOOST_CMAKE true)
+    set(Boost_NO_SYSTEM_PATHS true)
 endif()
 
-message(STATUS "Searching curl library")
-message(STATUS "Library search path is : " ${KIWI_CURL_LIB})
-message(STATUS "Include search path is : " ${KIWI_CURL_INCLUDE})
+option (Boost_USE_STATIC_LIBS "Use static libraries for boost" ON)
+find_package (Boost 1.63.0 REQUIRED COMPONENTS system)
 
-find_library(CURL_LIBRARIES NAMES curl PATHS ${KIWI_CURL_LIB} NO_DEFAULT_PATH)
-find_path(CURL_INCLUDE_DIRS NAMES curl PATHS ${KIWI_CURL_INCLUDE} NO_DEFAULT_PATH)
-
-if (CURL_LIBRARIES AND CURL_INCLUDE_DIRS)
-    set(USE_SYSTEM_CURL ON CACHE BOOL "Use system curl")
-    set(CURL_FOUND TRUE CACHE BOOL "Curl found")
-    set(CMAKE_DISABLE_FIND_PACKAGE_CURL TRUE CACHE BOOL "Disactivate find package curl")
-    message(STATUS "Libcurl found on system")
-    message(STATUS "CURL_LIBRARIES : " ${CURL_LIBRARIES})
-    message(STATUS "CURL_INCLUDE_DIRS : " ${CURL_INCLUDE_DIRS})
+if (Boost_FOUND)
+    message(STATUS "Boost found on system")
+    message(STATUS "Boost_LIBRARIES : " ${Boost_LIBRARIES})
+    message(STATUS "BOOST_INCLUDE_DIRECTORIES : " ${Boost_INCLUDE_DIRS})
 else()
-    message(FATAL_ERROR "Curl was not found on system, check Readme.md for instructions on how to set searh path")
+    message(FATAL_ERROR "Boost not found on system")
 endif()
-
-add_subdirectory(ThirdParty/cpr)
-set_target_properties(${CPR_LIBRARIES} PROPERTIES FOLDER ThirdParty)
-set_target_properties(${CPR_LIBRARIES} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-target_compile_definitions(${CPR_LIBRARIES} PUBLIC -DCURL_STATICLIB=1)
 
 #----------------------------------
 # Json
@@ -341,14 +327,26 @@ target_compile_definitions(${CPR_LIBRARIES} PUBLIC -DCURL_STATICLIB=1)
 set(JSON_INCLUDE_DIRS ${ROOT_DIR}/ThirdParty/json)
 
 #----------------------------------
+# KiwiTool
+#----------------------------------
+
+file(GLOB_RECURSE KIWI_TOOL_SRC ${ROOT_DIR}/Modules/KiwiTool/*.[c|h]pp
+                                ${ROOT_DIR}/Modules/KiwiTool/*.h)
+add_library(KiwiTool STATIC ${KIWI_TOOL_SRC})
+target_include_directories(KiwiTool PUBLIC ${ROOT_DIR}/Modules ${ROOT_DIR}/ThirdParty/concurrentqueue)
+set_target_properties(KiwiTool PROPERTIES FOLDER Modules)
+source_group_rec("${KIWI_TOOL_SRC}" ${ROOT_DIR}/Modules/KiwiTool)
+
+#----------------------------------
 # Model
 #----------------------------------
 
 file(GLOB_RECURSE KIWI_MODEL_SRC ${ROOT_DIR}/Modules/KiwiModel/*.[c|h]pp
                                  ${ROOT_DIR}/Modules/KiwiModel/*.h)
 add_library(KiwiModel STATIC ${KIWI_MODEL_SRC})
+target_add_dependency(KiwiModel KiwiTool)
 target_include_directories(KiwiModel PUBLIC ${ROOT_DIR}/Modules ${FLIP_INCLUDE_DIRS})
-target_link_libraries(KiwiModel ${FLIP_LIBRARIES})
+target_link_libraries(KiwiModel PUBLIC ${FLIP_LIBRARIES})
 target_compile_definitions(KiwiModel PUBLIC ${FLIP_COMPILE_DEFINITIONS})
 set_target_properties(KiwiModel PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_MODEL_SRC}" ${ROOT_DIR}/Modules/KiwiModel)
@@ -366,13 +364,34 @@ set_target_properties(KiwiDsp PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_DSP_SRC}" ${ROOT_DIR}/Modules/KiwiDsp)
 
 #----------------------------------
+# Network
+#----------------------------------
+
+file(GLOB_RECURSE KIWI_NETWORK_SRC ${ROOT_DIR}/Modules/KiwiNetwork/*.[c|h]pp
+                                   ${ROOT_DIR}/Modules/KiwiNetwork/*.h)
+add_library(KiwiNetwork STATIC ${KIWI_NETWORK_SRC})
+target_include_directories(KiwiNetwork PUBLIC ${ROOT_DIR}/Modules
+                                              ${ROOT_DIR}/ThirdParty/Beast/include
+                                              ${Boost_INCLUDE_DIRS})
+target_compile_definitions(KiwiNetwork PUBLIC "-DBOOST_ALL_NO_LIB=1")
+set(NETWORK_DEP ${Boost_LIBRARIES})
+if (WIN32)
+    set(NETWORK_DEP ${NETWORK_DEP} ${WS2_32})
+elseif(LINUX)
+    set(NETWORK_DEP ${NETWORK_DEP} ${PTHREAD})
+endif()
+target_link_libraries(KiwiNetwork PUBLIC ${NETWORK_DEP})
+set_target_properties(KiwiNetwork PROPERTIES FOLDER Modules)
+source_group_rec("${KIWI_NETWORK_SRC}" ${ROOT_DIR}/Modules/KiwiNetwork)
+
+
+#----------------------------------
 # Engine
 #----------------------------------
 
 file(GLOB_RECURSE KIWI_ENGINE_SRC ${ROOT_DIR}/Modules/KiwiEngine/*.[c|h]pp
                                   ${ROOT_DIR}/Modules/KiwiEngine/*.h)
 add_library(KiwiEngine STATIC ${KIWI_ENGINE_SRC})
-target_include_directories(KiwiEngine PUBLIC ${ROOT_DIR}/ThirdParty/readerwriterqueue)
 target_include_directories(KiwiEngine PUBLIC ${ROOT_DIR}/Modules)
 target_add_dependency(KiwiEngine KiwiModel)
 target_add_dependency(KiwiEngine KiwiDsp)
@@ -383,12 +402,19 @@ source_group_rec("${KIWI_ENGINE_SRC}" ${ROOT_DIR}/Modules/KiwiEngine)
 # Server
 #----------------------------------
 
+file(GLOB_RECURSE KIWI_SERVER_SRC ${ROOT_DIR}/Modules/KiwiServer/*.[c|h]pp
+                                  ${ROOT_DIR}/Modules/KiwiServer/*.h)
+add_library(KiwiServer ${KIWI_SERVER_SRC})
+target_include_directories(KiwiServer PUBLIC ${JSON_INCLUDE_DIRS})
+target_add_dependency(KiwiServer KiwiModel)
+target_add_dependency(KiwiServer Juce)
+set_target_properties(KiwiServer PROPERTIES FOLDER Modules)
+source_group_rec("${KIWI_SERVER_SRC}" ${ROOT_DIR}/Modules/KiwiServer)
+
 file(GLOB_RECURSE SERVER_SRC ${ROOT_DIR}/Server/Source/*.[c|h]pp
                              ${ROOT_DIR}/Server/Source/*.h)
 add_executable(Server ${SERVER_SRC})
-target_include_directories(Server PUBLIC ${JSON_INCLUDE_DIRS})
-target_add_dependency(Server KiwiModel)
-target_add_dependency(Server Juce)
+target_add_dependency(Server KiwiServer)
 source_group_rec("${SERVER_SRC}" ${ROOT_DIR}/Server/Source)
 
 #----------------------------------
@@ -398,12 +424,12 @@ source_group_rec("${SERVER_SRC}" ${ROOT_DIR}/Server/Source)
 file(GLOB_RECURSE KIWI_CLIENT_SRC ${ROOT_DIR}/Client/Source/*.[c|h]pp
                                   ${ROOT_DIR}/Client/Source/*.h)
 add_executable(Kiwi ${KIWI_CLIENT_SRC} "${KIWI_CLIENT_RESSOURCES}")
+target_add_dependency(Kiwi KiwiNetwork)
 target_add_dependency(Kiwi KiwiEngine)
 target_add_dependency(Kiwi KiwiModel)
 target_add_dependency(Kiwi KiwiDsp)
 target_add_dependency(Kiwi Juce)
-target_add_dependency(Kiwi ${CPR_LIBRARIES})
-target_include_directories(Kiwi PUBLIC ${JSON_INCLUDE_DIRS} ${CPR_INCLUDE_DIRS})
+target_include_directories(Kiwi PUBLIC ${JSON_INCLUDE_DIRS} ${ROOT_DIR}/Client/Source)
 
 if (APPLE)
 	set_target_properties(Kiwi PROPERTIES MACOSX_BUNDLE TRUE
@@ -430,6 +456,18 @@ source_group_rec("${KIWI_CLIENT_SRC}" ${ROOT_DIR}/Client/Source)
 # Tests
 #----------------------------------
 
+# Test Tool
+
+file(GLOB TEST_TOOL_SRC ${ROOT_DIR}/Test/Tool/*.[c|h]pp
+                        ${ROOT_DIR}/Test/Tool/*.h)
+add_executable(test_tool ${TEST_TOOL_SRC})
+target_add_dependency(test_tool KiwiTool)
+set_target_properties(test_tool PROPERTIES FOLDER Test)
+if (LINUX)
+  target_link_libraries(test_tool PUBLIC ${PTHREAD})
+endif()
+source_group_rec("${TEST_TOOL_SRC}" ${ROOT_DIR}/Test/Tool)
+
 # Test Dsp
 
 file(GLOB TEST_DSP_SRC ${ROOT_DIR}/Test/Dsp/*.[c|h]pp
@@ -448,17 +486,35 @@ target_add_dependency(test_model KiwiModel)
 set_target_properties(test_model PROPERTIES FOLDER Test)
 source_group_rec("${TEST_MODEL_SRC}" ${ROOT_DIR}/Test/Model)
 
+# Test Network
+
+file(GLOB TEST_NETWORK_SRC ${ROOT_DIR}/Test/Network/*.[c|h]pp
+                           ${ROOT_DIR}/Test/Network/*.h)
+add_executable(test_network ${TEST_NETWORK_SRC})
+target_add_dependency(test_network KiwiNetwork)
+set_target_properties(test_network PROPERTIES FOLDER Test)
+source_group_rec("${TEST_NETWORK_SRC}" ${ROOT_DIR}/Test/Network)
+
 # Test Engine
 
 file(GLOB TEST_ENGINE_SRC ${ROOT_DIR}/Test/Engine/*.[c|h]pp
                           ${ROOT_DIR}/Test/Engine/*.h)
 add_executable(test_engine ${TEST_ENGINE_SRC})
 target_add_dependency(test_engine KiwiEngine)
-if (LINUX)
-  target_link_libraries(test_engine PUBLIC ${PTHREAD})
-endif()
 set_target_properties(test_engine PROPERTIES FOLDER Test)
 source_group_rec("${TEST_ENGINE_SRC}" ${ROOT_DIR}/Test/Engine)
+
+# Test Server
+
+file(GLOB TEST_SERVER_SRC ${ROOT_DIR}/Test/Server/*.[c|h]pp
+                          ${ROOT_DIR}/Test/Server/*.h)
+add_executable(test_server ${TEST_SERVER_SRC})
+target_add_dependency(test_server KiwiServer)
+set_target_properties(test_server PROPERTIES FOLDER Test)
+if (LINUX)
+  target_link_libraries(test_server PUBLIC ${PTHREAD})
+endif()
+source_group_rec("${TEST_SERVER_SRC}" ${ROOT_DIR}/Test/Server)
 
 # Coverage setting
 if(${GCOV_SUPPORT} STREQUAL "On" AND DEBUG)
@@ -468,15 +524,21 @@ if(${GCOV_SUPPORT} STREQUAL "On" AND DEBUG)
   target_link_libraries(test_dsp PUBLIC gcov)
   target_link_libraries(test_model PUBLIC gcov)
   target_link_libraries(test_engine PUBLIC gcov)
+  target_link_libraries(test_server PUBLIC gcov)
+  target_link_libraries(test_network PUBLIC gcov)
+  target_link_libraries(test_tool PUBLIC gcov)
 endif()
 
 # Tests Target
 
-add_custom_target(Tests ALL DEPENDS test_dsp test_model test_engine)
+add_custom_target(Tests ALL DEPENDS test_dsp test_model test_engine test_network test_tool)
 set_target_properties(Tests PROPERTIES FOLDER Test)
 
 add_custom_command(TARGET Tests
                    POST_BUILD COMMAND test_dsp
                               COMMAND test_model
                               COMMAND test_engine
+                              COMMAND test_tool
+                              COMMAND test_server
+                              COMMAND test_network
                    USES_TERMINAL)

@@ -21,6 +21,8 @@
 
 #pragma once
 
+//! @todo Clean flip headers below, use only needed one in this file
+
 // ---- Flip headers ---- //
 #include "flip/Bool.h"
 #include "flip/Int.h"
@@ -33,12 +35,18 @@
 #include "flip/Enum.h"
 #include "flip/Signal.h"
 
-#include "KiwiModel_Atom.h"
+#include <KiwiTool/KiwiTool_Atom.h>
+#include <KiwiTool/KiwiTool_Parameter.h>
+#include <KiwiTool/KiwiTool_Listeners.h>
+
+#include <KiwiModel/KiwiModel_ObjectClass.h>
+#include <KiwiModel/KiwiModel_Error.h>
 
 #include <mutex>
 #include <algorithm>
 #include <exception>
 #include <set>
+#include <map>
 
 namespace kiwi
 {
@@ -151,6 +159,37 @@ namespace kiwi
         //! @details objects can be instantiated in a Patcher.
         class Object : public flip::Object
         {
+        public: // classes
+            
+            using SignalKey = uint32_t;
+            
+            class Listener
+            {
+            public:
+                
+                // @brief Destructor
+                virtual ~Listener() = default;
+                
+                //! @brief Called when a parameter has changed;
+                virtual void modelParameterChanged(std::string const& name, tool::Parameter const& param) =  0;
+                
+                //! @brief Called when an attribute has changed.
+                virtual void modelAttributeChanged(std::string const& name, tool::Parameter const& param) = 0;
+            };
+            
+            //! @brief an error that object can throw to notify a problem.
+            //! @todo Check if object's id shall be added to error.
+            class Error : public model::Error
+            {
+            public: // methods
+                
+                //! @brief Constructor.
+                Error(std::string const& message):model::Error(message) {}
+                
+                //! @brief Destructor.
+                ~Error() = default;
+            };
+            
         public: // methods
  
             //! @brief Constructor.
@@ -159,8 +198,50 @@ namespace kiwi
             //! @brief Destructor.
             virtual ~Object() = default;
             
+            //! @brief Returns the arguments of the object.
+            std::vector<tool::Atom> const& getArguments() const;
+            
+            //! @brief Returns a list of changed attributes.
+            //! @details Use this function in the observation to check which values shall
+            //! be updated.
+            std::set<std::string> getChangedAttributes() const;
+            
+            //! @brief Retrieve one of the object's attributes.
+            tool::Parameter const& getAttribute(std::string const& name) const;
+            
+            //! @brief Sets one of the object's attribute.
+            void setAttribute(std::string const& name, tool::Parameter const& param);
+            
+            //! @brief Returns one of the object's parameters.
+            tool::Parameter const& getParameter(std::string const& name) const;
+            
+            //! @brief Sets one of the object's parameter.
+            void setParameter(std::string const& name, tool::Parameter const& param);
+            
+            //! @brief Writes the parameter into data model.
+            //! @details If the parameter is saved this function will be called at every attempt to
+            //! modify the parameter. Never called for non saved parameters.
+            virtual void writeAttribute(std::string const& name, tool::Parameter const& paramter);
+            
+            //! @brief Reads the model to initialize a parameter.
+            //! @details Saved parameters may infos from the data model.
+            virtual void readAttribute(std::string const& name, tool::Parameter & parameter) const;
+            
+            //! @brief Checks the data model to see if a parameter has changed.
+            //! @details Only called for saved parameters. Default returns false.
+            virtual bool attributeChanged(std::string const& name) const;
+            
+            //! @brief Adds a listener of object's parameters.
+            void addListener(Listener& listener) const;
+            
+            //! @brief Removes listenere from list.
+            void removeListener(Listener& listener) const;
+            
             //! @brief Returns the name of the Object.
             std::string getName() const;
+            
+            //! @brief Returns the object's static definition.
+            ObjectClass const& getClass() const;
             
             //! @brief Returns the text of the Object.
             std::string getText() const;
@@ -208,10 +289,17 @@ namespace kiwi
             double getY() const noexcept;
             
             //! @brief Sets the width of the object.
+            //! @details Width will not be lower than minimal width.
+            //! If ratio was previously set proportions will be kept intact by changing height.
             void setWidth(double new_width);
             
             //! @brief Sets the height of the object.
+            //! @details Height will not be lower than minimal height.
+            //! If ratio was previously set proportions will be kept intact by changing width.
             void setHeight(double new_height);
+                
+            //! @brief Returns the aspect ratio.
+            double getRatio() const;
             
             //! @brief Returns the object's width.
             double getWidth() const noexcept;
@@ -219,10 +307,35 @@ namespace kiwi
             //! @brief Returns the object's height.
             double getHeight() const noexcept;
             
+            //! @brief Returns the minimal width for this object.
+            double getMinWidth() const noexcept;
+                
+            //! @brief Returns the minimal height for this object;
+            double getMinHeight() const noexcept;
+            
             //! @brief Returns inlet or outlet description.
             virtual std::string getIODescription(bool is_inlet, size_t index) const;
             
-        protected: // methods
+            //! @brief Checks if the object has this flag set.
+            bool hasFlag(ObjectClass::Flag flag) const;
+            
+            //! @brief Returns the object's signal referenced by this key.
+            //! @details Throws an exception if no signal is referenced for key.
+            template <class... Args>
+            auto& getSignal(SignalKey key) const
+            {
+                flip::SignalBase& signal_base = *m_signals.at(key);
+                return dynamic_cast<flip::Signal<Args...>&>(signal_base);
+            }
+            
+        protected:
+            
+            //! @brief Adds a signal having singal key.
+            template <class... Args>
+            void addSignal(SignalKey key, model::Object& object)
+            {
+                m_signals.emplace(key, std::make_unique<flip::Signal<Args...>>(key, object));
+            }
             
             //! @brief Clear and replace all the object's inlets.
             void setInlets(flip::Array<Inlet> const& inlets);
@@ -235,7 +348,19 @@ namespace kiwi
             
             //! @brief Adds an outlet at end of current outlet list.
             void pushOutlet(PinType type);
-            
+                
+            //! @brief Sets the ratio height/width.
+            //! @details If width was previously set. Height will adapt to ratio.
+            void setRatio(double ratio);
+                
+            //! @brief Sets the minimal width that the object can have.
+            //! @details Will recompute height and width if needed.
+            void setMinWidth(double min_width);
+                
+            //! @brief Sets the minimal height that the object can have.
+            //! @details Will recompute height and width if needed.
+            void setMinHeight(double min_height);
+                
         public: // internal methods
             
             //! @internal flip Default constructor
@@ -246,15 +371,22 @@ namespace kiwi
             
         private: // members
             
-            flip::String        m_name;
-            flip::String        m_text;
-            flip::Array<Inlet>  m_inlets;
-            flip::Array<Outlet> m_outlets;
-            
-            flip::Float         m_position_x;
-            flip::Float         m_position_y;
-            flip::Float         m_width;
-            flip::Float         m_height;
+            flip::String                                            m_text;
+            flip::Array<Inlet>                                      m_inlets;
+            flip::Array<Outlet>                                     m_outlets;
+            flip::Float                                             m_position_x;
+            flip::Float                                             m_position_y;
+            flip::Float                                             m_width;
+            flip::Float                                             m_height;
+            flip::Float                                             m_min_width;
+            flip::Float                                             m_min_height;
+            flip::Float                                             m_ratio;
+            mutable std::map<std::string, tool::Parameter>          m_attributes;
+            mutable std::map<std::string, tool::Parameter>          m_parameters;
+            mutable std::unique_ptr<std::vector<tool::Atom>>        m_args;
+            std::map<SignalKey, std::unique_ptr<flip::SignalBase>>  m_signals;
+            mutable tool::Listeners<Listener>                       m_listeners;
+            ObjectClass *                                           m_class;
             
             friend class Factory;
         

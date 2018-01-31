@@ -21,11 +21,15 @@
 
 #pragma once
 
+#include <thread>
+#include <atomic>
+
 #include "flip/Document.h"
+
+#include <KiwiTool/KiwiTool_Beacon.h>
 
 #include "KiwiEngine_Console.h"
 #include "KiwiEngine_Patcher.h"
-#include "KiwiEngine_Beacon.h"
 #include "KiwiEngine_AudioControler.h"
 
 namespace kiwi
@@ -39,12 +43,12 @@ namespace kiwi
         //! @brief The Instance adds the engine objects to the engine::Factory
         //! @details The patcher document model must be initialised before creating the Instance
         //! The Instance is also the entry point to retrieve beacons and output messages to the console.
-        class Instance : public Beacon::Factory
+        class Instance : public tool::Beacon::Factory
         {
         public: // methods
             
             //! @brief Constructs an Instance and adds the engine objects to the engine::Factory.
-            Instance(std::unique_ptr<AudioControler> audio_controler);
+            Instance(std::unique_ptr<AudioControler> audio_controler, tool::Scheduler<> & main_scheduler);
             
             //! @brief Destructor.
             ~Instance();
@@ -77,16 +81,30 @@ namespace kiwi
             
             AudioControler& getAudioControler() const;
             
+            // ================================================================================ //
+            //                              SCHEDULER                                           //
+            // ================================================================================ //
+            
+            //! @brief Returns the engine's scheduler.
+            tool::Scheduler<> & getScheduler();
+            
+            //! @brief Returns the main's scheduler.
+            tool::Scheduler<> & getMainScheduler();
+            
         private: // methods
             
-            //! @internal Adds the engine objects to the engine::Factory
-            void addObjectsToFactory();
+            //! @internal Processes the scheduler to check if new messages have been added.
+            void processScheduler();
             
         private: // members
             
             Console m_console;
             
             std::unique_ptr<AudioControler> m_audio_controler;
+            tool::Scheduler<>               m_scheduler;
+            tool::Scheduler<>&              m_main_scheduler;
+            std::atomic<bool>               m_quit;
+            std::thread                     m_engine_thread;
             
         private: // deleted methods
             

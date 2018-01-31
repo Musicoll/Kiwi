@@ -24,7 +24,7 @@
 #include "KiwiEngine_Link.h"
 #include "KiwiEngine_Factory.h"
 #include "KiwiEngine_Instance.h"
-#include "KiwiEngine_Scheduler.h"
+#include <KiwiTool/KiwiTool_Scheduler.h>
 
 #include <KiwiModel/KiwiModel_PatcherUser.h>
 
@@ -36,12 +36,12 @@ namespace kiwi
         //                                      PATCHER                                     //
         // ================================================================================ //
         
-        Patcher::Patcher(Instance& instance) noexcept :
+        Patcher::Patcher(Instance& instance, model::Patcher & patcher_model) noexcept :
         m_instance(instance),
         m_objects(),
-        m_mutex(),
         m_so_links(1),
-        m_chain()
+        m_chain(),
+        m_patcher_model(patcher_model)
         {
             m_instance.getAudioControler().add(m_chain);
         }
@@ -49,6 +49,11 @@ namespace kiwi
         Patcher::~Patcher()
         {
             m_instance.getAudioControler().remove(m_chain);
+        }
+        
+        model::Patcher & Patcher::getPatcherModel()
+        {
+            return m_patcher_model;
         }
         
         void Patcher::addObject(uint64_t object_id, std::shared_ptr<Object> object)
@@ -188,10 +193,24 @@ namespace kiwi
         }
         
         // ================================================================================ //
+        //                                      SCHEDULER                                   //
+        // ================================================================================ //
+        
+        tool::Scheduler<> & Patcher::getScheduler() const
+        {
+            return m_instance.getScheduler();
+        }
+        
+        tool::Scheduler<> & Patcher::getMainScheduler() const
+        {
+            return m_instance.getMainScheduler();
+        }
+        
+        // ================================================================================ //
         //                                      BEACON                                      //
         // ================================================================================ //
         
-        Beacon& Patcher::getBeacon(std::string const& name) const
+        tool::Beacon& Patcher::getBeacon(std::string const& name) const
         {
             return m_instance.getBeacon(name);
         }
@@ -204,48 +223,94 @@ namespace kiwi
         {
             if(model.changed())
             {
-                const bool link_changed = model.linksChanged();
+                updateGraph(model);
                 
-                // check links before objects
-                if(link_changed)
-                {
-                    for(auto const& link : model.getLinks())
-                    {
-                        if(link.removed())
-                        {
-                            linkRemoved(link);
-                        }
-                    }
-                }
-
-                if(model.objectsChanged())
-                {
-                    for(auto& object : model.getObjects())
-                    {
-                        if(object.added())
-                        {
-                            objectAdded(object);
-                        }
-                        else if(object.removed())
-                        {
-                            objectRemoved(object);
-                        }
-                    }
-                }
-                
-                // check links before objects
-                if(link_changed)
-                {
-                    for(auto& link : model.getLinks())
-                    {
-                        if(link.added())
-                        {
-                            linkAdded(link);
-                        }
-                    }
-                }
+                updateAttributes(model);
                 
                 updateChain();
+            }
+        }
+        
+        void Patcher::updateGraph(model::Patcher const& patcher_model)
+        {
+            std::set<model::Link const*> added_links;
+            std::set<model::Link const*> removed_links;
+            std::set<model::Object const*> added_objects;
+            std::set<model::Object const*> removed_objects;
+            
+            if (patcher_model.linksChanged())
+            {
+                for (auto const& link : patcher_model.getLinks())
+                {
+                    if (link.added())
+                    {
+                        added_links.insert(&link);
+                    }
+                    if (link.removed())
+                    {
+                        removed_links.insert(&link);
+                    }
+                }
+            }
+            
+            if (patcher_model.objectsChanged())
+            {
+                for(auto const & object : patcher_model.getObjects())
+                {
+                    if(object.added())
+                    {
+                        added_objects.insert(&object);
+                    }
+                    else if(object.removed())
+                    {
+                        removed_objects.insert(&object);
+                    }
+                }
+            }
+            
+            if (!added_links.empty() || !removed_links.empty() || !added_objects.empty() || !removed_objects.empty())
+            {
+                std::unique_lock<std::mutex> lock(getScheduler().lock());
+                
+                for (auto link : removed_links)
+                {
+                    linkRemoved(*link);
+                }
+                
+                for (auto object : added_objects)
+                {
+                    objectAdded(*object);
+                }
+                
+                for (auto object : removed_objects)
+                {
+                    objectRemoved(*object);
+                }
+                
+                for (auto link : added_links)
+                {
+                    linkAdded(*link);
+                }
+            }
+        }
+        
+        void Patcher::updateAttributes(model::Patcher const& patcher_model)
+        {
+            if (patcher_model.objectsChanged())
+            {
+                for(auto const & object : patcher_model.getObjects())
+                {
+                    if (!object.removed() && !object.added())
+                    {
+                        std::set<std::string> changed_params = object.getChangedAttributes();
+                        
+                        for (std::string const& param_name : changed_params)
+                        {
+                            m_objects.at(object.ref().obj())->modelAttributeChanged(param_name,
+                                                                                    object.getAttribute(param_name));
+                        }
+                    }
+                }
             }
         }
 

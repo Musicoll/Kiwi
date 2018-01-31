@@ -49,13 +49,15 @@ namespace kiwi
             //! @brief Destructor.
             ~Patcher();
             
-            //! @brief Try to create an Object with a text.
-            //! @details This function will first parse the input string in a vector of atom
-            //! to find a registered name object as first atom.
-            //! the last atoms are passed to the created object as arguments.
-            //! @param text A string composed by the name of the object optionnally followed by a space and a list of argument values (ex : "plus 42")
-            //! @return An Object.
-            model::Object& addObject(std::string const& name, std::vector<Atom> const& args);
+            //! @brief Adds an object to the patcher model.
+            //! @param The object to add in the text.
+            //! @return A reference to the object added.
+            model::Object& addObject(std::unique_ptr<model::Object> && object);
+            
+            //! @brief Replaces an object by another one.
+            //! @details This function will rewire the new object.
+            //! @return A reference to the newly added object.
+            model::Object& replaceObject(model::Object const& old_object, std::unique_ptr<model::Object> && object);
             
             //! @brief create an Object from a flip::Mold.
             model::Object& addObject(std::string const& name, flip::Mold const& mold);
@@ -91,15 +93,6 @@ namespace kiwi
             //! @brief Returns true if a User has been added, removed or changed.
             bool usersChanged() const noexcept;
             
-            //! @brief Returns true if the Patcher name changed.
-            bool nameChanged() const noexcept;
-            
-            //! @brief Returns the Patcher name.
-            std::string getName() const;
-            
-            //! @brief Sets the Patcher name.
-            void setName(std::string const& new_name);
-            
             //! @brief Gets the objects.
             Objects const& getObjects() const noexcept;
             
@@ -117,6 +110,9 @@ namespace kiwi
             
             //! @brief Gets the users.
             Users& getUsers() noexcept;
+            
+            //! @brief Returns true if current user is already in added to the document.
+            bool hasSelfUser() const;
             
             //! @brief Returns the current User.
             //! @details The function will look for a User that match
@@ -170,8 +166,6 @@ namespace kiwi
             Links           m_links;
             
             Users           m_users;
-            
-            flip::String    m_patcher_name;
             
         private: // deleted methods
             

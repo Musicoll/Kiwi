@@ -43,6 +43,9 @@ namespace kiwi
         //! @brief juce::Component::paint
         void paint(juce::Graphics& g) override;
         
+        //! @brief Removes users icon.
+        void removeUsersIcon();
+        
     private: // classes
         
         //! @internal Toolbar item factory
@@ -99,6 +102,9 @@ namespace kiwi
         //! @brief Called when one or more users are connecting or disconnecting to the Patcher Document.
         void connectedUserChanged(PatcherManager& manager) override;
         
+        //! @brief Call to update the number of users displayed and user names.
+        void updateUsers();
+        
         //! @brief Provides prefered size for this item.
         bool getToolbarItemSizes(int toolbarDepth, bool isVertical,
                                  int& preferredSize, int& minSize, int& maxSize) override;
@@ -116,6 +122,9 @@ namespace kiwi
         //! @brief Stops this component flashing.
         void stopFlashing();
         
+        //! @brief Displays the list of usernames.
+        void mouseDown(juce::MouseEvent const& e) override final;
+        
     private: // methods
         
         //! @internal juce::Timer callback.
@@ -123,10 +132,11 @@ namespace kiwi
         
     private: // variables
         
-        PatcherManager&     m_patcher_manager;
-        size_t              m_users;
-        const juce::Image   m_users_img;
-        float               m_flash_alpha = 0.f;
+        PatcherManager&             m_patcher_manager;
+        std::vector<std::string>    m_users;
+        size_t                      m_user_nb;
+        const juce::Image           m_users_img;
+        float                       m_flash_alpha = 0.f;
     };
     
     // ================================================================================ //
@@ -158,6 +168,9 @@ namespace kiwi
         //! @brief juce::Component::paint
         void paint(juce::Graphics& g) override;
         
+        //! @brief Removes the users icon from toolbar;
+        void removeUsersIcon();
+        
         // -------------------------------------------------------------------------------- //
         //                              APPLICATION COMMAND TARGET                          //
         // -------------------------------------------------------------------------------- //
@@ -184,6 +197,13 @@ namespace kiwi
         
         PatcherViewWindow(PatcherManager& manager, PatcherView& patcherview);
         
+        //! @brief Shows an modal window asking for user input.
+        bool showOkCancelBox(juce::AlertWindow::AlertIconType icon_type,
+                             std::string const& title,
+                             std::string const& message,
+                             std::string const& button_1,
+                             std::string const& button_2);
+        
         void closeButtonPressed() override;
         
         //! @brief returns the patcher manager.
@@ -191,6 +211,9 @@ namespace kiwi
         
         //! @brief returns the PatcherView.
         PatcherView& getPatcherView();
+        
+        //! @brief Removes the connected users icon. Called once patcher disconnected.
+        void removeUsersIcon();
         
     private: // variables
         

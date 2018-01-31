@@ -21,9 +21,23 @@
 
 #pragma once
 
-#include "KiwiEngine_Def.h"
+#include <functional>
+#include <set>
+#include <string>
+#include <atomic>
+
+#include <flip/Ref.h>
+
+#include <KiwiEngine/KiwiEngine_Def.h>
+
+#include <KiwiTool/KiwiTool_Scheduler.h>
+#include <KiwiTool/KiwiTool_ConcurrentQueue.h>
+
+#include <KiwiEngine/KiwiEngine_Patcher.h>
 
 #include <KiwiDsp/KiwiDsp_Processor.h>
+
+#include <KiwiModel/KiwiModel_Object.h>
 
 namespace kiwi
 {
@@ -34,8 +48,30 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief The Object reacts and interacts with other ones by sending and receiving messages via its inlets and outlets.
-        class Object
+        class Object : public model::Object::Listener
         {
+        private: // classes
+            
+            //! @brief A generic task that call an std::function.
+            //! @details When executed
+            class Task : public tool::Scheduler<>::Task
+            {
+            public: // methods
+                
+                Task(std::function<void()> callback);
+                
+                ~Task();
+                
+                void execute() override final;
+                
+                bool executed() const;
+                
+            private: // members
+                
+                std::function<void()> 	m_callback;
+                std::atomic<bool>       m_executed;
+            };
+            
         public: // methods
             
             //! @brief Constructor.
@@ -47,7 +83,7 @@ namespace kiwi
             //! @brief Receives a set of arguments via an inlet.
             //! @details This method must be overriden by object's subclasses.
             //! @todo see if the method must be noexcept.
-            virtual void receive(size_t index, std::vector<Atom> const& args) = 0;
+            virtual void receive(size_t index, std::vector<tool::Atom> const& args) = 0;
             
             //! @brief Called when the Patcher is loaded.
             virtual void loadbang() {};
@@ -57,6 +93,12 @@ namespace kiwi
             
             //! @internal Removes a Link from an outlet.
             void removeOutputLink(size_t outlet_index, Object & receiver, size_t inlet_index);
+            
+            //! @brief Called when a parameter has changed.
+            void modelParameterChanged(std::string const& name, tool::Parameter const& parameter) override final;
+            
+            //! @brief Called when an attribute has changed.
+            void modelAttributeChanged(std::string const& name, tool::Parameter const& parameter) override final;
             
         protected: // methods
             
@@ -77,11 +119,37 @@ namespace kiwi
             void error(std::string const& text) const;
             
             // ================================================================================ //
+            //                                      SCHEDULER                                   //
+            // ================================================================================ //
+            
+            //! @biref Returns the engine's scheduler.
+            tool::Scheduler<> & getScheduler() const;
+            
+            //! @biref Returns the main scheduler.
+            tool::Scheduler<> & getMainScheduler() const;
+            
+            //! @brief Defers a task on the engine thread.
+            //! @details The task is automatically unscheduled when object is destroyed.
+            void defer(std::function<void()> call_back);
+            
+            //! @brief Defers a task on the main thread.
+            //! @details The tasks is automatically unscheduled when object is destroyed.
+            void deferMain(std::function<void()> call_back);
+            
+            //! @brief Schedules a task on the engine thread.
+            //! @details The tasks is automatically unscheduled when object is destroyed.
+            void schedule(std::function<void()> call_back, tool::Scheduler<>::duration_t delay);
+            
+            //! @brief Schedules a task on the main thread.
+            //! @details The tasks is automatically unscheduled when object is destroyed.
+            void scheduleMain(std::function<void()> call_back, tool::Scheduler<>::duration_t delay);
+            
+            // ================================================================================ //
             //                                      BEACON                                      //
             // ================================================================================ //
             
             //! @brief Gets or creates a Beacon with a given name.
-            Beacon& getBeacon(std::string const& name) const;
+            tool::Beacon& getBeacon(std::string const& name) const;
             
             // ================================================================================ //
             //                                       SEND                                       //
@@ -90,16 +158,43 @@ namespace kiwi
             //! @brief Sends a vector of Atom via an outlet.
             //! @todo Improve the stack overflow system.
             //! @todo See if the method must be noexcept.
-            void send(const size_t index, std::vector<Atom> const& args);
+            void send(const size_t index, std::vector<tool::Atom> const& args);
+            
+            //! @brief Changes one of the data model's attributes.
+            //! @details For thread safety actual model's modification is called on the main thread.
+            void setAttribute(std::string const& name, tool::Parameter const& parameter);
+            
+            //! @brief Changes one of the data model's parameter.
+            //! @details For thread safety actual model's modification is called on the main thread.
+            void setParameter(std::string const& name, tool::Parameter const& parameter);
+            
+        private: // methods
+            
+            //! @brief Returns the object's data model.
+            model::Object & getObjectModel();
+            
+            //! @brief Called once the data model's parameters has changed.
+            //! @details Automatically called on the engine's thread.
+            virtual void parameterChanged(std::string const& param_name, tool::Parameter const& param);
+            
+            //! @brief Called once one of the data model's attributes has changed.
+            //! @brief Automatically called on the engine's thread.
+            virtual void attributeChanged(std::string const& name, tool::Parameter const& attribute);
+            
+            //! @brief Call this function to remove tasks already executed.
+            void removeTasks(std::set<std::shared_ptr<Task>> & tasks);
             
         private: // members
             
             using Outlet = std::set<Link>;
 
-            Patcher&                m_patcher;
-            size_t                  m_inlets;
-            std::vector<Outlet>     m_outlets;
-            size_t                  m_stack_count = 0ul;
+            Patcher&                        m_patcher;
+            flip::Ref const                 m_ref;
+            size_t                          m_inlets;
+            std::vector<Outlet>             m_outlets;
+            std::set<std::shared_ptr<Task>> m_tasks;
+            std::set<std::shared_ptr<Task>> m_main_tasks;
+            size_t                          m_stack_count;
             
         private: // deleted methods
             

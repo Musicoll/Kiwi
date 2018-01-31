@@ -25,6 +25,8 @@
 
 #include <KiwiModel/KiwiModel_Patcher.h>
 
+#include <KiwiApp_Patcher/KiwiApp_PatcherViewMouseHandler.h>
+
 #include "KiwiApp_PatcherViewport.h"
 #include "KiwiApp_PatcherViewHitTester.h"
 #include "KiwiApp_PatcherManager.h"
@@ -34,8 +36,7 @@
 namespace kiwi
 {
     class PatcherManager;
-    class ObjectView;
-    class ClassicBox;
+    class ObjectFrame;
     class LinkView;
     class LinkViewCreator;
     class Instance;
@@ -61,7 +62,7 @@ namespace kiwi
         //! @brief Destructor
         ~PatcherView();
         
-        using ObjectViews = std::vector<std::unique_ptr<ObjectView>>;
+        using ObjectFrames = std::vector<std::unique_ptr<ObjectFrame>>;
         using LinkViews = std::vector<std::unique_ptr<LinkView>>;
         
         //! @brief Returns the PatcherManager.
@@ -73,14 +74,14 @@ namespace kiwi
         //! @brief Returns the patcher view model.
         model::Patcher::View& getPatcherViewModel();
         
-        //! @brief Returns the ObjectViews.
-        ObjectViews const& getObjects() const;
+        //! @brief Returns the Objects' frames.
+        ObjectFrames const& getObjects() const;
         
         //! @brief Returns the LinkViews.
         LinkViews const& getLinks() const;
         
-        //! @brief Returns the ObjectView corresponding to a given Object model.
-        ObjectView* getObject(model::Object const& object);
+        //! @brief Returns the Object's frame corresponding to a given Object model.
+        ObjectFrame* getObject(model::Object const& object);
         
         //! @brief Returns the LinkView corresponding to a given Link model.
         LinkView* getLink(model::Link const& link);
@@ -91,8 +92,11 @@ namespace kiwi
         //! @brief Get the lock status of the patcher view.
         bool isLocked() const;
         
+        //! @brief Returns a list of Users that selected an object.
+        std::set<uint64_t> getDistantSelection(ObjectFrame const& object) const;
+        
         //! @brief Returns true if the object is selected.
-        bool isSelected(ObjectView const& object) const;
+        bool isSelected(ObjectFrame const& object) const;
         
         //! @brief Returns true if the link is selected.
         bool isSelected(LinkView const& link) const;
@@ -104,19 +108,21 @@ namespace kiwi
         //! @brief Returns the position of the patcher origin relative to the component position.
         juce::Point<int> getOriginPosition() const;
         
-        //! @brief Create an object model. 
-        model::Object& createObjectModel(std::string const& text);
-        
         //! @brief Call this to switch the box to edit mode
-        //! @details You will need to call endEditBox() function after calling this.
-        bool startEditBox(ClassicBox* box);
+        //! @details Will result in objectEdited being called in case of success.
+        void editObject(ObjectFrame & object_frame);
         
-        //! @brief called by ClassicBox when hmmm.. the text has been edited.
-        //! @details You will need to call startEditBox() function before calling this.
-        void endEditBox(ClassicBox& box, std::string new_text);
+        //! @brief Called when the object has entered edition mode.
+        void objectEditorShown(ObjectFrame const& object_frame);
         
-        //! @internal Update the patcher window title.
-        void updateWindowTitle() const;
+        //! @brief Called once an object's text has changed.
+        void objectTextChanged(ObjectFrame const& object_frame, std::string const& new_text);
+        
+        //! @brief Called when the object is quitting edition mode.
+        void objectEditorHidden(ObjectFrame const& object_frame);
+        
+        //! @brief Returns true if an object if being edited.
+        bool isEditingObject() const;
         
         // ================================================================================ //
         //                                    COMPONENT                                     //
@@ -176,6 +182,9 @@ namespace kiwi
         //! @internal Object model is resident and internal value changed.
         void objectChanged(model::Patcher::View& view, model::Object& object);
         
+        //! @internal Updates the object's view parameters.
+        void updateParameters(model::Patcher const& patcher);
+        
         //! @internal Object model will be removed from the document.
         void removeObjectView(model::Object& object);
         
@@ -188,8 +197,8 @@ namespace kiwi
         //! @internal Link model will be removed from the document.
         void removeLinkView(model::Link& link);
         
-        //! @brief Add a newbox Object at current mouse position and optionally give it focus.
-        void createNewBoxModel(bool give_focus);
+        //! @brief Add a new object's model at current mouse position and optionally give it focus.
+        void createObjectModel(std::string const& text, bool give_focus);
         
         // ================================================================================ //
         //                                     UNDO/REDO                                    //
@@ -223,15 +232,15 @@ namespace kiwi
         //! @brief Returns the selected links.
         std::set<flip::Ref> const& getSelectedLinks() const;
         
-        void addToSelectionBasedOnModifiers(ObjectView& object, bool select_only);
+        void addToSelectionBasedOnModifiers(ObjectFrame& object, bool select_only);
         
         void addToSelectionBasedOnModifiers(LinkView& link, bool select_only);
         
-        bool selectOnMouseDown(ObjectView& object, bool select_only);
+        bool selectOnMouseDown(ObjectFrame& object, bool select_only);
         
         bool selectOnMouseDown(LinkView& link, bool select_only);
         
-        void selectOnMouseUp(ObjectView& box, bool select_only,
+        void selectOnMouseUp(ObjectFrame& box, bool select_only,
                              const bool box_was_dragged,
                              const bool result_of_mouse_down_select_method);
         
@@ -249,13 +258,13 @@ namespace kiwi
         bool isAnyLinksSelected();
         
         //! @brief Select an Object.
-        void selectObject(ObjectView& object);
+        void selectObject(ObjectFrame& object);
         
         //! @brief Select multiple objects
-        void selectObjects(std::vector<ObjectView*> const& objects);
+        void selectObjects(std::vector<ObjectFrame*> const& objects);
         
         //! @brief Unselect all and select an object.
-        void selectObjectOnly(ObjectView& object);
+        void selectObjectOnly(ObjectFrame& object);
         
         //! @brief Select a Link.
         void selectLink(LinkView& link);
@@ -267,7 +276,7 @@ namespace kiwi
         void selectLinkOnly(LinkView& link);
         
         //! @brief Unselect an Object.
-        void unselectObject(ObjectView& object);
+        void unselectObject(ObjectFrame& object);
         
         //! @brief Unselect a Link.
         void unselectLink(LinkView& link);
@@ -280,19 +289,6 @@ namespace kiwi
         
         //! @brief Unselect all objects.
         void deleteSelection();
-        
-        //! @brief Begins a move or resize gesture.
-        void startMoveOrResizeObjects();
-        
-        //! @brief Ends a move or resize gesture.
-        void endMoveOrResizeObjects();
-        
-        //! @brief Resize selected objects by a given amount of pixels.
-        //! @param delta        The given amount of pixel.
-        //! @param border_flag  The border flag (see HitTester::Border enum)
-        //! @param preserve_ratio Should preserve box ratio
-        void resizeSelectedObjects(juce::Point<int> const& delta,
-                                   const long border_flag, const bool preserve_ratio);
         
         //! @brief Move selected objects by a given amount of pixels.
         //! @param delta The given amount of pixel.
@@ -323,10 +319,10 @@ namespace kiwi
         //                                      MISC                                        //
         // ================================================================================ //
         
-        //! @internal Find a ObjectView with a given Object model.
-        ObjectViews::iterator findObject(model::Object const& object);
+        //! @internal Finds an ObjectFrame with a given Object model.
+        ObjectFrames::iterator findObject(model::Object const& object);
         
-        //! @internal Find a LinkView with a given Link model.
+        //! @internal Finds a LinkView with a given Link model.
         LinkViews::iterator findLink(model::Link const& link);
         
         //! @internal Returns true if a link can be created between two objects.
@@ -340,7 +336,7 @@ namespace kiwi
         juce::Rectangle<int> getSelectionBounds();
         
         //! @internal get the nearest valid iolet of the link creator.
-        std::pair<ObjectView*, size_t> getLinkCreatorNearestEndingIolet();
+        std::pair<ObjectFrame*, size_t> getLinkCreatorNearestEndingIolet();
         
         //! @brief Zoom in Patcher View.
         void zoomIn();
@@ -356,7 +352,7 @@ namespace kiwi
         
         //! @internal Show Object contextual popup menu
         //! @details Will only show up when the patcher view is unlocked.
-        void showObjectPopupMenu(ObjectView const& object_view, juce::Point<int> const& position);
+        void showObjectPopupMenu(ObjectFrame const& object_view, juce::Point<int> const& position);
         
         //! @internal Show Link contextual Popup menu
         //! @details Will only show up when the patcher view is unlocked.
@@ -367,9 +363,6 @@ namespace kiwi
         
         //! @brief Bring all object components in front of link ones.
         void bringsObjectsToFront();
-        
-        //! Get the appropriate mouse cursor for a given border flag.
-        juce::MouseCursor::StandardCursorType getMouseCursorForBorder(int border_flag) const;
 
     private: // members
         
@@ -378,7 +371,7 @@ namespace kiwi
         model::Patcher&                             m_patcher_model;
         model::Patcher::View&                       m_view_model;
         
-        ObjectViews                                 m_objects;
+        ObjectFrames                                m_objects;
         LinkViews                                   m_links;
         
         std::set<flip::Ref>                         m_local_objects_selection;
@@ -389,26 +382,17 @@ namespace kiwi
         
         PatcherViewport                             m_viewport;
         HitTester                                   m_hittester;
+        MouseHandler                                m_mouse_handler;
         IoletHighlighter                            m_io_highlighter;
         Lasso                                       m_lasso;
         std::unique_ptr<LinkViewCreator>            m_link_creator;
         
+        ObjectFrame  const*                         m_box_being_edited = nullptr;
+        
         bool    m_is_locked;
         int     m_grid_size;
-                
-        // mouse interactions flags
-        juce::Point<int> m_last_drag;
-        bool m_object_received_down_event = false;
-        bool m_copy_on_drag = false;
-        bool m_is_dragging = false;
-        bool m_is_dragging_links = false;
-        bool m_mouse_has_just_been_clicked = false;
-        bool m_select_on_mouse_down_status = false;
-        bool m_link_downstatus = false;
-        bool m_is_in_move_or_resize_gesture = false;
-        ObjectView* m_box_being_edited = nullptr;
-        long m_object_border_down_status;
         
+        friend MouseHandler;
         friend PatcherViewport;
         friend Lasso;
     };

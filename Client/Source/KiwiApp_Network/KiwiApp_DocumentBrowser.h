@@ -21,14 +21,16 @@
 
 #pragma once
 
-#include <KiwiEngine/KiwiEngine_Listeners.h>
+#include <KiwiTool/KiwiTool_Listeners.h>
 
 #include <juce_data_structures/juce_data_structures.h>
 #include <juce_events/juce_events.h>
 
-#include "KiwiApp_Api.h"
+#include "../KiwiApp_Network/KiwiApp_Api.h"
 
 #include "../KiwiApp_General/KiwiApp_StoredSettings.h"
+
+#include "KiwiApp_ApiController.h"
 
 namespace kiwi
 {
@@ -37,70 +39,38 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief Request Patcher document informations through a Kiwi API.
-    class DocumentBrowser : public juce::Timer, public NetworkSettings::Listener
+    class DocumentBrowser : public juce::Timer
     {
     public: // nested classes
         
-        struct Listener;
         class Drive;
         
     public: // methods
         
         //! @brief Constructor
-        DocumentBrowser();
+        DocumentBrowser(std::string const& drive_name, int refresh_time);
         
         //! @brief Destructor
         ~DocumentBrowser();
         
-        //! @brief start processing
-        void start(const int interval = 5000);
-        
-        //! @brief stop processing
-        void stop();
-        
-        //! @brief Scan the LAN to find a service provider.
-        void process();
+        //! @brief Sets the drive's name.
+        void setDriveName(std::string const& name);
         
         //! @brief juce::Timer callback.
         void timerCallback() override;
         
         //! @brief Returns a list of drives.
-        std::vector<Drive*> getDrives() const;
-        
-        //! @brief Add a listener.
-        void addListener(Listener& listener);
-        
-        //! @brief remove a listener.
-        void removeListener(Listener& listener);
+        Drive* getDrive() const;
         
     private: // methods
         
-        void networkSettingsChanged(NetworkSettings const&, const juce::Identifier& id) override;
+        //! @brief Handles request that denied by server.
+        static void handleDeniedRequest();
         
     private: // variables
         
-        std::unique_ptr<Drive>                          m_distant_drive;
-        engine::Listeners<Listener>                     m_listeners = {};
-    };
-    
-    // ================================================================================ //
-    //                              DOCUMENT BROWSER LISTENER                           //
-    // ================================================================================ //
-    
-    //! @brief Listen to document explorer changes.
-    struct DocumentBrowser::Listener
-    {
-        //! @brief Destructor.
-        virtual ~Listener() = default;
-        
-        //! @brief Called when the document list changed.
-        virtual void driveAdded(DocumentBrowser::Drive& drive) = 0;
-        
-        //! @brief Called when the document list changed.
-        virtual void driveChanged(DocumentBrowser::Drive const& drive) = 0;
-        
-        //! @brief Called when the document list changed.
-        virtual void driveRemoved(DocumentBrowser::Drive const& drive) = 0;
+        std::unique_ptr<Drive>      m_distant_drive;
+        int                         m_refresh_time;
     };
     
     // ================================================================================ //
@@ -116,12 +86,13 @@ namespace kiwi
         
         using DocumentSessions = std::vector<std::unique_ptr<DocumentSession>>;
         
+    private:
+        
+        using Comp = std::function<bool(DocumentSession const& l_hs, DocumentSession const& r_hs)>;
+        
     public: // methods
         
-        Drive(std::string const& name,
-              std::string const& host,
-              uint16_t api_port,
-              uint16_t session_port);
+        Drive(std::string const& name);
         
         ~Drive() = default;
         
@@ -131,35 +102,21 @@ namespace kiwi
         //! @brief remove a listener.
         void removeListener(Listener& listener);
         
-        //! @brief Returns the API object reference.
-        Api& useApi();
-        
-        //! @brief Set the kiwi api port.
-        void setApiPort(uint16_t port);
-        
-        //! @brief Returns the kiwi api port.
-        uint16_t getApiPort() const;
-        
-        //! @brief Set the kiwi document session port.
-        void setSessionPort(uint16_t port);
-        
-        //! @brief Returns the kiwi document session port.
-        uint16_t getSessionPort() const;
-        
-        //! @brief Set both the api's and session's host.
-        void setHost(std::string const& host);
-        
-        //! @brief Returns the session host.
-        std::string const& getHost() const;
-        
         //! @brief Set the name of this drive.
         void setName(std::string const& host);
         
         //! @brief Returns the name of this drive.
         std::string const& getName() const;
         
+        //! @brief Uploads a document.
+        //! @detail data is represented as a string
+        void uploadDocument(std::string const& name, std::string const& data);
+        
         //! @brief Creates and opens a new document on this drive.
         void createNewDocument();
+        
+        //! @brief Changes the way documents are sorted.
+        void setSort(Comp comp);
         
         //! @brief Returns the documents.
         DocumentSessions const& getDocuments() const;
@@ -167,23 +124,23 @@ namespace kiwi
         //! @brief Returns the documents.
         DocumentSessions& getDocuments();
         
-        //! @brief Returns true if the drive match the other drive
-        //! @details this operator only compares ip and port.
-        bool operator==(Drive const& drive) const;
-        
         //! @brief Refresh all the document list.
         void refresh();
+        
+    private: // methods
+        
+        //! @brief Refresh the document list without posting network erors.
+        void refresh_internal();
         
     private: // members
         
         //! @internal Update the document list (need to be called in the juce Message thread)
         void updateDocumentList(Api::Documents docs);
         
-        Api                         m_api;
-        uint16_t                    m_session_port = 9090;
-        std::string                 m_name = "Drive";
+        std::string                 m_name;
         DocumentSessions            m_documents;
-        engine::Listeners<Listener> m_listeners;
+        tool::Listeners<Listener>   m_listeners;
+        Comp                        m_sort;
         
         friend class DocumentBrowser;
     };
@@ -234,20 +191,49 @@ namespace kiwi
         //! @brief Returns the document name
         std::string getName() const;
         
-        //! @brief Returns the document session host
-        std::string getHost() const;
-        
         //! @brief Returns the session id of the document.
         uint64_t getSessionId() const;
         
-        //! @brief Returns the document session port.
-        uint16_t getSessionPort() const;
+        //! @brief Returns the open token of the document.
+        std::string const& getOpenToken() const;
         
         //! @brief Returns the drive that holds this document.
         DocumentBrowser::Drive const& useDrive() const;
         
         //! @brief Rename the document.
         void rename(std::string const& new_name);
+        
+        //! @brief Duplicates the document on server side.
+        void duplicate();
+        
+        //! @brief Move the document to trash.
+        void trash();
+        
+        // @brief Moves document out of the trash.
+        void untrash();
+        
+        //! @brief Called to download the document.
+        //! @details download is asynchronous and callback is called on the main thread
+        //! if request succeed.
+        void download(std::function<void(std::string const&)> callback);
+        
+        //! @brief Returns the date creation as a string.
+        std::string const& getCreationDate() const;
+        
+        //! @brief Returns the author's username.
+        std::string const& getAuthor() const;
+        
+        //! @brief Returns true if document is trashed
+        bool isTrashed() const;
+        
+        //! @brief Returns trashed date as string.
+        std::string const& getTrashedDate() const;
+        
+        //! @brief Returns the last modification date.
+        std::string const& getOpenedDate() const;
+        
+        //! @brief Returns the user that modified document last.
+        std::string const& getOpenedUser() const;
         
         //! @brief Returns true if the DocumentSession match another DocumentSession
         //! @details this operator uses the session_id field to compare.
@@ -257,6 +243,7 @@ namespace kiwi
         
         DocumentBrowser::Drive&             m_drive;
         Api::Document                       m_document;
+        std::string                         m_open_token;
         
         friend class DocumentBrowser::Drive;
     };

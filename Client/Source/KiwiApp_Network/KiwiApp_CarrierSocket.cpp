@@ -31,99 +31,91 @@ namespace kiwi
     //                                  CARRIER SOCKET                                  //
     // ================================================================================ //
     
-    CarrierSocket::CarrierSocket(flip::DocumentBase& document, std::string const& host, uint16_t port, uint64_t session_id):
-    m_transport_socket(document, session_id, host, port)
+    CarrierSocket::CarrierSocket(flip::DocumentBase& document):
+    m_transport_socket(nullptr),
+    m_document(document),
+    m_state(State::Disconnected),
+    m_state_func(),
+    m_transfer_func()
     {
-        bindCallBacks();
     }
     
-    void CarrierSocket::listenStateTransition(flip::CarrierBase::Transition state, flip::CarrierBase::Error error)
+    void CarrierSocket::onStateTransition(flip::CarrierBase::Transition transition,
+                                          flip::CarrierBase::Error error)
     {
-        switch(state)
+        if (transition == flip::CarrierBase::Transition::Disconnected)
         {
-            case flip::CarrierBase::Transition::Disconnected:
-            {
-                if (m_func_disonnected) {m_func_disonnected();}
-                break;
-            }
-            case flip::CarrierBase::Transition::Connecting:
-            {
-                break;
-            }
-            case flip::CarrierBase::Transition::Connected:
-            {
-                if (m_func_connected){m_func_connected();}
-                break;
-            }
+            m_state = State::Disconnected;
+        }
+        else if (transition == flip::CarrierBase::Transition::Connecting)
+        {
+            m_state = State::Connecting;
+        }
+        else if (transition == flip::CarrierBase::Transition::Connected)
+        {
+            m_state = State::Connected;
+        }
+        
+        if (m_state_func)
+        {
+            m_state_func(transition, error);
         }
     }
     
-    void CarrierSocket::listenTransferBackEnd(size_t cur, size_t total)
+    void CarrierSocket::onTransferBackend(size_t cur, size_t total)
     {
-        if (cur == total)
+        if (m_transfer_func)
         {
-            if (m_func_loaded){m_func_loaded();}
+            m_transfer_func(cur, total);
         }
     }
     
-    void CarrierSocket::listenTransferTransaction(size_t cur, size_t total)
+    void CarrierSocket::listenStateTransition(std::function <void (flip::CarrierBase::Transition,
+                                                    flip::CarrierBase::Error error)> call_back)
     {
+        m_state_func = call_back;
     }
     
-    void CarrierSocket::listenTransferSignal(size_t cur, size_t total)
-    {
-    }
     
-    void CarrierSocket::bindCallBacks()
+    void CarrierSocket::listenTransferBackend(std::function <void (size_t, size_t)> call_back)
     {
-        using namespace std::placeholders; // for _1, _2 etc.
-        
-        m_transport_socket.listen_state_transition(std::bind(&CarrierSocket::listenStateTransition,
-                                                             this, _1, _2));
-        
-        m_transport_socket.listen_transfer_backend(std::bind(&CarrierSocket::listenTransferBackEnd,
-                                                             this, _1, _2));
-        
-        m_transport_socket.listen_transfer_transaction(std::bind(&CarrierSocket::listenTransferTransaction,
-                                                                 this, _1, _2));
-        
-        m_transport_socket.listen_transfer_signal(std::bind(&CarrierSocket::listenTransferSignal,
-                                                            this, _1, _2));
-    }
-    
-    void CarrierSocket::listenDisconnected(std::function<void ()> func)
-    {
-        m_func_disonnected = func;
-    }
-    
-    void CarrierSocket::listenConnected(std::function<void ()> func)
-    {
-        m_func_connected = func;
-    }
-    
-    void CarrierSocket::listenLoaded(std::function<void ()> func)
-    {
-        m_func_loaded = func;
+        m_transfer_func = call_back;
     }
     
     void CarrierSocket::process()
     {
-        m_transport_socket.process();
+        if (m_transport_socket != nullptr)
+        {
+            m_transport_socket->process();
+        }
     }
     
     void CarrierSocket::disconnect()
     {
-        m_transport_socket.rebind("", 0);
+        m_transport_socket.reset();
     }
     
     bool CarrierSocket::isConnected() const
     {
-        return m_transport_socket.is_connected();
+        return m_transport_socket != nullptr && m_state == State::Connected;
     }
     
-    void CarrierSocket::connect(std::string const& host, uint16_t port)
+    void CarrierSocket::connect(std::string const& host,
+                                uint16_t port,
+                                uint64_t session_id,
+                                std::string & metadata)
     {
-        m_transport_socket.rebind(host, port);
+        m_transport_socket.reset(new flip::CarrierTransportSocketTcp(m_document, session_id, metadata, host, port));
+        
+        m_transport_socket->listen_state_transition(std::bind(&CarrierSocket::onStateTransition,
+                                                              this,
+                                                              std::placeholders::_1,
+                                                              std::placeholders::_2));
+        
+        m_transport_socket->listen_transfer_backend(std::bind(&CarrierSocket::onTransferBackend,
+                                                              this,
+                                                              std::placeholders::_1,
+                                                              std::placeholders::_2));
     }
     
     CarrierSocket::~CarrierSocket()

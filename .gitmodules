@@ -1,9 +1,9 @@
 [submodule "ThirdParty/Juce"]
 	path = ThirdParty/Juce
 	url = https://github.com/julianstorer/JUCE.git
-[submodule "ThirdParty/cpr"]
-	path = ThirdParty/cpr
-	url = https://github.com/whoshuu/cpr.git
-[submodule "ThirdParty/readerwriterqueue"]
-	path = ThirdParty/readerwriterqueue
-	url = https://github.com/cameron314/readerwriterqueue.git
+[submodule "ThirdParty/concurrentqueue"]
+	path = ThirdParty/concurrentqueue
+	url = https://github.com/cameron314/concurrentqueue.git
+[submodule "ThirdParty/Beast"]
+	path = ThirdParty/Beast
+	url = https://github.com/boostorg/beast.git

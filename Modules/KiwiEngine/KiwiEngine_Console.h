@@ -21,8 +21,8 @@
 
 #pragma once
 
-#include <KiwiModel/KiwiModel_Atom.h>
-#include "KiwiEngine_Listeners.h"
+#include <KiwiTool/KiwiTool_Atom.h>
+#include <KiwiTool/KiwiTool_Listeners.h>
 
 namespace kiwi
 {
@@ -86,7 +86,7 @@ namespace kiwi
             
         private: // members
             
-            Listeners<Listener>  m_listeners;
+            tool::Listeners<Listener>  m_listeners;
         };
     }
 }

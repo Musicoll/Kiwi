@@ -35,15 +35,20 @@ matrix:
     install:
       # make sure CXX is correctly set
       - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
-      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr ThirdParty/readerwriterqueue
+      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/concurrentqueue ThirdParty/Beast
       - pip install --user cpp-coveralls
-      - wget --no-check-certificate -O ../curl-7.52.1.tar.gz https://github.com/Musicoll/Kiwi/files/999838/curl-7.52.1-linux.tar.gz
       - wget --no-check-certificate -O ../flip-demo.tar.gz http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files/flip-demo-linux-c47e41da05.tar.gz
       - cd ..
-      - tar xvzf curl-7.52.1.tar.gz
       - tar xvzf flip-demo.tar.gz &> /dev/null
-      - export KIWI_CURL_LIB=$(pwd)/curl-7.52.1/lib && export KIWI_CURL_INCLUDE=$(pwd)/curl-7.52.1/include
       - export KIWI_FLIP_LIB=$(pwd)/flip-demo/lib/gcc && export KIWI_FLIP_INCLUDE=$(pwd)/flip-demo/include
+      - cd ${HOME}
+      - wget --no-check-certificate -O ./boost_1_63_0.tar.gz https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz
+      - tar xvzf ./boost_1_63_0.tar.gz &> /dev/null
+      - cd ./boost_1_63_0
+      - ./bootstrap.sh toolset=gcc link=static
+      - ./b2 --with-system stage
+      - export KIWI_BOOST_INCLUDE=${HOME}/boost_1_63_0
+      - export KIWI_BOOST_LIB=${HOME}/boost_1_63_0/stage/lib
       - cd ${TRAVIS_BUILD_DIR}
 
     script:
@@ -58,47 +63,103 @@ matrix:
     - mkdir Kiwi
     - mv Build/Release/KiwiBuild/Kiwi Kiwi/Kiwi
     - tar zcvf Kiwi_linux.tar.gz Kiwi/
+    - mkdir Kiwi_Server
+    - mv Build/Release/KiwiBuild/Server Kiwi_Server/Server
+    - tar zcvf Kiwi_Server_linux.tar.gz Kiwi_Server/
 
     deploy:
       provider: releases
       api_key:
         secure: atcBDMdJNzUGiUYSqQu/URg8mfvRk9b78tvj1eHKCeDXSTP0Y1UvI5YpmTx8SkUXp23QH4sgp0tKTFB98FbRojR4IL2NW+KZDG1o5BxZ4HYJ4hdCXXXhzeujcn2AjQzRJ9f8uodX/7Pfa19jGlovj1Tl9ZJ9jIfyyvcxlJXkTN9+CDlkkcpLNU64c4B+CclS8aLPbIKqvLmIy3fphzzkJoKN5rnE4EvKrIkJBPEib1WIY8K7W8boCwghsGBs04MwRZwidKIjPSPgbYpmGPspfKpu0W8mKMirdGEVt4rzpm+Dl9wMa/5Qsyc6afYfS4p3PZOfBio0mtVrPz4+4VXy/Ad+FDNnvxUy9776D0pSv2iBrdHhqs6n1vG0uT4uhbGtvwJR3BBbo6+TmEKakRgp+uRhYEvGy/EO0OkcKrOVLsrZ/akj8O+KOSROrz2VYfxmDTxtUi8K51vW3pJhcGsEsN1FkcJfef/pvxGLK5i0qEZWoyCyA4YMPNDWFFiuBadPTujIGJ/iDmwouzalV9F0vKOIFvP9IuZ1FHLOyEzhyoBS3l1NNpQUz+HNgupTVYSREH1qPXUHg3B5BdFpEJpOjU/P8gwG4npcNxX/5XvigFFiTeEN+eV4xcBVLcg+SsumeswIqi5Tvm+mzYyqz3wj628ddWxgGiPFSfySI4tz6lg=
-      file: Kiwi_linux.tar.gz
+      file:
+      - Kiwi_linux.tar.gz
+      - Kiwi_Server_linux.tar.gz
       skip_cleanup: true
+      draft: true
+      prerelease: false
       on:
         repo: Musicoll/Kiwi
         tags: true
+        branch: master
+
+    deploy:
+      provider: releases
+      api_key:
+        secure: atcBDMdJNzUGiUYSqQu/URg8mfvRk9b78tvj1eHKCeDXSTP0Y1UvI5YpmTx8SkUXp23QH4sgp0tKTFB98FbRojR4IL2NW+KZDG1o5BxZ4HYJ4hdCXXXhzeujcn2AjQzRJ9f8uodX/7Pfa19jGlovj1Tl9ZJ9jIfyyvcxlJXkTN9+CDlkkcpLNU64c4B+CclS8aLPbIKqvLmIy3fphzzkJoKN5rnE4EvKrIkJBPEib1WIY8K7W8boCwghsGBs04MwRZwidKIjPSPgbYpmGPspfKpu0W8mKMirdGEVt4rzpm+Dl9wMa/5Qsyc6afYfS4p3PZOfBio0mtVrPz4+4VXy/Ad+FDNnvxUy9776D0pSv2iBrdHhqs6n1vG0uT4uhbGtvwJR3BBbo6+TmEKakRgp+uRhYEvGy/EO0OkcKrOVLsrZ/akj8O+KOSROrz2VYfxmDTxtUi8K51vW3pJhcGsEsN1FkcJfef/pvxGLK5i0qEZWoyCyA4YMPNDWFFiuBadPTujIGJ/iDmwouzalV9F0vKOIFvP9IuZ1FHLOyEzhyoBS3l1NNpQUz+HNgupTVYSREH1qPXUHg3B5BdFpEJpOjU/P8gwG4npcNxX/5XvigFFiTeEN+eV4xcBVLcg+SsumeswIqi5Tvm+mzYyqz3wj628ddWxgGiPFSfySI4tz6lg=
+      file:
+      - Kiwi_linux.tar.gz
+      - Kiwi_Server_linux.tar.gz
+      skip_cleanup: true
+      draft: true
+      prerelease: false
+      name: ${TRAVIS_TAG}
+      tag_name: ${TRAVIS_TAG}
+      on:
+        repo: Musicoll/Kiwi
+        tags: true
+        condition: $TRAVIS_BRANCH != "master"
 
   - os: osx
     compiler: clang++
     env: COMPILER=clang++
+    osx_image: xcode9.2
 
     install:
-      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/cpr ThirdParty/readerwriterqueue
-      - curl -o ../curl-7.52.1.zip -L  https://github.com/Musicoll/Kiwi/files/997532/curl-7.52.1-macos.zip
+      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/concurrentqueue ThirdParty/Beast
       - curl -o ../flip-demo.tar.gz -L http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files/flip-demo-macos-c47e41da05.tar.gz
       - cd ..
-      - unzip curl-7.52.1.zip
       - tar xvzf flip-demo.tar.gz &> /dev/null
-      - export KIWI_CURL_LIB=$(pwd)/curl-7.52.1/lib && export KIWI_CURL_INCLUDE=$(pwd)/curl-7.52.1/include
       - export KIWI_FLIP_LIB=$(pwd)/flip-demo/lib && export KIWI_FLIP_INCLUDE=$(pwd)/flip-demo/include
+      - cd ${HOME}
+      - curl -o ./boost_1_63_0.tar.gz -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz
+      - tar xvzf ./boost_1_63_0.tar.gz &> /dev/null
+      - cd ./boost_1_63_0
+      - ./bootstrap.sh toolset=clang macosx-version-min=10.8 architecture=combined link=static
+      - ./b2 address-model=32_64 --with-system stage
+      - export KIWI_BOOST_INCLUDE=${HOME}/boost_1_63_0
+      - export KIWI_BOOST_LIB=${HOME}/boost_1_63_0/stage/lib
       - cd ${TRAVIS_BUILD_DIR}
 
     script:
     - python ./Scripts/configure.py -c Release
-    - python ./Scripts/build.py -c Release | xcpretty
+    - python ./Scripts/build.py -c Release
 
     before_deploy:
     - mkdir Kiwi
     - mv Build/Release/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
     - zip -r Kiwi_macos.zip Kiwi
+    - mkdir Kiwi_Server
+    - mv Build/Release/KiwiBuild/Release/Server Kiwi_Server/Server
+    - zip -r Kiwi_Server_macos.zip Kiwi_Server
 
     deploy:
       provider: releases
       api_key:
         secure: atcBDMdJNzUGiUYSqQu/URg8mfvRk9b78tvj1eHKCeDXSTP0Y1UvI5YpmTx8SkUXp23QH4sgp0tKTFB98FbRojR4IL2NW+KZDG1o5BxZ4HYJ4hdCXXXhzeujcn2AjQzRJ9f8uodX/7Pfa19jGlovj1Tl9ZJ9jIfyyvcxlJXkTN9+CDlkkcpLNU64c4B+CclS8aLPbIKqvLmIy3fphzzkJoKN5rnE4EvKrIkJBPEib1WIY8K7W8boCwghsGBs04MwRZwidKIjPSPgbYpmGPspfKpu0W8mKMirdGEVt4rzpm+Dl9wMa/5Qsyc6afYfS4p3PZOfBio0mtVrPz4+4VXy/Ad+FDNnvxUy9776D0pSv2iBrdHhqs6n1vG0uT4uhbGtvwJR3BBbo6+TmEKakRgp+uRhYEvGy/EO0OkcKrOVLsrZ/akj8O+KOSROrz2VYfxmDTxtUi8K51vW3pJhcGsEsN1FkcJfef/pvxGLK5i0qEZWoyCyA4YMPNDWFFiuBadPTujIGJ/iDmwouzalV9F0vKOIFvP9IuZ1FHLOyEzhyoBS3l1NNpQUz+HNgupTVYSREH1qPXUHg3B5BdFpEJpOjU/P8gwG4npcNxX/5XvigFFiTeEN+eV4xcBVLcg+SsumeswIqi5Tvm+mzYyqz3wj628ddWxgGiPFSfySI4tz6lg=
-      file: Kiwi_macos.zip
+      file:
+      - Kiwi_macos.zip
+      - Kiwi_Server_macos.zip
       skip_cleanup: true
+      draft: true
+      prerelease: false
       on:
         repo: Musicoll/Kiwi
         tags: true
+        branch: master
+
+    deploy:
+      provider: releases
+      api_key:
+        secure: atcBDMdJNzUGiUYSqQu/URg8mfvRk9b78tvj1eHKCeDXSTP0Y1UvI5YpmTx8SkUXp23QH4sgp0tKTFB98FbRojR4IL2NW+KZDG1o5BxZ4HYJ4hdCXXXhzeujcn2AjQzRJ9f8uodX/7Pfa19jGlovj1Tl9ZJ9jIfyyvcxlJXkTN9+CDlkkcpLNU64c4B+CclS8aLPbIKqvLmIy3fphzzkJoKN5rnE4EvKrIkJBPEib1WIY8K7W8boCwghsGBs04MwRZwidKIjPSPgbYpmGPspfKpu0W8mKMirdGEVt4rzpm+Dl9wMa/5Qsyc6afYfS4p3PZOfBio0mtVrPz4+4VXy/Ad+FDNnvxUy9776D0pSv2iBrdHhqs6n1vG0uT4uhbGtvwJR3BBbo6+TmEKakRgp+uRhYEvGy/EO0OkcKrOVLsrZ/akj8O+KOSROrz2VYfxmDTxtUi8K51vW3pJhcGsEsN1FkcJfef/pvxGLK5i0qEZWoyCyA4YMPNDWFFiuBadPTujIGJ/iDmwouzalV9F0vKOIFvP9IuZ1FHLOyEzhyoBS3l1NNpQUz+HNgupTVYSREH1qPXUHg3B5BdFpEJpOjU/P8gwG4npcNxX/5XvigFFiTeEN+eV4xcBVLcg+SsumeswIqi5Tvm+mzYyqz3wj628ddWxgGiPFSfySI4tz6lg=
+      file:
+      - Kiwi_macos.zip
+      - Kiwi_Server_macos.zip
+      skip_cleanup: true
+      draft: true
+      prerelease: false
+      name: ${TRAVIS_TAG}
+      tag_name: ${TRAVIS_TAG}
+      on:
+        repo: Musicoll/Kiwi
+        tags: true
+        condition: $TRAVIS_BRANCH != "master"

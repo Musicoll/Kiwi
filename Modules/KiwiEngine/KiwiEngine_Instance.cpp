@@ -20,7 +20,6 @@
  */
 
 #include "KiwiEngine_Factory.h"
-#include "KiwiEngine_Objects.h"
 #include "KiwiEngine_Instance.h"
 
 namespace kiwi
@@ -31,15 +30,19 @@ namespace kiwi
         //                                      INSTANCE                                    //
         // ================================================================================ //
         
-        Instance::Instance(std::unique_ptr<AudioControler> audio_controler):
-        m_audio_controler(std::move(audio_controler))
+        Instance::Instance(std::unique_ptr<AudioControler> audio_controler, tool::Scheduler<> & main_scheduler):
+        m_audio_controler(std::move(audio_controler)),
+        m_scheduler(),
+        m_main_scheduler(main_scheduler),
+        m_quit(false),
+        m_engine_thread(std::bind(&Instance::processScheduler, this))
         {
-            addObjectsToFactory();
         }
         
         Instance::~Instance()
         {
-            ;
+            m_quit.store(true);
+            m_engine_thread.join();
         }
         
         // ================================================================================ //
@@ -76,27 +79,6 @@ namespace kiwi
             m_console.removeListener(listener);
         }
         
-        void Instance::addObjectsToFactory()
-        {
-            engine::Factory::add<NewBox>("newbox");
-            engine::Factory::add<ErrorBox>("errorbox");
-            engine::Factory::add<Plus>("plus");
-            engine::Factory::add<Times>("times");
-            engine::Factory::add<Print>("print");
-            engine::Factory::add<Receive>("receive");
-            engine::Factory::add<Loadmess>("loadmess");
-            engine::Factory::add<Delay>("delay");
-            engine::Factory::add<Pipe>("pipe");
-            engine::Factory::add<Metro>("metro");
-            engine::Factory::add<OscTilde>("osc~");
-            engine::Factory::add<AdcTilde>("adc~");
-            engine::Factory::add<DacTilde>("dac~");
-            engine::Factory::add<TimesTilde>("times~");
-            engine::Factory::add<PlusTilde>("plus~");
-            engine::Factory::add<SigTilde>("sig~");
-            engine::Factory::add<DelaySimpleTilde>("delaysimple~");
-        }
-        
         // ================================================================================ //
         //                              AUDIO CONTROLER                                     //
         // ================================================================================ //
@@ -104,6 +86,32 @@ namespace kiwi
         AudioControler& Instance::getAudioControler() const
         {
             return *m_audio_controler.get();
+        }
+        
+        // ================================================================================ //
+        //                                  SCHEDULER                                       //
+        // ================================================================================ //
+        
+        tool::Scheduler<> & Instance::getScheduler()
+        {
+            return m_scheduler;
+        }
+        
+        tool::Scheduler<> & Instance::getMainScheduler()
+        {
+            return m_main_scheduler;
+        }
+        
+        void Instance::processScheduler()
+        {
+            m_scheduler.setThreadAsConsumer();
+            
+            while(!m_quit.load())
+            {
+                m_scheduler.process();
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+            }
         }
     }
 }

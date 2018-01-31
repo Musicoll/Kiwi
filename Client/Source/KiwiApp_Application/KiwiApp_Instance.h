@@ -22,6 +22,9 @@
 #pragma once
 
 #include <KiwiEngine/KiwiEngine_Instance.h>
+#include <KiwiTool/KiwiTool_Scheduler.h>
+
+#include <juce_events/timers/juce_Timer.h>
 
 #include "flip/Document.h"
 
@@ -31,8 +34,9 @@
 #include "KiwiApp_BeaconDispatcher.h"
 
 #include "../KiwiApp_Patcher/KiwiApp_PatcherManager.h"
-#include "../KiwiApp_General/KiwiApp_StoredSettings.h"
 #include "../KiwiApp_Audio/KiwiApp_DspDeviceManager.h"
+
+#include "../KiwiApp_Auth/KiwiApp_AuthPanel.h"
 
 namespace kiwi
 {
@@ -43,7 +47,7 @@ namespace kiwi
     // ================================================================================ //
 
     //! @brief The Application Instance
-    class Instance
+    class Instance : public juce::Timer
     {
     public:
         
@@ -53,9 +57,18 @@ namespace kiwi
         //! @brief Destructor
         ~Instance();
         
+        //! @brief Timer call back, processes the scheduler events list.
+        void timerCallback() override final;
+        
         //! @brief Get the user ID of the Instance.
         uint64_t getUserId() const noexcept;
         
+        //! @brief Enables the document browser view.
+        void login();
+        
+        //! @brief Close all remote patchers and disable document browser view.
+        void logout();
+    
         //! @brief create a new patcher window.
         void newPatcher();
         
@@ -63,7 +76,10 @@ namespace kiwi
         engine::Instance& useEngineInstance();
         
         //! @brief Returns the engine::Instance
-        engine::Instance const& getEngineInstance() const;
+        engine::Instance const& useEngineInstance() const;
+        
+        //! @brief Returns the instance's scheduler
+        tool::Scheduler<> & useScheduler();
         
         //! @brief Open a File.
         bool openFile(juce::File const& file);
@@ -77,12 +93,15 @@ namespace kiwi
         //! @brief Attempt to close the given window asking user to save file if needed.
         void closeWindow(Window& window);
         
+        //! @brief Attempt to close the window with the given id, asking user to save file if needed.
+        void closeWindowWithId(WindowId window_id);
+        
         //! @brief Attempt to close all document, after asking user to save them if needed.
         //! @return True if all document have been closed, false if the user cancel the action.
         bool closeAllPatcherWindows();
         
         //! @brief Attempt to create a new patcher with document Session informations.
-        PatcherManager* openRemotePatcher(DocumentBrowser::Drive::DocumentSession& session);
+        void openRemotePatcher(DocumentBrowser::Drive::DocumentSession& session);
         
         //! @brief Brings the Application settings window to front.
         void showAppSettingsWindow();
@@ -95,6 +114,9 @@ namespace kiwi
         
         //! @brief Brings the Console to front.
         void showConsoleWindow();
+        
+        //! @brief Brings the Auth form window to front.
+        void showAuthWindow(AuthPanel::FormType type);
         
         //! @brief Brings the "About Kiwi" window to front.
         void showAboutKiwiWindow();
@@ -118,6 +140,9 @@ namespace kiwi
         //! @internal get the given patcher manager iterator.
         PatcherManagers::iterator getPatcherManagerForSession(DocumentBrowser::Drive::DocumentSession& session);
         
+        //! @internal gets patcher manager currently associated to file.
+        Instance::PatcherManagers::iterator getPatcherManagerForFile(juce::File const& file);
+        
         //! @internal Returns the next untitled number based on current documents
         size_t getNextUntitledNumberAndIncrement();
         
@@ -127,9 +152,9 @@ namespace kiwi
         
     private: // variables
         
-        engine::Instance                            m_instance;
+        tool::Scheduler<>                           m_scheduler;
         
-        uint64_t                                    m_user_id;
+        engine::Instance                            m_instance;
         
         DocumentBrowser                             m_browser;
         

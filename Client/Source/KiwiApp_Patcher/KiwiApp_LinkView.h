@@ -23,7 +23,7 @@
 
 #include <KiwiModel/KiwiModel_Link.h>
 
-#include "KiwiApp_ObjectView.h"
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectFrame.h>
 
 namespace kiwi
 {
@@ -112,7 +112,7 @@ namespace kiwi
     public:
         
         //! @brief Constructor
-        LinkViewCreator(ObjectView& binded_object,
+        LinkViewCreator(ObjectFrame& binded_object,
                      const size_t index,
                      bool is_sender,
                      juce::Point<int> dragged_pos);
@@ -121,7 +121,7 @@ namespace kiwi
         ~LinkViewCreator() = default;
         
         //! @brief Get the binded object
-        ObjectView& getBindedObject() const {return m_binded_object;};
+        ObjectFrame& getBindedObject() const {return m_binded_object;};
         
         //! @brief Get the portlet index
         size_t getBindedIndex() const {return m_index;};
@@ -140,7 +140,7 @@ namespace kiwi
         
     private: // members
         
-        ObjectView&            m_binded_object;
+        ObjectFrame&        m_binded_object;
         const size_t        m_index;
         const bool          m_is_sender;
     };

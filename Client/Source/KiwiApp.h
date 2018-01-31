@@ -21,11 +21,7 @@
 
 #pragma once
 
-#include <thread>
-
 #include <juce_gui_basics/juce_gui_basics.h>
-
-#include <KiwiEngine/KiwiEngine_Scheduler.h>
 
 #include "KiwiApp_Application/KiwiApp_Instance.h"
 #include "KiwiApp_General/KiwiApp_StoredSettings.h"
@@ -33,10 +29,12 @@
 
 #include "KiwiApp_Components/KiwiApp_TooltipWindow.h"
 
+#include "KiwiApp_Network/KiwiApp_ApiController.h"
+
 namespace ProjectInfo
 {
     const char* const  projectName    = "Kiwi";
-    const char* const  versionString  = "0.1.0";
+    const char* const  versionString  = "v1.0.0-beta";
     const int          versionNumber  = 0x010;
 }
 
@@ -46,7 +44,8 @@ namespace kiwi
     //                                  KiWi APPLICATION                                //
     // ================================================================================ //
     
-    class KiwiApp : public juce::JUCEApplication
+    class KiwiApp : public juce::JUCEApplication,
+                    public NetworkSettings::Listener
     {
     public: // methods
         
@@ -84,9 +83,6 @@ namespace kiwi
         //! @brief Returns true if the app is running in a Windows operating system.
         static bool isWindows();
         
-        //! @brief Run the engine scheduler executed queued events.
-        void processEngine();
-        
         //==============================================================================
         
         //! @brief Get the current running application instance.
@@ -97,6 +93,34 @@ namespace kiwi
         
         //! @brief Get the current running kiwi instance.
         static Instance& useInstance();
+        
+        //! @brief Get the Api object.
+        static Api& useApi();
+        
+        //! @brief Attempt to log-in the user (Async).
+        //! @param name_or_email The name or email of the user.
+        //! @param password The user password.
+        //! @see logout, getCurrentUser
+        static void login(std::string const& name_or_email,
+                          std::string const& password,
+                          std::function<void()> success_callback,
+                          Api::ErrorCallback error_callback);
+        
+        //! @brief Attempt to register/signup the user.
+        //! @param username user name
+        //! @param email email address
+        //! @param password password
+        static void signup(std::string const& username,
+                           std::string const& email,
+                           std::string const& password,
+                           std::function<void(std::string)> success_callback,
+                           Api::ErrorCallback error_callback);
+        
+        //! @brief Returns the current user
+        static Api::AuthUser const& getCurrentUser();
+        
+        //! @brief Log-out the user
+        static void logout();
         
         //! @brief Get the current running engine instance.
         static engine::Instance& useEngineInstance();
@@ -158,6 +182,7 @@ namespace kiwi
         
         //! @brief Called by createMenu to create each menu
         void createOpenRecentPatchersMenu(juce::PopupMenu& menu);
+        void createAccountMenu(juce::PopupMenu& menu);
         void createFileMenu(juce::PopupMenu& menu);
         void createEditMenu(juce::PopupMenu& menu);
         void createViewMenu(juce::PopupMenu& menu);
@@ -209,13 +234,26 @@ namespace kiwi
         //! @internal Utility to quit the app asynchronously.
         class AsyncQuitRetrier;
         
+        //! @internal Initializes engine's factory declaring engine objects
+        void declareEngineObjects();
+        
+        //! @internal Initializes gui specific objects.
+        void declareObjectViews();
+        
+        //! @internal Checks if current Kiwi version is the latest. Show popup if version not up to date.
+        void checkLatestRelease();
+        
+        // @brief Handles changes of server address.
+        void networkSettingsChanged(NetworkSettings const& settings, juce::Identifier const& ids) override final;
+        
     private: // members
+        
+        std::unique_ptr<ApiController>                      m_api_controller;
+        std::unique_ptr<Api>                                m_api;
         
         std::unique_ptr<Instance>                           m_instance;
         std::unique_ptr<juce::ApplicationCommandManager>	m_command_manager;
         std::unique_ptr<MainMenuModel>                      m_menu_model;
-        std::thread                                         m_engine_thread;
-        std::atomic<bool>                                   m_quit_requested;
         
         LookAndFeel                                         m_looknfeel;
         TooltipWindow                                       m_tooltip_window;

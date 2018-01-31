@@ -20,9 +20,15 @@
  */
 
 #include <KiwiModel/KiwiModel_DataModel.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Objects.h>
 
-#include "KiwiApp.h"
-#include "KiwiApp_General/KiwiApp_CommandIDs.h"
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Objects.h>
+
+#include <KiwiApp_Patcher/KiwiApp_Factory.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_Objects.h>
+#include <KiwiApp.h>
+#include <KiwiApp_General/KiwiApp_CommandIDs.h>
+#include <KiwiApp_General/KiwiApp_IDs.h>
 
 namespace kiwi
 {
@@ -92,29 +98,33 @@ namespace kiwi
    
         model::DataModel::init();
         
+        declareEngineObjects();
+        
+        declareObjectViews();
+        
         juce::Desktop::getInstance().setGlobalScaleFactor(1.);
         
         juce::LookAndFeel::setDefaultLookAndFeel(&m_looknfeel);
         
         m_command_manager = std::make_unique<juce::ApplicationCommandManager>();
         
-        engine::Scheduler<>::createInstance();
-        
         m_settings = std::make_unique<StoredSettings>();
         
+        m_settings->network().addListener(*this);
+        
         m_menu_model.reset(new MainMenuModel());
-
-        engine::Scheduler<>& scheduler = engine::Scheduler<>::createInstance();
         
-        scheduler.registerConsumer(Thread::Engine);
-        scheduler.registerProducer(Thread::Gui, Thread::Engine);
-        scheduler.registerProducer(Thread::Engine, Thread::Engine);
-        
-        m_quit_requested.store(false);
-        m_engine_thread = std::thread(std::bind(&KiwiApp::processEngine, this));
+        m_api_controller.reset(new ApiController());
+        m_api.reset(new Api(*m_api_controller));
         
         m_instance = std::make_unique<Instance>();
         m_command_manager->registerAllCommandsForTarget(this);
+        
+        checkLatestRelease();
+
+        #if JUCE_WINDOWS
+        m_instance->openFile(juce::File(commandLine.unquoted()));
+        #endif
         
         #if JUCE_MAC
         juce::PopupMenu macMainMenuPopup;
@@ -133,12 +143,88 @@ namespace kiwi
         }
     }
     
+    void KiwiApp::declareEngineObjects()
+    {
+        engine::NewBox::declare();
+        engine::ErrorBox::declare();
+        engine::Slider::declare();
+        engine::Print::declare();
+        engine::Receive::declare();
+        engine::Plus::declare();
+        engine::Times::declare();
+        engine::Delay::declare();
+        engine::Metro::declare();
+        engine::Pipe::declare();
+        engine::Bang::declare();
+        engine::Toggle::declare();
+        engine::AdcTilde::declare();
+        engine::DacTilde::declare();
+        engine::OscTilde::declare();
+        engine::Loadmess::declare();
+        engine::SigTilde::declare();
+        engine::TimesTilde::declare();
+        engine::PlusTilde::declare();
+        engine::MeterTilde::declare();
+        engine::DelaySimpleTilde::declare();
+        engine::Message::declare();
+        engine::NoiseTilde::declare();
+        engine::PhasorTilde::declare();
+        engine::SahTilde::declare();
+        engine::SnapshotTilde::declare();
+        engine::Trigger::declare();
+        engine::LineTilde::declare();
+        engine::Minus::declare();
+        engine::Divide::declare();
+        engine::Equal::declare();
+        engine::Less::declare();
+        engine::Greater::declare();
+        engine::Different::declare();
+        engine::Pow::declare();
+        engine::Modulo::declare();
+        engine::MinusTilde::declare();
+        engine::DivideTilde::declare();
+        engine::LessTilde::declare();
+        engine::GreaterTilde::declare();
+        engine::EqualTilde::declare();
+        engine::DifferentTilde::declare();
+        engine::LessEqual::declare();
+        engine::LessEqualTilde::declare();
+        engine::GreaterEqual::declare();
+        engine::GreaterEqualTilde::declare();
+        engine::Comment::declare();
+        engine::Pack::declare();
+        engine::Unpack::declare();
+        engine::Random::declare();
+        engine::Scale::declare();
+        engine::Select::declare();
+        engine::Number::declare();
+        engine::NumberTilde::declare();
+        engine::Hub::declare();
+        engine::Mtof::declare();
+        engine::Send::declare();
+    }
+    
+    void KiwiApp::declareObjectViews()
+    {
+        SliderView::declare();
+        BangView::declare();
+        ToggleView::declare();
+        MeterTildeView::declare();
+        MessageView::declare();
+        CommentView::declare();
+        NumberView::declare();
+        NumberTildeView::declare();
+    }
+    
     void KiwiApp::shutdown()
     {
         #if JUCE_MAC
         juce::MenuBarModel::setMacMainMenu(nullptr);
         #endif
         
+        m_api->cancelPendingRequest();
+        m_api.reset();
+        m_api_controller.reset();
         m_settings.reset();
     }
     
@@ -152,12 +238,7 @@ namespace kiwi
         {
             if(m_instance->closeAllPatcherWindows())
             {
-                m_quit_requested.store(true);
-                m_engine_thread.join();
-                
                 m_instance.reset();
-                
-                engine::Scheduler<>::deleteInstance();
                 
                 quit();
             }
@@ -196,15 +277,6 @@ namespace kiwi
                 & juce::SystemStats::Windows) != 0;
     }
     
-    void KiwiApp::processEngine()
-    {
-        while(!m_quit_requested.load())
-        {
-            engine::Scheduler<>::use().process(Thread::Engine);
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
-    }
-    
     // ================================================================================ //
     //                                    STATIC QUERY                                  //
     // ================================================================================ //
@@ -228,11 +300,92 @@ namespace kiwi
     
     Instance& KiwiApp::useInstance()
     {
-        return *KiwiApp::use().m_instance.get();
+        return *KiwiApp::use().m_instance;
+    }
+    
+    Api& KiwiApp::useApi()
+    {
+        return *KiwiApp::use().m_api;
+    }
+    
+    void KiwiApp::login(std::string const& name_or_email,
+                        std::string const& password,
+                        std::function<void()> success_callback,
+                        Api::ErrorCallback error_callback)
+    {
+        auto& api_controller = *KiwiApp::use().m_api_controller;
+        
+        auto success = [cb = std::move(success_callback)]()
+        {
+            KiwiApp::useInstance().login();
+            cb();
+        };
+        
+        api_controller.login(name_or_email, password, std::move(success), std::move(error_callback));
+    }
+    
+    void KiwiApp::signup(std::string const& username,
+                         std::string const& email,
+                         std::string const& password,
+                         std::function<void(std::string)> success_callback,
+                         Api::ErrorCallback error_callback)
+    {
+        auto& api_controller = *KiwiApp::use().m_api_controller;
+        api_controller.signup(username, email, password, std::move(success_callback), std::move(error_callback));
+    }
+    
+    Api::AuthUser const& KiwiApp::getCurrentUser()
+    {
+        return KiwiApp::use().m_api_controller->getAuthUser();
+    }
+    
+    void KiwiApp::logout()
+    {
+        useInstance().logout();
+        KiwiApp::use().m_api_controller->logout();
+        KiwiApp::commandStatusChanged();
+    }
+    
+    void KiwiApp::checkLatestRelease()
+    {
+        std::string current_version = getApplicationVersion().toStdString();
+        
+        Api::CallbackFn<std::string const&> on_success = [current_version](std::string const& latest_version)
+        {
+                KiwiApp::useInstance().useScheduler().schedule([current_version, latest_version]()
+                {
+                    if (current_version.compare(latest_version) != 0)
+                    {
+                        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::QuestionIcon,
+                                                               "New release available" ,
+                                                               "Upgrading required to access remote documents.\n\n Please visit:\n https://github.com/Musicoll/Kiwi/releases");
+                    }
+                });
+        };
+        
+        Api::ErrorCallback on_fail =[](Api::Error error)
+        {
+        };
+        
+        useApi().getRelease(on_success, on_fail);
+    }
+    
+    void KiwiApp::networkSettingsChanged(NetworkSettings const& settings, juce::Identifier const& id)
+    {
+        if (id == Ids::server_address)
+        {
+            logout();
+            
+            m_api_controller->setHost(settings.getHost());
+            m_api_controller->setPort(settings.getApiPort());
+            
+            checkLatestRelease();
+        }
     }
     
     uint64_t KiwiApp::userID()
     {
+        // refactor this (maybe a useless method)
         return KiwiApp::use().m_instance->getUserId();
     }
     
@@ -345,7 +498,7 @@ namespace kiwi
     {
         const char* const names[] =
         {
-            "File", "Edit", "View", "Options", "Window", "Help", nullptr
+            "Account", "File", "Edit", "View", "Options", "Window", "Help", nullptr
         };
         
         return juce::StringArray(names);
@@ -353,12 +506,13 @@ namespace kiwi
     
     void KiwiApp::createMenu(juce::PopupMenu& menu, const juce::String& menuName)
     {
-        if		(menuName == "File")        createFileMenu		(menu);
-        else if (menuName == "Edit")        createEditMenu		(menu);
-        else if (menuName == "View")        createViewMenu		(menu);
-        else if (menuName == "Options")     createOptionsMenu	(menu);
-        else if (menuName == "Window")      createWindowMenu	(menu);
-        else if (menuName == "Help")		createHelpMenu		(menu);
+        if      (menuName == "Account") createAccountMenu   (menu);
+        else if (menuName == "File")    createFileMenu      (menu);
+        else if (menuName == "Edit")    createEditMenu      (menu);
+        else if (menuName == "View")    createViewMenu      (menu);
+        else if (menuName == "Options") createOptionsMenu   (menu);
+        else if (menuName == "Window")  createWindowMenu    (menu);
+        else if (menuName == "Help")    createHelpMenu      (menu);
         
         else assert(false); // names have changed?
     }
@@ -366,6 +520,16 @@ namespace kiwi
     void KiwiApp::createOpenRecentPatchersMenu(juce::PopupMenu& menu)
     {
         
+    }
+    
+    void KiwiApp::createAccountMenu(juce::PopupMenu& menu)
+    {
+        menu.addCommandItem(&getCommandManager(), CommandIDs::remember_me);
+        menu.addSeparator();
+        menu.addCommandItem(&getCommandManager(), CommandIDs::login);
+        menu.addCommandItem(&getCommandManager(), CommandIDs::signup);
+        menu.addSeparator();
+        menu.addCommandItem(&getCommandManager(), CommandIDs::logout);
     }
     
     void KiwiApp::createFileMenu(juce::PopupMenu& menu)
@@ -471,7 +635,11 @@ namespace kiwi
             CommandIDs::showBeaconDispatcherWindow,
             CommandIDs::switchDsp,
             CommandIDs::startDsp,
-            CommandIDs::stopDsp
+            CommandIDs::stopDsp,
+            CommandIDs::login,
+            CommandIDs::signup,
+            CommandIDs::logout,
+            CommandIDs::remember_me,
         };
         
         commands.addArray(ids, juce::numElementsInArray(ids));
@@ -503,6 +671,46 @@ namespace kiwi
                                CommandCategories::windows, 0);
                 
                 result.addDefaultKeypress('k', juce::ModifierKeys::commandModifier);
+                break;
+            }
+            case CommandIDs::login:
+            {
+                auto const& user = getCurrentUser();
+                const bool logged = user.isLoggedIn();
+                result.setInfo(logged
+                               ? juce::String(TRANS("Logged-in as ") + user.getName())
+                               : TRANS("Login"),
+                               TRANS("Show the \"Login form\" Window"),
+                               CommandCategories::windows, 0);
+                
+                result.setActive(!logged);
+                break;
+            }
+            case CommandIDs::signup:
+            {
+                result.setInfo(TRANS("Register"), TRANS("Show the \"Register form\" Window"),
+                               CommandCategories::windows, 0);
+                
+                result.setActive(!getCurrentUser().isLoggedIn());
+                break;
+            }
+            case CommandIDs::logout:
+            {
+                result.setInfo(TRANS("Logout"), TRANS("Log out current user"),
+                               CommandCategories::windows, 0);
+                
+                result.setActive(getCurrentUser().isLoggedIn());
+                break;
+            }
+            case CommandIDs::remember_me:
+            {
+                result.setInfo(TRANS("Remember me"), TRANS("Remember current user"),
+                               CommandCategories::windows, 0);
+                
+                auto const& user = getCurrentUser();
+                
+                result.setActive(user.isLoggedIn());
+                result.setTicked(getAppSettings().network().getRememberUserFlag());
                 break;
             }
             case CommandIDs::showAboutAppWindow:
@@ -545,7 +753,7 @@ namespace kiwi
                 result.setInfo(TRANS("Switch global DSP state"), TRANS("Switch global DSP state"),
                                CommandCategories::general, 0);
                 
-                result.setTicked(m_instance->getEngineInstance().getAudioControler().isAudioOn());
+                result.setTicked(m_instance->useEngineInstance().getAudioControler().isAudioOn());
                 
                 break;
             }
@@ -554,7 +762,7 @@ namespace kiwi
                 result.setInfo(TRANS("Start dsp"), TRANS("Start dsp"),
                                CommandCategories::general, 0);
 
-                result.setActive(!m_instance->getEngineInstance().getAudioControler().isAudioOn());
+                result.setActive(!m_instance->useEngineInstance().getAudioControler().isAudioOn());
                 
                 break;
             }
@@ -563,19 +771,21 @@ namespace kiwi
                 result.setInfo(TRANS("Stop dsp"), TRANS("Stop dsp"),
                                CommandCategories::general, 0);
                 
-                result.setActive(m_instance->getEngineInstance().getAudioControler().isAudioOn());
+                result.setActive(m_instance->useEngineInstance().getAudioControler().isAudioOn());
                 
+                break;
+            }
+            case juce::StandardApplicationCommandIDs::quit:
+            {
+                result.setInfo(TRANS("Quit Kiwi"), TRANS("Quits the application"),
+                               CommandCategories::general, 0);
+                
+                result.addDefaultKeypress('q', juce::ModifierKeys::commandModifier);
                 break;
             }
             default:
             {
-                if(commandID == juce::StandardApplicationCommandIDs::quit)
-                {
-                    result.setInfo(TRANS("Quit Kiwi"), TRANS("Quits the application"),
-                                   CommandCategories::general, 0);
-                    
-                    result.addDefaultKeypress('q', juce::ModifierKeys::commandModifier);
-                }
+                break;
             }
         }
     }
@@ -592,6 +802,28 @@ namespace kiwi
             case CommandIDs::openFile :
             {
                 m_instance->askUserToOpenPatcherDocument();
+                break;
+            }
+            case CommandIDs::login:
+            {
+                m_instance->showAuthWindow(AuthPanel::FormType::Login);
+                break;
+            }
+            case CommandIDs::signup:
+            {
+                m_instance->showAuthWindow(AuthPanel::FormType::SignUp);
+                break;
+            }
+            case CommandIDs::logout:
+            {
+                KiwiApp::logout();
+                break;
+            }
+            case CommandIDs::remember_me:
+            {
+                auto& settings = getAppSettings().network();
+                settings.setRememberUserFlag(!settings.getRememberUserFlag());
+                commandStatusChanged();
                 break;
             }
             case CommandIDs::showConsoleWindow :

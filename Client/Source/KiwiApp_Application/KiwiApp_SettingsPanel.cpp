@@ -19,8 +19,10 @@
  ==============================================================================
  */
 
-#include "KiwiApp_SettingsPanel.h"
-#include "../KiwiApp.h"
+#include <KiwiApp_Application/KiwiApp_SettingsPanel.h>
+#include <KiwiApp_General/KiwiApp_IDs.h>
+#include <KiwiApp.h>
+#include <KiwiApp_General/KiwiApp_StoredSettings.h>
 
 namespace kiwi
 {
@@ -28,26 +30,76 @@ namespace kiwi
     //                                  SETTINGS PANEL                                  //
     // ================================================================================ //
     
-    SettingsPanel::SettingsPanel() : juce::PropertyPanel("Application settings")
+    SettingsPanel::SettingsPanel():
+    m_settings(getAppSettings().network().getServerAddress()),
+    m_pannel("Application settings"),
+    m_apply_button("apply"),
+    m_reset_button("reset")
     {
-        auto& net_config = getAppSettings().network();
         
         juce::Array<juce::PropertyComponent*> props {
             
-            new juce::TextPropertyComponent(net_config.getHostValue(), "Host", 20, false),
-            new juce::TextPropertyComponent(net_config.getApiPortValue(), "API Port", 5, false),
-            new juce::TextPropertyComponent(net_config.getSessionPortValue(), "Session Port", 5, false),
-            new juce::TextPropertyComponent(net_config.getRefreshIntervalValue(), "Refresh interval time", 5, false)
+            new juce::TextPropertyComponent(m_settings
+                                            .getPropertyAsValue(Ids::host, nullptr),"Host", 20,false),
+            new juce::TextPropertyComponent(m_settings
+                                            .getPropertyAsValue(Ids::api_port, nullptr), "API Port", 5, false),
+            new juce::TextPropertyComponent(m_settings
+                                            .getPropertyAsValue(Ids::session_port, nullptr), "Session Port", 5, false)
             
         };
         
-        addSection("Network config", props, true, 0);
+        m_pannel.addSection("Network config", props, true, 0);
         
-        setSize(300, 400);
+        m_apply_button.setButtonText("Apply");
+        m_reset_button.setButtonText("Reset");
+        
+        m_apply_button.addListener(this);
+        m_reset_button.addListener(this);
+        
+        setSize(400, m_pannel.getTotalContentHeight() + 50);
+        
+        addAndMakeVisible(m_pannel);
+        addAndMakeVisible(m_apply_button);
+        addAndMakeVisible(m_reset_button);
     }
     
     SettingsPanel::~SettingsPanel()
     {
-        clear();
+        m_pannel.clear();
+    }
+    
+    void SettingsPanel::resized()
+    {
+        juce::Rectangle<int> bounds = getLocalBounds();
+        
+        m_pannel.setBounds(bounds.withHeight(m_pannel.getTotalContentHeight()));
+        
+        m_apply_button.setBounds(bounds
+                                 .withPosition(m_pannel.getX() + 10, m_pannel.getBottom() + 10)
+                                 .withHeight(30));
+        
+        m_apply_button.changeWidthToFitText();
+        
+        m_reset_button.setBounds(m_apply_button.getBounds().withLeft(m_apply_button.getRight() + 10));
+        
+        m_reset_button.changeWidthToFitText();
+    }
+    
+    void SettingsPanel::buttonClicked(juce::Button * button)
+    {
+        if (button->getName() == "apply")
+        {
+            getAppSettings().network().setServerAddress(m_settings[Ids::host].toString().toStdString(),
+                                                        m_settings[Ids::api_port].operator int(),
+                                                        m_settings[Ids::session_port].operator int());
+        }
+        else if(button->getName() == "reset")
+        {
+            NetworkSettings & network = getAppSettings().network();
+            
+            network.resetToDefault();
+            
+            m_settings.copyPropertiesFrom(network.getServerAddress(), nullptr);
+        }
     }
 }

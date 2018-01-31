@@ -63,6 +63,13 @@ namespace kiwi
         g.fillAll(juce::Colour(0xff444444));
     }
     
+    void PatcherToolbar::removeUsersIcon()
+    {
+        m_toolbar.removeToolbarItem(0);
+        m_toolbar.removeToolbarItem(0);
+        m_toolbar.repaint();
+    }
+    
     PatcherToolbar::Factory::Factory(PatcherManager& patcher_manager) : m_patcher_manager(patcher_manager)
     {
         
@@ -153,11 +160,13 @@ namespace kiwi
                                                            PatcherManager& patcher_manager)
     : ToolbarItemComponent (toolbarItemId, "Custom Toolbar Item", false)
     , m_patcher_manager(patcher_manager)
-    , m_users(m_patcher_manager.getNumberOfUsers())
+    , m_users()
+    , m_user_nb(m_patcher_manager.getNumberOfUsers())
     , m_users_img(juce::ImageCache::getFromMemory(binary_data::images::users_png,
                                                   binary_data::images::users_png_size))
     , m_flash_alpha(0.f)
     {
+        updateUsers();
         m_patcher_manager.addListener(*this);
     }
     
@@ -166,11 +175,45 @@ namespace kiwi
         m_patcher_manager.removeListener(*this);
     }
     
+    void PatcherToolbar::UsersItemComponent::updateUsers()
+    {
+        m_user_nb = m_patcher_manager.getNumberOfUsers();
+        
+        startFlashing();
+        
+        auto success = [this](Api::Users users)
+        {
+            KiwiApp::useInstance().useScheduler().schedule([this, users]()
+            {
+                m_users.clear();
+                
+                for(Api::User const& user : users)
+                {
+                    m_users.push_back(user.getName());
+                    
+                }
+                
+            });
+        };
+        
+        auto fail = [this](Api::Error error)
+        {
+            KiwiApp::useInstance().useScheduler().schedule([this, error]()
+            {
+                m_users.clear();
+                
+            });
+        };
+        
+        KiwiApp::useApi().getUsers(m_patcher_manager.getConnectedUsers(), success, fail);
+    }
+    
     void PatcherToolbar::UsersItemComponent::connectedUserChanged(PatcherManager& manager)
     {
         if(&manager == &m_patcher_manager)
         {
-            m_users = m_patcher_manager.getNumberOfUsers();
+            updateUsers();
+            
             startFlashing();
         }
     }
@@ -195,7 +238,7 @@ namespace kiwi
         g.fillEllipse(label_bounds.expanded(2).toFloat());
         
         g.setColour(juce::Colours::whitesmoke);
-        g.drawText(std::to_string(m_users), label_bounds, juce::Justification::centred);
+        g.drawText(std::to_string(m_user_nb), label_bounds, juce::Justification::centred);
     }
     
     bool PatcherToolbar::UsersItemComponent::getToolbarItemSizes(int toolbarDepth, bool isVertical,
@@ -226,6 +269,21 @@ namespace kiwi
         repaint();
     }
     
+    void PatcherToolbar::UsersItemComponent::mouseDown(juce::MouseEvent const& e)
+    {
+        if (m_users.size() > 0)
+        {
+            juce::PopupMenu m;
+            
+            for(std::string const& username : m_users)
+            {
+                m.addItem(1, username, false, false);
+            }
+            
+            m.showAt(this);
+        }
+    }
+    
     void PatcherToolbar::UsersItemComponent::timerCallback()
     {
         // Reduce the alpha level of the flash slightly so it fades out
@@ -251,7 +309,6 @@ namespace kiwi
         setSize(600, 400);
         
         addAndMakeVisible(&patcherview.getViewport(), true);
-        patcherview.updateWindowTitle();
         
         KiwiApp::bindToCommandManager(this);
         KiwiApp::bindToKeyMapping(this);
@@ -285,6 +342,11 @@ namespace kiwi
     void PatcherComponent::paint(juce::Graphics& g)
     {
         ;
+    }
+    
+    void PatcherComponent::removeUsersIcon()
+    {
+        m_toolbar.removeUsersIcon();
     }
     
     // ================================================================================ //
@@ -327,6 +389,21 @@ namespace kiwi
         setContentNonOwned(&m_patcher_component, true);
         setVisible(true);
     }
+    
+    void PatcherViewWindow::removeUsersIcon()
+    {
+        m_patcher_component.removeUsersIcon();
+    }
+    
+    bool PatcherViewWindow::showOkCancelBox(juce::AlertWindow::AlertIconType icon_type,
+                                            std::string const& title,
+                                            std::string const& message,
+                                            std::string const& button_1,
+                                            std::string const& button_2)
+    {
+        return juce::AlertWindow::showOkCancelBox(icon_type, title, message, button_1, button_2, this);
+    }
+    
     
     PatcherManager& PatcherViewWindow::getPatcherManager()
     {
