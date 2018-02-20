@@ -99,11 +99,11 @@ namespace kiwi
         
         void Object::removeTasks(std::set<std::shared_ptr<Task>> & tasks)
         {
-            for (auto task_it = m_tasks.begin(); task_it != m_tasks.end(); )
+            for (auto task_it = tasks.begin(); task_it != tasks.end(); )
             {
                 if ((*task_it)->executed() == true)
                 {
-                    task_it = m_tasks.erase(task_it);
+                    task_it = tasks.erase(task_it);
                 }
                 else
                 {
