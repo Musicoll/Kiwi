@@ -56,7 +56,7 @@ namespace kiwi
             return m_patcher_model;
         }
         
-        void Patcher::addObject(uint64_t object_id, std::shared_ptr<Object> object)
+        void Patcher::addObject(flip::Ref object_id, std::shared_ptr<Object> object)
         {
             m_objects[object_id] = object;
             
@@ -68,7 +68,7 @@ namespace kiwi
             }
         }
         
-        void Patcher::removeObject(uint64_t object_id)
+        void Patcher::removeObject(flip::Ref object_id)
         {
             auto processor = std::dynamic_pointer_cast<AudioObject>(m_objects[object_id]);
             
@@ -80,7 +80,7 @@ namespace kiwi
             m_objects.erase(object_id);
         }
         
-        void Patcher::addLink(uint64_t from_id, size_t outlet, uint64_t to_id, size_t inlet, bool is_signal)
+        void Patcher::addLink(flip::Ref from_id, size_t outlet, flip::Ref to_id, size_t inlet, bool is_signal)
         {
             std::shared_ptr<Object> from = m_objects[from_id];
             std::shared_ptr<Object> to = m_objects[to_id];
@@ -102,7 +102,7 @@ namespace kiwi
             }
         }
         
-        void Patcher::removeLink(uint64_t from_id, size_t outlet, uint64_t to_id, size_t inlet, bool is_signal)
+        void Patcher::removeLink(flip::Ref from_id, size_t outlet, flip::Ref to_id, size_t inlet, bool is_signal)
         {
             std::shared_ptr<Object> from = m_objects[from_id];
             std::shared_ptr<Object> to = m_objects[to_id];
@@ -306,8 +306,8 @@ namespace kiwi
                         
                         for (std::string const& param_name : changed_params)
                         {
-                            m_objects.at(object.ref().obj())->modelAttributeChanged(param_name,
-                                                                                    object.getAttribute(param_name));
+                            m_objects.at(object.ref())->modelAttributeChanged(param_name,
+                                                                              object.getAttribute(param_name));
                         }
                     }
                 }
@@ -316,28 +316,28 @@ namespace kiwi
 
         void Patcher::objectAdded(model::Object const& object_m)
         {
-            addObject(object_m.ref().obj(), Factory::create(*this, object_m));
+            addObject(object_m.ref(), Factory::create(*this, object_m));
         }
 
         void Patcher::objectRemoved(model::Object const& object_m)
         {
-            removeObject(object_m.ref().obj());
+            removeObject(object_m.ref());
         }
 
         void Patcher::linkAdded(model::Link const& link_m)
         {
-            addLink(link_m.getSenderObject().ref().obj(),
+            addLink(link_m.getSenderObject().ref(),
                     link_m.getSenderIndex(),
-                    link_m.getReceiverObject().ref().obj(),
+                    link_m.getReceiverObject().ref(),
                     link_m.getReceiverIndex(),
                     link_m.isSignal());
         }
         
         void Patcher::linkRemoved(model::Link const& link_m)
         {
-            removeLink(link_m.getSenderObject().ref().obj(),
+            removeLink(link_m.getSenderObject().ref(),
                        link_m.getSenderIndex(),
-                       link_m.getReceiverObject().ref().obj(),
+                       link_m.getReceiverObject().ref(),
                        link_m.getReceiverIndex(),
                        link_m.isSignal());
         }
