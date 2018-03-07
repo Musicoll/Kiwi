@@ -25,6 +25,17 @@
 namespace kiwi { namespace network { namespace http {
     
     // ================================================================================ //
+    //                                  SESSION ID                                      //
+    // ================================================================================ //
+    
+    static uint64_t id_cnt = 0;
+    
+    uint64_t getNextId()
+    {
+        return ++id_cnt;
+    }
+    
+    // ================================================================================ //
     //                                  HTTP PAYLOAD                                    //
     // ================================================================================ //
     
@@ -96,10 +107,16 @@ namespace kiwi { namespace network { namespace http {
     , m_payload()
     , m_body()
     , m_timeout(0)
+    , m_id(getNextId())
     , m_query()
     , m_req_header()
     {
         ;
+    }
+    
+    uint64_t Session::getId() const
+    {
+        return m_id;
     }
     
     void Session::setHost(std::string const& host)

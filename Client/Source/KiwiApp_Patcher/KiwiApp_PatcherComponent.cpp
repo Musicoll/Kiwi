@@ -181,27 +181,32 @@ namespace kiwi
         
         startFlashing();
         
-        auto success = [this](Api::Users users)
+        Component::SafePointer<UsersItemComponent> form(this);
+        
+        auto success = [form](Api::Users users)
         {
-            KiwiApp::useInstance().useScheduler().schedule([this, users]()
+            KiwiApp::useScheduler().schedule([form, users]()
             {
-                m_users.clear();
-                
-                for(Api::User const& user : users)
+                if (form)
                 {
-                    m_users.push_back(user.getName());
+                    form.getComponent()->m_users.clear();
                     
+                    for(Api::User const& user : users)
+                    {
+                        form.getComponent()->m_users.push_back(user.getName());
+                    }
                 }
-                
             });
         };
         
-        auto fail = [this](Api::Error error)
+        auto fail = [form](Api::Error error)
         {
-            KiwiApp::useInstance().useScheduler().schedule([this, error]()
+            KiwiApp::useScheduler().schedule([form, error]()
             {
-                m_users.clear();
-                
+                if (form)
+                {
+                    form.getComponent()->m_users.clear();
+                }
             });
         };
         

@@ -104,7 +104,9 @@ namespace kiwi { namespace network { namespace http {
         using Callback = std::function<void(Response)>;
         
         Session();
-        ~Session() = default;
+        ~Session() = default; 
+        
+        uint64_t getId() const;
         
         void setHost(std::string const& host);
         void setPort(std::string const& port);
@@ -146,6 +148,7 @@ namespace kiwi { namespace network { namespace http {
         Payload                 m_payload;
         Body                    m_body;
         Timeout                 m_timeout;
+        uint64_t                m_id;
         
         std::unique_ptr<HttpQuery>          m_query;
         beast::http::request_header<>       m_req_header;
