@@ -94,10 +94,13 @@ namespace kiwi { namespace network { namespace http {
     
     class Session
     {
+    private: // classes
+        
+        using HttpQuery = Query<beast::http::string_body, beast::http::string_body>;
+        
     public: // methods
         
         using Response = http::Response<beast::http::string_body>;
-        using AsyncResponse = std::future<void>;
         using Callback = std::function<void(Response)>;
         
         Session();
@@ -113,7 +116,7 @@ namespace kiwi { namespace network { namespace http {
         void setPayload(Payload && payload);
         void setBody(std::string const& content);
         
-        bool isPending();
+        bool executed();
         void cancel();
         
         Response Get();
@@ -128,23 +131,24 @@ namespace kiwi { namespace network { namespace http {
         Response Delete();
         void DeleteAsync(Callback callback);
         
-    private: // variables
+    private: // methods
         
-        std::unique_ptr<Query<beast::http::string_body, Response::body_type>> makeQuery();
+        void initQuery();
         
         Response makeResponse(beast::http::verb verb);
         void makeResponse(beast::http::verb verb, Callback && callback);
         
-        std::string         m_port;
-        std::string         m_target;
-        Parameters          m_parameters;
-        Payload             m_payload;
-        Body                m_body;
-        Timeout             m_timeout;
-        std::future<void>   m_future;
-        std::atomic<bool>   m_keep_processing;
+    private: // members
         
-        beast::http::request_header<> m_req_header;
+        std::string             m_port;
+        std::string             m_target;
+        Parameters              m_parameters;
+        Payload                 m_payload;
+        Body                    m_body;
+        Timeout                 m_timeout;
+        
+        std::unique_ptr<HttpQuery>          m_query;
+        beast::http::request_header<>       m_req_header;
     };
     
 }}} // namespace kiwi::network::http

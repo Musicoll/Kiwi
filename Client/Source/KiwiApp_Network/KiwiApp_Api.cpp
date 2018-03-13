@@ -517,7 +517,7 @@ namespace kiwi
     {
         for(auto it = m_pending_requests.begin(); it != m_pending_requests.end();)
         {
-            if (!(*it)->isPending())
+            if ((*it)->executed())
             {
                 it = m_pending_requests.erase(it);
             }
