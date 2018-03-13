@@ -24,55 +24,100 @@
 namespace kiwi { namespace network { namespace http {
     
     // ================================================================================ //
-    //                                        HTTP                                      //
-    // ================================================================================ //
-    
-    template<class ReqType, class ResType>
-    Response<ResType>
-    write(std::unique_ptr<Request<ReqType>> request,
-          std::string port,
-          Timeout timeout)
-    {
-        Query<ReqType, ResType> query(std::move(request), port, timeout);
-        
-        while(!query.process()){}
-        
-        return query.getResponse();
-    }
-    
-    template <class ReqType, class ResType>
-    std::future<void>
-    writeAsync(std::unique_ptr<Request<ReqType>> request,
-               std::string port,
-               std::function<void(Response<ResType>)> callback,
-               Timeout timeout)
-    {
-        auto query = std::make_unique<Query<ReqType, ResType>>(std::move(request), port, timeout);
-        
-        return std::async(std::launch::async, [query = std::move(query), cb = std::move(callback)]()
-        {
-            while(!query->process()){}
-            
-            return cb(query->getResponse());
-        });
-    }
-    
-    // ================================================================================ //
     //                                     HTTP QUERY                                   //
     // ================================================================================ //
     
     template<class ReqType, class ResType>
     Query<ReqType, ResType>::Query(std::unique_ptr<beast::http::request<ReqType>> request,
-                                   std::string port,
-                                   Timeout timeout)
+                                   std::string port)
     : m_request(std::move(request))
     , m_response()
     , m_port(port)
     , m_io_service()
     , m_socket(m_io_service)
-    , m_timer(m_io_service)
-    , m_resolver(m_io_service)
+    , m_timer(m_socket.get_io_service())
+    , m_resolver(m_socket.get_io_service())
     , m_buffer()
+    , m_thread()
+    , m_executed(false)
+    , m_callback()
+    {
+    }
+    
+    template<class ReqType, class ResType>
+    Query<ReqType, ResType>::~Query()
+    {
+        if (m_thread.joinable())
+        {
+            m_thread.join();
+        }
+    }
+    
+    template<class ReqType, class ResType>
+    Response<ResType> Query<ReqType, ResType>::writeQuery(Timeout timeout)
+    {
+        if (m_thread.joinable())
+        {
+            m_thread.join();
+        }
+        
+        if (!executed())
+        {
+            init(timeout);
+            
+            while(!executed())
+            {
+                m_socket.get_io_service().poll_one();
+            }
+        }
+        
+        return m_response;
+    }
+    
+    template<class ReqType, class ResType>
+    void Query<ReqType, ResType>::writeQueryAsync(std::function<void(Response<ResType> const& res)> && callback, Timeout timeout)
+    {
+        if (!executed() && !m_thread.joinable())
+        {
+            init(timeout);
+            
+            m_callback = std::move(callback);
+            
+            m_thread = std::thread([this]()
+            {
+                while(!executed())
+                {
+                    m_socket.get_io_service().poll_one();
+                }
+            });
+        }
+    }
+    
+    template<class ReqType, class ResType>
+    void Query<ReqType, ResType>::cancel()
+    {
+        if (m_timer.cancel() != 0)
+        {
+            if (m_thread.joinable())
+            {
+                m_thread.join();
+            }
+        }
+        
+        if (!m_executed)
+        {
+            shutdown(boost::asio::error::basic_errors::timed_out);
+        }
+    }
+    
+    template<class ReqType, class ResType>
+    bool Query<ReqType, ResType>::executed()
+    {
+        return m_executed.load();
+    }
+    
+    template<class ReqType, class ResType>
+    void Query<ReqType, ResType>::init(Timeout timeout)
     {
         if (timeout > Timeout(0))
         {
@@ -81,9 +126,10 @@ namespace kiwi { namespace network { namespace http {
             m_timer.async_wait([this](Error const& error)
             {
                 handleTimeout(error);
-                
             });
         }
+        
+        m_request->prepare_payload();
         
         const std::string host = m_request->at(beast::http::field::host).to_string();
         
@@ -99,26 +145,6 @@ namespace kiwi { namespace network { namespace http {
                 connect(iterator);
             }
         });
-        
-        m_io_service.reset();
-    }
-    
-    template<class ReqType, class ResType>
-    Query<ReqType, ResType>::~Query()
-    {
-        ;
-    }
-    
-    template<class ReqType, class ResType>
-    bool Query<ReqType, ResType>::process()
-    {
-        return !m_io_service.run_one() || m_response.error;
-    }
-    
-    template<class ReqType, class ResType>
-    Response<ResType> const& Query<ReqType, ResType>::getResponse() const
-    {
-        return m_response;
     }
     
     template<class ReqType, class ResType>
@@ -131,7 +157,7 @@ namespace kiwi { namespace network { namespace http {
     void Query<ReqType, ResType>::connect(tcp::resolver::iterator iterator)
     {
         boost::asio::async_connect(m_socket, iterator, [this](Error const& error,
-                                                              tcp::resolver::iterator i) {
+                                                              tcp::resolver::iterator i){
             if (error)
             {
                 shutdown(error);
@@ -171,8 +197,6 @@ namespace kiwi { namespace network { namespace http {
     template<class ReqType, class ResType>
     void Query<ReqType, ResType>::shutdown(Error const& error)
     {
-        m_io_service.stop();
-        
         if (error)
         {
             m_response.error = error;
@@ -180,6 +204,13 @@ namespace kiwi { namespace network { namespace http {
         
         boost::system::error_code ec;
         m_socket.shutdown(tcp::socket::shutdown_both, ec);
+        
+        if (m_callback)
+        {
+            m_callback(m_response);
+        }
+        
+        m_executed.store(true);
     }
     
 }}} // namespace kiwi::network::http

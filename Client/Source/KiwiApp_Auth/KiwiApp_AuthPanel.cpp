@@ -19,10 +19,10 @@
  ==============================================================================
  */
 
-#include "KiwiApp_AuthPanel.h"
+#include <KiwiApp_Auth/KiwiApp_AuthPanel.h>
 
-#include "../KiwiApp.h"
-#include "../KiwiApp_General/KiwiApp_CommandIDs.h"
+#include <KiwiApp.h>
+#include <KiwiApp_General/KiwiApp_CommandIDs.h>
 
 namespace kiwi
 {
@@ -105,20 +105,30 @@ namespace kiwi
     
     void LoginForm::performPassReset()
     {
-        auto success_callback = [this](std::string const& message)
+        Component::SafePointer<LoginForm> form(this);
+        
+        auto success_callback = [form](std::string const& message)
         {
-            KiwiApp::useInstance().useScheduler().schedule([this]() {
-                setState(State::Login);
-                showAlert("Password reset. Try login again.", AlertBox::Type::Info);
+            KiwiApp::useScheduler().schedule([form]()
+            {
+                if (form)
+                {
+                    form.getComponent()->setState(State::Login);
+                    form.getComponent()->showAlert("Password reset. Try login again.", AlertBox::Type::Info);
+                }
             });
         };
         
-        auto error_callback = [this](Api::Error error)
+        auto error_callback = [form](Api::Error error)
         {
             std::string error_message = error.getMessage();
             
-            KiwiApp::useInstance().useScheduler().schedule([this, error_message]() {
-                showAlert(error_message, AlertBox::Type::Error);
+            KiwiApp::useScheduler().schedule([form, error_message]()
+            {
+                if (form)
+                {
+                    form.getComponent()->showAlert(error_message, AlertBox::Type::Error);
+                }
             });
         };
         
@@ -130,20 +140,24 @@ namespace kiwi
     
     void LoginForm::performPassRequest()
     {
-        auto success_callback = [this](std::string const& message)
+        Component::SafePointer<LoginForm> form(this);
+        
+        auto success_callback = [form](std::string const& message)
         {
-            KiwiApp::useInstance().useScheduler().schedule([this]() {
-                setState(State::Reset);
-                showAlert("Reset token sent. Check your email.", AlertBox::Type::Info);
+            KiwiApp::useScheduler().schedule([form]()
+            {
+                form.getComponent()->setState(State::Reset);
+                form.getComponent()->showAlert("Reset token sent. Check your email.", AlertBox::Type::Info);
             });
         };
         
-        auto error_callback = [this](Api::Error error)
+        auto error_callback = [form](Api::Error error)
         {
             std::string error_message = error.getMessage();
             
-            KiwiApp::useInstance().useScheduler().schedule([this, error_message]() {
-                showAlert(error_message, AlertBox::Type::Error);
+            KiwiApp::useScheduler().schedule([form, error_message]()
+            {
+                form.getComponent()->showAlert(error_message, AlertBox::Type::Error);
             });
         };
         
@@ -172,36 +186,50 @@ namespace kiwi
         
         showOverlay();
         
-        auto success_callback = [this, remember_me]()
+        Component::SafePointer<LoginForm> form(this);
+        
+        auto success_callback = [form, remember_me](Api::AuthUser auth_user)
         {
-            KiwiApp::useInstance().useScheduler().schedule([this, remember_me]() {
+            KiwiApp::useScheduler().schedule([form, remember_me, auth_user]() {
                 
-                showSuccessOverlay("Login success !");
+                getAppSettings().network().setRememberUserFlag(remember_me);
                 
-                KiwiApp::useInstance().useScheduler().schedule([this, remember_me]() {
+                KiwiApp::use().setAuthUser(auth_user);
+                
+                if (form)
+                {
+                    form.getComponent()->showSuccessOverlay("Login success !");
                     
-                    getAppSettings().network().setRememberUserFlag(remember_me);
-                    dismiss();
-                    
-                }, std::chrono::milliseconds(1000));
+                    KiwiApp::useScheduler().schedule([form](){
+                        
+                        if (form)
+                        {
+                            form.getComponent()->dismiss();
+                        }
+                        
+                    }, std::chrono::milliseconds(1000));
+                }
                 
             }, std::chrono::milliseconds(500));
         };
         
-        auto error_callback = [this](Api::Error error)
+        auto error_callback = [form](Api::Error error)
         {
-            KiwiApp::useInstance().useScheduler().schedule([this, message = error.getMessage()]() {
-                
-                hideOverlay();
-                showAlert(message, AlertBox::Type::Error);
+            KiwiApp::useScheduler().schedule([form, message = error.getMessage()]()
+            {
+                if (form)
+                {
+                    form.getComponent()->hideOverlay();
+                    form.getComponent()->showAlert(message, AlertBox::Type::Error);
+                }
                 
             }, std::chrono::milliseconds(500));
         };
         
-        KiwiApp::login(username.toStdString(),
-                       password.toStdString(),
-                       std::move(success_callback),
-                       std::move(error_callback));
+        KiwiApp::useApi().login(username.toStdString(),
+                                password.toStdString(),
+                                std::move(success_callback),
+                                std::move(error_callback));
     }
     
     void LoginForm::onUserSubmit()
@@ -297,40 +325,54 @@ namespace kiwi
         
         showOverlay();
         
-        auto success_callback = [this](std::string message)
+        Component::SafePointer<SignUpForm> form(this);
+        
+        auto success_callback = [form](std::string message)
         {
-            KiwiApp::useInstance().useScheduler().schedule([this, message]() {
+            KiwiApp::useScheduler().schedule([form, message]() {
                 
-                showSuccessOverlay(message);
-                
-                KiwiApp::useInstance().useScheduler().schedule([this]() {
+                if (form)
+                {
+                    form.getComponent()->showSuccessOverlay(message);
                     
-                    if(AuthPanel* auth_panel = findParentComponentOfClass<AuthPanel>())
+                    KiwiApp::useScheduler().schedule([form]()
                     {
-                        hideOverlay();
-                        auth_panel->setCurrentTabIndex(AuthPanel::FormType::Login);
-                    }
-                    
-                }, std::chrono::milliseconds(1000));
+                        SignUpForm * this_form = form.getComponent();
+                        
+                        if (this_form)
+                        {
+                            if(AuthPanel* auth_panel = this_form->findParentComponentOfClass<AuthPanel>())
+                            {
+                                this_form->hideOverlay();
+                                auth_panel->setCurrentTabIndex(AuthPanel::FormType::Login);
+                            }
+                        }
+                        
+                    }, std::chrono::milliseconds(1000));
+                }
                 
             }, std::chrono::milliseconds(500));
         };
         
-        auto error_callback = [this](Api::Error error)
+        auto error_callback = [form](Api::Error error)
         {
-            KiwiApp::useInstance().useScheduler().schedule([this, message = error.getMessage()](){
-                
-                hideOverlay();
-                showAlert(message, AlertBox::Type::Error);
+            
+            KiwiApp::useScheduler().schedule([form, message = error.getMessage()]()
+            {
+                if (form)
+                {
+                    form.getComponent()->hideOverlay();
+                    form.getComponent()->showAlert(message, AlertBox::Type::Error);
+                }
                 
             }, std::chrono::milliseconds(500));
         };
         
-        KiwiApp::signup(username.toStdString(),
-                        email.toStdString(),
-                        password.toStdString(),
-                        std::move(success_callback),
-                        std::move(error_callback));
+        KiwiApp::useApi().signup(username.toStdString(),
+                                 email.toStdString(),
+                                 password.toStdString(),
+                                 std::move(success_callback),
+                                 std::move(error_callback));
     }
     
     // ================================================================================ //

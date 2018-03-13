@@ -141,6 +141,7 @@ namespace kiwi
         DocumentSessions            m_documents;
         tool::Listeners<Listener>   m_listeners;
         Comp                        m_sort;
+        std::shared_ptr<Drive>      m_drive;
         
         friend class DocumentBrowser;
     };
@@ -244,6 +245,7 @@ namespace kiwi
         DocumentBrowser::Drive&             m_drive;
         Api::Document                       m_document;
         std::string                         m_open_token;
+        std::shared_ptr<DocumentSession>    m_session;
         
         friend class DocumentBrowser::Drive;
     };

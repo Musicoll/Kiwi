@@ -57,8 +57,6 @@ namespace kiwi {
         
         void flash();
         
-        void switchOff();
-        
         void signalTriggered();
         
     private: // members
@@ -68,7 +66,6 @@ namespace kiwi {
         flip::SignalConnection                          m_connection;
         bool                                            m_active;
         bool                                            m_mouse_down;
-        std::shared_ptr<tool::Scheduler<>::CallBack>    m_switch_off;
         
     private: // deleted methods
         

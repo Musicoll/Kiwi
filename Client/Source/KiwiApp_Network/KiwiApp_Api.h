@@ -22,6 +22,7 @@
 #pragma once
 
 #include <unordered_set>
+#include <set>
 
 #include <KiwiNetwork/KiwiNetwork_Http.h>
 
@@ -71,77 +72,83 @@ namespace kiwi
         //! @brief Destructor
         ~Api();
         
-        //! @brief Cancel pending execution.
-        void cancelPendingRequest();
+        //! @brief Cancels a request.
+        void cancelRequest(uint64_t request_id);
+        
+        //! @brief Returns true if the request is currently pending.
+        bool isPending(uint64_t request_id);
+        
+        //! @brief Cancel all pending requests.
+        void cancelAll();
         
     public: // requests
         
         //! @brief Attempt to log-in the user.
         //! @param username_or_email user name or email address
         //! @param password password
-        void login(std::string const& username_or_email,
-                   std::string const& password,
-                   CallbackFn<AuthUser> success_cb,
-                   ErrorCallback error_cb);
+        uint64_t login(std::string const& username_or_email,
+                       std::string const& password,
+                       CallbackFn<AuthUser> success_cb,
+                       ErrorCallback error_cb);
         
         //! @brief Attempt to register/signup the user.
         //! @param username user name
         //! @param email email address
         //! @param password password
-        void signup(std::string const& username,
-                    std::string const& email,
-                    std::string const& password,
-                    CallbackFn<std::string> success_cb,
-                    ErrorCallback error_cb);
+        uint64_t signup(std::string const& username,
+                        std::string const& email,
+                        std::string const& password,
+                        CallbackFn<std::string> success_cb,
+                        ErrorCallback error_cb);
         
         //! @brief Returns a list of users, retrieved with user ids.
-        void getUsers(std::unordered_set<uint64_t> const& user_ids, CallbackFn<Api::Users> sucess_cb, ErrorCallback error_cb);
+        uint64_t getUsers(std::unordered_set<uint64_t> const& user_ids, CallbackFn<Api::Users> sucess_cb, ErrorCallback error_cb);
         
         //! @brief Make an async API request to get a list of documents
-        void getDocuments(std::function<void(Response, Api::Documents)> callback);
+        uint64_t getDocuments(std::function<void(Response, Api::Documents)> callback);
         
         //! @brief Make an async API request to create a new document
         //! @param callback
-        void createDocument(std::string const& document_name,
-                            std::function<void(Response, Api::Document)> callback);
+        uint64_t createDocument(std::string const& document_name,
+                                std::function<void(Response, Api::Document)> callback);
         
         //! @brief Uploads a document to the server.
-        void uploadDocument(std::string const& name,
-                            std::string const& data,
-                            std::string const& kiwi_version,
-                            std::function<void(Response, Api::Document)> callback);
+        uint64_t uploadDocument(std::string const& name,
+                                std::string const& data,
+                                std::string const& kiwi_version,
+                                std::function<void(Response, Api::Document)> callback);
         
         //! @brief Duplicates a document on server side.
-        void duplicateDocument(std::string const& document_id, Callback callback);
+        uint64_t duplicateDocument(std::string const& document_id, Callback callback);
         
         //! @brief Rename a document asynchronously.
         //! @param callback The callback method that will be called when the request is completed.
-        void renameDocument(std::string document_id,
-                            std::string const& new_name,
-                            Callback callback);
+        uint64_t renameDocument(std::string document_id,
+                                 std::string const& new_name,
+                                 Callback callback);
         
         //! @brief Moves a document to trash.
-        void trashDocument(std::string document_id, Callback callback);
+        uint64_t trashDocument(std::string document_id, Callback callback);
         
         //! @brief Moves document out of the trash.
-        void untrashDocument(std::string document_id, Callback callback);
+        uint64_t untrashDocument(std::string document_id, Callback callback);
         
         //! @brief Returns the open token used to open document.
-        void getOpenToken(std::string document_id,
+        uint64_t getOpenToken(std::string document_id,
                           CallbackFn<std::string const&> success_cb,
                           ErrorCallback error_cb);
         
         //! @brief Make an async API request to download a document.
-        void downloadDocument(std::string document_id, Callback success_cb);
+        uint64_t downloadDocument(std::string document_id, Callback success_cb);
         
         //! @brief Retrieve version of kiwi compatible with the api server.
-        void getRelease(CallbackFn<std::string const&> success_cb, ErrorCallback error_cb);
+        uint64_t getRelease(CallbackFn<std::string const&> success_cb, ErrorCallback error_cb);
         
         //! @brief Requests a reset token to the server.
-        void requestPasswordToken(std::string const& user_mail, CallbackFn<std::string const&> success_cb, ErrorCallback error_cb);
+        uint64_t requestPasswordToken(std::string const& user_mail, CallbackFn<std::string const&> success_cb, ErrorCallback error_cb);
         
         //! @brief Sends reset request token to the server.
-        void resetPassword(std::string const& token,
+        uint64_t resetPassword(std::string const& token,
                            std::string const& newpass,
                            CallbackFn<std::string const&> success_cb,
                            ErrorCallback error_cb);
@@ -177,15 +184,26 @@ namespace kiwi
         std::unique_ptr<Session> makeSession(std::string const& endpoint, bool add_auth = true);
         
         //! @internal Store the async future response in a vector
-        void storeSession(std::unique_ptr<Session> session);
+        uint64_t storeSession(std::unique_ptr<Session> session);
         
         //! @internal Check if the response header has a JSON content-type
         static bool hasJsonHeader(Response const& res);
         
+    private: // helper functions
+        
+        struct comp_session
+        {
+            bool operator() (std::unique_ptr<Session> const& lhs,
+                             std::unique_ptr<Session> const& rhs)
+            {
+                return lhs->getId() < rhs->getId();
+            }
+        };
+        
     private: // variables
         
-        Api::Controller&                        m_controller;
-        std::vector<std::unique_ptr<Session>>   m_pending_requests;
+        Api::Controller&                                   m_controller;
+        std::set<std::unique_ptr<Session>, comp_session>   m_requests;
         
     private: // deleted methods
         

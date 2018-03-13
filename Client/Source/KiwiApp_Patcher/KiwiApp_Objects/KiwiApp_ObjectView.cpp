@@ -111,7 +111,7 @@ namespace kiwi
     
     tool::Scheduler<> & ObjectView::getScheduler() const
     {
-        return KiwiApp::useInstance().useScheduler();
+        return KiwiApp::useScheduler();
     }
     
     void ObjectView::defer(std::function<void()> call_back)
