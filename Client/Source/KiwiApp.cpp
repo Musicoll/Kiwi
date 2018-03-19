@@ -209,6 +209,7 @@ namespace kiwi
         engine::Gate::declare();
         engine::Switch::declare();
         engine::GateTilde::declare();
+        engine::SwitchTilde::declare();
     }
     
     void KiwiApp::declareObjectViews()
