@@ -80,3 +80,4 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Send.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Gate.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Switch.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_GateTilde.h>
