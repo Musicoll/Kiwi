@@ -79,3 +79,4 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Mtof.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Send.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Gate.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Switch.h>

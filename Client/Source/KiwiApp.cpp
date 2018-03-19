@@ -207,6 +207,7 @@ namespace kiwi
         engine::Mtof::declare();
         engine::Send::declare();
         engine::Gate::declare();
+        engine::Switch::declare();
     }
     
     void KiwiApp::declareObjectViews()
