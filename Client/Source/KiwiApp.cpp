@@ -206,6 +206,7 @@ namespace kiwi
         engine::Hub::declare();
         engine::Mtof::declare();
         engine::Send::declare();
+        engine::Gate::declare();
     }
     
     void KiwiApp::declareObjectViews()
