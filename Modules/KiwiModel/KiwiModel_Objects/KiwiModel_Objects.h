@@ -84,3 +84,4 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_SwitchTilde.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Float.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_ClipTilde.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Clip.h>
