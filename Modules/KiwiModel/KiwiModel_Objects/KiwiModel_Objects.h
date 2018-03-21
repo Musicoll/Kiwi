@@ -82,3 +82,4 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Switch.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_GateTilde.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_SwitchTilde.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Float.h>

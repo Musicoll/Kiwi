@@ -210,6 +210,7 @@ namespace kiwi
         engine::Switch::declare();
         engine::GateTilde::declare();
         engine::SwitchTilde::declare();
+        engine::Float::declare();
     }
     
     void KiwiApp::declareObjectViews()

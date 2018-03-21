@@ -94,6 +94,7 @@ namespace kiwi
             model::Switch::declare();
             model::GateTilde::declare();
             model::SwitchTilde::declare();
+            model::Float::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)

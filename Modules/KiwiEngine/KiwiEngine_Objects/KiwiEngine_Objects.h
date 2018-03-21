@@ -82,3 +82,4 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Switch.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_GateTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_SwitchTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Float.h>
