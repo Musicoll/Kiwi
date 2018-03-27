@@ -21,4 +21,27 @@
 
 #pragma once
 
-#define KIWI_MODEL_VERSION_STRING "v3"
+#include <KiwiModel/KiwiModel_Object.h>
+
+namespace kiwi { namespace model {
+    
+    // ================================================================================ //
+    //                                    FLOAT                                         //
+    // ================================================================================ //
+    
+    class Float : public Object
+    {
+    public:
+        
+        Float(flip::Default& d) : Object(d) {}
+        
+        Float(std::vector<tool::Atom> const& args);
+        
+        static void declare();
+        
+        static std::unique_ptr<Object> create(std::vector<tool::Atom> const& args);
+        
+        std::string getIODescription(bool is_inlet, size_t index) const override;
+    };
+    
+}}

@@ -21,37 +21,27 @@
 
 #pragma once
 
-#include <KiwiEngine/KiwiEngine_Object.h>
+#include <KiwiModel/KiwiModel_Object.h>
 
-namespace kiwi { namespace engine {
+namespace kiwi { namespace model {
     
     // ================================================================================ //
-    //                                    PACK                                          //
+    //                                    GATE~                                         //
     // ================================================================================ //
     
-    class Pack : public engine::Object
+    class GateTilde : public model::Object
     {
     public:
         
         static void declare();
         
-        static std::unique_ptr<Object> create(model::Object const& model, Patcher & patcher);
+        static std::unique_ptr<Object> create(std::vector<tool::Atom> const& args);
         
-        Pack(model::Object const& model, Patcher& patcher);
+        GateTilde(flip::Default& d) : model::Object(d) {}
         
-        ~Pack() = default;
+        GateTilde(std::vector<tool::Atom> const& args);
         
-        void setElement(size_t index, tool::Atom const& atom);
-        
-        void receive(size_t index, std::vector<tool::Atom> const& args) override;
-        
-    private:
-        
-        void output_list();
-        
-    private:
-        
-        std::vector<tool::Atom> m_list;
+        std::string getIODescription(bool is_inlet, size_t index) const override;
     };
     
 }}

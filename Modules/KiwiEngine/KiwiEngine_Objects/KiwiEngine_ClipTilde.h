@@ -21,37 +21,42 @@
 
 #pragma once
 
+#include <atomic>
+
 #include <KiwiEngine/KiwiEngine_Object.h>
 
 namespace kiwi { namespace engine {
     
     // ================================================================================ //
-    //                                    PACK                                          //
+    //                                       CLIP~                                      //
     // ================================================================================ //
     
-    class Pack : public engine::Object
+    class ClipTilde : public AudioObject
     {
-    public:
+    public: // methods
         
         static void declare();
         
         static std::unique_ptr<Object> create(model::Object const& model, Patcher & patcher);
         
-        Pack(model::Object const& model, Patcher& patcher);
+        ClipTilde(model::Object const& model, Patcher& patcher);
         
-        ~Pack() = default;
+        void receive(size_t index, std::vector<tool::Atom> const& args) override final;
         
-        void setElement(size_t index, tool::Atom const& atom);
+        void prepare(dsp::Processor::PrepareInfo const& infos) override final;
         
-        void receive(size_t index, std::vector<tool::Atom> const& args) override;
+        void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
         
-    private:
+        void performMinMax(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
         
-        void output_list();
+        void performMin(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
         
-    private:
+        void performMax(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
         
-        std::vector<tool::Atom> m_list;
+    private: // methods
+        
+        std::atomic<float> m_minimum;
+        std::atomic<float> m_maximum;
     };
-    
+
 }}

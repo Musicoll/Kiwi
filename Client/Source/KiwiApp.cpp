@@ -206,6 +206,13 @@ namespace kiwi
         engine::Hub::declare();
         engine::Mtof::declare();
         engine::Send::declare();
+        engine::Gate::declare();
+        engine::Switch::declare();
+        engine::GateTilde::declare();
+        engine::SwitchTilde::declare();
+        engine::Float::declare();
+        engine::ClipTilde::declare();
+        engine::Clip::declare();
     }
     
     void KiwiApp::declareObjectViews()

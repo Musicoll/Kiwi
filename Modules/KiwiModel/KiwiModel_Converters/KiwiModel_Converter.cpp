@@ -58,7 +58,7 @@ namespace kiwi { namespace model {
                 convert_v1_v2(backend);
             }
             
-            if (backend.version.compare("v2") == 0)
+            if (backend.version.compare("v2") == 0 || backend.version.compare("v3") == 0)
             {
                 success = true;
             }

@@ -21,37 +21,32 @@
 
 #pragma once
 
+#include <atomic>
+
 #include <KiwiEngine/KiwiEngine_Object.h>
 
 namespace kiwi { namespace engine {
     
     // ================================================================================ //
-    //                                    PACK                                          //
+    //                                       CLIP                                       //
     // ================================================================================ //
     
-    class Pack : public engine::Object
+    class Clip : public Object
     {
-    public:
+    public: // methods
         
         static void declare();
         
         static std::unique_ptr<Object> create(model::Object const& model, Patcher & patcher);
         
-        Pack(model::Object const& model, Patcher& patcher);
+        Clip(model::Object const& model, Patcher& patcher);
         
-        ~Pack() = default;
+        void receive(size_t index, std::vector<tool::Atom> const& args) override final;
         
-        void setElement(size_t index, tool::Atom const& atom);
+    private: // methods
         
-        void receive(size_t index, std::vector<tool::Atom> const& args) override;
-        
-    private:
-        
-        void output_list();
-        
-    private:
-        
-        std::vector<tool::Atom> m_list;
+        double  m_minimum;
+        double  m_maximum;
     };
-    
+
 }}

@@ -26,10 +26,10 @@
 namespace kiwi { namespace engine {
     
     // ================================================================================ //
-    //                                    PACK                                          //
+    //                                    SWITCH                                        //
     // ================================================================================ //
     
-    class Pack : public engine::Object
+    class Switch : public engine::Object
     {
     public:
         
@@ -37,21 +37,18 @@ namespace kiwi { namespace engine {
         
         static std::unique_ptr<Object> create(model::Object const& model, Patcher & patcher);
         
-        Pack(model::Object const& model, Patcher& patcher);
-        
-        ~Pack() = default;
-        
-        void setElement(size_t index, tool::Atom const& atom);
+        Switch(model::Object const& model, Patcher& patcher);
         
         void receive(size_t index, std::vector<tool::Atom> const& args) override;
         
     private:
         
-        void output_list();
+        void openInput(int input);
         
     private:
         
-        std::vector<tool::Atom> m_list;
+        size_t m_opened_input;
+        size_t m_num_inputs;
     };
     
 }}

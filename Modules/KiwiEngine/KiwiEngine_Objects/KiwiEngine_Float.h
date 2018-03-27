@@ -26,32 +26,23 @@
 namespace kiwi { namespace engine {
     
     // ================================================================================ //
-    //                                    PACK                                          //
+    //                                    FLOAT                                         //
     // ================================================================================ //
     
-    class Pack : public engine::Object
+    class Float : public Object
     {
     public:
         
         static void declare();
         
-        static std::unique_ptr<Object> create(model::Object const& model, Patcher & patcher);
+        static std::unique_ptr<Object> create(model::Object const& model, Patcher& patcher);
         
-        Pack(model::Object const& model, Patcher& patcher);
+        Float(model::Object const& model, Patcher& patcher);
         
-        ~Pack() = default;
-        
-        void setElement(size_t index, tool::Atom const& atom);
-        
-        void receive(size_t index, std::vector<tool::Atom> const& args) override;
+        void receive(size_t index, std::vector<tool::Atom> const& args) override final;
         
     private:
         
-        void output_list();
-        
-    private:
-        
-        std::vector<tool::Atom> m_list;
+        double m_stored_value;
     };
-    
 }}
