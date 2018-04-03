@@ -210,6 +210,7 @@ namespace kiwi
         engine::Float::declare();
         engine::ClipTilde::declare();
         engine::Clip::declare();
+        engine::FaustTilde::declare();
     }
     
     void KiwiApp::declareObjectViews()
