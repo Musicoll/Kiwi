@@ -73,7 +73,7 @@ namespace kiwi
         
     private: // methods
         
-        void highlight(ObjectFrame const& object, const size_t index);
+        void highlight(ObjectFrame const& object, const size_t index, bool is_inlet);
         
     private: // members
         
@@ -82,5 +82,6 @@ namespace kiwi
         std::string             m_object_name;
         bool                    m_show_tooltip_on_left;
         size_t                  m_last_index;
+        flip::Ref               m_object_ref;
     };
 }
