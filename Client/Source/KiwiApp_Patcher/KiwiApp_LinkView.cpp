@@ -32,12 +32,9 @@ namespace kiwi
     void LinkViewBase::updateBounds()
     {
         const juce::Rectangle<int> link_bounds(m_last_outlet_pos, m_last_inlet_pos);
-        const juce::Rectangle<int> new_bounds = link_bounds.expanded(20);
         
-        const juce::Point<int> comp_pos = new_bounds.getPosition();
-        
-        const juce::Point<int> local_inlet_pos(m_last_inlet_pos - comp_pos);
-        const juce::Point<int> local_outlet_pos(m_last_outlet_pos - comp_pos);
+        const juce::Point<int> local_inlet_pos(m_last_inlet_pos );
+        const juce::Point<int> local_outlet_pos(m_last_outlet_pos);
         
         const juce::Point<float> start_point = local_outlet_pos.translated(0.f, 2.f).toFloat();
         const juce::Point<float> end_point = local_inlet_pos.translated(0.f, -1.f).toFloat();
@@ -48,11 +45,14 @@ namespace kiwi
         const juce::Point<float> ctrl_pt1 { start_point.x, static_cast<float>(start_point.y + shift) };
         const juce::Point<float> ctrl_pt2 { end_point.x, static_cast<float>(end_point.y - shift) };
         
-        m_path.clear();
-        m_path.startNewSubPath(start_point.x, start_point.y);
-        m_path.cubicTo(ctrl_pt1, ctrl_pt2, end_point);
+        juce::Path path;
+        path.startNewSubPath(start_point.x, start_point.y);
+        path.cubicTo(ctrl_pt1, ctrl_pt2, end_point);
         
-        setBounds(new_bounds);
+        setBounds(path.getBounds().toNearestInt().expanded(2, 2));
+        
+        path.applyTransform(juce::AffineTransform::translation(-1 * getX(), -1 * getY()));
+        m_path = path;
     }
     
     // ================================================================================ //
