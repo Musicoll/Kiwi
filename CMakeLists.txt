@@ -395,6 +395,7 @@ add_library(KiwiEngine STATIC ${KIWI_ENGINE_SRC})
 target_include_directories(KiwiEngine PUBLIC ${ROOT_DIR}/Modules)
 target_add_dependency(KiwiEngine KiwiModel)
 target_add_dependency(KiwiEngine KiwiDsp)
+target_add_dependency(KiwiEngine Juce)
 set_target_properties(KiwiEngine PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_ENGINE_SRC}" ${ROOT_DIR}/Modules/KiwiEngine)
 
