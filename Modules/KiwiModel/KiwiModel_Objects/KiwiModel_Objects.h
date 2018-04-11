@@ -78,3 +78,4 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Hub.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Mtof.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Send.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_PluginTilde.h>
