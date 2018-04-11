@@ -21,8 +21,6 @@
 
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_PluginTilde.h>
 #include <KiwiEngine/KiwiEngine_Factory.h>
-#include <stdlib.h>
-#include <dlfcn.h>
 
 namespace kiwi { namespace engine {
     
