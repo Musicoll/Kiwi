@@ -78,3 +78,4 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Hub.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Mtof.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Send.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_PluginTilde.h>
