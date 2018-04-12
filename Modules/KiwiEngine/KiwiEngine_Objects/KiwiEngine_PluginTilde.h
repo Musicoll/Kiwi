@@ -44,6 +44,8 @@ namespace kiwi { namespace engine {
         void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
         void prepare(dsp::Processor::PrepareInfo const& infos) final;
     private:
+        class PluginWrapper;
+        std::unique_ptr<PluginWrapper> m_plugin_wrapper;
     };
 
 }}

@@ -22,8 +22,22 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_PluginTilde.h>
 #include <KiwiEngine/KiwiEngine_Factory.h>
 
+#include <juce_audio_processors/juce_audio_processors.h>
+
 namespace kiwi { namespace engine {
     
+    // ================================================================================ //
+    //                                       PLUGIN WRAPPER                             //
+    // ================================================================================ //
+    
+    class PluginTilde::PluginWrapper : private juce::AudioPluginFormatManager
+    {
+    public:
+        PluginWrapper()
+        {
+            addDefaultFormats();
+        }
+    };
     // ================================================================================ //
     //                                       PLUGIN~                                    //
     // ================================================================================ //
@@ -39,7 +53,7 @@ namespace kiwi { namespace engine {
     }
     
     PluginTilde::PluginTilde(model::Object const& model, Patcher& patcher):
-    AudioObject(model, patcher)
+    AudioObject(model, patcher), m_plugin_wrapper(std::make_unique<PluginWrapper>())
     {
         
     }
