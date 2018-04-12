@@ -257,17 +257,18 @@ source_group_rec("${JUCE_SRC}" ${ROOT_DIR}/ThirdParty/Juce/modules)
 # Flip
 #----------------------------------
 
+set(KIWI_FLIP_INCLUDE ${ROOT_DIR}/ThirdParty/flip/include)
+
 if(WIN32)
     if (CMAKE_CL_64)
-        set(KIWI_FLIP_LIB $ENV{KIWI_FLIP_LIB_x64})
-        set(KIWI_FLIP_INCLUDE $ENV{KIWI_FLIP_INCLUDE_x64})
+        set(KIWI_FLIP_LIB ${ROOT_DIR}/ThirdParty/flip/lib/VS2015/x64/Release)
     else()
-        set(KIWI_FLIP_LIB $ENV{KIWI_FLIP_LIB_WIN32})
-        set(KIWI_FLIP_INCLUDE $ENV{KIWI_FLIP_INCLUDE_WIN32})
+        set(KIWI_FLIP_LIB ${ROOT_DIR}/ThirdParty/flip/lib/VS2015/Win32/Release)
     endif()
+elseif(LINUX)
+    set(KIWI_FLIP_LIB ${ROOT_DIR}/ThirdParty/flip/lib/gcc)
 else()
-    set(KIWI_FLIP_LIB $ENV{KIWI_FLIP_LIB})
-    set(KIWI_FLIP_INCLUDE $ENV{KIWI_FLIP_INCLUDE})
+    set(KIWI_FLIP_LIB ${ROOT_DIR}/ThirdParty/flip/lib)
 endif()
 
 message(STATUS "Searching flip library")

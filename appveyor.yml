@@ -16,17 +16,10 @@ install:
     - git submodule update --init --recursive "ThirdParty/Juce"
     - git submodule update --init --recursive "ThirdParty/concurrentqueue"
     - git submodule update --init --recursive "ThirdParty/Beast"
-    - set PATH=C:\Python27;%PATH%
-    - curl -o ..\flip-demo.zip -L -k  http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files/flip-demo-windows-c47e41da05.zip
-    - cd ..
-    - 7z x flip-demo.zip -o./flip-demo
-    - set KIWI_FLIP_LIB_x64=%cd%/flip-demo/lib/VS2015/x64/Release
-    - set KIWI_FLIP_INCLUDE_x64=%cd%/flip-demo/include
-    - set KIWI_FLIP_LIB_WIN32=%cd%/flip-demo/lib/VS2015/Win32/Release
-    - set KIWI_FLIP_INCLUDE_WIN32=%cd%/flip-demo/include
     - set KIWI_BOOST_INCLUDE=C:\Libraries\boost_1_63_0
     - set KIWI_BOOST_LIB_x64=C:\Libraries\boost_1_63_0\lib64-msvc-14.0
     - set KIWI_BOOST_LIB_WIN32=C:\Libraries\boost_1_63_0\lib32-msvc-14.0
+    - set PATH=C:\Python27;%PATH%
     - cd %APPVEYOR_BUILD_FOLDER%
     - if "%APPVEYOR_REPO_BRANCH%"=="master" (set KIWI_DEPLOY=release) else (set KIWI_DEPLOY=draft)
 

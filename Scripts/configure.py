@@ -39,25 +39,18 @@ def parse_args ():
     return arg_parser.parse_args (sys.argv[1:])
 
 #==============================================================================
+# Name : update_flip
+#==============================================================================
+def update_flip():
+    subprocess.check_call("python " + os.path.join(project_dir, "Scripts", "flip.py"), shell= True);
+
+#==============================================================================
 # Name : create_dir
 #==============================================================================
 
 def create_dir(dir):
 	if not os.path.exists(dir):
 	   os.makedirs(dir);
-
-#==============================================================================
-# Name : flip_private
-#==============================================================================
-
-def build_flip_private():
-    flip_path = os.path.join(project_dir, "ThirdParty", "flip")
-    os.chdir(flip_path);
-    configure_path = os.path.join(flip_path, "configure.py")
-    build_path = os.path.join(flip_path, "build.py")
-    subprocess.check_call("python " + configure_path, shell= True);
-    subprocess.check_call("python " + build_path + " -c Debug -t flip", shell= True);
-    subprocess.check_call("python " + build_path + " -c Release -t flip", shell= True);
 
 #==============================================================================
 # Name : mac_release
@@ -237,6 +230,8 @@ def configure_linux(args):
 #==============================================================================
 # Name : main
 #==============================================================================
+
+update_flip()
 
 root_build_dir = os.path.join(project_dir, "Build")
 

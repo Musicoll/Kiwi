@@ -37,10 +37,6 @@ matrix:
       - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
       - git submodule update --init --recursive ThirdParty/Juce ThirdParty/concurrentqueue ThirdParty/Beast
       - pip install --user cpp-coveralls
-      - wget --no-check-certificate -O ../flip-demo.tar.gz http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files/flip-demo-linux-c47e41da05.tar.gz
-      - cd ..
-      - tar xvzf flip-demo.tar.gz &> /dev/null
-      - export KIWI_FLIP_LIB=$(pwd)/flip-demo/lib/gcc && export KIWI_FLIP_INCLUDE=$(pwd)/flip-demo/include
       - cd ${HOME}
       - wget --no-check-certificate -O ./boost_1_63_0.tar.gz https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz
       - tar xvzf ./boost_1_63_0.tar.gz &> /dev/null
@@ -106,10 +102,6 @@ matrix:
 
     install:
       - git submodule update --init --recursive ThirdParty/Juce ThirdParty/concurrentqueue ThirdParty/Beast
-      - curl -o ../flip-demo.tar.gz -L http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files/flip-demo-macos-c47e41da05.tar.gz
-      - cd ..
-      - tar xvzf flip-demo.tar.gz &> /dev/null
-      - export KIWI_FLIP_LIB=$(pwd)/flip-demo/lib && export KIWI_FLIP_INCLUDE=$(pwd)/flip-demo/include
       - cd ${HOME}
       - curl -o ./boost_1_63_0.tar.gz -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz
       - tar xvzf ./boost_1_63_0.tar.gz &> /dev/null
