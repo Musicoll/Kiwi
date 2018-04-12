@@ -187,7 +187,7 @@ namespace kiwi { namespace engine {
         {
             m_wrapper->load("", m_plugin_file);
         }
-        catch (std::string& e)
+        catch (std::string const& e)
         {
             error(e);
         }
@@ -208,7 +208,7 @@ namespace kiwi { namespace engine {
                     {
                         m_wrapper->setParameter(args[1].getInt(), args[2].getFloat());
                     }
-                    catch (std::string& e)
+                    catch (std::string const& e)
                     {
                         error(e);
                         return;
@@ -226,7 +226,7 @@ namespace kiwi { namespace engine {
                 {
                     m_wrapper->setParameter(method, args[1].getFloat());
                 }
-                catch (std::string& e)
+                catch (std::string const& e)
                 {
                     error(e);
                     return;
@@ -251,7 +251,7 @@ namespace kiwi { namespace engine {
                                static_cast<int>(getNumberOfOutputs() - 1),
                                infos);
         }
-        catch (std::string& e)
+        catch (std::string const& e)
         {
             warning(e);
             return;
