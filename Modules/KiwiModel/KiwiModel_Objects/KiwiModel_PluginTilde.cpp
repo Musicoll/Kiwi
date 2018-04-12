@@ -47,11 +47,11 @@ namespace kiwi { namespace model {
     
     PluginTilde::PluginTilde(std::vector<tool::Atom> const& args)
     {
-        if (args.size() < 3)
+        if (args.size() < 4)
         {
-            throw Error("plugin~ expects 3 default arguments: the number of inlets, the number of outlets and the name of the file containing the FAUST code.");
+            throw Error("plugin~ expects 4 default arguments: the number of inlets, the number of outlets and the name of the plugin and the format of the plugin (vst2 or vst3).");
         }
-        if (args.size() > 3)
+        if (args.size() > 4)
         {
             throw Error("plugin~ too many arguments.");
         }
@@ -66,7 +66,12 @@ namespace kiwi { namespace model {
         }
         if (!args[2].isString())
         {
-            throw Error("plugin~ 3rd argument must be the name of the file containing the FAUST code");
+            throw Error("plugin~ 3rd argument must be the name of the plugin");
+        }
+        if (!args[3].isString() || (args[3].getString() != std::string("vst2") &&
+                                    args[3].getString() != std::string("vst3")))
+        {
+            throw Error("plugin~ 4th argument must be the format of the plugin (vst2 or vst3)");
         }
         pushInlet({PinType::IType::Control, PinType::IType::Signal});
         for(int i = 1; i < args[0].getInt(); ++i)
