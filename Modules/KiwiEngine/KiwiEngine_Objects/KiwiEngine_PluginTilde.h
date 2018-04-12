@@ -56,7 +56,7 @@ namespace kiwi { namespace engine {
         bool isVST3();
         
         static std::string parsePluginFile(std::vector<tool::Atom> const& args);
-        
+        std::unique_ptr<PluginWrapper> m_wrapper;
         std::unique_ptr<juce::AudioPluginInstance> m_plugin;
         std::string const                    m_plugin_file;
     };

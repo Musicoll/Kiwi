@@ -27,6 +27,13 @@
 namespace kiwi { namespace engine {
     
 
+    class PluginTilde::PluginWrapper
+    {
+    public:
+        juce::AudioBuffer<dsp::sample_t> audio;
+        juce::MidiBuffer midi;
+    };
+    
     // ================================================================================ //
     //                                       PLUGIN~                                    //
     // ================================================================================ //
@@ -67,6 +74,7 @@ namespace kiwi { namespace engine {
     
     PluginTilde::PluginTilde(model::Object const& model, Patcher& patcher):
     AudioObject(model, patcher),
+    m_wrapper(std::make_unique<PluginWrapper>()),
     m_plugin_file(parsePluginFile(model.getArguments()))
     {
         load();
@@ -79,12 +87,12 @@ namespace kiwi { namespace engine {
     
     bool PluginTilde::isVST2()
     {
-        return m_plugin_file.find("VST2");
+        return m_plugin_file.find("VST2") != std::string::npos;
     }
     
     bool PluginTilde::isVST3()
     {
-        return m_plugin_file.find("VST3");
+        return m_plugin_file.find("VST3") != std::string::npos;
     }
     
     void PluginTilde::load()
@@ -159,14 +167,35 @@ namespace kiwi { namespace engine {
     
     void PluginTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
     {
-        
+        for(size_t i = 0; i < input.getNumberOfChannels(); ++i)
+        {
+            m_wrapper->audio.copyFrom(i, 0, input[i].data(), input[i].size());
+        }
+        m_plugin->processBlock(m_wrapper->audio, m_wrapper->midi);
+        for(size_t i = 0; i < output.getNumberOfChannels() - 1; ++i)
+        {
+            std::copy_n(m_wrapper->audio.getReadPointer(i), output[i].size(), output[i].data());
+        }
     }
     
     void PluginTilde::prepare(PrepareInfo const& infos)
     {
         if(m_plugin)
         {
-            
+            juce::AudioProcessor::BusesLayout layout;
+            // int check if nins == 1 perhaps nins == 0
+            layout.inputBuses.add(juce::AudioChannelSet::canonicalChannelSet(getNumberOfInputs()));
+            layout.outputBuses.add(juce::AudioChannelSet::canonicalChannelSet(getNumberOfOutputs() - 1));
+            if(m_plugin->setBusesLayout(layout))
+            {
+                m_plugin->prepareToPlay(infos.sample_rate, infos.vector_size);
+                m_wrapper->audio.setSize(std::max(getNumberOfInputs(), getNumberOfOutputs() - 1), infos.vector_size);
+                setPerformCallBack(this, &PluginTilde::perform);
+            }
+            else
+            {
+                error("plugin~ doesn't support current audio buses layout from :");
+            }
         }
     }
     
