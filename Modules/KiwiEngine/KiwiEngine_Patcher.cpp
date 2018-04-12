@@ -60,7 +60,7 @@ namespace kiwi
         {
             m_objects[object_id] = object;
             
-            std::shared_ptr<dsp::Processor> processor = std::dynamic_pointer_cast<AudioObject>(object);
+            auto processor = std::dynamic_pointer_cast<dsp::Processor>(object);
             
             if(processor)
             {
@@ -70,7 +70,7 @@ namespace kiwi
         
         void Patcher::removeObject(uint64_t object_id)
         {
-            auto processor = std::dynamic_pointer_cast<AudioObject>(m_objects[object_id]);
+            auto processor = std::dynamic_pointer_cast<dsp::Processor>(m_objects[object_id]);
             
             if (processor)
             {
