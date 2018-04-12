@@ -7,3 +7,6 @@
 [submodule "ThirdParty/Beast"]
 	path = ThirdParty/Beast
 	url = https://github.com/boostorg/beast.git
+[submodule "ThirdParty/vst3sdk"]
+	path = ThirdParty/vst3sdk
+	url = https://github.com/steinbergmedia/vst3sdk.git
