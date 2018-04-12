@@ -48,11 +48,10 @@ namespace kiwi
         void drawTableHeaderBackground(juce::Graphics& g, juce::TableHeaderComponent& header) override;
         
         //! @brief Overriden to draw a custom Table header column.
-        void drawTableHeaderColumn(juce::Graphics& g, juce::String const& columnName,
-                                   int /*columnId*/,
+        void drawTableHeaderColumn(juce::Graphics&, juce::TableHeaderComponent&,
+                                   const juce::String& columnName, int columnId,
                                    int width, int height,
-                                   bool isMouseOver, bool isMouseDown,
-                                   int columnFlags) override;
+                                   bool isMouseOver, bool isMouseDown, int columnFlags) override;
         
         //! @brief Custom Button background drawing
         void drawButtonBackground(juce::Graphics& g, juce::Button& b,

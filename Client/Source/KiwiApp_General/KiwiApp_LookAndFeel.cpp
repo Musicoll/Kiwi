@@ -124,8 +124,8 @@ namespace kiwi
         g.fillPath(p, p.getTransformToScaleToFit(plusRect.reduced(2, plusRect.getHeight() / 4), true));
     }
     
-    void LookAndFeel::drawTableHeaderColumn(juce::Graphics& g, juce::String const& columnName,
-                                            int /*columnId*/,
+    void LookAndFeel::drawTableHeaderColumn(juce::Graphics& g, juce::TableHeaderComponent&,
+                                            juce::String const& columnName, int /*columnId*/,
                                             int width, int height,
                                             bool isMouseOver, bool isMouseDown,
                                             int columnFlags)

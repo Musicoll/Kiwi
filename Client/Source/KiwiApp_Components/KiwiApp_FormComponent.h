@@ -29,7 +29,7 @@ namespace kiwi
     //                                    ALERT BOX                                     //
     // ================================================================================ //
     
-    class AlertBox : public juce::Component, private juce::ButtonListener
+    class AlertBox : public juce::Component, private juce::Button::Listener
     {
     public: // methods
         
@@ -72,7 +72,7 @@ namespace kiwi
     //                                  FORM COMPONENT                                  //
     // ================================================================================ //
     
-    class FormComponent : public juce::Component, private juce::ButtonListener
+    class FormComponent : public juce::Component, private juce::Button::Listener
     {
     public: // methods
         

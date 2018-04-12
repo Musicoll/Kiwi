@@ -135,7 +135,7 @@ namespace kiwi
             {
                 for(int y = (origin.getY() % grid_size); y < clip_bounds.getBottom(); y += grid_size)
                 {
-                    g.setPixel(x, y);
+                    g.fillRect(x, y, 1, 1);
                 }
             }
         }
