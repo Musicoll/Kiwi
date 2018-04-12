@@ -26,12 +26,108 @@
 
 namespace kiwi { namespace engine {
     
+    // ================================================================================ //
+    //                                       PLUGIN WRAPPER                             //
+    // ================================================================================ //
 
     class PluginTilde::PluginWrapper
     {
     public:
-        juce::AudioBuffer<dsp::sample_t> audio;
-        juce::MidiBuffer midi;
+        
+        inline bool isValid()
+        {
+            return static_cast<bool>(m_plugin);
+        }
+        
+        void load(const std::string& path, const std::string& filepath)
+        {
+            juce::File const file(filepath);
+            juce::OwnedArray<juce::PluginDescription> results;
+            std::unique_ptr<juce::AudioPluginFormat> plugin_format;
+            if(file.hasFileExtension(".vst3"))
+            {
+                plugin_format = std::make_unique<juce::VST3PluginFormat>();
+            }
+            else
+            {
+                plugin_format = std::make_unique<juce::VSTPluginFormat>();
+            }
+            
+            plugin_format->findAllTypesForFile(results, filepath);
+            if(!results.isEmpty())
+            {
+                m_plugin = plugin_format->createInstanceFromDescription(*results[0], 44100, 64);
+                if(m_plugin)
+                {
+                    m_plugin->enableAllBuses();
+                    return;
+                }
+                throw std::string("can't create plugin intance for ") + filepath;
+                return;
+            }
+            throw std::string("can't find ") + filepath;
+        }
+        
+        void setParameter(const std::string& name, const float value)
+        {
+            const int strsize = static_cast<int>(name.size());
+            auto const& params = m_plugin->getParameters();
+            for(int i = 0; i < params.size(); ++i)
+            {
+                if(!params[i]->getName(strsize).compare(name))
+                {
+                    params[i]->setValue(value);
+                }
+            }
+            throw std::string("unknown parameter \'") + name + std::string("'");
+        }
+        
+        void setParameter(const int index, const float value)
+        {
+            auto const& params = m_plugin->getParameters();
+            if(params.size() > index)
+            {
+                params[index]->setValue(value);
+                return;
+            }
+            throw std::string("index out of range");
+        }
+        
+        void prepare(const int nins, const int nouts, PrepareInfo const& infos)
+        {
+            if(m_plugin->setBusesLayout(BusesLayout{AudioChannelSet::canonicalChannelSet(nins), AudioChannelSet::canonicalChannelSet(nouts)}))
+            {
+                m_audio_buffer.setSize(std::max(nins, nouts), infos.vector_size);
+                m_plugin->prepareToPlay(infos.sample_rate, infos.vector_size);
+                return;
+            }
+            throw std::string("default audio buses layout is not supported");
+        }
+        
+        void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+        {
+            const size_t nsamples = input.getVectorSize();
+            const size_t ninputs  = input.getNumberOfChannels();
+            const size_t noutputs = output.getNumberOfChannels() - 1;
+            for(size_t i = 0; i < ninputs; ++i)
+            {
+                std::copy_n(input[i].data(), nsamples, m_audio_buffer.getWritePointer(i));
+            }
+            m_plugin->processBlock(m_audio_buffer, m_midi_buffer);
+            for(size_t i = 0; i < noutputs; ++i)
+            {
+                std::copy_n(m_audio_buffer.getReadPointer(i), nsamples, output[i].data());
+            }
+        }
+        
+    private:
+            
+        using BusesLayout = juce::AudioProcessor::BusesLayout;
+        using AudioChannelSet = juce::AudioChannelSet;
+            
+        juce::ScopedPointer<juce::AudioPluginInstance> m_plugin = nullptr;
+        juce::AudioBuffer<dsp::sample_t>               m_audio_buffer;
+        juce::MidiBuffer                               m_midi_buffer;
     };
     
     // ================================================================================ //
@@ -85,118 +181,82 @@ namespace kiwi { namespace engine {
         
     }
     
-    bool PluginTilde::isVST2()
-    {
-        return m_plugin_file.find("VST2") != std::string::npos;
-    }
-    
-    bool PluginTilde::isVST3()
-    {
-        return m_plugin_file.find("VST3") != std::string::npos;
-    }
-    
     void PluginTilde::load()
     {
-        std::unique_ptr<juce::AudioPluginFormat> plugin_format;
-        if(isVST2())
+        try
         {
-            plugin_format = std::make_unique<juce::VSTPluginFormat>();
+            m_wrapper->load("", m_plugin_file);
         }
-        else
+        catch (std::string& e)
         {
-            plugin_format = std::make_unique<juce::VST3PluginFormat>();
-        }
-        
-        if(plugin_format->fileMightContainThisPluginType(m_plugin_file))
-        {
-            juce::OwnedArray<juce::PluginDescription> results;
-            plugin_format->findAllTypesForFile(results, m_plugin_file);
-            if(!results.isEmpty())
-            {
-                m_plugin = std::unique_ptr<juce::AudioPluginInstance>(plugin_format->createInstanceFromDescription(*results[0], 44100, 64));
-                if(m_plugin)
-                {
-                    m_plugin->enableAllBuses();
-                  
-                    post("plugin~ " + m_plugin_file + " has been loaded");
-                }
-                else
-                {
-                    error("plugin~ can't allocate " + m_plugin_file);
-                }
-            }
-            else
-            {
-                error("plugin~ can't find type " + m_plugin_file);
-            }
-        }
-        else
-        {
-            error("plugin~ can't find " + m_plugin_file);
+            error(e);
         }
     }
     
     void PluginTilde::receive(size_t index, std::vector<tool::Atom> const& args)
     {
-        if(!m_plugin)
-        {
-            error("plugin~ " + m_plugin_file + " not loaded");
+        if(!m_wrapper->isValid())
             return;
-        }
-        if(args.size() > 2 &&
-           args[0].isString() && args[0].getString() == "param" &&
-           args[1].isInt() && args[1].getInt() >= 0 &&
-           args[2].isFloat() && args[2].getFloat() >= 0)
+        if(!args.empty() && args[0].isString())
         {
-            auto const& params = m_plugin->getParameters();
-            if(params.size() > args[1].getInt())
+            std::string const method = args[0].getString();
+            if(method == "param")
             {
-                params[args[1].getInt()]->setValue(args[2].getFloat());
-                post("plugin~ set param " + std::to_string(args[1].getInt()) + " (" + params[args[1].getInt()]->getName(400).toStdString() + "): " + std::to_string(args[2].getFloat()));
+                if(args.size() > 2 && args[1].isInt() && args[2].isFloat())
+                {
+                    try
+                    {
+                        m_wrapper->setParameter(args[1].getInt(), args[2].getFloat());
+                    }
+                    catch (std::string& e)
+                    {
+                        error(e);
+                        return;
+                    }
+                    if(args.size() > 3)
+                        warning("param method too many arguments");
+                    return;
+                }
+                warning("param method wrong arguments");
+                return;
             }
-            else
+            else if(args.size() > 1 && args[1].isFloat())
             {
-                error("plugin~ param index out of range");
+                try
+                {
+                    m_wrapper->setParameter(method, args[1].getFloat());
+                }
+                catch (std::string& e)
+                {
+                    error(e);
+                    return;
+                }
+                if(args.size() > 2)
+                    warning(method + " method too many arguments");
+                return;
             }
-        }
-        else
-        {
-            error("plugin~ wrong method");
-        }
-    }
-    
-    void PluginTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
-    {
-        for(size_t i = 0; i < input.getNumberOfChannels(); ++i)
-        {
-            m_wrapper->audio.copyFrom(i, 0, input[i].data(), input[i].size());
-        }
-        m_plugin->processBlock(m_wrapper->audio, m_wrapper->midi);
-        for(size_t i = 0; i < output.getNumberOfChannels() - 1; ++i)
-        {
-            std::copy_n(m_wrapper->audio.getReadPointer(i), output[i].size(), output[i].data());
+            warning("wrong arguments");
+            return;
         }
     }
     
     void PluginTilde::prepare(PrepareInfo const& infos)
     {
-        if(m_plugin)
+        if(!m_wrapper->isValid())
+            return;
+        try
         {
-            juce::AudioProcessor::BusesLayout layout;
-            // int check if nins == 1 perhaps nins == 0
-            layout.inputBuses.add(juce::AudioChannelSet::canonicalChannelSet(getNumberOfInputs()));
-            layout.outputBuses.add(juce::AudioChannelSet::canonicalChannelSet(getNumberOfOutputs() - 1));
-            if(m_plugin->setBusesLayout(layout))
-            {
-                m_plugin->prepareToPlay(infos.sample_rate, infos.vector_size);
-                m_wrapper->audio.setSize(std::max(getNumberOfInputs(), getNumberOfOutputs() - 1), infos.vector_size);
-                setPerformCallBack(this, &PluginTilde::perform);
-            }
-            else
-            {
-                error("plugin~ doesn't support current audio buses layout from :");
-            }
+            // See for inputs = 0...
+            m_wrapper->prepare(static_cast<int>(getNumberOfInputs()),
+                               static_cast<int>(getNumberOfOutputs() - 1),
+                               infos);
         }
+        catch (std::string& e)
+        {
+            warning(e);
+            return;
+        }
+        setPerformCallBack(m_wrapper.get(), &PluginWrapper::perform);
     }
     
 }}
