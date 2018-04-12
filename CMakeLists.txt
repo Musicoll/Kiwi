@@ -221,24 +221,6 @@ set(JUCE_MACRO_DEFINITIONS JUCE_STANDALONE_APPLICATION=1
                            JUCE_DISPLAY_SPLASH_SCREEN=0
                            JUCE_REPORT_APP_USAGE=0)
 
-#set(JUCE_COMPILED_SRC
-#   ${ROOT_DIR}/ThirdParty/Juce/modules/juce_core/juce_core.cpp
-#   ${ROOT_DIR}/ThirdParty/Juce/modules/juce_data_structures/juce_data_structures.cpp
-#   ${ROOT_DIR}/ThirdParty/Juce/modules/juce_events/juce_events.cpp
-#                             ${ROOT_DIR}/ThirdParty/Juce/modules/juce_graphics/juce_graphics.cpp
-#                             ${ROOT_DIR}/ThirdParty/Juce/modules/juce_gui_basics/juce_gui_basics.cpp
-#                             ${ROOT_DIR}/ThirdParty/Juce/modules/juce_gui_extra/juce_gui_extra.cpp
-#                             ${ROOT_DIR}/ThirdParty/Juce/modules/juce_audio_basics/juce_audio_basics.cpp
-#                             ${ROOT_DIR}/ThirdParty/Juce/modules/juce_audio_devices/juce_audio_devices.cpp
-#                             ${ROOT_DIR}/ThirdParty/Juce/modules/juce_audio_formats/juce_audio_formats.cpp
-#                             ${ROOT_DIR}/ThirdParty/Juce/modules/juce_audio_utils/juce_audio_utils.cpp
-#                             ${ROOT_DIR}/ThirdParty/Juce/modules/juce_audio_processors/juce_audio_processors.cpp
-#                             ${ROOT_DIR}/ThirdParty/Juce/modules/juce_audio_processors/juce_audio_processors.cpp)
-
-#file (GLOB_RECURSE JUCE_SRC ${ROOT_DIR}/ThirdParty/Juce/modules/*.[h|c]pp
-#                            ${ROOT_DIR}/ThirdParty/Juce/modules/*.h
-#                            ${ROOT_DIR}/ThirdParty/Juce/modules/*.mm)
-
 set(JUCE_SRC)
 add_juce_module(JUCE_SRC juce_core)
 add_juce_module(JUCE_SRC juce_data_structures)
