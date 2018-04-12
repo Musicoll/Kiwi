@@ -221,6 +221,9 @@ set(JUCE_MACRO_DEFINITIONS
   JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1
   JUCE_DISPLAY_SPLASH_SCREEN=0
   JUCE_REPORT_APP_USAGE=0
+  JUCE_PLUGINHOST_VST=1
+  JUCE_PLUGINHOST_VST3=1
+#  JUCE_PLUGINHOST_AU=1
 )
 
 set(JUCE_SRC)
@@ -240,6 +243,7 @@ if (APPLE)
     set_source_files_properties(${JUCE_SRC} PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif()
 
+set(JUCE_INCLUDE_DIRS ${JUCE_INCLUDE_DIRS} ${ROOT_DIR}/ThirdParty/vst3sdk)
 add_library(Juce STATIC ${JUCE_SRC})
 target_link_libraries(Juce ${JUCE_DEP})
 target_compile_definitions(Juce PUBLIC ${JUCE_MACRO_DEFINITIONS})
