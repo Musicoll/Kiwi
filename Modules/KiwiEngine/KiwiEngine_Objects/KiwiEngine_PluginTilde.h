@@ -45,7 +45,7 @@ namespace kiwi { namespace engine {
         PluginTilde(model::Object const& model, Patcher& patcher);
         ~PluginTilde();
         
-        void receive(size_t index, std::vector<tool::Atom> const& args) final {}
+        void receive(size_t index, std::vector<tool::Atom> const& args) final;
         void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
         void prepare(dsp::Processor::PrepareInfo const& infos) final;
     private:

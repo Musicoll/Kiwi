@@ -108,6 +108,8 @@ namespace kiwi { namespace engine {
                 m_plugin = std::unique_ptr<juce::AudioPluginInstance>(plugin_format->createInstanceFromDescription(*results[0], 44100, 64));
                 if(m_plugin)
                 {
+                    m_plugin->enableAllBuses();
+                  
                     post("plugin~ " + m_plugin_file + " has been loaded");
                 }
                 else
@@ -124,9 +126,35 @@ namespace kiwi { namespace engine {
         {
             error("plugin~ can't find " + m_plugin_file);
         }
-        
-        
-        juce::PluginDescription descrition;
+    }
+    
+    void PluginTilde::receive(size_t index, std::vector<tool::Atom> const& args)
+    {
+        if(!m_plugin)
+        {
+            error("plugin~ " + m_plugin_file + " not loaded");
+            return;
+        }
+        if(args.size() > 2 &&
+           args[0].isString() && args[0].getString() == "param" &&
+           args[1].isInt() && args[1].getInt() >= 0 &&
+           args[2].isFloat() && args[2].getFloat() >= 0)
+        {
+            auto const& params = m_plugin->getParameters();
+            if(params.size() > args[1].getInt())
+            {
+                params[args[1].getInt()]->setValue(args[2].getFloat());
+                post("plugin~ set param " + std::to_string(args[1].getInt()) + " (" + params[args[1].getInt()]->getName(400).toStdString() + "): " + std::to_string(args[2].getFloat()));
+            }
+            else
+            {
+                error("plugin~ param index out of range");
+            }
+        }
+        else
+        {
+            error("plugin~ wrong method");
+        }
     }
     
     void PluginTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
@@ -136,7 +164,10 @@ namespace kiwi { namespace engine {
     
     void PluginTilde::prepare(PrepareInfo const& infos)
     {
-        
+        if(m_plugin)
+        {
+            
+        }
     }
     
 }}
