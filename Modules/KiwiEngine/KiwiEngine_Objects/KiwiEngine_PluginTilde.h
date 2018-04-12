@@ -23,6 +23,11 @@
 
 #include <KiwiEngine/KiwiEngine_Object.h>
 
+namespace juce
+{
+    class AudioPluginInstance;
+}
+
 namespace kiwi { namespace engine {
     
     // ================================================================================ //
@@ -44,8 +49,16 @@ namespace kiwi { namespace engine {
         void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
         void prepare(dsp::Processor::PrepareInfo const& infos) final;
     private:
+        
         class PluginWrapper;
-        std::unique_ptr<PluginWrapper> m_plugin_wrapper;
+        void load();
+        bool isVST2();
+        bool isVST3();
+        
+        static std::string parsePluginFile(std::vector<tool::Atom> const& args);
+        
+        std::unique_ptr<juce::AudioPluginInstance> m_plugin;
+        std::string const                    m_plugin_file;
     };
 
 }}

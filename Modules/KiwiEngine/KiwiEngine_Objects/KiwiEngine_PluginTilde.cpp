@@ -26,21 +26,34 @@
 
 namespace kiwi { namespace engine {
     
-    // ================================================================================ //
-    //                                       PLUGIN WRAPPER                             //
-    // ================================================================================ //
-    
-    class PluginTilde::PluginWrapper : private juce::AudioPluginFormatManager
-    {
-    public:
-        PluginWrapper()
-        {
-            addDefaultFormats();
-        }
-    };
+
     // ================================================================================ //
     //                                       PLUGIN~                                    //
     // ================================================================================ //
+    
+    std::string PluginTilde::parsePluginFile(std::vector<tool::Atom> const& args)
+    {
+#ifdef JUCE_MAC
+        const std::string vst_ext(".vst");
+#elif JUCE_WINDOWS
+        const std::string vst_ext(".dll");
+#elif JUCE_LINUX
+        const std::string vst_ext(".so");
+#endif
+        juce::File const folder(juce::File::getSpecialLocation(juce::File::userDocumentsDirectory)
+                                .getChildFile("Kiwi Media")
+                                .getChildFile("Plugins"));
+        
+        if(args[3].getString() == std::string("vst2"))
+        {
+            return folder.getChildFile("VST2")
+            .getChildFile(juce::String(args[2].getString() + vst_ext))
+            .getFullPathName().toStdString();
+        }
+        return folder.getChildFile("VST3")
+        .getChildFile(juce::String(args[2].getString() + ".vst3"))
+        .getFullPathName().toStdString();
+    }
     
     void PluginTilde::declare()
     {
@@ -53,14 +66,67 @@ namespace kiwi { namespace engine {
     }
     
     PluginTilde::PluginTilde(model::Object const& model, Patcher& patcher):
-    AudioObject(model, patcher), m_plugin_wrapper(std::make_unique<PluginWrapper>())
+    AudioObject(model, patcher),
+    m_plugin_file(parsePluginFile(model.getArguments()))
     {
-        
+        load();
     }
     
     PluginTilde::~PluginTilde()
     {
         
+    }
+    
+    bool PluginTilde::isVST2()
+    {
+        return m_plugin_file.find("VST2");
+    }
+    
+    bool PluginTilde::isVST3()
+    {
+        return m_plugin_file.find("VST3");
+    }
+    
+    void PluginTilde::load()
+    {
+        std::unique_ptr<juce::AudioPluginFormat> plugin_format;
+        if(isVST2())
+        {
+            plugin_format = std::make_unique<juce::VSTPluginFormat>();
+        }
+        else
+        {
+            plugin_format = std::make_unique<juce::VST3PluginFormat>();
+        }
+        
+        if(plugin_format->fileMightContainThisPluginType(m_plugin_file))
+        {
+            juce::OwnedArray<juce::PluginDescription> results;
+            plugin_format->findAllTypesForFile(results, m_plugin_file);
+            if(!results.isEmpty())
+            {
+                m_plugin = std::unique_ptr<juce::AudioPluginInstance>(plugin_format->createInstanceFromDescription(*results[0], 44100, 64));
+                if(m_plugin)
+                {
+                    post("plugin~ " + m_plugin_file + " has been loaded");
+                }
+                else
+                {
+                    error("plugin~ can't allocate " + m_plugin_file);
+                }
+            }
+            else
+            {
+                error("plugin~ can't find type " + m_plugin_file);
+            }
+        }
+        else
+        {
+            error("plugin~ can't find " + m_plugin_file);
+        }
+        
+        
+        juce::PluginDescription descrition;
     }
     
     void PluginTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
