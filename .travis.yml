@@ -35,7 +35,7 @@ matrix:
     install:
       # make sure CXX is correctly set
       - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
-      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/concurrentqueue ThirdParty/Beast
+      - git submodule update --init --recursive
       - pip install --user cpp-coveralls
       - wget --no-check-certificate -O ../flip-demo.tar.gz http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files/flip-demo-linux-c47e41da05.tar.gz
       - cd ..
@@ -105,7 +105,7 @@ matrix:
     osx_image: xcode9.2
 
     install:
-      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/concurrentqueue ThirdParty/Beast
+      - git submodule update --init --recursive
       - curl -o ../flip-demo.tar.gz -L http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files/flip-demo-macos-c47e41da05.tar.gz
       - cd ..
       - tar xvzf flip-demo.tar.gz &> /dev/null
