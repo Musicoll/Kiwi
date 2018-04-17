@@ -13,9 +13,7 @@ environment:
         PLATFORM: x64
 
 install:
-    - git submodule update --init --recursive "ThirdParty/Juce"
-    - git submodule update --init --recursive "ThirdParty/concurrentqueue"
-    - git submodule update --init --recursive "ThirdParty/Beast"
+    - git submodule update --init --recursive
     - set PATH=C:\Python27;%PATH%
     - curl -o ..\flip-demo.zip -L -k  http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files/flip-demo-windows-c47e41da05.zip
     - cd ..
