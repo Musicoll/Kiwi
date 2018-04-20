@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Kiwi Wiki</title>
+  <script src="https://cdn.rawgit.com/showdownjs/showdown/1.8.6/dist/showdown.min.js"></script>
+  <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js'></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="css/navbar.css" />
+  <link rel="stylesheet" type="text/css" href="css/main.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+    <div class="sidenav">
+      <a href="#about">Getting started</a>
+      <a class="md_link" md_link="software/objects.md">Objects</a>
+      <a href="#clients">Tutorials</a>
+      <a class="md_link" md_link="software/versions.md">Versions</a>
+      <a class="md_link" md_link="developper/dev.md">Developper guide</a>
+    </div>
+
+    <div class="main" id="content">
+      <h1>Kiwi Wiki</h1>
+      <p>Welcome to our wiki !</p>
+      <p>You will find here all relevent informations on how to use kiwi as well
+      as guidance for fellow developpers eager to contribute.</p>
+    </div>
+
+    <script>
+    /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
+    var dropdown = document.getElementsByClassName("dropdown-btn");
+    var i;
+
+    for (i = 0; i < dropdown.length; i++) {
+      dropdown[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var dropdownContent = this.nextElementSibling;
+        if (dropdownContent.style.display === "block") {
+          dropdownContent.style.display = "none";
+        } else {
+          dropdownContent.style.display = "block";
+        }
+      });
+    }
+
+    var markdowns = document.getElementsByClassName("md_link");
+
+    for(var i = 0; i < markdowns.length; i++)
+    {
+        markdowns[i].addEventListener('click', function(){
+
+            var converter = new showdown.Converter();
+
+            myUrl = this.getAttribute("md_link")
+
+            var markdown_text = "";
+
+            $.ajax( { url: myUrl,
+                      type: 'get',
+                      dataType: 'text',
+                      async: false,
+                      success: function(data) { markdown_text = data; }
+            });
+
+            document.getElementById('content').innerHTML = converter.makeHtml(markdown_text);
+        })
+    }
+
+    </script>
+
+</body>
+</html>
