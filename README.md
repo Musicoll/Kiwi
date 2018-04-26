@@ -50,7 +50,8 @@ A list of the kiwi objects can be found [here](https://github.com/Musicoll/Kiwi/
 
 ### Authors
 
-[![Eliott Paris](https://avatars.githubusercontent.com/u/1750257?s=90)](https://github.com/eliottparis) | [![Pierre Guillot](https://avatars.githubusercontent.com/u/1409918?s=90)](https://github.com/pierreguillot) | [![Jean Millot](https://avatars.githubusercontent.com/u/16612690?s=90)](https://github.com/jean-millot)
+[![Eliott Paris](https://avatars.githubusercontent.com/u/1750257?s=90)](https://github.com/eliottparis) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FMusicoll%2FKiwi.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FMusicoll%2FKiwi?ref=badge_shield)
+| [![Pierre Guillot](https://avatars.githubusercontent.com/u/1409918?s=90)](https://github.com/pierreguillot) | [![Jean Millot](https://avatars.githubusercontent.com/u/16612690?s=90)](https://github.com/jean-millot)
 ---|---|---
 [Eliott Paris](https://github.com/eliottparis) | [Pierre Guillot](https://github.com/pierreguillot) | [Jean Millot](https://github.com/jean-millot)
 
@@ -81,3 +82,6 @@ Kiwi uses the following ThirdParty libraries:
 > You can check out the full license [here](https://github.com/Musicoll/Kiwi/blob/master/Licence.md)
 
 The Kiwi application is licensed under the terms of the **GPLv3** license. However, Kiwi also depends on the **Flip** library (developed by [irisate](https://irisate.com/)) which is NOT open-source. You will need to download a public version on their [website](http://developer.irisate.com/) to compile.
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FMusicoll%2FKiwi.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FMusicoll%2FKiwi?ref=badge_large)
