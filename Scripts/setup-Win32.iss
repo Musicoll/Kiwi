@@ -40,11 +40,11 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: mypAssociation; Description: "Associate ""kiwi"" extension"; GroupDescription: File extensions:
 
 [Files]
-Source: "..\Build\Release\Win32\KiwiBuild\Release\Kiwi.exe"; DestDir: "{src}"; Flags: ignoreversion
-Source: "..\Build\Release\Win32\KiwiBuild\Release\concrt140.dll"; DestDir: "{src}"; Flags: ignoreversion
-Source: "..\Build\Release\Win32\KiwiBuild\Release\msvcp140.dll"; DestDir: "{src}"; Flags: ignoreversion
-Source: "..\Build\Release\Win32\KiwiBuild\Release\vccorlib140.dll"; DestDir: "{src}"; Flags: ignoreversion
-Source: "..\Build\Release\Win32\KiwiBuild\Release\vcruntime140.dll"; DestDir: "{src}"; Flags: ignoreversion
+Source: "..\Build\Release\Win32\KiwiBuild\Release\Kiwi.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Build\Release\Win32\KiwiBuild\Release\concrt140.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Build\Release\Win32\KiwiBuild\Release\msvcp140.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Build\Release\Win32\KiwiBuild\Release\vccorlib140.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Build\Release\Win32\KiwiBuild\Release\vcruntime140.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
