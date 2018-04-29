@@ -25,9 +25,11 @@ build_script:
     - python .\Scripts\build.py -c %CONFIGURATION% -p %PLATFORM%
 
 after_build:
+    - if "%PLATFORM%"=="x64" ("C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Scripts\setup-x64.iss)
+    - if "%PLATFORM%"=="Win32" ("C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Scripts\setup-Win32.iss)
     - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\%CONFIGURATION%
-    - 7z a Kiwi_%PLATFORM%.zip %BUILD_DIR%\Kiwi.exe %BUILD_DIR%\*.dll
-    - 7z a Kiwi_Server_%PLATFORM%.zip %BUILD_DIR%\Server.exe
+    - if "%PLATFORM%"=="x64" (7z a Kiwi_%PLATFORM%.zip %BUILD_DIR%\Kiwi-x64-setup.exe)
+    - if "%PLATFORM%"=="Win32" (7z a Kiwi_%PLATFORM%.zip %BUILD_DIR%\Kiwi-win32-setup.exe)
 
 artifacts:
   - path: '*.zip'
