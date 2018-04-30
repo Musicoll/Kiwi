@@ -103,9 +103,6 @@ namespace kiwi
         //! @brief Brings the Application settings window to front.
         void showAppSettingsWindow();
         
-        //! @brief Removes a patcher from cach.
-        void removePatcher(PatcherManager const& patcher_manager);
-        
         //! @brief Opens a juce native audio setting pannel.
         void showAudioSettingsWindow();
         

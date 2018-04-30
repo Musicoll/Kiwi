@@ -89,6 +89,7 @@ namespace kiwi
             
             if (!keep_patcher)
             {
+                (*manager)->forceCloseAllWindows();
                 manager = m_patcher_managers.erase(manager);
             }
             else
@@ -129,6 +130,7 @@ namespace kiwi
                 
                 if (!keep_patcher)
                 {
+                    (*manager)->forceCloseAllWindows();
                     manager = m_patcher_managers.erase(manager);
                 }
                 else
@@ -345,16 +347,6 @@ namespace kiwi
             {
                 KiwiApp::error("Failed to connect to the document [" + session.getName() + "]");
             }
-        }
-    }
-    
-    void Instance::removePatcher(PatcherManager const& patcher_manager)
-    {
-        const auto it = getPatcherManager(patcher_manager);
-        
-        if (it != m_patcher_managers.end())
-        {
-            m_patcher_managers.erase(it);
         }
     }
     

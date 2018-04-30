@@ -67,7 +67,6 @@ namespace kiwi
     
     PatcherManager::~PatcherManager()
     {
-        forceCloseAllWindows();
         disconnect();
     }
     
