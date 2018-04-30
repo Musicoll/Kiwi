@@ -127,7 +127,7 @@ namespace kiwi
         startTimer(10);
 
         #if JUCE_WINDOWS
-        m_instance->openFile(juce::File(commandLine.unquoted()));
+        openCommandFile(commandLine);
         #endif
         
         #if JUCE_MAC
@@ -141,10 +141,7 @@ namespace kiwi
     
     void KiwiApp::anotherInstanceStarted(juce::String const& command_line)
     {
-        if(m_instance)
-        {
-            m_instance->openFile(juce::File(command_line.unquoted()));
-        }
+        openCommandFile(command_line);
     }
     
     void KiwiApp::declareEngineObjects()
@@ -384,6 +381,19 @@ namespace kiwi
             m_api_controller->setPort(settings.getApiPort());
             
             checkLatestRelease();
+        }
+    }
+
+    void KiwiApp::openCommandFile(juce::String const& command_line)
+    {
+        if (command_line.length() > 0)
+        {
+            juce::File file(command_line.unquoted());
+
+            if (file.hasFileExtension("kiwi") && m_instance)
+            {
+                m_instance->openFile(file);
+            }
         }
     }
     
