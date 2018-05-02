@@ -236,6 +236,9 @@ namespace kiwi
         
         // @brief Handles changes of server address.
         void networkSettingsChanged(NetworkSettings const& settings, juce::Identifier const& ids) override final;
+
+        //! @brief Parse startup command line and open file if exists.
+        void openCommandFile(juce::String const& command_line);
         
     private: // members
         

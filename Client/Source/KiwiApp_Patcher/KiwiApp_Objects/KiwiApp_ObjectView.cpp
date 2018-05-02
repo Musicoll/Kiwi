@@ -36,7 +36,7 @@ namespace kiwi
     ObjectView::ObjectView(model::Object & object_model):
     m_model(object_model),
     m_border_size(1.5),
-    m_tasks()
+    m_master(this, [](ObjectView*){})
     {
         object_model.addListener(*this);
         
@@ -50,11 +50,6 @@ namespace kiwi
     
     ObjectView::~ObjectView()
     {
-        for (auto task : m_tasks)
-        {
-            getScheduler().unschedule(task);
-        }
-        
         getModel().removeListener(*this);
     }
     
@@ -116,64 +111,27 @@ namespace kiwi
     
     void ObjectView::defer(std::function<void()> call_back)
     {
-        removeTasks(m_tasks);
+        std::weak_ptr<ObjectView> object(m_master);
         
-        std::shared_ptr<Task> task(new Task(call_back));
-        
-        m_tasks.insert(task);
-        
-        getScheduler().defer(task);
+        getScheduler().defer([object, cb = std::move(call_back)]()
+        {
+            if (!object.expired())
+            {
+                cb();
+            }
+        });
     }
     
     void ObjectView::schedule(std::function<void()> call_back, tool::Scheduler<>::duration_t delay)
     {
-        removeTasks(m_tasks);
+        std::weak_ptr<ObjectView> object(m_master);
         
-        std::shared_ptr<Task> task(new Task(call_back));
-        
-        m_tasks.insert(task);
-        
-        getScheduler().schedule(task, delay);
-    }
-    
-    void ObjectView::removeTasks(std::set<std::shared_ptr<Task>> & tasks)
-    {
-        for (auto task_it = m_tasks.begin(); task_it != m_tasks.end(); )
+        getScheduler().schedule([object, cb = std::move(call_back)]()
         {
-            if ((*task_it)->executed() == true)
+            if (!object.expired())
             {
-                task_it = m_tasks.erase(task_it);
+                cb();
             }
-            else
-            {
-                ++task_it;
-            }
-        }
-    }
-    
-    // ================================================================================ //
-    //                                        TASK                                      //
-    // ================================================================================ //
-    
-    ObjectView::Task::Task(std::function<void()> callback):
-    m_callback(callback),
-    m_executed(false)
-    {
-    }
-    
-    ObjectView::Task::~Task()
-    {
-    }
-    
-    void ObjectView::Task::execute()
-    {
-        m_callback();
-        
-        m_executed.store(true);
-    }
-    
-    bool ObjectView::Task::executed() const
-    {
-        return m_executed.load();
+        }, delay);
     }
 }
