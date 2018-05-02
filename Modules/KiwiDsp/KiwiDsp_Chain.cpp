@@ -393,8 +393,6 @@ namespace kiwi
                     Node::Pin& prev_pin = tie.m_pin;
                     Node& prev_node  = tie.m_pin.m_owner;
                     
-                    connect(*prev_node.m_processor, prev_pin.m_index, *node.m_processor, inlet.m_index);
-                    
                     std::function<void(void)> call_back = std::bind(&Chain::execConnect,
                                                                     this,
                                                                     prev_node.m_processor.get(), prev_pin.m_index,
@@ -413,8 +411,6 @@ namespace kiwi
                 {
                     Node::Pin& next_pin = tie.m_pin;
                     Node& next_node  = tie.m_pin.m_owner;
-                    
-                    connect(*node.m_processor, outlet.m_index, *next_node.m_processor, next_pin.m_index);
                     
                     std::function<void(void)> call_back = std::bind(&Chain::execConnect,
                                                                     this,
