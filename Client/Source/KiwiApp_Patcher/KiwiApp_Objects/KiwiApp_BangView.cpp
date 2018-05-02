@@ -98,27 +98,18 @@ namespace kiwi {
             repaint();
         }
         
-        Component::SafePointer<BangView> form(this);
-        
-        getScheduler().schedule([form]()
+        schedule([this]()
         {
-            if (form)
-            {
-                form.getComponent()->m_active = false;
-                form.getComponent()->repaint();
-            }
+            m_active = false;
+            repaint();
         }, std::chrono::milliseconds(150));
-        
     }
     
     void BangView::signalTriggered()
     {
-        Component::SafePointer<BangView> form(this);
-        
-        getScheduler().defer([form]()
+        defer([this]()
         {
-            if (form)
-                form.getComponent()->flash();
+            flash();
         });
     }
 }

@@ -40,20 +40,14 @@ namespace kiwi
         m_ref(model.ref()),
         m_inlets(model.getNumberOfInlets()),
         m_outlets(model.getNumberOfOutlets()),
-        m_tasks(),
-        m_main_tasks(),
-        m_stack_count(0ul)
+        m_stack_count(0ul),
+        m_master(this, [](engine::Object*){})
         {
             getObjectModel().addListener(*this);
         }
         
         Object::~Object() noexcept
         {
-            for (auto task : m_tasks)
-            {
-                getScheduler().unschedule(task);
-            }
-            
             getObjectModel().removeListener(*this);
         }
         
@@ -68,49 +62,8 @@ namespace kiwi
         }
         
         // ================================================================================ //
-        //                                        TASK                                      //
-        // ================================================================================ //
-        
-        Object::Task::Task(std::function<void()> callback):
-        m_callback(callback),
-        m_executed(false)
-        {
-        }
-        
-        Object::Task::~Task()
-        {
-        }
-        
-        void Object::Task::execute()
-        {
-            m_callback();
-            
-            m_executed.store(true);
-        }
-        
-        bool Object::Task::executed() const
-        {
-            return m_executed.load();
-        }
-        
-        // ================================================================================ //
         //                                      PARMETERS                                   //
         // ================================================================================ //
-        
-        void Object::removeTasks(std::set<std::shared_ptr<Task>> & tasks)
-        {
-            for (auto task_it = tasks.begin(); task_it != tasks.end(); )
-            {
-                if ((*task_it)->executed() == true)
-                {
-                    task_it = tasks.erase(task_it);
-                }
-                else
-                {
-                    ++task_it;
-                }
-            }
-        }
         
         void Object::modelParameterChanged(std::string const& name, tool::Parameter const& parameter)
         {
@@ -158,16 +111,10 @@ namespace kiwi
         
         void Object::setParameter(std::string const& name, tool::Parameter const& param)
         {
-            removeTasks(m_main_tasks);
-            
-            std::shared_ptr<Task> task(new Task([this, name, param]()
+            deferMain([this, name, param]
             {
                 getObjectModel().setParameter(name, param);
-            }));
-            
-            m_main_tasks.insert(task);
-            
-            getMainScheduler().defer(task);
+            });
         }
         
         // ================================================================================ //
@@ -210,46 +157,54 @@ namespace kiwi
         
         void Object::defer(std::function<void()> call_back)
         {
-            removeTasks(m_tasks);
+            std::weak_ptr<engine::Object> object(m_master);
             
-            std::shared_ptr<Task> task(new Task(call_back));
-            
-            m_tasks.insert(task);
-            
-            getScheduler().defer(task);
+            getScheduler().defer([object, cb = std::move(call_back)]()
+            {
+                if (!object.expired())
+                {
+                    cb();
+                }
+            });
         }
         
         void Object::deferMain(std::function<void()> call_back)
         {
-            removeTasks(m_main_tasks);
+            std::weak_ptr<engine::Object> object(m_master);
             
-            std::shared_ptr<Task> task(new Task(call_back));
-            
-            m_main_tasks.insert(task);
-            
-            getMainScheduler().defer(task);
+            getMainScheduler().defer([object, cb = std::move(call_back)]()
+            {
+                if (!object.expired())
+                {
+                    cb();
+                }
+            });
         }
         
         void Object::schedule(std::function<void()> call_back, tool::Scheduler<>::duration_t delay)
         {
-            removeTasks(m_tasks);
+            std::weak_ptr<engine::Object> object(m_master);
             
-            std::shared_ptr<Task> task(new Task(call_back));
-            
-            m_tasks.insert(task);
-            
-            getScheduler().schedule(task, delay);
+            getScheduler().schedule([object, cb = std::move(call_back)]()
+            {
+                if (!object.expired())
+                {
+                    cb();
+                }
+            }, delay);
         }
         
         void Object::scheduleMain(std::function<void()> call_back, tool::Scheduler<>::duration_t delay)
         {
-            removeTasks(m_main_tasks);
+            std::weak_ptr<engine::Object> object(m_master);
             
-            std::shared_ptr<Task> task(new Task(call_back));
-            
-            m_main_tasks.insert(task);
-            
-            getMainScheduler().schedule(task, delay);
+            getMainScheduler().schedule([object, cb = std::move(call_back)]()
+            {
+                if (!object.expired())
+                {
+                    cb();
+                }
+            }, delay);
         }
         
         // ================================================================================ //

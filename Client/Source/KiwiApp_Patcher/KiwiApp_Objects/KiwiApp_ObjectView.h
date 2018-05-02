@@ -53,27 +53,6 @@ namespace kiwi
             Active =        0x1100009
         };
         
-    private: // classes
-        
-        //! @brief A generic task that call an std::function.
-        class Task : public tool::Scheduler<>::Task
-        {
-        public: // methods
-            
-            Task(std::function<void()> callback);
-            
-            ~Task();
-            
-            void execute() override final;
-            
-            bool executed() const;
-            
-        private: // members
-            
-            std::function<void()> 	m_callback;
-            std::atomic<bool>       m_executed;
-        };
-        
     public: // methods
         
         //! @brief Constructor.
@@ -115,8 +94,6 @@ namespace kiwi
         
     private: // methods
         
-        void removeTasks(std::set<std::shared_ptr<Task>> & tasks);
-        
         //! @brief Override this function if you want it to have a customied outline.
         //! @details Used to draw the object's outline. Returns the object's bounds by default.
         //! @todo May make it return path instead.
@@ -132,7 +109,7 @@ namespace kiwi
         
         model::Object&                  m_model;
         int                             m_border_size;
-        std::set<std::shared_ptr<Task>> m_tasks;
+        std::shared_ptr<ObjectView>     m_master;
         
     private: // deleted methods
         

@@ -50,28 +50,6 @@ namespace kiwi
         //! @brief The Object reacts and interacts with other ones by sending and receiving messages via its inlets and outlets.
         class Object : public model::Object::Listener
         {
-        private: // classes
-            
-            //! @brief A generic task that call an std::function.
-            //! @details When executed
-            class Task : public tool::Scheduler<>::Task
-            {
-            public: // methods
-                
-                Task(std::function<void()> callback);
-                
-                ~Task();
-                
-                void execute() override final;
-                
-                bool executed() const;
-                
-            private: // members
-                
-                std::function<void()> 	m_callback;
-                std::atomic<bool>       m_executed;
-            };
-            
         public: // methods
             
             //! @brief Constructor.
@@ -181,9 +159,6 @@ namespace kiwi
             //! @brief Automatically called on the engine's thread.
             virtual void attributeChanged(std::string const& name, tool::Parameter const& attribute);
             
-            //! @brief Call this function to remove tasks already executed.
-            void removeTasks(std::set<std::shared_ptr<Task>> & tasks);
-            
         private: // members
             
             using Outlet = std::set<Link>;
@@ -192,9 +167,8 @@ namespace kiwi
             flip::Ref const                 m_ref;
             size_t                          m_inlets;
             std::vector<Outlet>             m_outlets;
-            std::set<std::shared_ptr<Task>> m_tasks;
-            std::set<std::shared_ptr<Task>> m_main_tasks;
             size_t                          m_stack_count;
+            std::shared_ptr<Object>         m_master;
             
         private: // deleted methods
             
