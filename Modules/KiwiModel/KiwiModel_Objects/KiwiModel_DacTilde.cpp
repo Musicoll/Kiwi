@@ -67,7 +67,7 @@ namespace kiwi { namespace model {
                 {
                     if (arg.getInt() <= 0)
                     {
-                        throw std::runtime_error("null or negative channel");
+                        throw Error("null or negative channel");
                     }
                     
                     routes.push_back(arg.getInt() - 1);
@@ -80,7 +80,7 @@ namespace kiwi { namespace model {
                     
                     if (sep_pos == std::string::npos)
                     {
-                        throw std::runtime_error("wrong symbol syntax");
+                        throw Error("wrong symbol syntax");
                     }
                     
                     int left_input = std::stoi(inputs.substr(0, sep_pos)) - 1;
@@ -88,7 +88,7 @@ namespace kiwi { namespace model {
                     
                     if (left_input < 0 || right_input < 0)
                     {
-                        throw std::runtime_error("null or negative channel");
+                        throw Error("null or negative channel");
                     }
                     
                     const bool rev = left_input > right_input;

@@ -77,6 +77,10 @@ namespace kiwi
                     {
                         getScheduler().unschedule(m_task);
                     }
+                    else
+                    {
+                        warning("delay inlet 1 only receives bang and stop");
+                    }
                 }
                 else if(index == 1)
                 {
