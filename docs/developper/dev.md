@@ -33,9 +33,9 @@ python ./Script/configure.py
 To build Kiwi, you can either open your code editor and build the project or use our build script.
 Here is a list of tested compilers depending on your platform.
 
-* MacOs: clang 7.3.1
-* Windows: msvc 19.0
-* Linus: gcc-4.9
+- MacOs: clang 7.3.1
+- Windows: msvc 19.0
+- Linus: gcc-4.9
 
 ```shell
 python ./Script/build.py
@@ -51,7 +51,7 @@ python ./Script/build.py -t Server -c Debug
 
 ##### Tests
 
-Tests are ran as a post build command of target Tests. To run run tests
+Tests are ran as a post build command of target Tests. To run tests.
 
 ```shell
 python ./Srcipts/build.py -t Tests -c Release
@@ -60,9 +60,44 @@ python ./Srcipts/build.py -t Tests -c Release
 
 ### Code<a name="code"></a>
 
-The documentation of Kiwi's classes can be found [here](html/index.html).
+The documentation of Kiwi's classes can be found [here](../html/index.html).
 
 ### Server<a name="server"></a>
+
+The Kiwi client application needs running API and document session servers to work. The API server is used by Kiwi to give informations about document and users. The document session server
+
+#### Api Server
+
+To run the Node.js server, follow the instructions in the readme.md file of the [kiwi-node-server](https://github.com/Musicoll/kiwi-node-server) repository
+
+#### Document session server
+
+First create a `.json` config file somewhere (ie a `dev.json` file in a `/config` directory next to the server binary).
+
+The `.json` file must contain:
+- A `session_port` entry to specify the session port to use to serve documents.
+- A `backend_directory` entry to specify directory in which documents are saved.
+- A `open_token` which is given by the API server and used by the document server to verify the users identity. (Shall be the same for API and document server).
+- A `kiwi_version` that is the compatible kiwi version. Shall be the same as the app version of the binary that will communicate with the server.
+
+The api server also uses a json file for its settings. Its easier to use the same json file for both the API server and the document server for some informations are shared between the two servers.
+
+ex:
+```json
+{
+    "session_port": 1000,
+	"backend_directory": "server_backend",
+	"open_token": "etienned@o",
+	"kiwi_version": "v1.0.0"
+}
+```
+
+You can then launch the server by typing in a terminal.
+
+```shell
+$ ./Server -f ./config/dev.json
+```
+
 ### Scripts<a name="scripts"></a>
 
 ##### Documentation
@@ -91,3 +126,16 @@ This script takes 2 optional arguments:
  # or with custom paths
  $ python ./Scripts/ressource.py -i input/ressources/path -o output/binary/path
  ```
+##### Windows installer
+
+An installer for Kiwi's software is generated for windows operating system. [Inno setup](http://www.jrsoftware.org/isinfo.php) is used to generated the installer .exe file.
+
+
+To manually generate the windows installer for 32 and 64 bit, first make sure that you have compiled Kiwi Win32 and 64x binaries in mode Release. Install inno setup on your machine and locate the folder containing "ISCC.exe" and invoke it the command line specifying either [Kiwi-Directory]/Scripts/setup-Win32.iss to generate the 32 bit installeror /Scripts/setup-x64.iss to generate the 64 bit insaller.
+
+ex:
+```shell
+$ "C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Scripts\setup-x64.iss
+```
+
+The installer is generated in the respective build directories i.e [Kiwi-Directory]\Build\Release\[Platform]\KiwiBuild\[Config].

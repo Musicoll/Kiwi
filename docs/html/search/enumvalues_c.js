@@ -1,0 +1,19 @@
+var searchData=
+[
+  ['save',['save',['../namespacekiwi.html#af97b8ccce46622497af1dbf6272cb04aaba643d5fccb05b545824e423489a4447',1,'kiwi']]],
+  ['saveas',['saveAs',['../namespacekiwi.html#af97b8ccce46622497af1dbf6272cb04aa46cf6765b861b0e3eb80a9e0d5558fbb',1,'kiwi']]],
+  ['scrolltobottom',['scrollToBottom',['../namespacekiwi.html#af97b8ccce46622497af1dbf6272cb04aa81ec6c2e0ba91d4574652bf18fd18824',1,'kiwi']]],
+  ['scrolltotop',['scrollToTop',['../namespacekiwi.html#af97b8ccce46622497af1dbf6272cb04aa261ca0f7da4ec60c4fad82f2a9a57fcd',1,'kiwi']]],
+  ['showaboutappwindow',['showAboutAppWindow',['../namespacekiwi.html#af97b8ccce46622497af1dbf6272cb04aaf982078d6794ff158462111ae33f7272',1,'kiwi']]],
+  ['showappsettingswindow',['showAppSettingsWindow',['../namespacekiwi.html#af97b8ccce46622497af1dbf6272cb04aa663de180b44dbae32e0df2fcc966d384',1,'kiwi']]],
+  ['showaudiostatuswindow',['showAudioStatusWindow',['../namespacekiwi.html#af97b8ccce46622497af1dbf6272cb04aa5d31a3353464e18378d9ecfdef18095e',1,'kiwi']]],
+  ['showbeacondispatcherwindow',['showBeaconDispatcherWindow',['../namespacekiwi.html#af97b8ccce46622497af1dbf6272cb04aafe6f35f5b110ff0c4f961ffc420bb547',1,'kiwi']]],
+  ['showconsolewindow',['showConsoleWindow',['../namespacekiwi.html#af97b8ccce46622497af1dbf6272cb04aa9d8d94e382cc963054ee9cc530c809d0',1,'kiwi']]],
+  ['showdocumentbrowserwindow',['showDocumentBrowserWindow',['../namespacekiwi.html#af97b8ccce46622497af1dbf6272cb04aacff12cc316b0c605d50f3767185869e4',1,'kiwi']]],
+  ['showobjectinspector',['showObjectInspector',['../namespacekiwi.html#af97b8ccce46622497af1dbf6272cb04aacadeb900755f61c23b03737557e26306',1,'kiwi']]],
+  ['showpatcherinspector',['showPatcherInspector',['../namespacekiwi.html#af97b8ccce46622497af1dbf6272cb04aae8a173e9096c8e049a3e15a467f4e275',1,'kiwi']]],
+  ['signup',['signup',['../namespacekiwi.html#af97b8ccce46622497af1dbf6272cb04aa15ac24213cfc460fc7c4c743de626136',1,'kiwi']]],
+  ['startdsp',['startDsp',['../namespacekiwi.html#af97b8ccce46622497af1dbf6272cb04aa0c802921ddfcc38c76a08fa0f5c35e58',1,'kiwi']]],
+  ['stopdsp',['stopDsp',['../namespacekiwi.html#af97b8ccce46622497af1dbf6272cb04aa6d789095e2c0e2c84e774a29b9f324aa',1,'kiwi']]],
+  ['switchdsp',['switchDsp',['../namespacekiwi.html#af97b8ccce46622497af1dbf6272cb04aae6b5908b0bf68169d100e67712dde1bf',1,'kiwi']]]
+];

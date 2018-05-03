@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['receive',['Receive',['../classkiwi_1_1engine_1_1_receive.html',1,'kiwi::engine::Receive'],['../classkiwi_1_1model_1_1_receive.html',1,'kiwi::model::Receive']]],
-  ['router',['Router',['../classkiwi_1_1engine_1_1_router.html',1,'kiwi::engine']]],
-  ['rowelem',['RowElem',['../classkiwi_1_1_document_browser_view_1_1_drive_view_1_1_row_elem.html',1,'kiwi::DocumentBrowserView::DriveView']]]
+  ['query',['Query',['../classkiwi_1_1network_1_1http_1_1_query.html',1,'kiwi::network::http']]],
+  ['queue',['Queue',['../classkiwi_1_1tool_1_1_scheduler_1_1_queue.html',1,'kiwi::tool::Scheduler']]]
 ];
