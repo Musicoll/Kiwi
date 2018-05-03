@@ -27,7 +27,7 @@ namespace kiwi
     const std::string Api::Endpoint::login {Api::Endpoint::root + "/login"};
     const std::string Api::Endpoint::documents {Api::Endpoint::root + "/documents"};
     const std::string Api::Endpoint::users {Api::Endpoint::root + "/users"};
-    const std::string Api::Endpoint::release {Api::Endpoint::root + "/release"};
+    const std::string Api::Endpoint::releases {Api::Endpoint::root + "/releases"};
     
     std::string Api::Endpoint::document(std::string const& document_id)
     {
@@ -420,7 +420,7 @@ namespace kiwi
     
     uint64_t Api::getRelease(CallbackFn<std::string const&> success_cb, ErrorCallback error_cb)
     {
-        auto session = makeSession(Endpoint::release);
+        auto session = makeSession(Endpoint::releases);
         
         auto cb = [success = std::move(success_cb),
                    fail = std::move(error_cb)](Response res)

@@ -174,7 +174,7 @@ namespace kiwi
             static const std::string login;
             static const std::string documents;
             static const std::string users;
-            static const std::string release;
+            static const std::string releases;
             
             static std::string document(std::string const& document_id);
             static std::string user(std::string const& user_id);
