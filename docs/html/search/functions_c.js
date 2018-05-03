@@ -1,13 +1,16 @@
 var searchData=
 [
-  ['menu',['Menu',['../classkiwi_1_1_suggest_editor_1_1_menu.html#a6c2d31295e47a6d5ecbc6f8f1358f4a6',1,'kiwi::SuggestEditor::Menu']]],
-  ['metro',['Metro',['../classkiwi_1_1model_1_1_metro.html#a6002f043e1d92be58b583948bd1b11b1',1,'kiwi::model::Metro::Metro(flip::Default &amp;d)'],['../classkiwi_1_1model_1_1_metro.html#a09e7732442cdad3014d08685d63e8996',1,'kiwi::model::Metro::Metro(std::string const &amp;name, std::vector&lt; Atom &gt; const &amp;args)']]],
-  ['moldcast',['moldCast',['../classkiwi_1_1model_1_1_factory_1_1_object_class_base.html#a857ccf566d288c0a92dd196a97baef09',1,'kiwi::model::Factory::ObjectClassBase']]],
-  ['moldmake',['moldMake',['../classkiwi_1_1model_1_1_factory_1_1_object_class_base.html#adf13f14cb942b3afe995b533464e6709',1,'kiwi::model::Factory::ObjectClassBase']]],
-  ['morethanoneinstanceallowed',['moreThanOneInstanceAllowed',['../classkiwi_1_1_kiwi_app.html#ae92798a7cdbb7b8ede67ebfe0222a64d',1,'kiwi::KiwiApp']]],
-  ['mousedoubleclick',['mouseDoubleClick',['../classkiwi_1_1_document_browser_view_1_1_drive_view_1_1_row_elem.html#ab6e415330d1843616039e4d38b9a87d8',1,'kiwi::DocumentBrowserView::DriveView::RowElem']]],
-  ['mousedown',['mouseDown',['../classkiwi_1_1_document_browser_view_1_1_drive_view_1_1_header.html#a55d4d8d33a7be513c0d8008aaafc6dbf',1,'kiwi::DocumentBrowserView::DriveView::Header::mouseDown()'],['../classkiwi_1_1_document_browser_view_1_1_drive_view_1_1_row_elem.html#a52c976c0322d4f69b64aa31f152a6030',1,'kiwi::DocumentBrowserView::DriveView::RowElem::mouseDown()']]],
-  ['mouseenter',['mouseEnter',['../classkiwi_1_1_document_browser_view_1_1_drive_view_1_1_row_elem.html#aab07535cc5ea486dd5cc1380082f0aa5',1,'kiwi::DocumentBrowserView::DriveView::RowElem']]],
-  ['mouseexit',['mouseExit',['../classkiwi_1_1_document_browser_view_1_1_drive_view_1_1_row_elem.html#a5fd947b98df91d3252a5c7776aed5b27',1,'kiwi::DocumentBrowserView::DriveView::RowElem']]],
-  ['mouseup',['mouseUp',['../classkiwi_1_1_document_browser_view_1_1_drive_view_1_1_row_elem.html#a6b1ce821a21e9730ff44fd649320769b',1,'kiwi::DocumentBrowserView::DriveView::RowElem']]]
+  ['needssaving',['needsSaving',['../classkiwi_1_1_patcher_manager.html#a80128e55fb4745991a0deec585926d53',1,'kiwi::PatcherManager']]],
+  ['network',['network',['../classkiwi_1_1_stored_settings.html#a2f8e8f7903cde08339c7b6b3bf1d592a',1,'kiwi::StoredSettings']]],
+  ['networksettings',['NetworkSettings',['../classkiwi_1_1_network_settings.html#afb919f82139f223717f0ef9164f78b80',1,'kiwi::NetworkSettings']]],
+  ['networksettingschanged',['networkSettingsChanged',['../structkiwi_1_1_network_settings_1_1_listener.html#a4f22371d7f454ffe4661aeab3789b4a6',1,'kiwi::NetworkSettings::Listener']]],
+  ['newbox',['NewBox',['../classkiwi_1_1model_1_1_new_box.html#ace7882af3fbb07956eb0f526611ec6ea',1,'kiwi::model::NewBox::NewBox(flip::Default &amp;d)'],['../classkiwi_1_1model_1_1_new_box.html#afb88d344817f408cda116385e1a55e0c',1,'kiwi::model::NewBox::NewBox()']]],
+  ['newconsolemessage',['newConsoleMessage',['../classkiwi_1_1engine_1_1_console_1_1_listener.html#a27084584e5d55c4ee70561eb1aa7d76b',1,'kiwi::engine::Console::Listener']]],
+  ['newpatcher',['newPatcher',['../classkiwi_1_1_instance.html#ab5d6643ff7f264bde50547fe4a5eb847',1,'kiwi::Instance']]],
+  ['newview',['newView',['../classkiwi_1_1_patcher_manager.html#a41e49100c2752ff5827dd6396a558baf',1,'kiwi::PatcherManager']]],
+  ['node',['Node',['../classkiwi_1_1dsp_1_1_chain_1_1_node.html#a1b31b579d32aaf19a7342b11a9cb3f26',1,'kiwi::dsp::Chain::Node']]],
+  ['nothingtouched',['nothingTouched',['../classkiwi_1_1_hit_tester.html#a4291cb21f2e9b24101bf4c89c1e15808',1,'kiwi::HitTester']]],
+  ['numbertildeview',['NumberTildeView',['../classkiwi_1_1_number_tilde_view.html#a9b39925c18509373c54406747718e3bb',1,'kiwi::NumberTildeView']]],
+  ['numberview',['NumberView',['../classkiwi_1_1_number_view.html#acd6104b15f777c3082ea2a62639e18aa',1,'kiwi::NumberView']]],
+  ['numberviewbase',['NumberViewBase',['../classkiwi_1_1_number_view_base.html#ac64166ba4bf97dc392135f7ecc5c9f38',1,'kiwi::NumberViewBase']]]
 ];

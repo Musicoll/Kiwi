@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['queue',['Queue',['../classkiwi_1_1engine_1_1_scheduler_1_1_queue.html',1,'kiwi::engine::Scheduler&lt; Clock &gt;::Queue'],['../classkiwi_1_1engine_1_1_scheduler_1_1_queue.html#a73b1d081a0c5845f8bfdceba71f08464',1,'kiwi::engine::Scheduler::Queue::Queue()']]]
+  ['query',['Query',['../classkiwi_1_1network_1_1http_1_1_query.html',1,'kiwi::network::http']]],
+  ['query',['Query',['../classkiwi_1_1network_1_1http_1_1_query.html#a8ee6a56ed815dd357bbf4e33b9317adb',1,'kiwi::network::http::Query']]],
+  ['queue',['Queue',['../classkiwi_1_1tool_1_1_scheduler_1_1_queue.html#ac3053dd48ba3e3936b4781e817a5cf0b',1,'kiwi::tool::Scheduler::Queue']]],
+  ['queue',['Queue',['../classkiwi_1_1tool_1_1_scheduler_1_1_queue.html',1,'kiwi::tool::Scheduler']]]
 ];

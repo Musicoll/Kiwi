@@ -90,6 +90,13 @@ namespace kiwi
             model::Hub::declare();
             model::Mtof::declare();
             model::Send::declare();
+            model::Gate::declare();
+            model::Switch::declare();
+            model::GateTilde::declare();
+            model::SwitchTilde::declare();
+            model::Float::declare();
+            model::ClipTilde::declare();
+            model::Clip::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)

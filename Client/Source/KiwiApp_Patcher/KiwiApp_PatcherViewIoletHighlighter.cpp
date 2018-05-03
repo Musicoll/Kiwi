@@ -30,7 +30,12 @@ namespace kiwi
     //                                   IOLET HILIGHTER                                //
     // ================================================================================ //
     
-    IoletHighlighter::IoletHighlighter()
+    IoletHighlighter::IoletHighlighter():
+    m_text(""),
+    m_object_name(""),
+    m_show_tooltip_on_left(false),
+    m_last_index(),
+    m_object_ref()
     {
         setInterceptsMouseClicks(false, false);
         setAlwaysOnTop(true);
@@ -62,29 +67,32 @@ namespace kiwi
     
     void IoletHighlighter::highlightInlet(ObjectFrame const& object, const size_t index)
     {
-        m_is_inlet = true;
-        highlight(object, index);
+        highlight(object, index, true);
     }
     
     void IoletHighlighter::highlightOutlet(ObjectFrame const& object, const size_t index)
     {
-        m_is_inlet = false;
-        highlight(object, index);
+        highlight(object, index, false);
     }
     
-    void IoletHighlighter::highlight(ObjectFrame const& object, const size_t index)
+    void IoletHighlighter::highlight(ObjectFrame const& object, const size_t index, bool is_inlet)
     {
         const auto& object_model = object.getModel();
+        
         auto new_name = object_model.getName();
         auto new_text = object_model.getIODescription(m_is_inlet, index);
         
-        if(!isVisible() || m_text != new_text || m_object_name != new_name || m_last_index != index)
+        //! Only hilight if either no pin is currently hilighted
+        //! or hilighted pin is different.
+        if(!isVisible() || (m_object_ref != object_model.ref() || m_is_inlet != is_inlet || m_last_index != index))
         {
-            auto pos = m_is_inlet
+            auto pos = is_inlet
             ? object.getInletPatcherPosition(index) : object.getOutletPatcherPosition(index);
             
-            m_text = std::move(new_text);
-            m_object_name = std::move(new_name);
+            m_text = object_model.getIODescription(is_inlet, index);
+            m_object_name = object_model.getName();
+            m_is_inlet = is_inlet;
+            m_object_ref = object_model.ref();
             m_last_index = index;
             
             setBounds(juce::Rectangle<int>(pos, pos).expanded(5));

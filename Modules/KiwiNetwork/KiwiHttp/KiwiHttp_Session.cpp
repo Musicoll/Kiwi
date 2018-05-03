@@ -25,6 +25,17 @@
 namespace kiwi { namespace network { namespace http {
     
     // ================================================================================ //
+    //                                  SESSION ID                                      //
+    // ================================================================================ //
+    
+    static uint64_t id_cnt = 0;
+    
+    uint64_t getNextId()
+    {
+        return ++id_cnt;
+    }
+    
+    // ================================================================================ //
     //                                  HTTP PAYLOAD                                    //
     // ================================================================================ //
     
@@ -96,11 +107,16 @@ namespace kiwi { namespace network { namespace http {
     , m_payload()
     , m_body()
     , m_timeout(0)
-    , m_future()
-    , m_keep_processing(true)
+    , m_id(getNextId())
+    , m_query()
     , m_req_header()
     {
         ;
+    }
+    
+    uint64_t Session::getId() const
+    {
+        return m_id;
     }
     
     void Session::setHost(std::string const& host)
@@ -143,14 +159,17 @@ namespace kiwi { namespace network { namespace http {
         m_body.content = content;
     }
     
-    bool Session::isPending()
+    bool Session::executed()
     {
-        return m_future.valid() && m_future.wait_for(std::chrono::seconds(0)) != std::future_status::ready;
+        return m_query && m_query->executed();
     }
     
     void Session::cancel()
     {
-        m_keep_processing = false;
+        if (m_query)
+        {
+            m_query->cancel();
+        }
     }
     
     Session::Response Session::Get()
@@ -193,73 +212,65 @@ namespace kiwi { namespace network { namespace http {
         makeResponse(beast::http::verb::delete_, std::move(callback));
     }
     
-    std::unique_ptr<Query<beast::http::string_body, Session::Response::body_type>> Session::makeQuery()
+    void Session::initQuery()
     {
-        const auto makeTarget = [this]() {
-            
-            if(!m_parameters.content.empty())
-            {
-                return m_target + "?" + m_parameters.content;
-            }
-            
-            return m_target;
-        };
-        
-        auto request = std::make_unique<Request<beast::http::string_body>>(std::move(m_req_header));
-        request->target(makeTarget());
-        
-        if(!(m_req_header.method() == beast::http::verb::get) &&
-           (!m_payload.content.empty()
-            || !m_body.content.empty()))
+        if (!m_query)
         {
-            if(!m_payload.content.empty())
-            {
-                request->set(beast::http::field::content_type, "application/x-www-form-urlencoded");
-                request->body = std::move(m_payload.content);
-            }
-            else if(!m_body.content.empty())
-            {
-                auto& req = *request;
-                const auto content_type = req[beast::http::field::content_type];
-                if(content_type.empty())
+            const auto makeTarget = [this]() {
+                
+                if(!m_parameters.content.empty())
                 {
-                    request->set(beast::http::field::content_type, "application/octet-stream");
+                    return m_target + "?" + m_parameters.content;
                 }
                 
-                request->body = std::move(m_body.content);
+                return m_target;
+            };
+            
+            auto request = std::make_unique<Request<beast::http::string_body>>(std::move(m_req_header));
+            request->target(makeTarget());
+            
+            if(!(m_req_header.method() == beast::http::verb::get) &&
+               (!m_payload.content.empty()
+                || !m_body.content.empty()))
+            {
+                if(!m_payload.content.empty())
+                {
+                    request->set(beast::http::field::content_type, "application/x-www-form-urlencoded");
+                    request->body = std::move(m_payload.content);
+                }
+                else if(!m_body.content.empty())
+                {
+                    auto& req = *request;
+                    const auto content_type = req[beast::http::field::content_type];
+                    if(content_type.empty())
+                    {
+                        request->set(beast::http::field::content_type, "application/octet-stream");
+                    }
+                    
+                    request->body = std::move(m_body.content);
+                }
             }
+            
+            m_query = std::make_unique<HttpQuery>(std::move(request), m_port);
         }
-        
-        request->prepare_payload();
-        return std::make_unique<Query<beast::http::string_body, Response::body_type>>(std::move(request), m_port, m_timeout);
     }
     
     Session::Response Session::makeResponse(beast::http::verb verb)
     {
         m_req_header.method(verb);
         
-        auto query = makeQuery();
+        initQuery();
         
-        while(!query->process()){}
-        
-        return query->getResponse();
+        return m_query->writeQuery(m_timeout);
     }
     
     void Session::makeResponse(beast::http::verb verb, Session::Callback && callback)
     {
         m_req_header.method(verb);
         
-        m_future = std::async(std::launch::async, [this, query = makeQuery(), cb = std::move(callback)]()
-        {
-            while(m_keep_processing)
-            {
-                if (query->process())
-                {
-                    cb(query->getResponse());
-                    m_keep_processing = false;
-                }
-            }
-        });
+        initQuery();
+        
+        m_query->writeQueryAsync(callback, m_timeout);
     }
     
 }}} // namespace kiwi::network::http

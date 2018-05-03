@@ -114,6 +114,8 @@ namespace kiwi
         
         m_menu_model.reset(new MainMenuModel());
         
+        m_scheduler.reset(new tool::Scheduler<>());
+        
         m_api_controller.reset(new ApiController());
         m_api.reset(new Api(*m_api_controller));
         
@@ -121,9 +123,11 @@ namespace kiwi
         m_command_manager->registerAllCommandsForTarget(this);
         
         checkLatestRelease();
+        
+        startTimer(10);
 
         #if JUCE_WINDOWS
-        m_instance->openFile(juce::File(commandLine.unquoted()));
+        openCommandFile(commandLine);
         #endif
         
         #if JUCE_MAC
@@ -137,10 +141,7 @@ namespace kiwi
     
     void KiwiApp::anotherInstanceStarted(juce::String const& command_line)
     {
-        if(m_instance)
-        {
-            m_instance->openFile(juce::File(command_line.unquoted()));
-        }
+        openCommandFile(command_line);
     }
     
     void KiwiApp::declareEngineObjects()
@@ -202,6 +203,13 @@ namespace kiwi
         engine::Hub::declare();
         engine::Mtof::declare();
         engine::Send::declare();
+        engine::Gate::declare();
+        engine::Switch::declare();
+        engine::GateTilde::declare();
+        engine::SwitchTilde::declare();
+        engine::Float::declare();
+        engine::ClipTilde::declare();
+        engine::Clip::declare();
     }
     
     void KiwiApp::declareObjectViews()
@@ -222,9 +230,13 @@ namespace kiwi
         juce::MenuBarModel::setMacMainMenu(nullptr);
         #endif
         
-        m_api->cancelPendingRequest();
+        stopTimer();
+        
+        m_instance.reset();
+        m_api->cancelAll();
         m_api.reset();
         m_api_controller.reset();
+        m_scheduler.reset();
         m_settings.reset();
     }
     
@@ -238,8 +250,6 @@ namespace kiwi
         {
             if(m_instance->closeAllPatcherWindows())
             {
-                m_instance.reset();
-                
                 quit();
             }
         }
@@ -258,6 +268,11 @@ namespace kiwi
     bool KiwiApp::moreThanOneInstanceAllowed()
     {
         return true;
+    }
+    
+    void KiwiApp::timerCallback()
+    {
+        m_scheduler->process();
     }
     
     bool KiwiApp::isMacOSX()
@@ -308,30 +323,16 @@ namespace kiwi
         return *KiwiApp::use().m_api;
     }
     
-    void KiwiApp::login(std::string const& name_or_email,
-                        std::string const& password,
-                        std::function<void()> success_callback,
-                        Api::ErrorCallback error_callback)
+    tool::Scheduler<>& KiwiApp::useScheduler()
     {
-        auto& api_controller = *KiwiApp::use().m_api_controller;
-        
-        auto success = [cb = std::move(success_callback)]()
-        {
-            KiwiApp::useInstance().login();
-            cb();
-        };
-        
-        api_controller.login(name_or_email, password, std::move(success), std::move(error_callback));
+        return *KiwiApp::use().m_scheduler;
     }
     
-    void KiwiApp::signup(std::string const& username,
-                         std::string const& email,
-                         std::string const& password,
-                         std::function<void(std::string)> success_callback,
-                         Api::ErrorCallback error_callback)
+    void KiwiApp::setAuthUser(Api::AuthUser const& auth_user)
     {
-        auto& api_controller = *KiwiApp::use().m_api_controller;
-        api_controller.signup(username, email, password, std::move(success_callback), std::move(error_callback));
+        (*KiwiApp::use().m_api_controller).setAuthUser(auth_user);
+        
+        KiwiApp::useInstance().login();
     }
     
     Api::AuthUser const& KiwiApp::getCurrentUser()
@@ -352,7 +353,7 @@ namespace kiwi
         
         Api::CallbackFn<std::string const&> on_success = [current_version](std::string const& latest_version)
         {
-                KiwiApp::useInstance().useScheduler().schedule([current_version, latest_version]()
+                KiwiApp::useScheduler().schedule([current_version, latest_version]()
                 {
                     if (current_version.compare(latest_version) != 0)
                     {
@@ -380,6 +381,19 @@ namespace kiwi
             m_api_controller->setPort(settings.getApiPort());
             
             checkLatestRelease();
+        }
+    }
+
+    void KiwiApp::openCommandFile(juce::String const& command_line)
+    {
+        if (command_line.length() > 0)
+        {
+            juce::File file(command_line.unquoted());
+
+            if (file.hasFileExtension("kiwi") && m_instance)
+            {
+                m_instance->openFile(file);
+            }
         }
     }
     

@@ -23,6 +23,7 @@
 
 #include <map>
 #include <set>
+#include <flip/Ref.h>
 
 #include <KiwiTool/KiwiTool_Beacon.h>
 
@@ -57,16 +58,16 @@ namespace kiwi
             ~Patcher();
             
             //! @brief Adds an object to the patcher.
-            void addObject(uint64_t object_id, std::shared_ptr<Object> object);
+            void addObject(flip::Ref object_id, std::shared_ptr<Object> object);
             
             //! @brief Removes an object from the patcher.
-            void removeObject(uint64_t object_id);
+            void removeObject(flip::Ref object_id);
             
             //! @brief Adds a link between to object of the patcher.
-            void addLink(uint64_t from_id, size_t outlet, uint64_t to_id, size_t inlet, bool is_signal);
+            void addLink(flip::Ref from_id, size_t outlet, flip::Ref to_id, size_t inlet, bool is_signal);
             
             //! @brief Removes a link between two objects.
-            void removeLink(uint64_t from_id, size_t outlet, uint64_t to_id, size_t inlet, bool is_signal);
+            void removeLink(flip::Ref from_id, size_t outlet, flip::Ref to_id, size_t inlet, bool is_signal);
             
             //! @brief Updates the dsp chain held by the engine patcher
             void updateChain();
@@ -161,7 +162,7 @@ namespace kiwi
             using SoLinks = std::queue<Link const*>;
             
             Instance&                                       m_instance;
-            std::map<uint64_t, std::shared_ptr<Object>>     m_objects;
+            std::map<flip::Ref, std::shared_ptr<Object>>    m_objects;
             std::vector<SoLinks>                            m_so_links;
             dsp::Chain                                      m_chain;
             model::Patcher &                                m_patcher_model;

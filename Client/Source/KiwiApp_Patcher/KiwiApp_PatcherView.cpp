@@ -773,7 +773,7 @@ namespace kiwi
             const ObjectFrame& binded_object = m_link_creator->getBindedObject();
             const juce::Point<int> end_pos = m_link_creator->getEndPosition();
             
-            const int max_distance = 50;
+            const int max_distance = 30;
             int min_distance = max_distance;
             
             for(auto& object_frame_uptr : m_objects)

@@ -45,14 +45,12 @@ namespace kiwi {
     m_signal(model.getSignal<>(model::Bang::Signal::TriggerBang)),
     m_connection(m_signal.connect(std::bind(&BangView::signalTriggered, this))),
     m_active(false),
-    m_mouse_down(false),
-    m_switch_off(std::make_shared<tool::Scheduler<>::CallBack>(std::bind(&BangView::switchOff, this)))
+    m_mouse_down(false)
     {
     }
     
     BangView::~BangView()
     {
-        getScheduler().unschedule(m_switch_off);
     }
     
     void BangView::paint(juce::Graphics & g)
@@ -100,18 +98,16 @@ namespace kiwi {
             repaint();
         }
         
-        getScheduler().schedule(m_switch_off, std::chrono::milliseconds(150));
-    }
-    
-    void BangView::switchOff()
-    {
-        m_active = false;
-        repaint();
+        schedule([this]()
+        {
+            m_active = false;
+            repaint();
+        }, std::chrono::milliseconds(150));
     }
     
     void BangView::signalTriggered()
     {
-        getScheduler().defer([this]()
+        defer([this]()
         {
             flash();
         });
