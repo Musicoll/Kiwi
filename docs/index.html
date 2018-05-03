@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8"/>
   <title>Kiwi Wiki</title>
-  <script src="https://cdn.rawgit.com/showdownjs/showdown/1.8.6/dist/showdown.min.js"></script>
-  <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js'></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+  <script src="javascript/showdown.min.js"></script>
+  <script src="javascript/jquery.min.js"></script>
+  <link rel="stylesheet" href="css/font-awesome.min.css" />
   <link rel="stylesheet" href="css/navbar.css" />
   <link rel="stylesheet" type="text/css" href="css/main.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,22 +13,28 @@
 <body>
 
     <div class="sidenav">
-      <a href="#about">Getting started</a>
-      <a class="md_link" md_link="software/objects.md">Objects</a>
-      <a href="#clients">Tutorials</a>
-      <a class="md_link" md_link="software/versions.md">Versions</a>
-      <a class="md_link" md_link="developper/dev.md">Developper guide</a>
-    </div>
-
-    <div class="main" id="content">
-      <h1>Kiwi Wiki</h1>
-      <p>Welcome to our wiki !</p>
-      <p>You will find here all relevent informations on how to use kiwi as well
-      as guidance for fellow developpers eager to contribute.</p>
+        <img title="logo" src="ressources/img/kiwi_icon.png" height=50x/>
+        <div class="vertical-line"></div>
+        <a href="software/getting-started.html">Getting started</a>
+        <a href="software/objects.html">Objects</a>
+        <a href="software/tutorials.html">Tutorials</a>
+        <a href="software/versions.html">Versions</a>
+        <a href="developper/dev.html">Developper guide</a>
+        <div class="vertical-line"></div>
+        <table style="border: 50px" bordercolor="#818181">
+            <tr>
+                <th style="border: 50px" bordercolor="#818181">
+                    <a href="index.html">En</button>
+                </th>
+                <th style="border: 50px" bordercolor="#818181">
+                    <a href="fr/index.html">Fr</button>
+                </th>
+            </tr>
+        </table>
     </div>
 
     <script>
-    /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
+
     var dropdown = document.getElementsByClassName("dropdown-btn");
     var i;
 
@@ -43,6 +49,16 @@
         }
       });
     }
+    </script>
+
+    <div class="main" id="content">
+      <h1>Kiwi Wiki</h1>
+      <p>Welcome to our wiki !</p>
+      <p>You will find here all relevent informations on how to use kiwi as well
+      as guidance for fellow developpers eager to contribute.</p>
+    </div>
+
+    <script>
 
     var markdowns = document.getElementsByClassName("md_link");
 

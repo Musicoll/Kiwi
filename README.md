@@ -9,42 +9,26 @@ It enables several creators to work simultaneously on a same patch hosted online
 
 [![Build Status](https://travis-ci.org/Musicoll/Kiwi.svg?branch=master)](https://travis-ci.org/Musicoll/Kiwi)
 [![Build status](https://ci.appveyor.com/api/projects/status/github/Musicoll/Kiwi?branch=master&svg=true)](https://ci.appveyor.com/project/CICM/kiwi)
-[![Coverage Status](https://coveralls.io/repos/github/Musicoll/Kiwi/badge.svg?branch=master)](https://coveralls.io/github/Musicoll/Kiwi?branch=master) [![Documentation](https://img.shields.io/badge/docs-doxygen-blue.svg)](http://musicoll.github.io/Kiwi/html)  [![Release](https://img.shields.io/github/release/Musicoll/Kiwi.svg)](https://github.com/Musicoll/Kiwi/releases)  [![license](https://img.shields.io/github/license/Musicoll/Kiwi.svg?maxAge=2592000)](https://github.com/Musicoll/Kiwi/blob/master/Licence.md)  [![Website](https://img.shields.io/website/http/shields.io.svg?maxAge=2592000)](http://musicoll.mshparisnord.org)
+ [![Documentation](https://img.shields.io/badge/docs-doxygen-blue.svg)](http://musicoll.github.io/Kiwi/html)  [![Release](https://img.shields.io/github/release/Musicoll/Kiwi.svg)](https://github.com/Musicoll/Kiwi/releases)  [![license](https://img.shields.io/github/license/Musicoll/Kiwi.svg?maxAge=2592000)](https://github.com/Musicoll/Kiwi/blob/master/Licence.md)  [![Website](https://img.shields.io/website/http/shields.io.svg?maxAge=2592000)](http://kiwi.mshparisnord.fr/)
 
 > Warning: Kiwi is in a heavy development stage and everything is subject to change without notice.
-
-You can take a look at the version changelog [here](https://github.com/Musicoll/Kiwi/wiki/Changelog).
 
 ### Download
 
 If you want to test Kiwi, you can download a version on the [Release Page](https://github.com/Musicoll/Kiwi/releases).
 
-### Build from sources
+### Documentation
 
-You can also build Kiwi from sources.
-
-Kiwi scripts and build system uses python (v2.7 or higher) and cmake (v2.8.7 or higher). To build Kiwi from source:
-
-- clone this repository:
-
-```shell
-$ git clone --recursive https://github.com/Musicoll/Kiwi.git
-```
-
-- Read these instructions to install dependencies for [Mac](https://github.com/Musicoll/Kiwi/wiki/Installation-%28Mac%29), [Windows](https://github.com/Musicoll/Kiwi/wiki/Installation-%28Windows%29) or [Linux](https://github.com/Musicoll/Kiwi/wiki/Installation-%28Linux%29)
-- You should then be able to [compile Kiwi]().
-
-### Objects
-
-A list of the kiwi objects can be found [here](https://github.com/Musicoll/Kiwi/wiki/List-of-Objects).
+Kiwi's documentation can be found [here](http://musicoll.github.io/Kiwi/html). Kiwi's documentation includes:
+- A start up guide for users
+- The documentation for all objects
+- Audio processing tutorials
+- A developer guide for contributors
 
 ### Roadmap
 
-- [ ] Authentication System.
-- [ ] Private space.
-- [ ] GUI Objects.
-- [ ] Sub-Patchers.
-- [ ] Add more objects.
+- [ ] Integrate [faust](http://faust.grame.fr/) audio programming language
+- [ ] Improve network security
 
 ---
 

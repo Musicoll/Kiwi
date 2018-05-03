@@ -1,4 +1,12 @@
+# Versions
+
 Kiwi follows the [Semantic Versioning Specification](http://semver.org/).
+
+## v1.0.0
+
+- Fix numerous bugs.
+- Add new required objects (gate/gate~/switch/switch~/float/clip/clip~).
+- Improve former objects' behaviour.
 
 ## v1.0.0-beta
 
@@ -14,8 +22,7 @@ Kiwi follows the [Semantic Versioning Specification](http://semver.org/).
     * Search document enabled.
 - Enable patch compatibility between versions.
 - Fix miscellaneous bugs.
-
-Check out new available objects in v1.0.0-beta [here](List-of-Objects).
+- Add new objects.
 
 ## v0.1.0
 
@@ -28,22 +35,19 @@ Check out new available objects in v1.0.0-beta [here](List-of-Objects).
 - Add a scheduler and make the objects pipe, delay and metro.
 - Add an "About Kiwi" Window.
 - Add an "Application preferences" window.
-
-See the list of objects added in the v0.1.0 [here](List-of-Objects).
+- Add new objects.
 
 ## v0.0.3
 
 - Collaboration on LAN with automatic client discovery.
 - Add DSP chain
 - Add some basic DSP objects
-
-See the list of objects added in the v0.0.3 [here](List-of-Objects).
+- Add new objects.
 
 ## v0.0.2
 
 - Add beacons and a beacon dispatcher window
-
-See the list of objects added in the v0.0.2 [here](List-of-Objects).
+- Add new objects.
 
 ## v0.0.1
 
