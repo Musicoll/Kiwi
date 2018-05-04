@@ -19,7 +19,7 @@ If you want to test Kiwi, you can download a version on the [Release Page](https
 
 ### Documentation
 
-Kiwi's documentation can be found [here](http://musicoll.github.io/Kiwi/html). Kiwi's documentation includes:
+Kiwi's documentation can be found [here](http://musicoll.github.io/Kiwi). Kiwi's documentation includes:
 - A start up guide for users
 - The documentation for all objects
 - Audio processing tutorials
