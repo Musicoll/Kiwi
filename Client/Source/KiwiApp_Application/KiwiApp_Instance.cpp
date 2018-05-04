@@ -42,8 +42,7 @@ namespace kiwi
     size_t Instance::m_untitled_patcher_index(1);
     
     Instance::Instance() :
-    m_scheduler(),
-    m_instance(std::make_unique<DspDeviceManager>(), m_scheduler),
+    m_instance(std::make_unique<DspDeviceManager>(), KiwiApp::useScheduler()),
     m_browser(KiwiApp::getCurrentUser().isLoggedIn() ? KiwiApp::getCurrentUser().getName(): "logged out",
               1000),
     m_console_history(std::make_shared<ConsoleHistory>(m_instance)),
@@ -68,8 +67,6 @@ namespace kiwi
     
     void Instance::timerCallback()
     {
-        m_scheduler.process();
-        
         for(auto manager = m_patcher_managers.begin(); manager != m_patcher_managers.end();)
         {
             bool keep_patcher = true;
@@ -92,6 +89,7 @@ namespace kiwi
             
             if (!keep_patcher)
             {
+                (*manager)->forceCloseAllWindows();
                 manager = m_patcher_managers.erase(manager);
             }
             else
@@ -132,6 +130,7 @@ namespace kiwi
                 
                 if (!keep_patcher)
                 {
+                    (*manager)->forceCloseAllWindows();
                     manager = m_patcher_managers.erase(manager);
                 }
                 else
@@ -153,11 +152,6 @@ namespace kiwi
     engine::Instance const& Instance::useEngineInstance() const
     {
         return m_instance;
-    }
-    
-    tool::Scheduler<> & Instance::useScheduler()
-    {
-        return m_scheduler;
     }
     
     void Instance::newPatcher()
@@ -353,16 +347,6 @@ namespace kiwi
             {
                 KiwiApp::error("Failed to connect to the document [" + session.getName() + "]");
             }
-        }
-    }
-    
-    void Instance::removePatcher(PatcherManager const& patcher_manager)
-    {
-        const auto it = getPatcherManager(patcher_manager);
-        
-        if (it != m_patcher_managers.end())
-        {
-            m_patcher_managers.erase(it);
         }
     }
     

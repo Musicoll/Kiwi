@@ -386,7 +386,6 @@ namespace kiwi
             mutable std::unique_ptr<std::vector<tool::Atom>>        m_args;
             std::map<SignalKey, std::unique_ptr<flip::SignalBase>>  m_signals;
             mutable tool::Listeners<Listener>                       m_listeners;
-            ObjectClass *                                           m_class;
             
             friend class Factory;
         

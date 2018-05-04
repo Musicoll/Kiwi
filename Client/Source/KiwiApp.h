@@ -34,8 +34,8 @@
 namespace ProjectInfo
 {
     const char* const  projectName    = "Kiwi";
-    const char* const  versionString  = "v1.0.0-beta";
-    const int          versionNumber  = 0x010;
+    const char* const  versionString  = "v1.0.0";
+    const int          versionNumber  = 0x100;
 }
 
 namespace kiwi
@@ -45,7 +45,8 @@ namespace kiwi
     // ================================================================================ //
     
     class KiwiApp : public juce::JUCEApplication,
-                    public NetworkSettings::Listener
+                    public NetworkSettings::Listener,
+                    public juce::Timer
     {
     public: // methods
         
@@ -74,6 +75,9 @@ namespace kiwi
         //! @brief Checks whether multiple instances of the app are allowed.
         bool moreThanOneInstanceAllowed() override;
         
+        //! @brief Timer call back, processes the scheduler events list.
+        void timerCallback() override final;
+        
         //! @brief Returns true if the app is running in a Mac OSX operating system.
         static bool isMacOSX();
         
@@ -97,24 +101,11 @@ namespace kiwi
         //! @brief Get the Api object.
         static Api& useApi();
         
-        //! @brief Attempt to log-in the user (Async).
-        //! @param name_or_email The name or email of the user.
-        //! @param password The user password.
-        //! @see logout, getCurrentUser
-        static void login(std::string const& name_or_email,
-                          std::string const& password,
-                          std::function<void()> success_callback,
-                          Api::ErrorCallback error_callback);
+        //! @brief Gets the application scheduler.
+        static tool::Scheduler<>& useScheduler();
         
-        //! @brief Attempt to register/signup the user.
-        //! @param username user name
-        //! @param email email address
-        //! @param password password
-        static void signup(std::string const& username,
-                           std::string const& email,
-                           std::string const& password,
-                           std::function<void(std::string)> success_callback,
-                           Api::ErrorCallback error_callback);
+        //! @brief Sets the auth user.
+        static void setAuthUser(Api::AuthUser const& auth_user);
         
         //! @brief Returns the current user
         static Api::AuthUser const& getCurrentUser();
@@ -245,6 +236,9 @@ namespace kiwi
         
         // @brief Handles changes of server address.
         void networkSettingsChanged(NetworkSettings const& settings, juce::Identifier const& ids) override final;
+
+        //! @brief Parse startup command line and open file if exists.
+        void openCommandFile(juce::String const& command_line);
         
     private: // members
         
@@ -258,5 +252,6 @@ namespace kiwi
         LookAndFeel                                         m_looknfeel;
         TooltipWindow                                       m_tooltip_window;
         std::unique_ptr<StoredSettings>                     m_settings;
+        std::unique_ptr<tool::Scheduler<>>                  m_scheduler;
     };
 }

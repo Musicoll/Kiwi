@@ -78,3 +78,10 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Hub.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Mtof.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Send.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Gate.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Switch.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_GateTilde.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_SwitchTilde.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Float.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_ClipTilde.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Clip.h>

@@ -234,7 +234,7 @@ private:
 class PlusScalarRemover : public Processor
 {
 public:
-    PlusScalarRemover() noexcept : Processor(1ul, 1ul) {}
+    PlusScalarRemover() noexcept : Processor(2ul, 1ul) {}
     ~PlusScalarRemover() = default;
 private:
     
@@ -242,17 +242,14 @@ private:
     {
         if (info.inputs[0])
         {
-            m_signal_1.reset(new Signal(info.vector_size, 1.));
             setPerformCallBack(this, &PlusScalarRemover::perform);
         }
     };
     
     void perform(Buffer const& input, Buffer& output) noexcept
     {
-        Signal::add(output[0ul], input[0ul], *m_signal_1);
+        Signal::add(input[0ul], input[1ul], output[0ul]);
     }
-    
-    std::unique_ptr<Signal> m_signal_1;
 };
 
 // ==================================================================================== //

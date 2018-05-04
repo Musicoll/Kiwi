@@ -78,9 +78,6 @@ namespace kiwi
         //! @brief Returns the engine::Instance
         engine::Instance const& useEngineInstance() const;
         
-        //! @brief Returns the instance's scheduler
-        tool::Scheduler<> & useScheduler();
-        
         //! @brief Open a File.
         bool openFile(juce::File const& file);
         
@@ -105,9 +102,6 @@ namespace kiwi
         
         //! @brief Brings the Application settings window to front.
         void showAppSettingsWindow();
-        
-        //! @brief Removes a patcher from cach.
-        void removePatcher(PatcherManager const& patcher_manager);
         
         //! @brief Opens a juce native audio setting pannel.
         void showAudioSettingsWindow();
@@ -151,8 +145,6 @@ namespace kiwi
         void showWindowWithId(WindowId id, std::function<std::unique_ptr<Window>()> create_fn);
         
     private: // variables
-        
-        tool::Scheduler<>                           m_scheduler;
         
         engine::Instance                            m_instance;
         

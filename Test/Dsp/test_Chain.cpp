@@ -443,4 +443,39 @@ TEST_CASE("Dsp - Chain", "[Dsp, Chain]")
         
         chain.release();
     }
+    
+    SECTION("Chain processor without perform")
+    {
+        Chain chain;
+        
+        std::shared_ptr<Processor> sig1(new Sig(1));
+        std::shared_ptr<Processor> sig2(new Sig(2));
+        std::shared_ptr<Processor> plus_remove(new PlusScalarRemover());
+        std::string result;
+        std::shared_ptr<Processor> print(new Print(result));
+        
+        chain.addProcessor(sig1);
+        chain.addProcessor(sig2);
+        chain.addProcessor(plus_remove);
+        chain.addProcessor(print);
+        
+        chain.connect(*sig2, 0, *plus_remove, 1);
+        chain.connect(*plus_remove, 0, *print, 0);
+        
+        REQUIRE_NOTHROW(chain.prepare(samplerate, 4ul));
+        
+        chain.tick();
+        
+        CHECK(result == "[0.000000, 0.000000, 0.000000, 0.000000]");
+        
+        chain.connect(*sig1, 0, *plus_remove, 0);
+    
+        chain.update();
+        
+        chain.tick();
+        
+        CHECK(result == "[3.000000, 3.000000, 3.000000, 3.000000]");
+        
+        chain.release();
+    }
 }

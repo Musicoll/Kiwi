@@ -78,3 +78,10 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Hub.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Mtof.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Send.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Gate.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Switch.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_GateTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_SwitchTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Float.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_ClipTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Clip.h>

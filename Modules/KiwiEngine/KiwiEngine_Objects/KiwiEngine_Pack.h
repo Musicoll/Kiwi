@@ -41,6 +41,8 @@ namespace kiwi { namespace engine {
         
         ~Pack() = default;
         
+        void setElement(size_t index, tool::Atom const& atom);
+        
         void receive(size_t index, std::vector<tool::Atom> const& args) override;
         
     private:

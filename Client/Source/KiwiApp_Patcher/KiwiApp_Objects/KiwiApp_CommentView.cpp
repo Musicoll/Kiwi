@@ -47,6 +47,8 @@ namespace kiwi {
         
         juce::Label & label = getLabel();
         
+        label.setJustificationType(juce::Justification::topLeft);
+        
         label.setText(object_model.getAttribute("text")[0].getString(),
                       juce::NotificationType::dontSendNotification);
         
@@ -106,6 +108,7 @@ namespace kiwi {
         
         editor->setBounds(getLocalBounds());
         editor->setBorder(juce::BorderSize<int>(0));
+        editor->setFont(getLabel().getFont());
         
         
         editor->setColour(juce::TextEditor::ColourIds::textColourId,

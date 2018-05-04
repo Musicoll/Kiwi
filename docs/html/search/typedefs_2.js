@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['int_5ft',['int_t',['../classkiwi_1_1_atom.html#a5de4f7eec12d21484f48e9d7de65e62e',1,'kiwi::Atom']]]
+  ['hours',['hours',['../classkiwi_1_1dsp_1_1_timer.html#a700d632bdd52aa319f3c24fff635ecd3',1,'kiwi::dsp::Timer']]]
 ];

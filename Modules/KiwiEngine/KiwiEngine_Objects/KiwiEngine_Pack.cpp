@@ -49,35 +49,65 @@ namespace kiwi { namespace engine {
         send(0, m_list);
     }
     
+    void Pack::setElement(size_t index, tool::Atom const& atom)
+    {
+        switch (m_list[index].getType())
+        {
+            case tool::Atom::Type::Float:
+            {
+                m_list[index] = atom.getFloat();
+                break;
+            }
+            case tool::Atom::Type::Int:
+            {
+                m_list[index] = atom.getInt();
+                break;
+            }
+            case tool::Atom::Type::String:
+            {
+                m_list[index] = atom.getString();
+                break;
+            }
+            default: break;
+        }
+
+    }
+    
     void Pack::receive(size_t index, std::vector<tool::Atom> const& args)
     {
-        const bool is_bang = args[0].isBang();
-        if (!is_bang)
+        if (!args.empty())
         {
-            switch (m_list[index].getType())
+            if (index == 0)
             {
-                case tool::Atom::Type::Float:
+                if (args[0].isBang())
                 {
-                    m_list[index] = args[0].getFloat();
-                    break;
+                    output_list();
                 }
-                case tool::Atom::Type::Int:
+                else if (args[0].isString()
+                         && args[0].getString() == "set"
+                         && args.size() > 1)
                 {
-                    m_list[index] = args[0].getInt();
-                    break;
+                    setElement(index, args[1]);
                 }
-                case tool::Atom::Type::String:
+                else
                 {
-                    m_list[index] = args[0].getString();
-                    break;
+                    setElement(index, args[0]);
+                    output_list();
                 }
-                default: break;
             }
-        }
-        
-        if (index == 0 && is_bang)
-        {
-            output_list();
+            else
+            {
+                if (args[0].isString()
+                    && args[0].getString() == "set"
+                    && args.size() > 1)
+                {
+                    setElement(index, args[1]);
+                }
+                else
+                {
+                    setElement(index, args[0]);
+                }
+            }
         }
     }
     

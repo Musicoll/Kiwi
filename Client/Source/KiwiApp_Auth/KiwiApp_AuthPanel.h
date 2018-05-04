@@ -21,7 +21,9 @@
 
 #pragma once
 
-#include "../KiwiApp_Components/KiwiApp_FormComponent.h"
+#include <KiwiApp_Components/KiwiApp_FormComponent.h>
+
+#include <KiwiApp_Network/KiwiApp_Api.h>
 
 namespace kiwi
 {
@@ -71,7 +73,7 @@ namespace kiwi
         
     private: // members
         
-        State m_state;
+        State           m_state;
         
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LoginForm)
     };

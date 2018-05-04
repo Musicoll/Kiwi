@@ -17,16 +17,6 @@ install:
     - git submodule update --init --recursive "ThirdParty/concurrentqueue"
     - git submodule update --init --recursive "ThirdParty/Beast"
     - set PATH=C:\Python27;%PATH%
-    - curl -o ..\flip-demo.zip -L -k  http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files/flip-demo-windows-c47e41da05.zip
-    - cd ..
-    - 7z x flip-demo.zip -o./flip-demo
-    - set KIWI_FLIP_LIB_x64=%cd%/flip-demo/lib/VS2015/x64/Release
-    - set KIWI_FLIP_INCLUDE_x64=%cd%/flip-demo/include
-    - set KIWI_FLIP_LIB_WIN32=%cd%/flip-demo/lib/VS2015/Win32/Release
-    - set KIWI_FLIP_INCLUDE_WIN32=%cd%/flip-demo/include
-    - set KIWI_BOOST_INCLUDE=C:\Libraries\boost_1_63_0
-    - set KIWI_BOOST_LIB_x64=C:\Libraries\boost_1_63_0\lib64-msvc-14.0
-    - set KIWI_BOOST_LIB_WIN32=C:\Libraries\boost_1_63_0\lib32-msvc-14.0
     - cd %APPVEYOR_BUILD_FOLDER%
     - if "%APPVEYOR_REPO_BRANCH%"=="master" (set KIWI_DEPLOY=release) else (set KIWI_DEPLOY=draft)
 
@@ -35,9 +25,11 @@ build_script:
     - python .\Scripts\build.py -c %CONFIGURATION% -p %PLATFORM%
 
 after_build:
+    - if "%PLATFORM%"=="x64" ("C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Scripts\setup-x64.iss)
+    - if "%PLATFORM%"=="Win32" ("C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Scripts\setup-Win32.iss)
     - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\%CONFIGURATION%
-    - 7z a Kiwi_%PLATFORM%.zip %BUILD_DIR%\Kiwi.exe %BUILD_DIR%\*.dll
-    - 7z a Kiwi_Server_%PLATFORM%.zip %BUILD_DIR%\Server.exe
+    - if "%PLATFORM%"=="x64" (7z a Kiwi_%PLATFORM%.zip %BUILD_DIR%\Kiwi-x64-setup.exe)
+    - if "%PLATFORM%"=="Win32" (7z a Kiwi_%PLATFORM%.zip %BUILD_DIR%\Kiwi-win32-setup.exe)
 
 artifacts:
   - path: '*.zip'

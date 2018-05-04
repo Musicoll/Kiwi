@@ -175,8 +175,7 @@ namespace kiwi
         m_parameters(),
         m_args(nullptr),
         m_signals(),
-        m_listeners(),
-        m_class(nullptr)
+        m_listeners()
         {
         }
         

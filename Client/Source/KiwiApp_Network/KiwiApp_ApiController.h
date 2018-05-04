@@ -42,24 +42,10 @@ namespace kiwi
         //! If false, the user profile will be saved whithout the token.
         ~ApiController();
         
-        //! @brief Attempt to log the client api user in (Async).
-        //! @param name_or_email The name or email of the user.
-        //! @param password The user password.
-        //! @see logout, isUserLoggedIn
-        void login(std::string const& name_or_email,
-                   std::string const& password,
-                   std::function<void()> success_callback,
-                   Api::ErrorCallback error_callback);
-        
-        //! @brief Attempt to register/signup the user.
-        //! @param username user name
-        //! @param email email address
-        //! @param password password
-        void signup(std::string const& username,
-                    std::string const& email,
-                    std::string const& password,
-                    std::function<void(std::string)> success_cb,
-                    Api::ErrorCallback error_cb);
+        //! @brief Changes the API's authenticated user.
+        //! @details All authenticated will now use this user to
+        //! query the server.
+        void setAuthUser(Api::AuthUser const& auth_user);
         
         //! @brief Log-out the user.
         //! @see login, isUserLoggedIn

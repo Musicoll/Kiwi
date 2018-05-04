@@ -32,6 +32,8 @@ namespace kiwi { namespace model {
     {
         std::unique_ptr<ObjectClass> send_class(new ObjectClass("send", &Send::create));
         
+        send_class->addAlias("s");
+        
         flip::Class<Send> & send_model = DataModel::declare<Send>()
                                          .name(send_class->getModelName().c_str())
                                          .inherit<Object>();
