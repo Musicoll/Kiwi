@@ -5,11 +5,11 @@ It enables several creators to work simultaneously on a same patch hosted online
 
 > Kiwi is part of the French ANR-funded [**MUSICOLL**](http://musicoll.mshparisnord.org/) project that unites the [CICM](http://cicm.mshparisnord.org/) and [OhmForce](https://www.ohmforce.com/Company.do). The main goal of this project is to study how collaboration can enhance the way digital audio music composition is taught and more generally how it can improve music creation workflow.
 
-![Kiwi App](https://raw.github.com/Musicoll/Kiwi/master/docs/Ressources/Kiwi-v0.1.0.png "Kiwi v0.1.0")
+<img title="register" src="https://raw.github.com/Musicoll/Kiwi/master/docs/ressources/img/Kiwi-v1.0.0.jpg" height=400px/>
 
 [![Build Status](https://travis-ci.org/Musicoll/Kiwi.svg?branch=master)](https://travis-ci.org/Musicoll/Kiwi)
 [![Build status](https://ci.appveyor.com/api/projects/status/github/Musicoll/Kiwi?branch=master&svg=true)](https://ci.appveyor.com/project/CICM/kiwi)
- [![Documentation](https://img.shields.io/badge/docs-doxygen-blue.svg)](http://musicoll.github.io/Kiwi/html)  [![Release](https://img.shields.io/github/release/Musicoll/Kiwi.svg)](https://github.com/Musicoll/Kiwi/releases)  [![license](https://img.shields.io/github/license/Musicoll/Kiwi.svg?maxAge=2592000)](https://github.com/Musicoll/Kiwi/blob/master/Licence.md)  [![Website](https://img.shields.io/website/http/shields.io.svg?maxAge=2592000)](http://kiwi.mshparisnord.fr/)
+ [![Documentation](https://img.shields.io/badge/docs-doxygen-blue.svg)](http://musicoll.github.io/Kiwi)  [![Release](https://img.shields.io/github/release/Musicoll/Kiwi.svg)](https://github.com/Musicoll/Kiwi/releases)  [![license](https://img.shields.io/github/license/Musicoll/Kiwi.svg?maxAge=2592000)](https://github.com/Musicoll/Kiwi/blob/master/Licence.md)  [![Website](https://img.shields.io/website/http/shields.io.svg?maxAge=2592000)](http://kiwi.mshparisnord.fr/)
 
 > Warning: Kiwi is in a heavy development stage and everything is subject to change without notice.
 
@@ -19,7 +19,7 @@ If you want to test Kiwi, you can download a version on the [Release Page](https
 
 ### Documentation
 
-Kiwi's documentation can be found [here](http://musicoll.github.io/Kiwi/html). Kiwi's documentation includes:
+Kiwi's documentation can be found [here](http://musicoll.github.io/Kiwi). Kiwi's documentation includes:
 - A start up guide for users
 - The documentation for all objects
 - Audio processing tutorials
