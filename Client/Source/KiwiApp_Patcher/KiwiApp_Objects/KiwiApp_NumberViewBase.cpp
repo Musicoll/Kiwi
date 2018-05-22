@@ -30,11 +30,10 @@ namespace kiwi {
     //                                   NUMBER VIEW BASE                               //
     // ================================================================================ //
     
-    NumberViewBase::NumberViewBase(model::Object & object_model) :
-    EditableObjectView(object_model),
-    m_value(0),
-    m_indent(9),
-    m_icon_colour(findColour (ObjectView::ColourIds::Outline))
+    NumberViewBase::NumberViewBase(model::Object & object_model)
+    : EditableObjectView(object_model)
+    , m_value(0)
+    , m_indent(9)
     {
         juce::Label & label = getLabel();
         
@@ -65,18 +64,12 @@ namespace kiwi {
         g.setColour (findColour (ObjectView::ColourIds::Outline));
         
         drawOutline(g);
-        
-        juce::Path corner;
-        
-        g.setColour(m_icon_colour);
-        
-        juce::Rectangle<int> triangle_bounds = getLocalBounds().withWidth(m_indent - 4).withHeight(getHeight() - 8).translated(2, 4);
-        
-        corner.addTriangle(triangle_bounds.getTopLeft().toFloat(),
-                           triangle_bounds.getTopRight().toFloat() + juce::Point<float>(0, (triangle_bounds.getHeight() / 2.)),
-                           triangle_bounds.getBottomLeft().toFloat());
-        
-        g.fillPath(corner);
+        drawIcon(g);
+    }
+    
+    void NumberViewBase::drawIcon (juce::Graphics& g) const
+    {
+        // nothing by default
     }
     
     void NumberViewBase::resized()
@@ -84,11 +77,6 @@ namespace kiwi {
         juce::Rectangle<int> label_bounds = getLocalBounds();
         label_bounds.removeFromLeft(m_indent);
         getLabel().setBounds(label_bounds);
-    }
-    
-    void NumberViewBase::setIconColour(juce::Colour colour)
-    {
-        m_icon_colour = colour;
     }
     
     double NumberViewBase::getDisplayNumber() const

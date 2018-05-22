@@ -61,6 +61,8 @@ namespace kiwi {
         
     private: // methods
         
+        void drawIcon (juce::Graphics& g) const override;
+        
         //! @brief Stores the initial value before draging.
         void mouseDown(juce::MouseEvent const& e) override final;
         

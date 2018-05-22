@@ -48,6 +48,8 @@ namespace kiwi {
         
     private: // methods
         
+        void drawIcon (juce::Graphics& g) const override;
+        
         //! @brief Called when the displayed number has just changed.
         void displayNumberChanged(double new_number) override final;
         
