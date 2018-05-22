@@ -38,46 +38,41 @@ namespace kiwi { namespace engine {
         return std::make_unique<Select>(model, patcher);
     }
     
-    Select::Select(model::Object const& model, Patcher& patcher) :
-    Object(model, patcher),
-    m_list(model.getArguments())
-    {
-    }
+    Select::Select(model::Object const& model, Patcher& patcher)
+    : Object(model, patcher)
+    , m_list(model.getArguments())
+    {}
     
     void Select::receive(size_t index, std::vector<tool::Atom> const& args)
     {
+        if(args.empty())
+            return; // abort
+        
+        static const std::vector<tool::Atom> bang_msg = {"bang"};
+        
+        tool::Atom const& input = args[0];
+        
         if (index == 0)
         {
-            bool arg_found = false;
-            
-            for(size_t i = 0; i != m_list.size() && !arg_found; ++i)
+            for(size_t i = 0; i != m_list.size(); ++i)
             {
-                if (args[0].isNumber())
+                tool::Atom const& selector = m_list[i];
+                
+                if ((input.isNumber()
+                     && (input.getFloat() == selector.getFloat()))
+                    || (input.isString()
+                        && (input.getString() == selector.getString())))
                 {
-                    if (args[0].getFloat() == m_list[i].getFloat())
-                    {
-                        send(i, {"bang"});
-                        arg_found = true;
-                    }
-                }
-                else if(args[0].isString())
-                {
-                    if (args[0].getString() == m_list[i].getString())
-                    {
-                        send(i, {"bang}"});
-                        arg_found = true;
-                    }
+                    send(i, bang_msg);
+                    return;
                 }
             }
             
-            if (!arg_found)
-            {
-                send(m_list.size(), {"bang"});
-            }
+            send(m_list.size(), args);
         }
-        else
+        else if(index > 0 && m_list.size() <= index)
         {
-            m_list[index - 1] = args[0];
+            m_list[index - 1] = input;
         }
     }
     
