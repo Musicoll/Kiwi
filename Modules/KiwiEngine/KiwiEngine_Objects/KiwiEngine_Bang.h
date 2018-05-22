@@ -47,7 +47,8 @@ namespace kiwi { namespace engine {
         
     private: // members
         
-        flip::Signal<> &        m_signal;
+        flip::Signal<>&         m_trigger_signal;
+        flip::Signal<>&         m_flash_signal;
         flip::SignalConnection  m_connection;
     };
 

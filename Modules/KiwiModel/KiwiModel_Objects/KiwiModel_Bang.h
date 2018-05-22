@@ -35,7 +35,8 @@ namespace kiwi { namespace model {
         
         enum Signal : SignalKey
         {
-            TriggerBang
+            TriggerBang,
+            FlashBang
         };
         
     public: // methods
