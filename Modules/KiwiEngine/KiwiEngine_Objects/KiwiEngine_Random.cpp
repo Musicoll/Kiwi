@@ -41,24 +41,13 @@ namespace kiwi { namespace engine {
         return std::make_unique<Random>(model, patcher);
     }
     
-    Random::Random(model::Object const& model, Patcher& patcher):
-    Object(model, patcher),
-    m_random_generator(),
-    m_random_distribution(0, 100)
+    Random::Random(model::Object const& model, Patcher& patcher)
+    : Object(model, patcher)
     {
-        m_random_generator.seed(1);
+        auto const& args = model.getArguments();
         
-        std::vector<tool::Atom> const& args = model.getArguments();
-        
-        if (args.size() > 0 && args[0].isNumber())
-        {
-            setRange(args[0].getInt());
-        }
-        
-        if (args.size() > 1 && args[1].isNumber())
-        {
-            setSeed(args[1].getInt());
-        }
+        setRange((args.size() > 0 && args[0].isNumber()) ? args[0].getInt() : 0ll);
+        setSeed((args.size() > 1 && args[1].isNumber()) ? args[1].getInt() : 0ll);
     }
     
     void Random::receive(size_t index, std::vector<tool::Atom> const& args)
@@ -67,11 +56,11 @@ namespace kiwi { namespace engine {
         {
             if (args[0].isBang())
             {
-                send(0, {m_random_distribution(m_random_generator)});
+                send(0, {getNextRandomValue()});
             }
             else
             {
-                warning("random inlet 1 only understand bang");
+                warning("random: inlet 1 only understand bang");
             }
         }
         else if (index == 1)
@@ -82,7 +71,7 @@ namespace kiwi { namespace engine {
             }
             else
             {
-                warning("random inlet 2 only understand numbers");
+                warning("random: inlet 2 only understand numbers");
             }
         }
         else if (index == 2)
@@ -93,18 +82,29 @@ namespace kiwi { namespace engine {
             }
             else
             {
-                warning("random inlet 2 only understand numbers");
+                warning("random: inlet 3 only understand numbers");
             }
         }
     }
     
-    void Random::setRange(int range)
+    void Random::setRange(int64_t range)
     {
-        m_random_distribution.param(std::uniform_int_distribution<int>::param_type(0, std::max(0, range)));
+        m_random_distribution.param(rnd_distribution_t::param_type(0ll, std::max(0ll, range - 1)));
     }
     
-    void Random::setSeed(int seed)
+    void Random::setSeed(int64_t seed)
     {
-        m_random_generator.seed();
+        if(seed == 0)
+        {
+            // obtain a seed from the timer
+            seed = (clock_t::now() - m_start_time).count();
+        }
+        
+        m_random_generator.seed(seed);
+    }
+    
+    int64_t Random::getNextRandomValue()
+    {
+        return m_random_distribution(m_random_generator);
     }
 }}
