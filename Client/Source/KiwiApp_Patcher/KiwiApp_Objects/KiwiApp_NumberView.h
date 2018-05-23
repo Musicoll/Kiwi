@@ -34,17 +34,6 @@ namespace kiwi {
     //! @brief The view of any textual kiwi object.
     class NumberView : public NumberViewBase
     {
-    private: // members
-        
-        struct MouseInfo
-        {
-            double  m_mouse_down_value  = 0;
-            int     m_mouse_down_y      = 0;
-            bool    m_is_alt_down       = false;
-            double  m_alt_down_value    = 0;
-            int     m_alt_down_y        = 0;
-        };
-        
     public: // methods
         
         // @brief The declaration method.
@@ -83,9 +72,10 @@ namespace kiwi {
         
     private: // members
         
-        flip::Signal<> &    m_output_message;
-        int                 m_sensitivity;
-        MouseInfo           m_mouse_info;
+        flip::Signal<>& m_output_message;
+        int m_decimal_drag = 0;
+        juce::Point<float> m_last_drag_pos {};
+        double m_drag_value = 0;
         
     private: // deleted methods
         

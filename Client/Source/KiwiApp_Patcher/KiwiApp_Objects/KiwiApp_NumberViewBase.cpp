@@ -89,7 +89,7 @@ namespace kiwi {
         m_value = number;
         
         juce::String display_value(std::to_string(m_value));
-        
+
         display_value = display_value.trimCharactersAtEnd("0");
         
         getLabel().setText(display_value, juce::NotificationType::dontSendNotification);
@@ -97,7 +97,7 @@ namespace kiwi {
     
     void NumberViewBase::textChanged()
     {
-        m_value = getLabel().getText().getFloatValue();
+        m_value = getLabel().getText().getDoubleValue();
         
         displayNumberChanged(m_value);
     }
