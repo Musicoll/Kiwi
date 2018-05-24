@@ -97,7 +97,7 @@ namespace kiwi
         
         void Object::setAttribute(std::string const& name, tool::Parameter && param)
         {
-            deferMain([this, name, param {std::move(param)}]() {
+            deferMain([this, name, param = std::move(param)]() {
                 
                 auto& object_model = getObjectModel();
                 object_model.setAttribute(name, param);                
@@ -108,7 +108,7 @@ namespace kiwi
         
         void Object::setParameter(std::string const& name, tool::Parameter && param)
         {
-            deferMain([this, name, param {std::move(param)}]() {
+            deferMain([this, name, param = std::move(param)]() {
                 getObjectModel().setParameter(name, param);
             });
         }
