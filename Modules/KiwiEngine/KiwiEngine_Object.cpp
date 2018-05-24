@@ -81,14 +81,10 @@ namespace kiwi
             });
         }
         
-        model::Object & Object::getObjectModel()
+        model::Object& Object::getObjectModel()
         {
-            flip::Array<model::Object> & objects = m_patcher.getPatcherModel().getObjects();
-    
-            return *std::find_if(objects.begin(), objects.end(), [this](model::Object const & object_model)
-            {
-                return object_model.ref() == m_ref;
-            });
+            return m_patcher.getPatcherModel().document()
+            .object<model::Object>(m_ref);
         }
         
         void Object::parameterChanged(std::string const& param_name, tool::Parameter const& param)
@@ -99,20 +95,20 @@ namespace kiwi
         {
         }
         
-        void Object::setAttribute(std::string const& name, tool::Parameter const& param)
+        void Object::setAttribute(std::string const& name, tool::Parameter && param)
         {
-            deferMain([this, name, param]()
-            {
-                getObjectModel().setAttribute(name, param);
+            deferMain([this, name, param {std::move(param)}]() {
                 
-                model::DocumentManager::commit(getObjectModel());
+                auto& object_model = getObjectModel();
+                object_model.setAttribute(name, param);                
+                model::DocumentManager::commit(object_model);
+                
             });
         }
         
-        void Object::setParameter(std::string const& name, tool::Parameter const& param)
+        void Object::setParameter(std::string const& name, tool::Parameter && param)
         {
-            deferMain([this, name, param]
-            {
+            deferMain([this, name, param {std::move(param)}]() {
                 getObjectModel().setParameter(name, param);
             });
         }
