@@ -60,7 +60,7 @@ namespace kiwi { namespace engine {
             }
             else
             {
-                warning("random: inlet 1 only understand bang");
+                warning("random: inlet 1 only understands bang");
             }
         }
         else if (index == 1)
@@ -71,7 +71,7 @@ namespace kiwi { namespace engine {
             }
             else
             {
-                warning("random: inlet 2 only understand numbers");
+                warning("random: inlet 2 only understands numbers");
             }
         }
         else if (index == 2)
@@ -82,14 +82,14 @@ namespace kiwi { namespace engine {
             }
             else
             {
-                warning("random: inlet 3 only understand numbers");
+                warning("random: inlet 3 only understands numbers");
             }
         }
     }
     
     void Random::setRange(int64_t range)
     {
-        m_random_distribution.param(rnd_distribution_t::param_type(0ll, std::max(0ll, range - 1)));
+        m_random_distribution.param(rnd_distribution_t::param_type(0, std::max<int64_t>(0, range - 1)));
     }
     
     void Random::setSeed(int64_t seed)
