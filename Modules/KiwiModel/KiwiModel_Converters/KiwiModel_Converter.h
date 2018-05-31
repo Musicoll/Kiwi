@@ -42,9 +42,13 @@ namespace kiwi { namespace model {
     private: // methods
         
         //! @brief Converts a v1 data model to a v2 data model.
-        static void convert_v1_v2(flip::BackEndIR & backend);
+        static void convert_v1_v2(flip::BackEndIR& backend);
         
-        //! @brief Rollbacks depecrated revisions.
-        static void process_rollback(flip::BackEndIR & backend);
+        //! @brief Converts a v3 data model to a v4 data model.
+        static void convert_v3_v4(flip::BackEndIR& backend);
+        
+        //! @brief Removes invalid links
+        static void remove_invalid_links(flip::BackEndIR& backend);
     };
+    
 }}

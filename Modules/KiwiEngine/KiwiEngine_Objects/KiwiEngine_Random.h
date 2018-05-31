@@ -23,6 +23,7 @@
 
 #include <KiwiEngine/KiwiEngine_Object.h>
 
+#include <chrono>
 #include <random>
 
 namespace kiwi { namespace engine {
@@ -45,14 +46,19 @@ namespace kiwi { namespace engine {
         
     private: // methods
         
-        void setRange(int range);
+        void setRange(int64_t range);
+        void setSeed(int64_t new_seed);
         
-        void setSeed(int new_seed);
+        int64_t getNextRandomValue();
         
     private: // members
         
-        std::mt19937                        m_random_generator;
-        std::uniform_int_distribution<int>  m_random_distribution;
+        using clock_t = std::chrono::high_resolution_clock;
+        using rnd_distribution_t = std::uniform_int_distribution<int64_t>;
+        
+        clock_t::time_point m_start_time { clock_t::now() };
+        std::mt19937        m_random_generator {};
+        rnd_distribution_t  m_random_distribution {0ll, 0ll};
     };
     
 }}

@@ -56,6 +56,7 @@ namespace kiwi { namespace model {
         }
         
         addSignal<>(Signal::TriggerBang, *this);
+        addSignal<>(Signal::FlashBang, *this);
         setRatio(1.);
         setMinWidth(20.);
         setWidth(20);
@@ -67,6 +68,7 @@ namespace kiwi { namespace model {
     Object(d)
     {
         addSignal<>(Signal::TriggerBang, *this);
+        addSignal<>(Signal::FlashBang, *this);
     }
     
     std::string Bang::getIODescription(bool is_inlet, size_t index) const

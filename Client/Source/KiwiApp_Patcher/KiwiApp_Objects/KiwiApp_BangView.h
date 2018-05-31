@@ -62,8 +62,10 @@ namespace kiwi {
     private: // members
         
         //! @todo Put border into ObjectView.
-        flip::Signal<>&                                 m_signal;
-        flip::SignalConnection                          m_connection;
+        flip::Signal<>&                                 m_trigger_signal;
+        flip::Signal<>&                                 m_flash_signal;
+        flip::SignalConnection                          m_trigger_connection;
+        flip::SignalConnection                          m_flash_connection;
         bool                                            m_active;
         bool                                            m_mouse_down;
         

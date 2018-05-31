@@ -30,11 +30,13 @@ namespace kiwi { namespace model {
     
     void Random::declare()
     {
-        std::unique_ptr<ObjectClass> random_class(new ObjectClass("random", &Random::create));
+        auto kiwi_class = std::make_unique<ObjectClass>("random", &Random::create);
         
-        flip::Class<Random> & random_model = DataModel::declare<Random>().name(random_class->getModelName().c_str()).inherit<Object>();
+        auto& flip_class = DataModel::declare<Random>()
+        .name(kiwi_class->getModelName().c_str())
+        .inherit<Object>();
         
-        Factory::add<Random>(std::move(random_class), random_model);
+        Factory::add<Random>(std::move(kiwi_class), flip_class);
     }
     
     std::unique_ptr<Object> Random::create(std::vector<tool::Atom> const& args)
@@ -46,22 +48,25 @@ namespace kiwi { namespace model {
     {
         if (args.size() > 2)
         {
-            throw Error("random too many arguments");
-        }
-        
-        if (args.size() > 1 && !args[1].isNumber())
-        {
-            throw Error("random seed argument must be a number");
+            throw Error("random: too many arguments");
         }
         
         if (args.size() > 0 && !args[0].isNumber())
         {
-            throw Error("random range argument must be a number");
+            throw Error("random: range argument must be a number");
         }
         
-        pushInlet({PinType::IType::Control});
-        pushInlet({PinType::IType::Control});
-        pushInlet({PinType::IType::Control});
+        if (args.size() > 1 && !args[1].isNumber())
+        {
+            throw Error("random: seed argument must be a number");
+        }
+        
+        pushInlet({PinType::IType::Control}); // bang or seed message inlet
+        
+        if (args.size() == 0)
+        {
+            pushInlet({PinType::IType::Control}); // range inlet
+        }
         
         pushOutlet(PinType::IType::Control);
     }
@@ -72,23 +77,19 @@ namespace kiwi { namespace model {
         {
             if (index == 0)
             {
-                return "bang causes random number generation";
+                return "bang causes random number generation, seed sets the seed";
             }
             else if (index == 1)
             {
-                return "Sets the range";
-            }
-            else if (index == 2)
-            {
-                return "Sets the seed";
+                return "Sets the maximum range (exclusive)";
             }
         }
-        else
+        else if(index == 0)
         {
-            return "Ouputs ramdom number";
+            return "Outputs random number";
         }
      
-        return "";
+        return {};
     }
     
 }}

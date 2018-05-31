@@ -30,13 +30,15 @@ namespace kiwi { namespace model {
     
     void Select::declare()
     {
-        std::unique_ptr<ObjectClass> select_class(new ObjectClass("select", &Select::create));
+        auto kiwi_class = std::make_unique<ObjectClass>("select", &Select::create);
         
-        flip::Class<Select> & select_model = DataModel::declare<Select>()
-                                            .name(select_class->getModelName().c_str())
-                                            .inherit<Object>();
+        kiwi_class->addAlias("sel");
         
-        Factory::add<Select>(std::move(select_class), select_model);
+        auto& flip_class = (DataModel::declare<Select>()
+                            .name(kiwi_class->getModelName().c_str())
+                            .inherit<Object>());
+        
+        Factory::add<Select>(std::move(kiwi_class), flip_class);
     }
     
     std::unique_ptr<Object> Select::create(std::vector<tool::Atom> const& args)
@@ -79,13 +81,15 @@ namespace kiwi { namespace model {
         }
         else
         {
-            if (index == getArguments().size())
+            auto const& args = getArguments();
+            
+            if (index == args.size())
             {
-                description = "Ouptuts bang if input doesn't match";
+                description = "Input if doesn't match";
             }
             else
             {
-                description = "Outputs bang if input matches " + getArguments()[index].getString();
+                description = "Outputs bang if input matches \"" + tool::AtomHelper::toString(args[index]) + "\"";
             }
         }
         

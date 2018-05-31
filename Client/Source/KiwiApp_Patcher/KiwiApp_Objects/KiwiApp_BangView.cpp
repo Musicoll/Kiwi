@@ -40,14 +40,15 @@ namespace kiwi {
         return std::make_unique<BangView>(model);
     }
     
-    BangView::BangView(model::Object & model):
-    ObjectView(model),
-    m_signal(model.getSignal<>(model::Bang::Signal::TriggerBang)),
-    m_connection(m_signal.connect(std::bind(&BangView::signalTriggered, this))),
-    m_active(false),
-    m_mouse_down(false)
-    {
-    }
+    BangView::BangView(model::Object & model)
+    : ObjectView(model)
+    , m_trigger_signal(model.getSignal<>(model::Bang::Signal::TriggerBang))
+    , m_flash_signal(model.getSignal<>(model::Bang::Signal::FlashBang))
+    , m_trigger_connection(m_trigger_signal.connect(std::bind(&BangView::signalTriggered, this)))
+    , m_flash_connection(m_flash_signal.connect(std::bind(&BangView::signalTriggered, this)))
+    , m_active(false)
+    , m_mouse_down(false)
+    {}
     
     BangView::~BangView()
     {
@@ -81,7 +82,7 @@ namespace kiwi {
         m_mouse_down = true;
         repaint();
         
-        m_signal();
+        m_trigger_signal();
     }
     
     void BangView::mouseUp(juce::MouseEvent const& e)

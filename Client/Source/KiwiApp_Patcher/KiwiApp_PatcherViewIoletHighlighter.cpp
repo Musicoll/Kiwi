@@ -77,10 +77,7 @@ namespace kiwi
     
     void IoletHighlighter::highlight(ObjectFrame const& object, const size_t index, bool is_inlet)
     {
-        const auto& object_model = object.getModel();
-        
-        auto new_name = object_model.getName();
-        auto new_text = object_model.getIODescription(m_is_inlet, index);
+        auto const& object_model = object.getModel();
         
         //! Only hilight if either no pin is currently hilighted
         //! or hilighted pin is different.

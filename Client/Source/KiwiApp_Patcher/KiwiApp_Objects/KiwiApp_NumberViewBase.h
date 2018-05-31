@@ -50,9 +50,7 @@ namespace kiwi {
         //! @brief Returns the displayed text as a number.
         double getDisplayNumber() const;
         
-        //! @brief Sets the triangle icon colour.
-        //! @details By default colour is outline colour.
-        void setIconColour(juce::Colour colour);
+        virtual void drawIcon (juce::Graphics& g) const;
         
     private: // methods
         
@@ -78,11 +76,10 @@ namespace kiwi {
         //! @details Overrides EditableOjectView::createTextEditor.
         juce::TextEditor* createdTextEditor() override final;
         
-    private: // members
+    protected: // members
         
         double              m_value;
         int                 m_indent;
-        juce::Colour        m_icon_colour;
         
     private: // deleted methods
         

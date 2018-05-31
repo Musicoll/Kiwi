@@ -33,12 +33,14 @@ namespace kiwi { namespace model {
     public:
         
         //! @brief The std::string constructor.
-        explicit Error(const std::string& message) :
-        std::runtime_error(std::string("kiwi::model ") + message) {}
+        explicit Error(std::string const& message)
+        : std::runtime_error(message)
+        {}
         
         //! @brief The const char* constructor.
-        explicit Error(const char* message) :
-        std::runtime_error(std::string("kiwi::model ") + std::string(message)) {}
+        explicit Error(const char* message)
+        : std::runtime_error(std::string(message))
+        {}
         
         //! @brief The destructor.
         virtual inline ~Error() noexcept = default;

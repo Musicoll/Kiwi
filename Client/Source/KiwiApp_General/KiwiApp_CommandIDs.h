@@ -68,7 +68,6 @@ namespace kiwi
         
         newBox                      = 0xf30300,        ///< Add a new "box" to the patcher.
         newMessage                  = 0xf30301,        ///< Add a new "message" object box to the patcher.
-        newFlonum                   = 0xf30302,        ///< Add a new "flonum" object box to the patcher.
         newNumber                   = 0xf30303,        ///< Add a new "number" object box to the patcher.
         newComment                  = 0xf30304,        ///< Add a new "comment" object box to the patcher.
         newBang                     = 0xf30305,        ///< Add a new "button" object box to the patcher.

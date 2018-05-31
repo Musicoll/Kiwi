@@ -40,10 +40,11 @@ namespace kiwi { namespace engine {
         return std::make_unique<Bang>(model, patcher);
     }
     
-    Bang::Bang(model::Object const& model, Patcher & patcher):
-    Object(model, patcher),
-    m_signal(model.getSignal<>(model::Bang::Signal::TriggerBang)),
-    m_connection(m_signal.connect(std::bind(&Bang::signalTriggered, this)))
+    Bang::Bang(model::Object const& model, Patcher & patcher)
+    : Object(model, patcher)
+    , m_trigger_signal(model.getSignal<>(model::Bang::Signal::TriggerBang))
+    , m_flash_signal(model.getSignal<>(model::Bang::Signal::FlashBang))
+    , m_connection(m_trigger_signal.connect(std::bind(&Bang::signalTriggered, this)))
     {
     }
     
@@ -61,9 +62,16 @@ namespace kiwi { namespace engine {
     
     void Bang::receive(size_t index, std::vector<tool::Atom> const& args)
     {
-        if (index == 0)
+        if (index == 0 && !args.empty())
         {
-            m_signal();
+            if(args[0].getString() == "set")
+            {
+                m_flash_signal();
+            }
+            else
+            {
+                m_trigger_signal();
+            }
         }
     }
     

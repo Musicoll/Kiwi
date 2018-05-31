@@ -73,8 +73,15 @@ namespace kiwi { namespace model {
                     default: return "null";
                 }
             }();
+            
+            auto description = type_str + " atom " + std::to_string(index + 1) + " in list";
+            
+            if(index == 0)
+            {
+                description += ", causes output";
+            }
 
-            return type_str + " atom " + std::to_string(index + 1) + " in list";
+            return std::move(description);
         }
         
         return {};
