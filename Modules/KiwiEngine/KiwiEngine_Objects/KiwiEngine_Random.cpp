@@ -52,15 +52,29 @@ namespace kiwi { namespace engine {
     
     void Random::receive(size_t index, std::vector<tool::Atom> const& args)
     {
+        if(args.empty())
+            return; // abort
+        
         if (index == 0)
         {
             if (args[0].isBang())
             {
                 send(0, {getNextRandomValue()});
             }
+            else if (args[0].getString() == "seed")
+            {
+                if(args.size() > 1 && args[1].isNumber())
+                {
+                    setSeed(args[1].getInt());
+                }
+                else
+                {
+                    warning("random: seed message must be followed by an integer");
+                }
+            }
             else
             {
-                warning("random: inlet 1 only understands bang");
+                warning("random: inlet 1 only understands bang or seed message");
             }
         }
         else if (index == 1)
@@ -72,17 +86,6 @@ namespace kiwi { namespace engine {
             else
             {
                 warning("random: inlet 2 only understands numbers");
-            }
-        }
-        else if (index == 2)
-        {
-            if (args[0].isNumber())
-            {
-                setSeed(args[0].getInt());
-            }
-            else
-            {
-                warning("random: inlet 3 only understands numbers");
             }
         }
     }
