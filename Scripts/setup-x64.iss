@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Kiwi"
-#define MyAppVersion "v1.0.0-beta"
+#define MyAppVersion "v1.0.1"
 #define MyAppPublisher "CICM"
 #define MyAppURL "http://kiwi.mshparisnord.fr/"
 #define MyAppExeName "Kiwi.exe"
@@ -61,4 +61,3 @@ Root: HKCR; Subkey: "{#MyAppName}\shell\open\command";  ValueData: """{app}\{#My
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-
