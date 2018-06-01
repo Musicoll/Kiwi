@@ -2,6 +2,37 @@
 
 Kiwi follows the [Semantic Versioning Specification](http://semver.org/).
 
+## v1.0.1
+
+[select] :
+- fix bad output when symbol match
+- output input if doesn't match (was bang)
+- Add [sel] alias
+
+[number] :
+- improve decimal drag
+- Add patcherview shortcuts (f/i)
+- Output only when value has changed
+
+[number~] :
+-  updated draw method
+
+[bang] :
+- Add set method (flash without output)
+
+[random] : (breaking-changes)
+- default range is 0 (was 100)
+- output random value between 0 and range-1 (was 0 and range)
+- default seed is 0 (was 1)
+- a seed of 0 means that it is initialized with an unpredictable time value.
+- seed can now be set
+- Add a *seed* method and remove the seed inlet
+- remove range inlet when the range argument is specified
+
+misc:
+- Allow undo/redo of [message] and [comment] text edition.
+- Remove "kiwi::model" in error message.
+
 ## v1.0.0
 
 - Fix numerous bugs.

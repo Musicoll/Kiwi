@@ -12,15 +12,15 @@ A list of help patches describing how each object works is <a href="../ressource
 | **noise~**      |       | A white noise generator                                 |
 | **sah~**        |       | Samples and holds an input signal                       |
 | **hub**         |       | Send message to other users                             |
-| **send**        |  *s*  | Send message to matching receive object                 |
+| **send**        |  *s*  | Send messages to a receiver bound to the same name      |
 | **mtof**        |       | Convert midi notes to frequencies                       |
 | **number~**     |       | Display audio samples values                            |
-| **number**      |       | Display a nuumber                                       |
-| **select**      |       | Ouput bang if receive matching input                    |
-| **snapshot~**   |       | Ouput sample signal values                              |
-| **random**      |       | Ouput random number in a uniform distribution           |
-| **unpack**      |       | Access elements in a list                               |
-| **pack**        |       | Create and outputs a list of messages                   |
+| **number**      |       | Display and output number                               |
+| **select**      | *sel* | Output bangs based on input matching                    |
+| **snapshot~**   |       | Output sample signal values                             |
+| **random**      |       | Generate a random number                                |
+| **unpack**      |       | Breaks a list into individual atoms                     |
+| **pack**        |       | Create a list from individual atoms                     |
 | **comment**     |       | Add a comment to the patch                              |
 | **!=~**         |       | Signal inequality operator                              |
 | **==~**         |       | Signal equality operator                                |
@@ -41,10 +41,10 @@ A list of help patches describing how each object works is <a href="../ressource
 | **/**           |       | Compute the division of two numbers                     |
 | **-**           |       | Compute the substraction of two numbers                 |
 | **message**     |       | Send messages or list of messages                       |
-| **slider**      |       | Graphical slider sending values between 0 and 1         |
-| **toggle**      |       | A switch button                                         |
-| **bang**        |       | Send a bang message                                     |
-| **meter~**      |       | A peak amplitude vu meter                               |
+| **slider**      |       | GUI sending values between 0. and 1.                    |
+| **toggle**      |       | GUI sending 0 or 1                                      |
+| **bang**        |       | GUI sending a bang message                              |
+| **meter~**      |       | A Peak Program Meter GUI                                |
 | **trigger**     |  *t*  | Trigger events based on received data                   |
 | **newbox**      |       | Empty new box                                           |
 | **errorbox**    |       | Error box                                               |
@@ -53,8 +53,8 @@ A list of help patches describing how each object works is <a href="../ressource
 | **print**       |       | Print messages into Kiwi console                        |
 | **receive**     | *r*   | Receive messages from a sender bound to the same name   |
 | **loadmess**    |       | Output arguments as message when the patch is loaded    |
-| **delay**       |       | Delay messages as bang                                  |
-| **pipe**        |       | Delay any message                                       |
+| **delay**       |       | Delays messages as bang                                 |
+| **pipe**        |       | Delays any message                                      |
 | **metro**       |       | Output bang at regular time interval                    |
 | **adc~**        |       | Receive audio signals from inputs or external devices   |
 | **dac~**        |       | Send audio signals to outputs or external devices       |
@@ -66,9 +66,9 @@ A list of help patches describing how each object works is <a href="../ressource
 | **delaysimple~**|       | Simple variable delay line with optional feedback value |
 | **scale**       |       | Convert a number from one range into another range      |
 | **gate**        |       | Route message to selected output                        |
-| **switch**      |       | Output message receive in selected inlet                |
+| **switch**      |       | Output messages received in selected inlet              |
 | **gate~**       |       | Route received signal to selected output                |
-| **switch~**     |       | Ouput signal received in selected inlet                 |
+| **switch~**     |       | Output signal received in selected inlet                |
 | **clip**        |       | Clip a number between a maximum and a minimum value     |
 | **clip~**       |       | Clip a signal between a maximum and a minimum value     |
 | **float**       |       | Store a float value                                     |

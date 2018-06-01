@@ -41,37 +41,40 @@ namespace kiwi { namespace engine {
         return std::make_unique<Random>(model, patcher);
     }
     
-    Random::Random(model::Object const& model, Patcher& patcher):
-    Object(model, patcher),
-    m_random_generator(),
-    m_random_distribution(0, 100)
+    Random::Random(model::Object const& model, Patcher& patcher)
+    : Object(model, patcher)
     {
-        m_random_generator.seed(1);
+        auto const& args = model.getArguments();
         
-        std::vector<tool::Atom> const& args = model.getArguments();
-        
-        if (args.size() > 0 && args[0].isNumber())
-        {
-            setRange(args[0].getInt());
-        }
-        
-        if (args.size() > 1 && args[1].isNumber())
-        {
-            setSeed(args[1].getInt());
-        }
+        setRange((args.size() > 0 && args[0].isNumber()) ? args[0].getInt() : 0ll);
+        setSeed((args.size() > 1 && args[1].isNumber()) ? args[1].getInt() : 0ll);
     }
     
     void Random::receive(size_t index, std::vector<tool::Atom> const& args)
     {
+        if(args.empty())
+            return; // abort
+        
         if (index == 0)
         {
             if (args[0].isBang())
             {
-                send(0, {m_random_distribution(m_random_generator)});
+                send(0, {getNextRandomValue()});
+            }
+            else if (args[0].getString() == "seed")
+            {
+                if(args.size() > 1 && args[1].isNumber())
+                {
+                    setSeed(args[1].getInt());
+                }
+                else
+                {
+                    warning("random: seed message must be followed by an integer");
+                }
             }
             else
             {
-                warning("random inlet 1 only understand bang");
+                warning("random: inlet 1 only understands bang or seed message");
             }
         }
         else if (index == 1)
@@ -82,29 +85,29 @@ namespace kiwi { namespace engine {
             }
             else
             {
-                warning("random inlet 2 only understand numbers");
+                warning("random: inlet 2 only understands numbers");
             }
         }
-        else if (index == 2)
+    }
+    
+    void Random::setRange(int64_t range)
+    {
+        m_random_distribution.param(rnd_distribution_t::param_type(0, std::max<int64_t>(0, range - 1)));
+    }
+    
+    void Random::setSeed(int64_t seed)
+    {
+        if(seed == 0)
         {
-            if (args[0].isNumber())
-            {
-                setSeed(args[0].getInt());
-            }
-            else
-            {
-                warning("random inlet 2 only understand numbers");
-            }
+            // obtain a seed from the timer
+            seed = (clock_t::now() - m_start_time).count();
         }
+        
+        m_random_generator.seed(seed);
     }
     
-    void Random::setRange(int range)
+    int64_t Random::getNextRandomValue()
     {
-        m_random_distribution.param(std::uniform_int_distribution<int>::param_type(0, std::max(0, range)));
-    }
-    
-    void Random::setSeed(int seed)
-    {
-        m_random_generator.seed();
+        return m_random_distribution(m_random_generator);
     }
 }}

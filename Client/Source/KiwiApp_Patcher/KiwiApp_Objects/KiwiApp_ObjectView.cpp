@@ -55,11 +55,11 @@ namespace kiwi
     
     void ObjectView::setAttribute(std::string const& name, tool::Parameter const& parameter)
     {
-        model::Object & object_model = getModel();
-        
+        model::Object& object_model = getModel();
         object_model.setAttribute(name, parameter);
         
-        model::DocumentManager::commit(object_model);
+        const auto commit_msg = object_model.getName() + " \"" + name + "\" changed";
+        model::DocumentManager::commit(object_model, commit_msg);
     }
     
     void ObjectView::setParameter(std::string const& name, tool::Parameter const& parameter)

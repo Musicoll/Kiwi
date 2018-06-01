@@ -62,11 +62,8 @@ namespace kiwi { namespace engine {
     {
         if (index == 0 && !args.empty())
         {
-            setAttribute("message",
-                         tool::Parameter(tool::Parameter::Type::String,
-                                         {tool::AtomHelper::toString(args)}));
+            setAttribute("message", { tool::Parameter::Type::String, {tool::AtomHelper::toString(args)}});
         }
     }
     
 }}
-

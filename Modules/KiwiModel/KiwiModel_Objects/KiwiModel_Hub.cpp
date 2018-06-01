@@ -31,20 +31,20 @@ namespace kiwi { namespace model {
     void Hub::declare()
     {
         // Objectclass
-        std::unique_ptr<ObjectClass> hub_class(new ObjectClass("hub", &Hub::create));
+        auto kiwi_class = std::make_unique<ObjectClass>("hub", &Hub::create);
         
         // Parameters
-        std::unique_ptr<ParameterClass> param_message(new ParameterClass(tool::Parameter::Type::String));
+        auto param_message = std::make_unique<ParameterClass>(tool::Parameter::Type::String);
         
-        hub_class->addAttribute("message", std::move(param_message));
+        kiwi_class->addAttribute("message", std::move(param_message));
         
         // DataModel
-        flip::Class<Hub> & hub_model = DataModel::declare<Hub>()
-                                                  .name(hub_class->getModelName().c_str())
-                                                  .inherit<Object>()
-                                                  .member<flip::Message<std::string>, &Hub::m_message>("message");
+        auto& flip_class = DataModel::declare<Hub>()
+        .name(kiwi_class->getModelName().c_str())
+        .inherit<Object>()
+        .member<flip::Message<std::string>, &Hub::m_message>("message");
         
-        Factory::add<Hub>(std::move(hub_class), hub_model);
+        Factory::add<Hub>(std::move(kiwi_class), flip_class);
     }
     
     std::unique_ptr<Object> Hub::create(std::vector<tool::Atom> const& args)
@@ -52,21 +52,24 @@ namespace kiwi { namespace model {
         return std::make_unique<Hub>(args);
     }
     
-    Hub::Hub(std::vector<tool::Atom> const& args):
-    Object(),
-    m_message()
+    Hub::Hub(std::vector<tool::Atom> const& args)
+    : Object()
+    , m_message()
     {
         if (args.size() > 0)
             throw Error("message too many arguments");
         
         pushInlet({PinType::IType::Control});
         pushOutlet(PinType::IType::Control);
+        
+        m_message.disable_in_undo();
     }
     
-    Hub::Hub(flip::Default& d):
-    Object(d),
-    m_message()
+    Hub::Hub(flip::Default& d)
+    : Object(d)
+    , m_message()
     {
+        m_message.disable_in_undo();
     }
     
     void Hub::writeAttribute(std::string const& name, tool::Parameter const& parameter)

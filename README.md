@@ -42,7 +42,8 @@ Kiwi's documentation can be found [here](http://musicoll.github.io/Kiwi). Kiwi's
 
 ### Papers
 
-- [JIM 2017](https://jim2017.sciencesconf.org/data/Eliott_Paris2017aa.pdf) (fr).
+- [JIM 2017](https://hal.archives-ouvertes.fr/hal-01550190/document) (fr).
+- [JIM 2018](https://hal.archives-ouvertes.fr/hal-01791492/document) (fr).
 
 ---
 

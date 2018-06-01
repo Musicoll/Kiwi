@@ -140,11 +140,11 @@ namespace kiwi
             
             //! @brief Changes one of the data model's attributes.
             //! @details For thread safety actual model's modification is called on the main thread.
-            void setAttribute(std::string const& name, tool::Parameter const& parameter);
+            void setAttribute(std::string const& name, tool::Parameter && parameter);
             
             //! @brief Changes one of the data model's parameter.
             //! @details For thread safety actual model's modification is called on the main thread.
-            void setParameter(std::string const& name, tool::Parameter const& parameter);
+            void setParameter(std::string const& name, tool::Parameter && parameter);
             
         private: // methods
             

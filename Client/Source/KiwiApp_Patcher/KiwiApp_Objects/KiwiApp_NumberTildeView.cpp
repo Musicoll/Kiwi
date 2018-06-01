@@ -38,12 +38,20 @@ namespace kiwi {
         return std::make_unique<NumberTildeView>(object_model);
     }
     
-    NumberTildeView::NumberTildeView(model::Object & object_model) :
-    NumberViewBase(object_model)
+    NumberTildeView::NumberTildeView(model::Object & object_model)
+    : NumberViewBase(object_model)
     {
         setEditable(false);
-        setIconColour(findColour(ObjectView::ColourIds::Active));
         setInterceptsMouseClicks(false, false);
+    }
+    
+    void NumberTildeView::drawIcon (juce::Graphics& g) const
+    {
+        g.setColour (findColour (ObjectView::ColourIds::Active));
+        
+        g.setFont(22.f);
+        g.drawFittedText("~", getLocalBounds().withWidth(getHeight()).withX(2),
+                         juce::Justification::centredLeft, 1);
     }
     
     void NumberTildeView::parameterChanged(std::string const& name, tool::Parameter const& param)

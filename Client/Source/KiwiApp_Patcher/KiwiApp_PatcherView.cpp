@@ -1827,6 +1827,7 @@ namespace kiwi
         commands.add(CommandIDs::newSlider);
         commands.add(CommandIDs::newMessage);
         commands.add(CommandIDs::newComment);
+        commands.add(CommandIDs::newNumber);
         
         commands.add(CommandIDs::zoomIn);
         commands.add(CommandIDs::zoomOut);
@@ -1973,6 +1974,14 @@ namespace kiwi
                 result.setActive(!isLocked());
                 break;
             }
+            case CommandIDs::newNumber:
+            {
+                result.setInfo(TRANS("New Number Box"), TRANS("Add a new number"), CommandCategories::editing, 0);
+                result.addDefaultKeypress('f', juce::ModifierKeys::noModifiers);
+                result.addDefaultKeypress('i', juce::ModifierKeys::noModifiers);
+                result.setActive(!isLocked());
+                break;
+            }
             case CommandIDs::newComment:
             {
                 result.setInfo(TRANS("New Comment Box"),
@@ -2059,9 +2068,10 @@ namespace kiwi
             case juce::StandardApplicationCommandIDs::selectAll:{ selectAllObjects(); break; }
             
             case CommandIDs::newBox:                            { createObjectModel("", true); break; }
-            case CommandIDs::newBang:                           { createObjectModel("bang", true); break; }
-            case CommandIDs::newToggle:                         { createObjectModel("toggle", true); break; }
-            case CommandIDs::newSlider:                         { createObjectModel("slider", true); break; }
+            case CommandIDs::newBang:                           { createObjectModel("bang", false); break; }
+            case CommandIDs::newToggle:                         { createObjectModel("toggle", false); break; }
+            case CommandIDs::newNumber:                         { createObjectModel("number", false); break; }
+            case CommandIDs::newSlider:                         { createObjectModel("slider", false); break; }
             case CommandIDs::newComment:                        { createObjectModel("comment", true); break; }
             case CommandIDs::newMessage:                        { createObjectModel("message", true); break; }
                 
