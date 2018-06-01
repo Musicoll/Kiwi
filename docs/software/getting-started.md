@@ -10,20 +10,19 @@ Kiwi is compatible with the three main operating system.
 
 - Macos : version 10.7 and later.
 - Windows : windows 7 and later.
-- Linus : tested with ubuntu 14.04
+- Linux : tested with ubuntu 14.04
 
 ## Installing
 
-Once download is complete, the corresponding archive shall be extracted by double clicking on it. A Kiwi folder containing the application is then created. On macos and linux copy the application to your app folder (Application folder on Mac, /usr/bin on linux). Windows users may execute the installer.
+Once download is complete, the corresponding archive shall be extracted by double clicking on it. A Kiwi folder containing the application is then created. On macOS and linux, copy the application to your app folder (Application folder on Mac, /usr/bin on linux). Windows users may execute the installer.
 
-## Lauching Kiwi
+## Launching Kiwi
 
-When Kiwi is executed three main windows appear : The Document Browser, the Beacon Dispatcher and Kiwi's console.
+When Kiwi is executed two main windows appear : The Document Browser and the Kiwi's console.
 
 <table style="border: 0px">
     <tr>
         <th style="border: 0px"><img title="DocumentBrowser" src="../ressources/img/emptyDocumentBrowser.png" height=500 /></th>
-        <th style="border: 0px"><img src="../ressources/img/emptyBeaconDispatcher.png" height=200></th>
         <th style="border: 0px"><img = src="../ressources/img/emptyKiwiConsole.png" height=400></th>
     </tr>
 </table>

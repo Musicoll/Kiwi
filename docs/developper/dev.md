@@ -35,7 +35,7 @@ Here is a list of tested compilers depending on your platform.
 
 - MacOs: clang 7.3.1
 - Windows: msvc 19.0
-- Linus: gcc-4.9
+- Linux: gcc-4.9
 
 ```shell
 python ./Script/build.py
@@ -85,7 +85,7 @@ The api server also uses a json file for its settings. Its easier to use the sam
 ex:
 ```json
 {
-    "session_port": 1000,
+  "session_port": 1000,
 	"backend_directory": "server_backend",
 	"open_token": "etienned@o",
 	"kiwi_version": "v1.0.0"
