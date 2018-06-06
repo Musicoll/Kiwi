@@ -471,7 +471,7 @@ namespace kiwi
                     }
                     
                     m_logger.log("saving session : " + hexadecimal_convert(m_identifier)
-                                        + " in file : " + m_backend_file.getFileName());
+                                 + " in file : " + m_backend_file.getFileName().toStdString());
                     
                     if (!save())
                     {

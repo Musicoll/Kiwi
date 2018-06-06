@@ -95,7 +95,7 @@ namespace kiwi
                 auto msg = history->get(selection[i]).first;
                 if(msg && !msg->text.empty())
                 {
-                    text += msg->text + "\n";
+                    text += juce::String(msg->text + "\n");
                 }
             }
             

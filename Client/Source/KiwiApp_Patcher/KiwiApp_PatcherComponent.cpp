@@ -383,9 +383,10 @@ namespace kiwi
     //                                PATCHER VIEW WINDOW                               //
     // ================================================================================ //
     
-    PatcherViewWindow::PatcherViewWindow(PatcherManager& manager, PatcherView& patcherview) :
-    Window("Untitled", nullptr, true, true, juce::String::empty, !KiwiApp::isMacOSX()),
-    m_patcher_component(patcherview)
+    PatcherViewWindow::PatcherViewWindow(PatcherManager& manager,
+                                         PatcherView& patcherview)
+    : Window("Untitled", nullptr, true, true, "", !KiwiApp::isMacOSX())
+    , m_patcher_component(patcherview)
     {
         // Todo: Add size infos to the Patcher Model
         setSize(600, 500);
