@@ -24,7 +24,7 @@
 #include <KiwiEngine/KiwiEngine_Instance.h>
 #include <KiwiTool/KiwiTool_Scheduler.h>
 
-#include <juce_events/timers/juce_Timer.h>
+#include <juce_events/juce_events.h>
 
 #include "flip/Document.h"
 

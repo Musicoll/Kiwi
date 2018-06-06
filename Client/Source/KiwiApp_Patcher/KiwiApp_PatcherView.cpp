@@ -135,7 +135,7 @@ namespace kiwi
             {
                 for(int y = (origin.getY() % grid_size); y < clip_bounds.getBottom(); y += grid_size)
                 {
-                    g.setPixel(x, y);
+                    g.fillRect(x, y, 1, 1);
                 }
             }
         }
@@ -1863,7 +1863,7 @@ namespace kiwi
             {
                 juce::String label = TRANS("Undo");
                 const bool hasUndo = canUndo();
-                if(hasUndo) { label += ' ' + getUndoLabel(); }
+                if(hasUndo) { label += juce::String(" ") + getUndoLabel(); }
                 
                 result.setInfo(label, TRANS("Undo last action"), CommandCategories::general, 0);
                 result.addDefaultKeypress('z',  juce::ModifierKeys::commandModifier);
@@ -1874,7 +1874,7 @@ namespace kiwi
             {
                 juce::String label = TRANS("Redo");
                 const bool hasRedo = canRedo();
-                if(hasRedo) { label += ' ' + getRedoLabel(); }
+                if(hasRedo) { label += juce::String(" ") + getRedoLabel(); }
                 
                 result.setInfo(label, TRANS("Redo action"), CommandCategories::general, 0);
                 result.addDefaultKeypress('z', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier);

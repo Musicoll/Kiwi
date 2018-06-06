@@ -46,7 +46,7 @@ namespace kiwi
                std::unique_ptr<juce::Component> content,
                bool resizable = false,
                bool is_main_window = true,
-               juce::String settings_name = juce::String::empty,
+               juce::String settings_name = "",
                bool add_menubar = false);
         
         //! @brief Window destructor. Called whenever buttonPressed is called.
