@@ -37,6 +37,8 @@ void showHelp()
     std::cout << "Usage:\n";
     std::cout << " -h shows this help message. \n";
     std::cout << " -f set the json configuration file to use (needed). \n";
+    std::cout << '\n';
+    std::cout << "ex: ./Server -f ./config/prod.json" << std::endl;
 }
 
 void on_interupt(int signal)
@@ -66,11 +68,25 @@ int main(int argc, char const* argv[])
         return 0;
     }
     
-    juce::File configuration_file("./" + cl_parser.getOption("-f"));
+    juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile)
+    .setAsCurrentWorkingDirectory();
     
+    const std::string config_filepath = cl_parser.getOption("-f");
+    
+    if(config_filepath.empty())
+    {
+        std::cerr << "Error: Server need a configuration file:\n" << std::endl;
+        showHelp();
+        return 0;
+    }
+    
+    juce::File configuration_file(config_filepath);
     if(!configuration_file.exists())
     {
-        std::cerr << "Error: Config file does not exist or is unspecified.." << std::endl;
+        std::cerr << "Error: Config file: \""
+        << configuration_file.getFullPathName()
+        << "\" not found !" << std::endl;
+        
         showHelp();
         return 0;
     }
