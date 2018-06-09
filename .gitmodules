@@ -7,3 +7,6 @@
 [submodule "ThirdParty/Beast"]
 	path = ThirdParty/Beast
 	url = https://github.com/boostorg/beast.git
+[submodule "ThirdParty/kiwi-node-server"]
+	path = ThirdParty/kiwi-node-server
+	url = https://github.com/Musicoll/kiwi-node-server.git
