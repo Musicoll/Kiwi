@@ -33,9 +33,10 @@ namespace kiwi {
     //                                   COMMENT VIEW                                   //
     // ================================================================================ //
     
-    //! @brief The view of any textual kiwi object.
-    class CommentView : public EditableObjectView,
-                        public juce::TextEditor::Listener
+    //! @brief The *comment* object view.
+    class CommentView
+    : public EditableObjectView
+    , public juce::TextEditor::Listener
     {
     public: // methods
         
@@ -53,8 +54,11 @@ namespace kiwi {
         
     private: // methods
         
-        //! @brief Called when the object is resized.
-        void resized() override final;
+        //! @brief Validate the new width and height for the box
+        void validateSize(int& new_width, int& new_height) override;
+        
+        //! @brief Called every time a patcher is locked or unlocked.
+        void lockStatusChanged(bool is_locked) override;
         
         //! @brief Called when the text is being typed.
         //! @details Used to resize in order to keep text visible.
@@ -73,6 +77,10 @@ namespace kiwi {
         //! @brief Constructs the label's text editor.
         //! @details Overrides EditableOjectView::createTextEditor.
         juce::TextEditor* createdTextEditor() override final;
+    
+    private: // variables
+        
+        bool m_patcher_view_locked {false};
         
     private: // deleted methods
         

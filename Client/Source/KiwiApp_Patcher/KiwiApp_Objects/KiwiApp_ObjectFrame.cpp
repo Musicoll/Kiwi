@@ -32,26 +32,27 @@ namespace kiwi
     //                                     OBJECT FRAME                                 //
     // ================================================================================ //
     
-    ObjectFrame::ObjectFrame(PatcherView& patcher_view, std::unique_ptr<ObjectView> object_view) :
-    m_object_view(std::move(object_view)),
-    m_patcher_view(patcher_view),
-    m_io_width(6),
-    m_io_height(3),
-    m_inlets(getModel().getNumberOfInlets()),
-    m_outlets(getModel().getNumberOfOutlets()),
-    m_outline(10, 4, 1)
+    ObjectFrame::ObjectFrame(PatcherView& patcher_view,
+                             std::unique_ptr<ObjectView> object_view)
+    : m_object_view(std::move(object_view))
+    , m_patcher_view(patcher_view)
+    , m_io_width(6)
+    , m_io_height(3)
+    , m_inlets(getModel().getNumberOfInlets())
+    , m_outlets(getModel().getNumberOfOutlets())
+    , m_outline(10, 4, 1)
     {
+        const bool pv_locked = isLocked();
+        setInterceptsMouseClicks(pv_locked, pv_locked);
+        m_object_view->lockStatusChanged(pv_locked);
+        
         initColours();
+        updateBoundsFromModel(false);
         
         addChildComponent(m_outline);
-        
-        addAndMakeVisible(m_object_view.get());
-        
-        updateBounds(false);
-        
         updateOutline();
         
-        setInterceptsMouseClicks(isLocked(), isLocked());
+        addAndMakeVisible(m_object_view.get());
     }
     
     ObjectFrame::~ObjectFrame()
@@ -73,7 +74,7 @@ namespace kiwi
         m_outline.setBounds(getLocalBounds());
     }
     
-    void ObjectFrame::updateBounds(bool animate)
+    void ObjectFrame::updateBoundsFromModel(bool animate)
     {
         model::Object const& model = getModel();
         
@@ -81,10 +82,14 @@ namespace kiwi
         {
             const juce::Point<int> origin = m_patcher_view.getOriginPosition();
             
+            int width = model.getWidth();
+            int height = model.getHeight();
+            
+            validateSize(width, height);
+            
             const juce::Rectangle<int> object_bounds(model.getX() + origin.getX(),
                                                      model.getY() + origin.getY(),
-                                                     model.getWidth(),
-                                                     model.getHeight());
+                                                     width, height);
             
             const juce::Rectangle<int> frame_bounds = object_bounds.expanded(m_outline.getBorderThickness());
             
@@ -128,6 +133,11 @@ namespace kiwi
     juce::Rectangle<int> ObjectFrame::getObjectBounds() const
     {
         return m_object_view->getBounds().withPosition(getPosition() + m_object_view->getBounds().getPosition());
+    }
+    
+    void ObjectFrame::validateSize(int& new_width, int& new_height)
+    {
+        m_object_view->validateSize(new_width, new_height);
     }
     
     void ObjectFrame::mouseDown(juce::MouseEvent const& e)
@@ -259,7 +269,7 @@ namespace kiwi
             const bool animate = (ctrl == flip::Controller::UNDO
                                   || ctrl == flip::Controller::EXTERNAL);
             
-            updateBounds(animate);
+            updateBoundsFromModel(animate);
             
             repaint();
         }
@@ -274,9 +284,7 @@ namespace kiwi
     {
         dynamic_cast<EditableObjectView*>(m_object_view.get())->removeListener(*this);
         
-        ClassicView * object_view = dynamic_cast<ClassicView*>(m_object_view.get());
-        
-        if (object_view)
+        if (auto* object_view = dynamic_cast<ClassicView*>(m_object_view.get()))
         {
             getPatcherView().objectTextChanged(*this, new_text);
         }
@@ -298,12 +306,10 @@ namespace kiwi
     
     void ObjectFrame::editObject()
     {
-        EditableObjectView * object_view = dynamic_cast<EditableObjectView*>(m_object_view.get());
-        
-        if (object_view != nullptr)
+        if (auto* editable_object_view = dynamic_cast<EditableObjectView*>(m_object_view.get()))
         {
-            object_view->addListener(*this);
-            object_view->edit();
+            editable_object_view->addListener(*this);
+            editable_object_view->edit();
         }
     }
     
@@ -365,13 +371,15 @@ namespace kiwi
     
     void ObjectFrame::lockStatusChanged()
     {
+        const bool locked = isLocked();
+        setInterceptsMouseClicks(locked, locked);
+        m_object_view->lockStatusChanged(locked);
         repaint();
-        setInterceptsMouseClicks(isLocked(), isLocked());
     }
     
     void ObjectFrame::patcherViewOriginPositionChanged()
     {
-        updateBounds(false);
+        updateBoundsFromModel(false);
     }
     
     juce::Point<int> ObjectFrame::getInletPatcherPosition(const size_t index) const
@@ -473,21 +481,19 @@ namespace kiwi
     
     ObjectFrame::Outline::Outline(int resize_length,
                                   int resize_thickness,
-                                  int inner_thickness):
-    juce::Component(),
-    m_resize_length(resize_length),
-    m_resize_thickness(resize_thickness),
-    m_inner_thickness(inner_thickness),
-    m_corners(),
-    m_borders(),
-    m_resize_colour(),
-    m_inner_colour()
-    {
-    }
+                                  int inner_thickness)
+    : juce::Component()
+    , m_resize_length(resize_length)
+    , m_resize_thickness(resize_thickness)
+    , m_inner_thickness(inner_thickness)
+    , m_corners()
+    , m_borders()
+    , m_resize_colour()
+    , m_inner_colour()
+    {}
     
     ObjectFrame::Outline::~Outline()
-    {
-    }
+    {}
     
     int ObjectFrame::Outline::getBorderThickness() const
     {

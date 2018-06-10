@@ -59,6 +59,9 @@ namespace kiwi {
         
     private: // methods
         
+        //! @brief Validate the new width and height for the box
+        void validateSize(int& new_width, int& new_height) override;
+        
         //! @brief Called when the object is resized.
         void resized() override final;
         

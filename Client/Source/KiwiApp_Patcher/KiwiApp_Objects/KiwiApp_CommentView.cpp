@@ -40,76 +40,94 @@ namespace kiwi {
         return std::make_unique<CommentView>(object_model);
     }
     
-    CommentView::CommentView(model::Object & object_model) :
-    EditableObjectView(object_model)
+    CommentView::CommentView(model::Object & object_model)
+    : EditableObjectView(object_model)
     {
         setColour(ObjectView::ColourIds::Background, juce::Colours::transparentWhite);
         
-        juce::Label & label = getLabel();
+        juce::Label& label = getLabel();
         
-        label.setJustificationType(juce::Justification::topLeft);
+        const auto comment_text = object_model.getAttribute("text")[0].getString();
+        label.setText(comment_text, juce::NotificationType::dontSendNotification);
         
-        label.setText(object_model.getAttribute("text")[0].getString(),
-                      juce::NotificationType::dontSendNotification);
+        label.setColour(juce::Label::backgroundColourId,
+                        findColour(ObjectView::ColourIds::Background));
         
-        label.setColour(juce::Label::backgroundColourId, findColour(ObjectView::ColourIds::Background));
         label.setColour(juce::Label::backgroundWhenEditingColourId,
-                          findColour(ObjectView::ColourIds::Background));
-        label.setColour(juce::Label::textColourId, findColour(ObjectView::ColourIds::Text));
-        label.setColour(juce::Label::textWhenEditingColourId, findColour(ObjectView::ColourIds::Text));
+                        findColour(ObjectView::ColourIds::Background));
+        
+        label.setColour(juce::Label::textColourId,
+                        findColour(ObjectView::ColourIds::Text).brighter(0.4));
+        
+        label.setColour(juce::Label::textWhenEditingColourId,
+                        findColour(ObjectView::ColourIds::Text));
 
         addAndMakeVisible(label);
     }
 
     CommentView::~CommentView()
+    {}
+    
+    void CommentView::lockStatusChanged(bool is_locked)
     {
+        m_patcher_view_locked = is_locked;
+        repaint();
     }
     
     void CommentView::paintOverChildren (juce::Graphics& g)
     {
-        g.setColour (findColour (ObjectView::ColourIds::Outline));
-        
-        drawOutline(g);
+        if(!m_patcher_view_locked)
+        {
+            // dashed outline
+            juce::Path path;
+            path.addRectangle(getLocalBounds());
+            const juce::PathStrokeType path_stroke(1.0);
+            float const dashed_length[2] {2.f, 2.f};
+            path_stroke.createDashedStroke(path, path, dashed_length, 2);
+            
+            g.setColour(findColour (ObjectView::ColourIds::Outline).brighter(0.8).withAlpha(0.8f));
+            g.strokePath(path, path_stroke);
+        }
     }
     
-    void CommentView::resized()
+    void CommentView::validateSize(int& new_width, int& new_height)
     {
-        getLabel().setBounds(getLocalBounds());
+        new_width = std::max(new_width, getMinWidth());
+        const auto text_bounds = getTextBoundingBox(getLabel().getText(), new_width);
+        new_height = std::max<int>(text_bounds.getHeight(), getMinHeight());
     }
     
     void CommentView::textEditorTextChanged(juce::TextEditor& editor)
     {
-        setSize(std::max(editor.getTextWidth() + 16, 40), editor.getTextHeight());
+        setSize(std::max(getWidth(), getMinWidth()),
+                std::max(editor.getTextHeight() + 2, getMinHeight()));
     }
     
     void CommentView::attributeChanged(std::string const& name, tool::Parameter const& param)
     {
-        if (name == "text")
+        static const std::string text_param = "text";
+        
+        if (name == text_param)
         {
-            getLabel().setText(param[0].getString(), juce::NotificationType::dontSendNotification);
+            const auto new_text = param[0].getString();
+            getLabel().setText(new_text, juce::NotificationType::dontSendNotification);
+            
+            const auto width = getWidth();
+            const auto text_bounds = getTextBoundingBox(new_text, width);
+            setSize(std::max(width, getMinWidth()),
+                    std::max<int>(text_bounds.getHeight(), getMinHeight()));
         }
     }
     
     void CommentView::textChanged()
     {
-        model::Object & model = getModel();
-        
-        model.setWidth(getWidth());
-        
-        model.setHeight(getHeight());
-        
-        setAttribute("text", tool::Parameter(tool::Parameter::Type::String,
-                                             {getLabel().getText().toStdString()}));
+        const auto new_text = getLabel().getText().toStdString();
+        setAttribute("text", tool::Parameter(tool::Parameter::Type::String, {new_text}));
     }
     
     juce::TextEditor* CommentView::createdTextEditor()
     {
-        juce::TextEditor * editor = new juce::TextEditor();
-        
-        editor->setBounds(getLocalBounds());
-        editor->setBorder(juce::BorderSize<int>(0));
-        editor->setFont(getLabel().getFont());
-        
+        auto* editor = new juce::TextEditor();
         
         editor->setColour(juce::TextEditor::ColourIds::textColourId,
                           getLabel().findColour(juce::Label::textWhenEditingColourId));
@@ -120,12 +138,17 @@ namespace kiwi {
         editor->setColour(juce::TextEditor::highlightColourId,
                           findColour(ObjectView::ColourIds::Highlight, true).withAlpha(0.4f));
         
-        
         editor->setColour(juce::TextEditor::outlineColourId,
                           juce::Colours::transparentWhite);
         
         editor->setColour(juce::TextEditor::focusedOutlineColourId,
                           juce::Colours::transparentWhite);
+        
+        editor->setBounds(getLocalBounds());
+        editor->setIndents(getPadding(), getPadding());
+        editor->setBorder(juce::BorderSize<int>(0));
+        editor->setFont(getFont());
+        editor->setJustification(getLabel().getJustificationType());
         
         editor->setScrollbarsShown(false);
         editor->setScrollToShowCursor(true);
@@ -134,7 +157,6 @@ namespace kiwi {
         editor->setInterceptsMouseClicks(true, false);
         
         editor->addListener(this);
-        
         return editor;
     }
 }

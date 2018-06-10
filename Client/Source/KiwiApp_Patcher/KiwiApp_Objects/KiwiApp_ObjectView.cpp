@@ -33,18 +33,19 @@ namespace kiwi
     //                                   OBJECT VIEW                                    //
     // ================================================================================ //
     
-    ObjectView::ObjectView(model::Object & object_model):
-    m_model(object_model),
-    m_border_size(1.5),
-    m_master(this, [](ObjectView*){})
+    ObjectView::ObjectView(model::Object & object_model)
+    : m_model(object_model)
+    , m_border_size(1.5)
+    , m_master(this, [](ObjectView*){})
     {
         object_model.addListener(*this);
         
-        setColour(ObjectView::ColourIds::Error, juce::Colour::fromFloatRGBA(0.6, 0.1, 0.1, 0.));
-        setColour(ObjectView::ColourIds::Background, juce::Colours::white);
+        setColour(ObjectView::ColourIds::Error, juce::Colour::fromRGBA(223, 97, 94, 250));
+        const juce::Colour bgcolor = juce::Colours::white;
+        setColour(ObjectView::ColourIds::Background, bgcolor);
         setColour(ObjectView::ColourIds::Text, juce::Colours::black);
-        setColour(ObjectView::ColourIds::Outline, juce::Colours::black);
-        setColour(ObjectView::ColourIds::Highlight, juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.));
+        setColour(ObjectView::ColourIds::Outline, bgcolor.contrasting(0.8));
+        setColour(ObjectView::ColourIds::Highlight, juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
         setColour(ObjectView::ColourIds::Active, juce::Colour(0xff21ba90));
     }
     
@@ -95,9 +96,19 @@ namespace kiwi
         return getLocalBounds();
     }
     
+    void ObjectView::validateSize(int& new_width, int& new_height)
+    {
+        ;
+    }
+    
     void ObjectView::drawOutline(juce::Graphics & g)
     {
         g.drawRect(getOutline(), m_border_size);
+    }
+    
+    void ObjectView::lockStatusChanged(bool is_locked)
+    {
+        // nothing to do by default
     }
     
     // ================================================================================ //

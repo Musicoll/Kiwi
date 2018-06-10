@@ -40,6 +40,7 @@ namespace kiwi { namespace model {
         
         // Flags
         comment_class->setFlag(ObjectClass::Flag::DefinedSize);
+        comment_class->setFlag(ObjectClass::Flag::ResizeWidth);
         
         // DataModel
         flip::Class<Comment> & comment_model = DataModel::declare<Comment>()
@@ -55,24 +56,23 @@ namespace kiwi { namespace model {
         return std::make_unique<Comment>(args);
     }
     
-    Comment::Comment(std::vector<tool::Atom> const& args):
-    Object(),
-    m_comment_text("")
+    Comment::Comment(std::vector<tool::Atom> const& args)
+    : Object()
+    , m_comment_text("")
     {
         if (args.size() > 0)
             throw Error("comment too many arguments");
             
         setMinWidth(20.);
         setMinHeight(20.);
-        setWidth(40);
+        setWidth(120.);
         setHeight(20.);
     }
     
-    Comment::Comment(flip::Default& d):
-    Object(d),
-    m_comment_text("")
-    {
-    }
+    Comment::Comment(flip::Default& d)
+    : Object(d)
+    , m_comment_text("")
+    {}
     
     void Comment::writeAttribute(std::string const& name, tool::Parameter const& parameter)
     {

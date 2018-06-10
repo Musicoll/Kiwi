@@ -32,44 +32,12 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief Abstract class for object's views that can be edited in mode unlock.
-    class EditableObjectView : public ObjectView, public juce::Label::Listener
+    class EditableObjectView
+    : public ObjectView
+    , public juce::Label::Listener
     {
     public: // classes
-        
-        struct Listener
-        {
-            //! @brief Destructor.
-            virtual ~Listener() = default;
-            
-            //! @brief Called when the text has been edited and return key was pressed.
-            virtual void textChanged(std::string const& new_text) =  0;
-            
-            //! @brief Called when the classic view ends its edition.
-            virtual void editorHidden() =  0;
-            
-            //! @brief Called when the classic view enters its edition mode.
-            virtual void editorShown() =  0;
-        };
-        
-    private: // classes
-        
-        class Label : public juce::Label
-        {
-        public: // methods
-            
-            //! @brief Constructor.
-            Label(EditableObjectView & object_view);
-            
-            //! @brief Destructor.
-            ~Label();
-            
-            //! @brief Called to create the text editor once edit is called.
-            juce::TextEditor* createEditorComponent() override final;
-            
-        private: // members
-            
-            EditableObjectView & m_object_view;
-        };
+        struct Listener;
         
     public: // methods
         
@@ -89,7 +57,59 @@ namespace kiwi
         //! @brief Edits the label.
         void edit();
         
+        //! @brief Set a new text.
+        void setText(juce::String const& new_text);
+        
+        //! @brief Get the text.
+        juce::String getText() const;
+        
+        //! @brief Set a new font.
+        void setFont(juce::Font font);
+        
+        //! @brief Get the current font used by the box.
+        juce::Font getFont() const;
+        
+        //! @brief Set a padding value.
+        void setPadding(int padding);
+        
+        //! @brief Get the current padding value.
+        int getPadding() const;
+        
+        //! @brief Get the minimum height.
+        //! @details The minimum height is (font_height + 2 * padding)
+        int getMinHeight() const;
+        
+        //! @brief Get the minimum width.
+        //! @details The minimum width is (font_height + 2 * padding)
+        int getMinWidth() const;
+        
+    private: // classes
+        
+        class Label : public juce::Label
+        {
+        public: // methods
+            
+            //! @brief Constructor.
+            Label(EditableObjectView & object_view);
+            
+            //! @brief Destructor.
+            ~Label();
+            
+            //! @brief Called to create the text editor once edit is called.
+            juce::TextEditor* createEditorComponent() override final;
+            
+            void paint(juce::Graphics& g) override;
+            
+        private: // members
+            
+            EditableObjectView & m_object_view;
+        };
+        
     protected: // methods
+        
+        //! @brief Called when the object is resized.
+        //! @details Default implementation apply local bounds to the label.
+        virtual void resized() override;
         
         //! @brief Returns the label created by the editable object.
         juce::Label & getLabel();
@@ -98,7 +118,17 @@ namespace kiwi
         //! @details Editable object is editable by default.
         void setEditable(bool editable);
         
+        //! @brief Try to find the bounding bow of a text
+        //! @details This is a default implementation,
+        //! subclasses can override this method if they need.
+        virtual juce::Rectangle<float> getTextBoundingBox(juce::String const& text,
+                                                          float max_width) const;
+        
     private: // methods
+        
+        void paint(juce::Graphics& g) override;
+        
+        void drawLabel(juce::Graphics& g);
         
         //! @brief Creates the text editor used by label when it's edited.
         virtual juce::TextEditor* createdTextEditor() = 0;
@@ -121,8 +151,9 @@ namespace kiwi
     private: // members
         
         Label                       m_label;
-        bool                        m_editable;
+        bool                        m_editable {true};
         tool::Listeners<Listener>   m_listeners;
+        int                         m_padding {3};
         
     private: // deleted methods
         
@@ -131,5 +162,20 @@ namespace kiwi
         EditableObjectView(EditableObjectView && other) = delete;
         EditableObjectView& operator=(EditableObjectView const& other) = delete;
         EditableObjectView& operator=(EditableObjectView && other) = delete;
+    };
+    
+    struct EditableObjectView::Listener
+    {
+        //! @brief Destructor.
+        virtual ~Listener() = default;
+        
+        //! @brief Called when the text has been edited and return key was pressed.
+        virtual void textChanged(std::string const& new_text) =  0;
+        
+        //! @brief Called when the classic view ends its edition.
+        virtual void editorHidden() =  0;
+        
+        //! @brief Called when the classic view enters its edition mode.
+        virtual void editorShown() =  0;
     };
 }

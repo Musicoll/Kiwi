@@ -41,19 +41,19 @@ namespace kiwi
     // ================================================================================ //
     
     PatcherView::PatcherView(PatcherManager& manager,
-                       Instance& instance,
-                       model::Patcher& patcher,
-                       model::Patcher::View& view) :
-    m_manager(manager),
-    m_instance(instance),
-    m_patcher_model(patcher),
-    m_view_model(view),
-    m_viewport(*this),
-    m_hittester(*this),
-    m_mouse_handler(*this),
-    m_io_highlighter(),
-    m_lasso(*this),
-    m_grid_size(20)
+                             Instance& instance,
+                             model::Patcher& patcher,
+                             model::Patcher::View& view)
+    : m_manager(manager)
+    , m_instance(instance)
+    , m_patcher_model(patcher)
+    , m_view_model(view)
+    , m_viewport(*this)
+    , m_hittester(*this)
+    , m_mouse_handler(*this)
+    , m_io_highlighter()
+    , m_lasso(*this)
+    , m_grid_size(20)
     {
         KiwiApp::bindToCommandManager(this);
         KiwiApp::bindToKeyMapping(this);
@@ -992,6 +992,10 @@ namespace kiwi
         
         bool patcher_area_uptodate = false;
         
+        // update parameters before updating bounds
+        // (ie text objects adapt their sizes depending on the size)
+        updateParameters(patcher);
+        
         // send ObjectView change notification
         for(auto& object : patcher.getObjects())
         {
@@ -1064,8 +1068,6 @@ namespace kiwi
                 removeObjectView(object);
             }
         }
-        
-        updateParameters(patcher);
         
         if(view.removed()) {}
     }
@@ -1367,9 +1369,9 @@ namespace kiwi
         {
             const auto it = (zorder > 0) ? m_objects.begin() + zorder : m_objects.end();
             
-            std::unique_ptr<ObjectView> object_view = Factory::createObjectView(object);
+            auto of = std::make_unique<ObjectFrame>(*this, Factory::createObjectView(object));
             
-            ObjectFrame& object_frame = **(m_objects.emplace(it, new ObjectFrame(*this, std::move(object_view))));
+            auto& object_frame = **(m_objects.emplace(it, std::move(of)));
             
             addAndMakeVisible(object_frame, zorder);
         }
@@ -1528,12 +1530,13 @@ namespace kiwi
         
         std::vector<tool::Atom> atoms = tool::AtomHelper::parse(new_text);
         
-        std::unique_ptr<model::Object> object_model = model::Factory::create(atoms);
+        auto object_model = model::Factory::create(atoms);
         
-        juce::Point<int> origin = getOriginPosition();
-        juce::Rectangle<int> box_bounds = object_frame.getObjectBounds();
+        auto origin = getOriginPosition();
+        auto box_bounds = object_frame.getObjectBounds();
         
-        object_model->setPosition(box_bounds.getX() - origin.x, box_bounds.getY() - origin.y);
+        object_model->setPosition(box_bounds.getX() - origin.x,
+                                  box_bounds.getY() - origin.y);
         
         // handle error box case
         if(object_model->getName() == "errorbox")
@@ -1546,7 +1549,11 @@ namespace kiwi
         
         if (!object_model->hasFlag(model::ObjectClass::Flag::DefinedSize))
         {
-            const int text_width = juce::Font().getStringWidth(new_text) + 12;
+            // TODO: we should fetch these values dynamically :
+            const int object_text_padding = 3;
+            const juce::Font object_font = juce::Font(15);
+            
+            const int text_width = object_font.getStringWidth(new_text) + object_text_padding*2;
             const int max_io = std::max(object_model->getNumberOfInlets(),
                                         object_model->getNumberOfOutlets()) * 14;
             

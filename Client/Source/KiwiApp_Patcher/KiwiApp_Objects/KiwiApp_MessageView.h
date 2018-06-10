@@ -33,9 +33,10 @@ namespace kiwi {
     //                                   MESSAGE VIEW                                   //
     // ================================================================================ //
     
-    //! @brief The view of any textual kiwi object.
-    class MessageView : public EditableObjectView,
-                        public juce::TextEditor::Listener
+    //! @brief The *message* object view.
+    class MessageView
+    : public EditableObjectView
+    , public juce::TextEditor::Listener
     {
     public: // methods
         
@@ -53,32 +54,34 @@ namespace kiwi {
         
     private: // methods
         
+        //! @brief Validate the new width and height for the box
+        void validateSize(int& new_width, int& new_height) override;
+        
         //! @brief Called when the message is clicked.
-        void mouseDown(juce::MouseEvent const& e) override final;
+        void mouseDown(juce::MouseEvent const& e) override;
         
         //! @brief Called when the bang is unclicked.
-        void mouseUp(juce::MouseEvent const& e) override final;
-        
-        //! @brief Called when the object is resized.
-        void resized() override final;
+        void mouseUp(juce::MouseEvent const& e) override;
         
         //! @brief Called when the text is being typed.
         //! @details Used to resize in order to keep text visible.
-        void textEditorTextChanged(juce::TextEditor& editor) override final;
+        void textEditorTextChanged(juce::TextEditor& editor) override;
+        
+        void paint(juce::Graphics& g) override;
         
         //! @brief Paints elements over the text editor.
-        void paintOverChildren (juce::Graphics& g) override final;
+        void paintOverChildren (juce::Graphics& g) override;
         
         //! @brief Called whenever one of the object's attribute has changed.
-        void attributeChanged(std::string const& name, tool::Parameter const& param) override final;
+        void attributeChanged(std::string const& name, tool::Parameter const& param) override;
         
         //! @brief Called when the label text has changed.
         //! @details Overrides EditableObjectView::textChanged.
-        void textChanged() override final;
+        void textChanged() override;
         
         //! @brief Constructs the label's text editor.
         //! @details Overrides EditableOjectView::createTextEditor.
-        juce::TextEditor* createdTextEditor() override final;
+        juce::TextEditor* createdTextEditor() override;
         
     private: // members
         

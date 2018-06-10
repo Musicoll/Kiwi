@@ -33,13 +33,16 @@
 namespace kiwi
 {
     class ObjectFrame;
+    class PatcherView;
     
     // ================================================================================ //
     //                                   OBJECT VIEW                                    //
     // ================================================================================ //
     
     //! @brief Abstract for objects graphical representation.
-    class ObjectView : public juce::Component, public model::Object::Listener
+    class ObjectView
+    : public juce::Component
+    , public model::Object::Listener
     {
     public: // classes
         
@@ -69,6 +72,12 @@ namespace kiwi
         
         //! @brief Called when a parameter has changed.
         void modelParameterChanged(std::string const& name, tool::Parameter const& param) override final;
+        
+        //! @brief Validate the new width and height for the box
+        virtual void validateSize(int& new_width, int& new_height);
+        
+        //! @brief Called every time a patcher is locked or unlocked.
+        virtual void lockStatusChanged(bool is_locked);
         
     protected: // methods
         

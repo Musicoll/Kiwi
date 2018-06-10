@@ -51,7 +51,11 @@ namespace kiwi {
     }
     
     NumberViewBase::~NumberViewBase()
+    {}
+    
+    void NumberViewBase::validateSize(int& new_width, int& new_height)
     {
+        new_height = getMinHeight();
     }
     
     void NumberViewBase::paint(juce::Graphics & g)
