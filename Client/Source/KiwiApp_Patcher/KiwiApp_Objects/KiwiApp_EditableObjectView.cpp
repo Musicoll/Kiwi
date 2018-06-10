@@ -106,8 +106,8 @@ namespace kiwi {
         const int padding = getPadding();
         const int side_padding = padding * 2;
         const float max_line_width = max_width - side_padding;
-        const auto font { getFont() };
-        arr.addJustifiedText (font, text,
+        
+        arr.addJustifiedText (getFont(), text,
                               padding, padding,
                               max_line_width,
                               juce::Justification::topLeft);
