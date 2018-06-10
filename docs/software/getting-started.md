@@ -46,7 +46,7 @@ To connect to an existing user account, click on login in the menu 'Account'. A 
 
 At this point, you can either join a shared patch using the Document Browser window or open a local patch. In this section we will demonstrate how to open and manipulate a local patch. Instructions on how to collaborate will be given later.
 
-Pease click on this <a href="../ressources/pathces/first-patch.kiwi" target='_blank_'>link</a> to download a first example and open the example with Kiwi.
+Pease click on this <a href="../ressources/patchs/first-patch.kiwi" target='_blank_'>link</a> to download a first example and open the example with Kiwi.
 
 <img title="first patch" src="../ressources/img/first-patch.png" height="600px">
 

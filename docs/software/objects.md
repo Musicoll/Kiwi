@@ -2,7 +2,7 @@
 
 ## Help patches
 
-A list of help patches describing how each object works is <a href="../ressources/pathces/help/help.zip" target='_blank_'>here</a>. The list of help patches is currently incomplete but will evolve later on.
+A list of help patches describing how each object works is <a href="../ressources/patchs/help/help.zip" target='_blank_'>here</a>. The list of help patches is currently incomplete but will evolve later on.
 
 ## List of objects
 
