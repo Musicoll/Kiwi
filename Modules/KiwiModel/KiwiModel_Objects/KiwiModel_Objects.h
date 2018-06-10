@@ -86,4 +86,5 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_ClipTilde.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Clip.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_SfPlayTilde.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_SfRecordTilde.h>
 

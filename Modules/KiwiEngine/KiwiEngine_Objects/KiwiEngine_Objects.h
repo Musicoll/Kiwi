@@ -86,3 +86,4 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_ClipTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Clip.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_SfPlayTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_SfRecordTilde.h>
