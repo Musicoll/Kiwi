@@ -113,6 +113,9 @@ namespace kiwi
         //! @brief Log-out the user
         static void logout();
         
+        //! @brief Return true if the application can connect to the server.
+        static bool canConnectToServer();
+        
         //! @brief Get the current running engine instance.
         static engine::Instance& useEngineInstance();
         
@@ -253,5 +256,7 @@ namespace kiwi
         TooltipWindow                                       m_tooltip_window;
         std::unique_ptr<StoredSettings>                     m_settings;
         std::unique_ptr<tool::Scheduler<>>                  m_scheduler;
+        
+        bool m_same_app_and_server_version = false;
     };
 }

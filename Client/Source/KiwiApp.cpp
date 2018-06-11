@@ -333,7 +333,6 @@ namespace kiwi
     void KiwiApp::setAuthUser(Api::AuthUser const& auth_user)
     {
         (*KiwiApp::use().m_api_controller).setAuthUser(auth_user);
-        
         KiwiApp::useInstance().login();
     }
     
@@ -349,21 +348,31 @@ namespace kiwi
         KiwiApp::commandStatusChanged();
     }
     
+    bool KiwiApp::canConnectToServer()
+    {
+        return KiwiApp::use().m_same_app_and_server_version;
+    }
+    
     void KiwiApp::checkLatestRelease()
     {
         std::string current_version = getApplicationVersion().toStdString();
         
-        Api::CallbackFn<std::string const&> on_success = [current_version](std::string const& latest_version)
-        {
-                KiwiApp::useScheduler().schedule([current_version, latest_version]()
+        Api::CallbackFn<std::string const&> on_success = [this, current_version](std::string const& server_version) {
+            
+            KiwiApp::useScheduler().schedule([this, current_version, server_version]() {
+                
+                m_same_app_and_server_version = (current_version == server_version);
+                if (!m_same_app_and_server_version)
                 {
-                    if (current_version.compare(latest_version) != 0)
-                    {
-                        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::QuestionIcon,
-                                                               "New release available" ,
-                                                               "Upgrading required to access remote documents.\n\n Please visit:\n https://github.com/Musicoll/Kiwi/releases");
-                    }
-                });
+                    juce::String title = "Incompatible Application and Server versions.";
+                    juce::String text = "- app: " + juce::String(current_version) + "\n";
+                    text += "- server: " + juce::String(server_version) + "\n";
+                    text += "\nPlease visit: https://github.com/Musicoll/Kiwi/releases";
+                    
+                    juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+                                                           title, text);
+                }
+            });
         };
         
         Api::ErrorCallback on_fail =[](Api::Error error)

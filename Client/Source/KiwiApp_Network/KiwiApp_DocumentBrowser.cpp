@@ -284,6 +284,12 @@ namespace kiwi
     
     void DocumentBrowser::Drive::refresh_internal()
     {
+        if(!KiwiApp::canConnectToServer())
+        {
+            m_drive->updateDocumentList({});
+            return;
+        }
+        
         std::weak_ptr<DocumentBrowser::Drive> drive(m_drive);
         
         KiwiApp::useApi().getDocuments([drive](Api::Response res, Api::Documents docs)

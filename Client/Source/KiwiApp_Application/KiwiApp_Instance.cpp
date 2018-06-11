@@ -416,9 +416,12 @@ namespace kiwi
     void Instance::showDocumentBrowserWindow()
     {
         showWindowWithId(WindowId::DocumentBrowser, [&browser = m_browser](){
+            
+            const bool can_connect = (KiwiApp::canConnectToServer()
+                                      && KiwiApp::getCurrentUser().isLoggedIn());
+            
             return std::make_unique<Window>("Document Browser",
-                                            std::make_unique<DocumentBrowserView>(browser,
-                                                                                  KiwiApp::getCurrentUser().isLoggedIn()),
+                                            std::make_unique<DocumentBrowserView>(browser, can_connect),
                                             true, false, "document_browser_window");
         });
     }
