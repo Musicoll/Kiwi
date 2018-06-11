@@ -39,8 +39,8 @@ namespace kiwi
     //                                  DOCUMENT BROWSER                                //
     // ================================================================================ //
     
-    DocumentBrowserView::DocumentBrowserView(DocumentBrowser& browser, bool enabled) :
-    m_browser(browser)
+    DocumentBrowserView::DocumentBrowserView(DocumentBrowser& browser, bool enabled)
+    : m_browser(browser)
     {
         setSize(1, 1);
         
@@ -93,20 +93,22 @@ namespace kiwi
     
     DocumentBrowserView::DriveView::RowElem::RowElem(DriveView& drive_view,
                                                      std::string const& name,
-                                                     std::string const& tooltip) :
-    m_drive_view(drive_view),
-    m_name(name),
-    m_open_btn("open", std::unique_ptr<juce::Drawable>(juce::Drawable::createFromImageData(binary_data::images::open_png, binary_data::images::open_png_size)), ImageButton::ButtonStyle::ImageFitted),
-    m_kiwi_filetype_img(juce::ImageCache::getFromMemory(binary_data::images::kiwi_filetype_png,
-                                                        binary_data::images::kiwi_filetype_png_size)),
-    m_row(-1)
+                                                     std::string const& tooltip)
+    : m_drive_view(drive_view)
+    , m_name(name)
+    , m_open_btn("open", std::unique_ptr<juce::Drawable>(juce::Drawable::createFromImageData(binary_data::images::open_png, binary_data::images::open_png_size)), ImageButton::ButtonStyle::ImageFitted)
+    , m_kiwi_filetype_img(juce::ImageCache::getFromMemory(binary_data::images::kiwi_filetype_png,
+                                                        binary_data::images::kiwi_filetype_png_size))
     {
         setTooltip(tooltip);
         
-        m_open_btn.setCommand(std::bind(&DriveView::openDocument, &m_drive_view, m_row));
-        m_open_btn.setSize(40, 40);
-        m_open_btn.setTooltip("open this patcher");
-        addChildComponent(m_open_btn);
+        if(!m_drive_view.isShowingTrashedDocuments())
+        {
+            m_open_btn.setCommand(std::bind(&DriveView::openDocument, &m_drive_view, m_row));
+            m_open_btn.setSize(40, 40);
+            m_open_btn.setTooltip("open this patcher");
+            addChildComponent(m_open_btn);
+        }
         
         // label setup
         m_name_label.setText(m_name, juce::NotificationType::dontSendNotification);
@@ -137,35 +139,44 @@ namespace kiwi
         m_name_label.setText(m_name, juce::NotificationType::dontSendNotification);
         
         m_selected = now_selected;
-        m_open_btn.setVisible(m_selected);
+        m_open_btn.setVisible(m_selected && !m_drive_view.isShowingTrashedDocuments());
         repaint();
     }
     
     void DocumentBrowserView::DriveView::RowElem::paint(juce::Graphics& g)
     {
+        const bool is_trash_row = m_drive_view.isShowingTrashedDocuments();
         const auto bounds = getLocalBounds();
-        const juce::Colour bg_color(0xDDFFFFFF);
+        const juce::Colour bg_color(is_trash_row ? 0xDDDDDDDD : 0xDDFFFFFF);
         const juce::Colour selected_color_color(juce::Colours::lightblue);
         
-        g.setColour(m_selected ? selected_color_color : m_mouseover ? bg_color.darker(0.1f) : bg_color);
-        g.fillAll();
+        g.fillAll(((!is_trash_row && m_selected)
+                   ? selected_color_color
+                   : (m_mouseover ? bg_color.darker(0.1f) : bg_color)));
         
-        // document status notifier (connected / disconnected / not-connected)
-        g.setColour(juce::Colours::grey);
-        g.fillRect(0, 0, 5, getHeight());
+        if(!is_trash_row)
+        {
+            // document status notifier (connected / disconnected / not-connected)
+            g.setColour(juce::Colours::grey);
+            g.fillRect(0, 0, 5, getHeight());
+        }
         
         g.setColour(bg_color.darker(0.5f));
         g.drawHorizontalLine(getBottom() - 1, 0., getWidth());
         
         g.drawImage(m_kiwi_filetype_img,
-                    juce::Rectangle<float>(10, 5, 30, 30),
+                    juce::Rectangle<float>(is_trash_row ? 5 : 10, 5, 30, 30),
                     juce::RectanglePlacement::stretchToFit, false);
     }
     
     void DocumentBrowserView::DriveView::RowElem::resized()
     {
         const auto bounds = getLocalBounds();
-        m_open_btn.setBounds(bounds.reduced(5).withLeft(bounds.getWidth() - 40));
+        
+        if(!m_drive_view.isShowingTrashedDocuments())
+        {
+            m_open_btn.setBounds(bounds.reduced(5).withLeft(bounds.getWidth() - 40));
+        }
         m_name_label.setBounds(bounds.reduced(5).withRight(m_open_btn.getX() - 5).withLeft(40));
     }
     
@@ -185,7 +196,7 @@ namespace kiwi
     {
         juce::PopupMenu m;
         
-        if (!m_drive_view.getTrashMode())
+        if (!m_drive_view.isShowingTrashedDocuments())
         {
             m.addItem(1, "Rename");
             m.addItem(2, "Delete");
@@ -354,7 +365,7 @@ namespace kiwi
         
         m_create_document_btn.setCommand([this]()
         {
-            if (!m_drive_view.getTrashMode())
+            if (!m_drive_view.isShowingTrashedDocuments())
                 m_drive_view.createDocument();
         });
         m_create_document_btn.setSize(40, 40);
@@ -370,12 +381,12 @@ namespace kiwi
         
         m_trash_btn.setCommand([this]()
         {
-            bool new_trash_mode = !m_drive_view.getTrashMode();
+            bool new_trash_mode = !m_drive_view.isShowingTrashedDocuments();
             m_drive_view.setTrashMode(new_trash_mode);
             m_trash_btn.setAlpha(new_trash_mode ? 1. : 0.5);
             m_create_document_btn.setAlpha(new_trash_mode ? 0.5 : 1.);
         });
-        m_trash_btn.setAlpha(m_drive_view.getTrashMode() ? 1. : 0.5);
+        m_trash_btn.setAlpha(m_drive_view.isShowingTrashedDocuments() ? 1. : 0.5);
         m_trash_btn.setSize(40, 40);
         m_trash_btn.setTooltip("Display trashed documents");
         addAndMakeVisible(m_trash_btn);
@@ -391,7 +402,7 @@ namespace kiwi
             
             m_create_document_btn.setCommand([this]()
                                              {
-                                                 if (!m_drive_view.getTrashMode())
+                                                 if (!m_drive_view.isShowingTrashedDocuments())
                                                      m_drive_view.createDocument();
                                              });
             m_create_document_btn.setAlpha(1);
@@ -617,7 +628,7 @@ namespace kiwi
         });
     }
     
-    bool DocumentBrowserView::DriveView::getTrashMode() const
+    bool DocumentBrowserView::DriveView::isShowingTrashedDocuments() const
     {
         return m_trash_mode;
     }
@@ -799,6 +810,9 @@ namespace kiwi
     
     void DocumentBrowserView::DriveView::listBoxItemDoubleClicked(int row, juce::MouseEvent const& e)
     {
-        openDocument(row);
+        if (!isShowingTrashedDocuments())
+        {
+            openDocument(row);
+        }
     }
 }

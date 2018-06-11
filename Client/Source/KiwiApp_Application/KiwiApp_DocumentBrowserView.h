@@ -182,7 +182,7 @@ namespace kiwi
         void setTrashMode(bool trash_mode);
         
         //! @brief Get current mode trash or default.
-        bool getTrashMode() const;
+        bool isShowingTrashedDocuments() const;
         
         //! @brief Creates document info tooltip.
         std::string createDocumentToolTip(DocumentBrowser::Drive::DocumentSession const& doc);
@@ -302,7 +302,7 @@ namespace kiwi
         
         const juce::Image   m_kiwi_filetype_img;
         
-        int                 m_row;
+        int                 m_row = -1;
         bool                m_selected;
         bool                m_mouseover = false;
     };
