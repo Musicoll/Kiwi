@@ -60,8 +60,7 @@ namespace kiwi { namespace engine {
                 
                 if(start_ms < end_ms)
                 {
-                    end_sample = std::min(static_cast<int64_t>(end_ms * 0.001 * sf_samplerate),
-                                          sf_frames);
+                    end_sample = std::min<int64_t>(end_ms * 0.001 * sf_samplerate, sf_frames);
                 }
                 
                 int64_t length = end_sample - start_sample;
