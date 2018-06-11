@@ -20,6 +20,7 @@
  */
 
 #include "KiwiApp_Api.h"
+#include <juce_core/juce_core.h>
 
 namespace kiwi
 {
@@ -524,13 +525,14 @@ namespace kiwi
     
     std::string Api::convertDate(std::string const& date)
     {
-        std::string result = date;
+        const bool with_date = true;
+        const bool with_time = true;
+        const bool with_second = false;
+        const bool use_24_hour_clock = true;
         
-        result.replace(result.find_first_of("T"), 1 , " ");
-        result.replace(result.find_first_of("Z"), 1 , " ");
-        result.append("GMT");
-        
-        return result;
+        return (juce::Time::fromISO8601(juce::String(date))
+                .toString(with_date, with_time, with_second, use_24_hour_clock)
+                .toStdString());
     }
     
     bool Api::hasJsonHeader(Response const& res)

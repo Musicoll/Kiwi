@@ -632,14 +632,12 @@ namespace kiwi
     std::string DocumentBrowserView::DriveView::createDocumentToolTip(DocumentBrowser::Drive::DocumentSession const& doc)
     {
         std::string tooltip = "name: " + doc.getName() + "\n"
-        + "created by : " + doc.getAuthor() + "\n"
-        + "created at : " + doc.getCreationDate() + "\n"
-        + "last opened at : " + doc.getOpenedDate() + "\n"
-        + "last opened by : " + doc.getOpenedUser();
+        + "created by: " + doc.getAuthor() + " (" + doc.getCreationDate() + ")\n"
+        + "last opened by: " + doc.getOpenedUser() + " (" + doc.getOpenedDate() + ")";
         
         if (doc.isTrashed())
         {
-            tooltip += "\ntrashed at : " + doc.getTrashedDate();
+            tooltip += "\ntrashed at: " + doc.getTrashedDate();
         }
         
         return tooltip;

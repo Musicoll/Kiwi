@@ -52,7 +52,7 @@ namespace kiwi
         }
         
         setAlwaysOnTop(true);
-        setOpaque(true);
+        setOpaque(false);
         
         if(parent_comp != nullptr)
         {
