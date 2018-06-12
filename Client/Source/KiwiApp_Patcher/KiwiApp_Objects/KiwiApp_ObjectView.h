@@ -48,6 +48,7 @@ namespace kiwi
         
         enum ColourIds
         {
+            Pin =           0x1100003,
             Background =    0x1100004,
             Error =         0x1100005,
             Text =          0x1100006,

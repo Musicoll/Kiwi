@@ -46,7 +46,6 @@ namespace kiwi
         setInterceptsMouseClicks(pv_locked, pv_locked);
         m_object_view->lockStatusChanged(pv_locked);
         
-        initColours();
         updateBoundsFromModel(false);
         
         addChildComponent(m_outline);
@@ -110,7 +109,7 @@ namespace kiwi
     {
         if(!isLocked())
         {
-            g.setColour(findColour(ObjectFrame::ColourIds::Pin));
+            g.setColour(findColour(ObjectView::ColourIds::Pin));
             drawInletsOutlets(g);
         }
     }
@@ -226,14 +225,6 @@ namespace kiwi
         return rect.intersects(bounds) || rect.contains(bounds) || bounds.contains(rect);
     }
     
-    void ObjectFrame::initColours()
-    {
-        setColour(ObjectFrame::ColourIds::Selection, juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.8));
-        setColour(ObjectFrame::ColourIds::SelectionOtherView, juce::Colour(0xAA9BFF71));
-        setColour(ObjectFrame::ColourIds::SelectionDistant, juce::Colour(0xAAFF9B71));
-        setColour(ObjectFrame::ColourIds::Pin, juce::Colour(0.3, 0.3, 0.3));
-    }
-    
     bool ObjectFrame::isSelected() const
     {
         return getPatcherView().isSelected(*this);
@@ -328,34 +319,36 @@ namespace kiwi
         
         if (selected)
         {
-            m_outline.setVisible(true);
-            
-            m_outline.setResizeColour(findColour(ObjectFrame::ColourIds::Selection));
+            m_outline.setResizeColour(findColour(PatcherView::ColourIds::Selection));
             
             if (distant_selected)
             {
-                m_outline.setInnerColour(findColour(ObjectFrame::ColourIds::SelectionDistant));
+                m_outline.setInnerColour(findColour(PatcherView::ColourIds::SelectionOtherUser));
             }
             else if (other_view_selected)
             {
-                m_outline.setInnerColour(findColour(ObjectFrame::ColourIds::SelectionOtherView));
+                m_outline.setInnerColour(findColour(PatcherView::ColourIds::SelectionOtherView));
             }
             else
             {
-                m_outline.setInnerColour(findColour(ObjectFrame::ColourIds::Selection));
+                m_outline.setInnerColour(findColour(PatcherView::ColourIds::Selection));
             }
+            
+            m_outline.setVisible(true);
         }
         else if(distant_selected)
         {
+            const auto color = findColour(PatcherView::ColourIds::SelectionOtherUser);
+            m_outline.setResizeColour(color);
+            m_outline.setInnerColour(color);
             m_outline.setVisible(true);
-            m_outline.setResizeColour(findColour(ObjectFrame::ColourIds::SelectionDistant));
-            m_outline.setInnerColour(findColour(ObjectFrame::ColourIds::SelectionDistant));
         }
         else if (other_view_selected)
         {
+            const auto color = findColour(PatcherView::ColourIds::SelectionOtherView);
+            m_outline.setResizeColour(color);
+            m_outline.setInnerColour(color);
             m_outline.setVisible(true);
-            m_outline.setResizeColour(findColour(ObjectFrame::ColourIds::SelectionOtherView));
-            m_outline.setInnerColour(findColour(ObjectFrame::ColourIds::SelectionOtherView));
         }
         else
         {

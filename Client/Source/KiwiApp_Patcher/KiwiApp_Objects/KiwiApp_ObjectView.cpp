@@ -39,14 +39,6 @@ namespace kiwi
     , m_master(this, [](ObjectView*){})
     {
         object_model.addListener(*this);
-        
-        setColour(ObjectView::ColourIds::Error, juce::Colour::fromRGBA(223, 97, 94, 250));
-        const juce::Colour bgcolor = juce::Colours::white;
-        setColour(ObjectView::ColourIds::Background, bgcolor);
-        setColour(ObjectView::ColourIds::Text, juce::Colours::black);
-        setColour(ObjectView::ColourIds::Outline, bgcolor.contrasting(0.8));
-        setColour(ObjectView::ColourIds::Highlight, juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
-        setColour(ObjectView::ColourIds::Active, juce::Colour(0xff21ba90));
     }
     
     ObjectView::~ObjectView()

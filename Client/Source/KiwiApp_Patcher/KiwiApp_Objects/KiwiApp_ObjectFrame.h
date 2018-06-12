@@ -110,16 +110,6 @@ namespace kiwi
         
     public: // classes
         
-        enum ColourIds
-        {
-            Selection =             0x1100000,
-            SelectionOtherView =    0x1100001,
-            SelectionDistant =      0x1100002,
-            Pin =                   0x1100003
-        };
-        
-    public: // classes
-        
         struct Outline : public juce::Component
         {
         public: // classes
@@ -204,10 +194,6 @@ namespace kiwi
         
         //! @brief Called when the classic view enters its edition mode.
         void editorShown() override final;
-        
-        //! @brief Initializes all colours with default values.
-        //! @todo Set colours in look and feel instead.
-        void initColours();
         
         //! @brief Called to update the bounds of the object.
         void updateBoundsFromModel(bool animate);

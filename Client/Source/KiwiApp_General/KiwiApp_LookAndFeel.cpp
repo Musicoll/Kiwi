@@ -22,6 +22,10 @@
 #include "../KiwiApp_General/KiwiApp_LookAndFeel.h"
 #include "../KiwiApp_Ressources/KiwiApp_BinaryData.h"
 
+#include <KiwiApp_Patcher/KiwiApp_PatcherView.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectView.h>
+#include <KiwiApp_Patcher/KiwiApp_LinkView.h>
+
 namespace bfonts = kiwi::binary_data::fonts;
 
 namespace kiwi
@@ -40,10 +44,11 @@ namespace kiwi
         return tl;
     }
     
-    LookAndFeel::LookAndFeel() : juce::LookAndFeel_V4(getGreyColourScheme())
+    LookAndFeel::LookAndFeel()
+    : juce::LookAndFeel_V4(getGreyColourScheme())
     {
-        setColour(juce::ScrollBar::ColourIds::thumbColourId, juce::Colours::grey.withAlpha(0.7f));
         setUsingNativeAlertWindows(true);
+        initColours();
     }
     
     juce::Typeface::Ptr LookAndFeel::getTypefaceForFont(juce::Font const& font)
@@ -227,11 +232,41 @@ namespace kiwi
                                                    bool isMouseOver, bool isMouseDown,
                                                    juce::ToolbarItemComponent& component)
     {
-        /*
-        if (isMouseDown)
-            g.fillAll(component.findColour (Toolbar::buttonMouseDownBackgroundColourId, true));
-        else if (isMouseOver)
-            g.fillAll(component.findColour (Toolbar::buttonMouseOverBackgroundColourId, true));
-        */
+        // don't draw toolbar button background
+    }
+    
+    void LookAndFeel::initColours()
+    {
+        // ------ Application
+        
+        setColour(juce::ScrollBar::ColourIds::thumbColourId,
+                  juce::Colours::grey.withAlpha(0.7f));
+        
+        // ------ patcherview colors
+        
+        const auto patcherview_bg = juce::Colour::fromFloatRGBA(0.8, 0.8, 0.8, 1.);
+        setColour(PatcherView::ColourIds::BackgroundUnlocked, patcherview_bg);
+        setColour(PatcherView::ColourIds::BackgroundLocked, patcherview_bg);
+        
+        const auto selection_color = juce::Colour::fromFloatRGBA(0., 0.5, 1., 1.);
+        setColour(PatcherView::ColourIds::Selection, selection_color);
+        setColour(PatcherView::ColourIds::SelectionOtherView, selection_color.contrasting(0.4));
+        setColour(PatcherView::ColourIds::SelectionOtherUser, juce::Colour(0xFFFF8C00));
+        
+        // ------ objectbox colors
+        
+        const juce::Colour box_bgcolor = juce::Colours::white;
+        setColour(ObjectView::ColourIds::Pin, juce::Colour(0.3, 0.3, 0.3));
+        setColour(ObjectView::ColourIds::Error, juce::Colour::fromRGBA(223, 97, 94, 250));
+        setColour(ObjectView::ColourIds::Background, box_bgcolor);
+        setColour(ObjectView::ColourIds::Text, juce::Colours::black);
+        setColour(ObjectView::ColourIds::Outline, box_bgcolor.contrasting(0.8));
+        setColour(ObjectView::ColourIds::Highlight, juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
+        setColour(ObjectView::ColourIds::Active, juce::Colour(0xff21ba90));
+        
+        // ------ link colors
+        const auto link_bg = juce::Colour(0.2, 0.2, 0.2);
+        setColour(LinkView::ColourIds::ControlBackground, link_bg);
+        setColour(LinkView::ColourIds::SignalBackground, link_bg);
     }
 }

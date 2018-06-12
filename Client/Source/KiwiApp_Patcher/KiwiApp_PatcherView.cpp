@@ -95,8 +95,9 @@ namespace kiwi
     
     void PatcherView::paint(juce::Graphics & g)
     {
-        const juce::Colour bgcolor = juce::Colour::fromFloatRGBA(0.8, 0.8, 0.8, 1.);
-
+        const auto bgcolor = findColour((isLocked()
+                                         ? PatcherView::ColourIds::BackgroundLocked
+                                         : PatcherView::ColourIds::BackgroundUnlocked));
         if(!isLocked())
         {
             const int grid_size = m_grid_size;

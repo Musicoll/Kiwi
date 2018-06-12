@@ -75,6 +75,9 @@ namespace kiwi
         
     private: // deleted methods
         
+        //! @brief Set the default Application components colors
+        void initColours();
+        
         LookAndFeel(LookAndFeel const& other) = delete;
         LookAndFeel(LookAndFeel && other) = delete;
         LookAndFeel& operator=(LookAndFeel const& other) = delete;
