@@ -31,7 +31,7 @@ namespace kiwi { namespace model {
     
     void SfRecordTilde::declare()
     {
-        auto kiwi_class = std::make_unique<ObjectClass>("sfrecord~", &SfRecordTilde::create);
+        auto kiwi_class = std::make_unique<ObjectClass>("sf.record~", &SfRecordTilde::create);
         
         auto& flip_class = DataModel::declare<SfRecordTilde>()
         .name(kiwi_class->getModelName().c_str())
@@ -69,7 +69,7 @@ namespace kiwi { namespace model {
         {
             if(index == 0)
             {
-                return "open, start, stop recording, Audio Channel 1";
+                return "Audio Channel 1, open a file and start/stop recording";
             }
             else
             {

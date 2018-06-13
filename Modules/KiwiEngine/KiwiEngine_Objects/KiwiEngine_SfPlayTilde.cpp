@@ -28,6 +28,9 @@ namespace kiwi { namespace engine {
     //                                SOUNDFILE PLAYER                                  //
     // ================================================================================ //
     
+    //! @note the SoundFilePlayer class is based on the juce tutorial :
+    // https://docs.juce.com/master/tutorial_playing_sound_files.html
+    
     SoundFilePlayer::SoundFilePlayer()
     : m_buffer()
     , m_audio_source_channel_info(m_buffer)
@@ -64,10 +67,17 @@ namespace kiwi { namespace engine {
                 }
                 
                 int64_t length = end_sample - start_sample;
-                auto susection_reader = new juce::AudioSubsectionReader(reader.release(), start_sample, length, true);
+                auto subsection_reader = new juce::AudioSubsectionReader(reader.release(), start_sample, length, true);
                 
-                auto new_source = std::make_unique<juce::AudioFormatReaderSource>(susection_reader, true);
-                m_transport_source.setSource(new_source.get(), 0, nullptr, susection_reader->sampleRate);
+                auto new_source = std::make_unique<juce::AudioFormatReaderSource>(subsection_reader,
+                                                                                  true);
+                int read_ahead = 0;
+                m_transport_source.setSource(new_source.get(),
+                                             read_ahead,
+                                             nullptr,
+                                             subsection_reader->sampleRate,
+                                             getNumberOfChannels());
+                
                 m_reader_source.reset(new_source.release());
                 setLoop(is_looping);
                 changeState(Starting);
@@ -98,7 +108,7 @@ namespace kiwi { namespace engine {
     
     void SoundFilePlayer::setNumberOfChannels(size_t channels)
     {
-        m_channels = channels > 0 ? channels : m_channels;
+        m_channels = channels > 0 ? channels : 0;
     }
     
     size_t SoundFilePlayer::getNumberOfChannels() const
@@ -239,7 +249,7 @@ namespace kiwi { namespace engine {
     
     void SfPlayTilde::declare()
     {
-        Factory::add<SfPlayTilde>("sfplay~", &SfPlayTilde::create);
+        Factory::add<SfPlayTilde>("sf.play~", &SfPlayTilde::create);
     }
     
     std::unique_ptr<Object> SfPlayTilde::create(model::Object const& model, Patcher & patcher)
@@ -284,26 +294,30 @@ namespace kiwi { namespace engine {
                     openFileDialog();
                 }
             }
-            else if ((args[0].isNumber() && args[0].getInt() == 1)
-                     || args[0].getString() == "start")
+            else if (args[0].isNumber())
             {
-                m_player.start(m_file_to_read);
+                auto num = args[0].getInt();
+                if(num == 1)
+                    m_player.start(m_file_to_read);
+                else if(num == 0)
+                    m_player.stop();
+                else
+                    warning("sf.play~: use 1 to play, 0 to stop");
             }
-            else if ((args[0].isNumber() && args[0].getInt() == 0)
-                     || args[0].getString() == "stop")
-            {
-                m_player.stop();
-            }
-            else if (args[0].getString() == "seek")
+            else if (args[0].getString() == "play")
             {
                 if(args.size() > 1 && args[1].isNumber())
                 {
-                    double start_ms = args[1].getFloat();
-                    double end_ms = ((args.size() > 2 && args[2].isNumber())
-                                     ? args[2].getFloat()
-                                     : -1.);
+                    const double start_ms = args[1].getFloat();
+                    const double end_ms = ((args.size() > 2 && args[2].isNumber())
+                                           ? args[2].getFloat()
+                                           : -1.);
                                      
                     m_player.start(m_file_to_read, start_ms, end_ms);
+                }
+                else
+                {
+                    warning("sf.play~: the \"play\" method requires a start position in ms, pass a second argument to specify the ending position");
                 }
             }
             else if (args[0].getString() == "loop")
@@ -314,7 +328,7 @@ namespace kiwi { namespace engine {
                 }
                 else
                 {
-                    warning("sfplay~: loop message must be followed by 0 or 1");
+                    warning("sf.play~: loop message must be followed by 0 or 1");
                 }
             }
             else if (args[0].getString() == "print")
@@ -340,19 +354,19 @@ namespace kiwi { namespace engine {
         const auto file_path = file.getFullPathName();
         if(!juce::File::isAbsolutePath(file_path))
         {
-            warning("sfplay~: is not an absolute path");
+            warning("sf.play~: is not an absolute path");
             return false;
         }
         
         if(file.isDirectory())
         {
-            warning("sfplay~: invalid file path");
+            warning("sf.play~: invalid file path");
             return false;
         }
         
         if(!file.exists())
         {
-            warning("sfplay~: file doesn't exist \""
+            warning("sf.play~: file doesn't exist \""
                     + file_path.toStdString() + "\"");
             return false;
         }

@@ -31,7 +31,7 @@ namespace kiwi { namespace model {
     
     void SfPlayTilde::declare()
     {
-        auto kiwi_class = std::make_unique<ObjectClass>("sfplay~", &SfPlayTilde::create);
+        auto kiwi_class = std::make_unique<ObjectClass>("sf.play~", &SfPlayTilde::create);
         
         auto& flip_class = DataModel::declare<SfPlayTilde>()
         .name(kiwi_class->getModelName().c_str())
@@ -72,7 +72,7 @@ namespace kiwi { namespace model {
         {
             if(index == 0)
             {
-                return "(msg) Open file, start, stop, int";
+                return "(msg) Open file, 0 to stop, 1 to start";
             }
         }
         else

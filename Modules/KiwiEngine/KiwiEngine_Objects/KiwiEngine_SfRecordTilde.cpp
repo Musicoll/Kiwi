@@ -28,6 +28,7 @@ namespace kiwi { namespace engine {
     //                               SOUNDFILE RECORDER                                 //
     // ================================================================================ //
     
+    //! @note the SoundFileRecorder class is based on the juce Demo App
     SoundFileRecorder::SoundFileRecorder()
     : m_background_thread("SoundFile Recorder Thread")
     {
@@ -55,7 +56,25 @@ namespace kiwi { namespace engine {
         
         // Now create a WAV writer object that writes to our output stream...
         juce::WavAudioFormat wav_format;
-        juce::AudioFormatWriter* writer = wav_format.createWriterFor(file_stream.get(), m_sample_rate, getNumberOfChannels(), 16, {}, 0);
+        
+        const int bit_per_sample = 16;
+        const int quality_option = 0;
+        const juce::StringPairArray metadata {};
+        const int nchan = getNumberOfChannels();
+        auto channel_set = juce::AudioChannelSet::canonicalChannelSet(nchan);
+        
+        if(!wav_format.isChannelLayoutSupported(channel_set))
+        {
+            std::cerr << "channel layout not supported\n";
+            return false;
+        }
+        
+        auto* writer = wav_format.createWriterFor(file_stream.get(),
+                                                  m_sample_rate,
+                                                  channel_set,
+                                                  bit_per_sample,
+                                                  metadata,
+                                                  quality_option);
         
         if (writer == nullptr)
             return false; // abort
@@ -65,9 +84,9 @@ namespace kiwi { namespace engine {
         
         // Now we'll create one of these helper objects which will act as a FIFO buffer, and will
         // write the data to disk on our background thread.
-        m_threaded_writer = std::make_unique<juce::AudioFormatWriter::ThreadedWriter>(writer,
-                                                                                      m_background_thread,
-                                                                                      32768);
+        m_threaded_writer.reset(new juce::AudioFormatWriter::ThreadedWriter(writer,
+                                                                            m_background_thread,
+                                                                            32768));
         
         // And now, swap over our active writer pointer so that the audio callback will start using it..
         const std::lock_guard<std::mutex> lock (m_writer_lock);
@@ -136,7 +155,7 @@ namespace kiwi { namespace engine {
     
     void SfRecordTilde::declare()
     {
-        Factory::add<SfRecordTilde>("sfrecord~", &SfRecordTilde::create);
+        Factory::add<SfRecordTilde>("sf.record~", &SfRecordTilde::create);
     }
     
     std::unique_ptr<Object> SfRecordTilde::create(model::Object const& model, Patcher & patcher)
@@ -163,9 +182,13 @@ namespace kiwi { namespace engine {
             {
                 if(args.size() > 1)
                 {
-                    if(args[0].isString())
+                    if(args[1].isString())
                     {
                         openFile(juce::File(args[1].getString()));
+                    }
+                    else
+                    {
+                        error("sf.record~: bad argument for open");
                     }
                 }
                 else
@@ -173,15 +196,15 @@ namespace kiwi { namespace engine {
                     openFileDialog();
                 }
             }
-            else if ((args[0].isNumber() && args[0].getInt() == 1)
-                     || args[0].getString() == "start")
+            else if (args[0].isNumber())
             {
-                record();
-            }
-            else if ((args[0].isNumber() && args[0].getInt() == 0)
-                     || args[0].getString() == "stop")
-            {
-                stop();
+                auto num = args[0].getInt();
+                if(num == 1)
+                    record();
+                else if(num == 0)
+                    stop();
+                else
+                    warning("sf.record~: use 1 to start recording, 0 to stop");
             }
             else if (args[0].getString() == "record")
             {
@@ -202,13 +225,13 @@ namespace kiwi { namespace engine {
         const auto path = file.getFullPathName();
         if(!juce::File::isAbsolutePath(path))
         {
-            warning("sfrecord~: is not an absolute path");
+            warning("sf.record~: is not an absolute path");
             return false;
         }
         
         if(file.isDirectory())
         {
-            warning("sfrecord~: invalid file path");
+            warning("sf.record~: invalid file path");
             return false;
         }
         
@@ -216,7 +239,7 @@ namespace kiwi { namespace engine {
         
         if(!file.hasWriteAccess())
         {
-            warning("sfrecord~: no write access to file \""
+            warning("sf.record~: no write access to file \""
                     + path.toStdString() + "\"");
             return false;
         }
@@ -234,13 +257,13 @@ namespace kiwi { namespace engine {
         {
             if(!file.create())
             {
-                warning("sfrecord~: can't create file \"" + path.toStdString() + "\"");
+                warning("sf.record~: can't create file \"" + path.toStdString() + "\"");
                 return false;
             }
         }
         else
         {
-            warning("sfrecord~: file will be overwritten \""
+            warning("sf.record~: file will be overwritten \""
                     + path.toStdString() + "\"");
         }
         
