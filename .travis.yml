@@ -46,10 +46,6 @@ matrix:
     script:
       - python ./Scripts/configure.py -coverage
       - python ./Scripts/build.py -c Release
-      - python ./Scripts/build.py -c Debug -t Tests
-
-    after_success:
-      - coveralls -i Modules --gcov-options '\-lp' > /dev/null
 
     before_deploy:
     - mkdir Kiwi
