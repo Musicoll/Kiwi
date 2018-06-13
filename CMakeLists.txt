@@ -49,6 +49,28 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 #--------------------------------------
+# FAUST LLVM PRE_DEFINITIONS
+#--------------------------------------
+
+if(MSVC)
+    set(CMAKE_CXX_FLAGS_RELEASE "/MT"  CACHE STRING  "FORCE CXX FLAGS" FORCE)
+    set(CMAKE_C_FLAGS_RELEASE "/MT"  CACHE STRING  "FORCE C FLAGS" FORCE)
+    set(CMAKE_CXX_FLAGS_DEBUG "/MTd"  CACHE STRING  "FORCE CXX FLAGS" FORCE)
+    set(CMAKE_C_FLAGS_DEBUG "/MTd"  CACHE STRING  "FORCE C FLAGS" FORCE)
+    set(CompilerFlags
+        CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+        CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE)
+    foreach(CompilerFlag ${CompilerFlags})
+      string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+    endforeach()
+endif()
+
+set(USE_LLVM_CONFIG OFF CACHE STRING "Use LLVM CONFIG" FORCE)
+set(LLVM_DIR "./ThirdParty/llvm/lib/cmake/llvm" CACHE STRING "LLVM path"  FORCE)
+message(STATUS ${USE_LLVM_CONFIG})
+message(STATUS ${LLVM_DIR})
+
+#--------------------------------------
 # Compiler Check
 #--------------------------------------
 
@@ -59,10 +81,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # IDE Settings
 #--------------------------------------
 
-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.12)
 set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++14")
 set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
-set(CMAKE_OSX_ARCHITECTURES "i386;x86_64")
 set(CMAKE_SUPPRESS_REGENERATION true)
 
 #--------------------------------------
@@ -326,6 +347,22 @@ endif()
 set(JSON_INCLUDE_DIRS ${ROOT_DIR}/ThirdParty/json)
 
 #----------------------------------
+# LLVM & FAUST
+#----------------------------------
+include(Scripts/FaustLib.cmake)
+
+find_package(LLVM REQUIRED CONFIG)
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+
+add_definitions(${LLVM_DEFINITIONS})
+include_directories(${LLVM_INCLUDE_DIRS})
+llvm_map_components_to_libnames(llvm_libs all)
+list(REMOVE_ITEM llvm_libs LTO)
+
+include_directories(${PROJECT_SOURCE_DIR}/ThirdParty/faust/architecture)
+
+#----------------------------------
 # KiwiTool
 #----------------------------------
 
@@ -394,6 +431,9 @@ add_library(KiwiEngine STATIC ${KIWI_ENGINE_SRC})
 target_include_directories(KiwiEngine PUBLIC ${ROOT_DIR}/Modules)
 target_add_dependency(KiwiEngine KiwiModel)
 target_add_dependency(KiwiEngine KiwiDsp)
+add_dependencies(KiwiEngine staticlib)
+target_link_libraries(KiwiEngine PUBLIC ${llvm_libs})
+target_link_libraries(KiwiEngine PUBLIC staticlib)
 set_target_properties(KiwiEngine PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_ENGINE_SRC}" ${ROOT_DIR}/Modules/KiwiEngine)
 
