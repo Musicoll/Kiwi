@@ -51,6 +51,9 @@ namespace kiwi
         
     private: // methods
         
+        //! @brief Validate the new width and height for the box
+        void validateSize(int& new_width, int& new_height) override;
+        
         void sliderValueChanged(juce::Slider * slider) override final;
         
         void paint(juce::Graphics & g) override final;

@@ -21,8 +21,8 @@
 
 #include <KiwiModel/KiwiModel_Factory.h>
 
+#include <KiwiApp.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ClassicView.h>
-
 #include <KiwiApp_Components/KiwiApp_SuggestEditor.h>
 
 namespace kiwi
@@ -44,7 +44,7 @@ namespace kiwi
                                   findColour(ObjectView::ColourIds::Background));
         
         setColour(ObjectView::ColourIds::Background, bg_colour);
-        setColour(ObjectView::ColourIds::Outline, juce::Colours::transparentBlack);
+        setColour(ObjectView::ColourIds::Outline, bg_colour.contrasting(0.4));
         
         label.setColour(juce::Label::backgroundColourId, bg_colour);
         label.setColour(juce::Label::backgroundWhenEditingColourId, bg_colour);
@@ -66,9 +66,7 @@ namespace kiwi
     
     void ClassicView::paintOverChildren (juce::Graphics& g)
     {
-        g.setColour(findColour(EditableObjectView::ColourIds::Background).contrasting(0.4));
-        g.drawLine(0, 0, getWidth(), 0, 6);
-        g.drawLine(0, getHeight(), getWidth(), getHeight(), 6);
+        drawOutline(g);
     }
     
     void ClassicView::textChanged()

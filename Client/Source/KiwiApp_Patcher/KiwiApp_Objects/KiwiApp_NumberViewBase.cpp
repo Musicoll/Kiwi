@@ -65,8 +65,6 @@ namespace kiwi {
     
     void NumberViewBase::paintOverChildren (juce::Graphics& g)
     {
-        g.setColour (findColour (ObjectView::ColourIds::Outline));
-        
         drawOutline(g);
         drawIcon(g);
     }

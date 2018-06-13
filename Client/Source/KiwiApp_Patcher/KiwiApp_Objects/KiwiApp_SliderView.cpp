@@ -46,7 +46,7 @@ namespace kiwi
                            findColour(ObjectView::ColourIds::Outline));
         
         m_slider.setColour(juce::Slider::ColourIds::trackColourId,
-                           findColour(ObjectView::ColourIds::Active).darker(0.5));
+                           findColour(ObjectView::ColourIds::Active).contrasting(0.2f));
         
         m_slider.setColour(juce::Slider::ColourIds::thumbColourId,
                            findColour(ObjectView::ColourIds::Active));
@@ -63,6 +63,20 @@ namespace kiwi
     SliderView::~SliderView()
     {
         m_slider.removeListener(this);
+    }
+    
+    void SliderView::validateSize(int& new_width, int& new_height)
+    {
+        const int min = 40;
+        const bool vertical = (new_width <= new_height);
+        if(vertical)
+        {
+            new_height = std::max<int>(min, new_height);
+        }
+        else
+        {
+            new_width = std::max<int>(min, new_width);
+        }
     }
     
     void SliderView::declare()

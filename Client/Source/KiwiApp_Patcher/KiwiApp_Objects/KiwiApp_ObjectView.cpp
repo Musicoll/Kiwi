@@ -35,7 +35,6 @@ namespace kiwi
     
     ObjectView::ObjectView(model::Object & object_model)
     : m_model(object_model)
-    , m_border_size(1.5)
     , m_master(this, [](ObjectView*){})
     {
         object_model.addListener(*this);
@@ -95,7 +94,9 @@ namespace kiwi
     
     void ObjectView::drawOutline(juce::Graphics & g)
     {
-        g.drawRect(getOutline(), m_border_size);
+        g.setColour(findColour(ObjectView::ColourIds::Outline));
+        const auto border_size = KiwiApp::useLookAndFeel().getObjectBorderSize();
+        g.drawRect(getOutline().toFloat(), border_size);
     }
     
     void ObjectView::lockStatusChanged(bool is_locked)

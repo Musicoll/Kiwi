@@ -92,27 +92,36 @@ namespace kiwi {
     
     void MessageView::paint(juce::Graphics& g)
     {
-        g.setColour(findColour(EditableObjectView::ColourIds::Background).contrasting(m_active ? 0.1 : 0.));
-        g.fillRoundedRectangle(getLocalBounds().toFloat(), 3.f);
+        const float roundness = 3.f;
+        const float bordersize = 1.f;
+        const auto bounds = getLocalBounds().toFloat().reduced(bordersize*0.5f);
+        const auto bgcolor = findColour(ObjectView::ColourIds::Background);
+        const auto active_color = findColour(ObjectView::ColourIds::Active);
+        const bool clicked = m_active;
         
-        g.setColour(findColour(EditableObjectView::ColourIds::Background).contrasting(0.3));
-        g.drawRoundedRectangle(getLocalBounds().toFloat().reduced(0.5), 3.f, 1.5f);
+        g.setColour(bgcolor.contrasting(clicked ? 0.1 : 0.));
+        g.fillRoundedRectangle(bounds, roundness);
+        
+        g.setColour(clicked ? active_color : bgcolor.contrasting(0.25));
+        g.drawRoundedRectangle(bounds, roundness, bordersize);
     }
     
     void MessageView::paintOverChildren (juce::Graphics& g)
     {
-        g.setColour(findColour(EditableObjectView::ColourIds::Background).contrasting(0.3));
-        auto bounds = getLocalBounds();
+        if(getLabel().isBeingEdited())
+            return; // abort
         
-        if (m_active)
-        {
-            g.setColour(findColour(ObjectView::ColourIds::Active));
-        }
+        g.setColour(m_active
+                    ? findColour(ObjectView::ColourIds::Active)
+                    : findColour(ObjectView::ColourIds::Background).contrasting(0.25));
+        
+        const auto bounds = getLocalBounds();
+        const auto topright = bounds.getTopRight().toFloat();
         
         juce::Path corner;
-        corner.addTriangle(bounds.getTopRight().toFloat() - juce::Point<float>(10, 0),
-                           bounds.getTopRight().toFloat(),
-                           bounds.getTopRight().toFloat() + juce::Point<float>(0, 10));
+        corner.addTriangle(topright.translated(-10.f, 0.f),
+                           topright,
+                           topright.translated(0, 10));
         
         g.fillPath(corner);
     }

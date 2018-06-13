@@ -94,7 +94,7 @@ namespace kiwi
         void schedule(std::function<void()> call_back, tool::Scheduler<>::duration_t delay);
         
         //! @brief Draws the outlines of the object.
-        void drawOutline(juce::Graphics & g);
+        virtual void drawOutline(juce::Graphics & g);
         
         //! @brief Changes one of the data model's attribute.
         void setAttribute(std::string const& name, tool::Parameter const& param);
@@ -118,7 +118,6 @@ namespace kiwi
     private: // members
         
         model::Object&                  m_model;
-        int                             m_border_size;
         std::shared_ptr<ObjectView>     m_master;
         
     private: // deleted methods

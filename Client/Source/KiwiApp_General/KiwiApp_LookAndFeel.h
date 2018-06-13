@@ -24,8 +24,9 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 namespace kiwi
-{   
-    class LookAndFeel final : public juce::LookAndFeel_V4
+{
+    class LookAndFeel
+    : public juce::LookAndFeel_V4
     {
     public: // methods
         
@@ -34,6 +35,9 @@ namespace kiwi
         
         //! @brief Destructor.
         ~LookAndFeel() = default;
+        
+        //! @brief Return the default border size of an object.
+        float getObjectBorderSize() const;
         
         //! @brief Returns the typeface for a certain font name and style.
         //! @details LookAndFeel doesn't cache typeface because juce has its own caching mechanism
@@ -78,9 +82,14 @@ namespace kiwi
         //! @brief Set the default Application components colors
         void initColours();
         
+    private: // variables
+        
+        float m_box_border_size = 1.f;
+        
         LookAndFeel(LookAndFeel const& other) = delete;
         LookAndFeel(LookAndFeel && other) = delete;
         LookAndFeel& operator=(LookAndFeel const& other) = delete;
         LookAndFeel& operator=(LookAndFeel && other) = delete;
     };
 }
+

@@ -30,25 +30,31 @@ namespace bfonts = kiwi::binary_data::fonts;
 
 namespace kiwi
 {
+    LookAndFeel::LookAndFeel()
+    : juce::LookAndFeel_V4(getGreyColourScheme())
+    {
+        setUsingNativeAlertWindows(true);
+        initColours();
+    }
+    
+    float LookAndFeel::getObjectBorderSize() const
+    {
+        return m_box_border_size;
+    }
+    
     juce::TextLayout LookAndFeel::layoutTooltipText(juce::String const& text, juce::Colour colour) noexcept
     {
         const float font_size = 13.0f;
         const int max_width = 400;
         
         juce::AttributedString s;
+        s.setColour(colour);
         s.setJustification(juce::Justification::centred);
         s.append(text, juce::Font(font_size, juce::Font::bold), colour);
         
         juce::TextLayout tl;
         tl.createLayoutWithBalancedLineLengths(s, (float) max_width);
         return tl;
-    }
-    
-    LookAndFeel::LookAndFeel()
-    : juce::LookAndFeel_V4(getGreyColourScheme())
-    {
-        setUsingNativeAlertWindows(true);
-        initColours();
     }
     
     juce::Typeface::Ptr LookAndFeel::getTypefaceForFont(juce::Font const& font)
@@ -261,7 +267,7 @@ namespace kiwi
         setColour(ObjectView::ColourIds::Error, juce::Colour::fromRGBA(223, 97, 94, 250));
         setColour(ObjectView::ColourIds::Background, box_bgcolor);
         setColour(ObjectView::ColourIds::Text, juce::Colours::black);
-        setColour(ObjectView::ColourIds::Outline, box_bgcolor.contrasting(0.8));
+        setColour(ObjectView::ColourIds::Outline, box_bgcolor.contrasting(0.4));
         setColour(ObjectView::ColourIds::Highlight, juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
         setColour(ObjectView::ColourIds::Active, juce::Colour(0xff21ba90));
         
@@ -271,3 +277,4 @@ namespace kiwi
         setColour(LinkView::ColourIds::SignalBackground, patcher_second_color);
     }
 }
+

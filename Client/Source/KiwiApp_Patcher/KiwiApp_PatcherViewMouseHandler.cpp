@@ -237,7 +237,7 @@ namespace kiwi
             constrainer.setFixedAspectRatio(1 / ratio);
         }
         
-        juce::Rectangle<int> limits = m_patcher_view.getBounds();
+        const juce::Rectangle<int> limits {};
         
         juce::Rectangle<int> previous_bounds(model.getX(), model.getY(),
                                              model.getWidth(), model.getHeight());

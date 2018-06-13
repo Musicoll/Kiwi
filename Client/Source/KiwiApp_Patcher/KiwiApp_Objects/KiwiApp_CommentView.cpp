@@ -81,11 +81,11 @@ namespace kiwi {
             // dashed outline
             juce::Path path;
             path.addRectangle(getLocalBounds());
-            const juce::PathStrokeType path_stroke(1.0);
+            const juce::PathStrokeType path_stroke(1.f);
             float const dashed_length[2] {2.f, 2.f};
             path_stroke.createDashedStroke(path, path, dashed_length, 2);
             
-            g.setColour(findColour (ObjectView::ColourIds::Outline).brighter(0.8).withAlpha(0.8f));
+            g.setColour(findColour (ObjectView::ColourIds::Outline));
             g.strokePath(path, path_stroke);
         }
     }

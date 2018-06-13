@@ -24,6 +24,7 @@
 
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_MeterTilde.h>
 
+#include <KiwiApp.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_MeterTildeView.h>
 #include <KiwiApp_Patcher/KiwiApp_Factory.h>
 
@@ -43,60 +44,69 @@ namespace kiwi
         return std::make_unique<MeterTildeView>(model);
     }
     
-    MeterTildeView::MeterTildeView(model::Object & object_model):
-    ObjectView(object_model),
-    m_leds(),
-    m_active_led(-1),
-    m_cold_colour(juce::Colour(0xff04047f)),
-    m_hot_colour(juce::Colour(0xffca2423)),
-    m_border(5),
-    m_padding(1),
-    m_connection(object_model.getSignal<float>(model::MeterTilde::Signal::PeakChanged)
-                 .connect(std::bind(&MeterTildeView::peakChanged, this, std::placeholders::_1)))
+    MeterTildeView::MeterTildeView(model::Object & object_model)
+    : ObjectView(object_model)
+    , m_connection(object_model.getSignal<float>(model::MeterTilde::Signal::PeakChanged)
+                   .connect([this](auto new_peak){ peakChanged(new_peak); }))
     {
-        size_t num_leds = 12;
+        const size_t num_leds = 12;
+        m_leds.resize(num_leds);
         
-        for(int i = 0; i < num_leds; ++i)
+        for(size_t i = 0; i < num_leds; ++i)
         {
-            float min_db = - 3. * (num_leds - (i + 1));
-            
-            m_leds.push_back({min_db,
-                              computeGradientColour(( static_cast<float>(i) / (num_leds - 1))),
-                              juce::Rectangle<int>()});
+            auto& led = m_leds[i];
+            led.min_db = -3.f * (num_leds - (i + 1.f));
+            led.colour = computeGradientColour(static_cast<float>(i) / (num_leds - 1.f));
         }
+        
+        computeActiveLed(-120.f);
     }
     
     MeterTildeView::~MeterTildeView()
+    {}
+    
+    void MeterTildeView::validateSize(int& new_width, int& new_height)
     {
+        const int min = 40;
+        const bool vertical = (new_width <= new_height);
+        if(vertical)
+        {
+            new_height = std::max<int>(min, new_height);
+        }
+        else
+        {
+            new_width = std::max<int>(min, new_width);
+        }
     }
     
     void MeterTildeView::resized()
     {
-        juce::AffineTransform transform;
+        const auto bounds = getLocalBounds().toFloat();
+        const bool vertical = (bounds.getWidth() <= bounds.getHeight());
         
-        if (getHeight() > getWidth())
+        const float num_leds = m_leds.size();
+        const float padding = m_padding;
+        const float sep = m_led_distance;
+        
+        auto space = bounds.reduced(padding, padding);
+        
+        if(vertical)
         {
-            transform = juce::AffineTransform::translation(-getLocalBounds().getCentre());
-            transform = transform.followedBy(juce::AffineTransform(0, -1, 0, 1, 0, 0));
-            transform = transform.followedBy(juce::AffineTransform::translation(getLocalBounds().getCentre()));
+            const auto led_space = (space.getHeight() / num_leds);
+            for(auto& led : m_leds)
+            {
+                led.bounds = (space.removeFromBottom(led_space)
+                              .removeFromTop(led_space - sep));
+            }
         }
-        
-        juce::Rectangle<int> bounds = getLocalBounds().transformedBy(transform);
-        
-        float led_width = (bounds.getWidth() - (m_leds.size() - 1.) * m_padding - 2. * m_border) / m_leds.size();
-        
-        int led_height = bounds.getHeight() - 2 * m_border;
-        
-        int led_y = bounds.getY() + (bounds.getHeight() / 2.) - (led_height / 2.);
-        
-        for(int i = 0; i < m_leds.size(); ++i)
+        else
         {
-            juce::Rectangle<int> led_bounds(bounds.getX() + m_border + (i + 1) * m_padding + i * led_width,
-                                            led_y,
-                                            led_width,
-                                            led_height);
-            
-            m_leds[i].m_bounds = led_bounds.transformedBy(transform.inverted());
+            const auto led_space = (space.getWidth() / num_leds);
+            for(auto& led : m_leds)
+            {
+                led.bounds = (space.removeFromLeft(led_space)
+                              .removeFromLeft(led_space - sep));
+            }
         }
     }
     
@@ -122,7 +132,7 @@ namespace kiwi
     {
         auto it = std::find_if(m_leds.rbegin(), m_leds.rend(), [peak_db](Led const& led)
         {
-            return peak_db >= led.m_min_db;
+            return peak_db >= led.min_db;
         });
         
         m_active_led = it != m_leds.rend() ? m_leds.rend() - (it + 1) : -1;
@@ -132,7 +142,7 @@ namespace kiwi
     {
         defer([this, new_peak]()
         {
-            float peak_db = 20 * log10(new_peak);
+            float peak_db = 20. * log10(new_peak);
             computeActiveLed(peak_db);
             repaint();
         });
@@ -141,21 +151,25 @@ namespace kiwi
     void MeterTildeView::paint(juce::Graphics & g)
     {
         g.fillAll(findColour(ObjectView::ColourIds::Background));
+        const auto led_border_size = 0.5f;
+        const auto outline_color = findColour(ObjectView::ColourIds::Outline);
         
-        for(int i = 0; i < m_leds.size(); ++i)
+        for(int i = 0; i < m_leds.size(); i++)
         {
-            g.setColour(findColour(ObjectView::ColourIds::Outline));
-            g.drawRect(m_leds[i].m_bounds.toFloat(), 1);
-
+            const auto& led = m_leds[i];
             if (i <= m_active_led)
             {
-                g.setColour(m_leds[i].m_colour);
-                g.fillRect(m_leds[i].m_bounds.reduced(1).toFloat());
+                g.setColour(led.colour);
+                g.fillRect(led.bounds);
+            }
+            else
+            {
+                g.setColour(outline_color);
+                g.drawRect(led.bounds, led_border_size);
             }
         }
         
-        g.setColour(findColour(ObjectView::ColourIds::Outline));
-        
+        g.setColour(outline_color);
         drawOutline(g);
     }
 }
