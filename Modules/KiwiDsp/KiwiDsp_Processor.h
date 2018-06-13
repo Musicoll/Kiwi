@@ -30,7 +30,7 @@ namespace kiwi
         class Chain;
         
         // ==================================================================================== //
-        //                                    PERFORM CALL BACKC                                //
+        //                                    PERFORM CALL BACK                                 //
         // ==================================================================================== //
         
         //! @brief Pure virtual interface that defines a perform function to be implemented by child classes.
