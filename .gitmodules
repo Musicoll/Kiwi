@@ -10,3 +10,6 @@
 [submodule "ThirdParty/kiwi-node-server"]
 	path = ThirdParty/kiwi-node-server
 	url = https://github.com/Musicoll/kiwi-node-server.git
+[submodule "ThirdParty/faust"]
+	path = ThirdParty/faust
+	url = https://github.com/grame-cncm/faust.git
