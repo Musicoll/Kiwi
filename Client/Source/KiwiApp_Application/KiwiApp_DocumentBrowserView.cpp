@@ -199,7 +199,7 @@ namespace kiwi
         if (!m_drive_view.isShowingTrashedDocuments())
         {
             m.addItem(1, "Rename");
-            m.addItem(2, "Delete");
+            m.addItem(2, "Move to trash");
             m.addItem(10, "Upload");
             m.addItem(11, "Duplicate");
         }
