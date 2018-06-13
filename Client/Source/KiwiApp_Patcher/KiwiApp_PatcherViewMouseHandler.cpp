@@ -83,7 +83,9 @@ namespace kiwi
             }
             case Action::CreateLink:
             {
-                ObjectFrame & object = *hit_tester.getObject();
+                m_patcher_view.unselectAll();
+                
+                auto& object = *hit_tester.getObject();
                 
                 const size_t index = hit_tester.getIndex();
                 

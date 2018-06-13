@@ -28,29 +28,48 @@ namespace kiwi
     // ================================================================================ //
     //                                   LINK VIEW BASE                                 //
     // ================================================================================ //
-
+    
     void LinkViewBase::updateBounds()
     {
-        const juce::Rectangle<int> link_bounds(m_last_outlet_pos, m_last_inlet_pos);
+        const auto inlet = m_last_inlet_pos;
+        const auto outlet = m_last_outlet_pos;
+        const juce::Rectangle<int> link_bounds(outlet, inlet);
         
-        const juce::Point<int> local_inlet_pos(m_last_inlet_pos );
-        const juce::Point<int> local_outlet_pos(m_last_outlet_pos);
-        
-        const juce::Point<float> start_point = local_outlet_pos.translated(0.f, 2.f).toFloat();
-        const juce::Point<float> end_point = local_inlet_pos.translated(0.f, -1.f).toFloat();
-        
-        const float max_shift = std::min(link_bounds.getWidth(), link_bounds.getHeight());
-        const float shift = (max_shift < 10) ? max_shift * 0.2 : (max_shift * 0.5);
-        
-        const juce::Point<float> ctrl_pt1 { start_point.x, static_cast<float>(start_point.y + shift) };
-        const juce::Point<float> ctrl_pt2 { end_point.x, static_cast<float>(end_point.y - shift) };
+        juce::Point<float> start = outlet.translated(0.f, 2.f).toFloat();
+        juce::Point<float> end = inlet.translated(0.f, -1.f).toFloat();
         
         juce::Path path;
-        path.startNewSubPath(start_point.x, start_point.y);
-        path.cubicTo(ctrl_pt1, ctrl_pt2, end_point);
+        
+        if(link_bounds.getWidth() == 0)
+        {
+            path.startNewSubPath(start.x, start.y);
+            path.lineTo(end.x, end.y);
+        }
+        else
+        {
+            const float width = link_bounds.getWidth();
+            const float height = link_bounds.getHeight();
+            
+            const float min = std::min<float>(width, height);
+            const float max = std::max<float>(width, height);
+            
+            const float max_shift_y = 20.f;
+            const float max_shift_x = 20.f;
+            
+            const float shift_y = std::min<float>(max_shift_y, max * 0.5);
+            
+            const float shift_x = ((start.y >= end.y)
+                                   ? std::min<float>(max_shift_x, min * 0.5)
+                                   : 0.f) * ((start.x < end.x) ? -1. : 1.);
+            
+            const juce::Point<float> ctrl_pt1 { start.x - shift_x, start.y + shift_y };
+            const juce::Point<float> ctrl_pt2 { end.x + shift_x, end.y - shift_y };
+            
+            path.startNewSubPath(start);
+            path.cubicTo(ctrl_pt1, ctrl_pt2, end);
+        }
         
         setBounds(path.getBounds().toNearestInt().expanded(2, 2));
-        
         path.applyTransform(juce::AffineTransform::translation(-1 * getX(), -1 * getY()));
         m_path = path;
     }
@@ -59,9 +78,9 @@ namespace kiwi
     //                                     LINK VIEW                                    //
     // ================================================================================ //
     
-    LinkView::LinkView(PatcherView& patcherview, model::Link& link_m) :
-    m_patcherview(patcherview),
-    m_model(&link_m)
+    LinkView::LinkView(PatcherView& patcherview, model::Link& link_m)
+    : m_patcherview(patcherview)
+    , m_model(&link_m)
     {
         auto& sender_object_m = m_model->getSenderObject();
         auto& receiver_object_m = m_model->getReceiverObject();
@@ -99,9 +118,14 @@ namespace kiwi
         }
     }
     
+    model::Link& LinkView::getModel() const
+    {
+        return *m_model;
+    }
+    
     bool LinkView::isSelected() const noexcept
     {
-        return m_is_selected;
+        return m_selected.on_this_view;
     }
     
     void LinkView::linkChanged(model::Link& link)
@@ -116,32 +140,68 @@ namespace kiwi
     
     void LinkView::localSelectionChanged(bool selected)
     {
-        if(m_is_selected != selected)
+        if(m_selected.on_this_view != selected)
         {
-            m_is_selected = selected;
+            m_selected.on_this_view = selected;
             repaint();
         }
     }
     
     void LinkView::distantSelectionChanged(std::set<uint64_t> distant_user_id_selection)
     {
-        m_distant_selection = distant_user_id_selection;
-        repaint();
+        const bool was_selected_in_another_view = m_selected.in_another_view;
+        const bool was_selected_by_another_user = m_selected.by_another_user;
+        
+        bool should_repaint = false;
+        if(distant_user_id_selection.empty())
+        {
+            should_repaint = (was_selected_in_another_view || was_selected_by_another_user);
+            m_selected.in_another_view = false;
+            m_selected.by_another_user = false;
+        }
+        else
+        {
+            const auto user_id = KiwiApp::userID();
+            for(auto distant_user_id : distant_user_id_selection)
+            {
+                if(distant_user_id == user_id)
+                {
+                    m_selected.in_another_view = true;
+                }
+                else
+                {
+                    m_selected.by_another_user = true;
+                }
+                
+                if(m_selected.in_another_view && m_selected.by_another_user)
+                {
+                    break;
+                }
+            }
+            
+            should_repaint = ((was_selected_in_another_view != m_selected.in_another_view)
+                              || (was_selected_in_another_view != m_selected.by_another_user));
+        }
+        
+        if(should_repaint)
+        {
+            repaint();
+        }
     }
     
-    void LinkView::componentMovedOrResized(Component& component, bool /*was_moved*/, bool /*was_resized*/)
+    void LinkView::componentMovedOrResized(Component& component,
+                                           bool /*was_moved*/, bool /*was_resized*/)
     {
-        ObjectFrame* jbox = dynamic_cast<ObjectFrame*>(&component);
-        if(jbox)
+        if(auto* box = dynamic_cast<ObjectFrame*>(&component))
         {
-            if(&jbox->getModel() == &m_model->getSenderObject())
+            if(&box->getModel() == &m_model->getSenderObject())
             {
-                m_last_outlet_pos = jbox->getOutletPatcherPosition(m_model->getSenderIndex());
+                m_last_outlet_pos = box->getOutletPatcherPosition(m_model->getSenderIndex());
                 updateBounds();
             }
-            else if(&jbox->getModel() == &m_model->getReceiverObject())
+            else if(&box->getModel() == &m_model->getReceiverObject())
             {
-                m_last_inlet_pos = jbox->getInletPatcherPosition(m_model->getReceiverIndex());
+                m_last_inlet_pos = box->getInletPatcherPosition(m_model->getReceiverIndex());
                 updateBounds();
             }
         }
@@ -154,35 +214,47 @@ namespace kiwi
     
     void LinkView::paint(juce::Graphics & g)
     {
-        const juce::Colour link_color = isSignal() ?
-                                        juce::Colour::fromFloatRGBA(0.2, 0.8, 0.2, 1.) :
-                                        juce::Colour::fromFloatRGBA(0.2, 0.2, 0.2, 1.);
+        const bool selected_by_other = (m_selected.by_another_user
+                                        || m_selected.in_another_view);
         
-        const juce::Colour selection_color = juce::Colour::fromFloatRGBA(0., 0.5, 1., 1.);
-        const juce::Colour other_view_selected_color = juce::Colour::fromFloatRGBA(0.8, 0.3, 0.3, 1.);
-        const juce::Colour distant_selected_color(0xAAFF9B71);
+        const float stroke = (isSignal() ? 2.f : 1.f);
         
-        const bool selected = m_is_selected;
-        const bool other_selected = ! m_distant_selection.empty();
-        const bool other_view_selected = (other_selected &&
-                                          m_distant_selection.find(KiwiApp::userID())
-                                          != m_distant_selection.end());
-        
-        const bool distant_selected = ((other_selected && (other_view_selected && m_distant_selection.size() > 1))
-                                       || (other_selected && !other_view_selected));
-        
-        g.setColour(link_color);
-        g.strokePath(m_path, juce::PathStrokeType(2.f));
-        
-        juce::Colour inner_color = link_color.contrasting(0.4);
-        
-        if(selected || other_view_selected || distant_selected)
+        juce::Colour bgcolor;
+        if(m_selected.on_this_view)
         {
-            inner_color = selected ? selection_color : other_view_selected ? other_view_selected_color : distant_selected_color;
+            bgcolor = findColour(PatcherView::ColourIds::Selection);
+        }
+        else if (m_selected.by_another_user)
+        {
+            bgcolor = findColour(PatcherView::ColourIds::SelectionOtherUser);
+        }
+        else if (m_selected.in_another_view)
+        {
+            bgcolor = findColour(PatcherView::ColourIds::SelectionOtherView);
+        }
+        else
+        {
+            bgcolor = findColour(isSignal()
+                                 ? LinkView::ColourIds::SignalBackground
+                                 : LinkView::ColourIds::ControlBackground);
         }
         
-        g.setColour(inner_color);
-        g.strokePath(m_path, juce::PathStrokeType(1.f));
+        g.setColour(bgcolor);
+        g.strokePath(m_path, juce::PathStrokeType(stroke));
+        
+        if(m_selected.on_this_view && selected_by_other)
+        {
+            g.setColour(findColour(m_selected.by_another_user
+                                   ? PatcherView::ColourIds::SelectionOtherUser
+                                   : PatcherView::ColourIds::SelectionOtherView)
+                        .withAlpha(1.f));
+            
+            juce::Path path;
+            const juce::PathStrokeType path_stroke(stroke * 0.5);
+            float const dashed_length[2] {10.f, 10.f};
+            path_stroke.createDashedStroke(path, m_path, dashed_length, 2);
+            g.strokePath(path, path_stroke);
+        }
     }
     
     bool LinkView::hitTest(juce::Point<int> const& pt, HitTester& hit) const

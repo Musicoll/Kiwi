@@ -256,7 +256,8 @@ namespace kiwi
         // ------ objectbox colors
         
         const juce::Colour box_bgcolor = juce::Colours::white;
-        setColour(ObjectView::ColourIds::Pin, juce::Colour(0.3, 0.3, 0.3));
+        const juce::Colour patcher_second_color = juce::Colour(0xff444444);
+        setColour(ObjectView::ColourIds::Pin, patcher_second_color);
         setColour(ObjectView::ColourIds::Error, juce::Colour::fromRGBA(223, 97, 94, 250));
         setColour(ObjectView::ColourIds::Background, box_bgcolor);
         setColour(ObjectView::ColourIds::Text, juce::Colours::black);
@@ -265,8 +266,8 @@ namespace kiwi
         setColour(ObjectView::ColourIds::Active, juce::Colour(0xff21ba90));
         
         // ------ link colors
-        const auto link_bg = juce::Colour(0.2, 0.2, 0.2);
-        setColour(LinkView::ColourIds::ControlBackground, link_bg);
-        setColour(LinkView::ColourIds::SignalBackground, link_bg);
+        
+        setColour(LinkView::ColourIds::ControlBackground, patcher_second_color);
+        setColour(LinkView::ColourIds::SignalBackground, patcher_second_color);
     }
 }
