@@ -16,9 +16,11 @@ install:
     - set PATH=C:\Python27;%PATH%
     - cd %APPVEYOR_BUILD_FOLDER%
     - if "%APPVEYOR_REPO_BRANCH%"=="master" (set KIWI_DEPLOY=release) else (set KIWI_DEPLOY=draft)
-    - curl -L https://github.com/pierreguillot/llvm-win/releases/download/v6.0.0/llvm-windows-x64-mt.zip -o ThirdParty/llvm.zip
-    - 7z x ThirdParty/llvm.zip
-    - rename ThirdParty/llvm-windows-x64-mt ThirdParty/llvm
+    - cd %APPVEYOR_BUILD_FOLDER%/ThirdParty
+    - curl -L https://github.com/pierreguillot/llvm-win/releases/download/v6.0.0/llvm-windows-x64-mt.zip -o llvm.zip
+    - 7z x llvm.zip
+    - rename llvm-windows-x64-mt llvm
+    - cd %APPVEYOR_BUILD_FOLDER%
 
 build_script:
     - python .\Scripts\configure.py -c %CONFIGURATION% -p %PLATFORM%
