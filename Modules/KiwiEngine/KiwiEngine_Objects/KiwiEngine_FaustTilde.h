@@ -44,26 +44,33 @@ namespace kiwi { namespace engine {
         
         ~FaustTilde();
         
-        void receive(size_t index, std::vector<tool::Atom> const& args) final {}
+        void receive(size_t index, std::vector<tool::Atom> const& args) final;
         
         void prepare(dsp::Processor::PrepareInfo const& infos) final;
-        
+
     private:
         static std::string getName(model::Object const& model);
         static std::vector<std::string> getOptions(model::Object const& model);
         
-        void deleteFactory();
-        void deleteInstance();
         void createFactory();
         void createInstance();
         void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
         
-        const std::string m_name;
-        const std::vector<std::string> m_options;
-        llvm_dsp_factory* m_factory  = nullptr;
-        llvm_dsp*         m_instance = nullptr;
-        std::vector<dsp::sample_t*> m_inputs;
-        std::vector<dsp::sample_t*> m_outputs;
+        struct nop
+        {
+            template <typename T>
+            void operator() (T const &) const noexcept { }
+        };
+        
+        class UIGlue;
+        
+        std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>  m_factory;
+        std::unique_ptr<llvm_dsp, nop>      m_instance;
+        std::unique_ptr<UIGlue>             m_ui_glue;
+        std::vector<dsp::sample_t*>         m_inputs;
+        std::vector<dsp::sample_t*>         m_outputs;
+        const std::string                   m_name;
+        const std::vector<std::string>      m_options;
         
         static std::string const m_folder;
     };
