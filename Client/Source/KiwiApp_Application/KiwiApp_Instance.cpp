@@ -125,8 +125,8 @@ namespace kiwi
                                                                "User logged out",
                                                                "Do you want to continue editing document \""
                                                                + (*manager)->getDocumentName() +"\" offline",
-                                                               "Ok",
-                                                               "Cancel");
+                                                               "Yes",
+                                                               "No");
                 
                 if (!keep_patcher)
                 {

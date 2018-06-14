@@ -47,7 +47,7 @@ namespace kiwi
     MeterTildeView::MeterTildeView(model::Object & object_model)
     : ObjectView(object_model)
     , m_connection(object_model.getSignal<float>(model::MeterTilde::Signal::PeakChanged)
-                   .connect([this](auto new_peak){ peakChanged(new_peak); }))
+                   .connect([this](float new_peak){ peakChanged(new_peak); }))
     {
         const size_t num_leds = 12;
         m_leds.resize(num_leds);
