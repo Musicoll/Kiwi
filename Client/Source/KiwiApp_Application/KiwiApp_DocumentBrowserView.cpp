@@ -33,6 +33,8 @@
 #include "../KiwiApp_Ressources/KiwiApp_BinaryData.h"
 #include "../KiwiApp.h"
 
+#include <juce_gui_basics/juce_gui_basics.h>
+
 namespace kiwi
 {
     // ================================================================================ //
@@ -177,6 +179,7 @@ namespace kiwi
         {
             m_open_btn.setBounds(bounds.reduced(5).withLeft(bounds.getWidth() - 40));
         }
+        
         m_name_label.setBounds(bounds.reduced(5).withRight(m_open_btn.getX() - 5).withLeft(40));
     }
     
@@ -368,53 +371,46 @@ namespace kiwi
             if (!m_drive_view.isShowingTrashedDocuments())
                 m_drive_view.createDocument();
         });
+        
         m_create_document_btn.setSize(40, 40);
-        m_create_document_btn.setTooltip("Create a new patcher on this drive");
-        m_create_document_btn.setColour(ImageButton::ColourIds::textColourId, juce::Colours::whitesmoke);
+        m_create_document_btn.setTooltip("Create a new hosted patcher");
         addAndMakeVisible(m_create_document_btn);
         
-        m_refresh_btn.setCommand([this](){m_drive_view.refresh();});
+        m_refresh_btn.setCommand([this](){
+            m_drive_view.refresh();
+        });
+        
         m_refresh_btn.setSize(40, 40);
-        m_refresh_btn.setTooltip("Refresh Document list");
-        m_refresh_btn.setColour(ImageButton::ColourIds::textColourId, juce::Colours::whitesmoke);
+        m_refresh_btn.setTooltip("Refresh list");
         addAndMakeVisible(m_refresh_btn);
         
         m_trash_btn.setCommand([this]()
         {
-            bool new_trash_mode = !m_drive_view.isShowingTrashedDocuments();
-            m_drive_view.setTrashMode(new_trash_mode);
-            m_trash_btn.setAlpha(new_trash_mode ? 1. : 0.5);
-            m_create_document_btn.setAlpha(new_trash_mode ? 0.5 : 1.);
+            const bool was_in_trash_mode = m_drive_view.isShowingTrashedDocuments();
+            const bool is_in_trash_mode = !was_in_trash_mode;
+            m_drive_view.setTrashMode(is_in_trash_mode);
+            m_trash_btn.setTooltip(juce::String(is_in_trash_mode ? "Hide" : "Show")
+                                   + " trashed documents");
+            
+            m_create_document_btn.setEnabled(!is_in_trash_mode);
+            m_trash_btn.setToggleState(is_in_trash_mode,
+                                       juce::NotificationType::dontSendNotification);
         });
-        m_trash_btn.setAlpha(m_drive_view.isShowingTrashedDocuments() ? 1. : 0.5);
+        
+        m_trash_btn.setToggleState(m_drive_view.isShowingTrashedDocuments(),
+                                   juce::NotificationType::dontSendNotification);
+        
         m_trash_btn.setSize(40, 40);
         m_trash_btn.setTooltip("Display trashed documents");
         addAndMakeVisible(m_trash_btn);
-        
     }
     
     void DocumentBrowserView::DriveView::Header::enablementChanged()
     {
-        if (isEnabled())
-        {
-            m_refresh_btn.setCommand([this](){m_drive_view.refresh();});
-            m_refresh_btn.setAlpha(1);
-            
-            m_create_document_btn.setCommand([this]()
-                                             {
-                                                 if (!m_drive_view.isShowingTrashedDocuments())
-                                                     m_drive_view.createDocument();
-                                             });
-            m_create_document_btn.setAlpha(1);
-        }
-        else
-        {
-            m_refresh_btn.setCommand([](){});
-            m_refresh_btn.setAlpha(0.5);
-            
-            m_create_document_btn.setCommand([](){});
-            m_create_document_btn.setAlpha(0.5);
-        }
+        const bool enabled = isEnabled();
+        m_create_document_btn.setEnabled(enabled);
+        m_refresh_btn.setEnabled(enabled);
+        m_trash_btn.setEnabled(enabled);
     }
     
     void DocumentBrowserView::DriveView::Header::resized()
@@ -595,7 +591,19 @@ namespace kiwi
     
     void DocumentBrowserView::DriveView::createDocument()
     {
-        m_drive.createNewDocument();
+        juce::AlertWindow alert("Create a new hosted Patcher", "name:",
+                                juce::AlertWindow::AlertIconType::NoIcon);
+        
+        alert.addButton("Cancel", 0);
+        alert.addButton("Ok", 1);
+        alert.addTextEditor("title", "Untitled");
+
+        if(alert.runModalLoop())
+        {
+            auto& text_editor = *alert.getTextEditor("title");
+            auto text = text_editor.getText();
+            m_drive.createNewDocument(text.toStdString());
+        }
     }
     
     void DocumentBrowserView::DriveView::setTrashMode(bool trash_mode)
@@ -810,9 +818,6 @@ namespace kiwi
     
     void DocumentBrowserView::DriveView::listBoxItemDoubleClicked(int row, juce::MouseEvent const& e)
     {
-        if (!isShowingTrashedDocuments())
-        {
-            openDocument(row);
-        }
+        openDocument(row);
     }
 }
