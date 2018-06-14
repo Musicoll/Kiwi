@@ -29,15 +29,13 @@ matrix:
     - sudo apt-get install libgtk-3-dev
     - sudo apt-get install libwebkit2gtk-4.0-dev
 
-
     addons:
       apt:
         sources: ['ubuntu-toolchain-r-test']
         packages: [g++-4.9, 'python-pip', 'python-yaml', 'libssl1.0.0']
 
     install:
-      # make sure CXX is correctly set
-      - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
+      - export CXX=g++-4.9 # make sure CXX is correctly set
       - git submodule update --init --recursive ThirdParty/Juce ThirdParty/concurrentqueue ThirdParty/Beast ThirdParty/faust
       - pip install --user cpp-coveralls
       - curl -o ./ThirdParty/llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
@@ -58,38 +56,6 @@ matrix:
     - mkdir Kiwi_Server
     - mv Build/Release/KiwiBuild/Server Kiwi_Server/Server
     - tar zcvf Kiwi_Server_linux.tar.gz Kiwi_Server/
-
-    deploy:
-      provider: releases
-      api_key:
-        secure: atcBDMdJNzUGiUYSqQu/URg8mfvRk9b78tvj1eHKCeDXSTP0Y1UvI5YpmTx8SkUXp23QH4sgp0tKTFB98FbRojR4IL2NW+KZDG1o5BxZ4HYJ4hdCXXXhzeujcn2AjQzRJ9f8uodX/7Pfa19jGlovj1Tl9ZJ9jIfyyvcxlJXkTN9+CDlkkcpLNU64c4B+CclS8aLPbIKqvLmIy3fphzzkJoKN5rnE4EvKrIkJBPEib1WIY8K7W8boCwghsGBs04MwRZwidKIjPSPgbYpmGPspfKpu0W8mKMirdGEVt4rzpm+Dl9wMa/5Qsyc6afYfS4p3PZOfBio0mtVrPz4+4VXy/Ad+FDNnvxUy9776D0pSv2iBrdHhqs6n1vG0uT4uhbGtvwJR3BBbo6+TmEKakRgp+uRhYEvGy/EO0OkcKrOVLsrZ/akj8O+KOSROrz2VYfxmDTxtUi8K51vW3pJhcGsEsN1FkcJfef/pvxGLK5i0qEZWoyCyA4YMPNDWFFiuBadPTujIGJ/iDmwouzalV9F0vKOIFvP9IuZ1FHLOyEzhyoBS3l1NNpQUz+HNgupTVYSREH1qPXUHg3B5BdFpEJpOjU/P8gwG4npcNxX/5XvigFFiTeEN+eV4xcBVLcg+SsumeswIqi5Tvm+mzYyqz3wj628ddWxgGiPFSfySI4tz6lg=
-      file:
-      - Kiwi_linux.tar.gz
-      - Kiwi_Server_linux.tar.gz
-      skip_cleanup: true
-      draft: true
-      prerelease: false
-      on:
-        repo: Musicoll/Kiwi
-        tags: true
-        branch: master
-
-    deploy:
-      provider: releases
-      api_key:
-        secure: atcBDMdJNzUGiUYSqQu/URg8mfvRk9b78tvj1eHKCeDXSTP0Y1UvI5YpmTx8SkUXp23QH4sgp0tKTFB98FbRojR4IL2NW+KZDG1o5BxZ4HYJ4hdCXXXhzeujcn2AjQzRJ9f8uodX/7Pfa19jGlovj1Tl9ZJ9jIfyyvcxlJXkTN9+CDlkkcpLNU64c4B+CclS8aLPbIKqvLmIy3fphzzkJoKN5rnE4EvKrIkJBPEib1WIY8K7W8boCwghsGBs04MwRZwidKIjPSPgbYpmGPspfKpu0W8mKMirdGEVt4rzpm+Dl9wMa/5Qsyc6afYfS4p3PZOfBio0mtVrPz4+4VXy/Ad+FDNnvxUy9776D0pSv2iBrdHhqs6n1vG0uT4uhbGtvwJR3BBbo6+TmEKakRgp+uRhYEvGy/EO0OkcKrOVLsrZ/akj8O+KOSROrz2VYfxmDTxtUi8K51vW3pJhcGsEsN1FkcJfef/pvxGLK5i0qEZWoyCyA4YMPNDWFFiuBadPTujIGJ/iDmwouzalV9F0vKOIFvP9IuZ1FHLOyEzhyoBS3l1NNpQUz+HNgupTVYSREH1qPXUHg3B5BdFpEJpOjU/P8gwG4npcNxX/5XvigFFiTeEN+eV4xcBVLcg+SsumeswIqi5Tvm+mzYyqz3wj628ddWxgGiPFSfySI4tz6lg=
-      file:
-      - Kiwi_linux.tar.gz
-      - Kiwi_Server_linux.tar.gz
-      skip_cleanup: true
-      draft: true
-      prerelease: false
-      name: ${TRAVIS_TAG}
-      tag_name: ${TRAVIS_TAG}
-      on:
-        repo: Musicoll/Kiwi
-        tags: true
-        condition: $TRAVIS_BRANCH != "master"
 
   - os: osx
     compiler: clang++
@@ -120,34 +86,34 @@ matrix:
     - mv Build/Release/KiwiBuild/Release/Server Kiwi_Server/Server
     - zip -r Kiwi_Server_macos.zip Kiwi_Server
 
-    deploy:
-      provider: releases
-      api_key:
-        secure: atcBDMdJNzUGiUYSqQu/URg8mfvRk9b78tvj1eHKCeDXSTP0Y1UvI5YpmTx8SkUXp23QH4sgp0tKTFB98FbRojR4IL2NW+KZDG1o5BxZ4HYJ4hdCXXXhzeujcn2AjQzRJ9f8uodX/7Pfa19jGlovj1Tl9ZJ9jIfyyvcxlJXkTN9+CDlkkcpLNU64c4B+CclS8aLPbIKqvLmIy3fphzzkJoKN5rnE4EvKrIkJBPEib1WIY8K7W8boCwghsGBs04MwRZwidKIjPSPgbYpmGPspfKpu0W8mKMirdGEVt4rzpm+Dl9wMa/5Qsyc6afYfS4p3PZOfBio0mtVrPz4+4VXy/Ad+FDNnvxUy9776D0pSv2iBrdHhqs6n1vG0uT4uhbGtvwJR3BBbo6+TmEKakRgp+uRhYEvGy/EO0OkcKrOVLsrZ/akj8O+KOSROrz2VYfxmDTxtUi8K51vW3pJhcGsEsN1FkcJfef/pvxGLK5i0qEZWoyCyA4YMPNDWFFiuBadPTujIGJ/iDmwouzalV9F0vKOIFvP9IuZ1FHLOyEzhyoBS3l1NNpQUz+HNgupTVYSREH1qPXUHg3B5BdFpEJpOjU/P8gwG4npcNxX/5XvigFFiTeEN+eV4xcBVLcg+SsumeswIqi5Tvm+mzYyqz3wj628ddWxgGiPFSfySI4tz6lg=
-      file:
-      - Kiwi_macos.zip
-      - Kiwi_Server_macos.zip
-      skip_cleanup: true
-      draft: true
-      prerelease: false
-      on:
-        repo: Musicoll/Kiwi
-        tags: true
-        branch: master
+deploy:
+  provider: releases
+  api_key:
+    secure: atcBDMdJNzUGiUYSqQu/URg8mfvRk9b78tvj1eHKCeDXSTP0Y1UvI5YpmTx8SkUXp23QH4sgp0tKTFB98FbRojR4IL2NW+KZDG1o5BxZ4HYJ4hdCXXXhzeujcn2AjQzRJ9f8uodX/7Pfa19jGlovj1Tl9ZJ9jIfyyvcxlJXkTN9+CDlkkcpLNU64c4B+CclS8aLPbIKqvLmIy3fphzzkJoKN5rnE4EvKrIkJBPEib1WIY8K7W8boCwghsGBs04MwRZwidKIjPSPgbYpmGPspfKpu0W8mKMirdGEVt4rzpm+Dl9wMa/5Qsyc6afYfS4p3PZOfBio0mtVrPz4+4VXy/Ad+FDNnvxUy9776D0pSv2iBrdHhqs6n1vG0uT4uhbGtvwJR3BBbo6+TmEKakRgp+uRhYEvGy/EO0OkcKrOVLsrZ/akj8O+KOSROrz2VYfxmDTxtUi8K51vW3pJhcGsEsN1FkcJfef/pvxGLK5i0qEZWoyCyA4YMPNDWFFiuBadPTujIGJ/iDmwouzalV9F0vKOIFvP9IuZ1FHLOyEzhyoBS3l1NNpQUz+HNgupTVYSREH1qPXUHg3B5BdFpEJpOjU/P8gwG4npcNxX/5XvigFFiTeEN+eV4xcBVLcg+SsumeswIqi5Tvm+mzYyqz3wj628ddWxgGiPFSfySI4tz6lg=
+  file:
+  - Kiwi_$os.zip
+  - Kiwi_server_$os.zip
+  skip_cleanup: true
+  draft: true
+  prerelease: false
+  on:
+    repo: Musicoll/Kiwi
+    tags: true
+    branch: master
 
-    deploy:
-      provider: releases
-      api_key:
-        secure: atcBDMdJNzUGiUYSqQu/URg8mfvRk9b78tvj1eHKCeDXSTP0Y1UvI5YpmTx8SkUXp23QH4sgp0tKTFB98FbRojR4IL2NW+KZDG1o5BxZ4HYJ4hdCXXXhzeujcn2AjQzRJ9f8uodX/7Pfa19jGlovj1Tl9ZJ9jIfyyvcxlJXkTN9+CDlkkcpLNU64c4B+CclS8aLPbIKqvLmIy3fphzzkJoKN5rnE4EvKrIkJBPEib1WIY8K7W8boCwghsGBs04MwRZwidKIjPSPgbYpmGPspfKpu0W8mKMirdGEVt4rzpm+Dl9wMa/5Qsyc6afYfS4p3PZOfBio0mtVrPz4+4VXy/Ad+FDNnvxUy9776D0pSv2iBrdHhqs6n1vG0uT4uhbGtvwJR3BBbo6+TmEKakRgp+uRhYEvGy/EO0OkcKrOVLsrZ/akj8O+KOSROrz2VYfxmDTxtUi8K51vW3pJhcGsEsN1FkcJfef/pvxGLK5i0qEZWoyCyA4YMPNDWFFiuBadPTujIGJ/iDmwouzalV9F0vKOIFvP9IuZ1FHLOyEzhyoBS3l1NNpQUz+HNgupTVYSREH1qPXUHg3B5BdFpEJpOjU/P8gwG4npcNxX/5XvigFFiTeEN+eV4xcBVLcg+SsumeswIqi5Tvm+mzYyqz3wj628ddWxgGiPFSfySI4tz6lg=
-      file:
-      - Kiwi_macos.zip
-      - Kiwi_Server_macos.zip
-      skip_cleanup: true
-      draft: true
-      prerelease: false
-      name: ${TRAVIS_TAG}
-      tag_name: ${TRAVIS_TAG}
-      on:
-        repo: Musicoll/Kiwi
-        tags: true
-        condition: $TRAVIS_BRANCH != "master"
+deploy:
+  provider: releases
+  api_key:
+    secure: atcBDMdJNzUGiUYSqQu/URg8mfvRk9b78tvj1eHKCeDXSTP0Y1UvI5YpmTx8SkUXp23QH4sgp0tKTFB98FbRojR4IL2NW+KZDG1o5BxZ4HYJ4hdCXXXhzeujcn2AjQzRJ9f8uodX/7Pfa19jGlovj1Tl9ZJ9jIfyyvcxlJXkTN9+CDlkkcpLNU64c4B+CclS8aLPbIKqvLmIy3fphzzkJoKN5rnE4EvKrIkJBPEib1WIY8K7W8boCwghsGBs04MwRZwidKIjPSPgbYpmGPspfKpu0W8mKMirdGEVt4rzpm+Dl9wMa/5Qsyc6afYfS4p3PZOfBio0mtVrPz4+4VXy/Ad+FDNnvxUy9776D0pSv2iBrdHhqs6n1vG0uT4uhbGtvwJR3BBbo6+TmEKakRgp+uRhYEvGy/EO0OkcKrOVLsrZ/akj8O+KOSROrz2VYfxmDTxtUi8K51vW3pJhcGsEsN1FkcJfef/pvxGLK5i0qEZWoyCyA4YMPNDWFFiuBadPTujIGJ/iDmwouzalV9F0vKOIFvP9IuZ1FHLOyEzhyoBS3l1NNpQUz+HNgupTVYSREH1qPXUHg3B5BdFpEJpOjU/P8gwG4npcNxX/5XvigFFiTeEN+eV4xcBVLcg+SsumeswIqi5Tvm+mzYyqz3wj628ddWxgGiPFSfySI4tz6lg=
+  file:
+  - Kiwi_$os.zip
+  - Kiwi_Server_$os.zip
+  skip_cleanup: true
+  draft: true
+  prerelease: false
+  name: ${TRAVIS_TAG}
+  tag_name: ${TRAVIS_TAG}
+  on:
+    repo: Musicoll/Kiwi
+    tags: true
+    condition: $TRAVIS_BRANCH != "master"
