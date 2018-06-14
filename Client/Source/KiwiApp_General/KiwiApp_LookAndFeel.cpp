@@ -262,19 +262,23 @@ namespace kiwi
         // ------ objectbox colors
         
         const juce::Colour box_bgcolor = juce::Colours::white;
-        const juce::Colour patcher_second_color = juce::Colour(0xff444444);
-        setColour(ObjectView::ColourIds::Pin, patcher_second_color);
+        const auto box_bdcolor = box_bgcolor.contrasting(0.4);
+        const auto link_control_color = box_bdcolor.contrasting(0.1f);
+        const auto link_signal_color = juce::Colour(0xff444444);
+        
+        setColour(ObjectView::ColourIds::PinControl, link_control_color);
+        setColour(ObjectView::ColourIds::PinSignal, link_signal_color);
         setColour(ObjectView::ColourIds::Error, juce::Colour::fromRGBA(223, 97, 94, 250));
         setColour(ObjectView::ColourIds::Background, box_bgcolor);
         setColour(ObjectView::ColourIds::Text, juce::Colours::black);
-        setColour(ObjectView::ColourIds::Outline, box_bgcolor.contrasting(0.4));
+        setColour(ObjectView::ColourIds::Outline, box_bdcolor);
         setColour(ObjectView::ColourIds::Highlight, juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
         setColour(ObjectView::ColourIds::Active, juce::Colour(0xff21ba90));
         
         // ------ link colors
         
-        setColour(LinkView::ColourIds::ControlBackground, patcher_second_color);
-        setColour(LinkView::ColourIds::SignalBackground, patcher_second_color);
+        setColour(LinkView::ColourIds::ControlBackground, link_control_color);
+        setColour(LinkView::ColourIds::SignalBackground, link_signal_color);
     }
 }
 

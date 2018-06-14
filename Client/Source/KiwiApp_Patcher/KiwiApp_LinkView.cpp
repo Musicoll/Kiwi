@@ -217,7 +217,7 @@ namespace kiwi
         const bool selected_by_other = (m_selected.by_another_user
                                         || m_selected.in_another_view);
         
-        const float stroke = (isSignal() ? 2.f : 1.f);
+        const float stroke = (isSignal() ? 2.f : 1.5f);
         
         juce::Colour bgcolor;
         if(m_selected.on_this_view)

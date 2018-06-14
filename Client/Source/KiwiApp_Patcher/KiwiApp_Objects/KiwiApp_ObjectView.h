@@ -48,13 +48,14 @@ namespace kiwi
         
         enum ColourIds
         {
-            Pin =           0x1100003,
-            Background =    0x1100004,
-            Error =         0x1100005,
-            Text =          0x1100006,
-            Outline =       0x1100007,
-            Highlight =     0x1100008,
-            Active =        0x1100009
+            PinControl =    0x1100013,
+            PinSignal =     0x1100015,
+            Background =    0x1100024,
+            Error =         0x1100025,
+            Text =          0x1100026,
+            Outline =       0x1100027,
+            Highlight =     0x1100028,
+            Active =        0x1100029
         };
         
     public: // methods
