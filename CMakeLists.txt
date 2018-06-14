@@ -540,6 +540,9 @@ file(GLOB TEST_ENGINE_SRC ${ROOT_DIR}/Test/Engine/*.[c|h]pp
                           ${ROOT_DIR}/Test/Engine/*.h)
 add_executable(test_engine ${TEST_ENGINE_SRC})
 target_add_dependency(test_engine KiwiEngine)
+add_dependencies(test_engine staticlib)
+target_link_libraries(test_engine PUBLIC ${llvm_libs})
+target_link_libraries(test_engine PUBLIC staticlib)
 set_target_properties(test_engine PROPERTIES FOLDER Test)
 source_group_rec("${TEST_ENGINE_SRC}" ${ROOT_DIR}/Test/Engine)
 
