@@ -26,7 +26,7 @@
 namespace kiwi { namespace engine {
     
     // ================================================================================ //
-    //                                       PLUS~                                      //
+    //                                       FAUST~                                     //
     // ================================================================================ //
     
     std::string const FaustTilde::m_folder = std::string("/Users/pierre/Documents/Kiwi Media/Faust/");
