@@ -67,22 +67,17 @@ namespace kiwi { namespace engine {
     FaustTilde::FaustTilde(model::Object const& model, Patcher& patcher):
     AudioObject(model, patcher), m_name(getName(model)), m_options(getOptions(model))
     {
-        loadFactory();
+        createFactory();
+        if(m_factory)
+        {
+            createInstance();
+        }
     }
     
     FaustTilde::~FaustTilde()
     {
         deleteInstance();
         deleteFactory();
-    }
-    
-    void FaustTilde::deleteInstance()
-    {
-        if(m_instance)
-        {
-            delete m_instance;
-            m_instance = NULL;
-        }
     }
     
     void FaustTilde::deleteFactory()
@@ -95,7 +90,16 @@ namespace kiwi { namespace engine {
         }
     }
     
-    void FaustTilde::loadFactory()
+    void FaustTilde::deleteInstance()
+    {
+        if(m_instance)
+        {
+            delete m_instance;
+            m_instance = NULL;
+        }
+    }
+    
+    void FaustTilde::createFactory()
     {
         std::string errors;
         char const* argv[m_options.size()];
@@ -113,9 +117,49 @@ namespace kiwi { namespace engine {
         }
     }
     
+    void FaustTilde::createInstance()
+    {
+        assert(m_factory && "factory must not be null");
+        m_instance = m_factory->createDSPInstance();
+        if(!m_instance)
+        {
+            warning("faust~: can't allocate DSP instance");
+        }
+    }
+    
+    void FaustTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
+    {
+        const size_t nsamples = input.getVectorSize();
+        const size_t ninputs  = m_inputs.size();
+        const size_t noutputs = m_outputs.size();
+        for(size_t i = 0; i < ninputs; ++i)
+        {
+            m_inputs[i] = const_cast<dsp::sample_t*>(input[i].data());
+        }
+        for(size_t i = 0; i < noutputs; ++i)
+        {
+            m_outputs[i] = output[i].data();
+        }
+        m_instance->compute(nsamples, m_inputs.data(), m_outputs.data());
+    }
+    
     void FaustTilde::prepare(PrepareInfo const& infos)
     {
-        
+        if(m_instance)
+        {
+            if(static_cast<size_t>(m_instance->getNumInputs()) < getNumberOfInputs() &&
+               static_cast<size_t>(m_instance->getNumOutputs()) < getNumberOfOutputs())
+            {
+                m_instance->instanceInit(static_cast<int>(infos.sample_rate));
+                m_inputs.resize(m_instance->getNumInputs());
+                m_outputs.resize(m_instance->getNumOutputs());
+                setPerformCallBack(this, &FaustTilde::perform);
+            }
+            else
+            {
+                warning("faust~: DSP instance has invalid number of inputs and outputs");
+            }
+        }
     }
     
 }}

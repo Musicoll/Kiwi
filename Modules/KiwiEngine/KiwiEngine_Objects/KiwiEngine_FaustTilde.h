@@ -49,18 +49,21 @@ namespace kiwi { namespace engine {
         void prepare(dsp::Processor::PrepareInfo const& infos) final;
         
     private:
-        
         static std::string getName(model::Object const& model);
         static std::vector<std::string> getOptions(model::Object const& model);
         
-        void deleteInstance();
         void deleteFactory();
-        void loadFactory();
+        void deleteInstance();
+        void createFactory();
+        void createInstance();
+        void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
         
         const std::string m_name;
         const std::vector<std::string> m_options;
         llvm_dsp_factory* m_factory  = nullptr;
         llvm_dsp*         m_instance = nullptr;
+        std::vector<dsp::sample_t*> m_inputs;
+        std::vector<dsp::sample_t*> m_outputs;
         
         static std::string const m_folder;
     };
