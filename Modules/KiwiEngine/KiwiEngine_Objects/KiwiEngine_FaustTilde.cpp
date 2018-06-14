@@ -29,7 +29,7 @@ namespace kiwi { namespace engine {
     //                                       PLUS~                                      //
     // ================================================================================ //
     
-    std::string const FaustTilde::m_folder = std::string("~/Documents/Kiwi Media/Faust/");
+    std::string const FaustTilde::m_folder = std::string("/Users/pierre/Documents/Kiwi Media/Faust/");
     
     void FaustTilde::declare()
     {
@@ -43,13 +43,29 @@ namespace kiwi { namespace engine {
     
     std::string FaustTilde::getName(model::Object const& model)
     {
-        return model.getArguments()[2].getString();
+        return model.getArguments()[2].getString() + std::string(".dsp");
+    }
+    
+    std::vector<std::string> FaustTilde::getOptions(model::Object const& model)
+    {
+        std::vector<std::string> options;
+        auto const& args = model.getArguments();
+        for(size_t i = 3; i < args.size(); ++i)
+        {
+            options.push_back(tool::AtomHelper::toString(args[i], false));
+        }
+        if(!std::count(options.begin(), options.end(), "-I"))
+        {
+            options.push_back("-I");
+            options.push_back(m_folder + std::string("libs"));
+        }
+        return options;
     }
     
 
     
     FaustTilde::FaustTilde(model::Object const& model, Patcher& patcher):
-    AudioObject(model, patcher), m_name(getName(model))
+    AudioObject(model, patcher), m_name(getName(model)), m_options(getOptions(model))
     {
         loadFactory();
     }
@@ -82,8 +98,19 @@ namespace kiwi { namespace engine {
     void FaustTilde::loadFactory()
     {
         std::string errors;
-        m_factory = createDSPFactoryFromFile(m_folder + m_name, 0, NULL, std::string(), errors);
-        post(errors);
+        char const* argv[m_options.size()];
+        warning(m_folder + m_name);
+        for(size_t i = 0; i < m_options.size(); ++i)
+        {
+            argv[i] = m_options[i].c_str();
+            warning(m_options[i]);
+        }
+        
+        m_factory = createDSPFactoryFromFile(m_folder + m_name, m_options.size(), argv, std::string(), errors);
+        if(!errors.empty())
+        {
+            warning(errors);
+        }
     }
     
     void FaustTilde::prepare(PrepareInfo const& infos)

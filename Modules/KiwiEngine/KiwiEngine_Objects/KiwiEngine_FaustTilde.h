@@ -51,12 +51,14 @@ namespace kiwi { namespace engine {
     private:
         
         static std::string getName(model::Object const& model);
+        static std::vector<std::string> getOptions(model::Object const& model);
         
         void deleteInstance();
         void deleteFactory();
         void loadFactory();
         
         const std::string m_name;
+        const std::vector<std::string> m_options;
         llvm_dsp_factory* m_factory  = nullptr;
         llvm_dsp*         m_instance = nullptr;
         
