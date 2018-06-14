@@ -21,12 +21,15 @@
 
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_FaustTilde.h>
 #include <KiwiEngine/KiwiEngine_Factory.h>
+#include <faust/dsp/llvm-dsp.h>
 
 namespace kiwi { namespace engine {
     
     // ================================================================================ //
     //                                       PLUS~                                      //
     // ================================================================================ //
+    
+    std::string const FaustTilde::m_folder = std::string("~/Documents/Kiwi Media/Faust/");
     
     void FaustTilde::declare()
     {
@@ -38,9 +41,49 @@ namespace kiwi { namespace engine {
         return std::make_unique<FaustTilde>(model, patcher);
     }
     
-    FaustTilde::FaustTilde(model::Object const& model, Patcher& patcher):
-    AudioObject(model, patcher)
+    std::string FaustTilde::getName(model::Object const& model)
     {
+        return model.getArguments()[2].getString();
+    }
+    
+
+    
+    FaustTilde::FaustTilde(model::Object const& model, Patcher& patcher):
+    AudioObject(model, patcher), m_name(getName(model))
+    {
+        loadFactory();
+    }
+    
+    FaustTilde::~FaustTilde()
+    {
+        deleteInstance();
+        deleteFactory();
+    }
+    
+    void FaustTilde::deleteInstance()
+    {
+        if(m_instance)
+        {
+            delete m_instance;
+            m_instance = NULL;
+        }
+    }
+    
+    void FaustTilde::deleteFactory()
+    {
+        if(m_factory)
+        {
+            assert(m_instance == nullptr && "instance must be null");
+            deleteDSPFactory(m_factory);
+            m_factory = NULL;
+        }
+    }
+    
+    void FaustTilde::loadFactory()
+    {
+        std::string errors;
+        m_factory = createDSPFactoryFromFile(m_folder + m_name, 0, NULL, std::string(), errors);
+        post(errors);
     }
     
     void FaustTilde::prepare(PrepareInfo const& infos)

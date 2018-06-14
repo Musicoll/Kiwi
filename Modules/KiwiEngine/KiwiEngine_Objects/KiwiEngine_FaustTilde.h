@@ -23,6 +23,9 @@
 
 #include <KiwiEngine/KiwiEngine_Object.h>
 
+class llvm_dsp_factory;
+class llvm_dsp;
+
 namespace kiwi { namespace engine {
     
     // ================================================================================ //
@@ -39,9 +42,25 @@ namespace kiwi { namespace engine {
         
         FaustTilde(model::Object const& model, Patcher& patcher);
         
+        ~FaustTilde();
+        
         void receive(size_t index, std::vector<tool::Atom> const& args) final {}
         
         void prepare(dsp::Processor::PrepareInfo const& infos) final;
+        
+    private:
+        
+        static std::string getName(model::Object const& model);
+        
+        void deleteInstance();
+        void deleteFactory();
+        void loadFactory();
+        
+        const std::string m_name;
+        llvm_dsp_factory* m_factory  = nullptr;
+        llvm_dsp*         m_instance = nullptr;
+        
+        static std::string const m_folder;
     };
 
 }}
