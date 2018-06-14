@@ -113,7 +113,7 @@ namespace kiwi
         void uploadDocument(std::string const& name, std::string const& data);
         
         //! @brief Creates and opens a new document on this drive.
-        void createNewDocument();
+        void createNewDocument(std::string const& document_name);
         
         //! @brief Changes the way documents are sorted.
         void setSort(Comp comp);

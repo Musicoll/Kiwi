@@ -163,11 +163,11 @@ namespace kiwi
         });
     }
     
-    void DocumentBrowser::Drive::createNewDocument()
+    void DocumentBrowser::Drive::createNewDocument(std::string const& name)
     {
         std::weak_ptr<DocumentBrowser::Drive> drive(m_drive);
         
-        KiwiApp::useApi().createDocument("", [drive](Api::Response res, Api::Document document)
+        KiwiApp::useApi().createDocument(name, [drive](Api::Response res, Api::Document document)
         {
             KiwiApp::useScheduler().schedule([drive, res, document]()
             {
