@@ -36,10 +36,48 @@ namespace kiwi {
         m_label.setInterceptsMouseClicks(false, false);
         m_label.setBorderSize(juce::BorderSize<int>(getPadding()));
         m_label.setJustificationType(juce::Justification::topLeft);
+        
+        setMinimumWidth(20);
+        setMinimumHeight(20);
+        
+        canGrowVertically(false);
+        canGrowHorizontally(true);
     }
 
     EditableObjectView::~EditableObjectView()
     {}
+    
+    void EditableObjectView::checkBounds(juce::Rectangle<int>& bounds,
+                                         juce::Rectangle<int> const& prev_bounds,
+                                         juce::Rectangle<int> const& limits,
+                                         bool stretching_top,
+                                         bool stretching_left,
+                                         bool stretching_bottom,
+                                         bool stretching_right)
+    {
+        // the resize routine could impose a different ratio to our box
+        // but we do not support fixed ratio for text box now
+        // Todo: handle fixed ratio by resizing font height.
+        setFixedAspectRatio(0);
+        
+        juce::ComponentBoundsConstrainer::checkBounds(bounds, prev_bounds,
+                                                      limits,
+                                                      stretching_top, stretching_left,
+                                                      stretching_bottom, stretching_right);
+        if(!canGrowVertically())
+        {
+            if(stretching_top)
+            {
+                bounds.setY(prev_bounds.getY());
+            }
+            
+            bounds.setHeight(prev_bounds.getHeight());
+        }
+        
+        const auto new_width = std::max(bounds.getWidth(), getMinWidth());
+        const auto text_bounds = getTextBoundingBox(getLabel().getText(), new_width);
+        bounds.setHeight(std::max<int>(text_bounds.getHeight(), getMinHeight()));
+    }
 
     void EditableObjectView::setEditable(bool editable)
     {

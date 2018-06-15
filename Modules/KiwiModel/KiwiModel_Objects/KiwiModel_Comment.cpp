@@ -40,7 +40,6 @@ namespace kiwi { namespace model {
         
         // Flags
         comment_class->setFlag(ObjectClass::Flag::DefinedSize);
-        comment_class->setFlag(ObjectClass::Flag::ResizeWidth);
         
         // DataModel
         flip::Class<Comment> & comment_model = DataModel::declare<Comment>()
@@ -62,9 +61,7 @@ namespace kiwi { namespace model {
     {
         if (args.size() > 0)
             throw Error("comment too many arguments");
-            
-        setMinWidth(20.);
-        setMinHeight(20.);
+        
         setWidth(120.);
         setHeight(20.);
     }

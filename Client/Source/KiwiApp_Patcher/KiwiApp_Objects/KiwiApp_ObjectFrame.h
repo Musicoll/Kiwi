@@ -105,8 +105,12 @@ namespace kiwi
         //! @brief Called when object's frame is clicked.
         void mouseDrag(juce::MouseEvent const& e) override final;
         
-        //! @brief Validate the new width and height for the box
-        void validateSize(int& new_width, int& new_height);
+        //! @brief Get the ComponentBoundsConstrainer.
+        juce::ComponentBoundsConstrainer* getBoundsConstrainer() const;
+        
+        //! @brief Get the resizing Flag as a set of border.
+        //! @see HitTester::Border
+        int getResizingFlags() const;
         
     public: // classes
         

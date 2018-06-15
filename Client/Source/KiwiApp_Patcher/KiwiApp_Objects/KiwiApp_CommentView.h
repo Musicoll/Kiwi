@@ -54,9 +54,6 @@ namespace kiwi {
         
     private: // methods
         
-        //! @brief Validate the new width and height for the box
-        void validateSize(int& new_width, int& new_height) override;
-        
         //! @brief Called every time a patcher is locked or unlocked.
         void lockStatusChanged(bool is_locked) override;
         

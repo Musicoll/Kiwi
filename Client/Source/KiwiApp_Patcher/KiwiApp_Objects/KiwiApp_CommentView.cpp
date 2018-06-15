@@ -90,13 +90,6 @@ namespace kiwi {
         }
     }
     
-    void CommentView::validateSize(int& new_width, int& new_height)
-    {
-        new_width = std::max(new_width, getMinWidth());
-        const auto text_bounds = getTextBoundingBox(getLabel().getText(), new_width);
-        new_height = std::max<int>(text_bounds.getHeight(), getMinHeight());
-    }
-    
     void CommentView::textEditorTextChanged(juce::TextEditor& editor)
     {
         setSize(std::max(getWidth(), getMinWidth()),
@@ -111,11 +104,7 @@ namespace kiwi {
         {
             const auto new_text = param[0].getString();
             getLabel().setText(new_text, juce::NotificationType::dontSendNotification);
-            
-            const auto width = getWidth();
-            const auto text_bounds = getTextBoundingBox(new_text, width);
-            setSize(std::max(width, getMinWidth()),
-                    std::max<int>(text_bounds.getHeight(), getMinHeight()));
+            checkComponentBounds(this);
         }
     }
     

@@ -75,6 +75,15 @@ namespace kiwi
         //! @brief Get the current padding value.
         int getPadding() const;
         
+        //! @brief Check Component bounds.
+        void checkBounds (juce::Rectangle<int>& bounds,
+                          juce::Rectangle<int> const& previousBounds,
+                          juce::Rectangle<int> const& limits,
+                          bool isStretchingTop,
+                          bool isStretchingLeft,
+                          bool isStretchingBottom,
+                          bool isStretchingRight) override;
+        
         //! @brief Get the minimum height.
         //! @details The minimum height is (font_height + 2 * padding)
         int getMinHeight() const;

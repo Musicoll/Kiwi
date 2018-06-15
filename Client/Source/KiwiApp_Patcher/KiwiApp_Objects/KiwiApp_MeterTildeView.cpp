@@ -65,24 +65,14 @@ namespace kiwi
     MeterTildeView::~MeterTildeView()
     {}
     
-    void MeterTildeView::validateSize(int& new_width, int& new_height)
-    {
-        const int min = 40;
-        const bool vertical = (new_width <= new_height);
-        if(vertical)
-        {
-            new_height = std::max<int>(min, new_height);
-        }
-        else
-        {
-            new_width = std::max<int>(min, new_width);
-        }
-    }
-    
     void MeterTildeView::resized()
     {
         const auto bounds = getLocalBounds().toFloat();
-        const bool vertical = (bounds.getWidth() <= bounds.getHeight());
+        
+        const int min = 10;
+        const int max = 30;
+        const bool vertical = (getWidth() <= getHeight());
+        setMinimumSize(vertical ? min : max, vertical ? max : min);
         
         const float num_leds = m_leds.size();
         const float padding = m_padding;

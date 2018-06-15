@@ -70,13 +70,6 @@ namespace kiwi {
     MessageView::~MessageView()
     {}
     
-    void MessageView::validateSize(int& new_width, int& new_height)
-    {
-        new_width = std::max(new_width, getMinWidth());
-        const auto text_bounds = getTextBoundingBox(getLabel().getText(), new_width);
-        new_height = std::max<int>(text_bounds.getHeight(), getMinHeight());
-    }
-    
     void MessageView::mouseDown(juce::MouseEvent const& e)
     {
         m_active = true;
@@ -145,6 +138,7 @@ namespace kiwi {
         if (name == name_text)
         {
             setText(param[0].getString());
+            checkComponentBounds(this);
         }
     }
     

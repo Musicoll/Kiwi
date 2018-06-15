@@ -57,13 +57,6 @@ namespace kiwi
     ClassicView::~ClassicView()
     {}
     
-    void ClassicView::validateSize(int& new_width, int& new_height)
-    {
-        new_width = std::max(new_width, getMinWidth());
-        const auto text_bounds = getTextBoundingBox(getLabel().getText(), new_width);
-        new_height = std::max<int>(text_bounds.getHeight(), getMinHeight());
-    }
-    
     void ClassicView::paintOverChildren (juce::Graphics& g)
     {
         drawOutline(g);

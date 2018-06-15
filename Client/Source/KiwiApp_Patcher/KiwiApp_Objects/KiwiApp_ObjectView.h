@@ -42,6 +42,7 @@ namespace kiwi
     //! @brief Abstract for objects graphical representation.
     class ObjectView
     : public juce::Component
+    , public juce::ComponentBoundsConstrainer
     , public model::Object::Listener
     {
     public: // classes
@@ -75,13 +76,26 @@ namespace kiwi
         //! @brief Called when a parameter has changed.
         void modelParameterChanged(std::string const& name, tool::Parameter const& param) override final;
         
-        //! @brief Validate the new width and height for the box
-        virtual void validateSize(int& new_width, int& new_height);
-        
         //! @brief Called every time a patcher is locked or unlocked.
         virtual void lockStatusChanged(bool is_locked);
         
+        //! @brief Get the resizing Flag as a set of border.
+        //! @see HitTester::Border
+        int getResizingFlags() const;
+        
+        //! @brief Returns true if the box can grow horizontally
+        bool canGrowHorizontally() const;
+        
+        //! @brief Returns true if the box can grow vertically
+        bool canGrowVertically() const;
+        
     protected: // methods
+        
+        //! @brief Pass true if the box can grow horizontally
+        void canGrowHorizontally(bool can);
+        
+        //! @brief Pass true if the box can grow vertically
+        void canGrowVertically(bool can);
         
         //! @biref Returns the main scheduler.
         tool::Scheduler<> & getScheduler() const;
@@ -120,6 +134,7 @@ namespace kiwi
         
         model::Object&                  m_model;
         std::shared_ptr<ObjectView>     m_master;
+        int                             m_resizing_flags;
         
     private: // deleted methods
         

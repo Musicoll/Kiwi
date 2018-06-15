@@ -91,14 +91,13 @@ namespace kiwi
         {
             const juce::Point<int> origin = m_patcher_view.getOriginPosition();
             
-            int width = model.getWidth();
-            int height = model.getHeight();
+            juce::Rectangle<int> object_bounds(model.getX() + origin.getX(),
+                                               model.getY() + origin.getY(),
+                                               model.getWidth(), model.getHeight());
             
-            validateSize(width, height);
-            
-            const juce::Rectangle<int> object_bounds(model.getX() + origin.getX(),
-                                                     model.getY() + origin.getY(),
-                                                     width, height);
+            m_object_view->checkBounds(object_bounds,
+                                       m_object_view->getBounds(), {},
+                                       false, false, false, false);
             
             const juce::Rectangle<int> frame_bounds = object_bounds.expanded(m_outline.getBorderThickness());
             
@@ -182,9 +181,14 @@ namespace kiwi
         return object_view_bounds.withPosition(getPosition() + object_view_bounds.getPosition());
     }
     
-    void ObjectFrame::validateSize(int& new_width, int& new_height)
+    juce::ComponentBoundsConstrainer* ObjectFrame::getBoundsConstrainer() const
     {
-        m_object_view->validateSize(new_width, new_height);
+        return m_object_view.get();
+    }
+    
+    int ObjectFrame::getResizingFlags() const
+    {
+        return m_object_view->getResizingFlags();
     }
     
     void ObjectFrame::mouseDown(juce::MouseEvent const& e)
@@ -422,30 +426,39 @@ namespace kiwi
     
     juce::Rectangle<int> ObjectFrame::getInletLocalBounds(const size_t index) const
     {
-        juce::Rectangle<int> inlet_bounds = m_object_view->getBounds();
-        
-        const auto space_to_remove = m_outline.getResizeLength() - m_outline.getBorderThickness();
-        inlet_bounds.removeFromLeft(space_to_remove);
-        inlet_bounds.removeFromRight(space_to_remove);
-        
         juce::Rectangle<int> rect;
+        
         const auto ninlets = getNumberOfInlets();
 
         if(ninlets > 0 && index < ninlets)
         {
+            juce::Rectangle<int> inlet_bounds = m_object_view->getBounds();
+            
+            auto pin_width = getPinWidth();
+            
+            const auto border_width = (m_outline.getResizeLength()
+                                       - m_outline.getBorderThickness());
+            
+            const auto space_to_remove = juce::jlimit<int>(0, border_width, inlet_bounds.getWidth() - (pin_width * ninlets) - border_width);
+            
+            if(space_to_remove > 0)
+            {
+                inlet_bounds.removeFromLeft(space_to_remove);
+                inlet_bounds.removeFromRight(space_to_remove);
+            }
+            
             if(ninlets == 1 && index == 0)
             {
                 rect.setBounds(inlet_bounds.getX(),
                                inlet_bounds.getY(),
-                               getPinWidth(), getPinHeight());
+                               pin_width, getPinHeight());
             }
-            
-            if(ninlets > 1)
+            else if(ninlets > 1)
             {
-                const double ratio = (inlet_bounds.getWidth() - getPinWidth()) / (double)(ninlets - 1);
+                const double ratio = (inlet_bounds.getWidth() - pin_width) / (double)(ninlets - 1);
                 rect.setBounds(inlet_bounds.getX() + ratio * index,
                                inlet_bounds.getY(),
-                               getPinWidth(), getPinHeight());
+                               pin_width, getPinHeight());
             }
         }
         
@@ -454,21 +467,31 @@ namespace kiwi
     
     juce::Rectangle<int> ObjectFrame::getOutletLocalBounds(const size_t index) const
     {
-        juce::Rectangle<int> outlet_bounds = m_object_view->getBounds();
-        
-        outlet_bounds.removeFromLeft(m_outline.getResizeLength() - m_outline.getBorderThickness());
-        outlet_bounds.removeFromRight(m_outline.getResizeLength() - m_outline.getBorderThickness());
-        
         juce::Rectangle<int> rect;
         const auto noutlets = getNumberOfOutlets();
         
         if(noutlets > 0 && index < noutlets)
         {
+            juce::Rectangle<int> outlet_bounds = m_object_view->getBounds();
+            
+            auto pin_width = getPinWidth();
+            
+            const auto border_width = (m_outline.getResizeLength()
+                                       - m_outline.getBorderThickness());
+            
+            const auto space_to_remove = juce::jlimit<int>(0, border_width, outlet_bounds.getWidth() - (pin_width * noutlets) - border_width);
+            
+            if(space_to_remove > 0)
+            {
+                outlet_bounds.removeFromLeft(space_to_remove);
+                outlet_bounds.removeFromRight(space_to_remove);
+            }
+            
             if(noutlets == 1 && index == 0)
             {
                 rect.setBounds(outlet_bounds.getX(),
                                outlet_bounds.getY() + outlet_bounds.getHeight() - getPinHeight(),
-                               getPinWidth(), getPinHeight());
+                               pin_width, getPinHeight());
             }
             
             if(noutlets > 1)
@@ -476,7 +499,7 @@ namespace kiwi
                 const double ratio = (outlet_bounds.getWidth() - getPinWidth()) / (double)(noutlets - 1);
                 rect.setBounds(outlet_bounds.getX() + ratio * index,
                                outlet_bounds.getY() + outlet_bounds.getHeight() - getPinHeight(),
-                               getPinWidth(), getPinHeight());
+                               pin_width, getPinHeight());
             }
         }
         
@@ -623,8 +646,8 @@ namespace kiwi
         const auto outline_bounds = getLocalBounds().toFloat();
         const auto object_bounds = outline_bounds.reduced(m_resize_thickness);
         
-        const float thickness = m_resize_thickness * 0.5f;
-        g.drawRect(outline_bounds.reduced(thickness), thickness);
+        const float thickness = m_resize_thickness;
+        g.drawRect(outline_bounds.reduced(thickness*0.75), thickness*0.25);
         
         /* // The following code do the same
         juce::RectangleList<float> rectangles (outline_bounds);

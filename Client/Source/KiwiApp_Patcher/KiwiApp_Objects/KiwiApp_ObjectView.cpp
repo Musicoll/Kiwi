@@ -36,8 +36,11 @@ namespace kiwi
     ObjectView::ObjectView(model::Object & object_model)
     : m_model(object_model)
     , m_master(this, [](ObjectView*){})
+    , m_resizing_flags(HitTester::Border::None)
     {
         object_model.addListener(*this);
+        canGrowHorizontally(true);
+        canGrowVertically(true);
     }
     
     ObjectView::~ObjectView()
@@ -87,11 +90,6 @@ namespace kiwi
         return getLocalBounds();
     }
     
-    void ObjectView::validateSize(int& new_width, int& new_height)
-    {
-        ;
-    }
-    
     void ObjectView::drawOutline(juce::Graphics & g)
     {
         g.setColour(findColour(ObjectView::ColourIds::Outline));
@@ -102,6 +100,51 @@ namespace kiwi
     void ObjectView::lockStatusChanged(bool is_locked)
     {
         // nothing to do by default
+    }
+
+    int ObjectView::getResizingFlags() const
+    {
+        return m_resizing_flags;
+    }
+    
+    bool ObjectView::canGrowHorizontally() const
+    {
+        return ((m_resizing_flags & HitTester::Border::Left)
+                || m_resizing_flags & HitTester::Border::Right);
+    }
+    
+    bool ObjectView::canGrowVertically() const
+    {
+        return ((m_resizing_flags & HitTester::Border::Top)
+                || m_resizing_flags & HitTester::Border::Bottom);
+    }
+    
+    void ObjectView::canGrowHorizontally(bool can)
+    {
+        if(can)
+        {
+            m_resizing_flags |= HitTester::Border::Left;
+            m_resizing_flags |= HitTester::Border::Right;
+        }
+        else
+        {
+            m_resizing_flags &= ~HitTester::Border::Left;
+            m_resizing_flags &= ~HitTester::Border::Right;
+        }
+    }
+    
+    void ObjectView::canGrowVertically(bool can)
+    {
+        if(can)
+        {
+            m_resizing_flags |= HitTester::Border::Top;
+            m_resizing_flags |= HitTester::Border::Bottom;
+        }
+        else
+        {
+            m_resizing_flags &= ~HitTester::Border::Top;
+            m_resizing_flags &= ~HitTester::Border::Bottom;
+        }
     }
     
     // ================================================================================ //

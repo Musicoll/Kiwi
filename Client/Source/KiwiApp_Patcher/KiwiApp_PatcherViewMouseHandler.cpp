@@ -106,7 +106,7 @@ namespace kiwi
                 
                 break;
             }
-            case Action::MoveObject:
+            case Action::MoveObjects:
             {
                 KiwiApp::commandStatusChanged();
                 
@@ -191,7 +191,7 @@ namespace kiwi
                 }
                 break;
             }
-            case Action::ResizeObject:
+            case Action::ResizeObjects:
             {
                 m_direction = getResizeDirection(hit_tester);
                 
@@ -218,45 +218,6 @@ namespace kiwi
         }
     }
     
-    void MouseHandler::applyNewBounds(model::Object & model, juce::Rectangle<int> new_bounds, double ratio) const
-    {
-        juce::ComponentBoundsConstrainer constrainer;
-        
-        const double default_min_width = 20.;
-        const double default_min_height = 20.;
-        
-        constrainer.setMinimumWidth((model.getMinWidth() > 0) ? model.getMinWidth() : default_min_width);
-        constrainer.setMinimumHeight((model.getMinHeight() > 0) ? model.getMinHeight() : default_min_height);
-        
-        if (model.getRatio() != 0)
-        {
-            constrainer.setFixedAspectRatio(1 / model.getRatio());
-        }
-        else if (ratio != 0)
-        {
-            constrainer.setFixedAspectRatio(1 / ratio);
-        }
-        
-        const juce::Rectangle<int> limits {};
-        
-        juce::Rectangle<int> previous_bounds(model.getX(), model.getY(),
-                                             model.getWidth(), model.getHeight());
-        
-        juce::Rectangle<int> target_bounds = new_bounds;
-        
-        constrainer.checkBounds(target_bounds,
-                                previous_bounds,
-                                limits,
-                                m_direction & Direction::Up,
-                                m_direction & Direction::Left,
-                                m_direction & Direction::Down,
-                                m_direction & Direction::Right);
-        
-        model.setPosition(target_bounds.getX(), target_bounds.getY());
-        model.setWidth(target_bounds.getWidth());
-        model.setHeight(target_bounds.getHeight());
-    }
-    
     void MouseHandler::continueAction(juce::MouseEvent const& e)
     {
         HitTester& hit_tester = m_patcher_view.m_hittester;
@@ -270,7 +231,7 @@ namespace kiwi
                     m_patcher_view.copySelectionToClipboard();
                     m_patcher_view.pasteFromClipboard({0, 0});
                     
-                    startAction(Action::MoveObject, e);
+                    startAction(Action::MoveObjects, e);
                 }
                 break;
             }
@@ -326,7 +287,7 @@ namespace kiwi
                 
                 break;
             }
-            case Action::MoveObject:
+            case Action::MoveObjects:
             {
                 if (m_patcher_view.isAnyObjectSelected())
                 {
@@ -346,7 +307,7 @@ namespace kiwi
             {
                 if (hit_tester.objectTouched() && e.getMouseDownPosition() != e.getPosition())
                 {
-                    startAction(Action::MoveObject, e);
+                    startAction(Action::MoveObjects, e);
                 }
                 break;
             }
@@ -354,7 +315,7 @@ namespace kiwi
             {
                 if (hit_tester.objectTouched() && e.getMouseDownPosition() != e.getPosition())
                 {
-                    startAction(Action::MoveObject, e);
+                    startAction(Action::MoveObjects, e);
                 }
                 break;
             }
@@ -362,61 +323,34 @@ namespace kiwi
             {
                 if (hit_tester.objectTouched() && e.getMouseDownPosition() != e.getPosition())
                 {
-                    startAction(Action::MoveObject, e);
+                    startAction(Action::MoveObjects, e);
                 }
                 break;
             }
-            case Action::ResizeObject:
+            case Action::ResizeObjects:
             {
                 juce::Point<int> delta = e.getPosition() - e.getMouseDownPosition();
+                auto& patcher_model = m_patcher_view.m_patcher_model;
                 
                 for (auto bounds_it : m_mousedown_bounds)
                 {
-                    juce::Rectangle<int> new_bounds = bounds_it.second;
+                    auto& document = patcher_model.entity().use<model::DocumentManager>();
+                    const auto object_ref = bounds_it.first;
                     
-                    double ratio = 0.;
-                    
-                    if (e.mods.isShiftDown() && new_bounds.getWidth() != 0)
+                    if(auto model = document.get<model::Object>(object_ref))
                     {
-                        ratio = static_cast<double>(new_bounds.getHeight()) / static_cast<double>(new_bounds.getWidth());
-                    }
-                    
-                    if (m_direction & Direction::Left)
-                    {
-                        new_bounds.setLeft(std::min(new_bounds.getX() + delta.getX(), new_bounds.getRight()));
-                    }
-                    
-                    if (m_direction & Direction::Up)
-                    {
-                        new_bounds.setTop(std::min(new_bounds.getY() + delta.getY(), new_bounds.getBottom()));
-                    }
-                    
-                    if (m_direction & Direction::Right)
-                    {
-                        new_bounds.setRight(std::max(new_bounds.getRight() + delta.getX(), new_bounds.getX()));
-                    }
-                    
-                    if (m_direction & Direction::Down)
-                    {
-                        new_bounds.setBottom(std::max(new_bounds.getBottom() + delta.getY(), new_bounds.getY()));
-                    }
-                    
-                    if(auto* box = hit_tester.getObject())
-                    {
-                        int new_width = new_bounds.getWidth();
-                        int new_height = new_bounds.getHeight();
-                        box->validateSize(new_width, new_height);
-                        new_bounds.setSize(new_width, new_height);
-                    }
-                    
-                    auto& document = m_patcher_view.m_patcher_model.entity().use<model::DocumentManager>();
-                    if(auto* model = document.get<model::Object>(bounds_it.first))
-                    {
-                        applyNewBounds(*model, new_bounds, ratio);
+                        if(auto* box = m_patcher_view.getObject(*model))
+                        {
+                            resizeModelObjectBounds(*model, *box,
+                                                    bounds_it.second,
+                                                    delta, e.mods.isShiftDown());
+                        }
                     }
                 }
                 
-                model::DocumentManager::commitGesture(m_patcher_view.m_patcher_model, "Resize object");
+                std::string commit_msg = "Resize object";
+                commit_msg += (m_mousedown_bounds.size() > 1 ? "s" : "");
+                model::DocumentManager::commitGesture(patcher_model, commit_msg);
                 
                 break;
             }
@@ -481,16 +415,14 @@ namespace kiwi
                 }
                 break;
             }
-            case Action::MoveObject:
+            case Action::MoveObjects:
             {
                 model::DocumentManager::endCommitGesture(m_patcher_view.m_patcher_model);
                 
-                KiwiApp::commandStatusChanged();
-                
                 m_patcher_view.m_viewport.updatePatcherArea(true);
-                
                 m_patcher_view.m_viewport.jumpViewToObject(*hit_tester.getObject());
                 
+                KiwiApp::commandStatusChanged();
                 break;
             }
             case Action::ObjectEdition:
@@ -499,17 +431,16 @@ namespace kiwi
                 m_patcher_view.editObject(object);
                 break;
             }
-            case Action::ResizeObject:
+            case Action::ResizeObjects:
             {
+                model::DocumentManager::endCommitGesture(m_patcher_view.m_patcher_model);
+                
                 m_direction = Direction::None;
                 m_mousedown_bounds.clear();
                 
-                model::DocumentManager::endCommitGesture(m_patcher_view.m_patcher_model);
-                
                 m_patcher_view.m_viewport.updatePatcherArea(true);
                 
-                m_patcher_view.m_viewport.jumpViewToObject(*hit_tester.getObject());
-                
+                KiwiApp::commandStatusChanged();
                 break;
             }
             case Action::SwitchLock:
@@ -578,7 +509,7 @@ namespace kiwi
                 }
                 else if (hit_tester.getZone() == HitTester::Zone::Border)
                 {
-                    startAction(Action::ResizeObject, e);
+                    startAction(Action::ResizeObjects, e);
                 }
             }
             else if(hit_tester.linkTouched())
@@ -669,26 +600,43 @@ namespace kiwi
         
         int direction = Direction::None;
         
-        model::Object const& object_model = hit_tester.getObject()->getModel();
+        int resize_flags = HitTester::Border::None;
         
-        if ((border & HitTester::Border::Top) && object_model.hasFlag(model::ObjectClass::Flag::ResizeHeight))
+        if(auto* box = hit_tester.getObject())
         {
-            direction |= Direction::Up;
+            resize_flags = box->getResizingFlags();
         }
         
-        if ((border & HitTester::Border::Right)) // && object_model.hasFlag(model::ObjectClass::Flag::ResizeWidth))
+        const bool grow_x = ((resize_flags & HitTester::Border::Left)
+                             || resize_flags & HitTester::Border::Right);
+        
+        const bool grow_y = ((resize_flags & HitTester::Border::Top)
+                             || resize_flags & HitTester::Border::Bottom);
+        
+        if(grow_x)
         {
-            direction |= Direction::Right;
+            if (border & HitTester::Border::Right)
+            {
+                direction |= Direction::Right;
+            }
+            
+            if (border & HitTester::Border::Left)
+            {
+                direction |= Direction::Left;
+            }
         }
         
-        if ((border & HitTester::Border::Bottom) && object_model.hasFlag(model::ObjectClass::Flag::ResizeHeight))
+        if(grow_y)
         {
-            direction |= Direction::Down;
-        }
-        
-        if ((border & HitTester::Border::Left) ) // && object_model.hasFlag(model::ObjectClass::Flag::ResizeWidth))
-        {
-            direction |= Direction::Left;
+            if (border & HitTester::Border::Top)
+            {
+                direction |= Direction::Up;
+            }
+            
+            if ((border & HitTester::Border::Bottom))
+            {
+                direction |= Direction::Down;
+            }
         }
         
         return direction;
@@ -699,6 +647,22 @@ namespace kiwi
         juce::MouseCursor::StandardCursorType mc = juce::MouseCursor::NormalCursor;
         
         int direction = getResizeDirection(hit_tester);
+        
+        int resize_flags = HitTester::Border::None;
+        
+        if(auto* box = hit_tester.getObject())
+        {
+            resize_flags = box->getResizingFlags();
+        }
+        
+        const bool grow_y = ((resize_flags & HitTester::Border::Top)
+                             || resize_flags & HitTester::Border::Bottom);
+        
+        if(!grow_y &&
+           (direction == Direction::Left || direction == Direction::Right))
+        {
+            return juce::MouseCursor::LeftRightResizeCursor;
+        }
         
         switch(direction)
         {
@@ -788,5 +752,72 @@ namespace kiwi
         }
         
         m_patcher_view.setMouseCursor(mc);
+    }
+    
+    void MouseHandler::resizeModelObjectBounds(model::Object& model,
+                                               ObjectFrame& box,
+                                               juce::Rectangle<int> prev_bounds,
+                                               juce::Point<int> delta, bool fixed_ratio)
+    {
+        juce::Rectangle<int> new_bounds = prev_bounds;
+        
+        double ratio = 0.;
+        const bool stretching_top = m_direction & Direction::Up;
+        const bool stretching_left = m_direction & Direction::Left;
+        const bool stretching_bottom = m_direction & Direction::Down;
+        const bool stretching_right = m_direction & Direction::Right;
+        
+        if (fixed_ratio && new_bounds.getWidth() != 0)
+        {
+            ratio = (static_cast<double>(new_bounds.getWidth())
+                     / static_cast<double>(new_bounds.getHeight()));
+        }
+        
+        if (stretching_left)
+        {
+            new_bounds.setLeft(std::min(new_bounds.getX() + delta.getX(),
+                                        new_bounds.getRight()));
+        }
+        
+        if (stretching_top)
+        {
+            new_bounds.setTop(std::min(new_bounds.getY() + delta.getY(),
+                                       new_bounds.getBottom()));
+        }
+        
+        if (stretching_right)
+        {
+            new_bounds.setRight(std::max(new_bounds.getRight() + delta.getX(),
+                                         new_bounds.getX()));
+        }
+        
+        if (stretching_bottom)
+        {
+            new_bounds.setBottom(std::max(new_bounds.getBottom() + delta.getY(),
+                                          new_bounds.getY()));
+        }
+        
+        const juce::Rectangle<int> limits {};
+        
+        juce::Rectangle<int> target_bounds = new_bounds;
+        
+        auto* box_constrainer = box.getBoundsConstrainer();
+        
+        juce::ComponentBoundsConstrainer constrainer;
+        constrainer.setFixedAspectRatio(box_constrainer->getFixedAspectRatio() == 0 ? ratio : box_constrainer->getFixedAspectRatio());
+        
+        auto box_ratio = box_constrainer->getFixedAspectRatio();
+        
+        // impose ratio if not set
+        box_constrainer->setFixedAspectRatio(box_ratio == 0 ? ratio : box_ratio);
+        box_constrainer->checkBounds(target_bounds, prev_bounds, limits,
+                                     stretching_top, stretching_left,
+                                     stretching_bottom, stretching_right);
+        // restore ratio
+        box_constrainer->setFixedAspectRatio(box_ratio);
+        
+        model.setPosition(target_bounds.getX(), target_bounds.getY());
+        model.setWidth(target_bounds.getWidth());
+        model.setHeight(target_bounds.getHeight());
     }
 }

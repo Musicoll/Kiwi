@@ -103,9 +103,7 @@ namespace kiwi { namespace model {
         //! @brief A list of flags that defines the object's behavior.
         enum class Flag
         {
-            Internal,       //! Internal objects are hidden from objects's dionnary.
-            ResizeWidth,    //! Set this flag to resize object horizontally.
-            ResizeHeight,   //! Set this flag to resize object vertically.
+            Internal,       //! Internal objects do not appears in object list.
             DefinedSize     //! If the object has a predefined size.
         };
         

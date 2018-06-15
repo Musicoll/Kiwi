@@ -34,8 +34,6 @@ namespace kiwi { namespace model {
         std::unique_ptr<ObjectClass> toggle_class(new ObjectClass("toggle", &Toggle::create));
         
         toggle_class->setFlag(ObjectClass::Flag::DefinedSize);
-        toggle_class->setFlag(ObjectClass::Flag::ResizeWidth);
-        toggle_class->setFlag(ObjectClass::Flag::ResizeHeight);
         
         std::unique_ptr<ParameterClass> param_value(new ParameterClass(tool::Parameter::Type::Int));
         
@@ -62,8 +60,6 @@ namespace kiwi { namespace model {
         }
         
         addSignal<>(Signal::OutputValue, *this);
-        setRatio(1.);
-        setMinWidth(20.);
         setWidth(20);
         pushInlet({PinType::IType::Control});
         pushOutlet(PinType::IType::Control);

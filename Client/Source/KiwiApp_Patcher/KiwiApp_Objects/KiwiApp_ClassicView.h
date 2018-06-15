@@ -51,9 +51,6 @@ namespace kiwi
         
     private: // methods
         
-        //! @brief Validate the new width and height for the box
-        void validateSize(int& new_width, int& new_height) override;
-        
         //! @brief Constructs the label's text editor.
         //! @brief Overrides EditableObjectView::createTextEditor.
         juce::TextEditor* createdTextEditor() override;

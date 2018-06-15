@@ -65,20 +65,6 @@ namespace kiwi
         m_slider.removeListener(this);
     }
     
-    void SliderView::validateSize(int& new_width, int& new_height)
-    {
-        const int min = 40;
-        const bool vertical = (new_width <= new_height);
-        if(vertical)
-        {
-            new_height = std::max<int>(min, new_height);
-        }
-        else
-        {
-            new_width = std::max<int>(min, new_width);
-        }
-    }
-    
     void SliderView::declare()
     {
         Factory::add<SliderView>("slider", &SliderView::create);
@@ -121,12 +107,17 @@ namespace kiwi
     
     void SliderView::resized()
     {
-        if (getWidth() > getHeight() && m_slider.isVertical())
+        const int min = 20;
+        const int max = 40;
+        const bool vertical = (getWidth() <= getHeight());
+        setMinimumSize(vertical ? min : max, vertical ? max : min);
+        
+        if (!vertical && m_slider.isVertical())
         {
             m_slider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
         }
         
-        if (getHeight() > getWidth() && m_slider.isHorizontal())
+        if (vertical && m_slider.isHorizontal())
         {
             m_slider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
         }

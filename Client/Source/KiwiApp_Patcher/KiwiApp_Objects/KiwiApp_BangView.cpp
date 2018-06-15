@@ -48,11 +48,13 @@ namespace kiwi {
     , m_flash_connection(m_flash_signal.connect(std::bind(&BangView::signalTriggered, this)))
     , m_active(false)
     , m_mouse_down(false)
-    {}
+    {
+        setMinimumSize(20.f, 20.f);
+        setFixedAspectRatio(1.f);
+    }
     
     BangView::~BangView()
-    {
-    }
+    {}
     
     void BangView::paint(juce::Graphics & g)
     {

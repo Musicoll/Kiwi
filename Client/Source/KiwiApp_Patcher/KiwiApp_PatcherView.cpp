@@ -647,8 +647,8 @@ namespace kiwi
     
     bool PatcherView::keyPressed(const juce::KeyPress& key)
     {
-        if(m_mouse_handler.getCurrentAction() == MouseHandler::Action::MoveObject ||
-           m_mouse_handler.getCurrentAction() == MouseHandler::Action::ResizeObject)
+        if(m_mouse_handler.getCurrentAction() == MouseHandler::Action::MoveObjects ||
+           m_mouse_handler.getCurrentAction() == MouseHandler::Action::ResizeObjects)
             return false; // abort
         
         if(key.isKeyCode(juce::KeyPress::deleteKey) || key.isKeyCode(juce::KeyPress::backspaceKey))
@@ -729,7 +729,7 @@ namespace kiwi
         }
         
         m_view_model.setLock(locked);
-        model::DocumentManager::commit(m_patcher_model, "Edit mode switch");
+        model::DocumentManager::commit(m_patcher_model);
     }
     
     bool PatcherView::isLocked() const
@@ -1005,8 +1005,8 @@ namespace kiwi
                 if(object.boundsChanged()
                    && !patcher_area_uptodate
                    && !view.removed()
-                   && m_mouse_handler.getCurrentAction() != MouseHandler::Action::MoveObject
-                   && m_mouse_handler.getCurrentAction() != MouseHandler::Action::ResizeObject)
+                   && m_mouse_handler.getCurrentAction() != MouseHandler::Action::MoveObjects
+                   && m_mouse_handler.getCurrentAction() != MouseHandler::Action::ResizeObjects)
                 {
                     m_viewport.updatePatcherArea(true);
                     patcher_area_uptodate = true;

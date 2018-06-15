@@ -43,6 +43,8 @@ namespace kiwi {
     m_signal(model.getSignal<>(model::Toggle::Signal::OutputValue)),
     m_is_on(false)
     {
+        setMinimumSize(20.f, 20.f);
+        setFixedAspectRatio(1.f);
     }
     
     ToggleView::~ToggleView()
