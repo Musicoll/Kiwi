@@ -47,8 +47,9 @@ namespace kiwi
     
     //! @brief The main DocumentObserver.
     //! @details The Instance dispatch changes to all other DocumentObserver objects
-    class PatcherManager :  public flip::DocumentObserver<model::Patcher>,
-                            public DocumentBrowser::Drive::Listener
+    class PatcherManager
+    : public flip::DocumentObserver<model::Patcher>
+    , public DocumentBrowser::Drive::Listener
     {
     public: // nested classes
         
@@ -62,6 +63,12 @@ namespace kiwi
         //! @brief Destructor.
         ~PatcherManager();
         
+        //! @brief Try to create a patcher manager from a file
+        //! @details This method throws a std::runtime exception if error occurs during read.
+        //! @return A PatcherManager if succeed, nullptr otherwise.
+        static std::unique_ptr<PatcherManager> createFromFile(Instance& instance,
+                                                              juce::File const& file);
+        
         //! @brief Try to connect this patcher to a remote server.
         bool connect(std::string const& host, uint16_t port, DocumentBrowser::Drive::DocumentSession& session);
         
@@ -70,9 +77,6 @@ namespace kiwi
         
         //! @brief Pull changes from server if it is remote.
         void pull();
-        
-        //! @brief Load patcher datas from file.
-        bool loadFromFile(juce::File const& file);
         
         //! @brief Save the document.
         //! @details Returns true if saving document succeeded false otherwise.
@@ -152,8 +156,15 @@ namespace kiwi
         //! @internal Write data into file.
         void writeDocument();
         
-        //! @internal Reads data from file.
-        bool readDocument();
+        //! @internal Reads from binary data file.
+        bool readBackEndBinary(flip::DataProviderBase& data_provider);
+        
+        //! @brief Load patcher datas from file.
+        //! @details Loading document from file could fail if the file can not be read.
+        //! This could happen if the file has not a valid extension,
+        //! or if the document version is incompatible.
+        //! @exception Throws a std::runtime exception if file loading fail.
+        bool loadFromFile(juce::File const& file);
         
         //! @internal flip::DocumentObserver<model::Patcher>::document_changed
         void document_changed(model::Patcher& patcher) override final;
@@ -202,8 +213,8 @@ namespace kiwi
         flip::Document                              m_document;
         juce::File                                  m_file;
         CarrierSocket                               m_socket;
-        bool                                        m_need_saving_flag;
-        DocumentBrowser::Drive::DocumentSession*    m_session;
+        bool                                        m_need_saving_flag = false;
+        DocumentBrowser::Drive::DocumentSession*    m_session = nullptr;
         
         flip::SignalConnection                      m_user_connected_signal_cnx;
         flip::SignalConnection                      m_user_disconnected_signal_cnx;

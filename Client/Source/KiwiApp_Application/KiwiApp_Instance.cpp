@@ -106,11 +106,11 @@ namespace kiwi
     }
     
     void Instance::login()
-    {
-        m_browser.setDriveName(KiwiApp::getCurrentUser().getName());
+        {
+            m_browser.setDriveName(KiwiApp::getCurrentUser().getName());
         
-        m_windows[std::size_t(WindowId::DocumentBrowser)]->getContentComponent()->setEnabled(true);
-    }
+            m_windows[std::size_t(WindowId::DocumentBrowser)]->getContentComponent()->setEnabled(true);
+        }
     
     void Instance::logout()
     {
@@ -172,46 +172,56 @@ namespace kiwi
     
     bool Instance::openFile(juce::File const& file)
     {
-        bool open_succeeded = false;
+        if(!file.hasFileExtension("kiwi"))
+        {
+            KiwiApp::error("can't open file (bad file extension)");
+            return false;
+        }
         
-        if(file.hasFileExtension("kiwi"))
         {
             auto manager_it = getPatcherManagerForFile(file);
             
-            if (manager_it == m_patcher_managers.end())
-            {
-                std::string patcher_name = file.getFileNameWithoutExtension().toStdString();
-                
-                std::unique_ptr<PatcherManager> patcher_manager (new PatcherManager(*this, patcher_name));
-                
-                if (patcher_manager->loadFromFile(file))
-                {
-                    auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(),
-                                                                 std::move(patcher_manager));
-                    
-                    open_succeeded = true;
-                    
-                    if((*manager_it)->getNumberOfView() == 0)
-                    {
-                        (*manager_it)->newView();
-                    }
-                }
-                else
-                {
-                    KiwiApp::error("Can't open document. Version is not up to date. Please download latest Kiwi version.");
-                }
-            }
-            else
+            // If a patcher already manages this file, just brings it to front
+            if (manager_it != m_patcher_managers.end())
             {
                 (*manager_it)->bringsFirstViewToFront();
+                return true;
             }
         }
-        else
+        
+        // there is no manager for this file so lets create one
+
+        std::unique_ptr<PatcherManager> temp_manager = nullptr;
+
+        try
         {
-            KiwiApp::error("can't open file (bad file extension)");
+            temp_manager = PatcherManager::createFromFile(*this, file);
+        }
+        catch (std::runtime_error const& err)
+        {
+            const std::string error = err.what();
+            const std::string filename = file.getFileName().toStdString();
+            KiwiApp::error("Can't open document \"" + filename + "\"");
+            KiwiApp::error("error: " + error);
+            KiwiApp::error("Please download latest Kiwi version.");
+            return false;
         }
         
-        return open_succeeded;
+        if(temp_manager)
+        {
+            auto manager_it = m_patcher_managers.emplace(m_patcher_managers.end(),
+                                                         std::move(temp_manager));
+            auto& manager = *(manager_it->get());
+            
+            if(manager.getNumberOfView() == 0)
+            {
+                manager.newView();
+            }
+            
+            return true;
+        }
+        
+        return false;
     }
     
     void Instance::askUserToOpenPatcherDocument()
