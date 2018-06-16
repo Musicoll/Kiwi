@@ -1576,50 +1576,48 @@ namespace kiwi
     
     void PatcherView::createObjectModel(std::string const& text, bool give_focus)
     {
-        if(! model::DocumentManager::isInCommitGesture(m_patcher_model))
+        if(model::DocumentManager::isInCommitGesture(m_patcher_model))
+            return;
+        
+        std::unique_ptr<model::Object> new_object = model::Factory::create(tool::AtomHelper::parse(text));
+        
+        juce::Point<int> pos = getMouseXYRelative() - getOriginPosition();
+        
+        auto& doc = m_patcher_model.entity().use<model::DocumentManager>();
+        
+        new_object->setPosition(pos.x, pos.y);
+        auto& obj = m_patcher_model.addObject(std::move(new_object));
+        
+        const bool linked_newbox = m_local_objects_selection.size() == 1;
+        if(linked_newbox)
         {
-            bool linked_newbox = m_local_objects_selection.size() == 1;
-            
-            std::unique_ptr<model::Object> new_object = model::Factory::create(tool::AtomHelper::parse(text));
-            
-            juce::Point<int> pos = getMouseXYRelative() - getOriginPosition();
-            
-            auto& doc = m_patcher_model.entity().use<model::DocumentManager>();
-            
-            if(linked_newbox)
+            if(auto* selobj = doc.get<model::Object>(*m_local_objects_selection.begin()))
             {
-                model::Object* obj = doc.get<model::Object>(*m_local_objects_selection.begin());
-                
-                if(obj)
+                if(selobj->getNumberOfOutlets() >= 1)
                 {
-                    pos.setX(obj->getX());
-                    pos.setY(obj->getY() + obj->getHeight() + m_grid_size);
+                    obj.setPosition(selobj->getX(),
+                                    selobj->getY() + selobj->getHeight() + m_grid_size);
                     
-                    if(obj->getNumberOfInlets() >= 1)
-                    {
-                        m_patcher_model.addLink(*obj, 0, *new_object, 0);
-                    }
+                    m_patcher_model.addLink(*selobj, 0, obj, 0);
                 }
             }
-            
-            new_object->setPosition(pos.x, pos.y);
-            
-            m_view_model.unselectAll();
-            
-            m_view_model.selectObject(m_patcher_model.addObject(std::move(new_object)));
-            
-            model::DocumentManager::commit(m_patcher_model, "Insert New Empty Box");
-
-            if(give_focus && m_local_objects_selection.size() == 1)
+        }
+        
+        m_view_model.unselectAll();
+        m_view_model.selectObject(obj);
+        
+        std::string commit_message = ("Insert \"" + obj.getName() + "\"");
+        model::DocumentManager::commit(m_patcher_model, commit_message);
+        
+        if(give_focus && m_local_objects_selection.size() == 1)
+        {
+            model::Object* object_m = doc.get<model::Object>(*m_local_objects_selection.begin());
+            if(object_m)
             {
-                model::Object* object_m = doc.get<model::Object>(*m_local_objects_selection.begin());
-                if(object_m)
+                const auto it = findObject(*object_m);
+                if(it != m_objects.cend())
                 {
-                    const auto it = findObject(*object_m);
-                    if(it != m_objects.cend())
-                    {
-                        editObject(**it);
-                    }
+                    editObject(**it);
                 }
             }
         }
