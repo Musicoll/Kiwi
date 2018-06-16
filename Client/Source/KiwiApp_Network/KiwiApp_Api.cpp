@@ -22,6 +22,8 @@
 #include "KiwiApp_Api.h"
 #include <juce_core/juce_core.h>
 
+#include <iomanip>
+
 namespace kiwi
 {
     const std::string Api::Endpoint::root = "/api";
@@ -217,12 +219,14 @@ namespace kiwi
         
         json j_users;
         
-        for(uint64_t const& user_id : user_ids)
+        for(uint64_t user_id : user_ids)
         {
-            std::ostringstream result;
-            result << std::hex << std::uppercase << user_id;
+            std::stringstream converter;
             
-            j_users.push_back(result.str());
+            converter << std::setfill('0') << std::setw(16)
+            << std::hex << std::uppercase << user_id;
+            
+            j_users.push_back(converter.str());
         }
         
         session->setParameters({{"ids", j_users.dump()}});
