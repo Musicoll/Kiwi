@@ -34,7 +34,7 @@ namespace kiwi
         LookAndFeel();
         
         //! @brief Destructor.
-        ~LookAndFeel() = default;
+        virtual ~LookAndFeel() = default;
         
         //! @brief Return the default border size of an object.
         float getObjectBorderSize() const;
