@@ -479,6 +479,10 @@ namespace kiwi
                     {
                         DocumentBrowser::handleDeniedRequest();
                     }
+                    else if (res.result() == beast::http::status::not_found)
+                    {
+                        KiwiApp::error("error: document not found");
+                    }
                     else if(res.error)
                     {
                         KiwiApp::error(res.error.message());
@@ -542,6 +546,10 @@ namespace kiwi
                     if (res.result() == beast::http::status::forbidden)
                     {
                         DocumentBrowser::handleDeniedRequest();
+                    }
+                    else if (res.result() == beast::http::status::not_found)
+                    {
+                        KiwiApp::error("error: document not found");
                     }
                     else if(res.error)
                     {
