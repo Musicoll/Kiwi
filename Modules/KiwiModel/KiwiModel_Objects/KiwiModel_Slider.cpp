@@ -42,13 +42,9 @@ namespace kiwi { namespace model {
         
         
         // flags
-        
-        slider_class->setFlag(ObjectClass::Flag::ResizeWidth);
-        slider_class->setFlag(ObjectClass::Flag::ResizeHeight);
         slider_class->setFlag(ObjectClass::Flag::DefinedSize);
         
         // data model
-        
         flip::Class<Slider> & slider_model = DataModel::declare<Slider>()
                                              .name(slider_class->getModelName().c_str())
                                              .inherit<Object>();
@@ -71,8 +67,6 @@ namespace kiwi { namespace model {
     {
         addSignal<>(Signal::OutputValue, *this);
         
-        setMinWidth(20.);
-        setMinHeight(20.);
         setWidth(20);
         setHeight(50.);
         pushInlet({PinType::IType::Control});

@@ -28,18 +28,13 @@ namespace kiwi { namespace model {
     //                                   DOCUMENT MANAGER                               //
     // ================================================================================ //
     
-    DocumentManager::DocumentManager(flip::DocumentBase& document) :
-    m_document(document),
-    m_history(document),
-    m_gesture_flag(false),
-    m_gesture_cnt(0)
-    {
-        ;
-    }
+    DocumentManager::DocumentManager(flip::DocumentBase& document)
+    : m_document(document)
+    , m_history(m_document)
+    {}
     
     DocumentManager::~DocumentManager()
-    {
-    }
+    {}
     
     void DocumentManager::commit(flip::Type& type, std::string action)
     {
@@ -65,16 +60,16 @@ namespace kiwi { namespace model {
         patcher.entity().use<DocumentManager>().commitGesture(action);
     }
     
-    void DocumentManager::endCommitGesture(flip::Type & type)
+    void DocumentManager::endCommitGesture(flip::Type& type)
     {
         auto& patcher = type.ancestor<model::Patcher>();
         patcher.entity().use<DocumentManager>().endCommitGesture();
     }
     
-    bool DocumentManager::isInCommitGesture(flip::Type & type)
+    bool DocumentManager::isInCommitGesture(flip::Type& type)
     {
         auto & patcher = type.ancestor<model::Patcher>();
-        return patcher.entity().use<DocumentManager>().m_gesture_flag;
+        return(patcher.entity().use<DocumentManager>().m_session != nullptr);
     }
     
     bool DocumentManager::canUndo()
@@ -119,8 +114,6 @@ namespace kiwi { namespace model {
     
     void DocumentManager::commit(std::string action)
     {
-        assert(!m_gesture_flag);
-        
         if(!action.empty())
         {
             m_document.set_label(action);
@@ -145,49 +138,124 @@ namespace kiwi { namespace model {
         m_document.push();
     }
     
-    
     void DocumentManager::startCommitGesture()
     {
-        assert(!m_gesture_flag);
-        m_gesture_flag = true;
+        if(m_session)
+        {
+            m_session->revert();
+        }
+        else
+        {
+            m_session.reset(new Session(m_document));
+        }
         
-        m_gesture_cnt = 0;
+        m_session->start();
     }
     
     void DocumentManager::commitGesture(std::string action)
     {
-        assert(m_gesture_flag);
-        assert(!action.empty());
+        assert(m_session && "call startCommitGesture before");
         
-        m_document.set_label(action);
-        m_document.commit();
-        
-        m_document.set_label(action);
-        auto tx = m_document.squash();
-        
-        if(!tx.empty())
-        {
-            if(m_gesture_cnt == 0)
-            {
-                m_history.add_undo_step(tx);
-            }
-            else
-            {
-                *m_history.last_undo() = tx;
-            }
-            
-            ++m_gesture_cnt;
-        }
+        m_session->commit(action);
     }
     
     void DocumentManager::endCommitGesture()
     {
-        assert(m_gesture_flag);
-        m_gesture_flag = false;
+        assert(m_session && "call startCommitGesture before");
         
-        if(m_gesture_cnt > 0)
+        m_session->end(&m_history);
+        m_document.push();
+        m_session.reset();
+    }
+    
+    // ================================================================================ //
+    //                                      SESSION                                     //
+    // ================================================================================ //
+    
+    DocumentManager::Session::Session(flip::DocumentBase& document)
+    : m_document(document)
+    , m_history(document)
+    {}
+    
+    DocumentManager::Session::~Session()
+    {}
+    
+    void DocumentManager::Session::start()
+    {
+        if(m_tx.empty())
+            return;
+        
+        m_document.execute_backward(m_tx);
+    }
+    
+    void DocumentManager::Session::commit()
+    {
+        bool first_flag = m_tx.empty();
+        auto tx = m_document.commit();
+        
+        m_document.execute_backward(tx);
+        m_document.execute_backward(m_tx);
+        
+        flip::Transaction tx_abs;
+        m_document.root<model::Patcher>().make(tx_abs);
+        tx_abs.invert_direction();
+        
+        m_tx = tx_abs;
+        
+        if(tx.has_metadata(flip::Transaction::key_label))
         {
-            m_document.push();
+            m_tx.impl_use_metadata_map()[flip::Transaction::key_label] = tx.label();
         }
+        
+        if(first_flag)
+        {
+            m_history.add_undo_step(m_tx);
+        }
+        else if(m_tx.empty())
+        {
+            m_history.erase(m_history.last_undo());
+        }
+        else
+        {
+            *m_history.last_undo() = m_tx;
+        }
+        
+        m_document.revert();
+    }
+    
+    void DocumentManager::Session::commit(std::string label)
+    {
+        if(!label.empty())
+        {
+            m_document.set_label(label);
+        }
+        
+        commit();
+    }
+    
+    void DocumentManager::Session::end(flip::History<flip::HistoryStoreMemory>* master_history)
+    {
+        if(m_tx.empty()) return;
+        
+        if(master_history != nullptr)
+        {
+            // copy session transaction into the master history.
+            master_history->add_undo_step(m_tx);
+        }
+        
+        m_tx.clear();
+        m_history.clear();
+    }
+    
+    void DocumentManager::Session::revert()
+    {
+        if(m_tx.empty()) return;
+        
+        m_document.execute_backward(m_tx);
+        m_tx.clear();
+        
+        m_document.commit();
+        
+        m_history.erase(m_history.last_undo());
     }
 }}

@@ -21,12 +21,12 @@
 
 #pragma once
 
-#include <flip/BackEndIR.h>
+#include <KiwiModel/KiwiModel_Converters/KiwiModel_ConverterBase.h>
 
 namespace kiwi { namespace model {
     
     // ================================================================================ //
-    //                                   CONVERTER                                      //
+    //                                KIWI CONVERTER                                    //
     // ================================================================================ //
     
     //! @brief Converts a document's backend representation to meet current version representation.
@@ -34,21 +34,32 @@ namespace kiwi { namespace model {
     {
     public: // methods
         
+        //! @brief Returns the current version of the converter.
+        static std::string const& getLatestVersion();
+        
+        //! @brief Returns true if a given version can be converted from.
+        static bool canConvertToLatestFrom(std::string const& version);
+        
         //! @brief Tries converting current data model version.
         //! @details Returns true if the conversion was successful, false otherwise. Call this function
         //! after reading from data provider.
-        static bool process(flip::BackEndIR & backend);
+        static bool process(flip::BackEndIR& backend);
         
     private: // methods
         
-        //! @brief Converts a v1 data model to a v2 data model.
-        static void convert_v1_v2(flip::BackEndIR& backend);
+        Converter();
+        ~Converter();
+        static Converter& use();
         
-        //! @brief Converts a v3 data model to a v4 data model.
-        static void convert_v3_v4(flip::BackEndIR& backend);
+        using converters_t = std::vector<std::unique_ptr<ConverterBase>>;
+        converters_t& converters();
         
-        //! @brief Removes invalid links
-        static void remove_invalid_links(flip::BackEndIR& backend);
+        template<class T>
+        bool addConverter();
+        
+    private: // variables
+        
+        converters_t m_converters;
     };
     
 }}

@@ -50,27 +50,27 @@ namespace kiwi
         
         enum class Action
         {
-            None =              0,
-            CopyOnDrag =        1,
-            Object =            2,
-            CreateLink =        3,
-            Lasso =             4,
-            MoveObject =        5,
-            PopupMenu =         6,
-            ObjectEdition =     7,
-            SwitchSelection =   8,
-            Selection =         9,
-            SwitchLock =        10,
-            ResizeObject =      11
+            None = 0,
+            CopyOnDrag,
+            Object,
+            CreateLink,
+            Lasso,
+            MoveObjects,
+            ResizeObjects,
+            PopupMenu,
+            ObjectEdition,
+            SwitchSelection,
+            Selection,
+            SwitchLock
         };
         
         enum Direction : int
         {
-            None = 0,
-            Up = 1 << 0,
-            Down = 1 << 1,
-            Left = 1 << 2,
-            Right = 1 << 3
+            None    = 0,
+            Up      = 1 << 0,
+            Down    = 1 << 1,
+            Left    = 1 << 2,
+            Right   = 1 << 3
         };
         
     public: // methods
@@ -113,12 +113,14 @@ namespace kiwi
         //! @brief Returns the resize direction according to the hit_tester.
         int getResizeDirection(HitTester const& hit_tester) const;
         
-        //! @brief Applies new bounds to a object model.
-        //! @details If ratio is set, the function will keep this ratio will resizing.
-        void applyNewBounds(model::Object & object_model, juce::Rectangle<int> new_bounds, double ratio = 0.) const;
-        
         //! @brief Returns the right resize mouse cursor.
         juce::MouseCursor::StandardCursorType getMouseCursorForBorder(HitTester const& hit_tester) const;
+        
+        //! @brief Resize the model object's bounds
+        void resizeModelObjectBounds(model::Object& model,
+                                     ObjectFrame& box,
+                                     juce::Rectangle<int> prev_bounds,
+                                     juce::Point<int> delta, bool fixed_ratio);
         
     private: // members
         

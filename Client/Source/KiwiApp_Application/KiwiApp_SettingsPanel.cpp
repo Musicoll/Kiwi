@@ -33,8 +33,8 @@ namespace kiwi
     SettingsPanel::SettingsPanel():
     m_settings(getAppSettings().network().getServerAddress()),
     m_pannel("Application settings"),
-    m_apply_button("apply"),
-    m_reset_button("reset")
+    m_apply_button("Apply"),
+    m_reset_button("Reset")
     {
         
         juce::Array<juce::PropertyComponent*> props {
@@ -49,9 +49,6 @@ namespace kiwi
         };
         
         m_pannel.addSection("Network config", props, true, 0);
-        
-        m_apply_button.setButtonText("Apply");
-        m_reset_button.setButtonText("Reset");
         
         m_apply_button.addListener(this);
         m_reset_button.addListener(this);
@@ -85,15 +82,15 @@ namespace kiwi
         m_reset_button.changeWidthToFitText();
     }
     
-    void SettingsPanel::buttonClicked(juce::Button * button)
+    void SettingsPanel::buttonClicked(juce::Button* button)
     {
-        if (button->getName() == "apply")
+        if (button == &m_apply_button)
         {
             getAppSettings().network().setServerAddress(m_settings[Ids::host].toString().toStdString(),
                                                         m_settings[Ids::api_port].operator int(),
                                                         m_settings[Ids::session_port].operator int());
         }
-        else if(button->getName() == "reset")
+        else if(button == &m_reset_button)
         {
             NetworkSettings & network = getAppSettings().network();
             

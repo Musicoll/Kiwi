@@ -114,7 +114,7 @@ namespace kiwi
         
         int m_edge_indent;
         
-        std::function<void(void)> m_command;
+        std::function<void(void)> m_command = nullptr;
         
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ImageButton)
     };

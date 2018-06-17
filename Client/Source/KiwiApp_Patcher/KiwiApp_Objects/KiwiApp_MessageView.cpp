@@ -40,105 +40,121 @@ namespace kiwi {
         return std::make_unique<MessageView>(object_model);
     }
     
-    MessageView::MessageView(model::Object & object_model) :
-    EditableObjectView(object_model),
-    m_output_message(object_model.getSignal<>(model::Message::Signal::outputMessage)),
-    m_active(false)
+    MessageView::MessageView(model::Object & object_model)
+    : EditableObjectView(object_model)
+    , m_output_message(object_model.getSignal<>(model::Message::Signal::outputMessage))
+    , m_active(false)
     {
+        setColour(ObjectView::ColourIds::Background, juce::Colours::whitesmoke);
+        setColour(ObjectView::ColourIds::Outline, juce::Colours::whitesmoke.withAlpha(0.f));
+        
         juce::Label & label = getLabel();
+        const auto object_text = object_model.getAttribute("text")[0].getString();
+        label.setText(object_text, juce::NotificationType::dontSendNotification);
         
-        label.setText(object_model.getAttribute("text")[0].getString(),
-                      juce::NotificationType::dontSendNotification);
+        label.setColour(juce::Label::backgroundColourId,
+                        findColour(ObjectView::ColourIds::Background));
         
-        label.setColour(juce::Label::backgroundColourId, findColour(ObjectView::ColourIds::Background));
         label.setColour(juce::Label::backgroundWhenEditingColourId,
-                          findColour(ObjectView::ColourIds::Background));
-        label.setColour(juce::Label::textColourId, findColour(ObjectView::ColourIds::Text));
-        label.setColour(juce::Label::textWhenEditingColourId, findColour(ObjectView::ColourIds::Text));
+                        findColour(ObjectView::ColourIds::Background));
         
-        label.setInterceptsMouseClicks(false, false);
+        label.setColour(juce::Label::textColourId,
+                        findColour(ObjectView::ColourIds::Text));
+        
+        label.setColour(juce::Label::textWhenEditingColourId,
+                        findColour(ObjectView::ColourIds::Text));
 
         addAndMakeVisible(label);
     }
 
     MessageView::~MessageView()
-    {
-    }
+    {}
     
     void MessageView::mouseDown(juce::MouseEvent const& e)
     {
         m_active = true;
-        
-        repaint();
-        
         m_output_message();
+        repaint();
     }
     
     void MessageView::mouseUp(juce::MouseEvent const& e)
     {
         m_active = false;
-        
         repaint();
+    }
+    
+    void MessageView::paint(juce::Graphics& g)
+    {
+        const float roundness = 3.f;
+        const float bordersize = 1.f;
+        const auto bounds = getLocalBounds().toFloat().reduced(bordersize*0.5f);
+        const auto bgcolor = findColour(ObjectView::ColourIds::Background);
+        const auto active_color = findColour(ObjectView::ColourIds::Active);
+        const bool clicked = m_active;
+        
+        g.setColour(bgcolor.contrasting(clicked ? 0.1 : 0.));
+        g.fillRoundedRectangle(bounds, roundness);
+        
+        g.setColour(clicked ? active_color : bgcolor.contrasting(0.25));
+        g.drawRoundedRectangle(bounds, roundness, bordersize);
     }
     
     void MessageView::paintOverChildren (juce::Graphics& g)
     {
-        g.setColour (findColour (ObjectView::ColourIds::Outline));
+        if(getLabel().isBeingEdited())
+            return; // abort
         
-        drawOutline(g);
+        g.setColour(m_active
+                    ? findColour(ObjectView::ColourIds::Active)
+                    : findColour(ObjectView::ColourIds::Background).contrasting(0.25));
+        
+        const auto bounds = getLocalBounds();
+        const auto topright = bounds.getTopRight().toFloat();
         
         juce::Path corner;
-        
-        juce::Rectangle<int> bounds = getLocalBounds();
-        
-        if (m_active)
-        {
-            g.setColour(findColour(ObjectView::ColourIds::Active));
-        }
-        
-        corner.addTriangle(bounds.getTopRight().toFloat() - juce::Point<float>(10, 0),
-                           bounds.getTopRight().toFloat(),
-                           bounds.getTopRight().toFloat() + juce::Point<float>(0, 10));
+        corner.addTriangle(topright.translated(-10.f, 0.f),
+                           topright,
+                           topright.translated(0, 10));
         
         g.fillPath(corner);
     }
     
-    void MessageView::resized()
-    {
-        getLabel().setBounds(getLocalBounds());
-    }
-    
     void MessageView::textEditorTextChanged(juce::TextEditor& editor)
     {
-        const int text_width = editor.getFont().getStringWidth(editor.getText());
+        const auto text = editor.getText();
+        auto single_line_text_width = editor.getFont().getStringWidthFloat(text) + 16 + 2;
+        auto width = std::max<float>(getWidth() + 16, single_line_text_width);
         
-        if(editor.getWidth() < text_width + 16)
-        {
-            setSize(text_width + 16, getHeight());
-        }
+        auto prev_width = getWidth();
+        auto text_bounds = getTextBoundingBox(text, width);
+        
+        setSize(std::max<int>(prev_width, single_line_text_width),
+                std::max(std::min<int>(text_bounds.getHeight(), getHeight()), getMinHeight()));
     }
     
     void MessageView::attributeChanged(std::string const& name, tool::Parameter const& param)
     {
-        if (name == "text")
+        static const std::string name_text = "text";
+        if (name == name_text)
         {
-            getLabel().setText(param[0].getString(), juce::NotificationType::dontSendNotification);
+            setText(param[0].getString());
+            checkComponentBounds(this);
         }
     }
     
     void MessageView::textChanged()
     {
-        juce::Label& label = getLabel();
-        
         // Parse text and convert it back to string to display the formated version.
-        const auto atoms = tool::AtomHelper::parse(label.getText().toStdString(),
+        const auto atoms = tool::AtomHelper::parse(getText().toStdString(),
                                                    tool::AtomHelper::ParsingFlags::Comma
                                                    | tool::AtomHelper::ParsingFlags::Dollar);
         
         auto formatted_text = tool::AtomHelper::toString(atoms);
-        const int text_width = label.getFont().getStringWidth(formatted_text);
+        const int text_width = getFont().getStringWidth(formatted_text);
         model::Object & model = getModel();
-        model.setWidth(text_width + 16);
+        
+        model.setWidth(std::max(26, text_width) + 10);
+        model.setHeight(getMinHeight());
         
         // set the attribute and label text with formated text
         getLabel().setText(formatted_text, juce::NotificationType::dontSendNotification);
@@ -149,21 +165,16 @@ namespace kiwi {
     
     juce::TextEditor* MessageView::createdTextEditor()
     {
-        juce::TextEditor * editor = new juce::TextEditor();
-        
-        editor->setBounds(getLocalBounds());
-        editor->setBorder(juce::BorderSize<int>(0));
-        
+        auto* editor = new juce::TextEditor();
         
         editor->setColour(juce::TextEditor::ColourIds::textColourId,
                           getLabel().findColour(juce::Label::textWhenEditingColourId));
         
         editor->setColour(juce::TextEditor::backgroundColourId,
-                          getLabel().findColour(juce::Label::backgroundWhenEditingColourId));
+                          juce::Colours::transparentWhite);
         
         editor->setColour(juce::TextEditor::highlightColourId,
                           findColour(ObjectView::ColourIds::Highlight, true).withAlpha(0.4f));
-        
         
         editor->setColour(juce::TextEditor::outlineColourId,
                           juce::Colours::transparentWhite);
@@ -171,14 +182,19 @@ namespace kiwi {
         editor->setColour(juce::TextEditor::focusedOutlineColourId,
                           juce::Colours::transparentWhite);
         
+        editor->setBounds(getLocalBounds());
+        editor->setIndents(getPadding(), getPadding());
+        editor->setBorder(juce::BorderSize<int>(0));
+        editor->setFont(getFont());
+        editor->setJustification(getLabel().getJustificationType());
+        
         editor->setScrollbarsShown(false);
         editor->setScrollToShowCursor(true);
         editor->setReturnKeyStartsNewLine(false);
-        editor->setMultiLine(true, false);
+        editor->setMultiLine(true, true);
         editor->setInterceptsMouseClicks(true, false);
         
         editor->addListener(this);
-        
         return editor;
     }
 }

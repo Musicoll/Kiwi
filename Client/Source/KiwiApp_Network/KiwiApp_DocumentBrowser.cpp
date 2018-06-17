@@ -163,11 +163,11 @@ namespace kiwi
         });
     }
     
-    void DocumentBrowser::Drive::createNewDocument()
+    void DocumentBrowser::Drive::createNewDocument(std::string const& name)
     {
         std::weak_ptr<DocumentBrowser::Drive> drive(m_drive);
         
-        KiwiApp::useApi().createDocument("", [drive](Api::Response res, Api::Document document)
+        KiwiApp::useApi().createDocument(name, [drive](Api::Response res, Api::Document document)
         {
             KiwiApp::useScheduler().schedule([drive, res, document]()
             {
@@ -284,6 +284,24 @@ namespace kiwi
     
     void DocumentBrowser::Drive::refresh_internal()
     {
+        const bool is_connected = KiwiApp::canConnectToServer();
+        const bool was_connected = m_was_connected;
+        
+        if(was_connected != is_connected)
+        {
+            // dirty connection state manager :(
+            // todo: need to refactor all document browser system
+            m_listeners.call(&Listener::driveConnectionStatusChanged, is_connected);
+        }
+        
+        m_was_connected = is_connected;
+        
+        if(was_connected && !is_connected)
+        {
+            m_drive->updateDocumentList({});
+            return;
+        }
+        
         std::weak_ptr<DocumentBrowser::Drive> drive(m_drive);
         
         KiwiApp::useApi().getDocuments([drive](Api::Response res, Api::Documents docs)
@@ -473,6 +491,10 @@ namespace kiwi
                     {
                         DocumentBrowser::handleDeniedRequest();
                     }
+                    else if (res.result() == beast::http::status::not_found)
+                    {
+                        KiwiApp::error("error: document not found");
+                    }
                     else if(res.error)
                     {
                         KiwiApp::error(res.error.message());
@@ -536,6 +558,10 @@ namespace kiwi
                     if (res.result() == beast::http::status::forbidden)
                     {
                         DocumentBrowser::handleDeniedRequest();
+                    }
+                    else if (res.result() == beast::http::status::not_found)
+                    {
+                        KiwiApp::error("error: document not found");
                     }
                     else if(res.error)
                     {

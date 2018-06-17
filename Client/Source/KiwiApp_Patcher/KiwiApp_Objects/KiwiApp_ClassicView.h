@@ -53,21 +53,18 @@ namespace kiwi
         
         //! @brief Constructs the label's text editor.
         //! @brief Overrides EditableObjectView::createTextEditor.
-        juce::TextEditor* createdTextEditor() override final;
+        juce::TextEditor* createdTextEditor() override;
         
         //! @brief Called when label text changed.
         //! @details Overrides EditableObjectView::textChanged.
-        void textChanged() override final;
-        
-        //! @brief Called when the object is resized.
-        void resized() override final;
+        void textChanged() override;
         
         //! @brief Called when the text is being typed.
         //! @details Used to resize in order to keep text visible.
-        void textEditorTextChanged(juce::TextEditor& editor) override final;
+        void textEditorTextChanged(juce::TextEditor& editor) override;
         
         //! @brief Paints elements over the text editor.
-        void paintOverChildren (juce::Graphics& g) override final;
+        void paintOverChildren (juce::Graphics& g) override;
         
     private: // deleted methods
         

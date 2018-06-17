@@ -62,6 +62,16 @@ namespace kiwi
         //! @brief Destructor
         ~PatcherView();
         
+        //! @brief PatcherView colors
+        enum ColourIds
+        {
+            BackgroundUnlocked =    0x2100010,
+            BackgroundLocked =      0x2100012,
+            Selection =             0x2100100,
+            SelectionOtherView =    0x2100105,
+            SelectionOtherUser =    0x2100110
+        };
+        
         using ObjectFrames = std::vector<std::unique_ptr<ObjectFrame>>;
         using LinkViews = std::vector<std::unique_ptr<LinkView>>;
         

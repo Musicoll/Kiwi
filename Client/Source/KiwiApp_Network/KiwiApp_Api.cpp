@@ -20,6 +20,9 @@
  */
 
 #include "KiwiApp_Api.h"
+#include <juce_core/juce_core.h>
+
+#include <iomanip>
 
 namespace kiwi
 {
@@ -216,12 +219,14 @@ namespace kiwi
         
         json j_users;
         
-        for(uint64_t const& user_id : user_ids)
+        for(uint64_t user_id : user_ids)
         {
-            std::ostringstream result;
-            result << std::hex << std::uppercase << user_id;
+            std::stringstream converter;
             
-            j_users.push_back(result.str());
+            converter << std::setfill('0') << std::setw(16)
+            << std::hex << std::uppercase << user_id;
+            
+            j_users.push_back(converter.str());
         }
         
         session->setParameters({{"ids", j_users.dump()}});
@@ -524,13 +529,14 @@ namespace kiwi
     
     std::string Api::convertDate(std::string const& date)
     {
-        std::string result = date;
+        const bool with_date = true;
+        const bool with_time = true;
+        const bool with_second = false;
+        const bool use_24_hour_clock = true;
         
-        result.replace(result.find_first_of("T"), 1 , " ");
-        result.replace(result.find_first_of("Z"), 1 , " ");
-        result.append("GMT");
-        
-        return result;
+        return (juce::Time::fromISO8601(juce::String(date))
+                .toString(with_date, with_time, with_second, use_24_hour_clock)
+                .toStdString());
     }
     
     bool Api::hasJsonHeader(Response const& res)

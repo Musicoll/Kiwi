@@ -41,7 +41,6 @@ namespace kiwi { namespace model {
         
         
         // flags
-        number_class->setFlag(ObjectClass::Flag::ResizeWidth);
         number_class->setFlag(ObjectClass::Flag::DefinedSize);
         
         // data model
@@ -68,8 +67,6 @@ namespace kiwi { namespace model {
         
         addSignal<>(Signal::OutputValue, *this);
         
-        setMinWidth(20.);
-        setMinHeight(20.);
         setWidth(50.);
         setHeight(20.);
         pushInlet({PinType::IType::Control});

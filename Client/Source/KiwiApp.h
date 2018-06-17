@@ -34,8 +34,8 @@
 namespace ProjectInfo
 {
     const char* const  projectName    = "Kiwi";
-    const char* const  versionString  = "v1.0.1";
-    const int          versionNumber  = 0x101;
+    const char* const  versionString  = "v1.0.2";
+    const int          versionNumber  = 0x102;
 }
 
 namespace kiwi
@@ -44,9 +44,10 @@ namespace kiwi
     //                                  KiWi APPLICATION                                //
     // ================================================================================ //
     
-    class KiwiApp : public juce::JUCEApplication,
-                    public NetworkSettings::Listener,
-                    public juce::Timer
+    class KiwiApp
+    : public juce::JUCEApplication
+    , public NetworkSettings::Listener
+    , public juce::MultiTimer
     {
     public: // methods
         
@@ -76,7 +77,7 @@ namespace kiwi
         bool moreThanOneInstanceAllowed() override;
         
         //! @brief Timer call back, processes the scheduler events list.
-        void timerCallback() override final;
+        void timerCallback(int timer_id) override;
         
         //! @brief Returns true if the app is running in a Mac OSX operating system.
         static bool isMacOSX();
@@ -112,6 +113,9 @@ namespace kiwi
         
         //! @brief Log-out the user
         static void logout();
+        
+        //! @brief Return true if the application can connect to the server.
+        static bool canConnectToServer();
         
         //! @brief Get the current running engine instance.
         static engine::Instance& useEngineInstance();
@@ -222,6 +226,19 @@ namespace kiwi
         
     private: // methods
         
+        //! @internal Returns true if the App is compatible with a given server version.
+        bool canConnectToServerVersion(std::string const& server_version);
+        
+        //! @internal Ping the server to test current connection
+        //! @brief Called regularly by the App
+        void pingServer();
+        
+        //! @internal handle ping succeed
+        void pingSucceed(std::string const& server_version);
+        
+        //! @internal handle ping failed
+        void pingFailed(Api::Error error);
+        
         //! @internal Utility to quit the app asynchronously.
         class AsyncQuitRetrier;
         
@@ -231,9 +248,6 @@ namespace kiwi
         //! @internal Initializes gui specific objects.
         void declareObjectViews();
         
-        //! @internal Checks if current Kiwi version is the latest. Show popup if version not up to date.
-        void checkLatestRelease();
-        
         // @brief Handles changes of server address.
         void networkSettingsChanged(NetworkSettings const& settings, juce::Identifier const& ids) override final;
 
@@ -242,16 +256,25 @@ namespace kiwi
         
     private: // members
         
-        std::unique_ptr<ApiController>                      m_api_controller;
-        std::unique_ptr<Api>                                m_api;
-        
-        std::unique_ptr<Instance>                           m_instance;
-        std::unique_ptr<juce::ApplicationCommandManager>	m_command_manager;
-        std::unique_ptr<MainMenuModel>                      m_menu_model;
+        enum TimerIds : int
+        {
+            MainScheduler = 0,
+            ServerPing,
+        };
         
         LookAndFeel                                         m_looknfeel;
         TooltipWindow                                       m_tooltip_window;
-        std::unique_ptr<StoredSettings>                     m_settings;
-        std::unique_ptr<tool::Scheduler<>>                  m_scheduler;
+        
+        std::unique_ptr<ApiController>                      m_api_controller = nullptr;
+        std::unique_ptr<Api>                                m_api = nullptr;
+        
+        std::unique_ptr<Instance>                           m_instance = nullptr;
+        std::unique_ptr<juce::ApplicationCommandManager>	m_command_manager = nullptr;
+        std::unique_ptr<MainMenuModel>                      m_menu_model = nullptr;
+        std::unique_ptr<StoredSettings>                     m_settings = nullptr;
+        
+        std::unique_ptr<tool::Scheduler<>>                  m_scheduler = nullptr;
+        
+        std::string m_last_server_version_check {};
     };
 }
