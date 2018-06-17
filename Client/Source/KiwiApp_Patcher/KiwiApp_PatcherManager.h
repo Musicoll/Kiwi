@@ -95,16 +95,16 @@ namespace kiwi
         model::Patcher const& getPatcher() const;
         
         //! @brief Returns true if the this is a remotely connected document.
-        bool isRemote() const noexcept;
+        bool isConnected() const noexcept;
         
         //! @brief Returns the session ID of the document.
         //! @details This function returns 0 if the document is loaded from disk or memory.
-        //! @see isRemote
+        //! @see isConnected
         uint64_t getSessionId() const noexcept;
         
         //! @brief Returns the name of the document.
         //! @details This function returns 0 if the document is loaded from disk or memory.
-        //! @see isRemote
+        //! @see isConnected
         std::string getDocumentName() const;
         
         //! @brief Returns the number of users connected to the patcher document.
@@ -139,16 +139,19 @@ namespace kiwi
         //! @brief remove a listener.
         void removeListener(Listener& listener);
         
+        //! @brief Force all windows to close without asking user to save document.
+        void forceCloseAllWindows();
+        
+    private:
+        
         //! @brief Called when a document session has been added.
         void documentAdded(DocumentBrowser::Drive::DocumentSession& doc) override;
         
         //! @brief Called when a document session changed.
         void documentChanged(DocumentBrowser::Drive::DocumentSession& doc) override;
         
-        //! @brief Force all windows to close without asking user to save document.
-        void forceCloseAllWindows();
-        
-    private:
+        //! @brief Called when the drive connection status changed.
+        void driveConnectionStatusChanged(bool is_online) override;
         
         //! @internal Called from socket process to notify changing state.
         void onStateTransition(flip::CarrierBase::Transition transition, flip::CarrierBase::Error error);

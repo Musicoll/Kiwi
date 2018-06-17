@@ -121,10 +121,6 @@ namespace kiwi
         
         m_instance = std::make_unique<Instance>();
         m_command_manager->registerAllCommandsForTarget(this);
-        
-        checkLatestRelease();
-        
-        startTimer(10);
 
         #if JUCE_WINDOWS
         openCommandFile(commandLine);
@@ -137,6 +133,10 @@ namespace kiwi
         macMainMenuPopup.addCommandItem(&getCommandManager(), CommandIDs::showAppSettingsWindow);
         juce::MenuBarModel::setMacMainMenu(m_menu_model.get(), &macMainMenuPopup, TRANS("Open Recent"));
         #endif
+        
+        pingServer();
+        startTimer(TimerIds::MainScheduler, 10); // main scheduler update
+        startTimer(TimerIds::ServerPing, 3000); // Server ping
     }
     
     void KiwiApp::anotherInstanceStarted(juce::String const& command_line)
@@ -232,7 +232,8 @@ namespace kiwi
         juce::MenuBarModel::setMacMainMenu(nullptr);
         #endif
         
-        stopTimer();
+        stopTimer(TimerIds::MainScheduler);
+        stopTimer(TimerIds::ServerPing);
         
         m_instance.reset();
         m_api->cancelAll();
@@ -272,9 +273,18 @@ namespace kiwi
         return true;
     }
     
-    void KiwiApp::timerCallback()
+    void KiwiApp::timerCallback(int timer_id)
     {
-        m_scheduler->process();
+        if(timer_id == TimerIds::MainScheduler)
+        {
+            m_instance->tick();
+            m_scheduler->process();
+        }
+        else if(timer_id == TimerIds::ServerPing)
+        {
+            // ping server
+            pingServer();
+        }
     }
     
     bool KiwiApp::isMacOSX()
@@ -343,55 +353,114 @@ namespace kiwi
     
     void KiwiApp::logout()
     {
-        useInstance().logout();
+        useInstance().handleConnectionLost();
         KiwiApp::use().m_api_controller->logout();
         KiwiApp::commandStatusChanged();
     }
     
     bool KiwiApp::canConnectToServer()
     {
-        return KiwiApp::use().m_same_app_and_server_version;
+        const auto server_version = KiwiApp::use().m_last_server_version_check;
+        
+        return (!server_version.empty()
+                && server_version != "null"
+                && KiwiApp::use().canConnectToServerVersion(server_version));
     }
     
-    void KiwiApp::checkLatestRelease()
+    bool KiwiApp::canConnectToServerVersion(std::string const& server_version)
     {
-        std::string current_version = getApplicationVersion().toStdString();
+        const auto& version = KiwiApp::use().getApplicationVersion();
+        return (version.compare(server_version) == 0);
+    }
+    
+    void KiwiApp::pingSucceed(std::string const& new_server_version)
+    {
+        bool was_connected = canConnectToServer();
         
-        Api::CallbackFn<std::string const&> on_success = [this, current_version](std::string const& server_version) {
-            
-            KiwiApp::useScheduler().schedule([this, current_version, server_version]() {
-                
-                m_same_app_and_server_version = (current_version == server_version);
-                if (!m_same_app_and_server_version)
-                {
-                    juce::String title = "Incompatible Application and Server versions.";
-                    juce::String text = "- app: " + juce::String(current_version) + "\n";
-                    text += "- server: " + juce::String(server_version) + "\n";
-                    text += "\nPlease visit: https://github.com/Musicoll/Kiwi/releases";
-                    
-                    juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
-                                                           title, text);
-                }
-            });
-        };
+        if((new_server_version == m_last_server_version_check) && was_connected)
+            return;
         
-        Api::ErrorCallback on_fail =[](Api::Error error)
+        if (was_connected)
         {
+            logout();
+        }
+        
+        if (canConnectToServerVersion(new_server_version))
+        {
+            useInstance().login();
+        }
+        else if(m_last_server_version_check != new_server_version)
+        {
+            const auto current_version = KiwiApp::use().getApplicationVersion().toStdString();
+            warning("Can't connect to server! Requires Kiwi " + new_server_version
+                    + ", please visit:");
+            warning("https://github.com/Musicoll/Kiwi/releases");
+        }
+        
+        m_last_server_version_check = new_server_version;
+        
+        if(!was_connected && canConnectToServer())
+        {
+            const auto api_host = m_api_controller->getHost();
+            post("Connection established to " + api_host);
+        }
+    }
+    
+    void KiwiApp::pingFailed(Api::Error error)
+    {
+        static const std::string ping_failed = "null";
+        
+        const bool was_connected = canConnectToServer();
+        if(was_connected)
+        {
+            KiwiApp::error("Connection lost");
+            m_instance->handleConnectionLost();
+        }
+        else if(m_last_server_version_check != ping_failed)
+        {
+            KiwiApp::error("Connection to server failed: " + error.getMessage());
+        }
+        
+        m_last_server_version_check = ping_failed;
+    }
+    
+    void KiwiApp::pingServer()
+    {
+        Api::CallbackFn<std::string const&> success = [this](std::string const& server_version) {
+            
+            KiwiApp::useScheduler().schedule([this, server_version]() {
+                pingSucceed(server_version);
+            });
+            
         };
         
-        useApi().getRelease(on_success, on_fail);
+        useApi().getRelease(success, [this](Api::Error err) {
+            
+            KiwiApp::useScheduler().schedule([this, err = std::move(err)]() {
+                pingFailed(err);
+            });
+            
+        });
     }
     
     void KiwiApp::networkSettingsChanged(NetworkSettings const& settings, juce::Identifier const& id)
     {
         if (id == Ids::server_address)
         {
-            logout();
+            auto& api = *m_api_controller;
             
-            m_api_controller->setHost(settings.getHost());
-            m_api_controller->setPort(settings.getApiPort());
+            const auto host = settings.getHost();
+            const auto api_port = settings.getApiPort();
+            //const auto session_port = settings.getSessionPort();
             
-            checkLatestRelease();
+            if((api.getHost() != host) || (api_port != api.getPort()))
+            {
+                // settings changed
+                m_api_controller->setHost(settings.getHost());
+                m_api_controller->setPort(settings.getApiPort());
+                
+                pingServer();
+            }
         }
     }
 

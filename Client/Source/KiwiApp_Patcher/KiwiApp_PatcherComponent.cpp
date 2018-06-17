@@ -108,7 +108,7 @@ namespace kiwi
         ids.add(flexibleSpacerId);
         ids.add(ItemIds::dsp_on_off);
         
-        if(m_patcher_manager.isRemote())
+        if(m_patcher_manager.isConnected())
         {
             ids.add(ItemIds::users);
         }
@@ -116,7 +116,7 @@ namespace kiwi
     
     void PatcherToolbar::Factory::getDefaultItemSet(juce::Array<int>& ids)
     {
-        if(m_patcher_manager.isRemote())
+        if(m_patcher_manager.isConnected())
         {
             ids.add(ItemIds::users);
             ids.add(separatorBarId);

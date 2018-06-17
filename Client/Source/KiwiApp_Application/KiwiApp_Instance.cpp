@@ -41,62 +41,22 @@ namespace kiwi
 
     size_t Instance::m_untitled_patcher_index(1);
     
-    Instance::Instance() :
-    m_instance(std::make_unique<DspDeviceManager>(), KiwiApp::useScheduler()),
-    m_browser(KiwiApp::getCurrentUser().isLoggedIn() ? KiwiApp::getCurrentUser().getName(): "logged out",
-              1000),
-    m_console_history(std::make_shared<ConsoleHistory>(m_instance)),
-    m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
+    Instance::Instance()
+    : m_instance(std::make_unique<DspDeviceManager>(), KiwiApp::useScheduler())
+    , m_browser("Offline", 1000)
+    , m_console_history(std::make_shared<ConsoleHistory>(m_instance))
+    , m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
     {
-        startTimer(10);
-        
         // reserve space for singleton windows.
         m_windows.resize(std::size_t(WindowId::count));
         
-        //showAppSettingsWindow();
-        //showBeaconDispatcherWindow();
         showDocumentBrowserWindow();
         showConsoleWindow();
     }
     
     Instance::~Instance()
     {
-        closeAllPatcherWindows();
-        stopTimer();
-    }
-    
-    void Instance::timerCallback()
-    {
-        for(auto manager = m_patcher_managers.begin(); manager != m_patcher_managers.end();)
-        {
-            bool keep_patcher = true;
-            
-            if ((*manager)->isRemote())
-            {
-                (*manager)->pull();
-                
-                if (!(*manager)->isRemote())
-                {
-                    keep_patcher
-                    = (*manager)->getFirstWindow().showOkCancelBox(juce::AlertWindow::QuestionIcon,
-                                                                   "Connetion lost",
-                                                                   "Do you want to continue editing document \""
-                                                                   + (*manager)->getDocumentName() +"\" offline",
-                                                                   "Ok",
-                                                                   "Cancel");
-                }
-            }
-            
-            if (!keep_patcher)
-            {
-                (*manager)->forceCloseAllWindows();
-                manager = m_patcher_managers.erase(manager);
-            }
-            else
-            {
-                ++manager;
-            }
-        }
+        forceCloseAllPatcherWindows();
     }
     
     uint64_t Instance::getUserId() const noexcept
@@ -106,42 +66,86 @@ namespace kiwi
     }
     
     void Instance::login()
+    {
+        if(getUserId() > flip::Ref::User::Offline)
         {
             m_browser.setDriveName(KiwiApp::getCurrentUser().getName());
-        
             m_windows[std::size_t(WindowId::DocumentBrowser)]->getContentComponent()->setEnabled(true);
         }
-    
-    void Instance::logout()
-    {
-        m_browser.setDriveName("logged out");
-        
-        for(auto manager = m_patcher_managers.begin(); manager != m_patcher_managers.end();)
+        else
         {
-            if ((*manager)->isRemote())
+            showAuthWindow(AuthPanel::FormType::Login);
+        }
+    }
+    
+    void Instance::handleConnectionLost()
+    {
+        m_browser.setDriveName("Offline");
+        m_windows[std::size_t(WindowId::DocumentBrowser)]->getContentComponent()->setEnabled(false);
+    }
+    
+    void Instance::tick()
+    {
+        static bool is_pulling = false;
+        if(!is_pulling)
+        {
+            is_pulling = true;
+            pullRemoteDocuments();
+            is_pulling = false;
+        }
+    }
+    
+    bool Instance::askUserToContinueEditingDocumentOffline(PatcherManager& manager,
+                                                           std::string const& reason) const
+    {
+        auto& first_window = manager.getFirstWindow();
+        auto message = std::string("Do you want to continue editing document \"");
+        message += manager.getDocumentName() + "\" offline ?";
+        
+        return first_window.showOkCancelBox(juce::AlertWindow::QuestionIcon,
+                                            reason, message, "Yes", "No");
+    }
+    
+    void Instance::pullRemoteDocuments()
+    {
+        const bool user_logged_in = KiwiApp::getCurrentUser().isLoggedIn();
+        const bool is_connected_to_api = (KiwiApp::canConnectToServer() && user_logged_in);
+        
+        auto manager_it = m_patcher_managers.begin();
+        while(manager_it != m_patcher_managers.end())
+        {
+            auto& manager = *(*manager_it);
+            
+            if (manager.isConnected())
             {
-                bool keep_patcher
-                = (*manager)->getFirstWindow().showOkCancelBox(juce::AlertWindow::QuestionIcon,
-                                                               "User logged out",
-                                                               "Do you want to continue editing document \""
-                                                               + (*manager)->getDocumentName() +"\" offline",
-                                                               "Yes",
-                                                               "No");
+                manager.pull(); // This is here we pull the flip document.
                 
-                if (!keep_patcher)
+                const bool is_still_connected = manager.isConnected();
+                const bool connection_lost = !is_still_connected;
+                
+                if(connection_lost
+                   || (is_still_connected
+                       && (!is_connected_to_api || !user_logged_in)))
                 {
-                    (*manager)->forceCloseAllWindows();
-                    manager = m_patcher_managers.erase(manager);
-                }
-                else
-                {
-                    (*manager)->disconnect();
-                    ++manager;
+                    auto reason = user_logged_in ? "Connection lost" : "You are logged out";
+                    bool keep_edit = askUserToContinueEditingDocumentOffline(manager, reason);
+                    
+                    if(!keep_edit)
+                    {
+                        // the user wants to close the document
+                        manager.forceCloseAllWindows();
+                        manager_it = m_patcher_managers.erase(manager_it);
+                        continue;
+                    }
+                    else if(!is_connected_to_api)
+                    {
+                        manager.disconnect();
+                    }
                 }
             }
+            
+            ++manager_it;
         }
-        
-        m_windows[std::size_t(WindowId::DocumentBrowser)]->getContentComponent()->setEnabled(false);
     }
     
     engine::Instance& Instance::useEngineInstance()
@@ -328,6 +332,16 @@ namespace kiwi
         return success;
     }
     
+    void Instance::forceCloseAllPatcherWindows()
+    {
+        for(auto& manager : m_patcher_managers)
+        {
+            manager->forceCloseAllWindows();
+        }
+        
+        m_patcher_managers.clear();
+    }
+    
     void Instance::openRemotePatcher(DocumentBrowser::Drive::DocumentSession& session)
     {
         auto mng_it = getPatcherManagerForSession(session);
@@ -374,7 +388,7 @@ namespace kiwi
     {
         const auto find_it = [&file](std::unique_ptr<PatcherManager> const& manager_uptr)
         {
-            return (!manager_uptr->isRemote() && file == manager_uptr->getSelectedFile());
+            return (!manager_uptr->isConnected() && file == manager_uptr->getSelectedFile());
         };
         
         return std::find_if(m_patcher_managers.begin(), m_patcher_managers.end(), find_it);
@@ -384,7 +398,7 @@ namespace kiwi
     {
         const auto find_it = [session_id = session.getSessionId()](std::unique_ptr<PatcherManager> const& manager_uptr)
         {
-            return (manager_uptr->isRemote()
+            return (manager_uptr->isConnected()
                     && session_id != 0
                     && session_id == manager_uptr->getSessionId());
             

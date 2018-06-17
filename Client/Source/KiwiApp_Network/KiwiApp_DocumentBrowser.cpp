@@ -284,7 +284,19 @@ namespace kiwi
     
     void DocumentBrowser::Drive::refresh_internal()
     {
-        if(!KiwiApp::canConnectToServer())
+        const bool is_connected = KiwiApp::canConnectToServer();
+        const bool was_connected = m_was_connected;
+        
+        if(was_connected != is_connected)
+        {
+            // dirty connection state manager :(
+            // todo: need to refactor all document browser system
+            m_listeners.call(&Listener::driveConnectionStatusChanged, is_connected);
+        }
+        
+        m_was_connected = is_connected;
+        
+        if(was_connected && !is_connected)
         {
             m_drive->updateDocumentList({});
             return;

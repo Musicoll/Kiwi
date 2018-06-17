@@ -92,9 +92,13 @@ namespace kiwi
     
     void PatcherManager::pull()
     {
-        if (isRemote())
+        if (isConnected())
         {
             m_socket.process();
+        }
+        
+        if (isConnected())
+        {
             model::DocumentManager::pull(getPatcher());
         }
     }
@@ -104,8 +108,11 @@ namespace kiwi
     {
         if (transition == flip::CarrierBase::Transition::Disconnected)
         {
-            m_session->useDrive().removeListener(*this);
-            m_session = nullptr;
+            if(m_session)
+            {
+                m_session->useDrive().removeListener(*this);
+                m_session = nullptr;
+            }
             
             m_connected_users.clear();
             
@@ -126,12 +133,11 @@ namespace kiwi
     
     void PatcherManager::disconnect()
     {
-        if (isRemote())
+        if (isConnected())
         {
             m_socket.disconnect();
         }
     }
-    
     
     bool PatcherManager::connect(std::string const& host,
                                  uint16_t port,
@@ -320,7 +326,7 @@ namespace kiwi
         return m_document.root<model::Patcher>();
     }
     
-    bool PatcherManager::isRemote() const noexcept
+    bool PatcherManager::isConnected() const noexcept
     {
         return m_socket.isConnected();
     }
@@ -373,7 +379,7 @@ namespace kiwi
     
     bool PatcherManager::needsSaving() const noexcept
     {
-        return m_need_saving_flag && !isRemote();
+        return m_need_saving_flag && !isConnected();
     }
     
     void PatcherManager::writeDocument()
@@ -428,13 +434,15 @@ namespace kiwi
         
         if (needsSaving())
         {
+            const auto title = TRANS("Closing document...");
+            const auto message = TRANS("Do you want to save the changes to \"") + m_name + "\"?";
+            
             const int r = juce::AlertWindow::showYesNoCancelBox(juce::AlertWindow::QuestionIcon,
-                                                                TRANS("Closing document..."),
-                                                                TRANS("Do you want to save the changes to \"")
-                                                                + m_name + "\"?",
+                                                                title, message,
                                                                 TRANS("Save"),
                                                                 TRANS("Discard changes"),
-                                                                TRANS("Cancel"));
+                                                                TRANS("Cancel"),
+                                                                &getFirstWindow());
             
             if (r == 0) // cancel button
             {
@@ -544,6 +552,16 @@ namespace kiwi
         }
     }
     
+    void PatcherManager::driveConnectionStatusChanged(bool is_online)
+    {
+        //! @todo drive refactoring
+        if(m_session && !is_online)
+        {
+            m_session->useDrive().removeListener(*this);
+            m_session = nullptr;
+        }
+    }
+    
     void PatcherManager::documentAdded(DocumentBrowser::Drive::DocumentSession& doc)
     {
         ;
@@ -628,7 +646,7 @@ namespace kiwi
         
         bool is_locked = view.getLock();
         
-        std::string title = (isRemote() ? "[Remote] " : "")
+        std::string title = (isConnected() ? "[Remote] " : "")
         +  m_name
         + (is_locked ? "" : " (edit)");
         

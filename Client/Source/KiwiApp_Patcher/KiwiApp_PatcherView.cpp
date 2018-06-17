@@ -1856,7 +1856,7 @@ namespace kiwi
             {
                 result.setInfo(TRANS("Save"), TRANS("Save document"), CommandCategories::general, 0);
                 result.addDefaultKeypress('s', juce::ModifierKeys::commandModifier);
-                result.setActive(!m_manager.isRemote());
+                result.setActive(!m_manager.isConnected());
                 break;
             }
             case CommandIDs::newPatcherView:

@@ -107,12 +107,6 @@ namespace kiwi
         //! @details Called when one or more document has been changed / removed or added.
         void driveChanged() override;
         
-        //! @brief Disable the display of document and their modification.
-        void disable();
-        
-        //! @brief Enable the display of documents and their modification.
-        void enable();
-        
         //! @brief Returns the number of items in the list.
         int getNumRows() override;
         
