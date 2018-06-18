@@ -40,89 +40,10 @@ namespace kiwi
     //! @brief A juce component holding the object's graphical representation.
     //! @details ObjectFrame is implemented as a wrapper around an object view that displays
     //! selections and outlet and handle certain interactions.
-    class ObjectFrame : public juce::Component,
-                        public EditableObjectView::Listener
+    class ObjectFrame
+    : public juce::Component
+    , public EditableObjectView::Listener
     {
-    public: // classes
-        
-        enum ColourIds
-        {
-            Selection =             0x1100000,
-            SelectionOtherView =    0x1100001,
-            SelectionDistant =      0x1100002,
-            Pin =                   0x1100003
-        };
-        
-    public: // classes
-        
-        struct Outline : public juce::Component
-        {
-        public: // classes
-            
-            enum class Border : int
-            {
-                Top =       1 << 0,
-                Bottom =    1 << 1,
-                Left =      1 << 2,
-                Right =     1 << 3
-            };
-            
-        public: // methods
-            
-            //! @brief Constructor.
-            //! @details Defines the resizable corner size, its thickness and the inner border thickness?
-            Outline(int resize_length,
-                    int resize_thickness,
-                    int inner_thickness);
-            
-            //! @brief Tests if the point reaches an interactive resiable corner.
-            bool hitTest(juce::Point<int> const& pt, HitTester& hit_tester) const;
-            
-            //! @brief Returns the corner border width.
-            int getBorderThickness() const;
-            
-            //! @brief Returns the corner border length.
-            int getResizeLength() const;
-            
-            //! @brief Sets the corner colour.
-            void setResizeColour(juce::Colour colour);
-            
-            //! @brief Sets the inner border colour.
-            void setInnerColour(juce::Colour colour);
-            
-            ~Outline();
-            
-        private: // methods
-                
-            //! @brief Draws a corner.
-            void drawCorner(juce::Graphics & g, Border border);
-              
-            //! @brief Draws a border.
-            void drawBorder(juce::Graphics & g, Border border);
-                
-            //! @brief Graphical rendering method.
-            void paint(juce::Graphics & g) override final;
-            
-            //! @brief Call once size changed. Recompute borders and corners position.
-            void resized() override final;
-            
-            //! @brief Update the corners position
-            void updateCorners();
-            
-            //! @brief Update the borders position.
-            void updateBorders();
-            
-        private: // members
-            
-            int                                                     m_resize_length;
-            int                                                     m_resize_thickness;
-            int                                                     m_inner_thickness;
-            std::map<Border, std::array<juce::Rectangle<int>, 3>>   m_corners;
-            std::map<Border, juce::Rectangle<int>>                  m_borders;
-            juce::Colour                                            m_resize_colour;
-            juce::Colour                                            m_inner_colour;
-        };
-        
     public: // methods
         
         //! @brief Constructor.
@@ -133,7 +54,7 @@ namespace kiwi
         
         //! @brief Called whenever an object's model has changed.
         void objectChanged(model::Patcher::View& view, model::Object& object);
-            
+        
         //! @brief Updates the inner object's view attributes.
         void attributeChanged(std::string const& name, tool::Parameter const& parameter);
         
@@ -180,9 +101,67 @@ namespace kiwi
         
         //! @brief Called when object's frame is clicked.
         void mouseUp(juce::MouseEvent const& e) override final;
-            
+        
         //! @brief Called when object's frame is clicked.
         void mouseDrag(juce::MouseEvent const& e) override final;
+        
+        //! @brief Get the ComponentBoundsConstrainer.
+        juce::ComponentBoundsConstrainer* getBoundsConstrainer() const;
+        
+        //! @brief Get the resizing Flag as a set of border.
+        //! @see HitTester::Border
+        int getResizingFlags() const;
+        
+    public: // classes
+        
+        struct Outline : public juce::Component
+        {
+        public: // classes
+            
+            enum Border : int
+            {
+                Top =       1 << 0,
+                Bottom =    1 << 1,
+                Left =      1 << 2,
+                Right =     1 << 3
+            };
+            
+        public: // methods
+            
+            //! @brief Constructor.
+            Outline(int resize_length, int resize_thickness);
+            
+            //! @brief Tests if the point reaches an interactive resiable corner.
+            bool hitTest(juce::Point<int> const& pt, HitTester& hit_tester) const;
+            
+            //! @brief Returns the corner border width.
+            int getBorderThickness() const;
+            
+            //! @brief Returns the corner border length.
+            int getResizeLength() const;
+            
+            ~Outline();
+            
+        private: // methods
+            
+            //! @brief Draws a corner.
+            void drawCorner(juce::Graphics & g, Border border);
+            
+            //! @brief Graphical rendering method.
+            void paint(juce::Graphics & g) override final;
+            
+            //! @brief Call once size changed. Recompute borders and corners position.
+            void resized() override final;
+            
+            //! @brief Update the corners position
+            void updateCorners();
+            
+        private: // members
+            
+            int                                                     m_resize_length;
+            int                                                     m_resize_thickness;
+            std::map<Border, std::array<juce::Rectangle<float>, 3>> m_corners;
+        };
         
     private: // methods
         
@@ -201,12 +180,8 @@ namespace kiwi
         //! @brief Called when the classic view enters its edition mode.
         void editorShown() override final;
         
-        //! @brief Initializes all colours with default values.
-        //! @todo Set colours in look and feel instead.
-        void initColours();
-        
         //! @brief Called to update the bounds of the object.
-        void updateBounds(bool animate);
+        void updateBoundsFromModel(bool animate);
         
         //! @brief Updates the outline according to the selection status.
         //! @details Makes it visible or not and updates its colour.
@@ -221,6 +196,18 @@ namespace kiwi
         
         //! @brief Returns a list of Users that selected an object.
         std::set<uint64_t> getDistantSelection() const;
+        
+        //! @brief Returns the number of inlets
+        size_t getNumberOfInlets() const noexcept;
+        
+        //! @brief Returns the number of outlets
+        size_t getNumberOfOutlets() const noexcept;
+        
+        //! @brief Update the inlets
+        void updateInlets(model::Object const& object);
+        
+        //! @brief Update the outlets
+        void updateOutlets(model::Object const& object);
         
         //! @brief Draws the inlets/outlets of the object.
         void drawInletsOutlets(juce::Graphics & g);
@@ -242,13 +229,22 @@ namespace kiwi
         
     private: // members
         
-        std::unique_ptr<ObjectView>             m_object_view;
-        PatcherView&                            m_patcher_view;
-        const size_t                            m_io_width;
-        const size_t                            m_io_height;
-        size_t                                  m_inlets;
-        size_t                                  m_outlets;
-        Outline                                 m_outline;
+        struct Pin
+        {
+            Pin(bool pin_is_signal)
+            : is_signal(pin_is_signal)
+            {}
+            
+            bool is_signal {false};
+        };
+        
+        std::unique_ptr<ObjectView> m_object_view;
+        PatcherView&                m_patcher_view;
+        const size_t                m_io_width;
+        const size_t                m_io_height;
+        std::vector<Pin>            m_inlets;
+        std::vector<Pin>            m_outlets;
+        Outline                     m_outline;
         
     private: // deleted methods
         
@@ -259,3 +255,4 @@ namespace kiwi
         ObjectFrame& operator=(ObjectFrame && other) = delete;
     };
 }
+

@@ -95,7 +95,7 @@ namespace kiwi
                 auto msg = history->get(selection[i]).first;
                 if(msg && !msg->text.empty())
                 {
-                    text += msg->text + "\n";
+                    text += juce::String(msg->text + "\n");
                 }
             }
             
@@ -173,6 +173,44 @@ namespace kiwi
     {
         m_table.selectRangeOfRows(0, m_table.getNumRows());
         erase();
+    }
+    
+    // ================================================================================ //
+    //                              FileDragAndDropTarget                               //
+    // ================================================================================ //
+    
+    bool ConsoleContent::isInterestedInFileDrag(juce::StringArray const& files)
+    {
+        if(!files.isEmpty())
+        {
+            juce::File file = files[0];
+            return file.hasFileExtension(".kiwi");
+        }
+        
+        return false;
+    }
+    
+    void ConsoleContent::fileDragEnter(juce::StringArray const&, int, int)
+    {
+        m_is_dragging_over = true;
+        repaint();
+    }
+    
+    void ConsoleContent::fileDragExit(juce::StringArray const&)
+    {
+        m_is_dragging_over = false;
+        repaint();
+    }
+    
+    void ConsoleContent::filesDropped(juce::StringArray const& files, int x, int y)
+    {
+        if(!files.isEmpty())
+        {
+            juce::File file = files[0];
+            KiwiApp::useInstance().openFile(file);
+            m_is_dragging_over = false;
+            repaint();
+        }
     }
     
     // ================================================================================ //
@@ -259,6 +297,12 @@ namespace kiwi
             }
             
             left += width;
+        }
+        
+        if(m_is_dragging_over)
+        {
+            g.setColour(juce::Colours::blue.withAlpha(0.5f));
+            g.drawRect(getLocalBounds().withTop(m_table.getHeaderHeight()), 5);
         }
     }
     

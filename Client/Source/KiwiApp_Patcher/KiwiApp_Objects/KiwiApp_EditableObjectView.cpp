@@ -27,16 +27,56 @@ namespace kiwi {
     //                                 EDITABLE OBJECT VIEW                             //
     // ================================================================================ //
     
-    EditableObjectView::EditableObjectView(model::Object & object_model) :
-    ObjectView(object_model),
-    m_label(*this),
-    m_editable(true),
-    m_listeners()
+    EditableObjectView::EditableObjectView(model::Object & object_model)
+    : ObjectView(object_model)
+    , m_label(*this)
     {
+        m_label.setFont(14);
+        m_label.setMinimumHorizontalScale(0);
+        m_label.setInterceptsMouseClicks(false, false);
+        m_label.setBorderSize(juce::BorderSize<int>(getPadding()));
+        m_label.setJustificationType(juce::Justification::topLeft);
+        
+        setMinimumWidth(20);
+        setMinimumHeight(20);
+        
+        canGrowVertically(false);
+        canGrowHorizontally(true);
     }
 
     EditableObjectView::~EditableObjectView()
+    {}
+    
+    void EditableObjectView::checkBounds(juce::Rectangle<int>& bounds,
+                                         juce::Rectangle<int> const& prev_bounds,
+                                         juce::Rectangle<int> const& limits,
+                                         bool stretching_top,
+                                         bool stretching_left,
+                                         bool stretching_bottom,
+                                         bool stretching_right)
     {
+        // the resize routine could impose a different ratio to our box
+        // but we do not support fixed ratio for text box now
+        // Todo: handle fixed ratio by resizing font height.
+        setFixedAspectRatio(0);
+        
+        juce::ComponentBoundsConstrainer::checkBounds(bounds, prev_bounds,
+                                                      limits,
+                                                      stretching_top, stretching_left,
+                                                      stretching_bottom, stretching_right);
+        if(!canGrowVertically())
+        {
+            if(stretching_top)
+            {
+                bounds.setY(prev_bounds.getY());
+            }
+            
+            bounds.setHeight(prev_bounds.getHeight());
+        }
+        
+        const auto new_width = std::max(bounds.getWidth(), getMinWidth());
+        const auto text_bounds = getTextBoundingBox(getLabel().getText(), new_width);
+        bounds.setHeight(std::max<int>(text_bounds.getHeight(), getMinHeight()));
     }
 
     void EditableObjectView::setEditable(bool editable)
@@ -52,11 +92,74 @@ namespace kiwi {
         }
     }
     
+    void EditableObjectView::setText(juce::String const& new_text)
+    {
+        m_label.setText(new_text, juce::NotificationType::dontSendNotification);
+    }
+    
+    juce::String EditableObjectView::getText() const
+    {
+        return m_label.getText();
+    }
+    
+    void EditableObjectView::setFont(juce::Font font)
+    {
+        m_label.setFont(font);
+    }
+    
+    juce::Font EditableObjectView::getFont() const
+    {
+        return m_label.getFont();
+    }
+    
+    void EditableObjectView::setPadding(int padding)
+    {
+        m_padding = std::min<int>(0, padding);
+    }
+    
+    int EditableObjectView::getPadding() const
+    {
+        return m_padding;
+    }
+    
+    int EditableObjectView::getMinHeight() const
+    {
+        return getFont().getHeight() + m_padding * 2;
+    }
+    
+    int EditableObjectView::getMinWidth() const
+    {
+        return getFont().getHeight() + m_padding * 2;
+    }
+    
+    void EditableObjectView::resized()
+    {
+        m_label.setBounds(getLocalBounds());
+    }
+    
+    juce::Rectangle<float> EditableObjectView::getTextBoundingBox(juce::String const& text,
+                                                                  float max_width) const
+    {
+        juce::GlyphArrangement arr;
+        const int padding = getPadding();
+        const int side_padding = padding * 2;
+        const float max_line_width = max_width - side_padding;
+        
+        arr.addJustifiedText (getFont(), text,
+                              padding, padding,
+                              max_line_width,
+                              juce::Justification::topLeft);
+        
+        const auto bounds = arr.getBoundingBox(0, -1, true);
+        return bounds.withHeight(bounds.getHeight() + side_padding);
+    }
+    
     void EditableObjectView::labelTextChanged (juce::Label* label)
     {
         textChanged();
         
-        m_listeners.call(&EditableObjectView::Listener::textChanged, m_label.getText().toStdString());
+        m_listeners.call(&EditableObjectView::Listener::textChanged,
+                         m_label.getText().toStdString());
     }
     
     juce::Label & EditableObjectView::getLabel()
@@ -88,13 +191,32 @@ namespace kiwi {
         m_listeners.remove(listener);
     }
     
+    void EditableObjectView::paint(juce::Graphics& g)
+    {
+        g.fillAll(findColour(EditableObjectView::ColourIds::Background));
+    }
+    
+    void EditableObjectView::drawLabel(juce::Graphics& g)
+    {
+        if(!m_label.isBeingEdited())
+        {
+            g.setColour (m_label.findColour(juce::Label::ColourIds::textColourId));
+
+            g.setFont(getFont());
+            g.drawMultiLineText(m_label.getText(),
+                                getPadding(),
+                                getFont().getHeight(),
+                                m_label.getWidth() - getPadding() * 2);
+        }
+    }
+    
     // ================================================================================ //
     //                                   LABEL                                          //
     // ================================================================================ //
     
-    EditableObjectView::Label::Label(EditableObjectView & object_view):
-    juce::Label(),
-    m_object_view(object_view)
+    EditableObjectView::Label::Label(EditableObjectView & object_view)
+    : juce::Label()
+    , m_object_view(object_view)
     {
         addListener(&m_object_view);
     }
@@ -104,9 +226,14 @@ namespace kiwi {
         removeListener(&m_object_view);
     }
     
-    juce::TextEditor * EditableObjectView::Label::createEditorComponent()
+    juce::TextEditor* EditableObjectView::Label::createEditorComponent()
     {
         return m_object_view.createdTextEditor();
+    }
+    
+    void EditableObjectView::Label::paint(juce::Graphics& g)
+    {
+        m_object_view.drawLabel(g);
     }
     
 }

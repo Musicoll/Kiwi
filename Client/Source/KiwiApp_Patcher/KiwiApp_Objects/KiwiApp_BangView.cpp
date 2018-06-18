@@ -48,32 +48,32 @@ namespace kiwi {
     , m_flash_connection(m_flash_signal.connect(std::bind(&BangView::signalTriggered, this)))
     , m_active(false)
     , m_mouse_down(false)
-    {}
+    {
+        setMinimumSize(20.f, 20.f);
+        setFixedAspectRatio(1.f);
+    }
     
     BangView::~BangView()
-    {
-    }
+    {}
     
     void BangView::paint(juce::Graphics & g)
     {
         g.fillAll(findColour(ObjectView::ColourIds::Background));
-        
         g.setColour(findColour(ObjectView::ColourIds::Outline));
-        
-        juce::Rectangle<int> bounds = getLocalBounds();
-        
-        double circle_outer = 80 * bounds.getWidth() / 100.;
-        
-        double circle_thickness = 10 * bounds.getWidth() / 100.;
-        
-        g.drawEllipse(bounds.reduced(bounds.getWidth() - circle_outer).toFloat(), circle_thickness);
-        
         drawOutline(g);
+        
+        const auto bounds = getLocalBounds().toFloat();
+        const auto width = std::max(bounds.getWidth(), bounds.getHeight());
+        
+        const float circle_outer = 80.f * (width * 0.01f);
+        const float circle_thickness = 10.f * (width * 0.01f);
+        
+        g.drawEllipse(bounds.reduced(width - circle_outer), circle_thickness);
         
         if (m_mouse_down || m_active)
         {
             g.setColour(findColour(ObjectView::ColourIds::Active));
-            g.fillEllipse(bounds.reduced(bounds.getWidth() - circle_outer + circle_thickness).toFloat());
+            g.fillEllipse(bounds.reduced(width - circle_outer + circle_thickness));
         }
     }
     

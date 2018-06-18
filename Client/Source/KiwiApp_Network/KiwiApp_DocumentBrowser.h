@@ -113,7 +113,7 @@ namespace kiwi
         void uploadDocument(std::string const& name, std::string const& data);
         
         //! @brief Creates and opens a new document on this drive.
-        void createNewDocument();
+        void createNewDocument(std::string const& document_name);
         
         //! @brief Changes the way documents are sorted.
         void setSort(Comp comp);
@@ -142,6 +142,7 @@ namespace kiwi
         tool::Listeners<Listener>   m_listeners;
         Comp                        m_sort;
         std::shared_ptr<Drive>      m_drive;
+        bool                        m_was_connected = false;
         
         friend class DocumentBrowser;
     };
@@ -167,6 +168,8 @@ namespace kiwi
         
         //! @brief Called when one or more documents has been added, removed or changed.
         virtual void driveChanged() {};
+        
+        virtual void driveConnectionStatusChanged(bool is_online) {};
     };
     
     // ================================================================================ //

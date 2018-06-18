@@ -33,19 +33,14 @@ namespace kiwi
     //                                   OBJECT VIEW                                    //
     // ================================================================================ //
     
-    ObjectView::ObjectView(model::Object & object_model):
-    m_model(object_model),
-    m_border_size(1.5),
-    m_master(this, [](ObjectView*){})
+    ObjectView::ObjectView(model::Object & object_model)
+    : m_model(object_model)
+    , m_master(this, [](ObjectView*){})
+    , m_resizing_flags(HitTester::Border::None)
     {
         object_model.addListener(*this);
-        
-        setColour(ObjectView::ColourIds::Error, juce::Colour::fromFloatRGBA(0.6, 0.1, 0.1, 0.));
-        setColour(ObjectView::ColourIds::Background, juce::Colours::white);
-        setColour(ObjectView::ColourIds::Text, juce::Colours::black);
-        setColour(ObjectView::ColourIds::Outline, juce::Colours::black);
-        setColour(ObjectView::ColourIds::Highlight, juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.));
-        setColour(ObjectView::ColourIds::Active, juce::Colour(0xff21ba90));
+        canGrowHorizontally(true);
+        canGrowVertically(true);
     }
     
     ObjectView::~ObjectView()
@@ -97,7 +92,59 @@ namespace kiwi
     
     void ObjectView::drawOutline(juce::Graphics & g)
     {
-        g.drawRect(getOutline(), m_border_size);
+        g.setColour(findColour(ObjectView::ColourIds::Outline));
+        const auto border_size = KiwiApp::useLookAndFeel().getObjectBorderSize();
+        g.drawRect(getOutline().toFloat(), border_size);
+    }
+    
+    void ObjectView::lockStatusChanged(bool is_locked)
+    {
+        // nothing to do by default
+    }
+
+    int ObjectView::getResizingFlags() const
+    {
+        return m_resizing_flags;
+    }
+    
+    bool ObjectView::canGrowHorizontally() const
+    {
+        return ((m_resizing_flags & HitTester::Border::Left)
+                || m_resizing_flags & HitTester::Border::Right);
+    }
+    
+    bool ObjectView::canGrowVertically() const
+    {
+        return ((m_resizing_flags & HitTester::Border::Top)
+                || m_resizing_flags & HitTester::Border::Bottom);
+    }
+    
+    void ObjectView::canGrowHorizontally(bool can)
+    {
+        if(can)
+        {
+            m_resizing_flags |= HitTester::Border::Left;
+            m_resizing_flags |= HitTester::Border::Right;
+        }
+        else
+        {
+            m_resizing_flags &= ~HitTester::Border::Left;
+            m_resizing_flags &= ~HitTester::Border::Right;
+        }
+    }
+    
+    void ObjectView::canGrowVertically(bool can)
+    {
+        if(can)
+        {
+            m_resizing_flags |= HitTester::Border::Top;
+            m_resizing_flags |= HitTester::Border::Bottom;
+        }
+        else
+        {
+            m_resizing_flags &= ~HitTester::Border::Top;
+            m_resizing_flags &= ~HitTester::Border::Bottom;
+        }
     }
     
     // ================================================================================ //

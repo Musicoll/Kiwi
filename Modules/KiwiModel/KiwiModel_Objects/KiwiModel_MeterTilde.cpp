@@ -34,8 +34,6 @@ namespace kiwi { namespace model {
         std::unique_ptr<ObjectClass> metertilde_class(new ObjectClass("meter~", &MeterTilde::create));
         
         metertilde_class->setFlag(ObjectClass::Flag::DefinedSize);
-        metertilde_class->setFlag(ObjectClass::Flag::ResizeWidth);
-        metertilde_class->setFlag(ObjectClass::Flag::ResizeHeight);
         
         flip::Class<MeterTilde> & metertilde_model = DataModel::declare<MeterTilde>()
                                                      .name(metertilde_class->getModelName().c_str())
@@ -63,8 +61,6 @@ namespace kiwi { namespace model {
             throw Error("meter~ too many arguments");
         }
         
-        setMinWidth(20);
-        setMinHeight(20);
         setWidth(100);
         setHeight(20);
         pushInlet({PinType::IType::Signal});

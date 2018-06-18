@@ -207,6 +207,7 @@ namespace kiwi
         private: // members
             
             const uint64_t                              m_identifier;
+            const std::string                           m_hex_id;
             std::unique_ptr<model::PatcherValidator>    m_validator;
             std::unique_ptr<flip::DocumentServer>       m_document;
             std::vector<flip::SignalConnection>         m_signal_connections;

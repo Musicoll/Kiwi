@@ -24,7 +24,7 @@
 #include <KiwiEngine/KiwiEngine_Instance.h>
 #include <KiwiTool/KiwiTool_Scheduler.h>
 
-#include <juce_events/timers/juce_Timer.h>
+#include <juce_events/juce_events.h>
 
 #include "flip/Document.h"
 
@@ -47,7 +47,7 @@ namespace kiwi
     // ================================================================================ //
 
     //! @brief The Application Instance
-    class Instance : public juce::Timer
+    class Instance
     {
     public:
         
@@ -57,17 +57,14 @@ namespace kiwi
         //! @brief Destructor
         ~Instance();
         
-        //! @brief Timer call back, processes the scheduler events list.
-        void timerCallback() override final;
+        //! @brief Tick the instance regularly to pull remote document data.
+        void tick();
         
         //! @brief Get the user ID of the Instance.
         uint64_t getUserId() const noexcept;
         
         //! @brief Enables the document browser view.
         void login();
-        
-        //! @brief Close all remote patchers and disable document browser view.
-        void logout();
     
         //! @brief create a new patcher window.
         void newPatcher();
@@ -97,6 +94,9 @@ namespace kiwi
         //! @return True if all document have been closed, false if the user cancel the action.
         bool closeAllPatcherWindows();
         
+        //! @brief Force close all patcher windows.
+        void forceCloseAllPatcherWindows();
+        
         //! @brief Attempt to create a new patcher with document Session informations.
         void openRemotePatcher(DocumentBrowser::Drive::DocumentSession& session);
         
@@ -124,7 +124,20 @@ namespace kiwi
         //! @brief Get Patcher clipboard data.
         std::vector<uint8_t>& getPatcherClipboardData();
         
+        //! @internal Handle connection lost.
+        //! @todo refactor this to handle this event by a callback instead
+        void handleConnectionLost();
+        
     private: // methods
+        
+        //! @internal pull all documents
+        //! @brief currently used by the Instance::tick method
+        void pullRemoteDocuments();
+        
+        //! @brief Ask the user if he wants to continue to edit document offline
+        //! @details This could happen if the user logged out or if the connection was lost.
+        bool askUserToContinueEditingDocumentOffline(PatcherManager& manager,
+                                                     std::string const& reason) const;
         
         using PatcherManagers = std::vector<std::unique_ptr<PatcherManager>>;
         

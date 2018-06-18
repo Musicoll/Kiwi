@@ -35,17 +35,21 @@ namespace kiwi { namespace model {
     public:
         
         //! @brief Constructor.
-        DocumentManager(flip::DocumentBase & document);
+        DocumentManager(flip::DocumentBase& document);
         
         //! @brief Destructor.
         ~DocumentManager();
         
         //! @brief Commit and push.
         //! @see startCommitGesture, endCommitGesture.
-        static void commit(flip::Type& type, std::string action = std::string());
+        static void commit(flip::Type& type,
+                           std::string action = std::string());
         
         //! @brief  Connect the DocumentManager to a remote server
-        static void connect(flip::Type& type, const std::string host, uint16_t port, uint64_t session_id);
+        static void connect(flip::Type& type,
+                            const std::string host,
+                            uint16_t port,
+                            uint64_t session_id);
         
         //! @brief Pull changes from remote server
         static void pull(flip::Type& type);
@@ -95,7 +99,7 @@ namespace kiwi { namespace model {
     private:
         
         //! @brief Commmits and pushes a transaction
-        void commit(std::string action);
+        void commit(std::string label);
         
         //! @brief Pulls transactions stacked by a socket's process
         void pull();
@@ -107,17 +111,18 @@ namespace kiwi { namespace model {
         void startCommitGesture();
         
         //! @brief Commit a gesture.
-        void commitGesture(std::string action);
+        void commitGesture(std::string label);
         
         //! @brief Ends a commit gesture.
         void endCommitGesture();
+        
+        class Session;
         
     private:
         
         flip::DocumentBase&                     m_document;
         flip::History<flip::HistoryStoreMemory> m_history;
-        bool                                    m_gesture_flag;
-        size_t                                  m_gesture_cnt;
+        std::unique_ptr<Session>                m_session = nullptr;
         
     private:
         
@@ -128,5 +133,42 @@ namespace kiwi { namespace model {
         DocumentManager& operator =(DocumentManager&& rhs) = delete;
         bool operator ==(DocumentManager const& rhs) const = delete;
         bool operator !=(DocumentManager const& rhs) const = delete;
+    };
+    
+    // ================================================================================ //
+    //                                      SESSION                                     //
+    // ================================================================================ //
+    
+    //! @brief The Session is used internally by the DocumentManager to
+    //! handle the gesture commits.
+    //! @details A session manages its own transaction stack,
+    //! and squash each new transaction into a single one.
+    //! @see DocumentManager::startCommitGesture, DocumentManager::commitGesture, DocumentManager::endCommitGesture, DocumentManager::isInCommitGesture
+    class DocumentManager::Session
+    {
+    public:
+        Session(flip::DocumentBase& document);
+        virtual ~Session();
+        
+        //! @brief Starts a change
+        void start();
+        
+        //! @brief Commits a change without a transaction label
+        void commit();
+        
+        //! @brief Commits a change with a transaction label
+        void commit(std::string label);
+        
+        //! @brief Clear history
+        void end(flip::History<flip::HistoryStoreMemory>* master_history = nullptr);
+        
+        //! @brief Reverts all changes
+        void revert();
+        
+    private:
+        
+        flip::DocumentBase& m_document;
+        flip::History<flip::HistoryStoreMemory> m_history;
+        flip::Transaction m_tx;
     };
 }}

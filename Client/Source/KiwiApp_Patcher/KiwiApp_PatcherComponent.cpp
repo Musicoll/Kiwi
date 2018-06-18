@@ -29,19 +29,39 @@
 
 namespace kiwi
 {
+    class PatcherToolbar::PatcherToolbarLookAndFeel
+    : public LookAndFeel
+    {
+    public:
+        
+        PatcherToolbarLookAndFeel(PatcherToolbar& toolbar)
+        : m_toolbar(toolbar)
+        {}
+        
+        void paintToolbarBackground(juce::Graphics& g,
+                                    int width, int height,
+                                    juce::Toolbar&) override
+        {
+            m_toolbar.paintToolbarBackground(g, width, height);
+        }
+        
+    private:
+        PatcherToolbar& m_toolbar;
+    };
+    
     // ================================================================================ //
     //                            PATCHER COMPONENT TOOLBAR                             //
     // ================================================================================ //
     
-    PatcherToolbar::PatcherToolbar(PatcherManager& patcher_manager) :
-    m_patcher_manager(patcher_manager),
-    m_factory(m_patcher_manager)
+    PatcherToolbar::PatcherToolbar(PatcherManager& patcher_manager)
+    : m_patcher_manager(patcher_manager)
+    , m_factory(m_patcher_manager)
+    , m_toolbar_look_and_feel(std::make_unique<PatcherToolbarLookAndFeel>(*this))
     {
+        m_toolbar.setLookAndFeel(m_toolbar_look_and_feel.get());
+        
         m_toolbar.setVertical(false);
         m_toolbar.setStyle(juce::Toolbar::ToolbarItemStyle::iconsOnly);
-        auto& lf = KiwiApp::useLookAndFeel();
-        m_toolbar.setColour(juce::Toolbar::ColourIds::backgroundColourId, lf.getCurrentColourScheme()
-                            .getUIColour(juce::LookAndFeel_V4::ColourScheme::UIColour::windowBackground));
         m_toolbar.setColour(juce::Toolbar::ColourIds::labelTextColourId, juce::Colours::black);
         m_toolbar.setColour(juce::Toolbar::ColourIds::buttonMouseOverBackgroundColourId, juce::Colours::whitesmoke.contrasting(0.1));
         m_toolbar.setColour(juce::Toolbar::ColourIds::buttonMouseDownBackgroundColourId, juce::Colours::whitesmoke.contrasting(0.2));
@@ -53,27 +73,30 @@ namespace kiwi
         m_toolbar.addDefaultItems(m_factory);
     }
     
+    PatcherToolbar::~PatcherToolbar()
+    {
+        m_toolbar.setLookAndFeel(nullptr);
+    }
+    
     void PatcherToolbar::resized()
     {
         m_toolbar.setBounds(getLocalBounds());
     }
     
-    void PatcherToolbar::paint(juce::Graphics& g)
+    void PatcherToolbar::paintToolbarBackground(juce::Graphics& g, int width, int height)
     {
-        g.fillAll(juce::Colour(0xff444444));
+        g.fillAll(findColour(juce::Toolbar::ColourIds::backgroundColourId));
     }
     
     void PatcherToolbar::removeUsersIcon()
     {
         m_toolbar.removeToolbarItem(0);
-        m_toolbar.removeToolbarItem(0);
         m_toolbar.repaint();
     }
     
-    PatcherToolbar::Factory::Factory(PatcherManager& patcher_manager) : m_patcher_manager(patcher_manager)
-    {
-        
-    }
+    PatcherToolbar::Factory::Factory(PatcherManager& patcher_manager)
+    : m_patcher_manager(patcher_manager)
+    {}
     
     void PatcherToolbar::Factory::getAllToolbarItemIds(juce::Array<int>& ids)
     {
@@ -85,7 +108,7 @@ namespace kiwi
         ids.add(flexibleSpacerId);
         ids.add(ItemIds::dsp_on_off);
         
-        if(m_patcher_manager.isRemote())
+        if(m_patcher_manager.isConnected())
         {
             ids.add(ItemIds::users);
         }
@@ -93,7 +116,7 @@ namespace kiwi
     
     void PatcherToolbar::Factory::getDefaultItemSet(juce::Array<int>& ids)
     {
-        if(m_patcher_manager.isRemote())
+        if(m_patcher_manager.isConnected())
         {
             ids.add(ItemIds::users);
             ids.add(separatorBarId);
@@ -177,7 +200,8 @@ namespace kiwi
     
     void PatcherToolbar::UsersItemComponent::updateUsers()
     {
-        m_user_nb = m_patcher_manager.getNumberOfUsers();
+        auto users_ids = m_patcher_manager.getConnectedUsers();
+        m_user_nb = users_ids.size();
         
         startFlashing();
         
@@ -210,7 +234,7 @@ namespace kiwi
             });
         };
         
-        KiwiApp::useApi().getUsers(m_patcher_manager.getConnectedUsers(), success, fail);
+        KiwiApp::useApi().getUsers(users_ids, success, fail);
     }
     
     void PatcherToolbar::UsersItemComponent::connectedUserChanged(PatcherManager& manager)
@@ -237,13 +261,21 @@ namespace kiwi
                                           center_y - count_size / 2,
                                           count_size, count_size);
         
-        const juce::Colour badge_color(juce::Colours::grey.withAlpha(0.5f));
-        g.setColour(badge_color.overlaidWith(juce::Colours::white.withAlpha(m_flash_alpha)));
+        const auto online_color = juce::Colour::fromRGB(72, 165, 93);
+        const auto badge_color = (juce::Colours::grey.withAlpha(0.5f)
+                                  .overlaidWith(online_color.withAlpha(m_flash_alpha)));
+        
+        g.setColour(badge_color);
         g.drawEllipse(label_bounds.expanded(2).toFloat(), 0.5f);
         g.fillEllipse(label_bounds.expanded(2).toFloat());
         
         g.setColour(juce::Colours::whitesmoke);
         g.drawText(std::to_string(m_user_nb), label_bounds, juce::Justification::centred);
+        
+        auto flag_rect = juce::Rectangle<float>(0, 0, 3, height).reduced(0, 2);
+        
+        g.setColour(online_color);
+        g.fillRect(flag_rect);
     }
     
     bool PatcherToolbar::UsersItemComponent::getToolbarItemSizes(int toolbarDepth, bool isVertical,
@@ -264,7 +296,7 @@ namespace kiwi
     void PatcherToolbar::UsersItemComponent::startFlashing()
     {
         m_flash_alpha = 1.0f;
-        startTimerHz (25);
+        startTimerHz (20);
     }
     
     void PatcherToolbar::UsersItemComponent::stopFlashing()
@@ -383,9 +415,10 @@ namespace kiwi
     //                                PATCHER VIEW WINDOW                               //
     // ================================================================================ //
     
-    PatcherViewWindow::PatcherViewWindow(PatcherManager& manager, PatcherView& patcherview) :
-    Window("Untitled", nullptr, true, true, juce::String::empty, !KiwiApp::isMacOSX()),
-    m_patcher_component(patcherview)
+    PatcherViewWindow::PatcherViewWindow(PatcherManager& manager,
+                                         PatcherView& patcherview)
+    : Window("Untitled", nullptr, true, true, "", !KiwiApp::isMacOSX())
+    , m_patcher_component(patcherview)
     {
         // Todo: Add size infos to the Patcher Model
         setSize(600, 500);
@@ -393,6 +426,8 @@ namespace kiwi
         
         setContentNonOwned(&m_patcher_component, true);
         setVisible(true);
+        
+        getLookAndFeel().setUsingNativeAlertWindows(false);
     }
     
     void PatcherViewWindow::removeUsersIcon()

@@ -34,8 +34,6 @@ namespace kiwi { namespace model {
         std::unique_ptr<ObjectClass> bang_class(new ObjectClass("bang", &Bang::create));
         
         bang_class->setFlag(ObjectClass::Flag::DefinedSize);
-        bang_class->setFlag(ObjectClass::Flag::ResizeWidth);
-        bang_class->setFlag(ObjectClass::Flag::ResizeHeight);
         
         flip::Class<Bang> & bang_model = DataModel::declare<Bang>().name(bang_class->getModelName().c_str()).inherit<Object>();
         
@@ -57,8 +55,6 @@ namespace kiwi { namespace model {
         
         addSignal<>(Signal::TriggerBang, *this);
         addSignal<>(Signal::FlashBang, *this);
-        setRatio(1.);
-        setMinWidth(20.);
         setWidth(20);
         pushInlet({PinType::IType::Control});
         pushOutlet(PinType::IType::Control);

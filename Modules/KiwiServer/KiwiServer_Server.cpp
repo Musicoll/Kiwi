@@ -144,13 +144,15 @@ namespace kiwi
         
         void Server::onConnected(flip::PortBase & port)
         {
-            uint64_t session_id = port.session();
-            
-            if(m_sessions.find(port.session()) == m_sessions.end())
+            const auto session_id = port.session();
+            const auto session = m_sessions.find(session_id);
+            if(session == m_sessions.end())
             {
-                juce::File session_file = getSessionFile(port.session());
+                juce::File session_file = getSessionFile(session_id);
                 
-                m_logger.log("creating new session for session_id : " + hexadecimal_convert(session_id));
+                const auto session_hex_id = hexadecimal_convert(session_id);
+                
+                m_logger.log("creating new session for session_id : " + session_hex_id);
                 
                 auto session = m_sessions
                 .insert(std::make_pair(session_id,
@@ -158,12 +160,12 @@ namespace kiwi
                 
                 if (session_file.exists())
                 {
-                    m_logger.log("loading session file for session_id : " + hexadecimal_convert(session_id));
+                    m_logger.log("loading session file for session_id : " + session_hex_id);
                     
                     if (!(*session.first).second.load())
                     {
                         m_logger.log("opening document document session : "
-                                            + hexadecimal_convert(session_id) + " failed");
+                                     + session_hex_id + " failed");
                         
                         m_sessions.erase(session_id);
                         
@@ -175,7 +177,7 @@ namespace kiwi
             }
             else
             {
-                m_sessions.find(port.session())->second.bind(port);
+                session->second.bind(port);
             }
         }
         
@@ -276,13 +278,14 @@ namespace kiwi
         // ================================================================================ //
         
         Server::Session::Session(Session && other)
-        : m_identifier(std::move(other.m_identifier))
+        : m_identifier(other.m_identifier)
+        , m_hex_id(other.m_hex_id)
         , m_validator(std::move(other.m_validator))
         , m_document(std::move(other.m_document))
         , m_signal_connections(std::move(other.m_signal_connections))
         , m_backend_file(std::move(other.m_backend_file))
-        , m_token(other.m_token)
-        , m_kiwi_version(other.m_kiwi_version)
+        , m_token(std::move(other.m_token))
+        , m_kiwi_version(std::move(other.m_kiwi_version))
         , m_logger(other.m_logger)
         {
             ;
@@ -294,6 +297,7 @@ namespace kiwi
                                  std::string const& kiwi_version,
                                  Server::Logger & logger)
         : m_identifier(identifier)
+        , m_hex_id(hexadecimal_convert(identifier))
         , m_validator(new model::PatcherValidator())
         , m_document(new flip::DocumentServer(model::DataModel::use(), *m_validator, m_identifier))
         , m_signal_connections()
@@ -313,11 +317,9 @@ namespace kiwi
         {
             if (m_document)
             {
-                std::set<flip::PortBase*> ports = m_document->ports();
-                
-                for (std::set<flip::PortBase*>::iterator port = ports.begin(); port != ports.end(); ++port)
+                for (auto* port : m_document->ports())
                 {
-                    m_document->port_factory_remove(**port);
+                    m_document->port_factory_remove(*port);
                 }
             }
         }
@@ -447,7 +449,7 @@ namespace kiwi
         void Server::Session::unbind(flip::PortBase & port)
         {
             m_logger.log("User " + std::to_string(port.user())
-                                + " disconnecting from session" + hexadecimal_convert(m_identifier));
+                                + " disconnecting from session" + m_hex_id);
             
             std::set<flip::PortBase*> ports = m_document->ports();
             
@@ -470,8 +472,8 @@ namespace kiwi
                         m_backend_file.create();
                     }
                     
-                    m_logger.log("saving session : " + hexadecimal_convert(m_identifier)
-                                        + " in file : " + m_backend_file.getFileName());
+                    m_logger.log("saving session : " + m_hex_id
+                                 + " in file : " + m_backend_file.getFileName().toStdString());
                     
                     if (!save())
                     {
