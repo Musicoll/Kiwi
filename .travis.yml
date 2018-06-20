@@ -29,7 +29,10 @@ matrix:
     - curl -o ./ThirdParty/llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
     - tar xvf ./ThirdParty/llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 ThirdParty/llvm
     script:
-    - python ./Scripts/configure.py -coverage
+    - python ./Scripts/flip.py
+    - python ./Scripts/boost.py
+    - mkdir Build && cd Build
+    - cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm -DCMAKE_BUILD_TYPE=Debug -DGCOV_SUPPORT=On
     - cmake --build . --config Debug
     after_success:
     - coveralls -i Modules --gcov-options '\-lp' > /dev/null
@@ -53,7 +56,10 @@ matrix:
     - curl -o ./ThirdParty/llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
     - tar xvf ./ThirdParty/llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 ThirdParty/llvm
     script:
-    - python ./Scripts/configure.py -Release
+    - python ./Scripts/flip.py
+    - python ./Scripts/boost.py
+    - mkdir Build && cd Build
+    - cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm -DCMAKE_BUILD_TYPE=Release
     - cmake --build . --config Release
     before_deploy:
     - mkdir Kiwi && mv Build/Release/KiwiBuild/Kiwi Kiwi/Kiwi
@@ -75,7 +81,10 @@ matrix:
     - curl -o ./ThirdParty/llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
     - tar zxvf ./ThirdParty/llvm.tar.xz && mv ./clang+llvm-5.0.0-x86_64-apple-darwin ThirdParty/llvm
     script:
-    - python ./Scripts/configure.py -c Release
+    - python ./Scripts/flip.py
+    - python ./Scripts/boost.py
+    - mkdir Build && cd Build
+    - make .. -GXcode  -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm
     - cmake --build . --config Release
     before_deploy:
     - mkdir Kiwi && mv Build/Release/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app

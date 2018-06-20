@@ -60,51 +60,6 @@ def create_dir(dir):
 	   os.makedirs(dir);
 
 #==============================================================================
-# Name : mac_release
-#==============================================================================
-
-def mac_release():
-    cmd_loc = cmd;
-    build_dir = os.path.join(project_dir, "Build", "Release");
-    create_dir(build_dir);
-    os.chdir(build_dir);
-    cmd_loc+= " -DCMAKE_BUILD_TYPE:STRING=Release";
-    cmd_loc+= " " + project_dir;
-    subprocess.check_call(cmd_loc, shell= True);
-    return
-
-
-#==============================================================================
-# Name : mac_debug
-#==============================================================================
-
-def mac_debug():
-    cmd_loc = cmd;
-    build_dir = os.path.join(project_dir, "Build", "Debug");
-    create_dir(build_dir);
-    os.chdir(build_dir);
-    cmd_loc += " -DCMAKE_BUILD_TYPE:STRING=Debug"
-    cmd_loc += " " + project_dir;
-    subprocess.check_call(cmd_loc, shell= True);
-    return
-
-#==============================================================================
-# Name : configure_mac
-#==============================================================================
-
-def configure_mac(args):
-    global cmd;
-    cmd += " -G Xcode";
-
-    if (args.configuration == "Debug" or args.configuration == "All"):
-        mac_debug();
-
-    if (args.configuration == "Release" or args.configuration == "All"):
-        mac_release();
-
-    return
-
-#==============================================================================
 # Name : win_debug_32
 #==============================================================================
 
@@ -189,52 +144,6 @@ def configure_windows(args):
     return
 
 #==============================================================================
-# Name : linux_debug
-#==============================================================================
-
-def linux_debug():
-    cmd_loc = cmd;
-    build_dir = os.path.join(project_dir, "Build", "Debug");
-    create_dir(build_dir);
-    os.chdir(build_dir);
-    cmd_loc += " -DCMAKE_BUILD_TYPE:STRING=Debug"
-    cmd_loc += " " + project_dir
-    subprocess.check_call(cmd_loc, shell= True)
-    return
-
-#==============================================================================
-# Name : linux_release
-#==============================================================================
-
-def linux_release():
-    cmd_loc = cmd;
-    build_dir = os.path.join(project_dir, "Build", "Release");
-    create_dir(build_dir);
-    os.chdir(build_dir);
-    cmd_loc += " -DCMAKE_BUILD_TYPE:STRING=Release"
-    cmd_loc += " " + project_dir
-    subprocess.check_call(cmd_loc, shell= True)
-    return
-
-
-#==============================================================================
-# Name : configure_linux
-#==============================================================================
-
-def configure_linux(args):
-    global cmd;
-    if (args.coverage):
-        cmd += " -DGCOV_SUPPORT=On"
-
-    if (args.configuration == "Debug" or args.configuration == "All"):
-        linux_debug()
-
-    if (args.configuration == "Release" or args.configuration == "All"):
-        linux_release()
-
-    return
-
-#==============================================================================
 # Name : main
 #==============================================================================
 
@@ -242,13 +151,5 @@ init_boost()
 
 update_flip()
 
-root_build_dir = os.path.join(project_dir, "Build")
-
-create_dir(root_build_dir)
-
-if platform.system()=="Darwin":
-    configure_mac(parse_args());
-elif platform.system() == "Windows":
+if platform.system() == "Windows":
 	configure_windows(parse_args())
-elif platform.system() == "Linux":
-	configure_linux(parse_args())
