@@ -24,6 +24,9 @@
 #include <faust/dsp/llvm-dsp.h>
 #include <faust/gui/UI.h>
 
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_FaustTilde.h>
+#include <KiwiModel/KiwiModel_DocumentManager.h>
+
 namespace kiwi { namespace engine {
     
     class FaustTilde::UIGlue : public UI
@@ -89,8 +92,6 @@ namespace kiwi { namespace engine {
     //                                       FAUST~                                     //
     // ================================================================================ //
     
-    std::string const FaustTilde::m_folder = std::string("/Users/pierre/Documents/Kiwi Media/Faust/");
-    
     void FaustTilde::declare()
     {
         Factory::add<FaustTilde>("faust~", &FaustTilde::create);
@@ -117,24 +118,30 @@ namespace kiwi { namespace engine {
         if(!std::count(options.begin(), options.end(), "-I"))
         {
             options.push_back("-I");
-            options.push_back(m_folder + std::string("libs"));
+            options.push_back("/Users/pierre/Documents/Kiwi Media/Faust/" + std::string("libs"));
         }
         return options;
     }
     
 
-    
     FaustTilde::FaustTilde(model::Object const& model, Patcher& patcher):
     AudioObject(model, patcher),
     m_factory(nullptr, deleteDSPFactory),
     m_ui_glue(std::make_unique<UIGlue>(*this)),
-    m_name(getName(model)),
     m_options(getOptions(model))
     {
-        createFactory();
-        if(m_factory)
+        auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel());
+        if(fmodel)
         {
-            createInstance();
+            std::string code = fmodel->getCode();
+            if(!code.empty())
+            {
+                createFactoryFromString(code);
+                if(m_factory)
+                {
+                    createInstance();
+                }
+            }
         }
     }
     
@@ -143,18 +150,55 @@ namespace kiwi { namespace engine {
         
     }
     
-    void FaustTilde::createFactory()
+    void FaustTilde::openFile(const std::string& file)
+    {
+        createFactoryFromFile(file);
+        if(m_factory)
+        {
+            createInstance();
+            deferMain([this]() {
+                if(m_factory)
+                {
+                    std::string code = m_factory->getDSPCode();
+                    auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel());
+                    if(model)
+                    {
+                        model->setCode(code);
+                        model::DocumentManager::commit(*model);
+                    }
+                }
+            });
+        }
+    }
+    
+    void FaustTilde::createFactoryFromFile(const std::string& file)
     {
         std::string errors;
         char const* argv[m_options.size()];
-        warning(m_folder + m_name);
         for(size_t i = 0; i < m_options.size(); ++i)
         {
             argv[i] = m_options[i].c_str();
             warning(m_options[i]);
         }
         m_ui_glue->m_parameters.clear();
-        m_factory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromFile(m_folder + m_name, m_options.size(), argv, std::string(), errors), deleteDSPFactory);
+        m_factory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromFile(file, m_options.size(), argv, std::string(), errors), deleteDSPFactory);
+        if(!errors.empty())
+        {
+            warning(errors);
+        }
+    }
+    
+    void FaustTilde::createFactoryFromString(const std::string& code)
+    {
+        std::string errors;
+        char const* argv[m_options.size()];
+        for(size_t i = 0; i < m_options.size(); ++i)
+        {
+            argv[i] = m_options[i].c_str();
+            warning(m_options[i]);
+        }
+        m_ui_glue->m_parameters.clear();
+        m_factory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString("faust~", code, m_options.size(), argv, std::string(), errors), deleteDSPFactory);
         if(!errors.empty())
         {
             warning(errors);
@@ -179,6 +223,30 @@ namespace kiwi { namespace engine {
         if(!args.empty() && args[0].isString())
         {
             const auto& name = args[0].getString();
+            if(name == "open")
+            {
+                if(args.size() == 1)
+                {
+                    warning(std::string("faust~: open method - dialog windows not implemented yet"));
+                    return;
+                }
+                else
+                {
+                    if(args[1].isString())
+                    {
+                        openFile(args[1].getString());
+                    }
+                    else
+                    {
+                        warning(std::string("faust~: open method expects a path"));
+                    }
+                    if(args.size() > 2)
+                    {
+                        warning(std::string("faust~: open method extra arguments"));
+                    }
+                }
+                return;
+            }
             for(auto const& param : m_ui_glue->m_parameters)
             {
                 if(param.first == name)

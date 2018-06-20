@@ -52,8 +52,11 @@ namespace kiwi { namespace engine {
         static std::string getName(model::Object const& model);
         static std::vector<std::string> getOptions(model::Object const& model);
         
-        void createFactory();
+        void openFile(const std::string& file);
+        void createFactoryFromFile(const std::string& file);
+        void createFactoryFromString(const std::string& code);
         void createInstance();
+        
         void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
         
         struct nop
@@ -69,10 +72,7 @@ namespace kiwi { namespace engine {
         std::unique_ptr<UIGlue>             m_ui_glue;
         std::vector<dsp::sample_t*>         m_inputs;
         std::vector<dsp::sample_t*>         m_outputs;
-        const std::string                   m_name;
         const std::vector<std::string>      m_options;
-        
-        static std::string const m_folder;
     };
 
 }}
