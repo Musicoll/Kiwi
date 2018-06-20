@@ -30,7 +30,7 @@ matrix:
     - tar xvf ./ThirdParty/llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 ThirdParty/llvm
     script:
     - python ./Scripts/configure.py -coverage
-    - python ./Scripts/build.py -c Debug -t Tests
+    - cmake --build . --config Debug
     after_success:
     - coveralls -i Modules --gcov-options '\-lp' > /dev/null
 
@@ -54,7 +54,7 @@ matrix:
     - tar xvf ./ThirdParty/llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 ThirdParty/llvm
     script:
     - python ./Scripts/configure.py -Release
-    - python ./Scripts/build.py -c Release
+    - cmake --build . --config Release
     before_deploy:
     - mkdir Kiwi && mv Build/Release/KiwiBuild/Kiwi Kiwi/Kiwi
     - zip -r Kiwi_$os.zip Kiwi
@@ -77,7 +77,7 @@ matrix:
     - tar zxvf ./ThirdParty/llvm.tar.xz && mv ./clang+llvm-5.0.0-x86_64-apple-darwin ThirdParty/llvm
     script:
     - python ./Scripts/configure.py -c Release
-    - python ./Scripts/build.py -c Release
+    - cmake --build . --config Release
     before_deploy:
     - mkdir Kiwi && mv Build/Release/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
     - zip -r Kiwi_$os.zip Kiwi
