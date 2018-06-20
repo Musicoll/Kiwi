@@ -133,10 +133,11 @@ namespace kiwi { namespace engine {
         auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel());
         if(fmodel)
         {
-            std::string code = fmodel->getCode();
+            std::string code = fmodel->getDSPCode();
+            
             if(!code.empty())
             {
-                createFactoryFromString(code);
+                createFactoryFromString("", code);
                 if(m_factory)
                 {
                     createInstance();
@@ -148,6 +149,29 @@ namespace kiwi { namespace engine {
     FaustTilde::~FaustTilde()
     {
         
+    }
+    
+    void FaustTilde::attributeChanged(std::string const& name, tool::Parameter const& parameter)
+    {
+        if (name == "dspname")
+        {
+            auto const value = parameter[0].getString();
+            deferMain([this, value]() {
+                auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel());
+                if(fmodel)
+                {
+                    std::string code = fmodel->getDSPCode();
+                    if(!code.empty())
+                    {
+                        createFactoryFromString(value, code);
+                        if(m_factory)
+                        {
+                            createInstance();
+                        }
+                    }
+                }
+            });
+        }
     }
     
     void FaustTilde::openFile(const std::string& file)
@@ -163,7 +187,7 @@ namespace kiwi { namespace engine {
                     auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel());
                     if(model)
                     {
-                        model->setCode(code);
+                        model->setDSPCode(code);
                         model::DocumentManager::commit(*model);
                     }
                 }
@@ -186,9 +210,10 @@ namespace kiwi { namespace engine {
         {
             warning(errors);
         }
+        setAttribute("dspname", { tool::Parameter::Type::String, {tool::AtomHelper::toString(m_factory->getName())}});
     }
     
-    void FaustTilde::createFactoryFromString(const std::string& code)
+    void FaustTilde::createFactoryFromString(const std::string& name, const std::string& code)
     {
         std::string errors;
         char const* argv[m_options.size()];
@@ -198,7 +223,7 @@ namespace kiwi { namespace engine {
             warning(m_options[i]);
         }
         m_ui_glue->m_parameters.clear();
-        m_factory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString("faust~", code, m_options.size(), argv, std::string(), errors), deleteDSPFactory);
+        m_factory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString(name, code, m_options.size(), argv, std::string(), errors), deleteDSPFactory);
         if(!errors.empty())
         {
             warning(errors);

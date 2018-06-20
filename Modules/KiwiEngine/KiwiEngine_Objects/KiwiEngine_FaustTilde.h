@@ -44,17 +44,18 @@ namespace kiwi { namespace engine {
         
         ~FaustTilde();
         
-        void receive(size_t index, std::vector<tool::Atom> const& args) final;
+        void receive(size_t index, std::vector<tool::Atom> const& args) override;
         
-        void prepare(dsp::Processor::PrepareInfo const& infos) final;
+        void prepare(dsp::Processor::PrepareInfo const& infos) override;
 
+        void attributeChanged(std::string const& name, tool::Parameter const& param) override;
     private:
         static std::string getName(model::Object const& model);
         static std::vector<std::string> getOptions(model::Object const& model);
         
         void openFile(const std::string& file);
         void createFactoryFromFile(const std::string& file);
-        void createFactoryFromString(const std::string& code);
+        void createFactoryFromString(const std::string& name, const std::string& code);
         void createInstance();
         
         void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;

@@ -32,11 +32,14 @@ namespace kiwi { namespace model {
     void FaustTilde::declare()
     {
         std::unique_ptr<ObjectClass> fausttilde_class(new ObjectClass("faust~", &FaustTilde::create));
+        auto param_message = std::make_unique<ParameterClass>(tool::Parameter::Type::String);
+        fausttilde_class->addAttribute("dspname", std::move(param_message));
         
         flip::Class<FaustTilde> & fausttilde_model = DataModel::declare<FaustTilde>()
                                                     .name(fausttilde_class->getModelName().c_str())
                                                     .inherit<Object>()
-                                                    .member<flip::String, &FaustTilde::m_code>("code");
+                                                    .member<flip::String, &FaustTilde::m_dsp_code>("dspcode")
+                                                    .member<flip::String, &FaustTilde::m_dsp_name>("dspname");
         
         Factory::add<FaustTilde>(std::move(fausttilde_class), fausttilde_model);
     }
@@ -48,12 +51,14 @@ namespace kiwi { namespace model {
     
     FaustTilde::FaustTilde(flip::Default& d): model::Object(d)
     {
-        m_code.disable_in_undo();
+        m_dsp_code.disable_in_undo();
+        m_dsp_name.disable_in_undo();
     }
     
     FaustTilde::FaustTilde(std::vector<tool::Atom> const& args)
     {
-        m_code.disable_in_undo();
+        m_dsp_code.disable_in_undo();
+        m_dsp_name.disable_in_undo();
         if (args.size() < 2)
         {
             throw Error("faust~ expects 2 default arguments: the number of inlets and the number of outlets.");
@@ -94,14 +99,14 @@ namespace kiwi { namespace model {
         }
     }
     
-    void FaustTilde::setCode(std::string const& newcode)
+    void FaustTilde::setDSPCode(std::string const& newcode)
     {
-        m_code = newcode;
+        m_dsp_code = newcode;
     }
     
-    std::string FaustTilde::getCode()
+    std::string FaustTilde::getDSPCode()
     {
-        return m_code;
+        return m_dsp_code;
     }
     
 }}

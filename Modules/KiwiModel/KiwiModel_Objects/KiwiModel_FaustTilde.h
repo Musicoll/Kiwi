@@ -43,13 +43,13 @@ namespace kiwi { namespace model {
         
         std::string getIODescription(bool is_inlet, size_t index) const override;
         
-        void setCode(std::string const& newcode);
+        void setDSPCode(std::string const& newcode);
         
-        std::string getCode();
-        
+        std::string getDSPCode();
     private:
         
-        flip::String    m_code;
+        flip::String m_dsp_code;
+        flip::String m_dsp_name;
     };
     
 }}
