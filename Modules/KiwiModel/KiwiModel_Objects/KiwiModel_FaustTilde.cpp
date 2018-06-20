@@ -52,10 +52,6 @@ namespace kiwi { namespace model {
         {
             throw Error("faust~ expects 2 default arguments: the number of inlets and the number of outlets.");
         }
-        if (args.size() > 2)
-        {
-            throw Error("faust~ too many arguments.");
-        }
         
         if (!args[0].isInt() || args[0].getInt() < 0)
         {
