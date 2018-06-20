@@ -223,11 +223,8 @@ namespace kiwi
         void Object::setAttribute(std::string const& name, tool::Parameter const& param)
         {
             assert(getClass().hasAttribute(name) && "Attribute not declare");
-            
-            ParameterClass const& attribute_class = getClass().getAttribute(name);
-            
-            assert(attribute_class.getDataType() == param.getType());
-            
+            assert(getClass().getAttribute(name).getDataType() == param.getType());
+
             writeAttribute(name, param);
         }
         
@@ -263,11 +260,8 @@ namespace kiwi
         
         void Object::setParameter(std::string const& name, tool::Parameter const& param)
         {
-            assert(getClass().hasParameter(name) && "Parameter not declare");
-            
-            ParameterClass const& param_class = getClass().getParameter(name);
-            
-            assert(param_class.getDataType() == param.getType());
+            assert(getClass().hasParameter(name) && "Parameter not declare");            
+            assert(getClass().getParameter(name).getDataType() == param.getType());
             
             if (m_parameters.find(name) == m_parameters.end())
             {
