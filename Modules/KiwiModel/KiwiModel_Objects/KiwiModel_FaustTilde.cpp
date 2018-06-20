@@ -34,8 +34,9 @@ namespace kiwi { namespace model {
         std::unique_ptr<ObjectClass> fausttilde_class(new ObjectClass("faust~", &FaustTilde::create));
         
         flip::Class<FaustTilde> & fausttilde_model = DataModel::declare<FaustTilde>()
-                                                   .name(fausttilde_class->getModelName().c_str())
-                                                   .inherit<Object>();
+                                                    .name(fausttilde_class->getModelName().c_str())
+                                                    .inherit<Object>()
+                                                    .member<flip::String, &FaustTilde::m_code>("code");
         
         Factory::add<FaustTilde>(std::move(fausttilde_class), fausttilde_model);
     }
@@ -47,11 +48,11 @@ namespace kiwi { namespace model {
     
     FaustTilde::FaustTilde(std::vector<tool::Atom> const& args)
     {
-        if (args.size() < 3)
+        if (args.size() < 2)
         {
-            throw Error("faust~ expects 3 default arguments: the number of inlets, the number of outlets and the name of the file containing the FAUST code.");
+            throw Error("faust~ expects 2 default arguments: the number of inlets and the number of outlets.");
         }
-        if (args.size() > 3)
+        if (args.size() > 2)
         {
             throw Error("faust~ too many arguments.");
         }
@@ -64,12 +65,8 @@ namespace kiwi { namespace model {
         {
             throw Error("faust~ 2nd argument must be the number of outlets - positive or null");
         }
-        if (!args[2].isString())
-        {
-            throw Error("faust~ 3rd argument must be the name of the file containing the FAUST code");
-        }
         pushInlet({PinType::IType::Control, PinType::IType::Signal});
-        for(int i = 0; i < args[0].getInt(); ++i)
+        for(int i = 1; i < args[0].getInt(); ++i)
         {
             pushInlet({PinType::IType::Signal});
         }
@@ -77,7 +74,6 @@ namespace kiwi { namespace model {
         {
             pushOutlet(PinType::IType::Signal);
         }
-        pushOutlet(PinType::IType::Control);
     }
     
     std::string FaustTilde::getIODescription(bool is_inlet, size_t index) const
@@ -86,15 +82,24 @@ namespace kiwi { namespace model {
         {
             if(index == 0)
             {
-                return std::string("Messages and Audio Input Channel") + std::to_string(index);
+                return std::string("Messages and Audio Input Channel ") + std::to_string(index);
             }
-            return std::string("Audio Input Channel") + std::to_string(index);
+            return std::string("Audio Input Channel ") + std::to_string(index);
         }
-        else if (index < getNumberOfOutlets())
+        else
         {
-            return std::string("Audio Output Channel") + std::to_string(index);
+            return std::string("Audio Output Channel ") + std::to_string(index);
         }
-        return std::string("Informations");
+    }
+    
+    void FaustTilde::setCode(std::string const& newcode)
+    {
+        m_code = newcode;
+    }
+    
+    std::string FaustTilde::getCode()
+    {
+        return m_code;
     }
     
 }}

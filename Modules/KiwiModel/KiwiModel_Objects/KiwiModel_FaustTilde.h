@@ -42,6 +42,14 @@ namespace kiwi { namespace model {
         FaustTilde(std::vector<tool::Atom> const& args);
         
         std::string getIODescription(bool is_inlet, size_t index) const override;
+        
+        void setCode(std::string const& newcode);
+        
+        std::string getCode();
+        
+    private:
+        
+        flip::String    m_code;
     };
     
 }}
