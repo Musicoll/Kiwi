@@ -46,8 +46,14 @@ namespace kiwi { namespace model {
         return std::make_unique<FaustTilde>(args);
     }
     
+    FaustTilde::FaustTilde(flip::Default& d): model::Object(d)
+    {
+        m_code.disable_in_undo();
+    }
+    
     FaustTilde::FaustTilde(std::vector<tool::Atom> const& args)
     {
+        m_code.disable_in_undo();
         if (args.size() < 2)
         {
             throw Error("faust~ expects 2 default arguments: the number of inlets and the number of outlets.");

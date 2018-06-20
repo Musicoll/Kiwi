@@ -37,7 +37,7 @@ namespace kiwi { namespace model {
         
         static std::unique_ptr<Object> create(std::vector<tool::Atom> const& args);
         
-        FaustTilde(flip::Default& d): model::Object(d){};
+        FaustTilde(flip::Default& d);
         
         FaustTilde(std::vector<tool::Atom> const& args);
         
