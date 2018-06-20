@@ -58,11 +58,13 @@ namespace kiwi
             //! @brief Destructor.
             virtual ~Object() noexcept;
             
+        private: // methods
             //! @brief Receives a set of arguments via an inlet.
             //! @details This method must be overriden by object's subclasses.
             //! @todo see if the method must be noexcept.
             virtual void receive(size_t index, std::vector<tool::Atom> const& args) = 0;
             
+        public: // methods
             //! @brief Called when the Patcher is loaded.
             virtual void loadbang() {};
             
@@ -146,10 +148,12 @@ namespace kiwi
             //! @details For thread safety actual model's modification is called on the main thread.
             void setParameter(std::string const& name, tool::Parameter && parameter);
             
-        private: // methods
+        protected: // methods
             
             //! @brief Returns the object's data model.
             model::Object & getObjectModel();
+            
+        private: // methods
             
             //! @brief Called once the data model's parameters has changed.
             //! @details Automatically called on the engine's thread.
