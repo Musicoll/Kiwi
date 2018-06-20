@@ -12,34 +12,49 @@ matrix:
   include:
   - os: linux
     compiler: gcc
-
+    addons:
+      apt:
+        sources: ['ubuntu-toolchain-r-test']
+        packages: [g++-4.9, 'python-pip', 'python-yaml', 'libssl1.0.0']
     before_install:
     - python --version
     - python -c 'import ssl; print ssl.OPENSSL_VERSION;'
     - sudo add-apt-repository ppa:webkit-team/ppa -y
     - sudo apt-get update
     - sudo apt-get install -y pkg-config libedit-dev libfreetype6-dev libx11-dev libxrandr-dev libxinerama1 libxinerama-dev libxcursor-dev libasound2-dev libgtk-3-dev libwebkit2gtk-4.0-dev
+    install:
+    - export CXX=g++-4.9 # make sure CXX is correctly set
+    - git submodule update --init --recursive ThirdParty/Juce ThirdParty/concurrentqueue ThirdParty/Beast ThirdParty/faust
+    - pip install --user cpp-coveralls
+    - curl -o ./ThirdParty/llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
+    - tar xvf ./ThirdParty/llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 ThirdParty/llvm
+    script:
+    - python ./Scripts/configure.py -coverage
+    - python ./Scripts/build.py -c Debug -t Tests
+    after_success:
+    - coveralls -i Modules --gcov-options '\-lp' > /dev/null
 
+  - os: linux
+    compiler: gcc
     addons:
       apt:
         sources: ['ubuntu-toolchain-r-test']
         packages: [g++-4.9, 'python-pip', 'python-yaml', 'libssl1.0.0']
-
+    before_install:
+    - python --version
+    - python -c 'import ssl; print ssl.OPENSSL_VERSION;'
+    - sudo add-apt-repository ppa:webkit-team/ppa -y
+    - sudo apt-get update
+    - sudo apt-get install -y pkg-config libedit-dev libfreetype6-dev libx11-dev libxrandr-dev libxinerama1 libxinerama-dev libxcursor-dev libasound2-dev libgtk-3-dev libwebkit2gtk-4.0-dev
     install:
-      - export CXX=g++-4.9 # make sure CXX is correctly set
-      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/concurrentqueue ThirdParty/Beast ThirdParty/faust
-      - pip install --user cpp-coveralls
-      - curl -o ./ThirdParty/llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
-      - tar xvf ./ThirdParty/llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 ThirdParty/llvm
-
+    - export CXX=g++-4.9 # make sure CXX is correctly set
+    - git submodule update --init --recursive ThirdParty/Juce ThirdParty/concurrentqueue ThirdParty/Beast ThirdParty/faust
+    - pip install --user cpp-coveralls
+    - curl -o ./ThirdParty/llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
+    - tar xvf ./ThirdParty/llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 ThirdParty/llvm
     script:
-      - python ./Scripts/configure.py -coverage
-      - python ./Scripts/build.py -c Release
-      - python ./Scripts/build.py -c Debug -t Tests
-
-    after_success:
-      - coveralls -i Modules --gcov-options '\-lp' > /dev/null
-
+    - python ./Scripts/configure.py -Release
+    - python ./Scripts/build.py -c Release
     before_deploy:
     - mkdir Kiwi && mv Build/Release/KiwiBuild/Kiwi Kiwi/Kiwi
     - zip -r Kiwi_$os.zip Kiwi
@@ -50,23 +65,19 @@ matrix:
     compiler: clang++
     env: COMPILER=clang++
     osx_image: xcode9.2
-
     before_install:
-     - pyenv install 2.7.11
-     - pyenv global 2.7.11
-     - eval "$(pyenv init -)"
-     - python --version
-     - python -c 'import ssl; print ssl.OPENSSL_VERSION;'
-
+    - pyenv install 2.7.11
+    - pyenv global 2.7.11
+    - eval "$(pyenv init -)"
+    - python --version
+    - python -c 'import ssl; print ssl.OPENSSL_VERSION;'
     install:
-      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/concurrentqueue ThirdParty/Beast ThirdParty/faust
-      - curl -o ./ThirdParty/llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
-      - tar zxvf ./ThirdParty/llvm.tar.xz && mv ./clang+llvm-5.0.0-x86_64-apple-darwin ThirdParty/llvm
-
+    - git submodule update --init --recursive ThirdParty/Juce ThirdParty/concurrentqueue ThirdParty/Beast ThirdParty/faust
+    - curl -o ./ThirdParty/llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
+    - tar zxvf ./ThirdParty/llvm.tar.xz && mv ./clang+llvm-5.0.0-x86_64-apple-darwin ThirdParty/llvm
     script:
     - python ./Scripts/configure.py -c Release
     - python ./Scripts/build.py -c Release
-
     before_deploy:
     - mkdir Kiwi && mv Build/Release/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
     - zip -r Kiwi_$os.zip Kiwi
