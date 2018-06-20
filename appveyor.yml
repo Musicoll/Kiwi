@@ -21,14 +21,12 @@ install:
     - 7z x llvm.zip
     - rename llvm-windows-x64-mt llvm
     - cd %APPVEYOR_BUILD_FOLDER%
-
+    - python ./Scripts/flip.py
+    - python ./Scripts/boost.py
 build_script:
-    - python .\Scripts\flip.py
-    - python .\Scripts\boost.py
     - mkdir Build && cd Build
     - cmake .. -G "Visual Studio 14 2015 Win64" -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm
     - cmake --build . --config %CONFIGURATION%
-
 after_build:
     - C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Scripts\setup-x64.iss
     - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\%CONFIGURATION%
