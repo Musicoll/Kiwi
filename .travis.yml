@@ -84,7 +84,7 @@ matrix:
     - python ./Scripts/boost.py
     script:
     - mkdir Build && cd Build
-    - make .. -GXcode  -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm
+    - cmake .. -GXcode  -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm
     - cmake --build . --config Release
     before_deploy:
     - mkdir Kiwi && mv Build/Release/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
