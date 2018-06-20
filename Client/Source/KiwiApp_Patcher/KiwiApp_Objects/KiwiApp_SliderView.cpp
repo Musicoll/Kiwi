@@ -46,7 +46,7 @@ namespace kiwi
                            findColour(ObjectView::ColourIds::Outline));
         
         m_slider.setColour(juce::Slider::ColourIds::trackColourId,
-                           findColour(ObjectView::ColourIds::Active).darker(0.5));
+                           findColour(ObjectView::ColourIds::Active).contrasting(0.2f));
         
         m_slider.setColour(juce::Slider::ColourIds::thumbColourId,
                            findColour(ObjectView::ColourIds::Active));
@@ -107,12 +107,17 @@ namespace kiwi
     
     void SliderView::resized()
     {
-        if (getWidth() > getHeight() && m_slider.isVertical())
+        const int min = 20;
+        const int max = 40;
+        const bool vertical = (getWidth() <= getHeight());
+        setMinimumSize(vertical ? min : max, vertical ? max : min);
+        
+        if (!vertical && m_slider.isVertical())
         {
             m_slider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
         }
         
-        if (getHeight() > getWidth() && m_slider.isHorizontal())
+        if (vertical && m_slider.isHorizontal())
         {
             m_slider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
         }

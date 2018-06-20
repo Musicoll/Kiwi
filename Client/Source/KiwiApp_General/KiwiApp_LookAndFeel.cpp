@@ -22,28 +22,39 @@
 #include "../KiwiApp_General/KiwiApp_LookAndFeel.h"
 #include "../KiwiApp_Ressources/KiwiApp_BinaryData.h"
 
+#include <KiwiApp_Patcher/KiwiApp_PatcherView.h>
+#include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectView.h>
+#include <KiwiApp_Patcher/KiwiApp_LinkView.h>
+
 namespace bfonts = kiwi::binary_data::fonts;
 
 namespace kiwi
 {
+    LookAndFeel::LookAndFeel()
+    : juce::LookAndFeel_V4(getGreyColourScheme())
+    {
+        setUsingNativeAlertWindows(true);
+        initColours();
+    }
+    
+    float LookAndFeel::getObjectBorderSize() const
+    {
+        return m_box_border_size;
+    }
+    
     juce::TextLayout LookAndFeel::layoutTooltipText(juce::String const& text, juce::Colour colour) noexcept
     {
         const float font_size = 13.0f;
         const int max_width = 400;
         
         juce::AttributedString s;
+        s.setColour(colour);
         s.setJustification(juce::Justification::centred);
         s.append(text, juce::Font(font_size, juce::Font::bold), colour);
         
         juce::TextLayout tl;
         tl.createLayoutWithBalancedLineLengths(s, (float) max_width);
         return tl;
-    }
-    
-    LookAndFeel::LookAndFeel() : juce::LookAndFeel_V4(getGreyColourScheme())
-    {
-        setColour(juce::ScrollBar::ColourIds::thumbColourId, juce::Colours::grey.withAlpha(0.7f));
-        setUsingNativeAlertWindows(true);
     }
     
     juce::Typeface::Ptr LookAndFeel::getTypefaceForFont(juce::Font const& font)
@@ -227,11 +238,47 @@ namespace kiwi
                                                    bool isMouseOver, bool isMouseDown,
                                                    juce::ToolbarItemComponent& component)
     {
-        /*
-        if (isMouseDown)
-            g.fillAll(component.findColour (Toolbar::buttonMouseDownBackgroundColourId, true));
-        else if (isMouseOver)
-            g.fillAll(component.findColour (Toolbar::buttonMouseOverBackgroundColourId, true));
-        */
+        // don't draw toolbar button background
+    }
+    
+    void LookAndFeel::initColours()
+    {
+        // ------ Application
+        
+        setColour(juce::ScrollBar::ColourIds::thumbColourId,
+                  juce::Colours::grey.withAlpha(0.7f));
+        
+        // ------ patcherview colors
+        
+        const auto patcherview_bg = juce::Colour::fromFloatRGBA(0.8, 0.8, 0.8, 1.);
+        setColour(PatcherView::ColourIds::BackgroundUnlocked, patcherview_bg);
+        setColour(PatcherView::ColourIds::BackgroundLocked, patcherview_bg);
+        
+        const auto selection_color = juce::Colour::fromFloatRGBA(0., 0.5, 1., 1.);
+        setColour(PatcherView::ColourIds::Selection, selection_color);
+        setColour(PatcherView::ColourIds::SelectionOtherView, selection_color.contrasting(0.4));
+        setColour(PatcherView::ColourIds::SelectionOtherUser, juce::Colour(0xFFFF8C00));
+        
+        // ------ objectbox colors
+        
+        const juce::Colour box_bgcolor = juce::Colours::white;
+        const auto box_bdcolor = box_bgcolor.contrasting(0.4);
+        const auto link_control_color = box_bdcolor.contrasting(0.1f);
+        const auto link_signal_color = juce::Colour(0xff444444);
+        
+        setColour(ObjectView::ColourIds::PinControl, link_control_color);
+        setColour(ObjectView::ColourIds::PinSignal, link_signal_color);
+        setColour(ObjectView::ColourIds::Error, juce::Colour::fromRGBA(223, 97, 94, 250));
+        setColour(ObjectView::ColourIds::Background, box_bgcolor);
+        setColour(ObjectView::ColourIds::Text, juce::Colours::black);
+        setColour(ObjectView::ColourIds::Outline, box_bdcolor);
+        setColour(ObjectView::ColourIds::Highlight, juce::Colour::fromFloatRGBA(0., 0.5, 1., 0.4));
+        setColour(ObjectView::ColourIds::Active, juce::Colour(0xff21ba90));
+        
+        // ------ link colors
+        
+        setColour(LinkView::ColourIds::ControlBackground, link_control_color);
+        setColour(LinkView::ColourIds::SignalBackground, link_signal_color);
     }
 }
+

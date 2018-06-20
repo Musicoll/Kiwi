@@ -289,29 +289,16 @@ namespace kiwi
             double getY() const noexcept;
             
             //! @brief Sets the width of the object.
-            //! @details Width will not be lower than minimal width.
-            //! If ratio was previously set proportions will be kept intact by changing height.
             void setWidth(double new_width);
             
             //! @brief Sets the height of the object.
-            //! @details Height will not be lower than minimal height.
-            //! If ratio was previously set proportions will be kept intact by changing width.
             void setHeight(double new_height);
-                
-            //! @brief Returns the aspect ratio.
-            double getRatio() const;
             
             //! @brief Returns the object's width.
             double getWidth() const noexcept;
             
             //! @brief Returns the object's height.
             double getHeight() const noexcept;
-            
-            //! @brief Returns the minimal width for this object.
-            double getMinWidth() const noexcept;
-                
-            //! @brief Returns the minimal height for this object;
-            double getMinHeight() const noexcept;
             
             //! @brief Returns inlet or outlet description.
             virtual std::string getIODescription(bool is_inlet, size_t index) const;
@@ -349,18 +336,6 @@ namespace kiwi
             //! @brief Adds an outlet at end of current outlet list.
             void pushOutlet(PinType type);
                 
-            //! @brief Sets the ratio height/width.
-            //! @details If width was previously set. Height will adapt to ratio.
-            void setRatio(double ratio);
-                
-            //! @brief Sets the minimal width that the object can have.
-            //! @details Will recompute height and width if needed.
-            void setMinWidth(double min_width);
-                
-            //! @brief Sets the minimal height that the object can have.
-            //! @details Will recompute height and width if needed.
-            void setMinHeight(double min_height);
-                
         public: // internal methods
             
             //! @internal flip Default constructor
@@ -378,12 +353,9 @@ namespace kiwi
             flip::Float                                             m_position_y;
             flip::Float                                             m_width;
             flip::Float                                             m_height;
-            flip::Float                                             m_min_width;
-            flip::Float                                             m_min_height;
-            flip::Float                                             m_ratio;
             mutable std::map<std::string, tool::Parameter>          m_attributes;
             mutable std::map<std::string, tool::Parameter>          m_parameters;
-            mutable std::unique_ptr<std::vector<tool::Atom>>        m_args;
+            mutable std::unique_ptr<std::vector<tool::Atom>>        m_args = nullptr;
             std::map<SignalKey, std::unique_ptr<flip::SignalBase>>  m_signals;
             mutable tool::Listeners<Listener>                       m_listeners;
             

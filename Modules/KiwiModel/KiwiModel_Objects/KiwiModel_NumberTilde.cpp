@@ -41,7 +41,6 @@ namespace kiwi { namespace model {
         
         
         // flags
-        numbertilde_class->setFlag(ObjectClass::Flag::ResizeWidth);
         numbertilde_class->setFlag(ObjectClass::Flag::DefinedSize);
         
         // data model
@@ -66,8 +65,6 @@ namespace kiwi { namespace model {
             throw Error("number tilde doesn't take any arguments");
         }
         
-        setMinWidth(20.);
-        setMinHeight(20.);
         setWidth(50.);
         setHeight(20.);
         pushInlet({PinType::IType::Signal});

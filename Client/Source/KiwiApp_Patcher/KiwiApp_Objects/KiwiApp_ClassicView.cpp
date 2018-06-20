@@ -21,8 +21,8 @@
 
 #include <KiwiModel/KiwiModel_Factory.h>
 
+#include <KiwiApp.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ClassicView.h>
-
 #include <KiwiApp_Components/KiwiApp_SuggestEditor.h>
 
 namespace kiwi
@@ -36,12 +36,15 @@ namespace kiwi
     {
         juce::Label & label = getLabel();
         
-        label.setText(object_model.getText(), juce::NotificationType::dontSendNotification);
+        const auto object_text = object_model.getText();
+        label.setText(object_text, juce::NotificationType::dontSendNotification);
         
-        juce::Colour bg_colour = object_model.getName() == "errorbox" ?
-                                 findColour(ObjectView::ColourIds::Error).withAlpha(0.4f) :
-                                 findColour(ObjectView::ColourIds::Background);
+        juce::Colour bg_colour = (object_model.getName() == "errorbox" ?
+                                  findColour(ObjectView::ColourIds::Error) :
+                                  findColour(ObjectView::ColourIds::Background));
         
+        setColour(ObjectView::ColourIds::Background, bg_colour);
+        setColour(ObjectView::ColourIds::Outline, bg_colour.contrasting(0.4));
         
         label.setColour(juce::Label::backgroundColourId, bg_colour);
         label.setColour(juce::Label::backgroundWhenEditingColourId, bg_colour);
@@ -52,42 +55,31 @@ namespace kiwi
     }
 
     ClassicView::~ClassicView()
-    {
-    }
+    {}
     
     void ClassicView::paintOverChildren (juce::Graphics& g)
     {
-        g.setColour (findColour (ObjectView::ColourIds::Outline));
-        
         drawOutline(g);
     }
     
-    void ClassicView::resized()
-    {
-        getLabel().setBounds(getLocalBounds());
-    }
-    
     void ClassicView::textChanged()
-    {
-    }
+    {}
     
     void ClassicView::textEditorTextChanged(juce::TextEditor& editor)
     {
-        const int text_width = editor.getFont().getStringWidth(editor.getText());
+        const auto text = editor.getText();
         
-        if(editor.getWidth() < text_width + 16)
-        {
-            setSize(text_width + 16, getHeight());
-        }
+        auto single_line_text_width = editor.getFont().getStringWidthFloat(text) + getPadding() * 2 + 10;
+        auto prev_width = getWidth();
+        auto text_bounds = getTextBoundingBox(text, single_line_text_width);
+        
+        setSize(std::max<int>(prev_width, single_line_text_width),
+                std::max(std::min<int>(text_bounds.getHeight(), getHeight()), getMinHeight()));
     }
     
     juce::TextEditor* ClassicView::createdTextEditor()
     {
         juce::TextEditor * editor = new SuggestEditor(model::Factory::getNames());
-        
-        editor->setBounds(getLocalBounds());
-        editor->setBorder(juce::BorderSize<int>(0));
-        
         
         editor->setColour(juce::TextEditor::ColourIds::textColourId,
                           getLabel().findColour(juce::Label::textWhenEditingColourId));
@@ -98,17 +90,23 @@ namespace kiwi
         editor->setColour(juce::TextEditor::highlightColourId,
                           findColour(ObjectView::ColourIds::Highlight, true).withAlpha(0.4f));
         
-        
         editor->setColour(juce::TextEditor::outlineColourId,
                           juce::Colours::transparentWhite);
         
         editor->setColour(juce::TextEditor::focusedOutlineColourId,
                           juce::Colours::transparentWhite);
         
+        editor->setBounds(getLocalBounds());
+        editor->setIndents(getPadding(), getPadding());
+        editor->setBorder(juce::BorderSize<int>(0));
+        editor->setFont(getLabel().getFont());
+        editor->setJustification(getLabel().getJustificationType());
+        
         editor->setScrollbarsShown(false);
         editor->setScrollToShowCursor(true);
         editor->setReturnKeyStartsNewLine(false);
-        editor->setMultiLine(true, false);
+        editor->setMultiLine(true, true);
+        editor->setInterceptsMouseClicks(true, false);
         
         editor->addListener(this);
         

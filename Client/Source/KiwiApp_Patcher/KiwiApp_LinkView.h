@@ -65,8 +65,15 @@ namespace kiwi
         //! @brief Destructor
         ~LinkView();
         
+        //! @brief LinkView colors
+        enum ColourIds
+        {
+            ControlBackground =     0x2110010,
+            SignalBackground =      0x2110012,
+        };
+        
         //! @brief Get the Link model
-        model::Link& getModel() const {return *m_model;};
+        model::Link& getModel() const;
         
         //! Returns true if the link is selected.
         bool isSelected() const noexcept;
@@ -92,14 +99,26 @@ namespace kiwi
         //! @param component    the component that was moved or resized
         //! @param wasMoved     true if the component's top-left corner has just moved
         //! @param wasResized   true if the component's width or height has just changed
-        void componentMovedOrResized(Component& component, bool was_moved, bool was_resized) override;
+        void componentMovedOrResized(Component& component,
+                                     bool was_moved, bool was_resized) override;
         
     private: // members
         
+        struct Selection
+        {
+            bool on_this_view = false;
+            bool in_another_view = false;
+            bool by_another_user = false;
+            
+            operator bool () const
+            {
+                return (on_this_view || in_another_view || by_another_user);
+            }
+        };
+        
         PatcherView&        m_patcherview;
-        model::Link*        m_model;
-        bool                m_is_selected = 0;
-        std::set<uint64_t>  m_distant_selection;
+        model::Link*        m_model {nullptr};
+        Selection           m_selected {};
     };
     
     // ================================================================================ //

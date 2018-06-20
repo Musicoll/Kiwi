@@ -51,23 +51,33 @@ namespace kiwi
     //                                  PATCHER MANAGER                                 //
     // ================================================================================ //
     
-    PatcherManager::PatcherManager(Instance& instance, std::string const& name) :
-    m_name(name),
-    m_instance(instance),
-    m_validator(),
-    m_document(model::DataModel::use(), *this, m_validator,
-               m_instance.getUserId(), 'cicm', 'kpat'),
-    m_file(),
-    m_socket(m_document),
-    m_need_saving_flag(false),
-    m_session(nullptr)
-    {
-        ;
-    }
+    PatcherManager::PatcherManager(Instance& instance, std::string const& name)
+    : m_name(name)
+    , m_instance(instance)
+    , m_validator()
+    , m_document(model::DataModel::use(), *this, m_validator,
+               m_instance.getUserId(), 'cicm', 'kpat')
+    , m_socket(m_document)
+    , m_session(nullptr)
+    {}
     
     PatcherManager::~PatcherManager()
     {
         disconnect();
+    }
+    
+    std::unique_ptr<PatcherManager> PatcherManager::createFromFile(Instance& instance,
+                                                                   juce::File const& file)
+    {
+        auto filename = file.getFileNameWithoutExtension().toStdString();
+        auto manager = std::make_unique<PatcherManager>(instance, filename);
+        
+        if(manager && manager->loadFromFile(file))
+        {
+            return manager;
+        }
+        
+        return nullptr;
     }
     
     void PatcherManager::addListener(Listener& listener)
@@ -82,9 +92,13 @@ namespace kiwi
     
     void PatcherManager::pull()
     {
-        if (isRemote())
+        if (isConnected())
         {
             m_socket.process();
+        }
+        
+        if (isConnected())
+        {
             model::DocumentManager::pull(getPatcher());
         }
     }
@@ -94,8 +108,11 @@ namespace kiwi
     {
         if (transition == flip::CarrierBase::Transition::Disconnected)
         {
-            m_session->useDrive().removeListener(*this);
-            m_session = nullptr;
+            if(m_session)
+            {
+                m_session->useDrive().removeListener(*this);
+                m_session = nullptr;
+            }
             
             m_connected_users.clear();
             
@@ -116,12 +133,11 @@ namespace kiwi
     
     void PatcherManager::disconnect()
     {
-        if (isRemote())
+        if (isConnected())
         {
             m_socket.disconnect();
         }
     }
-    
     
     bool PatcherManager::connect(std::string const& host,
                                  uint16_t port,
@@ -216,70 +232,88 @@ namespace kiwi
         return m_socket.isConnected() && patcher_loaded;
     }
     
-    bool PatcherManager::readDocument()
+    bool PatcherManager::readBackEndBinary(flip::DataProviderBase& data_provider)
     {
-        bool loading_succeeded = false;
+        flip::BackEndIR binary_backend;
+        binary_backend.register_backend<flip::BackEndBinary>();
+        //binary_backend.register_backend<flip::BackEndMl>();
         
-        flip::DataProviderFile provider(m_file.getFullPathName().toStdString().c_str());
-        flip::BackEndIR back_end;
-        
-        back_end.register_backend<flip::BackEndBinary>();
-        
-        if (back_end.read(provider))
+        if (binary_backend.read(data_provider))
         {
-            if (model::Converter::process(back_end))
+            const auto current_version = model::Converter::getLatestVersion();
+            const auto backend_version = binary_backend.version;
+            
+            if(!model::Converter::canConvertToLatestFrom(backend_version))
+            {
+                throw std::runtime_error("bad version: no conversion available from "
+                                         + backend_version + " to " + current_version);
+                return false;
+            }
+            
+            if (model::Converter::process(binary_backend))
             {
                 try
                 {
-                    m_document.read(back_end);
+                    m_document.read(binary_backend);
                 }
                 catch (...)
                 {
+                    std::runtime_error("document failed to read");
                     return false;
                 }
-                
-                loading_succeeded = true;
+            }
+            else
+            {
+                throw std::runtime_error("failed to convert document from "
+                                         + backend_version + " to " + current_version);
             }
         }
+        else
+        {
+            throw std::runtime_error("backend failed to read");
+        }
         
-        return loading_succeeded;
+        return true;
     }
     
     bool PatcherManager::loadFromFile(juce::File const& file)
     {
-        bool success = false;
-        
-        if (file.hasFileExtension("kiwi"))
+        if(!file.hasFileExtension("kiwi"))
         {
-            m_file = file;
-            
-            if (readDocument())
-            {
-                model::Patcher& patcher = getPatcher();
-                
-                patcher.useSelfUser();
-                
-                try
-                {
-                    model::DocumentManager::commit(patcher);
-                }
-                catch (...)
-                {
-                    return false;
-                }
-                
-                setName(file.getFileNameWithoutExtension().toStdString());
-                
-                setNeedSaving(false);
-                
-                updateTitleBars();
-                
-                patcher.entity().use<engine::Patcher>().sendLoadbang();
-                success = true;
-            }
+            throw std::runtime_error("bad extension");
+            return false;
         }
         
-        return success;
+        std::string filepath = file.getFullPathName().toStdString();
+        
+        // assuming that the file is in in a binary format
+        
+        flip::DataProviderFile provider(filepath.c_str());
+        
+        if(readBackEndBinary(provider))
+        {
+            model::Patcher& patcher = getPatcher();
+            patcher.useSelfUser();
+            
+            try
+            {
+                model::DocumentManager::commit(patcher);
+            }
+            catch (...)
+            {
+                throw std::runtime_error("document failed to load");
+                return false;
+            }
+            
+            m_file = file;
+            setName(file.getFileNameWithoutExtension().toStdString());
+            setNeedSaving(false);
+            updateTitleBars();
+            
+            patcher.entity().use<engine::Patcher>().sendLoadbang();
+        }
+        
+        return true;
     }
     
     model::Patcher& PatcherManager::getPatcher()
@@ -292,7 +326,7 @@ namespace kiwi
         return m_document.root<model::Patcher>();
     }
     
-    bool PatcherManager::isRemote() const noexcept
+    bool PatcherManager::isConnected() const noexcept
     {
         return m_socket.isConnected();
     }
@@ -345,7 +379,7 @@ namespace kiwi
     
     bool PatcherManager::needsSaving() const noexcept
     {
-        return m_need_saving_flag && !isRemote();
+        return m_need_saving_flag && !isConnected();
     }
     
     void PatcherManager::writeDocument()
@@ -400,13 +434,15 @@ namespace kiwi
         
         if (needsSaving())
         {
+            const auto title = TRANS("Closing document...");
+            const auto message = TRANS("Do you want to save the changes to \"") + m_name + "\"?";
+            
             const int r = juce::AlertWindow::showYesNoCancelBox(juce::AlertWindow::QuestionIcon,
-                                                                TRANS("Closing document..."),
-                                                                TRANS("Do you want to save the changes to \"")
-                                                                + m_name + "\"?",
+                                                                title, message,
                                                                 TRANS("Save"),
                                                                 TRANS("Discard changes"),
-                                                                TRANS("Cancel"));
+                                                                TRANS("Cancel"),
+                                                                &getFirstWindow());
             
             if (r == 0) // cancel button
             {
@@ -516,6 +552,16 @@ namespace kiwi
         }
     }
     
+    void PatcherManager::driveConnectionStatusChanged(bool is_online)
+    {
+        //! @todo drive refactoring
+        if(m_session && !is_online)
+        {
+            m_session->useDrive().removeListener(*this);
+            m_session = nullptr;
+        }
+    }
+    
     void PatcherManager::documentAdded(DocumentBrowser::Drive::DocumentSession& doc)
     {
         ;
@@ -600,7 +646,7 @@ namespace kiwi
         
         bool is_locked = view.getLock();
         
-        std::string title = (isRemote() ? "[Remote] " : "")
+        std::string title = (isConnected() ? "[Remote] " : "")
         +  m_name
         + (is_locked ? "" : " (edit)");
         

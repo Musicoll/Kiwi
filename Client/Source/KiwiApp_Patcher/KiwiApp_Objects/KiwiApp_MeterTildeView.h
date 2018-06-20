@@ -39,9 +39,9 @@ namespace kiwi {
         
         struct Led
         {
-            float                   m_min_db;
-            juce::Colour            m_colour;
-            juce::Rectangle<int>    m_bounds;
+            float                   min_db {0.f};
+            juce::Colour            colour {};
+            juce::Rectangle<float>  bounds {};
         };
         
     public: // methods
@@ -68,13 +68,13 @@ namespace kiwi {
         
     private: // members
         
-        std::vector<Led>                                m_leds;
-        int                                             m_active_led;
-        juce::Colour                                    m_cold_colour;
-        juce::Colour                                    m_hot_colour;
-        int                                             m_border;
-        int                                             m_padding;
-        flip::SignalConnection                          m_connection;
+        std::vector<Led>        m_leds {};
+        int                     m_active_led = -1;
+        juce::Colour            m_cold_colour = juce::Colour(0xff04047f);
+        juce::Colour            m_hot_colour = juce::Colour(0xffca2423);
+        float                   m_led_distance = 1.f;
+        float                   m_padding = 4.f;
+        flip::SignalConnection  m_connection {};
         
     private: // deleted methods
         

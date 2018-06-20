@@ -37,16 +37,19 @@ namespace kiwi
         //! @brief Constructor.
         PatcherToolbar(PatcherManager& patcher_manager);
         
+        //! @brief Destructor.
+        ~PatcherToolbar();
+        
         //! @brief juce::Component::resized
         void resized() override;
-        
-        //! @brief juce::Component::paint
-        void paint(juce::Graphics& g) override;
         
         //! @brief Removes users icon.
         void removeUsersIcon();
         
     private: // classes
+        
+        //! called by custom toolbar lookandfeel.
+        void paintToolbarBackground(juce::Graphics& g, int width, int height);
         
         //! @internal Toolbar item factory
         struct Factory : public juce::ToolbarItemFactory
@@ -79,6 +82,9 @@ namespace kiwi
         
         juce::Toolbar   m_toolbar;
         Factory         m_factory;
+        std::unique_ptr<juce::LookAndFeel> m_toolbar_look_and_feel = nullptr;
+        
+        class PatcherToolbarLookAndFeel;
     };
     
     // ================================================================================ //

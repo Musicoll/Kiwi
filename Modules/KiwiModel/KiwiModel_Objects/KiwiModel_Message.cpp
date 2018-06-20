@@ -64,8 +64,6 @@ namespace kiwi { namespace model {
     Object(),
     m_message_text("")
     {
-        setMinWidth(20.);
-        setMinHeight(20.);
         setWidth(40);
         setHeight(20.);
         pushInlet({PinType::IType::Control});

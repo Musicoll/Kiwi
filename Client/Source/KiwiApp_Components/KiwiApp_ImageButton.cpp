@@ -37,6 +37,10 @@ namespace kiwi
     m_edge_indent(3)
     {
         setImages(drawable.get());
+        const auto transparent = juce::Colours::transparentWhite;
+        setColour(ImageButton::ColourIds::backgroundColourId, transparent);
+        setColour(ImageButton::ColourIds::backgroundOnColourId, transparent);
+        setColour(ImageButton::ColourIds::textColourId, juce::Colours::whitesmoke);
     }
     
     ImageButton::~ImageButton()

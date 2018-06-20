@@ -37,11 +37,12 @@ namespace kiwi
     //! @brief The juce ConsoleContent Component
     //! @details The juce Console Component maintain a ConsoleHistory and display Console messages to the user.
     //! The user can select a message to copy it to the system clipboard, delete a specific message or a range of messages, sort messages, double-click on a row to hilight the corresponding object...
-    class ConsoleContent :
-    public ConsoleHistory::Listener,
-    public juce::Component,
-    public juce::TableListBoxModel,
-    public juce::TableHeaderComponent::Listener
+    class ConsoleContent
+    : public ConsoleHistory::Listener
+    , public juce::Component
+    , public juce::TableListBoxModel
+    , public juce::TableHeaderComponent::Listener
+    , public juce::FileDragAndDropTarget
     {
     public:
         
@@ -126,6 +127,15 @@ namespace kiwi
         void clearAll();
         
         // ================================================================================ //
+        //                              FileDragAndDropTarget                               //
+        // ================================================================================ //
+        
+        bool isInterestedInFileDrag(juce::StringArray const& files) override;
+        void fileDragEnter(juce::StringArray const&, int, int) override;
+        void fileDragExit(juce::StringArray const&) override;
+        void filesDropped(juce::StringArray const& files, int x, int y) override;
+        
+        // ================================================================================ //
         //                          TABLE HEADER COMPONENT LISTENER                         //
         // ================================================================================ //
         
@@ -160,6 +170,8 @@ namespace kiwi
         wConsoleHistory     m_history;
         juce::Font          m_font;
         juce::TableListBox  m_table;
+        
+        bool m_is_dragging_over {false};
         
         friend class Console;
     };

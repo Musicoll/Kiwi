@@ -33,24 +33,30 @@
 namespace kiwi
 {
     class ObjectFrame;
+    class PatcherView;
     
     // ================================================================================ //
     //                                   OBJECT VIEW                                    //
     // ================================================================================ //
     
     //! @brief Abstract for objects graphical representation.
-    class ObjectView : public juce::Component, public model::Object::Listener
+    class ObjectView
+    : public juce::Component
+    , public juce::ComponentBoundsConstrainer
+    , public model::Object::Listener
     {
     public: // classes
         
         enum ColourIds
         {
-            Background =    0x1100004,
-            Error =         0x1100005,
-            Text =          0x1100006,
-            Outline =       0x1100007,
-            Highlight =     0x1100008,
-            Active =        0x1100009
+            PinControl =    0x1100013,
+            PinSignal =     0x1100015,
+            Background =    0x1100024,
+            Error =         0x1100025,
+            Text =          0x1100026,
+            Outline =       0x1100027,
+            Highlight =     0x1100028,
+            Active =        0x1100029
         };
         
     public: // methods
@@ -70,7 +76,26 @@ namespace kiwi
         //! @brief Called when a parameter has changed.
         void modelParameterChanged(std::string const& name, tool::Parameter const& param) override final;
         
+        //! @brief Called every time a patcher is locked or unlocked.
+        virtual void lockStatusChanged(bool is_locked);
+        
+        //! @brief Get the resizing Flag as a set of border.
+        //! @see HitTester::Border
+        int getResizingFlags() const;
+        
+        //! @brief Returns true if the box can grow horizontally
+        bool canGrowHorizontally() const;
+        
+        //! @brief Returns true if the box can grow vertically
+        bool canGrowVertically() const;
+        
     protected: // methods
+        
+        //! @brief Pass true if the box can grow horizontally
+        void canGrowHorizontally(bool can);
+        
+        //! @brief Pass true if the box can grow vertically
+        void canGrowVertically(bool can);
         
         //! @biref Returns the main scheduler.
         tool::Scheduler<> & getScheduler() const;
@@ -84,7 +109,7 @@ namespace kiwi
         void schedule(std::function<void()> call_back, tool::Scheduler<>::duration_t delay);
         
         //! @brief Draws the outlines of the object.
-        void drawOutline(juce::Graphics & g);
+        virtual void drawOutline(juce::Graphics & g);
         
         //! @brief Changes one of the data model's attribute.
         void setAttribute(std::string const& name, tool::Parameter const& param);
@@ -108,8 +133,8 @@ namespace kiwi
     private: // members
         
         model::Object&                  m_model;
-        int                             m_border_size;
         std::shared_ptr<ObjectView>     m_master;
+        int                             m_resizing_flags;
         
     private: // deleted methods
         

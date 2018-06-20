@@ -43,6 +43,8 @@ namespace kiwi {
     m_signal(model.getSignal<>(model::Toggle::Signal::OutputValue)),
     m_is_on(false)
     {
+        setMinimumSize(20.f, 20.f);
+        setFixedAspectRatio(1.f);
     }
     
     ToggleView::~ToggleView()
@@ -67,33 +69,18 @@ namespace kiwi {
     void ToggleView::paint(juce::Graphics & g)
     {
         g.fillAll(findColour(ObjectView::ColourIds::Background));
-        
-        g.setColour(findColour(ObjectView::ColourIds::Outline));
-        
         drawOutline(g);
         
-        if (m_is_on)
-        {
-            g.setColour(findColour(ObjectView::ColourIds::Active));
-        }
+        g.setColour(m_is_on
+                    ? findColour(ObjectView::ColourIds::Active)
+                    : findColour(ObjectView::ColourIds::Outline));
         
-        juce::Rectangle<int> bounds = getLocalBounds();
+        const auto local_bounds = getLocalBounds().toFloat();
+        const auto max = std::max(local_bounds.getWidth(), local_bounds.getHeight());
+        const auto cross_stroke_width = max * 0.1;
+        const auto cross_bounds = local_bounds.reduced(max * 0.3);
         
-        double cross_stroke_width = 10. * (bounds.getWidth() / 100.);
-        
-        juce::Rectangle<int> inner_bounds = bounds.reduced(30. * bounds.getWidth() / 100.,
-                                                           30. * bounds.getHeight() / 100.);
-        
-        g.drawLine(inner_bounds.getBottomLeft().getX(),
-                   inner_bounds.getBottomLeft().getY(),
-                   inner_bounds.getTopRight().getX(),
-                   inner_bounds.getTopRight().getY(),
-                   cross_stroke_width);
-        
-        g.drawLine(inner_bounds.getTopLeft().getX(),
-                   inner_bounds.getTopLeft().getY(),
-                   inner_bounds.getBottomRight().getX(),
-                   inner_bounds.getBottomRight().getY(),
-                   cross_stroke_width);
+        g.drawLine({cross_bounds.getTopLeft(), cross_bounds.getBottomRight()}, cross_stroke_width);
+        g.drawLine({cross_bounds.getBottomLeft(), cross_bounds.getTopRight()}, cross_stroke_width);
     }
 }

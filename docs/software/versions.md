@@ -2,6 +2,34 @@
 
 Kiwi follows the [Semantic Versioning Specification](http://semver.org/).
 
+## v1.0.2
+
+#### New objects:
+- [sf.play~]: play an audio file from disk.
+- [sf.record~]: record an audio file on disk.
+
+#### Improvements :
+- All object boxes can now be resized.
+- Changed the look of the gui links and boxes.
+- Enhance contrast between local and distant selections.
+- Add contrast between control and signal pins.
+- Add a dialog box to set the name of the patch to create.
+- Drag-and-drop a file to the console to open it.
+- Improved client/server version check.
+
+#### Bug-fix
+- Fix crashes in transaction stack.
+- Handle 404 errors in *download* and *duplicate* API requests.
+- Fix connected user list display
+
+#### Dev:
+- Bump Kiwi Model version to v4.0.1
+- Removes "ratio", "min_width", "min_height" members from the `model::Object`.
+- Update model converter code.
+- Use juce (v5.2.1).
+- Add [kiwi-node-server](https://github.com/Musicoll/kiwi-node-server) as submodule.
+- Add Juce dependency to the engine.
+
 ## v1.0.1
 
 [select] :

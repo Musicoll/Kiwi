@@ -107,12 +107,6 @@ namespace kiwi
         //! @details Called when one or more document has been changed / removed or added.
         void driveChanged() override;
         
-        //! @brief Disable the display of document and their modification.
-        void disable();
-        
-        //! @brief Enable the display of documents and their modification.
-        void enable();
-        
         //! @brief Returns the number of items in the list.
         int getNumRows() override;
         
@@ -182,7 +176,7 @@ namespace kiwi
         void setTrashMode(bool trash_mode);
         
         //! @brief Get current mode trash or default.
-        bool getTrashMode() const;
+        bool isShowingTrashedDocuments() const;
         
         //! @brief Creates document info tooltip.
         std::string createDocumentToolTip(DocumentBrowser::Drive::DocumentSession const& doc);
@@ -302,7 +296,7 @@ namespace kiwi
         
         const juce::Image   m_kiwi_filetype_img;
         
-        int                 m_row;
+        int                 m_row = -1;
         bool                m_selected;
         bool                m_mouseover = false;
     };
