@@ -99,6 +99,7 @@ namespace kiwi
             model::Clip::declare();
             model::SfPlayTilde::declare();
             model::SfRecordTilde::declare();
+            model::FaustTilde::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)
