@@ -78,10 +78,19 @@ matrix:
     - python -c 'import ssl; print ssl.OPENSSL_VERSION;'
     install:
     - git submodule update --init --recursive ThirdParty/Juce ThirdParty/concurrentqueue ThirdParty/Beast ThirdParty/faust
-    - curl -o ./ThirdParty/llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
-    - tar zxvf ./ThirdParty/llvm.tar.xz && mv ./clang+llvm-5.0.0-x86_64-apple-darwin ThirdParty/llvm
+    # LLVM
+    - cd $TRAVIS_BUILD_DIR/ThirdParty
+    - curl http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz -o ./llvm.tar.xz
+    - tar zxvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-x86_64-apple-darwin llvm
+    # BOOST
+    - cd $TRAVIS_BUILD_DIR/ThirdParty
+    - curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz -o ./boost.tar.gz
+    - tar zxvf ./boost.tar.gz && mv ./boost_1_63_0 boost && cd boost
+    - ./bootstrap.sh toolset=clang macosx-version-min=10.8 link=static
+    - ./b2 address-model=64 --with-system stage
+    # FLIP
+    - cd $TRAVIS_BUILD_DIR/ThirdParty
     - python ./Scripts/flip.py
-    - python ./Scripts/boost.py
     script:
     - mkdir Build && cd Build
     - cmake .. -GXcode  -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm

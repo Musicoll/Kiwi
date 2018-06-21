@@ -54,16 +54,6 @@ def write_version(version):
 
 
 #==============================================================================
-# Name : init_boost_macos
-#==============================================================================
-
-def init_boost_macos():
-
-    subprocess.check_call("./bootstrap.sh toolset=clang macosx-version-min=10.8 architecture=combined link=static", shell= True)
-
-    subprocess.check_call("./b2 address-model=32_64 --with-system stage", shell= True)
-
-#==============================================================================
 # Name : download_flip_windows
 #==============================================================================
 
@@ -168,9 +158,7 @@ def download_boost_windows():
 
 def download_boost():
 
-    if (platform.system() == "Darwin"):
-        download_boost_unix()
-    elif (platform.system() == "Windows"):
+    if (platform.system() == "Windows"):
     	download_boost_windows()
     elif platform.system() == "Linux":
     	download_boost_unix()
