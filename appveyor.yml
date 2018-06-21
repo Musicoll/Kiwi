@@ -9,35 +9,36 @@ environment:
         PLATFORM: x64
 
 install:
-    - git submodule update --init --recursive
-    - set PATH=C:\Python27;%PATH%
-    # BOOST
-    - cd %APPVEYOR_BUILD_FOLDER%/ThirdParty
-    - curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.zip -o ./boost.zip -o boost.zip
-    - 7z x boost.zip
-    - rename boost_1_63_0 boost
-    # LLVM
-    - cd %APPVEYOR_BUILD_FOLDER%/ThirdParty
-    - curl -L https://github.com/pierreguillot/llvm-win/releases/download/v6.0.0/llvm-windows-x64-md.zip -o llvm.zip
-    - 7z x llvm.zip
-    - rename llvm-windows-x64-md llvm
-    # FLIP
-    - cd %APPVEYOR_BUILD_FOLDER%
-    - python ./Scripts/flip.py
+  - git submodule update --init --recursive
+  - set PATH=C:\Python27;%PATH%
+  # BOOST
+  - cd %APPVEYOR_BUILD_FOLDER%/ThirdParty
+  - curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.zip -o ./boost.zip -o boost.zip
+  - 7z x boost.zip
+  - rename boost_1_63_0 boost
+  # LLVM
+  - cd %APPVEYOR_BUILD_FOLDER%/ThirdParty
+  - curl -L https://github.com/pierreguillot/llvm-win/releases/download/v6.0.0/llvm-windows-x64-md.zip -o llvm.zip
+  - 7z x llvm.zip
+  - rename llvm-windows-x64-md llvm
+  # FLIP
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - python ./Scripts/flip.py
 build_script:
-    # BOOST
-    - cd %APPVEYOR_BUILD_FOLDER%\ThirdParty\boost
-    - bootstrap.bat
-    - b2 --toolset=msvc-14.0 -j4 --with-system --stagedir=stage64 variant=release architecture=x86 address-model=64 link=static
-    # KIWI
-    - cd %APPVEYOR_BUILD_FOLDER%
-    - mkdir Build && cd Build
-    - cmake .. -G "Visual Studio 14 2015 Win64" -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm
-    - cmake --build . --config %CONFIGURATION%
+  # BOOST
+  - cd %APPVEYOR_BUILD_FOLDER%\ThirdParty\boost
+  - bootstrap.bat
+  - b2 --toolset=msvc-14.0 -j4 --with-system --stagedir=stage64 variant=release architecture=x86 address-model=64 link=static
+  # KIWI
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - mkdir Build && cd Build
+  - cmake .. -G "Visual Studio 14 2015 Win64" -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm
+  - cmake --build . --config %CONFIGURATION%
 after_build:
-    - C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Scripts\setup-x64.iss
-    - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\%CONFIGURATION%
-    - 7z a Kiwi_%PLATFORM%.zip %BUILD_DIR%\Kiwi-x64-setup.exe
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Scripts\setup-x64.iss
+  - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\%CONFIGURATION%
+  - 7z a Kiwi_%PLATFORM%.zip %BUILD_DIR%\Kiwi-x64-setup.exe
 
 artifacts:
   - path: '*.zip'
@@ -53,11 +54,6 @@ deploy:
     on:
       appveyor_repo_tag: true
 
-#---------------------------------#
-#         notifications           #
-#---------------------------------#
 notifications:
-
-  # Email
   - provider: Email
     on_build_status_changed: false
