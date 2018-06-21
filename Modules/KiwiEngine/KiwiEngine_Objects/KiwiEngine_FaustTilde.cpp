@@ -27,6 +27,11 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_FaustTilde.h>
 #include <KiwiModel/KiwiModel_DocumentManager.h>
 
+#include <juce_core/juce_core.h>
+//#include <juce_audio_formats/juce_audio_formats.h>
+//#include <juce_audio_devices/juce_audio_devices.h>
+//#include <juce_gui_basics/juce_gui_basics.h>
+
 #define MAX_FAUST_OPTIONS 64
 namespace kiwi { namespace engine {
     
@@ -118,8 +123,9 @@ namespace kiwi { namespace engine {
         }
         if(!std::count(options.begin(), options.end(), "-I"))
         {
+            auto const file = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile);
             options.push_back("-I");
-            options.push_back("/Users/pierre/Documents/Kiwi Media/Faust/" + std::string("libs"));
+            options.push_back(file.getFullPathName().toStdString() + std::string("/Contents/Resources/Faust/Libs"));
         }
         return options;
     }
