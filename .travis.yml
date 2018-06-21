@@ -33,7 +33,7 @@ matrix:
     # LLVM
     - cd $TRAVIS_BUILD_DIR/ThirdParty
     - curl -o ./llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
-    - tar xvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
+    - tar xf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
     # FLIP
     - cd $TRAVIS_BUILD_DIR
     - python ./Scripts/flip.py
@@ -72,7 +72,7 @@ matrix:
     # LLVM
     - cd $TRAVIS_BUILD_DIR/ThirdParty
     - curl -o ./llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
-    - tar xvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
+    - tar xf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
     # FLIP
     - cd $TRAVIS_BUILD_DIR
     - python ./Scripts/flip.py
