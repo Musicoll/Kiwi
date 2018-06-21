@@ -123,7 +123,7 @@ matrix:
     - cd $TRAVIS_BUILD_DIR
     - mkdir Build && cd Build
     - cmake .. -GXcode  -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm
-    - xcodebuild -scheme Kiwi -configuration Release | egrep '^(/.+:[0-9+:[0-9]+:.(error|warning):|fatal|===)' -
+    - xcodebuild -scheme Kiwi -configuration Release #| egrep '^(/.+:[0-9+:[0-9]+:.(error|warning):|fatal|===)' -
     before_deploy:
     - mkdir Kiwi && mv Build/Release/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
     - zip -r Kiwi_$os.zip Kiwi
