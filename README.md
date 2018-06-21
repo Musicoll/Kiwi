@@ -1,6 +1,6 @@
 <p align="center">
   <h1 align="center">
-    Kiwi
+    <img src="http://musicoll.github.io/Kiwi/ressources/img/kiwi_icon.png" height=40px/> Kiwi
   </h1>
   <p align="center">
     A real-time collaborative audio patching software
