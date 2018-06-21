@@ -131,7 +131,7 @@ endif()
 if (WIN32)
     add_definitions("-D_CPPUNWIND")
     add_definitions("-D_WIN32_WINNT=0x0501")
-
+    add_definitions("-D_USE_MATH_DEFINES")
 	if (DEBUG)
 		add_definitions("-D_CONSOLE=1")
 	endif()
