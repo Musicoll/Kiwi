@@ -204,11 +204,13 @@ namespace kiwi { namespace engine {
                               std::string code = fmodel->getDSPCode();
                               if(!code.empty())
                               {
+                                  m_mutex.lock();
                                   createFactoryFromString(value, code);
                                   if(m_factory)
                                   {
                                       createInstance();
                                   }
+                                  m_mutex.unlock();
                               }
                           }
                       });
@@ -329,15 +331,36 @@ namespace kiwi { namespace engine {
         const size_t nsamples = input.getVectorSize();
         const size_t ninputs  = m_inputs.size();
         const size_t noutputs = m_outputs.size();
-        for(size_t i = 0; i < ninputs; ++i)
+        if(m_mutex.try_lock())
         {
-            m_inputs[i] = const_cast<dsp::sample_t*>(input[i].data());
+            if(m_instance)
+            {
+                for(size_t i = 0; i < ninputs; ++i)
+                {
+                    m_inputs[i] = const_cast<dsp::sample_t*>(input[i].data());
+                }
+                for(size_t i = 0; i < noutputs; ++i)
+                {
+                    m_outputs[i] = output[i].data();
+                }
+                m_instance->compute(nsamples, m_inputs.data(), m_outputs.data());
+            }
+            else
+            {
+                for(size_t i = ninputs; i < noutputs; ++i)
+                {
+                    std::fill_n(output[i].data(), nsamples, 0.f);
+                }
+            }
+            m_mutex.unlock();
         }
-        for(size_t i = 0; i < noutputs; ++i)
+        else
         {
-            m_outputs[i] = output[i].data();
+            for(size_t i = ninputs; i < noutputs; ++i)
+            {
+                std::fill_n(output[i].data(), nsamples, 0.f);
+            }
         }
-        m_instance->compute(nsamples, m_inputs.data(), m_outputs.data());
     }
     
     void FaustTilde::prepare(PrepareInfo const& infos)

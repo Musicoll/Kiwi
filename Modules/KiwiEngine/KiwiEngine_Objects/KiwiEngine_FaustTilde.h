@@ -80,11 +80,13 @@ namespace kiwi { namespace engine {
         
         std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>  m_factory;
         std::unique_ptr<llvm_dsp, nop>      m_instance;
+        std::mutex                          m_mutex;
         std::unique_ptr<UIGlue>             m_ui_glue;
         std::vector<dsp::sample_t*>         m_inputs;
         std::vector<dsp::sample_t*>         m_outputs;
         
-        std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>  m_factory_engine;
+        std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)> m_factory_engine;
+        
         const std::vector<std::string>      m_options;
     };
 
