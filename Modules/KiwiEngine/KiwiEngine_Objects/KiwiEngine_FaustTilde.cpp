@@ -61,22 +61,22 @@ namespace kiwi { namespace engine {
         
         void addCheckButton(const char* label, FAUSTFLOAT* zone) final
         {
-             m_parameters[label] = Parameter({1, zone,0, 0, 1, 1});
+             m_parameters[label] = Parameter({1, zone, 0.f, 1.f, 1.f, 0.f});
         }
         
         void addVerticalSlider(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step) final
         {
-            m_parameters[label] = Parameter({2, zone, init, min, max, step});
+            m_parameters[label] = Parameter({2, zone, min, max, step, init});
         }
         
         virtual void addHorizontalSlider(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step) final
         {
-            m_parameters[label] = Parameter({2, zone, init, min, max, step});
+            m_parameters[label] = Parameter({2, zone, min, max, step, init});
         }
         
         virtual void addNumEntry(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step) final
         {
-            m_parameters[label] = Parameter({2, zone, init, min, max, step});
+            m_parameters[label] = Parameter({2, zone, min, max, step, init});
         }
         
         void addHorizontalBargraph(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT min, FAUSTFLOAT max) final {};
@@ -234,6 +234,10 @@ namespace kiwi { namespace engine {
         {
             warning(errors);
         }
+        if(m_factory)
+        {
+            log("faust~: compiled " + m_factory->getName());
+        }
     }
     
     void FaustTilde::createInstance()
@@ -248,9 +252,21 @@ namespace kiwi { namespace engine {
         }
         else
         {
-            log("faust~: compiled");
+            log("faust~: number of inputs " + std::to_string(m_instance->getNumInputs()));
+            log("faust~: number of outputs " + std::to_string(m_instance->getNumOutputs()));
         }
         m_instance->buildUserInterface(m_ui_glue.get());
+        log("faust~: number of parameters " + std::to_string(m_ui_glue->m_parameters.size()));
+        for(auto const& param : m_ui_glue->m_parameters)
+        {
+            log("");
+            log("faust~: parameter " + param.first);
+            log("faust~: type " + std::to_string(param.second.type));
+            log("faust~: default " + std::to_string(param.second.saved));
+            log("faust~: minimum " + std::to_string(param.second.min));
+            log("faust~: maximum " + std::to_string(param.second.max));
+            log("faust~: step " + std::to_string(param.second.step));
+        }
     }
     
     void FaustTilde::receive(size_t index, std::vector<tool::Atom> const& args)
@@ -288,14 +304,14 @@ namespace kiwi { namespace engine {
                 {
                     if(param.second.type == 0)
                     {
-                        *param.second.zone = !(*param.second.zone != 0.f);
+                        *param.second.zone = static_cast<FAUSTFLOAT>(!(*param.second.zone != 0.f));
                         return;
                     }
                     if(param.second.type == 1)
                     {
                         if(args.size() > 1 && args[1].isNumber())
                         {
-                            *param.second.zone = args[1].getFloat() != 0.f;
+                            *param.second.zone = static_cast<FAUSTFLOAT>(args[1].getFloat()) != 0.f;
                             if(args.size() > 2)
                             {
                                 warning(std::string("faust~: receive method - interface \"")  + name + std::string("\" too many arguments"));
@@ -308,10 +324,7 @@ namespace kiwi { namespace engine {
                     {
                         if(args.size() > 1 && args[1].isNumber())
                         {
-                            float value = args[1].getFloat();
-                            value = value > param.second.min ? value : param.second.min;
-                            value = value < param.second.max ? value : param.second.max;
-                            *param.second.zone = value;
+                            *param.second.zone = std::max(std::min(static_cast<FAUSTFLOAT>(args[1].getFloat()), param.second.max), param.second.min);
                             if(args.size() > 2)
                             {
                                 warning(std::string("faust~: receive method - interface \"")  + name + std::string("\" too many arguments"));
@@ -373,7 +386,15 @@ namespace kiwi { namespace engine {
             if(static_cast<size_t>(m_instance->getNumInputs()) < getNumberOfInputs() &&
                static_cast<size_t>(m_instance->getNumOutputs()) < getNumberOfOutputs())
             {
+                for(auto& param : m_ui_glue->m_parameters)
+                {
+                    param.second.saved = *param.second.zone;
+                }
                 m_instance->instanceInit(static_cast<int>(infos.sample_rate));
+                for(auto& param : m_ui_glue->m_parameters)
+                {
+                    *param.second.zone = param.second.saved;
+                }
                 m_inputs.resize(m_instance->getNumInputs());
                 m_outputs.resize(m_instance->getNumOutputs());
                 setPerformCallBack(this, &FaustTilde::perform);
