@@ -143,7 +143,6 @@ namespace kiwi { namespace engine {
     
     void FaustTilde::openFile(const std::string& file)
     {
-        post("openFile " + file);
         // Compile the file
         std::string errors;
         char const* argv[m_options.size()];
@@ -160,7 +159,6 @@ namespace kiwi { namespace engine {
         // Notify the model
         if(m_factory_engine)
         {
-            post("valid ");
             deferMain([this]()
                       {
                           if(m_factory_engine)
@@ -184,25 +182,25 @@ namespace kiwi { namespace engine {
     
     void FaustTilde::attributeChanged(std::string const& name, tool::Parameter const& parameter)
     {
-        post("attributeChanged " + name);
         if (name == "dspname")
         {
             auto const value = parameter[0].getString();
-            deferMain([this, value]() {
-                auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel());
-                if(fmodel)
-                {
-                    std::string code = fmodel->getDSPCode();
-                    if(!code.empty())
-                    {
-                        createFactoryFromString(value, code);
-                        if(m_factory)
-                        {
-                            createInstance();
-                        }
-                    }
-                }
-            });
+            deferMain([this, value]()
+                      {
+                          auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel());
+                          if(fmodel)
+                          {
+                              std::string code = fmodel->getDSPCode();
+                              if(!code.empty())
+                              {
+                                  createFactoryFromString(value, code);
+                                  if(m_factory)
+                                  {
+                                      createInstance();
+                                  }
+                              }
+                          }
+                      });
         }
     }
     
