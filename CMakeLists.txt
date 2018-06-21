@@ -36,11 +36,6 @@ endif()
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-#--------------------------------------
-# IDE Settings
-#--------------------------------------
-
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
 set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++14")
 set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
@@ -62,53 +57,27 @@ elseif(WIN32)
 	set(KIWI_CLIENT_RESSOURCES ${KIWI_RESSOURCES_DIR}/Project/VisualStudio15/Kiwi.rc)
 endif()
 
-#--------------------------------------
-# Flags
-#--------------------------------------
+#-------------------------------------------------------------------------------
+# COMPILATION FLAGS
+#-------------------------------------------------------------------------------
 
-if (WIN32)
-	set(CMAKE_CXX_FLAGS "/EHsc")
-	set(CMAKE_EXE_LINKER_FLAGS "")
-
-	if (DEBUG)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zi /Od")
-		set(CMAKE_CXX_FLAGS_DEBUG "/MD")
-    else()
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2")
-		set(CMAKE_CXX_FLAGS_RELEASE "/MD")
-	endif()
-
-    if (CMAKE_CL_64)
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MACHINE:X64")
-    else()
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MACHINE:X86")
-    endif()
-
-elseif(APPLE)
-
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-warning-option -Wno-pessimizing-move
-                                            -Wno-overloaded-virtual -Wnounused-function -Wno-unused-local-typedefs")
-
-    if (DEBUG)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
-    else()
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-    endif()
-
-elseif(LINUX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-multichar")
-
-  if (DEBUG)
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
+if(WIN32)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD /O2")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd /Zi /Od")
+else()
+  if(APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-warning-option -Wno-pessimizing-move -Wno-overloaded-virtual -Wnounused-function -Wno-unused-local-typedefs")
   else()
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-multichar")
   endif()
-
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
 endif()
 
-#--------------------------------------
-# Preprocessor macro
-#--------------------------------------
+#-------------------------------------------------------------------------------
+# PREPROCESSOR DEFINTIIONS
+#-------------------------------------------------------------------------------
 
 if (WIN32)
     add_definitions("-D_CPPUNWIND")
