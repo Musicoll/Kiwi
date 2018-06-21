@@ -58,13 +58,21 @@ tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost && cd boost
 cd ../..
 # LLVM
 cd ThirdParty
-curl -o ./ThirdParty/llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
-tar xvf ./ThirdParty/llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 ThirdParty/llvm
+curl -o ./llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
+tar xvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
 ```
 
     - Windows
 ```
 # BOOST
+ThirdParty
+curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.zip -o ./boost.zip -o boost.zip
+7z x boost.zip
+rename boost_1_63_0 boost
+cd boost
+bootstrap.bat
+b2 --toolset=msvc-14.0 -j4 --with-system --stagedir=stage64 variant=release architecture=x86 address-model=64 link=static
+cd ../..
 # LLVM
 cd ThirdParty
 curl -L https://github.com/pierreguillot/llvm-win/releases/download/v6.0.0/llvm-windows-x64-mt.zip -o llvm.zip
