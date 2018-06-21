@@ -33,43 +33,43 @@ git submodule update --init --recursive
 
   2. Install dependencies (FLIP - BOOST >= 1.63.0 - LLVM >= 5.0.0)
 
-      - MacOS
-```
-# BOOST
-cd ThirdParty
-curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz -o ./boost.tar.gz
-tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost
-# LLVM
-curl http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz -o ./llvm.tar.xz
-tar zxvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-x86_64-apple-darwin llvm
-cd ..
-```
+    - MacOS
+    ```
+    # BOOST
+    cd ThirdParty
+    curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz -o ./boost.tar.gz
+    tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost
+    # LLVM
+    curl http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz -o ./llvm.tar.xz
+    tar zxvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-x86_64-apple-darwin llvm
+    cd ..
+    ```
 
-      - Linux
-```
-# BOOST
-cd ThirdParty
-curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz -o ./boost.tar.gz
-tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost
-# LLVM
-curl -o ./llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
-tar xvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
-cd ..
-```
+    - Linux
+    ```
+    # BOOST
+    cd ThirdParty
+    curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz -o ./boost.tar.gz
+    tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost
+    # LLVM
+    curl -o ./llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
+    tar xvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
+    cd ..
+    ```
 
-      - Windows
-```
-# BOOST
-ThirdParty
-curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.zip -o ./boost.zip -o boost.zip
-7z x boost.zip
-rename boost_1_63_0 boost
-# LLVM
-curl -L https://github.com/pierreguillot/llvm-win/releases/download/v6.0.0/llvm-windows-x64-mt.zip -o llvm.zip
-7z x llvm.zip
-rename llvm-windows-x64-mt llvm
-cd ..
-```
+    - Windows
+    ```
+    # BOOST
+    ThirdParty
+    curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.zip -o ./boost.zip -o boost.zip
+    7z x boost.zip
+    rename boost_1_63_0 boost
+    # LLVM
+    curl -L https://github.com/pierreguillot/llvm-win/releases/download/v6.0.0/llvm-windows-x64-mt.zip -o llvm.zip
+    7z x llvm.zip
+    rename llvm-windows-x64-mt llvm
+    cd ..
+    ```
 
   3. Build Boost
       - MacOS
