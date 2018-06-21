@@ -34,12 +34,13 @@ matrix:
     - ./b2 --with-system stage
     # LLVM
     - cd $TRAVIS_BUILD_DIR/ThirdParty
-    - curl -o ./ThirdParty/llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
-    - tar xvf ./ThirdParty/llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 ThirdParty/llvm
+    - curl -o ./llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
+    - tar xvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
     # FLIP
     - cd $TRAVIS_BUILD_DIR
     - python ./Scripts/flip.py
     script:
+    - cd $TRAVIS_BUILD_DIR
     - mkdir Build && cd Build
     - cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm -DCMAKE_BUILD_TYPE=Debug -DGCOV_SUPPORT=On
     - cmake --build . --config Debug
@@ -69,12 +70,13 @@ matrix:
     - ./b2 --with-system stage
     # LLVM
     - cd $TRAVIS_BUILD_DIR/ThirdParty
-    - curl -o ./ThirdParty/llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
-    - tar xvf ./ThirdParty/llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 ThirdParty/llvm
+    - curl -o ./llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
+    - tar xvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
     # FLIP
     - cd $TRAVIS_BUILD_DIR
     - python ./Scripts/flip.py
     script:
+    - cd $TRAVIS_BUILD_DIR
     - mkdir Build && cd Build
     - cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm -DCMAKE_BUILD_TYPE=Release
     - cmake --build . --config Release
@@ -109,6 +111,7 @@ matrix:
     - cd $TRAVIS_BUILD_DIR
     - python ./Scripts/flip.py
     script:
+    - cd $TRAVIS_BUILD_DIR
     - mkdir Build && cd Build
     - cmake .. -GXcode  -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm
     - cmake --build . --config Release
