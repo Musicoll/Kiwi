@@ -34,6 +34,7 @@ git submodule update --init --recursive
   2. Install dependencies (FLIP - BOOST >= 1.63.0 - LLVM >= 5.0.0)
 
     - MacOS
+
     ```
     # BOOST
     cd ThirdParty
@@ -46,6 +47,7 @@ git submodule update --init --recursive
     ```
 
     - Linux
+
     ```
     # BOOST
     cd ThirdParty
@@ -58,6 +60,7 @@ git submodule update --init --recursive
     ```
 
     - Windows
+    
     ```
     # BOOST
     ThirdParty
