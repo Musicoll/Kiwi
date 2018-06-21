@@ -1,16 +1,6 @@
 ## Create Faust Lib
 message(STATUS "Faust Library")
 
-## For Windows use static runtime instead of default dynamic runtime
-if(MSVC)
-    set(CompilerFlags
-        CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-        CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE)
-    foreach(CompilerFlag ${CompilerFlags})
-      string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
-    endforeach()
-endif()
-
 ## Save the llvm directory and change it for subdirectory
 if(DEFINED LLVM_DIR)
   set(LLVM_DIR_TEMP   ${LLVM_DIR})
