@@ -30,52 +30,44 @@ git clone https://github.com/Musicoll/Kiwi.git
 cd Kiwi
 git submodule update --init --recursive
 ```
-
   2. Install dependencies (FLIP - BOOST >= 1.63.0 - LLVM >= 5.0.0)
-
-    - MacOS
-
-    ```
-
-    cd ThirdParty
-    curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz -o ./boost.tar.gz
-    tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost
-
-    curl http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz -o ./llvm.tar.xz
-    tar zxvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-x86_64-apple-darwin llvm
-    
-    ```
-
-    - Linux
-
-    ```
-    # BOOST
-    cd ThirdParty
-    curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz -o ./boost.tar.gz
-    tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost
-    # LLVM
-    curl -o ./llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
-    tar xvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
-    cd ..
-    ```
-
-    - Windows
-
-    ```
-    # BOOST
-    ThirdParty
-    curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.zip -o ./boost.zip -o boost.zip
-    7z x boost.zip
-    rename boost_1_63_0 boost
-    # LLVM
-    curl -L https://github.com/pierreguillot/llvm-win/releases/download/v6.0.0/llvm-windows-x64-mt.zip -o llvm.zip
-    7z x llvm.zip
-    rename llvm-windows-x64-mt llvm
-    cd ..
-    ```
-
+    - MacOS   
+```sh
+# BOOST
+cd ThirdParty
+curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz -o ./boost.tar.gz
+tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost
+# LLVM
+curl http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz -o ./llvm.tar.xz
+tar zxvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-x86_64-apple-darwin llvm
+cd ..
+```
+    - Linux   
+```sh
+# BOOST
+cd ThirdParty
+curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz -o ./boost.tar.gz
+tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost
+# LLVM
+curl -o ./llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
+tar xvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
+cd ..
+```
+    - Windows   
+```sh
+# BOOST
+ThirdParty
+curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.zip -o ./boost.zip -o boost.zip
+7z x boost.zip
+rename boost_1_63_0 boost
+# LLVM
+curl -L https://github.com/pierreguillot/llvm-win/releases/download/v6.0.0/llvm-windows-x64-mt.zip -o llvm.zip
+7z x llvm.zip
+rename llvm-windows-x64-mt llvm
+cd ..
+```
   3. Build Boost
-      - MacOS
+    - MacOS
 ```
 cd ThirdParty/boost
 ./bootstrap.sh toolset=clang macosx-version-min=10.9 link=static
@@ -83,7 +75,7 @@ cd ThirdParty/boost
 cd ../..
 ```
 
-      - Linux
+    - Linux
 ```
 cd ThirdParty/boost
 ./bootstrap.sh toolset=gcc link=static
@@ -91,7 +83,7 @@ cd ThirdParty/boost
 cd ../..
 ```
 
-      - Windows
+    - Windows
 ```
 cd ThirdParty\boost
 bootstrap.bat
@@ -100,7 +92,7 @@ cd ../..
 ```
 
   4. Build Kiwi
-      - MacOS
+    - MacOS
 ```
 cd .
 mkdir Build && cd Build
@@ -108,7 +100,7 @@ cmake .. -GXcode  -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/l
 cmake --build .
 ```
 
-      - Linux
+    - Linux
 ```
 cd .
 mkdir Build && cd Build
@@ -116,7 +108,7 @@ cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm
 cmake --build .
 ```
 
-      - Windows
+    - Windows
 ```
 cd .
 mkdir Build && cd Build
