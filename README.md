@@ -24,6 +24,53 @@ Kiwi is part of the French ANR-funded [MUSICOLL](http://musicoll.mshparisnord.or
 
 ### Compilation
 
+  1. Clone the project  
+```
+git clone https://github.com/Musicoll/Kiwi.git
+cd Kiwi
+git submodule update --init --recursive
+```
+
+  2. Install and build dependencies
+    - MacOS
+```
+# BOOST
+cd ThirdParty
+curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz -o ./boost.tar.gz
+tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost && cd boost
+./bootstrap.sh toolset=clang macosx-version-min=10.9 link=static
+./b2 address-model=64 --with-system stage
+cd ../..
+# LLVM
+cd ThirdParty
+curl http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz -o ./llvm.tar.xz
+tar zxvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-x86_64-apple-darwin llvm
+cd ../..
+```
+    - Linux
+```
+# BOOST
+cd ThirdParty
+curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz -o ./boost.tar.gz
+tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost && cd boost
+./bootstrap.sh toolset=gcc link=static
+./b2 --with-system stage
+cd ../..
+# LLVM
+cd ThirdParty
+curl -o ./ThirdParty/llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
+tar xvf ./ThirdParty/llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 ThirdParty/llvm
+```
+
+    - Windows
+```
+# BOOST
+# LLVM
+cd ThirdParty
+curl -L https://github.com/pierreguillot/llvm-win/releases/download/v6.0.0/llvm-windows-x64-mt.zip -o llvm.zip
+7z x llvm.zip
+rename llvm-windows-x64-mt llvm
+```
 
 ### Organizations
 
@@ -39,7 +86,7 @@ Kiwi is part of the French ANR-funded [MUSICOLL](http://musicoll.mshparisnord.or
 - [Pierre GUILLOT](https://github.com/pierreguillot)
 - [Jean MILLOT](https://github.com/jean-millot)
 
-### Dependencies and Credits
+### Credits
 
 - [Flip](http://developer.irisate.com/)
 - [Juce](https://github.com/WeAreROLI/JUCE)
