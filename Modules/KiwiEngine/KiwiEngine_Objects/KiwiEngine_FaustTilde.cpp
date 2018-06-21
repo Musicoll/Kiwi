@@ -27,6 +27,7 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_FaustTilde.h>
 #include <KiwiModel/KiwiModel_DocumentManager.h>
 
+#define MAX_FAUST_OPTIONS 64
 namespace kiwi { namespace engine {
     
     class FaustTilde::UIGlue : public UI
@@ -145,8 +146,12 @@ namespace kiwi { namespace engine {
     {
         // Compile the file
         std::string errors;
-        char const* argv[m_options.size()];
-        for(size_t i = 0; i < m_options.size(); ++i)
+        char const* argv[MAX_FAUST_OPTIONS];
+        if(m_options.size() > MAX_FAUST_OPTIONS)
+        {
+            warning("faust~: maximum number of options is " + std::to_string(MAX_FAUST_OPTIONS));
+        }
+        for(size_t i = 0; i < m_options.size() && i < MAX_FAUST_OPTIONS; ++i)
         {
             argv[i] = m_options[i].c_str();
         }
@@ -207,8 +212,12 @@ namespace kiwi { namespace engine {
     void FaustTilde::createFactoryFromString(const std::string& name, const std::string& code)
     {
         std::string errors;
-        char const* argv[m_options.size()];
-        for(size_t i = 0; i < m_options.size(); ++i)
+        char const* argv[MAX_FAUST_OPTIONS];
+        if(m_options.size() > MAX_FAUST_OPTIONS)
+        {
+            warning("faust~: maximum number of options is " + std::to_string(MAX_FAUST_OPTIONS));
+        }
+        for(size_t i = 0; i < m_options.size() && i < MAX_FAUST_OPTIONS; ++i)
         {
             argv[i] = m_options[i].c_str();
         }
