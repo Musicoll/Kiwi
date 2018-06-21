@@ -7,28 +7,9 @@ project(Kiwi CXX)
 #--------------------------------------
 
 option(GCOV_SUPPORT "Build for gcov" Off)
-
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-set(ROOT_DIR ${PROJECT_SOURCE_DIR})
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/KiwiBuild")
 set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/KiwiBuild")
-
-if(CMAKE_CONFIGURATION_TYPES)
-   set(CMAKE_CONFIGURATION_TYPES ${CMAKE_BUILD_TYPE})
-   set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING
-     "Reset the configurations to what we need"
-     FORCE)
- endif()
-
-if(UNIX AND NOT APPLE)
-  set(LINUX TRUE)
-endif()
-
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-	set(DEBUG TRUE)
-endif()
 
 #--------------------------------------
 # Compiler Check
