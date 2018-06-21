@@ -183,7 +183,6 @@ namespace kiwi { namespace engine {
                               }
                               // This also commit the change
                               setAttribute(std::string("dspname"), {tool::Parameter::Type::String, {name}});
-                              post("notify ");
                           }
                       });
         }
@@ -246,6 +245,10 @@ namespace kiwi { namespace engine {
         {
             warning("faust~: can't allocate DSP instance");
             return;
+        }
+        else
+        {
+            log("faust~: compiled");
         }
         m_instance->buildUserInterface(m_ui_glue.get());
     }
