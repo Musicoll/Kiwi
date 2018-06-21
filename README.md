@@ -6,8 +6,8 @@
     A real-time collaborative audio patching software
   </p>
   <p align="center">
-    <a href="https://travis-ci.org/Musicoll/Kiwi"><img src="https://img.shields.io/travis/Musicoll/Kiwi.svg?label=travis" alt="Travis"></a>
-    <a href="https://ci.appveyor.com/project/CICM/kiwi/history"><img src="https://img.shields.io/appveyor/ci/CICM/kiwi.svg?label=appveyor" alt="Appveyor CI"></a>
+    <a href="https://travis-ci.org/Musicoll/Kiwi"><img src="https://travis-ci.org/Musicoll/Kiwi.svg?branch=master" alt="Travis"></a>
+    <a href="https://ci.appveyor.com/project/CICM/kiwi/history"><img src="https://ci.appveyor.com/api/projects/status/github/Musicoll/Kiwi?branch=master&svg=true" alt="Appveyor CI"></a>
   </p>
   <p align="center">
     <a href="http://kiwi.mshparisnord.fr/"><img src="https://img.shields.io/badge/@-website-blue.svg" alt="Website"></a>
@@ -60,4 +60,4 @@ Kiwi is part of the French ANR-funded [MUSICOLL](http://musicoll.mshparisnord.or
 
 ### License
 
-The Kiwi application is licensed under the terms of the [GNU GPL-3.0]((https://github.com/Musicoll/Kiwi/blob/master/Licence.md) license. However, Kiwi also depends on the [Flip](http://developer.irisate.com/) library which is NOT open-source.
+The Kiwi application is licensed under the terms of the [GNU GPL-3.0](https://github.com/Musicoll/Kiwi/blob/master/Licence.md) license. However, Kiwi also depends on the [Flip](http://developer.irisate.com/) library which is NOT open-source.
