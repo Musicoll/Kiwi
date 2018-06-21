@@ -1,68 +1,63 @@
-## Kiwi
+<p align="center">
+  <h1 align="center">
+    Kiwi
+  </h1>
+  <p align="center">
+    A real-time collaborative audio patching software
+  </p>
+  <p align="center">
+    <a href="https://travis-ci.org/Musicoll/Kiwi"><img src="https://img.shields.io/travis/Musicoll/Kiwi.svg?label=travis" alt="Travis"></a>
+    <a href="https://ci.appveyor.com/project/CICM/kiwi/history"><img src="https://img.shields.io/appveyor/ci/CICM/kiwi.svg?label=appveyor" alt="Appveyor CI"></a>
+  </p>
+  <p align="center">
+    <a href="http://kiwi.mshparisnord.fr/"><img src="https://img.shields.io/badge/@-website-blue.svg" alt="Website"></a>
+    <a href="http://musicoll.github.io/Kiwi"><img src="https://img.shields.io/badge/@-documentation-blue.svg" alt="Documentation"></a>
+    <a href="https://github.com/Musicoll/Kiwi/releases"><img src="https://img.shields.io/badge/@-download-blue.svg" alt="Download"></a>
+  </p>
+</p>
 
-Kiwi is a real-time collaborative audio patching software.  
-It enables several creators to work simultaneously on a same patch hosted online and accessible from any connected terminal.
+### Presentation
 
-> Kiwi is part of the French ANR-funded [**MUSICOLL**](http://musicoll.mshparisnord.org/) project that unites the [CICM](http://cicm.mshparisnord.org/) and [OhmForce](https://www.ohmforce.com/Company.do). The main goal of this project is to study how collaboration can enhance the way digital audio music composition is taught and more generally how it can improve music creation workflow.
+Kiwi is part of the French ANR-funded [MUSICOLL](http://musicoll.mshparisnord.org/) project that unites the [CICM](http://cicm.mshparisnord.org/) and [OhmForce](https://www.ohmforce.com/Company.do). The main goal of this project is to study how collaboration can enhance the way digital audio music composition is taught and more generally how it can improve music creation workflow. It enables several creators to work simultaneously on a same patch hosted online and accessible from any connected terminal.
 
 <img title="register" src="https://raw.github.com/Musicoll/Kiwi/master/docs/ressources/img/Kiwi-v1.0.0.jpg" height=400px/>
 
-[![Build Status](https://travis-ci.org/Musicoll/Kiwi.svg?branch=master)](https://travis-ci.org/Musicoll/Kiwi)
-[![Build status](https://ci.appveyor.com/api/projects/status/github/Musicoll/Kiwi?branch=master&svg=true)](https://ci.appveyor.com/project/CICM/kiwi)
- [![Documentation](https://img.shields.io/badge/docs-doxygen-blue.svg)](http://musicoll.github.io/Kiwi)  [![Release](https://img.shields.io/github/release/Musicoll/Kiwi.svg)](https://github.com/Musicoll/Kiwi/releases)  [![license](https://img.shields.io/github/license/Musicoll/Kiwi.svg?maxAge=2592000)](https://github.com/Musicoll/Kiwi/blob/master/Licence.md)  [![Website](https://img.shields.io/website/http/shields.io.svg?maxAge=2592000)](http://kiwi.mshparisnord.fr/)
+### Compilation
 
-> Warning: Kiwi is in a heavy development stage and everything is subject to change without notice.
 
-### Download
+### Organizations
 
-If you want to test Kiwi, you can download a version on the [Release Page](https://github.com/Musicoll/Kiwi/releases).
-
-### Documentation
-
-Kiwi's documentation can be found [here](http://musicoll.github.io/Kiwi). Kiwi's documentation includes:
-- A start up guide for users
-- The documentation for all objects
-- Audio processing tutorials
-- A developer guide for contributors
-
-### Roadmap
-
-- [ ] Integrate [faust](http://faust.grame.fr/) audio programming language
-- [ ] Improve network security
-
----
+- [ANR MUSICOLL](http://musicoll.mshparisnord.org)
+- [CICM](http://cicm.mshparisnord.org)
+- [OhmForce](https://www.ohmforce.com/Company.do)
+- [MSH Paris Nord](https://www.mshparisnord.fr)
+- [Université Paris 8](https://www.univ-paris8.fr)
 
 ### Authors
 
-[![Eliott Paris](https://avatars.githubusercontent.com/u/1750257?s=90)](https://github.com/eliottparis) | [![Pierre Guillot](https://avatars.githubusercontent.com/u/1409918?s=90)](https://github.com/pierreguillot) | [![Jean Millot](https://avatars.githubusercontent.com/u/16612690?s=90)](https://github.com/jean-millot)
----|---|---
-[Eliott Paris](https://github.com/eliottparis) | [Pierre Guillot](https://github.com/pierreguillot) | [Jean Millot](https://github.com/jean-millot)
+- [Eliott PARIS](https://github.com/eliottparis)
+- [Pierre GUILLOT](https://github.com/pierreguillot)
+- [Jean MILLOT](https://github.com/jean-millot)
 
----
-
-### Papers
-
-- [JIM 2017](https://hal.archives-ouvertes.fr/hal-01550190/document) (fr).
-- [JIM 2018](https://hal.archives-ouvertes.fr/hal-01791492/document) (fr).
-
----
-
-### Credits
-
-Kiwi uses the following ThirdParty libraries:
+### Dependencies and Credits
 
 - [Flip](http://developer.irisate.com/)
 - [Juce](https://github.com/WeAreROLI/JUCE)
 - [Beast](https://github.com/boostorg/Beast/)
 - [concurrentqueue](https://github.com/cameron314/concurrentqueue)
 - [json](https://github.com/nlohmann/json)
+- [CMake](https://cmake.org/)
+- [LLVM](http://llvm.org)
+- [FAUST](https://github.com/grame-cncm/faust.git)
+- [Icon by Freepik](https://www.flaticon.com/)
 
-> Most of the application icons are *designed by Freepik and distributed by Flaticon*.
+### Papers
 
----
+- [JIM 2017 - Kiwi : Vers un environnement de creation musicale temps reel collaboratif](https://hal.archives-ouvertes.fr/hal-01550190/document)
+- [JIM 2018 - Enseigner le patching de manière collective avec le logiciel collaboratif Kiwi](https://hal.archives-ouvertes.fr/hal-01791492/document).
+- [Teaching, investigating, creating: MUSICOLL](https://hal.archives-ouvertes.fr/hal-01581698v1)
+
 
 ### License
 
-> You can check out the full license [here](https://github.com/Musicoll/Kiwi/blob/master/Licence.md)
-
-The Kiwi application is licensed under the terms of the **GPLv3** license. However, Kiwi also depends on the **Flip** library (developed by [irisate](https://irisate.com/)) which is NOT open-source. You will need to download a public version on their [website](http://developer.irisate.com/) to compile.
+The Kiwi application is licensed under the terms of the [GNU GPL-3.0]((https://github.com/Musicoll/Kiwi/blob/master/Licence.md) license. However, Kiwi also depends on the [Flip](http://developer.irisate.com/) library which is NOT open-source.
