@@ -29,9 +29,7 @@ matrix:
     # BOOST
     - cd $TRAVIS_BUILD_DIR/ThirdParty
     - curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz -o ./boost.tar.gz
-    - tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost && cd boost
-    - ./bootstrap.sh toolset=gcc link=static
-    - ./b2 --with-system stage
+    - tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost
     # LLVM
     - cd $TRAVIS_BUILD_DIR/ThirdParty
     - curl -o ./llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
@@ -40,6 +38,11 @@ matrix:
     - cd $TRAVIS_BUILD_DIR
     - python ./Scripts/flip.py
     script:
+    # BOOST
+    - cd $TRAVIS_BUILD_DIR/ThirdParty/boost
+    - ./bootstrap.sh toolset=gcc link=static
+    - ./b2 --with-system stage
+    # KIWI
     - cd $TRAVIS_BUILD_DIR
     - mkdir Build && cd Build
     - cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm -DCMAKE_BUILD_TYPE=Debug -DGCOV_SUPPORT=On
@@ -65,9 +68,7 @@ matrix:
     # BOOST
     - cd $TRAVIS_BUILD_DIR/ThirdParty
     - curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz -o ./boost.tar.gz
-    - tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost && cd boost
-    - ./bootstrap.sh toolset=gcc link=static
-    - ./b2 --with-system stage
+    - tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost
     # LLVM
     - cd $TRAVIS_BUILD_DIR/ThirdParty
     - curl -o ./llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
@@ -76,6 +77,11 @@ matrix:
     - cd $TRAVIS_BUILD_DIR
     - python ./Scripts/flip.py
     script:
+    # BOOST
+    - cd $TRAVIS_BUILD_DIR/ThirdParty/boost
+    - ./bootstrap.sh toolset=gcc link=static
+    - ./b2 --with-system stage
+    # KIWI
     - cd $TRAVIS_BUILD_DIR
     - mkdir Build && cd Build
     - cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm -DCMAKE_BUILD_TYPE=Release
@@ -101,8 +107,6 @@ matrix:
     - cd $TRAVIS_BUILD_DIR/ThirdParty
     - curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz -o ./boost.tar.gz
     - tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost && cd boost
-    - ./bootstrap.sh toolset=clang macosx-version-min=10.9 link=static
-    - ./b2 address-model=64 --with-system stage
     # LLVM
     - cd $TRAVIS_BUILD_DIR/ThirdParty
     - curl http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz -o ./llvm.tar.xz
@@ -111,6 +115,11 @@ matrix:
     - cd $TRAVIS_BUILD_DIR
     - python ./Scripts/flip.py
     script:
+    # BOOST
+    - cd $TRAVIS_BUILD_DIR/ThirdParty/boost
+    - ./bootstrap.sh toolset=clang macosx-version-min=10.9 link=static
+    - ./b2 address-model=64 --with-system stage
+    # KIWI
     - cd $TRAVIS_BUILD_DIR
     - mkdir Build && cd Build
     - cmake .. -GXcode  -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm

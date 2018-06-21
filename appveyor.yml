@@ -18,9 +18,6 @@ install:
     - curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.zip -o ./boost.zip -o boost.zip
     - 7z x boost.zip
     - rename boost_1_63_0 boost
-    - cd boost
-    - bootstrap.bat
-    - b2 --toolset=msvc-14.0 -j4 --with-system --stagedir=stage64 variant=release architecture=x86 address-model=64 link=static
     # LLVM
     - cd %APPVEYOR_BUILD_FOLDER%/ThirdParty
     - curl -L https://github.com/pierreguillot/llvm-win/releases/download/v6.0.0/llvm-windows-x64-mt.zip -o llvm.zip
@@ -30,6 +27,12 @@ install:
     - cd %APPVEYOR_BUILD_FOLDER%
     - python ./Scripts/flip.py
 build_script:
+    # BOOST
+    - cd %APPVEYOR_BUILD_FOLDER%\ThirdParty\boost
+    - bootstrap.bat
+    - b2 --toolset=msvc-14.0 -j4 --with-system --stagedir=stage64 variant=release architecture=x86 address-model=64 link=static
+    # KIWI
+    - cd %APPVEYOR_BUILD_FOLDER%
     - mkdir Build && cd Build
     - cmake .. -G "Visual Studio 14 2015 Win64" -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm
     - cmake --build . --config %CONFIGURATION%
