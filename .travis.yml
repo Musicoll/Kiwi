@@ -77,17 +77,17 @@ matrix:
     - python --version
     - python -c 'import ssl; print ssl.OPENSSL_VERSION;'
     install:
-    - git submodule update --init --recursive ThirdParty/Juce ThirdParty/concurrentqueue ThirdParty/Beast ThirdParty/faust
-    # LLVM
-    - cd $TRAVIS_BUILD_DIR/ThirdParty
-    - curl http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz -o ./llvm.tar.xz
-    - tar zxvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-x86_64-apple-darwin llvm
+    - git submodule update --init --recursive
     # BOOST
     - cd $TRAVIS_BUILD_DIR/ThirdParty
     - curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz -o ./boost.tar.gz
-    - tar zxvf ./boost.tar.gz && mv ./boost_1_63_0 boost && cd boost
+    - tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost && cd boost
     - ./bootstrap.sh toolset=clang macosx-version-min=10.9 link=static
     - ./b2 address-model=64 --with-system stage
+    # LLVM
+    - cd $TRAVIS_BUILD_DIR/ThirdParty
+    - curl http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz -o ./llvm.tar.xz
+    - tar zxf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-x86_64-apple-darwin llvm
     # FLIP
     - cd $TRAVIS_BUILD_DIR/ThirdParty
     - python ./Scripts/flip.py
