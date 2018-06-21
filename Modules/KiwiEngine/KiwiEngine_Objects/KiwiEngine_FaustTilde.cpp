@@ -32,7 +32,6 @@
 //#include <juce_audio_devices/juce_audio_devices.h>
 //#include <juce_gui_basics/juce_gui_basics.h>
 
-#define MAX_FAUST_OPTIONS 64
 namespace kiwi { namespace engine {
     
     class FaustTilde::UIGlue : public UI
@@ -85,7 +84,7 @@ namespace kiwi { namespace engine {
         
         void declare(FAUSTFLOAT*, const char* key, const char* value) final
         {
-            m_owner.log(std::string(key) + std::string(": ") + std::string(value));
+            m_owner.log(std::string("faust~: declare ") + std::string(key) + std::string(" - ") + std::string(value));
         }
         
         void openTabBox(const char* label) final {};
@@ -152,16 +151,12 @@ namespace kiwi { namespace engine {
     {
         // Compile the file
         std::string errors;
-        char const* argv[MAX_FAUST_OPTIONS];
-        if(m_options.size() > MAX_FAUST_OPTIONS)
-        {
-            warning("faust~: maximum number of options is " + std::to_string(MAX_FAUST_OPTIONS));
-        }
-        for(size_t i = 0; i < m_options.size() && i < MAX_FAUST_OPTIONS; ++i)
+        std::vector<char const*> argv(m_options.size());
+        for(size_t i = 0; i < m_options.size(); ++i)
         {
             argv[i] = m_options[i].c_str();
         }
-        m_factory_engine = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromFile(file, m_options.size(), argv, std::string(), errors), deleteDSPFactory);
+        m_factory_engine = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromFile(file, m_options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
         if(!errors.empty())
         {
             warning(errors);
@@ -219,17 +214,13 @@ namespace kiwi { namespace engine {
     void FaustTilde::createFactoryFromString(const std::string& name, const std::string& code)
     {
         std::string errors;
-        char const* argv[MAX_FAUST_OPTIONS];
-        if(m_options.size() > MAX_FAUST_OPTIONS)
-        {
-            warning("faust~: maximum number of options is " + std::to_string(MAX_FAUST_OPTIONS));
-        }
-        for(size_t i = 0; i < m_options.size() && i < MAX_FAUST_OPTIONS; ++i)
+        std::vector<char const*> argv(m_options.size());
+        for(size_t i = 0; i < m_options.size(); ++i)
         {
             argv[i] = m_options[i].c_str();
         }
         m_ui_glue->m_parameters.clear();
-        m_factory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString(name, code, m_options.size(), argv, std::string(), errors), deleteDSPFactory);
+        m_factory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString(name, code, m_options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
         if(!errors.empty())
         {
             warning(errors);
@@ -259,7 +250,7 @@ namespace kiwi { namespace engine {
         log("faust~: number of parameters " + std::to_string(m_ui_glue->m_parameters.size()));
         for(auto const& param : m_ui_glue->m_parameters)
         {
-            log("");
+            log(" ");
             log("faust~: parameter " + param.first);
             log("faust~: type " + std::to_string(param.second.type));
             log("faust~: default " + std::to_string(param.second.saved));
