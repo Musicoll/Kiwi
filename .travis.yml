@@ -24,12 +24,21 @@ matrix:
     - sudo apt-get install -y pkg-config libedit-dev libfreetype6-dev libx11-dev libxrandr-dev libxinerama1 libxinerama-dev libxcursor-dev libasound2-dev libgtk-3-dev libwebkit2gtk-4.0-dev
     install:
     - export CXX=g++-4.9 # make sure CXX is correctly set
-    - git submodule update --init --recursive ThirdParty/Juce ThirdParty/concurrentqueue ThirdParty/Beast ThirdParty/faust
+    - git submodule update --init --recursive
     - pip install --user cpp-coveralls
+    # BOOST
+    - cd $TRAVIS_BUILD_DIR/ThirdParty
+    - curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz -o ./boost.tar.gz
+    - tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost && cd boost
+    - ./bootstrap.sh toolset=gcc link=static
+    - ./b2 --with-system stage
+    # LLVM
+    - cd $TRAVIS_BUILD_DIR/ThirdParty
     - curl -o ./ThirdParty/llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
     - tar xvf ./ThirdParty/llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 ThirdParty/llvm
+    # FLIP
+    - cd $TRAVIS_BUILD_DIR
     - python ./Scripts/flip.py
-    - python ./Scripts/boost.py
     script:
     - mkdir Build && cd Build
     - cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm -DCMAKE_BUILD_TYPE=Debug -DGCOV_SUPPORT=On
@@ -51,12 +60,20 @@ matrix:
     - sudo apt-get install -y pkg-config libedit-dev libfreetype6-dev libx11-dev libxrandr-dev libxinerama1 libxinerama-dev libxcursor-dev libasound2-dev libgtk-3-dev libwebkit2gtk-4.0-dev
     install:
     - export CXX=g++-4.9 # make sure CXX is correctly set
-    - git submodule update --init --recursive ThirdParty/Juce ThirdParty/concurrentqueue ThirdParty/Beast ThirdParty/faust
-    - pip install --user cpp-coveralls
+    - git submodule update --init --recursive
+    # BOOST
+    - cd $TRAVIS_BUILD_DIR/ThirdParty
+    - curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz -o ./boost.tar.gz
+    - tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost && cd boost
+    - ./bootstrap.sh toolset=gcc link=static
+    - ./b2 --with-system stage
+    # LLVM
+    - cd $TRAVIS_BUILD_DIR/ThirdParty
     - curl -o ./ThirdParty/llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
     - tar xvf ./ThirdParty/llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 ThirdParty/llvm
+    # FLIP
+    - cd $TRAVIS_BUILD_DIR
     - python ./Scripts/flip.py
-    - python ./Scripts/boost.py
     script:
     - mkdir Build && cd Build
     - cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm -DCMAKE_BUILD_TYPE=Release
@@ -89,7 +106,7 @@ matrix:
     - curl http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz -o ./llvm.tar.xz
     - tar zxf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-x86_64-apple-darwin llvm
     # FLIP
-    - cd $TRAVIS_BUILD_DIR/ThirdParty
+    - cd $TRAVIS_BUILD_DIR
     - python ./Scripts/flip.py
     script:
     - mkdir Build && cd Build
