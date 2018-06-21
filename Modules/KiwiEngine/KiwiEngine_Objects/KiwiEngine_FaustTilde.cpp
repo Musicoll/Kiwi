@@ -311,7 +311,7 @@ namespace kiwi { namespace engine {
                             float value = args[1].getFloat();
                             value = value > param.second.min ? value : param.second.min;
                             value = value < param.second.max ? value : param.second.max;
-                            *param.second.zone = args[1].getFloat() != 0.f;
+                            *param.second.zone = value;
                             if(args.size() > 2)
                             {
                                 warning(std::string("faust~: receive method - interface \"")  + name + std::string("\" too many arguments"));
