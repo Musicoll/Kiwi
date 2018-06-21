@@ -14,7 +14,7 @@ install:
     - cd %APPVEYOR_BUILD_FOLDER%
     - if "%APPVEYOR_REPO_BRANCH%"=="master" (set KIWI_DEPLOY=release) else (set KIWI_DEPLOY=draft)
     # BOOST
-    cd %APPVEYOR_BUILD_FOLDER%/ThirdParty
+    - cd %APPVEYOR_BUILD_FOLDER%/ThirdParty
     - curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.zip -o ./boost.zip -o boost.zip
     - 7z x boost.zip
     - rename boost_1_63_0 boost
