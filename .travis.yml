@@ -85,7 +85,7 @@ matrix:
     - cd $TRAVIS_BUILD_DIR
     - mkdir Build && cd Build
     - cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm -DCMAKE_BUILD_TYPE=Release
-    - cmake --build . --config Release
+    - xcodebuild -scheme Kiwi -configuration Release | egrep '^(/.+:[0-9+:[0-9]+:.(error|warning):|fatal|===)' -
     before_deploy:
     - mkdir Kiwi && mv Build/Release/KiwiBuild/Kiwi Kiwi/Kiwi
     - zip -r Kiwi_$os.zip Kiwi
