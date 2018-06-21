@@ -109,4 +109,30 @@ namespace kiwi { namespace model {
         return m_dsp_code;
     }
     
+    void FaustTilde::writeAttribute(std::string const& name, tool::Parameter const& parameter)
+    {
+        if (name == "dspname")
+        {
+            m_dsp_name = parameter[0].getString();
+        }
+    }
+    
+    void FaustTilde::readAttribute(std::string const& name, tool::Parameter & parameter) const
+    {
+        if (name == "dspname")
+        {
+            std::string const& message = m_dsp_name;
+            parameter = tool::Parameter(tool::Parameter::Type::String, {message});
+        }
+    }
+    
+    bool FaustTilde::attributeChanged(std::string const& name) const
+    {
+        if (name == "dspname")
+        {
+            return m_dsp_name.changed();
+        }
+        return false;
+    }
+    
 }}

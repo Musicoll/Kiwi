@@ -62,7 +62,10 @@ namespace kiwi { namespace engine {
         //! @see attributeChanged
         void openFile(const std::string& file);
         
+        //! @brief Create the factory from a string
+        //! @details Compile a code in the main factory.
         void createFactoryFromString(const std::string& name, const std::string& code);
+        
         void createInstance();
         
         void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;

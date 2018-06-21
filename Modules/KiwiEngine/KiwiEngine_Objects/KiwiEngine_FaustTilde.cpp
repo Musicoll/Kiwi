@@ -131,20 +131,7 @@ namespace kiwi { namespace engine {
     m_factory_engine(nullptr, deleteDSPFactory),
     m_options(getOptions(model))
     {
-        auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel());
-        if(fmodel)
-        {
-            std::string code = fmodel->getDSPCode();
-            
-            if(!code.empty())
-            {
-                createFactoryFromString("", code);
-                if(m_factory)
-                {
-                    createInstance();
-                }
-            }
-        }
+        attributeChanged("dspname", {tool::Parameter::Type::String, {std::string("")}});
     }
     
     FaustTilde::~FaustTilde()
@@ -152,8 +139,52 @@ namespace kiwi { namespace engine {
         
     }
     
+    // ================================================================================ //
+    
+    void FaustTilde::openFile(const std::string& file)
+    {
+        post("openFile " + file);
+        // Compile the file
+        std::string errors;
+        char const* argv[m_options.size()];
+        for(size_t i = 0; i < m_options.size(); ++i)
+        {
+            argv[i] = m_options[i].c_str();
+        }
+        m_factory_engine = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromFile(file, m_options.size(), argv, std::string(), errors), deleteDSPFactory);
+        if(!errors.empty())
+        {
+            warning(errors);
+        }
+        
+        // Notify the model
+        if(m_factory_engine)
+        {
+            post("valid ");
+            deferMain([this]()
+                      {
+                          if(m_factory_engine)
+                          {
+                              std::string code = m_factory_engine->getDSPCode();
+                              std::string name = m_factory_engine->getSHAKey();
+                              auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel());
+                              if(model)
+                              {
+                                  model->setDSPCode(code);
+                              }
+                              // This also commit the change
+                              setAttribute(std::string("dspname"), {tool::Parameter::Type::String, {name}});
+                              post("notify ");
+                          }
+                      });
+        }
+    }
+    
+    // ================================================================================ //
+    
     void FaustTilde::attributeChanged(std::string const& name, tool::Parameter const& parameter)
     {
+        post("attributeChanged " + name);
         if (name == "dspname")
         {
             auto const value = parameter[0].getString();
@@ -175,45 +206,6 @@ namespace kiwi { namespace engine {
         }
     }
     
-    // ================================================================================ //
-    
-    void FaustTilde::openFile(const std::string& file)
-    {
-        // Compile the file
-        std::string errors;
-        char const* argv[m_options.size()];
-        for(size_t i = 0; i < m_options.size(); ++i)
-        {
-            argv[i] = m_options[i].c_str();
-        }
-        m_factory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromFile(file, m_options.size(), argv, std::string(), errors), deleteDSPFactory);
-        if(!errors.empty())
-        {
-            warning(errors);
-        }
-        
-        // Notify the model
-        if(m_factory_engine)
-        {
-            deferMain([this]()
-                      {
-                          if(m_factory_engine)
-                          {
-                              std::string code = m_factory_engine->getDSPCode();
-                              std::string name = m_factory_engine->getSHAKey();
-                              auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel());
-                              if(model)
-                              {
-                                  model->setDSPCode(code);
-                              }
-                              // This also commit the change
-                              setAttribute(std::string("dspname"), {tool::Parameter::Type::String, {name}});
-                          }
-                      });
-        }
-    }
-
-    
     void FaustTilde::createFactoryFromString(const std::string& name, const std::string& code)
     {
         std::string errors;
@@ -221,7 +213,6 @@ namespace kiwi { namespace engine {
         for(size_t i = 0; i < m_options.size(); ++i)
         {
             argv[i] = m_options[i].c_str();
-            warning(m_options[i]);
         }
         m_ui_glue->m_parameters.clear();
         m_factory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString(name, code, m_options.size(), argv, std::string(), errors), deleteDSPFactory);

@@ -46,6 +46,12 @@ namespace kiwi { namespace model {
         void setDSPCode(std::string const& newcode);
         
         std::string getDSPCode();
+        
+        void writeAttribute(std::string const& name, tool::Parameter const& parameter);
+        
+        void readAttribute(std::string const& name, tool::Parameter & parameter) const;
+        
+        bool attributeChanged(std::string const& name) const;
     private:
         
         flip::String m_dsp_code;
