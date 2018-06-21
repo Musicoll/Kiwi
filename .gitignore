@@ -3,3 +3,6 @@ Build/
 ThirdParty/flip
 ThirdParty/boost
 ThirdParty/llvm
+
+# Compressed files
+*.tar.gz
