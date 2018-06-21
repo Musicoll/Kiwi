@@ -175,7 +175,7 @@ namespace kiwi { namespace engine {
                           if(m_factory_engine)
                           {
                               std::string code = m_factory_engine->getDSPCode();
-                              std::string name = m_factory_engine->getSHAKey();
+                              std::string name = juce::Uuid().toString().toStdString();
                               auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel());
                               if(model)
                               {
