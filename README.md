@@ -33,7 +33,7 @@ git submodule update --init --recursive
 
   2. Install dependencies (FLIP - BOOST >= 1.63.0 - LLVM >= 5.0.0)
 
-    - MacOS
+      - MacOS
 ```
 # BOOST
 cd ThirdParty
@@ -45,7 +45,7 @@ tar zxvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-x86_64-apple-darwin llvm
 cd ..
 ```
 
-    - Linux
+      - Linux
 ```
 # BOOST
 cd ThirdParty
@@ -57,7 +57,7 @@ tar xvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
 cd ..
 ```
 
-    - Windows
+      - Windows
 ```
 # BOOST
 ThirdParty
@@ -72,7 +72,7 @@ cd ..
 ```
 
   3. Build Boost
-    - MacOS
+      - MacOS
 ```
 cd ThirdParty/boost
 ./bootstrap.sh toolset=clang macosx-version-min=10.9 link=static
@@ -80,7 +80,7 @@ cd ThirdParty/boost
 cd ../..
 ```
 
-    - Linux
+      - Linux
 ```
 cd ThirdParty/boost
 ./bootstrap.sh toolset=gcc link=static
@@ -88,7 +88,7 @@ cd ThirdParty/boost
 cd ../..
 ```
 
-    - Windows
+      - Windows
 ```
 cd ThirdParty\boost
 bootstrap.bat
@@ -97,7 +97,7 @@ cd ../..
 ```
 
   4. Build Kiwi
-    - MacOS
+      - MacOS
 ```
 cd .
 mkdir Build && cd Build
@@ -105,7 +105,7 @@ cmake .. -GXcode  -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/l
 cmake --build .
 ```
 
-    - Linux
+      - Linux
 ```
 cd .
 mkdir Build && cd Build
@@ -113,7 +113,7 @@ cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm
 cmake --build .
 ```
 
-    - Windows
+      - Windows
 ```
 cd .
 mkdir Build && cd Build
