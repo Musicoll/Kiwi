@@ -65,11 +65,6 @@ if(MSVC)
     endforeach()
 endif()
 
-set(USE_LLVM_CONFIG OFF CACHE STRING "Use LLVM CONFIG" FORCE)
-set(LLVM_DIR "./ThirdParty/llvm/lib/cmake/llvm" CACHE STRING "LLVM path"  FORCE)
-message(STATUS ${USE_LLVM_CONFIG})
-message(STATUS ${LLVM_DIR})
-
 #--------------------------------------
 # Compiler Check
 #--------------------------------------
