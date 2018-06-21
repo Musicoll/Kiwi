@@ -86,7 +86,7 @@ matrix:
     - cd $TRAVIS_BUILD_DIR/ThirdParty
     - curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz -o ./boost.tar.gz
     - tar zxvf ./boost.tar.gz && mv ./boost_1_63_0 boost && cd boost
-    - ./bootstrap.sh toolset=clang macosx-version-min=10.8 link=static
+    - ./bootstrap.sh toolset=clang macosx-version-min=10.9 link=static
     - ./b2 address-model=64 --with-system stage
     # FLIP
     - cd $TRAVIS_BUILD_DIR/ThirdParty
