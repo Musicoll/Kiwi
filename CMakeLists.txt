@@ -26,14 +26,14 @@ set(CMAKE_SUPPRESS_REGENERATION true)
 # Ressources
 #--------------------------------------
 
+file(GLOB_RECURSE FAUST_LIB_RESOURCE ${PROJECT_SOURCE_DIR}/ThirdParty/faust/libraries/*.lib)
 set(KIWI_RESSOURCES_DIR ${PROJECT_SOURCE_DIR}/Ressources)
-
 if (APPLE)
 	set(KIWI_APP_ICON ${KIWI_RESSOURCES_DIR}/Project/XCode/Icon.icns)
 	set(KIWI_PATCHER_FILETYPE_ICON ${KIWI_RESSOURCES_DIR}/Project/XCode/kiwi_filetype.icns)
 	set(KIWI_PLIST ${KIWI_RESSOURCES_DIR}/Project/XCode/Info.plist)
-	set_source_files_properties(${KIWI_APP_ICON} ${KIWI_PATCHER_FILETYPE_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-	set(KIWI_CLIENT_RESSOURCES ${KIWI_APP_ICON} ${KIWI_PATCHER_FILETYPE_ICON} ${KIWI_PLIST})
+	set_source_files_properties(${KIWI_APP_ICON} ${KIWI_PATCHER_FILETYPE_ICON} ${FAUST_LIB_RESOURCE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+	set(KIWI_CLIENT_RESSOURCES ${KIWI_APP_ICON} ${KIWI_PATCHER_FILETYPE_ICON} ${KIWI_PLIST} ${FAUST_LIB_RESOURCE} )
 elseif(WIN32)
 	set(KIWI_CLIENT_RESSOURCES ${KIWI_RESSOURCES_DIR}/Project/VisualStudio15/Kiwi.rc)
 endif()
@@ -48,7 +48,7 @@ if(WIN32)
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd /Zi /Od")
 else()
   if(APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-warning-option -Wno-pessimizing-move -Wno-overloaded-virtual -Wnounused-function -Wno-unused-local-typedefs")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
   else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-multichar")
   endif()
@@ -366,8 +366,7 @@ source_group_rec("${SERVER_SRC}" ${PROJECT_SOURCE_DIR}/Server/Source)
 # Client
 #----------------------------------
 
-file(GLOB_RECURSE KIWI_CLIENT_SRC ${PROJECT_SOURCE_DIR}/Client/Source/*.[c|h]pp
-                                  ${PROJECT_SOURCE_DIR}/Client/Source/*.h)
+file(GLOB_RECURSE KIWI_CLIENT_SRC ${PROJECT_SOURCE_DIR}/Client/Source/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Client/Source/*.h)
 add_executable(Kiwi ${KIWI_CLIENT_SRC} "${KIWI_CLIENT_RESSOURCES}")
 target_add_dependency(Kiwi KiwiNetwork)
 target_add_dependency(Kiwi KiwiEngine)
@@ -375,6 +374,7 @@ target_add_dependency(Kiwi KiwiModel)
 target_add_dependency(Kiwi KiwiDsp)
 target_add_dependency(Kiwi Juce)
 target_include_directories(Kiwi PUBLIC ${JSON_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/Client/Source)
+
 
 if (APPLE)
 	set_target_properties(Kiwi PROPERTIES MACOSX_BUNDLE TRUE MACOSX_BUNDLE_INFO_PLIST ${KIWI_PLIST})
