@@ -40,8 +40,8 @@ if(CMAKE_CONFIGURATION_TYPES)
      FORCE)
  endif()
 
- if(UNIX AND NOT APPLE)
-        set(LINUX TRUE)
+if(UNIX AND NOT APPLE)
+  set(LINUX TRUE)
 endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
