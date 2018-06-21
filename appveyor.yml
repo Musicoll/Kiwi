@@ -20,9 +20,9 @@ install:
     - rename boost_1_63_0 boost
     # LLVM
     - cd %APPVEYOR_BUILD_FOLDER%/ThirdParty
-    - curl -L https://github.com/pierreguillot/llvm-win/releases/download/v6.0.0/llvm-windows-x64-mt.zip -o llvm.zip
+    - curl -L https://github.com/pierreguillot/llvm-win/releases/download/v6.0.0/llvm-windows-x64-md.zip -o llvm.zip
     - 7z x llvm.zip
-    - rename llvm-windows-x64-mt llvm
+    - rename llvm-windows-x64-md llvm
     # FLIP
     - cd %APPVEYOR_BUILD_FOLDER%
     - python ./Scripts/flip.py
