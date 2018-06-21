@@ -36,14 +36,14 @@ git submodule update --init --recursive
     - MacOS
 
     ```
-    # BOOST
+
     cd ThirdParty
     curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz -o ./boost.tar.gz
     tar zxf ./boost.tar.gz && mv ./boost_1_63_0 boost
-    # LLVM
+
     curl http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz -o ./llvm.tar.xz
     tar zxvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-x86_64-apple-darwin llvm
-    cd ..
+    
     ```
 
     - Linux
@@ -60,7 +60,7 @@ git submodule update --init --recursive
     ```
 
     - Windows
-    
+
     ```
     # BOOST
     ThirdParty
