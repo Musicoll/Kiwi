@@ -1,6 +1,6 @@
 
 message(STATUS "Boost - searching the static Boost library 1.63.0 with system")
-option(USE_SYSTEM_BBOST  "Use the pre-compiled Boost library of your system" OFF)
+option(USE_SYSTEM_BOOST  "Use the pre-compiled Boost library of your system" OFF)
 # -----------------------------------------------------------------------------#
 
 # Boost internal directory
@@ -32,14 +32,6 @@ set(BOOST_INTERN_LIBRARIES_DIR_APPLE "${KIWI_BOOST_INTERN_DIR}/stage/lib")
 set(BOOST_INTERN_LIBRARIES_DIR_LINUX "${KIWI_BOOST_INTERN_DIR}/stage/lib")
 set(BOOST_INTERN_LIBRARIES_DIR_WIN32 "${KIWI_BOOST_INTERN_DIR}/stage64/lib")
 
-set(BOOST_INTERN_CMD_CONFIGURE_APPLE "./bootstrap.sh toolset=clang macosx-version-min=10.9 link=static")
-set(BOOST_INTERN_CMD_CONFIGURE_LINUX "./bootstrap.sh toolset=gcc link=static")
-set(BOOST_INTERN_CMD_CONFIGURE_WIN32 "bootstrap.bat")
-
-set(BOOST_INTERN_CMD_COMPILE_APPLE "./b2 address-model=64 --with-system stage")
-set(BOOST_INTERN_CMD_COMPILE_LINUX "./b2 --with-system stage")
-set(BOOST_INTERN_CMD_COMPILE_WIN32 "b2 --toolset=msvc-14.0 -j4 --with-system --stagedir=stage64 variant=release architecture=x86 address-model=64 link=static")
-
 # Local Generic Variables
 # -----------------------------------------------------------------------------#
 if(APPLE)
@@ -48,27 +40,18 @@ if(APPLE)
 	set(BOOST_PKG_EXT ${BOOST_PKG_EXT_APPLE})
 	set(BOOST_INTERN_INCLUDE_DIR ${BOOST_INTERN_INCLUDE_DIR_APPLE})
 	set(BOOST_INTERN_LIBRARIES_DIR ${BOOST_INTERN_LIBRARIES_DIR_APPLE})
-	set(BOOST_INTERN_CMD_UNPACK ${BOOST_INTERN_CMD_UNPACK_APPLE})
-	set(BOOST_INTERN_CMD_CONFIGURE ${BOOST_INTERN_CMD_CONFIGURE_APPLE})
-	set(BOOST_INTERN_CMD_COMPILE ${BOOST_INTERN_CMD_COMPILE_APPLE})
 elseif(UNIX)
 	set(BOOST_URL ${BOOST_URL_LINUX})
 	set(BOOST_PKG_NAME ${BOOST_PKG_NAME_LINUX})
 	set(BOOST_PKG_EXT ${BOOST_PKG_EXT_LINUX})
 	set(BOOST_INTERN_INCLUDE_DIR ${BOOST_INTERN_INCLUDE_DIR_LINUX})
 	set(BOOST_INTERN_LIBRARIES_DIR ${BOOST_INTERN_LIBRARIES_DIR_LINUX})
-	set(BOOST_INTERN_CMD_UNPACK ${BOOST_INTERN_CMD_UNPACK_LINUX})
-	set(BOOST_INTERN_CMD_CONFIGURE ${BOOST_INTERN_CMD_CONFIGURE_LINUX})
-	set(BOOST_INTERN_CMD_COMPILE ${BOOST_INTERN_CMD_COMPILE_LINUX})
 elseif(WIN32)
 	set(BOOST_URL ${BOOST_URL_WIN32})
 	set(BOOST_PKG_NAME ${BOOST_PKG_NAME_WIN32})
 	set(BOOST_PKG_EXT ${BOOST_PKG_EXT_WIN32})
 	set(BOOST_INTERN_INCLUDE_DIR ${BOOST_INTERN_INCLUDE_DIR_WIN32})
 	set(BOOST_INTERN_LIBRARIES_DIR ${BOOST_INTERN_LIBRARIES_DIR_WIN32})
-	set(BOOST_INTERN_CMD_UNPACK ${BOOST_INTERN_CMD_UNPACK_WIN32})
-	set(BOOST_INTERN_CMD_CONFIGURE ${BOOST_INTERN_CMD_CONFIGURE_WIN32})
-	set(BOOST_INTERN_CMD_COMPILE ${BOOST_INTERN_CMD_COMPILE_WIN32})
 endif()
 
 set(BOOST_PKG_FILE "${BOOST_PKG_NAME}.${BOOST_PKG_EXT}")
@@ -115,12 +98,25 @@ if(NOT ${USE_SYSTEM_BOOST})
 		# Configure the boost library
 		# -------------------------------------------------------------------------#
 		message(STATUS "Configure the boost library")
-		execute_process(COMMAND ${BOOST_INTERN_CMD_CONFIGURE} WORKING_DIRECTORY ${KIWI_BOOST_INTERN_DIR})
+		if(APPLE)
+			execute_process(COMMAND ./bootstrap.sh toolset=clang macosx-version-min=10.9 link=static WORKING_DIRECTORY ${KIWI_BOOST_INTERN_DIR})
+		elseif(UNIX)
+			execute_process(COMMAND ./bootstrap.sh toolset=gcc link=static WORKING_DIRECTORY ${KIWI_BOOST_INTERN_DIR})
+		elseif(WIN32)
+			execute_process(COMMAND bootstrap.bat WORKING_DIRECTORY ${KIWI_BOOST_INTERN_DIR})
+		endif()
+
 
 		# Compile the boost library
 		# -------------------------------------------------------------------------#
 		message(STATUS "Compile the boost library")
-		execute_process(COMMAND ${BOOST_INTERN_CMD_COMPILE} WORKING_DIRECTORY ${KIWI_BOOST_INTERN_DIR})
+		if(APPLE)
+			execute_process(COMMAND ./b2 address-model=64 --with-system stage WORKING_DIRECTORY ${KIWI_BOOST_INTERN_DIR})
+		elseif(UNIX)
+			execute_process(COMMAND ./b2 --with-system stage WORKING_DIRECTORY ${KIWI_BOOST_INTERN_DIR})
+		elseif(WIN32)
+			execute_process(COMMAND b2 --toolset=msvc-14.0 -j4 --with-system --stagedir=stage64 variant=release architecture=x86 address-model=64 link=static WORKING_DIRECTORY ${KIWI_BOOST_INTERN_DIR})
+		endif()
 
 		# Find boost library now it is compiled
 		# -------------------------------------------------------------------------#

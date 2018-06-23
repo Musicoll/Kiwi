@@ -10,10 +10,6 @@ environment:
 
 install:
   - git submodule update --init --recursive
-  - set PATH=C:\Python27;%PATH%
-  # FLIP
-  - cd %APPVEYOR_BUILD_FOLDER%
-  - python ./Scripts/flip.py
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir Build && cd Build

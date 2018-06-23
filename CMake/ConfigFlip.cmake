@@ -69,40 +69,52 @@ if(NOT DEFINED FLIP_LIBRARY_DIRS)
 	set(FLIP_LIBRARY_DIRS ${FLIP_INTERN_LIBRARIES_DIR} CACHE STRING "Flip include directories")
 endif()
 
-# Search for the FLIP library
-# ---------------------------------------------------------------------------#
-find_library(FLIP_LIBRARIES NAMES flip PATHS ${FLIP_LIBRARY_DIRS} NO_DEFAULT_PATH)
 # Use the FLIP internal library
 # -----------------------------------------------------------------------------#
-if((${FLIP_LIBRARIES} STREQUAL "FLIP_LIBRARIES-NOTFOUND") AND (NOT ${USE_SYSTEM_FLIP}))
-	set(FLIP_INCLUDE_DIRS ${FLIP_INTERN_INCLUDE_DIR})
-	set(FLIP_LIBRARY_DIRS ${FLIP_INTERN_LIBRARIES_DIR})
+if(NOT ${USE_SYSTEM_FLIP})
 
-	# Remove the current invalid FLIP folder
-	# -------------------------------------------------------------------------#
-	if(EXISTS ${KIWI_FLIP_INTERN_DIR})
-		message(STATUS "Remove current invalid flip folder ${KIWI_FLIP_INTERN_DIR}")
-		file(REMOVE_RECURSE ${KIWI_FLIP_INTERN_DIR})
-	endif()
-
-	# Download the FLIP package
-	# -------------------------------------------------------------------------#
-	if(NOT (EXISTS "${KIWI_DEPENDENCIES_DIR}/${FLIP_PKG_FILE}"))
-		message(STATUS "Download ${FLIP_PKG_FILE}")
-		file(DOWNLOAD ${FLIP_PKG_PATH} "${KIWI_DEPENDENCIES_DIR}/${FLIP_PKG_FILE}" SHOW_PROGRESS)
-	endif()
-
-	# Unpack the FLIP package
-	# -------------------------------------------------------------------------#
-	message(STATUS "Unpack ${FLIP_PKG_FILE} to ${KIWI_FLIP_INTERN_DIR}")
-	unpack_file(${FLIP_PKG_FILE} ${KIWI_DEPENDENCIES_DIR})
-	file(RENAME ${KIWI_DEPENDENCIES_DIR}/${FLIP_PKG_FOLDER_NAME} ${KIWI_FLIP_INTERN_DIR})
-
-	# Find the Flip internal library now it is installed
+	# Search for the FLIP internal library
 	# ---------------------------------------------------------------------------#
 	find_library(FLIP_LIBRARIES NAMES flip PATHS ${FLIP_LIBRARY_DIRS} NO_DEFAULT_PATH)
 
-endif((${FLIP_LIBRARIES} STREQUAL "FLIP_LIBRARIES-NOTFOUND") AND (NOT ${USE_SYSTEM_FLIP}))
+	# Set up the FLIP internal library
+	# ---------------------------------------------------------------------------#
+	if(${FLIP_LIBRARIES} STREQUAL "FLIP_LIBRARIES-NOTFOUND")
+		set(FLIP_INCLUDE_DIRS ${FLIP_INTERN_INCLUDE_DIR})
+		set(FLIP_LIBRARY_DIRS ${FLIP_INTERN_LIBRARIES_DIR})
+
+		# Remove the current invalid FLIP folder
+		# -------------------------------------------------------------------------#
+		if(EXISTS ${KIWI_FLIP_INTERN_DIR})
+			message(STATUS "Remove current invalid flip folder ${KIWI_FLIP_INTERN_DIR}")
+			file(REMOVE_RECURSE ${KIWI_FLIP_INTERN_DIR})
+		endif()
+
+		# Download the FLIP package
+		# -------------------------------------------------------------------------#
+		if(NOT (EXISTS "${KIWI_DEPENDENCIES_DIR}/${FLIP_PKG_FILE}"))
+			message(STATUS "Download ${FLIP_PKG_FILE}")
+			file(DOWNLOAD ${FLIP_PKG_PATH} "${KIWI_DEPENDENCIES_DIR}/${FLIP_PKG_FILE}" SHOW_PROGRESS)
+		endif()
+
+		# Unpack the FLIP package
+		# -------------------------------------------------------------------------#
+		message(STATUS "Unpack ${FLIP_PKG_FILE} to ${KIWI_FLIP_INTERN_DIR}")
+		unpack_file(${FLIP_PKG_FILE} ${KIWI_DEPENDENCIES_DIR})
+		file(RENAME ${KIWI_DEPENDENCIES_DIR}/${FLIP_PKG_FOLDER_NAME} ${KIWI_FLIP_INTERN_DIR})
+
+		# Find the Flip internal library now it is installed
+		# ---------------------------------------------------------------------------#
+		find_library(FLIP_LIBRARIES NAMES flip PATHS ${FLIP_LIBRARY_DIRS} NO_DEFAULT_PATH)
+	endif()
+
+else()
+
+	# Search for the system FLIP library
+	# ---------------------------------------------------------------------------#
+	find_library(FLIP_LIBRARIES NAMES flip PATHS ${FLIP_LIBRARY_DIRS})
+
+endif(NOT ${USE_SYSTEM_FLIP})
 
 # -----------------------------------------------------------------------------#
 

@@ -98,7 +98,14 @@ if(NOT ${USE_SYSTEM_LLVM})
 		set(LLVM_DIR ${LLVM_INTERN_CMAKE_DIR})
 		set(USE_LLVM_CONFIG OFF)
 		find_package(LLVM CONFIG)
+
 	endif(NOT ${LLVM_INTERNAL_VALID})
+
+else()
+
+	# Find the LLVM system library
+	# ---------------------------------------------------------------------------#
+	find_package(LLVM CONFIG)
 
 endif(NOT ${USE_SYSTEM_LLVM})
 
