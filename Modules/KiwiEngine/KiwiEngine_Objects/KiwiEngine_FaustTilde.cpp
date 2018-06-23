@@ -350,7 +350,7 @@ namespace kiwi { namespace engine {
                 {
                     m_outputs[i] = output[i].data();
                 }
-                m_instance->compute(nsamples, m_inputs.data(), m_outputs.data());
+                m_instance->compute(nsamples, static_cast<FAUSTFLOAT**>(m_inputs.data()), m_outputs.data());
             }
             else
             {
