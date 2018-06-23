@@ -84,7 +84,7 @@ if(NOT ${USE_SYSTEM_LLVM})
 		# -------------------------------------------------------------------------#
 		if(NOT EXISTS "${KIWI_DEPENDENCIES_DIR}/${LLVM_PKG_FILE}")
 			message(STATUS "Download ${LLVM_PKG_FILE}")
-			file(DOWNLOAD ${LLVM_PKG_PATH} "${KIWI_DEPENDENCIES_DIR}/${LLVM_PKG_FILE}" SHOW_PROGRESS)
+			file(DOWNLOAD ${LLVM_PKG_PATH} "${KIWI_DEPENDENCIES_DIR}/${LLVM_PKG_FILE}")
 		endif()
 
 		# Unpack the LLVM package

@@ -24,61 +24,17 @@ Kiwi is part of the French ANR-funded [MUSICOLL](http://musicoll.mshparisnord.or
 
 ### Compilation
 
-Kiwi requires that the static Boost library 1.63.0 with the system component installed.
-
-  1. Clone the project  
 ```
 git clone https://github.com/Musicoll/Kiwi.git
 cd Kiwi
 git submodule update --init --recursive
-```
-  2. Install dependencies (FLIP - BOOST >= 1.63.0 - LLVM >= 5.0.0)
-    - MacOS   
-```sh
-# LLVM
-curl http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz -o ./llvm.tar.xz
-tar zxvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-x86_64-apple-darwin llvm
-cd ..
-```
-    - Linux   
-```sh
-# LLVM
-curl -o ./llvm.tar.xz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
-tar xvf ./llvm.tar.xz && mv ./clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
-cd ..
-```
-    - Windows   
-```sh
-# LLVM
-curl -L https://github.com/pierreguillot/llvm-win/releases/download/v6.0.0/llvm-windows-x64-mt.zip -o llvm.zip
-7z x llvm.zip
-rename llvm-windows-x64-mt llvm
-cd ..
-```
-  4. Build Kiwi
-    - MacOS
-```
-cd .
+cd Kiwi
 mkdir Build && cd Build
-cmake .. -GXcode  -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm
+cmake ..
 cmake --build .
 ```
 
-    - Linux
-```
-cd .
-mkdir Build && cd Build
-cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm -DCMAKE_BUILD_TYPE=Release
-cmake --build .
-```
-
-    - Windows
-```
-cd .
-mkdir Build && cd Build
-cmake .. -G "Visual Studio 14 2015 Win64" -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./ThirdParty/llvm/lib/cmake/llvm
-cmake --build .
-```
+Using the system/personal dependencies
 
 ### Organizations
 

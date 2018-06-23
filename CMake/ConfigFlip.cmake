@@ -94,7 +94,7 @@ if(NOT ${USE_SYSTEM_FLIP})
 		# -------------------------------------------------------------------------#
 		if(NOT (EXISTS "${KIWI_DEPENDENCIES_DIR}/${FLIP_PKG_FILE}"))
 			message(STATUS "Download ${FLIP_PKG_FILE}")
-			file(DOWNLOAD ${FLIP_PKG_PATH} "${KIWI_DEPENDENCIES_DIR}/${FLIP_PKG_FILE}" SHOW_PROGRESS)
+			file(DOWNLOAD ${FLIP_PKG_PATH} "${KIWI_DEPENDENCIES_DIR}/${FLIP_PKG_FILE}")
 		endif()
 
 		# Unpack the FLIP package

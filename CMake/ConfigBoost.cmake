@@ -69,7 +69,6 @@ if(NOT ${USE_SYSTEM_BOOST})
 	# ---------------------------------------------------------------------------#
 	set(Boost_INCLUDE_DIR "${BOOST_INTERN_INCLUDE_DIR}")
 	set(Boost_LIBRARY_DIR "${BOOST_INTERN_LIBRARIES_DIR}")
-	find_package(Boost 1.63.0 COMPONENTS system QUIET)
 
 	# Set up for the boost internal library
 	# ---------------------------------------------------------------------------#
@@ -86,7 +85,7 @@ if(NOT ${USE_SYSTEM_BOOST})
 		# -------------------------------------------------------------------------#
 		if(NOT EXISTS "${KIWI_DEPENDENCIES_DIR}/${BOOST_PKG_FILE}")
 			message(STATUS "Download ${BOOST_PKG_FILE}")
-			file(DOWNLOAD ${BOOST_PKG_PATH} "${KIWI_DEPENDENCIES_DIR}/${BOOST_PKG_FILE}" SHOW_PROGRESS)
+			file(DOWNLOAD ${BOOST_PKG_PATH} "${KIWI_DEPENDENCIES_DIR}/${BOOST_PKG_FILE}")
 		endif()
 
 		# Unpack the boost package
@@ -119,6 +118,12 @@ if(NOT ${USE_SYSTEM_BOOST})
 		endif()
 
 		# Find boost library now it is compiled
+		# -------------------------------------------------------------------------#
+		find_package(Boost 1.63.0 COMPONENTS system)
+
+	else()
+
+		# Find boost library with system
 		# -------------------------------------------------------------------------#
 		find_package(Boost 1.63.0 COMPONENTS system)
 
