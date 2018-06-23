@@ -25,6 +25,10 @@ set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
 # Ressources
 #--------------------------------------
 
+if(NOT DEFINED KIWI_DEPENDENCIES_DIR)
+	set(KIWI_DEPENDENCIES_DIR "${PROJECT_SOURCE_DIR}/ThirdParty")
+endif()
+
 file(GLOB_RECURSE FAUST_LIB_RESOURCE ${KIWI_DEPENDENCIES_DIR}/faust/libraries/*.lib)
 set(KIWI_RESSOURCES_DIR ${PROJECT_SOURCE_DIR}/Ressources)
 if (APPLE)
@@ -92,10 +96,6 @@ endif()
 #--------------------------------------
 
 include(./Scripts/group.cmake)
-
-if(NOT DEFINED KIWI_DEPENDENCIES_DIR)
-	set(KIWI_DEPENDENCIES_DIR "${PROJECT_SOURCE_DIR}/ThirdParty")
-endif()
 
 #----------------------------------
 # Juce
