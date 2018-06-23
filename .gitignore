@@ -6,3 +6,5 @@ ThirdParty/llvm
 
 # Compressed files
 *.tar.gz
+*.tar.xz
+*.zip
