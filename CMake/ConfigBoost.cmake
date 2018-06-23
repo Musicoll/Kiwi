@@ -72,7 +72,7 @@ if(NOT ${USE_SYSTEM_BOOST})
 
 	# Set up for the boost internal library
 	# ---------------------------------------------------------------------------#
-	if(NOT Boost_FOUND)
+	if(NOT EXISTS ${KIWI_BOOST_INTERN_DIR}/bootstrap.log)
 
 		# Remove the current invalid boost folder
 		# -------------------------------------------------------------------------#
