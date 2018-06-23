@@ -24,7 +24,7 @@ Kiwi is part of the French ANR-funded [MUSICOLL](http://musicoll.mshparisnord.or
 
 ### Compilation
 
-The compilation of Kiwi uses [CMake](https://cmake.org/). Most of the dependencies are included as git submodules, the other will be installed during automatically during the CMake configuration phase. Thus, the compilation requires the default git and CMake steps such as:
+The compilation of Kiwi uses [CMake](https://cmake.org/). Most of the dependencies are included as git submodules, the others will be installed during automatically during the CMake configuration phase. Thus, the compilation requires the default git and CMake steps such as:
 
 ```
 git clone https://github.com/Musicoll/Kiwi.git
@@ -35,7 +35,7 @@ cmake ..
 cmake --build .
 ```
 
-This default approach downloads and compiles all the required dependencies [Flip](http://developer.irisate.com/), [Boost](https://www.boost.org/) and [LLVM](http://llvm.org) but the CMake offers to use personal or the default systems libraries.
+This default CMake approach downloads and compiles all the dependencies [Flip](http://developer.irisate.com/), [Boost](https://www.boost.org/) and [LLVM](http://llvm.org) but the CMake approach also allows to use the personal/systems libraries.
 
 - Flip  
 Enables or disable the personal/system library for Flip with the option `USE_SYSTEM_FLIP ON/OFF (default OFF)`. Flip must be compiled as a static library compatible with the commit **c47e41da05**.  Use the variable `FLIP_INCLUDE_DIRS PATHS` to define the Flip include directories and the variable `FLIP_LIBRARY_DIRS PATHS` to define the Flip library directories.
