@@ -30,7 +30,8 @@ matrix:
     - cd $TRAVIS_BUILD_DIR
     - mkdir Build && cd Build
     - cmake .. -DCMAKE_C_FLAGS=-m64 -DCMAKE_BUILD_TYPE=Debug -DGCOV_SUPPORT=On
-    - cmake --build . --config Debug
+    - cmake --build . --config Debug --target Tests
+    - ctest .
     after_success:
     - coveralls -i Modules --gcov-options '\-lp' > /dev/null
 
