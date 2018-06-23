@@ -199,7 +199,7 @@ set(BEAST_INCLUDE_DIRS ${KIWI_DEPENDENCIES_DIR}/Beast/include)
 set(JSON_INCLUDE_DIRS ${KIWI_DEPENDENCIES_DIR}/json)
 set(CONCURRENTQUEUE_INCLUDE_DIRS ${KIWI_DEPENDENCIES_DIR}/concurrentqueue)
 
-# KiwiTool
+# Kiwi
 # -----------------------------------------------------------------------------#
 message(STATUS "Configuring Kiwi")
 set(KIWI_MODULE_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/Modules)
@@ -349,9 +349,15 @@ endif()
 
 source_group_rec("${KIWI_CLIENT_SRC}" ${PROJECT_SOURCE_DIR}/Client/Source)
 
-
 # Tests
 #------------------------------------------------------------------------------#
+# Coverage setting
+if(${GCOV_SUPPORT} STREQUAL "On")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+  set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
+	set(KIWI_TESTS_LINK_LIBRARIES gcov)
+endif()
 
 # Test Tool
 #------------------------------------------------------------------------------#
@@ -360,7 +366,7 @@ add_executable(test_tool ${TEST_TOOL_SRC})
 add_dependencies(test_tool KiwiTool)
 set_target_properties(test_tool PROPERTIES FOLDER Test)
 target_include_directories(test_tool PUBLIC ${KIWI_TOOL_INCLUDE_DIRS})
-target_link_libraries(test_tool KiwiTool)
+target_link_libraries(test_tool KiwiTool ${KIWI_TESTS_LINK_LIBRARIES})
 source_group_rec("${TEST_TOOL_SRC}" ${PROJECT_SOURCE_DIR}/Test/Tool)
 
 # Test Dsp
@@ -370,7 +376,7 @@ add_executable(test_dsp ${TEST_DSP_SRC})
 add_dependencies(test_dsp KiwiDsp)
 set_target_properties(test_dsp PROPERTIES FOLDER Test)
 target_include_directories(test_dsp PUBLIC ${KIWI_DSP_INCLUDE_DIRS})
-target_link_libraries(test_dsp KiwiDsp)
+target_link_libraries(test_dsp KiwiDsp ${KIWI_TESTS_LINK_LIBRARIES})
 source_group_rec("${TEST_DSP_SRC}" ${PROJECT_SOURCE_DIR}/Test/Dsp)
 
 # Test Model
@@ -380,7 +386,7 @@ add_executable(test_model ${TEST_MODEL_SRC})
 add_dependencies(test_model KiwiModel)
 set_target_properties(test_model PROPERTIES FOLDER Test)
 target_include_directories(test_model PUBLIC ${KIWI_MODEL_INCLUDE_DIRS})
-target_link_libraries(test_model KiwiModel)
+target_link_libraries(test_model KiwiModel ${KIWI_TESTS_LINK_LIBRARIES})
 source_group_rec("${TEST_MODEL_SRC}" ${PROJECT_SOURCE_DIR}/Test/Model)
 
 # Test Network
@@ -390,7 +396,7 @@ add_executable(test_network ${TEST_NETWORK_SRC})
 add_dependencies(test_network KiwiNetwork)
 set_target_properties(test_network PROPERTIES FOLDER Test)
 target_include_directories(test_network PUBLIC ${KIWI_NETWORK_INCLUDE_DIRS})
-target_link_libraries(test_network KiwiNetwork)
+target_link_libraries(test_network KiwiNetwork ${KIWI_TESTS_LINK_LIBRARIES})
 source_group_rec("${TEST_NETWORK_SRC}" ${PROJECT_SOURCE_DIR}/Test/Network)
 
 # Test Server
@@ -399,21 +405,9 @@ file(GLOB TEST_SERVER_SRC ${PROJECT_SOURCE_DIR}/Test/Server/*.[c|h]pp ${PROJECT_
 add_executable(test_server ${TEST_SERVER_SRC})
 add_dependencies(test_server KiwiServer)
 set_target_properties(test_server PROPERTIES FOLDER Test)
-target_include_directories(test_network PUBLIC ${KIWI_SERVER_INCLUDE_DIRS})
-target_link_libraries(test_server PUBLIC KiwiServer)
+target_include_directories(test_server PUBLIC ${KIWI_SERVER_INCLUDE_DIRS})
+target_link_libraries(test_server PUBLIC KiwiServer ${KIWI_TESTS_LINK_LIBRARIES})
 source_group_rec("${TEST_SERVER_SRC}" ${PROJECT_SOURCE_DIR}/Test/Server)
-
-# Coverage setting
-if(${GCOV_SUPPORT} STREQUAL "On")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
-  set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
-  target_link_libraries(test_dsp PUBLIC gcov)
-  target_link_libraries(test_model PUBLIC gcov)
-  target_link_libraries(test_server PUBLIC gcov)
-  target_link_libraries(test_network PUBLIC gcov)
-  target_link_libraries(test_tool PUBLIC gcov)
-endif()
 
 # Tests Target
 
