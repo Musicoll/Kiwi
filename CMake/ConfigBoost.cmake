@@ -1,10 +1,9 @@
-include(ExternalProject)
 
 message(STATUS "Boost - searching the static Boost library 1.63.0 with system")
-# ---------------------------------------------------------------------------#
+# -----------------------------------------------------------------------------#
 
 # Boost internal directory
-# ---------------------------------------------------------------------------#
+# -----------------------------------------------------------------------------#
 if(NOT DEFINED KIWI_DEPENDENCIES_DIR)
 	set(KIWI_DEPENDENCIES_DIR "${PROJECT_SOURCE_DIR}/ThirdParty")
 endif()
@@ -27,10 +26,6 @@ set(BOOST_PKG_EXT_WIN32 "zip")
 set(BOOST_INTERN_INCLUDE_DIR_APPLE "${KIWI_BOOST_INTERN_DIR}")
 set(BOOST_INTERN_INCLUDE_DIR_LINUX "${KIWI_BOOST_INTERN_DIR}")
 set(BOOST_INTERN_INCLUDE_DIR_WIN32 "${KIWI_BOOST_INTERN_DIR}")
-
-set(BOOST_INTERN_LIBRARIES_DIR_APPLE "${KIWI_BOOST_INTERN_DIR}/stage/lib")
-set(BOOST_INTERN_LIBRARIES_DIR_LINUX "${KIWI_BOOST_INTERN_DIR}/stage/lib")
-set(BOOST_INTERN_LIBRARIES_DIR_WIN32 "${KIWI_BOOST_INTERN_DIR}/stage64/lib")
 
 set(BOOST_INTERN_LIBRARIES_DIR_APPLE "${KIWI_BOOST_INTERN_DIR}/stage/lib")
 set(BOOST_INTERN_LIBRARIES_DIR_LINUX "${KIWI_BOOST_INTERN_DIR}/stage/lib")
@@ -85,7 +80,6 @@ set(BOOST_PKG_PATH "${BOOST_URL}/${BOOST_PKG_FILE}")
 # Start the script
 # -----------------------------------------------------------------------------#
 set(Boost_USE_STATIC_LIBS ON) # Use the static library
-option(USE_SYSTEM_BOOST  	"Use the pre-compiled Boost library of your system" OFF)
 
 # Use the boost internal library
 # -----------------------------------------------------------------------------#
@@ -102,7 +96,7 @@ if(NOT ${USE_SYSTEM_BOOST})
 	if(NOT Boost_FOUND)
 		set(BOOST_FOLDER "boost_1_63_0")
 
-		# Remove the boost package
+		# Remove the current invalid boost folder
 		# -------------------------------------------------------------------------#
 		if(EXISTS ${KIWI_BOOST_INTERN_DIR})
 			message(STATUS "Remove current invalid boost folder ${KIWI_BOOST_INTERN_DIR}")
@@ -113,10 +107,10 @@ if(NOT ${USE_SYSTEM_BOOST})
 		# -------------------------------------------------------------------------#
 		if(NOT EXISTS "${KIWI_DEPENDENCIES_DIR}/${BOOST_PKG_FILE}")
 			message(STATUS "Download ${BOOST_PKG_FILE}")
-			file(DOWNLOAD ${BOOST_PKG_PATH} "${KIWI_DEPENDENCIES_DIR}/${BOOST_PKG_FILE}" SHOW_PROGRESS TLS_VERIFY ON)
+			file(DOWNLOAD ${BOOST_PKG_PATH} "${KIWI_DEPENDENCIES_DIR}/${BOOST_PKG_FILE}" SHOW_PROGRESS)
 		endif()
 
-		# Download the boost package
+		# Unpack the boost package
 		# -------------------------------------------------------------------------#
 		message(STATUS "Unpack ${BOOST_PKG_FILE} to ${KIWI_BOOST_INTERN_DIR}")
 		execute_process(COMMAND ${BOOST_INTERN_CMD_UNPACK}${BOOST_PKG_FILE} WORKING_DIRECTORY ${KIWI_DEPENDENCIES_DIR})

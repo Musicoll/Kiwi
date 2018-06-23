@@ -1,11 +1,13 @@
-## Create Faust Lib
-message(STATUS "Faust Library")
 
-## Save the llvm directory and change it for subdirectory
-if(DEFINED LLVM_DIR)
-  set(LLVM_DIR_TEMP   ${LLVM_DIR})
-  set(LLVM_DIR        "./../../.${LLVM_DIR_TEMP}")
+message(STATUS "FAUST - configuring the FAUST static library")
+# -----------------------------------------------------------------------------#
+
+# FAUST internal directory
+# -----------------------------------------------------------------------------#
+if(NOT DEFINED KIWI_DEPENDENCIES_DIR)
+	set(KIWI_DEPENDENCIES_DIR "${PROJECT_SOURCE_DIR}/ThirdParty")
 endif()
+set(KIWI_FAUST_INTERN_DIR "${KIWI_DEPENDENCIES_DIR}/faust")
 
 ## Hardcoded targets for faust
 set(INCLUDE_STATIC      ON  CACHE STRING  "Include static library"      FORCE)
@@ -35,7 +37,6 @@ if(MSVC)
     set_property(TARGET staticlib APPEND_STRING PROPERTY LINK_FLAGS " /ignore:4099 ")
 endif()
 
-## Restore llvm directory
-if(DEFINED LLVM_DIR)
-  set(LLVM_DIR ${LLVM_DIR_TEMP})
-endif()
+include_directories(${KIWI_FAUST_INTERN_DIR}/architecture)
+
+message(STATUS "")

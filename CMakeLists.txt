@@ -20,7 +20,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
 set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++14")
 set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
-set(CMAKE_SUPPRESS_REGENERATION true)
 
 #--------------------------------------
 # Ressources
@@ -218,55 +217,22 @@ else()
 endif()
 
 set(FLIP_COMPILE_DEFINITIONS "flip_NOTHING=flip_NOTHING_FATAL")
+message(STATUS "")
 
 #----------------------------------
-# Beast
+# Dependencies
 #----------------------------------
 
-set(Boost_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/ThirdParty/boost)
-
-if (WIN32)
-    if (CMAKE_CL_64)
-        set(Boost_LIBRARY_DIR ${PROJECT_SOURCE_DIR}/ThirdParty/boost/stage64/lib)
-    else()
-        set(Boost_LIBRARY_DIR ${PROJECT_SOURCE_DIR}/ThirdParty/boost/stage32/lib)
-    endif()
-else()
-    set(Boost_LIBRARY_DIR ${PROJECT_SOURCE_DIR}/ThirdParty/boost/stage/lib)
-endif()
-
-option (Boost_USE_STATIC_LIBS "Use static libraries for boost" ON)
-find_package (Boost 1.63.0 REQUIRED COMPONENTS system)
-
-if (Boost_FOUND)
-    message(STATUS "Boost found on system")
-    message(STATUS "Boost_LIBRARIES : " ${Boost_LIBRARIES})
-    message(STATUS "BOOST_INCLUDE_DIRECTORIES : " ${Boost_INCLUDE_DIRS})
-else()
-    message(FATAL_ERROR "Boost not found on system")
-endif()
-
-#----------------------------------
-# Json
-#----------------------------------
-
-set(JSON_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/ThirdParty/json)
-
-#----------------------------------
-# LLVM & FAUST
-#----------------------------------
-include(Scripts/FaustLib.cmake)
-
-find_package(LLVM REQUIRED CONFIG)
-message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
-message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+include(CMake/ConfigBoost.cmake)
+include(CMake/ConfigLLVM.cmake)
+include(CMake/ConfigFAUST.cmake)
 
 add_definitions(${LLVM_DEFINITIONS})
 include_directories(${LLVM_INCLUDE_DIRS})
 llvm_map_components_to_libnames(llvm_libs all)
 list(REMOVE_ITEM llvm_libs LTO)
 
-include_directories(${PROJECT_SOURCE_DIR}/ThirdParty/faust/architecture)
+set(JSON_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/ThirdParty/json)
 
 #----------------------------------
 # KiwiTool
@@ -316,6 +282,7 @@ target_include_directories(KiwiNetwork PUBLIC ${PROJECT_SOURCE_DIR}/Modules
                                               ${PROJECT_SOURCE_DIR}/ThirdParty/Beast/include
                                               ${Boost_INCLUDE_DIRS})
 target_compile_definitions(KiwiNetwork PUBLIC "-DBOOST_ALL_NO_LIB=1")
+#add_dependencies(KiwiNetwork Boost)
 set(NETWORK_DEP ${Boost_LIBRARIES})
 if (WIN32)
     set(NETWORK_DEP ${NETWORK_DEP} ${WS2_32})
@@ -436,18 +403,6 @@ add_executable(test_network ${TEST_NETWORK_SRC})
 target_add_dependency(test_network KiwiNetwork)
 set_target_properties(test_network PROPERTIES FOLDER Test)
 source_group_rec("${TEST_NETWORK_SRC}" ${PROJECT_SOURCE_DIR}/Test/Network)
-
-# Test Engine
-
-#file(GLOB TEST_ENGINE_SRC ${PROJECT_SOURCE_DIR}/Test/Engine/*.[c|h]pp
-#                          ${PROJECT_SOURCE_DIR}/Test/Engine/*.h)
-#add_executable(test_engine ${TEST_ENGINE_SRC})
-#target_add_dependency(test_engine KiwiEngine)
-#add_dependencies(test_engine staticlib)
-#target_link_libraries(test_engine PUBLIC ${llvm_libs})
-#target_link_libraries(test_engine PUBLIC staticlib)
-#set_target_properties(test_engine PROPERTIES FOLDER Test)
-#source_group_rec("${TEST_ENGINE_SRC}" ${PROJECT_SOURCE_DIR}/Test/Engine)
 
 # Test Server
 
