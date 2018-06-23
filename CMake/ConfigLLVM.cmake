@@ -1,8 +1,9 @@
 
 message(STATUS "LLVM - searching the static LLVM library 5.0.0 (or superior)")
 option(USE_SYSTEM_LLVM  "Use the pre-compiled LLVM library of your system" OFF)
-option(LLVM_DIR 				"LLVM CMake module directory")
-option(USE_LLVM_CONFIG 	"Use system LLVM configuration")
+set(LLVM_DIR      			CACHE STRING "LLVM CMake module directory")
+set(USE_LLVM_CONFIG 		CACHE STRING "Use system LLVM configuration")
+
 # -----------------------------------------------------------------------------#
 
 # LLVM internal directory
@@ -98,8 +99,9 @@ if(NOT ${USE_SYSTEM_LLVM})
 		message(STATUS "Unpack ${LLVM_PKG_FILE} to ${KIWI_LLVM_INTERN_DIR}")
 		execute_process(COMMAND ${LLVM_INTERN_CMD_UNPACK}${LLVM_PKG_FILE} WORKING_DIRECTORY ${KIWI_DEPENDENCIES_DIR})
 		file(RENAME ${KIWI_DEPENDENCIES_DIR}/${LLVM_PKG_NAME} ${KIWI_LLVM_INTERN_DIR})
-		#
 
+		# Find the LLVM internal library now it is installed
+		# -------------------------------------------------------------------------#
 		set(LLVM_DIR ${LLVM_INTERN_CMAKE_DIR})
 		set(USE_LLVM_CONFIG OFF)
 		find_package(LLVM CONFIG)

@@ -1,5 +1,6 @@
 
 message(STATUS "Boost - searching the static Boost library 1.63.0 with system")
+option(USE_SYSTEM_BBOST  "Use the pre-compiled Boost library of your system" OFF)
 # -----------------------------------------------------------------------------#
 
 # Boost internal directory

@@ -179,50 +179,11 @@ target_include_directories(Juce PUBLIC ${JUCE_INCLUDE_DIRS})
 set_target_properties(Juce PROPERTIES FOLDER ThirdParty)
 source_group_rec("${JUCE_SRC}" ${PROJECT_SOURCE_DIR}/ThirdParty/Juce/modules)
 
-#----------------------------------
-# Flip
-#----------------------------------
 
-set(KIWI_FLIP_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/flip/include)
-
-if(WIN32)
-    if (CMAKE_CL_64)
-        set(KIWI_FLIP_LIB ${PROJECT_SOURCE_DIR}/ThirdParty/flip/lib/VS2015/x64/Release)
-    else()
-        set(KIWI_FLIP_LIB ${PROJECT_SOURCE_DIR}/ThirdParty/flip/lib/VS2015/Win32/Release)
-    endif()
-elseif(UNIX AND NOT APPLE)
-    set(KIWI_FLIP_LIB ${PROJECT_SOURCE_DIR}/ThirdParty/flip/lib/gcc)
-else()
-    set(KIWI_FLIP_LIB ${PROJECT_SOURCE_DIR}/ThirdParty/flip/lib)
-endif()
-
-message(STATUS "Searching flip library")
-message(STATUS "Library search path is : " ${KIWI_FLIP_LIB})
-message(STATUS "Include search path is : " ${KIWI_FLIP_INCLUDE})
-
-find_library(FLIP_LIBRARIES NAMES flip PATHS ${KIWI_FLIP_LIB} NO_DEFAULT_PATH)
-find_path(FLIP_INCLUDE_DIRS NAMES flip PATHS ${KIWI_FLIP_INCLUDE} NO_DEFAULT_PATH)
-
-if (WIN32)
-    set(FLIP_LIBRARIES ${FLIP_LIBRARIES} ${WS2_32})
-endif()
-
-if (FLIP_LIBRARIES AND FLIP_INCLUDE_DIRS)
-    message(STATUS "Flip found on system")
-    message(STATUS "FLIP_LIBRARIES : " ${FLIP_LIBRARIES})
-    message(STATUS "FLIP_INCLUDE_DIRS : " ${FLIP_INCLUDE_DIRS})
-else()
-    message(FATAL_ERROR "Flip was not found on system, check Readme.md for instructions on how to set search path")
-endif()
-
-set(FLIP_COMPILE_DEFINITIONS "flip_NOTHING=flip_NOTHING_FATAL")
-message(STATUS "")
-
-#----------------------------------
 # Dependencies
-#----------------------------------
-
+#-------------------------------------------------------------------------------
+message(STATUS "")
+include(CMake/ConfigFlip.cmake)
 include(CMake/ConfigBoost.cmake)
 include(CMake/ConfigLLVM.cmake)
 include(CMake/ConfigFAUST.cmake)
