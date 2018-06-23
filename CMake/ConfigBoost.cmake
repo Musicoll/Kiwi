@@ -32,10 +32,6 @@ set(BOOST_INTERN_LIBRARIES_DIR_APPLE "${KIWI_BOOST_INTERN_DIR}/stage/lib")
 set(BOOST_INTERN_LIBRARIES_DIR_LINUX "${KIWI_BOOST_INTERN_DIR}/stage/lib")
 set(BOOST_INTERN_LIBRARIES_DIR_WIN32 "${KIWI_BOOST_INTERN_DIR}/stage64/lib")
 
-set(BOOST_INTERN_CMD_UNPACK_APPLE tar xzf ./)
-set(BOOST_INTERN_CMD_UNPACK_LINUX tar xzf ./)
-set(BOOST_INTERN_CMD_UNPACK_WIN32 mv 7z x)
-
 set(BOOST_INTERN_CMD_CONFIGURE_APPLE "./bootstrap.sh toolset=clang macosx-version-min=10.9 link=static")
 set(BOOST_INTERN_CMD_CONFIGURE_LINUX "./bootstrap.sh toolset=gcc link=static")
 set(BOOST_INTERN_CMD_CONFIGURE_WIN32 "bootstrap.bat")
@@ -95,7 +91,6 @@ if(NOT ${USE_SYSTEM_BOOST})
 	# Set up for the boost internal library
 	# ---------------------------------------------------------------------------#
 	if(NOT Boost_FOUND)
-		set(BOOST_FOLDER "boost_1_63_0")
 
 		# Remove the current invalid boost folder
 		# -------------------------------------------------------------------------#
@@ -114,7 +109,7 @@ if(NOT ${USE_SYSTEM_BOOST})
 		# Unpack the boost package
 		# -------------------------------------------------------------------------#
 		message(STATUS "Unpack ${BOOST_PKG_FILE} to ${KIWI_BOOST_INTERN_DIR}")
-		execute_process(COMMAND ${BOOST_INTERN_CMD_UNPACK}${BOOST_PKG_FILE} WORKING_DIRECTORY ${KIWI_DEPENDENCIES_DIR})
+		unpack_file(${BOOST_PKG_FILE} ${KIWI_DEPENDENCIES_DIR})
 		file(RENAME ${KIWI_DEPENDENCIES_DIR}/${BOOST_PKG_NAME} ${KIWI_BOOST_INTERN_DIR})
 
 		# Configure the boost library

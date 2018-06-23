@@ -31,10 +31,6 @@ set(LLVM_INTERN_CMAKE_DIR_APPLE "${KIWI_LLVM_INTERN_DIR}/lib/cmake/llvm")
 set(LLVM_INTERN_CMAKE_DIR_LINUX "${KIWI_LLVM_INTERN_DIR}/lib/cmake/llvm")
 set(LLVM_INTERN_CMAKE_DIR_WIN32 "${KIWI_LLVM_INTERN_DIR}/lib/cmake/llvm")
 
-set(LLVM_INTERN_CMD_UNPACK_APPLE tar xzf ./)
-set(LLVM_INTERN_CMD_UNPACK_LINUX tar xzf ./)
-set(LLVM_INTERN_CMD_UNPACK_WIN32 mv 7z x)
-
 # Local Generic Variables
 # -----------------------------------------------------------------------------#
 if(APPLE)
@@ -42,19 +38,16 @@ if(APPLE)
 	set(LLVM_PKG_NAME ${LLVM_PKG_NAME_APPLE})
 	set(LLVM_PKG_EXT ${LLVM_PKG_EXT_APPLE})
 	set(LLVM_INTERN_CMAKE_DIR ${LLVM_INTERN_CMAKE_DIR_APPLE})
-	set(LLVM_INTERN_CMD_UNPACK ${LLVM_INTERN_CMD_UNPACK_APPLE})
 elseif(UNIX)
 	set(LLVM_URL ${LLVM_URL_LINUX})
 	set(LLVM_PKG_NAME ${LLVM_PKG_NAME_LINUX})
 	set(LLVM_PKG_EXT ${LLVM_PKG_EXT_LINUX})
 	set(LLVM_INTERN_CMAKE_DIR ${LLVM_INTERN_CMAKE_DIR_LINUX})
-	set(LLVM_INTERN_CMD_UNPACK ${LLVM_INTERN_CMD_UNPACK_LINUX})
 elseif(WIN32)
 	set(LLVM_URL ${LLVM_URL_WIN32})
 	set(LLVM_PKG_NAME ${LLVM_PKG_NAME_WIN32})
 	set(LLVM_PKG_EXT ${LLVM_PKG_EXT_WIN32})
 	set(LLVM_INTERN_CMAKE_DIR ${LLVM_INTERN_CMAKE_DIR_WIN32})
-	set(LLVM_INTERN_CMD_UNPACK ${LLVM_INTERN_CMD_UNPACK_WIN32})
 endif()
 
 set(LLVM_PKG_FILE "${LLVM_PKG_NAME}.${LLVM_PKG_EXT}")
@@ -83,7 +76,7 @@ if(NOT ${USE_SYSTEM_LLVM})
 		# Remove the current invalid LLVM folder
 		# -------------------------------------------------------------------------#
 		if(EXISTS ${KIWI_LLVM_INTERN_DIR})
-			message(STATUS "Remove current invalid boost folder ${KIWI_LLVM_INTERN_DIR}")
+			message(STATUS "Remove current invalid llvm folder ${KIWI_LLVM_INTERN_DIR}")
 			file(REMOVE_RECURSE ${KIWI_LLVM_INTERN_DIR})
 		endif()
 
@@ -97,7 +90,7 @@ if(NOT ${USE_SYSTEM_LLVM})
 		# Unpack the LLVM package
 		# -------------------------------------------------------------------------#
 		message(STATUS "Unpack ${LLVM_PKG_FILE} to ${KIWI_LLVM_INTERN_DIR}")
-		execute_process(COMMAND ${LLVM_INTERN_CMD_UNPACK}${LLVM_PKG_FILE} WORKING_DIRECTORY ${KIWI_DEPENDENCIES_DIR})
+		unpack_file(${LLVM_PKG_FILE} ${KIWI_DEPENDENCIES_DIR})
 		file(RENAME ${KIWI_DEPENDENCIES_DIR}/${LLVM_PKG_NAME} ${KIWI_LLVM_INTERN_DIR})
 
 		# Find the LLVM internal library now it is installed
@@ -105,16 +98,18 @@ if(NOT ${USE_SYSTEM_LLVM})
 		set(LLVM_DIR ${LLVM_INTERN_CMAKE_DIR})
 		set(USE_LLVM_CONFIG OFF)
 		find_package(LLVM CONFIG)
-
 	endif(NOT ${LLVM_INTERNAL_VALID})
 
 endif(NOT ${USE_SYSTEM_LLVM})
 
 if(LLVM_FOUND)
+	llvm_map_components_to_libnames(LLVM_ALL_LIBRARIES all)
+	list(REMOVE_ITEM LLVM_ALL_LIBRARIES LTO)
+
 	message(STATUS "LLVM " ${LLVM_PACKAGE_VERSION})
 	message(STATUS "LLVM include directory: " ${LLVM_INCLUDE_DIRS})
 	message(STATUS "LLVM library directory: " ${LLVM_LIBRARY_DIRS})
-	message(STATUS "LLVM libraries:" ${LLVM_LIBRARIES})
+	message(STATUS "LLVM libraries:" True)
 else()
 	message(SEND_ERROR "LLVM not installed")
 endif()

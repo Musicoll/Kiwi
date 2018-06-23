@@ -190,8 +190,6 @@ include(CMake/ConfigFAUST.cmake)
 
 add_definitions(${LLVM_DEFINITIONS})
 include_directories(${LLVM_INCLUDE_DIRS})
-llvm_map_components_to_libnames(llvm_libs all)
-list(REMOVE_ITEM llvm_libs LTO)
 
 set(JSON_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/ThirdParty/json)
 
@@ -267,7 +265,7 @@ target_add_dependency(KiwiEngine KiwiModel)
 target_add_dependency(KiwiEngine KiwiDsp)
 target_add_dependency(KiwiEngine Juce)
 add_dependencies(KiwiEngine staticlib)
-target_link_libraries(KiwiEngine PUBLIC ${llvm_libs})
+target_link_libraries(KiwiEngine PUBLIC ${LLVM_ALL_LIBRARIES})
 target_link_libraries(KiwiEngine PUBLIC staticlib)
 set_target_properties(KiwiEngine PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_ENGINE_SRC}" ${PROJECT_SOURCE_DIR}/Modules/KiwiEngine)
