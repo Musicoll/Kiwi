@@ -25,7 +25,7 @@ set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
 # Ressources
 #--------------------------------------
 
-file(GLOB_RECURSE FAUST_LIB_RESOURCE ${PROJECT_SOURCE_DIR}/ThirdParty/faust/libraries/*.lib)
+file(GLOB_RECURSE FAUST_LIB_RESOURCE ${KIWI_DEPENDENCIES_DIR}/faust/libraries/*.lib)
 set(KIWI_RESSOURCES_DIR ${PROJECT_SOURCE_DIR}/Ressources)
 if (APPLE)
 	set(KIWI_APP_ICON ${KIWI_RESSOURCES_DIR}/Project/XCode/Icon.icns)
@@ -92,13 +92,16 @@ endif()
 #--------------------------------------
 
 include(./Scripts/group.cmake)
-include(./Scripts/dependency.cmake)
+
+if(NOT DEFINED KIWI_DEPENDENCIES_DIR)
+	set(KIWI_DEPENDENCIES_DIR "${PROJECT_SOURCE_DIR}/ThirdParty")
+endif()
 
 #----------------------------------
 # Juce
 #----------------------------------
 
-set(JUCE_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/ThirdParty/Juce/modules)
+set(JUCE_INCLUDE_DIRS ${KIWI_DEPENDENCIES_DIR}/Juce/modules)
 
 if (APPLE)
     find_library(COCOA Cocoa)
@@ -111,7 +114,7 @@ if (APPLE)
     find_library(ACCELERATE Accelerate)
     find_library(DISCRECORDING DiscRecording)
     find_library(AUDIOTOOLBOX AudioToolbox)
-    set(JUCE_DEP ${COCOA} ${IOKIT} ${QUARTZCORE} ${CARBON} ${WEBKIT} ${COREAUDIO} ${COREMIDI} ${ACCELERATE} ${DISCRECORDING} ${AUDIOTOOLBOX})
+    set(JUCE_LINK_LIBRARIES ${COCOA} ${IOKIT} ${QUARTZCORE} ${CARBON} ${WEBKIT} ${COREAUDIO} ${COREMIDI} ${ACCELERATE} ${DISCRECORDING} ${AUDIOTOOLBOX})
 elseif(WIN32)
 	find_library(WS2_32 ws2_32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
 	find_library(UUID uuid PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
@@ -125,7 +128,7 @@ elseif(WIN32)
 	find_library(SHLWAPI shlwapi PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
 	find_library(RPCRT4 rpcrt4 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
 	find_library(WINMM winmm PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
-	set(JUCE_DEP ${WS2_32} ${UUID} ${WSOCK32} ${WININET} ${LIBVERSION} ${OLE32} ${OLEAUT32} ${COMDLG32} ${SHLWAPI} ${RPCRT4} ${WINMM})
+	set(JUCE_LINK_LIBRARIES ${WS2_32} ${UUID} ${WSOCK32} ${WININET} ${LIBVERSION} ${OLE32} ${OLEAUT32} ${COMDLG32} ${SHLWAPI} ${RPCRT4} ${WINMM})
 elseif(UNIX)
     find_library(RT rt)
     find_library(DL dl)
@@ -138,31 +141,31 @@ elseif(UNIX)
     pkg_check_modules(GTK3_X11 REQUIRED gtk+-x11-3.0)
     pkg_check_modules(WEBKIT_TO_GTK4 REQUIRED webkit2gtk-4.0)
     set(JUCE_INCLUDE_DIRS ${JUCE_INCLUDE_DIRS} /usr/include/freetype2 ${GTK3_X11_INCLUDE_DIRS} ${WEBKIT_TO_GTK4_INCLUDE_DIRS})
-    set(JUCE_DEP ${RT} ${DL} ${PTHREAD} ${FREETYPE} ${X11} ${XEXT} ${ASOUND} ${GTK3_X11_LIBRARIES} ${WEBKIT_TO_GTK4_LIBRARIES})
+    set(JUCE_LINK_LIBRARIES ${RT} ${DL} ${PTHREAD} ${FREETYPE} ${X11} ${XEXT} ${ASOUND} ${GTK3_X11_LIBRARIES} ${WEBKIT_TO_GTK4_LIBRARIES})
 endif()
 
-set(JUCE_MACRO_DEFINITIONS JUCE_STANDALONE_APPLICATION=1
+set(JUCE_COMPILE_DEFINITIONS JUCE_STANDALONE_APPLICATION=1
                            JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1
                            JUCE_DISPLAY_SPLASH_SCREEN=0
                            JUCE_REPORT_APP_USAGE=0)
 
-file (GLOB_RECURSE JUCE_SRC ${PROJECT_SOURCE_DIR}/ThirdParty/Juce/modules/*.[h|c]pp
-                            ${PROJECT_SOURCE_DIR}/ThirdParty/Juce/modules/*.h
-                            ${PROJECT_SOURCE_DIR}/ThirdParty/Juce/modules/*.mm)
+file (GLOB_RECURSE JUCE_SRC ${KIWI_DEPENDENCIES_DIR}/Juce/modules/*.[h|c]pp
+                            ${KIWI_DEPENDENCIES_DIR}/Juce/modules/*.h
+                            ${KIWI_DEPENDENCIES_DIR}/Juce/modules/*.mm)
 
 set_source_files_properties(${JUCE_SRC} PROPERTIES HEADER_FILE_ONLY TRUE)
 
-set(JUCE_COMPILED_SRC ${PROJECT_SOURCE_DIR}/ThirdParty/Juce/modules/juce_core/juce_core.cpp
-                      ${PROJECT_SOURCE_DIR}/ThirdParty/Juce/modules/juce_data_structures/juce_data_structures.cpp
-                      ${PROJECT_SOURCE_DIR}/ThirdParty/Juce/modules/juce_events/juce_events.cpp
-                      ${PROJECT_SOURCE_DIR}/ThirdParty/Juce/modules/juce_graphics/juce_graphics.cpp
-                      ${PROJECT_SOURCE_DIR}/ThirdParty/Juce/modules/juce_gui_basics/juce_gui_basics.cpp
-                      ${PROJECT_SOURCE_DIR}/ThirdParty/Juce/modules/juce_gui_extra/juce_gui_extra.cpp
-                      ${PROJECT_SOURCE_DIR}/ThirdParty/Juce/modules/juce_audio_basics/juce_audio_basics.cpp
-                      ${PROJECT_SOURCE_DIR}/ThirdParty/Juce/modules/juce_audio_devices/juce_audio_devices.cpp
-                      ${PROJECT_SOURCE_DIR}/ThirdParty/Juce/modules/juce_audio_formats/juce_audio_formats.cpp
-                      ${PROJECT_SOURCE_DIR}/ThirdParty/Juce/modules/juce_audio_utils/juce_audio_utils.cpp
-                      ${PROJECT_SOURCE_DIR}/ThirdParty/Juce/modules/juce_audio_processors/juce_audio_processors.cpp)
+set(JUCE_COMPILED_SRC ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_core/juce_core.cpp
+                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_data_structures/juce_data_structures.cpp
+                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_events/juce_events.cpp
+                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_graphics/juce_graphics.cpp
+                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_gui_basics/juce_gui_basics.cpp
+                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_gui_extra/juce_gui_extra.cpp
+                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_audio_basics/juce_audio_basics.cpp
+                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_audio_devices/juce_audio_devices.cpp
+                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_audio_formats/juce_audio_formats.cpp
+                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_audio_utils/juce_audio_utils.cpp
+                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_audio_processors/juce_audio_processors.cpp)
 
 if (APPLE)
     set_source_files_properties(${JUCE_COMPILED_SRC} PROPERTIES COMPILE_FLAGS "-x objective-c++"
@@ -173,16 +176,17 @@ endif()
 
 
 add_library(Juce STATIC ${JUCE_SRC})
-target_link_libraries(Juce ${JUCE_DEP})
-target_compile_definitions(Juce PUBLIC ${JUCE_MACRO_DEFINITIONS})
+target_link_libraries(Juce ${JUCE_LINK_LIBRARIES})
+target_compile_definitions(Juce PUBLIC ${JUCE_COMPILE_DEFINITIONS})
 target_include_directories(Juce PUBLIC ${JUCE_INCLUDE_DIRS})
 set_target_properties(Juce PROPERTIES FOLDER ThirdParty)
-source_group_rec("${JUCE_SRC}" ${PROJECT_SOURCE_DIR}/ThirdParty/Juce/modules)
+source_group_rec("${JUCE_SRC}" ${KIWI_DEPENDENCIES_DIR}/Juce/modules)
 
 
 # Dependencies
 #-------------------------------------------------------------------------------
 message(STATUS "")
+
 include(CMake/ConfigFlip.cmake)
 include(CMake/ConfigBoost.cmake)
 include(CMake/ConfigLLVM.cmake)
@@ -191,116 +195,141 @@ include(CMake/ConfigFAUST.cmake)
 add_definitions(${LLVM_DEFINITIONS})
 include_directories(${LLVM_INCLUDE_DIRS})
 
-set(JSON_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/ThirdParty/json)
+set(BEAST_INCLUDE_DIRS ${KIWI_DEPENDENCIES_DIR}/Beast/include)
+set(JSON_INCLUDE_DIRS ${KIWI_DEPENDENCIES_DIR}/json)
+set(CONCURRENTQUEUE_INCLUDE_DIRS ${KIWI_DEPENDENCIES_DIR}/concurrentqueue)
 
-#----------------------------------
 # KiwiTool
-#----------------------------------
+# -----------------------------------------------------------------------------#
+message(STATUS "Configuring Kiwi")
+set(KIWI_MODULE_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/Modules)
 
-file(GLOB_RECURSE KIWI_TOOL_SRC ${PROJECT_SOURCE_DIR}/Modules/KiwiTool/*.[c|h]pp
-                                ${PROJECT_SOURCE_DIR}/Modules/KiwiTool/*.h)
-add_library(KiwiTool STATIC ${KIWI_TOOL_SRC})
-target_include_directories(KiwiTool PUBLIC ${PROJECT_SOURCE_DIR}/Modules ${PROJECT_SOURCE_DIR}/ThirdParty/concurrentqueue)
+# KiwiTool
+# -----------------------------------------------------------------------------#
+set(KIWI_TOOL_INCLUDE_DIRS ${KIWI_MODULE_INCLUDE_DIRS} ${CONCURRENTQUEUE_INCLUDE_DIRS})
+set(KIWI_TOOL_COMPILE_DEFINITIONS "")
+set(KIWI_TOOL_LINK_LIBRARIES "")
+
+file(GLOB_RECURSE KIWI_TOOL_SOURCES ${KIWI_MODULE_INCLUDE_DIRS}/KiwiTool/*.[c|h]pp ${KIWI_MODULE_INCLUDE_DIRS}/KiwiTool/*.h)
+add_library(KiwiTool STATIC ${KIWI_TOOL_SOURCES})
+target_include_directories(KiwiTool PUBLIC ${KIWI_TOOL_INCLUDE_DIRS})
+
 set_target_properties(KiwiTool PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_TOOL_SRC}" ${PROJECT_SOURCE_DIR}/Modules/KiwiTool)
 
-#----------------------------------
-# Model
-#----------------------------------
+# KiwiModel
+#------------------------------------------------------------------------------#
+set(KIWI_MODEL_DEPENDENCIES KiwiTool)
+set(KIWI_MODEL_INCLUDE_DIRS ${KIWI_MODULE_INCLUDE_DIRS} ${KIWI_TOOL_INCLUDE_DIRS} ${FLIP_INCLUDE_DIRS})
+set(KIWI_MODEL_COMPILE_DEFINITIONS ${KIWI_TOOL_COMPILE_DEFINITIONS} ${FLIP_COMPILE_DEFINITIONS})
+set(KIWI_MODEL_LINK_LIBRARIES ${KIWI_TOOL_LINK_LIBRARIES} KiwiTool ${FLIP_LIBRARIES})
 
-file(GLOB_RECURSE KIWI_MODEL_SRC ${PROJECT_SOURCE_DIR}/Modules/KiwiModel/*.[c|h]pp
-                                 ${PROJECT_SOURCE_DIR}/Modules/KiwiModel/*.h)
-add_library(KiwiModel STATIC ${KIWI_MODEL_SRC})
-target_add_dependency(KiwiModel KiwiTool)
-target_include_directories(KiwiModel PUBLIC ${PROJECT_SOURCE_DIR}/Modules ${FLIP_INCLUDE_DIRS})
-target_link_libraries(KiwiModel PUBLIC ${FLIP_LIBRARIES})
-target_compile_definitions(KiwiModel PUBLIC ${FLIP_COMPILE_DEFINITIONS})
+file(GLOB_RECURSE KIWI_MODEL_SOURCES ${KIWI_MODULE_INCLUDE_DIRS}/KiwiModel/*.[c|h]pp ${KIWI_MODULE_INCLUDE_DIRS}/KiwiModel/*.h)
+add_library(KiwiModel STATIC ${KIWI_MODEL_SOURCES})
+add_dependencies(KiwiModel ${KIWI_MODEL_DEPENDENCIES})
+target_include_directories(KiwiModel PUBLIC ${KIWI_MODEL_INCLUDE_DIRS})
+target_compile_definitions(KiwiModel PUBLIC ${KIWI_MODEL_COMPILE_DEFINITIONS})
+target_link_libraries(KiwiModel PUBLIC ${KIWI_MODEL_LINK_LIBRARIES})
+
 set_target_properties(KiwiModel PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_MODEL_SRC}" ${PROJECT_SOURCE_DIR}/Modules/KiwiModel)
 
-#----------------------------------
-# Dsp
-#----------------------------------
+# KiwiDsp
+#------------------------------------------------------------------------------#
+set(KIWI_DSP_DEPENDENCIES)
+set(KIWI_DSP_INCLUDE_DIRS ${KIWI_MODULE_INCLUDE_DIRS})
+set(KIWI_DSP_COMPILE_DEFINITIONS "-DKIWI_DSP_FLOAT=1")
+set(KIWI_DSP_LINK_LIBRARIES "")
 
-file(GLOB_RECURSE KIWI_DSP_SRC ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp/*.[c|h]pp
-                               ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp/*.h)
-add_library(KiwiDsp STATIC ${KIWI_DSP_SRC})
-target_compile_definitions(KiwiDsp PUBLIC -DKIWI_DSP_FLOAT=1)
-target_include_directories(KiwiDsp PUBLIC ${PROJECT_SOURCE_DIR}/Modules)
+file(GLOB_RECURSE KIWI_DSP_SOURCES ${KIWI_MODULE_INCLUDE_DIRS}/KiwiDsp/*.[c|h]pp ${KIWI_MODULE_INCLUDE_DIRS}/KiwiDsp/*.h)
+add_library(KiwiDsp STATIC ${KIWI_DSP_SOURCES})
+target_include_directories(KiwiDsp PUBLIC ${KIWI_DSP_INCLUDE_DIRS})
+target_compile_definitions(KiwiDsp PUBLIC ${KIWI_DSP_COMPILE_DEFINITIONS})
+target_link_libraries(KiwiDsp PUBLIC ${KIWI_DSP_LINK_LIBRARIES})
+
 set_target_properties(KiwiDsp PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_DSP_SRC}" ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp)
 
-#----------------------------------
-# Network
-#----------------------------------
+# KiwiNetwork
+#------------------------------------------------------------------------------#
+set(KIWI_NETWORK_DEPENDENCIES)
+set(KIWI_NETWORK_INCLUDE_DIRS ${KIWI_MODULE_INCLUDE_DIRS} ${BEAST_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+set(KIWI_NETWORK_COMPILE_DEFINITIONS "-DBOOST_ALL_NO_LIB=1")
 
-file(GLOB_RECURSE KIWI_NETWORK_SRC ${PROJECT_SOURCE_DIR}/Modules/KiwiNetwork/*.[c|h]pp
-                                   ${PROJECT_SOURCE_DIR}/Modules/KiwiNetwork/*.h)
-add_library(KiwiNetwork STATIC ${KIWI_NETWORK_SRC})
-target_include_directories(KiwiNetwork PUBLIC ${PROJECT_SOURCE_DIR}/Modules
-                                              ${PROJECT_SOURCE_DIR}/ThirdParty/Beast/include
-                                              ${Boost_INCLUDE_DIRS})
-target_compile_definitions(KiwiNetwork PUBLIC "-DBOOST_ALL_NO_LIB=1")
-#add_dependencies(KiwiNetwork Boost)
-set(NETWORK_DEP ${Boost_LIBRARIES})
-if (WIN32)
-    set(NETWORK_DEP ${NETWORK_DEP} ${WS2_32})
-elseif(UNIX AND NOT APPLE)
-    set(NETWORK_DEP ${NETWORK_DEP} ${PTHREAD})
+if(APPLE)
+	set(KIWI_NETWORK_LINK_LIBRARIES ${Boost_LIBRARIES})
+elseif(UNIX)
+  set(KIWI_NETWORK_LINK_LIBRARIES ${Boost_LIBRARIES} ${PTHREAD})
+elseif(WIN32)
+	set(KIWI_NETWORK_LINK_LIBRARIES ${Boost_LIBRARIES} ${WS2_32})
 endif()
-target_link_libraries(KiwiNetwork PUBLIC ${NETWORK_DEP})
+
+file(GLOB_RECURSE KIWI_NETWORK_SOURCES ${KIWI_MODULE_INCLUDE_DIRS}/KiwiNetwork/*.[c|h]pp ${KIWI_MODULE_INCLUDE_DIRS}/KiwiNetwork/*.h)
+add_library(KiwiNetwork STATIC ${KIWI_NETWORK_SOURCES})
+target_include_directories(KiwiNetwork PUBLIC ${KIWI_NETWORK_INCLUDE_DIRS})
+target_compile_definitions(KiwiNetwork PUBLIC ${KIWI_NETWORK_COMPILE_DEFINITIONS})
+target_link_libraries(KiwiNetwork PUBLIC ${KIWI_NETWORK_LINK_LIBRARIES})
+
 set_target_properties(KiwiNetwork PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_NETWORK_SRC}" ${PROJECT_SOURCE_DIR}/Modules/KiwiNetwork)
 
+# Kiwi Engine
+#------------------------------------------------------------------------------#
+set(KIWI_ENGINE_DEPENDENCIES KiwiModel KiwiDsp Juce staticlib)
+set(KIWI_ENGINE_INCLUDE_DIRS ${KIWI_MODULE_INCLUDE_DIRS} ${KIWI_MODEL_INCLUDE_DIRS} ${KIWI_DSP_INCLUDE_DIRS} ${JUCE_INCLUDE_DIRS} ${LLVM_INCLUDE_DIRS})
+set(KIWI_ENGINE_COMPILE_DEFINITIONS ${KIWI_MODEL_COMPILE_DEFINITIONS} ${KIWI_DSP_COMPILE_DEFINITIONS} ${JUCE_COMPILE_DEFINITIONS})
+set(KIWI_ENGINE_LINK_LIBRARIES ${KIWI_MODEL_LINK_LIBRARIES} KiwiModel KiwiDsp ${JUCE_LINK_LIBRARIES} Juce staticlib)
 
-#----------------------------------
-# Engine
-#----------------------------------
 
-file(GLOB_RECURSE KIWI_ENGINE_SRC ${PROJECT_SOURCE_DIR}/Modules/KiwiEngine/*.[c|h]pp
-                                  ${PROJECT_SOURCE_DIR}/Modules/KiwiEngine/*.h)
-add_library(KiwiEngine STATIC ${KIWI_ENGINE_SRC})
-target_include_directories(KiwiEngine PUBLIC ${PROJECT_SOURCE_DIR}/Modules)
-target_add_dependency(KiwiEngine KiwiModel)
-target_add_dependency(KiwiEngine KiwiDsp)
-target_add_dependency(KiwiEngine Juce)
-add_dependencies(KiwiEngine staticlib)
-target_link_libraries(KiwiEngine PUBLIC ${LLVM_ALL_LIBRARIES})
-target_link_libraries(KiwiEngine PUBLIC staticlib)
+file(GLOB_RECURSE KIWI_ENGINE_SOURCES ${KIWI_MODULE_INCLUDE_DIRS}/KiwiEngine/*.[c|h]pp ${KIWI_MODULE_INCLUDE_DIRS}/KiwiEngine/*.h)
+add_library(KiwiEngine STATIC ${KIWI_ENGINE_SOURCES})
+add_dependencies(KiwiEngine ${KIWI_ENGINE_DEPENDENCIES})
+target_include_directories(KiwiEngine PUBLIC ${KIWI_ENGINE_INCLUDE_DIRS})
+target_compile_definitions(KiwiEngine PUBLIC ${KIWI_ENGINE_COMPILE_DEFINITIONS})
+target_link_libraries(KiwiEngine PUBLIC ${KIWI_ENGINE_LINK_LIBRARIES})
+
 set_target_properties(KiwiEngine PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_ENGINE_SRC}" ${PROJECT_SOURCE_DIR}/Modules/KiwiEngine)
 
 #----------------------------------
 # Server
 #----------------------------------
+set(KIWI_SERVER_DEPENDENCIES KiwiModel Juce)
+set(KIWI_SERVER_INCLUDE_DIRS ${KIWI_MODULE_INCLUDE_DIRS} ${KIWI_MODEL_INCLUDE_DIRS} ${JUCE_INCLUDE_DIRS} ${JSON_INCLUDE_DIRS} )
+set(KIWI_SERVER_COMPILE_DEFINITIONS ${KIWI_MODEL_COMPILE_DEFINITIONS} ${KIWI_MODEL_COMPILE_DEFINITIONS} ${JUCE_COMPILE_DEFINITIONS})
+set(KIWI_SERVER_LINK_LIBRARIES ${KIWI_MODEL_LINK_LIBRARIES} KiwiModel ${JUCE_LINK_LIBRARIES} Juce)
 
-file(GLOB_RECURSE KIWI_SERVER_SRC ${PROJECT_SOURCE_DIR}/Modules/KiwiServer/*.[c|h]pp
-                                  ${PROJECT_SOURCE_DIR}/Modules/KiwiServer/*.h)
-add_library(KiwiServer ${KIWI_SERVER_SRC})
-target_include_directories(KiwiServer PUBLIC ${JSON_INCLUDE_DIRS})
-target_add_dependency(KiwiServer KiwiModel)
-target_add_dependency(KiwiServer Juce)
+file(GLOB_RECURSE KIWI_SERVER_SOURCES ${KIWI_MODULE_INCLUDE_DIRS}/KiwiServer/*.[c|h]pp ${KIWI_MODULE_INCLUDE_DIRS}/KiwiServer/*.h)
+add_library(KiwiServer ${KIWI_SERVER_SOURCES})
+add_dependencies(KiwiServer ${KIWI_SERVER_DEPENDENCIES})
+target_include_directories(KiwiServer PUBLIC ${KIWI_SERVER_INCLUDE_DIRS})
+target_compile_definitions(KiwiServer PUBLIC ${KIWI_SERVER_COMPILE_DEFINITIONS})
+target_link_libraries(KiwiServer PUBLIC ${KIWI_SERVER_LINK_LIBRARIES})
+
 set_target_properties(KiwiServer PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_SERVER_SRC}" ${PROJECT_SOURCE_DIR}/Modules/KiwiServer)
 
-file(GLOB_RECURSE SERVER_SRC ${PROJECT_SOURCE_DIR}/Server/Source/*.[c|h]pp
-                             ${PROJECT_SOURCE_DIR}/Server/Source/*.h)
-add_executable(Server ${SERVER_SRC})
-target_add_dependency(Server KiwiServer)
-source_group_rec("${SERVER_SRC}" ${PROJECT_SOURCE_DIR}/Server/Source)
+# Kiwi Server application
+#------------------------------------------------------------------------------#
+file(GLOB_RECURSE KIWI_SERVER_APP_SOURCES ${PROJECT_SOURCE_DIR}/Server/Source/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Server/Source/*.h)
+add_executable(Server ${KIWI_SERVER_SOURCES} ${KIWI_SERVER_APP_SOURCES})
+add_dependencies(Server KiwiServer)
+target_compile_definitions(Server PUBLIC ${KIWI_SERVER_COMPILE_DEFINITIONS})
+target_link_libraries(Server PUBLIC KiwiServer)
 
-#----------------------------------
-# Client
-#----------------------------------
+# Kiwi Client application
+#------------------------------------------------------------------------------#
+set(KIWI_CLIENT_DEPENDENCIES KiwiNetwork KiwiEngine)
+set(KIWI_CLIENT_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/Client/Source ${KIWI_MODULE_INCLUDE_DIRS} ${KIWI_NETWORK_INCLUDE_DIRS} ${KIWI_ENGINE_INCLUDE_DIRS} ${JSON_INCLUDE_DIRS} )
+set(KIWI_CLIENT_COMPILE_DEFINITIONS ${KIWI_ENGINE_COMPILE_DEFINITIONS} ${KIWI_ENGINE_COMPILE_DEFINITIONS} ${KIWI_NETWORK_COMPILE_DEFINITIONS})
+set(KIWI_CLIENT_LINK_LIBRARIES KiwiEngine KiwiNetwork)
 
-file(GLOB_RECURSE KIWI_CLIENT_SRC ${PROJECT_SOURCE_DIR}/Client/Source/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Client/Source/*.h)
-add_executable(Kiwi ${KIWI_CLIENT_SRC} "${KIWI_CLIENT_RESSOURCES}")
-target_add_dependency(Kiwi KiwiNetwork)
-target_add_dependency(Kiwi KiwiEngine)
-target_add_dependency(Kiwi KiwiModel)
-target_add_dependency(Kiwi KiwiDsp)
-target_add_dependency(Kiwi Juce)
-target_include_directories(Kiwi PUBLIC ${JSON_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/Client/Source)
+file(GLOB_RECURSE KIWI_CLIENT_SOURCES ${PROJECT_SOURCE_DIR}/Client/Source/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Client/Source/*.h)
+add_executable(Kiwi ${KIWI_CLIENT_SOURCES} "${KIWI_CLIENT_RESSOURCES}")
+add_dependencies(Kiwi ${KIWI_CLIENT_DEPENDENCIES})
+target_include_directories(Kiwi PUBLIC ${KIWI_CLIENT_INCLUDE_DIRS})
+target_compile_definitions(Kiwi PUBLIC ${KIWI_CLIENT_COMPILE_DEFINITIONS})
+target_link_libraries(Kiwi PUBLIC ${KIWI_CLIENT_LINK_LIBRARIES})
 
 
 if (APPLE)
@@ -320,59 +349,58 @@ endif()
 
 source_group_rec("${KIWI_CLIENT_SRC}" ${PROJECT_SOURCE_DIR}/Client/Source)
 
-#----------------------------------
+
 # Tests
-#----------------------------------
+#------------------------------------------------------------------------------#
 
 # Test Tool
-
-file(GLOB TEST_TOOL_SRC ${PROJECT_SOURCE_DIR}/Test/Tool/*.[c|h]pp
-                        ${PROJECT_SOURCE_DIR}/Test/Tool/*.h)
+#------------------------------------------------------------------------------#
+file(GLOB TEST_TOOL_SRC ${PROJECT_SOURCE_DIR}/Test/Tool/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Test/Tool/*.h)
 add_executable(test_tool ${TEST_TOOL_SRC})
-target_add_dependency(test_tool KiwiTool)
+add_dependencies(test_tool KiwiTool)
 set_target_properties(test_tool PROPERTIES FOLDER Test)
-if (UNIX AND NOT APPLE)
-  target_link_libraries(test_tool PUBLIC ${PTHREAD})
-endif()
+target_include_directories(test_tool PUBLIC ${KIWI_TOOL_INCLUDE_DIRS})
+target_link_libraries(test_tool KiwiTool)
 source_group_rec("${TEST_TOOL_SRC}" ${PROJECT_SOURCE_DIR}/Test/Tool)
 
 # Test Dsp
-
-file(GLOB TEST_DSP_SRC ${PROJECT_SOURCE_DIR}/Test/Dsp/*.[c|h]pp
-                       ${PROJECT_SOURCE_DIR}/Test/Dsp/*.h)
+#------------------------------------------------------------------------------#
+file(GLOB TEST_DSP_SRC ${PROJECT_SOURCE_DIR}/Test/Dsp/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Test/Dsp/*.h)
 add_executable(test_dsp ${TEST_DSP_SRC})
-target_add_dependency(test_dsp KiwiDsp)
+add_dependencies(test_dsp KiwiDsp)
 set_target_properties(test_dsp PROPERTIES FOLDER Test)
+target_include_directories(test_dsp PUBLIC ${KIWI_DSP_INCLUDE_DIRS})
+target_link_libraries(test_dsp KiwiDsp)
 source_group_rec("${TEST_DSP_SRC}" ${PROJECT_SOURCE_DIR}/Test/Dsp)
 
 # Test Model
-
-file(GLOB TEST_MODEL_SRC ${PROJECT_SOURCE_DIR}/Test/Model/*.[c|h]pp
-                         ${PROJECT_SOURCE_DIR}/Test/Model/*.h)
+#------------------------------------------------------------------------------#
+file(GLOB TEST_MODEL_SRC ${PROJECT_SOURCE_DIR}/Test/Model/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Test/Model/*.h)
 add_executable(test_model ${TEST_MODEL_SRC})
-target_add_dependency(test_model KiwiModel)
+add_dependencies(test_model KiwiModel)
 set_target_properties(test_model PROPERTIES FOLDER Test)
+target_include_directories(test_model PUBLIC ${KIWI_MODEL_INCLUDE_DIRS})
+target_link_libraries(test_model KiwiModel)
 source_group_rec("${TEST_MODEL_SRC}" ${PROJECT_SOURCE_DIR}/Test/Model)
 
 # Test Network
-
-file(GLOB TEST_NETWORK_SRC ${PROJECT_SOURCE_DIR}/Test/Network/*.[c|h]pp
-                           ${PROJECT_SOURCE_DIR}/Test/Network/*.h)
+#------------------------------------------------------------------------------#
+file(GLOB TEST_NETWORK_SRC ${PROJECT_SOURCE_DIR}/Test/Network/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Test/Network/*.h)
 add_executable(test_network ${TEST_NETWORK_SRC})
-target_add_dependency(test_network KiwiNetwork)
+add_dependencies(test_network KiwiNetwork)
 set_target_properties(test_network PROPERTIES FOLDER Test)
+target_include_directories(test_network PUBLIC ${KIWI_NETWORK_INCLUDE_DIRS})
+target_link_libraries(test_network KiwiNetwork)
 source_group_rec("${TEST_NETWORK_SRC}" ${PROJECT_SOURCE_DIR}/Test/Network)
 
 # Test Server
-
-file(GLOB TEST_SERVER_SRC ${PROJECT_SOURCE_DIR}/Test/Server/*.[c|h]pp
-                          ${PROJECT_SOURCE_DIR}/Test/Server/*.h)
+#------------------------------------------------------------------------------#
+file(GLOB TEST_SERVER_SRC ${PROJECT_SOURCE_DIR}/Test/Server/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Test/Server/*.h)
 add_executable(test_server ${TEST_SERVER_SRC})
-target_add_dependency(test_server KiwiServer)
+add_dependencies(test_server KiwiServer)
 set_target_properties(test_server PROPERTIES FOLDER Test)
-if (UNIX AND NOT APPLE)
-  target_link_libraries(test_server PUBLIC ${PTHREAD})
-endif()
+target_include_directories(test_network PUBLIC ${KIWI_SERVER_INCLUDE_DIRS})
+target_link_libraries(test_server PUBLIC KiwiServer)
 source_group_rec("${TEST_SERVER_SRC}" ${PROJECT_SOURCE_DIR}/Test/Server)
 
 # Coverage setting
@@ -382,7 +410,6 @@ if(${GCOV_SUPPORT} STREQUAL "On")
   set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
   target_link_libraries(test_dsp PUBLIC gcov)
   target_link_libraries(test_model PUBLIC gcov)
-  #target_link_libraries(test_engine PUBLIC gcov)
   target_link_libraries(test_server PUBLIC gcov)
   target_link_libraries(test_network PUBLIC gcov)
   target_link_libraries(test_tool PUBLIC gcov)
