@@ -90,7 +90,13 @@ if(NOT ${USE_SYSTEM_LLVM})
 		# Unpack the LLVM package
 		# -------------------------------------------------------------------------#
 		message(STATUS "Unpack ${LLVM_PKG_FILE} to ${KIWI_LLVM_INTERN_DIR}")
-		unpack_file(${LLVM_PKG_FILE} ${KIWI_DEPENDENCIES_DIR})
+		if(APPLE)
+	    execute_process(COMMAND tar xzf ./${LLVM_PKG_FILE}  WORKING_DIRECTORY ${KIWI_DEPENDENCIES_DIR})
+	  elseif(UNIX)
+	    execute_process(COMMAND tar xzf ./${LLVM_PKG_FILE}  WORKING_DIRECTORY ${KIWI_DEPENDENCIES_DIR})
+	  elseif(WIN32)
+	    execute_process(COMMAND 7z x ${LLVM_PKG_FILE}  WORKING_DIRECTORY ${KIWI_DEPENDENCIES_DIR})
+	  endif()
 		file(RENAME ${KIWI_DEPENDENCIES_DIR}/${LLVM_PKG_NAME} ${KIWI_LLVM_INTERN_DIR})
 
 		# Find the LLVM internal library now it is installed

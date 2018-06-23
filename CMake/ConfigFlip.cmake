@@ -1,6 +1,4 @@
 
-include(CMake/unpack.cmake)
-
 message(STATUS "Flip - searching the Flip static library ")
 option(USE_SYSTEM_FLIP  "Use the pre-compiled Flip library of your system" OFF)
 # -----------------------------------------------------------------------------#
@@ -106,7 +104,13 @@ if(NOT ${USE_SYSTEM_FLIP})
 		# Unpack the FLIP package
 		# -------------------------------------------------------------------------#
 		message(STATUS "Unpack ${FLIP_PKG_FILE} to ${KIWI_FLIP_INTERN_DIR}")
-		unpack_file(${FLIP_PKG_FILE} ${KIWI_DEPENDENCIES_DIR})
+		if(APPLE)
+	    execute_process(COMMAND tar xzf ./${FLIP_PKG_FILE}  WORKING_DIRECTORY ${KIWI_DEPENDENCIES_DIR})
+	  elseif(UNIX)
+	    execute_process(COMMAND tar xzf ./${FLIP_PKG_FILE}  WORKING_DIRECTORY ${KIWI_DEPENDENCIES_DIR})
+	  elseif(WIN32)
+	    execute_process(COMMAND 7z x ${FLIP_PKG_FILE}  WORKING_DIRECTORY ${KIWI_DEPENDENCIES_DIR})
+	  endif()
 		file(RENAME ${KIWI_DEPENDENCIES_DIR}/${FLIP_PKG_FOLDER_NAME} ${KIWI_FLIP_INTERN_DIR})
 
 		# Find the Flip internal library now it is installed

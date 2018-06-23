@@ -91,7 +91,13 @@ if(NOT ${USE_SYSTEM_BOOST})
 		# Unpack the boost package
 		# -------------------------------------------------------------------------#
 		message(STATUS "Unpack ${BOOST_PKG_FILE} to ${KIWI_BOOST_INTERN_DIR}")
-		unpack_file(${BOOST_PKG_FILE} ${KIWI_DEPENDENCIES_DIR})
+		if(APPLE)
+	    execute_process(COMMAND tar xzf ./${BOOST_PKG_FILE}  WORKING_DIRECTORY ${KIWI_DEPENDENCIES_DIR})
+	  elseif(UNIX)
+	    execute_process(COMMAND tar xzf ./${BOOST_PKG_FILE}  WORKING_DIRECTORY ${KIWI_DEPENDENCIES_DIR})
+	  elseif(WIN32)
+	    execute_process(COMMAND 7z x ${BOOST_PKG_FILE}  WORKING_DIRECTORY ${KIWI_DEPENDENCIES_DIR})
+	  endif()
 		file(RENAME ${KIWI_DEPENDENCIES_DIR}/${BOOST_PKG_NAME} ${KIWI_BOOST_INTERN_DIR})
 
 		# Configure the boost library
