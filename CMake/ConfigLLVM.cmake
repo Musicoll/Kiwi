@@ -15,15 +15,15 @@ set(KIWI_LLVM_INTERN_DIR "${KIWI_DEPENDENCIES_DIR}/llvm")
 
 # Local OS Specific Variables
 # -----------------------------------------------------------------------------#
-set(LLVM_URL_APPLE "http://releases.llvm.org/5.0.0")
+set(LLVM_URL_APPLE "https://github.com/pierreguillot/llvm-win/releases/download/v6.0.0")
 set(LLVM_URL_LINUX "http://releases.llvm.org/5.0.0")
 set(LLVM_URL_WIN32 "https://github.com/pierreguillot/llvm-win/releases/download/v6.0.0")
 
-set(LLVM_PKG_NAME_APPLE "clang+llvm-5.0.0-x86_64-apple-darwin")
+set(LLVM_PKG_NAME_APPLE "llvm-macos-x64")
 set(LLVM_PKG_NAME_LINUX "clang+llvm-5.0.0-linux-x86_64-ubuntu14.04")
 set(LLVM_PKG_NAME_WIN32 "llvm-windows-x64-md")
 
-set(LLVM_PKG_EXT_APPLE "tar.xz")
+set(LLVM_PKG_EXT_APPLE "zip")
 set(LLVM_PKG_EXT_LINUX "tar.xz")
 set(LLVM_PKG_EXT_WIN32 "zip")
 
