@@ -145,7 +145,7 @@ endif(NOT ${USE_SYSTEM_BOOST})
 
 if(Boost_FOUND)
 	message(STATUS "Boost include directory: " ${Boost_INCLUDE_DIRS})
-	message(STATUS "Boost library directory: " ${Boost_LIBRARY_DIRs})
+	message(STATUS "Boost library directory: " ${Boost_LIBRARY_DIRS})
 	message(STATUS "Boost libraries:" ${Boost_LIBRARIES})
 else()
 	message(SEND_ERROR "Boost not installed")
