@@ -24,17 +24,27 @@ Kiwi is part of the French ANR-funded [MUSICOLL](http://musicoll.mshparisnord.or
 
 ### Compilation
 
+The compilation of Kiwi uses [CMake](https://cmake.org/). Most of the dependencies are included as git submodules, the other will be installed during automatically during the CMake configuration phase. Thus, the compilation requires the default git and CMake steps such as:
+
 ```
 git clone https://github.com/Musicoll/Kiwi.git
 cd Kiwi
 git submodule update --init --recursive
-cd Kiwi
 mkdir Build && cd Build
 cmake ..
 cmake --build .
 ```
 
-Using the system/personal dependencies
+This default approach downloads and compiles all the required dependencies [Flip](http://developer.irisate.com/), [Boost](https://www.boost.org/) and [LLVM](http://llvm.org) but the CMake offers to use personal or the default systems libraries.
+
+- Flip  
+Enables or disable the personal/system library for Flip with the option `USE_SYSTEM_FLIP ON/OFF (default OFF)`. Flip must be compiled as a static library compatible with the commit **c47e41da05**.  Use the variable `FLIP_INCLUDE_DIRS PATHS` to define the Flip include directories and the variable `FLIP_LIBRARY_DIRS PATHS` to define the Flip library directories.
+
+- Boost  
+Enables or disable the personal/system library for Boost with the option `USE_SYSTEM_BOOST ON/OFF (default OFF)`. Boost must be compiled as a static library with the system component and compatible with the version **1.63.0**. See this [documentation](https://cmake.org/cmake/help/v3.0/module/FindBoost.html) for more options.
+
+- LLVM  
+Enables or disable the personal/system library for LLVM with the option `USE_SYSTEM_LLVM ON/OFF (default OFF)`. LLVM must be compiled as a static library (with the dynamic runtime on Windows) and compatible with the version **5.0.0**. See this [documentation](https://llvm.org/docs/CMake.html) for more options.
 
 ### Organizations
 
@@ -54,6 +64,7 @@ Using the system/personal dependencies
 
 - [Flip](http://developer.irisate.com/)
 - [Juce](https://github.com/WeAreROLI/JUCE)
+- [boost](https://www.boost.org/)
 - [Beast](https://github.com/boostorg/Beast/)
 - [concurrentqueue](https://github.com/cameron314/concurrentqueue)
 - [json](https://github.com/nlohmann/json)

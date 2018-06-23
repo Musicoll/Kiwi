@@ -72,7 +72,7 @@ if(NOT DEFINED FLIP_INCLUDE_DIRS)
 	set(FLIP_INCLUDE_DIRS ${FLIP_INTERN_INCLUDE_DIR} CACHE STRING "Flip include directories")
 endif()
 if(NOT DEFINED FLIP_LIBRARY_DIRS)
-	set(FLIP_LIBRARY_DIRS ${FLIP_INTERN_LIBRARIES_DIR} CACHE STRING "Flip include directories")
+	set(FLIP_LIBRARY_DIRS ${FLIP_INTERN_LIBRARIES_DIR} CACHE STRING "Flip library directories")
 endif()
 
 # Use the FLIP internal library
