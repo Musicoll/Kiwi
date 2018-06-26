@@ -70,6 +70,8 @@ namespace kiwi { namespace engine {
         
         void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
         
+        std::string getCode() const;
+        
         struct nop
         {
             template <typename T>
@@ -77,17 +79,22 @@ namespace kiwi { namespace engine {
         };
         
         class UIGlue;
+        class FileSelector;
+        class CodeEditor;
+        class Window;
         
         std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>  m_factory;
         std::unique_ptr<llvm_dsp, nop>      m_instance;
         std::mutex                          m_mutex;
-        std::unique_ptr<UIGlue>             m_ui_glue;
         std::vector<dsp::sample_t*>         m_inputs;
         std::vector<dsp::sample_t*>         m_outputs;
         
         std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)> m_factory_engine;
         
-        const std::vector<std::string>      m_options;
+        const std::vector<std::string>  m_options;
+        std::unique_ptr<UIGlue>         m_ui_glue;
+        std::unique_ptr<FileSelector>   m_file_selector;
+        std::unique_ptr<CodeEditor>     m_code_editor;
     };
 
 }}

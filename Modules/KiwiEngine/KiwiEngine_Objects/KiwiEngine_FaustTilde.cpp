@@ -28,11 +28,104 @@
 #include <KiwiModel/KiwiModel_DocumentManager.h>
 
 #include <juce_core/juce_core.h>
-//#include <juce_audio_formats/juce_audio_formats.h>
-//#include <juce_audio_devices/juce_audio_devices.h>
-//#include <juce_gui_basics/juce_gui_basics.h>
+#include <juce_gui_basics/juce_gui_basics.h>
+#include <juce_gui_extra/juce_gui_extra.h>
 
 namespace kiwi { namespace engine {
+    
+    // ================================================================================ //
+    
+    class FaustTilde::Window : public juce::DocumentWindow
+    {
+    public:
+        Window() : juce::DocumentWindow("FAUST Editor", juce::Colours::grey, juce::DocumentWindow::allButtons, false)
+        {
+            setUsingNativeTitleBar(true);
+            setResizable(true, true);
+            setVisible(true);
+        }
+        
+        void closeButtonPressed() override {}
+    };
+    
+    // ================================================================================ //
+    
+    class FaustTilde::FileSelector
+    {
+    public:
+        
+        FileSelector(FaustTilde& o) : owner(o) {}
+        
+        void open()
+        {
+            auto directory = juce::File(last_directory);
+            if(!directory.exists())
+            {
+                directory = juce::File::getSpecialLocation(juce::File::userMusicDirectory);
+            }
+            fc = std::make_unique<juce::FileChooser>("Choose a DSP file to read...",
+                                                     directory,
+                                                     juce::String("*.dsp"), true);
+            owner.deferMain([this]() {
+                
+                this->fc->launchAsync(juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles, [this](juce::FileChooser const& chooser)
+                                      {
+                                          auto file = chooser.getResult();
+                                          if(file.getFullPathName().isNotEmpty())
+                                          {
+                                              this->owner.openFile(file.getFullPathName().toStdString());
+                                              this->last_directory = file.getParentDirectory().getFullPathName().toStdString();
+                                          }
+                                      });
+            });
+        }
+        
+    private:
+        
+        FaustTilde& owner;
+        std::unique_ptr<juce::FileChooser> fc;
+        std::string last_directory;
+    };
+    
+    // ================================================================================ //
+    
+    class FaustTilde::CodeEditor
+    {
+    public:
+        
+        CodeEditor(FaustTilde& o) :
+        owner(o),
+        window(),
+        document(),
+        editor(document, nullptr)
+        {
+            editor.setBounds(0, 0, 200, 100);
+            editor.setVisible(true);
+            window.setContentNonOwned(&editor, true);
+        }
+        
+        void open()
+        {
+            owner.deferMain([this]() {
+                
+                if(!window.isShowing())
+                {
+                    editor.loadContent(juce::String(owner.getCode()));
+                    window.addToDesktop();
+                }
+            });
+
+        }
+        
+    private:
+        
+        FaustTilde&               owner;
+        Window                    window;
+        juce::CodeDocument        document;
+        juce::CodeEditorComponent editor;
+    };
+    
+    // ================================================================================ //
     
     class FaustTilde::UIGlue : public UI
     {
@@ -133,9 +226,11 @@ namespace kiwi { namespace engine {
     FaustTilde::FaustTilde(model::Object const& model, Patcher& patcher):
     AudioObject(model, patcher),
     m_factory(nullptr, deleteDSPFactory),
-    m_ui_glue(std::make_unique<UIGlue>(*this)),
     m_factory_engine(nullptr, deleteDSPFactory),
-    m_options(getOptions(model))
+    m_options(getOptions(model)),
+    m_ui_glue(std::make_unique<UIGlue>(*this)),
+    m_file_selector(std::make_unique<FileSelector>(*this)),
+    m_code_editor(std::make_unique<CodeEditor>(*this))
     {
         attributeChanged("dspname", {tool::Parameter::Type::String, {std::string("")}});
     }
@@ -146,6 +241,15 @@ namespace kiwi { namespace engine {
     }
     
     // ================================================================================ //
+    
+    std::string FaustTilde::getCode() const
+    {
+        if(m_factory)
+        {
+            return m_factory->getDSPCode();
+        }
+        return "";
+    }
     
     void FaustTilde::openFile(const std::string& file)
     {
@@ -269,8 +373,7 @@ namespace kiwi { namespace engine {
             {
                 if(args.size() == 1)
                 {
-                    warning(std::string("faust~: open method - dialog windows not implemented yet"));
-                    return;
+                    m_file_selector->open();
                 }
                 else
                 {
@@ -286,6 +389,15 @@ namespace kiwi { namespace engine {
                     {
                         warning(std::string("faust~: open method extra arguments"));
                     }
+                }
+                return;
+            }
+            else if(name == "editor")
+            {
+                m_code_editor->open();
+                if(args.size() > 1)
+                {
+                    warning(std::string("faust~: editor method extra arguments"));
                 }
                 return;
             }
