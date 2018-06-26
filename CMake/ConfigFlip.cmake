@@ -12,9 +12,9 @@ set(KIWI_FLIP_INTERN_DIR "${KIWI_DEPENDENCIES_DIR}/flip")
 
 # Local OS Specific Variables
 # -----------------------------------------------------------------------------#
-set(FLIP_URL_APPLE "http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files")
-set(FLIP_URL_LINUX "http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files")
-set(FLIP_URL_WIN32 "http://developer.irisate.com.s3-website-us-east-1.amazonaws.com/files")
+set(FLIP_URL_APPLE "https://github.com/Musicoll/KiwiDependenciesPrebuilt/releases/download/v1.3")
+set(FLIP_URL_LINUX "https://github.com/Musicoll/KiwiDependenciesPrebuilt/releases/download/v1.3")
+set(FLIP_URL_WIN32 "https://github.com/Musicoll/KiwiDependenciesPrebuilt/releases/download/v1.3")
 
 set(FLIP_PKG_NAME_APPLE "flip-demo-macos-c47e41da05")
 set(FLIP_PKG_NAME_LINUX "flip-demo-linux-c47e41da05")

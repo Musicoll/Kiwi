@@ -12,9 +12,9 @@ set(KIWI_BOOST_INTERN_DIR "${KIWI_DEPENDENCIES_DIR}/boost")
 
 # Local OS Specific Variables
 # -----------------------------------------------------------------------------#
-set(BOOST_URL_APPLE "http://sourceforge.net/projects/boost/files/boost/1.63.0")
-set(BOOST_URL_LINUX "http://sourceforge.net/projects/boost/files/boost/1.63.0")
-set(BOOST_URL_WIN32 "http://sourceforge.net/projects/boost/files/boost/1.63.0")
+set(BOOST_URL_APPLE "https://github.com/Musicoll/KiwiDependenciesPrebuilt/releases/download/v1.3")
+set(BOOST_URL_LINUX "https://github.com/Musicoll/KiwiDependenciesPrebuilt/releases/download/v1.3")
+set(BOOST_URL_WIN32 "https://github.com/Musicoll/KiwiDependenciesPrebuilt/releases/download/v1.3")
 
 set(BOOST_PKG_NAME_APPLE "boost_1_63_0")
 set(BOOST_PKG_NAME_LINUX "boost_1_63_0")
