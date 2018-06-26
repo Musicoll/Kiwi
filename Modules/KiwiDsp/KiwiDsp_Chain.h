@@ -129,7 +129,7 @@ namespace kiwi
             {
                 NotPrepared     = 0,    ///< The Chain has not been prepared.
                 Preparing       = 1,    ///< The Chain is being prepared.
-                Prepared        = 2,    ///< The chain has been prepared.
+                Prepared        = 2     ///< The chain has been prepared.
             };
             
             class Node;

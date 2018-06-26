@@ -102,10 +102,10 @@ namespace kiwi
             //                                      SCHEDULER                                   //
             // ================================================================================ //
             
-            //! @biref Returns the engine's scheduler.
+            //! @brief Returns the engine's scheduler.
             tool::Scheduler<> & getScheduler() const;
             
-            //! @biref Returns the main scheduler.
+            //! @brief Returns the main scheduler.
             tool::Scheduler<> & getMainScheduler() const;
             
             //! @brief Defers a task on the engine thread.
@@ -160,7 +160,7 @@ namespace kiwi
             virtual void parameterChanged(std::string const& param_name, tool::Parameter const& param);
             
             //! @brief Called once one of the data model's attributes has changed.
-            //! @brief Automatically called on the engine's thread.
+            //! @details Automatically called on the engine's thread.
             virtual void attributeChanged(std::string const& name, tool::Parameter const& attribute);
             
         private: // members
@@ -189,7 +189,7 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief A pure interface that audio object must implement.
-        //! @brief audio objects will be held and triggered by both the engine and the dsp chain.
+        //! @details audio objects will be held and triggered by both the engine and the dsp chain.
         class AudioObject : public engine::Object, public dsp::Processor
         {
         public: // methods

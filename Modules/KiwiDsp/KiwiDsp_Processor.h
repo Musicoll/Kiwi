@@ -163,13 +163,13 @@ namespace kiwi
             inline void perform(Buffer const& input, Buffer& output) noexcept
             {
                 m_call_back->perform(input, output);
-            };
+            }
             
             //! @brief Releases everything after the digital signal processing.
             //! @details You can use this method to free the memory allocated during the call of
             //! the prepare method for example.
             //! @see prepare() and perform()
-            virtual void release() {};
+            virtual void release() {}
             
         private: // members
             
