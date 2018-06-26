@@ -142,7 +142,7 @@ namespace kiwi { namespace tool {
     {
         std::unique_lock<std::mutex> head_lock(m_mutex);
         
-        return std::move(head_lock);
+        return head_lock;
     }
     
     // ==================================================================================== //
