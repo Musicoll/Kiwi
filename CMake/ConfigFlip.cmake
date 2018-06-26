@@ -26,7 +26,7 @@ set(FLIP_PKG_EXT_WIN32 "zip")
 
 set(FLIP_PKG_FOLDER_NAME_APPLE "flip-demo")
 set(FLIP_PKG_FOLDER_NAME_LINUX "flip-demo")
-set(FLIP_PKG_FOLDER_NAME_WIN32 "flip-demo-windows-c47e41da05")
+set(FLIP_PKG_FOLDER_NAME_WIN32 "flip-demo")
 
 set(FLIP_INTERN_INCLUDE_DIR_APPLE "${KIWI_FLIP_INTERN_DIR}/include")
 set(FLIP_INTERN_INCLUDE_DIR_LINUX "${KIWI_FLIP_INTERN_DIR}/include")
@@ -105,11 +105,11 @@ if(NOT ${USE_SYSTEM_FLIP})
 		# -------------------------------------------------------------------------#
 		message(STATUS "Unpack ${FLIP_PKG_FILE} to ${KIWI_FLIP_INTERN_DIR}")
 		if(APPLE)
-	    execute_process(COMMAND tar xzf ./${FLIP_PKG_FILE}  WORKING_DIRECTORY ${KIWI_DEPENDENCIES_DIR})
+	    execute_process(COMMAND tar xzf ./${FLIP_PKG_FILE} WORKING_DIRECTORY ${KIWI_DEPENDENCIES_DIR})
 	  elseif(UNIX)
-	    execute_process(COMMAND tar xzf ./${FLIP_PKG_FILE}  WORKING_DIRECTORY ${KIWI_DEPENDENCIES_DIR})
+	    execute_process(COMMAND tar xzf ./${FLIP_PKG_FILE} WORKING_DIRECTORY ${KIWI_DEPENDENCIES_DIR})
 	  elseif(WIN32)
-	    execute_process(COMMAND 7z x ${FLIP_PKG_FILE}  WORKING_DIRECTORY ${KIWI_DEPENDENCIES_DIR})
+	    execute_process(COMMAND 7z x ${FLIP_PKG_FILE} WORKING_DIRECTORY ${KIWI_DEPENDENCIES_DIR})
 	  endif()
 		file(RENAME ${KIWI_DEPENDENCIES_DIR}/${FLIP_PKG_FOLDER_NAME} ${KIWI_FLIP_INTERN_DIR})
 
