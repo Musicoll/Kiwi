@@ -16,6 +16,9 @@ build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir Build && cd Build
   - cmake .. -G "Visual Studio 14 2015 Win64"
+  - cd %APPVEYOR_BUILD_FOLDER%\ThirdParty
+  - dir
+  - cd %APPVEYOR_BUILD_FOLDER%
   - cmake --build . --config %CONFIGURATION%
 #after_build:
 #  - cd %APPVEYOR_BUILD_FOLDER%
