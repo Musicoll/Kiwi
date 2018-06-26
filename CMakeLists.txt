@@ -21,27 +21,6 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
 set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++14")
 set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
 
-#--------------------------------------
-# Ressources
-#--------------------------------------
-
-if(NOT DEFINED KIWI_DEPENDENCIES_DIR)
-	set(KIWI_DEPENDENCIES_DIR "${PROJECT_SOURCE_DIR}/ThirdParty")
-endif()
-
-file(GLOB_RECURSE FAUST_LIB_RESOURCE ${KIWI_DEPENDENCIES_DIR}/faust/libraries/*.lib)
-set(KIWI_RESSOURCES_DIR ${PROJECT_SOURCE_DIR}/Ressources)
-if (APPLE)
-	set(KIWI_APP_ICON ${KIWI_RESSOURCES_DIR}/Project/XCode/Icon.icns)
-	set(KIWI_PATCHER_FILETYPE_ICON ${KIWI_RESSOURCES_DIR}/Project/XCode/kiwi_filetype.icns)
-	set(KIWI_PLIST ${KIWI_RESSOURCES_DIR}/Project/XCode/Info.plist)
-	set_source_files_properties(${KIWI_APP_ICON} ${KIWI_PATCHER_FILETYPE_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-  set_source_files_properties(${FAUST_LIB_RESOURCE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/Faust/Libs")
-	set(KIWI_CLIENT_RESSOURCES ${KIWI_APP_ICON} ${KIWI_PATCHER_FILETYPE_ICON} ${KIWI_PLIST} ${FAUST_LIB_RESOURCE} )
-elseif(WIN32)
-	set(KIWI_CLIENT_RESSOURCES ${KIWI_RESSOURCES_DIR}/Project/VisualStudio15/Kiwi.rc)
-endif()
-
 #-------------------------------------------------------------------------------
 # COMPILATION FLAGS
 #-------------------------------------------------------------------------------
@@ -59,37 +38,8 @@ else()
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
 endif()
-
-#-------------------------------------------------------------------------------
-# PREPROCESSOR DEFINTIIONS
-#-------------------------------------------------------------------------------
-
-if (WIN32)
-    add_definitions("-D_CPPUNWIND")
-    add_definitions("-D_WIN32_WINNT=0x0501")
-    add_definitions("-D_USE_MATH_DEFINES")
-	if (DEBUG)
-		add_definitions("-D_CONSOLE=1")
-	endif()
-endif()
-
-if (DEBUG)
-    add_definitions(-DDEBUG=1)
-else()
-    add_definitions(-DNDEBUG=1)
-endif()
-
-#--------------------------------------
-# Search libraries option
-#--------------------------------------
-
-if (WIN32)
-	if (CMAKE_CL_64)
-    set(WINDOWS_SDK_PATH "C:/Program Files (x86)/Microsoft SDKs/Windows/v7.1A/Lib/x64")
-	else()
-		set(WINDOWS_SDK_PATH "C:/Program Files (x86)/Microsoft SDKs/Windows/v7.1A/Lib")
-	endif()
-endif()
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG=1")
 
 #--------------------------------------
 # Macros
@@ -97,98 +47,17 @@ endif()
 
 include(./Scripts/group.cmake)
 
-#----------------------------------
-# Juce
-#----------------------------------
-
-set(JUCE_INCLUDE_DIRS ${KIWI_DEPENDENCIES_DIR}/Juce/modules)
-
-if (APPLE)
-    find_library(COCOA Cocoa)
-    find_library(IOKIT IOKit)
-    find_library(QUARTZCORE QuartzCore)
-    find_library(CARBON Carbon)
-    find_library(WEBKIT WebKit)
-    find_library(COREAUDIO CoreAudio)
-    find_library(COREMIDI CoreMIDI)
-    find_library(ACCELERATE Accelerate)
-    find_library(DISCRECORDING DiscRecording)
-    find_library(AUDIOTOOLBOX AudioToolbox)
-    set(JUCE_LINK_LIBRARIES ${COCOA} ${IOKIT} ${QUARTZCORE} ${CARBON} ${WEBKIT} ${COREAUDIO} ${COREMIDI} ${ACCELERATE} ${DISCRECORDING} ${AUDIOTOOLBOX})
-elseif(WIN32)
-	find_library(WS2_32 ws2_32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
-	find_library(UUID uuid PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
-	find_library(WSOCK32 wsock32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
-	find_library(WININET wininet PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
-	find_library(LIBVERSION version PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
-	find_library(OLE32 ole32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
-	find_library(OLEAUT32 oleaut32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
-	find_library(IMM32 imm32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
-	find_library(COMDLG32 comdlg32 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
-	find_library(SHLWAPI shlwapi PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
-	find_library(RPCRT4 rpcrt4 PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
-	find_library(WINMM winmm PATHS ${WINDOWS_SDK_PATH} NO_DEFAULT_PATH)
-	set(JUCE_LINK_LIBRARIES ${WS2_32} ${UUID} ${WSOCK32} ${WININET} ${LIBVERSION} ${OLE32} ${OLEAUT32} ${COMDLG32} ${SHLWAPI} ${RPCRT4} ${WINMM})
-elseif(UNIX)
-    find_library(RT rt)
-    find_library(DL dl)
-    find_library(PTHREAD pthread)
-    find_library(X11 X11)
-    find_library(XEXT Xext)
-    find_library(FREETYPE freetype)
-    find_library(ASOUND asound)
-    find_package(PkgConfig)
-    pkg_check_modules(GTK3_X11 REQUIRED gtk+-x11-3.0)
-    pkg_check_modules(WEBKIT_TO_GTK4 REQUIRED webkit2gtk-4.0)
-    set(JUCE_INCLUDE_DIRS ${JUCE_INCLUDE_DIRS} /usr/include/freetype2 ${GTK3_X11_INCLUDE_DIRS} ${WEBKIT_TO_GTK4_INCLUDE_DIRS})
-    set(JUCE_LINK_LIBRARIES ${RT} ${DL} ${PTHREAD} ${FREETYPE} ${X11} ${XEXT} ${ASOUND} ${GTK3_X11_LIBRARIES} ${WEBKIT_TO_GTK4_LIBRARIES})
-endif()
-
-set(JUCE_COMPILE_DEFINITIONS JUCE_STANDALONE_APPLICATION=1
-                           JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1
-                           JUCE_DISPLAY_SPLASH_SCREEN=0
-                           JUCE_REPORT_APP_USAGE=0)
-
-file (GLOB_RECURSE JUCE_SRC ${KIWI_DEPENDENCIES_DIR}/Juce/modules/*.[h|c]pp
-                            ${KIWI_DEPENDENCIES_DIR}/Juce/modules/*.h
-                            ${KIWI_DEPENDENCIES_DIR}/Juce/modules/*.mm)
-
-set_source_files_properties(${JUCE_SRC} PROPERTIES HEADER_FILE_ONLY TRUE)
-
-set(JUCE_COMPILED_SRC ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_core/juce_core.cpp
-                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_data_structures/juce_data_structures.cpp
-                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_events/juce_events.cpp
-                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_graphics/juce_graphics.cpp
-                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_gui_basics/juce_gui_basics.cpp
-                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_gui_extra/juce_gui_extra.cpp
-                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_audio_basics/juce_audio_basics.cpp
-                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_audio_devices/juce_audio_devices.cpp
-                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_audio_formats/juce_audio_formats.cpp
-                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_audio_utils/juce_audio_utils.cpp
-                      ${KIWI_DEPENDENCIES_DIR}/Juce/modules/juce_audio_processors/juce_audio_processors.cpp)
-
-if (APPLE)
-    set_source_files_properties(${JUCE_COMPILED_SRC} PROPERTIES COMPILE_FLAGS "-x objective-c++"
-                                                                HEADER_FILE_ONLY FALSE)
-else()
-    set_source_files_properties(${JUCE_COMPILED_SRC} PROPERTIES HEADER_FILE_ONLY FALSE)
-endif()
-
-
-add_library(Juce STATIC ${JUCE_SRC})
-target_link_libraries(Juce ${JUCE_LINK_LIBRARIES})
-target_compile_definitions(Juce PUBLIC ${JUCE_COMPILE_DEFINITIONS})
-target_include_directories(Juce PUBLIC ${JUCE_INCLUDE_DIRS})
-set_target_properties(Juce PROPERTIES FOLDER ThirdParty)
-source_group_rec("${JUCE_SRC}" ${KIWI_DEPENDENCIES_DIR}/Juce/modules)
-
-
 # Dependencies
 #-------------------------------------------------------------------------------
 message(STATUS "")
 
+if(NOT DEFINED KIWI_DEPENDENCIES_DIR)
+	set(KIWI_DEPENDENCIES_DIR "${PROJECT_SOURCE_DIR}/ThirdParty")
+endif()
+
 include(CMake/ConfigFlip.cmake)
 include(CMake/ConfigBoost.cmake)
+include(CMake/ConfigJUCE.cmake)
 include(CMake/ConfigLLVM.cmake)
 include(CMake/ConfigFAUST.cmake)
 
@@ -238,13 +107,13 @@ source_group_rec("${KIWI_MODEL_SRC}" ${PROJECT_SOURCE_DIR}/Modules/KiwiModel)
 #------------------------------------------------------------------------------#
 set(KIWI_DSP_DEPENDENCIES)
 set(KIWI_DSP_INCLUDE_DIRS ${KIWI_MODULE_INCLUDE_DIRS})
-set(KIWI_DSP_COMPILE_DEFINITIONS "-DKIWI_DSP_FLOAT=1")
+set(KIWI_DSP_COMPILE_DEFINITIONS KIWI_DSP_FLOAT=1)
 set(KIWI_DSP_LINK_LIBRARIES "")
 
 file(GLOB_RECURSE KIWI_DSP_SOURCES ${KIWI_MODULE_INCLUDE_DIRS}/KiwiDsp/*.[c|h]pp ${KIWI_MODULE_INCLUDE_DIRS}/KiwiDsp/*.h)
 add_library(KiwiDsp STATIC ${KIWI_DSP_SOURCES})
 target_include_directories(KiwiDsp PUBLIC ${KIWI_DSP_INCLUDE_DIRS})
-target_compile_definitions(KiwiDsp PUBLIC ${KIWI_DSP_COMPILE_DEFINITIONS})
+target_compile_definitions(KiwiDsp PUBLIC "${KIWI_DSP_COMPILE_DEFINITIONS}")
 target_link_libraries(KiwiDsp PUBLIC ${KIWI_DSP_LINK_LIBRARIES})
 
 set_target_properties(KiwiDsp PROPERTIES FOLDER Modules)
@@ -254,7 +123,7 @@ source_group_rec("${KIWI_DSP_SRC}" ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp)
 #------------------------------------------------------------------------------#
 set(KIWI_NETWORK_DEPENDENCIES)
 set(KIWI_NETWORK_INCLUDE_DIRS ${KIWI_MODULE_INCLUDE_DIRS} ${BEAST_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
-set(KIWI_NETWORK_COMPILE_DEFINITIONS "-DBOOST_ALL_NO_LIB=1")
+set(KIWI_NETWORK_COMPILE_DEFINITIONS BOOST_ALL_NO_LIB=1)
 
 if(APPLE)
 	set(KIWI_NETWORK_LINK_LIBRARIES ${Boost_LIBRARIES})
@@ -267,7 +136,7 @@ endif()
 file(GLOB_RECURSE KIWI_NETWORK_SOURCES ${KIWI_MODULE_INCLUDE_DIRS}/KiwiNetwork/*.[c|h]pp ${KIWI_MODULE_INCLUDE_DIRS}/KiwiNetwork/*.h)
 add_library(KiwiNetwork STATIC ${KIWI_NETWORK_SOURCES})
 target_include_directories(KiwiNetwork PUBLIC ${KIWI_NETWORK_INCLUDE_DIRS})
-target_compile_definitions(KiwiNetwork PUBLIC ${KIWI_NETWORK_COMPILE_DEFINITIONS})
+target_compile_definitions(KiwiNetwork PUBLIC "${KIWI_NETWORK_COMPILE_DEFINITIONS}")
 target_link_libraries(KiwiNetwork PUBLIC ${KIWI_NETWORK_LINK_LIBRARIES})
 
 set_target_properties(KiwiNetwork PROPERTIES FOLDER Modules)
@@ -285,7 +154,7 @@ file(GLOB_RECURSE KIWI_ENGINE_SOURCES ${KIWI_MODULE_INCLUDE_DIRS}/KiwiEngine/*.[
 add_library(KiwiEngine STATIC ${KIWI_ENGINE_SOURCES})
 add_dependencies(KiwiEngine ${KIWI_ENGINE_DEPENDENCIES})
 target_include_directories(KiwiEngine PUBLIC ${KIWI_ENGINE_INCLUDE_DIRS})
-target_compile_definitions(KiwiEngine PUBLIC ${KIWI_ENGINE_COMPILE_DEFINITIONS})
+set_target_properties(KiwiEngine PROPERTIES COMPILE_DEFINITIONS "${KIWI_ENGINE_COMPILE_DEFINITIONS}")
 target_link_libraries(KiwiEngine PUBLIC ${KIWI_ENGINE_LINK_LIBRARIES})
 
 set_target_properties(KiwiEngine PROPERTIES FOLDER Modules)
@@ -303,7 +172,7 @@ file(GLOB_RECURSE KIWI_SERVER_SOURCES ${KIWI_MODULE_INCLUDE_DIRS}/KiwiServer/*.[
 add_library(KiwiServer ${KIWI_SERVER_SOURCES})
 add_dependencies(KiwiServer ${KIWI_SERVER_DEPENDENCIES})
 target_include_directories(KiwiServer PUBLIC ${KIWI_SERVER_INCLUDE_DIRS})
-target_compile_definitions(KiwiServer PUBLIC ${KIWI_SERVER_COMPILE_DEFINITIONS})
+set_target_properties(KiwiServer PROPERTIES COMPILE_DEFINITIONS "${KIWI_SERVER_COMPILE_DEFINITIONS}")
 target_link_libraries(KiwiServer PUBLIC ${KIWI_SERVER_LINK_LIBRARIES})
 
 set_target_properties(KiwiServer PROPERTIES FOLDER Modules)
@@ -319,6 +188,20 @@ target_link_libraries(Server PUBLIC KiwiServer)
 
 # Kiwi Client application
 #------------------------------------------------------------------------------#
+
+file(GLOB_RECURSE FAUST_LIB_RESOURCE ${KIWI_DEPENDENCIES_DIR}/faust/libraries/*.lib)
+set(KIWI_RESSOURCES_DIR ${PROJECT_SOURCE_DIR}/Ressources)
+if (APPLE)
+	set(KIWI_APP_ICON ${KIWI_RESSOURCES_DIR}/Project/XCode/Icon.icns)
+	set(KIWI_PATCHER_FILETYPE_ICON ${KIWI_RESSOURCES_DIR}/Project/XCode/kiwi_filetype.icns)
+	set(KIWI_PLIST ${KIWI_RESSOURCES_DIR}/Project/XCode/Info.plist)
+	set_source_files_properties(${KIWI_APP_ICON} ${KIWI_PATCHER_FILETYPE_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+  set_source_files_properties(${FAUST_LIB_RESOURCE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/Faust/Libs")
+	set(KIWI_CLIENT_RESSOURCES ${KIWI_APP_ICON} ${KIWI_PATCHER_FILETYPE_ICON} ${KIWI_PLIST} ${FAUST_LIB_RESOURCE} )
+elseif(WIN32)
+	set(KIWI_CLIENT_RESSOURCES ${KIWI_RESSOURCES_DIR}/Project/VisualStudio15/Kiwi.rc)
+endif()
+
 set(KIWI_CLIENT_DEPENDENCIES KiwiNetwork KiwiEngine)
 set(KIWI_CLIENT_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/Client/Source ${KIWI_MODULE_INCLUDE_DIRS} ${KIWI_NETWORK_INCLUDE_DIRS} ${KIWI_ENGINE_INCLUDE_DIRS} ${JSON_INCLUDE_DIRS} )
 set(KIWI_CLIENT_COMPILE_DEFINITIONS ${KIWI_ENGINE_COMPILE_DEFINITIONS} ${KIWI_ENGINE_COMPILE_DEFINITIONS} ${KIWI_NETWORK_COMPILE_DEFINITIONS})
@@ -330,6 +213,7 @@ add_dependencies(Kiwi ${KIWI_CLIENT_DEPENDENCIES})
 target_include_directories(Kiwi PUBLIC ${KIWI_CLIENT_INCLUDE_DIRS})
 target_compile_definitions(Kiwi PUBLIC ${KIWI_CLIENT_COMPILE_DEFINITIONS})
 target_link_libraries(Kiwi PUBLIC ${KIWI_CLIENT_LINK_LIBRARIES})
+
 
 
 if (APPLE)
@@ -408,6 +292,7 @@ file(GLOB TEST_SERVER_SRC ${PROJECT_SOURCE_DIR}/Test/Server/*.[c|h]pp ${PROJECT_
 add_executable(test_server ${TEST_SERVER_SRC})
 add_dependencies(test_server KiwiServer)
 set_target_properties(test_server PROPERTIES FOLDER Test)
+set_target_properties(test_server PROPERTIES COMPILE_DEFINITIONS "${KIWI_SERVER_COMPILE_DEFINITIONS}")
 target_include_directories(test_server PUBLIC ${KIWI_SERVER_INCLUDE_DIRS})
 target_link_libraries(test_server PUBLIC KiwiServer ${KIWI_TESTS_LINK_LIBRARIES})
 source_group_rec("${TEST_SERVER_SRC}" ${PROJECT_SOURCE_DIR}/Test/Server)
