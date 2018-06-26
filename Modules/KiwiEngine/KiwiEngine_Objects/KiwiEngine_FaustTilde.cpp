@@ -20,6 +20,7 @@
  */
 
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_FaustTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_FaustCodeTokenizer.h>
 #include <KiwiEngine/KiwiEngine_Factory.h>
 #include <faust/dsp/llvm-dsp.h>
 #include <faust/gui/UI.h>
@@ -45,7 +46,10 @@ namespace kiwi { namespace engine {
             setVisible(true);
         }
         
-        void closeButtonPressed() override {}
+        void closeButtonPressed() override
+        {
+            removeFromDesktop();
+        }
     };
     
     // ================================================================================ //
@@ -97,11 +101,12 @@ namespace kiwi { namespace engine {
         owner(o),
         window(),
         document(),
-        editor(document, nullptr)
+        highlither(),
+        editor(document, &highlither)
         {
             editor.setBounds(0, 0, 200, 100);
             editor.setVisible(true);
-            window.setContentNonOwned(&editor, true);
+            window.setContentNonOwned(&editor, NULL);
         }
         
         void open()
@@ -122,6 +127,7 @@ namespace kiwi { namespace engine {
         FaustTilde&               owner;
         Window                    window;
         juce::CodeDocument        document;
+        FaustTokeniser            highlither;
         juce::CodeEditorComponent editor;
     };
     
@@ -244,15 +250,22 @@ namespace kiwi { namespace engine {
     
     std::string FaustTilde::getCode() const
     {
-        if(m_factory)
-        {
-            return m_factory->getDSPCode();
-        }
-        return "";
+        return m_code;
     }
     
     void FaustTilde::openFile(const std::string& file)
     {
+        juce::File const jf(file);
+        if(!jf.exists())
+        {
+            warning("faust~: " + file + " doesn't exist");
+            return;
+        }
+        if(!jf.hasFileExtension(".dsp"))
+        {
+            warning("faust~: " + file + " is not a FAUST DSP file");
+            return;
+        }
         // Compile the file
         std::string errors;
         std::vector<char const*> argv(m_options.size());
@@ -265,26 +278,22 @@ namespace kiwi { namespace engine {
         {
             warning(errors);
         }
-        
         // Notify the model
-        if(m_factory_engine)
-        {
-            deferMain([this]()
+        std::string const code = jf.loadFileAsString().toStdString();
+        deferMain([this, &code]()
+                  {
+                      if(m_factory_engine)
                       {
-                          if(m_factory_engine)
+                          std::string name = juce::Uuid().toString().toStdString();
+                          auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel());
+                          if(model)
                           {
-                              std::string code = m_factory_engine->getDSPCode();
-                              std::string name = juce::Uuid().toString().toStdString();
-                              auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel());
-                              if(model)
-                              {
-                                  model->setDSPCode(code);
-                              }
-                              // This also commit the change
-                              setAttribute(std::string("dspname"), {tool::Parameter::Type::String, {name}});
+                              model->setDSPCode(code);
                           }
-                      });
-        }
+                          // This also commit the change
+                          setAttribute(std::string("dspname"), {tool::Parameter::Type::String, {name}});
+                      }
+                  });
     }
     
     // ================================================================================ //
@@ -299,17 +308,14 @@ namespace kiwi { namespace engine {
                           auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel());
                           if(fmodel)
                           {
-                              std::string code = fmodel->getDSPCode();
-                              if(!code.empty())
+                              m_code = fmodel->getDSPCode();
+                              m_mutex.lock();
+                              createFactoryFromString(value, m_code);
+                              if(m_factory)
                               {
-                                  m_mutex.lock();
-                                  createFactoryFromString(value, code);
-                                  if(m_factory)
-                                  {
-                                      createInstance();
-                                  }
-                                  m_mutex.unlock();
+                                  createInstance();
                               }
+                              m_mutex.unlock();
                           }
                       });
         }

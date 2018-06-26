@@ -91,6 +91,7 @@ namespace kiwi { namespace engine {
         
         std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)> m_factory_engine;
         
+        std::string                     m_code;
         const std::vector<std::string>  m_options;
         std::unique_ptr<UIGlue>         m_ui_glue;
         std::unique_ptr<FileSelector>   m_file_selector;
