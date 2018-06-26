@@ -14,7 +14,7 @@ build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir Build && cd Build
   - cmake .. -G "Visual Studio 14 2015 Win64"
-  - cmake --build . --config %CONFIGURATION%
+  - cmake --build . --target Kiwi --config %CONFIGURATION%
 #after_build:
 #  - cd %APPVEYOR_BUILD_FOLDER%
 #  - C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Scripts\setup-x64.iss
