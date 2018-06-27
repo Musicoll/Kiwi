@@ -46,7 +46,11 @@ namespace kiwi { namespace model {
         
         void setDSPCode(std::string const& newcode);
         
-        std::string getDSPCode();
+        std::string getDSPCode() const;
+        
+        void setEditCode(std::string const& newcode);
+        
+        std::string getEditCode() const;
         
         void writeAttribute(std::string const& name, tool::Parameter const& parameter) override;
         
@@ -55,9 +59,10 @@ namespace kiwi { namespace model {
         bool attributeChanged(std::string const& name) const override;
     private:
         
-        flip::String m_dsp_code;
-        flip::String m_dsp_name;
-        flip::Message<std::string> m_compiled;
+        flip::String               m_dsp_code;
+        flip::Message<std::string> m_dsp_code_changed;
+        flip::String               m_edit_code;
+        flip::Message<std::string> m_edit_code_changed;
     };
     
 }}

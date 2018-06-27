@@ -118,7 +118,7 @@ namespace kiwi { namespace engine {
                 if(!window.isShowing())
                 {
                     document.removeListener(this);
-                    editor.loadContent(juce::String(owner.getCode()));
+                    editor.loadContent(juce::String(owner.getDspCode()));
                     window.addToDesktop();
                     document.addListener(this);
                 }
@@ -127,12 +127,12 @@ namespace kiwi { namespace engine {
         
         void codeDocumentTextInserted(const String& , int ) override
         {
-            owner.setCode(document.getAllContent().toStdString());
+            owner.setEditCode(document.getAllContent().toStdString());
         }
         
         void codeDocumentTextDeleted(int , int ) override
         {
-            owner.setCode(document.getAllContent().toStdString());
+            owner.setEditCode(document.getAllContent().toStdString());
         }
         
     private:
@@ -250,7 +250,7 @@ namespace kiwi { namespace engine {
     m_file_selector(std::make_unique<FileSelector>(*this)),
     m_code_editor(std::make_unique<CodeEditor>(*this))
     {
-        attributeChanged("compiled", {tool::Parameter::Type::String, {std::string("")}});
+        attributeChanged("dspcodechanged", {tool::Parameter::Type::String, {std::string("")}});
     }
     
     FaustTilde::~FaustTilde()
@@ -260,12 +260,12 @@ namespace kiwi { namespace engine {
     
     // ================================================================================ //
     
-    std::string FaustTilde::getCode() const
+    std::string FaustTilde::getDspCode() const
     {
         return m_code;
     }
     
-    void FaustTilde::setCode(std::string&& code)
+    void FaustTilde::setDspCode(std::string&& code)
     {
         deferMain([this, ncode = std::move(code)]()
                   {
@@ -273,7 +273,20 @@ namespace kiwi { namespace engine {
                       if(model)
                       {
                           model->setDSPCode(ncode);
-                          setAttribute(std::string("compiled"), {tool::Parameter::Type::String, {juce::Uuid().toString().toStdString()}});
+                          setAttribute(std::string("dspcodechanged"), {tool::Parameter::Type::String, {juce::Uuid().toString().toStdString()}});
+                      }
+                  });
+    }
+    
+    void FaustTilde::setEditCode(std::string&& code)
+    {
+        deferMain([this, ncode = std::move(code)]()
+                  {
+                      auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel());
+                      if(model)
+                      {
+                          model->setEditCode(ncode);
+                          setAttribute(std::string("editcodechanged"), {tool::Parameter::Type::String, {juce::Uuid().toString().toStdString()}});
                       }
                   });
     }
@@ -291,14 +304,14 @@ namespace kiwi { namespace engine {
             warning("faust~: " + file + " is not a FAUST DSP file");
             return;
         }
-        setCode(jf.loadFileAsString().toStdString());
+        setDspCode(jf.loadFileAsString().toStdString());
     }
     
     // ================================================================================ //
     
     void FaustTilde::attributeChanged(std::string const& name, tool::Parameter const& parameter)
     {
-        if (name == "compiled")
+        if (name == "dspcodechanged")
         {
             auto const value = parameter[0].getString();
             deferMain([this, value]()
@@ -309,6 +322,18 @@ namespace kiwi { namespace engine {
                               auto code = fmodel->getDSPCode();
                               compileCode(value, code);
                               m_code.swap(code);
+                          }
+                      });
+        }
+        else if(name == "editcodechanged")
+        {
+            auto const value = parameter[0].getString();
+            deferMain([this, value]()
+                      {
+                          auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel());
+                          if(fmodel)
+                          {
+                              auto code = fmodel->getEditCode();
                           }
                       });
         }

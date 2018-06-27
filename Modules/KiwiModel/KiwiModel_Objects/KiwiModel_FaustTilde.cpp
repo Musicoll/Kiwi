@@ -33,14 +33,19 @@ namespace kiwi { namespace model {
     {
         std::unique_ptr<ObjectClass> fausttilde_class(new ObjectClass("faust~", &FaustTilde::create));
         
-        auto param_compiled = std::make_unique<ParameterClass>(tool::Parameter::Type::String);
-        fausttilde_class->addAttribute("compiled", std::move(param_compiled));
+        auto param_dsp_code_changed = std::make_unique<ParameterClass>(tool::Parameter::Type::String);
+        fausttilde_class->addAttribute("dspcodechanged", std::move(param_dsp_code_changed));
+        
+        auto param_edit_code_changed = std::make_unique<ParameterClass>(tool::Parameter::Type::String);
+        fausttilde_class->addAttribute("editcodechanged", std::move(param_edit_code_changed));
         
         flip::Class<FaustTilde> & fausttilde_model = DataModel::declare<FaustTilde>()
-                                                    .name(fausttilde_class->getModelName().c_str())
-                                                    .inherit<Object>()
-                                                    .member<flip::String, &FaustTilde::m_dsp_code>("dspcode")
-                                                    .member<flip::Message<std::string>, &FaustTilde::m_compiled>("compiled");
+        .name(fausttilde_class->getModelName().c_str())
+        .inherit<Object>()
+        .member<flip::String, &FaustTilde::m_dsp_code>("dspcode")
+        .member<flip::Message<std::string>, &FaustTilde::m_dsp_code_changed>("dspcodechanged")
+        .member<flip::String, &FaustTilde::m_edit_code>("editcode")
+        .member<flip::Message<std::string>, &FaustTilde::m_edit_code_changed>("editcodechanged");
         
         Factory::add<FaustTilde>(std::move(fausttilde_class), fausttilde_model);
     }
@@ -53,13 +58,17 @@ namespace kiwi { namespace model {
     FaustTilde::FaustTilde(flip::Default& d): model::Object(d)
     {
         m_dsp_code.disable_in_undo();
-        m_compiled.disable_in_undo();
+        m_dsp_code_changed.disable_in_undo();
+        m_edit_code.disable_in_undo();
+        m_edit_code_changed.disable_in_undo();
     }
     
     FaustTilde::FaustTilde(std::vector<tool::Atom> const& args)
     {
         m_dsp_code.disable_in_undo();
-        m_compiled.disable_in_undo();
+        m_dsp_code_changed.disable_in_undo();
+        m_edit_code.disable_in_undo();
+        m_edit_code_changed.disable_in_undo();
         if (args.size() < 2)
         {
             throw Error("faust~ expects 2 default arguments: the number of inlets and the number of outlets.");
@@ -105,36 +114,60 @@ namespace kiwi { namespace model {
         m_dsp_code = newcode;
     }
     
-    std::string FaustTilde::getDSPCode()
+    std::string FaustTilde::getDSPCode() const
     {
         return m_dsp_code;
     }
     
+    void FaustTilde::setEditCode(std::string const& newcode)
+    {
+        m_edit_code = newcode;
+    }
+    
+    std::string FaustTilde::getEditCode() const
+    {
+        return m_edit_code;
+    }
+    
     void FaustTilde::writeAttribute(std::string const& name, tool::Parameter const& parameter)
     {
-        if(name == "compiled")
+        if(name == "dspcodechanged")
         {
-            m_compiled.send(parameter[0].getString());
+            m_dsp_code_changed.send(parameter[0].getString());
+        }
+        else if(name == "editcodechanged")
+        {
+            m_edit_code_changed.send(parameter[0].getString());
         }
     }
     
     void FaustTilde::readAttribute(std::string const& name, tool::Parameter & parameter) const
     {
-        if(name == "compiled")
+        if(name == "dspcodechanged")
         {
-            m_compiled.get([&parameter](bool forward_flag, std::string received_message)
-                          {
-                              parameter = tool::Parameter(tool::Parameter::Type::String, {received_message});
-                          });
+            m_dsp_code_changed.get([&parameter](bool forward_flag, std::string received_message)
+                                   {
+                                       parameter = tool::Parameter(tool::Parameter::Type::String, {received_message});
+                                   });
         }
-        
+        else if(name == "editcodechanged")
+        {
+            m_edit_code_changed.get([&parameter](bool forward_flag, std::string received_message)
+                                   {
+                                       parameter = tool::Parameter(tool::Parameter::Type::String, {received_message});
+                                   });
+        }
     }
     
     bool FaustTilde::attributeChanged(std::string const& name) const
     {
-        if(name == "compiled")
+        if(name == "dspcodechanged")
         {
-            return m_compiled.changed();
+            return m_dsp_code_changed.changed();
+        }
+        else if(name == "editcodechanged")
+        {
+            return m_edit_code_changed.changed();
         }
         return false;
     }

@@ -53,20 +53,26 @@ namespace kiwi { namespace engine {
         static std::string getName(model::Object const& model);
         static std::vector<std::string> getOptions(model::Object const& model);
         
+
+        //! @brief Set the DSP code
+        void setDspCode(std::string&& code);
+        
+        //! @brief Set the Edit code
+        void setEditCode(std::string&& code);
+        
+        //! @brief Get the DSP code
+        std::string getDspCode() const;
+        
         //! @brief ...
         //! @see attributeChanged
         void openFile(const std::string& file);
-        
-        //! @brief Set the DSP code
-        //! @details Change the DSP code in the model but doesn't compile the code.
-        void setCode(std::string&& code);
         
         //! @brief Create the factory from a string and generate a new instance.
         void compileCode(const std::string& name, const std::string& code);
         
         void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
         
-        std::string getCode() const;
+        ;
         
         struct nop
         {
