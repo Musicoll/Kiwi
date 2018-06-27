@@ -15,7 +15,7 @@ build_script:
   - cmake --build . --target Kiwi --config %CONFIGURATION%
 after_build:
   - cd %APPVEYOR_BUILD_FOLDER%
-  - "C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Scripts\setup-x64.iss
+  - ("C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Scripts\setup-x64.iss)
   - 7z a Kiwi_%PLATFORM%.zip %APPVEYOR_BUILD_FOLDER%\Kiwi-x64-setup.exe
 
 artifacts:
