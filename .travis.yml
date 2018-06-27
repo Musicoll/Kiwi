@@ -59,9 +59,9 @@ matrix:
     after_success:
     - cd $TRAVIS_BUILD_DIR
     - mkdir Kiwi && mv Build/KiwiBuild/Kiwi Kiwi/Kiwi
-    - zip -r Kiwi_$os.zip Kiwi
+    - zip -r Kiwi_linux.zip Kiwi
     - mkdir Kiwi_Server && mv Build/KiwiBuild/Server Kiwi_Server/Server
-    - zip -r Kiwi_server_$os.tar.gz Kiwi_Server
+    - zip -r Kiwi_server_linux.tar.gz Kiwi_Server
 
   - os: osx
     compiler: clang++
@@ -76,7 +76,7 @@ matrix:
     after_success:
     - cd $TRAVIS_BUILD_DIR
     - mkdir Kiwi && mv Build/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
-    - zip -r Kiwi_$os.zip Kiwi
+    - zip -r Kiwi_macos.zip Kiwi
 
 deploy:
   provider: releases
