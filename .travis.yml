@@ -56,9 +56,9 @@ matrix:
     - cmake .. -DCMAKE_C_FLAGS=-m64 -DCMAKE_BUILD_TYPE=Release
     - cmake --build .  --target Kiwi --config Release
     before_deploy:
-    - mkdir Kiwi && mv Build/Release/KiwiBuild/Kiwi Kiwi/Kiwi
+    - mkdir Kiwi && mv Build/KiwiBuild/Kiwi Kiwi/Kiwi
     - zip -r Kiwi_$os.zip Kiwi
-    - mkdir Kiwi_Server && mv Build/Release/KiwiBuild/Server Kiwi_Server/Server
+    - mkdir Kiwi_Server && mv Build/KiwiBuild/Server Kiwi_Server/Server
     - zip -r Kiwi_server_$os.tar.gz Kiwi_Server
 
   - os: osx
@@ -72,9 +72,9 @@ matrix:
     - cmake .. -GXcode
     - xcodebuild -scheme Kiwi -configuration Release
     before_deploy:
-    - mkdir Kiwi && mv Build/Release/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
+    - mkdir Kiwi && mv Build/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
     - zip -r Kiwi_$os.zip Kiwi
-    - mkdir Kiwi_Server && mv Build/Release/KiwiBuild/Release/Server Kiwi_Server/Server
+    - mkdir Kiwi_Server && mv Build/KiwiBuild/Release/Server Kiwi_Server/Server
     - zip -r Kiwi_server_$os.zip Kiwi_Server
 
 deploy:
