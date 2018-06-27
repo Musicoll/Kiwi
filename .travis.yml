@@ -57,6 +57,7 @@ matrix:
     - cmake --build .  --target Kiwi --config Release
     - cmake --build .  --target Server --config Release
     after_success:
+    - cd $TRAVIS_BUILD_DIR
     - mkdir Kiwi && mv Build/KiwiBuild/Kiwi Kiwi/Kiwi
     - zip -r Kiwi_$os.zip Kiwi
     - mkdir Kiwi_Server && mv Build/KiwiBuild/Server Kiwi_Server/Server
@@ -73,6 +74,7 @@ matrix:
     - cmake .. -GXcode
     - xcodebuild -scheme Kiwi -configuration Release
     after_success:
+    - cd $TRAVIS_BUILD_DIR
     - mkdir Kiwi && mv Build/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
     - zip -r Kiwi_$os.zip Kiwi
 
