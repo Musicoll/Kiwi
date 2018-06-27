@@ -127,13 +127,11 @@ namespace kiwi { namespace engine {
         
         void codeDocumentTextInserted(const String& , int ) override
         {
-            owner.log("modif");
             owner.setCode(document.getAllContent().toStdString());
         }
         
         void codeDocumentTextDeleted(int , int ) override
         {
-            owner.log("modif");
             owner.setCode(document.getAllContent().toStdString());
         }
         
@@ -267,15 +265,15 @@ namespace kiwi { namespace engine {
         return m_code;
     }
     
-    void FaustTilde::setCode(const std::string& code)
+    void FaustTilde::setCode(std::string&& code)
     {
-        m_code = code;
-        deferMain([this, &code]()
+        deferMain([this, ncode = std::move(code)]()
                   {
                       auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel());
                       if(model)
                       {
-                          model->setDSPCode(code);
+                          model->setDSPCode(ncode);
+                          setAttribute(std::string("compiled"), {tool::Parameter::Type::String, {juce::Uuid().toString().toStdString()}});
                       }
                   });
     }
@@ -293,14 +291,7 @@ namespace kiwi { namespace engine {
             warning("faust~: " + file + " is not a FAUST DSP file");
             return;
         }
-        auto const code = jf.loadFileAsString().toStdString();
-        deferMain([this, code = std::move(code)]()
-                  {
-                      // Change the model
-                      setCode(code);
-                      // Notify the change
-                      setAttribute(std::string("compiled"), {tool::Parameter::Type::String, {juce::Uuid().toString().toStdString()}});
-                  });
+        setCode(jf.loadFileAsString().toStdString());
     }
     
     // ================================================================================ //

@@ -59,7 +59,7 @@ namespace kiwi { namespace engine {
         
         //! @brief Set the DSP code
         //! @details Change the DSP code in the model but doesn't compile the code.
-        void setCode(const std::string& code);
+        void setCode(std::string&& code);
         
         //! @brief Create the factory from a string and generate a new instance.
         void compileCode(const std::string& name, const std::string& code);
