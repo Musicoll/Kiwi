@@ -84,7 +84,7 @@ add_library(KiwiTool STATIC ${KIWI_TOOL_SOURCES})
 target_include_directories(KiwiTool PUBLIC ${KIWI_TOOL_INCLUDE_DIRS})
 
 set_target_properties(KiwiTool PROPERTIES FOLDER Modules)
-source_group_rec("${KIWI_TOOL_SRC}" ${PROJECT_SOURCE_DIR}/Modules/KiwiTool)
+source_group_rec("${KIWI_TOOL_SOURCES}" ${PROJECT_SOURCE_DIR}/Modules/KiwiTool)
 
 # KiwiModel
 #------------------------------------------------------------------------------#
@@ -101,7 +101,7 @@ target_compile_definitions(KiwiModel PUBLIC ${KIWI_MODEL_COMPILE_DEFINITIONS})
 target_link_libraries(KiwiModel PUBLIC ${KIWI_MODEL_LINK_LIBRARIES})
 
 set_target_properties(KiwiModel PROPERTIES FOLDER Modules)
-source_group_rec("${KIWI_MODEL_SRC}" ${PROJECT_SOURCE_DIR}/Modules/KiwiModel)
+source_group_rec("${KIWI_MODEL_SOURCES}" ${PROJECT_SOURCE_DIR}/Modules/KiwiModel)
 
 # KiwiDsp
 #------------------------------------------------------------------------------#
@@ -117,7 +117,7 @@ target_compile_definitions(KiwiDsp PUBLIC "${KIWI_DSP_COMPILE_DEFINITIONS}")
 target_link_libraries(KiwiDsp PUBLIC ${KIWI_DSP_LINK_LIBRARIES})
 
 set_target_properties(KiwiDsp PROPERTIES FOLDER Modules)
-source_group_rec("${KIWI_DSP_SRC}" ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp)
+source_group_rec("${KIWI_DSP_SOURCES}" ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp)
 
 # KiwiNetwork
 #------------------------------------------------------------------------------#
@@ -140,7 +140,7 @@ target_compile_definitions(KiwiNetwork PUBLIC "${KIWI_NETWORK_COMPILE_DEFINITION
 target_link_libraries(KiwiNetwork PUBLIC ${KIWI_NETWORK_LINK_LIBRARIES})
 
 set_target_properties(KiwiNetwork PROPERTIES FOLDER Modules)
-source_group_rec("${KIWI_NETWORK_SRC}" ${PROJECT_SOURCE_DIR}/Modules/KiwiNetwork)
+source_group_rec("${KIWI_NETWORK_SOURCES}" ${PROJECT_SOURCE_DIR}/Modules/KiwiNetwork)
 
 # Kiwi Engine
 #------------------------------------------------------------------------------#
@@ -158,7 +158,7 @@ set_target_properties(KiwiEngine PROPERTIES COMPILE_DEFINITIONS "${KIWI_ENGINE_C
 target_link_libraries(KiwiEngine PUBLIC ${KIWI_ENGINE_LINK_LIBRARIES})
 
 set_target_properties(KiwiEngine PROPERTIES FOLDER Modules)
-source_group_rec("${KIWI_ENGINE_SRC}" ${PROJECT_SOURCE_DIR}/Modules/KiwiEngine)
+source_group_rec("${KIWI_ENGINE_SOURCES}" ${PROJECT_SOURCE_DIR}/Modules/KiwiEngine)
 
 #----------------------------------
 # Server
@@ -176,7 +176,7 @@ set_target_properties(KiwiServer PROPERTIES COMPILE_DEFINITIONS "${KIWI_SERVER_C
 target_link_libraries(KiwiServer PUBLIC ${KIWI_SERVER_LINK_LIBRARIES})
 
 set_target_properties(KiwiServer PROPERTIES FOLDER Modules)
-source_group_rec("${KIWI_SERVER_SRC}" ${PROJECT_SOURCE_DIR}/Modules/KiwiServer)
+source_group_rec("${KIWI_SERVER_SOURCES}" ${PROJECT_SOURCE_DIR}/Modules/KiwiServer)
 
 # Kiwi Server application
 #------------------------------------------------------------------------------#
@@ -214,8 +214,6 @@ target_include_directories(Kiwi PUBLIC ${KIWI_CLIENT_INCLUDE_DIRS})
 target_compile_definitions(Kiwi PUBLIC ${KIWI_CLIENT_COMPILE_DEFINITIONS})
 target_link_libraries(Kiwi PUBLIC ${KIWI_CLIENT_LINK_LIBRARIES})
 
-
-
 if (APPLE)
 	set_target_properties(Kiwi PROPERTIES MACOSX_BUNDLE TRUE MACOSX_BUNDLE_INFO_PLIST ${KIWI_PLIST})
 elseif(WIN32)
@@ -231,7 +229,7 @@ elseif(WIN32)
   set_target_properties(Kiwi PROPERTIES LINK_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
 endif()
 
-source_group_rec("${KIWI_CLIENT_SRC}" ${PROJECT_SOURCE_DIR}/Client/Source)
+source_group_rec("${KIWI_CLIENT_SOURCES}" ${PROJECT_SOURCE_DIR}/Client/Source)
 
 # Tests
 #------------------------------------------------------------------------------#
@@ -248,54 +246,54 @@ endif()
 
 # Test Tool
 #------------------------------------------------------------------------------#
-file(GLOB TEST_TOOL_SRC ${PROJECT_SOURCE_DIR}/Test/Tool/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Test/Tool/*.h)
-add_executable(test_tool ${TEST_TOOL_SRC})
+file(GLOB TEST_TOOL_SOURCES ${PROJECT_SOURCE_DIR}/Test/Tool/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Test/Tool/*.h)
+add_executable(test_tool ${TEST_TOOL_SOURCES})
 add_dependencies(test_tool KiwiTool)
 set_target_properties(test_tool PROPERTIES FOLDER Test)
 target_include_directories(test_tool PUBLIC ${KIWI_TOOL_INCLUDE_DIRS})
 target_link_libraries(test_tool KiwiTool ${KIWI_TESTS_LINK_LIBRARIES})
-source_group_rec("${TEST_TOOL_SRC}" ${PROJECT_SOURCE_DIR}/Test/Tool)
+source_group_rec("${TEST_TOOL_SOURCES}" ${PROJECT_SOURCE_DIR}/Test/Tool)
 
 # Test Dsp
 #------------------------------------------------------------------------------#
-file(GLOB TEST_DSP_SRC ${PROJECT_SOURCE_DIR}/Test/Dsp/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Test/Dsp/*.h)
-add_executable(test_dsp ${TEST_DSP_SRC})
+file(GLOB TEST_DSP_SOURCES ${PROJECT_SOURCE_DIR}/Test/Dsp/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Test/Dsp/*.h)
+add_executable(test_dsp ${TEST_DSP_SOURCES})
 add_dependencies(test_dsp KiwiDsp)
 set_target_properties(test_dsp PROPERTIES FOLDER Test)
 target_include_directories(test_dsp PUBLIC ${KIWI_DSP_INCLUDE_DIRS})
 target_link_libraries(test_dsp KiwiDsp ${KIWI_TESTS_LINK_LIBRARIES})
-source_group_rec("${TEST_DSP_SRC}" ${PROJECT_SOURCE_DIR}/Test/Dsp)
+source_group_rec("${TEST_DSP_SOURCES}" ${PROJECT_SOURCE_DIR}/Test/Dsp)
 
 # Test Model
 #------------------------------------------------------------------------------#
-file(GLOB TEST_MODEL_SRC ${PROJECT_SOURCE_DIR}/Test/Model/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Test/Model/*.h)
-add_executable(test_model ${TEST_MODEL_SRC})
+file(GLOB TEST_MODEL_SOURCES ${PROJECT_SOURCE_DIR}/Test/Model/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Test/Model/*.h)
+add_executable(test_model ${TEST_MODEL_SOURCES})
 add_dependencies(test_model KiwiModel)
 set_target_properties(test_model PROPERTIES FOLDER Test)
 target_include_directories(test_model PUBLIC ${KIWI_MODEL_INCLUDE_DIRS})
 target_link_libraries(test_model KiwiModel ${KIWI_TESTS_LINK_LIBRARIES})
-source_group_rec("${TEST_MODEL_SRC}" ${PROJECT_SOURCE_DIR}/Test/Model)
+source_group_rec("${TEST_MODEL_SOURCES}" ${PROJECT_SOURCE_DIR}/Test/Model)
 
 # Test Network
 #------------------------------------------------------------------------------#
-file(GLOB TEST_NETWORK_SRC ${PROJECT_SOURCE_DIR}/Test/Network/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Test/Network/*.h)
-add_executable(test_network ${TEST_NETWORK_SRC})
+file(GLOB TEST_NETWORK_SOURCES ${PROJECT_SOURCE_DIR}/Test/Network/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Test/Network/*.h)
+add_executable(test_network ${TEST_NETWORK_SOURCES})
 add_dependencies(test_network KiwiNetwork)
 set_target_properties(test_network PROPERTIES FOLDER Test)
 target_include_directories(test_network PUBLIC ${KIWI_NETWORK_INCLUDE_DIRS})
 target_link_libraries(test_network KiwiNetwork ${KIWI_TESTS_LINK_LIBRARIES})
-source_group_rec("${TEST_NETWORK_SRC}" ${PROJECT_SOURCE_DIR}/Test/Network)
+source_group_rec("${TEST_NETWORK_SOURCES}" ${PROJECT_SOURCE_DIR}/Test/Network)
 
 # Test Server
 #------------------------------------------------------------------------------#
-file(GLOB TEST_SERVER_SRC ${PROJECT_SOURCE_DIR}/Test/Server/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Test/Server/*.h)
-add_executable(test_server ${TEST_SERVER_SRC})
+file(GLOB TEST_SERVER_SOURCES ${PROJECT_SOURCE_DIR}/Test/Server/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Test/Server/*.h)
+add_executable(test_server ${TEST_SERVER_SOURCES})
 add_dependencies(test_server KiwiServer)
 set_target_properties(test_server PROPERTIES FOLDER Test)
 set_target_properties(test_server PROPERTIES COMPILE_DEFINITIONS "${KIWI_SERVER_COMPILE_DEFINITIONS}")
 target_include_directories(test_server PUBLIC ${KIWI_SERVER_INCLUDE_DIRS})
 target_link_libraries(test_server PUBLIC KiwiServer ${KIWI_TESTS_LINK_LIBRARIES})
-source_group_rec("${TEST_SERVER_SRC}" ${PROJECT_SOURCE_DIR}/Test/Server)
+source_group_rec("${TEST_SERVER_SOURCES}" ${PROJECT_SOURCE_DIR}/Test/Server)
 
 # Tests Target
 
