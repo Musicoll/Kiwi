@@ -41,7 +41,6 @@ Name: mypAssociation; Description: "Associate ""kiwi"" extension"; GroupDescript
 
 [Files]
 Source: "..\Build\KiwiBuild\Release\Kiwi.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\Build\KiwiBuild\Release\concrt140.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Build\KiwiBuild\Release\msvcp140.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Build\KiwiBuild\Release\vccorlib140.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Build\KiwiBuild\Release\vcruntime140.dll"; DestDir: "{app}"; Flags: ignoreversion
