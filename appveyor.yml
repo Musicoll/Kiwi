@@ -3,9 +3,7 @@ os: Visual Studio 2015
 
 environment:
    matrix:
-      - MSVS: 2015
-        MSBUILD: 14.0
-        CONFIGURATION: Release
+      - CONFIGURATION: Release
         PLATFORM: x64
 
 install:
@@ -15,11 +13,10 @@ build_script:
   - mkdir Build && cd Build
   - cmake .. -G "Visual Studio 14 2015 Win64"
   - cmake --build . --target Kiwi --config %CONFIGURATION%
-#after_build:
-#  - cd %APPVEYOR_BUILD_FOLDER%
-#  - C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Scripts\setup-x64.iss
-#  - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\%CONFIGURATION%
-#  - 7z a Kiwi_%PLATFORM%.zip %BUILD_DIR%\Kiwi-x64-setup.exe
+after_build:
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Scripts\setup-x64.iss
+  - 7z a Kiwi_%PLATFORM%.zip %APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\%CONFIGURATION%\Kiwi-x64-setup.exe
 
 artifacts:
   - path: '*.zip'
