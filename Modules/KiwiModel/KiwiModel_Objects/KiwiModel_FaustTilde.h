@@ -22,6 +22,7 @@
 #pragma once
 
 #include <KiwiModel/KiwiModel_Object.h>
+#include <flip/Message.h>
 
 namespace kiwi { namespace model {
     
@@ -56,6 +57,7 @@ namespace kiwi { namespace model {
         
         flip::String m_dsp_code;
         flip::String m_dsp_name;
+        flip::Message<std::string> m_compiled;
     };
     
 }}

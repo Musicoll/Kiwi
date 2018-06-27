@@ -39,7 +39,7 @@ namespace kiwi { namespace engine {
     class FaustTilde::Window : public juce::DocumentWindow
     {
     public:
-        Window() : juce::DocumentWindow("FAUST Editor", juce::Colours::grey, juce::DocumentWindow::allButtons, false)
+        Window() : juce::DocumentWindow("FAUST Editor", juce::Colours::white, juce::DocumentWindow::allButtons, false)
         {
             setUsingNativeTitleBar(true);
             setResizable(true, true);
@@ -93,7 +93,7 @@ namespace kiwi { namespace engine {
     
     // ================================================================================ //
     
-    class FaustTilde::CodeEditor
+    class FaustTilde::CodeEditor : public juce::CodeDocument::Listener
     {
     public:
         
@@ -104,22 +104,37 @@ namespace kiwi { namespace engine {
         highlither(),
         editor(document, &highlither)
         {
-            editor.setBounds(0, 0, 200, 100);
+            editor.setBounds(0, 0, 512, 384);
             editor.setVisible(true);
-            window.setContentNonOwned(&editor, NULL);
+            editor.setColour(juce::CodeEditorComponent::backgroundColourId, juce::Colours::white);
+            editor.setScrollbarThickness(8);
+            window.setContentNonOwned(&editor, true);
         }
         
         void open()
         {
-            owner.deferMain([this]() {
-                
+            owner.deferMain([this]()
+            {
                 if(!window.isShowing())
                 {
+                    document.removeListener(this);
                     editor.loadContent(juce::String(owner.getCode()));
                     window.addToDesktop();
+                    document.addListener(this);
                 }
             });
-
+        }
+        
+        void codeDocumentTextInserted(const String& , int ) override
+        {
+            owner.log("modif");
+            owner.setCode(document.getAllContent().toStdString());
+        }
+        
+        void codeDocumentTextDeleted(int , int ) override
+        {
+            owner.log("modif");
+            owner.setCode(document.getAllContent().toStdString());
         }
         
     private:
@@ -232,13 +247,12 @@ namespace kiwi { namespace engine {
     FaustTilde::FaustTilde(model::Object const& model, Patcher& patcher):
     AudioObject(model, patcher),
     m_factory(nullptr, deleteDSPFactory),
-    m_factory_engine(nullptr, deleteDSPFactory),
     m_options(getOptions(model)),
     m_ui_glue(std::make_unique<UIGlue>(*this)),
     m_file_selector(std::make_unique<FileSelector>(*this)),
     m_code_editor(std::make_unique<CodeEditor>(*this))
     {
-        attributeChanged("dspname", {tool::Parameter::Type::String, {std::string("")}});
+        attributeChanged("compiled", {tool::Parameter::Type::String, {std::string("")}});
     }
     
     FaustTilde::~FaustTilde()
@@ -251,6 +265,19 @@ namespace kiwi { namespace engine {
     std::string FaustTilde::getCode() const
     {
         return m_code;
+    }
+    
+    void FaustTilde::setCode(const std::string& code)
+    {
+        m_code = code;
+        deferMain([this, &code]()
+                  {
+                      auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel());
+                      if(model)
+                      {
+                          model->setDSPCode(code);
+                      }
+                  });
     }
     
     void FaustTilde::openFile(const std::string& file)
@@ -266,33 +293,13 @@ namespace kiwi { namespace engine {
             warning("faust~: " + file + " is not a FAUST DSP file");
             return;
         }
-        // Compile the file
-        std::string errors;
-        std::vector<char const*> argv(m_options.size());
-        for(size_t i = 0; i < m_options.size(); ++i)
-        {
-            argv[i] = m_options[i].c_str();
-        }
-        m_factory_engine = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromFile(file, m_options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
-        if(!errors.empty())
-        {
-            warning(errors);
-        }
-        // Notify the model
-        std::string const code = jf.loadFileAsString().toStdString();
-        deferMain([this, &code]()
+        auto const code = jf.loadFileAsString().toStdString();
+        deferMain([this, code = std::move(code)]()
                   {
-                      if(m_factory_engine)
-                      {
-                          std::string name = juce::Uuid().toString().toStdString();
-                          auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel());
-                          if(model)
-                          {
-                              model->setDSPCode(code);
-                          }
-                          // This also commit the change
-                          setAttribute(std::string("dspname"), {tool::Parameter::Type::String, {name}});
-                      }
+                      // Change the model
+                      setCode(code);
+                      // Notify the change
+                      setAttribute(std::string("compiled"), {tool::Parameter::Type::String, {juce::Uuid().toString().toStdString()}});
                   });
     }
     
@@ -300,7 +307,7 @@ namespace kiwi { namespace engine {
     
     void FaustTilde::attributeChanged(std::string const& name, tool::Parameter const& parameter)
     {
-        if (name == "dspname")
+        if (name == "compiled")
         {
             auto const value = parameter[0].getString();
             deferMain([this, value]()
@@ -308,20 +315,15 @@ namespace kiwi { namespace engine {
                           auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel());
                           if(fmodel)
                           {
-                              m_code = fmodel->getDSPCode();
-                              m_mutex.lock();
-                              createFactoryFromString(value, m_code);
-                              if(m_factory)
-                              {
-                                  createInstance();
-                              }
-                              m_mutex.unlock();
+                              auto code = fmodel->getDSPCode();
+                              compileCode(value, code);
+                              m_code.swap(code);
                           }
                       });
         }
     }
     
-    void FaustTilde::createFactoryFromString(const std::string& name, const std::string& code)
+    void FaustTilde::compileCode(const std::string& name, const std::string& code)
     {
         std::string errors;
         std::vector<char const*> argv(m_options.size());
@@ -329,45 +331,55 @@ namespace kiwi { namespace engine {
         {
             argv[i] = m_options[i].c_str();
         }
-        m_ui_glue->m_parameters.clear();
-        m_factory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString(name, code, m_options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
+        auto nfactory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString(name, code, m_options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
+        
         if(!errors.empty())
         {
-            warning(errors);
+            warning("faust~: compilation failed - " + errors);
         }
-        if(m_factory)
+        if(nfactory)
         {
-            log("faust~: compiled " + m_factory->getName());
-        }
-    }
-    
-    void FaustTilde::createInstance()
-    {
-        assert(m_factory && "factory must not be null");
-        m_ui_glue->m_parameters.clear();
-        m_instance = std::unique_ptr<llvm_dsp, nop>(m_factory->createDSPInstance());
-        if(!m_instance)
-        {
-            warning("faust~: can't allocate DSP instance");
-            return;
+            log("faust~: compilation succeed - " + nfactory->getName());
+            auto ninstance = std::unique_ptr<llvm_dsp, nop>(nfactory->createDSPInstance());
+            // Safetly swap the factory
+            {
+                std::lock_guard<std::mutex> guard(m_mutex);
+                m_instance = std::move(ninstance);
+            }
+            if(!m_instance)
+            {
+                m_ui_glue = std::make_unique<UIGlue>(*this);
+                warning("faust~: DSP allocation failed");
+            }
+            else
+            {
+                auto nglue = std::make_unique<UIGlue>(*this);
+                m_instance->buildUserInterface(nglue.get());
+                m_ui_glue = std::move(nglue);
+                log("faust~: DSP allocation succeed");
+                log("faust~: number of inputs " + std::to_string(m_instance->getNumInputs()));
+                log("faust~: number of outputs " + std::to_string(m_instance->getNumOutputs()));
+                log("faust~: number of parameters " + std::to_string(m_ui_glue->m_parameters.size()));
+                for(auto const& param : m_ui_glue->m_parameters)
+                {
+                    log(" ");
+                    log("faust~: parameter " + param.first);
+                    log("faust~: type " + std::to_string(param.second.type));
+                    log("faust~: default " + std::to_string(param.second.saved));
+                    log("faust~: minimum " + std::to_string(param.second.min));
+                    log("faust~: maximum " + std::to_string(param.second.max));
+                    log("faust~: step " + std::to_string(param.second.step));
+                }
+            }
         }
         else
         {
-            log("faust~: number of inputs " + std::to_string(m_instance->getNumInputs()));
-            log("faust~: number of outputs " + std::to_string(m_instance->getNumOutputs()));
+            m_ui_glue = std::make_unique<UIGlue>(*this);
+            // Safetly release the instance
+            std::lock_guard<std::mutex> guard(m_mutex);
+            m_instance.reset();
         }
-        m_instance->buildUserInterface(m_ui_glue.get());
-        log("faust~: number of parameters " + std::to_string(m_ui_glue->m_parameters.size()));
-        for(auto const& param : m_ui_glue->m_parameters)
-        {
-            log(" ");
-            log("faust~: parameter " + param.first);
-            log("faust~: type " + std::to_string(param.second.type));
-            log("faust~: default " + std::to_string(param.second.saved));
-            log("faust~: minimum " + std::to_string(param.second.min));
-            log("faust~: maximum " + std::to_string(param.second.max));
-            log("faust~: step " + std::to_string(param.second.step));
-        }
+        m_factory = std::move(nfactory);
     }
     
     void FaustTilde::receive(size_t index, std::vector<tool::Atom> const& args)
@@ -468,7 +480,7 @@ namespace kiwi { namespace engine {
                 {
                     m_outputs[i] = output[i].data();
                 }
-                m_instance->compute(nsamples, static_cast<FAUSTFLOAT**>(m_inputs.data()), m_outputs.data());
+                m_instance->compute(nsamples, const_cast<FAUSTFLOAT**>(m_inputs.data()), m_outputs.data());
             }
             else
             {

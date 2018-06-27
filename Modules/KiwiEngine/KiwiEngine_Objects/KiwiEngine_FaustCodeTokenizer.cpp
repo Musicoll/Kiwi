@@ -128,124 +128,119 @@ struct FaustTokeniserFunctions
     return FaustTokeniser::tokenType_identifier;
   }
   
-  template <typename Iterator>
-  static int readNextToken (Iterator& source)
+  template <typename Iterator> static int readNextToken (Iterator& source)
   {
-    source.skipWhitespace();
-    
-    const juce_wchar firstChar = source.peekNextChar();
-    
-    switch (firstChar)
-    {
-      case 0:
-        break;
-        
-      case '0':   case '1':   case '2':   case '3':   case '4':
-      case '5':   case '6':   case '7':   case '8':   case '9':
-      case '.':
-      {
-        int result = CppTokeniserFunctions::parseNumber (source);
-        
-        if (result == FaustTokeniser::tokenType_error)
-        {
-          source.skip();
-          
-          if (firstChar == '.')
-            return FaustTokeniser::tokenType_punctuation;
-        }
-        
-        return result;
-      }
+      source.skipWhitespace();
       
-      case ';':
-        source.skip();
-        return FaustTokeniser::tokenType_identifier;
-        
-      case ',':
-      case ':':
-        source.skip();
-        return FaustTokeniser::tokenType_operator;
-        
-      case '(':   case ')':
-      case '{':   case '}':
-      case '[':   case ']':
-        source.skip();
-        return FaustTokeniser::tokenType_bracket;
-        
-      case '"':
-        CppTokeniserFunctions::skipQuotedString (source);
-        return FaustTokeniser::tokenType_string;
-        
-      case '\'':
-        source.skip();
-        return FaustTokeniser::tokenType_operator;
-        
-      case '+':
-        source.skip();
-        CppTokeniserFunctions::skipIfNextCharMatches (source, '+', '=');
-        return FaustTokeniser::tokenType_operator;
-
-      case '-':
-        source.skip();
-        return FaustTokeniser::tokenType_operator;
-        
-      case '/':
+      const juce_wchar firstChar = source.peekNextChar();
+      
+      switch (firstChar)
       {
-        source.skip();
-        juce_wchar nextChar = source.peekNextChar();
-        
-        if (nextChar == '/')
-        {
-          source.skipToEndOfLine();
-          return FaustTokeniser::tokenType_comment;
-        }
-        
-        if (nextChar == '*')
-        {
-          source.skip();
-          CppTokeniserFunctions::skipComment (source);
-          return FaustTokeniser::tokenType_comment;
-        }
-        
-        if (nextChar == '=')
-          source.skip();
-        
-        return CPlusPlusCodeTokeniser::tokenType_operator;
+          case 0:
+              break;
+              
+          case '0':   case '1':   case '2':   case '3':   case '4':
+          case '5':   case '6':   case '7':   case '8':   case '9':
+          case '.':
+          {
+              int result = CppTokeniserFunctions::parseNumber (source);
+              
+              if (result == FaustTokeniser::tokenType_error)
+              {
+                  source.skip();
+                  
+                  if (firstChar == '.')
+                      return FaustTokeniser::tokenType_punctuation;
+              }
+              
+              return result;
+          }
+              
+          case ';':
+              source.skip();
+              return FaustTokeniser::tokenType_identifier;
+              
+          case ',':
+          case ':':
+              source.skip();
+              return FaustTokeniser::tokenType_operator;
+              
+          case '(':   case ')':
+          case '{':   case '}':
+          case '[':   case ']':
+              source.skip();
+              return FaustTokeniser::tokenType_bracket;
+              
+          case '"':
+              CppTokeniserFunctions::skipQuotedString (source);
+              return FaustTokeniser::tokenType_string;
+              
+          case '\'':
+              source.skip();
+              return FaustTokeniser::tokenType_operator;
+              
+          case '+':
+              source.skip();
+              CppTokeniserFunctions::skipIfNextCharMatches (source, '+', '=');
+              return FaustTokeniser::tokenType_operator;
+              
+          case '-':
+              source.skip();
+              return FaustTokeniser::tokenType_operator;
+              
+          case '/':
+          {
+              source.skip();
+              juce_wchar nextChar = source.peekNextChar();
+              
+              if (nextChar == '/')
+              {
+                  source.skipToEndOfLine();
+                  return FaustTokeniser::tokenType_comment;
+              }
+              
+              if (nextChar == '*')
+              {
+                  source.skip();
+                  CppTokeniserFunctions::skipComment (source);
+                  return FaustTokeniser::tokenType_comment;
+              }
+              
+              if (nextChar == '=')
+                  source.skip();
+              
+              return CPlusPlusCodeTokeniser::tokenType_operator;
+          }
+              
+          case '*':   case '%':
+          case '=':   case '!':
+              source.skip();
+              CppTokeniserFunctions::skipIfNextCharMatches (source, '=');
+              return FaustTokeniser::tokenType_operator;
+              
+          case '?':
+          case '~':
+              source.skip();
+              return FaustTokeniser::tokenType_operator;
+              
+          case '|':   case '&':   case '^':
+              source.skip();
+              CppTokeniserFunctions::skipIfNextCharMatches (source, firstChar);
+              CppTokeniserFunctions::skipIfNextCharMatches (source, '=');
+              return FaustTokeniser::tokenType_operator;
+              
+          default:
+              if (CppTokeniserFunctions::isIdentifierStart (firstChar))
+                  return parseIdentifier (source);
+              
+              source.skip();
+              break;
       }
-
-      case '*':   case '%':
-      case '=':   case '!':
-        source.skip();
-        CppTokeniserFunctions::skipIfNextCharMatches (source, '=');
-        return FaustTokeniser::tokenType_operator;
-        
-      case '?':
-      case '~':
-        source.skip();
-        return FaustTokeniser::tokenType_operator;
-        
-      case '<':   case '>':
-      case '|':   case '&':   case '^':
-        source.skip();
-        CppTokeniserFunctions::skipIfNextCharMatches (source, firstChar);
-        CppTokeniserFunctions::skipIfNextCharMatches (source, '=');
-        return FaustTokeniser::tokenType_operator;
-        
-      default:
-        if (CppTokeniserFunctions::isIdentifierStart (firstChar))
-          return parseIdentifier (source);
-        
-        source.skip();
-        break;
-    }
-    
-    return FaustTokeniser::tokenType_error;
+      return FaustTokeniser::tokenType_error;
   }
 };
 
 //==============================================================================
-FaustTokeniser::FaustTokeniser() {}
-FaustTokeniser::~FaustTokeniser() {}
 
 int FaustTokeniser::readNextToken (CodeDocument::Iterator& source)
 {
@@ -254,19 +249,20 @@ int FaustTokeniser::readNextToken (CodeDocument::Iterator& source)
 
 CodeEditorComponent::ColourScheme FaustTokeniser::getDefaultColourScheme()
 {
-  static const CodeEditorComponent::ColourScheme::TokenType types[] =
-  {
-    { "Error",          Colour (0xff000000) },
-    { "Comment",        Colour (0xff007505) },
-    { "Primitive",      Colour (0xffCC33CC) },
-    { "Operator",       Colour (0xff000000) },
-    { "Identifier",     Colour (0xff000000) },
-    { "Integer",        Colour (0xff0000CC) },
-    { "Float",          Colour (0xff0000CC) },
-    { "String",         Colour (0xffCC0000) },
-    { "Bracket",        Colour (0xff000000) },
-    { "Punctuation",    Colour (0xff000000) }
-  };
+    static const CodeEditorComponent::ColourScheme::TokenType types[] =
+    {
+        { "Error",          Colour (0xff000000) },
+        { "Comment",        Colour (0xff007505) },
+        { "Primitive",      Colour (0xffCC33CC) },
+        { "Operator",       Colour (0xff000000) },
+        { "Identifier",     Colour (0xff000000) },
+        { "Integer",        Colour (0xff0000CC) },
+        { "Float",          Colour (0xff0000CC) },
+        { "String",         Colour (0xffCC0000) },
+        { "Bracket",        Colour (0xff000000) },
+        { "Punctuation",    Colour (0xff000000) },
+        { "Rafter",         Colours::green }
+    };
   
   CodeEditorComponent::ColourScheme cs;
   

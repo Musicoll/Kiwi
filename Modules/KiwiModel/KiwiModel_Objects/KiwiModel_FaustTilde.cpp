@@ -32,14 +32,15 @@ namespace kiwi { namespace model {
     void FaustTilde::declare()
     {
         std::unique_ptr<ObjectClass> fausttilde_class(new ObjectClass("faust~", &FaustTilde::create));
-        auto param_message = std::make_unique<ParameterClass>(tool::Parameter::Type::String);
-        fausttilde_class->addAttribute("dspname", std::move(param_message));
+        
+        auto param_compiled = std::make_unique<ParameterClass>(tool::Parameter::Type::String);
+        fausttilde_class->addAttribute("compiled", std::move(param_compiled));
         
         flip::Class<FaustTilde> & fausttilde_model = DataModel::declare<FaustTilde>()
                                                     .name(fausttilde_class->getModelName().c_str())
                                                     .inherit<Object>()
                                                     .member<flip::String, &FaustTilde::m_dsp_code>("dspcode")
-                                                    .member<flip::String, &FaustTilde::m_dsp_name>("dspname");
+                                                    .member<flip::Message<std::string>, &FaustTilde::m_compiled>("compiled");
         
         Factory::add<FaustTilde>(std::move(fausttilde_class), fausttilde_model);
     }
@@ -52,13 +53,13 @@ namespace kiwi { namespace model {
     FaustTilde::FaustTilde(flip::Default& d): model::Object(d)
     {
         m_dsp_code.disable_in_undo();
-        m_dsp_name.disable_in_undo();
+        m_compiled.disable_in_undo();
     }
     
     FaustTilde::FaustTilde(std::vector<tool::Atom> const& args)
     {
         m_dsp_code.disable_in_undo();
-        m_dsp_name.disable_in_undo();
+        m_compiled.disable_in_undo();
         if (args.size() < 2)
         {
             throw Error("faust~ expects 2 default arguments: the number of inlets and the number of outlets.");
@@ -111,26 +112,29 @@ namespace kiwi { namespace model {
     
     void FaustTilde::writeAttribute(std::string const& name, tool::Parameter const& parameter)
     {
-        if (name == "dspname")
+        if(name == "compiled")
         {
-            m_dsp_name = parameter[0].getString();
+            m_compiled.send(parameter[0].getString());
         }
     }
     
     void FaustTilde::readAttribute(std::string const& name, tool::Parameter & parameter) const
     {
-        if (name == "dspname")
+        if(name == "compiled")
         {
-            std::string const& message = m_dsp_name;
-            parameter = tool::Parameter(tool::Parameter::Type::String, {message});
+            m_compiled.get([&parameter](bool forward_flag, std::string received_message)
+                          {
+                              parameter = tool::Parameter(tool::Parameter::Type::String, {received_message});
+                          });
         }
+        
     }
     
     bool FaustTilde::attributeChanged(std::string const& name) const
     {
-        if (name == "dspname")
+        if(name == "compiled")
         {
-            return m_dsp_name.changed();
+            return m_compiled.changed();
         }
         return false;
     }

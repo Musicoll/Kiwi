@@ -17,8 +17,8 @@ class FaustTokeniser   : public CodeTokeniser
 {
 public:
   //==============================================================================
-  FaustTokeniser();
-  ~FaustTokeniser();
+  FaustTokeniser() = default;
+  ~FaustTokeniser() = default;
   
   //==============================================================================
   int readNextToken (CodeDocument::Iterator&) override;
@@ -27,16 +27,17 @@ public:
   /** The token values returned by this tokeniser. */
   enum TokenType
   {
-    tokenType_error = 0,
-    tokenType_comment,
-    tokenType_primitive,
-    tokenType_operator,
-    tokenType_identifier,
-    tokenType_integer,
-    tokenType_float,
-    tokenType_string,
-    tokenType_bracket,
-    tokenType_punctuation
+      tokenType_error = 0,
+      tokenType_comment,
+      tokenType_primitive,
+      tokenType_operator,
+      tokenType_identifier,
+      tokenType_integer,
+      tokenType_float,
+      tokenType_string,
+      tokenType_bracket,
+      tokenType_punctuation,
+      tokenType_rafter
   };
   
 private:
