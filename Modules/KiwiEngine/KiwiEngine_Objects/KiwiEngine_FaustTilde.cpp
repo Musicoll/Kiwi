@@ -52,52 +52,22 @@ namespace kiwi { namespace engine {
         }
     };
     
-    // ================================================================================ //
-    
-    class FaustTilde::FileSelector
+    class FaustTilde::CodeEditor
     {
     public:
         
-        FileSelector(FaustTilde& o) : owner(o) {}
-        
-        void open()
-        {
-            auto directory = juce::File(last_directory);
-            if(!directory.exists())
-            {
-                directory = juce::File::getSpecialLocation(juce::File::userMusicDirectory);
-            }
-            fc = std::make_unique<juce::FileChooser>("Choose a DSP file to read...",
-                                                     directory,
-                                                     juce::String("*.dsp"), true);
-            owner.deferMain([this]() {
-                
-                this->fc->launchAsync(juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles, [this](juce::FileChooser const& chooser)
-                                      {
-                                          auto file = chooser.getResult();
-                                          if(file.getFullPathName().isNotEmpty())
-                                          {
-                                              this->owner.openFile(file.getFullPathName().toStdString());
-                                              this->last_directory = file.getParentDirectory().getFullPathName().toStdString();
-                                          }
-                                      });
-            });
-        }
-        
     private:
-        
-        FaustTilde& owner;
-        std::unique_ptr<juce::FileChooser> fc;
-        std::string last_directory;
+        std::unique_ptr<juce::Toolbar> menu;
+        juce::CodeEditorComponent      editor;
     };
     
     // ================================================================================ //
     
-    class FaustTilde::CodeEditor : public juce::CodeDocument::Listener
+    class FaustTilde::CodeEditorManager : public juce::CodeDocument::Listener
     {
     public:
         
-        CodeEditor(FaustTilde& o) :
+        CodeEditorManager(FaustTilde& o) :
         owner(o),
         window(),
         document(),
@@ -142,6 +112,45 @@ namespace kiwi { namespace engine {
         juce::CodeDocument        document;
         FaustTokeniser            highlither;
         juce::CodeEditorComponent editor;
+    };
+    
+    // ================================================================================ //
+    
+    class FaustTilde::FileSelector
+    {
+    public:
+        
+        FileSelector(FaustTilde& o) : owner(o) {}
+        
+        void open()
+        {
+            auto directory = juce::File(last_directory);
+            if(!directory.exists())
+            {
+                directory = juce::File::getSpecialLocation(juce::File::userMusicDirectory);
+            }
+            fc = std::make_unique<juce::FileChooser>("Choose a DSP file to read...",
+                                                     directory,
+                                                     juce::String("*.dsp"), true);
+            owner.deferMain([this]() {
+                
+                this->fc->launchAsync(juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles, [this](juce::FileChooser const& chooser)
+                                      {
+                                          auto file = chooser.getResult();
+                                          if(file.getFullPathName().isNotEmpty())
+                                          {
+                                              this->owner.openFile(file.getFullPathName().toStdString());
+                                              this->last_directory = file.getParentDirectory().getFullPathName().toStdString();
+                                          }
+                                      });
+            });
+        }
+        
+    private:
+        
+        FaustTilde& owner;
+        std::unique_ptr<juce::FileChooser> fc;
+        std::string last_directory;
     };
     
     // ================================================================================ //
@@ -248,7 +257,7 @@ namespace kiwi { namespace engine {
     m_options(getOptions(model)),
     m_ui_glue(std::make_unique<UIGlue>(*this)),
     m_file_selector(std::make_unique<FileSelector>(*this)),
-    m_code_editor(std::make_unique<CodeEditor>(*this))
+    m_code_editor(std::make_unique<CodeEditorManager>(*this))
     {
         attributeChanged("dspcodechanged", {tool::Parameter::Type::String, {std::string("")}});
     }
@@ -262,7 +271,7 @@ namespace kiwi { namespace engine {
     
     std::string FaustTilde::getDspCode() const
     {
-        return m_code;
+        return m_dsp_code;
     }
     
     void FaustTilde::setDspCode(std::string&& code)
@@ -276,6 +285,11 @@ namespace kiwi { namespace engine {
                           setAttribute(std::string("dspcodechanged"), {tool::Parameter::Type::String, {juce::Uuid().toString().toStdString()}});
                       }
                   });
+    }
+    
+    std::string FaustTilde::getEditCode() const
+    {
+        return m_edit_code;
     }
     
     void FaustTilde::setEditCode(std::string&& code)
@@ -321,7 +335,7 @@ namespace kiwi { namespace engine {
                           {
                               auto code = fmodel->getDSPCode();
                               compileCode(value, code);
-                              m_code.swap(code);
+                              m_dsp_code.swap(code);
                           }
                       });
         }
@@ -428,6 +442,7 @@ namespace kiwi { namespace engine {
             }
             else if(name == "editor")
             {
+                setEditCode(std::string(m_dsp_code));
                 m_code_editor->open();
                 if(args.size() > 1)
                 {

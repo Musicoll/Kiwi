@@ -52,16 +52,20 @@ namespace kiwi { namespace engine {
     private:
         static std::string getName(model::Object const& model);
         static std::vector<std::string> getOptions(model::Object const& model);
+    
+        //! @brief Get the DSP code
+        std::string getDspCode() const;
         
-
         //! @brief Set the DSP code
         void setDspCode(std::string&& code);
+        
+        //! @brief Get the Edit code
+        std::string getEditCode() const;
         
         //! @brief Set the Edit code
         void setEditCode(std::string&& code);
         
-        //! @brief Get the DSP code
-        std::string getDspCode() const;
+        
         
         //! @brief ...
         //! @see attributeChanged
@@ -83,6 +87,7 @@ namespace kiwi { namespace engine {
         class UIGlue;
         class FileSelector;
         class CodeEditor;
+        class CodeEditorManager;
         class Window;
         
         std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>  m_factory;
@@ -91,11 +96,12 @@ namespace kiwi { namespace engine {
         std::vector<dsp::sample_t*>         m_inputs;
         std::vector<dsp::sample_t*>         m_outputs;
         
-        std::string                     m_code;
-        const std::vector<std::string>  m_options;
-        std::unique_ptr<UIGlue>         m_ui_glue;
-        std::unique_ptr<FileSelector>   m_file_selector;
-        std::unique_ptr<CodeEditor>     m_code_editor;
+        std::string                         m_dsp_code;
+        std::string                         m_edit_code;
+        const std::vector<std::string>      m_options;
+        std::unique_ptr<UIGlue>             m_ui_glue;
+        std::unique_ptr<FileSelector>       m_file_selector;
+        std::unique_ptr<CodeEditorManager>  m_code_editor;
     };
 
 }}
