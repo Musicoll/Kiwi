@@ -97,6 +97,7 @@ namespace kiwi { namespace engine {
         std::string                     m_dsp_code;
         std::string                     m_edit_code;
         const std::vector<std::string>  m_options;
+        std::mutex                      m_mutex_glue;
         std::unique_ptr<UIGlue>         m_ui_glue;
         std::unique_ptr<FileSelector>   m_file_selector;
         std::unique_ptr<CodeEditor>     m_code_editor;

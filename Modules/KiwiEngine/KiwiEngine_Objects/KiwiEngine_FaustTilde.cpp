@@ -266,26 +266,31 @@ namespace kiwi { namespace engine {
         void addButton(const char* label, FAUSTFLOAT* zone) final
         {
             m_parameters[label] = Parameter({0, zone, 0, 0, 0, 0});
+            *zone = 0;
         }
         
         void addCheckButton(const char* label, FAUSTFLOAT* zone) final
         {
-             m_parameters[label] = Parameter({1, zone, 0.f, 1.f, 1.f, 0.f});
+            m_parameters[label] = Parameter({1, zone, 0.f, 1.f, 1.f, 0.f});
+            *zone = 0;
         }
         
         void addVerticalSlider(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step) final
         {
             m_parameters[label] = Parameter({2, zone, min, max, step, init});
+            *zone = init;
         }
         
         virtual void addHorizontalSlider(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step) final
         {
             m_parameters[label] = Parameter({2, zone, min, max, step, init});
+            *zone = init;
         }
         
         virtual void addNumEntry(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step) final
         {
             m_parameters[label] = Parameter({2, zone, min, max, step, init});
+            *zone = init;
         }
         
         void addHorizontalBargraph(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT min, FAUSTFLOAT max) final {};
@@ -460,18 +465,14 @@ namespace kiwi { namespace engine {
         {
             log("faust~: compilation succeed - " + nfactory->getName());
             auto ninstance = std::unique_ptr<llvm_dsp, nop>(nfactory->createDSPInstance());
-            // Safetly swap the factory
+            
+            if(ninstance)
             {
-                std::lock_guard<std::mutex> guard(m_mutex);
-                m_instance = std::move(ninstance);
-            }
-            if(!m_instance)
-            {
-                m_ui_glue = std::make_unique<UIGlue>(*this);
-                warning("faust~: DSP allocation failed");
-            }
-            else
-            {
+                // Safetly swap the factory
+                {
+                    std::lock_guard<std::mutex> guard(m_mutex);
+                    m_instance = std::move(ninstance);
+                }
                 auto nglue = std::make_unique<UIGlue>(*this);
                 m_instance->buildUserInterface(nglue.get());
                 m_ui_glue = std::move(nglue);
@@ -490,13 +491,25 @@ namespace kiwi { namespace engine {
                     log("faust~: step " + std::to_string(param.second.step));
                 }
             }
+            else
+            {
+                m_ui_glue = std::make_unique<UIGlue>(*this);
+                warning("faust~: DSP allocation failed");
+                {
+                    // Safetly release the instance
+                    std::lock_guard<std::mutex> guard(m_mutex);
+                    m_instance.reset();
+                }
+            }
         }
         else
         {
             m_ui_glue = std::make_unique<UIGlue>(*this);
-            // Safetly release the instance
-            std::lock_guard<std::mutex> guard(m_mutex);
-            m_instance.reset();
+            {
+                // Safetly release the instance
+                std::lock_guard<std::mutex> guard(m_mutex);
+                m_instance.reset();
+            }
         }
         m_factory = std::move(nfactory);
     }
