@@ -11,7 +11,7 @@
 
 struct FaustTokeniserFunctions
 {
-  static bool isPrimitive (String::CharPointerType token, const int tokenLength) noexcept
+  static bool isPrimitive (juce::String::CharPointerType token, const int tokenLength) noexcept
   {
     static const char* const primitives3Char[] =
     { "mem", "int", "cos", "sin", "tan", "exp", "log", "pow", "abs", "min", "max", "seq", "par", "sum", nullptr };
@@ -50,7 +50,7 @@ struct FaustTokeniserFunctions
     }
     
     for (int i = 0; k[i] != 0; ++i)
-      if (token.compare (CharPointer_ASCII (k[i])) == 0)
+      if (token.compare (juce::CharPointer_ASCII (k[i])) == 0)
         return true;
     
     return false;
@@ -101,12 +101,12 @@ struct FaustTokeniserFunctions
   static int parseIdentifier (Iterator& source) noexcept
   {
     int tokenLength = 0;
-    String::CharPointerType::CharType possibleIdentifier [100];
-    String::CharPointerType possible (possibleIdentifier);
+    juce::String::CharPointerType::CharType possibleIdentifier [100];
+    juce::String::CharPointerType possible (possibleIdentifier);
     
-    while (CppTokeniserFunctions::isIdentifierBody (source.peekNextChar()))
+    while (juce::CppTokeniserFunctions::isIdentifierBody (source.peekNextChar()))
     {
-      const juce_wchar c = source.nextChar();
+      const juce::juce_wchar c = source.nextChar();
       
       if (tokenLength < 20)
         possible.write (c);
@@ -118,7 +118,7 @@ struct FaustTokeniserFunctions
     {
       possible.writeNull();
       
-      if (isPrimitive (String::CharPointerType (possibleIdentifier), tokenLength))
+        if (isPrimitive (juce::String::CharPointerType (possibleIdentifier), tokenLength))
         return FaustTokeniser::tokenType_primitive;
       
 //      if (isOperator(String::CharPointerType (possibleIdentifier), tokenLength))
@@ -132,7 +132,7 @@ struct FaustTokeniserFunctions
   {
       source.skipWhitespace();
       
-      const juce_wchar firstChar = source.peekNextChar();
+      const juce::juce_wchar firstChar = source.peekNextChar();
       
       switch (firstChar)
       {
@@ -143,7 +143,7 @@ struct FaustTokeniserFunctions
           case '5':   case '6':   case '7':   case '8':   case '9':
           case '.':
           {
-              int result = CppTokeniserFunctions::parseNumber (source);
+              int result = juce::CppTokeniserFunctions::parseNumber (source);
               
               if (result == FaustTokeniser::tokenType_error)
               {
@@ -172,7 +172,7 @@ struct FaustTokeniserFunctions
               return FaustTokeniser::tokenType_bracket;
               
           case '"':
-              CppTokeniserFunctions::skipQuotedString (source);
+              juce::CppTokeniserFunctions::skipQuotedString (source);
               return FaustTokeniser::tokenType_string;
               
           case '\'':
@@ -181,7 +181,7 @@ struct FaustTokeniserFunctions
               
           case '+':
               source.skip();
-              CppTokeniserFunctions::skipIfNextCharMatches (source, '+', '=');
+              juce::CppTokeniserFunctions::skipIfNextCharMatches (source, '+', '=');
               return FaustTokeniser::tokenType_operator;
               
           case '-':
@@ -191,7 +191,7 @@ struct FaustTokeniserFunctions
           case '/':
           {
               source.skip();
-              juce_wchar nextChar = source.peekNextChar();
+              juce::juce_wchar nextChar = source.peekNextChar();
               
               if (nextChar == '/')
               {
@@ -202,20 +202,20 @@ struct FaustTokeniserFunctions
               if (nextChar == '*')
               {
                   source.skip();
-                  CppTokeniserFunctions::skipComment (source);
+                  juce::CppTokeniserFunctions::skipComment (source);
                   return FaustTokeniser::tokenType_comment;
               }
               
               if (nextChar == '=')
                   source.skip();
               
-              return CPlusPlusCodeTokeniser::tokenType_operator;
+              return juce::CPlusPlusCodeTokeniser::tokenType_operator;
           }
               
           case '*':   case '%':
           case '=':   case '!':
               source.skip();
-              CppTokeniserFunctions::skipIfNextCharMatches (source, '=');
+              juce::CppTokeniserFunctions::skipIfNextCharMatches (source, '=');
               return FaustTokeniser::tokenType_operator;
               
           case '?':
@@ -225,12 +225,12 @@ struct FaustTokeniserFunctions
               
           case '|':   case '&':   case '^':
               source.skip();
-              CppTokeniserFunctions::skipIfNextCharMatches (source, firstChar);
-              CppTokeniserFunctions::skipIfNextCharMatches (source, '=');
+              juce::CppTokeniserFunctions::skipIfNextCharMatches (source, firstChar);
+              juce::CppTokeniserFunctions::skipIfNextCharMatches (source, '=');
               return FaustTokeniser::tokenType_operator;
               
           default:
-              if (CppTokeniserFunctions::isIdentifierStart (firstChar))
+              if (juce::CppTokeniserFunctions::isIdentifierStart (firstChar))
                   return parseIdentifier (source);
               
               source.skip();
@@ -242,29 +242,29 @@ struct FaustTokeniserFunctions
 
 //==============================================================================
 
-int FaustTokeniser::readNextToken (CodeDocument::Iterator& source)
+int FaustTokeniser::readNextToken (juce::CodeDocument::Iterator& source)
 {
     return FaustTokeniserFunctions::readNextToken (source);
 }
 
-CodeEditorComponent::ColourScheme FaustTokeniser::getDefaultColourScheme()
+juce::CodeEditorComponent::ColourScheme FaustTokeniser::getDefaultColourScheme()
 {
-    static const CodeEditorComponent::ColourScheme::TokenType types[] =
+    static const juce::CodeEditorComponent::ColourScheme::TokenType types[] =
     {
-        { "Error",          Colour (0xff000000) },
-        { "Comment",        Colour (0xff007505) },
-        { "Primitive",      Colour (0xffCC33CC) },
-        { "Operator",       Colour (0xff000000) },
-        { "Identifier",     Colour (0xff000000) },
-        { "Integer",        Colour (0xff0000CC) },
-        { "Float",          Colour (0xff0000CC) },
-        { "String",         Colour (0xffCC0000) },
-        { "Bracket",        Colour (0xff000000) },
-        { "Punctuation",    Colour (0xff000000) },
-        { "Rafter",         Colours::green }
+        { "Error",          juce::Colour (0xff000000) },
+        { "Comment",        juce::Colour (0xff007505) },
+        { "Primitive",      juce::Colour (0xffCC33CC) },
+        { "Operator",       juce::Colour (0xff000000) },
+        { "Identifier",     juce::Colour (0xff000000) },
+        { "Integer",        juce::Colour (0xff0000CC) },
+        { "Float",          juce::Colour (0xff0000CC) },
+        { "String",         juce::Colour (0xffCC0000) },
+        { "Bracket",        juce::Colour (0xff000000) },
+        { "Punctuation",    juce::Colour (0xff000000) },
+        { "Rafter",         juce::Colours::green }
     };
   
-  CodeEditorComponent::ColourScheme cs;
+  juce::CodeEditorComponent::ColourScheme cs;
   
   for (unsigned int i = 0; i < sizeof (types) / sizeof (types[0]); ++i)  // (NB: numElementsInArray doesn't work here in GCC4.2)
     cs.set (types[i].name, types[i].colour);

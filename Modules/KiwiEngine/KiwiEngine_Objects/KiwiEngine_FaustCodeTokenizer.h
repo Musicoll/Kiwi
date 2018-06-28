@@ -11,9 +11,7 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 
-using namespace juce;
-
-class FaustTokeniser   : public CodeTokeniser
+class FaustTokeniser   : public juce::CodeTokeniser
 {
 public:
   //==============================================================================
@@ -21,8 +19,8 @@ public:
   ~FaustTokeniser() = default;
   
   //==============================================================================
-  int readNextToken (CodeDocument::Iterator&) override;
-  CodeEditorComponent::ColourScheme getDefaultColourScheme() override;
+  int readNextToken (juce::CodeDocument::Iterator&) override;
+  juce::CodeEditorComponent::ColourScheme getDefaultColourScheme() override;
   
   /** The token values returned by this tokeniser. */
   enum TokenType

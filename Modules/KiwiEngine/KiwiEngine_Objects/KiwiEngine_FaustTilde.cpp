@@ -36,82 +36,171 @@ namespace kiwi { namespace engine {
     
     // ================================================================================ //
     
-    class FaustTilde::Window : public juce::DocumentWindow
-    {
-    public:
-        Window() : juce::DocumentWindow("FAUST Editor", juce::Colours::white, juce::DocumentWindow::allButtons, false)
-        {
-            setUsingNativeTitleBar(true);
-            setResizable(true, true);
-            setVisible(true);
-        }
-        
-        void closeButtonPressed() override
-        {
-            removeFromDesktop();
-        }
-    };
-    
     class FaustTilde::CodeEditor
     {
     public:
         
-    private:
-        std::unique_ptr<juce::Toolbar> menu;
-        juce::CodeEditorComponent      editor;
-    };
-    
-    // ================================================================================ //
-    
-    class FaustTilde::CodeEditorManager : public juce::CodeDocument::Listener
-    {
-    public:
-        
-        CodeEditorManager(FaustTilde& o) :
-        owner(o),
-        window(),
-        document(),
-        highlither(),
-        editor(document, &highlither)
+        CodeEditor(FaustTilde& o) : m_owner(o), m_manager(*this)
         {
-            editor.setBounds(0, 0, 512, 384);
-            editor.setVisible(true);
-            editor.setColour(juce::CodeEditorComponent::backgroundColourId, juce::Colours::white);
-            editor.setScrollbarThickness(8);
-            window.setContentNonOwned(&editor, true);
+            m_window.setContentNonOwned(&m_manager, true);
         }
         
         void open()
         {
-            owner.deferMain([this]()
+            m_owner.deferMain([this]()
             {
-                if(!window.isShowing())
+                if(!m_window.isShowing())
                 {
-                    document.removeListener(this);
-                    editor.loadContent(juce::String(owner.getDspCode()));
-                    window.addToDesktop();
-                    document.addListener(this);
+                    m_manager.setCode(m_owner.getDspCode());
+                    m_window.addToDesktop();
                 }
             });
         }
         
-        void codeDocumentTextInserted(const String& , int ) override
+        void codeChanged()
         {
-            owner.setEditCode(document.getAllContent().toStdString());
+            m_owner.setEditCode(m_manager.getCode());
         }
         
-        void codeDocumentTextDeleted(int , int ) override
+        void synchronize()
         {
-            owner.setEditCode(document.getAllContent().toStdString());
+            m_owner.setDspCode(m_manager.getCode());
         }
         
     private:
         
-        FaustTilde&               owner;
-        Window                    window;
-        juce::CodeDocument        document;
-        FaustTokeniser            highlither;
-        juce::CodeEditorComponent editor;
+        // ================================================================================ //
+        
+        class CodeEditorManager :
+        public juce::Component,
+        public juce::CodeDocument::Listener,
+        public juce::ToolbarItemFactory,
+        public juce::Button::Listener
+        {
+        public:
+            
+            CodeEditorManager(CodeEditor& o) : m_owner(o), m_editor(m_document, &m_highlither)
+            {
+                setBounds(0, 0, 512, 384);
+                resized();
+                m_editor.setColour(juce::CodeEditorComponent::backgroundColourId, juce::Colours::white);
+                m_editor.setScrollbarThickness(8);
+                addAndMakeVisible(&m_editor);
+                m_menu.setVertical(false);
+                m_menu.setStyle(juce::Toolbar::textOnly);
+                m_menu.addDefaultItems(*this);
+                addAndMakeVisible(&m_menu);
+            }
+            
+            void resized() override
+            {
+                const auto width = getWidth();
+                const auto height = getHeight();
+                m_editor.setBounds(0, 40, width, height - 40);
+                m_menu.setBounds(0, 0, width, 40);
+            }
+            
+            void visibilityChanged() override
+            {
+                if(isVisible())
+                {
+                    m_document.addListener(this);
+                }
+                else
+                {
+                    m_document.removeListener(this);
+                }
+            }
+            
+            void codeDocumentTextInserted(const juce::String& , int ) override
+            {
+                m_owner.codeChanged();
+            }
+            
+            void codeDocumentTextDeleted(int , int ) override
+            {
+                m_owner.codeChanged();
+            }
+            
+            void getAllToolbarItemIds(juce::Array <int>& ids) override
+            {
+                //, juce::ToolbarItemFactory::separatorBarId, 2, juce::ToolbarItemFactory::separatorBarId, 3};
+                ids.add(1);
+            }
+            
+            void getDefaultItemSet(juce::Array <int>& ids) override
+            {
+                ids.add(1);
+            }
+            
+            juce::ToolbarItemComponent* createItem(int itemId) override
+            {
+                juce::String text;
+                if(itemId == 1)
+                {
+                    text = "Sync";
+                }
+                auto btn = new juce::ToolbarButton(itemId, text, new juce::DrawableImage(), nullptr);
+                btn->addListener(this);
+                return btn;
+            }
+            
+            void buttonClicked(juce::Button* btn) override
+            {
+                auto const iid = dynamic_cast<juce::ToolbarButton*>(btn)->getItemId();
+                if(iid == 1)
+                {
+                    m_owner.synchronize();
+                }
+            }
+            
+            void setCode(std::string&& code)
+            {
+                m_editor.loadContent(juce::String(std::move(code)));
+            }
+            
+            std::string getCode()
+            {
+                return m_document.getAllContent().toStdString();
+            }
+            
+        private:
+            CodeEditor&                 m_owner;
+            juce::Toolbar               m_menu;
+            FaustTokeniser              m_highlither;
+            juce::CodeDocument          m_document;
+            juce::CodeEditorComponent   m_editor;
+        };
+        
+        // ================================================================================ //
+        
+        class Window : public juce::DocumentWindow
+        {
+        public:
+            
+            Window() :
+            juce::DocumentWindow("FAUST Code Editor",
+                                 juce::Colours::white,
+                                 juce::DocumentWindow::allButtons,
+                                 false)
+            {
+                setUsingNativeTitleBar(true);
+                setResizable(true, true);
+                setVisible(true);
+                setTopLeftPosition(40, 40);
+            }
+            
+            void closeButtonPressed() override
+            {
+                removeFromDesktop();
+            }
+        };
+        
+        // ================================================================================ //
+        
+        FaustTilde&       m_owner;
+        Window            m_window;
+        CodeEditorManager m_manager;
     };
     
     // ================================================================================ //
@@ -257,7 +346,7 @@ namespace kiwi { namespace engine {
     m_options(getOptions(model)),
     m_ui_glue(std::make_unique<UIGlue>(*this)),
     m_file_selector(std::make_unique<FileSelector>(*this)),
-    m_code_editor(std::make_unique<CodeEditorManager>(*this))
+    m_code_editor(std::make_unique<CodeEditor>(*this))
     {
         attributeChanged("dspcodechanged", {tool::Parameter::Type::String, {std::string("")}});
     }
