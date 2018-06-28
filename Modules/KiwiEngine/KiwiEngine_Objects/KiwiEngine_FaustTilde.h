@@ -102,6 +102,7 @@ namespace kiwi { namespace engine {
         std::unique_ptr<UIGlue>         m_ui_glue;
         std::unique_ptr<FileSelector>   m_file_selector;
         std::unique_ptr<CodeEditor>     m_code_editor;
+        bool                            m_lock_state = false;
     };
 
 }}

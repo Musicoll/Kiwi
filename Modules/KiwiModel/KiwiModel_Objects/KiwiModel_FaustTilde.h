@@ -63,6 +63,7 @@ namespace kiwi { namespace model {
         flip::Message<std::string> m_dsp_code_changed;
         flip::String               m_edit_code;
         flip::Message<std::string> m_edit_code_changed;
+        flip::Int                  m_lock_state;
     };
     
 }}

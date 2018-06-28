@@ -26,7 +26,7 @@
 namespace kiwi { namespace model {
     
     // ================================================================================ //
-    //                                  OBJECT PLUS~                                    //
+    //                                  OBJECT FAUST~                                   //
     // ================================================================================ //
     
     void FaustTilde::declare()
@@ -39,13 +39,17 @@ namespace kiwi { namespace model {
         auto param_edit_code_changed = std::make_unique<ParameterClass>(tool::Parameter::Type::String);
         fausttilde_class->addAttribute("editcodechanged", std::move(param_edit_code_changed));
         
+        auto param_lock_state = std::make_unique<ParameterClass>(tool::Parameter::Type::Int);
+        fausttilde_class->addAttribute("lockstate", std::move(param_lock_state));
+        
         flip::Class<FaustTilde> & fausttilde_model = DataModel::declare<FaustTilde>()
         .name(fausttilde_class->getModelName().c_str())
         .inherit<Object>()
         .member<flip::String, &FaustTilde::m_dsp_code>("dspcode")
         .member<flip::Message<std::string>, &FaustTilde::m_dsp_code_changed>("dspcodechanged")
         .member<flip::String, &FaustTilde::m_edit_code>("editcode")
-        .member<flip::Message<std::string>, &FaustTilde::m_edit_code_changed>("editcodechanged");
+        .member<flip::Message<std::string>, &FaustTilde::m_edit_code_changed>("editcodechanged")
+        .member<flip::Int, &FaustTilde::m_lock_state>("lockstate");
         
         Factory::add<FaustTilde>(std::move(fausttilde_class), fausttilde_model);
     }
@@ -61,6 +65,7 @@ namespace kiwi { namespace model {
         m_dsp_code_changed.disable_in_undo();
         m_edit_code.disable_in_undo();
         m_edit_code_changed.disable_in_undo();
+        m_lock_state.disable_in_undo();
     }
     
     FaustTilde::FaustTilde(std::vector<tool::Atom> const& args)
@@ -69,6 +74,7 @@ namespace kiwi { namespace model {
         m_dsp_code_changed.disable_in_undo();
         m_edit_code.disable_in_undo();
         m_edit_code_changed.disable_in_undo();
+        m_lock_state.disable_in_undo();
         if (args.size() < 2)
         {
             throw Error("faust~ expects 2 default arguments: the number of inlets and the number of outlets.");
@@ -133,11 +139,35 @@ namespace kiwi { namespace model {
     {
         if(name == "dspcodechanged")
         {
-            m_dsp_code_changed.send(parameter[0].getString());
+            const int64_t state = static_cast<int64_t>(m_lock_state);
+            const int64_t uid = document().user();
+            if(!state || state == uid)
+            {
+                m_dsp_code_changed.send(parameter[0].getString());
+            }
         }
         else if(name == "editcodechanged")
         {
-            m_edit_code_changed.send(parameter[0].getString());
+            const int64_t state = static_cast<int64_t>(m_lock_state);
+            const int64_t uid = document().user();
+            if(!state || state == uid)
+            {
+                m_edit_code_changed.send(parameter[0].getString());
+            }
+        }
+        else if(name == "lockstate")
+        {
+            const bool require = static_cast<bool>(parameter[0].getInt());
+            const int64_t state = static_cast<int64_t>(m_lock_state);
+            const int64_t uid = document().user();
+            if(require && !state)
+            {
+                m_lock_state = uid;
+            }
+            else if(!require && state == uid)
+            {
+                m_lock_state = 0;
+            }
         }
     }
     
@@ -157,6 +187,10 @@ namespace kiwi { namespace model {
                                        parameter = tool::Parameter(tool::Parameter::Type::String, {received_message});
                                    });
         }
+        else if(name == "lockstate")
+        {
+            parameter = tool::Parameter(tool::Parameter::Type::Int, {static_cast<int64_t>(m_lock_state)});
+        }
     }
     
     bool FaustTilde::attributeChanged(std::string const& name) const
@@ -168,6 +202,10 @@ namespace kiwi { namespace model {
         else if(name == "editcodechanged")
         {
             return m_edit_code_changed.changed();
+        }
+        else if(name == "lockstate")
+        {
+            return m_lock_state.changed();
         }
         return false;
     }

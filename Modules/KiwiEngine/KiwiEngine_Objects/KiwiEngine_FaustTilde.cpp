@@ -27,6 +27,7 @@
 
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_FaustTilde.h>
 #include <KiwiModel/KiwiModel_DocumentManager.h>
+#include <KiwiModel/KiwiModel_DocumentManager.h>
 
 #include <juce_core/juce_core.h>
 #include <juce_gui_basics/juce_gui_basics.h>
@@ -529,6 +530,11 @@ namespace kiwi { namespace engine {
     
     void FaustTilde::setDspCode(std::string&& code)
     {
+        if(m_lock_state)
+        {
+            warning("faust~: code is currently locked by another user");
+            return;
+        }
         deferMain([this, ncode = std::move(code)]()
                   {
                       auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel());
@@ -547,6 +553,11 @@ namespace kiwi { namespace engine {
     
     void FaustTilde::setEditCode(std::string&& code)
     {
+        if(m_lock_state)
+        {
+            warning("faust~: code is currently locked by another user");
+            return;
+        }
         deferMain([this, ncode = std::move(code)]()
                   {
                       auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel());
@@ -603,6 +614,10 @@ namespace kiwi { namespace engine {
                               auto code = fmodel->getEditCode();
                           }
                       });
+        }
+        else if(name == "lockstate")
+        {
+            m_lock_state = static_cast<bool>(parameter[0].getInt());
         }
     }
     
