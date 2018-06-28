@@ -87,9 +87,11 @@ namespace kiwi { namespace engine {
         class UIGlue;
         class FileSelector;
         class CodeEditor;
+        typedef std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)> uptr_faust_factory;
+        typedef std::unique_ptr<llvm_dsp, nop> uptr_faust_instance;
         
-        std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>  m_factory;
-        std::unique_ptr<llvm_dsp, nop>  m_instance;
+        uptr_faust_factory              m_factory;
+        uptr_faust_instance             m_instance;
         std::mutex                      m_mutex;
         std::vector<dsp::sample_t*>     m_inputs;
         std::vector<dsp::sample_t*>     m_outputs;
@@ -97,7 +99,6 @@ namespace kiwi { namespace engine {
         std::string                     m_dsp_code;
         std::string                     m_edit_code;
         const std::vector<std::string>  m_options;
-        std::mutex                      m_mutex_glue;
         std::unique_ptr<UIGlue>         m_ui_glue;
         std::unique_ptr<FileSelector>   m_file_selector;
         std::unique_ptr<CodeEditor>     m_code_editor;

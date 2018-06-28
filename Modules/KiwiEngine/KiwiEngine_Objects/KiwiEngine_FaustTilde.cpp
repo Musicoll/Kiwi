@@ -256,41 +256,35 @@ namespace kiwi { namespace engine {
             FAUSTFLOAT  max;
             FAUSTFLOAT  step;
             FAUSTFLOAT  saved;
+            bool        dirty; // If the parameter should be deleted
         };
         
-        std::map<std::string, Parameter> m_parameters;
-        FaustTilde&                      m_owner;
         
         UIGlue(FaustTilde& owner) : m_owner(owner) {}
         
         void addButton(const char* label, FAUSTFLOAT* zone) final
         {
-            m_parameters[label] = Parameter({0, zone, 0, 0, 0, 0});
-            *zone = 0;
+            addParameter(label, 0, zone, 0, 0, 0, 0);
         }
         
         void addCheckButton(const char* label, FAUSTFLOAT* zone) final
         {
-            m_parameters[label] = Parameter({1, zone, 0.f, 1.f, 1.f, 0.f});
-            *zone = 0;
+            addParameter(label, 1, zone, 0.f, 1.f, 1.f, 0.f);
         }
         
         void addVerticalSlider(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step) final
         {
-            m_parameters[label] = Parameter({2, zone, min, max, step, init});
-            *zone = init;
+            addParameter(label, 2, zone, min, max, step, init);
         }
         
         virtual void addHorizontalSlider(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step) final
         {
-            m_parameters[label] = Parameter({2, zone, min, max, step, init});
-            *zone = init;
+            addParameter(label, 2, zone, min, max, step, init);
         }
         
         virtual void addNumEntry(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step) final
         {
-            m_parameters[label] = Parameter({2, zone, min, max, step, init});
-            *zone = init;
+            addParameter(label, 2, zone, min, max, step, init);
         }
         
         void addHorizontalBargraph(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT min, FAUSTFLOAT max) final {};
@@ -306,6 +300,171 @@ namespace kiwi { namespace engine {
         void openHorizontalBox(const char* label) final {}
         void openVerticalBox(const char* label) final {}
         void closeBox() final {}
+        
+        void log()
+        {
+            std::lock_guard<std::mutex> guard(m_mutex_glue);
+            m_owner.log("faust~: number of parameters " + std::to_string(m_parameters.size()));
+            for(auto const& param : m_parameters)
+            {
+                m_owner.log(" ");
+                m_owner.log("faust~: parameter " + param.first);
+                m_owner.log("faust~: type " + std::to_string(param.second.type));
+                m_owner.log("faust~: default " + std::to_string(param.second.saved));
+                m_owner.log("faust~: minimum " + std::to_string(param.second.min));
+                m_owner.log("faust~: maximum " + std::to_string(param.second.max));
+                m_owner.log("faust~: step " + std::to_string(param.second.step));
+            }
+        }
+        
+        void set(const std::string& name)
+        {
+            if(m_mutex_glue.try_lock())
+            {
+                auto it = m_parameters.find(name);
+                if(it != m_parameters.end())
+                {
+                    if(it->second.dirty)
+                    {
+                        m_mutex_glue.unlock();
+                        m_owner.warning(std::string("FAUST interfaces \"") + name + std::string("\" not valid anymore"));
+                        return;
+                    }
+                    if(it->second.type == 0)
+                    {
+                        const auto cvalue   = *(it->second.zone);
+                        *(it->second.zone) = static_cast<FAUSTFLOAT>(cvalue < std::numeric_limits<FAUSTFLOAT>::epsilon());
+                    }
+                    else
+                    {
+                        m_owner.warning(std::string("FAUST interface \"") + name + std::string("\" is a requires a value"));
+                    }
+                }
+                else
+                {
+                    m_owner.warning(std::string("no such FAUST interface \"") + name + std::string("\""));
+                }
+                m_mutex_glue.unlock();
+            }
+            else
+            {
+                m_owner.warning(std::string("FAUST interfaces being processed - please wait"));
+            }
+        }
+        
+        void set(const std::string& name, FAUSTFLOAT value)
+        {
+            if(m_mutex_glue.try_lock())
+            {
+                auto it = m_parameters.find(name);
+                if(it != m_parameters.end())
+                {
+                    if(it->second.dirty)
+                    {
+                        m_mutex_glue.unlock();
+                        m_owner.warning(std::string("FAUST interfaces \"") + name + std::string("\" not valid anymore"));
+                        return;
+                    }
+                    if(it->second.type == 1)
+                    {
+                        *(it->second.zone) = static_cast<FAUSTFLOAT>(value < std::numeric_limits<FAUSTFLOAT>::epsilon());
+                    }
+                    else if(it->second.type == 2)
+                    {
+                        const FAUSTFLOAT min = it->second.min;
+                        const FAUSTFLOAT max = it->second.max;
+                        *(it->second.zone) = std::max(std::min(max, value), min);
+                    }
+                    else
+                    {
+                        m_owner.warning(std::string("FAUST interface \"") + name + std::string("\" is doesn't requires a value"));
+                    }
+                }
+                else
+                {
+                    m_owner.warning(std::string("no such FAUST interface \"") + name + std::string("\""));
+                }
+                m_mutex_glue.unlock();
+            }
+            else
+            {
+                m_owner.warning(std::string("FAUST interfaces being processed - please wait"));
+            }
+        }
+        
+        void saveStates()
+        {
+            std::lock_guard<std::mutex> guard(m_mutex_glue);
+            for(auto& param : m_parameters)
+            {
+                param.second.saved = *param.second.zone;
+            }
+        }
+        
+        void recallStates()
+        {
+            std::lock_guard<std::mutex> guard(m_mutex_glue);
+            for(auto& param : m_parameters)
+            {
+                *param.second.zone = param.second.saved;
+            }
+        }
+        
+        void prepareChanges()
+        {
+            std::lock_guard<std::mutex> guard(m_mutex_glue);
+            for(auto& param : m_parameters)
+            {
+                param.second.dirty = true;
+            }
+        }
+        
+        void finishChanges()
+        {
+            std::lock_guard<std::mutex> guard(m_mutex_glue);
+            for(auto& param : m_parameters)
+            {
+                if(param.second.dirty)
+                {
+                    m_parameters.erase(param.first);
+                }
+            }
+        }
+        
+    private:
+        
+        void addParameter(const char* name, int type, FAUSTFLOAT* zone, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step, FAUSTFLOAT init)
+        {
+            std::lock_guard<std::mutex> guard(m_mutex_glue);
+            auto it = m_parameters.find(name);
+            if(it != m_parameters.end())
+            {
+                if(it->second.type != type ||
+                   it->second.min != min ||
+                   it->second.max != max ||
+                   it->second.step != step)
+                {
+                    it->second = Parameter({type, zone, min, max, step, init, false});
+                    *zone = init;
+                }
+                else
+                {
+                    it->second.saved = *it->second.zone;
+                    it->second.zone = zone;
+                    it->second.dirty = false;
+                    *zone = it->second.saved;
+                }
+            }
+            else
+            {
+                m_parameters[name] = Parameter({type, zone, min, max, step, init, false});
+                *zone = init;
+            }
+        }
+        
+        std::map<std::string, Parameter> m_parameters;
+        FaustTilde&                      m_owner;
+        std::mutex                       m_mutex_glue;
     };
     
     // ================================================================================ //
@@ -455,7 +614,17 @@ namespace kiwi { namespace engine {
         {
             argv[i] = m_options[i].c_str();
         }
-        auto nfactory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString(name, code, m_options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
+        
+        uptr_faust_factory nfactory(nullptr, deleteDSPFactory);
+        if(startMTDSPFactories())
+        {
+            nfactory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString(name, code, m_options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
+            stopMTDSPFactories();
+        }
+        else
+        {
+            warning("faust~: can't start multi-thread access");
+        }
         
         if(!errors.empty())
         {
@@ -468,32 +637,22 @@ namespace kiwi { namespace engine {
             
             if(ninstance)
             {
+                m_ui_glue->prepareChanges();
                 // Safetly swap the factory
                 {
                     std::lock_guard<std::mutex> guard(m_mutex);
                     m_instance = std::move(ninstance);
                 }
-                auto nglue = std::make_unique<UIGlue>(*this);
-                m_instance->buildUserInterface(nglue.get());
-                m_ui_glue = std::move(nglue);
+                m_instance->buildUserInterface(m_ui_glue.get());
+                m_ui_glue->finishChanges();
                 log("faust~: DSP allocation succeed");
                 log("faust~: number of inputs " + std::to_string(m_instance->getNumInputs()));
                 log("faust~: number of outputs " + std::to_string(m_instance->getNumOutputs()));
-                log("faust~: number of parameters " + std::to_string(m_ui_glue->m_parameters.size()));
-                for(auto const& param : m_ui_glue->m_parameters)
-                {
-                    log(" ");
-                    log("faust~: parameter " + param.first);
-                    log("faust~: type " + std::to_string(param.second.type));
-                    log("faust~: default " + std::to_string(param.second.saved));
-                    log("faust~: minimum " + std::to_string(param.second.min));
-                    log("faust~: maximum " + std::to_string(param.second.max));
-                    log("faust~: step " + std::to_string(param.second.step));
-                }
+                m_ui_glue->log();
             }
             else
             {
-                m_ui_glue = std::make_unique<UIGlue>(*this);
+                m_ui_glue->prepareChanges();
                 warning("faust~: DSP allocation failed");
                 {
                     // Safetly release the instance
@@ -504,7 +663,7 @@ namespace kiwi { namespace engine {
         }
         else
         {
-            m_ui_glue = std::make_unique<UIGlue>(*this);
+            m_ui_glue->prepareChanges();
             {
                 // Safetly release the instance
                 std::lock_guard<std::mutex> guard(m_mutex);
@@ -552,48 +711,41 @@ namespace kiwi { namespace engine {
                 }
                 return;
             }
-            for(auto const& param : m_ui_glue->m_parameters)
+            if(!m_factory || !m_instance)
             {
-                if(param.first == name)
+                return;
+            }
+            try
+            {
+                if(args.size() == 1)
                 {
-                    if(param.second.type == 0)
+                    m_ui_glue->set(name);
+                }
+                else if(args.size() > 1)
+                {
+                    if(args[1].isNumber())
                     {
-                        *param.second.zone = static_cast<FAUSTFLOAT>(!(*param.second.zone != 0.f));
-                        return;
-                    }
-                    if(param.second.type == 1)
-                    {
-                        if(args.size() > 1 && args[1].isNumber())
+                        m_ui_glue->set(name, args[1].getFloat());
+                        if(args.size() > 2)
                         {
-                            *param.second.zone = static_cast<FAUSTFLOAT>(args[1].getFloat()) != 0.f;
-                            if(args.size() > 2)
-                            {
-                                warning(std::string("faust~: receive method - interface \"")  + name + std::string("\" too many arguments"));
-                            }
-                            return;
+                            warning(std::string("faust~: FAUST interface \"") + name + std::string("\" too many arguments"));
                         }
-                        warning(std::string("faust~: receive method - interface \"") + name + std::string("\" expects a number"));
                     }
                     else
                     {
-                        if(args.size() > 1 && args[1].isNumber())
-                        {
-                            *param.second.zone = std::max(std::min(static_cast<FAUSTFLOAT>(args[1].getFloat()), param.second.max), param.second.min);
-                            if(args.size() > 2)
-                            {
-                                warning(std::string("faust~: receive method - interface \"")  + name + std::string("\" too many arguments"));
-                            }
-                            return;
-                        }
-                        warning(std::string("faust~: receive method - interface \"") + name + std::string("\" expects a number"));
+                        warning(std::string("faust~: FAUST interface \"") + name + std::string("\" requires a number"));
                     }
-                    
                 }
             }
-            warning(std::string("faust~: receive method - no such interface \"") + name + std::string("\""));
-            return;
+            catch (std::string& e)
+            {
+                warning(std::string("faust~: ")  + e);
+            }
         }
-        warning(std::string("faust~: receive method - bad argument"));
+        else
+        {
+            warning(std::string("faust~: receive bad arguments"));
+        }
     }
     
     void FaustTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
@@ -640,15 +792,9 @@ namespace kiwi { namespace engine {
             if(static_cast<size_t>(m_instance->getNumInputs()) < getNumberOfInputs() &&
                static_cast<size_t>(m_instance->getNumOutputs()) < getNumberOfOutputs())
             {
-                for(auto& param : m_ui_glue->m_parameters)
-                {
-                    param.second.saved = *param.second.zone;
-                }
+                m_ui_glue->saveStates();
                 m_instance->instanceInit(static_cast<int>(infos.sample_rate));
-                for(auto& param : m_ui_glue->m_parameters)
-                {
-                    *param.second.zone = param.second.saved;
-                }
+                m_ui_glue->recallStates();
                 m_inputs.resize(m_instance->getNumInputs());
                 m_outputs.resize(m_instance->getNumOutputs());
                 setPerformCallBack(this, &FaustTilde::perform);
