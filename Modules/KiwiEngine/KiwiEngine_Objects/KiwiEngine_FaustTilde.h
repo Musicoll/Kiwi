@@ -53,6 +53,9 @@ namespace kiwi { namespace engine {
         static std::string getName(model::Object const& model);
         static std::vector<std::string> getOptions(model::Object const& model);
     
+        //! @brief Get the compile options
+        std::vector<std::string> getCompileOptions() const;
+        
         //! @brief Get the DSP code
         std::string getDspCode() const;
         
