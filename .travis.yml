@@ -73,11 +73,13 @@ matrix:
     - mkdir Build && cd Build
     - cmake .. -GXcode
     - xcodebuild -scheme Kiwi -configuration Release
+    - xcodebuild -scheme Server -configuration Release
     after_success:
     - cd $TRAVIS_BUILD_DIR
     - mkdir Kiwi && mv Build/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
     - zip -r Kiwi_macos.zip Kiwi
-
+    - mkdir Kiwi_Server && mv Build/KiwiBuild/Release/Server Kiwi_Server/Server
+    - zip -r Kiwi_server_macos.tar.gz Kiwi_Server
 deploy:
   provider: releases
   api_key:
