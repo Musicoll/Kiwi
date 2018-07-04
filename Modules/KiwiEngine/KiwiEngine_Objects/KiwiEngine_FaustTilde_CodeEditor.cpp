@@ -92,8 +92,8 @@ namespace kiwi { namespace engine {
         {
         public:
             
-            CodeEditorManager(CodeEditor& o) :
-            m_owner(o),
+            CodeEditorManager(CodeEditor& owner) :
+            m_owner(owner),
             m_editor(m_document, &m_highlither),
             m_lock(true),
             m_code_changed(true)
@@ -179,6 +179,11 @@ namespace kiwi { namespace engine {
             {
                 if(!m_code_changed)
                 {
+                    return;
+                }
+                if(m_document.getNumCharacters() == 0)
+                {
+                    m_console.clear();
                     return;
                 }
                 std::string errors;

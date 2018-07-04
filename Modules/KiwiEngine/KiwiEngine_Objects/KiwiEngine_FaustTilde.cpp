@@ -34,47 +34,9 @@
 
 #include "KiwiEngine_FaustTilde_CodeEditor.cpp"
 #include "KiwiEngine_FaustTilde_UIGLue.cpp"
+#include "KiwiEngine_FaustTilde_FileSelector.cpp"
 
 namespace kiwi { namespace engine {
-    
-    
-    class FaustTilde::FileSelector
-    {
-    public:
-        
-        FileSelector(FaustTilde& o) : owner(o) {}
-        
-        void open()
-        {
-            auto directory = juce::File(last_directory);
-            if(!directory.exists())
-            {
-                directory = juce::File::getSpecialLocation(juce::File::userMusicDirectory);
-            }
-            fc = std::make_unique<juce::FileChooser>("Choose a DSP file to read...",
-                                                     directory,
-                                                     juce::String("*.dsp"), true);
-            owner.deferMain([this]() {
-                
-                this->fc->launchAsync(juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles, [this](juce::FileChooser const& chooser)
-                                      {
-                                          auto file = chooser.getResult();
-                                          if(file.getFullPathName().isNotEmpty())
-                                          {
-                                              this->owner.openFile(file.getFullPathName().toStdString());
-                                              this->last_directory = file.getParentDirectory().getFullPathName().toStdString();
-                                          }
-                                      });
-            });
-        }
-        
-    private:
-        
-        FaustTilde& owner;
-        std::unique_ptr<juce::FileChooser> fc;
-        std::string last_directory;
-    };
-    
     
     // ================================================================================ //
     //                                       FAUST~                                     //
@@ -237,6 +199,17 @@ namespace kiwi { namespace engine {
     
     void FaustTilde::compileCode(const std::string& name, const std::string& code)
     {
+        if(code.empty())
+        {
+            m_ui_glue->prepareChanges();
+            {
+                // Safetly release the instance
+                std::lock_guard<std::mutex> guard(m_mutex);
+                m_instance.reset();
+            }
+            m_factory.reset();
+            return;
+        }
         std::string errors;
         std::vector<char const*> argv(m_options.size());
         for(size_t i = 0; i < m_options.size(); ++i)
