@@ -126,7 +126,7 @@ namespace kiwi { namespace engine {
             }
         }
         
-        param_type get(const std::string& name)
+        param_type getOutput(const std::string& name)
         {
             if(m_mutex_glue.try_lock())
             {
@@ -134,6 +134,7 @@ namespace kiwi { namespace engine {
                 if(it == m_params_short.end())
                 {
                     m_mutex_glue.unlock();
+                    m_owner.warning(std::string("no such FAUST interface \"") + name + std::string("\""));
                     return 0;
                 }
                 param_type value = *(it->second.zone);
@@ -143,7 +144,23 @@ namespace kiwi { namespace engine {
             return 0;
         }
         
-        void set(const std::string& name)
+        bool hasOutput(const std::string& name)
+        {
+            if(m_mutex_glue.try_lock())
+            {
+                auto it = m_params_short.find(name);
+                if(it == m_params_short.end())
+                {
+                    m_mutex_glue.unlock();
+                    return false;
+                }
+                m_mutex_glue.unlock();
+                return true;
+            }
+            return false;
+        }
+        
+        void setInput(const std::string& name)
         {
             if(m_mutex_glue.try_lock())
             {
@@ -180,7 +197,7 @@ namespace kiwi { namespace engine {
             m_owner.warning(std::string("FAUST interfaces being processed - please wait"));
         }
         
-        void set(const std::string& name, param_type value)
+        void setInput(const std::string& name, param_type value)
         {
             if(m_mutex_glue.try_lock())
             {

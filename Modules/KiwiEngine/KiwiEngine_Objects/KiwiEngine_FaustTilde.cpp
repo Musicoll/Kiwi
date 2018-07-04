@@ -349,31 +349,28 @@ namespace kiwi { namespace engine {
             {
                 return;
             }
-            try
+            if(args.size() == 1)
             {
-                if(args.size() == 1)
+                if(m_ui_glue->hasOutput(name))
                 {
-                    m_ui_glue->set(name);
+                    send(getNumberOfOutputs() - 1, {m_ui_glue->getOutput(name)});
                 }
-                else if(args.size() > 1)
-                {
-                    if(args[1].isNumber())
-                    {
-                        m_ui_glue->set(name, args[1].getFloat());
-                        if(args.size() > 2)
-                        {
-                            warning(std::string("faust~: FAUST interface \"") + name + std::string("\" too many arguments"));
-                        }
-                    }
-                    else
-                    {
-                        warning(std::string("faust~: FAUST interface \"") + name + std::string("\" requires a number"));
-                    }
-                }
+                m_ui_glue->setInput(name);
             }
-            catch (std::string& e)
+            else if(args.size() > 1)
             {
-                warning(std::string("faust~: ")  + e);
+                if(args[1].isNumber())
+                {
+                    m_ui_glue->setInput(name, args[1].getFloat());
+                    if(args.size() > 2)
+                    {
+                        warning(std::string("faust~: FAUST interface \"") + name + std::string("\" too many arguments"));
+                    }
+                }
+                else
+                {
+                    warning(std::string("faust~: FAUST interface \"") + name + std::string("\" requires a number"));
+                }
             }
         }
         else
@@ -424,7 +421,7 @@ namespace kiwi { namespace engine {
         if(m_instance)
         {
             if(static_cast<size_t>(m_instance->getNumInputs()) <= getNumberOfInputs() &&
-               static_cast<size_t>(m_instance->getNumOutputs()) <= getNumberOfOutputs())
+               static_cast<size_t>(m_instance->getNumOutputs()) <= getNumberOfOutputs() - 1)
             {
                 m_ui_glue->saveStates();
                 m_instance->instanceInit(static_cast<int>(infos.sample_rate));
@@ -435,9 +432,7 @@ namespace kiwi { namespace engine {
             }
             else
             {
-                warning("faust~: DSP instance has invalid number of inputs and outputs");
-                warning("faust~: " + std::to_string(getNumberOfInputs()) + " " + std::to_string(getNumberOfOutputs()));
-                warning("faust~: " + std::to_string(m_instance->getNumInputs()) + " " + std::to_string(m_instance->getNumOutputs()));
+                warning("faust~: DSP instance has invalid number of inputs and outputs, expected at least " + std::to_string(m_instance->getNumInputs()) + " inputs but has " + std::to_string(getNumberOfInputs()) + " and " + std::to_string(m_instance->getNumOutputs()) + " inputs but has " + std::to_string(getNumberOfOutputs() - 1));
             }
         }
     }
