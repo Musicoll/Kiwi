@@ -34,6 +34,7 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 
 #include "../../../Client/Source/KiwiApp_Ressources/KiwiApp_BinaryData.h"
+//#include "../../../Client/Source/KiwiApp.h"
 
 namespace kiwi { namespace engine {
     
@@ -101,6 +102,7 @@ namespace kiwi { namespace engine {
                 setBounds(0, 0, 512, 384);
                 m_editor.setColour(juce::CodeEditorComponent::backgroundColourId, juce::Colours::white);
                 m_editor.setScrollbarThickness(8);
+                //m_editor.setCommandManager(&KiwiApp::getCommandManager());
                 addAndMakeVisible(&m_editor);
                 
                 auto img_sync = juce::ImageFileFormat::loadFrom(binary_data::images::refresh_png, binary_data::images::refresh_png_size);
@@ -127,8 +129,8 @@ namespace kiwi { namespace engine {
                 
                 m_console.setMultiLine(true);
                 m_console.setReadOnly(true);
-                m_console.setColour(juce::TextEditor::backgroundColourId, juce::Colours::white);
-                m_console.setColour(juce::TextEditor::textColourId, juce::Colours::black);
+                m_console.setColour(juce::TextEditor::backgroundColourId, juce::Colours::grey);
+                m_console.setColour(juce::TextEditor::textColourId, juce::Colours::red);
                 addAndMakeVisible(&m_console);
                 resized();
             }
@@ -180,6 +182,7 @@ namespace kiwi { namespace engine {
                 {
                     return;
                 }
+                std::string errors;
                 m_code_changed = false;
                 std::vector<std::string> options(m_owner.getCompileOptions());
                 std::vector<char const*> argv(options.size());
@@ -190,10 +193,10 @@ namespace kiwi { namespace engine {
             
                 if(startMTDSPFactories())
                 {
-                    uptr_faust_factory nfactory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString("", getCode(), options.size(), argv.data(), std::string(), m_errors), deleteDSPFactory);
+                    uptr_faust_factory nfactory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString("", getCode(), options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
                     stopMTDSPFactories();
                 }
-                m_console.setText(m_errors);
+                m_console.setText(errors);
             }
             
             void codeDocumentTextInserted(const juce::String& , int ) override
@@ -244,7 +247,6 @@ namespace kiwi { namespace engine {
             juce::CodeEditorComponent   m_editor;
             std::atomic<bool>           m_lock;
             std::atomic<bool>           m_code_changed;
-            std::string                 m_errors;
         };
         
         // ================================================================================ //
