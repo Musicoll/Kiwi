@@ -33,7 +33,8 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 
-#include "KiwiEngine_FaustTildeCodeEditor.cpp"
+#include "KiwiEngine_FaustTilde_CodeEditor.cpp"
+#include "KiwiEngine_FaustTilde_UIGLue.cpp"
 
 namespace kiwi { namespace engine {
     
@@ -75,230 +76,6 @@ namespace kiwi { namespace engine {
         std::string last_directory;
     };
     
-    // ================================================================================ //
-    
-    class FaustTilde::UIGlue : public UI
-    {
-    public:
-        class Parameter
-        {
-        public:
-            int         type;
-            FAUSTFLOAT* zone;
-            FAUSTFLOAT  min;
-            FAUSTFLOAT  max;
-            FAUSTFLOAT  step;
-            FAUSTFLOAT  saved;
-            bool        dirty; // If the parameter should be deleted
-        };
-        
-        
-        UIGlue(FaustTilde& owner) : m_owner(owner) {}
-        
-        void addButton(const char* label, FAUSTFLOAT* zone) final
-        {
-            addParameter(label, 0, zone, 0, 0, 0, 0);
-        }
-        
-        void addCheckButton(const char* label, FAUSTFLOAT* zone) final
-        {
-            addParameter(label, 1, zone, 0.f, 1.f, 1.f, 0.f);
-        }
-        
-        void addVerticalSlider(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step) final
-        {
-            addParameter(label, 2, zone, min, max, step, init);
-        }
-        
-        virtual void addHorizontalSlider(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step) final
-        {
-            addParameter(label, 2, zone, min, max, step, init);
-        }
-        
-        virtual void addNumEntry(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step) final
-        {
-            addParameter(label, 2, zone, min, max, step, init);
-        }
-        
-        void addHorizontalBargraph(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT min, FAUSTFLOAT max) final {};
-        void addVerticalBargraph(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT min, FAUSTFLOAT max) final {};
-        void addSoundfile(const char* label, const char* filename, Soundfile** sf_zone) final {}
-        
-        void declare(FAUSTFLOAT*, const char* key, const char* value) final
-        {
-            m_owner.log(std::string("faust~: declare ") + std::string(key) + std::string(" - ") + std::string(value));
-        }
-        
-        void openTabBox(const char* label) final {};
-        void openHorizontalBox(const char* label) final {}
-        void openVerticalBox(const char* label) final {}
-        void closeBox() final {}
-        
-        void log()
-        {
-            std::lock_guard<std::mutex> guard(m_mutex_glue);
-            m_owner.log("faust~: number of parameters " + std::to_string(m_parameters.size()));
-            for(auto const& param : m_parameters)
-            {
-                m_owner.log(" ");
-                m_owner.log("faust~: parameter " + param.first);
-                m_owner.log("faust~: type " + std::to_string(param.second.type));
-                m_owner.log("faust~: default " + std::to_string(param.second.saved));
-                m_owner.log("faust~: minimum " + std::to_string(param.second.min));
-                m_owner.log("faust~: maximum " + std::to_string(param.second.max));
-                m_owner.log("faust~: step " + std::to_string(param.second.step));
-            }
-        }
-        
-        void set(const std::string& name)
-        {
-            if(m_mutex_glue.try_lock())
-            {
-                auto it = m_parameters.find(name);
-                if(it != m_parameters.end())
-                {
-                    if(it->second.dirty)
-                    {
-                        m_mutex_glue.unlock();
-                        m_owner.warning(std::string("FAUST interfaces \"") + name + std::string("\" not valid anymore"));
-                        return;
-                    }
-                    if(it->second.type == 0)
-                    {
-                        const auto cvalue   = *(it->second.zone);
-                        *(it->second.zone) = static_cast<FAUSTFLOAT>(cvalue < std::numeric_limits<FAUSTFLOAT>::epsilon());
-                    }
-                    else
-                    {
-                        m_owner.warning(std::string("FAUST interface \"") + name + std::string("\" is a requires a value"));
-                    }
-                }
-                else
-                {
-                    m_owner.warning(std::string("no such FAUST interface \"") + name + std::string("\""));
-                }
-                m_mutex_glue.unlock();
-            }
-            else
-            {
-                m_owner.warning(std::string("FAUST interfaces being processed - please wait"));
-            }
-        }
-        
-        void set(const std::string& name, FAUSTFLOAT value)
-        {
-            if(m_mutex_glue.try_lock())
-            {
-                auto it = m_parameters.find(name);
-                if(it != m_parameters.end())
-                {
-                    if(it->second.dirty)
-                    {
-                        m_mutex_glue.unlock();
-                        m_owner.warning(std::string("FAUST interfaces \"") + name + std::string("\" not valid anymore"));
-                        return;
-                    }
-                    if(it->second.type == 1)
-                    {
-                        *(it->second.zone) = static_cast<FAUSTFLOAT>(value < std::numeric_limits<FAUSTFLOAT>::epsilon());
-                    }
-                    else if(it->second.type == 2)
-                    {
-                        const FAUSTFLOAT min = it->second.min;
-                        const FAUSTFLOAT max = it->second.max;
-                        *(it->second.zone) = std::max(std::min(max, value), min);
-                    }
-                    else
-                    {
-                        m_owner.warning(std::string("FAUST interface \"") + name + std::string("\" is doesn't requires a value"));
-                    }
-                }
-                else
-                {
-                    m_owner.warning(std::string("no such FAUST interface \"") + name + std::string("\""));
-                }
-                m_mutex_glue.unlock();
-            }
-            else
-            {
-                m_owner.warning(std::string("FAUST interfaces being processed - please wait"));
-            }
-        }
-        
-        void saveStates()
-        {
-            std::lock_guard<std::mutex> guard(m_mutex_glue);
-            for(auto& param : m_parameters)
-            {
-                param.second.saved = *param.second.zone;
-            }
-        }
-        
-        void recallStates()
-        {
-            std::lock_guard<std::mutex> guard(m_mutex_glue);
-            for(auto& param : m_parameters)
-            {
-                *param.second.zone = param.second.saved;
-            }
-        }
-        
-        void prepareChanges()
-        {
-            std::lock_guard<std::mutex> guard(m_mutex_glue);
-            for(auto& param : m_parameters)
-            {
-                param.second.dirty = true;
-            }
-        }
-        
-        void finishChanges()
-        {
-            std::lock_guard<std::mutex> guard(m_mutex_glue);
-            for(auto& param : m_parameters)
-            {
-                if(param.second.dirty)
-                {
-                    m_parameters.erase(param.first);
-                }
-            }
-        }
-        
-    private:
-        
-        void addParameter(const char* name, int type, FAUSTFLOAT* zone, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step, FAUSTFLOAT init)
-        {
-            std::lock_guard<std::mutex> guard(m_mutex_glue);
-            auto it = m_parameters.find(name);
-            if(it != m_parameters.end())
-            {
-                if(it->second.type != type ||
-                   it->second.min != min ||
-                   it->second.max != max ||
-                   it->second.step != step)
-                {
-                    it->second = Parameter({type, zone, min, max, step, init, false});
-                    *zone = init;
-                }
-                else
-                {
-                    it->second.saved = *it->second.zone;
-                    it->second.zone = zone;
-                    it->second.dirty = false;
-                    *zone = it->second.saved;
-                }
-            }
-            else
-            {
-                m_parameters[name] = Parameter({type, zone, min, max, step, init, false});
-                *zone = init;
-            }
-        }
-        
-        std::map<std::string, Parameter> m_parameters;
-        FaustTilde&                      m_owner;
-        std::mutex                       m_mutex_glue;
-    };
     
     // ================================================================================ //
     //                                       FAUST~                                     //
@@ -646,8 +423,8 @@ namespace kiwi { namespace engine {
     {
         if(m_instance)
         {
-            if(static_cast<size_t>(m_instance->getNumInputs()) < getNumberOfInputs() &&
-               static_cast<size_t>(m_instance->getNumOutputs()) < getNumberOfOutputs())
+            if(static_cast<size_t>(m_instance->getNumInputs()) <= getNumberOfInputs() &&
+               static_cast<size_t>(m_instance->getNumOutputs()) <= getNumberOfOutputs())
             {
                 m_ui_glue->saveStates();
                 m_instance->instanceInit(static_cast<int>(infos.sample_rate));
@@ -659,6 +436,8 @@ namespace kiwi { namespace engine {
             else
             {
                 warning("faust~: DSP instance has invalid number of inputs and outputs");
+                warning("faust~: " + std::to_string(getNumberOfInputs()) + " " + std::to_string(getNumberOfOutputs()));
+                warning("faust~: " + std::to_string(m_instance->getNumInputs()) + " " + std::to_string(m_instance->getNumOutputs()));
             }
         }
     }
