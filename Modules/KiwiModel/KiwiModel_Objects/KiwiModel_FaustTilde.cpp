@@ -77,7 +77,7 @@ namespace kiwi { namespace model {
         m_lock_state.disable_in_undo();
         if (args.size() < 2)
         {
-            throw Error("faust~ expects 2 default arguments: the number of inlets and the number of outlets.");
+            throw Error("faust~ expects at least 2 default arguments: the number of inlets and the number of outlets.");
         }
         
         if (!args[0].isInt() || args[0].getInt() < 0)
@@ -88,6 +88,13 @@ namespace kiwi { namespace model {
         {
             throw Error("faust~ 2nd argument must be the number of outlets - positive or null");
         }
+        if (args.size() > 2)
+        {
+            if(!args[2].isString() || args[2].getString() != "-c")
+            {
+                throw Error("faust~ 3rd argument must be the a facultative flag \"-c\" for extra control output");
+            }
+        }
         pushInlet({PinType::IType::Control, PinType::IType::Signal});
         for(int i = 1; i < args[0].getInt(); ++i)
         {
@@ -96,6 +103,10 @@ namespace kiwi { namespace model {
         for(int i = 0; i < args[1].getInt(); ++i)
         {
             pushOutlet(PinType::IType::Signal);
+        }
+        if(args.size() > 3)
+        {
+            pushOutlet(PinType::IType::Control);
         }
     }
     
