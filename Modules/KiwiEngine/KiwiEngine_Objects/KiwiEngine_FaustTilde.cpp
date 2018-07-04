@@ -148,7 +148,7 @@ namespace kiwi { namespace engine {
     
     void FaustTilde::setDspCode(std::string&& code)
     {
-        if(canLock() || hasLock())
+        if(!canLock() && !hasLock())
         {
             warning("faust~: code is currently locked by another user");
             return;
@@ -171,7 +171,7 @@ namespace kiwi { namespace engine {
     
     void FaustTilde::setEditCode(std::string&& code)
     {
-        if(canLock() || hasLock())
+        if(!canLock() && !hasLock())
         {
             warning("faust~: code is currently locked by another user");
             return;

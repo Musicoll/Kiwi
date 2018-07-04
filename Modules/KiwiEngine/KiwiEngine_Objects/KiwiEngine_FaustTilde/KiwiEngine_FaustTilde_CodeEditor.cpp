@@ -61,7 +61,7 @@ namespace kiwi { namespace engine {
                                     img_sync, 1.f, juce::Colours::lightgrey.withAlpha(0.5f),
                                     img_sync, 1.f, juce::Colours::lightgrey.withAlpha(0.5f));
             m_button_sync.setClickingTogglesState(false);
-            m_button_sync.setRadioGroupId(1);
+            m_button_sync.setName("update");
             m_button_sync.addListener(this);
             m_button_sync.setTooltip("Update DSP code");
             addAndMakeVisible(&m_button_sync);
@@ -72,7 +72,7 @@ namespace kiwi { namespace engine {
                                     img_lock, 1.f, juce::Colours::lightgrey.withAlpha(0.5f),
                                     img_lock, 1.f, juce::Colours::lightgrey.withAlpha(0.5f));
             m_button_lock.setClickingTogglesState(true);
-            m_button_lock.setRadioGroupId(2);
+            m_button_lock.setName("lock");
             m_button_lock.addListener(this);
             m_button_lock.setTooltip("Grab the lock");
             addAndMakeVisible(&m_button_lock);
@@ -82,8 +82,7 @@ namespace kiwi { namespace engine {
                                     img_force, 1.f, juce::Colours::transparentWhite,
                                     img_force, 1.f, juce::Colours::lightgrey.withAlpha(0.5f),
                                     img_force, 1.f, juce::Colours::lightgrey.withAlpha(0.5f));
-            m_button_forc.setClickingTogglesState(true);
-            m_button_forc.setRadioGroupId(3);
+            m_button_forc.setName("force");
             m_button_forc.addListener(this);
             m_button_forc.setTooltip("Force unlock");
             addAndMakeVisible(&m_button_forc);
@@ -167,18 +166,24 @@ namespace kiwi { namespace engine {
         // ================================================================================ //
         void buttonClicked(juce::Button* btn) override
         {
-            auto const iid = btn->getRadioGroupId();
-            if(iid == 1)
+            auto const name = btn->getName();
+            if(name == "update")
             {
                 uploadToDspCode();
             }
-            else if(iid == 2)
+            else if(name == "force")
             {
-                setLock(btn->getToggleState());
+                forceUnlock();
             }
-            else if(iid == 3)
+        }
+        
+        void buttonStateChanged (juce::Button* btn) override
+        {
+            auto const name = btn->getName();
+            if(name == "lock")
             {
-                m_owner.forceUnlock();
+                std::cout << "button 2 state " << (btn->getToggleState()) << "\n";
+                setLock(btn->getToggleState());
             }
         }
         
@@ -214,7 +219,11 @@ namespace kiwi { namespace engine {
         {
             const juce::MessageManagerLock mmLock;
             m_editor.setReadOnly(!m_owner.hasLock());
+            m_button_sync.setEnabled(m_owner.hasLock());
             m_button_lock.setToggleState(m_owner.hasLock(), juce::NotificationType::dontSendNotification);
+            m_button_lock.setEnabled(m_owner.canLock() || m_owner.hasLock());
+            m_button_forc.setEnabled(!m_owner.canLock() && !m_owner.canLock());
+
             repaint();
         }
         
@@ -295,6 +304,12 @@ namespace kiwi { namespace engine {
         void setLock(bool state)
         {
             m_owner.grabLock(state);
+        }
+        
+        // Force unlock
+        void forceUnlock()
+        {
+            m_owner.forceUnlock();
         }
         
         // ================================================================================ //
