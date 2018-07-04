@@ -160,7 +160,7 @@ namespace kiwi { namespace engine {
             return false;
         }
         
-        void setInput(const std::string& name)
+        void setInput(const std::string& name, param_type value)
         {
             if(m_mutex_glue.try_lock())
             {
@@ -184,42 +184,17 @@ namespace kiwi { namespace engine {
                 }
                 if(it->second.type == Parameter::Type::Button)
                 {
-                    *(it->second.zone) = 0;
-                    *(it->second.zone) = 1;
-                }
-                else
-                {
-                    m_owner.warning(std::string("FAUST interface \"") + name + std::string("\" is a requires a value"));
-                }
-                m_mutex_glue.unlock();
-                return;
-            }
-            m_owner.warning(std::string("FAUST interfaces being processed - please wait"));
-        }
-        
-        void setInput(const std::string& name, param_type value)
-        {
-            if(m_mutex_glue.try_lock())
-            {
-                auto it = m_params_short.find(name);
-                if(it == m_params_short.end())
-                {
-                    it = m_params_long.find(name);
-                    if(it == m_params_long.end())
+                    if(value < std::numeric_limits<param_type>::epsilon())
                     {
-                        m_mutex_glue.unlock();
-                        m_owner.warning(std::string("no such FAUST interface \"") + name + std::string("\""));
-                        return;
+                        *(it->second.zone) = 0;
+                    }
+                    else
+                    {
+                        *(it->second.zone) = 0;
+                        *(it->second.zone) = 1;
                     }
                 }
-                
-                if(it->second.dirty)
-                {
-                    m_mutex_glue.unlock();
-                    m_owner.warning(std::string("FAUST interfaces \"") + name + std::string("\" not valid anymore"));
-                    return;
-                }
-                if(it->second.type == Parameter::Type::CheckButton)
+                else if(it->second.type == Parameter::Type::CheckButton)
                 {
                     *(it->second.zone) = static_cast<param_type>(value < std::numeric_limits<param_type>::epsilon());
                 }
@@ -253,7 +228,10 @@ namespace kiwi { namespace engine {
             std::lock_guard<std::mutex> guard(m_mutex_glue);
             for(auto& param : m_params_short)
             {
-                param.second.saved = *param.second.zone;
+                if(param.second.type != Parameter::Type::Button)
+                {
+                    param.second.saved = *param.second.zone;
+                }
             }
         }
         
@@ -262,7 +240,10 @@ namespace kiwi { namespace engine {
             std::lock_guard<std::mutex> guard(m_mutex_glue);
             for(auto& param : m_params_short)
             {
-                *param.second.zone = param.second.saved;
+                if(param.second.type != Parameter::Type::Button)
+                {
+                    *param.second.zone = param.second.saved;
+                }
             }
         }
         

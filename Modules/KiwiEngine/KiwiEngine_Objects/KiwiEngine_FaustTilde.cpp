@@ -355,7 +355,11 @@ namespace kiwi { namespace engine {
                 {
                     send(getNumberOfOutputs() - 1, {m_ui_glue->getOutput(name)});
                 }
-                m_ui_glue->setInput(name);
+                m_ui_glue->setInput(name, 1);
+                scheduleMain([this, name = std::move(name)]()
+                             {
+                                 m_ui_glue->setInput(name, 0);
+                             } , tool::Scheduler<>::duration_t(2));
             }
             else if(args.size() > 1)
             {
