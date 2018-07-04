@@ -52,6 +52,8 @@ namespace kiwi { namespace model {
         
         std::string getEditCode() const;
         
+        int64_t getLockState() const;
+        
         void writeAttribute(std::string const& name, tool::Parameter const& parameter) override;
         
         void readAttribute(std::string const& name, tool::Parameter & parameter) const override;

@@ -136,28 +136,35 @@ namespace kiwi { namespace model {
         return m_edit_code;
     }
     
+    int64_t FaustTilde::getLockState() const
+    {
+        return m_lock_state;
+    }
+    
     void FaustTilde::writeAttribute(std::string const& name, tool::Parameter const& parameter)
     {
         if(name == "dspcodechanged")
         {
-            const int64_t state = static_cast<int64_t>(m_lock_state);
-            const int64_t uid = document().user();
-            if(!state || state == uid)
+            //const int64_t state = static_cast<int64_t>(m_lock_state);
+            //const int64_t uid = document().user();
+            //if(!state || state == uid)
             {
                 m_dsp_code_changed.send(parameter[0].getString());
             }
         }
         else if(name == "editcodechanged")
         {
-            const int64_t state = static_cast<int64_t>(m_lock_state);
-            const int64_t uid = document().user();
-            if(!state || state == uid)
+            //const int64_t state = static_cast<int64_t>(m_lock_state);
+            //const int64_t uid = document().user();
+            //if(!state || state == uid)
             {
                 m_edit_code_changed.send(parameter[0].getString());
             }
         }
         else if(name == "lockstate")
         {
+            m_lock_state = parameter[0].getInt();
+            /*
             const bool require = static_cast<bool>(parameter[0].getInt());
             const int64_t state = static_cast<int64_t>(m_lock_state);
             const int64_t uid = document().user();
@@ -169,6 +176,7 @@ namespace kiwi { namespace model {
             {
                 m_lock_state = 0;
             }
+             */
         }
     }
     
