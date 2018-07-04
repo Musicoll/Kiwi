@@ -23,7 +23,6 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_FaustCodeTokenizer.h>
 #include <KiwiEngine/KiwiEngine_Factory.h>
 #include <faust/dsp/llvm-dsp.h>
-#include <faust/gui/UI.h>
 
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_FaustTilde.h>
 #include <KiwiModel/KiwiModel_DocumentManager.h>
@@ -354,6 +353,7 @@ namespace kiwi { namespace engine {
                 if(m_ui_glue->hasOutput(name))
                 {
                     send(getNumberOfOutputs() - 1, {m_ui_glue->getOutput(name)});
+                    return;
                 }
                 m_ui_glue->setInput(name, 1);
                 scheduleMain([this, name = std::move(name)]()
@@ -370,17 +370,13 @@ namespace kiwi { namespace engine {
                     {
                         warning(std::string("faust~: FAUST interface \"") + name + std::string("\" too many arguments"));
                     }
+                    return;
                 }
-                else
-                {
-                    warning(std::string("faust~: FAUST interface \"") + name + std::string("\" requires a number"));
-                }
+                warning(std::string("faust~: FAUST interface \"") + name + std::string("\" requires a number"));
             }
+            return;
         }
-        else
-        {
-            warning(std::string("faust~: receive bad arguments"));
-        }
+        warning(std::string("faust~: receive bad arguments"));
     }
     
     void FaustTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept

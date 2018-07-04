@@ -23,7 +23,6 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_FaustCodeTokenizer.h>
 #include <KiwiEngine/KiwiEngine_Factory.h>
 #include <faust/dsp/llvm-dsp.h>
-#include <faust/gui/UI.h>
 
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_FaustTilde.h>
 #include <KiwiModel/KiwiModel_DocumentManager.h>

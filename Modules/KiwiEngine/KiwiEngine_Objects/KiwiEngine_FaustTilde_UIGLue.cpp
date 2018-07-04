@@ -20,7 +20,6 @@
  */
 
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_FaustTilde.h>
-#include <faust/dsp/llvm-dsp.h>
 #include <faust/gui/UI.h>
 
 namespace kiwi { namespace engine {
