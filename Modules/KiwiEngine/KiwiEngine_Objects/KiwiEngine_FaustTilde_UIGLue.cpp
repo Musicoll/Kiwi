@@ -27,21 +27,10 @@ namespace kiwi { namespace engine {
     
     // ================================================================================ //
     
+    //! @brief The User Interface Glue for FAUST
     class FaustTilde::UIGlue : public UI
     {
     public:
-        class Parameter
-        {
-        public:
-            int         type;
-            FAUSTFLOAT* zone;
-            FAUSTFLOAT  min;
-            FAUSTFLOAT  max;
-            FAUSTFLOAT  step;
-            FAUSTFLOAT  deft;
-            FAUSTFLOAT  saved;
-            bool        dirty; // If the parameter should be deleted
-        };
         
         
         UIGlue(FaustTilde& owner) : m_owner(owner)
@@ -51,27 +40,27 @@ namespace kiwi { namespace engine {
         
         void addButton(const char* label, FAUSTFLOAT* zone) override
         {
-            addParameter(label, 0, zone, 0, 0, 0, 0);
+            addParameter(label, Parameter::Type::Button, zone, 0, 0, 0, 0);
         }
         
         void addCheckButton(const char* label, FAUSTFLOAT* zone) override
         {
-            addParameter(label, 1, zone, 0.f, 1.f, 1.f, 0.f);
+            addParameter(label, Parameter::Type::CheckButton, zone, 0.f, 1.f, 1.f, 0.f);
         }
         
         void addVerticalSlider(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step) override
         {
-            addParameter(label, 2, zone, min, max, step, init);
+            addParameter(label, Parameter::Type::Float, zone, min, max, step, init);
         }
         
         virtual void addHorizontalSlider(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step) override
         {
-            addParameter(label, 2, zone, min, max, step, init);
+            addParameter(label, Parameter::Type::Float, zone, min, max, step, init);
         }
         
         virtual void addNumEntry(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step) override
         {
-            addParameter(label, 2, zone, min, max, step, init);
+            addParameter(label, Parameter::Type::Float, zone, min, max, step, init);
         }
         
         void addHorizontalBargraph(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT min, FAUSTFLOAT max) override {};
@@ -94,13 +83,7 @@ namespace kiwi { namespace engine {
             m_owner.log("faust~: number of parameters " + std::to_string(m_parameters.size()));
             for(auto const& param : m_parameters)
             {
-                m_owner.log(" ");
-                m_owner.log("faust~: parameter " + param.first);
-                m_owner.log("faust~: type " + std::to_string(param.second.type));
-                m_owner.log("faust~: default " + std::to_string(param.second.saved));
-                m_owner.log("faust~: minimum " + std::to_string(param.second.min));
-                m_owner.log("faust~: maximum " + std::to_string(param.second.max));
-                m_owner.log("faust~: step " + std::to_string(param.second.step));
+                m_owner.log("faust~: parameter " + param.first + " " + param.second.toString());
             }
         }
         
@@ -117,7 +100,7 @@ namespace kiwi { namespace engine {
                         m_owner.warning(std::string("FAUST interfaces \"") + name + std::string("\" not valid anymore"));
                         return;
                     }
-                    if(it->second.type == 0)
+                    if(it->second.type == Parameter::Type::Button)
                     {
                         *(it->second.zone) = 0;
                         *(it->second.zone) = 1;
@@ -152,11 +135,11 @@ namespace kiwi { namespace engine {
                         m_owner.warning(std::string("FAUST interfaces \"") + name + std::string("\" not valid anymore"));
                         return;
                     }
-                    if(it->second.type == 1)
+                    if(it->second.type == Parameter::Type::CheckButton)
                     {
                         *(it->second.zone) = static_cast<FAUSTFLOAT>(value < std::numeric_limits<FAUSTFLOAT>::epsilon());
                     }
-                    else if(it->second.type == 2)
+                    else if(it->second.type == Parameter::Type::Float)
                     {
                         const FAUSTFLOAT min = it->second.min;
                         const FAUSTFLOAT max = it->second.max;
@@ -233,7 +216,33 @@ namespace kiwi { namespace engine {
         
     private:
         
-        void addParameter(const char* name, int type, FAUSTFLOAT* zone, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step, FAUSTFLOAT init)
+        //! @brief The Parameter
+        class Parameter
+        {
+        public:
+            enum class Type
+            {
+                Button,
+                CheckButton,
+                Float
+            };
+            
+            Type        type;
+            FAUSTFLOAT* zone;
+            FAUSTFLOAT  min;
+            FAUSTFLOAT  max;
+            FAUSTFLOAT  step;
+            FAUSTFLOAT  deft;
+            FAUSTFLOAT  saved;
+            bool        dirty; // If the parameter should be deleted
+            
+            std::string toString() const
+            {
+                return std::string((type == Type::Button) ? " button" : ((type == Type::CheckButton) ? " check button" : "float")) + " [" + std::to_string(min) + " " + std::to_string(max) + "] " + std::to_string(deft);
+            }
+        };
+        
+        void addParameter(const char* name, Parameter::Type type, FAUSTFLOAT* zone, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step, FAUSTFLOAT init)
         {
             std::lock_guard<std::mutex> guard(m_mutex_glue);
             auto it = m_parameters.find(name);
