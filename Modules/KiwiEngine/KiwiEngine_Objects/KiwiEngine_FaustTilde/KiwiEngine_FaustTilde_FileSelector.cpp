@@ -36,7 +36,7 @@ namespace kiwi { namespace engine {
             
         }
         
-        void open()
+        void show()
         {
             auto directory = juce::File(m_last_directory);
             if(!directory.exists())

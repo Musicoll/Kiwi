@@ -20,17 +20,11 @@
  */
 
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_FaustTilde.h>
-#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_FaustCodeTokenizer.h>
 #include <KiwiEngine/KiwiEngine_Factory.h>
 #include <faust/dsp/llvm-dsp.h>
 
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_FaustTilde.h>
 #include <KiwiModel/KiwiModel_DocumentManager.h>
-#include <KiwiModel/KiwiModel_DocumentManager.h>
-
-#include <juce_core/juce_core.h>
-#include <juce_gui_basics/juce_gui_basics.h>
-#include <juce_gui_extra/juce_gui_extra.h>
 
 #include "KiwiEngine_FaustTilde/KiwiEngine_FaustTilde_CodeEditor.cpp"
 #include "KiwiEngine_FaustTilde/KiwiEngine_FaustTilde_UIGLue.cpp"
@@ -285,7 +279,7 @@ namespace kiwi { namespace engine {
             {
                 if(args.size() == 1)
                 {
-                    m_file_selector->open();
+                    m_file_selector->show();
                 }
                 else
                 {
@@ -309,7 +303,7 @@ namespace kiwi { namespace engine {
                 deferMain([this]()
                           {
                               setEditCode(std::string(m_dsp_code));
-                              m_code_editor->open();
+                              m_code_editor->show();
                           });
                 
                 if(args.size() > 1)
