@@ -355,7 +355,8 @@ namespace kiwi { namespace engine {
             {
                 deferMain([this]()
                           {
-                              setEditCode(std::string(m_dsp_code));
+                              std::string ncode = m_dsp_code;
+                              setEditCode(std::move(ncode));
                               m_code_editor->show();
                           });
                 
