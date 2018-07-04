@@ -182,7 +182,6 @@ namespace kiwi { namespace engine {
             auto const name = btn->getName();
             if(name == "lock")
             {
-                std::cout << "button 2 state " << (btn->getToggleState()) << "\n";
                 setLock(btn->getToggleState());
             }
         }
@@ -224,7 +223,7 @@ namespace kiwi { namespace engine {
                                   m_button_sync.setEnabled(m_owner.hasLock());
                                   m_button_lock.setToggleState(m_owner.hasLock(), juce::NotificationType::dontSendNotification);
                                   m_button_lock.setEnabled(m_owner.canLock() || m_owner.hasLock());
-                                  m_button_forc.setEnabled(!m_owner.canLock() && !m_owner.canLock());
+                                  m_button_forc.setEnabled(!m_owner.canLock() && !m_owner.hasLock());
                                   repaint();
                               });
             
