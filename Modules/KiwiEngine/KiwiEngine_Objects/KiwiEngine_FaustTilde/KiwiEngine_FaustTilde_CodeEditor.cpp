@@ -77,6 +77,17 @@ namespace kiwi { namespace engine {
             m_button_lock.setTooltip("Grab the lock");
             addAndMakeVisible(&m_button_lock);
             
+            auto img_force = juce::ImageFileFormat::loadFrom(binary_data::images::locked_png, binary_data::images::locked_png_size);
+            m_button_forc.setImages(false, true, true,
+                                    img_force, 1.f, juce::Colours::transparentWhite,
+                                    img_force, 1.f, juce::Colours::lightgrey.withAlpha(0.5f),
+                                    img_force, 1.f, juce::Colours::lightgrey.withAlpha(0.5f));
+            m_button_forc.setClickingTogglesState(true);
+            m_button_forc.setRadioGroupId(3);
+            m_button_forc.addListener(this);
+            m_button_forc.setTooltip("Force unlock");
+            addAndMakeVisible(&m_button_forc);
+            
             m_console.setMultiLine(true);
             m_console.setReadOnly(true);
             m_console.setColour(juce::TextEditor::backgroundColourId, juce::Colours::grey);
@@ -97,9 +108,9 @@ namespace kiwi { namespace engine {
         
         void paintOverChildren (juce::Graphics& g) override
         {
-            if(m_owner.isLocked())
+            if(!m_owner.hasLock())
             {
-                g.fillAll(juce::Colours::grey.withAlpha(0.5f));
+                g.fillAll(juce::Colours::grey.withAlpha(0.25f));
             }
         }
         
@@ -111,9 +122,10 @@ namespace kiwi { namespace engine {
             const auto btnsize   = 24;
             const auto btnoffset = (bansize - btnsize) / 2;
             m_editor.setBounds(0, 0, width, height - bansize);
-            m_button_sync.setBounds(0 + btnoffset, height - bansize + btnoffset, btnsize, btnsize);
-            m_button_lock.setBounds(bansize + btnoffset, height - bansize + btnoffset, btnsize, btnsize);
-            m_console.setBounds(bansize * 2, height - bansize, width - bansize * 2, bansize);
+            m_button_sync.setBounds(bansize * 0 + btnoffset, height - bansize + btnoffset, btnsize, btnsize);
+            m_button_lock.setBounds(bansize * 1 + btnoffset, height - bansize + btnoffset, btnsize, btnsize);
+            m_button_forc.setBounds(bansize * 2 + btnoffset, height - bansize + btnoffset, btnsize, btnsize);
+            m_console.setBounds(bansize * 3, height - bansize, width - bansize * 3, bansize);
         }
         
         void visibilityChanged() override
@@ -164,6 +176,10 @@ namespace kiwi { namespace engine {
             {
                 setLock(btn->getToggleState());
             }
+            else if(iid == 3)
+            {
+                m_owner.forceUnlock();
+            }
         }
         
         // The public interface
@@ -197,8 +213,8 @@ namespace kiwi { namespace engine {
         void updateLockState()
         {
             const juce::MessageManagerLock mmLock;
-            m_editor.setReadOnly(m_owner.isLocked());
-            m_button_lock.setToggleState(m_owner.isLocked(), juce::NotificationType::dontSendNotification);
+            m_editor.setReadOnly(!m_owner.hasLock());
+            m_button_lock.setToggleState(m_owner.hasLock(), juce::NotificationType::dontSendNotification);
             repaint();
         }
         
@@ -278,7 +294,7 @@ namespace kiwi { namespace engine {
         // Try to set the lock state
         void setLock(bool state)
         {
-            m_owner.setLock(state);
+            m_owner.grabLock(state);
         }
         
         // ================================================================================ //
@@ -308,6 +324,7 @@ namespace kiwi { namespace engine {
         FaustTilde&                 m_owner;
         juce::ImageButton           m_button_sync;
         juce::ImageButton           m_button_lock;
+        juce::ImageButton           m_button_forc;
         juce::TextEditor            m_console;
         
         FaustTokeniser              m_highlither;

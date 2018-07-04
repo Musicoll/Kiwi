@@ -51,6 +51,7 @@ namespace kiwi { namespace engine {
         void attributeChanged(std::string const& name, tool::Parameter const& param) override;
     private:
         static std::string getName(model::Object const& model);
+        static int64_t getUserId(model::Object const& model);
         static std::vector<std::string> getOptions(model::Object const& model);
     
         //! @brief Get the compile options
@@ -68,11 +69,18 @@ namespace kiwi { namespace engine {
         //! @brief Set the Edit code
         void setEditCode(std::string&& code);
         
-        //! @brief Get if the codes are locked
-        bool isLocked() const;
+        //! @brief Get if the object has the lock for the codes
+        bool hasLock() const;
         
-        //! @brief Grab the lock for the code
-        void setLock(bool state);
+        //! @brief Get if the object can grab the lock for the codes
+        bool canLock() const;
+        
+        //! @brief Grab or leave the lock for the code
+        //! @return true if the action succeed, otherwise false
+        bool grabLock(bool state);
+        
+        //! @brief Force to unlock the model
+        void forceUnlock();
         
         //! @brief ...
         //! @see attributeChanged
@@ -82,8 +90,6 @@ namespace kiwi { namespace engine {
         void compileCode(const std::string& name, const std::string& code);
         
         void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
-        
-        ;
         
         struct nop
         {
@@ -109,7 +115,8 @@ namespace kiwi { namespace engine {
         std::unique_ptr<UIGlue>         m_ui_glue;
         std::unique_ptr<FileSelector>   m_file_selector;
         std::unique_ptr<CodeEditor>     m_code_editor;
-        bool                            m_lock_state = false;
+        int64_t                         m_lock_state = 0;
+        const int64_t                   m_user_id;
     };
 
 }}

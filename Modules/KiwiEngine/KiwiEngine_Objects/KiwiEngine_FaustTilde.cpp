@@ -46,6 +46,14 @@ namespace kiwi { namespace engine {
         return std::make_unique<FaustTilde>(model, patcher);
     }
     
+    int64_t FaustTilde::getUserId(model::Object const& model)
+    {
+        int64_t temp;
+        uint64_t userid = model.document().user();
+        std::memcpy(&temp, &userid, sizeof(temp));
+        return temp;
+    }
+    
     std::string FaustTilde::getName(model::Object const& model)
     {
         return model.getArguments()[2].getString() + std::string(".dsp");
@@ -75,26 +83,57 @@ namespace kiwi { namespace engine {
     m_options(getOptions(model)),
     m_ui_glue(std::make_unique<UIGlue>(*this)),
     m_file_selector(std::make_unique<FileSelector>(*this)),
-    m_code_editor(std::make_unique<CodeEditor>(*this))
+    m_code_editor(std::make_unique<CodeEditor>(*this)),
+    m_user_id(getUserId(model))
     {
         attributeChanged("dspcodechanged", {tool::Parameter::Type::String, {std::string("")}});
         attributeChanged("editcodechanged", {tool::Parameter::Type::String, {std::string("")}});
+        attributeChanged("lockstate", {tool::Parameter::Type::Int, {0}});
+        auto const* fmodel = dynamic_cast<model::FaustTilde const*>(&model);
+        if(fmodel)
+        {
+            m_lock_state = fmodel->getLockState();
+        }
     }
     
     FaustTilde::~FaustTilde()
     {
-        
+        int bah_cest_pas_possible_ici;
+        //grabLock(false);
     }
     
     // ================================================================================ //
-    void FaustTilde::setLock(bool state)
+    bool FaustTilde::grabLock(bool state)
     {
-        setAttribute(std::string("lockstate"), {tool::Parameter::Type::Int, {static_cast<int64_t>(state)}});
+        if(!canLock() && state)
+        {
+            warning("The object is already locked");
+            return false;
+        }
+        else if(hasLock() && !state)
+        {
+            setAttribute(std::string("lockstate"), {tool::Parameter::Type::Int, {0}});
+        }
+        else if(canLock() && state)
+        {
+            setAttribute(std::string("lockstate"), {tool::Parameter::Type::Int, {m_user_id}});
+        }
+        return true;
     }
     
-    bool FaustTilde::isLocked() const
+    bool FaustTilde::hasLock() const
     {
-        return m_lock_state;
+        return m_lock_state == m_user_id;
+    }
+    
+    bool FaustTilde::canLock() const
+    {
+        return m_lock_state == 0;
+    }
+    
+    void FaustTilde::forceUnlock()
+    {
+        setAttribute(std::string("lockstate"), {tool::Parameter::Type::Int, {0}});
     }
     
     std::vector<std::string> FaustTilde::getCompileOptions() const
@@ -109,7 +148,7 @@ namespace kiwi { namespace engine {
     
     void FaustTilde::setDspCode(std::string&& code)
     {
-        if(m_lock_state)
+        if(canLock() || hasLock())
         {
             warning("faust~: code is currently locked by another user");
             return;
@@ -132,7 +171,7 @@ namespace kiwi { namespace engine {
     
     void FaustTilde::setEditCode(std::string&& code)
     {
-        if(m_lock_state)
+        if(canLock() || hasLock())
         {
             warning("faust~: code is currently locked by another user");
             return;
@@ -165,42 +204,7 @@ namespace kiwi { namespace engine {
         setDspCode(jf.loadFileAsString().toStdString());
     }
     
-    // ================================================================================ //
     
-    void FaustTilde::attributeChanged(std::string const& name, tool::Parameter const& parameter)
-    {
-        if (name == "dspcodechanged")
-        {
-            auto const value = parameter[0].getString();
-            deferMain([this, value]()
-                      {
-                          auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel());
-                          if(fmodel)
-                          {
-                              m_dsp_code = fmodel->getDSPCode();
-                              compileCode(value, m_dsp_code);
-                          }
-                      });
-        }
-        else if(name == "editcodechanged")
-        {
-            auto const value = parameter[0].getString();
-            deferMain([this, value]()
-                      {
-                          auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel());
-                          if(fmodel)
-                          {
-                              m_edit_code = fmodel->getEditCode();
-                              m_code_editor->downloadCode();
-                          }
-                      });
-        }
-        else if(name == "lockstate")
-        {
-            m_lock_state = static_cast<bool>(parameter[0].getInt());
-            m_code_editor->updateLockState();
-        }
-    }
     
     void FaustTilde::compileCode(const std::string& name, const std::string& code)
     {
@@ -280,6 +284,42 @@ namespace kiwi { namespace engine {
         m_factory = std::move(nfactory);
     }
     
+    // ================================================================================ //
+    
+    void FaustTilde::attributeChanged(std::string const& name, tool::Parameter const& parameter)
+    {
+        if (name == "dspcodechanged")
+        {
+            auto const value = parameter[0].getString();
+            deferMain([this, value]()
+                      {
+                          auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel());
+                          if(fmodel)
+                          {
+                              m_dsp_code = fmodel->getDSPCode();
+                              compileCode(value, m_dsp_code);
+                          }
+                      });
+        }
+        else if(name == "editcodechanged")
+        {
+            auto const value = parameter[0].getString();
+            deferMain([this, value]()
+                      {
+                          auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel());
+                          if(fmodel)
+                          {
+                              m_edit_code = fmodel->getEditCode();
+                              m_code_editor->downloadCode();
+                          }
+                      });
+        }
+        else if(name == "lockstate")
+        {
+            m_lock_state = parameter[0].getInt();
+            m_code_editor->updateLockState();
+        }
+    }
     // The Kiwi Object interface
     // ================================================================================ //
     
