@@ -111,7 +111,7 @@ namespace kiwi { namespace engine {
         // ================================================================================ //
         void declare(param_type*, const char* key, const char* value) override
         {
-            m_owner.log(std::string("faust~: declare ") + std::string(key) + std::string(" - ") + std::string(value));
+            //m_owner.log(std::string("faust~: declare ") + std::string(key) + std::string(" - ") + std::string(value));
         }
         
         // ================================================================================ //

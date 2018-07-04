@@ -32,9 +32,9 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 
-#include "KiwiEngine_FaustTilde_CodeEditor.cpp"
-#include "KiwiEngine_FaustTilde_UIGLue.cpp"
-#include "KiwiEngine_FaustTilde_FileSelector.cpp"
+#include "KiwiEngine_FaustTilde/KiwiEngine_FaustTilde_CodeEditor.cpp"
+#include "KiwiEngine_FaustTilde/KiwiEngine_FaustTilde_UIGLue.cpp"
+#include "KiwiEngine_FaustTilde/KiwiEngine_FaustTilde_FileSelector.cpp"
 
 namespace kiwi { namespace engine {
     
@@ -158,6 +158,7 @@ namespace kiwi { namespace engine {
             warning("faust~: " + file + " is not a FAUST DSP file");
             return;
         }
+        setEditCode(jf.loadFileAsString().toStdString());
         setDspCode(jf.loadFileAsString().toStdString());
     }
     

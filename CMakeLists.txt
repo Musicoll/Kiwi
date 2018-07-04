@@ -160,7 +160,10 @@ set(KIWI_ENGINE_COMPILE_DEFINITIONS ${KIWI_MODEL_COMPILE_DEFINITIONS} ${KIWI_DSP
 set(KIWI_ENGINE_LINK_LIBRARIES ${KIWI_MODEL_LINK_LIBRARIES} KiwiModel KiwiDsp ${JUCE_LINK_LIBRARIES} Juce staticlib)
 
 
-file(GLOB_RECURSE KIWI_ENGINE_SOURCES ${KIWI_MODULE_INCLUDE_DIRS}/KiwiEngine/*.[c|h]pp ${KIWI_MODULE_INCLUDE_DIRS}/KiwiEngine/*.h)
+file(GLOB KIWI_ENGINE_SOURCES ${KIWI_MODULE_INCLUDE_DIRS}/KiwiEngine/*.[c|h]pp
+														  ${KIWI_MODULE_INCLUDE_DIRS}/KiwiEngine/*.h
+														  ${KIWI_MODULE_INCLUDE_DIRS}/KiwiEngine/KiwiEngine_Objects/*.[c|h]pp
+														  ${KIWI_MODULE_INCLUDE_DIRS}/KiwiEngine/KiwiEngine_Objects/*.h)
 add_library(KiwiEngine STATIC ${KIWI_ENGINE_SOURCES})
 add_dependencies(KiwiEngine ${KIWI_ENGINE_DEPENDENCIES})
 target_include_directories(KiwiEngine PUBLIC ${KIWI_ENGINE_INCLUDE_DIRS})
@@ -314,6 +317,6 @@ add_custom_command(TARGET Tests
                    POST_BUILD COMMAND test_dsp
                               COMMAND test_model
                               COMMAND test_tool
-                              COMMAND test_server
+                              #COMMAND test_server
                               COMMAND test_network
                    USES_TERMINAL)
