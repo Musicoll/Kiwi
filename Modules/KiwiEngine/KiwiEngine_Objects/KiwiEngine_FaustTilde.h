@@ -68,7 +68,11 @@ namespace kiwi { namespace engine {
         //! @brief Set the Edit code
         void setEditCode(std::string&& code);
         
+        //! @brief Get if the codes are locked
+        bool isLocked() const;
         
+        //! @brief Grab the lock for the code
+        void setLock(bool state);
         
         //! @brief ...
         //! @see attributeChanged

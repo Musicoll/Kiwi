@@ -87,6 +87,15 @@ namespace kiwi { namespace engine {
     }
     
     // ================================================================================ //
+    void FaustTilde::setLock(bool state)
+    {
+        setAttribute(std::string("lockstate"), {tool::Parameter::Type::Int, {static_cast<int64_t>(state)}});
+    }
+    
+    bool FaustTilde::isLocked() const
+    {
+        return m_lock_state;
+    }
     
     std::vector<std::string> FaustTilde::getCompileOptions() const
     {
@@ -182,13 +191,14 @@ namespace kiwi { namespace engine {
                           if(fmodel)
                           {
                               m_edit_code = fmodel->getEditCode();
-                              m_code_editor->update();
+                              m_code_editor->downloadCode();
                           }
                       });
         }
         else if(name == "lockstate")
         {
             m_lock_state = static_cast<bool>(parameter[0].getInt());
+            m_code_editor->updateLockState();
         }
     }
     
@@ -269,6 +279,9 @@ namespace kiwi { namespace engine {
         }
         m_factory = std::move(nfactory);
     }
+    
+    // The Kiwi Object interface
+    // ================================================================================ //
     
     void FaustTilde::receive(size_t index, std::vector<tool::Atom> const& args)
     {

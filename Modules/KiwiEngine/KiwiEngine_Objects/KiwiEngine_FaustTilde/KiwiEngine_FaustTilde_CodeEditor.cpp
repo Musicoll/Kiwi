@@ -84,7 +84,7 @@ namespace kiwi { namespace engine {
             addAndMakeVisible(&m_console);
             resized();
             
-            
+            updateLockState();
             m_window.setContentNonOwned(this, true);
         }
         
@@ -93,6 +93,14 @@ namespace kiwi { namespace engine {
         void paint (juce::Graphics& g) override
         {
             g.fillAll(juce::Colours::grey);
+        }
+        
+        void paintOverChildren (juce::Graphics& g) override
+        {
+            if(m_owner.isLocked())
+            {
+                g.fillAll(juce::Colours::grey.withAlpha(0.5f));
+            }
         }
         
         void resized() override
@@ -152,6 +160,10 @@ namespace kiwi { namespace engine {
             {
                 uploadToDspCode();
             }
+            else if(iid == 2)
+            {
+                setLock(btn->getToggleState());
+            }
         }
         
         // The public interface
@@ -164,33 +176,30 @@ namespace kiwi { namespace engine {
         {
             m_owner.deferMain([this]()
                               {
+                                  downloadCode();
                                   if(!m_window.isShowing())
                                   {
-                                      update();
                                       m_window.addToDesktop();
+                                  }
+                                  else
+                                  {
+                                      m_window.toFront(true);
                                   }
                               });
         }
         
-        //! @brief Update the content of Code editor
-        void update()
+        //! @brief Download the code from the owner and update the editor content
+        void downloadCode()
         {
             setCode(m_owner.getEditCode());
         }
         
-        void lockInterface()
+        void updateLockState()
         {
-            
-        }
-        
-        void unlockInterface()
-        {
-            
-        }
-        
-        void getLock()
-        {
-            
+            const juce::MessageManagerLock mmLock;
+            m_editor.setReadOnly(m_owner.isLocked());
+            m_button_lock.setToggleState(m_owner.isLocked(), juce::NotificationType::dontSendNotification);
+            repaint();
         }
         
     private:
@@ -264,6 +273,12 @@ namespace kiwi { namespace engine {
                 stopMTDSPFactories();
             }
             m_console.setText(errors);
+        }
+        
+        // Try to set the lock state
+        void setLock(bool state)
+        {
+            m_owner.setLock(state);
         }
         
         // ================================================================================ //
