@@ -70,31 +70,41 @@ namespace kiwi { namespace engine {
         
         // Passive widgets
         // ================================================================================ //
-        void addHorizontalBargraph(const char* label, param_type* zone, param_type min, param_type max) override {};
-        void addVerticalBargraph(const char* label, param_type* zone, param_type min, param_type max) override {};
-        void addSoundfile(const char* label, const char* filename, Soundfile** sf_zone) override {}
+        void addHorizontalBargraph(const char* label, param_type* zone, param_type min, param_type max) override
+        {
+            addOutput(label, zone, min, max);
+        }
         
+        void addVerticalBargraph(const char* label, param_type* zone, param_type min, param_type max) override
+        {
+            addOutput(label, zone, min, max);
+        }
+        
+        void addSoundfile(const char* label, const char* filename, Soundfile** sf_zone) override
+        {
+            
+        }
         
         // Widget layout
         // ================================================================================ //
         void openTabBox(const char* label) override
         {
-            m_parameter_level.push_back(label);
+            m_params_path.push_back(label);
         }
         
         void openHorizontalBox(const char* label) override
         {
-            m_parameter_level.push_back(label);
+            m_params_path.push_back(label);
         }
         
         void openVerticalBox(const char* label) override
         {
-            m_parameter_level.push_back(label);
+            m_params_path.push_back(label);
         }
         
         void closeBox() override
         {
-            m_parameter_level.pop_back();
+            m_params_path.pop_back();
         }
         
         // Meta data
@@ -114,6 +124,23 @@ namespace kiwi { namespace engine {
             {
                 m_owner.log("faust~: parameter " + param.first + " " + param.second.toString());
             }
+        }
+        
+        param_type get(const std::string& name)
+        {
+            if(m_mutex_glue.try_lock())
+            {
+                auto it = m_params_short.find(name);
+                if(it == m_params_short.end())
+                {
+                    m_mutex_glue.unlock();
+                    return 0;
+                }
+                param_type value = *(it->second.zone);
+                m_mutex_glue.unlock();
+                return value;
+            }
+            return 0;
         }
         
         void set(const std::string& name)
@@ -229,8 +256,9 @@ namespace kiwi { namespace engine {
             {
                 param.second.dirty = true;
             }
-            m_parameter_level.clear();
+            m_params_path.clear();
             m_params_long.clear();
+            m_outputs.clear();
         }
         
         void finishChanges()
@@ -247,7 +275,7 @@ namespace kiwi { namespace engine {
                     it++;
                 }
             }
-            m_parameter_level.clear();
+            m_params_path.clear();
         }
         
     private:
@@ -281,11 +309,12 @@ namespace kiwi { namespace engine {
         std::string getLongName(const char* name)
         {
             std::string longname;
-            for(auto const& step : m_parameter_level)
+            for(auto const& step : m_params_path)
                 longname += step + "/";
             return longname + name;
         }
         
+    
         void addParameter(const char* name, Parameter::Type type, param_type* zone, param_type min, param_type max, param_type step, param_type init)
         {
             std::lock_guard<std::mutex> guard(m_mutex_glue);
@@ -318,10 +347,17 @@ namespace kiwi { namespace engine {
                 *zone = init;
             }
         }
+        
+        void addOutput(const char* name, param_type* zone, param_type min, param_type max)
+        {
+            std::lock_guard<std::mutex> guard(m_mutex_glue);
+            m_outputs[name] = Parameter({Parameter::Type::Float, zone, min, max, 0, 0, 0, false});
+        }
 
         std::map<std::string, Parameter>    m_params_short;
         std::map<std::string, Parameter>    m_params_long;
-        std::vector<std::string>            m_parameter_level;
+        std::map<std::string, Parameter>    m_outputs;
+        std::vector<std::string>            m_params_path;
         FaustTilde&                         m_owner;
         std::mutex                          m_mutex_glue;
     };
