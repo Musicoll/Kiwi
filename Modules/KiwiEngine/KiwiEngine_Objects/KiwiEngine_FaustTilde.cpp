@@ -105,7 +105,7 @@ namespace kiwi { namespace engine {
     // ================================================================================ //
     bool FaustTilde::grabLock(bool state)
     {
-        if(!canLock() && state)
+        if(!hasLock() && !canLock() && state)
         {
             warning("The object is already locked");
             return false;

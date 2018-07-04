@@ -217,14 +217,17 @@ namespace kiwi { namespace engine {
         
         void updateLockState()
         {
-            const juce::MessageManagerLock mmLock;
-            m_editor.setReadOnly(!m_owner.hasLock());
-            m_button_sync.setEnabled(m_owner.hasLock());
-            m_button_lock.setToggleState(m_owner.hasLock(), juce::NotificationType::dontSendNotification);
-            m_button_lock.setEnabled(m_owner.canLock() || m_owner.hasLock());
-            m_button_forc.setEnabled(!m_owner.canLock() && !m_owner.canLock());
-
-            repaint();
+            m_owner.deferMain([this]()
+                              {
+                                  const juce::MessageManagerLock mmLock;
+                                  m_editor.setReadOnly(!m_owner.hasLock());
+                                  m_button_sync.setEnabled(m_owner.hasLock());
+                                  m_button_lock.setToggleState(m_owner.hasLock(), juce::NotificationType::dontSendNotification);
+                                  m_button_lock.setEnabled(m_owner.canLock() || m_owner.hasLock());
+                                  m_button_forc.setEnabled(!m_owner.canLock() && !m_owner.canLock());
+                                  repaint();
+                              });
+            
         }
         
     private:
