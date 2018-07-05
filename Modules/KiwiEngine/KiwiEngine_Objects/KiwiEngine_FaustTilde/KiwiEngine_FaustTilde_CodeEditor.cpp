@@ -229,7 +229,7 @@ namespace kiwi { namespace engine {
             
         }
         
-        void updateOptions()
+        void updateCompileOptions()
         {
             m_code_changed = true;
         }

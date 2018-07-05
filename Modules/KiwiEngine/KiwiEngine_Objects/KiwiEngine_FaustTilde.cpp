@@ -53,24 +53,6 @@ namespace kiwi { namespace engine {
         std::memcpy(&temp, &userid, sizeof(temp));
         return temp;
     }
-    
-    std::vector<std::string> FaustTilde::getOptions(model::Object const& model)
-    {
-        std::vector<std::string> options;
-        auto const& args = model.getArguments();
-        for(size_t i = 3; i < args.size(); ++i)
-        {
-            options.push_back(tool::AtomHelper::toString(args[i], false));
-        }
-        if(!std::count(options.begin(), options.end(), "-I"))
-        {
-            auto const file = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile);
-            options.push_back("-I");
-            options.push_back(file.getFullPathName().toStdString() + std::string("/Contents/Resources/Faust/Libs"));
-        }
-        return options;
-    }
-    
 
     FaustTilde::FaustTilde(model::Object const& model, Patcher& patcher):
     AudioObject(model, patcher),
@@ -80,23 +62,24 @@ namespace kiwi { namespace engine {
     m_code_editor(std::make_unique<CodeEditor>(*this)),
     m_user_id(getUserId(model))
     {
+        m_compile_options.push_back("-I");
+        auto const apppath = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getFullPathName().toStdString();
+#ifdef __APPLE__
+        m_compile_options.push_back(apppath + std::string("/Contents/Resources/Faust/Libs"));
+#elif _WIN32
+        m_compile_options.push_back(apppath + std::string("\\Faust\\Libs"));
+#else
+        m_compile_options.push_back(apppath + std::string("/Faust/Libs"));
+#endif
+        
         attributeChanged("dspcodechanged", {tool::Parameter::Type::String, {std::string("")}});
         attributeChanged("editcodechanged", {tool::Parameter::Type::String, {std::string("")}});
+        attributeChanged("compileoptionschanged", {tool::Parameter::Type::String, {std::string("")}});
         auto const* fmodel = dynamic_cast<model::FaustTilde const*>(&model);
         if(fmodel)
         {
             attributeChanged("lockstate", {tool::Parameter::Type::Int, {fmodel->getLockState()}});
         }
-        m_options.push_back("-I");
-        auto const apppath = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getFullPathName().toStdString();
-#ifdef __APPLE__
-        m_options.push_back(apppath + std::string("/Contents/Resources/Faust/Libs"));
-#elif _WIN32
-        m_options.push_back(apppath + std::string("\\Faust\\Libs"));
-#else
-        m_options.push_back(apppath + std::string("/Faust/Libs"));
-#endif
-        
     }
     
     FaustTilde::~FaustTilde()
@@ -141,7 +124,7 @@ namespace kiwi { namespace engine {
     
     std::vector<std::string> FaustTilde::getCompileOptions() const
     {
-        return m_options;
+        return m_compile_options;
     }
     
     std::string FaustTilde::getDspCode() const
@@ -223,16 +206,16 @@ namespace kiwi { namespace engine {
             return;
         }
         std::string errors;
-        std::vector<char const*> argv(m_options.size());
-        for(size_t i = 0; i < m_options.size(); ++i)
+        std::vector<char const*> argv(m_compile_options.size());
+        for(size_t i = 0; i < m_compile_options.size(); ++i)
         {
-            argv[i] = m_options[i].c_str();
+            argv[i] = m_compile_options[i].c_str();
         }
         
         uptr_faust_factory nfactory(nullptr, deleteDSPFactory);
         if(startMTDSPFactories())
         {
-            nfactory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString(name, code, m_options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
+            nfactory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString(name, code, m_compile_options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
             stopMTDSPFactories();
         }
         else
@@ -306,14 +289,31 @@ namespace kiwi { namespace engine {
         }
         else if(name == "editcodechanged")
         {
-            auto const value = parameter[0].getString();
-            deferMain([this, value]()
+            deferMain([this]()
                       {
                           auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel());
                           if(fmodel)
                           {
                               m_edit_code = fmodel->getEditCode();
                               m_code_editor->downloadCode();
+                          }
+                      });
+        }
+        else if(name == "compileoptionschanged")
+        {
+            deferMain([this]()
+                      {
+                          auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel());
+                          if(fmodel)
+                          {
+                              auto noptions = fmodel->getCompileOptions();
+                              m_compile_options.resize(2 + noptions.size());
+                              for(size_t i = 0; i < noptions.size(); ++i)
+                              {
+                                  m_compile_options[i+2].swap(noptions[i]);
+                              }
+                              m_code_editor->updateCompileOptions();
+                              compileCode("", m_dsp_code);
                           }
                       });
         }

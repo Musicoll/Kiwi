@@ -52,6 +52,10 @@ namespace kiwi { namespace model {
         
         std::string getEditCode() const;
         
+        void setCompileOptions(std::vector<std::string> const& newcompileoptions);
+        
+        std::vector<std::string> getCompileOptions() const;
+        
         int64_t getLockState() const;
         
         void writeAttribute(std::string const& name, tool::Parameter const& parameter) override;
@@ -61,11 +65,25 @@ namespace kiwi { namespace model {
         bool attributeChanged(std::string const& name) const override;
     private:
         
+        class iString : public flip::Object
+        {
+        public:
+            flip::String  value;
+            
+            static void declare();
+            
+            iString(flip::Default& d);
+            
+            iString(flip::String&& value);
+        };
+        
         flip::String               m_dsp_code;
         flip::Message<std::string> m_dsp_code_changed;
         flip::String               m_edit_code;
         flip::Message<std::string> m_edit_code_changed;
         flip::Int                  m_lock_state;
+        flip::Array<iString>       m_compiles_options;
+        flip::Message<std::string> m_compiles_options_changed;
     };
     
 }}

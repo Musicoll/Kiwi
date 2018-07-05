@@ -52,7 +52,6 @@ namespace kiwi { namespace engine {
     private:
         
         static int64_t getUserId(model::Object const& model);
-        static std::vector<std::string> getOptions(model::Object const& model);
     
         //! @brief Get the compile options
         std::vector<std::string> getCompileOptions() const;
@@ -83,7 +82,6 @@ namespace kiwi { namespace engine {
         void forceUnlock();
         
         //! @brief ...
-        //! @see attributeChanged
         void openFile(const std::string& file);
         
         //! @brief Create the factory from a string and generate a new instance.
@@ -111,7 +109,7 @@ namespace kiwi { namespace engine {
         
         std::string                     m_dsp_code;
         std::string                     m_edit_code;
-        std::vector<std::string>        m_options;
+        std::vector<std::string>        m_compile_options;
         std::unique_ptr<UIGlue>         m_ui_glue;
         std::unique_ptr<FileSelector>   m_file_selector;
         std::unique_ptr<CodeEditor>     m_code_editor;
