@@ -131,8 +131,8 @@ namespace kiwi { namespace engine {
         {
             if(m_mutex_glue.try_lock())
             {
-                auto it = m_params_short.find(name);
-                if(it == m_params_short.end())
+                auto it = m_outputs.find(name);
+                if(it == m_outputs.end())
                 {
                     m_mutex_glue.unlock();
                     m_owner.warning(std::string("no such FAUST interface \"") + name + std::string("\""));
@@ -149,8 +149,8 @@ namespace kiwi { namespace engine {
         {
             if(m_mutex_glue.try_lock())
             {
-                auto it = m_params_short.find(name);
-                if(it == m_params_short.end())
+                auto it = m_outputs.find(name);
+                if(it == m_outputs.end())
                 {
                     m_mutex_glue.unlock();
                     return false;
@@ -185,15 +185,12 @@ namespace kiwi { namespace engine {
                 }
                 if(it->second.type == Parameter::Type::Button)
                 {
-                    if(value < std::numeric_limits<param_type>::epsilon())
-                    {
-                        *(it->second.zone) = 0;
-                    }
-                    else
-                    {
-                        *(it->second.zone) = 0;
-                        *(it->second.zone) = 1;
-                    }
+                    *(it->second.zone) = 0;
+                    *(it->second.zone) = 1;
+                    m_owner.scheduleMain([&it]()
+                                         {
+                                             *(it->second.zone) = 0;
+                                         } , std::chrono::milliseconds(2));
                 }
                 else if(it->second.type == Parameter::Type::CheckButton)
                 {

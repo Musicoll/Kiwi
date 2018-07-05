@@ -366,26 +366,25 @@ namespace kiwi { namespace engine {
                 }
                 return;
             }
+            
             if(!m_factory || !m_instance)
             {
                 return;
             }
-            if(args.size() == 1)
+            
+            if(m_ui_glue->hasOutput(name))
             {
-                if(m_ui_glue->hasOutput(name))
+                send(getNumberOfOutputs() - 1, {m_ui_glue->getOutput(name)});
+                return;
+            }
+            else
+            {
+                if(args.size() == 1)
                 {
-                    send(getNumberOfOutputs() - 1, {m_ui_glue->getOutput(name)});
+                    m_ui_glue->setInput(name, 0);
                     return;
                 }
-                m_ui_glue->setInput(name, 1);
-                scheduleMain([this, name = std::move(name)]()
-                             {
-                                 m_ui_glue->setInput(name, 0);
-                             } , tool::Scheduler<>::duration_t(2));
-            }
-            else if(args.size() > 1)
-            {
-                if(args[1].isNumber())
+                else if(args[1].isNumber())
                 {
                     m_ui_glue->setInput(name, args[1].getFloat());
                     if(args.size() > 2)
@@ -394,9 +393,9 @@ namespace kiwi { namespace engine {
                     }
                     return;
                 }
-                warning(std::string("faust~: FAUST interface \"") + name + std::string("\" requires a number"));
+                warning(std::string("faust~: FAUST interface \"") + name + std::string("\" wrong arguments"));
+                return;
             }
-            return;
         }
         warning(std::string("faust~: receive bad arguments"));
     }
