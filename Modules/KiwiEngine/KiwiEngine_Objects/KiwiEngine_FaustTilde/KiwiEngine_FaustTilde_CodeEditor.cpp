@@ -229,6 +229,11 @@ namespace kiwi { namespace engine {
             
         }
         
+        void updateOptions()
+        {
+            m_code_changed = true;
+        }
+        
     private:
         
         // The private interface

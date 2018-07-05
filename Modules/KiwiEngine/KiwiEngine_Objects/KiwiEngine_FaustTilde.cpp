@@ -75,7 +75,6 @@ namespace kiwi { namespace engine {
     FaustTilde::FaustTilde(model::Object const& model, Patcher& patcher):
     AudioObject(model, patcher),
     m_factory(nullptr, deleteDSPFactory),
-    m_options(getOptions(model)),
     m_ui_glue(std::make_unique<UIGlue>(*this)),
     m_file_selector(std::make_unique<FileSelector>(*this)),
     m_code_editor(std::make_unique<CodeEditor>(*this)),
@@ -83,12 +82,21 @@ namespace kiwi { namespace engine {
     {
         attributeChanged("dspcodechanged", {tool::Parameter::Type::String, {std::string("")}});
         attributeChanged("editcodechanged", {tool::Parameter::Type::String, {std::string("")}});
-        attributeChanged("lockstate", {tool::Parameter::Type::Int, {0}});
         auto const* fmodel = dynamic_cast<model::FaustTilde const*>(&model);
         if(fmodel)
         {
-            m_lock_state = fmodel->getLockState();
+            attributeChanged("lockstate", {tool::Parameter::Type::Int, {fmodel->getLockState()}});
         }
+        m_options.push_back("-I");
+        auto const apppath = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getFullPathName().toStdString();
+#ifdef __APPLE__
+        m_options.push_back(apppath + std::string("/Contents/Resources/Faust/Libs"));
+#elif _WIN32
+        m_options.push_back(apppath + std::string("\\Faust\\Libs"));
+#else
+        m_options.push_back(apppath + std::string("/Faust/Libs"));
+#endif
+        
     }
     
     FaustTilde::~FaustTilde()
