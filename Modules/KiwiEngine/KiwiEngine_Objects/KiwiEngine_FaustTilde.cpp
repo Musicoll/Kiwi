@@ -127,7 +127,7 @@ namespace kiwi { namespace engine {
         return m_compile_options;
     }
     
-    std::string FaustTilde::getDspCode() const
+    std::string const& FaustTilde::getDspCode() const
     {
         return m_dsp_code;
     }
@@ -150,7 +150,7 @@ namespace kiwi { namespace engine {
                   });
     }
     
-    std::string FaustTilde::getEditCode() const
+    std::string const& FaustTilde::getEditCode() const
     {
         return m_edit_code;
     }
@@ -206,28 +206,29 @@ namespace kiwi { namespace engine {
             return;
         }
         std::string errors;
-        std::vector<char const*> argv(m_compile_options.size());
-        for(size_t i = 0; i < m_compile_options.size(); ++i)
+        const auto options = m_compile_options;
+        const auto name = "kiwi" + juce::Uuid().toString().toStdString();
+        std::vector<char const*> argv(options.size());
+        for(size_t i = 0; i < 2 && i < options.size(); ++i)
         {
-            argv[i] = m_compile_options[i].c_str();
+            argv[i] = options[i].c_str();
         }
-        
         uptr_faust_factory nfactory(nullptr, deleteDSPFactory);
         if(startMTDSPFactories())
         {
-            nfactory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString("Kiwix", m_dsp_code, m_compile_options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
+            nfactory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString(name, m_dsp_code, options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
             stopMTDSPFactories();
         }
         else
         {
             warning("faust~: can't start multi-thread access");
         }
-        
+       
         if(!errors.empty())
         {
             warning("faust~: compilation failed - " + errors);
         }
-        if(nfactory)
+        else if(nfactory)
         {
             log("faust~: compilation succeed - " + nfactory->getName());
             auto ninstance = std::unique_ptr<llvm_dsp, nop>(nfactory->createDSPInstance());
@@ -257,17 +258,16 @@ namespace kiwi { namespace engine {
                     m_instance.reset();
                 }
             }
+            m_factory = std::move(nfactory);
+            return;
         }
-        else
+        m_ui_glue->prepareChanges();
         {
-            m_ui_glue->prepareChanges();
-            {
-                // Safetly release the instance
-                std::lock_guard<std::mutex> guard(m_mutex);
-                m_instance.reset();
-            }
+            // Safetly release the instance
+            std::lock_guard<std::mutex> guard(m_mutex);
+            m_instance.reset();
         }
-        m_factory = std::move(nfactory);
+        m_factory.reset();
     }
     
     // ================================================================================ //

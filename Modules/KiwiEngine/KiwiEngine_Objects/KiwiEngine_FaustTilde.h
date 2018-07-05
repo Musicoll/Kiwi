@@ -57,13 +57,13 @@ namespace kiwi { namespace engine {
         std::vector<std::string> getCompileOptions() const;
         
         //! @brief Get the DSP code
-        std::string getDspCode() const;
+        std::string const& getDspCode() const;
         
         //! @brief Set the DSP code
         void setDspCode(std::string&& code);
         
         //! @brief Get the Edit code
-        std::string getEditCode() const;
+        std::string const& getEditCode() const;
         
         //! @brief Set the Edit code
         void setEditCode(std::string&& code);

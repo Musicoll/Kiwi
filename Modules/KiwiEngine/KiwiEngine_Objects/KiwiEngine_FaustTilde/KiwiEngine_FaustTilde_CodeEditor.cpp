@@ -28,8 +28,6 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 
-//#include "../../../Client/Source/KiwiApp.h"
-
 namespace kiwi { namespace engine {
     
     // ================================================================================ //
@@ -49,9 +47,8 @@ namespace kiwi { namespace engine {
         m_code_changed(true)
         {
             setBounds(0, 0, 512, 384);
-            m_editor.setColour(juce::CodeEditorComponent::backgroundColourId, juce::Colours::white);
+            m_editor.setColour(juce::CodeEditorComponent::backgroundColourId, juce::Colours::lightgrey);
             m_editor.setScrollbarThickness(8);
-            //m_editor.setCommandManager(&KiwiApp::getCommandManager());
             addAndMakeVisible(&m_editor);
             
             m_button_sync.setButtonText("Sync");
@@ -65,10 +62,10 @@ namespace kiwi { namespace engine {
             m_button_lock.addListener(this);
             addAndMakeVisible(&m_button_lock);
             
-            m_console.setMultiLine(true);
             m_console.setReadOnly(true);
-            m_console.setColour(juce::TextEditor::backgroundColourId, juce::Colours::grey);
-            m_console.setColour(juce::TextEditor::textColourId, juce::Colours::red);
+            m_console.setColour(juce::TextEditor::backgroundColourId, juce::Colours::lightgrey);
+            m_console.setColour(juce::TextEditor::textColourId, juce::Colours::black);
+            m_console.setBorder({ 1, 0, 1, 3 });
             addAndMakeVisible(&m_console);
             resized();
             
@@ -100,7 +97,7 @@ namespace kiwi { namespace engine {
             m_editor.setBounds(0, 0, width, yoffset - 2);
             m_button_sync.setBounds(wsize * 0 + 2, yoffset, 48, 24);
             m_button_lock.setBounds(wsize * 1 + 2, yoffset, 48, 24);
-            m_console.setBounds(wsize * 2 + 2, yoffset, width - (wsize * 2 + 2) - 2, 24);
+            m_console.setBounds(wsize * 2 + 2, yoffset + 1, width - (wsize * 2 + 2) - 2, 22);
         }
         
         void visibilityChanged() override
@@ -236,11 +233,11 @@ namespace kiwi { namespace engine {
         // ================================================================================ //
         
         //! @brief Set the current code
-        void setCode(std::string&& code)
+        void setCode(std::string const& code)
         {
             juce::CodeEditorComponent::State state(m_editor);
             m_lock = false;
-            m_editor.loadContent(juce::String(std::move(code)));
+            m_editor.loadContent(juce::String(code));
             state.restoreState(m_editor);
             m_lock = true;
             m_code_changed = true;
@@ -277,7 +274,7 @@ namespace kiwi { namespace engine {
         //! @brief Compute the errors of the current code
         void computeErrors()
         {
-            if(!m_code_changed)
+            if(!m_code_changed || !isVisible())
             {
                 return;
             }
@@ -294,11 +291,24 @@ namespace kiwi { namespace engine {
             {
                 argv[i] = options[i].c_str();
             }
-            
             if(startMTDSPFactories())
             {
                 uptr_faust_factory nfactory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString("", getCode(), options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
                 stopMTDSPFactories();
+            }
+            auto pos = errors.find_first_of("\r\n");
+            if(pos != std::string::npos)
+            {
+                errors.erase(pos);
+            }
+            pos = errors.find("ERROR : ");
+            if(pos != std::string::npos)
+            {
+                errors.erase(pos, 8);
+            }
+            if(!errors.empty())
+            {
+                errors.replace(0, 3, "l.");
             }
             m_console.setText(errors);
         }
