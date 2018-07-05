@@ -28,7 +28,6 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 
-#include "../../../Client/Source/KiwiApp_Ressources/KiwiApp_BinaryData.h"
 //#include "../../../Client/Source/KiwiApp.h"
 
 namespace kiwi { namespace engine {
@@ -55,37 +54,16 @@ namespace kiwi { namespace engine {
             //m_editor.setCommandManager(&KiwiApp::getCommandManager());
             addAndMakeVisible(&m_editor);
             
-            auto img_sync = juce::ImageFileFormat::loadFrom(binary_data::images::refresh_png, binary_data::images::refresh_png_size);
-            m_button_sync.setImages(false, true, true,
-                                    img_sync, 1.f, juce::Colours::transparentWhite,
-                                    img_sync, 1.f, juce::Colours::lightgrey.withAlpha(0.5f),
-                                    img_sync, 1.f, juce::Colours::lightgrey.withAlpha(0.5f));
+            m_button_sync.setButtonText("Sync");
             m_button_sync.setClickingTogglesState(false);
             m_button_sync.setName("update");
             m_button_sync.addListener(this);
-            m_button_sync.setTooltip("Update DSP code");
+            m_button_sync.setTooltip("Synchonize the audio engine with this code");
             addAndMakeVisible(&m_button_sync);
             
-            auto img_lock = juce::ImageFileFormat::loadFrom(binary_data::images::locked_png, binary_data::images::locked_png_size);
-            m_button_lock.setImages(false, true, true,
-                                    img_lock, 1.f, juce::Colours::transparentWhite,
-                                    img_lock, 1.f, juce::Colours::lightgrey.withAlpha(0.5f),
-                                    img_lock, 1.f, juce::Colours::lightgrey.withAlpha(0.5f));
-            m_button_lock.setClickingTogglesState(true);
             m_button_lock.setName("lock");
             m_button_lock.addListener(this);
-            m_button_lock.setTooltip("Grab the lock");
             addAndMakeVisible(&m_button_lock);
-            
-            auto img_force = juce::ImageFileFormat::loadFrom(binary_data::images::locked_png, binary_data::images::locked_png_size);
-            m_button_forc.setImages(false, true, true,
-                                    img_force, 1.f, juce::Colours::transparentWhite,
-                                    img_force, 1.f, juce::Colours::lightgrey.withAlpha(0.5f),
-                                    img_force, 1.f, juce::Colours::lightgrey.withAlpha(0.5f));
-            m_button_forc.setName("force");
-            m_button_forc.addListener(this);
-            m_button_forc.setTooltip("Force unlock");
-            addAndMakeVisible(&m_button_forc);
             
             m_console.setMultiLine(true);
             m_console.setReadOnly(true);
@@ -115,16 +93,14 @@ namespace kiwi { namespace engine {
         
         void resized() override
         {
-            const auto width  = getWidth();
-            const auto height = getHeight();
-            const auto bansize   = 40;
-            const auto btnsize   = 24;
-            const auto btnoffset = (bansize - btnsize) / 2;
-            m_editor.setBounds(0, 0, width, height - bansize);
-            m_button_sync.setBounds(bansize * 0 + btnoffset, height - bansize + btnoffset, btnsize, btnsize);
-            m_button_lock.setBounds(bansize * 1 + btnoffset, height - bansize + btnoffset, btnsize, btnsize);
-            m_button_forc.setBounds(bansize * 2 + btnoffset, height - bansize + btnoffset, btnsize, btnsize);
-            m_console.setBounds(bansize * 3, height - bansize, width - bansize * 3, bansize);
+            const auto width   = getWidth();
+            const auto height  = getHeight();
+            const auto yoffset = height - 26;
+            const auto wsize   = 50;
+            m_editor.setBounds(0, 0, width, yoffset - 2);
+            m_button_sync.setBounds(wsize * 0 + 2, yoffset, 48, 24);
+            m_button_lock.setBounds(wsize * 1 + 2, yoffset, 48, 24);
+            m_console.setBounds(wsize * 2 + 2, yoffset, width - (wsize * 2 + 2) - 2, 24);
         }
         
         void visibilityChanged() override
@@ -171,19 +147,26 @@ namespace kiwi { namespace engine {
             {
                 uploadToDspCode();
             }
-            else if(name == "force")
+            else if(name == "lock")
             {
-                forceUnlock();
+                if(!m_owner.canLock() && !m_owner.hasLock())
+                {
+                    forceUnlock();
+                }
+                else if(m_owner.canLock() && !m_owner.hasLock())
+                {
+                    setLock(true);
+                }
+                else
+                {
+                    setLock(false);
+                }
             }
         }
         
         void buttonStateChanged (juce::Button* btn) override
         {
-            auto const name = btn->getName();
-            if(name == "lock")
-            {
-                setLock(btn->getToggleState());
-            }
+            ;
         }
         
         // The public interface
@@ -221,9 +204,22 @@ namespace kiwi { namespace engine {
                                   const juce::MessageManagerLock mmLock;
                                   m_editor.setReadOnly(!m_owner.hasLock());
                                   m_button_sync.setEnabled(m_owner.hasLock());
-                                  m_button_lock.setToggleState(m_owner.hasLock(), juce::NotificationType::dontSendNotification);
-                                  m_button_lock.setEnabled(m_owner.canLock() || m_owner.hasLock());
-                                  m_button_forc.setEnabled(!m_owner.canLock() && !m_owner.hasLock());
+                                  
+                                  if(!m_owner.canLock() && !m_owner.hasLock())
+                                  {
+                                      m_button_lock.setButtonText("Force");
+                                      m_button_lock.setTooltip("Force to unlock");
+                                  }
+                                  else if(m_owner.canLock() && !m_owner.hasLock())
+                                  {
+                                      m_button_lock.setButtonText("Grab");
+                                      m_button_lock.setTooltip("Grab the lock");
+                                  }
+                                  else
+                                  {
+                                      m_button_lock.setButtonText("Leave");
+                                      m_button_lock.setTooltip("Leave the lock");
+                                  }
                                   repaint();
                               });
             
@@ -344,9 +340,8 @@ namespace kiwi { namespace engine {
         };
         
         FaustTilde&                 m_owner;
-        juce::ImageButton           m_button_sync;
-        juce::ImageButton           m_button_lock;
-        juce::ImageButton           m_button_forc;
+        juce::TextButton            m_button_sync;
+        juce::TextButton            m_button_lock;
         juce::TextEditor            m_console;
         
         FaustTokeniser              m_highlither;

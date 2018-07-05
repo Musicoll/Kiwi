@@ -81,11 +81,11 @@ namespace kiwi { namespace engine {
         //! @brief Force to unlock the model
         void forceUnlock();
         
-        //! @brief ...
+        //! @brief Open a file an notify that the DSP and Edit codes changed
         void openFile(const std::string& file);
         
-        //! @brief Create the factory from a string and generate a new instance.
-        void compileCode(const std::string& name, const std::string& code);
+        //! @brief Compile the current DSP code.
+        void compileDspCode();
         
         void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
         

@@ -192,9 +192,9 @@ namespace kiwi { namespace engine {
     
     
     
-    void FaustTilde::compileCode(const std::string& name, const std::string& code)
+    void FaustTilde::compileDspCode()
     {
-        if(code.empty())
+        if(m_dsp_code.empty())
         {
             m_ui_glue->prepareChanges();
             {
@@ -215,7 +215,7 @@ namespace kiwi { namespace engine {
         uptr_faust_factory nfactory(nullptr, deleteDSPFactory);
         if(startMTDSPFactories())
         {
-            nfactory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString(name, code, m_compile_options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
+            nfactory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString("Kiwix", m_dsp_code, m_compile_options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
             stopMTDSPFactories();
         }
         else
@@ -283,7 +283,7 @@ namespace kiwi { namespace engine {
                           if(fmodel)
                           {
                               m_dsp_code = fmodel->getDSPCode();
-                              compileCode(value, m_dsp_code);
+                              compileDspCode();
                           }
                       });
         }
@@ -313,7 +313,7 @@ namespace kiwi { namespace engine {
                                   m_compile_options[i+2].swap(noptions[i]);
                               }
                               m_code_editor->updateCompileOptions();
-                              compileCode("", m_dsp_code);
+                              compileDspCode();
                           }
                       });
         }
