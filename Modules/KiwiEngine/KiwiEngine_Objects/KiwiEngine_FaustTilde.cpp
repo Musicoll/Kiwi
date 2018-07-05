@@ -54,11 +54,6 @@ namespace kiwi { namespace engine {
         return temp;
     }
     
-    std::string FaustTilde::getName(model::Object const& model)
-    {
-        return model.getArguments()[2].getString() + std::string(".dsp");
-    }
-    
     std::vector<std::string> FaustTilde::getOptions(model::Object const& model)
     {
         std::vector<std::string> options;

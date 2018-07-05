@@ -50,7 +50,7 @@ namespace kiwi { namespace engine {
 
         void attributeChanged(std::string const& name, tool::Parameter const& param) override;
     private:
-        static std::string getName(model::Object const& model);
+        
         static int64_t getUserId(model::Object const& model);
         static std::vector<std::string> getOptions(model::Object const& model);
     
