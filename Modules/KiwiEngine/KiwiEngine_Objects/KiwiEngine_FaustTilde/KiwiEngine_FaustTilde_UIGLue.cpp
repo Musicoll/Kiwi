@@ -185,15 +185,18 @@ namespace kiwi { namespace engine {
                 }
                 if(it->second.type == Parameter::Type::Button)
                 {
-                    param_type* zone = it->second.zone;
-                    *(zone) = 0;
-                    *(zone) = 1;
+                    *(it->second.zone) = 0;
+                    *(it->second.zone) = 1;
                     m_mutex_glue.unlock();
-                    m_owner.schedule([this, zone]()
+                    m_owner.schedule([this, name]()
                                      {
                                          if(m_mutex_glue.try_lock())
                                          {
-                                             *(zone) = 0;
+                                             auto it = m_params_short.find(name);
+                                             if(it != m_params_short.end())
+                                             {
+                                                 *(it->second.zone) = 0;
+                                             }
                                              m_mutex_glue.unlock();
                                          }
                                      } , std::chrono::milliseconds(2));
