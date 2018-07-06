@@ -58,16 +58,19 @@ namespace kiwi { namespace engine {
             m_button_sync.setName("update");
             m_button_sync.addListener(this);
             m_button_sync.setTooltip("Synchonize the audio engine with this code");
+            m_button_sync.setWantsKeyboardFocus(false);
             addAndMakeVisible(&m_button_sync);
             
             m_button_lock.setName("lock");
             m_button_lock.addListener(this);
+            m_button_lock.setWantsKeyboardFocus(false);
             addAndMakeVisible(&m_button_lock);
             
             m_button_errs.setButtonText(juce::String(juce::CharPointer_UTF8 ("•")));
             m_button_errs.setName("error");
             m_button_errs.addListener(this);
-            m_button_errs.setTooltip("Select the error line");
+            m_button_errs.setTooltip("Move the caret to the error line");
+            m_button_errs.setWantsKeyboardFocus(false);
             addAndMakeVisible(&m_button_errs);
             
             m_console.setReadOnly(true);
@@ -92,7 +95,8 @@ namespace kiwi { namespace engine {
         {
             if(!m_owner.hasLock())
             {
-                g.fillAll(juce::Colours::grey.withAlpha(0.25f));
+                g.setColour(juce::Colours::grey.withAlpha(0.2f));
+                g.fillRect(0, 0, getWidth(), getHeight() - 26);
             }
         }
         
@@ -172,9 +176,10 @@ namespace kiwi { namespace engine {
             }
             else if(name == "error")
             {
-                if(m_error_line > 0)
+                if(m_error_line >= 0)
                 {
-                    //m_editor.setHighlightedRegion(<#const Range<int> &newRange#>)
+                    juce::CodeDocument::Position const pos(m_document, m_error_line-1, 0);
+                    m_editor.moveCaretTo(pos, false);
                 }
             }
         }
@@ -305,11 +310,13 @@ namespace kiwi { namespace engine {
                 m_console.repaint();
                 m_button_errs.setEnabled(false);
                 m_button_errs.setColour(juce::TextButton::textColourOnId, juce::Colours::black);
+                m_button_errs.setColour(juce::TextButton::textColourOffId, juce::Colours::black);
             }
             else
             {
                 m_button_errs.setEnabled(true);
                 m_button_errs.setColour(juce::TextButton::textColourOnId, juce::Colours::red);
+                m_button_errs.setColour(juce::TextButton::textColourOffId, juce::Colours::red);
             }
         }
         
