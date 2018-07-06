@@ -185,27 +185,33 @@ namespace kiwi { namespace engine {
                 }
                 if(it->second.type == Parameter::Type::Button)
                 {
-                    *(it->second.zone) = 0;
-                    *(it->second.zone) = 1;
-                    m_owner.scheduleMain([&it]()
+                    param_type* zone = it->second.zone;
+                    *(zone) = 0;
+                    *(zone) = 1;
+                    m_mutex_glue.unlock();
+                    m_owner.schedule([this, zone]()
+                                     {
+                                         if(m_mutex_glue.try_lock())
                                          {
-                                             *(it->second.zone) = 0;
-                                         } , std::chrono::milliseconds(2));
+                                             *(zone) = 0;
+                                             m_mutex_glue.unlock();
+                                         }
+                                     } , std::chrono::milliseconds(2));
+                    return;
                 }
                 else if(it->second.type == Parameter::Type::CheckButton)
                 {
                     *(it->second.zone) = static_cast<param_type>(value < std::numeric_limits<param_type>::epsilon());
+                    m_mutex_glue.unlock();
+                    return;
                 }
                 else if(it->second.type == Parameter::Type::Float)
                 {
-                    const param_type min = it->second.min;
-                    const param_type max = it->second.max;
-                    *(it->second.zone) = std::max(std::min(max, value), min);
+                    *(it->second.zone) = std::max(std::min(it->second.max, value), it->second.min);
+                    m_mutex_glue.unlock();
+                    return;
                 }
-                else
-                {
-                    m_owner.warning(std::string("FAUST interface \"") + name + std::string("\" is doesn't requires a value"));
-                }
+                m_owner.warning(std::string("FAUST interface \"") + name + std::string("\" is doesn't requires a value"));
                 m_mutex_glue.unlock();
                 return;
             }
