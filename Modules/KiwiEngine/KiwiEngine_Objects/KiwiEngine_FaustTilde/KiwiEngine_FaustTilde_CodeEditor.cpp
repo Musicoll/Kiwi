@@ -44,10 +44,12 @@ namespace kiwi { namespace engine {
         m_owner(owner),
         m_editor(m_document, &m_highlither),
         m_lock(true),
-        m_code_changed(true)
+        m_code_changed(true),
+        m_error_line(-1)
         {
             setBounds(0, 0, 512, 384);
-            m_editor.setColour(juce::CodeEditorComponent::backgroundColourId, juce::Colours::lightgrey);
+            m_editor.setColour(juce::CodeEditorComponent::backgroundColourId, juce::Colours::white);
+            m_editor.setColour(juce::CodeEditorComponent::lineNumberBackgroundId, juce::Colours::lightgrey);
             m_editor.setScrollbarThickness(8);
             addAndMakeVisible(&m_editor);
             
@@ -61,6 +63,12 @@ namespace kiwi { namespace engine {
             m_button_lock.setName("lock");
             m_button_lock.addListener(this);
             addAndMakeVisible(&m_button_lock);
+            
+            m_button_errs.setButtonText(juce::String(juce::CharPointer_UTF8 ("•")));
+            m_button_errs.setName("error");
+            m_button_errs.addListener(this);
+            m_button_errs.setTooltip("Select the error line");
+            addAndMakeVisible(&m_button_errs);
             
             m_console.setReadOnly(true);
             m_console.setColour(juce::TextEditor::backgroundColourId, juce::Colours::lightgrey);
@@ -97,13 +105,16 @@ namespace kiwi { namespace engine {
             m_editor.setBounds(0, 0, width, yoffset - 2);
             m_button_sync.setBounds(wsize * 0 + 2, yoffset, 48, 24);
             m_button_lock.setBounds(wsize * 1 + 2, yoffset, 48, 24);
-            m_console.setBounds(wsize * 2 + 2, yoffset + 1, width - (wsize * 2 + 2) - 2, 22);
+            m_button_errs.setBounds(wsize * 2 + 2, yoffset, 22, 24);
+            m_console.setBounds(wsize * 2 + 24 + 2, yoffset + 1, width - (wsize * 2 + 24 + 2) - 2, 22);
         }
         
         void visibilityChanged() override
         {
             if(isVisible())
             {
+                m_code_changed = true;
+                computeErrors();
                 m_document.addListener(this);
                 startTimer(1000);
             }
@@ -157,6 +168,13 @@ namespace kiwi { namespace engine {
                 else
                 {
                     setLock(false);
+                }
+            }
+            else if(name == "error")
+            {
+                if(m_error_line > 0)
+                {
+                    //m_editor.setHighlightedRegion(<#const Range<int> &newRange#>)
                 }
             }
         }
@@ -265,6 +283,36 @@ namespace kiwi { namespace engine {
             m_code_changed = true;
         }
         
+        // Try to set the lock state
+        void setLock(bool state)
+        {
+            m_owner.grabLock(state);
+        }
+        
+        // Force unlock
+        void forceUnlock()
+        {
+            m_owner.forceUnlock();
+        }
+        
+        // Set the current error line
+        void setErrorLine(int line)
+        {
+            m_error_line = line;
+            if(m_error_line == -1)
+            {
+                m_console.setText(juce::String(""));
+                m_console.repaint();
+                m_button_errs.setEnabled(false);
+                m_button_errs.setColour(juce::TextButton::textColourOnId, juce::Colours::black);
+            }
+            else
+            {
+                m_button_errs.setEnabled(true);
+                m_button_errs.setColour(juce::TextButton::textColourOnId, juce::Colours::red);
+            }
+        }
+        
         //! @brief Get the compile options
         std::vector<std::string> getCompileOptions()
         {
@@ -281,7 +329,13 @@ namespace kiwi { namespace engine {
             m_code_changed = false;
             if(m_document.getNumCharacters() == 0)
             {
-                m_console.clear();
+                setErrorLine(-1);
+                return;
+            }
+            std::string const code = getCode();
+            if(code.empty() || code.find_first_not_of("\n\r\t\v\f ") == std::string::npos)
+            {
+                setErrorLine(-1);
                 return;
             }
             std::string errors;
@@ -293,7 +347,7 @@ namespace kiwi { namespace engine {
             }
             if(startMTDSPFactories())
             {
-                uptr_faust_factory nfactory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString("", getCode(), options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
+                uptr_faust_factory nfactory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString("", code, options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
                 stopMTDSPFactories();
             }
             auto pos = errors.find_first_of("\r\n");
@@ -308,22 +362,25 @@ namespace kiwi { namespace engine {
             }
             if(!errors.empty())
             {
+                int line;
                 errors.replace(0, 3, "l.");
+                try
+                {
+                    line = std::stoi(errors.substr(2));
+                }
+                catch(...)
+                {
+                    line = -2;
+                }
+                setErrorLine(line);
+                m_console.setText(errors);
             }
-            m_console.setText(errors);
+            else
+            {
+                setErrorLine(-1);
+            }
         }
         
-        // Try to set the lock state
-        void setLock(bool state)
-        {
-            m_owner.grabLock(state);
-        }
-        
-        // Force unlock
-        void forceUnlock()
-        {
-            m_owner.forceUnlock();
-        }
         
         // ================================================================================ //
         
@@ -352,6 +409,7 @@ namespace kiwi { namespace engine {
         FaustTilde&                 m_owner;
         juce::TextButton            m_button_sync;
         juce::TextButton            m_button_lock;
+        juce::TextButton            m_button_errs;
         juce::TextEditor            m_console;
         
         FaustTokeniser              m_highlither;
@@ -359,7 +417,7 @@ namespace kiwi { namespace engine {
         juce::CodeEditorComponent   m_editor;
         std::atomic<bool>           m_lock;
         std::atomic<bool>           m_code_changed;
-        
+        int                         m_error_line;
         Window                      m_window;
     };
 }}
