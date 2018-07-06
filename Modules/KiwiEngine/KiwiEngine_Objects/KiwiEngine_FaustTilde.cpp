@@ -127,6 +127,24 @@ namespace kiwi { namespace engine {
         return m_compile_options;
     }
     
+    void FaustTilde::setCompileOptions(std::vector<std::string>&& options)
+    {
+        if(!canLock() && !hasLock())
+        {
+            warning("faust~: code is currently locked by another user");
+            return;
+        }
+        deferMain([this, noptions = std::move(options)]()
+                  {
+                      auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel());
+                      if(model)
+                      {
+                          model->setCompileOptions(noptions);
+                          setAttribute(std::string("compileoptionschanged"), {tool::Parameter::Type::String, {juce::Uuid().toString().toStdString()}});
+                      }
+                  });
+    }
+    
     std::string const& FaustTilde::getDspCode() const
     {
         return m_dsp_code;
@@ -367,6 +385,19 @@ namespace kiwi { namespace engine {
                 {
                     warning(std::string("faust~: editor method extra arguments"));
                 }
+                return;
+            }
+            else if(name == "options")
+            {
+                std::vector<std::string> noptions(args.size() - 1);
+                for(size_t i = 1; i < args.size(); ++i)
+                {
+                    if(args[i].isNumber())
+                        noptions[i-1] = std::to_string(args[i].getFloat());
+                    else
+                        noptions[i-1] = args[i].getString();
+                }
+                setCompileOptions(std::move(noptions));
                 return;
             }
             

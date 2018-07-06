@@ -56,6 +56,9 @@ namespace kiwi { namespace engine {
         //! @brief Get the compile options
         std::vector<std::string> getCompileOptions() const;
         
+        //! @brief Set the DSP code
+        void setCompileOptions(std::vector<std::string>&& options);
+        
         //! @brief Get the DSP code
         std::string const& getDspCode() const;
         
