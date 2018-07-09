@@ -289,20 +289,36 @@ namespace kiwi { namespace engine {
         }
         
         //! @brief Ensure that the lock is freed and ask for to synchronize the code if needed
-        void willClose()
+        bool shouldClose()
         {
             if(m_owner.hasLock())
             {
-                /*
                 auto const current_code = getCode();
                 if(m_owner.getDspCode() != current_code)
                 {
-                    m_owner.setEditCode(std::string(current_code));
-                    m_owner.setDspCode(std::string(current_code));
-                    m_code_changed = true;
-                }*/
+                    const int r = juce::AlertWindow::showYesNoCancelBox(juce::AlertWindow::QuestionIcon,
+                                                                        juce::String("Closing document..."),
+                                                                        juce::String("Do you want to synchronize the changes?"),
+                                                                        juce::String("Synchronize"),
+                                                                        juce::String("Discard changes"),
+                                                                        juce::String("Cancel"),
+                                                                        &m_window);
+                    if(r == 1) // Synchronize
+                    {
+                        m_owner.setDspCode(std::string(current_code));
+                        m_owner.grabLock(false);
+                        return 1;
+                    }
+                    else if(r == 2) // Discard changes
+                    {
+                        m_owner.grabLock(false);
+                        return 1;
+                    }
+                    return false;
+                }
                 m_owner.grabLock(false);
             }
+            return true;
         }
         
         // Try to set the lock state
@@ -316,10 +332,10 @@ namespace kiwi { namespace engine {
         {
             const int r = juce::AlertWindow::showOkCancelBox(juce::AlertWindow::QuestionIcon,
                                                              juce::String("Force Unlock"),
-                                                             juce::String("Are you sure, you want to force to unlock the editor ? Perhaps somebody else is using it..."),
+                                                             juce::String("Are you sure, you want to force to unlock the editor?\nPerhaps somebody else is using it..."),
                                                              juce::String("Unlock"),
                                                              juce::String("Cancel"),
-                                                                &m_window);
+                                                             &m_window);
             
             if(r == 1) // save button
             {
@@ -439,9 +455,15 @@ namespace kiwi { namespace engine {
                 auto* content = dynamic_cast<FaustTilde::CodeEditor *>(getContentComponent());
                 if(content)
                 {
-                    content->willClose();
+                    if(content->shouldClose())
+                    {
+                        removeFromDesktop();
+                    }
                 }
-                removeFromDesktop();
+                else
+                {
+                    removeFromDesktop();
+                }
             }
         };
         
