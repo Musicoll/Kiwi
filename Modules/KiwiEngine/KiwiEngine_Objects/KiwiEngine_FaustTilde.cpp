@@ -84,8 +84,7 @@ namespace kiwi { namespace engine {
     
     FaustTilde::~FaustTilde()
     {
-        int bah_cest_pas_possible_ici;
-        //grabLock(false);
+        ;
     }
     
     // ================================================================================ //
