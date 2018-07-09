@@ -226,7 +226,7 @@ namespace kiwi { namespace engine {
             std::lock_guard<std::mutex> guard(m_mutex_glue);
             for(auto& param : m_params_short)
             {
-                *param.second.zone = param.second.deft;
+                *param.second.zone = param.second.dflt;
             }
         }
         
@@ -301,13 +301,13 @@ namespace kiwi { namespace engine {
             param_type  min;
             param_type  max;
             param_type  step;
-            param_type  deft;
+            param_type  dflt;
             param_type  saved;
             bool        dirty; // If the parameter should be deleted
             
             std::string toString() const
             {
-                return std::string((type == Type::Button) ? " button" : ((type == Type::CheckButton) ? " check button" : "float")) + " [" + std::to_string(min) + " " + std::to_string(max) + "] " + std::to_string(deft);
+                return std::string((type == Type::Button) ? " button" : ((type == Type::CheckButton) ? " check button" : "float")) + " [" + std::to_string(min) + " " + std::to_string(max) + "] " + std::to_string(dflt);
             }
         };
         
@@ -330,7 +330,7 @@ namespace kiwi { namespace engine {
                    it->second.min != min ||
                    it->second.max != max ||
                    it->second.step != step ||
-                   it->second.deft != init)
+                   it->second.dflt != init)
                 {
                     it->second = Parameter({type, zone, min, max, step, init, init, false});
                     m_params_long[getLongName(name)] = it->second;
