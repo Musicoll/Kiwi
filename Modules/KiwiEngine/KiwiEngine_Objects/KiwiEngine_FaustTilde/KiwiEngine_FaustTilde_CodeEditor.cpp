@@ -288,6 +288,23 @@ namespace kiwi { namespace engine {
             m_code_changed = true;
         }
         
+        //! @brief Ensure that the lock is freed and ask for to synchronize the code if needed
+        void willClose()
+        {
+            if(m_owner.hasLock())
+            {
+                /*
+                auto const current_code = getCode();
+                if(m_owner.getDspCode() != current_code)
+                {
+                    m_owner.setEditCode(std::string(current_code));
+                    m_owner.setDspCode(std::string(current_code));
+                    m_code_changed = true;
+                }*/
+                m_owner.grabLock(false);
+            }
+        }
+        
         // Try to set the lock state
         void setLock(bool state)
         {
@@ -409,6 +426,11 @@ namespace kiwi { namespace engine {
             
             void closeButtonPressed() override
             {
+                auto* content = dynamic_cast<FaustTilde::CodeEditor *>(getContentComponent());
+                if(content)
+                {
+                    content->willClose();
+                }
                 removeFromDesktop();
             }
         };
