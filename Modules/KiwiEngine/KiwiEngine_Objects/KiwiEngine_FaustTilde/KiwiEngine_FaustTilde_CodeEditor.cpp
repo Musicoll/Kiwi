@@ -314,7 +314,17 @@ namespace kiwi { namespace engine {
         // Force unlock
         void forceUnlock()
         {
-            m_owner.forceUnlock();
+            const int r = juce::AlertWindow::showOkCancelBox(juce::AlertWindow::QuestionIcon,
+                                                             juce::String("Force Unlock"),
+                                                             juce::String("Are you sure, you want to force to unlock the editor ? Perhaps somebody else is using it..."),
+                                                             juce::String("Unlock"),
+                                                             juce::String("Cancel"),
+                                                                &m_window);
+            
+            if(r == 1) // save button
+            {
+                m_owner.forceUnlock();
+            }
         }
         
         // Set the current error line
