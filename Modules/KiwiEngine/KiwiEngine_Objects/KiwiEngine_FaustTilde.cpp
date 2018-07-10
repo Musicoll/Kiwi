@@ -226,7 +226,7 @@ namespace kiwi { namespace engine {
         const auto options = m_compile_options;
         const auto name = "kiwi" + juce::Uuid().toString().toStdString();
         std::vector<char const*> argv(options.size());
-        for(size_t i = 0; i < 2 && i < options.size(); ++i)
+        for(size_t i = 0; i < options.size(); ++i)
         {
             argv[i] = options[i].c_str();
         }

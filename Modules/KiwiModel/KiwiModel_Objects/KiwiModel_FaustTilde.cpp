@@ -60,7 +60,7 @@ namespace kiwi { namespace model {
         fausttilde_class->addAttribute("lockstate", std::move(param_lock_state));
         
         auto param_compile_options = std::make_unique<ParameterClass>(tool::Parameter::Type::String);
-        fausttilde_class->addAttribute("compileoptions", std::move(param_compile_options));
+        fausttilde_class->addAttribute("compileoptionschanged", std::move(param_compile_options));
         
         iString::declare();
         
@@ -204,7 +204,7 @@ namespace kiwi { namespace model {
         {
             m_lock_state = parameter[0].getInt();
         }
-        else if(name == "editcodechanged")
+        else if(name == "compileoptionschanged")
         {
             m_compiles_options_changed.send(parameter[0].getString());
         }
