@@ -53,12 +53,13 @@ namespace kiwi { namespace engine {
             m_editor.setScrollbarThickness(8);
             addAndMakeVisible(&m_editor);
             
-            m_button_sync.setButtonText("Sync");
+            m_button_sync.setButtonText("Synchronize Audio");
             m_button_sync.setClickingTogglesState(false);
             m_button_sync.setName("update");
             m_button_sync.addListener(this);
             m_button_sync.setTooltip("Synchonize the audio engine with this code");
             m_button_sync.setWantsKeyboardFocus(false);
+            m_button_sync.setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
             addAndMakeVisible(&m_button_sync);
             
             m_button_lock.setName("lock");
@@ -77,6 +78,8 @@ namespace kiwi { namespace engine {
             m_console.setColour(juce::TextEditor::backgroundColourId, juce::Colours::lightgrey);
             m_console.setColour(juce::TextEditor::textColourId, juce::Colours::black);
             m_console.setBorder({ 1, 0, 1, 3 });
+            m_console.setSelectAllWhenFocused(true);
+            m_console.onFocusLost = [this]() { m_console.setCaretPosition(0); };
             addAndMakeVisible(&m_console);
             resized();
             
@@ -104,13 +107,30 @@ namespace kiwi { namespace engine {
         {
             const auto width   = getWidth();
             const auto height  = getHeight();
-            const auto yoffset = height - 26;
-            const auto wsize   = 50;
+            const auto hsize   = 24;
+            const auto yoffset = height - hsize - 2;
             m_editor.setBounds(0, 0, width, yoffset - 2);
-            m_button_sync.setBounds(wsize * 0 + 2, yoffset, 48, 24);
-            m_button_lock.setBounds(wsize * 1 + 2, yoffset, 48, 24);
-            m_button_errs.setBounds(wsize * 2 + 2, yoffset, 22, 24);
-            m_console.setBounds(wsize * 2 + 24 + 2, yoffset + 1, width - (wsize * 2 + 24 + 2) - 2, 22);
+            
+            int y = 2, btnw = 0;
+            {
+                btnw = 106;
+                m_button_sync.setBounds(y, yoffset, btnw, hsize);
+                y += (2 + btnw);
+            }
+            {
+                btnw = 84;
+                m_button_lock.setBounds(y, yoffset, btnw, hsize);
+                y += (2 + btnw);
+            }
+            {
+                btnw = hsize;
+                m_button_errs.setBounds(y, yoffset, btnw, hsize);
+                y += (2 + btnw);
+            }
+            {
+                btnw = width - y - 2;
+                m_console.setBounds(y, yoffset + 1, btnw, hsize - 2);
+            }
         }
         
         void visibilityChanged() override
@@ -227,18 +247,21 @@ namespace kiwi { namespace engine {
                                   
                                   if(!m_owner.canLock() && !m_owner.hasLock())
                                   {
-                                      m_button_lock.setButtonText("Force");
-                                      m_button_lock.setTooltip("Force to unlock");
+                                      m_button_lock.setButtonText("Unlock Edition");
+                                      m_button_lock.setTooltip("Force another user to unlock the editor and make it available for you or other users");
+                                      m_button_lock.setColour(juce::TextButton::buttonColourId, juce::Colours::red);
                                   }
                                   else if(m_owner.canLock() && !m_owner.hasLock())
                                   {
-                                      m_button_lock.setButtonText("Grab");
-                                      m_button_lock.setTooltip("Grab the lock");
+                                      m_button_lock.setButtonText("Start Edition");
+                                      m_button_lock.setTooltip("Lock the editor and make it enable for you");
+                                      m_button_lock.setColour(juce::TextButton::buttonColourId, juce::Colours::green);
                                   }
                                   else
                                   {
-                                      m_button_lock.setButtonText("Leave");
-                                      m_button_lock.setTooltip("Leave the lock");
+                                      m_button_lock.setButtonText("Leave Edition");
+                                      m_button_lock.setTooltip("Unlock the editor and make it available for other users");
+                                      m_button_lock.setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
                                   }
                                   repaint();
                               });
@@ -349,6 +372,7 @@ namespace kiwi { namespace engine {
             m_error_line = line;
             if(m_error_line == -1)
             {
+                m_console.setTooltip(juce::String("No error"));
                 m_console.setText(juce::String(""));
                 m_console.repaint();
                 m_button_errs.setEnabled(false);
@@ -424,6 +448,7 @@ namespace kiwi { namespace engine {
                 }
                 setErrorLine(line);
                 m_console.setText(errors);
+                m_console.setTooltip(juce::String(errors));
             }
             else
             {
