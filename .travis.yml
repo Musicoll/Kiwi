@@ -12,6 +12,7 @@ matrix:
   include:
   - os: linux
     compiler: gcc
+    env: Tests
     addons:
       apt:
         sources: ['ubuntu-toolchain-r-test']
@@ -37,6 +38,7 @@ matrix:
 
   - os: linux
     compiler: gcc
+    env: Deployment
     addons:
       apt:
         sources: ['ubuntu-toolchain-r-test']
@@ -80,6 +82,7 @@ matrix:
 
   - os: osx
     compiler: clang++
+    env: Deployment
     osx_image: xcode9.2
     install:
     - git submodule update --init --recursive
