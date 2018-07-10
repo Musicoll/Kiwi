@@ -74,7 +74,9 @@ namespace kiwi { namespace model {
             
             iString(flip::Default& d);
             
-            iString(flip::String&& value);
+            iString(flip::String&& v);
+            
+            iString(std::string const& v);
         };
         
         flip::String               m_dsp_code;

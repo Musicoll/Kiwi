@@ -41,7 +41,12 @@ namespace kiwi { namespace model {
         value.disable_in_undo();
     }
     
-    FaustTilde::iString::iString(flip::String&& value) : value(value)
+    FaustTilde::iString::iString(flip::String&& v) : value(v)
+    {
+        value.disable_in_undo();
+    }
+    
+    FaustTilde::iString::iString(std::string const& v) : value(v)
     {
         value.disable_in_undo();
     }
