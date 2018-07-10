@@ -317,6 +317,6 @@ add_custom_command(TARGET Tests
                    POST_BUILD COMMAND test_dsp
                               COMMAND test_model
                               COMMAND test_tool
-                              #COMMAND test_server
+                              COMMAND test_server
                               COMMAND test_network
                    USES_TERMINAL)
