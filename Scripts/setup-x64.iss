@@ -40,8 +40,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: mypAssociation; Description: "Associate ""kiwi"" extension"; GroupDescription: File extensions:
 
 [Files]
-Source: "..\Build\KiwiBuild\Release\Kiwi.exe"; DestDir: "{app}"; Flags: ignoreversion; NOTE: Don't use "Flags: ignoreversion" on any shared system files
-Source: "..\ThirdParty\faust\libraries\*"; DestDir: "{app}\Faust\Libs"; Flags: ignoreversion; NOTE: Don't use "Flags: ignoreversion" on any shared system files
+Source: "..\Build\KiwiBuild\Release\Kiwi.exe"; DestDir: "{app}"; Flags: ignoreversion;
+Source: "..\ThirdParty\faust\libraries\*"; DestDir: "{app}\Faust\Libs"; Flags: ignoreversion;
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

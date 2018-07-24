@@ -11,8 +11,8 @@ install:
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir Build && cd Build
-  #- cmake .. -G "Visual Studio 14 2015 Win64"
-  #- cmake --build . --target Kiwi --config %CONFIGURATION%
+  - cmake .. -G "Visual Studio 14 2015 Win64"
+  - cmake --build . --target Kiwi --config %CONFIGURATION%
 after_build:
   - cd %APPVEYOR_BUILD_FOLDER%
   - xcopy %APPVEYOR_BUILD_FOLDER%\docs %APPVEYOR_BUILD_FOLDER%\documentation\ /SY
