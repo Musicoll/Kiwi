@@ -145,6 +145,10 @@ namespace kiwi { namespace model {
         }
         else
         {
+            if(index == getNumberOfOutlets() -  1)
+            {
+                return std::string("Extra Output");
+            }
             return std::string("Audio Output Channel ") + std::to_string(index);
         }
     }
