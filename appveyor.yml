@@ -15,7 +15,7 @@ build_script:
   - cmake --build . --target Kiwi --config %CONFIGURATION%
 after_build:
   - cd %APPVEYOR_BUILD_FOLDER%
-  - xcopy %APPVEYOR_BUILD_FOLDER%\docs %APPVEYOR_BUILD_FOLDER%\documentation /D /E /Q
+  - xcopy %APPVEYOR_BUILD_FOLDER%\docs\ %APPVEYOR_BUILD_FOLDER%\documentation\ /D /E /Q
   - 7z a documentation.zip %APPVEYOR_BUILD_FOLDER%\documentation
   - rmdir %APPVEYOR_BUILD_FOLDER%\documentation\ /S /Q
   - set PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 5"
