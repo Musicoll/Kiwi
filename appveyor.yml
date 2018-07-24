@@ -15,9 +15,15 @@ build_script:
   - cmake --build . --target Kiwi --config %CONFIGURATION%
 after_build:
   - cd %APPVEYOR_BUILD_FOLDER%
+  - xcopy %APPVEYOR_BUILD_FOLDER%\docs %APPVEYOR_BUILD_FOLDER%\documentation /E
+  - 7z a documentation.zip %APPVEYOR_BUILD_FOLDER%\documentation
+  - rmdir %APPVEYOR_BUILD_FOLDER%\documentation\ /S /Q
   - set PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 5"
   - ISCC Scripts\setup-x64.iss
-  - 7z a Kiwi_%PLATFORM%.zip %APPVEYOR_BUILD_FOLDER%\Kiwi-x64-setup.exe
+  - mkdir Kiwi
+  - copy %APPVEYOR_BUILD_FOLDER%\documentation.zip %APPVEYOR_BUILD_FOLDER%\Kiwi\documentation.zip
+  - copy %APPVEYOR_BUILD_FOLDER%\Kiwi-x64-setup.exe %APPVEYOR_BUILD_FOLDER%\Kiwi\Kiwi-x64-setup.exe
+  - 7z a Kiwi_%PLATFORM%.zip %APPVEYOR_BUILD_FOLDER%\Kiwi
 
 artifacts:
   - path: '*.zip'
