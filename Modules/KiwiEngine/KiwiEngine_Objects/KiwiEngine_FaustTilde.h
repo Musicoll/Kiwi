@@ -90,6 +90,12 @@ namespace kiwi { namespace engine {
         //! @brief Compile the current DSP code.
         void compileDspCode();
         
+        //! @brief Get the time of a block size in ms.
+        double getBlockSizeInMS() { return static_cast<double>(m_block_size) / static_cast<double>(m_sample_rate); }
+        
+        //! @brief Get the time of a block size in ms.
+        bool prepareDsp(size_t sampleRate, size_t blockSize) noexcept;
+        
         void perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept;
         
         struct nop
@@ -118,6 +124,8 @@ namespace kiwi { namespace engine {
         std::unique_ptr<CodeEditor>     m_code_editor;
         int64_t                         m_lock_state = 0;
         const int64_t                   m_user_id;
+        size_t                          m_sample_rate   = 44100;
+        size_t                          m_block_size    = 64;
     };
 
 }}

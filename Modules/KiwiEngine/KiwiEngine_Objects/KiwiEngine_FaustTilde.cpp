@@ -264,6 +264,7 @@ namespace kiwi { namespace engine {
                 log("faust~: number of inputs " + std::to_string(m_instance->getNumInputs()));
                 log("faust~: number of outputs " + std::to_string(m_instance->getNumOutputs()));
                 m_ui_glue->log();
+                prepareDsp(m_sample_rate, m_block_size);
             }
             else
             {
@@ -470,18 +471,30 @@ namespace kiwi { namespace engine {
         }
     }
     
+    bool FaustTilde::prepareDsp(size_t sampleRate, size_t blockSize) noexcept
+    {
+        m_sample_rate   = sampleRate;
+        m_block_size    = blockSize;
+
+        if(static_cast<size_t>(m_instance->getNumInputs()) <= getNumberOfInputs() &&
+           static_cast<size_t>(m_instance->getNumOutputs()) <= getNumberOfOutputs() - 1)
+        {
+            m_ui_glue->saveStates();
+            m_instance->instanceInit(static_cast<int>(m_sample_rate));
+            m_ui_glue->recallStates();
+            m_inputs.resize(m_instance->getNumInputs());
+            m_outputs.resize(m_instance->getNumOutputs());
+            return true;
+        }
+        return false;
+    }
+    
     void FaustTilde::prepare(PrepareInfo const& infos)
     {
         if(m_instance)
         {
-            if(static_cast<size_t>(m_instance->getNumInputs()) <= getNumberOfInputs() &&
-               static_cast<size_t>(m_instance->getNumOutputs()) <= getNumberOfOutputs() - 1)
+            if(prepareDsp(infos.sample_rate, infos.vector_size))
             {
-                m_ui_glue->saveStates();
-                m_instance->instanceInit(static_cast<int>(infos.sample_rate));
-                m_ui_glue->recallStates();
-                m_inputs.resize(m_instance->getNumInputs());
-                m_outputs.resize(m_instance->getNumOutputs());
                 setPerformCallBack(this, &FaustTilde::perform);
             }
             else

@@ -199,7 +199,7 @@ namespace kiwi { namespace engine {
                                              }
                                              m_mutex_glue.unlock();
                                          }
-                                     } , std::chrono::milliseconds(2));
+                                     } , std::chrono::milliseconds(static_cast<size_t>(std::floor(m_owner.getBlockSizeInMS()))));
                     return;
                 }
                 else if(it->second.type == Parameter::Type::CheckButton)
