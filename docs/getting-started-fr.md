@@ -45,7 +45,7 @@ Pour se connecter à un compte utilisateur existant, il faut cliquer sur 'login'
 
 A ce point, il est soit possible de rejoindre un patch partagé en utilisant la fenêtre du Document Browser ou d'ouvrir un patch local. Dans cette section, nous montrerons comment ouvrir et manipuler un patch local. Les indications sur les manières de collaborer seront données un peu plus loin dans cette documentation.
 
-Ouvrez le patch **first-patch.kiwi** distribué avec les [tutoriels](https://github.com/Musicoll/Kiwi/releases/download/v1.0.3/tutorials.zip).
+Ouvrez le patch **first-patch.kiwi** distribué avec les [tutoriels](https://github.com/Musicoll/Kiwi/releases/download/v1.0.3/documentation.zip).
 
 <img title="first patch" src="./img/first-patch.png" height="600px">
 

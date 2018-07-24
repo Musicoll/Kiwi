@@ -1,6 +1,6 @@
 ## Patchs d'aide
 
-Une liste de patchs d'aide décrivant le fonctionnement des objets est <a href="https://github.com/Musicoll/Kiwi/releases/download/v1.0.3/help-files.zip" target='_blank_'>ici</a>.
+Une liste de patchs d'aide décrivant le fonctionnement des objets est <a href="https://github.com/Musicoll/Kiwi/releases/download/v1.0.3/documentation.zip" target='_blank_'>ici</a>.
 Parfois les patchs d'aide regroupent plusieurs objets liés fonctionnellement, par exemple gate et switch ou gate~ et switch~.
 
 ## List of objects
