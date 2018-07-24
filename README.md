@@ -46,6 +46,17 @@ Enables or disable the personal/system library for Boost with the option `USE_SY
 - LLVM  
 Enables or disable the personal/system library for LLVM with the option `USE_SYSTEM_LLVM ON/OFF (default OFF)`. LLVM must be compiled as a static library (with the dynamic runtime on Windows) and compatible with the version **5.0.0**. See this [documentation](https://llvm.org/docs/CMake.html) for more options.
 
+### Documentation
+
+The documentation of Kiwi is available [online](http://musicoll.github.io/Kiwi) and with the distribution. Generating the documentation requires to install  [github-wikito-converter](https://github.com/yakivmospan/github-wikito-converter):
+```
+npm install -g github-wikito-converter
+```
+Then, from the **docs** folder, run:
+```
+gwtc -t Kiwi -n index  ./
+```
+
 ### Organizations
 
 - [ANR MUSICOLL](http://musicoll.mshparisnord.org)
