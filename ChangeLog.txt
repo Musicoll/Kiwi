@@ -1,3 +1,15 @@
+### v1.0.3
+
+User:
+- Add the **faust~** object to load, edit and run FAUST code
+- Add english/french documentation to the distribution
+- Add help files to the distribution
+- Add tutorials to the distribution
+
+Dev:
+- Improve build system using CMake only
+- Improve build/node server documentation
+
 ### v1.0.2
 
 User:
