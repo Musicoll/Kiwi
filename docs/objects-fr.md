@@ -71,3 +71,4 @@ Parfois les patchs d'aide regroupent plusieurs objets liés fonctionnellement, p
 | **clip**        |       | Ecrête un nombre entre une valeur minimum et maximum    |
 | **clip~**       |       | Ecrête un signal entre une valeur minimum et maximum    |
 | **float**       |       | Stocke un nombre flottant                               |
+| **faust~**      |       | Edite et joue du code FAUST                            |

@@ -71,3 +71,4 @@ Sometimes help patches gather several objects that are functionally linked, for 
 | **clip**        |       | Clip a number between a maximum and a minimum value     |
 | **clip~**       |       | Clip a signal between a maximum and a minimum value     |
 | **float**       |       | Store a float value                                     |
+| **faust~**      |       | Edit and run FAUST code                                 |
