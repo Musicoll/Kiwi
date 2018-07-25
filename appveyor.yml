@@ -23,7 +23,7 @@ after_build:
   - mkdir Kiwi
   - copy %APPVEYOR_BUILD_FOLDER%\documentation.zip %APPVEYOR_BUILD_FOLDER%\Kiwi\documentation.zip
   - copy %APPVEYOR_BUILD_FOLDER%\Kiwi-x64-setup.exe %APPVEYOR_BUILD_FOLDER%\Kiwi\Kiwi-x64-setup.exe
-  - 7z a Kiwi_%PLATFORM%.zip %APPVEYOR_BUILD_FOLDER%\Kiwi
+  - 7z a Kiwi-windows-64.zip %APPVEYOR_BUILD_FOLDER%\Kiwi
 
 artifacts:
   - path: '*.zip'
