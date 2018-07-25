@@ -71,7 +71,7 @@ namespace kiwi { namespace engine {
 #else
         m_compile_options.push_back(apppath + std::string("/Faust/Libs"));
 #endif
-        
+        log(m_compile_options[m_compile_options.size()-1]);
         attributeChanged("dspcodechanged", {tool::Parameter::Type::String, {std::string("")}});
         attributeChanged("editcodechanged", {tool::Parameter::Type::String, {std::string("")}});
         attributeChanged("compileoptionschanged", {tool::Parameter::Type::String, {std::string("")}});
