@@ -63,9 +63,9 @@ namespace kiwi { namespace engine {
     m_user_id(getUserId(model))
     {
         m_compile_options.push_back("-I");
-        auto apppath = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getFullPathName().toStdString();
+        auto apppath = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getParentDirectory().getFullPathName().toStdString();
 #ifdef __APPLE__
-        m_compile_options.push_back(apppath + std::string("/Contents/Resources/Faust/Libs"));
+        m_compile_options.push_back(juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getFullPathName().toStdString() + std::string("/Contents/Resources/Faust/Libs"));
 #elif _WIN32
         std::replace(apppath.begin(), apppath.end(), '\\', '/');
         m_compile_options.push_back(apppath + std::string("/Faust/Libs"));
