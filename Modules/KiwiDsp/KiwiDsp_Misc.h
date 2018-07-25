@@ -92,7 +92,7 @@ namespace kiwi
             Timer() = default;
             
             //! @brief The destrcutor.
-            ~Timer() {};
+            ~Timer() {}
             
             //! @brief Gets the ellapsed time.
             template <typename TDur>

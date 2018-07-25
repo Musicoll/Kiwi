@@ -56,7 +56,7 @@ namespace kiwi { namespace engine {
         void setSampleRate(double sample_rate) noexcept;
         
         //! @brief Set the function to call when the ramp reached its final destination.
-        //! @brief This callback function will be called by the getNextValue() method.
+        //! @details This callback function will be called by the getNextValue() method.
         //! @param callback The callback function to be called.
         void setEndOfRampCallback(std::function<void()> callback);
         

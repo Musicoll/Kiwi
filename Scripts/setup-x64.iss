@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Kiwi"
-#define MyAppVersion "v1.0.2"
+#define MyAppVersion "v1.0.3"
 #define MyAppPublisher "CICM"
 #define MyAppURL "http://kiwi.mshparisnord.fr/"
 #define MyAppExeName "Kiwi.exe"
@@ -23,7 +23,7 @@ DefaultDirName={pf}\{#MyAppName}
 DisableDirPage=yes
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
-OutputDir=..\Build\Release\x64\KiwiBuild\Release
+OutputDir=..
 OutputBaseFilename=Kiwi-x64-setup
 SetupIconFile=..\Ressources\Project\VisualStudio15\Icon.ico
 Compression=lzma
@@ -40,12 +40,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: mypAssociation; Description: "Associate ""kiwi"" extension"; GroupDescription: File extensions:
 
 [Files]
-Source: "..\Build\Release\x64\KiwiBuild\Release\Kiwi.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\Build\Release\x64\KiwiBuild\Release\concrt140.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\Build\Release\x64\KiwiBuild\Release\msvcp140.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\Build\Release\x64\KiwiBuild\Release\vccorlib140.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\Build\Release\x64\KiwiBuild\Release\vcruntime140.dll"; DestDir: "{app}"; Flags: ignoreversion
-; NOTE: Don't use "Flags: ignoreversion" on any shared system files
+Source: "..\Build\KiwiBuild\Release\Kiwi.exe"; DestDir: "{app}"; Flags: ignoreversion;
+Source: "..\ThirdParty\faust\libraries\*"; DestDir: "{app}\Faust\Libs"; Flags: ignoreversion;
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

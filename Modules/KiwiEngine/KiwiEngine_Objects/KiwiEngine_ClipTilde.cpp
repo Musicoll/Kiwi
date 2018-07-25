@@ -21,6 +21,7 @@
 
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_ClipTilde.h>
 #include <KiwiEngine/KiwiEngine_Factory.h>
+#include <algorithm>
 
 namespace kiwi { namespace engine {
     
@@ -123,7 +124,7 @@ namespace kiwi { namespace engine {
         
         while(sample_index--)
         {
-            *output_data++ = std::max(m_minimum.load(), std::min(*input_data++, m_maximum.load()));
+            *output_data++ = std::max(static_cast<kiwi::dsp::sample_t>(m_minimum.load()), std::min(*input_data++, static_cast<kiwi::dsp::sample_t>(m_maximum.load())));
         }
     }
     
@@ -150,7 +151,7 @@ namespace kiwi { namespace engine {
         
         while(sample_index--)
         {
-            *output_data++ = std::max(*input_min++, std::min(*input_data++, m_maximum.load()));
+            *output_data++ = std::max(*input_min++, std::min(*input_data++, static_cast<kiwi::dsp::sample_t>(m_maximum.load())));
         }
     }
     
@@ -163,7 +164,7 @@ namespace kiwi { namespace engine {
         
         while(sample_index--)
         {
-            *output_data++ = std::max(m_minimum.load(), std::min(*input_data++, *input_max++));
+            *output_data++ = std::max(static_cast<kiwi::dsp::sample_t>(m_minimum.load()), std::min(*input_data++, *input_max++));
         }
     }
 }}

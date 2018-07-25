@@ -87,3 +87,4 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Clip.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_SfPlayTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_SfRecordTilde.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_FaustTilde.h>

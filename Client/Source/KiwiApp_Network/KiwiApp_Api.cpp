@@ -559,7 +559,7 @@ namespace kiwi
             session->setAuthorization("JWT " + user.getToken());
         }
         
-        return std::move(session);
+        return session;
     }
     
     uint64_t Api::storeSession(std::unique_ptr<Session> session)

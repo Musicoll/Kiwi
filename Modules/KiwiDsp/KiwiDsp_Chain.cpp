@@ -69,7 +69,7 @@ namespace kiwi
             {
                 m_processor->release();
             }
-            catch(Error & e)
+            catch(Error& e)
             {
                 
             }
@@ -479,12 +479,12 @@ namespace kiwi
         
         struct Chain::compare_proc
         {
-            compare_proc(Processor const& proc):m_proc(proc){};
+            compare_proc(Processor const& proc):m_proc(proc){}
             
             bool operator()(Node::uPtr const& node)
             {
                 return &m_proc == &(*node->m_processor);
-            };
+            }
             
             Processor const& m_proc;
         };
@@ -501,7 +501,7 @@ namespace kiwi
         
         struct Chain::index_node
         {
-            index_node(): m_next_index(1ul){};
+            index_node(): m_next_index(1ul){}
             
             void computeIndex(Node& node)
             {
@@ -537,7 +537,7 @@ namespace kiwi
             void operator()(Node::uPtr const& node)
             {
                 computeIndex(*node.get());
-            };
+            }
             
             size_t          m_next_index;
             std::set<Node*> m_loop_nodes;
@@ -555,7 +555,7 @@ namespace kiwi
                 bool operator()(std::unique_ptr<Node> const& l_node, std::unique_ptr<Node> const& r_node)
                 {
                     return l_node->m_index < r_node->m_index;
-                };
+                }
             };
             
             std::sort(m_nodes.begin(), m_nodes.end(), compare_index());

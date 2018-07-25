@@ -12,73 +12,71 @@ matrix:
   include:
   - os: linux
     compiler: gcc
-    env: COMPILER=g++-4.9
-
+    env: Tests
+    addons:
+      apt:
+        sources: ['ubuntu-toolchain-r-test']
+        packages: [g++-4.9, 'python-pip', 'python-yaml', 'libssl1.0.0']
     before_install:
     - python --version
     - python -c 'import ssl; print ssl.OPENSSL_VERSION;'
     - sudo add-apt-repository ppa:webkit-team/ppa -y
     - sudo apt-get update
-    - sudo apt-get install libfreetype6-dev
-    - sudo apt-get install libx11-dev
-    - sudo apt-get install libxrandr-dev
-    - sudo apt-get install libxinerama1
-    - sudo apt-get install libxinerama-dev
-    - sudo apt-get install libxcursor-dev
-    - sudo apt-get install libasound2-dev
-    - sudo apt-get install libgtk-3-dev
-    - sudo apt-get install libwebkit2gtk-4.0-dev
+    - sudo apt-get install -y pkg-config libedit-dev libfreetype6-dev libx11-dev libxrandr-dev libxinerama1 libxinerama-dev libxcursor-dev libasound2-dev libgtk-3-dev libwebkit2gtk-4.0-dev
+    install:
+    - export CXX=g++-4.9 # make sure CXX is correctly set
+    - git submodule update --init --recursive
+    - pip install --user cpp-coveralls
+    script:
+    - cd $TRAVIS_BUILD_DIR
+    - mkdir Build && cd Build
+    - cmake .. -DCMAKE_C_FLAGS=-m64 -DCMAKE_BUILD_TYPE=Debug -DGCOV_SUPPORT=On
+    - cmake --build . --config Debug --target Tests
+    after_success:
+    - coveralls -i Modules --gcov-options '\-lp' > /dev/null
 
-
+  - os: linux
+    compiler: gcc
+    env: Deployment
     addons:
       apt:
         sources: ['ubuntu-toolchain-r-test']
         packages: [g++-4.9, 'python-pip', 'python-yaml', 'libssl1.0.0']
-
+    before_install:
+    - python --version
+    - python -c 'import ssl; print ssl.OPENSSL_VERSION;'
+    - sudo add-apt-repository ppa:webkit-team/ppa -y
+    - sudo apt-get update
+    - sudo apt-get install -y pkg-config libedit-dev libfreetype6-dev libx11-dev libxrandr-dev libxinerama1 libxinerama-dev libxcursor-dev libasound2-dev libgtk-3-dev libwebkit2gtk-4.0-dev
     install:
-      # make sure CXX is correctly set
-      - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
-      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/concurrentqueue ThirdParty/Beast
-      - pip install --user cpp-coveralls
-
+    - export CXX=g++-4.9 # make sure CXX is correctly set
+    - git submodule update --init --recursive
     script:
-      - python ./Scripts/configure.py -coverage
-      - python ./Scripts/build.py -c Release
-      - python ./Scripts/build.py -c Debug -t Tests
-
+    - cd $TRAVIS_BUILD_DIR
+    - mkdir Build && cd Build
+    - cmake .. -DCMAKE_C_FLAGS=-m64 -DCMAKE_BUILD_TYPE=Release
+    - cmake --build .  --target Kiwi --config Release
+    - cmake --build .  --target Server --config Release
     after_success:
-      - coveralls -i Modules --gcov-options '\-lp' > /dev/null
-
-    before_deploy:
+    - cd $TRAVIS_BUILD_DIR
+    - cp -r docs documentation
+    - zip -r documentation.zip documentation
+    - rm -r documentation
     - mkdir Kiwi
-    - mv Build/Release/KiwiBuild/Kiwi Kiwi/Kiwi
-    - tar zcvf Kiwi_linux.tar.gz Kiwi/
-    - mkdir Kiwi_Server
-    - mv Build/Release/KiwiBuild/Server Kiwi_Server/Server
-    - tar zcvf Kiwi_Server_linux.tar.gz Kiwi_Server/
-
+    - mv Build/KiwiBuild/Kiwi Kiwi/Kiwi
+    - mv documentation.zip Kiwi/documentation.zip
+    - mkdir Kiwi/Faust
+    - cp -r ThirdParty/faust/libraries Kiwi/Faust/Libs
+    - zip -r Kiwi-linux-64.zip Kiwi
+    - mkdir KiwiServer && mv Build/KiwiBuild/Server KiwiServer/Server
+    - zip -r Kiwi-server-linux-64.zip KiwiServer
     deploy:
       provider: releases
       api_key:
         secure: atcBDMdJNzUGiUYSqQu/URg8mfvRk9b78tvj1eHKCeDXSTP0Y1UvI5YpmTx8SkUXp23QH4sgp0tKTFB98FbRojR4IL2NW+KZDG1o5BxZ4HYJ4hdCXXXhzeujcn2AjQzRJ9f8uodX/7Pfa19jGlovj1Tl9ZJ9jIfyyvcxlJXkTN9+CDlkkcpLNU64c4B+CclS8aLPbIKqvLmIy3fphzzkJoKN5rnE4EvKrIkJBPEib1WIY8K7W8boCwghsGBs04MwRZwidKIjPSPgbYpmGPspfKpu0W8mKMirdGEVt4rzpm+Dl9wMa/5Qsyc6afYfS4p3PZOfBio0mtVrPz4+4VXy/Ad+FDNnvxUy9776D0pSv2iBrdHhqs6n1vG0uT4uhbGtvwJR3BBbo6+TmEKakRgp+uRhYEvGy/EO0OkcKrOVLsrZ/akj8O+KOSROrz2VYfxmDTxtUi8K51vW3pJhcGsEsN1FkcJfef/pvxGLK5i0qEZWoyCyA4YMPNDWFFiuBadPTujIGJ/iDmwouzalV9F0vKOIFvP9IuZ1FHLOyEzhyoBS3l1NNpQUz+HNgupTVYSREH1qPXUHg3B5BdFpEJpOjU/P8gwG4npcNxX/5XvigFFiTeEN+eV4xcBVLcg+SsumeswIqi5Tvm+mzYyqz3wj628ddWxgGiPFSfySI4tz6lg=
       file:
-      - Kiwi_linux.tar.gz
-      - Kiwi_Server_linux.tar.gz
-      skip_cleanup: true
-      draft: true
-      prerelease: false
-      on:
-        repo: Musicoll/Kiwi
-        tags: true
-        branch: master
-
-    deploy:
-      provider: releases
-      api_key:
-        secure: atcBDMdJNzUGiUYSqQu/URg8mfvRk9b78tvj1eHKCeDXSTP0Y1UvI5YpmTx8SkUXp23QH4sgp0tKTFB98FbRojR4IL2NW+KZDG1o5BxZ4HYJ4hdCXXXhzeujcn2AjQzRJ9f8uodX/7Pfa19jGlovj1Tl9ZJ9jIfyyvcxlJXkTN9+CDlkkcpLNU64c4B+CclS8aLPbIKqvLmIy3fphzzkJoKN5rnE4EvKrIkJBPEib1WIY8K7W8boCwghsGBs04MwRZwidKIjPSPgbYpmGPspfKpu0W8mKMirdGEVt4rzpm+Dl9wMa/5Qsyc6afYfS4p3PZOfBio0mtVrPz4+4VXy/Ad+FDNnvxUy9776D0pSv2iBrdHhqs6n1vG0uT4uhbGtvwJR3BBbo6+TmEKakRgp+uRhYEvGy/EO0OkcKrOVLsrZ/akj8O+KOSROrz2VYfxmDTxtUi8K51vW3pJhcGsEsN1FkcJfef/pvxGLK5i0qEZWoyCyA4YMPNDWFFiuBadPTujIGJ/iDmwouzalV9F0vKOIFvP9IuZ1FHLOyEzhyoBS3l1NNpQUz+HNgupTVYSREH1qPXUHg3B5BdFpEJpOjU/P8gwG4npcNxX/5XvigFFiTeEN+eV4xcBVLcg+SsumeswIqi5Tvm+mzYyqz3wj628ddWxgGiPFSfySI4tz6lg=
-      file:
-      - Kiwi_linux.tar.gz
-      - Kiwi_Server_linux.tar.gz
+      - Kiwi-linux-64.zip
+      - Kiwi-server-linux-64.zip
       skip_cleanup: true
       draft: true
       prerelease: false
@@ -87,57 +85,37 @@ matrix:
       on:
         repo: Musicoll/Kiwi
         tags: true
-        condition: $TRAVIS_BRANCH != "master"
 
   - os: osx
     compiler: clang++
-    env: COMPILER=clang++
+    env: Deployment
     osx_image: xcode9.2
-
-    before_install:
-     - pyenv install 2.7.11
-     - pyenv global 2.7.11
-     - eval "$(pyenv init -)"
-     - python --version
-     - python -c 'import ssl; print ssl.OPENSSL_VERSION;'
-
     install:
-      - git submodule update --init --recursive ThirdParty/Juce ThirdParty/concurrentqueue ThirdParty/Beast
-
+    - git submodule update --init --recursive
     script:
-    - python ./Scripts/configure.py -c Release
-    - python ./Scripts/build.py -c Release
-
-    before_deploy:
+    - cd $TRAVIS_BUILD_DIR
+    - mkdir Build && cd Build
+    - cmake .. -GXcode
+    - xcodebuild -scheme Kiwi -configuration Release
+    - xcodebuild -scheme Server -configuration Release
+    after_success:
+    - cd $TRAVIS_BUILD_DIR
+    - cp -r docs documentation
+    - zip -r documentation.zip documentation
+    - rm -r documentation
     - mkdir Kiwi
-    - mv Build/Release/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
-    - zip -r Kiwi_macos.zip Kiwi
-    - mkdir Kiwi_Server
-    - mv Build/Release/KiwiBuild/Release/Server Kiwi_Server/Server
-    - zip -r Kiwi_Server_macos.zip Kiwi_Server
-
+    - mv Build/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
+    - mv documentation.zip Kiwi/documentation.zip
+    - zip -r Kiwi-macos-64.zip Kiwi
+    - mkdir KiwiServer && mv Build/KiwiBuild/Release/Server KiwiServer/Server
+    - zip -r Kiwi-server-macos-64.zip KiwiServer
     deploy:
       provider: releases
       api_key:
         secure: atcBDMdJNzUGiUYSqQu/URg8mfvRk9b78tvj1eHKCeDXSTP0Y1UvI5YpmTx8SkUXp23QH4sgp0tKTFB98FbRojR4IL2NW+KZDG1o5BxZ4HYJ4hdCXXXhzeujcn2AjQzRJ9f8uodX/7Pfa19jGlovj1Tl9ZJ9jIfyyvcxlJXkTN9+CDlkkcpLNU64c4B+CclS8aLPbIKqvLmIy3fphzzkJoKN5rnE4EvKrIkJBPEib1WIY8K7W8boCwghsGBs04MwRZwidKIjPSPgbYpmGPspfKpu0W8mKMirdGEVt4rzpm+Dl9wMa/5Qsyc6afYfS4p3PZOfBio0mtVrPz4+4VXy/Ad+FDNnvxUy9776D0pSv2iBrdHhqs6n1vG0uT4uhbGtvwJR3BBbo6+TmEKakRgp+uRhYEvGy/EO0OkcKrOVLsrZ/akj8O+KOSROrz2VYfxmDTxtUi8K51vW3pJhcGsEsN1FkcJfef/pvxGLK5i0qEZWoyCyA4YMPNDWFFiuBadPTujIGJ/iDmwouzalV9F0vKOIFvP9IuZ1FHLOyEzhyoBS3l1NNpQUz+HNgupTVYSREH1qPXUHg3B5BdFpEJpOjU/P8gwG4npcNxX/5XvigFFiTeEN+eV4xcBVLcg+SsumeswIqi5Tvm+mzYyqz3wj628ddWxgGiPFSfySI4tz6lg=
       file:
-      - Kiwi_macos.zip
-      - Kiwi_Server_macos.zip
-      skip_cleanup: true
-      draft: true
-      prerelease: false
-      on:
-        repo: Musicoll/Kiwi
-        tags: true
-        branch: master
-
-    deploy:
-      provider: releases
-      api_key:
-        secure: atcBDMdJNzUGiUYSqQu/URg8mfvRk9b78tvj1eHKCeDXSTP0Y1UvI5YpmTx8SkUXp23QH4sgp0tKTFB98FbRojR4IL2NW+KZDG1o5BxZ4HYJ4hdCXXXhzeujcn2AjQzRJ9f8uodX/7Pfa19jGlovj1Tl9ZJ9jIfyyvcxlJXkTN9+CDlkkcpLNU64c4B+CclS8aLPbIKqvLmIy3fphzzkJoKN5rnE4EvKrIkJBPEib1WIY8K7W8boCwghsGBs04MwRZwidKIjPSPgbYpmGPspfKpu0W8mKMirdGEVt4rzpm+Dl9wMa/5Qsyc6afYfS4p3PZOfBio0mtVrPz4+4VXy/Ad+FDNnvxUy9776D0pSv2iBrdHhqs6n1vG0uT4uhbGtvwJR3BBbo6+TmEKakRgp+uRhYEvGy/EO0OkcKrOVLsrZ/akj8O+KOSROrz2VYfxmDTxtUi8K51vW3pJhcGsEsN1FkcJfef/pvxGLK5i0qEZWoyCyA4YMPNDWFFiuBadPTujIGJ/iDmwouzalV9F0vKOIFvP9IuZ1FHLOyEzhyoBS3l1NNpQUz+HNgupTVYSREH1qPXUHg3B5BdFpEJpOjU/P8gwG4npcNxX/5XvigFFiTeEN+eV4xcBVLcg+SsumeswIqi5Tvm+mzYyqz3wj628ddWxgGiPFSfySI4tz6lg=
-      file:
-      - Kiwi_macos.zip
-      - Kiwi_Server_macos.zip
+      - Kiwi-macos-64.zip
+      - Kiwi-server-macos-64.zip
       skip_cleanup: true
       draft: true
       prerelease: false
@@ -146,4 +124,3 @@ matrix:
       on:
         repo: Musicoll/Kiwi
         tags: true
-        condition: $TRAVIS_BRANCH != "master"

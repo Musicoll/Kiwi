@@ -182,7 +182,7 @@ namespace kiwi
                 const size_t vectorsize = first_sig->size();
                 m_signals.emplace_back(std::move(first_sig));
                 
-                for(int i = 1; i < signals.size(); ++i)
+                for(size_t i = 1; i < signals.size(); ++i)
                 {
                     const Signal::sPtr sig(signals[i]);
                     assert(sig->size() == vectorsize

@@ -81,7 +81,7 @@ namespace kiwi { namespace model {
                 description += ", causes output";
             }
 
-            return std::move(description);
+            return description;
         }
         
         return {};

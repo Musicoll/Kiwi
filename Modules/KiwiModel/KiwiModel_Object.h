@@ -167,7 +167,7 @@ namespace kiwi
             {
             public:
                 
-                // @brief Destructor
+                //! @brief Destructor
                 virtual ~Listener() = default;
                 
                 //! @brief Called when a parameter has changed;
