@@ -803,7 +803,7 @@ this.activeTarget=b,this.clear();var c=this.selector+'[data-target="'+b+'"],'+th
         <div class="col-md-9">
 <p class="page" id="getting-started-en"></p><h1>Getting Started</h1>
 <h2 id="download">Download</h2>
-<p>Please follow this <a href="https://github.com/Musicoll/Kiwi/releases/latest">link</a> to download the software. You&#39;ll find a version for each operating system, a list of help patches that describes the objects&#39; behaviour and a set of tutorials guiding through creating certain audio processing.</p>
+<p>Download the latest Kiwi application for your operating system and the documentation from the <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>. You&#39;ll find a version for each operating system, a list of help patches that describes the objects&#39; behaviour and a set of tutorials guiding through creating certain audio processing.</p>
 <h2 id="compatibility">Compatibility</h2>
 <p>Kiwi is compatible with the three main operating system.</p>
 <ul>
@@ -832,7 +832,7 @@ this.activeTarget=b,this.clear();var c=this.selector+'[data-target="'+b+'"],'+th
 <p><img title="register" src="./img/loginWindow.png" height=400px/></p>
 <h2 id="first-patch">First patch</h2>
 <p>At this point, you can either join a shared patch using the Document Browser window or open a local patch. In this section we will demonstrate how to open and manipulate a local patch. Instructions on how to collaborate will be given later.</p>
-<p>Open the patch <strong>first-patch.kiwi</strong> given with the <a href="https://github.com/Musicoll/Kiwi/releases/download/v1.0.3/documentation.zip">tutorial</a>.</p>
+<p>Open the patch <strong>first-patch.kiwi</strong> provided in the documentation folder. If you didn&#39;t download the documentation yet, you can find it on this <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>.</p>
 <p><img title="first patch" src="./img/first-patch.png" height="600px"></p>
 <p>As you can see, the patch is a set of objects each one carrying out an operation. Data either control or signal data is sent between objects using links. Grey connections are used to send messages (numbers, strings, lists, bang ect...) whereas green connections send signals from top to bottom.</p>
 <p>This first patch is a generator of sound (synthesis) where the top-left part is the generator. The top-right is used to trigger a gain envelope. The signal is then sent to a master gain control and the dac~ object which represents the audio output of the patch.</p>
@@ -851,8 +851,7 @@ this.activeTarget=b,this.clear();var c=this.selector+'[data-target="'+b+'"],'+th
 <p>You can now edit and/or play the patch as you will with others.</p>
 <p class="page" id="objects-en"></p><h1>Objects List</h1>
 <h2 id="help-patches">Help patches</h2>
-<p>A list of help patches describing how each object works is <a href="https://github.com/Musicoll/Kiwi/releases/download/v1.0.3/documentation.zip" target='_blank_'>here</a>.
-Sometimes help patches gather several objects that are functionally linked, for instance gate and switch or gate~ and switch~.</p>
+<p>A list of help patches describing how each object works is provided in the documentation folder. If you didn&#39;t download the documentation yet, you can find it on this <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>. Sometimes help patches gather several objects that are functionally linked, for instance gate and switch or gate~ and switch~.</p>
 <h2 id="list-of-objects">List of objects</h2>
 <table>
 <thead>
@@ -1184,6 +1183,16 @@ Sometimes help patches gather several objects that are functionally linked, for 
 <td>Store a float value</td>
 </tr>
 <tr>
+<td><strong>sf.play~</strong></td>
+<td style="text-align:center"></td>
+<td>Play an audio file from disk</td>
+</tr>
+<tr>
+<td><strong>sf.record~</strong></td>
+<td style="text-align:center"></td>
+<td>Record an audio file on disk</td>
+</tr>
+<tr>
 <td><strong>faust~</strong></td>
 <td style="text-align:center"></td>
 <td>Edit and run FAUST code</td>
@@ -1191,7 +1200,7 @@ Sometimes help patches gather several objects that are functionally linked, for 
 </tbody>
 </table>
 <p class="page" id="tutorials-en"></p><h1>Tutorials</h1>
-<p>A set of tutorials is available <a href="https://github.com/Musicoll/Kiwi/releases/download/v1.0.3/documentation.zip" target='_blank_'>here</a>. Each tutorial aims at taking you through the creation of a specific audio processing or exploring a certain aspect of Kiwi software.</p>
+<p>A set of tutorials is provided in the documentation folder. If you didn&#39;t download the documentation yet, you can find it on this <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>. Each tutorial aims at taking you through the creation of a specific audio processing or exploring a certain aspect of Kiwi software.</p>
 <p>Available tutorials:</p>
 <ul>
 <li>first-patch</li>
@@ -1205,7 +1214,7 @@ Sometimes help patches gather several objects that are functionally linked, for 
 </ul>
 <p class="page" id="getting-started-fr"></p><h1>Premiers pas</h1>
 <h2 id="t-l-chargement">Téléchargement</h2>
-<p>Le logiciel est disponible en téléchargement <a href="https://github.com/Musicoll/Kiwi/releases/latest">ici</a>. On y trouve une version pour chaque système d&#39;exploitation, une liste de patchs d&#39;aide qui montrent le comportement des objets, et un ensemble de tutoriaux pour guider le lecteur dans la création de certains traitements audionumériques temps réel.</p>
+<p>Le dernière version de l&#39;application Kiwi et sa documentation sont disponibles sur cette <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>. On y trouve une version pour chaque système d&#39;exploitation, une liste de patchs d&#39;aide qui montrent le comportement des objets, et un ensemble de tutoriaux pour guider le lecteur dans la création de certains traitements audionumériques temps réel.</p>
 <h2 id="compatibilit-">Compatibilité</h2>
 <p>Kiwi est compatible avec les trois systèmes d&#39;exploitation principaux :</p>
 <ul>
@@ -1234,7 +1243,7 @@ Sometimes help patches gather several objects that are functionally linked, for 
 <p><img title="register" src="./img/loginWindow.png" height=400px/></p>
 <h2 id="premier-patch">Premier patch</h2>
 <p>A ce point, il est soit possible de rejoindre un patch partagé en utilisant la fenêtre du Document Browser ou d&#39;ouvrir un patch local. Dans cette section, nous montrerons comment ouvrir et manipuler un patch local. Les indications sur les manières de collaborer seront données un peu plus loin dans cette documentation.</p>
-<p>Ouvrez le patch <strong>first-patch.kiwi</strong> distribué avec les <a href="https://github.com/Musicoll/Kiwi/releases/download/v1.0.3/documentation.zip">tutoriels</a>.</p>
+<p>Ouvrez le patch <strong>first-patch.kiwi</strong> disponible dans le dossier de documentation. Si vous n&#39;avez pas encore la documentation, vous pouvez la télécharger sur cette <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>.</p>
 <p><img title="first patch" src="./img/first-patch.png" height="600px"></p>
 <p>Comme on peut le voir, un patch est un ensemble d&#39;objets, chacun exécutant une opération. Les données, soit de contrôle, soit des signaux, sont envoyées entre les objets par les connexions. Les connexions en gris sont utilisées pour envoyer des messages (nombres, chaînes de caractères, listes, bangs, etc.) tandis que les connexions en vert transportent les signaux de haut en bas.</p>
 <p>Le premier patch est un générateur de son (synthèse) : la partie en haut à gauche est le générateur.La partie en haut à droite est utilisée pour déclencher une enveloppe d&#39;amplitude. Le signal est ensuite envoyé vers un contrôle de gain maître et l&#39;objet dac~ qui représente la sortie audio du patch.</p>
@@ -1253,13 +1262,13 @@ Sometimes help patches gather several objects that are functionally linked, for 
 <p>On peut ensuite éditer ou jouer librement le patch avec les autres utilisateurs.</p>
 <p class="page" id="objects-fr"></p><h1>Liste des objets</h1>
 <h2 id="patchs-d-aide">Patchs d&#39;aide</h2>
-<p>Une liste de patchs d&#39;aide décrivant le fonctionnement des objets est <a href="https://github.com/Musicoll/Kiwi/releases/download/v1.0.3/documentation.zip" target='_blank_'>ici</a>.
+<p>Une liste de patchs d&#39;aide décrivant le fonctionnement des objets est disponible dans le dossier de documentation. Si vous n&#39;avez pas encore la documentation, vous pouvez la télécharger sur cette <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>.
 Parfois les patchs d&#39;aide regroupent plusieurs objets liés fonctionnellement, par exemple gate et switch ou gate~ et switch~.</p>
-<h2 id="list-of-objects">List of objects</h2>
+<h2 id="liste-des-objets">Liste des objets</h2>
 <table>
 <thead>
 <tr>
-<th>Object</th>
+<th>Objets</th>
 <th style="text-align:center">Alias</th>
 <th>Description</th>
 </tr>
@@ -1586,6 +1595,16 @@ Parfois les patchs d&#39;aide regroupent plusieurs objets liés fonctionnellemen
 <td>Stocke un nombre flottant</td>
 </tr>
 <tr>
+<td><strong>sf.play~</strong></td>
+<td style="text-align:center"></td>
+<td>Joue un fichier audio</td>
+</tr>
+<tr>
+<td><strong>sf.record~</strong></td>
+<td style="text-align:center"></td>
+<td>Enregistre un fichier audio</td>
+</tr>
+<tr>
 <td><strong>faust~</strong></td>
 <td style="text-align:center"></td>
 <td>Edite et joue du code FAUST</td>
@@ -1593,7 +1612,7 @@ Parfois les patchs d&#39;aide regroupent plusieurs objets liés fonctionnellemen
 </tbody>
 </table>
 <p class="page" id="tutorials-fr"></p><h1>Tutoriels</h1>
-<p>Un ensemble de tutoriaux est disponible <a href="https://github.com/Musicoll/Kiwi/releases/download/v1.0.3/documentation.zip" target='_blank_'>ici</a>. Chaque tutorial présente un traitement audio spécifique ou un certain aspect du logiciel Kiwi.</p>
+<p>Un ensemble de tutoriels est disponible dans le dossier de documentation. Si vous n&#39;avez pas encore la documentation, vous pouvez la télécharger sur cette <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>. Chaque tutorial présente un traitement audio spécifique ou un certain aspect du logiciel Kiwi.</p>
 <p>Tutoriaux disponibles:</p>
 <ul>
 <li>first-patch</li>

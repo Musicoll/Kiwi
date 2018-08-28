@@ -1,11 +1,11 @@
 ## Patchs d'aide
 
-Une liste de patchs d'aide décrivant le fonctionnement des objets est <a href="https://github.com/Musicoll/Kiwi/releases/download/v1.0.3/documentation.zip" target='_blank_'>ici</a>.
+Une liste de patchs d'aide décrivant le fonctionnement des objets est disponible dans le dossier de documentation. Si vous n'avez pas encore la documentation, vous pouvez la télécharger sur cette [page](https://github.com/Musicoll/Kiwi/releases/latest).
 Parfois les patchs d'aide regroupent plusieurs objets liés fonctionnellement, par exemple gate et switch ou gate~ et switch~.
 
-## List of objects
+## Liste des objets
 
-| Object          | Alias |                       Description                       |
+| Objets          | Alias |                       Description                       |
 |-----------------|:-----:|---------------------------------------------------------|
 | **line~**       |       | Génère un signal de rampe audio                         |
 | **noise~**      |       | Générateur de bruit blanc                               |

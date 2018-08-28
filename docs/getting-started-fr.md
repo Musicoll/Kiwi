@@ -1,6 +1,6 @@
 ## Téléchargement
 
-Le logiciel est disponible en téléchargement [ici](https://github.com/Musicoll/Kiwi/releases/latest). On y trouve une version pour chaque système d'exploitation, une liste de patchs d'aide qui montrent le comportement des objets, et un ensemble de tutoriaux pour guider le lecteur dans la création de certains traitements audionumériques temps réel.
+Le dernière version de l'application Kiwi et sa documentation sont disponibles sur cette [page](https://github.com/Musicoll/Kiwi/releases/latest). On y trouve une version pour chaque système d'exploitation, une liste de patchs d'aide qui montrent le comportement des objets, et un ensemble de tutoriaux pour guider le lecteur dans la création de certains traitements audionumériques temps réel.
 
 ## Compatibilité
 
@@ -45,7 +45,7 @@ Pour se connecter à un compte utilisateur existant, il faut cliquer sur 'login'
 
 A ce point, il est soit possible de rejoindre un patch partagé en utilisant la fenêtre du Document Browser ou d'ouvrir un patch local. Dans cette section, nous montrerons comment ouvrir et manipuler un patch local. Les indications sur les manières de collaborer seront données un peu plus loin dans cette documentation.
 
-Ouvrez le patch **first-patch.kiwi** distribué avec les [tutoriels](https://github.com/Musicoll/Kiwi/releases/download/v1.0.3/documentation.zip).
+Ouvrez le patch **first-patch.kiwi** disponible dans le dossier de documentation. Si vous n'avez pas encore la documentation, vous pouvez la télécharger sur cette [page](https://github.com/Musicoll/Kiwi/releases/latest).
 
 <img title="first patch" src="./img/first-patch.png" height="600px">
 
