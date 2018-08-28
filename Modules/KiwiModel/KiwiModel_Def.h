@@ -21,4 +21,4 @@
 
 #pragma once
 
-#define KIWI_MODEL_VERSION_STRING "v4.0.1"
+#define KIWI_MODEL_VERSION_STRING "v4.0.2"

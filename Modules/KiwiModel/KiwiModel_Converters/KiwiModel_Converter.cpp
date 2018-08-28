@@ -27,7 +27,7 @@
 #include <KiwiModel/KiwiModel_Converters/KiwiModel_Converter_v1_v2.cpp>
 #include <KiwiModel/KiwiModel_Converters/KiwiModel_Converter_v2_v3.cpp>
 #include <KiwiModel/KiwiModel_Converters/KiwiModel_Converter_v3_v4.cpp>
-#include <KiwiModel/KiwiModel_Converters/KiwiModel_Converter_v4_v401.cpp>
+#include <KiwiModel/KiwiModel_Converters/KiwiModel_Converter_v4_v40x.cpp>
 
 namespace kiwi { namespace model {
 

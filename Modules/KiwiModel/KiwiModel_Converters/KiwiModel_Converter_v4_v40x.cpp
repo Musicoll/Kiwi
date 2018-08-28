@@ -45,4 +45,16 @@ namespace kiwi { namespace model {
             return true;
         }
     };
+    
+    //! @brief Nothing to do from v4.0.1 to v4.0.2
+    struct Converter_v401_v402 : public ConverterBase
+    {
+        Converter_v401_v402() : ConverterBase("v4.0.1", "v4.0.2") {}
+        
+        bool operator () (flip::BackEndIR& backend) const override
+        {
+            // nothing to do from v2 to v3
+            return true;
+        }
+    };
 }}
