@@ -1,7 +1,6 @@
 ## Help patches
 
-A list of help patches describing how each object works is <a href="https://github.com/Musicoll/Kiwi/releases/download/v1.0.3/documentation.zip" target='_blank_'>here</a>.
-Sometimes help patches gather several objects that are functionally linked, for instance gate and switch or gate~ and switch~.
+A list of help patches describing how each object works is provided in the documentation folder. If you didn't download the documentation yet, you can find it on this [page](https://github.com/Musicoll/Kiwi/releases/latest). Sometimes help patches gather several objects that are functionally linked, for instance gate and switch or gate~ and switch~.
 
 ## List of objects
 

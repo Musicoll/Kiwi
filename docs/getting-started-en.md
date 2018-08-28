@@ -1,6 +1,6 @@
 ## Download
 
-Please follow this [link](https://github.com/Musicoll/Kiwi/releases/latest) to download the software. You'll find a version for each operating system, a list of help patches that describes the objects' behaviour and a set of tutorials guiding through creating certain audio processing.
+Download the latest Kiwi application for your operating system and the documentation from the [page](https://github.com/Musicoll/Kiwi/releases/latest). You'll find a version for each operating system, a list of help patches that describes the objects' behaviour and a set of tutorials guiding through creating certain audio processing.
 
 ## Compatibility
 
@@ -45,7 +45,7 @@ To connect to an existing user account, click on login in the menu 'Account'. A 
 
 At this point, you can either join a shared patch using the Document Browser window or open a local patch. In this section we will demonstrate how to open and manipulate a local patch. Instructions on how to collaborate will be given later.
 
-Open the patch **first-patch.kiwi** given with the [tutorial](https://github.com/Musicoll/Kiwi/releases/download/v1.0.3/documentation.zip).
+Open the patch **first-patch.kiwi** provided in the documentation folder. If you didn't download the documentation yet, you can find it on this [page](https://github.com/Musicoll/Kiwi/releases/latest).
 
 <img title="first patch" src="./img/first-patch.png" height="600px">
 
