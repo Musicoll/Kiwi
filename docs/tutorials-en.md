@@ -2,11 +2,20 @@ A set of tutorials is provided in the documentation folder. If you didn't downlo
 
 Available tutorials:
 
+
 - first-patch
-- flanger
-- fm-synthesis
-- sound generators gen01, gen02, gen03 and gen04
-- granulator on a delay line
-- overlapped-pitchshifter
-- Risset's bell
-- simple pitchshifter
+- mooc  
+  1. simple delay line
+  2. play and record sound files
+  3. chowning FM synthesis
+  4. risset’s bell
+  5. granular on a delay line
+  6. from Stockhausen’s Kontakte
+- others
+  - flanger
+  - sound generators gen01
+  - sound generators gen02
+  - sound generators gen03
+  - sound generators gen04
+  - simple pitchshifter
+  - overlapped pitchshifter
