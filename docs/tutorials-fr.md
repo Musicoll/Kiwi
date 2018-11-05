@@ -2,11 +2,19 @@ Un ensemble de tutoriels est disponible dans le dossier de documentation. Si vou
 
 Tutoriaux disponibles:
 
-- first-patch
-- flanger
-- fm-synthesis
-- générateurs sonores gen01, gen02, gen03, gen04
-- granulateur sur ligne à retard
-- overlapped-pitchshifter
-- cloche de Risset
-- simple-pitchshifter
+- premier patch (first-patch)
+- mooc  
+  1. ligne à retard simple
+  2. lecture et enregistrement de fichiers
+  3. synthèse FM d’après Chowning
+  4. cloche de Risset
+  5. granulateur sur ligne à retard
+  6. d’après Kontakte de Stockhausen
+- autres
+  - flanger
+  - générateurs sonores gen01
+  - générateurs sonores gen02
+  - générateurs sonores gen03
+  - générateurs sonores gen04
+  - pitchshifter simple
+  - pitchshifter avec recouvrement
