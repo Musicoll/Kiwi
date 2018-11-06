@@ -43,6 +43,7 @@ namespace kiwi
         showConsoleWindow           = 0x202000,        ///< Make visible the "console" window.
         showAudioStatusWindow       = 0x202010,        ///< Make visible the "audio status" window.
         showAboutAppWindow          = 0x202020,        ///< Make visible the "about app" window.
+        showDocumentationOnline     = 0x202025,        ///< Show the remote documentation.
         showAppSettingsWindow       = 0x202030,        ///< Make visible the "application settings" window.
         showDocumentBrowserWindow   = 0x202040,        ///< Make visible the "document browser" window.
         showBeaconDispatcherWindow  = 0x202050,        ///< Make visible the "beacon dispatcher" window.

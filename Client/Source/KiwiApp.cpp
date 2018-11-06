@@ -705,6 +705,8 @@ namespace kiwi
         #if ! JUCE_MAC
         menu.addCommandItem(m_command_manager.get(), CommandIDs::showAboutAppWindow);
         #endif
+        
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::showDocumentationOnline);
     }
     
     void KiwiApp::handleMainMenuCommand(int menuItemID)
@@ -724,6 +726,7 @@ namespace kiwi
             CommandIDs::openFile,
             CommandIDs::showConsoleWindow,
             CommandIDs::showAboutAppWindow,
+            CommandIDs::showDocumentationOnline,
             CommandIDs::showAudioStatusWindow,
             CommandIDs::showAppSettingsWindow,
             CommandIDs::showDocumentBrowserWindow,
@@ -811,6 +814,12 @@ namespace kiwi
             case CommandIDs::showAboutAppWindow:
             {
                 result.setInfo(TRANS("About Kiwi"), TRANS("Show the \"About Kiwi\" Window"),
+                               CommandCategories::windows, 0);
+                break;
+            }
+            case CommandIDs::showDocumentationOnline:
+            {
+                result.setInfo(TRANS("Documentation (online)"), TRANS("Show the online documentation"),
                                CommandCategories::windows, 0);
                 break;
             }
@@ -929,6 +938,12 @@ namespace kiwi
             case CommandIDs::showAboutAppWindow :
             {
                 m_instance->showAboutKiwiWindow();
+                break;
+            }
+            case CommandIDs::showDocumentationOnline :
+            {
+                juce::URL doc_url ("http://musicoll.github.io/Kiwi/");
+                doc_url.launchInDefaultBrowser();
                 break;
             }
             case CommandIDs::showAppSettingsWindow :
