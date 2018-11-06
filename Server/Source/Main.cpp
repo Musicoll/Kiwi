@@ -36,9 +36,9 @@ void showHelp()
 {
     std::cout << "Usage:\n";
     std::cout << " -h shows this help message. \n";
-    std::cout << " -f set the json configuration file to use (needed). \n";
+    std::cout << " -f set the json configuration file to use (required). \n";
     std::cout << '\n';
-    std::cout << "ex: ./Server -f ./config/prod.json" << std::endl;
+    std::cout << "ex: ./Server -f prod.json" << std::endl;
 }
 
 void on_interupt(int signal)
@@ -68,11 +68,7 @@ int main(int argc, char const* argv[])
         return 0;
     }
     
-    juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile)
-    .setAsCurrentWorkingDirectory();
-    
-    const std::string config_filepath = cl_parser.getOption("-f");
-    
+    const auto config_filepath = cl_parser.getOption("-f");
     if(config_filepath.empty())
     {
         std::cerr << "Error: Server need a configuration file:\n" << std::endl;
@@ -80,11 +76,15 @@ int main(int argc, char const* argv[])
         return 0;
     }
     
-    juce::File configuration_file(config_filepath);
-    if(!configuration_file.exists())
+    juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentExecutableFile)
+    .setAsCurrentWorkingDirectory();
+    
+    const auto config_file = juce::File::getCurrentWorkingDirectory().getChildFile(config_filepath);
+    
+    if(!config_file.exists())
     {
         std::cerr << "Error: Config file: \""
-        << configuration_file.getFullPathName()
+        << config_file.getFullPathName()
         << "\" not found !" << std::endl;
         
         showHelp();
@@ -97,7 +97,7 @@ int main(int argc, char const* argv[])
     
     try
     {
-         config = json::parse(configuration_file.loadFileAsString().toStdString());
+         config = json::parse(config_file.loadFileAsString().toStdString());
     }
     catch(nlohmann::detail::parse_error const& e)
     {
@@ -112,8 +112,9 @@ int main(int argc, char const* argv[])
     
     try
     {
+        const std::string backend_path = config["backend_directory"];
         server::Server kiwi_server(config["session_port"],
-                                   config["backend_directory"],
+                                   config_file.getParentDirectory().getChildFile(backend_path),
                                    config["open_token"],
                                    config["kiwi_version"]);
         

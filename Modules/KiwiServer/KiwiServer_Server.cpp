@@ -56,16 +56,16 @@ namespace kiwi
         const char* Server::kiwi_file_extension = "kiwi";
         
         Server::Server(uint16_t port,
-                       std::string const& backend_directory,
+                       juce::File backend_directory,
                        std::string const& open_token,
-                       std::string const& kiwi_version) :
-        m_backend_directory(backend_directory),
-        m_open_token(open_token),
-        m_kiwi_version(kiwi_version),
-        m_sessions(),
-        m_socket(*this, port),
-        m_ports(),
-        m_logger(m_backend_directory.getChildFile("log.txt"),
+                       std::string const& kiwi_version)
+        : m_backend_directory(std::move(backend_directory))
+        , m_open_token(open_token)
+        , m_kiwi_version(kiwi_version)
+        , m_sessions()
+        , m_socket(*this, port)
+        , m_ports()
+        , m_logger(m_backend_directory.getChildFile("log.txt"),
                  "server port: " + std::to_string(port)
                  + " server model version: " + KIWI_MODEL_VERSION_STRING
                  + " server kiwi version: " + m_kiwi_version)
@@ -152,7 +152,7 @@ namespace kiwi
                 
                 const auto session_hex_id = hexadecimal_convert(session_id);
                 
-                m_logger.log("creating new session for session_id : " + session_hex_id);
+                m_logger.log("Creating new session (" + session_hex_id + ")");
                 
                 auto session = m_sessions
                 .insert(std::make_pair(session_id,
@@ -160,11 +160,11 @@ namespace kiwi
                 
                 if (session_file.exists())
                 {
-                    m_logger.log("loading session file for session_id : " + session_hex_id);
+                    //m_logger.log("loading session file for session_id : " + session_hex_id);
                     
                     if (!(*session.first).second.load())
                     {
-                        m_logger.log("opening document document session : "
+                        m_logger.log("opening document session : "
                                      + session_hex_id + " failed");
                         
                         m_sessions.erase(session_id);
@@ -262,13 +262,11 @@ namespace kiwi
                 juce::FileLogger::trimFileSize(m_jlogger.getLogFile(), m_limit);
             }
             
-            std::string timestamp(juce::Time::getCurrentTime().toISO8601(true).toStdString());
+            auto time = juce::Time::Time::getCurrentTime().toString(true, true, true);
             
-            std::string log = "[server] - ";
-            
-            log.append(timestamp);
-            log.append(" ");
-            log.append(message.toStdString());
+            juce::String log = "[server] - ";
+            log << time << juce::newLine;
+            log << message;
             
             m_jlogger.logMessage(log);
         }
@@ -392,8 +390,8 @@ namespace kiwi
         
         void Server::Session::bind(flip::PortBase & port)
         {
-            m_logger.log("User: " + std::to_string(port.user())
-                                + " connecting to session : " + hexadecimal_convert(m_identifier));
+            m_logger.log("user (" + std::to_string(port.user())
+                                + ") connecting to session (" + hexadecimal_convert(m_identifier) + ")");
             
             if (authenticateUser(port.user(), port.metadata()))
             {
@@ -438,9 +436,9 @@ namespace kiwi
             }
             else
             {
-                m_logger.log("User: " + std::to_string(port.user())
-                                    + " failed to authenticate : "
-                                    + "metadata : " + port.metadata());
+                m_logger.log("user (" + std::to_string(port.user())
+                                    + ") failed to authenticate \n"
+                                    + "with metadata : " + port.metadata());
                 
                 throw std::runtime_error("authentication failed");
             }
@@ -448,8 +446,8 @@ namespace kiwi
         
         void Server::Session::unbind(flip::PortBase & port)
         {
-            m_logger.log("User " + std::to_string(port.user())
-                                + " disconnecting from session" + m_hex_id);
+            m_logger.log("disconnecting user (" + std::to_string(port.user())
+                                + ") from session (" + m_hex_id + ')');
             
             std::set<flip::PortBase*> ports = m_document->ports();
             
