@@ -87,8 +87,9 @@ namespace kiwi
             bool compare(DocumentBrowser::Drive::DocumentSession const& lhs,
                          DocumentBrowser::Drive::DocumentSession const& rhs) const;
             
-            SortBy  m_type = SortBy::creationTime;
-            bool    m_trashed_first = false;
+            SortBy      m_type = SortBy::creationTime;
+            bool        m_trashed_first = false;
+            std::string m_filter {};
         };
         
     public: // methods
@@ -148,6 +149,10 @@ namespace kiwi
         //! @brief Restore a trashed document.
         void restoreDocumentForRow(int row);
         
+        std::vector<DocumentBrowser::Drive::DocumentSession*> getDisplayedDocuments();
+        
+        DocumentBrowser::Drive::DocumentSession* getDocumentForRow(int row);
+        
     private: // methods
         
         //! @brief Hides document list and disable some interactions.
@@ -170,6 +175,9 @@ namespace kiwi
         
         //! @brief Changes the sort parameter and sorts.
         void setSortType(SortBy sort_type);
+        
+        //! @brief Suggests documents based on text input compared to documents name
+        void setFilter(std::string const& text);
         
         // @brief Set the trash mode.
         void setTrashMode(bool trash_mode);
@@ -204,7 +212,9 @@ namespace kiwi
     //                             BROWSER DRIVE VIEW HEADER                            //
     // ================================================================================ //
     
-    class DocumentBrowserView::DriveView::Header : public juce::Component
+    class DocumentBrowserView::DriveView::Header
+    : public juce::Component
+    , public juce::TextEditor::Listener
     {
     public: // methods
         
@@ -226,20 +236,38 @@ namespace kiwi
         //! @brief Sets the text diaplyed by the header bar.
         void setText(std::string const& text);
         
+        /** Show or hide toolbar */
+        void showSearchBar(bool show);
+        
     private: // methods
         
-        void enablementChanged() override final;
+        void enablementChanged() override;
+        
+        /** Called when the user changes the text in some way. */
+        void textEditorTextChanged (juce::TextEditor&) override;
+        
+        /** Called when the user presses the return key. */
+        void textEditorReturnKeyPressed (juce::TextEditor&) override {}
+        
+        /** Called when the user presses the escape key. */
+        void textEditorEscapeKeyPressed (juce::TextEditor&) override;
+        
+        /** Called when the text editor loses focus. */
+        void textEditorFocusLost (juce::TextEditor&) override {}
         
     private: // members
         
         DocumentBrowserView::DriveView& m_drive_view;
+        int                             m_toolbar_thickness = 50;
         ImageButton                     m_refresh_btn;
         ImageButton                     m_create_document_btn;
         ImageButton                     m_trash_btn;
+        ImageButton                     m_search_btn;
         juce::Rectangle<int>            m_folder_bounds;
         juce::Label                     m_label;
         juce::Image                     m_folder_img;
         juce::Image                     m_disable_folder_img;
+        juce::TextEditor                m_searchbar;
     };
     
     // ================================================================================ //
