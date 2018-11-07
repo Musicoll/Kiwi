@@ -256,7 +256,7 @@ namespace kiwi
                 // name is currently the only document field that can change.
                 if(new_doc->getName() != (*it)->getName()
                    || new_doc->isTrashed() != (*it)->isTrashed()
-                   || new_doc->getOpenedDate() != (*it)->getOpenedDate())
+                   || new_doc->getOpenedTime() != (*it)->getOpenedTime())
                 {
                     (*it)->m_document = new_doc->m_document;
                     
@@ -382,9 +382,14 @@ namespace kiwi
         return m_drive;
     }
     
-    std::string const& DocumentBrowser::Drive::DocumentSession::getCreationDate() const
+    juce::Time const& DocumentBrowser::Drive::DocumentSession::getCreationTime() const
     {
-        return m_document.creation_date;
+        return m_document.creation_time;
+    }
+    
+    std::string DocumentBrowser::Drive::DocumentSession::getCreationDate() const
+    {
+        return getCreationTime().toString(true, true, false, true).toStdString();
     }
     
     std::string const& DocumentBrowser::Drive::DocumentSession::getAuthor() const
@@ -397,14 +402,24 @@ namespace kiwi
         return m_document.trashed;
     }
     
-    std::string const& DocumentBrowser::Drive::DocumentSession::getTrashedDate() const
+    juce::Time const& DocumentBrowser::Drive::DocumentSession::getTrashedTime() const
     {
-        return m_document.trashed_date;
+        return m_document.trashed_time;
     }
     
-    std::string const& DocumentBrowser::Drive::DocumentSession::getOpenedDate() const
+    std::string DocumentBrowser::Drive::DocumentSession::getTrashedDate() const
     {
-        return m_document.opened_date;
+        return getTrashedTime().toString(true, true, false, true).toStdString();
+    }
+    
+    juce::Time const& DocumentBrowser::Drive::DocumentSession::getOpenedTime() const
+    {
+        return m_document.opened_time;
+    }
+    
+    std::string DocumentBrowser::Drive::DocumentSession::getOpenedDate() const
+    {
+        return getOpenedTime().toString(true, true, false, true).toStdString();
     }
     
     std::string const& DocumentBrowser::Drive::DocumentSession::getOpenedUser() const

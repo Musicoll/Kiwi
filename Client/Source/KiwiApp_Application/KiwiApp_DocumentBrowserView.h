@@ -67,29 +67,28 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief Listen to document browser changes.
-    class DocumentBrowserView::DriveView :
-    public juce::ListBox,
-    public juce::ListBoxModel,
-    public DocumentBrowser::Drive::Listener
+    class DocumentBrowserView::DriveView
+    : public juce::ListBox
+    , public juce::ListBoxModel
+    , public DocumentBrowser::Drive::Listener
     {
     private: // classes
         
-        enum class DataType
+        enum SortBy
         {
             name,
             author,
-            creationDate,
-            openedDate,
-            openedUser
+            creationTime,
+            openedTime
         };
         
         struct Comp
         {
-            bool compare(DocumentBrowser::Drive::DocumentSession const& l_hs,
-                         DocumentBrowser::Drive::DocumentSession const& r_hs) const;
+            bool compare(DocumentBrowser::Drive::DocumentSession const& lhs,
+                         DocumentBrowser::Drive::DocumentSession const& rhs) const;
             
-            DataType    m_type = DataType::creationDate;
-            bool        m_trashed_first = false;
+            SortBy  m_type = SortBy::creationTime;
+            bool    m_trashed_first = false;
         };
         
     public: // methods
@@ -151,8 +150,8 @@ namespace kiwi
         
     private: // methods
         
-        //! @brief Hides document liste and disable some interactions.
-        void enablementChanged() override final;
+        //! @brief Hides document list and disable some interactions.
+        void enablementChanged() override;
         
         //! @brief Resort content and call update content.
         void update();
@@ -167,10 +166,10 @@ namespace kiwi
         void createDocument();
         
         //! @brief Returns the current sorting parameter.
-        DataType getSortType() const;
+        SortBy getSortType() const;
         
         //! @brief Changes the sort parameter and sorts.
-        void setSortType(DataType sort_type);
+        void setSortType(SortBy sort_type);
         
         // @brief Set the trash mode.
         void setTrashMode(bool trash_mode);
@@ -180,6 +179,12 @@ namespace kiwi
         
         //! @brief Creates document info tooltip.
         std::string createDocumentToolTip(DocumentBrowser::Drive::DocumentSession const& doc);
+        
+        //! @brief Save the state of the component
+        void saveState();
+        
+        //! @brief Restore the state of the component
+        void restoreState();
         
     private: // classes
         

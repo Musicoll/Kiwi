@@ -221,8 +221,11 @@ namespace kiwi
         //! if request succeed.
         void download(std::function<void(std::string const&)> callback);
         
+        //! @brief Returns the time of the document creation.
+        juce::Time const& getCreationTime() const;
+        
         //! @brief Returns the date creation as a string.
-        std::string const& getCreationDate() const;
+        std::string getCreationDate() const;
         
         //! @brief Returns the author's username.
         std::string const& getAuthor() const;
@@ -230,11 +233,17 @@ namespace kiwi
         //! @brief Returns true if document is trashed
         bool isTrashed() const;
         
+        //! @brief Returns the trashed time.
+        juce::Time const& getTrashedTime() const;
+        
         //! @brief Returns trashed date as string.
-        std::string const& getTrashedDate() const;
+        std::string getTrashedDate() const;
+        
+        //! @brief Returns the last modification time.
+        juce::Time const& getOpenedTime() const;
         
         //! @brief Returns the last modification date.
-        std::string const& getOpenedDate() const;
+        std::string getOpenedDate() const;
         
         //! @brief Returns the user that modified document last.
         std::string const& getOpenedUser() const;

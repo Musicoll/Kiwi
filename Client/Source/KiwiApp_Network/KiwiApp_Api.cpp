@@ -758,15 +758,15 @@ namespace kiwi
             {"name", doc.name},
             {"session_id", session_id_converter.str()},
             {"createdBy", doc.author_name},
-            {"createdAt", doc.creation_date},
-            {"lastOpenedAt", doc.opened_date},
+            {"createdAt", doc.creation_time.toISO8601(true).toStdString()},
+            {"lastOpenedAt", doc.opened_time.toISO8601(true).toStdString()},
             {"lastModdifyBy", doc.opened_user}
         };
         
         if (doc.trashed)
         {
             j.at("trashed") = true;
-            j.at("trash_date") = doc.trashed_date;
+            j.at("trash_date") = doc.trashed_time.toISO8601(true).toStdString();
         }
         else
         {
@@ -779,11 +779,18 @@ namespace kiwi
         doc._id = Api::getJsonValue<std::string>(j, "_id");
         doc.name = Api::getJsonValue<std::string>(j, "name");
         doc.author_name = Api::getJsonValue<std::string>(j.at("createdBy"), "username");
-        doc.creation_date = Api::convertDate(Api::getJsonValue<std::string>(j, "createdAt"));
-        doc.opened_date = Api::convertDate(Api::getJsonValue<std::string>(j, "lastOpenedAt"));
+        
+        doc.creation_time = juce::Time::fromISO8601(Api::getJsonValue<std::string>(j, "createdAt"));
+        
+        doc.opened_time = juce::Time::fromISO8601(Api::getJsonValue<std::string>(j, "lastOpenedAt"));
         doc.opened_user = Api::getJsonValue<std::string>(j.at("lastOpenedBy"), "username");
         doc.trashed = Api::getJsonValue<bool>(j, "trashed");
-        doc.trashed_date = doc.trashed ? Api::convertDate(Api::getJsonValue<std::string>(j, "trashedDate")) : "";
+        
+        if(doc.trashed)
+        {
+            doc.trashed_time = juce::Time::fromISO8601(Api::getJsonValue<std::string>(j, "trashedDate"));
+        }
+        
         doc.session_id = 0ul;
         
         if(j.count("session_id"))

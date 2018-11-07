@@ -199,42 +199,53 @@ namespace kiwi
     {
         juce::PopupMenu m;
         
+        enum Commands : int
+        {
+            None = 0,
+            Rename,
+            MoveToTrash,
+            RestoreTrashed,
+            Upload,
+            Duplicate,
+            Download,
+            SortByName,
+            SortByCreationTime,
+            SortByCreator,
+            SortByLastOpenedTime
+        };
+        
         if (!m_drive_view.isShowingTrashedDocuments())
         {
-            m.addItem(1, "Rename");
-            m.addItem(2, "Move to trash");
-            m.addItem(10, "Upload");
-            m.addItem(11, "Duplicate");
+            m.addItem(Commands::Rename, "Rename");
+            m.addItem(Commands::MoveToTrash, "Move to trash");
+            m.addItem(Commands::Upload, "Upload");
+            m.addItem(Commands::Duplicate, "Duplicate");
         }
         else
         {
-            m.addItem(3, "Restore");
+            m.addItem(Commands::RestoreTrashed, "Restore");
         }
         
-        m.addItem(9, "Download");
+        m.addItem(Commands::Download, "Download");
         
-        DriveView::DataType current_sort = m_drive_view.getSortType();
+        DriveView::SortBy current_sort = m_drive_view.getSortType();
         
         juce::PopupMenu sort_menu;
-        sort_menu.addItem(4, "Name",
-                          current_sort != DriveView::DataType::name,
-                          current_sort == DriveView::DataType::name);
+        sort_menu.addItem(Commands::SortByName, "Name",
+                          current_sort != DriveView::SortBy::name,
+                          current_sort == DriveView::SortBy::name);
         
-        sort_menu.addItem(5, "Created at",
-                          current_sort != DriveView::DataType::creationDate,
-                          current_sort == DriveView::DataType::creationDate);
+        sort_menu.addItem(Commands::SortByCreationTime, "Creation date",
+                          current_sort != DriveView::SortBy::creationTime,
+                          current_sort == DriveView::SortBy::creationTime);
         
-        sort_menu.addItem(6, "Created by",
-                          current_sort != DriveView::DataType::author,
-                          current_sort == DriveView::DataType::author);
+        sort_menu.addItem(Commands::SortByCreator, "Creator",
+                          current_sort != DriveView::SortBy::author,
+                          current_sort == DriveView::SortBy::author);
         
-        sort_menu.addItem(7, "Last opened at",
-                          current_sort != DriveView::DataType::openedDate,
-                          current_sort == DriveView::DataType::openedDate);
-        
-        sort_menu.addItem(8, "Last opened by",
-                          current_sort != DriveView::DataType::openedUser,
-                          current_sort == DriveView::DataType::openedUser);
+        sort_menu.addItem(Commands::SortByLastOpenedTime, "Last opened",
+                          current_sort != DriveView::SortBy::openedTime,
+                          current_sort == DriveView::SortBy::openedTime);
         
         m.addSubMenu("Sort by", sort_menu);
         
@@ -242,59 +253,54 @@ namespace kiwi
         
         switch(result)
         {
-            case 1: // rename
+            case Commands::Rename: // rename
             {
                 m_name_label.showEditor();
                 break;
             }
-            case 2: // delete
+            case Commands::MoveToTrash: // delete
             {
                 m_drive_view.deleteDocumentForRow(m_row);
                 break;
             }
-            case 3: // restore
+            case Commands::RestoreTrashed: // restore
             {
                 m_drive_view.restoreDocumentForRow(m_row);
                 break;
             }
-            case 4: // sort by name
-            {
-                m_drive_view.setSortType(DriveView::DataType::name);
-                break;
-            }
-            case 5: // sort by creation date
-            {
-                m_drive_view.setSortType(DriveView::DataType::creationDate);
-                break;
-            }
-            case 6: // sort by author
-            {
-                m_drive_view.setSortType(DriveView::DataType::author);
-                break;
-            }
-            case 7:
-            {
-                m_drive_view.setSortType(DriveView::DataType::openedDate);
-                break;
-            }
-            case 8:
-            {
-                m_drive_view.setSortType(DriveView::DataType::openedUser);
-                break;
-            }
-            case 9: // download document
+            case Commands::Download: // download document
             {
                 m_drive_view.downloadDocumentForRow(m_row);
                 break;
             }
-            case 10: // upload document
+            case Commands::Upload: // upload document
             {
                 m_drive_view.uploadDocument();
                 break;
             }
-            case 11: // duplicate document
+            case Commands::Duplicate: // duplicate document
             {
                 m_drive_view.duplicateDocumentForRow(m_row);
+                break;
+            }
+            case Commands::SortByName: // sort by name
+            {
+                m_drive_view.setSortType(DriveView::SortBy::name);
+                break;
+            }
+            case Commands::SortByCreationTime: // sort by creation date
+            {
+                m_drive_view.setSortType(DriveView::SortBy::creationTime);
+                break;
+            }
+            case Commands::SortByCreator: // sort by author
+            {
+                m_drive_view.setSortType(DriveView::SortBy::author);
+                break;
+            }
+            case Commands::SortByLastOpenedTime:
+            {
+                m_drive_view.setSortType(DriveView::SortBy::openedTime);
                 break;
             }
         }
@@ -467,12 +473,12 @@ namespace kiwi
     //                                 BROWSER DRIVE VIEW                               //
     // ================================================================================ //
     
-    DocumentBrowserView::DriveView::DriveView(DocumentBrowser::Drive& drive) :
-    juce::ListBox("document list", this),
-    m_drive(drive),
-    m_trash_mode(false),
-    m_enabled(true),
-    m_sorter()
+    DocumentBrowserView::DriveView::DriveView(DocumentBrowser::Drive& drive)
+    : juce::ListBox("document list", this)
+    , m_drive(drive)
+    , m_trash_mode(false)
+    , m_enabled(true)
+    , m_sorter()
     {
         m_drive.addListener(*this);
         
@@ -487,59 +493,97 @@ namespace kiwi
         getViewport()->setScrollBarThickness(10);
         juce::ListBox::setColour(juce::ListBox::backgroundColourId, juce::Colour(0xFFD4D4D4));
         
-        m_drive.setSort([sorter = m_sorter](DocumentBrowser::Drive::DocumentSession const& l_hs,
-                                            DocumentBrowser::Drive::DocumentSession const& r_hs)
-        {
-            return sorter.compare(l_hs, r_hs);
-        });
-        
+        restoreState();
         update();
     }
     
     DocumentBrowserView::DriveView::~DriveView()
     {
+        saveState();
         m_drive.removeListener(*this);
     }
     
-    bool DocumentBrowserView::DriveView::Comp::compare(DocumentBrowser::Drive::DocumentSession const& l_hs,
-                                                       DocumentBrowser::Drive::DocumentSession const& r_hs) const
+    void DocumentBrowserView::DriveView::saveState()
+    {
+        const juce::String sort_str = [](SortBy sort) {
+            switch (sort) {
+                case SortBy::name: return "name";
+                case SortBy::author: return "author";
+                case SortBy::openedTime: return "openedTime";
+                case SortBy::creationTime:
+                default: return "creationTime";
+            }
+        }(getSortType());
+        
+        getGlobalProperties().setValue("DocumentBrowser_sort_type", sort_str);
+    }
+    
+    void DocumentBrowserView::DriveView::restoreState()
+    {
+        const SortBy sort = [](juce::String sort_str) {
+            
+            SortBy sort = SortBy::creationTime;
+            
+            if(sort_str == "name")
+            {
+                sort = SortBy::name;
+            }
+            else if(sort_str == "author")
+            {
+                sort = SortBy::author;
+            }
+            else if(sort_str == "openedTime")
+            {
+                sort = SortBy::openedTime;
+            }
+            else if(sort_str == "creationTime")
+            {
+                sort = SortBy::creationTime;
+            }
+            
+            return sort;
+            
+        }(getGlobalProperties().getValue("DocumentBrowser_sort_type"));
+        
+        setSortType(sort);
+    }
+    
+    bool DocumentBrowserView::DriveView::Comp::compare(DocumentBrowser::Drive::DocumentSession const& lhs,
+                                                       DocumentBrowser::Drive::DocumentSession const& rhs) const
     {
         bool type_ordered = false;
         
         switch(m_type)
         {
-            case DataType::name:
+            case SortBy::name:
             {
-                type_ordered = l_hs.getName() < r_hs.getName();
+                type_ordered = juce::String(lhs.getName()).compareNatural(rhs.getName()) < 0;
                 break;
             }
-            case DataType::author:
+            case SortBy::author:
             {
-                type_ordered = l_hs.getAuthor() < r_hs.getAuthor();
+                type_ordered = juce::String(lhs.getAuthor()).compareNatural(rhs.getAuthor()) < 0;
                 break;
             }
-            case DataType::creationDate:
+            case SortBy::creationTime:
             {
-                type_ordered = l_hs.getCreationDate() > r_hs.getCreationDate();
+                type_ordered = lhs.getCreationTime() > rhs.getCreationTime();
                 break;
             }
-            case DataType::openedDate:
+            case SortBy::openedTime:
             {
-                type_ordered = l_hs.getOpenedDate() > r_hs.getOpenedDate();
+                type_ordered = lhs.getOpenedTime() > rhs.getOpenedTime();
                 break;
             }
-            case DataType::openedUser:
-            {
-                type_ordered = l_hs.getOpenedUser() < r_hs.getOpenedUser();
-                break;
-            }
+                
+            default: break;
         }
         
-        bool trash_order = (m_trashed_first && l_hs.isTrashed() > r_hs.isTrashed())
-                            || (!m_trashed_first && l_hs.isTrashed() < r_hs.isTrashed());
+        bool trash_order = (m_trashed_first && lhs.isTrashed() > rhs.isTrashed())
+                            || (!m_trashed_first && lhs.isTrashed() < rhs.isTrashed());
         
         return trash_order
-               || (l_hs.isTrashed() == r_hs.isTrashed() && type_ordered);
+               || (lhs.isTrashed() == rhs.isTrashed() && type_ordered);
     }
     
     void DocumentBrowserView::DriveView::enablementChanged()
@@ -619,19 +663,19 @@ namespace kiwi
         });
     }
     
-    DocumentBrowserView::DriveView::DataType DocumentBrowserView::DriveView::getSortType() const
+    DocumentBrowserView::DriveView::SortBy DocumentBrowserView::DriveView::getSortType() const
     {
         return m_sorter.m_type;
     }
     
-    void DocumentBrowserView::DriveView::setSortType(DataType sort_type)
+    void DocumentBrowserView::DriveView::setSortType(SortBy sort_type)
     {
         m_sorter.m_type = sort_type;
         
-        m_drive.setSort([sorter = m_sorter](DocumentBrowser::Drive::DocumentSession const& l_hs,
-                                            DocumentBrowser::Drive::DocumentSession const& r_hs)
+        m_drive.setSort([sorter = m_sorter](DocumentBrowser::Drive::DocumentSession const& lhs,
+                                            DocumentBrowser::Drive::DocumentSession const& rhs)
         {
-            return sorter.compare(l_hs, r_hs);
+            return sorter.compare(lhs, rhs);
             
         });
     }
