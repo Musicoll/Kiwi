@@ -1839,11 +1839,6 @@ namespace kiwi
         commands.add(CommandIDs::zoomOut);
         commands.add(CommandIDs::zoomNormal);
         commands.add(CommandIDs::editModeSwitch);
-        commands.add(CommandIDs::gridModeSwitch);
-        commands.add(CommandIDs::enableSnapToGrid);
-        
-        commands.add(CommandIDs::showPatcherInspector);
-        commands.add(CommandIDs::showObjectInspector);
     }
     
     void PatcherView::getCommandInfo(const juce::CommandID commandID, juce::ApplicationCommandInfo& result)
@@ -2036,7 +2031,7 @@ namespace kiwi
             }
             default:
             {
-                result.setInfo (TRANS("[unknown command]"), TRANS("[unknown command]"), CommandCategories::view, 0);
+                assert(true && "Command not handled !");
                 break;
             }
         }
