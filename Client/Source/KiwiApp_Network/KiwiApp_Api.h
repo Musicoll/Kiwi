@@ -196,7 +196,7 @@ namespace kiwi
         struct comp_session
         {
             bool operator() (std::unique_ptr<Session> const& lhs,
-                             std::unique_ptr<Session> const& rhs)
+                             std::unique_ptr<Session> const& rhs) const
             {
                 return lhs->getId() < rhs->getId();
             }

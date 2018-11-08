@@ -131,6 +131,8 @@ namespace kiwi
             //! @brief Constructor.
             Outline(int resize_length, int resize_thickness);
             
+            using juce::Component::hitTest; // silent virtual function overload hiding warning
+            
             //! @brief Tests if the point reaches an interactive resiable corner.
             bool hitTest(juce::Point<int> const& pt, HitTester& hit_tester) const;
             

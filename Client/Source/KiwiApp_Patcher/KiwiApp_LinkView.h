@@ -89,6 +89,8 @@ namespace kiwi
         // juce::Component
         void paint(juce::Graphics& g) override;
         
+        using juce::Component::hitTest; // silent virtual function overload hiding warning
+        
         //! @brief internal kiwi PatcherView Hit-Testing.
         bool hitTest(juce::Point<int> const& pt, HitTester& result) const;
         
