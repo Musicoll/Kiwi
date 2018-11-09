@@ -96,6 +96,12 @@ namespace kiwi
         //! @brief Returns the LinkView corresponding to a given Link model.
         LinkView* getLink(model::Link const& link);
         
+        //! @brief Called by the patcherWindow when loaded
+        void windowInitialized();
+        
+        //! @brief Save the state of the patcherview in the model.
+        void saveState();
+        
         //! @brief Set the lock status of the patcher view.
         void setLock(bool locked);
         
@@ -113,7 +119,11 @@ namespace kiwi
         
         //! @brief Returns the Viewport that contains this patcher view.
         //! @details You must use this method if you want to add this component into an other one.
-        PatcherViewport& getViewport() { return m_viewport; }
+        PatcherViewport& useViewport();
+        
+        //! @brief Returns the Viewport that contains this patcher view.
+        //! @details You must use this method if you want to add this component into an other one.
+        PatcherViewport const& useViewport() const;
         
         //! @brief Returns the position of the patcher origin relative to the component position.
         juce::Point<int> getOriginPosition() const;
@@ -156,6 +166,9 @@ namespace kiwi
         bool perform(const InvocationInfo& info) override;
         
     private: // methods
+        
+        //! @brief Set patcherview bounds relative to the screen
+        void setScreenBounds(juce::Rectangle<int> bounds);
         
         //! @brief Called internally when the origin of the patcher view changed.
         void originPositionChanged();
@@ -390,7 +403,7 @@ namespace kiwi
         std::map<flip::Ref, std::set<uint64_t>>     m_distant_objects_selection;
         std::map<flip::Ref, std::set<uint64_t>>     m_distant_links_selection;
         
-        PatcherViewport                             m_viewport;
+        std::unique_ptr<PatcherViewport>            m_viewport = nullptr;
         HitTester                                   m_hittester;
         MouseHandler                                m_mouse_handler;
         IoletHighlighter                            m_io_highlighter;
@@ -399,7 +412,7 @@ namespace kiwi
         
         ObjectFrame  const*                         m_box_being_edited = nullptr;
         
-        bool    m_is_locked;
+        bool    m_is_locked = false;
         int     m_grid_size;
         
         friend MouseHandler;

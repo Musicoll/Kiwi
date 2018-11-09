@@ -48,13 +48,16 @@ namespace kiwi
     , m_instance(instance)
     , m_patcher_model(patcher)
     , m_view_model(view)
-    , m_viewport(*this)
+    , m_viewport(nullptr)
     , m_hittester(*this)
     , m_mouse_handler(*this)
     , m_io_highlighter()
     , m_lasso(*this)
     , m_grid_size(20)
     {
+        setSize(600, 400); // default size
+        m_viewport = std::make_unique<PatcherViewport>(*this);
+        
         KiwiApp::bindToCommandManager(this);
         KiwiApp::bindToKeyMapping(this);
         setWantsKeyboardFocus(true);
@@ -63,7 +66,8 @@ namespace kiwi
         addChildComponent(m_lasso);
 
         loadPatcher();
-        m_viewport.updatePatcherArea(true);
+        
+        useViewport().updatePatcherArea(false);
         
         m_manager.addListener(*this);
     }
@@ -87,6 +91,16 @@ namespace kiwi
     PatcherManager& PatcherView::usePatcherManager()
     {
         return m_manager;
+    }
+    
+    PatcherViewport& PatcherView::useViewport()
+    {
+        return *m_viewport;
+    }
+    
+    PatcherViewport const& PatcherView::useViewport() const
+    {
+        return *m_viewport;
     }
     
     // ================================================================================ //
@@ -130,7 +144,7 @@ namespace kiwi
             g.setColour(bgcolor);
             g.fillRect(origin_bounds);
             
-            g.setColour(bgcolor.contrasting(0.3));
+            g.setColour(bgcolor.contrasting(0.4));
             
             for(int x = (origin.getX() % grid_size); x < clip_bounds.getRight(); x += grid_size)
             {
@@ -717,6 +731,67 @@ namespace kiwi
         {
             if(link.resident()) { addLinkView(link); }
         }
+        
+        useViewport().resetObjectsArea();
+    }
+    
+    void PatcherView::setScreenBounds(juce::Rectangle<int> bounds)
+    {
+        if (auto* window = findParentComponentOfClass<PatcherViewWindow>())
+        {
+            const auto delta = getScreenPosition() - window->getPosition();
+            window->setBounds(bounds.getX() - delta.getX(),
+                              bounds.getY() - delta.getY(),
+                              bounds.getWidth() + delta.getX(),
+                              bounds.getHeight() + delta.getY());
+        }
+    }
+    
+    void PatcherView::windowInitialized()
+    {
+        auto const& model_screen_bounds = m_view_model.getScreenBounds();
+        
+        if(model_screen_bounds.getWidth() > 0 && model_screen_bounds.getHeight() > 0)
+        {
+            juce::Rectangle<double> bounds {
+                model_screen_bounds.getX(), model_screen_bounds.getY(),
+                model_screen_bounds.getWidth(), model_screen_bounds.getHeight()
+            };
+            
+            setScreenBounds(bounds.toNearestInt());
+        }
+        else
+        {
+            setScreenBounds(getLocalBounds().withCentre(juce::Desktop::getInstance()
+                                                      .getDisplays().getMainDisplay().userArea
+                                                      .getCentre()));
+        }
+        
+        auto const& view_position = m_view_model.getViewPosition();
+        
+        const juce::Point<int> view_point {
+            static_cast<int>(view_position.getX()),
+            static_cast<int>(view_position.getY())
+        };
+        
+        useViewport().setZoomFactor(m_view_model.getZoomFactor());
+        useViewport().setRelativeViewPosition(view_point);
+    }
+    
+    void PatcherView::saveState()
+    {
+        if(m_view_model.document().is_observing())
+            return; // abort
+        
+        const auto screen_bounds = useViewport().getScreenBounds().toDouble();
+        
+        m_view_model.setScreenBounds(screen_bounds.getX(), screen_bounds.getY(),
+                                     screen_bounds.getWidth(), screen_bounds.getHeight());
+        
+        const auto view_position = useViewport().getRelativeViewPosition().toDouble();        
+        m_view_model.setViewPosition(view_position.getX(), view_position.getY());
+        
+        model::DocumentManager::commit(m_patcher_model);
     }
     
     void PatcherView::setLock(bool locked)
@@ -822,7 +897,7 @@ namespace kiwi
     
     juce::Rectangle<int> PatcherView::getCurrentObjectsArea()
     {
-        juce::Rectangle<int> area;
+        juce::Rectangle<int> area {};
         
         for(auto& object_m : m_patcher_model.getObjects())
         {
@@ -907,7 +982,7 @@ namespace kiwi
     
     juce::Point<int> PatcherView::getOriginPosition() const
     {
-        return m_viewport.getOriginPosition();
+        return useViewport().getOriginPosition();
     }
     
     void PatcherView::originPositionChanged()
@@ -927,7 +1002,7 @@ namespace kiwi
         
         if(isAnyObjectSelected())
         {
-            m_viewport.bringRectToCentre(getSelectionBounds());
+            useViewport().bringRectToCentre(getSelectionBounds());
         }
     }
     
@@ -938,7 +1013,7 @@ namespace kiwi
         
         if(isAnyObjectSelected())
         {
-            m_viewport.bringRectToCentre(getSelectionBounds());
+            useViewport().bringRectToCentre(getSelectionBounds());
         }
     }
     
@@ -952,7 +1027,7 @@ namespace kiwi
             
             if(isAnyObjectSelected())
             {
-                m_viewport.bringRectToCentre(getSelectionBounds());
+                useViewport().bringRectToCentre(getSelectionBounds());
             }
         }
     }
@@ -1008,7 +1083,7 @@ namespace kiwi
                    && m_mouse_handler.getCurrentAction() != MouseHandler::Action::MoveObjects
                    && m_mouse_handler.getCurrentAction() != MouseHandler::Action::ResizeObjects)
                 {
-                    m_viewport.updatePatcherArea(true);
+                    useViewport().updatePatcherArea(true);
                     patcher_area_uptodate = true;
                 }
                 
@@ -1070,6 +1145,8 @@ namespace kiwi
             }
         }
         
+        checkViewInfos(view);
+        
         if(view.removed()) {}
     }
     
@@ -1112,7 +1189,7 @@ namespace kiwi
                 
                 if(m_is_locked)
                 {
-                    m_viewport.resetObjectsArea();
+                    useViewport().resetObjectsArea();
                 }
                 
                 repaint();
@@ -1122,7 +1199,7 @@ namespace kiwi
             if(m_view_model.zoomFactorChanged())
             {
                 const double zoom = m_view_model.getZoomFactor();
-                m_viewport.setZoomFactor(zoom);
+                useViewport().setZoomFactor(zoom);
             }
         }
     }
@@ -1799,7 +1876,7 @@ namespace kiwi
         
         model::DocumentManager::commit(m_patcher_model, "Delete objects and links");
         
-        m_viewport.updatePatcherArea(false);
+        useViewport().updatePatcherArea(false);
     }
     
     // ================================================================================ //

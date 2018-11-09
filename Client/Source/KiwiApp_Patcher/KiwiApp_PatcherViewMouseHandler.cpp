@@ -125,7 +125,7 @@ namespace kiwi
                         m_patcher_view.selectObject(object);
                     }
                     
-                    const auto pos = e.getPosition() - m_patcher_view.m_viewport.getOriginPosition();
+                    const auto pos = e.getPosition() - m_patcher_view.useViewport().getOriginPosition();
                     
                     m_patcher_view.showObjectPopupMenu(object, pos);
                 }
@@ -138,13 +138,13 @@ namespace kiwi
                         m_patcher_view.selectLink(link_view);
                     }
                     
-                    const auto pos = e.getPosition() - m_patcher_view.m_viewport.getOriginPosition();
+                    const auto pos = e.getPosition() - m_patcher_view.useViewport().getOriginPosition();
                     
                     m_patcher_view.showLinkPopupMenu(link_view, pos);
                 }
                 else if (hit_tester.patcherTouched())
                 {
-                    m_patcher_view.showPatcherPopupMenu(e.getPosition() - m_patcher_view.m_viewport.getOriginPosition());
+                    m_patcher_view.showPatcherPopupMenu(e.getPosition() - m_patcher_view.useViewport().getOriginPosition());
                 }
                 
                 break;
@@ -293,11 +293,11 @@ namespace kiwi
                 {
                     m_patcher_view.moveSelectedObjects(e.getPosition() - m_last_drag, true, true);
 
-                    if(!m_patcher_view.m_viewport.getRelativeViewArea().contains(e.getPosition()))
+                    if(!m_patcher_view.useViewport().getRelativeViewArea().contains(e.getPosition()))
                     {
                         m_patcher_view.beginDragAutoRepeat(50);
-                        const juce::MouseEvent e2(e.getEventRelativeTo(&m_patcher_view.m_viewport));
-                        m_patcher_view.m_viewport.autoScroll(e2.x, e2.y, 5, 5);
+                        const juce::MouseEvent e2(e.getEventRelativeTo(&m_patcher_view.useViewport()));
+                        m_patcher_view.useViewport().autoScroll(e2.x, e2.y, 5, 5);
                     }
                 }
                 
@@ -419,8 +419,8 @@ namespace kiwi
             {
                 model::DocumentManager::endCommitGesture(m_patcher_view.m_patcher_model);
                 
-                m_patcher_view.m_viewport.updatePatcherArea(true);
-                m_patcher_view.m_viewport.jumpViewToObject(*hit_tester.getObject());
+                m_patcher_view.useViewport().updatePatcherArea(true);
+                m_patcher_view.useViewport().jumpViewToObject(*hit_tester.getObject());
                 
                 KiwiApp::commandStatusChanged();
                 break;
@@ -438,7 +438,7 @@ namespace kiwi
                 m_direction = Direction::None;
                 m_mousedown_bounds.clear();
                 
-                m_patcher_view.m_viewport.updatePatcherArea(true);
+                m_patcher_view.useViewport().updatePatcherArea(true);
                 
                 KiwiApp::commandStatusChanged();
                 break;

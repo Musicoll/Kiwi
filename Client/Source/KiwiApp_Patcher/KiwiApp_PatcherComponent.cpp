@@ -338,14 +338,14 @@ namespace kiwi
     //                                PATCHER COMPONENT                                 //
     // ================================================================================ //
     
-    PatcherComponent::PatcherComponent(PatcherView& patcherview) :
-    m_patcher_manager(patcherview.usePatcherManager()),
-    m_patcherview(patcherview),
-    m_toolbar(m_patcher_manager)
+    PatcherComponent::PatcherComponent(PatcherView& patcherview)
+    : m_patcher_manager(patcherview.usePatcherManager())
+    , m_patcherview(patcherview)
+    , m_toolbar(m_patcher_manager)
     {
-        setSize(600, 400);
+        setSize(m_patcherview.getWidth(), m_patcherview.getHeight());
         
-        addAndMakeVisible(&patcherview.getViewport(), true);
+        addAndMakeVisible(&patcherview.useViewport(), true);
         
         KiwiApp::bindToCommandManager(this);
         KiwiApp::bindToKeyMapping(this);
@@ -371,9 +371,10 @@ namespace kiwi
     
     void PatcherComponent::resized()
     {
+        auto bounds = getLocalBounds();
         const int toolbar_size = 36;
-        m_toolbar.setBounds(getLocalBounds().withBottom(toolbar_size));
-        m_patcherview.getViewport().setBounds(getLocalBounds().withTop(toolbar_size));
+        m_toolbar.setBounds(bounds.removeFromTop(toolbar_size));
+        m_patcherview.useViewport().setBounds(bounds);
     }
     
     void PatcherComponent::paint(juce::Graphics& g)
@@ -418,16 +419,15 @@ namespace kiwi
     PatcherViewWindow::PatcherViewWindow(PatcherManager& manager,
                                          PatcherView& patcherview)
     : Window("Untitled", nullptr, true, true, "", !KiwiApp::isMacOSX())
+    , juce::ComponentMovementWatcher(this)
     , m_patcher_component(patcherview)
     {
-        // Todo: Add size infos to the Patcher Model
-        setSize(600, 500);
-        centreWithSize(getWidth(), getHeight());
-        
         setContentNonOwned(&m_patcher_component, true);
         setVisible(true);
         
         getLookAndFeel().setUsingNativeAlertWindows(false);
+        
+        patcherview.windowInitialized();
     }
     
     void PatcherViewWindow::removeUsersIcon()
@@ -458,5 +458,10 @@ namespace kiwi
     void PatcherViewWindow::closeButtonPressed()
     {
         KiwiApp::use().useInstance().removePatcherWindow(*this);
+    }
+    
+    void PatcherViewWindow::componentMovedOrResized(bool was_moved, bool was_resized)
+    {
+        m_patcher_component.usePatcherView().saveState();
     }
 }

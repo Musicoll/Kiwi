@@ -150,9 +150,9 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The PatcherComponent holds a patcher view and a patcher toolbar.
-    class PatcherComponent :
-    public juce::Component,
-    public juce::ApplicationCommandTarget
+    class PatcherComponent
+    : public juce::Component
+    , public juce::ApplicationCommandTarget
     {
     public: // methods
         
@@ -197,7 +197,9 @@ namespace kiwi
     //                                PATCHER VIEW WINDOW                               //
     // ================================================================================ //
     
-    class PatcherViewWindow : public Window
+    class PatcherViewWindow
+    : public Window
+    , public juce::ComponentMovementWatcher
     {
     public: // methods
         
@@ -220,6 +222,12 @@ namespace kiwi
         
         //! @brief Removes the connected users icon. Called once patcher disconnected.
         void removeUsersIcon();
+        
+    private: // methods
+        
+        void componentMovedOrResized(bool was_moved, bool was_resized) override;
+        void componentPeerChanged() override {};
+        void componentVisibilityChanged() override {}
         
     private: // variables
         
