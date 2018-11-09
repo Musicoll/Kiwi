@@ -393,15 +393,17 @@ namespace kiwi
     {
         bool saved = false;
         
-        if (needsSaving() && m_file.existsAsFile())
+        if(isConnected())
+            return false;
+        
+        if (m_file.existsAsFile())
         {
-            saved = true;
-            
             writeDocument();
+            saved = true;
         }
-        else if(needsSaving() || (!needsSaving() && !m_file.existsAsFile()))
+        else
         {
-            auto directory = juce::File::getSpecialLocation(juce::File::userHomeDirectory);
+            auto directory = juce::File::getCurrentWorkingDirectory();
             
             juce::File suggest_file = directory.getChildFile(juce::String(m_name)).withFileExtension("kiwi");
             
@@ -410,12 +412,10 @@ namespace kiwi
             if ((saved = saveFileChooser.browseForFileToSave(true)))
             {
                 m_file = saveFileChooser.getResult();
+                m_file.getParentDirectory().setAsCurrentWorkingDirectory();
                 
                 writeDocument();
-                
                 setName(m_file.getFileNameWithoutExtension().toStdString());
-                
-                updateTitleBars();
             }
         }
         
