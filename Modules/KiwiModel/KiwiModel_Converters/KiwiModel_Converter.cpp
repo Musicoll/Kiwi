@@ -41,6 +41,8 @@ namespace kiwi { namespace model {
         addConverter<Converter_v2_v3>();
         addConverter<Converter_v3_v4>();
         addConverter<Converter_v4_v401>();
+        addConverter<Converter_v401_v402>();
+        addConverter<Converter_v402_v403>();
     }
     
     Converter::~Converter()

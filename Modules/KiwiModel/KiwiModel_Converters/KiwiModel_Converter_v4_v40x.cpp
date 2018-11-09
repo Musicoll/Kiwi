@@ -47,13 +47,39 @@ namespace kiwi { namespace model {
     };
     
     //! @brief Nothing to do from v4.0.1 to v4.0.2
+    //! @details faust~ object added
     struct Converter_v401_v402 : public ConverterBase
     {
         Converter_v401_v402() : ConverterBase("v4.0.1", "v4.0.2") {}
         
         bool operator () (flip::BackEndIR& backend) const override
         {
-            // nothing to do from v2 to v3
+            // nothing to do from v4.0.1 to v4.0.2
+            return true;
+        }
+    };
+    
+    //! @brief Nothing to do from v4.0.2 to v4.0.3
+    //! @details add Bounds and Point classes
+    //! Add screen_bounds and view_position to Patcher::View
+    struct Converter_v402_v403 : public ConverterBase
+    {
+        Converter_v402_v403() : ConverterBase("v4.0.2", "v4.0.3") {}
+        
+        bool operator () (flip::BackEndIR& backend) const override
+        {
+            flip::BackEndIR::Type& patcher = backend.root;
+            
+            flip::walk(patcher, [](flip::BackEndIR::Type & type) {
+                
+                // skip every type that is not a "patcherview"
+                if (type.get_class () != "cicm.kiwi.Patcher.View")
+                    return;
+                
+                type.object_add_member_object("screen_bounds", "cicm.kiwi.Bounds");
+                type.object_add_member_object("view_position", "cicm.kiwi.Point");
+            });
+            
             return true;
         }
     };
