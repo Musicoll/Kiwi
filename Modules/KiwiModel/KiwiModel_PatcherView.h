@@ -23,6 +23,9 @@
 
 #include "KiwiModel_PatcherUser.h"
 
+#include "KiwiModel_Point.h"
+#include "KiwiModel_Bounds.h"
+
 namespace kiwi
 {
     namespace model
@@ -100,6 +103,18 @@ namespace kiwi
             //! @brief Select all objects and links
             void selectAll();
             
+            //! @brief Returns the bounds of the view relative to the screen.
+            Bounds const& getScreenBounds() const;
+            
+            //! @brief Sets the bounds of the view relative to the screen.
+            void setScreenBounds(double x, double y, double width, double height);
+            
+            //! @brief Returns the view position.
+            Point const& getViewPosition() const;
+            
+            //! @brief Sets the view position.
+            void setViewPosition(double x, double y);
+            
         public: // internal methods
             
             //! @internal flip Default constructor.
@@ -165,6 +180,8 @@ namespace kiwi
             
             flip::Bool                      m_is_locked;
             flip::Float                     m_zoom_factor;
+            Bounds                          m_screen_bounds;
+            Point                           m_view_position;
         };
     }
 }
