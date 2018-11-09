@@ -101,7 +101,8 @@ namespace kiwi
         void Patcher::View::setZoomFactor(double zoom_factor)
         {
             const double min_zoom = 0.25;
-            m_zoom_factor = zoom_factor < min_zoom ? min_zoom : zoom_factor;
+            const double max_zoom = 4.;
+            m_zoom_factor = std::max(min_zoom, std::min(zoom_factor, max_zoom));
         }
         
         double Patcher::View::getZoomFactor() const noexcept
