@@ -60,13 +60,17 @@ if(NOT ${USE_SYSTEM_LLVM})
 	# Search for the LLVM internal library
 	# ---------------------------------------------------------------------------#
 	set(LLVM_INTERNAL_VALID OFF)
-	set(LLVM_DIR ${LLVM_INTERN_CMAKE_DIR})
-	set(USE_LLVM_CONFIG OFF)
-	find_package(LLVM CONFIG)
-	if(${LLVM_FOUND})
-		if(NOT ${LLVM_PACKAGE_VERSION} VERSION_LESS "5.0")
-			set(LLVM_INTERNAL_VALID ON)
+
+	if(${LLVM_INTERN_CMAKE_DIR})
+
+		find_package(LLVM 5.0 EXACT PATHS ${LLVM_INTERN_CMAKE_DIR} NO_DEFAULT_PATH)
+
+		if(${LLVM_FOUND})
+			if(NOT ${LLVM_PACKAGE_VERSION} VERSION_LESS "5.0")
+				set(LLVM_INTERNAL_VALID ON)
+			endif()
 		endif()
+
 	endif()
 
 	# Set up for the LLVM internal library
