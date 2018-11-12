@@ -344,11 +344,14 @@ namespace kiwi
     
     void ObjectFrame::textChanged(std::string const& new_text)
     {
-        dynamic_cast<EditableObjectView*>(m_object_view.get())->removeListener(*this);
-        
-        if (auto* object_view = dynamic_cast<ClassicView*>(m_object_view.get()))
+        if (auto* editable_object_view = dynamic_cast<EditableObjectView*>(m_object_view.get()))
         {
-            getPatcherView().objectTextChanged(*this, new_text);
+            editable_object_view->removeListener(*this);
+            
+            if (dynamic_cast<ClassicView*>(m_object_view.get()))
+            {
+                getPatcherView().objectTextChanged(*this, new_text);
+            }
         }
     }
     
