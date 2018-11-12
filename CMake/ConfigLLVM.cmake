@@ -61,7 +61,7 @@ if(NOT ${USE_SYSTEM_LLVM})
 	# ---------------------------------------------------------------------------#
 	set(LLVM_INTERNAL_VALID OFF)
 
-	if(${LLVM_INTERN_CMAKE_DIR})
+	if(EXISTS ${LLVM_INTERN_CMAKE_DIR})
 
 		find_package(LLVM 5.0 EXACT PATHS ${LLVM_INTERN_CMAKE_DIR} NO_DEFAULT_PATH)
 
