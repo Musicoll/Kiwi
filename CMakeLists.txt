@@ -252,9 +252,10 @@ if(${GCOV_SUPPORT} STREQUAL "On")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
   set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
 	set(KIWI_TESTS_LINK_LIBRARIES gcov)
-	if(UNIX AND NOT APPLE)
-		set(KIWI_TESTS_LINK_LIBRARIES ${KIWI_TESTS_LINK_LIBRARIES} ${PTHREAD})
-	endif()
+endif()
+
+if(UNIX AND NOT APPLE)
+	set(KIWI_TESTS_LINK_LIBRARIES ${KIWI_TESTS_LINK_LIBRARIES} ${PTHREAD})
 endif()
 
 # Test Tool
