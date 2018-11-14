@@ -90,3 +90,4 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_FaustTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Route.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_OSCReceive.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_OSCSend.h>

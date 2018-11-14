@@ -215,6 +215,7 @@ namespace kiwi
         engine::FaustTilde::declare();
         engine::Route::declare();
         engine::OSCReceive::declare();
+        engine::OSCSend::declare();
     }
     
     void KiwiApp::declareObjectViews()

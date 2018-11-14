@@ -106,6 +106,7 @@ namespace kiwi
             model::FaustTilde::declare();
             model::Route::declare();
             model::OSCReceive::declare();
+            model::OSCSend::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)

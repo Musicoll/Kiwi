@@ -75,4 +75,5 @@ Parfois les patchs d'aide regroupent plusieurs objets liés fonctionnellement, p
 | **sf.record~**  |       | Enregistre un fichier audio                             |
 | **faust~**      |       | Edite et joue du code FAUST                             |
 | **route**       |       | Route les messages en fonction du premier élement       |
-| **OSC.receive** |       | Reçoit des messages Open Sound Control                  |
+| **OSC.receive** |       | Reception de messages Open Sound Control                |
+| **OSC.send**    |       | Envoi de messages Open Sound Control                    |

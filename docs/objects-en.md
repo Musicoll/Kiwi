@@ -75,3 +75,4 @@ A list of help patches describing how each object works is provided in the docum
 | **faust~**      |       | Edit and run FAUST code                                 |
 | **route**       |       | Route messages according to the first element           |
 | **OSC.receive** |       | Receive Open Sound Control messages                     |
+| **OSC.send**    |       | Send Open Sound Control messages                        |

@@ -90,4 +90,5 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_FaustTilde.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_Route.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_OSCReceive.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_OSCSend.h>
 
