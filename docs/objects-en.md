@@ -73,4 +73,5 @@ A list of help patches describing how each object works is provided in the docum
 | **sf.play~**    |       | Play an audio file from disk                            |
 | **sf.record~**  |       | Record an audio file on disk                            |
 | **faust~**      |       | Edit and run FAUST code                                 |
-| **route**       |       | route messages according to the first element           |
+| **route**       |       | Route messages according to the first element           |
+| **OSC.receive** |       | Receive Open Sound Control messages                     |

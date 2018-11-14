@@ -76,7 +76,8 @@ set(JUCE_COMPILED_SOURCES ${KIWI_JUCE_INTERN_DIR}/modules/juce_core/juce_core.cp
                       		${KIWI_JUCE_INTERN_DIR}/modules/juce_audio_devices/juce_audio_devices.cpp
                       		${KIWI_JUCE_INTERN_DIR}/modules/juce_audio_formats/juce_audio_formats.cpp
                       		${KIWI_JUCE_INTERN_DIR}/modules/juce_audio_utils/juce_audio_utils.cpp
-                      		${KIWI_JUCE_INTERN_DIR}/modules/juce_audio_processors/juce_audio_processors.cpp)
+                      		${KIWI_JUCE_INTERN_DIR}/modules/juce_audio_processors/juce_audio_processors.cpp
+													${KIWI_JUCE_INTERN_DIR}/modules/juce_osc/juce_osc.cpp)
 
 if (APPLE)
     set_source_files_properties(${JUCE_COMPILED_SOURCES} PROPERTIES COMPILE_FLAGS "-x objective-c++" HEADER_FILE_ONLY FALSE)

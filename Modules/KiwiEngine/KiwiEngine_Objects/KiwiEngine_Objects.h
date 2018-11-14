@@ -89,3 +89,4 @@
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_SfRecordTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_FaustTilde.h>
 #include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_Route.h>
+#include <KiwiEngine/KiwiEngine_Objects/KiwiEngine_OSCReceive.h>
