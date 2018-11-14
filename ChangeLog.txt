@@ -1,12 +1,16 @@
 ### v1.0.3
 
 User:
-- Add the **faust~** object to load, edit and run FAUST code
+- Add [route] object.
+- Save patcher per user size and position in the document.
+- Add a search bar to the DocumentBrowser window and fix sorting.
+- Add [faust~] object. Load, edit and run [FAUST](http://faust.grame.fr/) code in Kiwi.
 - Add english/french documentation to the distribution
 - Add help files to the distribution
 - Add tutorials to the distribution
 
 Dev:
+- [server] Allow relative or absolute backend path.
 - Improve build system using CMake only
 - Improve build/node server documentation
 
