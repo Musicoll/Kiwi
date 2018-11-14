@@ -74,3 +74,4 @@ Parfois les patchs d'aide regroupent plusieurs objets liés fonctionnellement, p
 | **sf.play~**    |       | Joue un fichier audio                                   |
 | **sf.record~**  |       | Enregistre un fichier audio                             |
 | **faust~**      |       | Edite et joue du code FAUST                             |
+| **route**       |       | Route les messages en fonction du premier élement       |

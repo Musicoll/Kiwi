@@ -213,6 +213,7 @@ namespace kiwi
         engine::SfPlayTilde::declare();
         engine::SfRecordTilde::declare();
         engine::FaustTilde::declare();
+        engine::Route::declare();
     }
     
     void KiwiApp::declareObjectViews()

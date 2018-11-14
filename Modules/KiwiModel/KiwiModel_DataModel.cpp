@@ -104,6 +104,7 @@ namespace kiwi
             model::SfPlayTilde::declare();
             model::SfRecordTilde::declare();
             model::FaustTilde::declare();
+            model::Route::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)

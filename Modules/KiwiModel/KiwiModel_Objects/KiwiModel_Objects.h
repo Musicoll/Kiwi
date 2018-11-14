@@ -88,4 +88,5 @@
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_SfPlayTilde.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_SfRecordTilde.h>
 #include <KiwiModel/KiwiModel_Objects/KiwiModel_FaustTilde.h>
+#include <KiwiModel/KiwiModel_Objects/KiwiModel_Route.h>
 
