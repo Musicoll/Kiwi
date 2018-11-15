@@ -104,21 +104,30 @@ int main(int argc, char const* argv[])
         std::cerr << "Parsing config file failed : " << e.what() << "\n";
         return 0;
     }
-    catch(nlohmann::detail::type_error const& e)
+    
+    // check config entries:
+    const std::vector<std::string> required_config_entries {
+      "backend_directory", "session_port", "open_token", "kiwi_version"
+    };
+    
+    for (auto const& entry : required_config_entries)
     {
-        std::cerr << "Accessing element json element failed : " << e.what() << "\n";
-        return 0;
+        if(! (config.find(entry) != config.end()) )
+        {
+            std::cerr << entry << " entry needed in config file\n";
+            return 0;
+        }
     }
+    
+    const std::string backend_path = config["backend_directory"];
+    const juce::File backend_dir {config_file.getParentDirectory().getChildFile(backend_path)};
+    const uint16_t session_port = config["session_port"];
+    const std::string token = config["open_token"];
+    const std::string kiwi_client_version = config["kiwi_version"];
     
     try
     {
-        const std::string backend_path = config["backend_directory"];
-        server::Server kiwi_server(config["session_port"],
-                                   config_file.getParentDirectory().getChildFile(backend_path),
-                                   config["open_token"],
-                                   config["kiwi_version"]);
-        
-        std::cout << "[server] - running on port " << config["session_port"] << std::endl;
+        server::Server kiwi_server(session_port, backend_dir, token, kiwi_client_version);
         
         flip::RunLoopTimer run_loop ([&kiwi_server]
         {
@@ -127,6 +136,9 @@ int main(int argc, char const* argv[])
             return !server_stopped.load();
         }, 0.02);
         
+        std::cout << "[server] - running on port: " << std::to_string(session_port) << std::endl;
+        std::cout << "[server] - backend_directory: " << backend_dir.getFullPathName().toStdString() << std::endl;
+        
         run_loop.run();
         
         std::cout << "[server] - stopped" << std::endl;
@@ -134,6 +146,7 @@ int main(int argc, char const* argv[])
     catch(std::runtime_error const& e)
     {
         std::cerr << "Launching server failed: \nerr : " << e.what() << "\n";
+        std::cerr << "Maybe someone is already listening on port " << std::to_string(session_port) << "\n";
         return 0;
     }
     
