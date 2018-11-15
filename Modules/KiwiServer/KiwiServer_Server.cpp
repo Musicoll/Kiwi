@@ -360,6 +360,17 @@ namespace kiwi
             }
             catch (...)
             {
+                m_logger.log("Fail to read " + m_backend_file.getFileName().toStdString());
+                return false;
+            }
+            
+            const auto current_version = model::Converter::getLatestVersion();
+            const auto backend_version = backend.version;
+            
+            if(!model::Converter::canConvertToLatestFrom(backend_version))
+            {
+                m_logger.log("Bad document version: no conversion available from "
+                             + backend_version + " to " + current_version);
                 return false;
             }
             
@@ -373,8 +384,15 @@ namespace kiwi
                 }
                 catch(...)
                 {
+                    m_logger.log("Failed to read " + m_backend_file.getFileName().toStdString());
                     return false;
                 }
+            }
+            else
+            {
+                m_logger.log("Failed to convert document from version "
+                             + backend_version + " to " + current_version);
+                return false;
             }
             
             return success;
