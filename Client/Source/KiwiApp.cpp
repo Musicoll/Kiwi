@@ -728,6 +728,7 @@ namespace kiwi
         menu.addSeparator();
         #endif
         
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::openObjectHelp);
         
         {
             juce::PopupMenu objects_submenu;
