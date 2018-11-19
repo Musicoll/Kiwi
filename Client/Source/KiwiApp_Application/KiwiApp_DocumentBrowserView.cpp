@@ -963,9 +963,9 @@ namespace kiwi
         auto directory = juce::File::getSpecialLocation(juce::File::userHomeDirectory);
         
         juce::File suggest_file =
-        directory.getChildFile(juce::String(document->getName())).withFileExtension("kiwi");
+        directory.getChildFile(juce::String(document->getName())).withFileExtension(".kiwi;");
         
-        juce::FileChooser saveFileChooser("Download file", suggest_file, "*.kiwi");
+        juce::FileChooser saveFileChooser("Download file", suggest_file, "*.kiwi;");
         
         if (saveFileChooser.browseForFileToSave(true))
         {

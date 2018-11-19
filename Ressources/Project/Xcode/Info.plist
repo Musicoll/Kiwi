@@ -36,6 +36,18 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>kiwihelp</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>kiwi_filetype.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Kiwi help file</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+		</dict>
 	</array>
 </dict>
 </plist>

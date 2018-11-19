@@ -176,7 +176,7 @@ namespace kiwi
     
     bool Instance::openFile(juce::File const& file)
     {
-        if(!file.hasFileExtension("kiwi"))
+        if(!file.hasFileExtension(".kiwi;.kiwihelp"))
         {
             KiwiApp::error("can't open file (bad file extension)");
             return false;
@@ -230,7 +230,7 @@ namespace kiwi
     
     void Instance::askUserToOpenPatcherDocument()
     {
-        juce::FileChooser file_chooser("Open file", m_last_opened_file, "*.kiwi");
+        juce::FileChooser file_chooser("Open file", m_last_opened_file, "*.kiwi;*.kiwihelp");
         
         if(file_chooser.browseForFileToOpen())
         {

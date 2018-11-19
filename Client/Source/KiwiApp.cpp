@@ -474,7 +474,7 @@ namespace kiwi
         {
             juce::File file(command_line.unquoted());
 
-            if (file.hasFileExtension("kiwi") && m_instance)
+            if (file.hasFileExtension(".kiwi;.kiwihelp") && m_instance)
             {
                 m_instance->openFile(file);
             }
