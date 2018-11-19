@@ -36,18 +36,12 @@ namespace kiwi
     //                                    HITTESTER                                     //
     // ================================================================================ //
     
-    MouseHandler::MouseHandler(PatcherView & patcher_view):
-    m_patcher_view(patcher_view),
-    m_current_action(Action::None),
-    m_last_drag(),  
-    m_mousedown_bounds(),
-    m_direction()
-    {
-    }
+    MouseHandler::MouseHandler(PatcherView & patcher_view)
+    : m_patcher_view(patcher_view)
+    {}
     
     MouseHandler::~MouseHandler()
-    {
-    }
+    {}
     
     MouseHandler::Action MouseHandler::getCurrentAction()
     {
@@ -64,40 +58,38 @@ namespace kiwi
         {
             case Action::CopyOnDrag:
             {
-                ObjectFrame & object = *hit_tester.getObject();
-                
-                if (!m_patcher_view.isSelected(object))
+                if(auto* object = hit_tester.getObject())
                 {
-                    m_patcher_view.selectObjectOnly(object);
+                    if (!m_patcher_view.isSelected(*object))
+                    {
+                        m_patcher_view.selectObjectOnly(*object);
+                    }
                 }
-                
                 break;
             }
-            case Action::Object:
+            case Action::ForwardToObject:
             {
-                ObjectFrame & object = *hit_tester.getObject();
-                
-                object.mouseDown(e.getEventRelativeTo(&object));
-                
+                if(auto* object = hit_tester.getObject())
+                {
+                    object->mouseDown(e.getEventRelativeTo(object));
+                }
                 break;
             }
             case Action::CreateLink:
             {
-                m_patcher_view.unselectAll();
-                
-                auto& object = *hit_tester.getObject();
-                
-                const size_t index = hit_tester.getIndex();
-                
-                const bool is_sender = hit_tester.getZone() == HitTester::Zone::Outlet;
-                
-                m_patcher_view.m_link_creator.reset(new LinkViewCreator(object,
-                                                                        index,
-                                                                        is_sender,
-                                                                        e.getPosition()));
-                
-                m_patcher_view.addAndMakeVisible(*m_patcher_view.m_link_creator);
-                
+                if(auto* object = hit_tester.getObject())
+                {
+                    m_patcher_view.unselectAll();
+                    
+                    const bool is_sender = hit_tester.getZone() == HitTester::Zone::Outlet;
+                    
+                    m_patcher_view.m_link_creator.reset(new LinkViewCreator(*object,
+                                                                            hit_tester.getIndex(),
+                                                                            is_sender,
+                                                                            e.getPosition()));
+                    
+                    m_patcher_view.addAndMakeVisible(*m_patcher_view.m_link_creator);
+                }
                 break;
             }
             case Action::Lasso:
@@ -109,9 +101,7 @@ namespace kiwi
             case Action::MoveObjects:
             {
                 KiwiApp::commandStatusChanged();
-                
                 model::DocumentManager::startCommitGesture(m_patcher_view.m_patcher_model);
-                
                 break;
             }
             case Action::PopupMenu:
@@ -211,10 +201,8 @@ namespace kiwi
                 
                 break;
             }
-            default:
-            {
-                break;
-            }
+                
+            default: break;
         }
     }
     
@@ -235,34 +223,28 @@ namespace kiwi
                 }
                 break;
             }
-            case Action::Object:
+            case Action::ForwardToObject:
             {
-                ObjectFrame & object = *hit_tester.getObject();
-                
-                object.mouseDrag(e.getEventRelativeTo(&object));
+                if(auto* box = hit_tester.getObject())
+                {
+                    box->mouseDrag(e.getEventRelativeTo(box));
+                }
                 
                 break;
             }
             case Action::CreateLink:
             {
-                auto end_pair = m_patcher_view.getLinkCreatorNearestEndingIolet();
-                
-                if(end_pair.first != nullptr)
+                auto nearest_ending_iolet = m_patcher_view.getLinkCreatorNearestEndingIolet();
+                if(auto* box = nearest_ending_iolet.first)
                 {
-                    const bool sender = m_patcher_view.m_link_creator->isBindedToSender();
-                    
-                    ObjectFrame* object_view = end_pair.first;
-                    
-                    if(object_view != nullptr)
+                    const auto index = nearest_ending_iolet.second;
+                    if(m_patcher_view.m_link_creator->isBindedToSender())
                     {
-                        if(sender)
-                        {
-                            m_patcher_view.m_io_highlighter.highlightInlet(*object_view, end_pair.second);
-                        }
-                        else
-                        {
-                            m_patcher_view.m_io_highlighter.highlightOutlet(*object_view, end_pair.second);
-                        }
+                        m_patcher_view.m_io_highlighter.highlightInlet(*box, index);
+                    }
+                    else
+                    {
+                        m_patcher_view.m_io_highlighter.highlightOutlet(*box, index);
                     }
                 }
                 else
@@ -303,7 +285,7 @@ namespace kiwi
                 
                 break;
             }
-            case Action::ObjectEdition:
+            case Action::EditObject:
             {
                 if (hit_tester.objectTouched() && e.getMouseDownPosition() != e.getPosition())
                 {
@@ -329,7 +311,7 @@ namespace kiwi
             }
             case Action::ResizeObjects:
             {
-                juce::Point<int> delta = e.getPosition() - e.getMouseDownPosition();
+                const auto delta = e.getPosition() - e.getMouseDownPosition();
                 auto& patcher_model = m_patcher_view.m_patcher_model;
                 
                 for (auto bounds_it : m_mousedown_bounds)
@@ -341,9 +323,11 @@ namespace kiwi
                     {
                         if(auto* box = m_patcher_view.getObject(*model))
                         {
-                            resizeModelObjectBounds(*model, *box,
+                            resizeModelObjectBounds(*model,
+                                                    *box,
                                                     bounds_it.second,
-                                                    delta, e.mods.isShiftDown());
+                                                    delta,
+                                                    e.mods.isShiftDown());
                         }
                     }
                 }
@@ -367,7 +351,7 @@ namespace kiwi
         
         switch (m_current_action)
         {
-            case Action::Object:
+            case Action::ForwardToObject:
             {
                 ObjectFrame & object = *hit_tester.getObject();
                 object.mouseUp(e.getEventRelativeTo(&object));
@@ -425,10 +409,12 @@ namespace kiwi
                 KiwiApp::commandStatusChanged();
                 break;
             }
-            case Action::ObjectEdition:
+            case Action::EditObject:
             {
-                ObjectFrame & object = *hit_tester.getObject();
-                m_patcher_view.editObject(object);
+                if(auto* object = hit_tester.getObject())
+                {
+                    m_patcher_view.editObject(*object);
+                }
                 break;
             }
             case Action::ResizeObjects:
@@ -448,10 +434,13 @@ namespace kiwi
                 m_patcher_view.setLock(!m_patcher_view.isLocked());
                 break;
             }
-            default:
+            case Action::OpenObjectHelp:
             {
+                m_patcher_view.openObjectHelp();
                 break;
             }
+                
+            default: break;
         }
         
         m_current_action = Action::None;
@@ -471,34 +460,37 @@ namespace kiwi
                 {
                     if (e.mods.isCommandDown())
                     {
-                        startAction(Action::Object, e);
-                    }
-                    else if(e.mods.isAltDown())
-                    {
-                        startAction(Action::CopyOnDrag, e);
+                        startAction(Action::ForwardToObject, e);
                     }
                     else
                     {
-                        if(e.mods.isPopupMenu())
+                        auto& object = *hit_tester.getObject();
+                        const bool was_selected = m_patcher_view.isSelected(object);
+                        
+                        if (e.mods.isShiftDown())
+                        {
+                            startAction(Action::SwitchSelection, e);
+                        }
+                        else if(!was_selected)
+                        {
+                            startAction(Action::Selection, e);
+                        }
+                        
+                        if(e.mods.isAltDown())
+                        {
+                            startAction(Action::None, e);
+                        }
+                        else if(was_selected && !e.mods.isShiftDown())
+                        {
+                            startAction(Action::EditObject, e);
+                        }
+                        else if(e.mods.isPopupMenu())
                         {
                             startAction(Action::PopupMenu, e);
                         }
                         else
                         {
-                            ObjectFrame& object = *hit_tester.getObject();
-                            
-                            if (e.mods.isShiftDown())
-                            {
-                                startAction(Action::SwitchSelection, e);
-                            }
-                            else if(m_patcher_view.isSelected(object))
-                            {
-                                startAction(Action::ObjectEdition, e);
-                            }
-                            else
-                            {
-                                startAction(Action::Selection, e);
-                            }
+                            startAction(Action::None, e);
                         }
                     }
                 }
@@ -563,13 +555,32 @@ namespace kiwi
     
     void MouseHandler::handleMouseDrag(juce::MouseEvent const& e)
     {
-        continueAction(e);
+        if(m_current_action == Action::None
+           && e.mouseWasDraggedSinceMouseDown()
+           && e.mods.isAltDown())
+        {
+            startAction(Action::CopyOnDrag, e);
+        }
+        else if(m_current_action == Action::None
+                && e.mouseWasDraggedSinceMouseDown())
+        {
+            startAction(Action::MoveObjects, e);
+        }
+        else if(m_current_action != Action::None)
+        {
+            continueAction(e);
+        }
         
         m_last_drag = e.getPosition();
     }
     
     void MouseHandler::handleMouseUp(juce::MouseEvent const& e)
     {
+        if(m_current_action == Action::None && e.mods.isAltDown())
+        {
+            startAction(Action::OpenObjectHelp, e);
+        }
+        
         endAction(e);
     }
     
@@ -583,9 +594,10 @@ namespace kiwi
             
             if(e.mods.isCommandDown() && hit_tester.objectTouched())
             {
-                ObjectFrame & object= *hit_tester.getObject();
-                
-                object.mouseDoubleClick(e.getEventRelativeTo(&object));
+                if(auto* object = hit_tester.getObject())
+                {
+                    object->mouseDoubleClick(e.getEventRelativeTo(object));
+                }
             }
             else if(hit_tester.patcherTouched())
             {
@@ -759,7 +771,7 @@ namespace kiwi
                                                juce::Rectangle<int> prev_bounds,
                                                juce::Point<int> delta, bool fixed_ratio)
     {
-        juce::Rectangle<int> new_bounds = prev_bounds;
+        auto new_bounds = prev_bounds;
         
         double ratio = 0.;
         const bool stretching_top = m_direction & Direction::Up;
@@ -799,14 +811,10 @@ namespace kiwi
         
         const juce::Rectangle<int> limits {};
         
-        juce::Rectangle<int> target_bounds = new_bounds;
+        auto target_bounds = new_bounds;
         
         auto* box_constrainer = box.getBoundsConstrainer();
-        
-        juce::ComponentBoundsConstrainer constrainer;
-        constrainer.setFixedAspectRatio(box_constrainer->getFixedAspectRatio() == 0 ? ratio : box_constrainer->getFixedAspectRatio());
-        
-        auto box_ratio = box_constrainer->getFixedAspectRatio();
+        const auto box_ratio = box_constrainer->getFixedAspectRatio();
         
         // impose ratio if not set
         box_constrainer->setFixedAspectRatio(box_ratio == 0 ? ratio : box_ratio);
