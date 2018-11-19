@@ -105,6 +105,9 @@ namespace kiwi
         //! @brief Gets the application scheduler.
         static tool::Scheduler<>& useScheduler();
         
+        //! @brief Returns the Kiwi object Help directory.
+        juce::File getKiwiObjectHelpDirectory();
+        
         //! @brief Sets the auth user.
         static void setAuthUser(Api::AuthUser const& auth_user);
         
@@ -254,6 +257,15 @@ namespace kiwi
         //! @brief Parse startup command line and open file if exists.
         void openCommandFile(juce::String const& command_line);
         
+        //! @brief Create object help popup menu
+        void createObjectHelpPopupMenu(juce::PopupMenu& menu);
+        
+        //! @brief Find help file given an index and open the file.
+        void findAndOpenHelpFile(int selected_index);
+        
+        //! @brief Get the list of help files.
+        juce::Array<juce::File> getSortedObjectHelpFilesInDirectory(juce::File const& directory) const noexcept;
+        
     private: // members
         
         enum TimerIds : int
@@ -276,5 +288,7 @@ namespace kiwi
         std::unique_ptr<tool::Scheduler<>>                  m_scheduler = nullptr;
         
         std::string m_last_server_version_check {};
+        
+        int m_num_help_files = 0;
     };
 }

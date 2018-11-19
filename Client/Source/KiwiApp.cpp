@@ -58,6 +58,12 @@ namespace kiwi
         KiwiApp::use().handleMainMenuCommand(menuItemID);
     }
     
+    //==============================================================================
+    enum
+    {
+        objectHelpBaseID = 100
+    };
+    
     // ================================================================================ //
     //                               ASYNC QUIT RETRIER                                 //
     // ================================================================================ //
@@ -342,6 +348,18 @@ namespace kiwi
     tool::Scheduler<>& KiwiApp::useScheduler()
     {
         return *KiwiApp::use().m_scheduler;
+    }
+    
+    juce::File KiwiApp::getKiwiObjectHelpDirectory()
+    {
+        using juce::File;
+        const auto apppath = File::getSpecialLocation(File::SpecialLocationType::currentApplicationFile);
+        
+#if JUCE_MAC
+        return apppath.getChildFile("Contents/Resources/helps");
+#else
+        return apppath.getChildFile("helps");
+#endif
     }
     
     void KiwiApp::setAuthUser(Api::AuthUser const& auth_user)
@@ -707,14 +725,67 @@ namespace kiwi
     {
         #if ! JUCE_MAC
         menu.addCommandItem(m_command_manager.get(), CommandIDs::showAboutAppWindow);
+        menu.addSeparator();
         #endif
         
+        
+        {
+            juce::PopupMenu objects_submenu;
+            createObjectHelpPopupMenu(objects_submenu);
+            if(m_num_help_files > 0)
+            {
+                menu.addSubMenu("Objects", objects_submenu);
+            }
+        }
+        
+        menu.addSeparator();
         menu.addCommandItem(m_command_manager.get(), CommandIDs::showDocumentationOnline);
     }
     
-    void KiwiApp::handleMainMenuCommand(int menuItemID)
+    void KiwiApp::handleMainMenuCommand(int menu_item_ID)
     {
-        ;
+        if (menu_item_ID >= objectHelpBaseID && menu_item_ID < (objectHelpBaseID + m_num_help_files))
+        {
+            findAndOpenHelpFile(menu_item_ID - objectHelpBaseID);
+        }
+    }
+    
+    void KiwiApp::findAndOpenHelpFile(int selected_index)
+    {
+        const auto help_files = getSortedObjectHelpFilesInDirectory(getKiwiObjectHelpDirectory());
+        
+        if (selected_index < help_files.size())
+        {
+            useInstance().openFile(help_files.getUnchecked(selected_index));
+        }
+    }
+    
+    void KiwiApp::createObjectHelpPopupMenu(juce::PopupMenu& menu)
+    {
+        m_num_help_files = 0;
+        const auto help_dir = getKiwiObjectHelpDirectory();
+        for (auto const& f : getSortedObjectHelpFilesInDirectory(help_dir))
+        {
+            menu.addItem(objectHelpBaseID + m_num_help_files, f.getFileNameWithoutExtension());
+            ++m_num_help_files;
+        }
+    }
+    
+    juce::Array<juce::File> KiwiApp::getSortedObjectHelpFilesInDirectory(juce::File const& dir) const noexcept
+    {
+        juce::Array<juce::File> help_files;
+        
+        juce::DirectoryIterator iter (dir, false, "*.kiwihelp",
+                                      juce::File::findFiles
+                                      | juce::File::ignoreHiddenFiles);
+        while(iter.next())
+        {
+            help_files.add (iter.getFile());
+        }
+        
+        help_files.sort();
+        
+        return help_files;
     }
     
     //==============================================================================
