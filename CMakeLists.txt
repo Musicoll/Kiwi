@@ -202,17 +202,19 @@ target_link_libraries(Server PUBLIC KiwiServer)
 # Kiwi Client application
 #------------------------------------------------------------------------------#
 
-file(GLOB_RECURSE FAUST_LIB_RESOURCE ${KIWI_DEPENDENCIES_DIR}/faust/libraries/*.lib)
-file(GLOB_RECURSE OBJECT_HELPS_RESOURCE ${PROJECT_SOURCE_DIR}/docs/helps/*.kiwi*)
 set(KIWI_RESSOURCES_DIR ${PROJECT_SOURCE_DIR}/Ressources)
+
 if (APPLE)
 	set(KIWI_APP_ICON ${KIWI_RESSOURCES_DIR}/Project/XCode/Icon.icns)
 	set(KIWI_PATCHER_FILETYPE_ICON ${KIWI_RESSOURCES_DIR}/Project/XCode/kiwi_filetype.icns)
 	set(KIWI_PLIST ${KIWI_RESSOURCES_DIR}/Project/XCode/Info.plist)
 	set_source_files_properties(${KIWI_APP_ICON} ${KIWI_PATCHER_FILETYPE_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
+	file(GLOB_RECURSE FAUST_LIB_RESOURCE ${KIWI_DEPENDENCIES_DIR}/faust/libraries/*.lib)
   set_source_files_properties(${FAUST_LIB_RESOURCE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/Faust/Libs")
-	set_source_files_properties(${OBJECT_HELPS_RESOURCE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/helps")
-	set(KIWI_CLIENT_RESSOURCES ${KIWI_APP_ICON} ${KIWI_PATCHER_FILETYPE_ICON} ${KIWI_PLIST} ${FAUST_LIB_RESOURCE} ${OBJECT_HELPS_RESOURCE} )
+
+	set(KIWI_CLIENT_RESSOURCES ${KIWI_APP_ICON} ${KIWI_PATCHER_FILETYPE_ICON} ${KIWI_PLIST} ${FAUST_LIB_RESOURCE})
+
 elseif(WIN32)
 	set(KIWI_CLIENT_RESSOURCES ${KIWI_RESSOURCES_DIR}/Project/VisualStudio15/Kiwi.rc)
 endif()
@@ -231,6 +233,15 @@ target_link_libraries(Kiwi PUBLIC ${KIWI_CLIENT_LINK_LIBRARIES})
 
 if (APPLE)
 	set_target_properties(Kiwi PROPERTIES MACOSX_BUNDLE TRUE MACOSX_BUNDLE_INFO_PLIST ${KIWI_PLIST})
+
+	# Copy ressources to bundle
+	set(KIWI_HELPS_RESOURCE ${PROJECT_SOURCE_DIR}/docs/helps)
+
+	set(KIWI_APP_BUNDLE_RESSOURCES $<TARGET_BUNDLE_CONTENT_DIR:Kiwi>/Resources)
+
+	add_custom_command(TARGET Kiwi POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory
+											"${KIWI_HELPS_RESOURCE}" "${KIWI_APP_BUNDLE_RESSOURCES}/helps")
+
 elseif(WIN32)
 	if (CMAKE_CL_64)
 		set(CRT_LIB "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/redist/x64/Microsoft.VC140.CRT")
