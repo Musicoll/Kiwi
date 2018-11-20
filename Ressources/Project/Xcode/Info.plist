@@ -22,6 +22,8 @@
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>CICM</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app requires audio input in order for the adc~ object to work. If you do not have an audio interface connected it will use the built-in microphone.</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
