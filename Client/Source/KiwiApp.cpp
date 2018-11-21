@@ -109,6 +109,8 @@ namespace kiwi
         
         declareObjectViews();
         
+        initRessources();
+        
         juce::Desktop::getInstance().setGlobalScaleFactor(1.);
         
         juce::LookAndFeel::setDefaultLookAndFeel(&m_looknfeel);
@@ -373,6 +375,68 @@ namespace kiwi
     {
         static const auto examples = getKiwiRessourcesDirectory().getChildFile("examples");
         return examples;
+    }
+    
+    void KiwiApp::initRessources()
+    {
+        // initialise help file aliases, ex:
+        // helpfile > < operators
+        // will associate classname "<" and ">" to helpfile "operators.kiwihelp"
+        
+        static const auto help_aliases_filename = "help-alias.txt";
+        m_help_aliases.clear();
+        
+        const auto help_dir = KiwiApp::use().getKiwiObjectHelpDirectory();
+        const auto help_aliases_file = help_dir.getChildFile(help_aliases_filename);
+        if(help_aliases_file.existsAsFile())
+        {
+            static const auto help_extension = ".kiwihelp";
+            
+            juce::StringArray lines;
+            help_aliases_file.readLines(lines);
+            for (auto& line : lines)
+            {
+                auto tokens = juce::StringArray::fromTokens(line, " ", "\"");
+                if(tokens.size() >= 3 && tokens[0] == "helpfile")
+                {
+                    auto const& file_token = tokens.getReference(tokens.size() - 1);
+                    auto help_file = help_dir.getChildFile(file_token.unquoted() + help_extension);
+                    if(help_file.existsAsFile())
+                    {
+                        for(int i = 1; i < tokens.size() - 1; ++i)
+                        {
+                            m_help_aliases.emplace(tokens[i].toStdString(), help_file);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    juce::File KiwiApp::findHelpFile(std::string const& classname) const
+    {
+        static const auto help_extension = ".kiwihelp";
+        const auto help_dir = KiwiApp::use().getKiwiObjectHelpDirectory();
+        
+        auto help_file = help_dir.getChildFile(classname + help_extension);
+        if(help_file.existsAsFile())
+        {
+            return help_file;
+        }
+        
+        // look for aliases help file name
+        
+        const auto alias = m_help_aliases.find(classname);
+        if(alias != m_help_aliases.cend())
+        {
+            help_file = alias->second;
+            if(help_file.existsAsFile())
+            {
+                return help_file;
+            }
+        }
+        
+        return {};
     }
     
     void KiwiApp::setAuthUser(Api::AuthUser const& auth_user)

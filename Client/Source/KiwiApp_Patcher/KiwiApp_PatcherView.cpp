@@ -1043,10 +1043,9 @@ namespace kiwi
             if(auto const* obj = doc.get<model::Object>(*m_local_objects_selection.begin()))
             {
                 auto const& obj_class = obj->getClass();
-                auto const& class_name = obj_class.getName();
+                auto const& classname = obj_class.getName();
                 
-                const auto help_file = KiwiApp::use().getKiwiObjectHelpDirectory()
-                .getChildFile(class_name + ".kiwihelp");
+                auto help_file = KiwiApp::use().findHelpFile(classname);
                 
                 if(help_file.existsAsFile())
                 {
@@ -1054,7 +1053,7 @@ namespace kiwi
                 }
                 else
                 {
-                    KiwiApp::error("can't find " + class_name + " help file");
+                    KiwiApp::error("can't find " + classname + " help file");
                 }
             }
         }

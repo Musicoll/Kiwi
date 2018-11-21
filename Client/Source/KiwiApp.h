@@ -114,6 +114,9 @@ namespace kiwi
         //! @brief Returns the Kiwi examples directory.
         juce::File getKiwiExamplesDirectory();
         
+        //! @brief Try to find a help file given an object class name.
+        juce::File findHelpFile(std::string const& classname) const;
+        
         //! @brief Sets the auth user.
         static void setAuthUser(Api::AuthUser const& auth_user);
         
@@ -235,6 +238,9 @@ namespace kiwi
         
     private: // methods
         
+        //! @internal Initialise ressource stuffs at startup
+        void initRessources();
+        
         //! @internal Returns true if the App is compatible with a given server version.
         bool canConnectToServerVersion(std::string const& server_version);
         
@@ -309,5 +315,7 @@ namespace kiwi
         
         int m_num_help_files = 0;
         int m_num_example_files = 0;
+        
+        std::map<std::string, juce::File> m_help_aliases {};
     };
 }
