@@ -105,8 +105,14 @@ namespace kiwi
         //! @brief Gets the application scheduler.
         static tool::Scheduler<>& useScheduler();
         
+        //! @brief Returns the Kiwi ressources directory.
+        juce::File getKiwiRessourcesDirectory();
+        
         //! @brief Returns the Kiwi object Help directory.
         juce::File getKiwiObjectHelpDirectory();
+        
+        //! @brief Returns the Kiwi examples directory.
+        juce::File getKiwiExamplesDirectory();
         
         //! @brief Sets the auth user.
         static void setAuthUser(Api::AuthUser const& auth_user);
@@ -266,6 +272,18 @@ namespace kiwi
         //! @brief Get the list of help files.
         juce::Array<juce::File> getSortedObjectHelpFilesInDirectory(juce::File const& directory) const noexcept;
         
+        //! @brief Create examples popup menu
+        void createExamplesPopupMenu(juce::PopupMenu& menu) noexcept;
+
+        //! @brief Get the list of example directories.
+        juce::Array<juce::File> getSortedExampleDirectories() noexcept;
+        
+        //! @brief Get the list of example files in directory.
+        juce::Array<juce::File> getSortedExampleFilesInDirectory(juce::File const& directory) const noexcept;
+        
+        //! @brief Find and launch an example file.
+        void findAndOpenExample(int selected_index);
+        
     private: // members
         
         enum TimerIds : int
@@ -290,5 +308,6 @@ namespace kiwi
         std::string m_last_server_version_check {};
         
         int m_num_help_files = 0;
+        int m_num_example_files = 0;
     };
 }

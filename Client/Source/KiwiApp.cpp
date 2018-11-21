@@ -61,7 +61,8 @@ namespace kiwi
     //==============================================================================
     enum
     {
-        objectHelpBaseID = 100
+        objectHelpBaseID = 100,
+        examplesBaseID = 300
     };
     
     // ================================================================================ //
@@ -350,16 +351,28 @@ namespace kiwi
         return *KiwiApp::use().m_scheduler;
     }
     
-    juce::File KiwiApp::getKiwiObjectHelpDirectory()
+    juce::File KiwiApp::getKiwiRessourcesDirectory()
     {
         using juce::File;
         const auto apppath = File::getSpecialLocation(File::SpecialLocationType::currentApplicationFile);
         
 #if JUCE_MAC
-        return apppath.getChildFile("Contents/Resources/helps");
+        return apppath.getChildFile("Contents/Resources");
 #else
-        return apppath.getChildFile("helps");
+        return apppath;
 #endif
+    }
+    
+    juce::File KiwiApp::getKiwiObjectHelpDirectory()
+    {
+        static const auto helps = getKiwiRessourcesDirectory().getChildFile("helps");
+        return helps;
+    }
+    
+    juce::File KiwiApp::getKiwiExamplesDirectory()
+    {
+        static const auto examples = getKiwiRessourcesDirectory().getChildFile("examples");
+        return examples;
     }
     
     void KiwiApp::setAuthUser(Api::AuthUser const& auth_user)
@@ -739,6 +752,15 @@ namespace kiwi
             }
         }
         
+        {
+            juce::PopupMenu examples_submenu;
+            createExamplesPopupMenu(examples_submenu);
+            if(m_num_example_files > 0)
+            {
+                menu.addSubMenu("Examples", examples_submenu);
+            }
+        }
+        
         menu.addSeparator();
         menu.addCommandItem(m_command_manager.get(), CommandIDs::showDocumentationOnline);
     }
@@ -749,15 +771,9 @@ namespace kiwi
         {
             findAndOpenHelpFile(menu_item_ID - objectHelpBaseID);
         }
-    }
-    
-    void KiwiApp::findAndOpenHelpFile(int selected_index)
-    {
-        const auto help_files = getSortedObjectHelpFilesInDirectory(getKiwiObjectHelpDirectory());
-        
-        if (selected_index < help_files.size())
+        else if (menu_item_ID >= examplesBaseID && menu_item_ID < (examplesBaseID + m_num_help_files))
         {
-            useInstance().openFile(help_files.getUnchecked(selected_index));
+            findAndOpenExample(menu_item_ID - examplesBaseID);
         }
     }
     
@@ -769,6 +785,16 @@ namespace kiwi
         {
             menu.addItem(objectHelpBaseID + m_num_help_files, f.getFileNameWithoutExtension());
             ++m_num_help_files;
+        }
+    }
+    
+    void KiwiApp::findAndOpenHelpFile(int selected_index)
+    {
+        const auto help_files = getSortedObjectHelpFilesInDirectory(getKiwiObjectHelpDirectory());
+        
+        if (selected_index < help_files.size())
+        {
+            useInstance().openFile(help_files.getUnchecked(selected_index));
         }
     }
     
@@ -787,6 +813,84 @@ namespace kiwi
         help_files.sort();
         
         return help_files;
+    }
+    
+    void KiwiApp::createExamplesPopupMenu(juce::PopupMenu& menu) noexcept
+    {
+        m_num_example_files = 0;
+        for (auto& dir : getSortedExampleDirectories())
+        {
+            juce::PopupMenu m;
+            for (auto& f : getSortedExampleFilesInDirectory (dir))
+            {
+                m.addItem (examplesBaseID + m_num_example_files, f.getFileNameWithoutExtension());
+                ++m_num_example_files;
+            }
+            
+            menu.addSubMenu (dir.getFileName(), m);
+        }
+    }
+    
+    juce::Array<juce::File> KiwiApp::getSortedExampleDirectories() noexcept
+    {
+        juce::Array<juce::File> example_directories;
+        
+        const auto examples_dir = getKiwiExamplesDirectory();
+        
+        if (! examples_dir.exists() || ! examples_dir.isDirectory() || ! examples_dir.containsSubDirectories())
+            return {};
+        
+        juce::DirectoryIterator iter (examples_dir, false, "*", juce::File::findDirectories);
+        while (iter.next())
+        {
+            auto example_directory = iter.getFile();
+            
+            if (example_directory.getNumberOfChildFiles (juce::File::findFiles
+                                                         | juce::File::ignoreHiddenFiles) > 0)
+            {
+                example_directories.add (example_directory);
+            }
+        }
+        
+        example_directories.sort();
+        
+        return example_directories;
+    }
+    
+    juce::Array<juce::File> KiwiApp::getSortedExampleFilesInDirectory(juce::File const& directory) const noexcept
+    {
+        juce::Array<juce::File> example_files;
+        
+        juce::DirectoryIterator iter (directory, false, "*.kiwi", juce::File::findFiles);
+        while (iter.next())
+            example_files.add(iter.getFile());
+        
+        example_files.sort();
+        
+        return example_files;
+    }
+    
+    void KiwiApp::findAndOpenExample(int selected_index)
+    {
+        juce::File example;
+        
+        for (auto& dir : getSortedExampleDirectories())
+        {
+            auto example_files = getSortedExampleFilesInDirectory(dir);
+            
+            if (selected_index < example_files.size())
+            {
+                example = example_files.getUnchecked(selected_index);
+                break;
+            }
+            
+            selected_index -= example_files.size();
+        }
+        
+        // example doesn't exist?
+        assert(example != juce::File());
+        
+        useInstance().openFile(example);
     }
     
     //==============================================================================
