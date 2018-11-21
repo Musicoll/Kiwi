@@ -108,26 +108,13 @@ namespace kiwi
             {
                 if(hit_tester.objectTouched() && hit_tester.getZone() == HitTester::Zone::Inside)
                 {
-                    ObjectFrame & object = *hit_tester.getObject();
-                    
-                    if (!m_patcher_view.isSelected(object))
-                    {
-                        m_patcher_view.selectObject(object);
-                    }
-                    
+                    auto& object = *hit_tester.getObject();
                     const auto pos = e.getPosition() - m_patcher_view.useViewport().getOriginPosition();
-                    
                     m_patcher_view.showObjectPopupMenu(object, pos);
                 }
                 else if (hit_tester.linkTouched() && hit_tester.getZone() == HitTester::Zone::Inside)
                 {
-                    LinkView& link_view = *hit_tester.getLink();
-                    
-                    if (!m_patcher_view.isSelected(link_view))
-                    {
-                        m_patcher_view.selectLink(link_view);
-                    }
-                    
+                    auto& link_view = *hit_tester.getLink();
                     const auto pos = e.getPosition() - m_patcher_view.useViewport().getOriginPosition();
                     
                     m_patcher_view.showLinkPopupMenu(link_view, pos);
@@ -480,13 +467,13 @@ namespace kiwi
                         {
                             startAction(Action::None, e);
                         }
-                        else if(was_selected && !e.mods.isShiftDown())
-                        {
-                            startAction(Action::EditObject, e);
-                        }
                         else if(e.mods.isPopupMenu())
                         {
                             startAction(Action::PopupMenu, e);
+                        }
+                        else if(was_selected && !e.mods.isShiftDown())
+                        {
+                            startAction(Action::EditObject, e);
                         }
                         else
                         {
@@ -545,7 +532,7 @@ namespace kiwi
         {
             startAction(Action::SwitchLock, e);
         }
-        else if(e.mods.isRightButtonDown())
+        else if(e.mods.isPopupMenu())
         {
             startAction(Action::PopupMenu, e);
         }
