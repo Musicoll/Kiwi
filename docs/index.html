@@ -13,7 +13,7 @@
 /*# sourceMappingURL=bootstrap.min.css.map */</style>
 <style>/*
 
-Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiacs.Org>
+Original highlight.js style (c) Ivan Sagalaev <maniac@softwaremaniacs.org>
 
 */
 
@@ -21,150 +21,94 @@ Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiac
   display: block;
   overflow-x: auto;
   padding: 0.5em;
-  background: #f0f0f0;
-  -webkit-text-size-adjust: none;
+  background: #F0F0F0;
 }
+
+
+/* Base color: saturation 0; */
 
 .hljs,
-.hljs-subst,
-.hljs-tag .hljs-title,
-.nginx .hljs-title {
-  color: black;
+.hljs-subst {
+  color: #444;
 }
 
-.hljs-string,
-.hljs-title,
-.hljs-constant,
-.hljs-parent,
-.hljs-tag .hljs-value,
-.hljs-rule .hljs-value,
-.hljs-preprocessor,
-.hljs-pragma,
-.hljs-name,
-.haml .hljs-symbol,
-.ruby .hljs-symbol,
-.ruby .hljs-symbol .hljs-string,
-.hljs-template_tag,
-.django .hljs-variable,
-.smalltalk .hljs-class,
-.hljs-addition,
-.hljs-flow,
-.hljs-stream,
-.bash .hljs-variable,
-.pf .hljs-variable,
-.apache .hljs-tag,
-.apache .hljs-cbracket,
-.tex .hljs-command,
-.tex .hljs-special,
-.erlang_repl .hljs-function_or_atom,
-.asciidoc .hljs-header,
-.markdown .hljs-header,
-.coffeescript .hljs-attribute,
-.tp .hljs-variable {
-  color: #800;
-}
-
-.smartquote,
-.hljs-comment,
-.hljs-annotation,
-.diff .hljs-header,
-.hljs-chunk,
-.asciidoc .hljs-blockquote,
-.markdown .hljs-blockquote {
-  color: #888;
-}
-
-.hljs-number,
-.hljs-date,
-.hljs-regexp,
-.hljs-literal,
-.hljs-hexcolor,
-.smalltalk .hljs-symbol,
-.smalltalk .hljs-char,
-.go .hljs-constant,
-.hljs-change,
-.lasso .hljs-variable,
-.makefile .hljs-variable,
-.asciidoc .hljs-bullet,
-.markdown .hljs-bullet,
-.asciidoc .hljs-link_url,
-.markdown .hljs-link_url {
-  color: #080;
-}
-
-.hljs-label,
-.ruby .hljs-string,
-.hljs-decorator,
-.hljs-filter .hljs-argument,
-.hljs-localvars,
-.hljs-array,
-.hljs-attr_selector,
-.hljs-important,
-.hljs-pseudo,
-.hljs-pi,
-.haml .hljs-bullet,
-.hljs-doctype,
-.hljs-deletion,
-.hljs-envvar,
-.hljs-shebang,
-.apache .hljs-sqbracket,
-.nginx .hljs-built_in,
-.tex .hljs-formula,
-.erlang_repl .hljs-reserved,
-.hljs-prompt,
-.asciidoc .hljs-link_label,
-.markdown .hljs-link_label,
-.vhdl .hljs-attribute,
-.clojure .hljs-attribute,
-.asciidoc .hljs-attribute,
-.lasso .hljs-attribute,
-.coffeescript .hljs-property,
-.hljs-phony {
-  color: #88f;
+.hljs-comment {
+  color: #888888;
 }
 
 .hljs-keyword,
-.hljs-id,
-.hljs-title,
-.hljs-built_in,
-.css .hljs-tag,
+.hljs-attribute,
+.hljs-selector-tag,
+.hljs-meta-keyword,
 .hljs-doctag,
-.smalltalk .hljs-class,
-.hljs-winutils,
-.bash .hljs-variable,
-.pf .hljs-variable,
-.apache .hljs-tag,
-.hljs-type,
-.hljs-typename,
-.tex .hljs-command,
-.asciidoc .hljs-strong,
-.markdown .hljs-strong,
-.hljs-request,
-.hljs-status,
-.tp .hljs-data,
-.tp .hljs-io {
+.hljs-name {
   font-weight: bold;
 }
 
-.asciidoc .hljs-emphasis,
-.markdown .hljs-emphasis,
-.tp .hljs-units {
+
+/* User color: hue: 0 */
+
+.hljs-type,
+.hljs-string,
+.hljs-number,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-quote,
+.hljs-template-tag,
+.hljs-deletion {
+  color: #880000;
+}
+
+.hljs-title,
+.hljs-section {
+  color: #880000;
+  font-weight: bold;
+}
+
+.hljs-regexp,
+.hljs-symbol,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-link,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: #BC6060;
+}
+
+
+/* Language color: hue: 90; */
+
+.hljs-literal {
+  color: #78A960;
+}
+
+.hljs-built_in,
+.hljs-bullet,
+.hljs-code,
+.hljs-addition {
+  color: #397300;
+}
+
+
+/* Meta color: hue: 200 */
+
+.hljs-meta {
+  color: #1f7199;
+}
+
+.hljs-meta-string {
+  color: #4d99bf;
+}
+
+
+/* Misc effects */
+
+.hljs-emphasis {
   font-style: italic;
 }
 
-.nginx .hljs-built_in {
-  font-weight: normal;
-}
-
-.coffeescript .javascript,
-.javascript .xml,
-.lasso .markup,
-.tex .hljs-formula,
-.xml .javascript,
-.xml .vbscript,
-.xml .css,
-.xml .hljs-cdata {
-  opacity: 0.5;
+.hljs-strong {
+  font-weight: bold;
 }
 </style>
 <style>/*
@@ -179,98 +123,74 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
   padding: 0.5em;
   color: #333;
   background: #f8f8f8;
-  -webkit-text-size-adjust: none;
 }
 
 .hljs-comment,
-.diff .hljs-header {
+.hljs-quote {
   color: #998;
   font-style: italic;
 }
 
 .hljs-keyword,
-.css .rule .hljs-keyword,
-.hljs-winutils,
-.nginx .hljs-title,
-.hljs-subst,
-.hljs-request,
-.hljs-status {
+.hljs-selector-tag,
+.hljs-subst {
   color: #333;
   font-weight: bold;
 }
 
 .hljs-number,
-.hljs-hexcolor,
-.ruby .hljs-constant {
+.hljs-literal,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag .hljs-attr {
   color: #008080;
 }
 
 .hljs-string,
-.hljs-tag .hljs-value,
-.hljs-doctag,
-.tex .hljs-formula {
+.hljs-doctag {
   color: #d14;
 }
 
 .hljs-title,
-.hljs-id,
-.scss .hljs-preprocessor {
+.hljs-section,
+.hljs-selector-id {
   color: #900;
   font-weight: bold;
 }
 
-.hljs-list .hljs-keyword,
 .hljs-subst {
   font-weight: normal;
 }
 
-.hljs-class .hljs-title,
 .hljs-type,
-.vhdl .hljs-literal,
-.tex .hljs-command {
+.hljs-class .hljs-title {
   color: #458;
   font-weight: bold;
 }
 
 .hljs-tag,
-.hljs-tag .hljs-title,
-.hljs-rule .hljs-property,
-.django .hljs-tag .hljs-keyword {
+.hljs-name,
+.hljs-attribute {
   color: #000080;
   font-weight: normal;
 }
 
-.hljs-attribute,
-.hljs-variable,
-.lisp .hljs-body,
-.hljs-name {
-  color: #008080;
-}
-
-.hljs-regexp {
+.hljs-regexp,
+.hljs-link {
   color: #009926;
 }
 
 .hljs-symbol,
-.ruby .hljs-symbol .hljs-string,
-.lisp .hljs-keyword,
-.clojure .hljs-keyword,
-.scheme .hljs-keyword,
-.tex .hljs-special,
-.hljs-prompt {
+.hljs-bullet {
   color: #990073;
 }
 
-.hljs-built_in {
+.hljs-built_in,
+.hljs-builtin-name {
   color: #0086b3;
 }
 
-.hljs-preprocessor,
-.hljs-pragma,
-.hljs-pi,
-.hljs-doctype,
-.hljs-shebang,
-.hljs-cdata {
+.hljs-meta {
   color: #999;
   font-weight: bold;
 }
@@ -283,12 +203,12 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
   background: #dfd;
 }
 
-.diff .hljs-change {
-  background: #0086b3;
+.hljs-emphasis {
+  font-style: italic;
 }
 
-.hljs-chunk {
-  color: #aaa;
+.hljs-strong {
+  font-weight: bold;
 }
 </style>
 <style> /*General for HTML and PDF*/
@@ -781,7 +701,7 @@ this.activeTarget=b,this.clear();var c=this.selector+'[data-target="'+b+'"],'+th
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-
+          
         </div><!--/.nav-collapse -->
       </div>
     </div>
@@ -789,12 +709,12 @@ this.activeTarget=b,this.clear();var c=this.selector+'[data-target="'+b+'"],'+th
       <div class="row">
         <div class="col-md-3">
           <div class="nav-container">
-            <div class="nav-inner" id="scroll-spy">
+            <div class="nav-inner" id="scroll-spy" style="width: min-content; overflow: auto; top: 60px; bottom: 0; padding 10px 0 10px 0;">
               <span class="toc"></span>
               <h1 id="english">English</h1>
-<ul class="nav"><li class="active"><a href="#getting-started-en">Getting Started</a></li><li><a href="#objects-en">Objects List</a></li><li><a href="#tutorials-en">Tutorials</a></li></ul><h1 id="fran-ais">Français</h1>
-<ul class="nav"><li><a href="#getting-started-fr">Premiers pas</a></li><li><a href="#objects-fr">Liste des objets</a></li><li><a href="#tutorials-fr">Tutoriels</a></li></ul>
-
+<ul class="nav"><li class="active"><a href="#getting-started-en">Getting Started</a></li><li><a href="#objects-en">Objects List</a></li><li><a href="#examples-en">Examples</a></li></ul><h1 id="fran-ais">Français</h1>
+<ul class="nav"><li><a href="#getting-started-fr">Premiers pas</a></li><li><a href="#objects-fr">Liste des objets</a></li><li><a href="#exemples-fr">Exemples</a></li></ul>
+              
             </div>
           </div>
         </div>
@@ -803,13 +723,13 @@ this.activeTarget=b,this.clear();var c=this.selector+'[data-target="'+b+'"],'+th
         <div class="col-md-9">
 <p class="page" id="getting-started-en"></p><h1>Getting Started</h1>
 <h2 id="download">Download</h2>
-<p>Download the latest Kiwi application for your operating system and the documentation from the <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>. You&#39;ll find a version for each operating system, a list of help patches that describes the objects&#39; behaviour and a set of tutorials guiding through creating certain audio processing.</p>
+<p>Download the latest Kiwi application for your operating system and the documentation from the <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>. You&#39;ll find a version for each operating system, a list of help patches that describes the objects&#39; behaviour and a set of examples guiding through creating certain audio processing.</p>
 <h2 id="compatibility">Compatibility</h2>
 <p>Kiwi is compatible with the three main operating system.</p>
 <ul>
 <li>Macos : version 10.7 and later.</li>
 <li>Windows : windows 7 and later.</li>
-<li>Linus : tested with ubuntu 14.04</li>
+<li>Linux : tested with ubuntu 14.04</li>
 </ul>
 <h2 id="installing">Installing</h2>
 <p>Once download is complete, the corresponding archive shall be extracted by double clicking on it. A Kiwi folder containing the application is then created. On macos and linux copy the application to your app folder (Application folder on Mac, /usr/bin on linux). Windows users may execute the installer.</p>
@@ -1197,36 +1117,54 @@ this.activeTarget=b,this.clear();var c=this.selector+'[data-target="'+b+'"],'+th
 <td style="text-align:center"></td>
 <td>Edit and run FAUST code</td>
 </tr>
+<tr>
+<td><strong>route</strong></td>
+<td style="text-align:center"></td>
+<td>Route messages according to the first element</td>
+</tr>
+<tr>
+<td><strong>OSC.receive</strong></td>
+<td style="text-align:center"></td>
+<td>Receive Open Sound Control messages</td>
+</tr>
+<tr>
+<td><strong>OSC.send</strong></td>
+<td style="text-align:center"></td>
+<td>Send Open Sound Control messages</td>
+</tr>
 </tbody>
 </table>
-<p class="page" id="tutorials-en"></p><h1>Tutorials</h1>
-<p>A set of tutorials is provided in the documentation folder. If you didn&#39;t download the documentation yet, you can find it on this <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>. Each tutorial aims at taking you through the creation of a specific audio processing or exploring a certain aspect of Kiwi software.</p>
-<p>Available tutorials:</p>
+<p class="page" id="examples-en"></p><h1>Examples</h1>
+<p>A set of examples is provided in the documentation folder. If you didn&#39;t download the documentation yet, you can find it on this <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>. Each example aims at taking you through the creation of a specific audio processing or exploring a certain aspect of Kiwi software.</p>
+<p>Available examples:</p>
 <ul>
-<li>first-patch</li>
-<li>mooc  <ol>
-<li>simple delay line</li>
-<li>play and record sound files</li>
-<li>chowning FM synthesis</li>
-<li>risset’s bell</li>
-<li>granular on a delay line</li>
-<li>from Stockhausen’s Kontakte</li>
-</ol>
+<li>Fx  <ul>
+<li>flanger</li>
+<li>granular</li>
+<li>overlapped pitchshifter</li>
+<li>simple delay</li>
+<li>simple pitchshifter</li>
+</ul>
+</li>
+<li>synthesis<ul>
+<li>additive synthesis</li>
+<li>Chowning FM</li>
+<li>Kontakte</li>
+<li>odd harmonic gen 1</li>
+<li>odd harmonic gen 2</li>
+<li>odd harmonic gen 3</li>
+<li>odd harmonic gen 3</li>
+<li>Risset&#39;s Bell</li>
+</ul>
 </li>
 <li>others<ul>
-<li>flanger</li>
-<li>sound generators gen01</li>
-<li>sound generators gen02</li>
-<li>sound generators gen03</li>
-<li>sound generators gen04</li>
-<li>simple pitchshifter</li>
-<li>overlapped pitchshifter</li>
+<li>play and record files</li>
 </ul>
 </li>
 </ul>
 <p class="page" id="getting-started-fr"></p><h1>Premiers pas</h1>
 <h2 id="t-l-chargement">Téléchargement</h2>
-<p>Le dernière version de l&#39;application Kiwi et sa documentation sont disponibles sur cette <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>. On y trouve une version pour chaque système d&#39;exploitation, une liste de patchs d&#39;aide qui montrent le comportement des objets, et un ensemble de tutoriaux pour guider le lecteur dans la création de certains traitements audionumériques temps réel.</p>
+<p>Le dernière version de l&#39;application Kiwi et sa documentation sont disponibles sur cette <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>. On y trouve une version pour chaque système d&#39;exploitation, une liste de patchs d&#39;aide qui montrent le comportement des objets, et un ensemble d&#39;exemples pour guider le lecteur dans la création de certains traitements audionumériques temps réel.</p>
 <h2 id="compatibilit-">Compatibilité</h2>
 <p>Kiwi est compatible avec les trois systèmes d&#39;exploitation principaux :</p>
 <ul>
@@ -1621,30 +1559,48 @@ Parfois les patchs d&#39;aide regroupent plusieurs objets liés fonctionnellemen
 <td style="text-align:center"></td>
 <td>Edite et joue du code FAUST</td>
 </tr>
+<tr>
+<td><strong>route</strong></td>
+<td style="text-align:center"></td>
+<td>Route les messages en fonction du premier élement</td>
+</tr>
+<tr>
+<td><strong>OSC.receive</strong></td>
+<td style="text-align:center"></td>
+<td>Reception de messages Open Sound Control</td>
+</tr>
+<tr>
+<td><strong>OSC.send</strong></td>
+<td style="text-align:center"></td>
+<td>Envoi de messages Open Sound Control</td>
+</tr>
 </tbody>
 </table>
-<p class="page" id="tutorials-fr"></p><h1>Tutoriels</h1>
-<p>Un ensemble de tutoriels est disponible dans le dossier de documentation. Si vous n&#39;avez pas encore la documentation, vous pouvez la télécharger sur cette <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>. Chaque tutorial présente un traitement audio spécifique ou un certain aspect du logiciel Kiwi.</p>
-<p>Tutoriaux disponibles:</p>
+<p class="page" id="exemples-fr"></p><h1>Exemples</h1>
+<p>Un ensemble d&#39;exemples est disponible dans le dossier de documentation. Si vous n&#39;avez pas encore la documentation, vous pouvez la télécharger sur cette <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>. Chaque exemple présente un traitement audio spécifique ou un certain aspect du logiciel Kiwi.</p>
+<p>Exemples disponibles:</p>
 <ul>
-<li>premier patch (first-patch)</li>
-<li>mooc  <ol>
-<li>ligne à retard simple</li>
-<li>lecture et enregistrement de fichiers</li>
-<li>synthèse FM d’après Chowning</li>
-<li>cloche de Risset</li>
-<li>granulateur sur ligne à retard</li>
-<li>d’après Kontakte de Stockhausen</li>
-</ol>
-</li>
-<li>autres<ul>
+<li>Fx  <ul>
 <li>flanger</li>
-<li>générateurs sonores gen01</li>
-<li>générateurs sonores gen02</li>
-<li>générateurs sonores gen03</li>
-<li>générateurs sonores gen04</li>
-<li>pitchshifter simple</li>
-<li>pitchshifter avec recouvrement</li>
+<li>granular</li>
+<li>overlapped pitchshifter</li>
+<li>simple delay</li>
+<li>simple pitchshifter</li>
+</ul>
+</li>
+<li>synthesis<ul>
+<li>additive synthesis</li>
+<li>Chowning FM</li>
+<li>Kontakte</li>
+<li>odd harmonic gen 1</li>
+<li>odd harmonic gen 2</li>
+<li>odd harmonic gen 3</li>
+<li>odd harmonic gen 3</li>
+<li>Risset&#39;s Bell</li>
+</ul>
+</li>
+<li>others<ul>
+<li>play and record files</li>
 </ul>
 </li>
 </ul>

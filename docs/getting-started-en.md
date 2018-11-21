@@ -1,6 +1,6 @@
 ## Download
 
-Download the latest Kiwi application for your operating system and the documentation from the [page](https://github.com/Musicoll/Kiwi/releases/latest). You'll find a version for each operating system, a list of help patches that describes the objects' behaviour and a set of tutorials guiding through creating certain audio processing.
+Download the latest Kiwi application for your operating system and the documentation from the [page](https://github.com/Musicoll/Kiwi/releases/latest). You'll find a version for each operating system, a list of help patches that describes the objects' behaviour and a set of examples guiding through creating certain audio processing.
 
 ## Compatibility
 
@@ -8,7 +8,7 @@ Kiwi is compatible with the three main operating system.
 
 - Macos : version 10.7 and later.
 - Windows : windows 7 and later.
-- Linus : tested with ubuntu 14.04
+- Linux : tested with ubuntu 14.04
 
 ## Installing
 
