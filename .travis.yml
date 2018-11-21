@@ -66,7 +66,7 @@ matrix:
     - mv Build/KiwiBuild/Kiwi Kiwi/Kiwi
     - mv documentation.zip Kiwi/documentation.zip
     - mkdir Kiwi/Faust
-    - cp -r ThirdParty/faust/libraries Kiwi/Faust/Libs
+    - cp -r ThirdParty/faust/libraries Kiwi/libs/faust
     - zip -r Kiwi-linux-64.zip Kiwi
     - mkdir KiwiServer && mv Build/KiwiBuild/Server KiwiServer/Server
     - zip -r Kiwi-server-linux-64.zip KiwiServer

@@ -160,10 +160,7 @@ set(KIWI_ENGINE_COMPILE_DEFINITIONS ${KIWI_MODEL_COMPILE_DEFINITIONS} ${KIWI_DSP
 set(KIWI_ENGINE_LINK_LIBRARIES ${KIWI_MODEL_LINK_LIBRARIES} KiwiModel KiwiDsp ${JUCE_LINK_LIBRARIES} Juce staticlib)
 
 
-file(GLOB KIWI_ENGINE_SOURCES ${KIWI_MODULE_INCLUDE_DIRS}/KiwiEngine/*.[c|h]pp
-														  ${KIWI_MODULE_INCLUDE_DIRS}/KiwiEngine/*.h
-														  ${KIWI_MODULE_INCLUDE_DIRS}/KiwiEngine/KiwiEngine_Objects/*.[c|h]pp
-														  ${KIWI_MODULE_INCLUDE_DIRS}/KiwiEngine/KiwiEngine_Objects/*.h)
+file(GLOB_RECURSE KIWI_ENGINE_SOURCES ${KIWI_MODULE_INCLUDE_DIRS}/KiwiEngine)
 add_library(KiwiEngine STATIC ${KIWI_ENGINE_SOURCES})
 add_dependencies(KiwiEngine ${KIWI_ENGINE_DEPENDENCIES})
 target_include_directories(KiwiEngine PUBLIC ${KIWI_ENGINE_INCLUDE_DIRS})
@@ -209,11 +206,7 @@ if (APPLE)
 	set(KIWI_PATCHER_FILETYPE_ICON ${KIWI_RESSOURCES_DIR}/Project/XCode/kiwi_filetype.icns)
 	set(KIWI_PLIST ${KIWI_RESSOURCES_DIR}/Project/XCode/Info.plist)
 	set_source_files_properties(${KIWI_APP_ICON} ${KIWI_PATCHER_FILETYPE_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-
-    file(GLOB_RECURSE FAUST_LIB_RESOURCE ${KIWI_DEPENDENCIES_DIR}/faust/libraries/*.lib)
-    set_source_files_properties(${FAUST_LIB_RESOURCE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/Faust/Libs")
-
-    set(KIWI_CLIENT_RESSOURCES ${KIWI_APP_ICON} ${KIWI_PATCHER_FILETYPE_ICON} ${KIWI_PLIST} ${FAUST_LIB_RESOURCE})
+    set(KIWI_CLIENT_RESSOURCES ${KIWI_APP_ICON} ${KIWI_PATCHER_FILETYPE_ICON} ${KIWI_PLIST})
 
 elseif(WIN32)
 	set(KIWI_CLIENT_RESSOURCES ${KIWI_RESSOURCES_DIR}/Project/VisualStudio15/Kiwi.rc)
@@ -234,17 +227,24 @@ target_link_libraries(Kiwi PUBLIC ${KIWI_CLIENT_LINK_LIBRARIES})
 if (APPLE)
 	set_target_properties(Kiwi PROPERTIES MACOSX_BUNDLE TRUE MACOSX_BUNDLE_INFO_PLIST ${KIWI_PLIST})
 
-    # Copy ressources to bundle
-	set(KIWI_HELPS_RESOURCE ${PROJECT_SOURCE_DIR}/docs/helps)
-	set(KIWI_EXAMPLES_RESOURCE ${PROJECT_SOURCE_DIR}/docs/examples)
-
+	# Copy ressources to bundle
 	set(KIWI_APP_BUNDLE_RESSOURCES $<TARGET_BUNDLE_CONTENT_DIR:Kiwi>/Resources)
 
-	add_custom_command(TARGET Kiwi POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory
-                       ${KIWI_HELPS_RESOURCE} "${KIWI_APP_BUNDLE_RESSOURCES}/helps")
+	set(KIWI_HELPS_RESOURCE ${PROJECT_SOURCE_DIR}/docs/helps)
+	set(KIWI_EXAMPLES_RESOURCE ${PROJECT_SOURCE_DIR}/docs/examples)
+    set(FAUST_LIB_RESOURCE ${KIWI_DEPENDENCIES_DIR}/faust/libraries)
 
 	add_custom_command(TARGET Kiwi POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory
-                       ${KIWI_EXAMPLES_RESOURCE} "${KIWI_APP_BUNDLE_RESSOURCES}/examples")
+		${KIWI_HELPS_RESOURCE} "${KIWI_APP_BUNDLE_RESSOURCES}/helps"
+	)
+
+	add_custom_command(TARGET Kiwi POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${KIWI_EXAMPLES_RESOURCE} "${KIWI_APP_BUNDLE_RESSOURCES}/examples"
+	)
+
+	add_custom_command(TARGET Kiwi POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${FAUST_LIB_RESOURCE} "${KIWI_APP_BUNDLE_RESSOURCES}/libs/faust"
+	)
 
 elseif(WIN32)
 	if (CMAKE_CL_64)
