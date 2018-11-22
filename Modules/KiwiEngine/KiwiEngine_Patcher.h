@@ -22,7 +22,6 @@
 #pragma once
 
 #include <map>
-#include <set>
 #include <flip/Ref.h>
 
 #include <KiwiTool/KiwiTool_Beacon.h>
@@ -34,145 +33,132 @@
 
 #include <KiwiModel/KiwiModel_PatcherUser.h>
 
-namespace kiwi
-{    
-    namespace engine
+namespace kiwi { namespace engine {
+    
+    // ================================================================================ //
+    //                                      PATCHER                                     //
+    // ================================================================================ //
+    
+    //! @brief The Patcher manages a set of Object and Link.
+    class Patcher
     {
+    private: // classes
+        
+        class CallBack;
+        
+    public: // methods
+        
+        //! @brief Constructor.
+        Patcher(Instance& instance, model::Patcher & patcher_model) noexcept;
+        
+        //! @brief Destructor.
+        ~Patcher();
+        
+        //! @internal The model changed.
+        void modelChanged(model::Patcher const& model);
+        
+        //! @brief Adds a link to the current stack overflow list (or create a new list if there is no).
+        //! @internal Only the Object should use this method.
+        void addStackOverflow(Link const& link);
+        
+        //! @brief Ends a list of stack overflow.
+        //! @internal Only the Object should use this method.
+        void endStackOverflow();
+        
+        //! @brief Gets the lists of stack overflow.
+        std::vector<std::queue<Link const*>> getStackOverflow() const;
+        
+        //! @brief Clears the lists of stack overflow.
+        void clearStackOverflow();
+        
+        //! @brief Returns the audio controler held by the patcher's instance.
+        AudioControler& getAudioControler() const;
+        
+        //! @internal Call the loadbang method of all objects.
+        void sendLoadbang();
+        
+        //! @brief Returns the patcher's data model.
+        model::Patcher & getPatcherModel();
+        
         // ================================================================================ //
-        //                                      PATCHER                                     //
+        //                                      CONSOLE                                     //
         // ================================================================================ //
         
-        //! @brief The Patcher manages a set of Object and Link.
-        class Patcher
-        {
-        private: // classes
-            
-            class CallBack;
-            
-        public: // methods
-            
-            //! @brief Constructor.
-            Patcher(Instance& instance, model::Patcher & patcher_model) noexcept;
-            
-            //! @brief Destructor.
-            ~Patcher();
-            
-            //! @brief Adds an object to the patcher.
-            void addObject(flip::Ref object_id, std::shared_ptr<Object> object);
-            
-            //! @brief Removes an object from the patcher.
-            void removeObject(flip::Ref object_id);
-            
-            //! @brief Adds a link between to object of the patcher.
-            void addLink(flip::Ref from_id, size_t outlet, flip::Ref to_id, size_t inlet, bool is_signal);
-            
-            //! @brief Removes a link between two objects.
-            void removeLink(flip::Ref from_id, size_t outlet, flip::Ref to_id, size_t inlet, bool is_signal);
-            
-            //! @brief Updates the dsp chain held by the engine patcher
-            void updateChain();
-            
-            //! @internal The model changed.
-            void modelChanged(model::Patcher const& model);
-            
-            //! @brief Adds a link to the current stack overflow list (or create a new list if there is no).
-            //! @internal Only the Object should use this method.
-            void addStackOverflow(Link const& link);
-            
-            //! @brief Ends a list of stack overflow.
-            //! @internal Only the Object should use this method.
-            void endStackOverflow();
-            
-            //! @brief Gets the lists of stack overflow.
-            std::vector<std::queue<Link const*>> getStackOverflow() const;
-            
-            //! @brief Clears the lists of stack overflow.
-            void clearStackOverflow();
-            
-            //! @brief Returns the audio controler held by the patcher's instance.
-            AudioControler& getAudioControler() const;
-            
-            //! @internal Call the loadbang method of all objects.
-            void sendLoadbang();
-            
-            //! @brief Returns the patcher's data model.
-            model::Patcher & getPatcherModel();
-            
-            // ================================================================================ //
-            //                                      CONSOLE                                     //
-            // ================================================================================ //
-            
-            //! @brief post a log message in the Console.
-            void log(std::string const& text) const;
-            
-            //! @brief post a message in the Console.
-            void post(std::string const& text) const;
-            
-            //! @brief post a warning message in the Console.
-            void warning(std::string const& text) const;
-            
-            //! @brief post an error message in the Console.
-            void error(std::string const& text) const;
-            
-            // ================================================================================ //
-            //                                      SCHEDULER                                   //
-            // ================================================================================ //
-            
-            //! @brief Returns the engine's scheduler.
-            tool::Scheduler<> & getScheduler() const;
-            
-            //! @brief Returns the main scheduler
-            tool::Scheduler<> & getMainScheduler() const;
-            
-            // ================================================================================ //
-            //                                      BEACON                                      //
-            // ================================================================================ //
-            
-            //! @brief Gets or creates a Beacon with a given name.
-            tool::Beacon& getBeacon(std::string const& name) const;
-            
-        private: // methods
-            
-            //! @internal Update the patcher's graph according to datamodel.
-            void updateGraph(model::Patcher const& patcher_model);
-            
-            //! @internal Updates obects' parameters according to there data model.
-            void updateAttributes(model::Patcher const& patcher_model);
-            
-            //! @internal Object model has just been added to the document.
-            void objectAdded(model::Object const& object);
-            
-            //! @internal Object model has changed.
-            void objectChanged(model::Object const& object);
-            
-            //! @internal Object model will be removed from the document.
-            void objectRemoved(model::Object const& object);
-            
-            //! @internal Link model has just been added to the document.
-            void linkAdded(model::Link const& link);
-            
-            //! @internal Link model has changed.
-            void linkChanged(model::Link const& link_m);
-            
-            //! @internal Link model will be removed from the document.
-            void linkRemoved(model::Link const& link_m);
+        //! @brief post a log message in the Console.
+        void log(std::string const& text) const;
         
-        private: // members
-            
-            using SoLinks = std::queue<Link const*>;
-            
-            Instance&                                       m_instance;
-            std::map<flip::Ref, std::shared_ptr<Object>>    m_objects;
-            std::vector<SoLinks>                            m_so_links;
-            dsp::Chain                                      m_chain;
-            model::Patcher &                                m_patcher_model;
-            
-        private: // deleted methods
-            
-            Patcher(Patcher const&) = delete;
-            Patcher(Patcher&&) = delete;
-            Patcher& operator=(Patcher const&) = delete;
-            Patcher& operator=(Patcher&&) = delete;
-        };
-    }
-}
+        //! @brief post a message in the Console.
+        void post(std::string const& text) const;
+        
+        //! @brief post a warning message in the Console.
+        void warning(std::string const& text) const;
+        
+        //! @brief post an error message in the Console.
+        void error(std::string const& text) const;
+        
+        // ================================================================================ //
+        //                                      SCHEDULER                                   //
+        // ================================================================================ //
+        
+        //! @brief Returns the engine's scheduler.
+        tool::Scheduler<> & getScheduler() const;
+        
+        //! @brief Returns the main scheduler
+        tool::Scheduler<> & getMainScheduler() const;
+        
+        // ================================================================================ //
+        //                                      BEACON                                      //
+        // ================================================================================ //
+        
+        //! @brief Gets or creates a Beacon with a given name.
+        tool::Beacon& getBeacon(std::string const& name) const;
+        
+    private: // methods
+        
+        //! @brief Updates the dsp chain held by the engine patcher
+        void updateChain();
+        
+        //! @internal Update the patcher's graph according to datamodel.
+        void updateGraph(model::Patcher const& patcher_model);
+        
+        //! @internal Updates obects' parameters according to there data model.
+        void updateAttributes(model::Patcher const& patcher_model);
+        
+        //! @internal Object model has just been added to the document.
+        void objectAdded(model::Object const& object);
+        
+        //! @internal Object model has changed.
+        void objectChanged(model::Object const& object);
+        
+        //! @internal Object model will be removed from the document.
+        void objectRemoved(model::Object const& object);
+        
+        //! @internal Link model has just been added to the document.
+        void linkAdded(model::Link const& link);
+        
+        //! @internal Link model has changed.
+        void linkChanged(model::Link const& link_m);
+        
+        //! @internal Link model will be removed from the document.
+        void linkRemoved(model::Link const& link_m);
+        
+    private: // members
+        
+        using SoLinks = std::queue<Link const*>;
+        
+        Instance&                                       m_instance;
+        std::map<flip::Ref, std::shared_ptr<Object>>    m_objects {};
+        std::vector<SoLinks>                            m_so_links {};
+        dsp::Chain                                      m_chain {};
+        model::Patcher&                                 m_patcher_model;
+        bool                                            m_dsp_chain_need_update = false;
+        
+    private: // deleted methods
+        
+        Patcher(Patcher const&) = delete;
+        Patcher(Patcher&&) = delete;
+        Patcher& operator=(Patcher const&) = delete;
+        Patcher& operator=(Patcher&&) = delete;
+    };
+    
+}}
