@@ -184,7 +184,7 @@ namespace kiwi
         if(!files.isEmpty())
         {
             juce::File file = files[0];
-            return file.hasFileExtension(".kiwi");
+            return file.hasFileExtension(".kiwi;.kiwihelp");
         }
         
         return false;

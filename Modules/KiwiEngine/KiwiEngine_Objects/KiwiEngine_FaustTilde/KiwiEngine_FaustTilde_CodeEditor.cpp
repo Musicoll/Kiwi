@@ -32,20 +32,20 @@ namespace kiwi { namespace engine {
     
     // ================================================================================ //
     
-    class FaustTilde::CodeEditor :
-    public juce::Component,
-    public juce::CodeDocument::Listener,
-    public juce::Button::Listener,
-    public juce::Timer
+    class FaustTilde::CodeEditor
+    : public juce::Component
+    , public juce::CodeDocument::Listener
+    , public juce::Button::Listener
+    , public juce::Timer
     {
     public:
         
-        CodeEditor(FaustTilde& owner) :
-        m_owner(owner),
-        m_editor(m_document, &m_highlither),
-        m_lock(true),
-        m_code_changed(true),
-        m_error_line(-1)
+        CodeEditor(FaustTilde& owner)
+        : m_owner(owner)
+        , m_editor(m_document, &m_highlither)
+        , m_lock(true)
+        , m_code_changed(true)
+        , m_error_line(-1)
         {
             setBounds(0, 0, 512, 384);
             m_editor.setColour(juce::CodeEditorComponent::backgroundColourId, juce::Colours::white);
@@ -140,7 +140,7 @@ namespace kiwi { namespace engine {
                 m_code_changed = true;
                 computeErrors();
                 m_document.addListener(this);
-                startTimer(1000);
+                startTimer(3000);
             }
             else
             {
@@ -217,18 +217,17 @@ namespace kiwi { namespace engine {
         //! @brief Display the Code editor
         void show()
         {
-            m_owner.deferMain([this]()
-                              {
-                                  downloadCode();
-                                  if(!m_window.isShowing())
-                                  {
-                                      m_window.addToDesktop();
-                                  }
-                                  else
-                                  {
-                                      m_window.toFront(true);
-                                  }
-                              });
+            m_owner.deferMain([this]() {
+                downloadCode();
+                if(!m_window.isShowing())
+                {
+                    m_window.addToDesktop();
+                }
+                else
+                {
+                    m_window.toFront(true);
+                }
+            });
         }
         
         //! @brief Download the code from the owner and update the editor content
@@ -239,33 +238,31 @@ namespace kiwi { namespace engine {
         
         void updateLockState()
         {
-            m_owner.deferMain([this]()
-                              {
-                                  const juce::MessageManagerLock mmLock;
-                                  m_editor.setReadOnly(!m_owner.hasLock());
-                                  m_button_sync.setEnabled(m_owner.hasLock());
-                                  
-                                  if(!m_owner.canLock() && !m_owner.hasLock())
-                                  {
-                                      m_button_lock.setButtonText("Unlock Edition");
-                                      m_button_lock.setTooltip("Force another user to unlock the editor and make it available for you or other users");
-                                      m_button_lock.setColour(juce::TextButton::buttonColourId, juce::Colours::red);
-                                  }
-                                  else if(m_owner.canLock() && !m_owner.hasLock())
-                                  {
-                                      m_button_lock.setButtonText("Start Edition");
-                                      m_button_lock.setTooltip("Lock the editor and make it enable for you");
-                                      m_button_lock.setColour(juce::TextButton::buttonColourId, juce::Colours::green);
-                                  }
-                                  else
-                                  {
-                                      m_button_lock.setButtonText("Leave Edition");
-                                      m_button_lock.setTooltip("Unlock the editor and make it available for other users");
-                                      m_button_lock.setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
-                                  }
-                                  repaint();
-                              });
-            
+            m_owner.deferMain([this]() {
+                const juce::MessageManagerLock mmLock;
+                m_editor.setReadOnly(!m_owner.hasLock());
+                m_button_sync.setEnabled(m_owner.hasLock());
+                
+                if(!m_owner.canLock() && !m_owner.hasLock())
+                {
+                    m_button_lock.setButtonText("Unlock Edition");
+                    m_button_lock.setTooltip("Force another user to unlock the editor and make it available for you or other users");
+                    m_button_lock.setColour(juce::TextButton::buttonColourId, juce::Colours::red);
+                }
+                else if(m_owner.canLock() && !m_owner.hasLock())
+                {
+                    m_button_lock.setButtonText("Start Edition");
+                    m_button_lock.setTooltip("Lock the editor and make it enable for you");
+                    m_button_lock.setColour(juce::TextButton::buttonColourId, juce::Colours::green);
+                }
+                else
+                {
+                    m_button_lock.setButtonText("Leave Edition");
+                    m_button_lock.setTooltip("Unlock the editor and make it available for other users");
+                    m_button_lock.setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
+                }
+                repaint();
+            });   
         }
         
         void updateCompileOptions()
@@ -412,28 +409,33 @@ namespace kiwi { namespace engine {
                 setErrorLine(-1);
                 return;
             }
+            
             std::string errors;
-            std::vector<std::string> options(m_owner.getCompileOptions());
-            std::vector<char const*> argv(options.size());
-            for(size_t i = 0; i < options.size(); ++i)
-            {
-                argv[i] = options[i].c_str();
-            }
             if(startMTDSPFactories())
             {
+                std::vector<std::string> options(m_owner.getCompileOptions());
+                std::vector<char const*> argv(options.size());
+                for(size_t i = 0; i < options.size(); ++i)
+                {
+                    argv[i] = options[i].c_str();
+                }
+                
                 uptr_faust_factory nfactory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString("", code, options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
                 stopMTDSPFactories();
             }
+            
             auto pos = errors.find_first_of("\r\n");
             if(pos != std::string::npos)
             {
                 errors.erase(pos);
             }
+            
             pos = errors.find("ERROR : ");
             if(pos != std::string::npos)
             {
                 errors.erase(pos, 8);
             }
+            
             if(!errors.empty())
             {
                 int line;

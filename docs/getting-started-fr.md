@@ -1,6 +1,6 @@
 ## Téléchargement
 
-Le dernière version de l'application Kiwi et sa documentation sont disponibles sur cette [page](https://github.com/Musicoll/Kiwi/releases/latest). On y trouve une version pour chaque système d'exploitation, une liste de patchs d'aide qui montrent le comportement des objets, et un ensemble de tutoriaux pour guider le lecteur dans la création de certains traitements audionumériques temps réel.
+Le dernière version de l'application Kiwi et sa documentation sont disponibles sur cette [page](https://github.com/Musicoll/Kiwi/releases/latest). On y trouve une version pour chaque système d'exploitation, une liste de patchs d'aide qui montrent le comportement des objets, et un ensemble d'exemples pour guider le lecteur dans la création de certains traitements audionumériques temps réel.
 
 ## Compatibilité
 

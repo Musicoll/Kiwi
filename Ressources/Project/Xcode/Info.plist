@@ -22,6 +22,8 @@
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>CICM</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app requires audio input in order for the adc~ object to work. If you do not have an audio interface connected it will use the built-in microphone.</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -33,6 +35,18 @@
 			<string>kiwi_filetype.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>Kiwi patcher</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>kiwihelp</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>kiwi_filetype.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Kiwi help file</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 		</dict>

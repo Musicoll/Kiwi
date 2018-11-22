@@ -427,6 +427,11 @@ namespace kiwi
         
         getLookAndFeel().setUsingNativeAlertWindows(false);
         
+        const auto user_area = juce::Desktop::getInstance()
+        .getDisplays().getMainDisplay().userArea;
+        
+        setResizeLimits(50, 50, user_area.getWidth(), user_area.getHeight());
+        
         patcherview.windowInitialized();
     }
     

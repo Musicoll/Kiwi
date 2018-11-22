@@ -278,7 +278,7 @@ namespace kiwi
     
     bool PatcherManager::loadFromFile(juce::File const& file)
     {
-        if(!file.hasFileExtension("kiwi"))
+        if(!file.hasFileExtension(".kiwi;.kiwihelp"))
         {
             throw std::runtime_error("bad extension");
             return false;
@@ -407,7 +407,7 @@ namespace kiwi
             
             juce::File suggest_file = directory.getChildFile(juce::String(m_name)).withFileExtension("kiwi");
             
-            juce::FileChooser saveFileChooser("Save file", suggest_file, "*.kiwi");
+            juce::FileChooser saveFileChooser("Save file", suggest_file, "*.kiwi;*.kiwihelp");
             
             if ((saved = saveFileChooser.browseForFileToSave(true)))
             {

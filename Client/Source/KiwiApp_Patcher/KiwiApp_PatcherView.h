@@ -370,6 +370,9 @@ namespace kiwi
         //! @brief Reset Patcher View zoom to 100%.
         void zoomNormal();
         
+        //! @brief React to the openObjectHelp command.
+        void openObjectHelp();
+        
         //! @internal Show Patcher contextual Popup menu
         void showPatcherPopupMenu(juce::Point<int> const& position);
         

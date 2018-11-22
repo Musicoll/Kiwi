@@ -49,7 +49,11 @@ namespace kiwi { namespace engine {
         void prepare(dsp::Processor::PrepareInfo const& infos) override;
 
         void attributeChanged(std::string const& name, tool::Parameter const& param) override;
+        
     private:
+        
+        //! @brief Returns the faust libraries path
+        std::string getFaustLibsPath() const;
         
         static int64_t getUserId(model::Object const& model);
     
@@ -118,12 +122,12 @@ namespace kiwi { namespace engine {
         
         std::string                     m_dsp_code;
         std::string                     m_edit_code;
-        std::vector<std::string>        m_compile_options;
+        std::vector<std::string>        m_compile_options {};
         std::unique_ptr<UIGlue>         m_ui_glue;
         std::unique_ptr<FileSelector>   m_file_selector;
         std::unique_ptr<CodeEditor>     m_code_editor;
         int64_t                         m_lock_state = 0;
-        const int64_t                   m_user_id;
+        const int64_t                   m_user_id = 0;
         size_t                          m_sample_rate   = 44100;
         size_t                          m_block_size    = 64;
     };

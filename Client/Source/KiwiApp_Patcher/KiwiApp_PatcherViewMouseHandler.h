@@ -52,16 +52,17 @@ namespace kiwi
         {
             None = 0,
             CopyOnDrag,
-            Object,
+            ForwardToObject,
             CreateLink,
             Lasso,
             MoveObjects,
             ResizeObjects,
-            PopupMenu,
-            ObjectEdition,
+            EditObject,
             SwitchSelection,
             Selection,
-            SwitchLock
+            SwitchLock,
+            PopupMenu,
+            OpenObjectHelp,
         };
         
         enum Direction : int
@@ -124,11 +125,11 @@ namespace kiwi
         
     private: // members
         
-        PatcherView &                               m_patcher_view;
-        Action                                      m_current_action;
-        juce::Point<int>                            m_last_drag;
-        std::map<flip::Ref, juce::Rectangle<int>>   m_mousedown_bounds;
-        int                                         m_direction;
+        PatcherView&                                m_patcher_view;
+        Action                                      m_current_action = Action::None;
+        juce::Point<int>                            m_last_drag {};
+        std::map<flip::Ref, juce::Rectangle<int>>   m_mousedown_bounds {};
+        int                                         m_direction = 0;
         
     private: // deleted methods
         

@@ -1,21 +1,21 @@
 /*
  ==============================================================================
- 
+
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
  - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
- 
+
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
- 
+
  KIWI is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  ------------------------------------------------------------------------------
- 
+
  Contact : cicm.mshparisnord@gmail.com
- 
+
  ==============================================================================
  */
 
@@ -31,11 +31,11 @@
 #include "KiwiEngine_FaustTilde/KiwiEngine_FaustTilde_FileSelector.cpp"
 
 namespace kiwi { namespace engine {
-    
+
     // ================================================================================ //
     //                                       FAUST~                                     //
     // ================================================================================ //
-    
+
     void FaustTilde::declare()
     {
         Factory::add<FaustTilde>("faust~", &FaustTilde::create);
@@ -45,48 +45,29 @@ namespace kiwi { namespace engine {
     {
         return std::make_unique<FaustTilde>(model, patcher);
     }
-    
-    int64_t FaustTilde::getUserId(model::Object const& model)
-    {
-        int64_t temp;
-        uint64_t userid = model.document().user();
-        std::memcpy(&temp, &userid, sizeof(temp));
-        return temp;
-    }
 
-    FaustTilde::FaustTilde(model::Object const& model, Patcher& patcher):
-    AudioObject(model, patcher),
-    m_factory(nullptr, deleteDSPFactory),
-    m_ui_glue(std::make_unique<UIGlue>(*this)),
-    m_file_selector(std::make_unique<FileSelector>(*this)),
-    m_code_editor(std::make_unique<CodeEditor>(*this)),
-    m_user_id(getUserId(model))
+    FaustTilde::FaustTilde(model::Object const& model, Patcher& patcher)
+    : AudioObject(model, patcher)
+    , m_factory(nullptr, deleteDSPFactory)
+    , m_compile_options({"-I", getFaustLibsPath()})
+    , m_ui_glue(std::make_unique<UIGlue>(*this))
+    , m_file_selector(std::make_unique<FileSelector>(*this))
+    , m_code_editor(std::make_unique<CodeEditor>(*this))
+    , m_user_id(getUserId(model))
     {
-        m_compile_options.push_back("-I");
-        auto apppath = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getParentDirectory().getFullPathName().toStdString();
-#ifdef __APPLE__
-        m_compile_options.push_back(juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getFullPathName().toStdString() + std::string("/Contents/Resources/Faust/Libs"));
-#elif _WIN32
-        std::replace(apppath.begin(), apppath.end(), '\\', '/');
-        m_compile_options.push_back(apppath + std::string("/Faust/Libs"));
-#else
-        m_compile_options.push_back(apppath + std::string("/Faust/Libs"));
-#endif
         attributeChanged("dspcodechanged", {tool::Parameter::Type::String, {std::string("")}});
         attributeChanged("editcodechanged", {tool::Parameter::Type::String, {std::string("")}});
         attributeChanged("compileoptionschanged", {tool::Parameter::Type::String, {std::string("")}});
-        auto const* fmodel = dynamic_cast<model::FaustTilde const*>(&model);
-        if(fmodel)
+        
+        if(auto const* fmodel = dynamic_cast<model::FaustTilde const*>(&model))
         {
             attributeChanged("lockstate", {tool::Parameter::Type::Int, {fmodel->getLockState()}});
         }
     }
-    
+
     FaustTilde::~FaustTilde()
-    {
-        ;
-    }
-    
+    {}
+
     // ================================================================================ //
     bool FaustTilde::grabLock(bool state)
     {
@@ -105,27 +86,50 @@ namespace kiwi { namespace engine {
         }
         return true;
     }
-    
+
     bool FaustTilde::hasLock() const
     {
         return m_lock_state == m_user_id;
     }
-    
+
     bool FaustTilde::canLock() const
     {
         return m_lock_state == 0;
     }
-    
+
     void FaustTilde::forceUnlock()
     {
         setAttribute(std::string("lockstate"), {tool::Parameter::Type::Int, {0}});
     }
     
+    std::string FaustTilde::getFaustLibsPath() const
+    {
+        const auto appfile = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile);
+        
+#ifdef __APPLE__
+        return appfile.getChildFile("Contents/Resources/libs/faust").getFullPathName().toStdString();
+#elif _WIN32
+        auto apppath = appfile.getParentDirectory().getFullPathName().toStdString();
+        std::replace(apppath.begin(), apppath.end(), '\\', '/');
+        return apppath + std::string("/libs/faust");
+#else
+        return appfile.getParentDirectory().getChildFile("libs/faust").getFullPathName().toStdString();
+#endif
+    }
+    
+    int64_t FaustTilde::getUserId(model::Object const& model)
+    {
+        int64_t temp;
+        uint64_t userid = model.document().user();
+        std::memcpy(&temp, &userid, sizeof(temp));
+        return temp;
+    }
+
     std::vector<std::string> FaustTilde::getCompileOptions() const
     {
         return m_compile_options;
     }
-    
+
     void FaustTilde::setCompileOptions(std::vector<std::string>&& options)
     {
         if(!canLock() && !hasLock())
@@ -133,22 +137,21 @@ namespace kiwi { namespace engine {
             warning("faust~: code is currently locked by another user");
             return;
         }
-        deferMain([this, noptions = std::move(options)]()
-                  {
-                      auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel());
-                      if(model)
-                      {
-                          model->setCompileOptions(noptions);
-                          setAttribute(std::string("compileoptionschanged"), {tool::Parameter::Type::String, {juce::Uuid().toString().toStdString()}});
-                      }
-                  });
+        
+        deferMain([this, noptions = std::move(options)]() {
+            if(auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel()))
+            {
+                model->setCompileOptions(noptions);
+                setAttribute(std::string("compileoptionschanged"), {tool::Parameter::Type::String, {juce::Uuid().toString().toStdString()}});
+            }
+        });
     }
-    
+
     std::string const& FaustTilde::getDspCode() const
     {
         return m_dsp_code;
     }
-    
+
     void FaustTilde::setDspCode(std::string&& code)
     {
         if(!canLock() && !hasLock())
@@ -156,22 +159,21 @@ namespace kiwi { namespace engine {
             warning("faust~: code is currently locked by another user");
             return;
         }
-        deferMain([this, ncode = std::move(code)]()
-                  {
-                      auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel());
-                      if(model)
-                      {
-                          model->setDSPCode(ncode);
-                          setAttribute(std::string("dspcodechanged"), {tool::Parameter::Type::String, {juce::Uuid().toString().toStdString()}});
-                      }
-                  });
+        
+        deferMain([this, ncode = std::move(code)]() {
+            if(auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel()))
+            {
+                model->setDSPCode(ncode);
+                setAttribute(std::string("dspcodechanged"), {tool::Parameter::Type::String, {juce::Uuid().toString().toStdString()}});
+            }
+        });
     }
-    
+
     std::string const& FaustTilde::getEditCode() const
     {
         return m_edit_code;
     }
-    
+
     void FaustTilde::setEditCode(std::string&& code)
     {
         if(!canLock() && !hasLock())
@@ -179,35 +181,35 @@ namespace kiwi { namespace engine {
             warning("faust~: code is currently locked by another user");
             return;
         }
-        deferMain([this, ncode = std::move(code)]()
-                  {
-                      auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel());
-                      if(model)
-                      {
-                          model->setEditCode(ncode);
-                          setAttribute(std::string("editcodechanged"), {tool::Parameter::Type::String, {juce::Uuid().toString().toStdString()}});
-                      }
-                  });
+        
+        deferMain([this, ncode = std::move(code)]() {
+            if(auto* model = dynamic_cast<model::FaustTilde*>(&getObjectModel()))
+            {
+                model->setEditCode(ncode);
+                setAttribute(std::string("editcodechanged"), {tool::Parameter::Type::String, {juce::Uuid().toString().toStdString()}});
+            }
+        });
     }
-    
-    void FaustTilde::openFile(const std::string& file)
+
+    void FaustTilde::openFile(std::string const& filepath)
     {
-        juce::File const jf(file);
-        if(!jf.exists())
+        juce::File const file(filepath);
+        if(!file.exists())
         {
-            warning("faust~: " + file + " doesn't exist");
+            warning("faust~: " + filepath + " doesn't exist");
             return;
         }
-        if(!jf.hasFileExtension(".dsp"))
+        
+        if(!file.hasFileExtension(".dsp"))
         {
-            warning("faust~: " + file + " is not a FAUST DSP file");
+            warning("faust~: " + filepath + " is not a FAUST DSP file");
             return;
         }
-        setEditCode(jf.loadFileAsString().toStdString());
-        setDspCode(jf.loadFileAsString().toStdString());
+        
+        const auto file_as_string = file.loadFileAsString();
+        setEditCode(file_as_string.toStdString());
+        setDspCode(file_as_string.toStdString());
     }
-    
-    
     
     void FaustTilde::compileDspCode()
     {
@@ -219,28 +221,31 @@ namespace kiwi { namespace engine {
                 std::lock_guard<std::mutex> guard(m_mutex);
                 m_instance.reset();
             }
+            
             m_factory.reset();
             return;
         }
+        
         std::string errors;
-        const auto options = m_compile_options;
-        const auto name = "kiwi" + juce::Uuid().toString().toStdString();
-        std::vector<char const*> argv(options.size());
-        for(size_t i = 0; i < options.size(); ++i)
-        {
-            argv[i] = options[i].c_str();
-        }
         uptr_faust_factory nfactory(nullptr, deleteDSPFactory);
         if(startMTDSPFactories())
         {
-            nfactory = std::unique_ptr<llvm_dsp_factory, bool(*)(llvm_dsp_factory*)>(createDSPFactoryFromString(name, m_dsp_code, options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
+            const auto options = m_compile_options;
+            const auto name = "kiwi" + juce::Uuid().toString().toStdString();
+            std::vector<char const*> argv(options.size());
+            for(size_t i = 0; i < options.size(); ++i)
+            {
+                argv[i] = options[i].c_str();
+            }
+            
+            nfactory = std::unique_ptr<llvm_dsp_factory, decltype(&deleteDSPFactory)>(createDSPFactoryFromString(name, m_dsp_code, options.size(), argv.data(), std::string(), errors), deleteDSPFactory);
             stopMTDSPFactories();
         }
         else
         {
             warning("faust~: can't start multi-thread access");
         }
-       
+
         if(!errors.empty())
         {
             warning("faust~: compilation failed - " + errors);
@@ -249,7 +254,7 @@ namespace kiwi { namespace engine {
         {
             log("faust~: compilation succeed - " + nfactory->getName());
             auto ninstance = std::unique_ptr<llvm_dsp, nop>(nfactory->createDSPInstance());
-            
+
             if(ninstance)
             {
                 m_ui_glue->prepareChanges();
@@ -276,9 +281,11 @@ namespace kiwi { namespace engine {
                     m_instance.reset();
                 }
             }
+            
             m_factory = std::move(nfactory);
             return;
         }
+        
         m_ui_glue->prepareChanges();
         {
             // Safetly release the instance
@@ -287,53 +294,46 @@ namespace kiwi { namespace engine {
         }
         m_factory.reset();
     }
-    
+
     // ================================================================================ //
-    
+
     void FaustTilde::attributeChanged(std::string const& name, tool::Parameter const& parameter)
     {
         if (name == "dspcodechanged")
         {
-            auto const value = parameter[0].getString();
-            deferMain([this, value]()
-                      {
-                          auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel());
-                          if(fmodel)
-                          {
-                              m_dsp_code = fmodel->getDSPCode();
-                              compileDspCode();
-                          }
-                      });
+            deferMain([this, value = parameter[0].getString()]() {
+                if(auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel()))
+                {
+                    m_dsp_code = fmodel->getDSPCode();
+                    compileDspCode();
+                }
+            });
         }
         else if(name == "editcodechanged")
         {
-            deferMain([this]()
-                      {
-                          auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel());
-                          if(fmodel)
-                          {
-                              m_edit_code = fmodel->getEditCode();
-                              m_code_editor->downloadCode();
-                          }
-                      });
+            deferMain([this]() {
+                if(auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel()))
+                {
+                    m_edit_code = fmodel->getEditCode();
+                    m_code_editor->downloadCode();
+                }
+            });
         }
         else if(name == "compileoptionschanged")
         {
-            deferMain([this]()
-                      {
-                          auto* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel());
-                          if(fmodel)
-                          {
-                              auto noptions = fmodel->getCompileOptions();
-                              m_compile_options.resize(2 + noptions.size());
-                              for(size_t i = 0; i < noptions.size(); ++i)
-                              {
-                                  m_compile_options[i+2].swap(noptions[i]);
-                              }
-                              m_code_editor->updateCompileOptions();
-                              compileDspCode();
-                          }
-                      });
+            deferMain([this]() {
+                if(auto const* fmodel = dynamic_cast<model::FaustTilde*>(&getObjectModel()))
+                {
+                    auto noptions = fmodel->getCompileOptions();
+                    m_compile_options.resize(2 + noptions.size());
+                    for(size_t i = 0; i < noptions.size(); ++i)
+                    {
+                        m_compile_options[i+2].swap(noptions[i]);
+                    }
+                    m_code_editor->updateCompileOptions();
+                    compileDspCode();
+                }
+            });
         }
         else if(name == "lockstate")
         {
@@ -343,7 +343,7 @@ namespace kiwi { namespace engine {
     }
     // The Kiwi Object interface
     // ================================================================================ //
-    
+
     void FaustTilde::receive(size_t index, std::vector<tool::Atom> const& args)
     {
         if(!args.empty() && args[0].isString())
@@ -365,29 +365,33 @@ namespace kiwi { namespace engine {
                     {
                         warning(std::string("faust~: open method expects a path"));
                     }
+                    
                     if(args.size() > 2)
                     {
                         warning(std::string("faust~: open method extra arguments"));
                     }
                 }
+                
                 return;
             }
-            else if(name == "editor")
+            
+            if(name == "editor")
             {
-                deferMain([this]()
-                          {
-                              std::string ncode = m_dsp_code;
-                              setEditCode(std::move(ncode));
-                              m_code_editor->show();
-                          });
-                
+                deferMain([this]() {
+                    std::string ncode = m_dsp_code;
+                    setEditCode(std::move(ncode));
+                    m_code_editor->show();
+                });
+
                 if(args.size() > 1)
                 {
                     warning(std::string("faust~: editor method extra arguments"));
                 }
+                
                 return;
             }
-            else if(name == "options")
+            
+            if(name == "options")
             {
                 std::vector<std::string> noptions(args.size() - 1);
                 for(size_t i = 1; i < args.size(); ++i)
@@ -400,40 +404,41 @@ namespace kiwi { namespace engine {
                 setCompileOptions(std::move(noptions));
                 return;
             }
-            
+
             if(!m_factory || !m_instance)
             {
                 return;
             }
-            
+
             if(m_ui_glue->hasOutput(name))
             {
                 send(getNumberOfOutputs() - 1, {m_ui_glue->getOutput(name)});
                 return;
             }
-            else
+            
+            if(args.size() == 1)
             {
-                if(args.size() == 1)
-                {
-                    m_ui_glue->setInput(name, 0);
-                    return;
-                }
-                else if(args[1].isNumber())
-                {
-                    m_ui_glue->setInput(name, args[1].getFloat());
-                    if(args.size() > 2)
-                    {
-                        warning(std::string("faust~: FAUST interface \"") + name + std::string("\" too many arguments"));
-                    }
-                    return;
-                }
-                warning(std::string("faust~: FAUST interface \"") + name + std::string("\" wrong arguments"));
+                m_ui_glue->setInput(name, 0);
                 return;
             }
+            
+            if(args[1].isNumber())
+            {
+                m_ui_glue->setInput(name, args[1].getFloat());
+                if(args.size() > 2)
+                {
+                    warning(std::string("faust~: FAUST interface \"") + name + std::string("\" too many arguments"));
+                }
+                return;
+            }
+            
+            warning(std::string("faust~: FAUST interface \"") + name + std::string("\" wrong arguments"));
+            return;
         }
+        
         warning(std::string("faust~: receive bad arguments"));
     }
-    
+
     void FaustTilde::perform(dsp::Buffer const& input, dsp::Buffer& output) noexcept
     {
         const size_t nsamples = input.getVectorSize();
@@ -470,7 +475,7 @@ namespace kiwi { namespace engine {
             }
         }
     }
-    
+
     bool FaustTilde::prepareDsp(size_t sampleRate, size_t blockSize) noexcept
     {
         m_sample_rate   = sampleRate;
@@ -488,7 +493,7 @@ namespace kiwi { namespace engine {
         }
         return false;
     }
-    
+
     void FaustTilde::prepare(PrepareInfo const& infos)
     {
         if(m_instance)
@@ -503,5 +508,5 @@ namespace kiwi { namespace engine {
             }
         }
     }
-    
+
 }}

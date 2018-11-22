@@ -232,6 +232,9 @@ namespace kiwi
             juce::PopupMenu m;
             auto* cm = &KiwiApp::getCommandManager();
             
+            m.addCommandItem(cm, CommandIDs::openObjectHelp);
+            m.addSeparator();
+            
             m.addCommandItem(cm, juce::StandardApplicationCommandIDs::cut);
             m.addCommandItem(cm, juce::StandardApplicationCommandIDs::copy);
             m.addCommandItem(cm, juce::StandardApplicationCommandIDs::paste);
@@ -1028,6 +1031,30 @@ namespace kiwi
             if(isAnyObjectSelected())
             {
                 useViewport().bringRectToCentre(getSelectionBounds());
+            }
+        }
+    }
+    
+    void PatcherView::openObjectHelp()
+    {
+        if(!isLocked() && isAnyObjectSelected() && m_local_objects_selection.size() == 1)
+        {
+            auto& doc = m_patcher_model.entity().use<model::DocumentManager>();
+            if(auto const* obj = doc.get<model::Object>(*m_local_objects_selection.begin()))
+            {
+                auto const& obj_class = obj->getClass();
+                auto const& classname = obj_class.getName();
+                
+                auto help_file = KiwiApp::use().findHelpFile(classname);
+                
+                if(help_file.existsAsFile())
+                {
+                    KiwiApp::useInstance().openFile(help_file);
+                }
+                else
+                {
+                    KiwiApp::error("can't find " + classname + " help file");
+                }
             }
         }
     }
@@ -1916,6 +1943,7 @@ namespace kiwi
         commands.add(CommandIDs::zoomOut);
         commands.add(CommandIDs::zoomNormal);
         commands.add(CommandIDs::editModeSwitch);
+        commands.add(CommandIDs::openObjectHelp);
     }
     
     void PatcherView::getCommandInfo(const juce::CommandID commandID, juce::ApplicationCommandInfo& result)
@@ -2106,6 +2134,32 @@ namespace kiwi
                 result.setTicked(!m_view_model.getLock());
                 break;
             }
+            case CommandIDs::openObjectHelp:
+            {
+                const bool active = (!isLocked()
+                                     && isAnyObjectSelected()
+                                     && m_local_objects_selection.size() == 1);
+                
+                auto text = TRANS("Help");
+                
+                if(active)
+                {
+                    auto& doc = m_patcher_model.entity().use<model::DocumentManager>();
+                    if(auto const* obj = doc.get<model::Object>(*m_local_objects_selection.begin()))
+                    {
+                        auto const& obj_class = obj->getClass();
+                        text = "Open " + obj_class.getName() + " Help";
+                    }
+                }
+                
+                result.setInfo(text, TRANS("Open object help patch"), CommandCategories::view, 0);
+                
+                auto modifier = juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier;
+                result.addDefaultKeypress ('h', modifier);
+                
+                result.setActive(active);
+                break;
+            }
             default:
             {
                 assert(true && "Command not handled !");
@@ -2157,6 +2211,7 @@ namespace kiwi
             case CommandIDs::zoomOut:                           { zoomOut(); break; }
             case CommandIDs::zoomNormal:                        { zoomNormal(); break; }
             case CommandIDs::editModeSwitch:                    { setLock(!isLocked()); break; }
+            case CommandIDs::openObjectHelp:                    { openObjectHelp(); break; }
                 
             default: return false;
         }

@@ -105,6 +105,18 @@ namespace kiwi
         //! @brief Gets the application scheduler.
         static tool::Scheduler<>& useScheduler();
         
+        //! @brief Returns the Kiwi ressources directory.
+        juce::File getKiwiRessourcesDirectory();
+        
+        //! @brief Returns the Kiwi object Help directory.
+        juce::File getKiwiObjectHelpDirectory();
+        
+        //! @brief Returns the Kiwi examples directory.
+        juce::File getKiwiExamplesDirectory();
+        
+        //! @brief Try to find a help file given an object class name.
+        juce::File findHelpFile(std::string const& classname) const;
+        
         //! @brief Sets the auth user.
         static void setAuthUser(Api::AuthUser const& auth_user);
         
@@ -226,6 +238,9 @@ namespace kiwi
         
     private: // methods
         
+        //! @internal Initialise ressource stuffs at startup
+        void initRessources();
+        
         //! @internal Returns true if the App is compatible with a given server version.
         bool canConnectToServerVersion(std::string const& server_version);
         
@@ -254,6 +269,27 @@ namespace kiwi
         //! @brief Parse startup command line and open file if exists.
         void openCommandFile(juce::String const& command_line);
         
+        //! @brief Create object help popup menu
+        void createObjectHelpPopupMenu(juce::PopupMenu& menu);
+        
+        //! @brief Find help file given an index and open the file.
+        void findAndOpenHelpFile(int selected_index);
+        
+        //! @brief Get the list of help files.
+        juce::Array<juce::File> getSortedObjectHelpFilesInDirectory(juce::File const& directory) const noexcept;
+        
+        //! @brief Create examples popup menu
+        void createExamplesPopupMenu(juce::PopupMenu& menu) noexcept;
+
+        //! @brief Get the list of example directories.
+        juce::Array<juce::File> getSortedExampleDirectories() noexcept;
+        
+        //! @brief Get the list of example files in directory.
+        juce::Array<juce::File> getSortedExampleFilesInDirectory(juce::File const& directory) const noexcept;
+        
+        //! @brief Find and launch an example file.
+        void findAndOpenExample(int selected_index);
+        
     private: // members
         
         enum TimerIds : int
@@ -276,5 +312,10 @@ namespace kiwi
         std::unique_ptr<tool::Scheduler<>>                  m_scheduler = nullptr;
         
         std::string m_last_server_version_check {};
+        
+        int m_num_help_files = 0;
+        int m_num_example_files = 0;
+        
+        std::map<std::string, juce::File> m_help_aliases {};
     };
 }
