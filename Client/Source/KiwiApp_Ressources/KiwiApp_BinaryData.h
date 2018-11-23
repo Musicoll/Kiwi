@@ -52,6 +52,9 @@ namespace kiwi
             extern char const* dsp_off_png;
             const int dsp_off_png_size = 12813;
 
+            extern char const* infinite_loop_png;
+            const int infinite_loop_png_size = 16276;
+
             extern char const* zoom_in_png;
             const int zoom_in_png_size = 14970;
 
