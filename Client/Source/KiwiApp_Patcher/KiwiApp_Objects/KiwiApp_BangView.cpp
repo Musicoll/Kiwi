@@ -97,13 +97,12 @@ namespace kiwi {
         {
             m_active = true;
             repaint();
+            
+            schedule([this]() {
+                m_active = false;
+                repaint();
+            }, std::chrono::milliseconds(150));
         }
-        
-        schedule([this]()
-        {
-            m_active = false;
-            repaint();
-        }, std::chrono::milliseconds(150));
     }
     
     void BangView::signalTriggered()
