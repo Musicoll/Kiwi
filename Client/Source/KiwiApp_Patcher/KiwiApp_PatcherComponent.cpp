@@ -88,10 +88,43 @@ namespace kiwi
         g.fillAll(findColour(juce::Toolbar::ColourIds::backgroundColourId));
     }
     
+    int PatcherToolbar::getToolbarItemIndex(Factory::ItemIds item_id)
+    {
+        for(int index = 0; index < m_toolbar.getNumItems(); index++)
+        {
+            if(m_toolbar.getItemId(index) == item_id)
+            {
+                return index;
+            }
+        }
+        
+        return -1;
+    }
+    
     void PatcherToolbar::removeUsersIcon()
     {
-        m_toolbar.removeToolbarItem(0);
-        m_toolbar.repaint();
+        const int users_item_index = getToolbarItemIndex(Factory::ItemIds::users);
+        if(users_item_index >= 0)
+        {
+            m_toolbar.removeToolbarItem(users_item_index);
+            m_toolbar.repaint();
+        }
+    }
+    
+    void PatcherToolbar::setStackOverflowIconVisible(bool should_be_visible)
+    {
+        const int stack_overflow_item_index = getToolbarItemIndex(Factory::ItemIds::stack_overflow);
+        const bool is_visible = (stack_overflow_item_index >= 0);
+        
+        if(should_be_visible && !is_visible)
+        {
+            const int index = getToolbarItemIndex(Factory::ItemIds::lock_unlock) + 1;
+            m_toolbar.addItem(m_factory, Factory::ItemIds::stack_overflow, index);
+        }
+        else if(!should_be_visible && is_visible)
+        {
+            m_toolbar.removeToolbarItem(stack_overflow_item_index);
+        }
     }
     
     PatcherToolbar::Factory::Factory(PatcherManager& patcher_manager)
@@ -107,6 +140,7 @@ namespace kiwi
         ids.add(spacerId);
         ids.add(flexibleSpacerId);
         ids.add(ItemIds::dsp_on_off);
+        ids.add(ItemIds::stack_overflow);
         
         if(m_patcher_manager.isConnected())
         {
@@ -162,6 +196,15 @@ namespace kiwi
             btn = new CustomToolbarButton(itemId, "DSP on/off", juce::Colours::whitesmoke,
                                           IMG(dsp_off_png), IMG(dsp_on_png));
             btn->setCommandToTrigger(&KiwiApp::getCommandManager(), CommandIDs::switchDsp, true);
+        }
+        else if(itemId == ItemIds::stack_overflow)
+        {
+            btn = new CustomToolbarButton(itemId, "clear stack-overflow message lock",
+                                          juce::Colour(0xFFE52E2E),
+                                          IMG(infinite_loop_png), IMG(infinite_loop_png));
+            btn->onClick = [this](){
+                m_patcher_manager.clearStackOverflow();
+            };
         }
         else if(itemId == ItemIds::users)
         {
@@ -351,11 +394,15 @@ namespace kiwi
         KiwiApp::bindToKeyMapping(this);
 
         addAndMakeVisible(m_toolbar);
+        
+        m_patcher_manager.addListener(*this);
+        
+        m_toolbar.setStackOverflowIconVisible(m_patcher_manager.hasStackOverflow());
     }
     
     PatcherComponent::~PatcherComponent()
     {
-        ;
+        m_patcher_manager.removeListener(*this);
     }
     
     PatcherView& PatcherComponent::usePatcherView()
@@ -385,6 +432,16 @@ namespace kiwi
     void PatcherComponent::removeUsersIcon()
     {
         m_toolbar.removeUsersIcon();
+    }
+    
+    void PatcherComponent::stackOverflowDetected(PatcherManager& manager, std::vector<flip::Ref> culprits)
+    {
+        m_toolbar.setStackOverflowIconVisible(true);
+    }
+    
+    void PatcherComponent::stackOverflowCleared(PatcherManager& manager)
+    {
+        m_toolbar.setStackOverflowIconVisible(false);
     }
     
     // ================================================================================ //

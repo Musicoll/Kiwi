@@ -59,16 +59,12 @@ namespace kiwi { namespace engine {
         
         //! @brief Adds a link to the current stack overflow list (or create a new list if there is no).
         //! @internal Only the Object should use this method.
-        void addStackOverflow(Link const& link);
-        
-        //! @brief Ends a list of stack overflow.
-        //! @internal Only the Object should use this method.
-        void endStackOverflow();
+        void signalStackOverflow(flip::Ref ref);
         
         //! @brief Gets the lists of stack overflow.
-        std::vector<std::queue<Link const*>> getStackOverflow() const;
+        bool stackOverflowDetected() const;
         
-        //! @brief Clears the lists of stack overflow.
+        //! @brief Clears the stack overflow.
         void clearStackOverflow();
         
         //! @brief Returns the audio controler held by the patcher's instance.
@@ -115,6 +111,9 @@ namespace kiwi { namespace engine {
         
     private: // methods
         
+        //! @brief Called when the stack-overflow is cleared.
+        void onStackOverflowCleared();
+        
         //! @brief Updates the dsp chain held by the engine patcher
         void updateChain();
         
@@ -144,14 +143,14 @@ namespace kiwi { namespace engine {
         
     private: // members
         
-        using SoLinks = std::queue<Link const*>;
-        
         Instance&                                       m_instance;
         std::map<flip::Ref, std::shared_ptr<Object>>    m_objects {};
-        std::vector<SoLinks>                            m_so_links {};
         dsp::Chain                                      m_chain {};
         model::Patcher&                                 m_patcher_model;
+        bool                                            m_has_stack_overflow = false;
         bool                                            m_dsp_chain_need_update = false;
+        
+        flip::SignalConnection                          m_stack_overflow_cleared_signal_cnx;
         
     private: // deleted methods
         

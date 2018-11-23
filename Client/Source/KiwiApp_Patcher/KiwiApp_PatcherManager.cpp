@@ -59,10 +59,20 @@ namespace kiwi
                m_instance.getUserId(), 'cicm', 'kpat')
     , m_socket(m_document)
     , m_session(nullptr)
+    , m_stack_overflow_detected_signal_cnx(m_document.root<model::Patcher>().signal_stack_overflow
+                                           .connect([this](std::vector<flip::Ref> refs) {
+        onStackOverflowDetected(std::move(refs));
+    }))
+    , m_stack_overflow_cleared_signal_cnx(m_document.root<model::Patcher>().signal_stack_overflow_clear
+                                          .connect([this]() {
+        onStackOverflowCleared();
+    }))
     {}
     
     PatcherManager::~PatcherManager()
     {
+        m_stack_overflow_cleared_signal_cnx.disconnect();
+        m_stack_overflow_detected_signal_cnx.disconnect();
         disconnect();
     }
     
@@ -129,6 +139,31 @@ namespace kiwi
             
             updateTitleBars();
         }
+    }
+    
+    bool PatcherManager::hasStackOverflow() const
+    {
+        return m_has_stack_overflow;
+    }
+    
+    void PatcherManager::onStackOverflowDetected(std::vector<flip::Ref> refs)
+    {
+        KiwiApp::error("remove the culprits then click on the infinite loop icon to unlock messages");
+        
+        m_has_stack_overflow = true;
+        
+        m_listeners.call(&Listener::stackOverflowDetected, *this, refs);
+    }
+    
+    void PatcherManager::onStackOverflowCleared()
+    {
+        m_has_stack_overflow = false;
+        m_listeners.call(&Listener::stackOverflowCleared, *this);
+    }
+    
+    void PatcherManager::clearStackOverflow()
+    {
+        m_document.root<model::Patcher>().signal_stack_overflow_clear();
     }
     
     void PatcherManager::disconnect()

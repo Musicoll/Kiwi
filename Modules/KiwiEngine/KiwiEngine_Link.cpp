@@ -35,12 +35,6 @@ namespace kiwi
         {
             ;
         }
-        
-        bool Link::operator<(Link const& other) const
-        {
-            return (&m_receiver < &other.m_receiver
-                    || (&m_receiver == &other.m_receiver && m_index < other.m_index));
-        }
  
         Object & Link::getReceiver() const
         {
@@ -50,6 +44,11 @@ namespace kiwi
         size_t Link::getReceiverIndex() const
         {
             return m_index;
+        }
+        
+        size_t& Link::useStackCount()
+        {
+            return m_stack_count;
         }
     }
 }

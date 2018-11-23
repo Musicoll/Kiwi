@@ -37,15 +37,18 @@ namespace kiwi { namespace engine {
     Patcher::Patcher(Instance& instance, model::Patcher& patcher_model) noexcept
     : m_instance(instance)
     , m_objects()
-    , m_so_links(1)
     , m_chain()
     , m_patcher_model(patcher_model)
+    , m_stack_overflow_cleared_signal_cnx(patcher_model.signal_stack_overflow_clear.connect([this]() {
+        onStackOverflowCleared();
+    }))
     {
         m_instance.getAudioControler().add(m_chain);
     }
     
     Patcher::~Patcher()
     {
+        m_stack_overflow_cleared_signal_cnx.disconnect();
         m_instance.getAudioControler().remove(m_chain);
     }
     
@@ -71,26 +74,34 @@ namespace kiwi { namespace engine {
         return m_instance.getAudioControler();
     }
     
-    
-    void Patcher::addStackOverflow(Link const& link)
+    void Patcher::signalStackOverflow(flip::Ref ref)
     {
-        m_so_links[m_so_links.size() - 1].push(&link);
+        m_instance.getMainScheduler().defer([this, ref = std::move(ref)](){
+            m_patcher_model.signal_stack_overflow({ref});
+        });
+        
+        m_has_stack_overflow = true;
     }
     
-    void Patcher::endStackOverflow()
+    bool Patcher::stackOverflowDetected() const
     {
-        m_so_links.push_back(SoLinks());
-    }
-    
-    std::vector<std::queue<Link const*>> Patcher::getStackOverflow() const
-    {
-        return m_so_links;
+        return m_has_stack_overflow;
     }
     
     void Patcher::clearStackOverflow()
     {
-        m_so_links.clear();
-        m_so_links.push_back(SoLinks());
+        for(auto& object_it : m_objects)
+        {
+            auto& object = object_it.second;
+            object->clearStackOverflow();
+        }
+        
+        m_has_stack_overflow = false;
+    }
+    
+    void Patcher::onStackOverflowCleared()
+    {
+        clearStackOverflow();
     }
     
     void Patcher::sendLoadbang()
@@ -304,7 +315,7 @@ namespace kiwi { namespace engine {
         
         if (!link_m.isSignal())
         {
-            from->addOutputLink(outlet, *to, inlet);
+            from->addOutputLink(link_m.ref(), outlet, *to, inlet);
         }
         else
         {
@@ -331,7 +342,7 @@ namespace kiwi { namespace engine {
         
         if (!link_m.isSignal())
         {
-            from->removeOutputLink(outlet, *to, inlet);
+            from->removeOutputLink(link_m.ref(), outlet);
         }
         else
         {

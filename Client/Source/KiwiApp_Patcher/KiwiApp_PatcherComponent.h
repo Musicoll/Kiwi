@@ -30,7 +30,8 @@ namespace kiwi
     //                            PATCHER COMPONENT TOOLBAR                             //
     // ================================================================================ //
     
-    class PatcherToolbar : public juce::Component
+    class PatcherToolbar
+    : public juce::Component
     {
     public: // methods
         
@@ -45,6 +46,9 @@ namespace kiwi
         
         //! @brief Removes users icon.
         void removeUsersIcon();
+        
+        //! @brief Show or hide stack-overflow icon.
+        void setStackOverflowIconVisible(bool visible);
         
     private: // classes
         
@@ -63,6 +67,7 @@ namespace kiwi
                 zoom_out            = 3,
                 dsp_on_off          = 4,
                 users               = 5,
+                stack_overflow      = 6,
             };
             
             void getAllToolbarItemIds(juce::Array<int>& ids) override;
@@ -75,6 +80,10 @@ namespace kiwi
         };
         
         class UsersItemComponent;
+        
+        //! @brief Returns the index of a specific item id in the toolbar.
+        //! @details returns -1 if the item is not found.
+        int getToolbarItemIndex(Factory::ItemIds item_id);
         
     private: // variables
         
@@ -152,6 +161,7 @@ namespace kiwi
     //! @brief The PatcherComponent holds a patcher view and a patcher toolbar.
     class PatcherComponent
     : public juce::Component
+    , private PatcherManager::Listener
     , public juce::ApplicationCommandTarget
     {
     public: // methods
@@ -185,6 +195,14 @@ namespace kiwi
         void getAllCommands(juce::Array<juce::CommandID>& commands) override;
         void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
         bool perform(const InvocationInfo& info) override;
+        
+    private: // methods
+        
+        //! @brief Called when a stack-overflow is detected;
+        void stackOverflowDetected(PatcherManager& manager, std::vector<flip::Ref> culprits) override;
+        
+        //! @brief Called when a stack-overflow is cleared.
+        void stackOverflowCleared(PatcherManager& manager) override;
 
     private: // members
         
