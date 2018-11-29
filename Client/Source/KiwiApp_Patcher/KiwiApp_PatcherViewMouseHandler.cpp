@@ -549,6 +549,7 @@ namespace kiwi
             startAction(Action::CopyOnDrag, e);
         }
         else if(m_current_action == Action::None
+                && !m_patcher_view.isLocked()
                 && e.mouseWasDraggedSinceMouseDown())
         {
             startAction(Action::MoveObjects, e);
