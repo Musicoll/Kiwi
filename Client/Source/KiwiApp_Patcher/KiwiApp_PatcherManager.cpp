@@ -424,19 +424,14 @@ namespace kiwi
         back_end.write<flip::BackEndBinary>(consumer);
     }
     
-    bool PatcherManager::saveDocument()
+    bool PatcherManager::saveDocument(bool save_as)
     {
         bool saved = false;
         
         if(isConnected())
             return false;
         
-        if (m_file.existsAsFile())
-        {
-            writeDocument();
-            saved = true;
-        }
-        else
+        if(save_as || !m_file.existsAsFile())
         {
             const auto dir = KiwiApp::getGlobalDirectoryFor(KiwiApp::FileLocations::Save);
             
@@ -454,6 +449,12 @@ namespace kiwi
                 writeDocument();
                 setName(m_file.getFileNameWithoutExtension().toStdString());
             }
+        }
+        
+        if (!saved && m_file.existsAsFile())
+        {
+            writeDocument();
+            saved = true;
         }
         
         if (saved)
@@ -487,7 +488,7 @@ namespace kiwi
             }
             else if(r == 1) // save button
             {
-                if (!saveDocument())
+                if (!saveDocument(false))
                 {
                     user_cancelled = true;
                 }

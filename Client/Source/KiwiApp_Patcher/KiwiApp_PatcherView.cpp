@@ -1918,6 +1918,7 @@ namespace kiwi
     void PatcherView::getAllCommands(juce::Array<juce::CommandID>& commands)
     {
         commands.add(CommandIDs::save);
+        commands.add(CommandIDs::saveAs);
         
         commands.add(CommandIDs::newPatcherView);
         
@@ -1954,8 +1955,18 @@ namespace kiwi
         {
             case CommandIDs::save:
             {
-                result.setInfo(TRANS("Save"), TRANS("Save document"), CommandCategories::general, 0);
+                result.setInfo(TRANS("Save"), TRANS("Save"), CommandCategories::general, 0);
                 result.addDefaultKeypress('s', juce::ModifierKeys::commandModifier);
+                result.setActive(!m_manager.isConnected());
+                break;
+            }
+            case CommandIDs::saveAs:
+            {
+                result.setInfo(TRANS("Save As.."), TRANS("Save As.."), CommandCategories::general, 0);
+                result.addDefaultKeypress('s',
+                                          juce::ModifierKeys::commandModifier
+                                          | juce::ModifierKeys::shiftModifier);
+                
                 result.setActive(!m_manager.isConnected());
                 break;
             }
@@ -2183,7 +2194,8 @@ namespace kiwi
             
         switch (info.commandID)
         {
-            case CommandIDs::save:                              { m_manager.saveDocument(); break; }
+            case CommandIDs::save:                              { m_manager.saveDocument(false); break; }
+            case CommandIDs::saveAs:                            { m_manager.saveDocument(true); break; }
             case CommandIDs::newPatcherView:                    { m_manager.newView(); break; }
                 
             case juce::StandardApplicationCommandIDs::undo:     { undo(); break; }

@@ -80,7 +80,11 @@ namespace kiwi
         
         //! @brief Save the document.
         //! @details Returns true if saving document succeeded false otherwise.
-        bool saveDocument();
+        bool saveDocument(bool save_as);
+        
+        //! @brief Save the document as another document.
+        //! @details Returns true if saving document succeeded false otherwise.
+        bool saveDocumentAs();
         
         //! @brief Returns true if the patcher needs to be saved.
         bool needsSaving() const noexcept;
