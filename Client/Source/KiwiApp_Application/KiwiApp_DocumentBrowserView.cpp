@@ -847,15 +847,15 @@ namespace kiwi
         }
         else
         {
+            
+            const auto& doc = *documents[row];
+            const auto name = doc.getName();
             if(c == nullptr)
             {
-                c = new RowElem(*this, documents[row]->getName(), createDocumentToolTip(*documents[row]));
+                c = new RowElem(*this, name, createDocumentToolTip(doc));
             }
             
-            static_cast<RowElem*>(c)->update(documents[row]->getName(),
-                                             createDocumentToolTip(*documents[row]),
-                                             row,
-                                             selected);
+            static_cast<RowElem*>(c)->update(name, createDocumentToolTip(doc), row, selected);
         }
 
         return c;
@@ -962,10 +962,17 @@ namespace kiwi
         
         auto directory = juce::File::getSpecialLocation(juce::File::userHomeDirectory);
         
-        juce::File suggest_file =
-        directory.getChildFile(juce::String(document->getName())).withFileExtension(".kiwi;");
+        const auto kiwi_extension = ".kiwi";
         
-        juce::FileChooser saveFileChooser("Download file", suggest_file, "*.kiwi;");
+        auto document_name = document->getName();
+        if(! directory.getChildFile(document_name).hasFileExtension(kiwi_extension))
+        {
+            document_name += kiwi_extension;
+        }
+        
+        const auto suggest_file = directory.getChildFile(document_name);
+        
+        juce::FileChooser saveFileChooser("Download file", suggest_file, "*.kiwi");
         
         if (saveFileChooser.browseForFileToSave(true))
         {
