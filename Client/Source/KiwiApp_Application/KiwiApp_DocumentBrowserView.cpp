@@ -118,7 +118,8 @@ namespace kiwi
         m_name_label.setSize(1, 1);
         m_name_label.setEditable(false, true, true);
         m_name_label.addListener(this);
-        m_name_label.setColour(juce::Label::textColourId, juce::Colours::black);
+        m_name_label.setColour(juce::Label::textColourId, juce::Colours::black.contrasting(0.2));
+        m_name_label.setColour(juce::Label::textWhenEditingColourId, juce::Colours::black);
         m_name_label.setInterceptsMouseClicks(false, false);
         addAndMakeVisible(m_name_label);
     }
@@ -149,7 +150,7 @@ namespace kiwi
     void DocumentBrowserView::DriveView::RowElem::paint(juce::Graphics& g)
     {
         const bool is_trash_row = m_drive_view.isShowingTrashedDocuments();
-        const auto bounds = getLocalBounds();
+        auto bounds = getLocalBounds();
         const juce::Colour bg_color(is_trash_row ? 0xDDDDDDDD : 0xDDFFFFFF);
         const juce::Colour selected_color_color(juce::Colours::lightblue);
         
@@ -161,14 +162,14 @@ namespace kiwi
         {
             // document status notifier (connected / disconnected / not-connected)
             g.setColour(juce::Colours::grey);
-            g.fillRect(0, 0, 5, getHeight());
+            g.fillRect(bounds.removeFromLeft(5));
         }
         
         g.setColour(bg_color.darker(0.5f));
         g.drawHorizontalLine(getBottom() - 1, 0., getWidth());
         
         g.drawImage(m_kiwi_filetype_img,
-                    juce::Rectangle<float>(is_trash_row ? 5 : 10, 5, 30, 30),
+                    bounds.removeFromLeft(getHeight()).reduced(5).toFloat(),
                     juce::RectanglePlacement::stretchToFit, false);
     }
     
@@ -178,10 +179,10 @@ namespace kiwi
         
         if(!m_drive_view.isShowingTrashedDocuments())
         {
-            m_open_btn.setBounds(bounds.reduced(5).withLeft(bounds.getWidth() - 40));
+            m_open_btn.setBounds(bounds.reduced(5).withLeft(bounds.getWidth() - getHeight()));
         }
         
-        m_name_label.setBounds(bounds.reduced(5).withRight(m_open_btn.getX() - 5).withLeft(40));
+        m_name_label.setBounds(bounds.reduced(5).withRight(m_open_btn.getX() - 5).withLeft(getHeight()));
     }
     
     void DocumentBrowserView::DriveView::RowElem::mouseEnter(juce::MouseEvent const& e)
@@ -551,7 +552,7 @@ namespace kiwi
         
         setMultipleSelectionEnabled(false);
         setRowSelectedOnMouseDown(false);
-        setRowHeight(40);
+        setRowHeight(30);
         
         auto* header = new Header(*this);
         header->setSize(getWidth(), 50);
