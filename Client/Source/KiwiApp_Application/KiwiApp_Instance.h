@@ -172,6 +172,5 @@ namespace kiwi
         std::vector<uint8_t>                        m_patcher_clipboard;
         
         static size_t                               m_untitled_patcher_index;
-        juce::File                                  m_last_opened_file;
     };
 }

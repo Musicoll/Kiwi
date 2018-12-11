@@ -920,13 +920,20 @@ namespace kiwi
     
     void DocumentBrowserView::DriveView::uploadDocument()
     {
-        auto directory = juce::File::getSpecialLocation(juce::File::userHomeDirectory);
+        const auto dir = KiwiApp::getGlobalDirectoryFor(KiwiApp::FileLocations::Upload);
         
-        juce::FileChooser file_chooser("Upload file", directory, "*.kiwi");
+        juce::FileChooser file_chooser("Upload file", dir, "*.kiwi");
         
         if(file_chooser.browseForFileToOpen())
         {
             juce::File result = file_chooser.getResult();
+            
+            const auto new_dir = result.getParentDirectory();
+            
+            if(new_dir.exists())
+            {
+                KiwiApp::setGlobalDirectoryFor(KiwiApp::FileLocations::Upload, new_dir);
+            }
             
             // Test that document is a valid kiwi document.
             flip::DataProviderFile provider(result.getFullPathName().toStdString().c_str());
@@ -960,23 +967,30 @@ namespace kiwi
         if(document == nullptr)
             return; // abort
         
-        auto directory = juce::File::getSpecialLocation(juce::File::userHomeDirectory);
+        const auto dir = KiwiApp::getGlobalDirectoryFor(KiwiApp::FileLocations::Download);
         
         const auto kiwi_extension = ".kiwi";
         
         auto document_name = document->getName();
-        if(! directory.getChildFile(document_name).hasFileExtension(kiwi_extension))
+        if(! dir.getChildFile(document_name).hasFileExtension(kiwi_extension))
         {
             document_name += kiwi_extension;
         }
         
-        const auto suggest_file = directory.getChildFile(document_name);
+        const auto suggest_file = dir.getChildFile(document_name);
         
         juce::FileChooser saveFileChooser("Download file", suggest_file, "*.kiwi");
         
         if (saveFileChooser.browseForFileToSave(true))
         {
             juce::File result = saveFileChooser.getResult();
+            
+            const auto new_dir = result.getParentDirectory();
+            
+            if(new_dir.exists())
+            {
+                KiwiApp::setGlobalDirectoryFor(KiwiApp::FileLocations::Download, new_dir);
+            }
             
             document->download([result](std::string const& content)
             {   

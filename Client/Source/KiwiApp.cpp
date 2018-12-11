@@ -450,6 +450,48 @@ namespace kiwi
         return KiwiApp::use().m_api_controller->getAuthUser();
     }
     
+    static juce::String getGlobalDirKey(KiwiApp::FileLocations location)
+    {
+        switch (location)
+        {
+            case KiwiApp::FileLocations::Save: { return "last_save_dir"; }
+            case KiwiApp::FileLocations::Open: { return "last_open_dir"; }
+            case KiwiApp::FileLocations::Download: { return "last_download_dir"; }
+            case KiwiApp::FileLocations::Upload: { return "last_upload_dir"; }
+                
+            default: return {};
+        }
+    }
+    
+    juce::File KiwiApp::getGlobalDirectoryFor(FileLocations location)
+    {
+        const juce::String dir_key = getGlobalDirKey(location);
+        
+        if(dir_key.isNotEmpty())
+        {
+            auto global_dir = juce::File(getGlobalProperties().getValue(dir_key, ""));
+            
+            if(global_dir.exists() && global_dir.isDirectory())
+            {
+                return global_dir;
+            }
+        }
+        
+        return juce::File::getSpecialLocation(juce::File::userHomeDirectory);
+    }
+    
+    void KiwiApp::setGlobalDirectoryFor(FileLocations location, juce::File path)
+    {
+        assert(path.isDirectory());
+        
+        const juce::String dir_key = getGlobalDirKey(location);
+        
+        if(dir_key.isNotEmpty())
+        {
+            getGlobalProperties().setValue(dir_key, path.getFullPathName());
+        }
+    }
+    
     void KiwiApp::logout()
     {
         useInstance().handleConnectionLost();

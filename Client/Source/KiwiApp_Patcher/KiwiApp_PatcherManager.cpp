@@ -438,16 +438,18 @@ namespace kiwi
         }
         else
         {
-            auto directory = juce::File::getCurrentWorkingDirectory();
+            const auto dir = KiwiApp::getGlobalDirectoryFor(KiwiApp::FileLocations::Save);
             
-            juce::File suggest_file = directory.getChildFile(juce::String(m_name)).withFileExtension("kiwi");
+            juce::File suggest_file = dir.getChildFile(juce::String(m_name)).withFileExtension("kiwi");
             
             juce::FileChooser saveFileChooser("Save file", suggest_file, "*.kiwi;*.kiwihelp");
             
             if ((saved = saveFileChooser.browseForFileToSave(true)))
             {
                 m_file = saveFileChooser.getResult();
-                m_file.getParentDirectory().setAsCurrentWorkingDirectory();
+                
+                KiwiApp::setGlobalDirectoryFor(KiwiApp::FileLocations::Save,
+                                               m_file.getParentDirectory());
                 
                 writeDocument();
                 setName(m_file.getFileNameWithoutExtension().toStdString());

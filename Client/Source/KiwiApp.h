@@ -123,6 +123,22 @@ namespace kiwi
         //! @brief Returns the current user
         static Api::AuthUser const& getCurrentUser();
         
+        //! @brief enum describing global file locations for the app.
+        enum FileLocations
+        {
+            Home,
+            Open,
+            Save,
+            Download,
+            Upload,
+        };
+        
+        //! @brief Returns the directory corresponding to a specific location.
+        static juce::File getGlobalDirectoryFor(FileLocations location);
+        
+        //! @brief Sets the directory corresponding to a specific location.
+        static void setGlobalDirectoryFor(FileLocations location, juce::File path);
+        
         //! @brief Log-out the user
         static void logout();
         
