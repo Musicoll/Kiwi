@@ -130,7 +130,7 @@ namespace kiwi
             else
             {
                 updatePosition(tip, screenPos, juce::Desktop::getInstance().getDisplays()
-                               .getDisplayContaining(screenPos).userArea);
+                               .findDisplayForPoint(screenPos).userArea);
                 
                 addToDesktop(  juce::ComponentPeer::windowHasDropShadow
                              | juce::ComponentPeer::windowIsTemporary
