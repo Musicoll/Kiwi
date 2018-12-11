@@ -45,7 +45,7 @@ namespace kiwi
     DocumentBrowserView::DocumentBrowserView(DocumentBrowser& browser, bool enabled)
     : m_browser(browser)
     {
-        setSize(1, 1);
+        setSize(300, 300);
         
         DocumentBrowser::Drive & drive = *m_browser.getDrive();
         
@@ -55,9 +55,6 @@ namespace kiwi
         m_drives.emplace_back(std::move(drive_view));
         
         resized();
-        
-        setSize(300, 300);
-        
         setEnabled(enabled);
     }
     
@@ -99,6 +96,7 @@ namespace kiwi
                                                      std::string const& tooltip)
     : m_drive_view(drive_view)
     , m_name(name)
+    , m_name_label("name", m_name)
     , m_open_btn("open", std::unique_ptr<juce::Drawable>(juce::Drawable::createFromImageData(binary_data::images::open_png, binary_data::images::open_png_size)), ImageButton::ButtonStyle::ImageFitted)
     , m_kiwi_filetype_img(juce::ImageCache::getFromMemory(binary_data::images::kiwi_filetype_png,
                                                         binary_data::images::kiwi_filetype_png_size))
@@ -114,8 +112,6 @@ namespace kiwi
         }
         
         // label setup
-        m_name_label.setText(m_name, juce::NotificationType::dontSendNotification);
-        m_name_label.setSize(1, 1);
         m_name_label.setEditable(false, true, true);
         m_name_label.addListener(this);
         m_name_label.setColour(juce::Label::textColourId, juce::Colours::black.contrasting(0.2));
@@ -175,14 +171,16 @@ namespace kiwi
     
     void DocumentBrowserView::DriveView::RowElem::resized()
     {
-        const auto bounds = getLocalBounds();
+        auto bounds = getLocalBounds().reduced(5);
+        
+        bounds.removeFromLeft(getHeight()); // image
         
         if(!m_drive_view.isShowingTrashedDocuments())
         {
-            m_open_btn.setBounds(bounds.reduced(5).withLeft(bounds.getWidth() - getHeight()));
+            m_open_btn.setBounds(bounds.removeFromRight(bounds.getHeight()));
         }
         
-        m_name_label.setBounds(bounds.reduced(5).withRight(m_open_btn.getX() - 5).withLeft(getHeight()));
+        m_name_label.setBounds(bounds);
     }
     
     void DocumentBrowserView::DriveView::RowElem::mouseEnter(juce::MouseEvent const& e)
@@ -848,7 +846,6 @@ namespace kiwi
         }
         else
         {
-            
             const auto& doc = *documents[row];
             const auto name = doc.getName();
             if(c == nullptr)

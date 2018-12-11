@@ -324,9 +324,9 @@ namespace kiwi
         
         DriveView&          m_drive_view;
         std::string         m_name;
-        ImageButton         m_open_btn;
         juce::Label         m_name_label;
         
+        ImageButton         m_open_btn;
         const juce::Image   m_kiwi_filetype_img;
         
         int                 m_row = -1;
