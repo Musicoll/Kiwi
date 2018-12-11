@@ -210,7 +210,6 @@ namespace kiwi
             Download,
             SortByName,
             SortByCreationTime,
-            SortByCreator,
             SortByLastOpenedTime
         };
         
@@ -238,10 +237,6 @@ namespace kiwi
         sort_menu.addItem(Commands::SortByCreationTime, "Creation date",
                           current_sort != DriveView::SortBy::creationTime,
                           current_sort == DriveView::SortBy::creationTime);
-        
-        sort_menu.addItem(Commands::SortByCreator, "Creator",
-                          current_sort != DriveView::SortBy::author,
-                          current_sort == DriveView::SortBy::author);
         
         sort_menu.addItem(Commands::SortByLastOpenedTime, "Last opened",
                           current_sort != DriveView::SortBy::openedTime,
@@ -291,11 +286,6 @@ namespace kiwi
             case Commands::SortByCreationTime: // sort by creation date
             {
                 m_drive_view.setSortType(DriveView::SortBy::creationTime);
-                break;
-            }
-            case Commands::SortByCreator: // sort by author
-            {
-                m_drive_view.setSortType(DriveView::SortBy::author);
                 break;
             }
             case Commands::SortByLastOpenedTime:
