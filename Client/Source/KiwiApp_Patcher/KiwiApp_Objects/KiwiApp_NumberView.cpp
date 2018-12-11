@@ -52,7 +52,7 @@ namespace kiwi {
     
     void NumberView::drawIcon (juce::Graphics& g) const
     {
-        g.setColour(findColour(ObjectView::ColourIds::Outline));
+        g.setColour(findColour(ObjectView::ColourIds::Background).contrasting(0.2));
         
         const juce::Rectangle<int> icon_bounds = getLocalBounds()
         .withWidth(m_indent - 4).withHeight(getHeight() - 8).translated(2, 4);

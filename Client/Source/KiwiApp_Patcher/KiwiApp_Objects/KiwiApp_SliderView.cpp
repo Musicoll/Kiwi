@@ -43,7 +43,7 @@ namespace kiwi
     m_output_value(object_model.getSignal<>(model::Slider::Signal::OutputValue))
     {
         m_slider.setColour(juce::Slider::ColourIds::backgroundColourId,
-                           findColour(ObjectView::ColourIds::Outline));
+                           findColour(ObjectView::ColourIds::Background).contrasting(0.2f));
         
         m_slider.setColour(juce::Slider::ColourIds::trackColourId,
                            findColour(ObjectView::ColourIds::Active).contrasting(0.2f));
