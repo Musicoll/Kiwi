@@ -74,7 +74,6 @@ include(CMake/ConfigFAUST.cmake)
 add_definitions(${LLVM_DEFINITIONS})
 include_directories(${LLVM_INCLUDE_DIRS})
 
-set(BEAST_INCLUDE_DIRS ${KIWI_DEPENDENCIES_DIR}/Beast/include)
 set(JSON_INCLUDE_DIRS ${KIWI_DEPENDENCIES_DIR}/json)
 set(CONCURRENTQUEUE_INCLUDE_DIRS ${KIWI_DEPENDENCIES_DIR}/concurrentqueue)
 
@@ -132,7 +131,7 @@ source_group_rec("${KIWI_DSP_SOURCES}" ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp)
 # KiwiNetwork
 #------------------------------------------------------------------------------#
 set(KIWI_NETWORK_DEPENDENCIES)
-set(KIWI_NETWORK_INCLUDE_DIRS ${KIWI_MODULE_INCLUDE_DIRS} ${BEAST_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+set(KIWI_NETWORK_INCLUDE_DIRS ${KIWI_MODULE_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 set(KIWI_NETWORK_COMPILE_DEFINITIONS BOOST_ALL_NO_LIB=1)
 
 if(APPLE)

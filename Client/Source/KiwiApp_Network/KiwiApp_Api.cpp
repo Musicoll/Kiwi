@@ -120,7 +120,7 @@ namespace kiwi
                 && hasJsonHeader(res)
                 && res.result() == beast::http::status::ok)
             {
-                const auto j = json::parse(res.body);
+                const auto j = json::parse(res.body());
                 
                 if(j.is_object() && j.count("user"))
                 {
@@ -173,7 +173,7 @@ namespace kiwi
                 && res.result() == beast::http::status::ok)
             {
                 
-                const auto j = json::parse(res.body);
+                const auto j = json::parse(res.body());
                 
                 if(j.is_object() && j.count("message"))
                 {
@@ -207,7 +207,7 @@ namespace kiwi
                 && hasJsonHeader(res)
                 && res.result() == beast::http::status::ok)
             {
-                success(json::parse(res.body));
+                success(json::parse(res.body()));
             }
             else
             {
@@ -244,7 +244,7 @@ namespace kiwi
             {
                 if(hasJsonHeader(res))
                 {
-                    auto j = json::parse(res.body);
+                    auto j = json::parse(res.body());
                     
                     if(j.is_array())
                     {
@@ -274,7 +274,7 @@ namespace kiwi
             {
                 if(hasJsonHeader(res))
                 {
-                    auto j = json::parse(res.body);
+                    auto j = json::parse(res.body());
                     
                     if(j.is_object())
                     {
@@ -313,7 +313,7 @@ namespace kiwi
                 && res.result() == beast::http::status::ok
                 && hasJsonHeader(res))
             {
-                auto j = json::parse(res.body);
+                auto j = json::parse(res.body());
                 
                 if(j.is_object())
                 {
@@ -399,7 +399,7 @@ namespace kiwi
                 && hasJsonHeader(res)
                 && res.result() == beast::http::status::ok)
             {
-                const auto j = json::parse(res.body);
+                const auto j = json::parse(res.body());
                 success(j["token"]);
             }
             else
@@ -434,7 +434,7 @@ namespace kiwi
                 && hasJsonHeader(res)
                 && res.result() == beast::http::status::ok)
             {
-                const auto j = json::parse(res.body);
+                const auto j = json::parse(res.body());
                 
                 if(j.is_object() && j.count("release"))
                 {
@@ -470,7 +470,7 @@ namespace kiwi
                 && hasJsonHeader(res)
                 && res.result() == beast::http::status::ok)
             {
-                const auto j = json::parse(res.body);
+                const auto j = json::parse(res.body());
                 
                 if(j.is_object() && j.count("message"))
                 {
@@ -508,7 +508,7 @@ namespace kiwi
                 && hasJsonHeader(res)
                 && res.result() == beast::http::status::ok)
             {
-                const auto j = json::parse(res.body);
+                const auto j = json::parse(res.body());
                 
                 if(j.is_object() && j.count("message"))
                 {
@@ -607,7 +607,7 @@ namespace kiwi
     {
         if(!response.error && hasJsonHeader(response))
         {
-            const auto j = json::parse(response.body);
+            const auto j = json::parse(response.body());
             
             if(j.count("message"))
             {

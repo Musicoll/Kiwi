@@ -236,7 +236,7 @@ namespace kiwi { namespace network { namespace http {
                 if(!m_payload.content.empty())
                 {
                     request->set(beast::http::field::content_type, "application/x-www-form-urlencoded");
-                    request->body = std::move(m_payload.content);
+                    request->body() = std::move(m_payload.content);
                 }
                 else if(!m_body.content.empty())
                 {
@@ -247,7 +247,7 @@ namespace kiwi { namespace network { namespace http {
                         request->set(beast::http::field::content_type, "application/octet-stream");
                     }
                     
-                    request->body = std::move(m_body.content);
+                    request->body() = std::move(m_body.content);
                 }
             }
             

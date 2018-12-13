@@ -564,7 +564,7 @@ namespace kiwi
         KiwiApp::useApi().downloadDocument(m_document._id,
                                            [session, cb = std::move(callback)](Api::Response res)
         {
-            KiwiApp::useScheduler().schedule([session, res, func = std::bind(cb, res.body)]()
+            KiwiApp::useScheduler().schedule([session, res, func = std::bind(cb, res.body())]()
             {
                 std::shared_ptr<DocumentSession> session_ptr = session.lock();
                 

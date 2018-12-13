@@ -1,5 +1,5 @@
 
-message(STATUS "Boost - searching the static Boost library 1.63.0 with system")
+message(STATUS "Boost - searching the static Boost library 1.69.0 with system")
 option(USE_SYSTEM_BOOST  "Use the pre-compiled Boost library of your system" OFF)
 # -----------------------------------------------------------------------------#
 
@@ -16,9 +16,9 @@ set(BOOST_URL_APPLE "https://github.com/Musicoll/KiwiDependenciesPrebuilt/releas
 set(BOOST_URL_LINUX "https://github.com/Musicoll/KiwiDependenciesPrebuilt/releases/download/v1.3")
 set(BOOST_URL_WIN32 "https://github.com/Musicoll/KiwiDependenciesPrebuilt/releases/download/v1.3")
 
-set(BOOST_PKG_NAME_APPLE "boost_1_63_0")
-set(BOOST_PKG_NAME_LINUX "boost_1_63_0")
-set(BOOST_PKG_NAME_WIN32 "boost_1_63_0")
+set(BOOST_PKG_NAME_APPLE "boost_1_69_0")
+set(BOOST_PKG_NAME_LINUX "boost_1_69_0")
+set(BOOST_PKG_NAME_WIN32 "boost_1_69_0")
 
 set(BOOST_PKG_EXT_APPLE "tar.gz")
 set(BOOST_PKG_EXT_LINUX "tar.gz")
@@ -125,13 +125,13 @@ if(NOT ${USE_SYSTEM_BOOST})
 
 		# Find boost library now it is compiled
 		# -------------------------------------------------------------------------#
-		find_package(Boost 1.63.0 COMPONENTS system)
+		find_package(Boost 1.69.0 COMPONENTS system)
 
 	else()
 
 		# Find boost library with system
 		# -------------------------------------------------------------------------#
-		find_package(Boost 1.63.0 COMPONENTS system)
+		find_package(Boost 1.69.0 COMPONENTS system)
 
 	endif()
 
@@ -139,7 +139,7 @@ else()
 
 	# Find boost library on the system
 	# ---------------------------------------------------------------------------#
-	find_package(Boost 1.63.0 COMPONENTS system)
+	find_package(Boost 1.69.0 COMPONENTS system)
 
 endif(NOT ${USE_SYSTEM_BOOST})
 
