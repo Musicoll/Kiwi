@@ -4,9 +4,6 @@
 [submodule "ThirdParty/concurrentqueue"]
 	path = ThirdParty/concurrentqueue
 	url = https://github.com/cameron314/concurrentqueue.git
-[submodule "ThirdParty/Beast"]
-	path = ThirdParty/Beast
-	url = https://github.com/boostorg/beast.git
 [submodule "ThirdParty/kiwi-node-server"]
 	path = ThirdParty/kiwi-node-server
 	url = https://github.com/Musicoll/kiwi-node-server.git
