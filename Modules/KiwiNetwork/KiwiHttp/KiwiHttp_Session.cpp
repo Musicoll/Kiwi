@@ -111,7 +111,7 @@ namespace kiwi { namespace network { namespace http {
     , m_query()
     , m_req_header()
     {
-        ;
+        m_req_header.version(11);
     }
     
     uint64_t Session::getId() const
