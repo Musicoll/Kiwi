@@ -42,7 +42,7 @@ TEST_CASE("Network - Http Query", "[Network, Http]")
         auto request = std::make_unique<beast::http::request<beast::http::string_body>>();
         request->method(beast::http::verb::get);
         request->target("/get");
-        request->version = 11;
+        request->version(11);
         request->set(beast::http::field::host, "httpbin.org");
         request->set(beast::http::field::user_agent, "test");
         
@@ -60,7 +60,7 @@ TEST_CASE("Network - Http Query", "[Network, Http]")
         auto request = std::make_unique<http::Request<beast::http::string_body>>();
         request->method(beast::http::verb::get);
         request->target("/get");
-        request->version = 11;
+        request->version(11);
         request->set(beast::http::field::host, "httpbin.org");
         request->set(beast::http::field::user_agent, "test");
         
@@ -95,7 +95,7 @@ TEST_CASE("Network - Http Query", "[Network, Http]")
     {
         auto request = std::make_unique<http::Request<beast::http::string_body>>();
         request->method(beast::http::verb::get);;
-        request->version = 11;
+        request->version(11);
         request->set(beast::http::field::host, "example.com");
         
         http::Query<beast::http::string_body, beast::http::string_body> query(std::move(request), "81");
@@ -110,7 +110,7 @@ TEST_CASE("Network - Http Query", "[Network, Http]")
     {
         auto request = std::make_unique<http::Request<beast::http::string_body>>();
         request->method(beast::http::verb::get);
-        request->version = 11;
+        request->version(11);
         request->set(beast::http::field::host, "example.com");
         
         std::function<void(http::Response<beast::http::string_body> const&)>
@@ -130,7 +130,7 @@ TEST_CASE("Network - Http Query", "[Network, Http]")
         auto request = std::make_unique<beast::http::request<beast::http::string_body>>();
         request->method(beast::http::verb::get);
         request->target("/get");
-        request->version = 11;
+        request->version(11);
         request->set(beast::http::field::host, "httpbin.org");
         request->set(beast::http::field::user_agent, "test");
         
@@ -149,7 +149,7 @@ TEST_CASE("Network - Http Query", "[Network, Http]")
     {
         auto request = std::make_unique<http::Request<beast::http::string_body>>();
         request->method(beast::http::verb::get);
-        request->version = 11;
+        request->version(11);
         request->set(beast::http::field::host, "example.com");
         
         std::function<void(http::Response<beast::http::string_body> const&)>
