@@ -3,55 +3,30 @@ message(STATUS "Boost - searching the static Boost library 1.69.0 with system")
 option(USE_SYSTEM_BOOST  "Use the pre-compiled Boost library of your system" OFF)
 # -----------------------------------------------------------------------------#
 
+# Local OS Specific Variables
+# -----------------------------------------------------------------------------#
+set(BOOST_URL "https://github.com/Musicoll/KiwiDependenciesPrebuilt/releases/download/v1.3")
+set(BOOST_PKG_NAME "boost_1_69_0")
+
 # Boost internal directory
 # -----------------------------------------------------------------------------#
 if(NOT DEFINED KIWI_DEPENDENCIES_DIR)
 	set(KIWI_DEPENDENCIES_DIR "${PROJECT_SOURCE_DIR}/ThirdParty")
 endif()
+
 set(KIWI_BOOST_INTERN_DIR "${KIWI_DEPENDENCIES_DIR}/boost")
-
-# Local OS Specific Variables
-# -----------------------------------------------------------------------------#
-set(BOOST_URL_APPLE "https://github.com/Musicoll/KiwiDependenciesPrebuilt/releases/download/v1.3")
-set(BOOST_URL_LINUX "https://github.com/Musicoll/KiwiDependenciesPrebuilt/releases/download/v1.3")
-set(BOOST_URL_WIN32 "https://github.com/Musicoll/KiwiDependenciesPrebuilt/releases/download/v1.3")
-
-set(BOOST_PKG_NAME_APPLE "boost_1_69_0")
-set(BOOST_PKG_NAME_LINUX "boost_1_69_0")
-set(BOOST_PKG_NAME_WIN32 "boost_1_69_0")
-
-set(BOOST_PKG_EXT_APPLE "tar.gz")
-set(BOOST_PKG_EXT_LINUX "tar.gz")
-set(BOOST_PKG_EXT_WIN32 "zip")
-
-set(BOOST_INTERN_INCLUDE_DIR_APPLE "${KIWI_BOOST_INTERN_DIR}")
-set(BOOST_INTERN_INCLUDE_DIR_LINUX "${KIWI_BOOST_INTERN_DIR}")
-set(BOOST_INTERN_INCLUDE_DIR_WIN32 "${KIWI_BOOST_INTERN_DIR}")
-
-set(BOOST_INTERN_LIBRARIES_DIR_APPLE "${KIWI_BOOST_INTERN_DIR}/stage/lib")
-set(BOOST_INTERN_LIBRARIES_DIR_LINUX "${KIWI_BOOST_INTERN_DIR}/stage/lib")
-set(BOOST_INTERN_LIBRARIES_DIR_WIN32 "${KIWI_BOOST_INTERN_DIR}/stage64/lib")
 
 # Local Generic Variables
 # -----------------------------------------------------------------------------#
 if(APPLE)
-	set(BOOST_URL ${BOOST_URL_APPLE})
-	set(BOOST_PKG_NAME ${BOOST_PKG_NAME_APPLE})
-	set(BOOST_PKG_EXT ${BOOST_PKG_EXT_APPLE})
-	set(BOOST_INTERN_INCLUDE_DIR ${BOOST_INTERN_INCLUDE_DIR_APPLE})
-	set(BOOST_INTERN_LIBRARIES_DIR ${BOOST_INTERN_LIBRARIES_DIR_APPLE})
+	set(BOOST_PKG_EXT "tar.gz")
+	set(BOOST_INTERN_LIBRARIES_DIR "${KIWI_BOOST_INTERN_DIR}/stage/lib")
 elseif(UNIX)
-	set(BOOST_URL ${BOOST_URL_LINUX})
-	set(BOOST_PKG_NAME ${BOOST_PKG_NAME_LINUX})
-	set(BOOST_PKG_EXT ${BOOST_PKG_EXT_LINUX})
-	set(BOOST_INTERN_INCLUDE_DIR ${BOOST_INTERN_INCLUDE_DIR_LINUX})
-	set(BOOST_INTERN_LIBRARIES_DIR ${BOOST_INTERN_LIBRARIES_DIR_LINUX})
+	set(BOOST_PKG_EXT "tar.gz")
+	set(BOOST_INTERN_LIBRARIES_DIR "${KIWI_BOOST_INTERN_DIR}/stage/lib")
 elseif(WIN32)
-	set(BOOST_URL ${BOOST_URL_WIN32})
-	set(BOOST_PKG_NAME ${BOOST_PKG_NAME_WIN32})
-	set(BOOST_PKG_EXT ${BOOST_PKG_EXT_WIN32})
-	set(BOOST_INTERN_INCLUDE_DIR ${BOOST_INTERN_INCLUDE_DIR_WIN32})
-	set(BOOST_INTERN_LIBRARIES_DIR ${BOOST_INTERN_LIBRARIES_DIR_WIN32})
+	set(BOOST_PKG_EXT "zip")
+	set(BOOST_INTERN_LIBRARIES_DIR "${KIWI_BOOST_INTERN_DIR}/stage64/lib")
 endif()
 
 set(BOOST_PKG_FILE "${BOOST_PKG_NAME}.${BOOST_PKG_EXT}")
@@ -120,7 +95,7 @@ if(NOT ${USE_SYSTEM_BOOST})
 		elseif(UNIX)
 			execute_process(COMMAND ./b2 --with-system stage WORKING_DIRECTORY ${KIWI_BOOST_INTERN_DIR})
 		elseif(WIN32)
-			execute_process(COMMAND b2 --toolset=msvc-14.0 -j4 --with-system --stagedir=stage64 variant=release architecture=x86 address-model=64 link=static WORKING_DIRECTORY ${KIWI_BOOST_INTERN_DIR})
+			execute_process(COMMAND b2 --toolset=msvc -j4 --with-system --stagedir=stage64 variant=release architecture=x86 address-model=64 link=static WORKING_DIRECTORY ${KIWI_BOOST_INTERN_DIR})
 		endif()
 
 		# Find boost library now it is compiled
