@@ -95,7 +95,7 @@ if(NOT ${USE_SYSTEM_BOOST})
 		elseif(UNIX)
 			execute_process(COMMAND ./b2 --with-system stage WORKING_DIRECTORY ${KIWI_BOOST_INTERN_DIR})
 		elseif(WIN32)
-			execute_process(COMMAND b2 --toolset=msvc -j4 --with-system --stagedir=stage64 variant=release architecture=x86 address-model=64 link=static WORKING_DIRECTORY ${KIWI_BOOST_INTERN_DIR})
+			execute_process(COMMAND b2 --toolset=msvc-14.0 -j4 --with-system --stagedir=stage64 variant=release architecture=x86 address-model=64 link=static WORKING_DIRECTORY ${KIWI_BOOST_INTERN_DIR})
 		endif()
 
 		# Find boost library now it is compiled
