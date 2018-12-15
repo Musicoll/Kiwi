@@ -120,7 +120,9 @@ namespace kiwi
                 && hasJsonHeader(res)
                 && res.result() == beast::http::status::ok)
             {
-                const auto j = json::parse(res.body());
+                json j;
+                try { j = json::parse(res.body()); }
+                catch (json::parse_error& e) { std::cerr << "json::parse_error: " << e.what() << '\n'; }
                 
                 if(j.is_object() && j.count("user"))
                 {
@@ -172,8 +174,9 @@ namespace kiwi
                 && hasJsonHeader(res)
                 && res.result() == beast::http::status::ok)
             {
-                
-                const auto j = json::parse(res.body());
+                json j;
+                try { j = json::parse(res.body()); }
+                catch (json::parse_error& e) { std::cerr << "json::parse_error: " << e.what() << '\n'; }
                 
                 if(j.is_object() && j.count("message"))
                 {
@@ -207,7 +210,11 @@ namespace kiwi
                 && hasJsonHeader(res)
                 && res.result() == beast::http::status::ok)
             {
-                success(json::parse(res.body()));
+                json j;
+                try { j = json::parse(res.body()); }
+                catch (json::parse_error& e) { std::cerr << "json::parse_error: " << e.what() << '\n'; }
+                
+                success(j);
             }
             else
             {
@@ -244,7 +251,9 @@ namespace kiwi
             {
                 if(hasJsonHeader(res))
                 {
-                    auto j = json::parse(res.body());
+                    json j;
+                    try { j = json::parse(res.body()); }
+                    catch (json::parse_error& e) { std::cerr << "json::parse_error: " << e.what() << '\n'; }
                     
                     if(j.is_array())
                     {
@@ -274,7 +283,9 @@ namespace kiwi
             {
                 if(hasJsonHeader(res))
                 {
-                    auto j = json::parse(res.body());
+                    json j;
+                    try { j = json::parse(res.body()); }
+                    catch (json::parse_error& e) { std::cerr << "json::parse_error: " << e.what() << '\n'; }
                     
                     if(j.is_object())
                     {
@@ -313,7 +324,9 @@ namespace kiwi
                 && res.result() == beast::http::status::ok
                 && hasJsonHeader(res))
             {
-                auto j = json::parse(res.body());
+                json j;
+                try { j = json::parse(res.body()); }
+                catch (json::parse_error& e) { std::cerr << "json::parse_error: " << e.what() << '\n'; }
                 
                 if(j.is_object())
                 {
@@ -399,13 +412,18 @@ namespace kiwi
                 && hasJsonHeader(res)
                 && res.result() == beast::http::status::ok)
             {
-                const auto j = json::parse(res.body());
-                success(j["token"]);
+                json j;
+                try { j = json::parse(res.body()); }
+                catch (json::parse_error& e) { std::cerr << "json::parse_error: " << e.what() << '\n'; }
+                
+                if(j.count("token"))
+                {
+                    success(j["token"]);
+                    return;
+                }
             }
-            else
-            {
-                fail(res);
-            }
+            
+            fail(res);
         };
         
         session->GetAsync(std::move(callback));
@@ -434,7 +452,9 @@ namespace kiwi
                 && hasJsonHeader(res)
                 && res.result() == beast::http::status::ok)
             {
-                const auto j = json::parse(res.body());
+                json j;
+                try { j = json::parse(res.body()); }
+                catch (json::parse_error& e) { std::cerr << "json::parse_error: " << e.what() << '\n'; }
                 
                 if(j.is_object() && j.count("release"))
                 {
@@ -470,7 +490,9 @@ namespace kiwi
                 && hasJsonHeader(res)
                 && res.result() == beast::http::status::ok)
             {
-                const auto j = json::parse(res.body());
+                json j;
+                try { j = json::parse(res.body()); }
+                catch (json::parse_error& e) { std::cerr << "json::parse_error: " << e.what() << '\n'; }
                 
                 if(j.is_object() && j.count("message"))
                 {
@@ -508,7 +530,9 @@ namespace kiwi
                 && hasJsonHeader(res)
                 && res.result() == beast::http::status::ok)
             {
-                const auto j = json::parse(res.body());
+                json j;
+                try { j = json::parse(res.body()); }
+                catch (json::parse_error& e) { std::cerr << "json::parse_error: " << e.what() << '\n'; }
                 
                 if(j.is_object() && j.count("message"))
                 {
@@ -601,13 +625,15 @@ namespace kiwi
         
     }
         
-    Api::Error::Error(Api::Response const& response)
-    : m_status_code(response.result_int())
-    , m_message(response.error ? response.error.message() : "Unknown Error")
+    Api::Error::Error(Api::Response const& res)
+    : m_status_code(res.result_int())
+    , m_message(res.error ? res.error.message() : "Unknown Error")
     {
-        if(!response.error && hasJsonHeader(response))
+        if(!res.error && hasJsonHeader(res))
         {
-            const auto j = json::parse(response.body());
+            json j;
+            try { j = json::parse(res.body()); }
+            catch (json::parse_error& e) { std::cerr << "json::parse_error: " << e.what() << '\n'; }
             
             if(j.count("message"))
             {
