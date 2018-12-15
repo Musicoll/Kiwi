@@ -400,10 +400,25 @@ namespace kiwi
         
         bool Server::Session::authenticateUser(uint64_t user, std::string metadata) const
         {
-            const auto j = json::parse(metadata);
-            return j["model_version"] == KIWI_MODEL_VERSION_STRING
-                   && j["open_token"] == m_token
-                   && j["kiwi_version"] == m_kiwi_version;
+            json j;
+            
+            try
+            {
+                j = json::parse(metadata);
+            }
+            catch (json::parse_error& e)
+            {
+                std::cout << "message: " << e.what() << '\n';
+                return false;
+            }
+            
+            static const auto model_version = "model_version";
+            static const auto open_token = "open_token";
+            static const auto kiwi_version = "kiwi_version";
+            
+            return ((j.count(model_version) && j[model_version] == KIWI_MODEL_VERSION_STRING)
+                    && (j.count(open_token) && j[open_token] == m_token)
+                    && (j.count(kiwi_version) && j[kiwi_version] == m_kiwi_version));
         }
         
         void Server::Session::bind(flip::PortBase & port)

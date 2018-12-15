@@ -99,9 +99,9 @@ int main(int argc, char const* argv[])
     {
          config = json::parse(config_file.loadFileAsString().toStdString());
     }
-    catch(nlohmann::detail::parse_error const& e)
+    catch(json::parse_error& e)
     {
-        std::cerr << "Parsing config file failed : " << e.what() << "\n";
+        std::cerr << "Parsing config file failed : " << e.what() << '\n';
         return 0;
     }
     
