@@ -25,31 +25,36 @@ set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
 # COMPILATION FLAGS
 #-------------------------------------------------------------------------------
 
-if(WIN32)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD /O2")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd /Zi /Od")
-else()
-  if(APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall") #-Weverything -Wno-c++98-compat -Wno-undef")
-		if(CMAKE_GENERATOR STREQUAL Xcode)
-		    set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_VALUE YES)
-				set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_VARIABLE YES)
-				set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_PARAMETER NO)
-				set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_LABEL YES)
-				set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_FUNCTION YES)
-
-				set(CMAKE_XCODE_ATTRIBUTE_CLANG_WARN_UNREACHABLE_CODE YES)
-				set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNKNOWN_PRAGMAS YES)
-		endif()
-  else() # linux
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-multichar -Wno-sign-compare")
-  endif()
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
-endif()
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG=1")
+
+if(WIN32)
+
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD /O2")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd /Zi /Od")
+
+else() # unix
+
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
+
+	if(APPLE)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall") #-Weverything -Wno-c++98-compat -Wno-undef")
+		if(CMAKE_GENERATOR STREQUAL Xcode)
+			set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_VALUE YES)
+			set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_VARIABLE YES)
+			set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_PARAMETER NO)
+			set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_LABEL YES)
+			set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_FUNCTION YES)
+			set(CMAKE_XCODE_ATTRIBUTE_CLANG_WARN_UNREACHABLE_CODE YES)
+			set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNKNOWN_PRAGMAS YES)
+		endif()
+
+	else() # linux
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-multichar -Wno-sign-compare")
+	endif()
+endif()
 
 #--------------------------------------
 # Macros
@@ -77,11 +82,13 @@ include_directories(${LLVM_INCLUDE_DIRS})
 set(JSON_INCLUDE_DIRS ${KIWI_DEPENDENCIES_DIR}/json)
 set(CONCURRENTQUEUE_INCLUDE_DIRS ${KIWI_DEPENDENCIES_DIR}/concurrentqueue)
 
+#------------------------------------------------------------------------------#
 # Kiwi
 # -----------------------------------------------------------------------------#
 message(STATUS "Configuring Kiwi")
 set(KIWI_MODULE_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/Modules)
 
+#------------------------------------------------------------------------------#
 # KiwiTool
 # -----------------------------------------------------------------------------#
 set(KIWI_TOOL_INCLUDE_DIRS ${KIWI_MODULE_INCLUDE_DIRS} ${CONCURRENTQUEUE_INCLUDE_DIRS})
@@ -95,6 +102,7 @@ target_include_directories(KiwiTool PUBLIC ${KIWI_TOOL_INCLUDE_DIRS})
 set_target_properties(KiwiTool PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_TOOL_SOURCES}" ${PROJECT_SOURCE_DIR}/Modules/KiwiTool)
 
+#------------------------------------------------------------------------------#
 # KiwiModel
 #------------------------------------------------------------------------------#
 set(KIWI_MODEL_DEPENDENCIES KiwiTool)
@@ -112,6 +120,7 @@ target_link_libraries(KiwiModel PUBLIC ${KIWI_MODEL_LINK_LIBRARIES})
 set_target_properties(KiwiModel PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_MODEL_SOURCES}" ${PROJECT_SOURCE_DIR}/Modules/KiwiModel)
 
+#------------------------------------------------------------------------------#
 # KiwiDsp
 #------------------------------------------------------------------------------#
 set(KIWI_DSP_DEPENDENCIES)
@@ -128,6 +137,7 @@ target_link_libraries(KiwiDsp PUBLIC ${KIWI_DSP_LINK_LIBRARIES})
 set_target_properties(KiwiDsp PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_DSP_SOURCES}" ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp)
 
+#------------------------------------------------------------------------------#
 # KiwiNetwork
 #------------------------------------------------------------------------------#
 set(KIWI_NETWORK_DEPENDENCIES)
@@ -137,7 +147,7 @@ set(KIWI_NETWORK_COMPILE_DEFINITIONS BOOST_ALL_NO_LIB=1)
 if(APPLE)
 	set(KIWI_NETWORK_LINK_LIBRARIES ${Boost_LIBRARIES})
 elseif(UNIX)
-  set(KIWI_NETWORK_LINK_LIBRARIES ${Boost_LIBRARIES} ${PTHREAD})
+	set(KIWI_NETWORK_LINK_LIBRARIES ${Boost_LIBRARIES} ${PTHREAD})
 elseif(WIN32)
 	set(KIWI_NETWORK_LINK_LIBRARIES ${Boost_LIBRARIES} ${ws2_32})
 endif()
@@ -260,13 +270,15 @@ endif()
 
 source_group_rec("${KIWI_CLIENT_SOURCES}" ${PROJECT_SOURCE_DIR}/Client/Source)
 
+#------------------------------------------------------------------------------#
 # Tests
 #------------------------------------------------------------------------------#
+
 # Coverage setting
 if(${GCOV_SUPPORT} STREQUAL "On")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
-  set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+	set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
 	set(KIWI_TESTS_LINK_LIBRARIES gcov)
 endif()
 
@@ -326,14 +338,14 @@ target_link_libraries(test_server PUBLIC KiwiServer ${KIWI_TESTS_LINK_LIBRARIES}
 source_group_rec("${TEST_SERVER_SOURCES}" ${PROJECT_SOURCE_DIR}/Test/Server)
 
 # Tests Target
-
+#------------------------------------------------------------------------------#
 add_custom_target(Tests ALL DEPENDS test_dsp test_model test_network test_tool)
 set_target_properties(Tests PROPERTIES FOLDER Test)
 
-add_custom_command(TARGET Tests
-                   POST_BUILD COMMAND test_dsp
-                              COMMAND test_model
-                              COMMAND test_tool
-                              COMMAND test_server
-                              COMMAND test_network
-                   USES_TERMINAL)
+add_custom_command(TARGET Tests POST_BUILD
+	COMMAND test_dsp
+	COMMAND test_model
+	COMMAND test_tool
+	COMMAND test_server
+	COMMAND test_network
+USES_TERMINAL)
