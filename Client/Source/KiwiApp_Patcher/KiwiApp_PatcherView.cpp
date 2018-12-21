@@ -2148,8 +2148,8 @@ namespace kiwi
             case CommandIDs::openObjectHelp:
             {
                 const bool active = (!isLocked()
-                                     && isAnyObjectSelected()
-                                     && m_local_objects_selection.size() == 1);
+                                     && m_local_objects_selection.size() == 1
+                                     && KiwiApp::use().getKiwiObjectHelpDirectory().exists());
                 
                 auto text = TRANS("Help");
                 
