@@ -109,7 +109,7 @@ namespace kiwi
         
         declareObjectViews();
         
-        initRessources();
+        initResources();
         
         juce::Desktop::getInstance().setGlobalScaleFactor(1.);
         
@@ -353,7 +353,7 @@ namespace kiwi
         return *KiwiApp::use().m_scheduler;
     }
     
-    juce::File KiwiApp::getKiwiRessourcesDirectory()
+    juce::File KiwiApp::getKiwiResourcesDirectory()
     {
         using juce::File;
         const auto apppath = File::getSpecialLocation(File::SpecialLocationType::currentApplicationFile);
@@ -367,17 +367,17 @@ namespace kiwi
     
     juce::File KiwiApp::getKiwiObjectHelpDirectory()
     {
-        static const auto helps = getKiwiRessourcesDirectory().getChildFile("helps");
+        static const auto helps = getKiwiResourcesDirectory().getChildFile("helps");
         return helps;
     }
     
     juce::File KiwiApp::getKiwiExamplesDirectory()
     {
-        static const auto examples = getKiwiRessourcesDirectory().getChildFile("examples");
+        static const auto examples = getKiwiResourcesDirectory().getChildFile("examples");
         return examples;
     }
     
-    void KiwiApp::initRessources()
+    void KiwiApp::initResources()
     {
         // initialise help file aliases, ex:
         // helpfile > < operators

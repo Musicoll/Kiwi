@@ -22,7 +22,7 @@
 #include "KiwiApp_PatcherComponent.h"
 #include "KiwiApp_PatcherView.h"
 
-#include "../KiwiApp_Ressources/KiwiApp_BinaryData.h"
+#include "../KiwiApp_Resources/KiwiApp_BinaryData.h"
 #include "../KiwiApp.h"
 #include "../KiwiApp_General/KiwiApp_CommandIDs.h"
 #include "../KiwiApp_Components/KiwiApp_CustomToolbarButton.h"

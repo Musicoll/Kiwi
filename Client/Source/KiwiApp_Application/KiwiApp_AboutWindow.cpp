@@ -25,7 +25,7 @@
 
 #include "../KiwiApp.h"
 
-#include "../KiwiApp_Ressources/KiwiApp_BinaryData.h"
+#include "../KiwiApp_Resources/KiwiApp_BinaryData.h"
 
 namespace kiwi
 {

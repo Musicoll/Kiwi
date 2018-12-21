@@ -18,8 +18,8 @@ if sys.version_info[0] != 2 or sys.version_info[1] < 7:
 #==============================================================================
 
 tab_count = 0
-DEFAULT_INPUT_PATH = "./Ressources/BinaryRes"
-DEFAULT_OUTPUT_PATH = "./Client/Source/KiwiApp_Ressources"
+DEFAULT_INPUT_PATH = "./Resources/BinaryRes"
+DEFAULT_OUTPUT_PATH = "./Client/Source/KiwiApp_Resources"
 
 #==============================================================================
 # Name : parse_args
@@ -145,7 +145,7 @@ output_h_file = open(os.path.join(args.output, "KiwiApp_BinaryData.h"), "a")
 
 # Append license header info
 
-header_file = open(os.path.join(os.getcwd(), "Ressources", "SourceHeader.txt"), "r")
+header_file = open(os.path.join(os.getcwd(), "Resources", "SourceHeader.txt"), "r")
 
 header_txt = header_file.read() + '\n';
 header_file.close()

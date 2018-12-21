@@ -105,8 +105,8 @@ namespace kiwi
         //! @brief Gets the application scheduler.
         static tool::Scheduler<>& useScheduler();
         
-        //! @brief Returns the Kiwi ressources directory.
-        juce::File getKiwiRessourcesDirectory();
+        //! @brief Returns the Kiwi resources directory.
+        juce::File getKiwiResourcesDirectory();
         
         //! @brief Returns the Kiwi object Help directory.
         juce::File getKiwiObjectHelpDirectory();
@@ -255,7 +255,7 @@ namespace kiwi
     private: // methods
         
         //! @internal Initialise ressource stuffs at startup
-        void initRessources();
+        void initResources();
         
         //! @internal Returns true if the App is compatible with a given server version.
         bool canConnectToServerVersion(std::string const& server_version);
