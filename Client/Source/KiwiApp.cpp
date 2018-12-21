@@ -361,7 +361,7 @@ namespace kiwi
 #if JUCE_MAC
         return apppath.getChildFile("Contents/Resources");
 #else
-        return apppath;
+        return apppath.getParentDirectory();
 #endif
     }
     
