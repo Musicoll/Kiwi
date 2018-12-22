@@ -52,9 +52,9 @@ The documentation of Kiwi is available [online](http://musicoll.github.io/Kiwi) 
 ```
 npm install -g github-wikito-converter
 ```
-Then, from the **docs** folder, run:
+Then, from the **Kiwi root** folder, run:
 ```
-gwtc -t Kiwi -n index  ./
+python ./Script/gendoc.py
 ```
 
 ### Organizations
