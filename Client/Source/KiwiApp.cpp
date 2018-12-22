@@ -868,7 +868,7 @@ namespace kiwi
         }
         
         menu.addSeparator();
-        menu.addCommandItem(m_command_manager.get(), CommandIDs::showDocumentationOnline);
+        menu.addCommandItem(m_command_manager.get(), CommandIDs::showDocumentation);
     }
     
     void KiwiApp::handleMainMenuCommand(int menu_item_ID)
@@ -1011,7 +1011,7 @@ namespace kiwi
             CommandIDs::openFile,
             CommandIDs::showConsoleWindow,
             CommandIDs::showAboutAppWindow,
-            CommandIDs::showDocumentationOnline,
+            CommandIDs::showDocumentation,
             CommandIDs::showAudioStatusWindow,
             CommandIDs::showAppSettingsWindow,
             CommandIDs::showDocumentBrowserWindow,
@@ -1102,9 +1102,9 @@ namespace kiwi
                                CommandCategories::windows, 0);
                 break;
             }
-            case CommandIDs::showDocumentationOnline:
+            case CommandIDs::showDocumentation:
             {
-                result.setInfo(TRANS("Documentation (online)"), TRANS("Show the online documentation"),
+                result.setInfo(TRANS("Documentation"), TRANS("Show the documentation"),
                                CommandCategories::windows, 0);
                 break;
             }
@@ -1225,10 +1225,17 @@ namespace kiwi
                 m_instance->showAboutKiwiWindow();
                 break;
             }
-            case CommandIDs::showDocumentationOnline :
+            case CommandIDs::showDocumentation :
             {
-                juce::URL doc_url ("http://musicoll.github.io/Kiwi/");
-                doc_url.launchInDefaultBrowser();
+                const auto docs_index = getKiwiResourcesDirectory().getChildFile("docs/index.html");
+                if(docs_index.existsAsFile())
+                {
+                    docs_index.startAsProcess();
+                }
+                else
+                {
+                    KiwiApp::error("can't open documentation!");
+                }
                 break;
             }
             case CommandIDs::showAppSettingsWindow :

@@ -105,12 +105,7 @@ matrix:
     - xcodebuild -scheme Server -configuration Release
     after_success:
     - cd $TRAVIS_BUILD_DIR
-    - cp -r docs documentation
-    - zip -r documentation.zip documentation
-    - rm -r documentation
-    - mkdir Kiwi
-    - mv Build/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
-    - mv documentation.zip Kiwi/documentation.zip
+    - mkdir Kiwi && mv Build/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
     - zip -r Kiwi-macos-64.zip Kiwi
     - mkdir KiwiServer && mv Build/KiwiBuild/Release/Server KiwiServer/Server
     - zip -r Kiwi-server-macos-64.zip KiwiServer
