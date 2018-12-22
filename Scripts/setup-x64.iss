@@ -4,7 +4,7 @@
 #define MyAppName "Kiwi"
 #define MyAppVersion "v1.0.3"
 #define MyAppPublisher "CICM"
-#define MyAppURL "http://kiwi.mshparisnord.fr/"
+#define MyAppURL "https://github.com/Musicoll/Kiwi"
 #define MyAppExeName "Kiwi.exe"
 
 [Setup]
@@ -32,16 +32,17 @@ ChangesAssociations = yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
-Name: "french"; MessagesFile: "compiler:Languages\French.isl"
-Name: "german"; MessagesFile: "compiler:Languages\German.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-Name: mypAssociation; Description: "Associate ""kiwi"" extension"; GroupDescription: File extensions:
+Name: mypAssociation; Description: "Associate ""kiwi"" and ""kiwihelp"" extensions"; GroupDescription: "File extensions:"
 
 [Files]
 Source: "..\Build\KiwiBuild\Release\Kiwi.exe"; DestDir: "{app}"; Flags: ignoreversion;
-Source: "..\ThirdParty\faust\libraries\*"; DestDir: "{app}\Faust\Libs"; Flags: ignoreversion;
+Source: "..\Resources\helps"; DestDir: "{app}\helps"; Flags: ignoreversion recursesubdirs createallsubdirs;
+Source: "..\docs"; DestDir: "{app}\docs"; Flags: ignoreversion recursesubdirs createallsubdirs;
+Source: "..\Resources\examples"; DestDir: "{app}\examples"; Flags: ignoreversion recursesubdirs createallsubdirs;
+Source: "..\ThirdParty\faust\libraries\*"; DestDir: "{app}\libs\faust"; Flags: ignoreversion recursesubdirs createallsubdirs;
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -49,11 +50,11 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Registry]
-
 Root: HKCR; Subkey: ".kiwi"; ValueData: "{#MyAppName}"; Flags: uninsdeletevalue; ValueType: string;  ValueName: ""; Tasks: mypAssociation
-Root: HKCR; Subkey: "{#MyAppName}"; ValueData: "Program {#MyAppName}";  Flags: uninsdeletekey;   ValueType: string;  ValueName: ""; Tasks: mypAssociation
-Root: HKCR; Subkey: "{#MyAppName}\DefaultIcon";             ValueData: "{app}\{#MyAppExeName},0";               ValueType: string;  ValueName: ""; Tasks: mypAssociation
-Root: HKCR; Subkey: "{#MyAppName}\shell\open\command";  ValueData: """{app}\{#MyAppExeName}"" ""%1""";  ValueType: string;  ValueName: ""; Tasks: mypAssociation
+Root: HKCR; Subkey: ".kiwihelp"; ValueData: "{#MyAppName}"; Flags: uninsdeletevalue; ValueType: string;  ValueName: ""; Tasks: mypAssociation
+Root: HKCR; Subkey: "{#MyAppName}"; ValueData: "Program {#MyAppName}";  Flags: uninsdeletekey; ValueType: string;  ValueName: ""; Tasks: mypAssociation
+Root: HKCR; Subkey: "{#MyAppName}\DefaultIcon"; ValueData: "{app}\{#MyAppExeName},0"; ValueType: string;  ValueName: ""; Tasks: mypAssociation
+Root: HKCR; Subkey: "{#MyAppName}\shell\open\command"; ValueData: """{app}\{#MyAppExeName}"" ""%1""";  ValueType: string;  ValueName: ""; Tasks: mypAssociation
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
