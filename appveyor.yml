@@ -41,7 +41,7 @@ deploy:
     release: $(APPVEYOR_REPO_TAG_NAME)
     auth_token:
         secure: ZtKK8yOVkgIf+6Vm0jQLCbjCjuTiln3w2k/xMHI/kgardyCVtZ6plKI5O8lR3NNY
-    artifact: /.*\.zip/
+    artifact: Kiwi-windows-64.zip
     draft: true
     prerelease: false
     on:
