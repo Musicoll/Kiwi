@@ -1,18 +1,26 @@
 ### v1.0.3
 
-User:
-- Add [route] object.
+New Objects:
+- [OSC.receive] and [OSC.send] objects. Receive and send Open Sound Control data.
+- [route] object.
+- [faust~] object. Load, edit and run [FAUST](http://faust.grame.fr/) code in Kiwi.
+
+Misc:
 - Save patcher per user size and position in the document.
 - Add a search bar to the DocumentBrowser window and fix sorting.
-- Add [faust~] object. Load, edit and run [FAUST](http://faust.grame.fr/) code in Kiwi.
-- Add english/french documentation to the distribution
-- Add help files to the distribution
+- Add documentation to the distribution
+- Access helps and examples files from the application.
 - Add tutorials to the distribution
+- Fix DocumentBrowser sorting bug.
+- better stack-overflow handling
+- Save and restore last path for "open, save, download, upload" actions.
 
 Dev:
 - [server] Allow relative or absolute backend path.
 - Improve build system using CMake only
 - Improve build/node server documentation
+- boost updated to 1.69.0
+- Add .kiwihelp extension
 
 ### v1.0.2
 
