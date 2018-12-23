@@ -43,7 +43,7 @@ Source: "..\Resources\helps"; DestDir: "{app}\helps"; Flags: ignoreversion recur
 Source: "..\docs"; DestDir: "{app}\docs"; Flags: ignoreversion recursesubdirs createallsubdirs;
 Source: "..\Resources\examples"; DestDir: "{app}\examples"; Flags: ignoreversion recursesubdirs createallsubdirs;
 Source: "..\ThirdParty\faust\libraries\*"; DestDir: "{app}\libs\faust"; Flags: ignoreversion recursesubdirs createallsubdirs;
-Source: "Changelog.txt"; DestDir: "{app}"; Flags: ignoreversion;
+Source: "..\Changelog.txt"; DestDir: "{app}"; Flags: ignoreversion;
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
