@@ -68,6 +68,8 @@ namespace kiwi {
         const float circle_outer = 80.f * (width * 0.01f);
         const float circle_thickness = 10.f * (width * 0.01f);
         
+        g.setColour(findColour(ObjectView::ColourIds::Background).contrasting(0.2));
+        
         g.drawEllipse(bounds.reduced(width - circle_outer), circle_thickness);
         
         if (m_mouse_down || m_active)
@@ -97,13 +99,12 @@ namespace kiwi {
         {
             m_active = true;
             repaint();
+            
+            schedule([this]() {
+                m_active = false;
+                repaint();
+            }, std::chrono::milliseconds(150));
         }
-        
-        schedule([this]()
-        {
-            m_active = false;
-            repaint();
-        }, std::chrono::milliseconds(150));
     }
     
     void BangView::signalTriggered()

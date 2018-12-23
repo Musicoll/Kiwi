@@ -23,6 +23,10 @@
 
 #include <KiwiModel/KiwiModel_Def.h>
 #include <KiwiModel/KiwiModel_DataModel.h>
+
+#include <KiwiModel/KiwiModel_Point.h>
+#include <KiwiModel/KiwiModel_Bounds.h>
+
 #include <KiwiModel/KiwiModel_PatcherUser.h>
 
 namespace kiwi
@@ -100,6 +104,9 @@ namespace kiwi
             model::SfPlayTilde::declare();
             model::SfRecordTilde::declare();
             model::FaustTilde::declare();
+            model::Route::declare();
+            model::OSCReceive::declare();
+            model::OSCSend::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)
@@ -114,6 +121,10 @@ namespace kiwi
             #endif
             
             DataModel::version(model_version);
+            
+            // basic data structures
+            model::Point::declare();
+            model::Bounds::declare();
             
             // patcher elements declaration :
             model::Object::declare();

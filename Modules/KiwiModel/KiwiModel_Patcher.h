@@ -125,10 +125,12 @@ namespace kiwi
             
             enum
             {
-                Signal_USER_CONNECT     = 0,
+                Signal_USER_CONNECT = 0,
                 Signal_USER_DISCONNECT,
                 Signal_GET_CONNECTED_USERS,
                 Signal_RECEIVE_CONNECTED_USERS,
+                Signal_STACK_OVERFLOW,
+                Signal_STACK_OVERFLOW_CLEAR,
             };
             
             // from server to client
@@ -142,6 +144,12 @@ namespace kiwi
             
             // from server to client
             flip::Signal<std::vector<uint64_t>> signal_receive_connected_users;
+            
+            // used by the engine when a stack-overflow is detected
+            flip::Signal<std::vector<flip::Ref>> signal_stack_overflow;
+            
+            // used by the view to clear stack-overflow
+            flip::Signal<> signal_stack_overflow_clear;
             
         public: // internal methods
             

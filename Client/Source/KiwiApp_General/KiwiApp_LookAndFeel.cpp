@@ -20,7 +20,7 @@
  */
 
 #include "../KiwiApp_General/KiwiApp_LookAndFeel.h"
-#include "../KiwiApp_Ressources/KiwiApp_BinaryData.h"
+#include "../KiwiApp_Resources/KiwiApp_BinaryData.h"
 
 #include <KiwiApp_Patcher/KiwiApp_PatcherView.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectView.h>

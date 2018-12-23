@@ -95,11 +95,10 @@ namespace kiwi
     private: // members
         
         PatcherView&                m_patcher;
-        juce::Viewport              m_viewport;
         Component                   m_magnifier;
-        juce::Rectangle<int>        m_last_bounds;
-        juce::Rectangle<int>        m_patching_area;
-        double                      m_zoom_factor;
-        bool                        m_can_hook_resized;
+        juce::Rectangle<int>        m_last_bounds {};
+        juce::Rectangle<int>        m_patching_area {};
+        double                      m_zoom_factor = 1.;
+        bool                        m_can_hook_resized = false;
     };
 }

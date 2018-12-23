@@ -1,6 +1,6 @@
 <p align="center">
   <h1 align="center">
-    <img src="http://musicoll.github.io/Kiwi/ressources/img/kiwi_icon.png" height=40px/> Kiwi
+    <img src="https://github.com/Musicoll/Kiwi/blob/master/Resources/BinaryRes/Images/kiwi_icon.png" height=40px/> Kiwi
   </h1>
   <p align="center">
     A real-time collaborative audio patching software
@@ -20,7 +20,7 @@
 
 Kiwi is part of the French ANR-funded [MUSICOLL](http://musicoll.mshparisnord.org/) project that unites the [CICM](http://cicm.mshparisnord.org/) and [OhmForce](https://www.ohmforce.com/Company.do). The main goal of this project is to study how collaboration can enhance the way digital audio music composition is taught and more generally how it can improve music creation workflow. It enables several creators to work simultaneously on a same patch hosted online and accessible from any connected terminal.
 
-<img title="register" src="https://raw.github.com/Musicoll/Kiwi/master/docs/ressources/img/Kiwi-v1.0.0.jpg" height=400px/>
+<img title="register" src="https://raw.github.com/Musicoll/Kiwi/master/docs/img/Kiwi-v1.0.0.jpg" height=400px/>
 
 ### Compilation
 
@@ -41,7 +41,7 @@ This default CMake approach downloads and compiles all the dependencies [Flip](h
 Enables or disable the personal/system library for Flip with the option `USE_SYSTEM_FLIP ON/OFF (default OFF)`. Flip must be compiled as a static library compatible with the commit **c47e41da05**.  Use the variable `FLIP_INCLUDE_DIRS PATHS` to define the Flip include directories and the variable `FLIP_LIBRARY_DIRS PATHS` to define the Flip library directories.
 
 - Boost  
-Enables or disable the personal/system library for Boost with the option `USE_SYSTEM_BOOST ON/OFF (default OFF)`. Boost must be compiled as a static library with the system component and compatible with the version **1.63.0**. See this [documentation](https://cmake.org/cmake/help/v3.0/module/FindBoost.html) for more options.
+Enables or disable the personal/system library for Boost with the option `USE_SYSTEM_BOOST ON/OFF (default OFF)`. Boost must be compiled as a static library with the system component and compatible with the version **1.69.0**. See this [documentation](https://cmake.org/cmake/help/v3.0/module/FindBoost.html) for more options.
 
 - LLVM  
 Enables or disable the personal/system library for LLVM with the option `USE_SYSTEM_LLVM ON/OFF (default OFF)`. LLVM must be compiled as a static library (with the dynamic runtime on Windows) and compatible with the version **5.0.0**. See this [documentation](https://llvm.org/docs/CMake.html) for more options.
@@ -52,9 +52,9 @@ The documentation of Kiwi is available [online](http://musicoll.github.io/Kiwi) 
 ```
 npm install -g github-wikito-converter
 ```
-Then, from the **docs** folder, run:
+Then, from the **Kiwi root** folder, run:
 ```
-gwtc -t Kiwi -n index  ./
+python ./Script/gendoc.py
 ```
 
 ### Organizations
@@ -75,14 +75,13 @@ gwtc -t Kiwi -n index  ./
 
 - [Flip](http://developer.irisate.com/)
 - [Juce](https://github.com/WeAreROLI/JUCE)
-- [boost](https://www.boost.org/)
-- [Beast](https://github.com/boostorg/Beast/)
+- [boost](https://www.boost.org/) / ([Beast](https://github.com/boostorg/Beast/))
 - [concurrentqueue](https://github.com/cameron314/concurrentqueue)
 - [json](https://github.com/nlohmann/json)
 - [CMake](https://cmake.org/)
 - [LLVM](http://llvm.org)
 - [FAUST](https://github.com/grame-cncm/faust.git)
-- [Icon by Freepik](https://www.flaticon.com/)
+- [Icons by Freepik](https://www.flaticon.com/)
 
 ### Papers
 

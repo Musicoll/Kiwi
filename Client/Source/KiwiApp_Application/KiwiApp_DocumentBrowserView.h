@@ -67,29 +67,29 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief Listen to document browser changes.
-    class DocumentBrowserView::DriveView :
-    public juce::ListBox,
-    public juce::ListBoxModel,
-    public DocumentBrowser::Drive::Listener
+    class DocumentBrowserView::DriveView
+    : public juce::ListBox
+    , public juce::ListBoxModel
+    , public DocumentBrowser::Drive::Listener
     {
     private: // classes
         
-        enum class DataType
+        enum SortBy
         {
             name,
             author,
-            creationDate,
-            openedDate,
-            openedUser
+            creationTime,
+            openedTime
         };
         
         struct Comp
         {
-            bool compare(DocumentBrowser::Drive::DocumentSession const& l_hs,
-                         DocumentBrowser::Drive::DocumentSession const& r_hs) const;
+            bool compare(DocumentBrowser::Drive::DocumentSession const& lhs,
+                         DocumentBrowser::Drive::DocumentSession const& rhs) const;
             
-            DataType    m_type = DataType::creationDate;
+            SortBy      m_type = SortBy::creationTime;
             bool        m_trashed_first = false;
+            std::string m_filter {};
         };
         
     public: // methods
@@ -149,10 +149,14 @@ namespace kiwi
         //! @brief Restore a trashed document.
         void restoreDocumentForRow(int row);
         
+        std::vector<DocumentBrowser::Drive::DocumentSession*> getDisplayedDocuments();
+        
+        DocumentBrowser::Drive::DocumentSession* getDocumentForRow(int row);
+        
     private: // methods
         
-        //! @brief Hides document liste and disable some interactions.
-        void enablementChanged() override final;
+        //! @brief Hides document list and disable some interactions.
+        void enablementChanged() override;
         
         //! @brief Resort content and call update content.
         void update();
@@ -167,10 +171,13 @@ namespace kiwi
         void createDocument();
         
         //! @brief Returns the current sorting parameter.
-        DataType getSortType() const;
+        SortBy getSortType() const;
         
         //! @brief Changes the sort parameter and sorts.
-        void setSortType(DataType sort_type);
+        void setSortType(SortBy sort_type);
+        
+        //! @brief Suggests documents based on text input compared to documents name
+        void setFilter(std::string const& text);
         
         // @brief Set the trash mode.
         void setTrashMode(bool trash_mode);
@@ -180,6 +187,12 @@ namespace kiwi
         
         //! @brief Creates document info tooltip.
         std::string createDocumentToolTip(DocumentBrowser::Drive::DocumentSession const& doc);
+        
+        //! @brief Save the state of the component
+        void saveState();
+        
+        //! @brief Restore the state of the component
+        void restoreState();
         
     private: // classes
         
@@ -199,7 +212,9 @@ namespace kiwi
     //                             BROWSER DRIVE VIEW HEADER                            //
     // ================================================================================ //
     
-    class DocumentBrowserView::DriveView::Header : public juce::Component
+    class DocumentBrowserView::DriveView::Header
+    : public juce::Component
+    , public juce::TextEditor::Listener
     {
     public: // methods
         
@@ -221,20 +236,38 @@ namespace kiwi
         //! @brief Sets the text diaplyed by the header bar.
         void setText(std::string const& text);
         
+        /** Show or hide toolbar */
+        void showSearchBar(bool show);
+        
     private: // methods
         
-        void enablementChanged() override final;
+        void enablementChanged() override;
+        
+        /** Called when the user changes the text in some way. */
+        void textEditorTextChanged (juce::TextEditor&) override;
+        
+        /** Called when the user presses the return key. */
+        void textEditorReturnKeyPressed (juce::TextEditor&) override {}
+        
+        /** Called when the user presses the escape key. */
+        void textEditorEscapeKeyPressed (juce::TextEditor&) override;
+        
+        /** Called when the text editor loses focus. */
+        void textEditorFocusLost (juce::TextEditor&) override {}
         
     private: // members
         
         DocumentBrowserView::DriveView& m_drive_view;
+        int                             m_toolbar_thickness = 50;
         ImageButton                     m_refresh_btn;
         ImageButton                     m_create_document_btn;
         ImageButton                     m_trash_btn;
+        ImageButton                     m_search_btn;
         juce::Rectangle<int>            m_folder_bounds;
         juce::Label                     m_label;
         juce::Image                     m_folder_img;
         juce::Image                     m_disable_folder_img;
+        juce::TextEditor                m_searchbar;
     };
     
     // ================================================================================ //
@@ -291,9 +324,9 @@ namespace kiwi
         
         DriveView&          m_drive_view;
         std::string         m_name;
-        ImageButton         m_open_btn;
         juce::Label         m_name_label;
         
+        ImageButton         m_open_btn;
         const juce::Image   m_kiwi_filetype_img;
         
         int                 m_row = -1;

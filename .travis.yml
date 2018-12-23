@@ -31,7 +31,7 @@ matrix:
     - cd $TRAVIS_BUILD_DIR
     - mkdir Build && cd Build
     - cmake .. -DCMAKE_C_FLAGS=-m64 -DCMAKE_BUILD_TYPE=Debug -DGCOV_SUPPORT=On
-    - cmake --build . --config Debug --target Tests
+    - cmake --build . --config Debug --target Tests  -- -j 4
     after_success:
     - coveralls -i Modules --gcov-options '\-lp' > /dev/null
 
@@ -55,19 +55,20 @@ matrix:
     - cd $TRAVIS_BUILD_DIR
     - mkdir Build && cd Build
     - cmake .. -DCMAKE_C_FLAGS=-m64 -DCMAKE_BUILD_TYPE=Release
-    - cmake --build .  --target Kiwi --config Release
-    - cmake --build .  --target Server --config Release
+    - cmake --build . --target Kiwi --config Release -- -j 4
+    - cmake --build . --target Server --config Release -- -j 4
     after_success:
     - cd $TRAVIS_BUILD_DIR
-    - cp -r docs documentation
-    - zip -r documentation.zip documentation
-    - rm -r documentation
+    # Client
     - mkdir Kiwi
+    - cp -r docs/ Kiwi/docs
+    - cp -r Resources/helps/ Kiwi/helps
+    - cp -r Resources/examples/ Kiwi/examples
+    - mkdir -p Kiwi/libs/faust && cp -r ThirdParty/faust/libraries/* Kiwi/libs/faust
     - mv Build/KiwiBuild/Kiwi Kiwi/Kiwi
-    - mv documentation.zip Kiwi/documentation.zip
-    - mkdir Kiwi/Faust
-    - cp -r ThirdParty/faust/libraries Kiwi/Faust/Libs
+    - cp Changelog.txt Kiwi/Changelog.txt
     - zip -r Kiwi-linux-64.zip Kiwi
+    # Server
     - mkdir KiwiServer && mv Build/KiwiBuild/Server KiwiServer/Server
     - zip -r Kiwi-server-linux-64.zip KiwiServer
     deploy:
@@ -92,6 +93,11 @@ matrix:
     osx_image: xcode9.2
     install:
     - git submodule update --init --recursive
+
+    # Install a recent CMake
+    - brew install cmake || brew upgrade cmake
+    - cmake --version
+
     script:
     - cd $TRAVIS_BUILD_DIR
     - mkdir Build && cd Build
@@ -100,12 +106,8 @@ matrix:
     - xcodebuild -scheme Server -configuration Release
     after_success:
     - cd $TRAVIS_BUILD_DIR
-    - cp -r docs documentation
-    - zip -r documentation.zip documentation
-    - rm -r documentation
-    - mkdir Kiwi
-    - mv Build/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
-    - mv documentation.zip Kiwi/documentation.zip
+    - mkdir Kiwi && mv Build/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
+    - cp Changelog.txt Kiwi/Changelog.txt
     - zip -r Kiwi-macos-64.zip Kiwi
     - mkdir KiwiServer && mv Build/KiwiBuild/Release/Server KiwiServer/Server
     - zip -r Kiwi-server-macos-64.zip KiwiServer

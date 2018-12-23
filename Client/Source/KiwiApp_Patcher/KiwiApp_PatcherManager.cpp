@@ -59,10 +59,20 @@ namespace kiwi
                m_instance.getUserId(), 'cicm', 'kpat')
     , m_socket(m_document)
     , m_session(nullptr)
+    , m_stack_overflow_detected_signal_cnx(m_document.root<model::Patcher>().signal_stack_overflow
+                                           .connect([this](std::vector<flip::Ref> refs) {
+        onStackOverflowDetected(std::move(refs));
+    }))
+    , m_stack_overflow_cleared_signal_cnx(m_document.root<model::Patcher>().signal_stack_overflow_clear
+                                          .connect([this]() {
+        onStackOverflowCleared();
+    }))
     {}
     
     PatcherManager::~PatcherManager()
     {
+        m_stack_overflow_cleared_signal_cnx.disconnect();
+        m_stack_overflow_detected_signal_cnx.disconnect();
         disconnect();
     }
     
@@ -129,6 +139,31 @@ namespace kiwi
             
             updateTitleBars();
         }
+    }
+    
+    bool PatcherManager::hasStackOverflow() const
+    {
+        return m_has_stack_overflow;
+    }
+    
+    void PatcherManager::onStackOverflowDetected(std::vector<flip::Ref> refs)
+    {
+        KiwiApp::error("remove the culprits then click on the infinite loop icon to unlock messages");
+        
+        m_has_stack_overflow = true;
+        
+        m_listeners.call(&Listener::stackOverflowDetected, *this, refs);
+    }
+    
+    void PatcherManager::onStackOverflowCleared()
+    {
+        m_has_stack_overflow = false;
+        m_listeners.call(&Listener::stackOverflowCleared, *this);
+    }
+    
+    void PatcherManager::clearStackOverflow()
+    {
+        m_document.root<model::Patcher>().signal_stack_overflow_clear();
     }
     
     void PatcherManager::disconnect()
@@ -278,7 +313,7 @@ namespace kiwi
     
     bool PatcherManager::loadFromFile(juce::File const& file)
     {
-        if(!file.hasFileExtension("kiwi"))
+        if(!file.hasFileExtension(".kiwi;.kiwihelp"))
         {
             throw std::runtime_error("bad extension");
             return false;
@@ -389,34 +424,37 @@ namespace kiwi
         back_end.write<flip::BackEndBinary>(consumer);
     }
     
-    bool PatcherManager::saveDocument()
+    bool PatcherManager::saveDocument(bool save_as)
     {
         bool saved = false;
         
-        if (needsSaving() && m_file.existsAsFile())
+        if(isConnected())
+            return false;
+        
+        if(save_as || !m_file.existsAsFile())
         {
-            saved = true;
+            const auto dir = KiwiApp::getGlobalDirectoryFor(KiwiApp::FileLocations::Save);
             
-            writeDocument();
-        }
-        else if(needsSaving() || (!needsSaving() && !m_file.existsAsFile()))
-        {
-            auto directory = juce::File::getSpecialLocation(juce::File::userHomeDirectory);
+            juce::File suggest_file = dir.getChildFile(juce::String(m_name)).withFileExtension("kiwi");
             
-            juce::File suggest_file = directory.getChildFile(juce::String(m_name)).withFileExtension("kiwi");
-            
-            juce::FileChooser saveFileChooser("Save file", suggest_file, "*.kiwi");
+            juce::FileChooser saveFileChooser("Save file", suggest_file, "*.kiwi;*.kiwihelp");
             
             if ((saved = saveFileChooser.browseForFileToSave(true)))
             {
                 m_file = saveFileChooser.getResult();
                 
+                KiwiApp::setGlobalDirectoryFor(KiwiApp::FileLocations::Save,
+                                               m_file.getParentDirectory());
+                
                 writeDocument();
-                
                 setName(m_file.getFileNameWithoutExtension().toStdString());
-                
-                updateTitleBars();
             }
+        }
+        
+        if (!saved && m_file.existsAsFile())
+        {
+            writeDocument();
+            saved = true;
         }
         
         if (saved)
@@ -450,7 +488,7 @@ namespace kiwi
             }
             else if(r == 1) // save button
             {
-                if (!saveDocument())
+                if (!saveDocument(false))
                 {
                     user_cancelled = true;
                 }

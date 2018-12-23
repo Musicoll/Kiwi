@@ -68,7 +68,6 @@ namespace kiwi { namespace engine {
                     {
                         getScheduler().unschedule(m_task);
                         timerCallBack();
-                        getScheduler().schedule(m_task, m_period);
                     }
                     else
                     {

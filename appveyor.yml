@@ -8,20 +8,28 @@ environment:
 
 install:
   - git submodule update --init --recursive
+
+  ############################################################################
+  # Install a recent CMake
+  ############################################################################
+  - set CMAKE_URL="https://cmake.org/files/v3.13/cmake-3.13.0-win64-x64.zip"
+  - appveyor DownloadFile %CMAKE_URL% -FileName cmake.zip
+  - 7z x cmake.zip -oC:\projects\deps > nul
+  - move C:\projects\deps\cmake-* C:\projects\deps\cmake # Move to a version-agnostic directory
+  - set PATH=C:\projects\deps\cmake\bin;%PATH%
+  - cmake --version
+
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir Build && cd Build
   - cmake .. -G "Visual Studio 14 2015 Win64"
   - cmake --build . --target Kiwi --config %CONFIGURATION%
+
 after_build:
   - cd %APPVEYOR_BUILD_FOLDER%
-  - xcopy %APPVEYOR_BUILD_FOLDER%\docs %APPVEYOR_BUILD_FOLDER%\documentation\ /SY
-  - 7z a documentation.zip %APPVEYOR_BUILD_FOLDER%\documentation
-  - rmdir %APPVEYOR_BUILD_FOLDER%\documentation\ /S /Q
   - set PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 5"
   - ISCC Scripts\setup-x64.iss
   - mkdir Kiwi
-  - copy %APPVEYOR_BUILD_FOLDER%\documentation.zip %APPVEYOR_BUILD_FOLDER%\Kiwi\documentation.zip
   - copy %APPVEYOR_BUILD_FOLDER%\Kiwi-x64-setup.exe %APPVEYOR_BUILD_FOLDER%\Kiwi\Kiwi-x64-setup.exe
   - 7z a Kiwi-windows-64.zip %APPVEYOR_BUILD_FOLDER%\Kiwi
 
@@ -33,7 +41,7 @@ deploy:
     release: $(APPVEYOR_REPO_TAG_NAME)
     auth_token:
         secure: ZtKK8yOVkgIf+6Vm0jQLCbjCjuTiln3w2k/xMHI/kgardyCVtZ6plKI5O8lR3NNY
-    artifact: /.*\.zip/
+    artifact: Kiwi-windows-64.zip
     draft: true
     prerelease: false
     on:

@@ -45,7 +45,6 @@ namespace kiwi
     : m_instance(std::make_unique<DspDeviceManager>(), KiwiApp::useScheduler())
     , m_browser("Offline", 1000)
     , m_console_history(std::make_shared<ConsoleHistory>(m_instance))
-    , m_last_opened_file(juce::File::getSpecialLocation(juce::File::userHomeDirectory))
     {
         // reserve space for singleton windows.
         m_windows.resize(std::size_t(WindowId::count));
@@ -176,7 +175,7 @@ namespace kiwi
     
     bool Instance::openFile(juce::File const& file)
     {
-        if(!file.hasFileExtension("kiwi"))
+        if(!file.hasFileExtension(".kiwi;.kiwihelp"))
         {
             KiwiApp::error("can't open file (bad file extension)");
             return false;
@@ -230,7 +229,8 @@ namespace kiwi
     
     void Instance::askUserToOpenPatcherDocument()
     {
-        juce::FileChooser file_chooser("Open file", m_last_opened_file, "*.kiwi");
+        const auto dir = KiwiApp::getGlobalDirectoryFor(KiwiApp::FileLocations::Open);
+        juce::FileChooser file_chooser("Open file", dir, "*.kiwi;*.kiwihelp");
         
         if(file_chooser.browseForFileToOpen())
         {
@@ -239,8 +239,8 @@ namespace kiwi
             
             if(success)
             {
-                selected_file.setAsCurrentWorkingDirectory();
-                m_last_opened_file = selected_file;
+                KiwiApp::setGlobalDirectoryFor(KiwiApp::FileLocations::Open,
+                                               selected_file.getParentDirectory());
             }
         }
     }

@@ -30,22 +30,20 @@ namespace kiwi
     //                                  PATCHER VIEWPORT                                //
     // ================================================================================ //
     
-    PatcherViewport::PatcherViewport(PatcherView& patcher) :
-    m_patcher(patcher),
-    m_can_hook_resized(false)
+    PatcherViewport::PatcherViewport(PatcherView& patcher)
+    : m_patcher(patcher)
+    , m_can_hook_resized(false)
     {
-        m_patcher.setSize(600, 400);
-        m_magnifier.setSize(600, 400);
+        setScrollBarThickness(8);
+        setSize(m_patcher.getWidth(), m_patcher.getHeight());
+        m_magnifier.setSize(m_patcher.getWidth(), m_patcher.getHeight());
         m_magnifier.addAndMakeVisible(m_patcher);
         setViewedComponent(&m_magnifier, false);
-        setScrollBarThickness(8);
-        
-        setSize(600, 400);
     }
     
     void PatcherViewport::visibleAreaChanged(juce::Rectangle<int> const& new_visible_area)
     {
-        ;
+        m_patcher.saveState();
     }
     
     void PatcherViewport::resized()
@@ -71,7 +69,8 @@ namespace kiwi
         if(zoom_factor != m_zoom_factor)
         {
             const double min_zoom = 0.25;
-            m_zoom_factor = zoom_factor < min_zoom ? min_zoom : zoom_factor;
+            const double max_zoom = 4.;
+            m_zoom_factor = std::max(min_zoom, std::min(zoom_factor, max_zoom));
             m_patcher.setTransform(juce::AffineTransform::scale(m_zoom_factor));
             
             updatePatcherArea(false);
@@ -240,7 +239,7 @@ namespace kiwi
             if(need_resize)
             {
                 m_magnifier.setSize(new_width * zoom, new_height * zoom);
-                new_width = (getMaximumVisibleWidth() + view_pos.getX()) / zoom + 1;
+                new_width = (getMaximumVisibleWidth() + view_pos.getX()) / zoom;
             }
         }
         
@@ -289,8 +288,8 @@ namespace kiwi
             
             if(need_resize)
             {
-                //m_magnifier.setSize(new_width * zoom, new_height * zoom);
-                //new_height = (getMaximumVisibleHeight() + view_pos.getY()) / zoom + 1;
+                m_magnifier.setSize(new_width * zoom, new_height * zoom);
+                new_height = (getMaximumVisibleHeight() + view_pos.getY()) / zoom;
             }
         }
         

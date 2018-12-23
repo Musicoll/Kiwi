@@ -28,6 +28,8 @@
 
 #include <json.hpp>
 
+#include <juce_core/juce_core.h>
+
 namespace kiwi
 {
     using nlohmann::json;
@@ -194,7 +196,7 @@ namespace kiwi
         struct comp_session
         {
             bool operator() (std::unique_ptr<Session> const& lhs,
-                             std::unique_ptr<Session> const& rhs)
+                             std::unique_ptr<Session> const& rhs) const
             {
                 return lhs->getId() < rhs->getId();
             }
@@ -351,10 +353,10 @@ namespace kiwi
         std::string _id = "0";
         std::string name = "";
         std::string author_name = "";
-        std::string creation_date = "";
+        juce::Time  creation_time {};
         bool        trashed = false;
-        std::string trashed_date = "";
-        std::string opened_date = "";
+        juce::Time  trashed_time {};
+        juce::Time  opened_time {};
         std::string opened_user = "";
         uint64_t    session_id = 0ul;
         

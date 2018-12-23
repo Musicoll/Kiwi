@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.9)
 
 project(Kiwi CXX)
 
@@ -25,31 +25,36 @@ set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
 # COMPILATION FLAGS
 #-------------------------------------------------------------------------------
 
-if(WIN32)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD /O2")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd /Zi /Od")
-else()
-  if(APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall") #-Weverything -Wno-c++98-compat -Wno-undef")
-		if(CMAKE_GENERATOR STREQUAL Xcode)
-		    set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_VALUE YES)
-				set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_VARIABLE YES)
-				set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_PARAMETER NO)
-				set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_LABEL YES)
-				set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_FUNCTION YES)
-
-				set(CMAKE_XCODE_ATTRIBUTE_CLANG_WARN_UNREACHABLE_CODE YES)
-				set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNKNOWN_PRAGMAS YES)
-		endif()
-  else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-  endif()
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
-endif()
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG=1")
+
+if(WIN32)
+
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD /O2")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd /Zi /Od")
+
+else() # unix
+
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
+
+	if(APPLE)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall") #-Weverything -Wno-c++98-compat -Wno-undef")
+		if(CMAKE_GENERATOR STREQUAL Xcode)
+			set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_VALUE YES)
+			set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_VARIABLE YES)
+			set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_PARAMETER NO)
+			set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_LABEL YES)
+			set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNUSED_FUNCTION YES)
+			set(CMAKE_XCODE_ATTRIBUTE_CLANG_WARN_UNREACHABLE_CODE YES)
+			set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_UNKNOWN_PRAGMAS YES)
+		endif()
+
+	else() # linux
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-multichar -Wno-sign-compare")
+	endif()
+endif()
 
 #--------------------------------------
 # Macros
@@ -74,15 +79,16 @@ include(CMake/ConfigFAUST.cmake)
 add_definitions(${LLVM_DEFINITIONS})
 include_directories(${LLVM_INCLUDE_DIRS})
 
-set(BEAST_INCLUDE_DIRS ${KIWI_DEPENDENCIES_DIR}/Beast/include)
 set(JSON_INCLUDE_DIRS ${KIWI_DEPENDENCIES_DIR}/json)
 set(CONCURRENTQUEUE_INCLUDE_DIRS ${KIWI_DEPENDENCIES_DIR}/concurrentqueue)
 
+#------------------------------------------------------------------------------#
 # Kiwi
 # -----------------------------------------------------------------------------#
 message(STATUS "Configuring Kiwi")
 set(KIWI_MODULE_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/Modules)
 
+#------------------------------------------------------------------------------#
 # KiwiTool
 # -----------------------------------------------------------------------------#
 set(KIWI_TOOL_INCLUDE_DIRS ${KIWI_MODULE_INCLUDE_DIRS} ${CONCURRENTQUEUE_INCLUDE_DIRS})
@@ -96,6 +102,7 @@ target_include_directories(KiwiTool PUBLIC ${KIWI_TOOL_INCLUDE_DIRS})
 set_target_properties(KiwiTool PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_TOOL_SOURCES}" ${PROJECT_SOURCE_DIR}/Modules/KiwiTool)
 
+#------------------------------------------------------------------------------#
 # KiwiModel
 #------------------------------------------------------------------------------#
 set(KIWI_MODEL_DEPENDENCIES KiwiTool)
@@ -113,6 +120,7 @@ target_link_libraries(KiwiModel PUBLIC ${KIWI_MODEL_LINK_LIBRARIES})
 set_target_properties(KiwiModel PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_MODEL_SOURCES}" ${PROJECT_SOURCE_DIR}/Modules/KiwiModel)
 
+#------------------------------------------------------------------------------#
 # KiwiDsp
 #------------------------------------------------------------------------------#
 set(KIWI_DSP_DEPENDENCIES)
@@ -129,16 +137,17 @@ target_link_libraries(KiwiDsp PUBLIC ${KIWI_DSP_LINK_LIBRARIES})
 set_target_properties(KiwiDsp PROPERTIES FOLDER Modules)
 source_group_rec("${KIWI_DSP_SOURCES}" ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp)
 
+#------------------------------------------------------------------------------#
 # KiwiNetwork
 #------------------------------------------------------------------------------#
 set(KIWI_NETWORK_DEPENDENCIES)
-set(KIWI_NETWORK_INCLUDE_DIRS ${KIWI_MODULE_INCLUDE_DIRS} ${BEAST_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+set(KIWI_NETWORK_INCLUDE_DIRS ${KIWI_MODULE_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 set(KIWI_NETWORK_COMPILE_DEFINITIONS BOOST_ALL_NO_LIB=1)
 
 if(APPLE)
 	set(KIWI_NETWORK_LINK_LIBRARIES ${Boost_LIBRARIES})
 elseif(UNIX)
-  set(KIWI_NETWORK_LINK_LIBRARIES ${Boost_LIBRARIES} ${PTHREAD})
+	set(KIWI_NETWORK_LINK_LIBRARIES ${Boost_LIBRARIES} ${PTHREAD})
 elseif(WIN32)
 	set(KIWI_NETWORK_LINK_LIBRARIES ${Boost_LIBRARIES} ${ws2_32})
 endif()
@@ -160,10 +169,7 @@ set(KIWI_ENGINE_COMPILE_DEFINITIONS ${KIWI_MODEL_COMPILE_DEFINITIONS} ${KIWI_DSP
 set(KIWI_ENGINE_LINK_LIBRARIES ${KIWI_MODEL_LINK_LIBRARIES} KiwiModel KiwiDsp ${JUCE_LINK_LIBRARIES} Juce staticlib)
 
 
-file(GLOB KIWI_ENGINE_SOURCES ${KIWI_MODULE_INCLUDE_DIRS}/KiwiEngine/*.[c|h]pp
-														  ${KIWI_MODULE_INCLUDE_DIRS}/KiwiEngine/*.h
-														  ${KIWI_MODULE_INCLUDE_DIRS}/KiwiEngine/KiwiEngine_Objects/*.[c|h]pp
-														  ${KIWI_MODULE_INCLUDE_DIRS}/KiwiEngine/KiwiEngine_Objects/*.h)
+file(GLOB_RECURSE KIWI_ENGINE_SOURCES ${KIWI_MODULE_INCLUDE_DIRS}/KiwiEngine/*)
 add_library(KiwiEngine STATIC ${KIWI_ENGINE_SOURCES})
 add_dependencies(KiwiEngine ${KIWI_ENGINE_DEPENDENCIES})
 target_include_directories(KiwiEngine PUBLIC ${KIWI_ENGINE_INCLUDE_DIRS})
@@ -202,17 +208,17 @@ target_link_libraries(Server PUBLIC KiwiServer)
 # Kiwi Client application
 #------------------------------------------------------------------------------#
 
-file(GLOB_RECURSE FAUST_LIB_RESOURCE ${KIWI_DEPENDENCIES_DIR}/faust/libraries/*.lib)
-set(KIWI_RESSOURCES_DIR ${PROJECT_SOURCE_DIR}/Ressources)
+set(KIWI_RESOURCES_DIR ${PROJECT_SOURCE_DIR}/Resources)
+
 if (APPLE)
-	set(KIWI_APP_ICON ${KIWI_RESSOURCES_DIR}/Project/XCode/Icon.icns)
-	set(KIWI_PATCHER_FILETYPE_ICON ${KIWI_RESSOURCES_DIR}/Project/XCode/kiwi_filetype.icns)
-	set(KIWI_PLIST ${KIWI_RESSOURCES_DIR}/Project/XCode/Info.plist)
+	set(KIWI_APP_ICON ${KIWI_RESOURCES_DIR}/Project/XCode/Icon.icns)
+	set(KIWI_PATCHER_FILETYPE_ICON ${KIWI_RESOURCES_DIR}/Project/XCode/kiwi_filetype.icns)
+	set(KIWI_PLIST ${KIWI_RESOURCES_DIR}/Project/XCode/Info.plist)
 	set_source_files_properties(${KIWI_APP_ICON} ${KIWI_PATCHER_FILETYPE_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-  set_source_files_properties(${FAUST_LIB_RESOURCE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/Faust/Libs")
-	set(KIWI_CLIENT_RESSOURCES ${KIWI_APP_ICON} ${KIWI_PATCHER_FILETYPE_ICON} ${KIWI_PLIST} ${FAUST_LIB_RESOURCE} )
+    set(KIWI_CLIENT_RESOURCES ${KIWI_APP_ICON} ${KIWI_PATCHER_FILETYPE_ICON} ${KIWI_PLIST})
+
 elseif(WIN32)
-	set(KIWI_CLIENT_RESSOURCES ${KIWI_RESSOURCES_DIR}/Project/VisualStudio15/Kiwi.rc)
+	set(KIWI_CLIENT_RESOURCES ${KIWI_RESOURCES_DIR}/Project/VisualStudio15/Kiwi.rc)
 endif()
 
 set(KIWI_CLIENT_DEPENDENCIES KiwiNetwork KiwiEngine)
@@ -221,7 +227,7 @@ set(KIWI_CLIENT_COMPILE_DEFINITIONS ${KIWI_ENGINE_COMPILE_DEFINITIONS} ${KIWI_EN
 set(KIWI_CLIENT_LINK_LIBRARIES KiwiEngine KiwiNetwork)
 
 file(GLOB_RECURSE KIWI_CLIENT_SOURCES ${PROJECT_SOURCE_DIR}/Client/Source/*.[c|h]pp ${PROJECT_SOURCE_DIR}/Client/Source/*.h)
-add_executable(Kiwi ${KIWI_CLIENT_SOURCES} "${KIWI_CLIENT_RESSOURCES}")
+add_executable(Kiwi ${KIWI_CLIENT_SOURCES} "${KIWI_CLIENT_RESOURCES}")
 add_dependencies(Kiwi ${KIWI_CLIENT_DEPENDENCIES})
 target_include_directories(Kiwi PUBLIC ${KIWI_CLIENT_INCLUDE_DIRS})
 target_compile_definitions(Kiwi PUBLIC ${KIWI_CLIENT_COMPILE_DEFINITIONS})
@@ -229,6 +235,31 @@ target_link_libraries(Kiwi PUBLIC ${KIWI_CLIENT_LINK_LIBRARIES})
 
 if (APPLE)
 	set_target_properties(Kiwi PROPERTIES MACOSX_BUNDLE TRUE MACOSX_BUNDLE_INFO_PLIST ${KIWI_PLIST})
+
+	# Copy resources to bundle
+	set(KIWI_APP_BUNDLE_RESOURCES $<TARGET_BUNDLE_CONTENT_DIR:Kiwi>/Resources)
+
+	set(KIWI_DOCS_RESOURCE ${PROJECT_SOURCE_DIR}/docs)
+	set(KIWI_HELPS_RESOURCE ${KIWI_RESOURCES_DIR}/helps)
+	set(KIWI_EXAMPLES_RESOURCE ${KIWI_RESOURCES_DIR}/examples)
+    set(FAUST_LIB_RESOURCE ${KIWI_DEPENDENCIES_DIR}/faust/libraries)
+
+	add_custom_command(TARGET Kiwi POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${KIWI_DOCS_RESOURCE} "${KIWI_APP_BUNDLE_RESOURCES}/docs"
+	)
+
+	add_custom_command(TARGET Kiwi POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${KIWI_HELPS_RESOURCE} "${KIWI_APP_BUNDLE_RESOURCES}/helps"
+	)
+
+	add_custom_command(TARGET Kiwi POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${KIWI_EXAMPLES_RESOURCE} "${KIWI_APP_BUNDLE_RESOURCES}/examples"
+	)
+
+	add_custom_command(TARGET Kiwi POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${FAUST_LIB_RESOURCE} "${KIWI_APP_BUNDLE_RESOURCES}/libs/faust"
+	)
+
 elseif(WIN32)
 	if (CMAKE_CL_64)
 		set(CRT_LIB "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/redist/x64/Microsoft.VC140.CRT")
@@ -238,23 +269,26 @@ elseif(WIN32)
 
 	add_custom_command(TARGET Kiwi POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CRT_LIB} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}" USES_TERMINAL)
 
-  set_target_properties(Kiwi PROPERTIES LINK_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:CONSOLE")
-  set_target_properties(Kiwi PROPERTIES LINK_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
+    set_target_properties(Kiwi PROPERTIES LINK_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:CONSOLE")
+    set_target_properties(Kiwi PROPERTIES LINK_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
 endif()
 
 source_group_rec("${KIWI_CLIENT_SOURCES}" ${PROJECT_SOURCE_DIR}/Client/Source)
 
+#------------------------------------------------------------------------------#
 # Tests
 #------------------------------------------------------------------------------#
+
 # Coverage setting
 if(${GCOV_SUPPORT} STREQUAL "On")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
-  set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+	set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
 	set(KIWI_TESTS_LINK_LIBRARIES gcov)
-	if(UNIX AND NOT APPLE)
-		set(KIWI_TESTS_LINK_LIBRARIES ${KIWI_TESTS_LINK_LIBRARIES} ${PTHREAD})
-	endif()
+endif()
+
+if(UNIX AND NOT APPLE)
+	set(KIWI_TESTS_LINK_LIBRARIES ${KIWI_TESTS_LINK_LIBRARIES} ${PTHREAD})
 endif()
 
 # Test Tool
@@ -309,14 +343,14 @@ target_link_libraries(test_server PUBLIC KiwiServer ${KIWI_TESTS_LINK_LIBRARIES}
 source_group_rec("${TEST_SERVER_SOURCES}" ${PROJECT_SOURCE_DIR}/Test/Server)
 
 # Tests Target
-
+#------------------------------------------------------------------------------#
 add_custom_target(Tests ALL DEPENDS test_dsp test_model test_network test_tool)
 set_target_properties(Tests PROPERTIES FOLDER Test)
 
-add_custom_command(TARGET Tests
-                   POST_BUILD COMMAND test_dsp
-                              COMMAND test_model
-                              COMMAND test_tool
-                              COMMAND test_server
-                              COMMAND test_network
-                   USES_TERMINAL)
+add_custom_command(TARGET Tests POST_BUILD
+	COMMAND test_dsp
+	COMMAND test_model
+	COMMAND test_tool
+	COMMAND test_server
+	COMMAND test_network
+USES_TERMINAL)

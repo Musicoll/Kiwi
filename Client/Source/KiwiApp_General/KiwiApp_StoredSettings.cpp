@@ -21,7 +21,7 @@
 
 #include "KiwiApp_StoredSettings.h"
 #include "../KiwiApp.h"
-#include "../KiwiApp_Ressources/KiwiApp_BinaryData.h"
+#include "../KiwiApp_Resources/KiwiApp_BinaryData.h"
 #include "KiwiApp_IDs.h"
 
 namespace kiwi
@@ -93,7 +93,17 @@ namespace kiwi
         if (file.exists())
         {
             std::string json_user_str = file.loadFileAsString().toStdString();
-            return json::parse(json_user_str);
+            json j;
+            try
+            {
+                j = json::parse(json_user_str);
+            }
+            catch (json::parse_error& e)
+            {
+                std::cerr << "message: " << e.what() << '\n';
+            }
+            
+            return j;
         }
         
         return {};

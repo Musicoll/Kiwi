@@ -52,9 +52,14 @@ std::string getMetaData()
 
 TEST_CASE("Server - Server", "[Server, Server]")
 {
+    const auto app_file = juce::File::SpecialLocationType::currentExecutableFile;
+    const auto backend_dir = (juce::File::getSpecialLocation(app_file)
+                              .getParentDirectory()
+                              .getChildFile("./server_backend_test"));
+    
     SECTION("Simple Connection - Deconnection")
     {
-        kiwi::server::Server server(9191, "./server_backend_test", token, kiwi_version);
+        kiwi::server::Server server(9191, backend_dir, token, kiwi_version);
         
         // Initializing document
         flip::Document document (kiwi::model::DataModel::use (), 123456789, 'appl', 'gui ');
@@ -84,20 +89,15 @@ TEST_CASE("Server - Server", "[Server, Server]")
         CHECK(!carrier.is_connected());
         CHECK(server.getSessions().empty());
         
-        juce::File backend ("./server_backend_test");
-        
-        if (backend.exists())
+        if (backend_dir.exists())
         {
-            backend.deleteRecursively();
+            backend_dir.deleteRecursively();
         }
     }
     
     SECTION("Simple Connection - Server Killed")
     {
-        std::unique_ptr<kiwi::server::Server> server(new kiwi::server::Server(9191,
-                                                                              "./server_backend_test",
-                                                                              token,
-                                                                              kiwi_version));
+        auto server = std::make_unique<kiwi::server::Server>(9191, backend_dir, token, kiwi_version);
         
         // Initializing document.
         flip::Document document (kiwi::model::DataModel::use (), 123456789, 'appl', 'gui ');
@@ -124,17 +124,15 @@ TEST_CASE("Server - Server", "[Server, Server]")
         
         CHECK(!carrier.is_connected());
         
-        juce::File backend ("./server_backend_test");
-        
-        if (backend.exists())
+        if (backend_dir.exists())
         {
-            backend.deleteRecursively();
+            backend_dir.deleteRecursively();
         }
     }
     
     SECTION("One user connecting to multiple document")
     {
-        kiwi::server::Server server(9191, "./server_backend_test", token, kiwi_version);
+        kiwi::server::Server server(9191, backend_dir, token, kiwi_version);
         
         // Initializing documents.
         flip::Document document_1 (kiwi::model::DataModel::use (), 123456789, 'appl', 'gui ');
@@ -169,17 +167,15 @@ TEST_CASE("Server - Server", "[Server, Server]")
         CHECK(!carrier_1.is_connected());
         CHECK(!carrier_2.is_connected());
         
-        juce::File backend ("./server_backend_test");
-        
-        if (backend.exists())
+        if (backend_dir.exists())
         {
-            backend.deleteRecursively();
+            backend_dir.deleteRecursively();
         }
     }
     
     SECTION("Multiple connections")
     {
-        kiwi::server::Server server(9191, "./server_backend_test", token, kiwi_version);
+        kiwi::server::Server server(9191, backend_dir, token, kiwi_version);
         
         // Initializing client 1
         flip::Document document_1 (kiwi::model::DataModel::use (), 1, 'appl', 'gui ');
@@ -254,11 +250,9 @@ TEST_CASE("Server - Server", "[Server, Server]")
         
         while(carrier_1.is_connected() || !server.getSessions().empty()){carrier_1.process(); server.process();}
         
-        juce::File backend ("./server_backend_test");
-        
-        if (backend.exists())
+        if (backend_dir.exists())
         {
-            backend.deleteRecursively();
+            backend_dir.deleteRecursively();
         }
         
         SECTION("Hexadecimal convert")

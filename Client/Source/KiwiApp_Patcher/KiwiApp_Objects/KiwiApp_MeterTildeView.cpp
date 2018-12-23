@@ -140,9 +140,10 @@ namespace kiwi
     
     void MeterTildeView::paint(juce::Graphics & g)
     {
-        g.fillAll(findColour(ObjectView::ColourIds::Background));
+        const auto bgcolor = findColour(ObjectView::ColourIds::Background);
+        g.fillAll(bgcolor);
         const auto led_border_size = 0.5f;
-        const auto outline_color = findColour(ObjectView::ColourIds::Outline);
+        const auto outline_color = bgcolor.contrasting(0.2);
         
         for(int i = 0; i < m_leds.size(); i++)
         {

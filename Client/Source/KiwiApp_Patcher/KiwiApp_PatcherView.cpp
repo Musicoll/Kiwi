@@ -48,13 +48,16 @@ namespace kiwi
     , m_instance(instance)
     , m_patcher_model(patcher)
     , m_view_model(view)
-    , m_viewport(*this)
+    , m_viewport(nullptr)
     , m_hittester(*this)
     , m_mouse_handler(*this)
     , m_io_highlighter()
     , m_lasso(*this)
     , m_grid_size(20)
     {
+        setSize(600, 400); // default size
+        m_viewport = std::make_unique<PatcherViewport>(*this);
+        
         KiwiApp::bindToCommandManager(this);
         KiwiApp::bindToKeyMapping(this);
         setWantsKeyboardFocus(true);
@@ -63,7 +66,8 @@ namespace kiwi
         addChildComponent(m_lasso);
 
         loadPatcher();
-        m_viewport.updatePatcherArea(true);
+        
+        useViewport().updatePatcherArea(false);
         
         m_manager.addListener(*this);
     }
@@ -87,6 +91,16 @@ namespace kiwi
     PatcherManager& PatcherView::usePatcherManager()
     {
         return m_manager;
+    }
+    
+    PatcherViewport& PatcherView::useViewport()
+    {
+        return *m_viewport;
+    }
+    
+    PatcherViewport const& PatcherView::useViewport() const
+    {
+        return *m_viewport;
     }
     
     // ================================================================================ //
@@ -130,7 +144,7 @@ namespace kiwi
             g.setColour(bgcolor);
             g.fillRect(origin_bounds);
             
-            g.setColour(bgcolor.contrasting(0.3));
+            g.setColour(bgcolor.contrasting(0.4));
             
             for(int x = (origin.getX() % grid_size); x < clip_bounds.getRight(); x += grid_size)
             {
@@ -217,6 +231,9 @@ namespace kiwi
         {
             juce::PopupMenu m;
             auto* cm = &KiwiApp::getCommandManager();
+            
+            m.addCommandItem(cm, CommandIDs::openObjectHelp);
+            m.addSeparator();
             
             m.addCommandItem(cm, juce::StandardApplicationCommandIDs::cut);
             m.addCommandItem(cm, juce::StandardApplicationCommandIDs::copy);
@@ -717,6 +734,67 @@ namespace kiwi
         {
             if(link.resident()) { addLinkView(link); }
         }
+        
+        useViewport().resetObjectsArea();
+    }
+    
+    void PatcherView::setScreenBounds(juce::Rectangle<int> bounds)
+    {
+        if (auto* window = findParentComponentOfClass<PatcherViewWindow>())
+        {
+            const auto delta = getScreenPosition() - window->getPosition();
+            window->setBounds(bounds.getX() - delta.getX(),
+                              bounds.getY() - delta.getY(),
+                              bounds.getWidth() + delta.getX(),
+                              bounds.getHeight() + delta.getY());
+        }
+    }
+    
+    void PatcherView::windowInitialized()
+    {
+        auto const& model_screen_bounds = m_view_model.getScreenBounds();
+        
+        if(model_screen_bounds.getWidth() > 0 && model_screen_bounds.getHeight() > 0)
+        {
+            juce::Rectangle<double> bounds {
+                model_screen_bounds.getX(), model_screen_bounds.getY(),
+                model_screen_bounds.getWidth(), model_screen_bounds.getHeight()
+            };
+            
+            setScreenBounds(bounds.toNearestInt());
+        }
+        else
+        {
+            setScreenBounds(getLocalBounds().withCentre(juce::Desktop::getInstance()
+                                                      .getDisplays().getMainDisplay().userArea
+                                                      .getCentre()));
+        }
+        
+        auto const& view_position = m_view_model.getViewPosition();
+        
+        const juce::Point<int> view_point {
+            static_cast<int>(view_position.getX()),
+            static_cast<int>(view_position.getY())
+        };
+        
+        useViewport().setZoomFactor(m_view_model.getZoomFactor());
+        useViewport().setRelativeViewPosition(view_point);
+    }
+    
+    void PatcherView::saveState()
+    {
+        if(m_view_model.document().is_observing())
+            return; // abort
+        
+        const auto screen_bounds = useViewport().getScreenBounds().toDouble();
+        
+        m_view_model.setScreenBounds(screen_bounds.getX(), screen_bounds.getY(),
+                                     screen_bounds.getWidth(), screen_bounds.getHeight());
+        
+        const auto view_position = useViewport().getRelativeViewPosition().toDouble();        
+        m_view_model.setViewPosition(view_position.getX(), view_position.getY());
+        
+        model::DocumentManager::commit(m_patcher_model);
     }
     
     void PatcherView::setLock(bool locked)
@@ -822,7 +900,7 @@ namespace kiwi
     
     juce::Rectangle<int> PatcherView::getCurrentObjectsArea()
     {
-        juce::Rectangle<int> area;
+        juce::Rectangle<int> area {};
         
         for(auto& object_m : m_patcher_model.getObjects())
         {
@@ -907,7 +985,7 @@ namespace kiwi
     
     juce::Point<int> PatcherView::getOriginPosition() const
     {
-        return m_viewport.getOriginPosition();
+        return useViewport().getOriginPosition();
     }
     
     void PatcherView::originPositionChanged()
@@ -927,7 +1005,7 @@ namespace kiwi
         
         if(isAnyObjectSelected())
         {
-            m_viewport.bringRectToCentre(getSelectionBounds());
+            useViewport().bringRectToCentre(getSelectionBounds());
         }
     }
     
@@ -938,7 +1016,7 @@ namespace kiwi
         
         if(isAnyObjectSelected())
         {
-            m_viewport.bringRectToCentre(getSelectionBounds());
+            useViewport().bringRectToCentre(getSelectionBounds());
         }
     }
     
@@ -952,7 +1030,31 @@ namespace kiwi
             
             if(isAnyObjectSelected())
             {
-                m_viewport.bringRectToCentre(getSelectionBounds());
+                useViewport().bringRectToCentre(getSelectionBounds());
+            }
+        }
+    }
+    
+    void PatcherView::openObjectHelp()
+    {
+        if(!isLocked() && isAnyObjectSelected() && m_local_objects_selection.size() == 1)
+        {
+            auto& doc = m_patcher_model.entity().use<model::DocumentManager>();
+            if(auto const* obj = doc.get<model::Object>(*m_local_objects_selection.begin()))
+            {
+                auto const& obj_class = obj->getClass();
+                auto const& classname = obj_class.getName();
+                
+                auto help_file = KiwiApp::use().findHelpFile(classname);
+                
+                if(help_file.existsAsFile())
+                {
+                    KiwiApp::useInstance().openFile(help_file);
+                }
+                else
+                {
+                    KiwiApp::error("can't find " + classname + " help file");
+                }
             }
         }
     }
@@ -1008,7 +1110,7 @@ namespace kiwi
                    && m_mouse_handler.getCurrentAction() != MouseHandler::Action::MoveObjects
                    && m_mouse_handler.getCurrentAction() != MouseHandler::Action::ResizeObjects)
                 {
-                    m_viewport.updatePatcherArea(true);
+                    useViewport().updatePatcherArea(true);
                     patcher_area_uptodate = true;
                 }
                 
@@ -1070,6 +1172,8 @@ namespace kiwi
             }
         }
         
+        checkViewInfos(view);
+        
         if(view.removed()) {}
     }
     
@@ -1112,7 +1216,7 @@ namespace kiwi
                 
                 if(m_is_locked)
                 {
-                    m_viewport.resetObjectsArea();
+                    useViewport().resetObjectsArea();
                 }
                 
                 repaint();
@@ -1122,7 +1226,7 @@ namespace kiwi
             if(m_view_model.zoomFactorChanged())
             {
                 const double zoom = m_view_model.getZoomFactor();
-                m_viewport.setZoomFactor(zoom);
+                useViewport().setZoomFactor(zoom);
             }
         }
     }
@@ -1799,7 +1903,7 @@ namespace kiwi
         
         model::DocumentManager::commit(m_patcher_model, "Delete objects and links");
         
-        m_viewport.updatePatcherArea(false);
+        useViewport().updatePatcherArea(false);
     }
     
     // ================================================================================ //
@@ -1814,6 +1918,7 @@ namespace kiwi
     void PatcherView::getAllCommands(juce::Array<juce::CommandID>& commands)
     {
         commands.add(CommandIDs::save);
+        commands.add(CommandIDs::saveAs);
         
         commands.add(CommandIDs::newPatcherView);
         
@@ -1839,11 +1944,7 @@ namespace kiwi
         commands.add(CommandIDs::zoomOut);
         commands.add(CommandIDs::zoomNormal);
         commands.add(CommandIDs::editModeSwitch);
-        commands.add(CommandIDs::gridModeSwitch);
-        commands.add(CommandIDs::enableSnapToGrid);
-        
-        commands.add(CommandIDs::showPatcherInspector);
-        commands.add(CommandIDs::showObjectInspector);
+        commands.add(CommandIDs::openObjectHelp);
     }
     
     void PatcherView::getCommandInfo(const juce::CommandID commandID, juce::ApplicationCommandInfo& result)
@@ -1854,8 +1955,18 @@ namespace kiwi
         {
             case CommandIDs::save:
             {
-                result.setInfo(TRANS("Save"), TRANS("Save document"), CommandCategories::general, 0);
+                result.setInfo(TRANS("Save"), TRANS("Save"), CommandCategories::general, 0);
                 result.addDefaultKeypress('s', juce::ModifierKeys::commandModifier);
+                result.setActive(!m_manager.isConnected());
+                break;
+            }
+            case CommandIDs::saveAs:
+            {
+                result.setInfo(TRANS("Save As.."), TRANS("Save As.."), CommandCategories::general, 0);
+                result.addDefaultKeypress('s',
+                                          juce::ModifierKeys::commandModifier
+                                          | juce::ModifierKeys::shiftModifier);
+                
                 result.setActive(!m_manager.isConnected());
                 break;
             }
@@ -2034,9 +2145,35 @@ namespace kiwi
                 result.setTicked(!m_view_model.getLock());
                 break;
             }
+            case CommandIDs::openObjectHelp:
+            {
+                const bool active = (!isLocked()
+                                     && m_local_objects_selection.size() == 1
+                                     && KiwiApp::use().getKiwiObjectHelpDirectory().exists());
+                
+                auto text = TRANS("Help");
+                
+                if(active)
+                {
+                    auto& doc = m_patcher_model.entity().use<model::DocumentManager>();
+                    if(auto const* obj = doc.get<model::Object>(*m_local_objects_selection.begin()))
+                    {
+                        auto const& obj_class = obj->getClass();
+                        text = "Open " + obj_class.getName() + " Help";
+                    }
+                }
+                
+                result.setInfo(text, TRANS("Open object help patch"), CommandCategories::view, 0);
+                
+                auto modifier = juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier;
+                result.addDefaultKeypress ('h', modifier);
+                
+                result.setActive(active);
+                break;
+            }
             default:
             {
-                result.setInfo (TRANS("[unknown command]"), TRANS("[unknown command]"), CommandCategories::view, 0);
+                assert(true && "Command not handled !");
                 break;
             }
         }
@@ -2057,7 +2194,8 @@ namespace kiwi
             
         switch (info.commandID)
         {
-            case CommandIDs::save:                              { m_manager.saveDocument(); break; }
+            case CommandIDs::save:                              { m_manager.saveDocument(false); break; }
+            case CommandIDs::saveAs:                            { m_manager.saveDocument(true); break; }
             case CommandIDs::newPatcherView:                    { m_manager.newView(); break; }
                 
             case juce::StandardApplicationCommandIDs::undo:     { undo(); break; }
@@ -2085,6 +2223,7 @@ namespace kiwi
             case CommandIDs::zoomOut:                           { zoomOut(); break; }
             case CommandIDs::zoomNormal:                        { zoomNormal(); break; }
             case CommandIDs::editModeSwitch:                    { setLock(!isLocked()); break; }
+            case CommandIDs::openObjectHelp:                    { openObjectHelp(); break; }
                 
             default: return false;
         }

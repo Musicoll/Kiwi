@@ -1,0 +1,11 @@
+helpfile bang slider toggle comment number number~ meter~ "GUI objects"
+helpfile + - * / % pow "operators"
+helpfile +~ -~ *~ /~ "operators (signal)"
+helpfile < > == != <= >= "comparison operators"
+helpfile <~ >~ ==~ !=~ <=~ >=~ "comparison operators (signal)"
+helpfile delay pipe "delay and pipe"
+helpfile gate switch "gate and switch"
+helpfile gate~ switch~ "gate~ and switch~"
+helpfile OSC.receive OSC.send OSC
+helpfile pack unpack "pack and unpack"
+helpfile send receive "send and receive"

@@ -71,8 +71,6 @@ namespace kiwi
     
     void ObjectFrame::childBoundsChanged(juce::Component * child)
     {
-        juce::Rectangle<int> object_bounds = getObjectBounds();
-        
         setBounds(getObjectBounds().expanded(m_outline.getBorderThickness()));
     }
     
@@ -157,8 +155,6 @@ namespace kiwi
     
     void ObjectFrame::drawInletsOutlets(juce::Graphics & g)
     {
-        const juce::Rectangle<int> bounds = m_object_view->getBounds();
-        
         const auto pin_control_color = findColour(ObjectView::ColourIds::PinControl);
         const auto pin_signal_color = findColour(ObjectView::ColourIds::PinSignal);
         
@@ -344,11 +340,14 @@ namespace kiwi
     
     void ObjectFrame::textChanged(std::string const& new_text)
     {
-        dynamic_cast<EditableObjectView*>(m_object_view.get())->removeListener(*this);
-        
-        if (auto* object_view = dynamic_cast<ClassicView*>(m_object_view.get()))
+        if (auto* editable_object_view = dynamic_cast<EditableObjectView*>(m_object_view.get()))
         {
-            getPatcherView().objectTextChanged(*this, new_text);
+            editable_object_view->removeListener(*this);
+            
+            if (dynamic_cast<ClassicView*>(m_object_view.get()))
+            {
+                getPatcherView().objectTextChanged(*this, new_text);
+            }
         }
     }
     
@@ -644,12 +643,12 @@ namespace kiwi
         g.setColour(findColour(PatcherView::ColourIds::Selection));
         
         const auto outline_bounds = getLocalBounds().toFloat();
-        const auto object_bounds = outline_bounds.reduced(m_resize_thickness);
         
         const float thickness = m_resize_thickness;
         g.drawRect(outline_bounds.reduced(thickness*0.75), thickness*0.25);
         
         /* // The following code do the same
+        const auto object_bounds = outline_bounds.reduced(m_resize_thickness);
         juce::RectangleList<float> rectangles (outline_bounds);
         rectangles.subtract(object_bounds);
         rectangles.subtract(object_bounds.reduced(m_resize_thickness, -m_resize_thickness));

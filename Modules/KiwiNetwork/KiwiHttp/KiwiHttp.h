@@ -104,7 +104,7 @@ namespace kiwi { namespace network { namespace http {
         void handleTimeout(beast::error_code const& error);
         
         //! @internal
-        void connect(tcp::resolver::iterator iterator);
+        void connect(tcp::resolver::results_type results);
         
         //! @internal
         void write();
@@ -121,7 +121,7 @@ namespace kiwi { namespace network { namespace http {
         Response<ResType>                   m_response;
         
         std::string                         m_port;
-        boost::asio::io_service             m_io_service;
+        boost::asio::io_context             m_io_context;
         tcp::socket                         m_socket;
         boost::asio::steady_timer           m_timer;
         tcp::resolver                       m_resolver;

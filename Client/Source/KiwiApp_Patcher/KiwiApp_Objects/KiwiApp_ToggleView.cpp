@@ -73,7 +73,7 @@ namespace kiwi {
         
         g.setColour(m_is_on
                     ? findColour(ObjectView::ColourIds::Active)
-                    : findColour(ObjectView::ColourIds::Outline));
+                    : findColour(ObjectView::ColourIds::Background).contrasting(0.2));
         
         const auto local_bounds = getLocalBounds().toFloat();
         const auto max = std::max(local_bounds.getWidth(), local_bounds.getHeight());

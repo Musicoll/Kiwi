@@ -59,20 +59,21 @@ namespace kiwi
             virtual ~Object() noexcept;
             
         private: // methods
+            
             //! @brief Receives a set of arguments via an inlet.
             //! @details This method must be overriden by object's subclasses.
-            //! @todo see if the method must be noexcept.
             virtual void receive(size_t index, std::vector<tool::Atom> const& args) = 0;
             
         public: // methods
+            
             //! @brief Called when the Patcher is loaded.
             virtual void loadbang() {};
             
             //! @internal Appends a new Link to an outlet.
-            void addOutputLink(size_t outlet_index, Object & receiver, size_t inlet_index);
+            void addOutputLink(flip::Ref link_ref, size_t outlet_index, Object & receiver, size_t inlet_index);
             
             //! @internal Removes a Link from an outlet.
-            void removeOutputLink(size_t outlet_index, Object & receiver, size_t inlet_index);
+            void removeOutputLink(flip::Ref link_ref, size_t outlet_index);
             
             //! @brief Called when a parameter has changed.
             void modelParameterChanged(std::string const& name, tool::Parameter const& parameter) override final;
@@ -163,18 +164,24 @@ namespace kiwi
             //! @details Automatically called on the engine's thread.
             virtual void attributeChanged(std::string const& name, tool::Parameter const& attribute);
             
+            //! @brief Called by the patcher when the stack-overflow is cleared.
+            void clearStackOverflow();
+            
         private: // members
             
-            using Outlet = std::set<Link>;
+            using Outlet = std::map<flip::Ref, Link>;
 
             Patcher&                        m_patcher;
             flip::Ref const                 m_ref;
             size_t                          m_inlets;
             std::vector<Outlet>             m_outlets;
-            size_t                          m_stack_count;
             std::shared_ptr<Object>         m_master;
             
+            static constexpr size_t m_stack_overflow_max = 12;
+            
         private: // deleted methods
+            
+            friend engine::Patcher;
             
             Object(Object const&) = delete;
             Object(Object&&) = delete;

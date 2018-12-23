@@ -184,7 +184,7 @@ TEST_CASE("Scheduler - Multithread", "[Scheduler]")
             ++count_producer_2;
         };
         
-        std::thread producer_1([&count_producer_1, &sch, &func_1]() {
+        std::thread producer_1([&sch, &func_1]() {
             size_t count_event = 0;
             
             while(count_event < 30)
@@ -194,7 +194,7 @@ TEST_CASE("Scheduler - Multithread", "[Scheduler]")
             }
         });
         
-        std::thread producer_2([&count_producer_2, &sch, &func_2]() {
+        std::thread producer_2([&sch, &func_2]() {
             size_t count_event = 0;
             
             while(count_event < 20)

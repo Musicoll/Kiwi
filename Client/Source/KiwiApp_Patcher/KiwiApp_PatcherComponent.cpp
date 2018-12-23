@@ -22,7 +22,7 @@
 #include "KiwiApp_PatcherComponent.h"
 #include "KiwiApp_PatcherView.h"
 
-#include "../KiwiApp_Ressources/KiwiApp_BinaryData.h"
+#include "../KiwiApp_Resources/KiwiApp_BinaryData.h"
 #include "../KiwiApp.h"
 #include "../KiwiApp_General/KiwiApp_CommandIDs.h"
 #include "../KiwiApp_Components/KiwiApp_CustomToolbarButton.h"
@@ -88,10 +88,43 @@ namespace kiwi
         g.fillAll(findColour(juce::Toolbar::ColourIds::backgroundColourId));
     }
     
+    int PatcherToolbar::getToolbarItemIndex(Factory::ItemIds item_id)
+    {
+        for(int index = 0; index < m_toolbar.getNumItems(); index++)
+        {
+            if(m_toolbar.getItemId(index) == item_id)
+            {
+                return index;
+            }
+        }
+        
+        return -1;
+    }
+    
     void PatcherToolbar::removeUsersIcon()
     {
-        m_toolbar.removeToolbarItem(0);
-        m_toolbar.repaint();
+        const int users_item_index = getToolbarItemIndex(Factory::ItemIds::users);
+        if(users_item_index >= 0)
+        {
+            m_toolbar.removeToolbarItem(users_item_index);
+            m_toolbar.repaint();
+        }
+    }
+    
+    void PatcherToolbar::setStackOverflowIconVisible(bool should_be_visible)
+    {
+        const int stack_overflow_item_index = getToolbarItemIndex(Factory::ItemIds::stack_overflow);
+        const bool is_visible = (stack_overflow_item_index >= 0);
+        
+        if(should_be_visible && !is_visible)
+        {
+            const int index = getToolbarItemIndex(Factory::ItemIds::lock_unlock) + 1;
+            m_toolbar.addItem(m_factory, Factory::ItemIds::stack_overflow, index);
+        }
+        else if(!should_be_visible && is_visible)
+        {
+            m_toolbar.removeToolbarItem(stack_overflow_item_index);
+        }
     }
     
     PatcherToolbar::Factory::Factory(PatcherManager& patcher_manager)
@@ -107,6 +140,7 @@ namespace kiwi
         ids.add(spacerId);
         ids.add(flexibleSpacerId);
         ids.add(ItemIds::dsp_on_off);
+        ids.add(ItemIds::stack_overflow);
         
         if(m_patcher_manager.isConnected())
         {
@@ -162,6 +196,15 @@ namespace kiwi
             btn = new CustomToolbarButton(itemId, "DSP on/off", juce::Colours::whitesmoke,
                                           IMG(dsp_off_png), IMG(dsp_on_png));
             btn->setCommandToTrigger(&KiwiApp::getCommandManager(), CommandIDs::switchDsp, true);
+        }
+        else if(itemId == ItemIds::stack_overflow)
+        {
+            btn = new CustomToolbarButton(itemId, "clear stack-overflow message lock",
+                                          juce::Colour(0xFFE52E2E),
+                                          IMG(infinite_loop_png), IMG(infinite_loop_png));
+            btn->onClick = [this](){
+                m_patcher_manager.clearStackOverflow();
+            };
         }
         else if(itemId == ItemIds::users)
         {
@@ -338,24 +381,28 @@ namespace kiwi
     //                                PATCHER COMPONENT                                 //
     // ================================================================================ //
     
-    PatcherComponent::PatcherComponent(PatcherView& patcherview) :
-    m_patcher_manager(patcherview.usePatcherManager()),
-    m_patcherview(patcherview),
-    m_toolbar(m_patcher_manager)
+    PatcherComponent::PatcherComponent(PatcherView& patcherview)
+    : m_patcher_manager(patcherview.usePatcherManager())
+    , m_patcherview(patcherview)
+    , m_toolbar(m_patcher_manager)
     {
-        setSize(600, 400);
+        setSize(m_patcherview.getWidth(), m_patcherview.getHeight());
         
-        addAndMakeVisible(&patcherview.getViewport(), true);
+        addAndMakeVisible(&patcherview.useViewport(), true);
         
         KiwiApp::bindToCommandManager(this);
         KiwiApp::bindToKeyMapping(this);
 
         addAndMakeVisible(m_toolbar);
+        
+        m_patcher_manager.addListener(*this);
+        
+        m_toolbar.setStackOverflowIconVisible(m_patcher_manager.hasStackOverflow());
     }
     
     PatcherComponent::~PatcherComponent()
     {
-        ;
+        m_patcher_manager.removeListener(*this);
     }
     
     PatcherView& PatcherComponent::usePatcherView()
@@ -371,9 +418,10 @@ namespace kiwi
     
     void PatcherComponent::resized()
     {
+        auto bounds = getLocalBounds();
         const int toolbar_size = 36;
-        m_toolbar.setBounds(getLocalBounds().withBottom(toolbar_size));
-        m_patcherview.getViewport().setBounds(getLocalBounds().withTop(toolbar_size));
+        m_toolbar.setBounds(bounds.removeFromTop(toolbar_size));
+        m_patcherview.useViewport().setBounds(bounds);
     }
     
     void PatcherComponent::paint(juce::Graphics& g)
@@ -384,6 +432,16 @@ namespace kiwi
     void PatcherComponent::removeUsersIcon()
     {
         m_toolbar.removeUsersIcon();
+    }
+    
+    void PatcherComponent::stackOverflowDetected(PatcherManager& manager, std::vector<flip::Ref> culprits)
+    {
+        m_toolbar.setStackOverflowIconVisible(true);
+    }
+    
+    void PatcherComponent::stackOverflowCleared(PatcherManager& manager)
+    {
+        m_toolbar.setStackOverflowIconVisible(false);
     }
     
     // ================================================================================ //
@@ -418,16 +476,20 @@ namespace kiwi
     PatcherViewWindow::PatcherViewWindow(PatcherManager& manager,
                                          PatcherView& patcherview)
     : Window("Untitled", nullptr, true, true, "", !KiwiApp::isMacOSX())
+    , juce::ComponentMovementWatcher(this)
     , m_patcher_component(patcherview)
     {
-        // Todo: Add size infos to the Patcher Model
-        setSize(600, 500);
-        centreWithSize(getWidth(), getHeight());
-        
         setContentNonOwned(&m_patcher_component, true);
         setVisible(true);
         
         getLookAndFeel().setUsingNativeAlertWindows(false);
+        
+        const auto user_area = juce::Desktop::getInstance()
+        .getDisplays().getMainDisplay().userArea;
+        
+        setResizeLimits(50, 50, user_area.getWidth(), user_area.getHeight());
+        
+        patcherview.windowInitialized();
     }
     
     void PatcherViewWindow::removeUsersIcon()
@@ -458,5 +520,10 @@ namespace kiwi
     void PatcherViewWindow::closeButtonPressed()
     {
         KiwiApp::use().useInstance().removePatcherWindow(*this);
+    }
+    
+    void PatcherViewWindow::componentMovedOrResized(bool was_moved, bool was_resized)
+    {
+        m_patcher_component.usePatcherView().saveState();
     }
 }

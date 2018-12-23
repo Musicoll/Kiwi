@@ -23,7 +23,7 @@
 
 #include "../KiwiApp.h"
 #include "../KiwiApp_General/KiwiApp_StoredSettings.h"
-#include "../KiwiApp_Ressources/KiwiApp_BinaryData.h"
+#include "../KiwiApp_Resources/KiwiApp_BinaryData.h"
 #include "../KiwiApp_General/KiwiApp_CommandIDs.h"
 
 namespace kiwi
@@ -184,7 +184,7 @@ namespace kiwi
         if(!files.isEmpty())
         {
             juce::File file = files[0];
-            return file.hasFileExtension(".kiwi");
+            return file.hasFileExtension(".kiwi;.kiwihelp");
         }
         
         return false;
