@@ -59,13 +59,16 @@ matrix:
     - cmake --build . --target Server --config Release -- -j 4
     after_success:
     - cd $TRAVIS_BUILD_DIR
+    # Client
     - mkdir Kiwi
     - cp -r docs/ Kiwi/docs
     - cp -r Resources/helps/ Kiwi/helps
     - cp -r Resources/examples/ Kiwi/examples
-    - mkdir -p Kiwi/libs/faust && cp -r ThirdParty/faust/libraries/ Kiwi/libs/faust
+    - mkdir -p Kiwi/libs/faust && cp -r ThirdParty/faust/libraries/* Kiwi/libs/faust
     - mv Build/KiwiBuild/Kiwi Kiwi/Kiwi
+    - cp Changelog.txt Kiwi/Changelog.txt
     - zip -r Kiwi-linux-64.zip Kiwi
+    # Server
     - mkdir KiwiServer && mv Build/KiwiBuild/Server KiwiServer/Server
     - zip -r Kiwi-server-linux-64.zip KiwiServer
     deploy:
@@ -104,6 +107,7 @@ matrix:
     after_success:
     - cd $TRAVIS_BUILD_DIR
     - mkdir Kiwi && mv Build/KiwiBuild/Release/Kiwi.app Kiwi/Kiwi.app
+    - cp Changelog.txt Kiwi/Changelog.txt
     - zip -r Kiwi-macos-64.zip Kiwi
     - mkdir KiwiServer && mv Build/KiwiBuild/Release/Server KiwiServer/Server
     - zip -r Kiwi-server-macos-64.zip KiwiServer
