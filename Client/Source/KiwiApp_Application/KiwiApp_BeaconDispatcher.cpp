@@ -22,7 +22,7 @@
 #include "KiwiApp_BeaconDispatcher.h"
 
 #include "../KiwiApp.h"
-#include "../KiwiApp_Ressources/KiwiApp_BinaryData.h"
+#include "../KiwiApp_Resources/KiwiApp_BinaryData.h"
 #include "../KiwiApp_General/KiwiApp_CommandIDs.h"
 #include "../KiwiApp_General/KiwiApp_StoredSettings.h"
 

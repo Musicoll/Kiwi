@@ -1,6 +1,6 @@
 <p align="center">
   <h1 align="center">
-    <img src="https://github.com/Musicoll/Kiwi/blob/master/Ressources/BinaryRes/Images/kiwi_icon.png" height=40px/> Kiwi
+    <img src="https://github.com/Musicoll/Kiwi/blob/master/Resources/BinaryRes/Images/kiwi_icon.png" height=40px/> Kiwi
   </h1>
   <p align="center">
     A real-time collaborative audio patching software
@@ -20,7 +20,7 @@
 
 Kiwi is part of the French ANR-funded [MUSICOLL](http://musicoll.mshparisnord.org/) project that unites the [CICM](http://cicm.mshparisnord.org/) and [OhmForce](https://www.ohmforce.com/Company.do). The main goal of this project is to study how collaboration can enhance the way digital audio music composition is taught and more generally how it can improve music creation workflow. It enables several creators to work simultaneously on a same patch hosted online and accessible from any connected terminal.
 
-<img title="register" src="https://raw.github.com/Musicoll/Kiwi/master/docs/ressources/img/Kiwi-v1.0.0.jpg" height=400px/>
+<img title="register" src="https://raw.github.com/Musicoll/Kiwi/master/docs/img/Kiwi-v1.0.0.jpg" height=400px/>
 
 ### Compilation
 
@@ -52,9 +52,9 @@ The documentation of Kiwi is available [online](http://musicoll.github.io/Kiwi) 
 ```
 npm install -g github-wikito-converter
 ```
-Then, from the **docs** folder, run:
+Then, from the **Kiwi root** folder, run:
 ```
-gwtc -t Kiwi -n index  ./
+python ./Script/gendoc.py
 ```
 
 ### Organizations

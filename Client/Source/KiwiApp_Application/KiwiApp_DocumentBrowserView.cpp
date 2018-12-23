@@ -30,7 +30,7 @@
 #include "KiwiApp_DocumentBrowserView.h"
 #include "KiwiApp_Instance.h"
 
-#include "../KiwiApp_Ressources/KiwiApp_BinaryData.h"
+#include "../KiwiApp_Resources/KiwiApp_BinaryData.h"
 #include "../KiwiApp_Utils/KiwiApp_SuggestList.h"
 #include "../KiwiApp.h"
 
