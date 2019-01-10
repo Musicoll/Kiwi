@@ -485,7 +485,10 @@ namespace kiwi { namespace engine {
            static_cast<size_t>(m_instance->getNumOutputs()) <= getNumberOfOutputs() - 1)
         {
             m_ui_glue->saveStates();
-            m_instance->instanceInit(static_cast<int>(m_sample_rate));
+            const int sampling_rate = static_cast<int>(m_sample_rate);
+            m_instance->init(sampling_rate);
+            m_instance->instanceInit(sampling_rate);
+            m_instance->instanceConstants(sampling_rate);
             m_ui_glue->recallStates();
             m_inputs.resize(m_instance->getNumInputs());
             m_outputs.resize(m_instance->getNumOutputs());
