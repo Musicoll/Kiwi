@@ -48,8 +48,8 @@ TEST_CASE("Network - Ssl", "[Network, Ssl]")
     {
         try
         {
-            auto const host = "127.0.0.1";
-            auto const port = "8080";
+            auto const host = "httpbin.org";
+            auto const port = "443";
             auto const target = "/";
             int version = 11;
             
@@ -85,7 +85,7 @@ TEST_CASE("Network - Ssl", "[Network, Ssl]")
             // Set up an HTTP GET request message
             http::request<http::string_body> req{http::verb::get, target, version};
             req.set(http::field::host, host);
-            req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+            req.set(http::field::user_agent, "test");
             
             // Send the HTTP request to the remote host
             http::write(stream, req);
@@ -99,12 +99,12 @@ TEST_CASE("Network - Ssl", "[Network, Ssl]")
             // Receive the HTTP response
             http::read(stream, buffer, res);
             
-            // Write the message to standard out
-            std::cout << res << std::endl;
-            
             // Gracefully close the stream
             boost::system::error_code ec;
             stream.shutdown(ec);
+
+            CHECK(res.result() == boost::beast::http::status::ok);
+
             if(ec == boost::asio::error::eof)
             {
                 // Rationale:
@@ -119,7 +119,6 @@ TEST_CASE("Network - Ssl", "[Network, Ssl]")
         catch(std::exception const& e)
         {
             std::cerr << "Error: " << e.what() << std::endl;
-            return EXIT_FAILURE;
         }
     }
 }

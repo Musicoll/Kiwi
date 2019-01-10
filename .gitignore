@@ -3,6 +3,7 @@ Build/
 ThirdParty/flip
 ThirdParty/boost
 ThirdParty/llvm
+ThirdParty/openssl
 
 # Compressed files
 *.tar.gz
