@@ -1,10 +1,10 @@
 ## Download
 
-Download the latest Kiwi application for your operating system and the documentation from the [page](https://github.com/Musicoll/Kiwi/releases/latest). You'll find a version for each operating system, a list of help patches that describes the objects' behaviour and a set of examples guiding through creating certain audio processing.
+You can download the latest Kiwi application for your operating system from the [github repository](https://github.com/Musicoll/Kiwi/releases/latest). You'll find a version for each operating system, a list of help patches that describes the objects' behaviour and a set of examples guiding through creating certain audio processing.
 
 ## Compatibility
 
-Kiwi is compatible with the three main operating system.
+Kiwi is compatible with the three main operating systems.
 
 - Macos : version 10.7 and later.
 - Windows : windows 7 and later.
@@ -54,7 +54,7 @@ As you can see, the patch is a set of objects each one carrying out an operation
 This first patch is a generator of sound (synthesis) where the top-left part is the generator. The top-right is used to trigger a gain envelope. The signal is then sent to a master gain control and the dac~ object which represents the audio output of the patch.
 
 A patch can either be in mode edition or in mode lock. In edition mode objects and links can be added, removed or edited. In mode lock, graphical objects (the gain slider is graphical is an example) are now enabled and can be manipulated to generate different sounds. To switch between mode lock and mode edition either click on the lock button
-<img title="lock" src="./img/locked.png" height=15px/> or press Cmd + E (Ctrl + E for linux or windows users).
+<img title="lock" src="./img/locked.png" height=15px/> or press `cmd + e` (`ctrl + e` for linux or windows users).
 
 The audio processing is by default disabled, to put the audio on click on the speaker icon on the top left part of the patch <img title="lock" src="./img/dsp_off.png" height=15px/>.
 

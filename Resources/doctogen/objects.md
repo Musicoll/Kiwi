@@ -1,6 +1,8 @@
 ## Help patches
 
-A list of help patches describing how each object works is provided in the documentation folder. If you didn't download the documentation yet, you can find it on this [page](https://github.com/Musicoll/Kiwi/releases/latest). Sometimes help patches gather several objects that are functionally linked, for instance gate and switch or gate~ and switch~.
+To see the help of an object, select it in a patch, then right-click on it and click in the help option. It will open the corresponding help file.
+
+A list of help patches describing how each object works is provided in the documentation accessible from the main application menu `Help/Objects`. Sometimes help patches gather several objects that are functionally linked, for instance *gate* and *switch* or *gate~* and *switch~*.
 
 ## List of objects
 
@@ -19,7 +21,7 @@ A list of help patches describing how each object works is provided in the docum
 | **random**      |       | Ouput random number in a uniform distribution           |
 | **unpack**      |       | Access elements in a list                               |
 | **pack**        |       | Create and outputs a list of messages                   |
-| **comment**     |  *c*  | Add a comment to the patch                              |
+| **comment**     |       | Add a comment to the patch                              |
 | **!=~**         |       | Signal inequality operator                              |
 | **==~**         |       | Signal equality operator                                |
 | **>=~**         |       | Signal superior operator                                |
@@ -49,7 +51,7 @@ A list of help patches describing how each object works is provided in the docum
 | **+**           |       | Add two numbers                                         |
 | **\***          |       | Multiply two numbers                                    |
 | **print**       |       | Print messages into Kiwi console                        |
-| **receive**     | *r*   | Receive messages from a sender bound to the same name   |
+| **receive**     |  *r*  | Receive messages from a sender bound to the same name   |
 | **loadmess**    |       | Output arguments as message when the patch is loaded    |
 | **delay**       |       | Delay messages as bang                                  |
 | **pipe**        |       | Delay any message                                       |
