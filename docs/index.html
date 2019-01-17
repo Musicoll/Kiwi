@@ -672,6 +672,69 @@ span.float-right {
     padding: 3px 6px;
 }
 </style>
+<style>body {
+    font-size: 18px;
+}
+/* table */
+
+table {
+    width: 100%;
+	border-top: 1px solid #919699;
+	border-left: 1px solid #919699;
+	border-spacing: 0;
+}
+
+table th {
+	padding: 4px 8px 4px 8px;
+	background: #E2E2E2;
+	font-size: 0.8em;
+	border-bottom: 1px solid #919699;
+	border-right: 1px solid #919699;
+}
+table th p {
+	font-weight: bold;
+	margin-bottom: 0px;
+}
+
+table td {
+	padding: 8px;
+	font-size: 0.8em;
+	vertical-align: top;
+	border-bottom: 1px solid #919699;
+	border-right: 1px solid #919699;
+}
+table td p {
+	margin-bottom: 0px;
+}
+table td p + p  {
+	margin-top: 5px;
+}
+table td p + p + p {
+	margin-top: 5px;
+}
+
+.centered {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.inline-block {
+  padding: 4px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.inline-block.orange {
+  background-color: #FF8C0088;
+  color: #444;
+}
+
+.inline-block.blue {
+  background-color: rgb(21, 127, 242);
+  color: #fff;
+}
+</style>
     <style>.nav > li > .nav > li > .nav > li > .nav > li {display: none;}</style>
     <script>/*! jQuery v2.2.4 | (c) jQuery Foundation | jquery.org/license */
 !function(a,b){"object"==typeof module&&"object"==typeof module.exports?module.exports=a.document?b(a,!0):function(a){if(!a.document)throw new Error("jQuery requires a window with a document");return b(a)}:b(a)}("undefined"!=typeof window?window:this,function(a,b){var c=[],d=a.document,e=c.slice,f=c.concat,g=c.push,h=c.indexOf,i={},j=i.toString,k=i.hasOwnProperty,l={},m="2.2.4",n=function(a,b){return new n.fn.init(a,b)},o=/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,p=/^-ms-/,q=/-([\da-z])/gi,r=function(a,b){return b.toUpperCase()};n.fn=n.prototype={jquery:m,constructor:n,selector:"",length:0,toArray:function(){return e.call(this)},get:function(a){return null!=a?0>a?this[a+this.length]:this[a]:e.call(this)},pushStack:function(a){var b=n.merge(this.constructor(),a);return b.prevObject=this,b.context=this.context,b},each:function(a){return n.each(this,a)},map:function(a){return this.pushStack(n.map(this,function(b,c){return a.call(b,c,b)}))},slice:function(){return this.pushStack(e.apply(this,arguments))},first:function(){return this.eq(0)},last:function(){return this.eq(-1)},eq:function(a){var b=this.length,c=+a+(0>a?b:0);return this.pushStack(c>=0&&b>c?[this[c]]:[])},end:function(){return this.prevObject||this.constructor()},push:g,sort:c.sort,splice:c.splice},n.extend=n.fn.extend=function(){var a,b,c,d,e,f,g=arguments[0]||{},h=1,i=arguments.length,j=!1;for("boolean"==typeof g&&(j=g,g=arguments[h]||{},h++),"object"==typeof g||n.isFunction(g)||(g={}),h===i&&(g=this,h--);i>h;h++)if(null!=(a=arguments[h]))for(b in a)c=g[b],d=a[b],g!==d&&(j&&d&&(n.isPlainObject(d)||(e=n.isArray(d)))?(e?(e=!1,f=c&&n.isArray(c)?c:[]):f=c&&n.isPlainObject(c)?c:{},g[b]=n.extend(j,f,d)):void 0!==d&&(g[b]=d));return g},n.extend({expando:"jQuery"+(m+Math.random()).replace(/\D/g,""),isReady:!0,error:function(a){throw new Error(a)},noop:function(){},isFunction:function(a){return"function"===n.type(a)},isArray:Array.isArray,isWindow:function(a){return null!=a&&a===a.window},isNumeric:function(a){var b=a&&a.toString();return!n.isArray(a)&&b-parseFloat(b)+1>=0},isPlainObject:function(a){var b;if("object"!==n.type(a)||a.nodeType||n.isWindow(a))return!1;if(a.constructor&&!k.call(a,"constructor")&&!k.call(a.constructor.prototype||{},"isPrototypeOf"))return!1;for(b in a);return void 0===b||k.call(a,b)},isEmptyObject:function(a){var b;for(b in a)return!1;return!0},type:function(a){return null==a?a+"":"object"==typeof a||"function"==typeof a?i[j.call(a)]||"object":typeof a},globalEval:function(a){var b,c=eval;a=n.trim(a),a&&(1===a.indexOf("use strict")?(b=d.createElement("script"),b.text=a,d.head.appendChild(b).parentNode.removeChild(b)):c(a))},camelCase:function(a){return a.replace(p,"ms-").replace(q,r)},nodeName:function(a,b){return a.nodeName&&a.nodeName.toLowerCase()===b.toLowerCase()},each:function(a,b){var c,d=0;if(s(a)){for(c=a.length;c>d;d++)if(b.call(a[d],d,a[d])===!1)break}else for(d in a)if(b.call(a[d],d,a[d])===!1)break;return a},trim:function(a){return null==a?"":(a+"").replace(o,"")},makeArray:function(a,b){var c=b||[];return null!=a&&(s(Object(a))?n.merge(c,"string"==typeof a?[a]:a):g.call(c,a)),c},inArray:function(a,b,c){return null==b?-1:h.call(b,a,c)},merge:function(a,b){for(var c=+b.length,d=0,e=a.length;c>d;d++)a[e++]=b[d];return a.length=e,a},grep:function(a,b,c){for(var d,e=[],f=0,g=a.length,h=!c;g>f;f++)d=!b(a[f],f),d!==h&&e.push(a[f]);return e},map:function(a,b,c){var d,e,g=0,h=[];if(s(a))for(d=a.length;d>g;g++)e=b(a[g],g,c),null!=e&&h.push(e);else for(g in a)e=b(a[g],g,c),null!=e&&h.push(e);return f.apply([],h)},guid:1,proxy:function(a,b){var c,d,f;return"string"==typeof b&&(c=a[b],b=a,a=c),n.isFunction(a)?(d=e.call(arguments,2),f=function(){return a.apply(b||this,d.concat(e.call(arguments)))},f.guid=a.guid=a.guid||n.guid++,f):void 0},now:Date.now,support:l}),"function"==typeof Symbol&&(n.fn[Symbol.iterator]=c[Symbol.iterator]),n.each("Boolean Number String Function Array Date RegExp Object Error Symbol".split(" "),function(a,b){i["[object "+b+"]"]=b.toLowerCase()});function s(a){var b=!!a&&"length"in a&&a.length,c=n.type(a);return"function"===c||n.isWindow(a)?!1:"array"===c||0===b||"number"==typeof b&&b>0&&b-1 in a}var t=function(a){var b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u="sizzle"+1*new Date,v=a.document,w=0,x=0,y=ga(),z=ga(),A=ga(),B=function(a,b){return a===b&&(l=!0),0},C=1<<31,D={}.hasOwnProperty,E=[],F=E.pop,G=E.push,H=E.push,I=E.slice,J=function(a,b){for(var c=0,d=a.length;d>c;c++)if(a[c]===b)return c;return-1},K="checked|selected|async|autofocus|autoplay|controls|defer|disabled|hidden|ismap|loop|multiple|open|readonly|required|scoped",L="[\\x20\\t\\r\\n\\f]",M="(?:\\\\.|[\\w-]|[^\\x00-\\xa0])+",N="\\["+L+"*("+M+")(?:"+L+"*([*^$|!~]?=)"+L+"*(?:'((?:\\\\.|[^\\\\'])*)'|\"((?:\\\\.|[^\\\\\"])*)\"|("+M+"))|)"+L+"*\\]",O=":("+M+")(?:\\((('((?:\\\\.|[^\\\\'])*)'|\"((?:\\\\.|[^\\\\\"])*)\")|((?:\\\\.|[^\\\\()[\\]]|"+N+")*)|.*)\\)|)",P=new RegExp(L+"+","g"),Q=new RegExp("^"+L+"+|((?:^|[^\\\\])(?:\\\\.)*)"+L+"+$","g"),R=new RegExp("^"+L+"*,"+L+"*"),S=new RegExp("^"+L+"*([>+~]|"+L+")"+L+"*"),T=new RegExp("="+L+"*([^\\]'\"]*?)"+L+"*\\]","g"),U=new RegExp(O),V=new RegExp("^"+M+"$"),W={ID:new RegExp("^#("+M+")"),CLASS:new RegExp("^\\.("+M+")"),TAG:new RegExp("^("+M+"|[*])"),ATTR:new RegExp("^"+N),PSEUDO:new RegExp("^"+O),CHILD:new RegExp("^:(only|first|last|nth|nth-last)-(child|of-type)(?:\\("+L+"*(even|odd|(([+-]|)(\\d*)n|)"+L+"*(?:([+-]|)"+L+"*(\\d+)|))"+L+"*\\)|)","i"),bool:new RegExp("^(?:"+K+")$","i"),needsContext:new RegExp("^"+L+"*[>+~]|:(even|odd|eq|gt|lt|nth|first|last)(?:\\("+L+"*((?:-\\d)?\\d*)"+L+"*\\)|)(?=[^-]|$)","i")},X=/^(?:input|select|textarea|button)$/i,Y=/^h\d$/i,Z=/^[^{]+\{\s*\[native \w/,$=/^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,_=/[+~]/,aa=/'|\\/g,ba=new RegExp("\\\\([\\da-f]{1,6}"+L+"?|("+L+")|.)","ig"),ca=function(a,b,c){var d="0x"+b-65536;return d!==d||c?b:0>d?String.fromCharCode(d+65536):String.fromCharCode(d>>10|55296,1023&d|56320)},da=function(){m()};try{H.apply(E=I.call(v.childNodes),v.childNodes),E[v.childNodes.length].nodeType}catch(ea){H={apply:E.length?function(a,b){G.apply(a,I.call(b))}:function(a,b){var c=a.length,d=0;while(a[c++]=b[d++]);a.length=c-1}}}function fa(a,b,d,e){var f,h,j,k,l,o,r,s,w=b&&b.ownerDocument,x=b?b.nodeType:9;if(d=d||[],"string"!=typeof a||!a||1!==x&&9!==x&&11!==x)return d;if(!e&&((b?b.ownerDocument||b:v)!==n&&m(b),b=b||n,p)){if(11!==x&&(o=$.exec(a)))if(f=o[1]){if(9===x){if(!(j=b.getElementById(f)))return d;if(j.id===f)return d.push(j),d}else if(w&&(j=w.getElementById(f))&&t(b,j)&&j.id===f)return d.push(j),d}else{if(o[2])return H.apply(d,b.getElementsByTagName(a)),d;if((f=o[3])&&c.getElementsByClassName&&b.getElementsByClassName)return H.apply(d,b.getElementsByClassName(f)),d}if(c.qsa&&!A[a+" "]&&(!q||!q.test(a))){if(1!==x)w=b,s=a;else if("object"!==b.nodeName.toLowerCase()){(k=b.getAttribute("id"))?k=k.replace(aa,"\\$&"):b.setAttribute("id",k=u),r=g(a),h=r.length,l=V.test(k)?"#"+k:"[id='"+k+"']";while(h--)r[h]=l+" "+qa(r[h]);s=r.join(","),w=_.test(a)&&oa(b.parentNode)||b}if(s)try{return H.apply(d,w.querySelectorAll(s)),d}catch(y){}finally{k===u&&b.removeAttribute("id")}}}return i(a.replace(Q,"$1"),b,d,e)}function ga(){var a=[];function b(c,e){return a.push(c+" ")>d.cacheLength&&delete b[a.shift()],b[c+" "]=e}return b}function ha(a){return a[u]=!0,a}function ia(a){var b=n.createElement("div");try{return!!a(b)}catch(c){return!1}finally{b.parentNode&&b.parentNode.removeChild(b),b=null}}function ja(a,b){var c=a.split("|"),e=c.length;while(e--)d.attrHandle[c[e]]=b}function ka(a,b){var c=b&&a,d=c&&1===a.nodeType&&1===b.nodeType&&(~b.sourceIndex||C)-(~a.sourceIndex||C);if(d)return d;if(c)while(c=c.nextSibling)if(c===b)return-1;return a?1:-1}function la(a){return function(b){var c=b.nodeName.toLowerCase();return"input"===c&&b.type===a}}function ma(a){return function(b){var c=b.nodeName.toLowerCase();return("input"===c||"button"===c)&&b.type===a}}function na(a){return ha(function(b){return b=+b,ha(function(c,d){var e,f=a([],c.length,b),g=f.length;while(g--)c[e=f[g]]&&(c[e]=!(d[e]=c[e]))})})}function oa(a){return a&&"undefined"!=typeof a.getElementsByTagName&&a}c=fa.support={},f=fa.isXML=function(a){var b=a&&(a.ownerDocument||a).documentElement;return b?"HTML"!==b.nodeName:!1},m=fa.setDocument=function(a){var b,e,g=a?a.ownerDocument||a:v;return g!==n&&9===g.nodeType&&g.documentElement?(n=g,o=n.documentElement,p=!f(n),(e=n.defaultView)&&e.top!==e&&(e.addEventListener?e.addEventListener("unload",da,!1):e.attachEvent&&e.attachEvent("onunload",da)),c.attributes=ia(function(a){return a.className="i",!a.getAttribute("className")}),c.getElementsByTagName=ia(function(a){return a.appendChild(n.createComment("")),!a.getElementsByTagName("*").length}),c.getElementsByClassName=Z.test(n.getElementsByClassName),c.getById=ia(function(a){return o.appendChild(a).id=u,!n.getElementsByName||!n.getElementsByName(u).length}),c.getById?(d.find.ID=function(a,b){if("undefined"!=typeof b.getElementById&&p){var c=b.getElementById(a);return c?[c]:[]}},d.filter.ID=function(a){var b=a.replace(ba,ca);return function(a){return a.getAttribute("id")===b}}):(delete d.find.ID,d.filter.ID=function(a){var b=a.replace(ba,ca);return function(a){var c="undefined"!=typeof a.getAttributeNode&&a.getAttributeNode("id");return c&&c.value===b}}),d.find.TAG=c.getElementsByTagName?function(a,b){return"undefined"!=typeof b.getElementsByTagName?b.getElementsByTagName(a):c.qsa?b.querySelectorAll(a):void 0}:function(a,b){var c,d=[],e=0,f=b.getElementsByTagName(a);if("*"===a){while(c=f[e++])1===c.nodeType&&d.push(c);return d}return f},d.find.CLASS=c.getElementsByClassName&&function(a,b){return"undefined"!=typeof b.getElementsByClassName&&p?b.getElementsByClassName(a):void 0},r=[],q=[],(c.qsa=Z.test(n.querySelectorAll))&&(ia(function(a){o.appendChild(a).innerHTML="<a id='"+u+"'></a><select id='"+u+"-\r\\' msallowcapture=''><option selected=''></option></select>",a.querySelectorAll("[msallowcapture^='']").length&&q.push("[*^$]="+L+"*(?:''|\"\")"),a.querySelectorAll("[selected]").length||q.push("\\["+L+"*(?:value|"+K+")"),a.querySelectorAll("[id~="+u+"-]").length||q.push("~="),a.querySelectorAll(":checked").length||q.push(":checked"),a.querySelectorAll("a#"+u+"+*").length||q.push(".#.+[+~]")}),ia(function(a){var b=n.createElement("input");b.setAttribute("type","hidden"),a.appendChild(b).setAttribute("name","D"),a.querySelectorAll("[name=d]").length&&q.push("name"+L+"*[*^$|!~]?="),a.querySelectorAll(":enabled").length||q.push(":enabled",":disabled"),a.querySelectorAll("*,:x"),q.push(",.*:")})),(c.matchesSelector=Z.test(s=o.matches||o.webkitMatchesSelector||o.mozMatchesSelector||o.oMatchesSelector||o.msMatchesSelector))&&ia(function(a){c.disconnectedMatch=s.call(a,"div"),s.call(a,"[s!='']:x"),r.push("!=",O)}),q=q.length&&new RegExp(q.join("|")),r=r.length&&new RegExp(r.join("|")),b=Z.test(o.compareDocumentPosition),t=b||Z.test(o.contains)?function(a,b){var c=9===a.nodeType?a.documentElement:a,d=b&&b.parentNode;return a===d||!(!d||1!==d.nodeType||!(c.contains?c.contains(d):a.compareDocumentPosition&&16&a.compareDocumentPosition(d)))}:function(a,b){if(b)while(b=b.parentNode)if(b===a)return!0;return!1},B=b?function(a,b){if(a===b)return l=!0,0;var d=!a.compareDocumentPosition-!b.compareDocumentPosition;return d?d:(d=(a.ownerDocument||a)===(b.ownerDocument||b)?a.compareDocumentPosition(b):1,1&d||!c.sortDetached&&b.compareDocumentPosition(a)===d?a===n||a.ownerDocument===v&&t(v,a)?-1:b===n||b.ownerDocument===v&&t(v,b)?1:k?J(k,a)-J(k,b):0:4&d?-1:1)}:function(a,b){if(a===b)return l=!0,0;var c,d=0,e=a.parentNode,f=b.parentNode,g=[a],h=[b];if(!e||!f)return a===n?-1:b===n?1:e?-1:f?1:k?J(k,a)-J(k,b):0;if(e===f)return ka(a,b);c=a;while(c=c.parentNode)g.unshift(c);c=b;while(c=c.parentNode)h.unshift(c);while(g[d]===h[d])d++;return d?ka(g[d],h[d]):g[d]===v?-1:h[d]===v?1:0},n):n},fa.matches=function(a,b){return fa(a,null,null,b)},fa.matchesSelector=function(a,b){if((a.ownerDocument||a)!==n&&m(a),b=b.replace(T,"='$1']"),c.matchesSelector&&p&&!A[b+" "]&&(!r||!r.test(b))&&(!q||!q.test(b)))try{var d=s.call(a,b);if(d||c.disconnectedMatch||a.document&&11!==a.document.nodeType)return d}catch(e){}return fa(b,n,null,[a]).length>0},fa.contains=function(a,b){return(a.ownerDocument||a)!==n&&m(a),t(a,b)},fa.attr=function(a,b){(a.ownerDocument||a)!==n&&m(a);var e=d.attrHandle[b.toLowerCase()],f=e&&D.call(d.attrHandle,b.toLowerCase())?e(a,b,!p):void 0;return void 0!==f?f:c.attributes||!p?a.getAttribute(b):(f=a.getAttributeNode(b))&&f.specified?f.value:null},fa.error=function(a){throw new Error("Syntax error, unrecognized expression: "+a)},fa.uniqueSort=function(a){var b,d=[],e=0,f=0;if(l=!c.detectDuplicates,k=!c.sortStable&&a.slice(0),a.sort(B),l){while(b=a[f++])b===a[f]&&(e=d.push(f));while(e--)a.splice(d[e],1)}return k=null,a},e=fa.getText=function(a){var b,c="",d=0,f=a.nodeType;if(f){if(1===f||9===f||11===f){if("string"==typeof a.textContent)return a.textContent;for(a=a.firstChild;a;a=a.nextSibling)c+=e(a)}else if(3===f||4===f)return a.nodeValue}else while(b=a[d++])c+=e(b);return c},d=fa.selectors={cacheLength:50,createPseudo:ha,match:W,attrHandle:{},find:{},relative:{">":{dir:"parentNode",first:!0}," ":{dir:"parentNode"},"+":{dir:"previousSibling",first:!0},"~":{dir:"previousSibling"}},preFilter:{ATTR:function(a){return a[1]=a[1].replace(ba,ca),a[3]=(a[3]||a[4]||a[5]||"").replace(ba,ca),"~="===a[2]&&(a[3]=" "+a[3]+" "),a.slice(0,4)},CHILD:function(a){return a[1]=a[1].toLowerCase(),"nth"===a[1].slice(0,3)?(a[3]||fa.error(a[0]),a[4]=+(a[4]?a[5]+(a[6]||1):2*("even"===a[3]||"odd"===a[3])),a[5]=+(a[7]+a[8]||"odd"===a[3])):a[3]&&fa.error(a[0]),a},PSEUDO:function(a){var b,c=!a[6]&&a[2];return W.CHILD.test(a[0])?null:(a[3]?a[2]=a[4]||a[5]||"":c&&U.test(c)&&(b=g(c,!0))&&(b=c.indexOf(")",c.length-b)-c.length)&&(a[0]=a[0].slice(0,b),a[2]=c.slice(0,b)),a.slice(0,3))}},filter:{TAG:function(a){var b=a.replace(ba,ca).toLowerCase();return"*"===a?function(){return!0}:function(a){return a.nodeName&&a.nodeName.toLowerCase()===b}},CLASS:function(a){var b=y[a+" "];return b||(b=new RegExp("(^|"+L+")"+a+"("+L+"|$)"))&&y(a,function(a){return b.test("string"==typeof a.className&&a.className||"undefined"!=typeof a.getAttribute&&a.getAttribute("class")||"")})},ATTR:function(a,b,c){return function(d){var e=fa.attr(d,a);return null==e?"!="===b:b?(e+="","="===b?e===c:"!="===b?e!==c:"^="===b?c&&0===e.indexOf(c):"*="===b?c&&e.indexOf(c)>-1:"$="===b?c&&e.slice(-c.length)===c:"~="===b?(" "+e.replace(P," ")+" ").indexOf(c)>-1:"|="===b?e===c||e.slice(0,c.length+1)===c+"-":!1):!0}},CHILD:function(a,b,c,d,e){var f="nth"!==a.slice(0,3),g="last"!==a.slice(-4),h="of-type"===b;return 1===d&&0===e?function(a){return!!a.parentNode}:function(b,c,i){var j,k,l,m,n,o,p=f!==g?"nextSibling":"previousSibling",q=b.parentNode,r=h&&b.nodeName.toLowerCase(),s=!i&&!h,t=!1;if(q){if(f){while(p){m=b;while(m=m[p])if(h?m.nodeName.toLowerCase()===r:1===m.nodeType)return!1;o=p="only"===a&&!o&&"nextSibling"}return!0}if(o=[g?q.firstChild:q.lastChild],g&&s){m=q,l=m[u]||(m[u]={}),k=l[m.uniqueID]||(l[m.uniqueID]={}),j=k[a]||[],n=j[0]===w&&j[1],t=n&&j[2],m=n&&q.childNodes[n];while(m=++n&&m&&m[p]||(t=n=0)||o.pop())if(1===m.nodeType&&++t&&m===b){k[a]=[w,n,t];break}}else if(s&&(m=b,l=m[u]||(m[u]={}),k=l[m.uniqueID]||(l[m.uniqueID]={}),j=k[a]||[],n=j[0]===w&&j[1],t=n),t===!1)while(m=++n&&m&&m[p]||(t=n=0)||o.pop())if((h?m.nodeName.toLowerCase()===r:1===m.nodeType)&&++t&&(s&&(l=m[u]||(m[u]={}),k=l[m.uniqueID]||(l[m.uniqueID]={}),k[a]=[w,t]),m===b))break;return t-=e,t===d||t%d===0&&t/d>=0}}},PSEUDO:function(a,b){var c,e=d.pseudos[a]||d.setFilters[a.toLowerCase()]||fa.error("unsupported pseudo: "+a);return e[u]?e(b):e.length>1?(c=[a,a,"",b],d.setFilters.hasOwnProperty(a.toLowerCase())?ha(function(a,c){var d,f=e(a,b),g=f.length;while(g--)d=J(a,f[g]),a[d]=!(c[d]=f[g])}):function(a){return e(a,0,c)}):e}},pseudos:{not:ha(function(a){var b=[],c=[],d=h(a.replace(Q,"$1"));return d[u]?ha(function(a,b,c,e){var f,g=d(a,null,e,[]),h=a.length;while(h--)(f=g[h])&&(a[h]=!(b[h]=f))}):function(a,e,f){return b[0]=a,d(b,null,f,c),b[0]=null,!c.pop()}}),has:ha(function(a){return function(b){return fa(a,b).length>0}}),contains:ha(function(a){return a=a.replace(ba,ca),function(b){return(b.textContent||b.innerText||e(b)).indexOf(a)>-1}}),lang:ha(function(a){return V.test(a||"")||fa.error("unsupported lang: "+a),a=a.replace(ba,ca).toLowerCase(),function(b){var c;do if(c=p?b.lang:b.getAttribute("xml:lang")||b.getAttribute("lang"))return c=c.toLowerCase(),c===a||0===c.indexOf(a+"-");while((b=b.parentNode)&&1===b.nodeType);return!1}}),target:function(b){var c=a.location&&a.location.hash;return c&&c.slice(1)===b.id},root:function(a){return a===o},focus:function(a){return a===n.activeElement&&(!n.hasFocus||n.hasFocus())&&!!(a.type||a.href||~a.tabIndex)},enabled:function(a){return a.disabled===!1},disabled:function(a){return a.disabled===!0},checked:function(a){var b=a.nodeName.toLowerCase();return"input"===b&&!!a.checked||"option"===b&&!!a.selected},selected:function(a){return a.parentNode&&a.parentNode.selectedIndex,a.selected===!0},empty:function(a){for(a=a.firstChild;a;a=a.nextSibling)if(a.nodeType<6)return!1;return!0},parent:function(a){return!d.pseudos.empty(a)},header:function(a){return Y.test(a.nodeName)},input:function(a){return X.test(a.nodeName)},button:function(a){var b=a.nodeName.toLowerCase();return"input"===b&&"button"===a.type||"button"===b},text:function(a){var b;return"input"===a.nodeName.toLowerCase()&&"text"===a.type&&(null==(b=a.getAttribute("type"))||"text"===b.toLowerCase())},first:na(function(){return[0]}),last:na(function(a,b){return[b-1]}),eq:na(function(a,b,c){return[0>c?c+b:c]}),even:na(function(a,b){for(var c=0;b>c;c+=2)a.push(c);return a}),odd:na(function(a,b){for(var c=1;b>c;c+=2)a.push(c);return a}),lt:na(function(a,b,c){for(var d=0>c?c+b:c;--d>=0;)a.push(d);return a}),gt:na(function(a,b,c){for(var d=0>c?c+b:c;++d<b;)a.push(d);return a})}},d.pseudos.nth=d.pseudos.eq;for(b in{radio:!0,checkbox:!0,file:!0,password:!0,image:!0})d.pseudos[b]=la(b);for(b in{submit:!0,reset:!0})d.pseudos[b]=ma(b);function pa(){}pa.prototype=d.filters=d.pseudos,d.setFilters=new pa,g=fa.tokenize=function(a,b){var c,e,f,g,h,i,j,k=z[a+" "];if(k)return b?0:k.slice(0);h=a,i=[],j=d.preFilter;while(h){c&&!(e=R.exec(h))||(e&&(h=h.slice(e[0].length)||h),i.push(f=[])),c=!1,(e=S.exec(h))&&(c=e.shift(),f.push({value:c,type:e[0].replace(Q," ")}),h=h.slice(c.length));for(g in d.filter)!(e=W[g].exec(h))||j[g]&&!(e=j[g](e))||(c=e.shift(),f.push({value:c,type:g,matches:e}),h=h.slice(c.length));if(!c)break}return b?h.length:h?fa.error(a):z(a,i).slice(0)};function qa(a){for(var b=0,c=a.length,d="";c>b;b++)d+=a[b].value;return d}function ra(a,b,c){var d=b.dir,e=c&&"parentNode"===d,f=x++;return b.first?function(b,c,f){while(b=b[d])if(1===b.nodeType||e)return a(b,c,f)}:function(b,c,g){var h,i,j,k=[w,f];if(g){while(b=b[d])if((1===b.nodeType||e)&&a(b,c,g))return!0}else while(b=b[d])if(1===b.nodeType||e){if(j=b[u]||(b[u]={}),i=j[b.uniqueID]||(j[b.uniqueID]={}),(h=i[d])&&h[0]===w&&h[1]===f)return k[2]=h[2];if(i[d]=k,k[2]=a(b,c,g))return!0}}}function sa(a){return a.length>1?function(b,c,d){var e=a.length;while(e--)if(!a[e](b,c,d))return!1;return!0}:a[0]}function ta(a,b,c){for(var d=0,e=b.length;e>d;d++)fa(a,b[d],c);return c}function ua(a,b,c,d,e){for(var f,g=[],h=0,i=a.length,j=null!=b;i>h;h++)(f=a[h])&&(c&&!c(f,d,e)||(g.push(f),j&&b.push(h)));return g}function va(a,b,c,d,e,f){return d&&!d[u]&&(d=va(d)),e&&!e[u]&&(e=va(e,f)),ha(function(f,g,h,i){var j,k,l,m=[],n=[],o=g.length,p=f||ta(b||"*",h.nodeType?[h]:h,[]),q=!a||!f&&b?p:ua(p,m,a,h,i),r=c?e||(f?a:o||d)?[]:g:q;if(c&&c(q,r,h,i),d){j=ua(r,n),d(j,[],h,i),k=j.length;while(k--)(l=j[k])&&(r[n[k]]=!(q[n[k]]=l))}if(f){if(e||a){if(e){j=[],k=r.length;while(k--)(l=r[k])&&j.push(q[k]=l);e(null,r=[],j,i)}k=r.length;while(k--)(l=r[k])&&(j=e?J(f,l):m[k])>-1&&(f[j]=!(g[j]=l))}}else r=ua(r===g?r.splice(o,r.length):r),e?e(null,g,r,i):H.apply(g,r)})}function wa(a){for(var b,c,e,f=a.length,g=d.relative[a[0].type],h=g||d.relative[" "],i=g?1:0,k=ra(function(a){return a===b},h,!0),l=ra(function(a){return J(b,a)>-1},h,!0),m=[function(a,c,d){var e=!g&&(d||c!==j)||((b=c).nodeType?k(a,c,d):l(a,c,d));return b=null,e}];f>i;i++)if(c=d.relative[a[i].type])m=[ra(sa(m),c)];else{if(c=d.filter[a[i].type].apply(null,a[i].matches),c[u]){for(e=++i;f>e;e++)if(d.relative[a[e].type])break;return va(i>1&&sa(m),i>1&&qa(a.slice(0,i-1).concat({value:" "===a[i-2].type?"*":""})).replace(Q,"$1"),c,e>i&&wa(a.slice(i,e)),f>e&&wa(a=a.slice(e)),f>e&&qa(a))}m.push(c)}return sa(m)}function xa(a,b){var c=b.length>0,e=a.length>0,f=function(f,g,h,i,k){var l,o,q,r=0,s="0",t=f&&[],u=[],v=j,x=f||e&&d.find.TAG("*",k),y=w+=null==v?1:Math.random()||.1,z=x.length;for(k&&(j=g===n||g||k);s!==z&&null!=(l=x[s]);s++){if(e&&l){o=0,g||l.ownerDocument===n||(m(l),h=!p);while(q=a[o++])if(q(l,g||n,h)){i.push(l);break}k&&(w=y)}c&&((l=!q&&l)&&r--,f&&t.push(l))}if(r+=s,c&&s!==r){o=0;while(q=b[o++])q(t,u,g,h);if(f){if(r>0)while(s--)t[s]||u[s]||(u[s]=F.call(i));u=ua(u)}H.apply(i,u),k&&!f&&u.length>0&&r+b.length>1&&fa.uniqueSort(i)}return k&&(w=y,j=v),t};return c?ha(f):f}return h=fa.compile=function(a,b){var c,d=[],e=[],f=A[a+" "];if(!f){b||(b=g(a)),c=b.length;while(c--)f=wa(b[c]),f[u]?d.push(f):e.push(f);f=A(a,xa(e,d)),f.selector=a}return f},i=fa.select=function(a,b,e,f){var i,j,k,l,m,n="function"==typeof a&&a,o=!f&&g(a=n.selector||a);if(e=e||[],1===o.length){if(j=o[0]=o[0].slice(0),j.length>2&&"ID"===(k=j[0]).type&&c.getById&&9===b.nodeType&&p&&d.relative[j[1].type]){if(b=(d.find.ID(k.matches[0].replace(ba,ca),b)||[])[0],!b)return e;n&&(b=b.parentNode),a=a.slice(j.shift().value.length)}i=W.needsContext.test(a)?0:j.length;while(i--){if(k=j[i],d.relative[l=k.type])break;if((m=d.find[l])&&(f=m(k.matches[0].replace(ba,ca),_.test(j[0].type)&&oa(b.parentNode)||b))){if(j.splice(i,1),a=f.length&&qa(j),!a)return H.apply(e,f),e;break}}}return(n||h(a,o))(f,b,!p,e,!b||_.test(a)&&oa(b.parentNode)||b),e},c.sortStable=u.split("").sort(B).join("")===u,c.detectDuplicates=!!l,m(),c.sortDetached=ia(function(a){return 1&a.compareDocumentPosition(n.createElement("div"))}),ia(function(a){return a.innerHTML="<a href='#'></a>","#"===a.firstChild.getAttribute("href")})||ja("type|href|height|width",function(a,b,c){return c?void 0:a.getAttribute(b,"type"===b.toLowerCase()?1:2)}),c.attributes&&ia(function(a){return a.innerHTML="<input/>",a.firstChild.setAttribute("value",""),""===a.firstChild.getAttribute("value")})||ja("value",function(a,b,c){return c||"input"!==a.nodeName.toLowerCase()?void 0:a.defaultValue}),ia(function(a){return null==a.getAttribute("disabled")})||ja(K,function(a,b,c){var d;return c?void 0:a[b]===!0?b.toLowerCase():(d=a.getAttributeNode(b))&&d.specified?d.value:null}),fa}(a);n.find=t,n.expr=t.selectors,n.expr[":"]=n.expr.pseudos,n.uniqueSort=n.unique=t.uniqueSort,n.text=t.getText,n.isXMLDoc=t.isXML,n.contains=t.contains;var u=function(a,b,c){var d=[],e=void 0!==c;while((a=a[b])&&9!==a.nodeType)if(1===a.nodeType){if(e&&n(a).is(c))break;d.push(a)}return d},v=function(a,b){for(var c=[];a;a=a.nextSibling)1===a.nodeType&&a!==b&&c.push(a);return c},w=n.expr.match.needsContext,x=/^<([\w-]+)\s*\/?>(?:<\/\1>|)$/,y=/^.[^:#\[\.,]*$/;function z(a,b,c){if(n.isFunction(b))return n.grep(a,function(a,d){return!!b.call(a,d,a)!==c});if(b.nodeType)return n.grep(a,function(a){return a===b!==c});if("string"==typeof b){if(y.test(b))return n.filter(b,a,c);b=n.filter(b,a)}return n.grep(a,function(a){return h.call(b,a)>-1!==c})}n.filter=function(a,b,c){var d=b[0];return c&&(a=":not("+a+")"),1===b.length&&1===d.nodeType?n.find.matchesSelector(d,a)?[d]:[]:n.find.matches(a,n.grep(b,function(a){return 1===a.nodeType}))},n.fn.extend({find:function(a){var b,c=this.length,d=[],e=this;if("string"!=typeof a)return this.pushStack(n(a).filter(function(){for(b=0;c>b;b++)if(n.contains(e[b],this))return!0}));for(b=0;c>b;b++)n.find(a,e[b],d);return d=this.pushStack(c>1?n.unique(d):d),d.selector=this.selector?this.selector+" "+a:a,d},filter:function(a){return this.pushStack(z(this,a||[],!1))},not:function(a){return this.pushStack(z(this,a||[],!0))},is:function(a){return!!z(this,"string"==typeof a&&w.test(a)?n(a):a||[],!1).length}});var A,B=/^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]*))$/,C=n.fn.init=function(a,b,c){var e,f;if(!a)return this;if(c=c||A,"string"==typeof a){if(e="<"===a[0]&&">"===a[a.length-1]&&a.length>=3?[null,a,null]:B.exec(a),!e||!e[1]&&b)return!b||b.jquery?(b||c).find(a):this.constructor(b).find(a);if(e[1]){if(b=b instanceof n?b[0]:b,n.merge(this,n.parseHTML(e[1],b&&b.nodeType?b.ownerDocument||b:d,!0)),x.test(e[1])&&n.isPlainObject(b))for(e in b)n.isFunction(this[e])?this[e](b[e]):this.attr(e,b[e]);return this}return f=d.getElementById(e[2]),f&&f.parentNode&&(this.length=1,this[0]=f),this.context=d,this.selector=a,this}return a.nodeType?(this.context=this[0]=a,this.length=1,this):n.isFunction(a)?void 0!==c.ready?c.ready(a):a(n):(void 0!==a.selector&&(this.selector=a.selector,this.context=a.context),n.makeArray(a,this))};C.prototype=n.fn,A=n(d);var D=/^(?:parents|prev(?:Until|All))/,E={children:!0,contents:!0,next:!0,prev:!0};n.fn.extend({has:function(a){var b=n(a,this),c=b.length;return this.filter(function(){for(var a=0;c>a;a++)if(n.contains(this,b[a]))return!0})},closest:function(a,b){for(var c,d=0,e=this.length,f=[],g=w.test(a)||"string"!=typeof a?n(a,b||this.context):0;e>d;d++)for(c=this[d];c&&c!==b;c=c.parentNode)if(c.nodeType<11&&(g?g.index(c)>-1:1===c.nodeType&&n.find.matchesSelector(c,a))){f.push(c);break}return this.pushStack(f.length>1?n.uniqueSort(f):f)},index:function(a){return a?"string"==typeof a?h.call(n(a),this[0]):h.call(this,a.jquery?a[0]:a):this[0]&&this[0].parentNode?this.first().prevAll().length:-1},add:function(a,b){return this.pushStack(n.uniqueSort(n.merge(this.get(),n(a,b))))},addBack:function(a){return this.add(null==a?this.prevObject:this.prevObject.filter(a))}});function F(a,b){while((a=a[b])&&1!==a.nodeType);return a}n.each({parent:function(a){var b=a.parentNode;return b&&11!==b.nodeType?b:null},parents:function(a){return u(a,"parentNode")},parentsUntil:function(a,b,c){return u(a,"parentNode",c)},next:function(a){return F(a,"nextSibling")},prev:function(a){return F(a,"previousSibling")},nextAll:function(a){return u(a,"nextSibling")},prevAll:function(a){return u(a,"previousSibling")},nextUntil:function(a,b,c){return u(a,"nextSibling",c)},prevUntil:function(a,b,c){return u(a,"previousSibling",c)},siblings:function(a){return v((a.parentNode||{}).firstChild,a)},children:function(a){return v(a.firstChild)},contents:function(a){return a.contentDocument||n.merge([],a.childNodes)}},function(a,b){n.fn[a]=function(c,d){var e=n.map(this,b,c);return"Until"!==a.slice(-5)&&(d=c),d&&"string"==typeof d&&(e=n.filter(d,e)),this.length>1&&(E[a]||n.uniqueSort(e),D.test(a)&&e.reverse()),this.pushStack(e)}});var G=/\S+/g;function H(a){var b={};return n.each(a.match(G)||[],function(a,c){b[c]=!0}),b}n.Callbacks=function(a){a="string"==typeof a?H(a):n.extend({},a);var b,c,d,e,f=[],g=[],h=-1,i=function(){for(e=a.once,d=b=!0;g.length;h=-1){c=g.shift();while(++h<f.length)f[h].apply(c[0],c[1])===!1&&a.stopOnFalse&&(h=f.length,c=!1)}a.memory||(c=!1),b=!1,e&&(f=c?[]:"")},j={add:function(){return f&&(c&&!b&&(h=f.length-1,g.push(c)),function d(b){n.each(b,function(b,c){n.isFunction(c)?a.unique&&j.has(c)||f.push(c):c&&c.length&&"string"!==n.type(c)&&d(c)})}(arguments),c&&!b&&i()),this},remove:function(){return n.each(arguments,function(a,b){var c;while((c=n.inArray(b,f,c))>-1)f.splice(c,1),h>=c&&h--}),this},has:function(a){return a?n.inArray(a,f)>-1:f.length>0},empty:function(){return f&&(f=[]),this},disable:function(){return e=g=[],f=c="",this},disabled:function(){return!f},lock:function(){return e=g=[],c||(f=c=""),this},locked:function(){return!!e},fireWith:function(a,c){return e||(c=c||[],c=[a,c.slice?c.slice():c],g.push(c),b||i()),this},fire:function(){return j.fireWith(this,arguments),this},fired:function(){return!!d}};return j},n.extend({Deferred:function(a){var b=[["resolve","done",n.Callbacks("once memory"),"resolved"],["reject","fail",n.Callbacks("once memory"),"rejected"],["notify","progress",n.Callbacks("memory")]],c="pending",d={state:function(){return c},always:function(){return e.done(arguments).fail(arguments),this},then:function(){var a=arguments;return n.Deferred(function(c){n.each(b,function(b,f){var g=n.isFunction(a[b])&&a[b];e[f[1]](function(){var a=g&&g.apply(this,arguments);a&&n.isFunction(a.promise)?a.promise().progress(c.notify).done(c.resolve).fail(c.reject):c[f[0]+"With"](this===d?c.promise():this,g?[a]:arguments)})}),a=null}).promise()},promise:function(a){return null!=a?n.extend(a,d):d}},e={};return d.pipe=d.then,n.each(b,function(a,f){var g=f[2],h=f[3];d[f[1]]=g.add,h&&g.add(function(){c=h},b[1^a][2].disable,b[2][2].lock),e[f[0]]=function(){return e[f[0]+"With"](this===e?d:this,arguments),this},e[f[0]+"With"]=g.fireWith}),d.promise(e),a&&a.call(e,e),e},when:function(a){var b=0,c=e.call(arguments),d=c.length,f=1!==d||a&&n.isFunction(a.promise)?d:0,g=1===f?a:n.Deferred(),h=function(a,b,c){return function(d){b[a]=this,c[a]=arguments.length>1?e.call(arguments):d,c===i?g.notifyWith(b,c):--f||g.resolveWith(b,c)}},i,j,k;if(d>1)for(i=new Array(d),j=new Array(d),k=new Array(d);d>b;b++)c[b]&&n.isFunction(c[b].promise)?c[b].promise().progress(h(b,j,i)).done(h(b,k,c)).fail(g.reject):--f;return f||g.resolveWith(k,c),g.promise()}});var I;n.fn.ready=function(a){return n.ready.promise().done(a),this},n.extend({isReady:!1,readyWait:1,holdReady:function(a){a?n.readyWait++:n.ready(!0)},ready:function(a){(a===!0?--n.readyWait:n.isReady)||(n.isReady=!0,a!==!0&&--n.readyWait>0||(I.resolveWith(d,[n]),n.fn.triggerHandler&&(n(d).triggerHandler("ready"),n(d).off("ready"))))}});function J(){d.removeEventListener("DOMContentLoaded",J),a.removeEventListener("load",J),n.ready()}n.ready.promise=function(b){return I||(I=n.Deferred(),"complete"===d.readyState||"loading"!==d.readyState&&!d.documentElement.doScroll?a.setTimeout(n.ready):(d.addEventListener("DOMContentLoaded",J),a.addEventListener("load",J))),I.promise(b)},n.ready.promise();var K=function(a,b,c,d,e,f,g){var h=0,i=a.length,j=null==c;if("object"===n.type(c)){e=!0;for(h in c)K(a,b,h,c[h],!0,f,g)}else if(void 0!==d&&(e=!0,n.isFunction(d)||(g=!0),j&&(g?(b.call(a,d),b=null):(j=b,b=function(a,b,c){return j.call(n(a),c)})),b))for(;i>h;h++)b(a[h],c,g?d:d.call(a[h],h,b(a[h],c)));return e?a:j?b.call(a):i?b(a[0],c):f},L=function(a){return 1===a.nodeType||9===a.nodeType||!+a.nodeType};function M(){this.expando=n.expando+M.uid++}M.uid=1,M.prototype={register:function(a,b){var c=b||{};return a.nodeType?a[this.expando]=c:Object.defineProperty(a,this.expando,{value:c,writable:!0,configurable:!0}),a[this.expando]},cache:function(a){if(!L(a))return{};var b=a[this.expando];return b||(b={},L(a)&&(a.nodeType?a[this.expando]=b:Object.defineProperty(a,this.expando,{value:b,configurable:!0}))),b},set:function(a,b,c){var d,e=this.cache(a);if("string"==typeof b)e[b]=c;else for(d in b)e[d]=b[d];return e},get:function(a,b){return void 0===b?this.cache(a):a[this.expando]&&a[this.expando][b]},access:function(a,b,c){var d;return void 0===b||b&&"string"==typeof b&&void 0===c?(d=this.get(a,b),void 0!==d?d:this.get(a,n.camelCase(b))):(this.set(a,b,c),void 0!==c?c:b)},remove:function(a,b){var c,d,e,f=a[this.expando];if(void 0!==f){if(void 0===b)this.register(a);else{n.isArray(b)?d=b.concat(b.map(n.camelCase)):(e=n.camelCase(b),b in f?d=[b,e]:(d=e,d=d in f?[d]:d.match(G)||[])),c=d.length;while(c--)delete f[d[c]]}(void 0===b||n.isEmptyObject(f))&&(a.nodeType?a[this.expando]=void 0:delete a[this.expando])}},hasData:function(a){var b=a[this.expando];return void 0!==b&&!n.isEmptyObject(b)}};var N=new M,O=new M,P=/^(?:\{[\w\W]*\}|\[[\w\W]*\])$/,Q=/[A-Z]/g;function R(a,b,c){var d;if(void 0===c&&1===a.nodeType)if(d="data-"+b.replace(Q,"-$&").toLowerCase(),c=a.getAttribute(d),"string"==typeof c){try{c="true"===c?!0:"false"===c?!1:"null"===c?null:+c+""===c?+c:P.test(c)?n.parseJSON(c):c;
@@ -710,9 +773,9 @@ if("undefined"==typeof jQuery)throw new Error("Bootstrap's JavaScript requires j
           <div class="nav-container">
             <div class="nav-inner" id="scroll-spy" style="width: min-content; overflow: auto; top: 60px; bottom: 0; padding 10px 0 10px 0;">
               <span class="toc"></span>
-              <h1 id="english">English</h1>
-<ul class="nav"><li class="active"><a href="#getting-started-en">Getting Started</a></li><li><a href="#objects-en">Objects List</a></li><li><a href="#examples-en">Examples</a></li></ul><h1 id="fran-ais">Français</h1>
-<ul class="nav"><li><a href="#getting-started-fr">Premiers pas</a></li><li><a href="#objects-fr">Liste des objets</a></li><li><a href="#exemples-fr">Exemples</a></li></ul>
+              <h3 id="getting-started">Getting Started</h3>
+<ul class="nav"><li class="active"><a href="#presentation">Presentation</a></li><li><a href="#installing">Installation</a></li><li><a href="#quick-tour">Quick Tour</a></li><li><a href="#patching">Patching</a></li><li><a href="#login">Register/Login</a></li><li><a href="#collaborate">Collaborate</a></li></ul><h3 id="details">Details</h3>
+<ul class="nav"><li><a href="#help-patches">Objects</a></li><li><a href="#objects-list">Objects list</a></li><li><a href="#examples">Examples</a></li><li><a href="#shortcuts">Shortcuts</a></li></ul>
               
             </div>
           </div>
@@ -720,888 +783,684 @@ if("undefined"==typeof jQuery)throw new Error("Bootstrap's JavaScript requires j
 
 
         <div class="col-md-9">
-<p class="page" id="getting-started-en"></p><h1>Getting Started</h1>
+<p class="page" id="presentation"></p><h1>Presentation</h1>
+<p>Kiwi is part of the French ANR-funded <a href="http://musicoll.mshparisnord.org/">MUSICOLL</a> project that unites the <a href="http://cicm.mshparisnord.org/">CICM</a> and <a href="https://www.ohmforce.com/">OhmForce</a>. The main goal of this project is to study how collaboration can enhance the way digital audio music composition is taught and more generally how it can improve music creation workflow.</p>
+<p><img alt="Kiwi Screenshot" src="./img/kiwi_screenshot.png" width="800px" class="centered"/></p>
+<p>Kiwi is a graphical programming environment dedicated to music creation in the spirit of other softwares like <a href="https://cycling74.com">Max</a> or <a href="https://puredata.info/">Pure Data</a>.
+Kiwi is also a realtime collaborative software that enables several distant users to work at the same time on a same patch hosted online.</p>
+<p class="page" id="installing"></p><h1>Installation</h1>
 <h2 id="download">Download</h2>
-<p>Download the latest Kiwi application for your operating system and the documentation from the <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>. You&#39;ll find a version for each operating system, a list of help patches that describes the objects&#39; behaviour and a set of examples guiding through creating certain audio processing.</p>
+<p>You can download the latest Kiwi application from the <a href="https://github.com/Musicoll/Kiwi/releases/latest">github repository</a>.</p>
 <h2 id="compatibility">Compatibility</h2>
-<p>Kiwi is compatible with the three main operating system.</p>
-<ul>
-<li>Macos : version 10.7 and later.</li>
-<li>Windows : windows 7 and later.</li>
-<li>Linux : tested with ubuntu 14.04</li>
-</ul>
-<h2 id="installing">Installing</h2>
-<p>Once download is complete, the corresponding archive shall be extracted by double clicking on it. A Kiwi folder containing the application is then created. On macos and linux copy the application to your app folder (Application folder on Mac, /usr/bin on linux). Windows users may execute the installer.</p>
-<h2 id="lauching-kiwi">Lauching Kiwi</h2>
-<p>When Kiwi is executed three main windows appear : The Document Browser, the Beacon Dispatcher and Kiwi&#39;s console.</p>
-<table style="border: 0px">
-    <tr>
-        <th style="border: 0px"><img title="DocumentBrowser" src="./img/emptyDocumentBrowser.png" height=500 /></th>
-        <th style="border: 0px"><img src="./img/emptyBeaconDispatcher.png" height=200></th>
-        <th style="border: 0px"><img = src="./img/emptyKiwiConsole.png" height=400></th>
-    </tr>
+<p>Kiwi is compatible with the three main operating systems :</p>
+<table>
+<thead>
+<tr>
+<th>OS</th>
+<th>version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mac</td>
+<td>&gt; 10.7</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>&gt; windows 7 and later</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>&gt; ubuntu 14.04</td>
+</tr>
+</tbody>
 </table>
-
-<p>The menu bar appears on top of your screen or as a header of Kiwi&#39;s console on windows.</p>
-<p><img title="MenuBar" src="./img/barreDesMenusMacOS.png" height=30/></p>
-<h2 id="signing-up">Signing up</h2>
-<p>There is two options to connect to Kiwi&#39;s server: either create a user account or use an already created account. To create an account, click on &#39;Register&#39; under &#39;Account&#39; menu. A register window appears. Enter your username, your email adress and your passowrd. After clicking the register button the user receives a email containing a temporary link enabling him to validate his account creation.</p>
-<p><img title="register" src="./img/registerWindow.png" height=400px/></p>
-<p>To connect to an existing user account, click on login in the menu &#39;Account&#39;. A login window shows up. Enter your email address or username and your password. If you forgot your password, you can reset it using your email address by clicking on the button &#39;Forgot password&#39;.</p>
-<p><img title="register" src="./img/loginWindow.png" height=400px/></p>
-<h2 id="first-patch">First patch</h2>
-<p>At this point, you can either join a shared patch using the Document Browser window or open a local patch. In this section we will demonstrate how to open and manipulate a local patch. Instructions on how to collaborate will be given later.</p>
-<p>Open the patch <strong>first-patch.kiwi</strong> provided in the documentation folder. If you didn&#39;t download the documentation yet, you can find it on this <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>.</p>
-<p><img title="first patch" src="./img/first-patch.png" height="600px"></p>
-<p>As you can see, the patch is a set of objects each one carrying out an operation. Data either control or signal data is sent between objects using links. Grey connections are used to send messages (numbers, strings, lists, bang ect...) whereas green connections send signals from top to bottom.</p>
-<p>This first patch is a generator of sound (synthesis) where the top-left part is the generator. The top-right is used to trigger a gain envelope. The signal is then sent to a master gain control and the dac~ object which represents the audio output of the patch.</p>
-<p>A patch can either be in mode edition or in mode lock. In edition mode objects and links can be added, removed or edited. In mode lock, graphical objects (the gain slider is graphical is an example) are now enabled and can be manipulated to generate different sounds. To switch between mode lock and mode edition either click on the lock button
-<img title="lock" src="./img/locked.png" height=15px/> or press Cmd + E (Ctrl + E for linux or windows users).</p>
-<p>The audio processing is by default disabled, to put the audio on click on the speaker icon on the top left part of the patch <img title="lock" src="./img/dsp_off.png" height=15px/>.</p>
-<p>Once you have locked the patch and started the audio processing you can increase the gain using the &quot;gain&quot; slider, you can generate the sound by clicking on the &quot;envelope&quot; message object (below &quot;envelope&quot; comment) and adjust the frequency of the generated sound by dragging the number object which controls the frequency.</p>
-<h2 id="collaborate">Collaborate</h2>
-<p>In this section we will describe how one can join a patch and collaborate with other users.</p>
-<p>To collaborate with others one may use the document browser and open a document that is being edited by another collaborator. There is no chatting solution integrated in Kiwi&#39;s software but you can use another chatting software to meet up and speak while working together.</p>
-<p><img title="first patch" src="./img/document-browser-full.png" height="400"></p>
-<p>As you can see the document displays a list of documents accessible by anyone. Downloading, deleting, uploading, renaming, duplicating a patches is enabled by right clicking on the document browser. Sorting documents using different criteria is also possible.</p>
-<p>Double click on a patch to start collaborating.</p>
-<p><img title="first patch" src="./img/online-document.png" height="400"></p>
-<p>Once you have join the document you can click on the top left part to show users currently editing or using the patch. Objects currently selected by other users are hilighted in orange whereas your own selection is shown in blue.</p>
-<p>You can now edit and/or play the patch as you will with others.</p>
-<p class="page" id="objects-en"></p><h1>Objects List</h1>
+<blockquote>
+<p>64bit version only</p>
+</blockquote>
+<h2 id="installing">Installing</h2>
+<p>Once download is complete, the corresponding archive shall be extracted by double clicking on it. A Kiwi folder containing the application is then created. On Mac and Linux, copy the application to your app folder (<code>Application</code> folder on Mac or <code>/usr/bin</code> on linux). Windows users may execute the installer.</p>
+<p>You will find in the application a list of <a href="#objects-list">help patches</a> that describes the objects&#39; behaviour and a set of <a href="#examples">examples</a>.</p>
+<p class="page" id="quick-tour"></p><h1>Quick Tour</h1>
+<p>When Kiwi is executed two windows will appear : the Document Browser and the Kiwi Console.</p>
+<p><img alt="DocumentBrowser" src="./img/emptyDocumentBrowser.png" width=300px/>
+<img alt="Kiwi Console" src="./img/console_explained.png" width=400px></p>
+<p>The Kiwi Console displays messages from the app or from the patcher. You can access the console from the <code>Window/Console</code> menu or by typing <code>cmd</code> + <code>k</code> on Mac or <code>ctrl</code> + <code>k</code> on Windows or Linux. Messages can be sent to the console through a <em>print</em> object from a patcher.</p>
+<p>The Document Browser window allows you to view, create and join remote patchers hosted online. To see hosted documents you first need to login.</p>
+<blockquote>
+<p>See the <a href="#login">Register/login</a> section</p>
+</blockquote>
+<p class="page" id="patching"></p><h1>Patching</h1>
+<p>In Kiwi you can either join a shared patch using the Document Browser window or open a local patch from your machine. In this section we will show how to open and manipulate a local patch. Instructions on how to collaborate over a patch are given <a href="#collaborate">here</a>.</p>
+<p><img title="Risset Bell" src="./img/RissetBell.png" width="800px"></p>
+<blockquote>
+<p><a href="http://www.alainbonardi.net/songes/modelisation_eng.htm">Risset&#39;s bell modelling</a>, you can found the patch in the examples.</p>
+</blockquote>
+<p>The patcher above is taken from the Kiwi examples. As you can see, a patch is a set of objects each one carrying out an operation. Control or signal data is sent between objects using links. Grey connections are used to send messages (numbers, strings, lists, bang ect...) whereas dark connections send signals, always from the top to the bottom.</p>
+<p>To create a new patcher, press <code>cmd</code>/<code>ctrl</code> + <code>n</code> or go to <code>File/New Patcher</code>.</p>
+<p>A patch can either be in <em>edit</em> or in <em>play</em> mode. To switch between <em>edit</em> and <em>play</em> mode, click on the lock button
+<img title="lock" src="./img/locked.png" height=22px/> or press <code>cmd</code> + <code>e</code> on Mac (<code>ctrl</code> + <code>e</code> for linux or windows users).</p>
+<h3 id="edit-mode">edit mode</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">edit mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><img alt="patcher edit" src="./img/kiwi_edit_video.gif"/></td>
+</tr>
+</tbody>
+</table>
+<p>In <em>edit</em> mode objects and links can be added, removed or edited into the patch.</p>
+<p>You can add objects in a patch by first creating an empty box with <code>n</code> or by double clicking and type an object name in the text editor.</p>
+<p><img alt="Object box popup" src="./img/object_box_popup.png" class="centered" width=500px /></p>
+<blockquote>
+<p>Please see the list of <a href="#objects-list">availaible objects</a>.</p>
+</blockquote>
+<blockquote>
+<p>You can also use availables <a href="#shortcuts">shortcuts</a> to instantiate GUI objects more easily.</p>
+</blockquote>
+<h3 id="play-mode">play mode</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">play mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><img alt="patcher playing" src="./img/kiwi_play_video_slider.gif"/></td>
+</tr>
+</tbody>
+</table>
+<p>In <em>play</em> mode graphical objects (the <em>slider</em> object for example) can be manipulated directly to change the state of the patch that is executed.</p>
+<p>The audio processing is by default disabled, to put the audio on, click on the speaker icon on the top left part of the patch <img title="lock" src="./img/dsp_off.png" height=22px/>.</p>
+<p>Once you have locked the patch and started the audio processing, in the above example, you could alter the gain of the signal with the <em>slider</em> or change the frequency of the oscillator using the <em>number</em> box.</p>
+<h3 id="multiview">Multiview</h3>
+<p><img alt="patcher multiview" src="./img/patcher_multiview.png" width=800px class="centered"/></p>
+<blockquote>
+<p>You can open a new view by pressing <code>cmd</code>/<code>ctrl</code> + <code>shift</code>+ <code>n</code>.</p>
+</blockquote>
+<h3 id="audio-settings">Audio Settings</h3>
+<p><img title="Audio Settings" src="./img/audio_settings.png" width=500px class="centered"/></p>
+<blockquote>
+<p>You can access the audio settings in the <code>Options/Audio Settings</code> menu.</p>
+</blockquote>
+<p class="page" id="login"></p><h1>Register/Login</h1>
+<p>To save and access online documents and start collaborating, you first need to login. There is two options to connect to Kiwi&#39;s server: either by creating a new user account or use an already created account.</p>
+<p><img alt="register/login" src="./img/auth_signup_signin.png" width="600px" class="centered"/></p>
+<h3 id="register">Register</h3>
+<p>To create an account, click on <strong>Register</strong> under the <strong>Account</strong> menu. A register window appears. Enter your username, your email address and your password. After clicking the <strong>register</strong> button, you will receive an email with a temporary link to validate your account. Check that mail then</p>
+<h3 id="login">Login</h3>
+<p>To connect to an existing user account, click on <strong>login</strong> in the <strong>Account</strong> menu. A login window shows up. Enter your email address or username and your password.</p>
+<h3 id="password-reset">Password Reset</h3>
+<p>If you forgot your password, you can reset it using your email address by clicking on the button <strong>Forgot password</strong>.</p>
+<p><img alt="reset password" src="./img/auth_token_reset_password.png" width="600px" class="centered"/></p>
+<p>You will receive an email containing a token to be passed with your new password to reset it.</p>
+<h3 id="network-settings">Network Settings</h3>
+<p><img alt="Network Settings" src="./img/network_settings.png" width="400px" class="centered"/></p>
+<p>You can access the network settings by pressing <code>cmd</code>/<code>ctrl</code> + <code>,</code> or via the <code>Settings</code> menu. There is option to connect to another server or on different ports. Most users don&#39;t need to make changes here but it could be usefull if you want to run your own Kiwi server.</p>
+<blockquote>
+<p>Please refers to the <a href="https://github.com/Musicoll/Kiwi/">github repository</a> to get more informations.</p>
+</blockquote>
+<p class="page" id="collaborate"></p><h1>Collaborate</h1>
+<p>In this section we will describe how one can join a patch and collaborate with other users. Once you are logged in, you can access the remote documents from the document browser window.</p>
+<p><img title="first patch" src="./img/document_browser.png" height="500" class="centered"></p>
+<p>As you can see the window displays a list of documents accessible online. They can be access by anyone connected to the same server. You can download, delete, upload, rename, duplicate patches from this window by right clicking on an item. Sorting documents using various criteria is also possible.</p>
+<p>Double click on a document to join an online session and start collaborating with other users. You can click on the top left icon of the patcher to show the users that are currently editing or playing with the patch.</p>
+<p><img alt="user list popup" src="./img/patcher_connected_user_list_popup.png" width="250">
+<img alt="FM Synth collaborate" src="./img/FM_synth_collab.png" width="500"></p>
+<p>Objects currently selected by other users are highlighted in <span class="inline-block orange">orange</span>, whereas your own selection is shown in <span class="inline-block blue">blue</span>.</p>
+<p>You can now edit and/or play the patch as you will with the others in realtime. Every modification you make in the structure of the patch will automatically be synced between peers and saved on the server.</p>
+<p>On the other hand, when you play with the patch, its state is not shared with the others. Indeed the execution of the patch stay local so you can control parameters independently and isolate or customize audio rendering.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">User A</th>
+<th style="text-align:center">User B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><img alt="User A" src="./img/kiwi_play_video_number.gif"/></td>
+<td style="text-align:center"><img alt="User B" src="./img/kiwi_play_video_slider.gif"/></td>
+</tr>
+</tbody>
+</table>
+<p>If you want to share some data of the patch with other users or synchronize GUI objects, you can do it via a specific object of the language called a <strong>hub</strong> that broadcast messages to every users connected to the same document through the server.</p>
+<p><img alt="Using the kiwi hub object" src="./img/hub_server_communication.png" width="600" class="centered"/></p>
+<blockquote>
+<p>Open the <strong>hub</strong> help patch in the Help menu for more infos</p>
+</blockquote>
+<p class="page" id="help-patches"></p><h1>Objects</h1>
 <h2 id="help-patches">Help patches</h2>
-<p>A list of help patches describing how each object works is provided in the documentation folder. If you didn&#39;t download the documentation yet, you can find it on this <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>. Sometimes help patches gather several objects that are functionally linked, for instance gate and switch or gate~ and switch~.</p>
-<h2 id="list-of-objects">List of objects</h2>
+<p>To see the help of an object, select it in a patch, then right-click on it and click in the help option. It will open the corresponding help file.</p>
+<p>A list of help patches describing how each object works is provided in the documentation accessible from the main application menu <code>Help/Objects</code>. Sometimes help patches gather several objects that are functionally linked, for instance <em>gate</em> and <em>switch</em> or <em>gate~</em> and <em>switch~</em>.</p>
+<p class="page" id="objects-list"></p><h1>Objects list</h1>
+<p>There is different kind of objects in Kiwi.</p>
+<p><img alt="Kiwi Objects" src="./img/object_typology.png" width=400px class="centered" /></p>
+<p>Here is a list of all available objects :</p>
+<h3 id="patching">Patching</h3>
 <table>
 <thead>
 <tr>
 <th>Object</th>
+<th>Description</th>
 <th style="text-align:center">Alias</th>
+<th style="text-align:center">Shortcut</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>newbox</strong></td>
+<td>Empty new box</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"><code>n</code></td>
+</tr>
+<tr>
+<td><strong>errorbox</strong></td>
+<td>Error box (when an object is invalid)</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>send</strong></td>
+<td>Send message to matching receive object</td>
+<td style="text-align:center"><em>s</em></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>receive</strong></td>
+<td>Receive messages from a sender bound to the same name</td>
+<td style="text-align:center"><em>r</em></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>mtof</strong></td>
+<td>Convert midi notes to frequencies</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>select</strong></td>
+<td>Ouput bang if receive matching input</td>
+<td style="text-align:center"><em>sel</em></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>random</strong></td>
+<td>Ouput random number in a uniform distribution</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>pack</strong></td>
+<td>Create and outputs a list of messages</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>unpack</strong></td>
+<td>Access elements in a list</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>trigger</strong></td>
+<td>Trigger events based on received data</td>
+<td style="text-align:center"><em>t</em></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>print</strong></td>
+<td>Print messages into Kiwi console</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>loadmess</strong></td>
+<td>Output arguments as message when the patch is loaded</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>delay</strong></td>
+<td>Delay messages as bang</td>
+<td style="text-align:center"><em>del</em></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>pipe</strong></td>
+<td>Delay any message</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>metro</strong></td>
+<td>Output bang at regular time interval</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>scale</strong></td>
+<td>Convert a number from one range into another range</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>gate</strong></td>
+<td>Route message to selected output</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>switch</strong></td>
+<td>Output message receive in selected inlet</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>clip</strong></td>
+<td>Clip a number between a maximum and a minimum value</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>float</strong></td>
+<td>Store a float value</td>
+<td style="text-align:center"><em>f</em></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>route</strong></td>
+<td>Route messages according to the first element</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="gui-objects">GUI Objects</h3>
+<table>
+<thead>
+<tr>
+<th>Object</th>
+<th>Description</th>
+<th style="text-align:center">Alias</th>
+<th style="text-align:center">Shortcut</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>message</strong></td>
+<td>Send messages or list of messages</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>slider</strong></td>
+<td>Graphical slider sending values between 0 and 1</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"><code>s</code></td>
+</tr>
+<tr>
+<td><strong>toggle</strong></td>
+<td>A switch button</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"><code>t</code></td>
+</tr>
+<tr>
+<td><strong>bang</strong></td>
+<td>Send a bang message</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"><code>b</code></td>
+</tr>
+<tr>
+<td><strong>meter~</strong></td>
+<td>A peak amplitude vu meter</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>comment</strong></td>
+<td>Add a comment to the patch</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"><code>c</code></td>
+</tr>
+<tr>
+<td><strong>number~</strong></td>
+<td>Display audio samples values</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td><strong>number</strong></td>
+<td>Display a number</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"><code>i</code>/<code>f</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="operators">Operators</h3>
+<table>
+<thead>
+<tr>
+<th>Object</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>line~</strong></td>
-<td style="text-align:center"></td>
-<td>Generate an audio ramp signal</td>
-</tr>
-<tr>
-<td><strong>noise~</strong></td>
-<td style="text-align:center"></td>
-<td>A white noise generator</td>
-</tr>
-<tr>
-<td><strong>sah~</strong></td>
-<td style="text-align:center"></td>
-<td>Samples and holds an input signal</td>
-</tr>
-<tr>
-<td><strong>hub</strong></td>
-<td style="text-align:center"></td>
-<td>Send message to other users</td>
-</tr>
-<tr>
-<td><strong>send</strong></td>
-<td style="text-align:center"><em>s</em></td>
-<td>Send message to matching receive object</td>
-</tr>
-<tr>
-<td><strong>mtof</strong></td>
-<td style="text-align:center"></td>
-<td>Convert midi notes to frequencies</td>
-</tr>
-<tr>
-<td><strong>number~</strong></td>
-<td style="text-align:center"></td>
-<td>Display audio samples values</td>
-</tr>
-<tr>
-<td><strong>number</strong></td>
-<td style="text-align:center"><em>f</em></td>
-<td>Display a nuumber</td>
-</tr>
-<tr>
-<td><strong>select</strong></td>
-<td style="text-align:center"></td>
-<td>Ouput bang if receive matching input</td>
-</tr>
-<tr>
-<td><strong>snapshot~</strong></td>
-<td style="text-align:center"></td>
-<td>Ouput sample signal values</td>
-</tr>
-<tr>
-<td><strong>random</strong></td>
-<td style="text-align:center"></td>
-<td>Ouput random number in a uniform distribution</td>
-</tr>
-<tr>
-<td><strong>unpack</strong></td>
-<td style="text-align:center"></td>
-<td>Access elements in a list</td>
-</tr>
-<tr>
-<td><strong>pack</strong></td>
-<td style="text-align:center"></td>
-<td>Create and outputs a list of messages</td>
-</tr>
-<tr>
-<td><strong>comment</strong></td>
-<td style="text-align:center"><em>c</em></td>
-<td>Add a comment to the patch</td>
-</tr>
-<tr>
-<td><strong>!=~</strong></td>
-<td style="text-align:center"></td>
-<td>Signal inequality operator</td>
-</tr>
-<tr>
-<td><strong>==~</strong></td>
-<td style="text-align:center"></td>
-<td>Signal equality operator</td>
-</tr>
-<tr>
-<td><strong>&gt;=~</strong></td>
-<td style="text-align:center"></td>
-<td>Signal superior operator</td>
-</tr>
-<tr>
-<td><strong>&gt;~</strong></td>
-<td style="text-align:center"></td>
-<td>Signal strict superior operator</td>
-</tr>
-<tr>
-<td><strong>&lt;=~</strong></td>
-<td style="text-align:center"></td>
-<td>Signal inferior operator</td>
-</tr>
-<tr>
-<td><strong>&lt;~</strong></td>
-<td style="text-align:center"></td>
-<td>Signal strict inferior operator</td>
-</tr>
-<tr>
-<td><strong>/~</strong></td>
-<td style="text-align:center"></td>
-<td>Divide two signals</td>
-</tr>
-<tr>
-<td><strong>-~</strong></td>
-<td style="text-align:center"></td>
-<td>Substract two signals</td>
-</tr>
-<tr>
-<td><strong>%</strong></td>
-<td style="text-align:center"></td>
-<td>Compute the modulo of number in desired basis</td>
-</tr>
-<tr>
-<td><strong>pow</strong></td>
-<td style="text-align:center"></td>
-<td>Compute exponentiation of a number</td>
-</tr>
-<tr>
-<td><strong>==</strong></td>
-<td style="text-align:center"></td>
-<td>Equality operator</td>
-</tr>
-<tr>
-<td><strong>!=</strong></td>
-<td style="text-align:center"></td>
-<td>Inequality operator</td>
-</tr>
-<tr>
-<td><strong>&gt;=</strong></td>
-<td style="text-align:center"></td>
-<td>Superior operator</td>
-</tr>
-<tr>
-<td><strong>&gt;</strong></td>
-<td style="text-align:center"></td>
-<td>Strict superior operator</td>
-</tr>
-<tr>
-<td><strong>&lt;=</strong></td>
-<td style="text-align:center"></td>
-<td>Inferior operator</td>
-</tr>
-<tr>
-<td><strong>&lt;</strong></td>
-<td style="text-align:center"></td>
-<td>Strict inferior operator</td>
-</tr>
-<tr>
-<td><strong>/</strong></td>
-<td style="text-align:center"></td>
-<td>Compute the division of two numbers</td>
-</tr>
-<tr>
-<td><strong>-</strong></td>
-<td style="text-align:center"></td>
-<td>Compute the substraction of two numbers</td>
-</tr>
-<tr>
-<td><strong>message</strong></td>
-<td style="text-align:center"></td>
-<td>Send messages or list of messages</td>
-</tr>
-<tr>
-<td><strong>slider</strong></td>
-<td style="text-align:center"></td>
-<td>Graphical slider sending values between 0 and 1</td>
-</tr>
-<tr>
-<td><strong>toggle</strong></td>
-<td style="text-align:center"></td>
-<td>A switch button</td>
-</tr>
-<tr>
-<td><strong>bang</strong></td>
-<td style="text-align:center"></td>
-<td>Send a bang message</td>
-</tr>
-<tr>
-<td><strong>meter~</strong></td>
-<td style="text-align:center"></td>
-<td>A peak amplitude vu meter</td>
-</tr>
-<tr>
-<td><strong>trigger</strong></td>
-<td style="text-align:center"><em>t</em></td>
-<td>Trigger events based on received data</td>
-</tr>
-<tr>
-<td><strong>newbox</strong></td>
-<td style="text-align:center"></td>
-<td>Empty new box</td>
-</tr>
-<tr>
-<td><strong>errorbox</strong></td>
-<td style="text-align:center"></td>
-<td>Error box</td>
-</tr>
-<tr>
 <td><strong>+</strong></td>
-<td style="text-align:center"></td>
 <td>Add two numbers</td>
 </tr>
 <tr>
 <td><strong>*</strong></td>
-<td style="text-align:center"></td>
 <td>Multiply two numbers</td>
 </tr>
 <tr>
-<td><strong>print</strong></td>
-<td style="text-align:center"></td>
-<td>Print messages into Kiwi console</td>
+<td><strong>%</strong></td>
+<td>Compute the modulo of number in desired basis</td>
 </tr>
 <tr>
-<td><strong>receive</strong></td>
-<td style="text-align:center"><em>r</em></td>
-<td>Receive messages from a sender bound to the same name</td>
+<td><strong>pow</strong></td>
+<td>Compute exponentiation of a number</td>
 </tr>
 <tr>
-<td><strong>loadmess</strong></td>
-<td style="text-align:center"></td>
-<td>Output arguments as message when the patch is loaded</td>
+<td><strong>==</strong></td>
+<td>Equality operator</td>
 </tr>
 <tr>
-<td><strong>delay</strong></td>
-<td style="text-align:center"></td>
-<td>Delay messages as bang</td>
+<td><strong>!=</strong></td>
+<td>Inequality operator</td>
 </tr>
 <tr>
-<td><strong>pipe</strong></td>
-<td style="text-align:center"></td>
-<td>Delay any message</td>
+<td><strong>&gt;=</strong></td>
+<td>Greater than operator</td>
 </tr>
 <tr>
-<td><strong>metro</strong></td>
-<td style="text-align:center"></td>
-<td>Output bang at regular time interval</td>
+<td><strong>&gt;</strong></td>
+<td>Strictly greater than operator</td>
 </tr>
 <tr>
-<td><strong>adc~</strong></td>
-<td style="text-align:center"></td>
-<td>Receive audio signals from inputs or external devices</td>
+<td><strong>&lt;=</strong></td>
+<td>Lesser than operator</td>
 </tr>
 <tr>
-<td><strong>dac~</strong></td>
-<td style="text-align:center"></td>
-<td>Send audio signals to outputs or external devices</td>
+<td><strong>&lt;</strong></td>
+<td>Strictly lesser than operator</td>
 </tr>
 <tr>
-<td><strong>osc~</strong></td>
-<td style="text-align:center"></td>
-<td>A cosine oscillator</td>
+<td><strong>/</strong></td>
+<td>Divide two numbers</td>
 </tr>
 <tr>
-<td><strong>phasor~</strong></td>
-<td style="text-align:center"></td>
-<td>Generate a sawtooth signal</td>
-</tr>
-<tr>
-<td><strong>*~</strong></td>
-<td style="text-align:center"></td>
-<td>Multiply two signals</td>
-</tr>
-<tr>
-<td><strong>+~</strong></td>
-<td style="text-align:center"></td>
-<td>Add two signals</td>
-</tr>
-<tr>
-<td><strong>sig~</strong></td>
-<td style="text-align:center"></td>
-<td>Convert numbers into audio signals</td>
-</tr>
-<tr>
-<td><strong>delaysimple~</strong></td>
-<td style="text-align:center"></td>
-<td>Simple variable delay line with optional feedback value</td>
-</tr>
-<tr>
-<td><strong>scale</strong></td>
-<td style="text-align:center"></td>
-<td>Convert a number from one range into another range</td>
-</tr>
-<tr>
-<td><strong>gate</strong></td>
-<td style="text-align:center"></td>
-<td>Route message to selected output</td>
-</tr>
-<tr>
-<td><strong>switch</strong></td>
-<td style="text-align:center"></td>
-<td>Output message receive in selected inlet</td>
-</tr>
-<tr>
-<td><strong>gate~</strong></td>
-<td style="text-align:center"></td>
-<td>Route received signal to selected output</td>
-</tr>
-<tr>
-<td><strong>switch~</strong></td>
-<td style="text-align:center"></td>
-<td>Ouput signal received in selected inlet</td>
-</tr>
-<tr>
-<td><strong>clip</strong></td>
-<td style="text-align:center"></td>
-<td>Clip a number between a maximum and a minimum value</td>
-</tr>
-<tr>
-<td><strong>clip~</strong></td>
-<td style="text-align:center"></td>
-<td>Clip a signal between a maximum and a minimum value</td>
-</tr>
-<tr>
-<td><strong>float</strong></td>
-<td style="text-align:center"></td>
-<td>Store a float value</td>
-</tr>
-<tr>
-<td><strong>sf.play~</strong></td>
-<td style="text-align:center"></td>
-<td>Play an audio file from disk</td>
-</tr>
-<tr>
-<td><strong>sf.record~</strong></td>
-<td style="text-align:center"></td>
-<td>Record an audio file on disk</td>
-</tr>
-<tr>
-<td><strong>faust~</strong></td>
-<td style="text-align:center"></td>
-<td>Edit and run FAUST code</td>
-</tr>
-<tr>
-<td><strong>route</strong></td>
-<td style="text-align:center"></td>
-<td>Route messages according to the first element</td>
-</tr>
-<tr>
-<td><strong>OSC.receive</strong></td>
-<td style="text-align:center"></td>
-<td>Receive Open Sound Control messages</td>
-</tr>
-<tr>
-<td><strong>OSC.send</strong></td>
-<td style="text-align:center"></td>
-<td>Send Open Sound Control messages</td>
+<td><strong>-</strong></td>
+<td>Substract two numbers</td>
 </tr>
 </tbody>
 </table>
-<p class="page" id="examples-en"></p><h1>Examples</h1>
-<p>A set of examples is provided in the documentation folder. If you didn&#39;t download the documentation yet, you can find it on this <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>. Each example aims at taking you through the creation of a specific audio processing or exploring a certain aspect of Kiwi software.</p>
-<p>Available examples:</p>
-<ul>
-<li>Fx  <ul>
-<li>flanger</li>
-<li>granular</li>
-<li>overlapped pitchshifter</li>
-<li>simple delay</li>
-<li>simple pitchshifter</li>
-</ul>
-</li>
-<li>synthesis<ul>
-<li>additive synthesis</li>
-<li>Chowning FM</li>
-<li>Kontakte</li>
-<li>odd harmonic gen 1</li>
-<li>odd harmonic gen 2</li>
-<li>odd harmonic gen 3</li>
-<li>odd harmonic gen 3</li>
-<li>Risset&#39;s Bell</li>
-</ul>
-</li>
-<li>others<ul>
-<li>play and record files</li>
-</ul>
-</li>
-</ul>
-<p class="page" id="getting-started-fr"></p><h1>Premiers pas</h1>
-<h2 id="t-l-chargement">Téléchargement</h2>
-<p>Le dernière version de l&#39;application Kiwi et sa documentation sont disponibles sur cette <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>. On y trouve une version pour chaque système d&#39;exploitation, une liste de patchs d&#39;aide qui montrent le comportement des objets, et un ensemble d&#39;exemples pour guider le lecteur dans la création de certains traitements audionumériques temps réel.</p>
-<h2 id="compatibilit-">Compatibilité</h2>
-<p>Kiwi est compatible avec les trois systèmes d&#39;exploitation principaux :</p>
-<ul>
-<li>MacOS : version 10.7 et ultérieures.</li>
-<li>Windows : windows 7 et ultérieures.</li>
-<li>Linux : la version a été testé avec ubuntu 14.04</li>
-</ul>
-<h2 id="installation">Installation</h2>
-<p>Une fois le téléchargement effectué, l&#39;archive correspondante est extraite par un double-clic sur l&#39;icône. Un dossier Kiwi contenant l&#39;application est alors créé. Sur MacOS et Linux, il faut copier l&#39;application vers le dossier contenant les applications (Applications sur MacOS, /usr/bin sur Linux). Sous Windows, il faut exécuter l&#39;installeur.</p>
-<h2 id="lancement-de-kiwi">Lancement de Kiwi</h2>
-<p>Quand Kiwi est lancé, trois fenêtres principales apparaissent : le Document Browser, le Beacon Dispatcher et la console Kiwi.</p>
-<table style="border: 0px">
-    <tr>
-        <th style="border: 0px"><img title="DocumentBrowser" src="./img/emptyDocumentBrowser.png" height=500 /></th>
-        <th style="border: 0px"><img src="./img/emptyBeaconDispatcher.png" height=200></th>
-        <th style="border: 0px"><img = src="./img/emptyKiwiConsole.png" height=400></th>
-    </tr>
-</table>
-
-<p>La barre des menus apparaît en haut de l&#39;écran ou comme entête de la console Kiwi sur Windows.</p>
-<p><img title="MenuBar" src="./img/barreDesMenusMacOS.png" height=30/></p>
-<h2 id="connexion">Connexion</h2>
-<p>Il y a deux manières de se connecter au serveur Kiwi : soit en créant un compte utilisateur, soit en utilisant un compte déjà créé. Pour créer un compte, il faut cliquer sur &#39;Register&#39; dans le menu &#39;Account&#39;. Une fenêtre d&#39;enregistrement apparaît. Il faut entrer son nom d&#39;utilisateur (user name), son adresse email et son mot de passe. Après avoir cliqué sur le bouton &#39;register&#39;, l&#39;utilisateur reçoit un email contenant un lien temporaire permettant de valider la création de compte.</p>
-<p><img title="register" src="./img/registerWindow.png" height=400px/></p>
-<p>Pour se connecter à un compte utilisateur existant, il faut cliquer sur &#39;login&#39; dans le menu &#39;Account&#39;. Une fenêtre de connexion apparaît. Il faut entrer son adresse email ou son nom d&#39;utilisateur (user name) et son mot de passe. En cas d&#39;oubli de son mot de passe, il est possible de le réinitialiser en utilisant son adresse email, en cliquant sur le bouton &#39;Forgot password&#39;.</p>
-<p><img title="register" src="./img/loginWindow.png" height=400px/></p>
-<h2 id="premier-patch">Premier patch</h2>
-<p>A ce point, il est soit possible de rejoindre un patch partagé en utilisant la fenêtre du Document Browser ou d&#39;ouvrir un patch local. Dans cette section, nous montrerons comment ouvrir et manipuler un patch local. Les indications sur les manières de collaborer seront données un peu plus loin dans cette documentation.</p>
-<p>Ouvrez le patch <strong>first-patch.kiwi</strong> disponible dans le dossier de documentation. Si vous n&#39;avez pas encore la documentation, vous pouvez la télécharger sur cette <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>.</p>
-<p><img title="first patch" src="./img/first-patch.png" height="600px"></p>
-<p>Comme on peut le voir, un patch est un ensemble d&#39;objets, chacun exécutant une opération. Les données, soit de contrôle, soit des signaux, sont envoyées entre les objets par les connexions. Les connexions en gris sont utilisées pour envoyer des messages (nombres, chaînes de caractères, listes, bangs, etc.) tandis que les connexions en vert transportent les signaux de haut en bas.</p>
-<p>Le premier patch est un générateur de son (synthèse) : la partie en haut à gauche est le générateur.La partie en haut à droite est utilisée pour déclencher une enveloppe d&#39;amplitude. Le signal est ensuite envoyé vers un contrôle de gain maître et l&#39;objet dac~ qui représente la sortie audio du patch.</p>
-<p>Un patch peut soit être en mode édition soit en mode exécution (bloqué). En mode exécution (bloqué), les objets graphiques (le potentiomètre de gain est un exemple d&#39;objet graphique) sont actifs et peuvent être manipulés pour générer différents sons. Pour basculer du mode exécution (bloqué) au mode édition, il faut soit cliquer sur le bouton lock</p>
-<p><img title="lock" src="./img/locked.png" height=15px/> ou enfoncert les touches Cmd + E (Ctrl + E for linux or windows users).</p>
-<p>Le traitement audio temps réel est par défaut désactivé. Pour allumer l&#39;audio, il faut cliquer sur l&#39;icône de haut-parleur en haut à gauche du patch <img title="lock" src="./img/dsp_off.png" height=15px/>.</p>
-<p>Une fois le patch en mode exécution et l&#39;audio allumé, vous pouvez augmenter le gain en utilisant le potentiomètre &quot;gain&quot;; vous pouvez générer le son en cliquant sur l&#39;objet-message &quot;enveloppe&quot; (en-dessous du commentaire &quot;enveloppe&quot;) et ajuster la fréquence du son engendré par l&#39;objet-nombre qui contrôle la fréquence (par un &quot;drag&quot; à la souris).</p>
-<h2 id="collaboration">Collaboration</h2>
-<p>Dans cette section, nous décrivons comment il est possible de rejoindre un patch et de collaborer avec d&#39;autres utilisateurs.</p>
-<p>Pour collaborer avec les autres utilisateurs, il est possible d&#39;utiliser le &quot;document browser&quot; et d&#39;ouvrir un patch qui est édité par une autre personne. Il n&#39;y a pas de solution de &quot;chat&quot; dans Kiwi, mais on peut utiliser n&#39;importe quel autre logiciel de &quot;chat&quot; pour vous retrouver et échanger tout en travaillant ensemble.</p>
-<p><img title="first patch" src="./img/document-browser-full.png" height="400"></p>
-<p>Comme on peut le constater, le &quot;document browser&quot; présente une liste de documents accessible par tout le monde. Télécharger, remonter vers le serveur, renommer, supprimer, dupliquer un patch est possible par un clic droit sur le &quot;document browser&quot;. Il est également possible de trier des documents selon différents critères.</p>
-<p>Pour commencer à collaborer, double-cliquer sur un patch.</p>
-<p><img title="first patch" src="./img/online-document.png" height="400"></p>
-<p>Une fois que l&#39;on a rejoint le document, on peut cliquer en haut à gauche pour voir les utilisateurs qui travaillent au même moment sur le patch, en édition ou en exécution. Les objets sélectionnés par les autres utilisateurs sont surlignés en orange, tandis que la sélection personnelle est montrée en bleu.</p>
-<p>On peut ensuite éditer ou jouer librement le patch avec les autres utilisateurs.</p>
-<p class="page" id="objects-fr"></p><h1>Liste des objets</h1>
-<h2 id="patchs-d-aide">Patchs d&#39;aide</h2>
-<p>Une liste de patchs d&#39;aide décrivant le fonctionnement des objets est disponible dans le dossier de documentation. Si vous n&#39;avez pas encore la documentation, vous pouvez la télécharger sur cette <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>.
-Parfois les patchs d&#39;aide regroupent plusieurs objets liés fonctionnellement, par exemple gate et switch ou gate~ et switch~.</p>
-<h2 id="liste-des-objets">Liste des objets</h2>
+<h3 id="signal">Signal</h3>
 <table>
 <thead>
 <tr>
-<th>Objets</th>
-<th style="text-align:center">Alias</th>
+<th>Object</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><strong>line~</strong></td>
-<td style="text-align:center"></td>
-<td>Génère un signal de rampe audio</td>
+<td>Generate an audio ramp signal</td>
 </tr>
 <tr>
 <td><strong>noise~</strong></td>
-<td style="text-align:center"></td>
-<td>Générateur de bruit blanc</td>
+<td>A white noise generator</td>
 </tr>
 <tr>
 <td><strong>sah~</strong></td>
-<td style="text-align:center"></td>
-<td>&quot;Sample and hold&quot; sur un son en entrée</td>
-</tr>
-<tr>
-<td><strong>hub</strong></td>
-<td style="text-align:center"></td>
-<td>Envoie un message aux autres utilisateurs connectés</td>
-</tr>
-<tr>
-<td><strong>send</strong></td>
-<td style="text-align:center"><em>s</em></td>
-<td>Envoie un message à l&#39;objet receive correspondant</td>
-</tr>
-<tr>
-<td><strong>mtof</strong></td>
-<td style="text-align:center"></td>
-<td>Convertit une note Midi en fréquence</td>
-</tr>
-<tr>
-<td><strong>number~</strong></td>
-<td style="text-align:center"></td>
-<td>Affiche les valeurs des samples audio</td>
-</tr>
-<tr>
-<td><strong>number</strong></td>
-<td style="text-align:center"><em>f</em></td>
-<td>Affiche un nombre</td>
-</tr>
-<tr>
-<td><strong>select</strong></td>
-<td style="text-align:center"></td>
-<td>Produit un bang lorsque l&#39;entrée est égale à la valeur</td>
+<td>Samples and holds an input signal</td>
 </tr>
 <tr>
 <td><strong>snapshot~</strong></td>
-<td style="text-align:center"></td>
-<td>Capture les valeurs des samples</td>
-</tr>
-<tr>
-<td><strong>random</strong></td>
-<td style="text-align:center"></td>
-<td>Produit un nombre aléatoire (distribution uniforme)</td>
-</tr>
-<tr>
-<td><strong>unpack</strong></td>
-<td style="text-align:center"></td>
-<td>Sépare les éléments d&#39;une liste</td>
-</tr>
-<tr>
-<td><strong>pack</strong></td>
-<td style="text-align:center"></td>
-<td>Crée et produit une liste</td>
-</tr>
-<tr>
-<td><strong>comment</strong></td>
-<td style="text-align:center"><em>c</em></td>
-<td>Ajoute un commentaire au patch</td>
-</tr>
-<tr>
-<td><strong>!=~</strong></td>
-<td style="text-align:center"></td>
-<td>Opérateur signal d&#39;inégalité</td>
-</tr>
-<tr>
-<td><strong>==~</strong></td>
-<td style="text-align:center"></td>
-<td>Opérateur signal d&#39;égalité</td>
-</tr>
-<tr>
-<td><strong>&gt;=~</strong></td>
-<td style="text-align:center"></td>
-<td>Opérateur signal supérieur ou égal</td>
-</tr>
-<tr>
-<td><strong>&gt;~</strong></td>
-<td style="text-align:center"></td>
-<td>Opérateur signal supérieur strict</td>
-</tr>
-<tr>
-<td><strong>&lt;=~</strong></td>
-<td style="text-align:center"></td>
-<td>Opérateur signal inférieur ou égal</td>
-</tr>
-<tr>
-<td><strong>&lt;~</strong></td>
-<td style="text-align:center"></td>
-<td>Opérateur signal inférieur strict</td>
-</tr>
-<tr>
-<td><strong>/~</strong></td>
-<td style="text-align:center"></td>
-<td>Divise deux signaux</td>
-</tr>
-<tr>
-<td><strong>-~</strong></td>
-<td style="text-align:center"></td>
-<td>Soustrait deux signaux</td>
-</tr>
-<tr>
-<td><strong>%</strong></td>
-<td style="text-align:center"></td>
-<td>Calcule le modulo d&#39;un nombre dans la base désirée</td>
-</tr>
-<tr>
-<td><strong>pow</strong></td>
-<td style="text-align:center"></td>
-<td>Calcule la puissance d&#39;un nombre</td>
-</tr>
-<tr>
-<td><strong>==</strong></td>
-<td style="text-align:center"></td>
-<td>Opérateur d&#39;égalité</td>
-</tr>
-<tr>
-<td><strong>!=</strong></td>
-<td style="text-align:center"></td>
-<td>Opérateur d&#39;inégalité</td>
-</tr>
-<tr>
-<td><strong>&gt;=</strong></td>
-<td style="text-align:center"></td>
-<td>Opérateur supérieur ou égal</td>
-</tr>
-<tr>
-<td><strong>&gt;</strong></td>
-<td style="text-align:center"></td>
-<td>Opérateur supérieur strict</td>
-</tr>
-<tr>
-<td><strong>&lt;=</strong></td>
-<td style="text-align:center"></td>
-<td>Opérateur inférieur ou égal</td>
-</tr>
-<tr>
-<td><strong>&lt;</strong></td>
-<td style="text-align:center"></td>
-<td>Opérateur inférieur strict</td>
-</tr>
-<tr>
-<td><strong>/</strong></td>
-<td style="text-align:center"></td>
-<td>Calcule la division de deux nombres</td>
-</tr>
-<tr>
-<td><strong>-</strong></td>
-<td style="text-align:center"></td>
-<td>Calcule la différence de deux nombres</td>
-</tr>
-<tr>
-<td><strong>message</strong></td>
-<td style="text-align:center"></td>
-<td>Produit des messages ou des listes de messages</td>
-</tr>
-<tr>
-<td><strong>slider</strong></td>
-<td style="text-align:center"></td>
-<td>Potentiomètre graphique sortant des valeurs entre 0 et 1</td>
-</tr>
-<tr>
-<td><strong>toggle</strong></td>
-<td style="text-align:center"></td>
-<td>Bouton on/off (1/0)</td>
-</tr>
-<tr>
-<td><strong>bang</strong></td>
-<td style="text-align:center"></td>
-<td>Produit un bang</td>
-</tr>
-<tr>
-<td><strong>meter~</strong></td>
-<td style="text-align:center"></td>
-<td>Vu-mètre (pic d&#39;amplitude)</td>
-</tr>
-<tr>
-<td><strong>trigger</strong></td>
-<td style="text-align:center"><em>t</em></td>
-<td>Déclenche des événements à partir des données reçues</td>
-</tr>
-<tr>
-<td><strong>newbox</strong></td>
-<td style="text-align:center"></td>
-<td>Crée une boîte vide</td>
-</tr>
-<tr>
-<td><strong>errorbox</strong></td>
-<td style="text-align:center"></td>
-<td>Boîte erreur</td>
-</tr>
-<tr>
-<td><strong>+</strong></td>
-<td style="text-align:center"></td>
-<td>Ajoute deux nombres</td>
-</tr>
-<tr>
-<td><strong>*</strong></td>
-<td style="text-align:center"></td>
-<td>Multiplie deux nombres</td>
-</tr>
-<tr>
-<td><strong>print</strong></td>
-<td style="text-align:center"></td>
-<td>Ecrit des messages dans la console Kiwi</td>
-</tr>
-<tr>
-<td><strong>receive</strong></td>
-<td style="text-align:center"><em>r</em></td>
-<td>Reçoit des messages d&#39;un objet send du même nom</td>
-</tr>
-<tr>
-<td><strong>loadmess</strong></td>
-<td style="text-align:center"></td>
-<td>Sort ses arguments comme message au chargement du patch</td>
-</tr>
-<tr>
-<td><strong>delay</strong></td>
-<td style="text-align:center"></td>
-<td>Retarde un bang reçu en entrée</td>
-</tr>
-<tr>
-<td><strong>pipe</strong></td>
-<td style="text-align:center"></td>
-<td>Retarde n&#39;importe quel message</td>
-</tr>
-<tr>
-<td><strong>metro</strong></td>
-<td style="text-align:center"></td>
-<td>Produit un bang à intervalle régulier</td>
+<td>Ouput sample signal values</td>
 </tr>
 <tr>
 <td><strong>adc~</strong></td>
-<td style="text-align:center"></td>
-<td>Reçoit les signaux audio des entrées son</td>
+<td>Receive audio signals from inputs or external devices</td>
 </tr>
 <tr>
 <td><strong>dac~</strong></td>
-<td style="text-align:center"></td>
-<td>Envoie des signaux audio vers les sorties son</td>
+<td>Send audio signals to outputs or external devices</td>
 </tr>
 <tr>
 <td><strong>osc~</strong></td>
-<td style="text-align:center"></td>
-<td>Oscillateur cosinus</td>
+<td>A cosine oscillator</td>
 </tr>
 <tr>
 <td><strong>phasor~</strong></td>
-<td style="text-align:center"></td>
-<td>Génère un signal en dents de scie</td>
-</tr>
-<tr>
-<td><strong>*~</strong></td>
-<td style="text-align:center"></td>
-<td>Multiplie deux signaux</td>
-</tr>
-<tr>
-<td><strong>+~</strong></td>
-<td style="text-align:center"></td>
-<td>Ajoute deux signaux</td>
+<td>Generate a sawtooth signal</td>
 </tr>
 <tr>
 <td><strong>sig~</strong></td>
-<td style="text-align:center"></td>
-<td>Convertit des nombres en signaux audio</td>
+<td>Convert numbers into audio signals</td>
 </tr>
 <tr>
 <td><strong>delaysimple~</strong></td>
-<td style="text-align:center"></td>
-<td>Délai variable simple avec feedback optionnel</td>
-</tr>
-<tr>
-<td><strong>scale</strong></td>
-<td style="text-align:center"></td>
-<td>Changement d&#39;échelle d&#39;un nombre vers une autre échelle</td>
-</tr>
-<tr>
-<td><strong>gate</strong></td>
-<td style="text-align:center"></td>
-<td>Route un message vers la sortie sélectionnée</td>
-</tr>
-<tr>
-<td><strong>switch</strong></td>
-<td style="text-align:center"></td>
-<td>Sort le message reçu sur l&#39;entrée sélectionnée</td>
-</tr>
-<tr>
-<td><strong>gate~</strong></td>
-<td style="text-align:center"></td>
-<td>Route le signal reçu vers la sortie sélectionnée</td>
-</tr>
-<tr>
-<td><strong>switch~</strong></td>
-<td style="text-align:center"></td>
-<td>Sort le signal reçu sur l&#39;entrée sélectionnée</td>
-</tr>
-<tr>
-<td><strong>clip</strong></td>
-<td style="text-align:center"></td>
-<td>Ecrête un nombre entre une valeur minimum et maximum</td>
-</tr>
-<tr>
-<td><strong>clip~</strong></td>
-<td style="text-align:center"></td>
-<td>Ecrête un signal entre une valeur minimum et maximum</td>
-</tr>
-<tr>
-<td><strong>float</strong></td>
-<td style="text-align:center"></td>
-<td>Stocke un nombre flottant</td>
-</tr>
-<tr>
-<td><strong>sf.play~</strong></td>
-<td style="text-align:center"></td>
-<td>Joue un fichier audio</td>
-</tr>
-<tr>
-<td><strong>sf.record~</strong></td>
-<td style="text-align:center"></td>
-<td>Enregistre un fichier audio</td>
-</tr>
-<tr>
-<td><strong>faust~</strong></td>
-<td style="text-align:center"></td>
-<td>Edite et joue du code FAUST</td>
-</tr>
-<tr>
-<td><strong>route</strong></td>
-<td style="text-align:center"></td>
-<td>Route les messages en fonction du premier élement</td>
-</tr>
-<tr>
-<td><strong>OSC.receive</strong></td>
-<td style="text-align:center"></td>
-<td>Reception de messages Open Sound Control</td>
-</tr>
-<tr>
-<td><strong>OSC.send</strong></td>
-<td style="text-align:center"></td>
-<td>Envoi de messages Open Sound Control</td>
+<td>Simple variable delay line with optional feedback value</td>
 </tr>
 </tbody>
 </table>
-<p class="page" id="exemples-fr"></p><h1>Exemples</h1>
-<p>Un ensemble d&#39;exemples est disponible dans le dossier de documentation. Si vous n&#39;avez pas encore la documentation, vous pouvez la télécharger sur cette <a href="https://github.com/Musicoll/Kiwi/releases/latest">page</a>. Chaque exemple présente un traitement audio spécifique ou un certain aspect du logiciel Kiwi.</p>
-<p>Exemples disponibles:</p>
+<h3 id="operators-signal-">Operators (signal)</h3>
+<table>
+<thead>
+<tr>
+<th>Object</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>!=~</strong></td>
+<td>Signal inequality operator</td>
+</tr>
+<tr>
+<td><strong>==~</strong></td>
+<td>Signal equality operator</td>
+</tr>
+<tr>
+<td><strong>&gt;=~</strong></td>
+<td>Signal superior operator</td>
+</tr>
+<tr>
+<td><strong>&gt;~</strong></td>
+<td>Signal strict superior operator</td>
+</tr>
+<tr>
+<td><strong>&lt;=~</strong></td>
+<td>Signal inferior operator</td>
+</tr>
+<tr>
+<td><strong>&lt;~</strong></td>
+<td>Signal strict inferior operator</td>
+</tr>
+<tr>
+<td><strong>/~</strong></td>
+<td>Divide two signals</td>
+</tr>
+<tr>
+<td><strong>-~</strong></td>
+<td>Substract two signals</td>
+</tr>
+<tr>
+<td><strong>*~</strong></td>
+<td>Multiply two signals</td>
+</tr>
+<tr>
+<td><strong>+~</strong></td>
+<td>Add two signals</td>
+</tr>
+</tbody>
+</table>
+<h3 id="record-and-play-sound-files">Record And play sound files</h3>
+<table>
+<thead>
+<tr>
+<th>Object</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>sf.play~</strong></td>
+<td>Play an audio file from disk</td>
+</tr>
+<tr>
+<td><strong>sf.record~</strong></td>
+<td>Record an audio file on disk</td>
+</tr>
+</tbody>
+</table>
+<h3 id="collaborate">Collaborate</h3>
+<table>
+<thead>
+<tr>
+<th>Object</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>hub</strong></td>
+<td>Send message to other users of the same patch</td>
+</tr>
+</tbody>
+</table>
+<h3 id="others">Others</h3>
+<table>
+<thead>
+<tr>
+<th>Object</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>faust~</strong></td>
+<td>Edit and run FAUST code</td>
+</tr>
+<tr>
+<td><strong>OSC.receive</strong></td>
+<td>Receive Open Sound Control messages over UDP</td>
+</tr>
+<tr>
+<td><strong>OSC.send</strong></td>
+<td>Send Open Sound Control messages over UDP</td>
+</tr>
+</tbody>
+</table>
+<p class="page" id="examples"></p><h1>Examples</h1>
+<p>A set of examples is provided in the Kiwi documentation. To explore them, simply go to the main software menu <code>Help/Examples</code>.</p>
+<p>Each example aims at taking you through the creation of a specific audio processing or exploring a certain aspect of Kiwi :</p>
+<table>
+<thead>
+<tr>
+<th>Fx</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>flanger</td>
+</tr>
+<tr>
+<td>granular</td>
+</tr>
+<tr>
+<td>oscillo-pan</td>
+</tr>
+<tr>
+<td>overlapped pitchshifter</td>
+</tr>
+<tr>
+<td>simple delay</td>
+</tr>
+<tr>
+<td>simple pitchshifter</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>synthesis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>additive synthesis</td>
+</tr>
+<tr>
+<td>Chowning FM with Pan</td>
+</tr>
+<tr>
+<td>Chowning FM</td>
+</tr>
+<tr>
+<td>Kontakte</td>
+</tr>
+<tr>
+<td>odd harmonic gen 1</td>
+</tr>
+<tr>
+<td>odd harmonic gen 2</td>
+</tr>
+<tr>
+<td>odd harmonic gen 3</td>
+</tr>
+<tr>
+<td>odd harmonic gen 3</td>
+</tr>
+<tr>
+<td>Risset&#39;s Bell</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>others</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>play and record files             </td>
+</tr>
+</tbody>
+</table>
+<p class="page" id="shortcuts"></p><h1>Shortcuts</h1>
+<h4 id="application-shortcuts">Application shortcuts</h4>
 <ul>
-<li>Fx  <ul>
-<li>flanger</li>
-<li>granular</li>
-<li>overlapped pitchshifter</li>
-<li>simple delay</li>
-<li>simple pitchshifter</li>
+<li><code>cmd/ctrl</code> + <code>w</code> : Close current window.</li>
+<li><code>cmd/ctrl</code> + <code>k</code> : Show Kiwi Console Window.</li>
 </ul>
-</li>
-<li>synthesis<ul>
-<li>additive synthesis</li>
-<li>Chowning FM</li>
-<li>Kontakte</li>
-<li>odd harmonic gen 1</li>
-<li>odd harmonic gen 2</li>
-<li>odd harmonic gen 3</li>
-<li>odd harmonic gen 3</li>
-<li>Risset&#39;s Bell</li>
+<h4 id="patcher-shortcuts">Patcher shortcuts</h4>
+<ul>
+<li><code>cmd</code> + <code>n</code> : Create a new patcher.</li>
+<li><code>cmd/ctrl</code> + <code>shift</code> + <code>n</code> : Create a new patcher view.</li>
+<li><code>cmd/ctrl</code> + <code>e</code> : Switch between edit and perform mode.</li>
+<li><code>cmd/ctrl</code> + <code>=</code> : Zoom in.</li>
+<li><code>cmd/ctrl</code> + <code>-</code> : Zoom out.</li>
+<li><code>cmd/ctrl</code> + <code>shift</code> + <code>1</code> : Reset zoom.</li>
 </ul>
-</li>
-<li>others<ul>
-<li>play and record files</li>
-</ul>
-</li>
+<h4 id="objects-shortcuts">Objects shortcuts</h4>
+<ul>
+<li><code>n</code> : Add an object.</li>
+<li><code>b</code> : Add a bang object.</li>
+<li><code>t</code> : Add a toggle object.</li>
+<li><code>s</code> : Add a slider object.</li>
+<li><code>i</code>/<code>f</code> : Add a number object.</li>
+<li><code>c</code> : Add a comment object.</li>
+<li><code>m</code> : Add a message object.</li>
 </ul>
 
         </div> <!-- /div.col-md-9 -->

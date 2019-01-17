@@ -1,6 +1,6 @@
 <p align="center">
   <h1 align="center">
-    <img src="https://github.com/Musicoll/Kiwi/blob/master/Resources/BinaryRes/Images/kiwi_icon.png" height=40px/> Kiwi
+    <img src="Resources/BinaryRes/Images/kiwi_icon.png" height=50px/> Kiwi
   </h1>
   <p align="center">
     A real-time collaborative audio patching software
@@ -20,7 +20,7 @@
 
 Kiwi is part of the French ANR-funded [MUSICOLL](http://musicoll.mshparisnord.org/) project that unites the [CICM](http://cicm.mshparisnord.org/) and [OhmForce](https://www.ohmforce.com/Company.do). The main goal of this project is to study how collaboration can enhance the way digital audio music composition is taught and more generally how it can improve music creation workflow. It enables several creators to work simultaneously on a same patch hosted online and accessible from any connected terminal.
 
-<img title="register" src="https://raw.github.com/Musicoll/Kiwi/master/docs/img/Kiwi-v1.0.0.jpg" height=400px/>
+![Kiwi Screenshot](docs/img/kiwi_screenshot.png)
 
 ### Compilation
 
@@ -54,7 +54,7 @@ npm install -g github-wikito-converter
 ```
 Then, from the **Kiwi root** folder, run:
 ```
-python ./Script/gendoc.py
+python ./Scripts/gendoc.py
 ```
 
 ### Organizations
@@ -85,9 +85,10 @@ python ./Script/gendoc.py
 
 ### Papers
 
-- [JIM 2017 - Kiwi : Vers un environnement de creation musicale temps reel collaboratif](https://hal.archives-ouvertes.fr/hal-01550190/document)
-- [JIM 2018 - Enseigner le patching de manière collective avec le logiciel collaboratif Kiwi](https://hal.archives-ouvertes.fr/hal-01791492/document).
-- [Teaching, investigating, creating: MUSICOLL](https://hal.archives-ouvertes.fr/hal-01581698v1)
+- E. Paris, *Une Approche du patching audio collaboratif : Enjeux et développement du collecticiel Kiwi*, thèse de doctorat, sous la direction d'A. Sèdes et A. Bonardi, Université de Paris 8, 2018 - [URL](https://hal.archives-ouvertes.fr/tel-01970169v1) (fr).
+- P. Galleron, E. Maestri, J. Millot, A. Bonardi, E. Paris, *Enseigner le patching de manière collective avec le logiciel collaboratif Kiwi*, Journées d’Informatique Musicale (JIM 2018), 2018, Amiens, France, pp.105-114. [URL](https://hal.archives-ouvertes.fr/hal-01791492/document) (fr).
+- E. Paris, J. Millot, P. Guillot, A. Bonardi, A. Sèdes, *Kiwi : Vers un environnement de creation musicale temps reel collaboratif*, Journées d’Informatique Musicale (JIM 2017), 2017, Paris, France. [URL](https://hal.archives-ouvertes.fr/hal-01550190/document) (fr).
+- A. Sèdes, A. Bonardi, E. Paris, J. Millot, P. Guillot, *Teaching, investigating, creating: MUSICOLL*. Innovative Tools and Methods for Teaching Music and Signal Processing, 2017. [URL](https://hal.archives-ouvertes.fr/hal-01581698/document) (en).
 
 ### License
 

@@ -1,0 +1,62 @@
+body {
+    font-size: 18px;
+}
+/* table */
+
+table {
+    width: 100%;
+	border-top: 1px solid #919699;
+	border-left: 1px solid #919699;
+	border-spacing: 0;
+}
+
+table th {
+	padding: 4px 8px 4px 8px;
+	background: #E2E2E2;
+	font-size: 0.8em;
+	border-bottom: 1px solid #919699;
+	border-right: 1px solid #919699;
+}
+table th p {
+	font-weight: bold;
+	margin-bottom: 0px;
+}
+
+table td {
+	padding: 8px;
+	font-size: 0.8em;
+	vertical-align: top;
+	border-bottom: 1px solid #919699;
+	border-right: 1px solid #919699;
+}
+table td p {
+	margin-bottom: 0px;
+}
+table td p + p  {
+	margin-top: 5px;
+}
+table td p + p + p {
+	margin-top: 5px;
+}
+
+.centered {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.inline-block {
+  padding: 4px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.inline-block.orange {
+  background-color: #FF8C0088;
+  color: #444;
+}
+
+.inline-block.blue {
+  background-color: rgb(21, 127, 242);
+  color: #fff;
+}

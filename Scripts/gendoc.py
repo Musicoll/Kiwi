@@ -18,5 +18,6 @@ TITLE = "Kiwi"
 OUTPUT_FILENAME = "index"
 INPUT_PATH = "./Resources/doctogen"
 OUTPUT_PATH = "./docs"
+CSS = " --css ./Resources/doctogen/style.css"
 
-call("gwtc -t " + TITLE + " -n " + OUTPUT_FILENAME + " -o " + OUTPUT_PATH + " " + INPUT_PATH, shell=True)
+call("gwtc -t " + TITLE + " -n " + OUTPUT_FILENAME + " -o " + OUTPUT_PATH + " " + INPUT_PATH + CSS, shell=True)
