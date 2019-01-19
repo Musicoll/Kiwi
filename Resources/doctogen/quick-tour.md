@@ -1,4 +1,4 @@
-When Kiwi is executed two windows will appear : the Document Browser and the Kiwi Console.
+When Kiwi is executed two windows will appear: the Document Browser and the Kiwi Console.
 
 <img alt="DocumentBrowser" src="./img/emptyDocumentBrowser.png" width=300px/>
 <img alt="Kiwi Console" src="./img/console_explained.png" width=400px>

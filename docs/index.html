@@ -784,10 +784,9 @@ if("undefined"==typeof jQuery)throw new Error("Bootstrap's JavaScript requires j
 
         <div class="col-md-9">
 <p class="page" id="presentation"></p><h1>Presentation</h1>
-<p>Kiwi is part of the French ANR-funded <a href="http://musicoll.mshparisnord.org/">MUSICOLL</a> project that unites the <a href="http://cicm.mshparisnord.org/">CICM</a> and <a href="https://www.ohmforce.com/">OhmForce</a>. The main goal of this project is to study how collaboration can enhance the way digital audio music composition is taught and more generally how it can improve music creation workflow.</p>
+<p>Kiwi is a graphical programming environment dedicated to music and sound creation, such as <a href="https://cycling74.com">Max</a> or <a href="https://puredata.info/">Pure Data</a> softwares, but offering a real-time collaborative approach: Kiwi allows several distant users to work simultaneously on the same patch hosted online.</p>
 <p><img alt="Kiwi Screenshot" src="./img/kiwi_screenshot.png" width="800px" class="centered"/></p>
-<p>Kiwi is a graphical programming environment dedicated to music creation in the spirit of other softwares like <a href="https://cycling74.com">Max</a> or <a href="https://puredata.info/">Pure Data</a>.
-Kiwi is also a realtime collaborative software that enables several distant users to work at the same time on a same patch hosted online.</p>
+<p>Kiwi is part of the French ANR-funded <a href="http://musicoll.mshparisnord.org/">MUSICOLL</a> project that unites the <a href="http://cicm.mshparisnord.org/">CICM</a> and <a href="https://www.ohmforce.com/">OhmForce</a>. The main goal of this project is to study how collaboration can enhance the way digital audio music composition is taught and more generally how it can improve music creation workflow.</p>
 <p class="page" id="installing"></p><h1>Installation</h1>
 <h2 id="download">Download</h2>
 <p>You can download the latest Kiwi application from the <a href="https://github.com/Musicoll/Kiwi/releases/latest">github repository</a>.</p>
@@ -807,7 +806,7 @@ Kiwi is also a realtime collaborative software that enables several distant user
 </tr>
 <tr>
 <td>Windows</td>
-<td>&gt; windows 7 and later</td>
+<td>&gt; windows 7</td>
 </tr>
 <tr>
 <td>Linux</td>
@@ -816,13 +815,16 @@ Kiwi is also a realtime collaborative software that enables several distant user
 </tbody>
 </table>
 <blockquote>
-<p>64bit version only</p>
+<p>Kiwi is only compatible with the 64 bit operating systems.</p>
+</blockquote>
+<blockquote>
+<p>You also may need to authorize/unlock Kiwi on Mac or to deactivate your antivirus to install it on Windows.</p>
 </blockquote>
 <h2 id="installing">Installing</h2>
 <p>Once download is complete, the corresponding archive shall be extracted by double clicking on it. A Kiwi folder containing the application is then created. On Mac and Linux, copy the application to your app folder (<code>Application</code> folder on Mac or <code>/usr/bin</code> on linux). Windows users may execute the installer.</p>
 <p>You will find in the application a list of <a href="#objects-list">help patches</a> that describes the objects&#39; behaviour and a set of <a href="#examples">examples</a>.</p>
 <p class="page" id="quick-tour"></p><h1>Quick Tour</h1>
-<p>When Kiwi is executed two windows will appear : the Document Browser and the Kiwi Console.</p>
+<p>When Kiwi is executed two windows will appear: the Document Browser and the Kiwi Console.</p>
 <p><img alt="DocumentBrowser" src="./img/emptyDocumentBrowser.png" width=300px/>
 <img alt="Kiwi Console" src="./img/console_explained.png" width=400px></p>
 <p>The Kiwi Console displays messages from the app or from the patcher. You can access the console from the <code>Window/Console</code> menu or by typing <code>cmd</code> + <code>k</code> on Mac or <code>ctrl</code> + <code>k</code> on Windows or Linux. Messages can be sent to the console through a <em>print</em> object from a patcher.</p>
@@ -834,7 +836,7 @@ Kiwi is also a realtime collaborative software that enables several distant user
 <p>In Kiwi you can either join a shared patch using the Document Browser window or open a local patch from your machine. In this section we will show how to open and manipulate a local patch. Instructions on how to collaborate over a patch are given <a href="#collaborate">here</a>.</p>
 <p><img title="Risset Bell" src="./img/RissetBell.png" width="800px"></p>
 <blockquote>
-<p><a href="http://www.alainbonardi.net/songes/modelisation_eng.htm">Risset&#39;s bell modelling</a>, you can found the patch in the examples.</p>
+<p><a href="http://www.alainbonardi.net/songes/modelisation_eng.htm">Risset&#39;s bell modelling</a>, you can find the patch in the examples.</p>
 </blockquote>
 <p>The patcher above is taken from the Kiwi examples. As you can see, a patch is a set of objects each one carrying out an operation. Control or signal data is sent between objects using links. Grey connections are used to send messages (numbers, strings, lists, bang ect...) whereas dark connections send signals, always from the top to the bottom.</p>
 <p>To create a new patcher, press <code>cmd</code>/<code>ctrl</code> + <code>n</code> or go to <code>File/New Patcher</code>.</p>
@@ -929,7 +931,7 @@ Kiwi is also a realtime collaborative software that enables several distant user
 </tr>
 </tbody>
 </table>
-<p>If you want to share some data of the patch with other users or synchronize GUI objects, you can do it via a specific object of the language called a <strong>hub</strong> that broadcast messages to every users connected to the same document through the server.</p>
+<p>If you want to share some data of the patch with other users or synchronize GUI objects, you can do it via a specific object of the language called a <strong>hub</strong> that broadcasts messages to every users connected to the same document through the server.</p>
 <p><img alt="Using the kiwi hub object" src="./img/hub_server_communication.png" width="600" class="centered"/></p>
 <blockquote>
 <p>Open the <strong>hub</strong> help patch in the Help menu for more infos</p>

@@ -2,7 +2,7 @@ In Kiwi you can either join a shared patch using the Document Browser window or 
 
 <img title="Risset Bell" src="./img/RissetBell.png" width="800px">
 
-> [Risset's bell modelling](http://www.alainbonardi.net/songes/modelisation_eng.htm), you can found the patch in the examples.
+> [Risset's bell modelling](http://www.alainbonardi.net/songes/modelisation_eng.htm), you can find the patch in the examples.
 
 The patcher above is taken from the Kiwi examples. As you can see, a patch is a set of objects each one carrying out an operation. Control or signal data is sent between objects using links. Grey connections are used to send messages (numbers, strings, lists, bang ect...) whereas dark connections send signals, always from the top to the bottom.
 

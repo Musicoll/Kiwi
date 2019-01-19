@@ -19,7 +19,7 @@ On the other hand, when you play with the patch, its state is not shared with th
 |:---:|:---:|
 | <img alt="User A" src="./img/kiwi_play_video_number.gif"/> | <img alt="User B" src="./img/kiwi_play_video_slider.gif"/> |
 
-If you want to share some data of the patch with other users or synchronize GUI objects, you can do it via a specific object of the language called a **hub** that broadcast messages to every users connected to the same document through the server.
+If you want to share some data of the patch with other users or synchronize GUI objects, you can do it via a specific object of the language called a **hub** that broadcasts messages to every users connected to the same document through the server.
 
 <img alt="Using the kiwi hub object" src="./img/hub_server_communication.png" width="600" class="centered"/>
 

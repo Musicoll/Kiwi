@@ -9,10 +9,12 @@ Kiwi is compatible with the three main operating systems :
 | OS        |version                    |
 |-----------|---------------------------|
 | Mac       | > 10.7                    |
-| Windows   | > windows 7 and later     |
+| Windows   | > windows 7               |
 | Linux     | > ubuntu 14.04            |
 
-> 64bit version only
+> Kiwi is only compatible with the 64 bit operating systems.
+
+> You also may need to authorize/unlock Kiwi on Mac or to deactivate your antivirus to install it on Windows.
 
 ## Installing
 
