@@ -1,11 +1,15 @@
-# English
+### Getting Started
 
-- [Getting Started](getting-started-en.md)
-- [Objects List](objects-en.md)
-- [Examples](examples-en.md)
+- [Presentation](presentation.md)
+- [Installation](installing.md)
+- [Quick Tour](quick-tour.md)
+- [Patching](patching.md)
+- [Register/Login](login.md)
+- [Collaborate](collaborate.md)
 
-# Français
+### Details
 
-- [Premiers pas](getting-started-fr.md)
-- [Liste des objets](objects-fr.md)
-- [Exemples](exemples-fr.md)
+- [Objects](help-patches.md)
+- [Objects list](objects-list.md)
+- [Examples](examples.md)
+- [Shortcuts](shortcuts.md)
