@@ -16,15 +16,14 @@
 
 ### Presentation
 
-Kiwi is part of the French ANR-funded [MUSICOLL](http://musicoll.mshparisnord.org/) project that unites the [CICM](http://cicm.mshparisnord.org/) and [OhmForce](https://www.ohmforce.com/Company.do). The main goal of this project is to study how collaboration can enhance the way digital audio music composition is taught and more generally how it can improve music creation workflow.
+Kiwi is a graphical programming environment dedicated to music and sound creation, such as [Max](https://cycling74.com) or [Pure Data](https://puredata.info/) softwares, but offering a real-time collaborative approach: Kiwi allows several distant users to work simultaneously on the same patch hosted online.
 
 ![Kiwi Screenshot](docs/img/kiwi_screenshot.png)
 
-Kiwi is a graphical programming environment dedicated to music creation in the spirit of other softwares like [Max](https://cycling74.com) or [Pure Data](https://puredata.info/).
-Kiwi is also a realtime collaborative software that enables several distant users to work at the same time on a same patch hosted online.
+Kiwi is part of the French ANR-funded [MUSICOLL](http://musicoll.mshparisnord.org/) project that unites the [CICM](http://cicm.mshparisnord.org/) and [OhmForce](https://www.ohmforce.com/). The main goal of this project is to study how collaboration can enhance the way digital audio music composition is taught and more generally how it can improve music creation workflow.
 
 - You can [download the latest version](https://github.com/Musicoll/Kiwi/releases) in the release page : [![Release](https://img.shields.io/github/release/Musicoll/Kiwi.svg)](https://github.com/Musicoll/Kiwi/releases)
-- Access online [documentation](http://musicoll.github.io/Kiwi)
+- Access online software [documentation](http://musicoll.github.io/Kiwi)
 
 ---
 
