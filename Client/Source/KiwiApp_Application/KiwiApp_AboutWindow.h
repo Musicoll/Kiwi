@@ -51,6 +51,43 @@ namespace kiwi
         
     };
     
+    //! @brief A list of HyperlinkButtons with optional description.
+    class LinkList : public juce::Component
+    {
+    public: // methods
+        
+        struct Link {
+            Link(juce::String text, juce::URL url, juce::String _description = "")
+            : link(text, url)
+            , description("description", _description)
+            {}
+            
+            Link(Link const& rhs)
+            : link(rhs.link.getButtonText(), rhs.link.getURL())
+            , description("description", rhs.description.getText())
+            {}
+            
+            Link(Link&&) = default;
+            
+            juce::HyperlinkButton link = {};
+            juce::Label description = {};
+        };
+        
+        //! @brief Constructor.
+        LinkList(juce::String header, std::vector<Link> links);
+        
+        //! @brief Destructor.
+        ~LinkList() = default;
+        
+        //! @brief juce::Component
+        void resized() override;
+        
+    private: // variables
+        
+        juce::Label m_header = {};
+        std::vector<Link> m_links;
+    };
+    
     class AboutWindow::Content : public juce::Component
     {
     public: // methods
@@ -64,8 +101,15 @@ namespace kiwi
         //! @brief juce::Component
         void paint(juce::Graphics& g) override;
         
+        //! @brief juce::Component
+        void resized() override;
+        
     private: // variables
         
         juce::Image m_kiwi_app_image;
+        LinkList m_authors_links;
+        LinkList m_credits_links;
+        
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Content)
     };
 }
