@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -48,19 +48,20 @@ namespace kiwi
             //! @brief Destructor.
             ~Link() = default;
             
-            //! @brief Comparison operator
-            bool operator<(Link const& other) const;
-            
             //! @brief Gets the Object that receives messages.
             Object & getReceiver() const;
             
             //! @brief Gets the index of the inlet of the Link.
             size_t getReceiverIndex() const;
             
+            //! @brief returns the stack count (used by the object to detect stack-overflows);
+            size_t& useStackCount();
+            
         private: // members
             
-            engine::Object & m_receiver;
-            size_t           m_index;
+            engine::Object& m_receiver;
+            size_t          m_index = 0;
+            size_t          m_stack_count = 0;
             
         private: // deleted methods
             

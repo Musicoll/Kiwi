@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -59,6 +59,8 @@ namespace kiwi
         //! @brief Score bonuses and penalties to sort entries.
         struct Options
         {
+            Options() noexcept {}
+            
             // Score bonuses
             int adjacency_bonus             = 5;    //! For adjacent matches.
             
@@ -155,8 +157,6 @@ namespace kiwi
             }
         }
         
-    private: // methods
-        
         //! @brief Returns true if each character in pattern is found sequentially within str
         //! @details if found then score is also set.
         //! Score value has no intrinsic meaning. Range varies with pattern.
@@ -164,7 +164,7 @@ namespace kiwi
         //! @remark The code of this method is an adaptation of the Forrest Smith code described in this article :
         //! https://blog.forrestthewoods.com/reverse-engineering-sublime-text-s-fuzzy-match-4cffeed33fdb
         static std::pair<bool, int> computeScore(char const* pattern, char const* str,
-                                                 Options const& options)
+                                                 Options options = {})
         {
             int score = 0;
             char const* pattern_iter = pattern;
@@ -255,6 +255,8 @@ namespace kiwi
             
             return {true, score};
         }
+        
+    private: // methods
         
         void updateFilteredEntries()
         {

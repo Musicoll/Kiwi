@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -43,7 +43,7 @@ namespace kiwi
         //                                      SERVER                                      //
         // ================================================================================ //
         
-        //! @brief Converts and int64_t into a string representing it.
+        //! @brief Converts an int64_t into a string representing it.
         std::string hexadecimal_convert(uint64_t hexa_decimal);
         
         //! @brief The Server class.
@@ -53,7 +53,7 @@ namespace kiwi
             
             class Session;
             
-            class Logger final
+            class Logger
             {
             public: // methods
                 
@@ -77,7 +77,7 @@ namespace kiwi
             //! @brief Constructor.
             //! @details Initializes socket and creates backend directory if not there.
             Server(uint16_t port,
-                   std::string const& backend_directory,
+                   juce::File backend_directory,
                    std::string const& open_token,
                    std::string const& kiwi_version);
             

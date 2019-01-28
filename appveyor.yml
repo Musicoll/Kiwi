@@ -3,33 +3,35 @@ os: Visual Studio 2015
 
 environment:
    matrix:
-      - MSVS: 2015
-        MSBUILD: 14.0
-        CONFIGURATION: Release
-        PLATFORM: Win32
-      - MSVS: 2015
-        MSBUILD: 14.0
-        CONFIGURATION: Release
+      - CONFIGURATION: Release
         PLATFORM: x64
 
 install:
-    - git submodule update --init --recursive "ThirdParty/Juce"
-    - git submodule update --init --recursive "ThirdParty/concurrentqueue"
-    - git submodule update --init --recursive "ThirdParty/Beast"
-    - set PATH=C:\Python27;%PATH%
-    - cd %APPVEYOR_BUILD_FOLDER%
-    - if "%APPVEYOR_REPO_BRANCH%"=="master" (set KIWI_DEPLOY=release) else (set KIWI_DEPLOY=draft)
+  - git submodule update --init --recursive
+
+  ############################################################################
+  # Install a recent CMake
+  ############################################################################
+  - set CMAKE_URL="https://cmake.org/files/v3.13/cmake-3.13.0-win64-x64.zip"
+  - appveyor DownloadFile %CMAKE_URL% -FileName cmake.zip
+  - 7z x cmake.zip -oC:\projects\deps > nul
+  - move C:\projects\deps\cmake-* C:\projects\deps\cmake # Move to a version-agnostic directory
+  - set PATH=C:\projects\deps\cmake\bin;%PATH%
+  - cmake --version
 
 build_script:
-    - python .\Scripts\configure.py -c %CONFIGURATION% -p %PLATFORM%
-    - python .\Scripts\build.py -c %CONFIGURATION% -p %PLATFORM%
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - mkdir Build && cd Build
+  - cmake .. -G "Visual Studio 14 2015 Win64"
+  - cmake --build . --target Kiwi --config %CONFIGURATION%
 
 after_build:
-    - if "%PLATFORM%"=="x64" ("C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Scripts\setup-x64.iss)
-    - if "%PLATFORM%"=="Win32" ("C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Scripts\setup-Win32.iss)
-    - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\Build\Release\%PLATFORM%\KiwiBuild\%CONFIGURATION%
-    - if "%PLATFORM%"=="x64" (7z a Kiwi_%PLATFORM%.zip %BUILD_DIR%\Kiwi-x64-setup.exe)
-    - if "%PLATFORM%"=="Win32" (7z a Kiwi_%PLATFORM%.zip %BUILD_DIR%\Kiwi-win32-setup.exe)
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - set PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 5"
+  - ISCC Scripts\setup-x64.iss
+  - mkdir Kiwi
+  - copy %APPVEYOR_BUILD_FOLDER%\Kiwi-x64-setup.exe %APPVEYOR_BUILD_FOLDER%\Kiwi\Kiwi-x64-setup.exe
+  - 7z a Kiwi-windows-x64.zip %APPVEYOR_BUILD_FOLDER%\Kiwi
 
 artifacts:
   - path: '*.zip'
@@ -39,28 +41,12 @@ deploy:
     release: $(APPVEYOR_REPO_TAG_NAME)
     auth_token:
         secure: ZtKK8yOVkgIf+6Vm0jQLCbjCjuTiln3w2k/xMHI/kgardyCVtZ6plKI5O8lR3NNY
-    artifact: /.*\.zip/
+    artifact: Kiwi-windows-x64.zip
     draft: true
     prerelease: false
     on:
       appveyor_repo_tag: true
-      KIWI_DEPLOY: 'draft'
 
-  - provider: GitHub
-    auth_token:
-        secure: ZtKK8yOVkgIf+6Vm0jQLCbjCjuTiln3w2k/xMHI/kgardyCVtZ6plKI5O8lR3NNY
-    artifact: /.*\.zip/
-    draft: true
-    prerelease: false
-    on:
-      appveyor_repo_tag: true
-      KIWI_DEPLOY: 'release'
-
-#---------------------------------#
-#         notifications           #
-#---------------------------------#
 notifications:
-
-  # Email
   - provider: Email
     on_build_status_changed: false

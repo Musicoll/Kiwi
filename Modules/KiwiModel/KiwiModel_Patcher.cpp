@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -55,6 +55,8 @@ namespace kiwi
         , signal_user_disconnect(Signal_USER_DISCONNECT, *this)
         , signal_get_connected_users(Signal_GET_CONNECTED_USERS, *this)
         , signal_receive_connected_users(Signal_RECEIVE_CONNECTED_USERS, *this)
+        , signal_stack_overflow(Signal_STACK_OVERFLOW, *this)
+        , signal_stack_overflow_clear(Signal_STACK_OVERFLOW_CLEAR, *this)
         {
             // user changes doesn't need to be stored in an history.
             m_users.disable_in_undo();

@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -182,7 +182,7 @@ namespace kiwi
                 const size_t vectorsize = first_sig->size();
                 m_signals.emplace_back(std::move(first_sig));
                 
-                for(int i = 1; i < signals.size(); ++i)
+                for(size_t i = 1; i < signals.size(); ++i)
                 {
                     const Signal::sPtr sig(signals[i]);
                     assert(sig->size() == vectorsize

@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -43,6 +43,7 @@ namespace kiwi
         showConsoleWindow           = 0x202000,        ///< Make visible the "console" window.
         showAudioStatusWindow       = 0x202010,        ///< Make visible the "audio status" window.
         showAboutAppWindow          = 0x202020,        ///< Make visible the "about app" window.
+        showDocumentation           = 0x202025,        ///< Show the documentation.
         showAppSettingsWindow       = 0x202030,        ///< Make visible the "application settings" window.
         showDocumentBrowserWindow   = 0x202040,        ///< Make visible the "document browser" window.
         showBeaconDispatcherWindow  = 0x202050,        ///< Make visible the "beacon dispatcher" window.

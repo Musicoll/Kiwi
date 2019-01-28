@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -125,10 +125,12 @@ namespace kiwi
             
             enum
             {
-                Signal_USER_CONNECT     = 0,
+                Signal_USER_CONNECT = 0,
                 Signal_USER_DISCONNECT,
                 Signal_GET_CONNECTED_USERS,
                 Signal_RECEIVE_CONNECTED_USERS,
+                Signal_STACK_OVERFLOW,
+                Signal_STACK_OVERFLOW_CLEAR,
             };
             
             // from server to client
@@ -142,6 +144,12 @@ namespace kiwi
             
             // from server to client
             flip::Signal<std::vector<uint64_t>> signal_receive_connected_users;
+            
+            // used by the engine when a stack-overflow is detected
+            flip::Signal<std::vector<flip::Ref>> signal_stack_overflow;
+            
+            // used by the view to clear stack-overflow
+            flip::Signal<> signal_stack_overflow_clear;
             
         public: // internal methods
             

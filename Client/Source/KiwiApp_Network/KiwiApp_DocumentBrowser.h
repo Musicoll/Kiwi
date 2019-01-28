@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -221,8 +221,11 @@ namespace kiwi
         //! if request succeed.
         void download(std::function<void(std::string const&)> callback);
         
+        //! @brief Returns the time of the document creation.
+        juce::Time const& getCreationTime() const;
+        
         //! @brief Returns the date creation as a string.
-        std::string const& getCreationDate() const;
+        std::string getCreationDate() const;
         
         //! @brief Returns the author's username.
         std::string const& getAuthor() const;
@@ -230,11 +233,17 @@ namespace kiwi
         //! @brief Returns true if document is trashed
         bool isTrashed() const;
         
+        //! @brief Returns the trashed time.
+        juce::Time const& getTrashedTime() const;
+        
         //! @brief Returns trashed date as string.
-        std::string const& getTrashedDate() const;
+        std::string getTrashedDate() const;
+        
+        //! @brief Returns the last modification time.
+        juce::Time const& getOpenedTime() const;
         
         //! @brief Returns the last modification date.
-        std::string const& getOpenedDate() const;
+        std::string getOpenedDate() const;
         
         //! @brief Returns the user that modified document last.
         std::string const& getOpenedUser() const;

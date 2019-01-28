@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -23,6 +23,10 @@
 
 #include <KiwiModel/KiwiModel_Def.h>
 #include <KiwiModel/KiwiModel_DataModel.h>
+
+#include <KiwiModel/KiwiModel_Point.h>
+#include <KiwiModel/KiwiModel_Bounds.h>
+
 #include <KiwiModel/KiwiModel_PatcherUser.h>
 
 namespace kiwi
@@ -99,6 +103,10 @@ namespace kiwi
             model::Clip::declare();
             model::SfPlayTilde::declare();
             model::SfRecordTilde::declare();
+            model::FaustTilde::declare();
+            model::Route::declare();
+            model::OSCReceive::declare();
+            model::OSCSend::declare();
         }
         
         void DataModel::init(std::function<void()> declare_object)
@@ -113,6 +121,10 @@ namespace kiwi
             #endif
             
             DataModel::version(model_version);
+            
+            // basic data structures
+            model::Point::declare();
+            model::Bounds::declare();
             
             // patcher elements declaration :
             model::Object::declare();

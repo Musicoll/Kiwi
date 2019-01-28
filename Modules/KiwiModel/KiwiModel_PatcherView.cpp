@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -60,7 +60,10 @@ namespace kiwi
             .member<flip::Collection<View::Object>, &View::m_selected_objects>("selected_objects")
             .member<flip::Collection<View::Link>, &View::m_selected_links>("selected_links")
             .member<flip::Bool, &View::m_is_locked>("locked")
-            .member<flip::Float, &View::m_zoom_factor>("zoom_factor");
+            .member<flip::Float, &View::m_zoom_factor>("zoom_factor")
+            .member<Bounds, &View::m_screen_bounds>("screen_bounds")
+            .member<Point, &View::m_view_position>("view_position")
+            ;
         }
         
         // ================================================================================ //
@@ -101,7 +104,8 @@ namespace kiwi
         void Patcher::View::setZoomFactor(double zoom_factor)
         {
             const double min_zoom = 0.25;
-            m_zoom_factor = zoom_factor < min_zoom ? min_zoom : zoom_factor;
+            const double max_zoom = 4.;
+            m_zoom_factor = std::max(min_zoom, std::min(zoom_factor, max_zoom));
         }
         
         double Patcher::View::getZoomFactor() const noexcept
@@ -258,6 +262,27 @@ namespace kiwi
                     m_selected_links.emplace(link);
                 }
             }
+        }
+        
+        Bounds const& Patcher::View::getScreenBounds() const
+        {
+            return m_screen_bounds;
+        }
+        
+        void Patcher::View::setScreenBounds(double x, double y, double width, double height)
+        {
+            m_screen_bounds.setPosition(x, y);
+            m_screen_bounds.setSize(width, height);
+        }
+        
+        Point const& Patcher::View::getViewPosition() const
+        {
+            return m_view_position;
+        }
+        
+        void Patcher::View::setViewPosition(double x, double y)
+        {
+            m_view_position.setPosition(x, y);
         }
         
         // ================================================================================ //

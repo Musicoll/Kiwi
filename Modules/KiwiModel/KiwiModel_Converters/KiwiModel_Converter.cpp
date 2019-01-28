@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -27,7 +27,7 @@
 #include <KiwiModel/KiwiModel_Converters/KiwiModel_Converter_v1_v2.cpp>
 #include <KiwiModel/KiwiModel_Converters/KiwiModel_Converter_v2_v3.cpp>
 #include <KiwiModel/KiwiModel_Converters/KiwiModel_Converter_v3_v4.cpp>
-#include <KiwiModel/KiwiModel_Converters/KiwiModel_Converter_v4_v401.cpp>
+#include <KiwiModel/KiwiModel_Converters/KiwiModel_Converter_v4_v40x.cpp>
 
 namespace kiwi { namespace model {
 
@@ -41,6 +41,8 @@ namespace kiwi { namespace model {
         addConverter<Converter_v2_v3>();
         addConverter<Converter_v3_v4>();
         addConverter<Converter_v4_v401>();
+        addConverter<Converter_v401_v402>();
+        addConverter<Converter_v402_v403>();
     }
     
     Converter::~Converter()

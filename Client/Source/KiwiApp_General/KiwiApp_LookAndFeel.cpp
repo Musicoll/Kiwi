@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -20,7 +20,7 @@
  */
 
 #include "../KiwiApp_General/KiwiApp_LookAndFeel.h"
-#include "../KiwiApp_Ressources/KiwiApp_BinaryData.h"
+#include "../KiwiApp_Resources/KiwiApp_BinaryData.h"
 
 #include <KiwiApp_Patcher/KiwiApp_PatcherView.h>
 #include <KiwiApp_Patcher/KiwiApp_Objects/KiwiApp_ObjectView.h>

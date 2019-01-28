@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -163,13 +163,13 @@ namespace kiwi
             inline void perform(Buffer const& input, Buffer& output) noexcept
             {
                 m_call_back->perform(input, output);
-            };
+            }
             
             //! @brief Releases everything after the digital signal processing.
             //! @details You can use this method to free the memory allocated during the call of
             //! the prepare method for example.
             //! @see prepare() and perform()
-            virtual void release() {};
+            virtual void release() {}
             
         private: // members
             

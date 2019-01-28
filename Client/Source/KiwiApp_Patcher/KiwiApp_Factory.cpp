@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -31,19 +31,16 @@ namespace kiwi
     
     std::unique_ptr<ObjectView> Factory::createObjectView(model::Object & object_model)
     {
-        std::unique_ptr<ObjectView> object_view(nullptr);
-        
         std::string object_name = object_model.getName();
-
         if (m_creators.find(object_name) != m_creators.end())
         {
-            object_view = std::move(m_creators[object_name](object_model));
+            return m_creators[object_name](object_model);
         }
         else
         {
-            object_view = std::move(std::make_unique<ClassicView>(object_model));
+            return std::make_unique<ClassicView>(object_model);
         }
 
-        return object_view;
+        return std::unique_ptr<ObjectView>();
     }
 }

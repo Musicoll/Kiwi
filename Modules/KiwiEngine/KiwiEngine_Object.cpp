@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -35,13 +35,12 @@ namespace kiwi
         //                                      OBJECT                                      //
         // ================================================================================ //
         
-        Object::Object(model::Object const& model, Patcher& patcher) noexcept :
-        m_patcher(patcher),
-        m_ref(model.ref()),
-        m_inlets(model.getNumberOfInlets()),
-        m_outlets(model.getNumberOfOutlets()),
-        m_stack_count(0ul),
-        m_master(this, [](engine::Object*){})
+        Object::Object(model::Object const& model, Patcher& patcher) noexcept
+        : m_patcher(patcher)
+        , m_ref(model.ref())
+        , m_inlets(model.getNumberOfInlets())
+        , m_outlets(model.getNumberOfOutlets())
+        , m_master(this, [](engine::Object*){})
         {
             getObjectModel().addListener(*this);
         }
@@ -51,14 +50,14 @@ namespace kiwi
             getObjectModel().removeListener(*this);
         }
         
-        void Object::addOutputLink(size_t outlet_index, Object & receiver, size_t inlet_index)
+        void Object::addOutputLink(flip::Ref link_ref, size_t outlet_index, Object & receiver, size_t inlet_index)
         {
-            m_outlets[outlet_index].insert(Link(receiver, inlet_index));
+            m_outlets[outlet_index].emplace(std::make_pair(link_ref, Link {receiver, inlet_index}));
         }
         
-        void Object::removeOutputLink(size_t outlet_index, Object & receiver, size_t inlet_index)
+        void Object::removeOutputLink(flip::Ref link_ref, size_t outlet_index)
         {
-            m_outlets[outlet_index].erase(Link(receiver, inlet_index));
+            m_outlets[outlet_index].erase(link_ref);
         }
         
         // ================================================================================ //
@@ -67,33 +66,28 @@ namespace kiwi
         
         void Object::modelParameterChanged(std::string const& name, tool::Parameter const& parameter)
         {
-            defer([this, name, parameter]()
-            {
+            defer([this, name, parameter]() {
                 parameterChanged(name, parameter);
             });
         }
         
         void Object::modelAttributeChanged(std::string const& name, tool::Parameter const& parameter)
         {
-            defer([this, name, parameter]()
-            {
+            defer([this, name, parameter]() {
                 attributeChanged(name, parameter);
             });
         }
         
         model::Object& Object::getObjectModel()
         {
-            return m_patcher.getPatcherModel().document()
-            .object<model::Object>(m_ref);
+            return m_patcher.getPatcherModel().document().object<model::Object>(m_ref);
         }
         
         void Object::parameterChanged(std::string const& param_name, tool::Parameter const& param)
-        {
-        }
+        {}
         
         void Object::attributeChanged(std::string const& name, tool::Parameter const& attribute)
-        {
-        }
+        {}
         
         void Object::setAttribute(std::string const& name, tool::Parameter && param)
         {
@@ -155,8 +149,7 @@ namespace kiwi
         {
             std::weak_ptr<engine::Object> object(m_master);
             
-            getScheduler().defer([object, cb = std::move(call_back)]()
-            {
+            getScheduler().defer([object, cb = std::move(call_back)]() {
                 if (!object.expired())
                 {
                     cb();
@@ -168,8 +161,7 @@ namespace kiwi
         {
             std::weak_ptr<engine::Object> object(m_master);
             
-            getMainScheduler().defer([object, cb = std::move(call_back)]()
-            {
+            getMainScheduler().defer([object, cb = std::move(call_back)]() {
                 if (!object.expired())
                 {
                     cb();
@@ -181,8 +173,7 @@ namespace kiwi
         {
             std::weak_ptr<engine::Object> object(m_master);
             
-            getScheduler().schedule([object, cb = std::move(call_back)]()
-            {
+            getScheduler().schedule([object, cb = std::move(call_back)]() {
                 if (!object.expired())
                 {
                     cb();
@@ -194,8 +185,7 @@ namespace kiwi
         {
             std::weak_ptr<engine::Object> object(m_master);
             
-            getMainScheduler().schedule([object, cb = std::move(call_back)]()
-            {
+            getMainScheduler().schedule([object, cb = std::move(call_back)]() {
                 if (!object.expired())
                 {
                     cb();
@@ -212,50 +202,59 @@ namespace kiwi
             return m_patcher.getBeacon(name);
         }
         
-#define KIWI_ENGINE_STACKOVERFLOW_MAX 128
-        
         void Object::send(const size_t index, std::vector<tool::Atom> const& args)
         {
             assert(getScheduler().isThisConsumerThread());
             
-            const auto idx = static_cast<std::vector<Outlet>::size_type>(index);
+            // all message are disabled when the patcher has a stack overflow
+            if(m_patcher.stackOverflowDetected())
+                return;
             
-            if(idx < m_outlets.size())
+            if(index >= m_outlets.size())
+                return;
+            
+            for(auto& link_it : m_outlets[index])
             {
-                for(Link const& link : m_outlets[idx])
+                auto& link = link_it.second;
+                
+                ++link.useStackCount();
+                
+                if(link.useStackCount() >= m_stack_overflow_max)
                 {
-                    Object& receiver = link.getReceiver();
-                    if(++(receiver.m_stack_count) < KIWI_ENGINE_STACKOVERFLOW_MAX)
-                    {
-                        receiver.receive(link.getReceiverIndex(), args);
-                    }
-                    else if(++(receiver.m_stack_count) == KIWI_ENGINE_STACKOVERFLOW_MAX)
-                    {
-                        m_patcher.addStackOverflow(link);
-                        receiver.receive(link.getReceiverIndex(), args);
-                    }
-                    else
-                    {
-                        m_patcher.endStackOverflow();
-                        error("message loop detected");
-                    }
-                    --(receiver.m_stack_count);
+                    auto link_ref = link_it.first;
+                    m_patcher.signalStackOverflow(link_ref);
+                    
+                    error("infinite message loop detected, messages are disabled until you fix it...");
+                    return;
                 }
-            
+                
+                Object& receiver = link.getReceiver();
+                receiver.receive(link.getReceiverIndex(), args);
+                
+                --link.useStackCount();
             }
         }
-
-#undef KIWI_ENGINE_STACKOVERFLOW_MAX
+        
+        void Object::clearStackOverflow()
+        {
+            for(auto& outlet : m_outlets)
+            {
+                for(auto& link_it : outlet)
+                {
+                    auto& link = link_it.second;
+                    link.useStackCount() = 0;
+                }
+            }
+        }
         
         // ================================================================================ //
         //                                    AUDIOOBJECT                                   //
         // ================================================================================ //
         
-        AudioObject::AudioObject(model::Object const& model, Patcher& patcher) noexcept:
-        Object(model, patcher),
-        dsp::Processor(model.getNumberOfInlets(), model.getNumberOfOutlets())
-        {
-        }
+        AudioObject::AudioObject(model::Object const& model, Patcher& patcher) noexcept
+        : Object(model, patcher)
+        , dsp::Processor(model.getNumberOfInlets(), model.getNumberOfOutlets())
+        {}
         
     }
 }

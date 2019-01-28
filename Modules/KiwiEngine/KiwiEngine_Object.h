@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -58,19 +58,22 @@ namespace kiwi
             //! @brief Destructor.
             virtual ~Object() noexcept;
             
+        private: // methods
+            
             //! @brief Receives a set of arguments via an inlet.
             //! @details This method must be overriden by object's subclasses.
-            //! @todo see if the method must be noexcept.
             virtual void receive(size_t index, std::vector<tool::Atom> const& args) = 0;
+            
+        public: // methods
             
             //! @brief Called when the Patcher is loaded.
             virtual void loadbang() {};
             
             //! @internal Appends a new Link to an outlet.
-            void addOutputLink(size_t outlet_index, Object & receiver, size_t inlet_index);
+            void addOutputLink(flip::Ref link_ref, size_t outlet_index, Object & receiver, size_t inlet_index);
             
             //! @internal Removes a Link from an outlet.
-            void removeOutputLink(size_t outlet_index, Object & receiver, size_t inlet_index);
+            void removeOutputLink(flip::Ref link_ref, size_t outlet_index);
             
             //! @brief Called when a parameter has changed.
             void modelParameterChanged(std::string const& name, tool::Parameter const& parameter) override final;
@@ -100,10 +103,10 @@ namespace kiwi
             //                                      SCHEDULER                                   //
             // ================================================================================ //
             
-            //! @biref Returns the engine's scheduler.
+            //! @brief Returns the engine's scheduler.
             tool::Scheduler<> & getScheduler() const;
             
-            //! @biref Returns the main scheduler.
+            //! @brief Returns the main scheduler.
             tool::Scheduler<> & getMainScheduler() const;
             
             //! @brief Defers a task on the engine thread.
@@ -146,31 +149,39 @@ namespace kiwi
             //! @details For thread safety actual model's modification is called on the main thread.
             void setParameter(std::string const& name, tool::Parameter && parameter);
             
-        private: // methods
+        protected: // methods
             
             //! @brief Returns the object's data model.
             model::Object & getObjectModel();
+            
+        private: // methods
             
             //! @brief Called once the data model's parameters has changed.
             //! @details Automatically called on the engine's thread.
             virtual void parameterChanged(std::string const& param_name, tool::Parameter const& param);
             
             //! @brief Called once one of the data model's attributes has changed.
-            //! @brief Automatically called on the engine's thread.
+            //! @details Automatically called on the engine's thread.
             virtual void attributeChanged(std::string const& name, tool::Parameter const& attribute);
+            
+            //! @brief Called by the patcher when the stack-overflow is cleared.
+            void clearStackOverflow();
             
         private: // members
             
-            using Outlet = std::set<Link>;
+            using Outlet = std::map<flip::Ref, Link>;
 
             Patcher&                        m_patcher;
             flip::Ref const                 m_ref;
             size_t                          m_inlets;
             std::vector<Outlet>             m_outlets;
-            size_t                          m_stack_count;
             std::shared_ptr<Object>         m_master;
             
+            static constexpr size_t m_stack_overflow_max = 12;
+            
         private: // deleted methods
+            
+            friend engine::Patcher;
             
             Object(Object const&) = delete;
             Object(Object&&) = delete;
@@ -185,7 +196,7 @@ namespace kiwi
         // ================================================================================ //
         
         //! @brief A pure interface that audio object must implement.
-        //! @brief audio objects will be held and triggered by both the engine and the dsp chain.
+        //! @details audio objects will be held and triggered by both the engine and the dsp chain.
         class AudioObject : public engine::Object, public dsp::Processor
         {
         public: // methods

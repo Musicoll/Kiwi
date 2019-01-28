@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -80,7 +80,11 @@ namespace kiwi
         
         //! @brief Save the document.
         //! @details Returns true if saving document succeeded false otherwise.
-        bool saveDocument();
+        bool saveDocument(bool save_as);
+        
+        //! @brief Save the document as another document.
+        //! @details Returns true if saving document succeeded false otherwise.
+        bool saveDocumentAs();
         
         //! @brief Returns true if the patcher needs to be saved.
         bool needsSaving() const noexcept;
@@ -142,6 +146,12 @@ namespace kiwi
         //! @brief Force all windows to close without asking user to save document.
         void forceCloseAllWindows();
         
+        //! @brief This method is used to reset the stack count when a stack-overflow has previously been detected.
+        //! @details it will signal the Patcher model
+        void clearStackOverflow();
+        
+        bool hasStackOverflow() const;
+        
     private:
         
         //! @brief Called when a document session has been added.
@@ -155,6 +165,12 @@ namespace kiwi
         
         //! @internal Called from socket process to notify changing state.
         void onStateTransition(flip::CarrierBase::Transition transition, flip::CarrierBase::Error error);
+        
+        //! @brief Called when a stack-overflow is detected
+        void onStackOverflowDetected(std::vector<flip::Ref> refs);
+        
+        //! @brief Called when a stack-overflow is cleared
+        void onStackOverflowCleared();
         
         //! @internal Write data into file.
         void writeDocument();
@@ -222,8 +238,12 @@ namespace kiwi
         flip::SignalConnection                      m_user_connected_signal_cnx;
         flip::SignalConnection                      m_user_disconnected_signal_cnx;
         flip::SignalConnection                      m_receive_connected_users_signal_cnx;
+        flip::SignalConnection                      m_stack_overflow_detected_signal_cnx;
+        flip::SignalConnection                      m_stack_overflow_cleared_signal_cnx;
         
         std::unordered_set<uint64_t>                m_connected_users;
+        
+        bool                                        m_has_stack_overflow = false;
         
         tool::Listeners<Listener>                   m_listeners;
     };
@@ -238,5 +258,11 @@ namespace kiwi
         
         //! @brief Called when one or more users are connecting or disconnecting to the Patcher Document.
         virtual void connectedUserChanged(PatcherManager& manager) {};
+        
+        //! @brief Called when a stack-overflow is detected.
+        virtual void stackOverflowDetected(PatcherManager& manager, std::vector<flip::Ref> culprits) {};
+        
+        //! @brief Called when a stack-overflow is cleared.
+        virtual void stackOverflowCleared(PatcherManager& manager) {};
     };
 }

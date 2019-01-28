@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -111,7 +111,7 @@ namespace kiwi { namespace network { namespace http {
     , m_query()
     , m_req_header()
     {
-        ;
+        m_req_header.version(11);
     }
     
     uint64_t Session::getId() const
@@ -236,7 +236,7 @@ namespace kiwi { namespace network { namespace http {
                 if(!m_payload.content.empty())
                 {
                     request->set(beast::http::field::content_type, "application/x-www-form-urlencoded");
-                    request->body = std::move(m_payload.content);
+                    request->body() = std::move(m_payload.content);
                 }
                 else if(!m_body.content.empty())
                 {
@@ -247,7 +247,7 @@ namespace kiwi { namespace network { namespace http {
                         request->set(beast::http::field::content_type, "application/octet-stream");
                     }
                     
-                    request->body = std::move(m_body.content);
+                    request->body() = std::move(m_body.content);
                 }
             }
             

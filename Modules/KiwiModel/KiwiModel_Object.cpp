@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -223,11 +223,8 @@ namespace kiwi
         void Object::setAttribute(std::string const& name, tool::Parameter const& param)
         {
             assert(getClass().hasAttribute(name) && "Attribute not declare");
-            
-            ParameterClass const& attribute_class = getClass().getAttribute(name);
-            
-            assert(attribute_class.getDataType() == param.getType());
-            
+            assert(getClass().getAttribute(name).getDataType() == param.getType());
+
             writeAttribute(name, param);
         }
         
@@ -263,11 +260,8 @@ namespace kiwi
         
         void Object::setParameter(std::string const& name, tool::Parameter const& param)
         {
-            assert(getClass().hasParameter(name) && "Parameter not declare");
-            
-            ParameterClass const& param_class = getClass().getParameter(name);
-            
-            assert(param_class.getDataType() == param.getType());
+            assert(getClass().hasParameter(name) && "Parameter not declare");            
+            assert(getClass().getParameter(name).getDataType() == param.getType());
             
             if (m_parameters.find(name) == m_parameters.end())
             {

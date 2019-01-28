@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -52,16 +52,17 @@ namespace kiwi
         {
             None = 0,
             CopyOnDrag,
-            Object,
+            ForwardToObject,
             CreateLink,
             Lasso,
             MoveObjects,
             ResizeObjects,
-            PopupMenu,
-            ObjectEdition,
+            EditObject,
             SwitchSelection,
             Selection,
-            SwitchLock
+            SwitchLock,
+            PopupMenu,
+            OpenObjectHelp,
         };
         
         enum Direction : int
@@ -124,11 +125,11 @@ namespace kiwi
         
     private: // members
         
-        PatcherView &                               m_patcher_view;
-        Action                                      m_current_action;
-        juce::Point<int>                            m_last_drag;
-        std::map<flip::Ref, juce::Rectangle<int>>   m_mousedown_bounds;
-        int                                         m_direction;
+        PatcherView&                                m_patcher_view;
+        Action                                      m_current_action = Action::None;
+        juce::Point<int>                            m_last_drag {};
+        std::map<flip::Ref, juce::Rectangle<int>>   m_mousedown_bounds {};
+        int                                         m_direction = 0;
         
     private: // deleted methods
         

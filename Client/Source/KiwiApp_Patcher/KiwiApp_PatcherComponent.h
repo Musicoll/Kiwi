@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -30,7 +30,8 @@ namespace kiwi
     //                            PATCHER COMPONENT TOOLBAR                             //
     // ================================================================================ //
     
-    class PatcherToolbar : public juce::Component
+    class PatcherToolbar
+    : public juce::Component
     {
     public: // methods
         
@@ -45,6 +46,9 @@ namespace kiwi
         
         //! @brief Removes users icon.
         void removeUsersIcon();
+        
+        //! @brief Show or hide stack-overflow icon.
+        void setStackOverflowIconVisible(bool visible);
         
     private: // classes
         
@@ -63,6 +67,7 @@ namespace kiwi
                 zoom_out            = 3,
                 dsp_on_off          = 4,
                 users               = 5,
+                stack_overflow      = 6,
             };
             
             void getAllToolbarItemIds(juce::Array<int>& ids) override;
@@ -75,6 +80,10 @@ namespace kiwi
         };
         
         class UsersItemComponent;
+        
+        //! @brief Returns the index of a specific item id in the toolbar.
+        //! @details returns -1 if the item is not found.
+        int getToolbarItemIndex(Factory::ItemIds item_id);
         
     private: // variables
         
@@ -150,9 +159,10 @@ namespace kiwi
     // ================================================================================ //
     
     //! @brief The PatcherComponent holds a patcher view and a patcher toolbar.
-    class PatcherComponent :
-    public juce::Component,
-    public juce::ApplicationCommandTarget
+    class PatcherComponent
+    : public juce::Component
+    , private PatcherManager::Listener
+    , public juce::ApplicationCommandTarget
     {
     public: // methods
         
@@ -185,6 +195,14 @@ namespace kiwi
         void getAllCommands(juce::Array<juce::CommandID>& commands) override;
         void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
         bool perform(const InvocationInfo& info) override;
+        
+    private: // methods
+        
+        //! @brief Called when a stack-overflow is detected;
+        void stackOverflowDetected(PatcherManager& manager, std::vector<flip::Ref> culprits) override;
+        
+        //! @brief Called when a stack-overflow is cleared.
+        void stackOverflowCleared(PatcherManager& manager) override;
 
     private: // members
         
@@ -197,7 +215,9 @@ namespace kiwi
     //                                PATCHER VIEW WINDOW                               //
     // ================================================================================ //
     
-    class PatcherViewWindow : public Window
+    class PatcherViewWindow
+    : public Window
+    , public juce::ComponentMovementWatcher
     {
     public: // methods
         
@@ -220,6 +240,12 @@ namespace kiwi
         
         //! @brief Removes the connected users icon. Called once patcher disconnected.
         void removeUsersIcon();
+        
+    private: // methods
+        
+        void componentMovedOrResized(bool was_moved, bool was_resized) override;
+        void componentPeerChanged() override {};
+        void componentVisibilityChanged() override {}
         
     private: // variables
         

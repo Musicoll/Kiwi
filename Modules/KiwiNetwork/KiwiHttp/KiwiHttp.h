@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -104,7 +104,7 @@ namespace kiwi { namespace network { namespace http {
         void handleTimeout(beast::error_code const& error);
         
         //! @internal
-        void connect(tcp::resolver::iterator iterator);
+        void connect(tcp::resolver::results_type results);
         
         //! @internal
         void write();
@@ -121,7 +121,7 @@ namespace kiwi { namespace network { namespace http {
         Response<ResType>                   m_response;
         
         std::string                         m_port;
-        boost::asio::io_service             m_io_service;
+        boost::asio::io_context             m_io_context;
         tcp::socket                         m_socket;
         boost::asio::steady_timer           m_timer;
         tcp::resolver                       m_resolver;

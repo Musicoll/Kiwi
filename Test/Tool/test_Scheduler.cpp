@@ -3,7 +3,7 @@
  
  This file is part of the KIWI library.
  - Copyright (c) 2014-2016, Pierre Guillot & Eliott Paris.
- - Copyright (c) 2016-2017, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
+ - Copyright (c) 2016-2019, CICM, ANR MUSICOLL, Eliott Paris, Pierre Guillot, Jean Millot.
  
  Permission is granted to use this software under the terms of the GPL v3
  (or any later version). Details can be found at: www.gnu.org/licenses
@@ -184,7 +184,7 @@ TEST_CASE("Scheduler - Multithread", "[Scheduler]")
             ++count_producer_2;
         };
         
-        std::thread producer_1([&count_producer_1, &sch, &func_1]() {
+        std::thread producer_1([&sch, &func_1]() {
             size_t count_event = 0;
             
             while(count_event < 30)
@@ -194,7 +194,7 @@ TEST_CASE("Scheduler - Multithread", "[Scheduler]")
             }
         });
         
-        std::thread producer_2([&count_producer_2, &sch, &func_2]() {
+        std::thread producer_2([&sch, &func_2]() {
             size_t count_event = 0;
             
             while(count_event < 20)
