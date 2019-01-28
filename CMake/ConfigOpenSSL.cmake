@@ -26,7 +26,7 @@ if(NOT EXISTS ${KIWI_OPENSSL_INTERN_DIR})
 		file(DOWNLOAD "${OPENSSL_URL}/${OPENSSL_PKG_NAME}" "${PROJECT_SOURCE_DIR}/ThirdParty/${OPENSSL_PKG_NAME}")
 	endif()
 
-	# Unpack the boost package
+	# Unpack the openssl package
 	# -------------------------------------------------------------------------#
 	message(STATUS "Unpack ${PROJECT_SOURCE_DIR}/ThirdParty/${OPENSSL_PKG_NAME} to ${KIWI_OPENSSL_INTERN_DIR}")
 	if(APPLE)
