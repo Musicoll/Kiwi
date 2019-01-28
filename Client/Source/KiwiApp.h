@@ -34,8 +34,8 @@
 namespace ProjectInfo
 {
     const char* const  projectName    = "Kiwi";
-    const char* const  versionString  = "v1.0.3";
-    const int          versionNumber  = 0x103;
+    const char* const  versionString  = "v1.1";
+    const int          versionNumber  = 0x110;
 }
 
 namespace kiwi

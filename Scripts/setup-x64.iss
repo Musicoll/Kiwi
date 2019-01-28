@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Kiwi"
-#define MyAppVersion "v1.0.3"
+#define MyAppVersion "v1.1"
 #define MyAppPublisher "CICM"
 #define MyAppURL "https://github.com/Musicoll/Kiwi"
 #define MyAppExeName "Kiwi.exe"

@@ -1,4 +1,4 @@
-### v1.0.3
+### v1.1
 
 New Objects:
 - [faust~] object. Load, edit and run [FAUST](http://faust.grame.fr/) code in Kiwi.
