@@ -172,47 +172,47 @@ namespace kiwi { namespace network { namespace http {
         }
     }
     
-    Session::Response Session::Get()
+    Session::Response Session::Get(ssl::context * ssl_context)
     {
-        return makeResponse(beast::http::verb::get);
+        return makeResponse(beast::http::verb::get, ssl_context);
     }
     
-    void Session::GetAsync(Callback callback)
+    void Session::GetAsync(Callback callback, ssl::context * ssl_context)
     {
-        makeResponse(beast::http::verb::get, std::move(callback));
+        makeResponse(beast::http::verb::get, std::move(callback), ssl_context);
     }
     
-    Session::Response Session::Post()
+    Session::Response Session::Post(ssl::context * ssl_context)
     {
-        return makeResponse(beast::http::verb::post);
+        return makeResponse(beast::http::verb::post, ssl_context);
     }
     
-    void Session::PostAsync(Callback callback)
+    void Session::PostAsync(Callback callback, ssl::context * ssl_context)
     {
-        makeResponse(beast::http::verb::post, std::move(callback));
+        makeResponse(beast::http::verb::post, std::move(callback), ssl_context);
     }
     
-    Session::Response Session::Put()
+    Session::Response Session::Put(ssl::context * ssl_context)
     {
-        return makeResponse(beast::http::verb::put);
+        return makeResponse(beast::http::verb::put, ssl_context);
     }
     
-    void Session::PutAsync(Callback callback)
+    void Session::PutAsync(Callback callback, ssl::context * ssl_context)
     {
-        makeResponse(beast::http::verb::put, std::move(callback));
+        makeResponse(beast::http::verb::put, std::move(callback), ssl_context);
     }
     
-    Session::Response Session::Delete()
+    Session::Response Session::Delete(ssl::context * ssl_context)
     {
-        return makeResponse(beast::http::verb::delete_);
+        return makeResponse(beast::http::verb::delete_, ssl_context);
     }
     
-    void Session::DeleteAsync(Callback callback)
+    void Session::DeleteAsync(Callback callback, ssl::context * ssl_context)
     {
-        makeResponse(beast::http::verb::delete_, std::move(callback));
+        makeResponse(beast::http::verb::delete_, std::move(callback), ssl_context);
     }
     
-    void Session::initQuery()
+    void Session::initQuery(ssl::context * ssl_context)
     {
         if (!m_query)
         {
@@ -251,24 +251,31 @@ namespace kiwi { namespace network { namespace http {
                 }
             }
             
-            m_query = std::make_unique<HttpQuery>(std::move(request), m_port);
+            if (ssl_context != nullptr)
+            {
+                m_query = std::make_unique<HttpQuery>(std::move(request), m_port, *ssl_context);
+            }
+            else
+            {
+                m_query = std::make_unique<HttpQuery>(std::move(request), m_port);
+            }
         }
     }
     
-    Session::Response Session::makeResponse(beast::http::verb verb)
+    Session::Response Session::makeResponse(beast::http::verb verb, ssl::context * ssl_context)
     {
         m_req_header.method(verb);
         
-        initQuery();
+        initQuery(ssl_context);
         
         return m_query->writeQuery(m_timeout);
     }
     
-    void Session::makeResponse(beast::http::verb verb, Session::Callback && callback)
+    void Session::makeResponse(beast::http::verb verb, Session::Callback && callback, ssl::context * ssl_context)
     {
         m_req_header.method(verb);
         
-        initQuery();
+        initQuery(ssl_context);
         
         m_query->writeQueryAsync(callback, m_timeout);
     }

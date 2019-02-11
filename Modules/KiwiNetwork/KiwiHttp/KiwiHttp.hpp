@@ -34,13 +34,35 @@ namespace kiwi { namespace network { namespace http {
     , m_response()
     , m_port(port)
     , m_io_context()
-    , m_socket(m_io_context)
+    , m_stream(nullptr)
     , m_timer(m_io_context)
     , m_resolver(m_io_context)
     , m_buffer()
     , m_thread()
     , m_executed(false)
     , m_callback()
+    , m_secure(false)
+    {
+        ssl::context ctx(ssl::context::method::sslv23_client);
+        m_stream.reset(new ssl::stream<tcp::socket>(m_io_context, ctx));
+    }
+    
+    template<class ReqType, class ResType>
+    Query<ReqType, ResType>::Query(std::unique_ptr<beast::http::request<ReqType>> request,
+                                   std::string port,
+                                   ssl::context & ctx)
+    : m_request(std::move(request))
+    , m_response()
+    , m_port(port)
+    , m_io_context()
+    , m_stream(new ssl::stream<tcp::socket>(m_io_context, ctx))
+    , m_timer(m_io_context)
+    , m_resolver(m_io_context)
+    , m_buffer()
+    , m_thread()
+    , m_executed(false)
+    , m_callback()
+    , m_secure(true)
     {
     }
     
@@ -67,7 +89,7 @@ namespace kiwi { namespace network { namespace http {
             
             while(!executed())
             {
-                m_socket.get_io_context().poll_one();
+                m_io_context.poll_one();
             }
         }
         
@@ -87,7 +109,7 @@ namespace kiwi { namespace network { namespace http {
             {
                 while(!executed())
                 {
-                    m_socket.get_io_context().poll_one();
+                    m_io_context.poll_one();
                 }
             });
         }
@@ -133,6 +155,11 @@ namespace kiwi { namespace network { namespace http {
         
         const std::string host = m_request->at(beast::http::field::host).to_string();
         
+        if (m_secure)
+        {
+            SSL_set_tlsext_host_name(m_stream->native_handle(), host.c_str());
+        }
+        
         m_resolver.async_resolve(host, m_port, [this](beast::error_code ec,
                                                       tcp::resolver::results_type results)
         {
@@ -156,10 +183,33 @@ namespace kiwi { namespace network { namespace http {
     template<class ReqType, class ResType>
     void Query<ReqType, ResType>::connect(tcp::resolver::results_type results)
     {
-        boost::asio::async_connect(m_socket, results, [this](beast::error_code ec, tcp::endpoint const& endpoint){
+        boost::asio::async_connect(m_stream->next_layer(), results, [this](beast::error_code ec, tcp::endpoint const& endpoint){
             
             boost::ignore_unused(endpoint);
             
+            if (ec)
+            {
+                shutdown(ec);
+            }
+            else
+            {
+                if (!m_secure)
+                {
+                    write();
+                }
+                else
+                {
+                    handshake();
+                }
+            }
+        });
+    }
+    
+    template<class ReqType, class ResType>
+    void Query<ReqType, ResType>::handshake()
+    {
+        m_stream->async_handshake(ssl::stream_base::client, [this](boost::system::error_code ec)
+        {
             if (ec)
             {
                 shutdown(ec);
@@ -174,8 +224,7 @@ namespace kiwi { namespace network { namespace http {
     template<class ReqType, class ResType>
     void Query<ReqType, ResType>::write()
     {
-        beast::http::async_write(m_socket, *m_request, [this](beast::error_code ec,
-                                                              std::size_t bytes_transferred)
+        auto callback = [this](beast::error_code ec, std::size_t bytes_transferred)
         {
             boost::ignore_unused(bytes_transferred);
             
@@ -187,18 +236,35 @@ namespace kiwi { namespace network { namespace http {
             {
                 read();
             }
-        });
+        };
+        
+        if (!m_secure)
+        {
+            beast::http::async_write(m_stream->next_layer(), *m_request, callback);
+        }
+        else
+        {
+            beast::http::async_write(*m_stream, *m_request, callback);
+        }
     }
     
     template<class ReqType, class ResType>
     void Query<ReqType, ResType>::read()
     {
-        beast::http::async_read(m_socket, m_buffer, m_response, [this](beast::error_code ec,
-                                                                       std::size_t bytes_transferred)
+        auto callback = [this](beast::error_code ec, std::size_t bytes_transferred)
         {
             boost::ignore_unused(bytes_transferred);
             shutdown(ec);
-        });
+        };
+        
+        if (!m_secure)
+        {
+            beast::http::async_read(m_stream->next_layer(), m_buffer, m_response, callback);
+        }
+        else
+        {
+            beast::http::async_read(*m_stream, m_buffer, m_response, callback);
+        }
     }
     
     template<class ReqType, class ResType>
@@ -210,7 +276,7 @@ namespace kiwi { namespace network { namespace http {
         }
         
         boost::system::error_code ec;
-        m_socket.shutdown(tcp::socket::shutdown_both, ec);
+        m_stream->next_layer().shutdown(tcp::socket::shutdown_both, ec);
         
         if (m_callback)
         {

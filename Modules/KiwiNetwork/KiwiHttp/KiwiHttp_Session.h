@@ -121,24 +121,24 @@ namespace kiwi { namespace network { namespace http {
         bool executed();
         void cancel();
         
-        Response Get();
-        void GetAsync(Callback callback);
+        Response Get(ssl::context * ssl_context = nullptr);
+        void GetAsync(Callback callback, ssl::context * ssl_context = nullptr);
         
-        Response Post();
-        void PostAsync(Callback callback);
+        Response Post(ssl::context * ssl_context = nullptr);
+        void PostAsync(Callback callback, ssl::context * ssl_context = nullptr);
         
-        Response Put();
-        void PutAsync(Callback callback);
+        Response Put(ssl::context * ssl_context = nullptr);
+        void PutAsync(Callback callback, ssl::context * ssl_context = nullptr);
         
-        Response Delete();
-        void DeleteAsync(Callback callback);
+        Response Delete(ssl::context * ssl_context = nullptr);
+        void DeleteAsync(Callback callback, ssl::context * ssl_context = nullptr);
         
     private: // methods
         
-        void initQuery();
+        void initQuery(ssl::context * ssl_context);
         
-        Response makeResponse(beast::http::verb verb);
-        void makeResponse(beast::http::verb verb, Callback && callback);
+        Response makeResponse(beast::http::verb verb, ssl::context * ssl_context);
+        void makeResponse(beast::http::verb verb, Callback && callback, ssl::context * ssl_context);
         
     private: // members
         

@@ -30,11 +30,13 @@
 
 #include <boost/asio.hpp>
 #include <boost/asio/steady_timer.hpp>
+#include <boost/asio/ssl/stream.hpp>
 
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 
 namespace beast = boost::beast;
+namespace ssl = boost::asio::ssl;
 
 namespace kiwi { namespace network { namespace http {
     
@@ -72,6 +74,11 @@ namespace kiwi { namespace network { namespace http {
         Query(std::unique_ptr<Request<ReqType>> request,
               std::string port);
         
+        //! @brief SSL constructor.
+        Query(std::unique_ptr<Request<ReqType>> request,
+              std::string port,
+              ssl::context & context);
+        
         //! @brief Destructor.
         //! @details Wait for asynchronous operation to terminate.
         ~Query();
@@ -107,6 +114,9 @@ namespace kiwi { namespace network { namespace http {
         void connect(tcp::resolver::results_type results);
         
         //! @internal
+        void handshake();
+        
+        //! @internal
         void write();
         
         //! @internal
@@ -120,15 +130,16 @@ namespace kiwi { namespace network { namespace http {
         std::unique_ptr<Request<ReqType>>   m_request;
         Response<ResType>                   m_response;
         
-        std::string                         m_port;
-        boost::asio::io_context             m_io_context;
-        tcp::socket                         m_socket;
-        boost::asio::steady_timer           m_timer;
-        tcp::resolver                       m_resolver;
-        beast::flat_buffer                  m_buffer;
-        std::thread                         m_thread;
-        std::atomic<bool>                   m_executed;
-        Callback                            m_callback;
+        std::string                                 m_port;
+        boost::asio::io_context                     m_io_context;
+        std::unique_ptr<ssl::stream<tcp::socket>>   m_stream;
+        boost::asio::steady_timer                   m_timer;
+        tcp::resolver                               m_resolver;
+        beast::flat_buffer                          m_buffer;
+        std::thread                                 m_thread;
+        std::atomic<bool>                           m_executed;
+        Callback                                    m_callback;
+        bool                                        m_secure;
         
     private: // deleted methods
         
