@@ -104,6 +104,8 @@ namespace kiwi { namespace network { namespace http {
     : m_port("80")
     , m_target()
     , m_parameters()
+    , m_ssl(ssl::context::sslv23_client)
+    , m_ssl_mode(SecureMode::NoEncryption)
     , m_payload()
     , m_body()
     , m_timeout(0)
@@ -139,6 +141,26 @@ namespace kiwi { namespace network { namespace http {
         m_timeout = timeout;
     }
     
+    void Session::addCertificate(std::string const& certificate)
+    {
+        m_ssl.add_certificate_authority(boost::asio::buffer(certificate.data(), certificate.size()));
+    }
+    
+    void Session::setSecure(SecureMode mode)
+    {
+        m_ssl_mode = mode;
+        
+        if(m_ssl_mode == SecureMode::VerifyPeer)
+        {
+            m_ssl.set_verify_mode(ssl::verify_peer);
+        }
+        else if(m_ssl_mode == SecureMode::TrustPeer)
+        {
+            m_ssl.set_verify_mode(ssl::verify_none);
+        }
+        
+    }
+    
     void Session::setAuthorization(std::string const& auth)
     {
         m_req_header.set(beast::http::field::authorization, auth);
@@ -172,47 +194,47 @@ namespace kiwi { namespace network { namespace http {
         }
     }
     
-    Session::Response Session::Get(ssl::context * ssl_context)
+    Session::Response Session::Get()
     {
-        return makeResponse(beast::http::verb::get, ssl_context);
+        return makeResponse(beast::http::verb::get);
     }
     
-    void Session::GetAsync(Callback callback, ssl::context * ssl_context)
+    void Session::GetAsync(Callback callback)
     {
-        makeResponse(beast::http::verb::get, std::move(callback), ssl_context);
+        makeResponse(beast::http::verb::get, std::move(callback));
     }
     
-    Session::Response Session::Post(ssl::context * ssl_context)
+    Session::Response Session::Post()
     {
-        return makeResponse(beast::http::verb::post, ssl_context);
+        return makeResponse(beast::http::verb::post);
     }
     
-    void Session::PostAsync(Callback callback, ssl::context * ssl_context)
+    void Session::PostAsync(Callback callback)
     {
-        makeResponse(beast::http::verb::post, std::move(callback), ssl_context);
+        makeResponse(beast::http::verb::post, std::move(callback));
     }
     
-    Session::Response Session::Put(ssl::context * ssl_context)
+    Session::Response Session::Put()
     {
-        return makeResponse(beast::http::verb::put, ssl_context);
+        return makeResponse(beast::http::verb::put);
     }
     
-    void Session::PutAsync(Callback callback, ssl::context * ssl_context)
+    void Session::PutAsync(Callback callback)
     {
-        makeResponse(beast::http::verb::put, std::move(callback), ssl_context);
+        makeResponse(beast::http::verb::put, std::move(callback));
     }
     
-    Session::Response Session::Delete(ssl::context * ssl_context)
+    Session::Response Session::Delete()
     {
-        return makeResponse(beast::http::verb::delete_, ssl_context);
+        return makeResponse(beast::http::verb::delete_);
     }
     
-    void Session::DeleteAsync(Callback callback, ssl::context * ssl_context)
+    void Session::DeleteAsync(Callback callback)
     {
-        makeResponse(beast::http::verb::delete_, std::move(callback), ssl_context);
+        makeResponse(beast::http::verb::delete_, std::move(callback));
     }
     
-    void Session::initQuery(ssl::context * ssl_context)
+    void Session::initQuery()
     {
         if (!m_query)
         {
@@ -251,31 +273,31 @@ namespace kiwi { namespace network { namespace http {
                 }
             }
             
-            if (ssl_context != nullptr)
+            if (m_ssl_mode == SecureMode::NoEncryption)
             {
-                m_query = std::make_unique<HttpQuery>(std::move(request), m_port, *ssl_context);
+                m_query = std::make_unique<HttpQuery>(std::move(request), m_port);
             }
             else
             {
-                m_query = std::make_unique<HttpQuery>(std::move(request), m_port);
+                m_query = std::make_unique<HttpQuery>(std::move(request), m_port, m_ssl);
             }
         }
     }
     
-    Session::Response Session::makeResponse(beast::http::verb verb, ssl::context * ssl_context)
+    Session::Response Session::makeResponse(beast::http::verb verb)
     {
         m_req_header.method(verb);
         
-        initQuery(ssl_context);
+        initQuery();
         
         return m_query->writeQuery(m_timeout);
     }
     
-    void Session::makeResponse(beast::http::verb verb, Session::Callback && callback, ssl::context * ssl_context)
+    void Session::makeResponse(beast::http::verb verb, Session::Callback && callback)
     {
         m_req_header.method(verb);
         
-        initQuery(ssl_context);
+        initQuery();
         
         m_query->writeQueryAsync(callback, m_timeout);
     }

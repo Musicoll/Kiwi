@@ -98,6 +98,15 @@ namespace kiwi { namespace network { namespace http {
         
         using HttpQuery = Query<beast::http::string_body, beast::http::string_body>;
         
+    public: // classes
+        
+        enum class SecureMode
+        {
+            NoEncryption,
+            VerifyPeer,
+            TrustPeer
+        };
+        
     public: // methods
         
         using Response = http::Response<beast::http::string_body>;
@@ -113,6 +122,8 @@ namespace kiwi { namespace network { namespace http {
         void setTarget(std::string const& endpoint);
         void setTimeout(Timeout timeout);
         void setAuthorization(std::string const& auth);
+        void setSecure(SecureMode mode);
+        void addCertificate(std::string const& certificate);
         
         void setParameters(Parameters && parameters);
         void setPayload(Payload && payload);
@@ -121,30 +132,32 @@ namespace kiwi { namespace network { namespace http {
         bool executed();
         void cancel();
         
-        Response Get(ssl::context * ssl_context = nullptr);
-        void GetAsync(Callback callback, ssl::context * ssl_context = nullptr);
+        Response Get();
+        void GetAsync(Callback callback);
         
-        Response Post(ssl::context * ssl_context = nullptr);
-        void PostAsync(Callback callback, ssl::context * ssl_context = nullptr);
+        Response Post();
+        void PostAsync(Callback callback);
         
-        Response Put(ssl::context * ssl_context = nullptr);
-        void PutAsync(Callback callback, ssl::context * ssl_context = nullptr);
+        Response Put();
+        void PutAsync(Callback callback);
         
-        Response Delete(ssl::context * ssl_context = nullptr);
-        void DeleteAsync(Callback callback, ssl::context * ssl_context = nullptr);
+        Response Delete();
+        void DeleteAsync(Callback callback);
         
     private: // methods
         
-        void initQuery(ssl::context * ssl_context);
+        void initQuery();
         
-        Response makeResponse(beast::http::verb verb, ssl::context * ssl_context);
-        void makeResponse(beast::http::verb verb, Callback && callback, ssl::context * ssl_context);
+        Response makeResponse(beast::http::verb verb);
+        void makeResponse(beast::http::verb verb, Callback && callback);
         
     private: // members
         
         std::string             m_port;
         std::string             m_target;
         Parameters              m_parameters;
+        ssl::context            m_ssl;
+        SecureMode              m_ssl_mode;
         Payload                 m_payload;
         Body                    m_body;
         Timeout                 m_timeout;

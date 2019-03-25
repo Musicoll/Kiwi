@@ -20,6 +20,7 @@
  */
 
 #include "KiwiApp_Api.h"
+#include "../KiwiApp_Resources/KiwiApp_BinaryData.h"
 #include <juce_core/juce_core.h>
 
 #include <iomanip>
@@ -576,6 +577,16 @@ namespace kiwi
         session->setTarget(endpoint);
         session->setTimeout(http::Timeout(3000));
         
+        if (m_controller.verifyServer())
+        {
+            session->setSecure(Session::SecureMode::VerifyPeer);
+            session->addCertificate(m_controller.getCertificate());
+        }
+        else
+        {
+            session->setSecure(Session::SecureMode::TrustPeer);
+        }
+        
         const AuthUser& user = m_controller.getAuthUser();
         
         if(add_auth && user.isLoggedIn())
@@ -845,8 +856,12 @@ namespace kiwi
     : m_host(host)
     , m_port(port)
     , m_auth_user()
+    , m_certificate()
+    , m_verify_server(false)
     {
-        ;
+        m_certificate = juce::String::createStringFromData(binary_data::certificates::root1CA_crt,
+                                                           binary_data::certificates::root1CA_crt_size).toStdString();
+        m_verify_server = true;
     }
     
     void Api::Controller::setHost(std::string const& host)
@@ -877,6 +892,21 @@ namespace kiwi
     Api::AuthUser const& Api::Controller::getAuthUser() const
     {
         return m_auth_user;
+    }
+    
+    std::string const& Api::Controller::getCertificate() const
+    {
+        return m_certificate;
+    }
+    
+    bool Api::Controller::verifyServer() const
+    {
+        return m_verify_server;
+    }
+    
+    void Api::Controller::setVerifyServer(bool verify_server)
+    {
+        m_verify_server = verify_server;
     }
     
     void Api::Controller::clearToken()

@@ -95,6 +95,12 @@ namespace kiwi
             const int refresh_png_size = 15500;
 
         }
+        namespace certificates
+        {
+            extern char const* root1CA_crt;
+            const int root1CA_crt_size = 2009;
+
+        }
         namespace fonts
         {
             namespace open_sans
