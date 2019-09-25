@@ -859,8 +859,8 @@ namespace kiwi
     , m_certificate()
     , m_verify_server(false)
     {
-        m_certificate = juce::String::createStringFromData(binary_data::certificates::root1CA_crt,
-                                                           binary_data::certificates::root1CA_crt_size).toStdString();
+        m_certificate = juce::String::createStringFromData(binary_data::certificates::chain_pem,
+                                                           binary_data::certificates::chain_pem_size).toStdString();
         m_verify_server = true;
     }
     

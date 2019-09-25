@@ -603,14 +603,9 @@ namespace kiwi
                 pingServer();
             }
             
-            bool verify_server = settings.getSettings().getProperty(Ids::verify_server);
+            m_api_controller->setVerifyServer(true);
             
-            if (m_api_controller->verifyServer() != verify_server)
-            {
-                m_api_controller->setVerifyServer(verify_server);
-                
-                pingServer();
-            }
+            pingServer();
         }
     }
 

@@ -97,8 +97,8 @@ namespace kiwi
         }
         namespace certificates
         {
-            extern char const* root1CA_crt;
-            const int root1CA_crt_size = 2009;
+            extern char const* chain_pem;
+            const int chain_pem_size = 6770;
 
         }
         namespace fonts
