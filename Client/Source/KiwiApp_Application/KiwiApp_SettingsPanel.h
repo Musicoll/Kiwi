@@ -43,6 +43,12 @@ namespace kiwi
         
     private: // methods
         
+        //! @brief Load displayed data from application settings.
+        void loadAppSettings();
+        
+        //! @brief Store displayed settings into application settings.
+        void storeAppSettings();
+        
         //! @brief Resized methods called when resized.
         void resized() override final;
         

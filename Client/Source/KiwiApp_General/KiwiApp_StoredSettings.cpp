@@ -145,6 +145,11 @@ namespace kiwi
             m_settings.setProperty(Ids::remember_me, tree.getProperty(Ids::remember_me), nullptr);
         }
         
+        if (tree.hasProperty(Ids::verify_certificate))
+        {
+            m_settings.setProperty(Ids::verify_certificate, tree.getProperty(Ids::verify_certificate), nullptr);
+        }
+        
         juce::ValueTree server_tree = tree.getChildWithName(Ids::server_address).createCopy();
         
         if (server_tree.isValid())
@@ -178,8 +183,13 @@ namespace kiwi
             if (new_settings.hasProperty(Ids::remember_me))
             {
                 m_settings.setProperty(Ids::remember_me,
-                                       new_settings.getProperty(Ids::remember_me),
-                                       nullptr);
+                                       new_settings.getProperty(Ids::remember_me), nullptr);
+            }
+            
+            if (new_settings.hasProperty(Ids::verify_certificate))
+            {
+                m_settings.setProperty(Ids::verify_certificate,
+                                       new_settings.getProperty(Ids::verify_certificate), nullptr);
             }
             
             juce::ValueTree server_tree = new_settings.getChildWithName(Ids::server_address).createCopy();
@@ -212,6 +222,16 @@ namespace kiwi
     {
         int port = m_settings.getChildWithName(Ids::server_address).getProperty(Ids::session_port);
         return static_cast<uint16_t>(port);
+    }
+    
+    bool NetworkSettings::getVerifyCertificate() const
+    {
+        return m_settings.getProperty(Ids::verify_certificate);
+    }
+    
+    void NetworkSettings::setVerifyCertificate(bool verify)
+    {
+        m_settings.setProperty(Ids::verify_certificate, verify, nullptr);
     }
     
     void NetworkSettings::setRememberUserFlag(bool remember_me)

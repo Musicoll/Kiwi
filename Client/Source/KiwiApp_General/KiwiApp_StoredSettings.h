@@ -69,6 +69,12 @@ namespace kiwi
         //! @brief Returns the session port as an integer
         uint16_t getRefreshInterval() const;
         
+        //! @brief Returns true wether Kiwi shall verify server's certificate
+        bool getVerifyCertificate() const;
+        
+        //! @brief Changes the verify certificate property
+        void setVerifyCertificate(bool verify);
+        
         void setRememberUserFlag(bool remember_me);
         
         bool getRememberUserFlag() const;

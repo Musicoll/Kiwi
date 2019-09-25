@@ -590,22 +590,30 @@ namespace kiwi
         {
             auto& api = *m_api_controller;
             
-            const auto host = settings.getHost();
-            const auto api_port = settings.getApiPort();
-            //const auto session_port = settings.getSessionPort();
+            bool ping_required = false;
             
-            if((api.getHost() != host) || (api_port != api.getPort()))
+            if (api.getHost() != settings.getHost())
             {
-                // settings changed
                 m_api_controller->setHost(settings.getHost());
-                m_api_controller->setPort(settings.getApiPort());
-                
-                pingServer();
+                ping_required = true;
             }
             
-            m_api_controller->setVerifyServer(true);
+            if (api.getPort() != settings.getApiPort())
+            {
+                m_api_controller->setPort(settings.getApiPort());
+                ping_required = true;
+            }
             
-            pingServer();
+            if (api.verifyServer() != settings.getVerifyCertificate())
+            {
+                m_api_controller->setVerifyServer(settings.getVerifyCertificate());
+                ping_required = true;
+            }
+            
+            if (ping_required)
+            {
+                pingServer();
+            }
         }
     }
 
