@@ -407,6 +407,15 @@ namespace kiwi
         //! @brief Returns the authenticated user
         Api::AuthUser const& getAuthUser() const;
         
+        //! @brief Returns the root certificate used to verify the server's identity.
+        std::string const& getCertificate() const;
+        
+        //! @brief Returns wheter or not client shall verify the server's identity.
+        bool verifyServer() const;
+        
+        //! @brief Tells wheter or not client verify the server's identity.
+        void setVerifyServer(bool verify_server);
+        
     protected: // methods
         
         //! @brief Clears the token.
@@ -420,5 +429,7 @@ namespace kiwi
         std::string     m_host;
         uint16_t        m_port;
         Api::AuthUser   m_auth_user;
+        std::string     m_certificate;
+        bool            m_verify_server;
     };
 }

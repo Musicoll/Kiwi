@@ -39,6 +39,9 @@ namespace kiwi
         DECLARE_ID(session_port);
         DECLARE_ID(remember_me);
         DECLARE_ID(server_address);
+        DECLARE_ID(verify_certificate);
+        DECLARE_ID(network_version);
+        
         
         DECLARE_ID(NETWORK_CONFIG);
         

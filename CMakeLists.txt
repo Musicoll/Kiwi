@@ -75,6 +75,7 @@ include(CMake/ConfigBoost.cmake)
 include(CMake/ConfigJUCE.cmake)
 include(CMake/ConfigLLVM.cmake)
 include(CMake/ConfigFAUST.cmake)
+include(CMake/ConfigOpenSSL.cmake)
 
 add_definitions(${LLVM_DEFINITIONS})
 include_directories(${LLVM_INCLUDE_DIRS})
@@ -141,15 +142,15 @@ source_group_rec("${KIWI_DSP_SOURCES}" ${PROJECT_SOURCE_DIR}/Modules/KiwiDsp)
 # KiwiNetwork
 #------------------------------------------------------------------------------#
 set(KIWI_NETWORK_DEPENDENCIES)
-set(KIWI_NETWORK_INCLUDE_DIRS ${KIWI_MODULE_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+set(KIWI_NETWORK_INCLUDE_DIRS ${KIWI_MODULE_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
 set(KIWI_NETWORK_COMPILE_DEFINITIONS BOOST_ALL_NO_LIB=1)
 
 if(APPLE)
-	set(KIWI_NETWORK_LINK_LIBRARIES ${Boost_LIBRARIES})
+	set(KIWI_NETWORK_LINK_LIBRARIES ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES})
 elseif(UNIX)
-	set(KIWI_NETWORK_LINK_LIBRARIES ${Boost_LIBRARIES} ${PTHREAD})
+	set(KIWI_NETWORK_LINK_LIBRARIES ${Boost_LIBRARIES} ${PTHREAD} ${OPENSSL_LIBRARIES})
 elseif(WIN32)
-	set(KIWI_NETWORK_LINK_LIBRARIES ${Boost_LIBRARIES} ${ws2_32})
+	set(KIWI_NETWORK_LINK_LIBRARIES ${Boost_LIBRARIES} ${ws2_32} ${OPENSSL_LIBRARIES} "crypt32.lib")
 endif()
 
 file(GLOB_RECURSE KIWI_NETWORK_SOURCES ${KIWI_MODULE_INCLUDE_DIRS}/KiwiNetwork/*.[c|h]pp ${KIWI_MODULE_INCLUDE_DIRS}/KiwiNetwork/*.h)

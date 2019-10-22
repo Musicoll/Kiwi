@@ -98,6 +98,15 @@ namespace kiwi { namespace network { namespace http {
         
         using HttpQuery = Query<beast::http::string_body, beast::http::string_body>;
         
+    public: // classes
+        
+        enum class SecureMode
+        {
+            NoEncryption,
+            VerifyPeer,
+            TrustPeer
+        };
+        
     public: // methods
         
         using Response = http::Response<beast::http::string_body>;
@@ -113,6 +122,8 @@ namespace kiwi { namespace network { namespace http {
         void setTarget(std::string const& endpoint);
         void setTimeout(Timeout timeout);
         void setAuthorization(std::string const& auth);
+        void setSecure(SecureMode mode);
+        void addCertificate(std::string const& certificate);
         
         void setParameters(Parameters && parameters);
         void setPayload(Payload && payload);
@@ -145,6 +156,8 @@ namespace kiwi { namespace network { namespace http {
         std::string             m_port;
         std::string             m_target;
         Parameters              m_parameters;
+        ssl::context            m_ssl;
+        SecureMode              m_ssl_mode;
         Payload                 m_payload;
         Body                    m_body;
         Timeout                 m_timeout;

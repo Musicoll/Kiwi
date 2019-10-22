@@ -69,6 +69,12 @@ namespace kiwi
         //! @brief Returns the session port as an integer
         uint16_t getRefreshInterval() const;
         
+        //! @brief Returns true wether Kiwi shall verify server's certificate
+        bool getVerifyCertificate() const;
+        
+        //! @brief Changes the verify certificate property
+        void setVerifyCertificate(bool verify);
+        
         void setRememberUserFlag(bool remember_me);
         
         bool getRememberUserFlag() const;
@@ -90,6 +96,9 @@ namespace kiwi
         void removeListener(Listener& listener);
         
     private: // methods
+        
+        //! @brief Migrates settings if version is different.
+        void migrate();
         
         //! @brief Returns the underlying value tree
         juce::ValueTree& use();
