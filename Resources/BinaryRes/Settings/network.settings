@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<NETWORK_CONFIG remember_me="1">
-  <server_address host="kiwi.mshparisnord.fr" api_port="80" session_port="443"/>
+<NETWORK_CONFIG remember_me="1" verify_certificate="1" network_version="1">
+  <server_address host="kiwi.univ-paris8.fr" api_port="443" session_port="9090"/>
 </NETWORK_CONFIG>

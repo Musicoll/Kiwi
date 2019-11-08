@@ -31,20 +31,24 @@ namespace kiwi
     // ================================================================================ //
     
     SettingsPanel::SettingsPanel():
-    m_settings(getAppSettings().network().getServerAddress()),
+    m_settings("panel_settings"),
     m_pannel("Application settings"),
     m_apply_button("Apply"),
     m_reset_button("Reset")
     {
         
+        loadAppSettings();
+        
         juce::Array<juce::PropertyComponent*> props {
             
             new juce::TextPropertyComponent(m_settings
-                                            .getPropertyAsValue(Ids::host, nullptr),"Host", 20,false),
+                                            .getPropertyAsValue("host", nullptr),"Host", 20,false),
             new juce::TextPropertyComponent(m_settings
-                                            .getPropertyAsValue(Ids::api_port, nullptr), "API Port", 5, false),
+                                            .getPropertyAsValue("api_port", nullptr), "API Port", 5, false),
             new juce::TextPropertyComponent(m_settings
-                                            .getPropertyAsValue(Ids::session_port, nullptr), "Session Port", 5, false)
+                                            .getPropertyAsValue("session_port", nullptr), "Session Port", 5, false),
+            new juce::BooleanPropertyComponent(m_settings
+                                               .getPropertyAsValue("verify_certificate", nullptr), "Verify Certificate", "")
             
         };
         
@@ -63,6 +67,22 @@ namespace kiwi
     SettingsPanel::~SettingsPanel()
     {
         m_pannel.clear();
+    }
+    
+    void SettingsPanel::loadAppSettings()
+    {
+        m_settings.setProperty("host", juce::String(getAppSettings().network().getHost()), nullptr);
+        m_settings.setProperty("api_port", getAppSettings().network().getApiPort(), nullptr);
+        m_settings.setProperty("session_port", getAppSettings().network().getSessionPort(), nullptr);
+        m_settings.setProperty("verify_certificate", getAppSettings().network().getVerifyCertificate(), nullptr);
+    }
+    
+    void SettingsPanel::storeAppSettings()
+    {
+        getAppSettings().network().setServerAddress(m_settings["host"].toString().toStdString(),
+                                                    m_settings["api_port"].operator int(),
+                                                    m_settings["session_port"].operator int());
+        getAppSettings().network().setVerifyCertificate(m_settings["verify_certificate"]);
     }
     
     void SettingsPanel::resized()
@@ -86,9 +106,7 @@ namespace kiwi
     {
         if (button == &m_apply_button)
         {
-            getAppSettings().network().setServerAddress(m_settings[Ids::host].toString().toStdString(),
-                                                        m_settings[Ids::api_port].operator int(),
-                                                        m_settings[Ids::session_port].operator int());
+            storeAppSettings();
         }
         else if(button == &m_reset_button)
         {
@@ -96,7 +114,7 @@ namespace kiwi
             
             network.resetToDefault();
             
-            m_settings.copyPropertiesFrom(network.getServerAddress(), nullptr);
+            loadAppSettings();
         }
     }
 }

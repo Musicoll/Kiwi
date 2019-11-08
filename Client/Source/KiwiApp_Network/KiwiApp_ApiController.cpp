@@ -33,6 +33,7 @@ namespace kiwi
         
         setHost(settings.getHost());
         setPort(settings.getApiPort());
+        setVerifyServer(settings.getVerifyCertificate());
         
         restoreAuthUserProfile();
     }

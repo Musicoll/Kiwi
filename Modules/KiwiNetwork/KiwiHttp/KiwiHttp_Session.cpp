@@ -104,6 +104,8 @@ namespace kiwi { namespace network { namespace http {
     : m_port("80")
     , m_target()
     , m_parameters()
+    , m_ssl(ssl::context::sslv23_client)
+    , m_ssl_mode(SecureMode::NoEncryption)
     , m_payload()
     , m_body()
     , m_timeout(0)
@@ -137,6 +139,26 @@ namespace kiwi { namespace network { namespace http {
     void Session::setTimeout(Timeout timeout)
     {
         m_timeout = timeout;
+    }
+    
+    void Session::addCertificate(std::string const& certificate)
+    {
+        m_ssl.add_certificate_authority(boost::asio::buffer(certificate.data(), certificate.size()));
+    }
+    
+    void Session::setSecure(SecureMode mode)
+    {
+        m_ssl_mode = mode;
+        
+        if(m_ssl_mode == SecureMode::VerifyPeer)
+        {
+            m_ssl.set_verify_mode(ssl::verify_peer);
+        }
+        else if(m_ssl_mode == SecureMode::TrustPeer)
+        {
+            m_ssl.set_verify_mode(ssl::verify_none);
+        }
+        
     }
     
     void Session::setAuthorization(std::string const& auth)
@@ -251,7 +273,14 @@ namespace kiwi { namespace network { namespace http {
                 }
             }
             
-            m_query = std::make_unique<HttpQuery>(std::move(request), m_port);
+            if (m_ssl_mode == SecureMode::NoEncryption)
+            {
+                m_query = std::make_unique<HttpQuery>(std::move(request), m_port);
+            }
+            else
+            {
+                m_query = std::make_unique<HttpQuery>(std::move(request), m_port, m_ssl);
+            }
         }
     }
     

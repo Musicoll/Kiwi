@@ -115,7 +115,6 @@ namespace kiwi
     
     NetworkSettings::NetworkSettings() : m_settings(Ids::NETWORK_CONFIG)
     {
-        resetToDefault();
         m_settings.addListener(this);
     }
     
@@ -145,6 +144,11 @@ namespace kiwi
             m_settings.setProperty(Ids::remember_me, tree.getProperty(Ids::remember_me), nullptr);
         }
         
+        if (tree.hasProperty(Ids::verify_certificate))
+        {
+            m_settings.setProperty(Ids::verify_certificate, tree.getProperty(Ids::verify_certificate), nullptr);
+        }
+        
         juce::ValueTree server_tree = tree.getChildWithName(Ids::server_address).createCopy();
         
         if (server_tree.isValid())
@@ -169,6 +173,25 @@ namespace kiwi
         m_settings.addChild(tree, 0, nullptr);
     }
     
+    void NetworkSettings::migrate()
+    {
+        if (!m_settings.hasProperty(Ids::network_version))
+        {
+            juce::ValueTree server_tree = m_settings.getChildWithName(Ids::server_address);
+            
+            if(server_tree.getProperty(Ids::host) == "kiwi.mshparisnord.fr" &&
+               server_tree.getProperty(Ids::api_port) == "80")
+            {
+                server_tree.setProperty(Ids::host, "kiwi.univ-paris8.fr", nullptr);
+                server_tree.setProperty(Ids::api_port, "443", nullptr);
+                server_tree.setProperty(Ids::session_port, "9090", nullptr);
+                m_settings.setProperty(Ids::verify_certificate, true, nullptr);
+            }
+            
+            m_settings.setProperty(Ids::network_version, "1", nullptr);
+        }
+    }
+    
     void NetworkSettings::readFromXml(juce::XmlElement const& xml)
     {
         if(xml.hasTagName(m_settings.getType().toString()))
@@ -178,8 +201,18 @@ namespace kiwi
             if (new_settings.hasProperty(Ids::remember_me))
             {
                 m_settings.setProperty(Ids::remember_me,
-                                       new_settings.getProperty(Ids::remember_me),
-                                       nullptr);
+                                       new_settings.getProperty(Ids::remember_me), nullptr);
+            }
+            
+            if (new_settings.hasProperty(Ids::verify_certificate))
+            {
+                m_settings.setProperty(Ids::verify_certificate,
+                                       new_settings.getProperty(Ids::verify_certificate), nullptr);
+            }
+            
+            if (new_settings.hasProperty(Ids::network_version))
+            {
+                m_settings.setProperty(Ids::network_version, true, nullptr);
             }
             
             juce::ValueTree server_tree = new_settings.getChildWithName(Ids::server_address).createCopy();
@@ -189,6 +222,8 @@ namespace kiwi
                 m_settings.removeChild(m_settings.getChildWithName(Ids::server_address), nullptr);
                 m_settings.addChild(server_tree, 0, nullptr);
             }
+            
+            migrate();
         }
     }
     
@@ -212,6 +247,16 @@ namespace kiwi
     {
         int port = m_settings.getChildWithName(Ids::server_address).getProperty(Ids::session_port);
         return static_cast<uint16_t>(port);
+    }
+    
+    bool NetworkSettings::getVerifyCertificate() const
+    {
+        return m_settings.getProperty(Ids::verify_certificate);
+    }
+    
+    void NetworkSettings::setVerifyCertificate(bool verify)
+    {
+        m_settings.setProperty(Ids::verify_certificate, verify, nullptr);
     }
     
     void NetworkSettings::setRememberUserFlag(bool remember_me)
@@ -267,6 +312,8 @@ namespace kiwi
     
     void StoredSettings::flush()
     {
+        saveValueTree(m_network.use(), "Network Settings");
+        
         for(int i = m_property_files.size(); --i >= 0;)
         {
             m_property_files[i]->saveIfNeeded();
@@ -281,9 +328,14 @@ namespace kiwi
    
         // Try to reload User settings
         std::unique_ptr<juce::XmlElement> xml(getGlobalProperties().getXmlValue("Network Settings"));
+        
         if (xml)
         {
             m_network.readFromXml(*xml);
+        }
+        else
+        {
+            m_network.resetToDefault();
         }
     }
     
